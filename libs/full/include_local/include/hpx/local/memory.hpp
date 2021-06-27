@@ -12,8 +12,6 @@
 namespace hpx {
     using hpx::parallel::uninitialized_copy;
     using hpx::parallel::uninitialized_copy_n;
-    using hpx::parallel::uninitialized_default_construct;
-    using hpx::parallel::uninitialized_default_construct_n;
     using hpx::parallel::uninitialized_fill;
     using hpx::parallel::uninitialized_fill_n;
     using hpx::parallel::uninitialized_value_construct;

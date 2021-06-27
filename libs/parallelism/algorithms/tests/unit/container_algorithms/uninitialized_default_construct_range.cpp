@@ -8,7 +8,7 @@
 #include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/container_algorithms/uninitialized_fill.hpp>
+#include <hpx/parallel/container_algorithms/uninitialized_default_construct.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -17,133 +17,234 @@
 #include <string>
 #include <vector>
 
-#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
-void test_uninitialized_fill_sent()
+struct default_constructable
 {
-    std::vector<std::size_t> c(200);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    default_constructable()
+      : value_(42)
+    {
+    }
 
-    hpx::ranges::uninitialized_fill(
-        std::begin(c), sentinel<std::size_t>{*(std::begin(c) + 100)}, 10);
+    default_constructable(std::int32_t val)
+    {
+        value_ = val;
+    }
 
-    // verify values
-    std::size_t count = 0;
-    std::for_each(
-        std::begin(c), std::begin(c) + 100, [&count](std::size_t v) -> void {
-            HPX_TEST_EQ(v, std::size_t(10));
-            ++count;
+    bool operator!=(default_constructable const& lhs) const
+    {
+        return lhs.value_ != value_;
+    }
+
+    std::int32_t value_;
+};
+
+struct value_constructable
+{
+    std::int32_t value_;
+};
+
+std::size_t const data_size = 10;
+
+////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_uninitialized_default_construct_range_sent(IteratorTag)
+{
+    typedef std::vector<default_constructable> base_iterator;
+
+    base_iterator c(data_size, default_constructable(10));
+    auto end_size = rand() % data_size;
+    c[end_size] = default_constructable(20);
+
+    hpx::ranges::uninitialized_default_construct(
+        std::begin(c), sentinel<std::int32_t>{20});
+
+    std::size_t count42 = 0;
+    std::size_t count10 = 0;
+    std::for_each(std::begin(c), std::begin(c) + data_size,
+        [&count42, &count10](default_constructable v1) {
+            if (v1.value_ == 42)
+            {
+                count42++;
+            }
+            else if (v1.value_ == 10)
+            {
+                count10++;
+            }
         });
 
-    HPX_TEST_EQ(count, (size_t) 100);
+    HPX_TEST_EQ(count42, end_size);
+    HPX_TEST_EQ(count10, data_size - end_size - 1);
 }
 
-template <typename ExPolicy>
-void test_uninitialized_fill_sent(ExPolicy policy)
+template <typename ExPolicy, typename IteratorTag>
+void test_uninitialized_default_construct_range_sent(
+    ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    typedef std::vector<default_constructable> base_iterator;
 
-    std::vector<std::size_t> c(200);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    base_iterator c(data_size, default_constructable(10));
+    auto end_size = rand() % data_size;
+    c[end_size] = default_constructable(20);
 
-    hpx::ranges::uninitialized_fill(policy, std::begin(c),
-        sentinel<std::size_t>{*(std::begin(c) + 100)}, 10);
+    hpx::ranges::uninitialized_default_construct(
+        policy, std::begin(c), sentinel<std::int32_t>{20});
 
-    // verify values
-    std::size_t count = 0;
-    std::for_each(
-        std::begin(c), std::begin(c) + 100, [&count](std::size_t v) -> void {
-            HPX_TEST_EQ(v, std::size_t(10));
-            ++count;
+    std::size_t count42 = 0;
+    std::size_t count10 = 0;
+    std::for_each(std::begin(c), std::begin(c) + data_size,
+        [&count42, &count10](default_constructable v1) {
+            if (v1.value_ == 42)
+            {
+                count42++;
+            }
+            else if (v1.value_ == 10)
+            {
+                count10++;
+            }
         });
 
-    HPX_TEST_EQ(count, (size_t) 100);
+    HPX_TEST_EQ(count42, end_size);
+    HPX_TEST_EQ(count10, data_size - end_size - 1);
 }
 
 template <typename IteratorTag>
-void test_uninitialized_fill(IteratorTag)
+void test_uninitialized_default_construct_range(IteratorTag)
 {
-    std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    typedef std::vector<default_constructable> base_iterator;
 
-    hpx::ranges::uninitialized_fill(c, 10);
+    base_iterator c(data_size, default_constructable(10));
+    hpx::ranges::uninitialized_default_construct(c);
 
-    // verify values
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(10));
-        ++count;
-    });
-
-    HPX_TEST_EQ(count, c.size());
+    std::for_each(std::begin(c), std::begin(c) + data_size,
+        [&count](default_constructable v1) {
+            HPX_TEST_EQ(v1.value_, 42);
+            ++count;
+        });
+    HPX_TEST_EQ(count, data_size);
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_uninitialized_fill(ExPolicy policy, IteratorTag)
+void test_uninitialized_default_construct_range(ExPolicy&& policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    typedef std::vector<default_constructable> base_iterator;
 
-    hpx::ranges::uninitialized_fill(policy, c, 10);
+    base_iterator c(data_size, default_constructable(10));
+    hpx::ranges::uninitialized_default_construct(
+        std::forward<ExPolicy>(policy), c);
 
-    // verify values
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(10));
-        ++count;
-    });
-
-    HPX_TEST_EQ(count, c.size());
+    std::for_each(std::begin(c), std::begin(c) + data_size,
+        [&count](default_constructable v1) {
+            HPX_TEST_EQ(v1.value_, 42);
+            ++count;
+        });
+    HPX_TEST_EQ(count, data_size);
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_uninitialized_fill_async(ExPolicy p, IteratorTag)
+void test_uninitialized_default_construct_range_async(
+    ExPolicy&& policy, IteratorTag)
 {
-    std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), std::rand());
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
 
-    hpx::future<void> f = hpx::ranges::uninitialized_fill(p, c, 10);
+    typedef std::vector<default_constructable> base_iterator;
+
+    base_iterator c(data_size, default_constructable(10));
+    auto f = hpx::ranges::uninitialized_default_construct(
+        std::forward<ExPolicy>(policy), c);
     f.wait();
 
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(10));
-        ++count;
-    });
+    std::for_each(std::begin(c), std::begin(c) + data_size,
+        [&count](default_constructable v1) {
+            HPX_TEST_EQ(v1.value_, 42);
+            ++count;
+        });
+    HPX_TEST_EQ(count, data_size);
+}
 
-    HPX_TEST_EQ(count, c.size());
+template <typename ExPolicy, typename IteratorTag>
+void test_uninitialized_default_construct_range2(ExPolicy&& policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    typedef std::vector<value_constructable> base_iterator;
+    base_iterator c(data_size, value_constructable{10});
+
+    hpx::ranges::uninitialized_default_construct(
+        std::forward<ExPolicy>(policy), c);
+
+    std::size_t count = 0;
+    std::for_each(std::begin(c), std::begin(c) + data_size,
+        [&count](value_constructable v1) {
+            HPX_TEST_EQ(v1.value_, (std::int32_t) 10);
+            ++count;
+        });
+    HPX_TEST_EQ(count, data_size);
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_uninitialized_default_construct_range_async2(
+    ExPolicy&& policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    typedef std::vector<value_constructable> base_iterator;
+    base_iterator c(data_size, value_constructable{10});
+
+    auto f = hpx::ranges::uninitialized_default_construct(
+        std::forward<ExPolicy>(policy), c);
+    f.wait();
+
+    std::size_t count = 0;
+    std::for_each(std::begin(c), std::begin(c) + data_size,
+        [&count](value_constructable v1) {
+            HPX_TEST_EQ(v1.value_, (std::int32_t) 10);
+            ++count;
+        });
+    HPX_TEST_EQ(count, data_size);
 }
 
 template <typename IteratorTag>
-void test_uninitialized_fill()
+void test_uninitialized_default_construct_range()
 {
     using namespace hpx::execution;
 
-    test_uninitialized_fill(IteratorTag());
+    test_uninitialized_default_construct_range(IteratorTag());
+    test_uninitialized_default_construct_range(seq, IteratorTag());
+    test_uninitialized_default_construct_range(par, IteratorTag());
+    test_uninitialized_default_construct_range(par_unseq, IteratorTag());
 
-    test_uninitialized_fill(seq, IteratorTag());
-    test_uninitialized_fill(par, IteratorTag());
-    test_uninitialized_fill(par_unseq, IteratorTag());
+    test_uninitialized_default_construct_range_async(seq(task), IteratorTag());
+    test_uninitialized_default_construct_range_async(par(task), IteratorTag());
 
-    test_uninitialized_fill_async(seq(task), IteratorTag());
-    test_uninitialized_fill_async(par(task), IteratorTag());
+    test_uninitialized_default_construct_range2(seq, IteratorTag());
+    test_uninitialized_default_construct_range2(par, IteratorTag());
+    test_uninitialized_default_construct_range2(par_unseq, IteratorTag());
 
-    test_uninitialized_fill_sent();
-    test_uninitialized_fill_sent(seq);
-    test_uninitialized_fill_sent(par);
-    test_uninitialized_fill_sent(par_unseq);
+    test_uninitialized_default_construct_range_async2(seq(task), IteratorTag());
+    test_uninitialized_default_construct_range_async2(par(task), IteratorTag());
+
+    test_uninitialized_default_construct_range_sent(IteratorTag());
+    test_uninitialized_default_construct_range_sent(seq, IteratorTag());
+    test_uninitialized_default_construct_range_sent(par, IteratorTag());
+    test_uninitialized_default_construct_range_sent(par_unseq, IteratorTag());
 }
 
-void uninitialized_fill_test()
+void uninitialized_default_construct_range_test()
 {
-    test_uninitialized_fill<std::random_access_iterator_tag>();
-    test_uninitialized_fill<std::forward_iterator_tag>();
+    test_uninitialized_default_construct_range<
+        std::random_access_iterator_tag>();
+    test_uninitialized_default_construct_range<std::forward_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -156,7 +257,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    uninitialized_fill_test();
+    uninitialized_default_construct_range_test();
     return hpx::local::finalize();
 }
 
