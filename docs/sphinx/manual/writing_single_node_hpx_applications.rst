@@ -724,11 +724,11 @@ Parallel algorithms
      * Copies a number of objects to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_copy_n`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_default_construct`
+   * * :cpp:func:`hpx::uninitialized_default_construct`
      * Copies a range of objects to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_default_construct`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_default_construct_n`
+   * * :cpp:func:`hpx::uninitialized_default_construct_n`
      * Copies a number of objects to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_default_construct_n`

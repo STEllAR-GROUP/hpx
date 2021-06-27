@@ -567,8 +567,8 @@ Functions
 
 - :cpp:func:`hpx::parallel::v1::uninitialized_copy`
 - :cpp:func:`hpx::parallel::v1::uninitialized_copy_n`
-- :cpp:func:`hpx::parallel::v1::uninitialized_default_construct`
-- :cpp:func:`hpx::parallel::v1::uninitialized_default_construct_n`
+- :cpp:func:`hpx::uninitialized_default_construct`
+- :cpp:func:`hpx::uninitialized_default_construct_n`
 - :cpp:func:`hpx::parallel::v1::uninitialized_fill`
 - :cpp:func:`hpx::parallel::v1::uninitialized_fill_n`
 - :cpp:func:`hpx::uninitialized_move`
@@ -576,6 +576,8 @@ Functions
 - :cpp:func:`hpx::parallel::v1::uninitialized_value_construct`
 - :cpp:func:`hpx::parallel::v1::uninitialized_value_construct_n`
 
+- :cpp:func:`hpx::ranges::uninitialized_default_construct`
+- :cpp:func:`hpx::ranges::uninitialized_default_construct_n`
 - :cpp:func:`hpx::ranges::uninitialized_move`
 - :cpp:func:`hpx::ranges::uninitialized_move_n`
 

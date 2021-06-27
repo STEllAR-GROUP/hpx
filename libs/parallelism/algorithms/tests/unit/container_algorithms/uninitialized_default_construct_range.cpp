@@ -45,7 +45,7 @@ struct value_constructable
     std::int32_t value_;
 };
 
-std::size_t const data_size = 10;
+std::size_t const data_size = 10007;
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
