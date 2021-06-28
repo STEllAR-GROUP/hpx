@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include <cstdint>
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
+#include <cstdint>
+
+#if defined(HPX_HAVE_CUDA) && defined(HPX_COMPUTE_CODE)
 #include <hpx/hardware/timestamp/cuda.hpp>
 #endif
 
@@ -20,7 +21,7 @@ namespace hpx { namespace util { namespace hardware {
     // clang-format off
     HPX_HOST_DEVICE inline std::uint64_t timestamp()
     {
-#if defined(HPX_HAVE_CUDA) && defined(__CUDA_ARCH__)
+#if defined(HPX_HAVE_CUDA) && defined(HPX_COMPUTE_DEVICE_CODE)
         return timestamp_cuda();
 #else
         std::uint64_t r = 0;
