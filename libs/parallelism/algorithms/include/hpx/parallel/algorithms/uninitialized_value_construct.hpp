@@ -10,39 +10,40 @@
 
 #if defined(DOXYGEN)
 namespace hpx {
+    // clang-format off
 
-    /// Copies the given \a value to an uninitialized memory area, defined by
-    /// the range [first, last). If an exception is thrown during the
+    /// Constructs objects of type typename iterator_traits<ForwardIt>
+    /// ::value_type in the uninitialized storage designated by the range
+    /// by value-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
-    /// \note   Complexity: Linear in the distance between \a first and \a last
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
-    /// \param value        The value to be assigned.
     ///
-    /// The assignments in the parallel \a uninitialized_default_construct algorithm invoked
-    /// without an execution policy object will execute in sequential order in
-    /// the calling thread.
+    /// The assignments in the parallel \a uninitialized_value_construct
+    /// algorithm invoked without an execution policy object will execute in
+    /// sequential order in the calling thread.
     ///
-    /// \returns  The \a uninitialized_default_construct algorithm  returns nothing
+    /// \returns  The \a uninitialized_value_construct algorithm
+    ///           returns nothing
     ///
-    template <typename FwdIter, typename T>
-    void uninitialized_default_construct(
-        FwdIter first, FwdIter last, T const& value);
+    template <typename FwdIter>
+    void uninitialized_value_construct(FwdIter first, FwdIter last);
 
-    /// Copies the given \a value to an uninitialized memory area, defined by
-    /// the range [first, last). If an exception is thrown during the
+    /// Constructs objects of type typename iterator_traits<ForwardIt>
+    /// ::value_type in the uninitialized storage designated by the range
+    /// by value-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
-    /// \note   Complexity: Linear in the distance between \a first and \a last
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -51,7 +52,6 @@ namespace hpx {
     /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -59,67 +59,64 @@ namespace hpx {
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
-    /// \param value        The value to be assigned.
     ///
-    /// The initializations in the parallel \a uninitialized_default_construct algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
+    /// The assignments in the parallel \a uninitialized_value_construct
+    /// algorithm invoked with an execution policy object of type \a
+    /// sequenced_policy execute in sequential order in the calling thread.
     ///
-    /// The initializations in the parallel \a uninitialized_default_construct algorithm
-    /// invoked with an execution policy object of type
-    /// \a parallel_policy or \a parallel_task_policy are
-    /// permitted to execute in an unordered fashion in unspecified threads,
-    /// and indeterminately sequenced within each thread.
+    /// The assignments in the parallel \a uninitialized_value_construct
+    /// algorithm invoked with an execution policy object of type \a
+    /// parallel_policy or \a parallel_task_policy are permitted to execute
+    /// in an unordered fashion in unspecified threads, and indeterminately
+    /// sequenced within each thread.
     ///
-    /// \returns  The \a uninitialized_default_construct algorithm returns a
+    /// \returns  The \a uninitialized_value_construct algorithm returns a
     ///           \a hpx::future<void>, if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns nothing
     ///           otherwise.
     ///
-    template <typename ExPolicy, typename FwdIter, typename T>
+    template <typename ExPolicy, typename FwdIter>
     typename parallel::util::detail::algorithm_result<ExPolicy>::type
-    uninitialized_default_construct(
-        ExPolicy&& policy, FwdIter first, FwdIter last, T const& value);
+    uninitialized_value_construct(
+        ExPolicy&& policy, FwdIter first, FwdIter last);
 
-    /// Copies the given \a value value to the first count elements in an
-    /// uninitialized memory area beginning at first. If an exception is thrown
-    /// during the initialization, the function has no effects.
+    /// Constructs objects of type typename iterator_traits<ForwardIt>
+    /// ::value_type in the uninitialized storage designated by the range
+    /// [first, first + count) by value-initialization. If an exception
+    /// is thrown during the initialization, the function has no effects.
     ///
     /// \note   Complexity: Performs exactly \a count assignments, if
     ///         count > 0, no assignments otherwise.
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
+    ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
-    /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param count        Refers to the number of elements starting at
     ///                     \a first the algorithm will be applied to.
-    /// \param value        The value to be assigned.
     ///
-    /// The assignments in the parallel \a uninitialized_default_construct_n algorithm
-    /// invoked without an execution policy object execute in sequential order
-    /// in the calling thread.
+    /// The assignments in the parallel \a uninitialized_value_construct_n
+    /// algorithm invoked without an execution policy object execute in
+    /// sequential order in the calling thread.
     ///
-    /// \returns  The \a uninitialized_default_construct_n algorithm returns a
+    /// \returns  The \a uninitialized_value_construct_n algorithm returns a
     ///           returns \a FwdIter.
-    ///           The \a uninitialized_default_construct_n algorithm returns the output
-    ///           iterator to the element in the range, one past
-    ///           the last element copied.
+    ///           The \a uninitialized_value_construct_n algorithm returns
+    ///           the iterator to the element in the source range, one past
+    ///           the last element constructed.
     ///
-    template <typename FwdIter, typename Size, typename T>
-    FwdIter uninitialized_default_construct_n(
-        FwdIter first, Size count, T const& value);
+    template <typename FwdIter, typename Size>
+    FwdIter uninitialized_value_construct_n(FwdIter first, Size count);
 
-    /// Copies the given \a value value to the first count elements in an
-    /// uninitialized memory area beginning at first. If an exception is thrown
-    /// during the initialization, the function has no effects.
+    /// Constructs objects of type typename iterator_traits<ForwardIt>
+    /// ::value_type in the uninitialized storage designated by the range
+    /// [first, first + count) by value-initialization. If an exception
+    /// is thrown during the initialization, the function has no effects.
     ///
     /// \note   Complexity: Performs exactly \a count assignments, if
     ///         count > 0, no assignments otherwise.
@@ -129,11 +126,10 @@ namespace hpx {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
+    ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
-    /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -141,32 +137,33 @@ namespace hpx {
     ///                     the algorithm will be applied to.
     /// \param count        Refers to the number of elements starting at
     ///                     \a first the algorithm will be applied to.
-    /// \param value        The value to be assigned.
     ///
-    /// The initializations in the parallel \a uninitialized_default_construct_n algorithm
-    /// invoked with an execution policy object of type
+    /// The assignments in the parallel \a uninitialized_value_construct_n
+    /// algorithm invoked with an execution policy object of type
     /// \a sequenced_policy execute in sequential order in the
     /// calling thread.
     ///
-    /// The initializations in the parallel \a uninitialized_default_construct_n algorithm
-    /// invoked with an execution policy object of type
-    /// \a parallel_policy or \a parallel_task_policy are
-    /// permitted to execute in an unordered fashion in unspecified threads,
-    /// and indeterminately sequenced within each thread.
+    /// The assignments in the parallel \a uninitialized_value_construct_n
+    /// algorithm invoked with an execution policy object of type
+    /// \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
     ///
-    /// \returns  The \a uninitialized_default_construct_n algorithm returns a
-    ///           \a hpx::future<FwdIter>, if the execution policy is of type
+    /// \returns  The \a uninitialized_value_construct_n algorithm returns a
+    ///           \a hpx::future<FwdIter> if the execution policy is of type
     ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns FwdIter
-    ///           otherwise.
-    ///           The \a uninitialized_default_construct_n algorithm returns the output
-    ///           iterator to the element in the range, one past
-    ///           the last element copied.
+    ///           \a parallel_task_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a uninitialized_value_construct_n algorithm returns
+    ///           the iterator to the element in the source range, one past
+    ///           the last element constructed.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Size, typename T>
+    template <typename ExPolicy, typename FwdIter, typename Size>
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    uninitialized_default_construct_n(
-        ExPolicy&& policy, FwdIter first, Size count, T const& value);
+    uninitialized_value_construct_n(
+        ExPolicy&& policy, FwdIter first, Size count);
+    // clang-format on
 }    // namespace hpx
 
 #else    // DOXYGEN
@@ -196,8 +193,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // uninitialized_value_construct
     namespace detail {
-        /// \cond NOINTERNAL
-
         // provide our own implementation of std::uninitialized_value_construct
         // as some versions of MSVC horribly fail at compiling it for some types
         // T
@@ -316,46 +311,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     detail::distance(first, last));
             }
         };
-        /// \endcond
     }    // namespace detail
 
-    /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
-    /// in the uninitialized storage designated by the range [first, last) by
-    /// default-initialization. If an exception is thrown during the
-    /// initialization, the function has no effects.
-    ///
-    /// \note   Complexity: Performs exactly \a last - \a first assignments.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    ///
-    /// The assignments in the parallel \a uninitialized_value_construct
-    /// algorithm invoked with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a uninitialized_value_construct
-    /// algorithm invoked with an execution policy object of type \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an
-    /// unordered fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a uninitialized_value_construct algorithm returns a
-    ///           \a hpx::future<void>, if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a void otherwise.
-    ///
     template <typename ExPolicy, typename FwdIter,
         HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter>::value)>
@@ -451,52 +408,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
-    /// in the uninitialized storage designated by the range [first, first + count) by
-    /// default-initialization. If an exception is thrown during the
-    /// initialization, the function has no effects.
-    ///
-    /// \note   Complexity: Performs exactly \a count assignments, if
-    ///         count > 0, no assignments otherwise.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Size        The type of the argument specifying the number of
-    ///                     elements to apply \a f to.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param count        Refers to the number of elements starting at
-    ///                     \a first the algorithm will be applied to.
-    ///
-    /// The assignments in the parallel \a uninitialized_value_construct_n
-    /// algorithm invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
-    ///
-    /// The assignments in the parallel \a uninitialized_value_construct_n
-    /// algorithm invoked with an execution policy object of type
-    /// \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an
-    /// unordered fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a uninitialized_value_construct_n algorithm returns a
-    ///           \a hpx::future<FwdIter> if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a FwdIter otherwise.
-    ///           The \a uninitialized_value_construct_n algorithm returns the
-    ///           iterator to the element in the source range, one past
-    ///           the last element constructed.
-    ///
     template <typename ExPolicy, typename FwdIter, typename Size,
         HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter>::value)>

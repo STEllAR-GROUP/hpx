@@ -11,10 +11,12 @@
 #include <hpx/parallel/container_algorithms/uninitialized_value_construct.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <iterator>
 #include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "test_utils.hpp"

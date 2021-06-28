@@ -12,45 +12,46 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+    // clang-format off
 
-    /// Copies the given \a value to an uninitialized memory area, defined by
-    /// the range [first, last). If an exception is thrown during the
+    /// Constructs objects of type typename iterator_traits<ForwardIt>
+    /// ::value_type in the uninitialized storage designated by the range
+    /// by value-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
-    /// \note   Complexity: Linear in the distance between \a first and \a last
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter.
-    /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied.
-    /// \param value        The value to be assigned.
     ///
-    /// The assignments in the ranges \a uninitialized_value_construct algorithm invoked
-    /// without an execution policy object will execute in sequential order in
-    /// the calling thread.
+    /// The assignments in the parallel \a uninitialized_value_construct
+    /// algorithm invoked without an execution policy object will execute in
+    /// sequential order in the calling thread.
     ///
     /// \returns  The \a uninitialized_value_construct algorithm returns a
     ///           returns \a FwdIter.
-    ///           The \a uninitialized_value_construct algorithm returns the output
-    ///           iterator to the element in the range, one past
-    ///           the last element copied.
+    ///           The \a uninitialized_value_construct algorithm returns the
+    ///           output iterator to the element in the range, one past
+    ///           the last element constructed.
     ///
-    template <typename FwdIter, typename Sent, typename T>
+    template <typename FwdIter, typename Sent>
     FwdIter uninitialized_value_construct(
-        FwdIter first, Sent last, T const& value);
+        FwdIter first, Sent last);
 
-    /// Copies the given \a value to an uninitialized memory area, defined by
-    /// the range [first, last). If an exception is thrown during the
+    /// Constructs objects of type typename iterator_traits<ForwardIt>
+    /// ::value_type in the uninitialized storage designated by the range
+    /// by value-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
-    /// \note   Complexity: Linear in the distance between \a first and \a last
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -61,7 +62,6 @@ namespace hpx { namespace ranges {
     ///                     forward iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter.
-    /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -69,64 +69,66 @@ namespace hpx { namespace ranges {
     ///                     the algorithm will be applied to.
     /// \param last         Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied.
-    /// \param value        The value to be assigned.
     ///
-    /// The assignments in the parallel \a uninitialized_value_construct algorithm invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
+    /// The assignments in the parallel \a uninitialized_value_construct
+    /// algorithm invoked with an execution policy object of type \a
+    /// sequenced_policy execute in sequential order in the calling thread.
     ///
-    /// The assignments in the parallel \a uninitialized_value_construct algorithm invoked
-    /// with an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an
-    /// unordered fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
+    /// The assignments in the parallel \a uninitialized_value_construct
+    /// algorithm invoked with an execution policy object of type \a
+    /// parallel_policy or \a parallel_task_policy are permitted to execute
+    /// in an unordered fashion in unspecified threads, and indeterminately
+    /// sequenced within each thread.
     ///
     /// \returns  The \a uninitialized_value_construct algorithm returns a
-    ///           returns \a FwdIter.
-    ///           The \a uninitialized_value_construct algorithm returns the output
-    ///           iterator to the element in the range, one past
-    ///           the last element copied.
+    ///           \a hpx::future<FwdIter> if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a uninitialized_value_construct algorithm returns
+    ///           the iterator to the element in the source range, one past
+    ///           the last element constructed.
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent>
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
     uninitialized_value_construct(
-        ExPolicy&& policy, FwdIter first, Sent last, T const& value);
+        ExPolicy&& policy, FwdIter first, Sent last);
 
-    /// Copies the given \a value to an uninitialized memory area, defined by
-    /// the range [first, last). If an exception is thrown during the
+    /// Constructs objects of type typename iterator_traits<ForwardIt>
+    /// ::value_type in the uninitialized storage designated by the range
+    /// by value-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
-    /// \note   Complexity: Linear in the distance between \a first and \a last
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
-    /// \tparam T           The type of the value to be assigned (deduced).
     ///
-    /// \param rng          Refers to the range to which the value
-    ///                     will be filled
-    /// \param value        The value to be assigned.
+    /// \param rng          Refers to the range to which will be value
+    ///                     constructed.
     ///
-    /// The assignments in the parallel \a uninitialized_value_construct algorithm invoked
-    /// without an execution policy object will execute in sequential order in
-    /// the calling thread.
+    /// The assignments in the parallel \a uninitialized_value_construct
+    /// algorithm invoked without an execution policy object will execute in
+    /// sequential order in the calling thread.
     ///
     /// \returns  The \a uninitialized_value_construct algorithm returns a
     ///           returns \a hpx::traits::range_traits<Rng>
     ///           ::iterator_type.
-    ///           The \a uninitialized_value_construct algorithm returns the output
-    ///           iterator to the element in the range, one past
-    ///           the last element copied.
+    ///           The \a uninitialized_value_construct algorithm returns
+    ///           the output iterator to the element in the range, one past
+    ///           the last element constructed.
     ///
-    template <typename Rng, typename T>
+    template <typename Rng>
     typename hpx::traits::range_traits<Rng>::iterator_type
-    uninitialized_value_construct(Rng&& rng, T const& value);
+    uninitialized_value_construct(Rng&& rng);
 
-    /// Copies the given \a value to an uninitialized memory area, defined by
-    /// the range [first, last). If an exception is thrown during the
+    /// Constructs objects of type typename iterator_traits<ForwardIt>
+    /// ::value_type in the uninitialized storage designated by the range
+    /// by value-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
-    /// \note   Complexity: Linear in the distance between \a first and \a last
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -135,23 +137,21 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
-    /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param rng          Refers to the range to which the value
-    ///                     will be filled
-    /// \param value        The value to be assigned.
+    ///                     will be value consutrcted
     ///
-    /// The assignments in the parallel \a uninitialized_value_construct algorithm invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
+    /// The assignments in the parallel \a uninitialized_value_construct
+    /// algorithm invoked with an execution policy object of type \a
+    /// sequenced_policy execute in sequential order in the calling thread.
     ///
-    /// The assignments in the parallel \a uninitialized_value_construct algorithm invoked
-    /// with an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an
-    /// unordered fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
+    /// The assignments in the parallel \a uninitialized_value_construct
+    /// algorithm invoked with an execution policy object of type \a
+    /// parallel_policy or \a parallel_task_policy are permitted to execute
+    /// in an unordered fashion in unspecified threads, and indeterminately
+    /// sequenced within each thread.
     ///
     /// \returns  The \a uninitialized_value_construct algorithm returns a
     ///           \a hpx::future<typename hpx::traits::range_traits<Rng>
@@ -159,52 +159,51 @@ namespace hpx { namespace ranges {
     ///           execution policy is of type \a sequenced_task_policy
     ///           or \a parallel_task_policy and returns \a typename
     ///           hpx::traits::range_traits<Rng>::iterator_type otherwise.
-    ///           The \a uninitialized_value_construct algorithm returns the
-    ///           iterator to one past the last element filled in the range.
+    ///           The \a uninitialized_value_construct algorithm returns
+    ///           the output iterator to the element in the range, one past
+    ///           the last element constructed.
     ///
-    template <typename ExPolicy, typename Rng, typename T>
+    template <typename ExPolicy, typename Rng>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_traits<Rng1>::iterator_type>::type
-    uninitialized_value_construct(ExPolicy&& policy, Rng&& rng, T const& value);
+        typename hpx::traits::range_traits<Rng>::iterator_type>::type
+    uninitialized_value_construct(ExPolicy&& policy, Rng&& rng);
 
-    /// Copies the given \a value value to the first count elements in an
-    /// uninitialized memory area beginning at first. If an exception is thrown
-    /// during the initialization, the function has no effects.
+    /// Constructs objects of type typename iterator_traits<ForwardIt>
+    /// ::value_type in the uninitialized storage designated by the range
+    /// [first, first + count) by value-initialization. If an exception
+    /// is thrown during the initialization, the function has no effects.
     ///
     /// \note   Complexity: Performs exactly \a count assignments, if
     ///         count > 0, no assignments otherwise.
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
+    ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
-    /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param count        Refers to the number of elements starting at
     ///                     \a first the algorithm will be applied to.
-    /// \param value        The value to be assigned.
     ///
-    /// The assignments in the parallel \a uninitialized_value_construct_n algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
+    /// The assignments in the parallel \a uninitialized_value_construct_n
+    /// algorithm invoked without an execution policy object execute in
+    /// sequential order in the calling thread.
     ///
     /// \returns  The \a uninitialized_value_construct_n algorithm returns a
     ///           returns \a FwdIter.
-    ///           The \a uninitialized_value_construct_n algorithm returns the output
-    ///           iterator to the element in the range, one past
-    ///           the last element copied.
+    ///           The \a uninitialized_value_construct_n algorithm returns
+    ///           the iterator to the element in the source range, one past
+    ///           the last element constructed.
     ///
-    template <typename FwdIter, typename Size, typename T>
-    FwdIter uninitialized_value_construct_n(
-        FwdIter first, Size count, T const& value);
+    template <typename FwdIter, typename Size>
+    FwdIter uninitialized_value_construct_n(FwdIter first, Size count);
 
-    /// Copies the given \a value value to the first count elements in an
-    /// uninitialized memory area beginning at first. If an exception is thrown
-    /// during the initialization, the function has no effects.
+    /// Constructs objects of type typename iterator_traits<ForwardIt>
+    /// ::value_type in the uninitialized storage designated by the range
+    /// [first, first + count) by value-initialization. If an exception
+    /// is thrown during the initialization, the function has no effects.
     ///
     /// \note   Complexity: Performs exactly \a count assignments, if
     ///         count > 0, no assignments otherwise.
@@ -214,11 +213,10 @@ namespace hpx { namespace ranges {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
+    ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
-    /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -226,34 +224,35 @@ namespace hpx { namespace ranges {
     ///                     the algorithm will be applied to.
     /// \param count        Refers to the number of elements starting at
     ///                     \a first the algorithm will be applied to.
-    /// \param value        The value to be assigned.
     ///
-    /// The assignments in the parallel \a uninitialized_value_construct_n algorithm
-    /// invoked with an execution policy object of type
+    /// The assignments in the parallel \a uninitialized_value_construct_n
+    /// algorithm invoked with an execution policy object of type
     /// \a sequenced_policy execute in sequential order in the
     /// calling thread.
     ///
-    /// The assignments in the parallel \a uninitialized_value_construct_n algorithm
-    /// invoked with an execution policy object of type
+    /// The assignments in the parallel \a uninitialized_value_construct_n
+    /// algorithm invoked with an execution policy object of type
     /// \a parallel_policy or
     /// \a parallel_task_policy are permitted to execute in an
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a uninitialized_value_construct_n algorithm returns a
-    ///           \a hpx::future<FwdIter>, if the execution policy is of type
+    ///           \a hpx::future<FwdIter> if the execution policy is of type
     ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns FwdIter
-    ///           otherwise.
-    ///           The \a uninitialized_value_construct_n algorithm returns the output
-    ///           iterator to the element in the range, one past
-    ///           the last element copied.
+    ///           \a parallel_task_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a uninitialized_value_construct_n algorithm returns
+    ///           the iterator to the element in the source range, one past
+    ///           the last element constructed.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Size, typename T>
+    template <typename ExPolicy, typename FwdIter, typename Size>
     typename typename parallel::util::detail::algorithm_result<ExPolicy,
         FwdIter>::type
     uninitialized_value_construct_n(
-        ExPolicy&& policy, FwdIter first, Size count, T const& value);
+        ExPolicy&& policy, FwdIter first, Size count);
+
+    // clang-format on
 }}    // namespace hpx::ranges
 #else
 
