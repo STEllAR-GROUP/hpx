@@ -11,6 +11,7 @@
 #include <hpx/parallel/container_algorithms/uninitialized_default_construct.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <iterator>
 #include <numeric>
@@ -27,7 +28,7 @@ struct default_constructable
     {
     }
 
-    default_constructable(std::int32_t val)
+    explicit default_constructable(std::int32_t val)
     {
         value_ = val;
     }

@@ -50,8 +50,7 @@ void test_uninitialized_default_construct_n(ExPolicy policy, IteratorTag)
     std::memset(
         static_cast<void*>(p), 0xcd, data_size * sizeof(default_constructable));
 
-    hpx::uninitialized_default_construct_n(
-        policy, iterator(p), data_size);
+    hpx::uninitialized_default_construct_n(policy, iterator(p), data_size);
 
     std::size_t count = 0;
     std::for_each(p, p + data_size, [&count](default_constructable v1) {
@@ -74,8 +73,8 @@ void test_uninitialized_default_construct_n_async(ExPolicy policy, IteratorTag)
     std::memset(
         static_cast<void*>(p), 0xcd, data_size * sizeof(default_constructable));
 
-    auto f = hpx::uninitialized_default_construct_n(
-        policy, iterator(p), data_size);
+    auto f =
+        hpx::uninitialized_default_construct_n(policy, iterator(p), data_size);
     f.wait();
 
     std::size_t count = 0;
@@ -102,8 +101,7 @@ void test_uninitialized_default_construct_n2(ExPolicy policy, IteratorTag)
     std::memset(
         static_cast<void*>(p), 0xcd, data_size * sizeof(value_constructable));
 
-    hpx::uninitialized_default_construct_n(
-        policy, iterator(p), data_size);
+    hpx::uninitialized_default_construct_n(policy, iterator(p), data_size);
 
     std::size_t count = 0;
     std::for_each(p, p + data_size, [&count](value_constructable v1) {
@@ -126,8 +124,8 @@ void test_uninitialized_default_construct_n_async2(ExPolicy policy, IteratorTag)
     std::memset(
         static_cast<void*>(p), 0xcd, data_size * sizeof(value_constructable));
 
-    auto f = hpx::uninitialized_default_construct_n(
-        policy, iterator(p), data_size);
+    auto f =
+        hpx::uninitialized_default_construct_n(policy, iterator(p), data_size);
     f.wait();
 
     std::size_t count = 0;

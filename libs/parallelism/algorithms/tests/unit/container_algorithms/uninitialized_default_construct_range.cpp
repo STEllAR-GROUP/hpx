@@ -11,10 +11,12 @@
 #include <hpx/parallel/container_algorithms/uninitialized_default_construct.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <iterator>
 #include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "test_utils.hpp"
@@ -27,14 +29,14 @@ struct default_constructable
     {
     }
 
-    default_constructable(std::int32_t val)
+    explicit default_constructable(std::int32_t val)
     {
         value_ = val;
     }
 
-    bool operator!=(default_constructable const& lhs) const
+    bool operator!=(std::int32_t const& lhs) const
     {
-        return lhs.value_ != value_;
+        return lhs != value_;
     }
 
     std::int32_t value_;
