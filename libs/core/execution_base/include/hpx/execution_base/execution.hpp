@@ -11,8 +11,7 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>
-#include <hpx/iterator_support/counting_iterator.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/iterator_support/counting_shape.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -100,20 +99,6 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename Executor, typename Enable = void>
         struct bulk_then_execute_fn_helper;
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Incrementable>
-        using counting_shape_type = hpx::util::iterator_range<
-            hpx::util::counting_iterator<Incrementable>>;
-
-        template <typename Incrementable>
-        HPX_HOST_DEVICE inline counting_shape_type<Incrementable>
-        make_counting_shape(Incrementable n)
-        {
-            return hpx::util::make_iterator_range(
-                hpx::util::make_counting_iterator(Incrementable(0)),
-                hpx::util::make_counting_iterator(n));
-        }
         /// \endcond
     }    // namespace detail
 
@@ -357,7 +342,7 @@ namespace hpx { namespace parallel { namespace execution {
         {
             return detail::bulk_sync_execute_fn_helper<
                 std::decay_t<Executor>>::call(std::forward<Executor>(exec),
-                std::forward<F>(f), detail::make_counting_shape(shape),
+                std::forward<F>(f), hpx::util::make_counting_shape(shape),
                 std::forward<Ts>(ts)...);
         }
     } bulk_sync_execute{};
@@ -428,7 +413,7 @@ namespace hpx { namespace parallel { namespace execution {
         {
             return detail::bulk_async_execute_fn_helper<
                 std::decay_t<Executor>>::call(std::forward<Executor>(exec),
-                std::forward<F>(f), detail::make_counting_shape(shape),
+                std::forward<F>(f), hpx::util::make_counting_shape(shape),
                 std::forward<Ts>(ts)...);
         }
     } bulk_async_execute{};
@@ -506,7 +491,7 @@ namespace hpx { namespace parallel { namespace execution {
         {
             return detail::bulk_then_execute_fn_helper<
                 std::decay_t<Executor>>::call(std::forward<Executor>(exec),
-                std::forward<F>(f), detail::make_counting_shape(shape),
+                std::forward<F>(f), hpx::util::make_counting_shape(shape),
                 std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
         }
     } bulk_then_execute{};
