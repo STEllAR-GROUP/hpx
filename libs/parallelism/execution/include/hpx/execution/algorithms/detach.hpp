@@ -19,6 +19,7 @@
 #include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <cstddef>

@@ -21,7 +21,7 @@ set(tests
 )
 
 if(HPX_CXX_STANDARD GREATER_EQUAL 17)
-  list(APPEND tests thread_pool_scheduler)
+  list(APPEND tests thread_pool_scheduler scheduler_executor)
 endif()
 
 if(HPX_WITH_CXX17_STD_EXECUTION_POLICES)
