@@ -13,4 +13,5 @@ spack load ninja@1.10.0
 export CMAKE_CXX_COMPILER_LAUNCHER=ccache
 export CMAKE_GENERATOR=Ninja
 export CCACHE_DIR=/scratch/snx3000/simbergm/ccache-jenkins-hpx
-export CCACHE_MAXSIZE=500G
+export CCACHE_MAXSIZE=100G
+export CCACHE_MAXFILES=50000
