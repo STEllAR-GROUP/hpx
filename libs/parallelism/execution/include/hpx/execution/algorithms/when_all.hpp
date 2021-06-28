@@ -125,6 +125,7 @@ namespace hpx { namespace execution { namespace experimental {
             static_assert(num_predecessors > 0,
                 "when_all expects at least one predecessor sender");
 
+            // define operation state for each connected sender
             template <typename R, std::size_t I>
             struct operation_state;
 
@@ -244,12 +245,6 @@ namespace hpx { namespace execution { namespace experimental {
                 return operation_state<R, num_predecessors - 1>(
                     std::forward<R>(r), senders);
             }
-
-            template <typename R>
-            auto connect(R&& r) &
-            {
-                return operation_state<R, num_predecessors - 1>(r, senders);
-            }
         };
     }    // namespace detail
 
@@ -257,7 +252,12 @@ namespace hpx { namespace execution { namespace experimental {
       : hpx::functional::tag_fallback<when_all_t>
     {
     private:
-        template <typename... Ss>
+        // clang-format off
+        template <typename... Ss,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::util::all_of_v<is_sender<Ss>...>
+            )>
+        // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             when_all_t, Ss&&... ss)
         {

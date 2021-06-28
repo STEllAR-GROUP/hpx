@@ -19,6 +19,7 @@ if(HPX_CXX_STANDARD GREATER_EQUAL 17)
   list(
     APPEND
     tests
+    algorithm_bulk
     algorithm_detach
     algorithm_ensure_started
     algorithm_just

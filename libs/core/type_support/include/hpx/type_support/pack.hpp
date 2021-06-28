@@ -17,14 +17,14 @@ namespace hpx { namespace util {
     struct pack
     {
         typedef pack type;
-        static const std::size_t size = sizeof...(Ts);
+        static constexpr std::size_t size = sizeof...(Ts);
     };
 
     template <typename T, T... Vs>
     struct pack_c
     {
         typedef pack_c type;
-        static const std::size_t size = sizeof...(Vs);
+        static constexpr std::size_t size = sizeof...(Vs);
     };
 
     template <std::size_t... Is>
@@ -110,6 +110,9 @@ namespace hpx { namespace util {
     {
     };
 
+    template <typename... Ts>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool all_of_v = all_of<Ts...>::value;
+
     namespace detail {
         template <typename... Ts>
         static std::true_type any_of(...);
@@ -131,9 +134,15 @@ namespace hpx { namespace util {
     };
 
     template <typename... Ts>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool any_of_v = any_of<Ts...>::value;
+
+    template <typename... Ts>
     struct none_of : std::integral_constant<bool, !any_of<Ts...>::value>
     {
     };
+
+    template <typename... Ts>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool none_of_v = none_of<Ts...>::value;
 
     template <typename T, typename... Ts>
     struct contains : any_of<std::is_same<T, Ts>...>
@@ -192,6 +201,9 @@ namespace hpx { namespace util {
     struct at_index : detail::at_index_impl<I, pack<Ts...>>
     {
     };
+
+    template <std::size_t I, typename... Ts>
+    using at_index_t = typename at_index<I, Ts...>::type;
 
     namespace detail {
         template <typename Pack, template <typename> class Transformer>
