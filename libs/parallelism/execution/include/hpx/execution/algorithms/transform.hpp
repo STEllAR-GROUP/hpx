@@ -28,7 +28,7 @@ namespace hpx { namespace execution { namespace experimental {
             std::decay_t<F> f;
 
             template <typename Error>
-                void set_error(Error&& error) && noexcept
+            void set_error(Error&& error) && noexcept
             {
                 hpx::execution::experimental::set_error(
                     std::move(receiver), std::forward<Error>(error));
@@ -73,7 +73,7 @@ namespace hpx { namespace execution { namespace experimental {
         public:
             template <typename... Ts,
                 typename = std::enable_if_t<hpx::is_invocable_v<F, Ts...>>>
-                void set_value(Ts&&... ts) && noexcept
+            void set_value(Ts&&... ts) && noexcept
             {
                 using is_void_result =
                     std::is_void<hpx::util::invoke_result_t<F, Ts...>>;

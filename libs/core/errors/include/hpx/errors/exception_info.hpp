@@ -64,8 +64,8 @@ namespace hpx {
         {
         public:
             virtual ~exception_info_node_base() = default;
-            virtual void const* lookup(std::type_info const& tag) const
-                noexcept = 0;
+            virtual void const* lookup(
+                std::type_info const& tag) const noexcept = 0;
 
             std::shared_ptr<exception_info_node_base> next;
         };
@@ -82,8 +82,8 @@ namespace hpx {
             {
             }
 
-            void const* lookup(std::type_info const& tag) const
-                noexcept override
+            void const* lookup(
+                std::type_info const& tag) const noexcept override
             {
                 using entry_type =
                     std::pair<std::type_info const&, void const*>;

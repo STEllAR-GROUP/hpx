@@ -135,7 +135,7 @@ namespace hpx { namespace execution { namespace experimental {
                     hpx::intrusive_ptr<shared_state> state;
 
                     template <typename Error>
-                        void set_error(Error&& error) && noexcept
+                    void set_error(Error&& error) && noexcept
                     {
                         state->v.template emplace<error_type>(
                             error_type(std::forward<Error>(error)));
@@ -158,13 +158,11 @@ namespace hpx { namespace execution { namespace experimental {
                             std::variant>;
 
                     template <typename... Ts>
-                        auto set_value(Ts&&... ts) &&
-                        noexcept -> decltype(
-                            std::declval<
-                                std::variant<std::monostate, value_type>>()
-                                .template emplace<value_type>(
-                                    hpx::make_tuple<>(std::forward<Ts>(ts)...)),
-                            void())
+                    auto set_value(Ts&&... ts) && noexcept -> decltype(
+                        std::declval<std::variant<std::monostate, value_type>>()
+                            .template emplace<value_type>(
+                                hpx::make_tuple<>(std::forward<Ts>(ts)...)),
+                        void())
                     {
                         state->v.template emplace<value_type>(
                             hpx::make_tuple<>(std::forward<Ts>(ts)...));

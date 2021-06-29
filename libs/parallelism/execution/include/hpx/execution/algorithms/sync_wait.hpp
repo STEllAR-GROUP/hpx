@@ -140,7 +140,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Error>
-                void set_error(Error&& error) && noexcept
+            void set_error(Error&& error) && noexcept
             {
                 state.value.template emplace<error_type>(
                     std::forward<Error>(error));
@@ -156,7 +156,7 @@ namespace hpx { namespace execution { namespace experimental {
                 typename =
                     std::enable_if_t<(is_void_result && sizeof...(Us) == 0) ||
                         (!is_void_result && sizeof...(Us) == 1)>>
-                void set_value(Us&&... us) && noexcept
+            void set_value(Us&&... us) && noexcept
             {
                 state.value.template emplace<value_type>(
                     std::forward<Us>(us)...);

@@ -311,8 +311,9 @@ namespace hpx { namespace functional {
 
             template <typename... Args>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto
-            tag_fallback_dispatch_impl(std::true_type, Args&&... args) const
-                noexcept -> tag_fallback_dispatch_result_t<Tag, Args&&...>
+            tag_fallback_dispatch_impl(
+                std::true_type, Args&&... args) const noexcept
+                -> tag_fallback_dispatch_result_t<Tag, Args&&...>
             {
                 return tag_fallback_dispatch(static_cast<Tag const&>(*this),
                     std::forward<Args>(args)...);

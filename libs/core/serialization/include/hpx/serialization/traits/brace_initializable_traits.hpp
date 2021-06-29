@@ -28,7 +28,7 @@ namespace hpx { namespace traits {
                     !std::is_lvalue_reference<T>::value &&
                     !std::is_same<typename std::decay<T>::type,
                         hpx::util::unused_type>::value>::type>
-            operator T &&() const;
+            operator T&&() const;
 
             template <typename T,
                 typename Enable = typename std::enable_if<

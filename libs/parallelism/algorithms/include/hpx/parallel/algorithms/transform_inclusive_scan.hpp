@@ -181,7 +181,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::move(f3),
                     // step 4 use this return value
                     [final_dest](std::vector<hpx::shared_future<T>>&&,
-                        std::vector<hpx::future<void>> &&) -> FwdIter2 {
+                        std::vector<hpx::future<void>>&&) -> FwdIter2 {
                         return final_dest;
                     });
             }

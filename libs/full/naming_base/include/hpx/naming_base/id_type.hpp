@@ -223,8 +223,8 @@ namespace hpx { namespace naming {
             {
             }
 
-            constexpr id_type::management_type get_management_type() const
-                noexcept
+            constexpr id_type::management_type get_management_type()
+                const noexcept
             {
                 return type_;
             }

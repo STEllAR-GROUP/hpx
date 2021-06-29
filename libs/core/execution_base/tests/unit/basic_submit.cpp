@@ -165,7 +165,7 @@ struct sender_4
     };
 
     template <typename R>
-        operation_state<R> connect(R&& r) && noexcept
+    operation_state<R> connect(R&& r) && noexcept
     {
         ++connect_calls;
         return {r};
