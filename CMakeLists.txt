@@ -1730,8 +1730,6 @@ if(NOT WIN32)
   # System libraries
   # ############################################################################
   if(NOT MSVC)
-    hpx_add_compile_flag_if_available(-pthread)
-    hpx_add_link_flag_if_available(-pthread TARGETS EXE SHARED)
     if(HPX_CXX11_STD_ATOMIC_LIBRARIES)
       target_link_libraries(
         hpx_base_libraries INTERFACE ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
@@ -2146,6 +2144,8 @@ endif()
 # Find Our dependencies: These are all dependencies needed to build the core
 # library. Dependencies that are only needed by plugins, examples or tests
 # should be found separately in the appropriate subdirectory.
+
+include(HPX_SetupThreads)
 
 # Setup our required Boost libraries.
 include(HPX_SetupBoost)
