@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_CXX17_STD_VARIANT)
+#include <hpx/datastructures/variant.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -20,7 +21,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include <variant>
 
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
@@ -113,14 +113,14 @@ namespace hpx { namespace execution { namespace experimental {
 
                     struct start_visitor
                     {
-                        HPX_NORETURN void operator()(std::monostate) const
+                        HPX_NORETURN void operator()(hpx::monostate) const
                         {
                             HPX_UNREACHABLE;
                         }
 
                         template <typename OS_,
                             typename = std::enable_if_t<!std::is_same_v<
-                                std::decay_t<OS_>, std::monostate>>>
+                                std::decay_t<OS_>, hpx::monostate>>>
                         void operator()(OS_& os) const
                         {
                             hpx::execution::experimental::start(os);
@@ -133,14 +133,14 @@ namespace hpx { namespace execution { namespace experimental {
                         std::decay_t<F> f;
                         operation_state& os;
 
-                        HPX_NORETURN void operator()(std::monostate) const
+                        HPX_NORETURN void operator()(hpx::monostate) const
                         {
                             HPX_UNREACHABLE;
                         }
 
                         template <typename E,
                             typename = std::enable_if_t<!std::is_same_v<
-                                std::decay_t<E>, std::monostate>>>
+                                std::decay_t<E>, hpx::monostate>>>
                         void operator()(E& e)
                         {
                             using operation_state_type =
@@ -148,10 +148,11 @@ namespace hpx { namespace execution { namespace experimental {
                                     HPX_INVOKE(std::move(f), e),
                                     std::declval<R>()));
 
+#if defined(HPX_HAVE_CXX17_COPY_ELISION)
                             // with_result_of is used to emplace the operation
                             // state returned from connect without any
                             // intermediate copy construction (the operation
-                            // state is not required to be copyable nor movable.
+                            // state is not required to be copyable nor movable).
                             os.successor_os
                                 .template emplace<operation_state_type>(
                                     hpx::util::detail::with_result_of([&]() {
@@ -159,7 +160,15 @@ namespace hpx { namespace execution { namespace experimental {
                                             connect(HPX_INVOKE(std::move(f), e),
                                                 std::move(r));
                                     }));
-                            std::visit(start_visitor{}, os.successor_os);
+#else
+                            // MSVC doesn't get copy elision quite right, the operation
+                            // state must be constructed explicitly directly in place
+                            os.successor_os
+                                .template emplace_f<operation_state_type>(
+                                    hpx::execution::experimental::connect,
+                                    HPX_INVOKE(std::move(f), e), std::move(r));
+#endif
+                            hpx::visit(start_visitor{}, os.successor_os);
                         }
                     };
 
@@ -172,7 +181,7 @@ namespace hpx { namespace execution { namespace experimental {
                                 // invoke inside the visit may throw.
                                 os.predecessor_e.template emplace<E>(
                                     std::forward<E>(e));
-                                std::visit(set_error_visitor{std::move(r),
+                                hpx::visit(set_error_visitor{std::move(r),
                                                std::move(f), os},
                                     os.predecessor_e);
                             },
@@ -220,15 +229,15 @@ namespace hpx { namespace execution { namespace experimental {
 
                 // Potential errors returned from the predecessor sender
                 hpx::util::detail::prepend_t<
-                    predecessor_error_types<std::variant>, std::monostate>
+                    predecessor_error_types<hpx::variant>, hpx::monostate>
                     predecessor_e;
 
                 // Potential operation states returned when connecting a sender
                 // in successor_sender_types to the receiver connected to the
                 // let_error_sender
                 hpx::util::detail::prepend_t<
-                    successor_operation_state_types<std::variant>,
-                    std::monostate>
+                    successor_operation_state_types<hpx::variant>,
+                    hpx::monostate>
                     successor_os;
 
                 template <typename PS_, typename R_, typename F_>
@@ -281,4 +290,5 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } let_error{};
 }}}    // namespace hpx::execution::experimental
+
 #endif

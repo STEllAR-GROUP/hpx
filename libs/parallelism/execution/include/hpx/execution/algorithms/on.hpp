@@ -10,6 +10,7 @@
 #if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -24,7 +25,6 @@
 #include <exception>
 #include <type_traits>
 #include <utility>
-#include <variant>
 
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
@@ -70,8 +70,8 @@ namespace hpx { namespace execution { namespace experimental {
 
                 using value_type = hpx::util::detail::prepend_t<
                     typename hpx::execution::experimental::sender_traits<
-                        Sender>::template value_types<hpx::tuple, std::variant>,
-                    std::monostate>;
+                        Sender>::template value_types<hpx::tuple, hpx::variant>,
+                    hpx::monostate>;
                 value_type ts;
 
                 using sender_operation_state_type =
@@ -115,7 +115,7 @@ namespace hpx { namespace execution { namespace experimental {
                     void set_done() && noexcept
                     {
                         os.set_done_predecessor_sender();
-                    };
+                    }
 
                     template <typename... Ts>
                         void set_value(Ts&&... ts) && noexcept
@@ -142,13 +142,27 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     ts.template emplace<hpx::tuple<Us...>>(
                         std::forward<Us>(us)...);
-                    scheduler_os.template emplace(
+#if defined(HPX_HAVE_CXX17_COPY_ELISION)
+                    // with_result_of is used to emplace the operation
+                    // state returned from connect without any
+                    // intermediate copy construction (the operation
+                    // state is not required to be copyable nor movable).
+                    scheduler_os.emplace(
                         hpx::util::detail::with_result_of([&]() {
                             return hpx::execution::experimental::connect(
                                 hpx::execution::experimental::schedule(
                                     std::move(scheduler)),
                                 scheduler_sender_receiver{*this});
                         }));
+#else
+                    // MSVC doesn't get copy elision quite right, the operation
+                    // state must be constructed explicitly directly in place
+                    scheduler_os.emplace_f(
+                        hpx::execution::experimental::connect,
+                        hpx::execution::experimental::schedule(
+                            std::move(scheduler)),
+                        scheduler_sender_receiver{*this});
+#endif
                     hpx::execution::experimental::start(scheduler_os.value());
                 }
 
@@ -165,7 +179,7 @@ namespace hpx { namespace execution { namespace experimental {
                     void set_done() && noexcept
                     {
                         os.set_done_scheduler_sender();
-                    };
+                    }
 
                     void set_value() && noexcept
                     {
@@ -177,14 +191,14 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     std::decay_t<Receiver> receiver;
 
-                    HPX_NORETURN void operator()(std::monostate) const
+                    HPX_NORETURN void operator()(hpx::monostate) const
                     {
                         HPX_UNREACHABLE;
                     }
 
                     template <typename Ts,
                         typename = std::enable_if_t<
-                            !std::is_same_v<std::decay_t<Ts>, std::monostate>>>
+                            !std::is_same_v<std::decay_t<Ts>, hpx::monostate>>>
                     void operator()(Ts&& ts)
                     {
                         hpx::util::invoke_fused(
@@ -212,7 +226,7 @@ namespace hpx { namespace execution { namespace experimental {
                 void set_value_scheduler_sender() noexcept
                 {
                     scheduler_os.reset();
-                    std::visit(
+                    hpx::visit(
                         scheduler_sender_value_visitor{std::move(receiver)},
                         std::move(ts));
                 }
@@ -261,4 +275,5 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } on{};
 }}}    // namespace hpx::execution::experimental
+
 #endif

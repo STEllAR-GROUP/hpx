@@ -10,6 +10,7 @@
 
 #include <cstddef>
 #include <exception>
+#include <new>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -265,6 +266,21 @@ namespace hpx { namespace util {
             empty_ = false;
         }
 
+#if !defined(HPX_HAVE_CXX17_COPY_ELISION)
+        // workaround for broken return type copy elison in MSVC
+        template <typename F, typename... Ts>
+        void emplace_f(F&& f, Ts&&... ts)
+        {
+            if (!empty_)
+            {
+                reinterpret_cast<T*>(&storage_)->~T();
+                empty_ = true;
+            }
+            new (&storage_) T(std::forward<F>(f)(std::forward<Ts>(ts)...));
+            empty_ = false;
+        }
+#endif
+
         void swap(optional& other) noexcept(
             std::is_nothrow_move_constructible<T>::value&& noexcept(
                 _optional_swap::check_swap<T>()))
@@ -519,13 +535,17 @@ namespace hpx { namespace util {
     }
 }}    // namespace hpx::util
 
+namespace hpx {
+
+    using util::optional;
+}    // namespace hpx
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace std {
     template <typename T>
-    struct hash<hpx::util::optional<T>>
+    struct hash<hpx::optional<T>>
     {
-        constexpr std::size_t operator()(
-            ::hpx::util::optional<T> const& arg) const
+        constexpr std::size_t operator()(::hpx::optional<T> const& arg) const
         {
             return arg ? std::hash<T>{}(*arg) : std::size_t{};
         }
