@@ -98,6 +98,8 @@ namespace hpx { namespace debug {
             std::ostream&, std::thread::id, int);
         template HPX_CORE_EXPORT void print_hex(
             std::ostream&, unsigned long, int);
+        template HPX_CORE_EXPORT void print_hex(
+            std::ostream&, int, int);
 
         void print_ptr(std::ostream& os, void* v, int N)
         {
