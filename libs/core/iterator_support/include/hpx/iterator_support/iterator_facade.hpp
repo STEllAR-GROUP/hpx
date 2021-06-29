@@ -437,7 +437,7 @@ namespace hpx { namespace util {
             }
 
             // Provides X(r++)
-            HPX_HOST_DEVICE operator Iterator const&() const
+            HPX_HOST_DEVICE operator Iterator const &() const
             {
                 return stored_iterator;
             }

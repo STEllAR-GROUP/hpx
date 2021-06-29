@@ -282,14 +282,14 @@ namespace hpx {
             }
 
             template <std::size_t Position>
-            constexpr static_async_range<Target, Position, End> relocate() const
-                noexcept
+            constexpr static_async_range<Target, Position, End> relocate()
+                const noexcept
             {
                 return static_async_range<Target, Position, End>{target_};
             }
 
-            constexpr static_async_range<Target, Begin + 1, End> next() const
-                noexcept
+            constexpr static_async_range<Target, Begin + 1, End> next()
+                const noexcept
             {
                 return static_async_range<Target, Begin + 1, End>{target_};
             }

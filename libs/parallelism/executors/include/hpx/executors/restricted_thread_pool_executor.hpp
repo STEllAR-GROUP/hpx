@@ -71,8 +71,8 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         /// \cond NOINTERNAL
-        bool operator==(restricted_thread_pool_executor const& rhs) const
-            noexcept
+        bool operator==(
+            restricted_thread_pool_executor const& rhs) const noexcept
         {
             return pool_ == rhs.pool_ && priority_ == rhs.priority_ &&
                 stacksize_ == rhs.stacksize_ &&
@@ -81,8 +81,8 @@ namespace hpx { namespace parallel { namespace execution {
                 num_threads_ == rhs.num_threads_;
         }
 
-        bool operator!=(restricted_thread_pool_executor const& rhs) const
-            noexcept
+        bool operator!=(
+            restricted_thread_pool_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }

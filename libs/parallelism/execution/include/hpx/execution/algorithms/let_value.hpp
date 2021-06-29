@@ -156,7 +156,7 @@ namespace hpx { namespace execution { namespace experimental {
                     }
 
                     template <typename Error>
-                        void set_error(Error&& error) && noexcept
+                    void set_error(Error&& error) && noexcept
                     {
                         hpx::execution::experimental::set_error(
                             std::move(receiver), std::forward<Error>(error));
@@ -240,8 +240,7 @@ namespace hpx { namespace execution { namespace experimental {
                         hpx::monostate>;
 
                     template <typename... Ts>
-                        auto set_value(Ts&&... ts) &&
-                        noexcept
+                    auto set_value(Ts&&... ts) && noexcept
                         -> decltype(std::declval<predecessor_ts_type>()
                                         .template emplace<hpx::tuple<Ts...>>(
                                             std::forward<Ts>(ts)...),
