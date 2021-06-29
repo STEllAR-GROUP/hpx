@@ -12,16 +12,6 @@
 
 #include <type_traits>
 
-#if defined(HPX_HAVE_CXX17_VARIABLE_TEMPLATES)
-#define HPX_HAS_MEMBER_XXX_TRAIT_DEF_CXX17(MEMBER)                             \
-    template <typename T>                                                      \
-    constexpr bool HPX_PP_CAT(HPX_PP_CAT(has_, MEMBER), _v) =                  \
-        HPX_PP_CAT(has_, MEMBER)::value;                                       \
-    /**/
-#else
-#define HPX_HAS_MEMBER_XXX_TRAIT_DEF_CXX17(MEMBER) /**/
-#endif
-
 /// This macro creates a boolean unary meta-function which result is
 /// true if and only if its parameter type has member function with
 /// MEMBER name (no matter static it is or not). The generated trait
@@ -76,5 +66,7 @@
     using HPX_PP_CAT(HPX_PP_CAT(has_, MEMBER), _t) =                           \
         typename HPX_PP_CAT(has_, MEMBER)<T>::type;                            \
                                                                                \
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF_CXX17(MEMBER)                                 \
+    template <typename T>                                                      \
+    HPX_INLINE_CONSTEXPR_VARIABLE bool HPX_PP_CAT(                             \
+        HPX_PP_CAT(has_, MEMBER), _v) = HPX_PP_CAT(has_, MEMBER)<T>::value;    \
     /**/

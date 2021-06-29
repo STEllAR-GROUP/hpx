@@ -167,7 +167,7 @@ namespace hpx { namespace functional {
             Tag, Args...>;
 
     template <typename Tag, typename... Args>
-    constexpr bool is_tag_override_dispatchable_v =
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_tag_override_dispatchable_v =
         is_tag_override_dispatchable<Tag, Args...>::value;
 
     namespace detail {
@@ -202,7 +202,7 @@ namespace hpx { namespace functional {
     };
 
     template <typename Tag, typename... Args>
-    constexpr bool is_nothrow_tag_override_dispatchable_v =
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_nothrow_tag_override_dispatchable_v =
         is_nothrow_tag_override_dispatchable<Tag, Args...>::value;
 
     template <typename Tag, typename... Args>
@@ -238,8 +238,8 @@ namespace hpx { namespace functional {
         {
             // Is tag-override-dispatchable
             template <typename... Args,
-                typename Enable = typename std::enable_if<
-                    is_tag_override_dispatchable_v<Tag, Args&&...>>::type>
+                typename Enable = std::enable_if_t<
+                    is_tag_override_dispatchable_v<Tag, Args&&...>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_override_dispatchable_v<Tag, Args...>)
@@ -251,9 +251,9 @@ namespace hpx { namespace functional {
 
             // Is not tag-override-dispatchable, but tag-dispatchable
             template <typename... Args,
-                typename Enable = typename std::enable_if<
+                typename Enable = std::enable_if_t<
                     !is_tag_override_dispatchable_v<Tag, Args&&...> &&
-                    is_tag_dispatchable_v<Tag, Args&&...>>::type>
+                    is_tag_dispatchable_v<Tag, Args&&...>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_dispatchable_v<Tag, Args...>)
@@ -266,10 +266,10 @@ namespace hpx { namespace functional {
             // Is not tag-override-dispatchable, not tag-dispatchable, but
             // tag-fallback-dispatchable
             template <typename... Args,
-                typename Enable = typename std::enable_if<
+                typename Enable = std::enable_if_t<
                     !is_tag_override_dispatchable_v<Tag, Args&&...> &&
                     !is_tag_dispatchable_v<Tag, Args&&...> &&
-                    is_tag_fallback_dispatchable_v<Tag, Args&&...>>::type>
+                    is_tag_fallback_dispatchable_v<Tag, Args&&...>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_fallback_dispatchable_v<Tag, Args...>)
@@ -290,9 +290,8 @@ namespace hpx { namespace functional {
         {
             // Is nothrow tag-override-dispatchable
             template <typename... Args,
-                typename Enable = typename std::enable_if<
-                    is_nothrow_tag_override_dispatchable_v<Tag,
-                        Args&&...>>::type>
+                typename Enable = std::enable_if_t<
+                    is_nothrow_tag_override_dispatchable_v<Tag, Args&&...>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> tag_override_dispatch_result_t<Tag, Args&&...>
@@ -304,9 +303,9 @@ namespace hpx { namespace functional {
             // Is not nothrow tag-override-dispatchable, but nothrow
             // tag-dispatchable
             template <typename... Args,
-                typename Enable = typename std::enable_if<
+                typename Enable = std::enable_if_t<
                     !is_nothrow_tag_override_dispatchable_v<Tag, Args&&...> &&
-                    is_nothrow_tag_dispatchable_v<Tag, Args&&...>>::type>
+                    is_nothrow_tag_dispatchable_v<Tag, Args&&...>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> tag_dispatch_result_t<Tag, Args&&...>
@@ -318,11 +317,10 @@ namespace hpx { namespace functional {
             // Is not nothrow tag-override-dispatchable, not nothrow
             // tag-dispatchable, but nothrow tag-fallback-dispatchable
             template <typename... Args,
-                typename Enable = typename std::enable_if<
+                typename Enable = std::enable_if_t<
                     !is_nothrow_tag_override_dispatchable_v<Tag, Args&&...> &&
                     !is_nothrow_tag_dispatchable_v<Tag, Args&&...> &&
-                    is_nothrow_tag_fallback_dispatchable_v<Tag,
-                        Args&&...>>::type>
+                    is_nothrow_tag_fallback_dispatchable_v<Tag, Args&&...>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> tag_fallback_dispatch_result_t<Tag, Args&&...>

@@ -158,6 +158,13 @@ namespace hpx { namespace parallel { namespace traits {
     {
     };
 
+    template <typename F, typename Iter>
+    using is_projected_t = typename is_projected<F, Iter>::type;
+
+    template <typename F, typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_projected_v =
+        is_projected<F, Iter>::value;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Proj, typename Iter>
     struct projected
@@ -235,4 +242,13 @@ namespace hpx { namespace parallel { namespace traits {
             hpx::util::pack<typename std::decay<Projected>::type...>>
     {
     };
+
+    template <typename ExPolicy, typename F, typename... Projected>
+    using is_indirect_callable_t =
+        typename is_indirect_callable<ExPolicy, F, Projected...>::type;
+
+    template <typename ExPolicy, typename F, typename... Projected>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_indirect_callable_v =
+        is_indirect_callable<ExPolicy, F, Projected...>::value;
+
 }}}    // namespace hpx::parallel::traits

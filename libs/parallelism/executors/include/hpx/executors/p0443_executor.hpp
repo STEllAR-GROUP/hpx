@@ -8,13 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
 
 #include <cstddef>
 #include <exception>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -36,6 +39,7 @@ namespace hpx { namespace execution { namespace experimental {
             return !(*this == rhs);
         }
 
+        // support with_priority property
         friend executor tag_dispatch(
             hpx::execution::experimental::with_priority_t, executor const& exec,
             hpx::threads::thread_priority priority)
@@ -51,6 +55,7 @@ namespace hpx { namespace execution { namespace experimental {
             return exec.priority_;
         }
 
+        // support with_stacksize property
         friend executor tag_dispatch(
             hpx::execution::experimental::with_stacksize_t,
             executor const& exec, hpx::threads::thread_stacksize stacksize)
@@ -66,6 +71,7 @@ namespace hpx { namespace execution { namespace experimental {
             return exec.stacksize_;
         }
 
+        // support with_hint property
         friend executor tag_dispatch(hpx::execution::experimental::with_hint_t,
             executor const& exec, hpx::threads::thread_schedule_hint hint)
         {
@@ -80,10 +86,43 @@ namespace hpx { namespace execution { namespace experimental {
             return exec.schedulehint_;
         }
 
+        // support with_annotation property
+        using supports_annotations = void;
+
+        friend constexpr executor tag_dispatch(
+            hpx::execution::experimental::with_annotation_t,
+            executor const& exec, char const* annotation)
+        {
+            auto exec_with_annotation = exec;
+            exec_with_annotation.annotation_ = annotation;
+            return exec_with_annotation;
+        }
+
+        friend executor tag_dispatch(
+            hpx::execution::experimental::with_annotation_t,
+            executor const& exec, std::string annotation)
+        {
+            auto exec_with_annotation = exec;
+            exec_with_annotation.annotation_ =
+                hpx::util::detail::store_function_annotation(
+                    std::move(annotation));
+            return exec_with_annotation;
+        }
+
+        // support get_annotation property
+        friend constexpr char const* tag_dispatch(
+            hpx::execution::experimental::get_annotation_t,
+            executor const& exec) noexcept
+        {
+            return exec.annotation_;
+        }
+
         template <typename F>
         void execute(F&& f) const
         {
-            hpx::util::thread_description desc(f);
+            hpx::util::thread_description desc(annotation_ == nullptr ?
+                    traits::get_function_annotation<std::decay_t<F>>::call(f) :
+                    annotation_);
 
             hpx::parallel::execution::detail::post_policy_dispatch<
                 hpx::launch::async_policy>::call(hpx::launch::async, desc,
@@ -103,24 +142,26 @@ namespace hpx { namespace execution { namespace experimental {
               , r(std::forward<R_>(r))
             {
             }
+
             operation_state(operation_state&&) = delete;
             operation_state(operation_state const&) = delete;
+            operation_state& operator=(operation_state&&) = delete;
+            operation_state& operator=(operation_state const&) = delete;
 
-            void start() noexcept
+            void start() & noexcept
             {
-                try
-                {
-                    hpx::execution::experimental::execute(
-                        exec, [r = std::move(r)]() mutable {
-                            hpx::execution::experimental::set_value(
-                                std::move(r));
-                        });
-                }
-                catch (...)
-                {
-                    hpx::execution::experimental::set_error(
-                        std::move(r), std::current_exception());
-                }
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() {
+                        hpx::execution::experimental::execute(
+                            exec, [r = std::move(r)]() mutable {
+                                hpx::execution::experimental::set_value(
+                                    std::move(r));
+                            });
+                    },
+                    [&](std::exception_ptr ep) {
+                        hpx::execution::experimental::set_error(
+                            std::move(r), std::move(ep));
+                    });
             }
         };
 
@@ -181,6 +222,7 @@ namespace hpx { namespace execution { namespace experimental {
         hpx::threads::thread_stacksize stacksize_ =
             hpx::threads::thread_stacksize::small_;
         hpx::threads::thread_schedule_hint schedulehint_{};
+        char const* annotation_ = nullptr;
         /// \endcond
     };
 }}}    // namespace hpx::execution::experimental

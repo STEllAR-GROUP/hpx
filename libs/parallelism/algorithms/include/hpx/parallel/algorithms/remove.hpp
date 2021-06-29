@@ -319,8 +319,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               zip_iterator part_begin,
                               std::size_t part_size) -> std::size_t {
                     // MSVC complains if pred or proj is captured by ref below
-                    util::detail::loop_n<std::decay_t<ExPolicy>>(part_begin,
-                        part_size, [pred, proj](zip_iterator it) mutable {
+                    util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_size,
+                        [pred, proj](zip_iterator it) mutable {
                             bool f = hpx::util::invoke(
                                 pred, hpx::util::invoke(proj, get<0>(*it)));
 
@@ -359,7 +359,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     if (dest == get<0>(part_begin.get_iterator_tuple()))
                     {
                         // Self-assignment must be detected.
-                        util::detail::loop_n<execution_policy_type>(
+                        util::loop_n<execution_policy_type>(
                             part_begin, part_size, [&dest](zip_iterator it) {
                                 if (!get<1>(*it))
                                 {
@@ -373,7 +373,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     else
                     {
                         // Self-assignment can't be performed.
-                        util::detail::loop_n<execution_policy_type>(
+                        util::loop_n<execution_policy_type>(
                             part_begin, part_size, [&dest](zip_iterator it) {
                                 if (!get<1>(*it))
                                     *dest++ = std::move(get<0>(*it));

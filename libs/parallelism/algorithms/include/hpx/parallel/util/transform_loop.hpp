@@ -234,6 +234,107 @@ namespace hpx { namespace parallel { namespace util {
     }
 #endif
 
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
+
+        template <typename Iter1, typename Iter2>
+        struct transform_binary_loop_ind
+        {
+            template <typename InIter1B, typename InIter1E, typename InIter2,
+                typename OutIter, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr util::
+                in_in_out_result<InIter1B, InIter2, OutIter>
+                call(InIter1B first1, InIter1E last1, InIter2 first2,
+                    OutIter dest, F&& f)
+            {
+                for (/* */; first1 != last1; (void) ++first1, ++first2, ++dest)
+                {
+                    *dest = HPX_INVOKE(f, *first1, *first2);
+                }
+
+                return util::in_in_out_result<InIter1B, InIter2, OutIter>{
+                    std::move(first1), std::move(first2), std::move(dest)};
+            }
+
+            template <typename InIter1B, typename InIter1E, typename InIter2,
+                typename OutIter, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr util::
+                in_in_out_result<InIter1B, InIter2, OutIter>
+                call(InIter1B first1, InIter1E last1, InIter2 first2,
+                    InIter2 last2, OutIter dest, F&& f)
+            {
+                for (/* */; first1 != last1 && first2 != last2;
+                     (void) ++first1, ++first2, ++dest)
+                {
+                    *dest = HPX_INVOKE(f, *first1, *first2);
+                }
+
+                return util::in_in_out_result<InIter1B, InIter2, OutIter>{
+                    first1, first2, dest};
+            }
+        };
+    }    // namespace detail
+
+    template <typename ExPolicy>
+    struct transform_binary_loop_ind_t final
+      : hpx::functional::tag_fallback<transform_binary_loop_ind_t<ExPolicy>>
+    {
+    private:
+        template <typename InIter1B, typename InIter1E, typename InIter2,
+            typename OutIter, typename F>
+        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<
+            InIter1B, InIter2, OutIter>
+        tag_fallback_dispatch(
+            hpx::parallel::util::transform_binary_loop_ind_t<ExPolicy>,
+            InIter1B first1, InIter1E last1, InIter2 first2, OutIter dest,
+            F&& f)
+        {
+            return detail::transform_binary_loop_ind<InIter1B, InIter2>::call(
+                first1, last1, first2, dest, std::forward<F>(f));
+        }
+
+        template <typename InIter1B, typename InIter1E, typename InIter2B,
+            typename InIter2E, typename OutIter, typename F>
+        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<
+            InIter1B, InIter2B, OutIter>
+        tag_fallback_dispatch(
+            hpx::parallel::util::transform_binary_loop_ind_t<ExPolicy>,
+            InIter1B first1, InIter1E last1, InIter2B first2, InIter2E last2,
+            OutIter dest, F&& f)
+        {
+            return detail::transform_binary_loop_ind<InIter1B, InIter2B>::call(
+                first1, last1, first2, last2, dest, std::forward<F>(f));
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    HPX_INLINE_CONSTEXPR_VARIABLE transform_binary_loop_ind_t<ExPolicy>
+        transform_binary_loop_ind = transform_binary_loop_ind_t<ExPolicy>{};
+#else
+    template <typename ExPolicy, typename InIter1B, typename InIter1E,
+        typename InIter2, typename OutIter, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<InIter1B,
+        InIter2, OutIter>
+    transform_binary_loop_ind(
+        InIter1B first1, InIter1E last1, InIter2 first2, OutIter dest, F&& f)
+    {
+        return hpx::parallel::util::transform_binary_loop_ind_t<ExPolicy>{}(
+            first1, last1, first2, dest, std::forward<F>(f));
+    }
+
+    template <typename ExPolicy, typename InIter1B, typename InIter1E,
+        typename InIter2B, typename InIter2E, typename OutIter, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<InIter1B,
+        InIter2B, OutIter>
+    transform_binary_loop_ind(InIter1B first1, InIter1E last1, InIter2B first2,
+        InIter2E last2, OutIter dest, F&& f)
+    {
+        return hpx::parallel::util::transform_binary_loop_ind_t<ExPolicy>{}(
+            first1, last1, first2, last2, dest, std::forward<F>(f));
+    }
+#endif
+
     namespace detail {
 
         template <typename Iter>
@@ -452,11 +553,20 @@ namespace hpx { namespace parallel { namespace util {
                 typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr hpx::tuple<InIter1,
                 InIter2, OutIter>
-            call(InIter1 first1, std::size_t count, InIter2 first2,
-                OutIter dest, F&& f)
+            call(InIter1 first1, std::size_t num, InIter2 first2, OutIter dest,
+                F&& f)
             {
-                for (/* */; count != 0;
-                     (void) --count, ++first1, first2++, ++dest)
+                std::size_t count(num & std::size_t(-4));    // -V112
+                for (std::size_t i = 0; i < count;
+                     (void) ++first1, ++first2, i += 4)    // -V112
+                {
+                    *dest++ = HPX_INVOKE(f, first1, first2);
+                    *dest++ = HPX_INVOKE(f, ++first1, ++first2);
+                    *dest++ = HPX_INVOKE(f, ++first1, ++first2);
+                    *dest++ = HPX_INVOKE(f, ++first1, ++first2);
+                }
+                for (/**/; count < num;
+                     (void) ++count, ++first1, ++first2, ++dest)
                 {
                     *dest = HPX_INVOKE(f, first1, first2);
                 }
@@ -499,6 +609,76 @@ namespace hpx { namespace parallel { namespace util {
             InIter2 first2, OutIter dest, F&& f)
     {
         return hpx::parallel::util::transform_binary_loop_n_t<ExPolicy>{}(
+            first1, count, first2, dest, std::forward<F>(f));
+    }
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
+
+        template <typename Iter1, typename Inter2>
+        struct transform_binary_loop_ind_n
+        {
+            template <typename InIter1, typename InIter2, typename OutIter,
+                typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr hpx::tuple<InIter1,
+                InIter2, OutIter>
+            call(InIter1 first1, std::size_t num, InIter2 first2, OutIter dest,
+                F&& f)
+            {
+                std::size_t count(num & std::size_t(-4));    // -V112
+                for (std::size_t i = 0; i < count;
+                     (void) ++first1, ++first2, i += 4)    // -V112
+                {
+                    *dest++ = HPX_INVOKE(f, *first1, *first2);
+                    *dest++ = HPX_INVOKE(f, *(++first1), *(++first2));
+                    *dest++ = HPX_INVOKE(f, *(++first1), *(++first2));
+                    *dest++ = HPX_INVOKE(f, *(++first1), *(++first2));
+                }
+                for (/**/; count < num;
+                     (void) ++count, ++first1, ++first2, ++dest)
+                {
+                    *dest = HPX_INVOKE(f, *first1, *first2);
+                }
+
+                return hpx::make_tuple(
+                    std::move(first1), std::move(first2), std::move(dest));
+            }
+        };
+    }    // namespace detail
+
+    template <typename ExPolicy>
+    struct transform_binary_loop_ind_n_t final
+      : hpx::functional::tag_fallback<transform_binary_loop_ind_n_t<ExPolicy>>
+    {
+    private:
+        template <typename InIter1, typename InIter2, typename OutIter,
+            typename F>
+        friend HPX_HOST_DEVICE
+            HPX_FORCEINLINE constexpr hpx::tuple<InIter1, InIter2, OutIter>
+            tag_fallback_dispatch(
+                hpx::parallel::util::transform_binary_loop_ind_n_t<ExPolicy>,
+                InIter1 first1, std::size_t count, InIter2 first2, OutIter dest,
+                F&& f)
+        {
+            return detail::transform_binary_loop_ind_n<InIter1, InIter2>::call(
+                first1, count, first2, dest, std::forward<F>(f));
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    HPX_INLINE_CONSTEXPR_VARIABLE transform_binary_loop_ind_n_t<ExPolicy>
+        transform_binary_loop_ind_n = transform_binary_loop_ind_n_t<ExPolicy>{};
+#else
+    template <typename ExPolicy, typename InIter1, typename InIter2,
+        typename OutIter, typename F>
+    HPX_HOST_DEVICE
+        HPX_FORCEINLINE constexpr hpx::tuple<InIter1, InIter2, OutIter>
+        transform_binary_loop_ind_n(InIter1 first1, std::size_t count,
+            InIter2 first2, OutIter dest, F&& f)
+    {
+        return hpx::parallel::util::transform_binary_loop_ind_n_t<ExPolicy>{}(
             first1, count, first2, dest, std::forward<F>(f));
     }
 #endif

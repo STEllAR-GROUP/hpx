@@ -339,6 +339,35 @@ void test_properties()
         // A hint is not guaranteed to be respected, so we only check that the
         // executor holds the property.
     }
+
+    {
+        char const* annotation = "<test>";
+        auto exec_prop = ex::with_annotation(exec, annotation);
+        HPX_TEST_EQ(std::string(ex::get_annotation(exec_prop)),
+            std::string(annotation));
+
+        auto check = [annotation]() {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            HPX_TEST_EQ(std::string(annotation),
+                hpx::threads::get_thread_description(
+                    hpx::threads::get_self_id())
+                    .get_description());
+#else
+            (void) annotation;
+#endif
+        };
+        executed = false;
+        auto os = ex::connect(ex::schedule(exec_prop),
+            callback_receiver<decltype(check)>{check, cond, executed});
+        ex::start(os);
+
+        {
+            std::unique_lock<hpx::lcos::local::mutex> l{mtx};
+            cond.wait(l, [&]() { return executed.load(); });
+        }
+
+        HPX_TEST(executed);
+    }
 }
 
 void test_on_basic()

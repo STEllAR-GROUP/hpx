@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
-#include <hpx/execution_base/detail/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>
@@ -43,8 +43,9 @@ namespace hpx { namespace execution { namespace experimental {
             void set_done() && noexcept
             {
                 hpx::execution::experimental::set_done(std::move(r));
-            };
+            }
 
+        private:
             template <typename... Ts>
             void set_value_helper(std::true_type, Ts&&... ts) noexcept
             {
@@ -64,9 +65,9 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        // TODO: r may be moved before f throws, if it throws.
-                        hpx::execution::experimental::set_value(std::move(r),
-                            HPX_INVOKE(f, std::forward<Ts>(ts)...));
+                        auto&& result = HPX_INVOKE(f, std::forward<Ts>(ts)...);
+                        hpx::execution::experimental::set_value(
+                            std::move(r), std::move(result));
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
@@ -74,6 +75,7 @@ namespace hpx { namespace execution { namespace experimental {
                     });
             }
 
+        public:
             template <typename... Ts,
                 typename = std::enable_if_t<hpx::is_invocable_v<F, Ts...>>>
                 void set_value(Ts&&... ts) && noexcept

@@ -12,6 +12,7 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/rebind_executor.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/executors/annotating_executor.hpp>
 #include <hpx/properties/property.hpp>
 
 #include <string>
@@ -22,13 +23,12 @@ namespace hpx { namespace execution { namespace experimental {
 
     // with_annotation property implementation for execution policies
     // that simply forwards to the embedded executor
+    // clang-format off
     template <typename ExPolicy,
-        typename Enable =
-            std::enable_if_t<hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::functional::is_tag_dispatchable<
-                    hpx::execution::experimental::with_annotation_t,
-                    typename std::decay_t<ExPolicy>::executor_type,
-                    char const*>::value>>
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy_v<ExPolicy>
+        )>
+    // clang-format on
     constexpr decltype(auto) tag_dispatch(
         hpx::execution::experimental::with_annotation_t, ExPolicy&& policy,
         char const* annotation)
@@ -40,13 +40,12 @@ namespace hpx { namespace execution { namespace experimental {
             policy, std::move(exec), policy.parameters());
     }
 
+    // clang-format off
     template <typename ExPolicy,
-        typename Enable =
-            std::enable_if_t<hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::functional::is_tag_dispatchable<
-                    hpx::execution::experimental::with_annotation_t,
-                    typename std::decay_t<ExPolicy>::executor_type,
-                    std::string>::value>>
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy_v<ExPolicy>
+        )>
+    // clang-format on
     decltype(auto) tag_dispatch(hpx::execution::experimental::with_annotation_t,
         ExPolicy&& policy, std::string annotation)
     {
@@ -59,9 +58,15 @@ namespace hpx { namespace execution { namespace experimental {
 
     // get_annotation property implementation for execution policies
     // that simply forwards to the embedded executor
+    // clang-format off
     template <typename ExPolicy,
-        typename Enable =
-            std::enable_if_t<hpx::is_execution_policy<ExPolicy>::value>>
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::functional::is_tag_dispatchable_v<
+                hpx::execution::experimental::get_annotation_t,
+                typename std::decay_t<ExPolicy>::executor_type>
+        )>
+    // clang-format on
     constexpr decltype(auto) tag_dispatch(
         hpx::execution::experimental::get_annotation_t, ExPolicy&& policy)
     {

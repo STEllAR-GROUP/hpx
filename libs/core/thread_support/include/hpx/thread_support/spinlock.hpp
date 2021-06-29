@@ -29,12 +29,12 @@ namespace hpx { namespace util { namespace detail {
         HPX_CORE_EXPORT void yield_k(unsigned) noexcept;
 
     public:
-        spinlock() noexcept
+        constexpr spinlock() noexcept
           : m(false)
         {
         }
 
-        bool try_lock() noexcept
+        HPX_FORCEINLINE bool try_lock() noexcept
         {
             // First do a relaxed load to check if lock is free in order to prevent
             // unnecessary cache misses if someone does while(!try_lock())
@@ -56,7 +56,7 @@ namespace hpx { namespace util { namespace detail {
             } while (!try_lock());
         }
 
-        void unlock() noexcept
+        HPX_FORCEINLINE void unlock() noexcept
         {
             m.store(false, std::memory_order_release);
         }

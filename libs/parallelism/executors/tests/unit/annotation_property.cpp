@@ -366,17 +366,6 @@ void test_post_policy()
     HPX_TEST_EQ(annotation, desc);
 }
 
-void test_post_seq_policy()
-{
-    // just make sure things compile even if the used executor does not
-    // support with_annotation
-    auto policy =
-        hpx::experimental::prefer(hpx::execution::experimental::with_annotation,
-            hpx::execution::seq, "seq");
-
-    HPX_TEST(typeid(policy).name() == typeid(hpx::execution::seq).name());
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
@@ -392,8 +381,6 @@ int hpx_main()
 
     test_post_policy_prefer();
     test_post_policy();
-
-    test_post_seq_policy();
 
     return hpx::local::finalize();
 }

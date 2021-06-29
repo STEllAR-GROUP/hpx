@@ -59,8 +59,8 @@ namespace hpx { namespace util {
         template <typename F>
         explicit annotate_function(F&& f)
           : task_(thread_domain_,
-                hpx::traits::get_function_annotation_itt<
-                    typename std::decay<F>::type>::call(f))
+                hpx::traits::get_function_annotation_itt<std::decay_t<F>>::call(
+                    f))
         {
         }
 
@@ -74,11 +74,14 @@ namespace hpx { namespace util {
         HPX_NON_COPYABLE(annotate_function);
 
         explicit annotate_function(char const* name)
-          : desc_(hpx::threads::get_self_ptr() ?
-                    hpx::threads::set_thread_description(
-                        hpx::threads::get_self_id(), name) :
-                    nullptr)
         {
+            auto* self = hpx::threads::get_self_ptr();
+            if (self != nullptr)
+            {
+                threads::get_thread_id_data(self->get_thread_id())
+                    ->set_description(name);
+            }
+
 #if defined(HPX_HAVE_APEX)
             /* update the task wrapper in APEX to use the specified name */
             threads::set_self_timer_data(external_timer::update_task(
@@ -88,12 +91,14 @@ namespace hpx { namespace util {
 
         template <typename F>
         explicit annotate_function(F&& f)
-          : desc_(hpx::threads::get_self_ptr() ?
-                    hpx::threads::set_thread_description(
-                        hpx::threads::get_self_id(),
-                        hpx::util::thread_description(f)) :
-                    nullptr)
         {
+            auto* self = hpx::threads::get_self_ptr();
+            if (self != nullptr)
+            {
+                threads::get_thread_id_data(self->get_thread_id())
+                    ->set_description(hpx::util::thread_description(f));
+            }
+
 #if defined(HPX_HAVE_APEX)
             /* no need to update the task description in APEX, because
              * this same description was used when the task was created. */
@@ -102,10 +107,11 @@ namespace hpx { namespace util {
 
         ~annotate_function()
         {
-            if (hpx::threads::get_self_ptr())
+            auto* self = hpx::threads::get_self_ptr();
+            if (self != nullptr)
             {
-                hpx::threads::set_thread_description(
-                    hpx::threads::get_self_id(), desc_);
+                threads::get_thread_id_data(self->get_thread_id())
+                    ->set_description(desc_);
             }
         }
 
@@ -117,6 +123,8 @@ namespace hpx { namespace util {
         template <typename F>
         struct annotated_function
         {
+            using fun_type = util::decay_unwrap_t<F>;
+
             annotated_function() noexcept
               : name_(nullptr)
             {
@@ -134,11 +142,8 @@ namespace hpx { namespace util {
             {
             }
 
-        public:
             template <typename... Ts>
-            typename invoke_result<typename util::decay_unwrap<F>::type,
-                Ts...>::type
-            operator()(Ts&&... ts)
+            invoke_result_t<fun_type, Ts...> operator()(Ts&&... ts)
             {
                 annotate_function annotate(get_function_annotation());
                 return HPX_INVOKE(f_, std::forward<Ts>(ts)...);
@@ -159,8 +164,7 @@ namespace hpx { namespace util {
             /// \param none
             constexpr std::size_t get_function_address() const
             {
-                return traits::get_function_address<
-                    typename util::decay_unwrap<F>::type>::call(f_);
+                return traits::get_function_address<fun_type>::call(f_);
             }
 
             ///////////////////////////////////////////////////////////////////
@@ -176,8 +180,13 @@ namespace hpx { namespace util {
                 return name_ ? name_ : typeid(f_).name();
             }
 
+            constexpr fun_type const& get_bound_function() const noexcept
+            {
+                return f_;
+            }
+
         private:
-            typename util::decay_unwrap<F>::type f_;
+            fun_type f_;
             char const* name_;
         };
 
@@ -186,21 +195,19 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     template <typename F>
-    detail::annotated_function<typename std::decay<F>::type> annotated_function(
+    detail::annotated_function<std::decay_t<F>> annotated_function(
         F&& f, char const* name = nullptr)
     {
-        typedef detail::annotated_function<typename std::decay<F>::type>
-            result_type;
+        typedef detail::annotated_function<std::decay_t<F>> result_type;
 
         return result_type(std::forward<F>(f), name);
     }
 
     template <typename F>
-    detail::annotated_function<typename std::decay<F>::type> annotated_function(
+    detail::annotated_function<std::decay_t<F>> annotated_function(
         F&& f, std::string name)
     {
-        typedef detail::annotated_function<typename std::decay<F>::type>
-            result_type;
+        typedef detail::annotated_function<std::decay_t<F>> result_type;
 
         // Store string in a set to ensure it lives for the entire duration of
         // the task.
@@ -252,8 +259,10 @@ namespace hpx { namespace util {
 #endif
 }}    // namespace hpx::util
 
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx { namespace traits {
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    ///////////////////////////////////////////////////////////////////////////
     template <typename F>
     struct get_function_address<util::detail::annotated_function<F>>
     {
@@ -273,5 +282,5 @@ namespace hpx { namespace traits {
             return f.get_function_annotation();
         }
     };
-}}    // namespace hpx::traits
 #endif
+}}    // namespace hpx::traits

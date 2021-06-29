@@ -16,7 +16,9 @@
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/format.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
@@ -259,15 +261,37 @@ namespace hpx {
 
             init_id_pool_range();
 
-            if (pp)
-                pp->run(false);
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    if (pp)
+                        pp->run(false);
+                },
+                [&](std::exception_ptr&& e) {
+                    std::cerr << hpx::util::format(
+                        "the bootstrap parcelport ({}) has failed to "
+                        "initialize on locality {}:\n{},\nbailing out\n",
+                        pp->type(), hpx::get_locality_id(),
+                        hpx::get_error_what(e));
+                    std::terminate();
+                });
 
             agas::get_big_boot_barrier().wait_bootstrap();
         }
         else
         {
-            if (pp)
-                pp->run(false);
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    if (pp)
+                        pp->run(false);
+                },
+                [&](std::exception_ptr&& e) {
+                    std::cerr << hpx::util::format(
+                        "the bootstrap parcelport ({}) has failed to "
+                        "initialize on locality {}:\n{},\nbailing out\n",
+                        pp->type(), hpx::get_locality_id(),
+                        hpx::get_error_what(e));
+                    std::terminate();
+                });
 
             agas::get_big_boot_barrier().wait_hosted(
                 pp ? pp->get_locality_name() : "<console>",

@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             FwdIter smallest = it;
 
-            util::detail::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
+            util::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
                 [&f, &smallest, &proj, value = HPX_INVOKE(proj, *smallest)](
                     FwdIter const& curr) mutable -> void {
                     auto curr_value = HPX_INVOKE(proj, *curr);
@@ -83,7 +83,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 auto smallest = *it;
 
-                util::detail::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
+                util::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
                     [&f, &smallest, &proj, value = HPX_INVOKE(proj, *smallest)](
                         FwdIter const& curr) mutable -> void {
                         auto curr_value = HPX_INVOKE(proj, **curr);
@@ -267,7 +267,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             FwdIter greatest = it;
 
-            util::detail::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
+            util::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
                 [&f, &greatest, &proj, value = HPX_INVOKE(proj, *greatest)](
                     FwdIter const& curr) mutable -> void {
                     auto curr_value = HPX_INVOKE(proj, *curr);
@@ -300,7 +300,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 auto greatest = *it;
 
-                util::detail::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
+                util::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
                     [&f, &greatest, &proj, value = HPX_INVOKE(proj, *greatest)](
                         FwdIter const& curr) mutable -> void {
                         auto curr_value = HPX_INVOKE(proj, **curr);
@@ -486,7 +486,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return result;
 
             auto value = HPX_INVOKE(proj, *it);
-            util::detail::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
+            util::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
                 [&f, &result, &proj, min_value = value, max_value = value](
                     FwdIter const& curr) mutable -> void {
                     auto curr_value = HPX_INVOKE(proj, *curr);
@@ -526,7 +526,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 auto result = *it;
 
-                util::detail::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
+                util::loop_n<std::decay_t<ExPolicy>>(++it, count - 1,
                     [&f, &result, &proj,
                         min_value = HPX_INVOKE(proj, *result.first),
                         max_value = HPX_INVOKE(proj, *result.second)](
