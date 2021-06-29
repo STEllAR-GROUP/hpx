@@ -99,14 +99,12 @@ namespace hpx { namespace debug {
         template HPX_CORE_EXPORT void print_hex(
             std::ostream&, unsigned long, int);
 
-        template <typename Int>
-        void print_ptr(std::ostream& os, Int v, int N)
+        void print_ptr(std::ostream& os, void* v, int N)
         {
             os << std::right << std::setw(N) << std::noshowbase << std::hex
                << v;
         }
 
-        template HPX_CORE_EXPORT void print_ptr(std::ostream&, void*, int);
     }    // namespace detail
 
     // ------------------------------------------------------------------
