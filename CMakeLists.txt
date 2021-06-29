@@ -323,7 +323,10 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
   set(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL ON)
 
   add_library(hpx_precompiled_headers OBJECT libs/src/dummy.cpp)
-  target_link_libraries(hpx_precompiled_headers PRIVATE hpx_private_flags)
+  target_link_libraries(
+    hpx_precompiled_headers PRIVATE hpx_public_flags hpx_private_flags
+                                    hpx_base_libraries
+  )
   target_precompile_headers(
     hpx_precompiled_headers
     PRIVATE
