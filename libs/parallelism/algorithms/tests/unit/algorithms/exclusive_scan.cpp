@@ -34,7 +34,7 @@ void exclusive_scan_benchmark()
         auto op = [](double v1, double v2) { return v1 + v2; };
 
         hpx::chrono::high_resolution_timer t;
-        hpx::parallel::exclusive_scan(hpx::execution::par, std::begin(c),
+        hpx::exclusive_scan(hpx::execution::par, std::begin(c),
             std::end(c), std::begin(d), val, op);
         double elapsed = t.elapsed();
 
@@ -74,7 +74,7 @@ void test_exclusive_scan1(ExPolicy policy, IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::parallel::exclusive_scan(policy, iterator(std::begin(c)),
+    hpx::exclusive_scan(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(d), val, op);
 
     // verify values
@@ -104,7 +104,7 @@ void test_exclusive_scan1_async(ExPolicy p, IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::future<void> fut = hpx::parallel::exclusive_scan(p,
+    hpx::future<void> fut = hpx::exclusive_scan(p,
         iterator(std::begin(c)), iterator(std::end(c)), std::begin(d), val, op);
     fut.wait();
 
