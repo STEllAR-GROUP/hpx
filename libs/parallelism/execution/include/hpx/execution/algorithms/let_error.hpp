@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/assert.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
@@ -276,7 +277,12 @@ namespace hpx { namespace execution { namespace experimental {
       : hpx::functional::tag_fallback<let_error_t>
     {
     private:
-        template <typename PS, typename F>
+        // clang-format off
+        template <typename PS, typename F,
+            HPX_CONCEPT_REQUIRES_(
+                is_sender_v<PS>
+            )>
+        // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             let_error_t, PS&& ps, F&& f)
         {

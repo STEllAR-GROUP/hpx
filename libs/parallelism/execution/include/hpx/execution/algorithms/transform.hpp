@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -141,7 +142,12 @@ namespace hpx { namespace execution { namespace experimental {
       : hpx::functional::tag_fallback<transform_t>
     {
     private:
-        template <typename S, typename F>
+        // clang-format off
+        template <typename S, typename F,
+            HPX_CONCEPT_REQUIRES_(
+                is_sender_v<S>
+            )>
+        // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             transform_t, S&& s, F&& f)
         {

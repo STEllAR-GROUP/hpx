@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_CXX17_STD_VARIANT)
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -257,7 +258,12 @@ namespace hpx { namespace execution { namespace experimental {
       : hpx::functional::tag_fallback<on_t>
     {
     private:
-        template <typename Sender, typename Scheduler>
+        // clang-format off
+        template <typename Sender, typename Scheduler,
+            HPX_CONCEPT_REQUIRES_(
+                is_sender_v<Sender>
+            )>
+        // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             on_t, Sender&& predecessor_sender, Scheduler&& scheduler)
         {
