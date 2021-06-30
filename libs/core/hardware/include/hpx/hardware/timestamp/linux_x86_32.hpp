@@ -8,13 +8,22 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <cstdint>
+
+#if defined(HPX_HAVE_CUDA) && defined(HPX_COMPUTE_CODE)
+#include <hpx/hardware/timestamp/cuda.hpp>
+#endif
 
 namespace hpx { namespace util { namespace hardware {
 
     // clang-format off
-    inline std::uint64_t timestamp()
+    HPX_HOST_DEVICE inline std::uint64_t timestamp()
     {
+#if defined(HPX_HAVE_CUDA) && defined(HPX_COMPUTE_DEVICE_CODE)
+        return timestamp_cuda();
+#else
         std::uint64_t r = 0;
 
         #if defined(HPX_HAVE_RDTSCP)
@@ -36,6 +45,7 @@ namespace hpx { namespace util { namespace hardware {
         #endif
 
         return r;
+#endif
     }
     // clang-format on
 

@@ -15,13 +15,23 @@
 
 #include <hwi/include/bqc/A2_inlines.h>
 
+#include <hpx/config.hpp>
+
 #include <cstdint>
+
+#if defined(HPX_HAVE_CUDA) && defined(HPX_COMPUTE_CODE)
+#include <hpx/hardware/timestamp/cuda.hpp>
+#endif
 
 namespace hpx { namespace util { namespace hardware {
 
-    inline std::uint64_t timestamp()
+    HPX_HOST_DEVICE inline std::uint64_t timestamp()
     {
+#if defined(HPX_HAVE_CUDA) && defined(HPX_COMPUTE_DEVICE_CODE)
+        return timestamp_cuda();
+#else
         return GetTimeBase();
+#endif
     }
 
 }}}    // namespace hpx::util::hardware

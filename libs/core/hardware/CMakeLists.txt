@@ -11,6 +11,7 @@ set(hardware_headers
     hpx/hardware/cpuid/linux_x86.hpp
     hpx/hardware/cpuid/msvc.hpp
     hpx/hardware/timestamp/bgq.hpp
+    hpx/hardware/timestamp/cuda.hpp
     hpx/hardware/timestamp/linux_generic.hpp
     hpx/hardware/timestamp/linux_x86_32.hpp
     hpx/hardware/timestamp/linux_x86_64.hpp
@@ -47,6 +48,7 @@ add_hpx_module(
     "hpx/hardware/cpuid/linux_x86.hpp"
     "hpx/hardware/cpuid/msvc.hpp"
     "hpx/hardware/timestamp/bgq.hpp"
+    "hpx/hardware/timestamp/cuda.hpp"
     "hpx/hardware/timestamp/linux_generic.hpp"
     "hpx/hardware/timestamp/linux_x86_32.hpp"
     "hpx/hardware/timestamp/linux_x86_64.hpp"
