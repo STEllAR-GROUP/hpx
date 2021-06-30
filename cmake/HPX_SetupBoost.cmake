@@ -84,9 +84,6 @@ if(NOT TARGET hpx_dependencies_boost)
 
   include(HPX_AddDefinitions)
 
-  find_package(Threads QUIET REQUIRED)
-  target_link_libraries(hpx_dependencies_boost INTERFACE Threads::Threads)
-
   # Boost preprocessor definitions
   if(NOT Boost_USE_STATIC_LIBS)
     hpx_add_config_cond_define(BOOST_ALL_DYN_LINK)

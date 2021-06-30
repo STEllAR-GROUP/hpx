@@ -7,7 +7,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-hpx_warn("finding asio")
 if(NOT TARGET Asio::asio)
   find_path(
     ASIO_INCLUDE_DIR asio.hpp

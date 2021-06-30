@@ -81,6 +81,8 @@ if(NOT MIMALLOC_ROOT AND NOT "$ENV{MIMALLOC_ROOT}")
 endif()
 include(HPX_SetupAllocator)
 
+include(HPX_SetupThreads)
+
 # Boost Separate boost targets to be unarily linked to some modules
 set(HPX_BOOST_ROOT "@BOOST_ROOT@")
 # By default BOOST_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
