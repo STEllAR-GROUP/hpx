@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #include <cstdint>
 
 namespace hpx { namespace util { namespace hardware {
