@@ -10,7 +10,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
@@ -165,17 +167,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
 
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T, typename Op, typename Conv>
-        static typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-        exclusive_scan_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, T&& init, Op&& op, std::false_type, Conv&&)
-        {
-            return exclusive_scan<FwdIter2>().call(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::forward<T>(init), std::forward<Op>(op));
-        }
-
         // forward declare the segmented version of this algorithm
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename T, typename Op, typename Conv>
@@ -265,23 +256,38 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// \a op is not mathematically associative, the behavior of
     /// \a inclusive_scan may be non-deterministic.
     ///
+
+    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T, typename Op>
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
-    exclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, T init, Op&& op)
+        typename T, typename Op,
+        HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value
+            )>
+    // clang-format on
+    //HPX_DEPRECATED_V(1, 8,
+    //    "hpx::parallel::exclusive_scan is deprecated, use hpx::exclusive_scan "
+    //    "instead")
+        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        exclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, T init, Op&& op)
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
-
-        return detail::exclusive_scan_(std::forward<ExPolicy>(policy), first,
-            last, dest, std::move(init), std::forward<Op>(op), is_segmented(),
-            util::projection_identity{});
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+        return hpx::parallel::v1::detail::exclusive_scan<FwdIter2>().call(
+            std::forward<ExPolicy>(policy), first, last, dest, std::move(init),
+            std::forward<Op>(op));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -344,22 +350,135 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// The difference between \a exclusive_scan and \a inclusive_scan is that
     /// \a inclusive_scan includes the ith input element in the ith sum.
     ///
+
+    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T>
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
-    exclusive_scan(
-        ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init)
+        typename T,
+        HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value
+            )>
+    // clang-format on
+    //HPX_DEPRECATED_V(1, 8,
+    //    "hpx::parallel::exclusive_scan is deprecated, use hpx::exclusive_scan "
+    //    "instead")
+        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        exclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, T init)
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
         static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
-        typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
-
-        return detail::exclusive_scan_(std::forward<ExPolicy>(policy), first,
-            last, dest, std::move(init), std::plus<T>(), is_segmented(),
-            util::projection_identity{});
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+        return hpx::parallel::v1::detail::exclusive_scan<FwdIter2>().call(
+            std::forward<ExPolicy>(policy), first, last, dest, std::move(init),
+            std::plus<T>());
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
+
+namespace hpx {
+    ///////////////////////////////////////////////////////////////////////////
+    // DPO for hpx::exclusive_scan
+    HPX_INLINE_CONSTEXPR_VARIABLE struct exclusive_scan_t final
+      : hpx::functional::tag_fallback<exclusive_scan_t>
+    {
+        // clang-format off
+        template <typename InIter, typename OutIter, typename T,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<InIter>::value &&
+                hpx::traits::is_iterator<OutIter>::value
+            )>
+        // clang-format on
+        friend OutIter tag_fallback_dispatch(hpx::exclusive_scan_t,
+            InIter first, InIter last, OutIter dest, T init)
+        {
+            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+                "Requires at least input iterator.");
+            static_assert((hpx::traits::is_output_iterator<OutIter>::value),
+                "Requires at least output iterator.");
+
+            return hpx::parallel::v1::detail::exclusive_scan<OutIter>().call(
+                hpx::execution::seq, first, last, dest, std::move(init),
+                std::plus<T>());
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename T,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_forward_iterator<FwdIter1>::value &&
+                hpx::traits::is_forward_iterator<FwdIter2>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter2>::type
+        tag_fallback_dispatch(hpx::exclusive_scan_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init)
+        {
+            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+                "Requires at least forward iterator.");
+
+            return hpx::parallel::v1::detail::exclusive_scan<FwdIter2>().call(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                std::move(init), std::plus<T>());
+        }
+
+        // clang-format off
+        template <typename InIter, typename OutIter, typename T,
+            typename Op,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<InIter>::value &&
+                hpx::traits::is_iterator<OutIter>::value
+            )>
+        // clang-format on
+        friend OutIter tag_fallback_dispatch(hpx::exclusive_scan_t,
+            InIter first, InIter last, OutIter dest, T init, Op&& op)
+        {
+            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+                "Requires at least input iterator.");
+            static_assert((hpx::traits::is_output_iterator<OutIter>::value),
+                "Requires at least output iterator.");
+
+            return hpx::parallel::v1::detail::exclusive_scan<OutIter>().call(
+                hpx::execution::seq, first, last, dest, std::move(init),
+                std::forward<Op>(op));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename T, typename Op,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_forward_iterator<FwdIter1>::value &&
+                hpx::traits::is_forward_iterator<FwdIter2>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter2>::type
+        tag_fallback_dispatch(hpx::exclusive_scan_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init, Op&& op)
+        {
+            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+                "Requires at least forward iterator.");
+
+            return hpx::parallel::v1::detail::exclusive_scan<FwdIter2>().call(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                std::move(init), std::forward<Op>(op));
+        }
+
+    } exclusive_scan{};
+}    // namespace hpx

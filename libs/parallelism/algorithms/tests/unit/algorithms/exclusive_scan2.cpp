@@ -31,7 +31,7 @@ void test_exclusive_scan2(ExPolicy policy, IteratorTag)
     std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     std::size_t const val(0);
-    hpx::parallel::exclusive_scan(policy, iterator(std::begin(c)),
+    hpx::exclusive_scan(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(d), val);
 
     // verify values
@@ -53,7 +53,7 @@ void test_exclusive_scan2_async(ExPolicy p, IteratorTag)
     std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     std::size_t const val(0);
-    hpx::future<void> f = hpx::parallel::exclusive_scan(
+    hpx::future<void> f = hpx::exclusive_scan(
         p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d), val);
     f.wait();
 
