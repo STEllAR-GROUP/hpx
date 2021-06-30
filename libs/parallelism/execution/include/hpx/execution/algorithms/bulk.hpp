@@ -26,7 +26,6 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 namespace hpx { namespace execution { namespace experimental {
 
@@ -38,11 +37,6 @@ namespace hpx { namespace execution { namespace experimental {
             std::decay_t<R> r;
             std::decay_t<Shape> shape;
             std::decay_t<F> f;
-
-            using shape_iterator = typename hpx::traits::range_traits<
-                std::decay_t<Shape>>::iterator_type;
-            using shape_element =
-                typename std::iterator_traits<shape_iterator>::value_type;
 
             template <typename R_, typename Shape_, typename F_>
             bulk_receiver(R_&& r, Shape_&& shape, F_&& f)
@@ -64,9 +58,8 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::execution::experimental::set_done(std::move(r));
             }
 
-        private:
             template <typename... Ts>
-            void set_value_helper(std::true_type, Ts&&... ts) noexcept
+            void set_value(Ts&&... ts) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
@@ -74,48 +67,13 @@ namespace hpx { namespace execution { namespace experimental {
                         {
                             HPX_INVOKE(f, s, ts...);
                         }
-                        hpx::execution::experimental::set_value(std::move(r));
-                    },
-                    [&](std::exception_ptr ep) {
-                        hpx::execution::experimental::set_error(
-                            std::move(r), std::move(ep));
-                    });
-            }
-
-            template <typename... Ts>
-            void set_value_helper(std::false_type, Ts&&... ts) noexcept
-            {
-                hpx::detail::try_catch_exception_ptr(
-                    [&]() {
-                        using result_type =
-                            hpx::util::invoke_result_t<std::decay_t<F>,
-                                shape_element, std::decay_t<Ts>...>;
-
-                        std::vector<result_type> results;
-                        results.reserve(util::size(shape));
-                        for (auto const& s : shape)
-                        {
-                            results.emplace_back(HPX_INVOKE(f, s, ts...));
-                        }
-
                         hpx::execution::experimental::set_value(
-                            std::move(r), std::move(results));
+                            std::move(r), std::forward<Ts>(ts)...);
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
                             std::move(r), std::move(ep));
                     });
-            }
-
-        public:
-            template <typename... Ts,
-                typename = std::enable_if_t<
-                    hpx::is_invocable_v<F, shape_element, Ts...>>>
-            void set_value(Ts&&... ts) && noexcept
-            {
-                using is_void_result = std::is_void<
-                    hpx::util::invoke_result_t<F, shape_element, Ts...>>;
-                set_value_helper(is_void_result{}, std::forward<Ts>(ts)...);
             }
         };
 
@@ -126,31 +84,11 @@ namespace hpx { namespace execution { namespace experimental {
             std::decay_t<Shape> shape;
             std::decay_t<F> f;
 
-            using shape_iterator = typename hpx::traits::range_traits<
-                std::decay_t<Shape>>::iterator_type;
-            using shape_element =
-                typename std::iterator_traits<shape_iterator>::value_type;
-
-            template <typename Tuple>
-            struct invoke_result_helper;
-
-            template <template <typename...> class Tuple, typename... Ts>
-            struct invoke_result_helper<Tuple<Ts...>>
-            {
-                using result_type =
-                    hpx::util::invoke_result_t<F, shape_element, Ts...>;
-                using type =
-                    typename std::conditional<std::is_void<result_type>::value,
-                        Tuple<>, Tuple<std::vector<result_type>>>::type;
-            };
-
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
             using value_types =
-                hpx::util::detail::unique_t<hpx::util::detail::transform_t<
-                    typename hpx::execution::experimental::sender_traits<
-                        S>::template value_types<Tuple, Variant>,
-                    invoke_result_helper>>;
+                typename hpx::execution::experimental::sender_traits<
+                    S>::template value_types<Tuple, Variant>;
 
             template <template <typename...> class Variant>
             using error_types =
@@ -226,26 +164,7 @@ namespace hpx { namespace execution { namespace experimental {
                 std::forward<Shape>(shape), std::forward<F>(f)};
         }
 
-        // clang-format off
-        template <typename Shape, typename F,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_integral<Shape>::value
-            )>
-        // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
-            bulk_t, Shape const& shape, F&& f)
-        {
-            return detail::partial_algorithm<bulk_t,
-                detail::counting_shape_type<Shape>, F>{
-                detail::make_counting_shape(shape), std::forward<F>(f)};
-        }
-
-        // clang-format off
-        template <typename Shape, typename F,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral<std::decay_t<Shape>>::value
-            )>
-        // clang-format on
+        template <typename Shape, typename F>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             bulk_t, Shape&& shape, F&& f)
         {

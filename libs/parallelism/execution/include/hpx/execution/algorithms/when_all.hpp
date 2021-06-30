@@ -245,6 +245,12 @@ namespace hpx { namespace execution { namespace experimental {
                 return operation_state<R, num_predecessors - 1>(
                     std::forward<R>(r), senders);
             }
+
+            template <typename R>
+            auto connect(R&& r) &
+            {
+                return operation_state<R, num_predecessors - 1>(r, senders);
+            }
         };
     }    // namespace detail
 

@@ -16,7 +16,6 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 namespace ex = hpx::execution::experimental;
 
@@ -69,17 +68,12 @@ int main()
     {
         std::atomic<bool> set_value_called{false};
         std::atomic<int> set_value_count{0};
-        auto s = ex::bulk(ex::just(0), 10, [&](int n, int x) {
+        auto s = ex::bulk(ex::just(42), 10, [&](int n, int x) {
             HPX_TEST_EQ(n, set_value_count);
             ++set_value_count;
             return ++x;
         });
-        auto f = [](std::vector<int>&& v) {
-            for (int x : v)
-            {
-                HPX_TEST_EQ(x, 1);
-            }
-        };
+        auto f = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
@@ -90,19 +84,14 @@ int main()
     {
         std::atomic<bool> set_value_called{false};
         std::atomic<int> set_value_count{0};
-        auto s = ex::bulk(ex::just(custom_type_non_default_constructible{0}),
+        auto s = ex::bulk(ex::just(custom_type_non_default_constructible{42}),
             10, [&](int n, auto x) {
                 HPX_TEST_EQ(n, set_value_count);
                 ++set_value_count;
                 ++(x.x);
                 return x;
             });
-        auto f = [](auto&& v) {
-            for (auto&& x : v)
-            {
-                HPX_TEST_EQ(x.x, 1);
-            }
-        };
+        auto f = [](auto&& x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
@@ -112,50 +101,50 @@ int main()
 
     {
         std::atomic<bool> set_value_called{false};
-        auto s1 = ex::bulk(ex::just(0), 10, [](int, int x) { return ++x; });
-        auto f = [](int n, std::vector<int> v) {
-            for (auto& x : v)
-            {
-                ++x;
-            }
-            return v[n];
-        };
+        std::atomic<int> set_value_count{0};
+        auto s = ex::bulk(
+            ex::just(custom_type_non_default_constructible_non_copyable{42}),
+            10, [&](int n, auto&&) {
+                HPX_TEST_EQ(n, set_value_count);
+                ++set_value_count;
+            });
+        auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+        HPX_TEST_EQ(set_value_count, 10);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        std::atomic<int> set_value_count{0};
+        auto s1 = ex::bulk(ex::just(42), 10, [](int, int x) { return ++x; });
+        auto f = [&](int, int) { ++set_value_count; };
         auto s2 = ex::bulk(std::move(s1), 10, f);
         auto s3 = ex::bulk(std::move(s2), 10, f);
         auto s4 = ex::bulk(std::move(s3), 10, f);
-        auto f1 = [](std::vector<int> v) {
-            for (auto x : v)
-            {
-                HPX_TEST_EQ(x, 4);
-            }
-        };
+        auto f1 = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<decltype(f1)>{f1, set_value_called};
         auto os = ex::connect(std::move(s4), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
+        HPX_TEST_EQ(set_value_count, 30);
     }
 
     // operator| overload
     {
         std::atomic<bool> set_value_called{false};
-        auto s = ex::just() | ex::bulk(10, [](int) { return 3; }) |
-            ex::bulk(10,
-                [](int n, std::vector<int> const& x) { return x[n] / 1.5; }) |
-            ex::bulk(10,
-                [](int n, std::vector<double> const& x) { return x[n] / 2; }) |
-            ex::bulk(10, [](int n, std::vector<double> const& x) {
-                return std::to_string((int) x[n]);
-            });
-        auto f = [](std::vector<std::string> const& v) {
-            for (auto x : v)
-            {
-                HPX_TEST_EQ(x, std::string("1"));
-            }
-        };
-        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        std::atomic<int> set_value_count{0};
+        auto f = [&](int, int) { ++set_value_count; };
+        auto s = ex::just(42) | ex::bulk(10, f) | ex::bulk(10, f) |
+            ex::bulk(10, f) | ex::bulk(10, f);
+        auto f1 = [](int x) { HPX_TEST_EQ(x, 42); };
+        auto r = callback_receiver<decltype(f1)>{f1, set_value_called};
         auto os = ex::connect(std::move(s), r);
         ex::start(os);
         HPX_TEST(set_value_called);
+        HPX_TEST_EQ(set_value_count, 40);
     }
 
     // tag_dispatch overload
@@ -181,6 +170,17 @@ int main()
     // Failure path
     {
         std::atomic<bool> set_error_called{false};
+        auto s = ex::bulk(
+            ex::just(), 0, [](int) { throw std::runtime_error("error"); });
+        auto r = error_callback_receiver<decltype(check_exception_ptr)>{
+            check_exception_ptr, set_error_called, true};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(!set_error_called);
+    }
+
+    {
+        std::atomic<bool> set_error_called{false};
         auto s = ex::bulk(ex::just(), 10, [](int n) {
             if (n == 3)
                 throw std::runtime_error("error");
@@ -195,22 +195,15 @@ int main()
     {
         std::atomic<bool> set_error_called{false};
         auto s1 = ex::bulk(ex::just(0), 10, [](int, int x) { return ++x; });
-        auto s2 = ex::bulk(
-            std::move(s1), 10, [](int n, std::vector<int> const& x) {
-                if (n == 3)
-                    throw std::runtime_error("error");
-                return x[n] + 1;
-            });
+        auto s2 = ex::bulk(std::move(s1), 10, [](int n, int x) {
+            if (n == 3)
+                throw std::runtime_error("error");
+            return x + 1;
+        });
         auto s3 =
-            ex::bulk(std::move(s2), 10, [](int, std::vector<int> const& x) {
-            HPX_TEST(false);
-            return x[0];
-        });
+            ex::bulk(std::move(s2), 10, [](int, int) { HPX_TEST(false); });
         auto s4 =
-            ex::bulk(std::move(s3), 10, [](int, std::vector<int> const& x) {
-            HPX_TEST(false);
-            return x[0];
-        });
+            ex::bulk(std::move(s3), 10, [](int, int) { HPX_TEST(false); });
         auto r = error_callback_receiver<decltype(check_exception_ptr)>{
             check_exception_ptr, set_error_called};
         auto os = ex::connect(std::move(s4), std::move(r));
@@ -225,8 +218,8 @@ int main()
         std::atomic<int> custom_bulk_call_count{0};
         auto s = ex::bulk(ex::just(), 10,
             custom_bulk_operation{tag_dispatch_overload_called,
-                custom_bulk_call_operator_called,
-                custom_bulk_call_count, true});
+                custom_bulk_call_operator_called, custom_bulk_call_count,
+                true});
         auto r = error_callback_receiver<decltype(check_exception_ptr)>{
             check_exception_ptr, receiver_set_error_called};
         auto os = ex::connect(std::move(s), std::move(r));

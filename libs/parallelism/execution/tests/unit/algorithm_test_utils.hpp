@@ -111,6 +111,7 @@ struct error_callback_receiver
 {
     std::decay_t<F> f;
     std::atomic<bool>& set_error_called;
+    bool expect_set_value = false;
 
     template <typename E>
     void set_error(E&& e) noexcept
@@ -127,7 +128,7 @@ struct error_callback_receiver
     template <typename... Ts>
     void set_value(Ts&&...) noexcept
     {
-        HPX_TEST(false);
+        HPX_TEST(expect_set_value);
     }
 };
 
