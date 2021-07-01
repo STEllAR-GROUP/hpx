@@ -25,8 +25,8 @@ unsigned int seed;
 std::mt19937 gen;
 std::uniform_int_distribution<> dis(1, 10007);
 
-template<typename IteratorTag>
-void test_fill_sent(IteratorTag)
+template <typename IteratorTag>
+void test_exclusive_scan_sent(IteratorTag)
 {
     auto end_len = dis(gen);
     std::vector<std::size_t> c(10007);
@@ -37,8 +37,8 @@ void test_fill_sent(IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::ranges::exclusive_scan(std::begin(c),
-        sentinel<std::size_t>{2}, std::begin(d), val, op);
+    hpx::ranges::exclusive_scan(
+        std::begin(c), sentinel<std::size_t>{2}, std::begin(d), val, op);
 
     // verify values
     std::vector<std::size_t> e(end_len);
@@ -47,193 +47,124 @@ void test_fill_sent(IteratorTag)
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 }
-/*
-template <typename ExPolicy>
-void test_fill_sent(ExPolicy policy)
+
+template <typename ExPolicy, typename IteratorTag>
+void test_exclusive_scan_sent(ExPolicy policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    // ensure all characters are unique
-    std::unordered_set<unsigned char> uset;
+    auto end_len = dis(gen);
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(end_len);
+    std::fill(std::begin(c), std::begin(c) + end_len, std::size_t(1));
+    c[end_len] = 2;
 
-    std::vector<char> c1(7);
-    std::generate(std::begin(c1), std::end(c1), [&uset]() {
-        unsigned char c = 'a' + dis(gen);
-        while (uset.find(c) != uset.end())
-        {
-            c = 'a' + dis(gen);
-        }
-        uset.insert(c);
-        return c;
-    });
+    std::size_t const val(0);
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    uset.clear();
-    std::vector<char> c2(7);
-    std::generate(std::begin(c2), std::end(c2), [&uset]() {
-        unsigned char c = 'a' + dis(gen);
-        while (uset.find(c) != uset.end())
-        {
-            c = 'a' + dis(gen);
-        }
-        uset.insert(c);
-        return c;
-    });
+    hpx::ranges::exclusive_scan(policy, std::begin(c), sentinel<std::size_t>{2},
+        std::begin(d), val, op);
 
-    bool actual_result1 = std::lexicographical_compare(
-        std::begin(c1), std::begin(c1) + 5, std::begin(c2), std::begin(c2) + 5);
-    bool result1 = hpx::ranges::lexicographical_compare(policy, std::begin(c1),
-        sentinel<char>{*(std::begin(c1) + 5)}, std::begin(c2),
-        sentinel<char>{*(std::begin(c2) + 5)});
+    // verify values
+    std::vector<std::size_t> e(end_len);
+    hpx::parallel::v1::detail::sequential_exclusive_scan(
+        std::begin(c), std::begin(c) + end_len, std::begin(e), val, op);
 
-    bool actual_result2 = std::lexicographical_compare(
-        std::begin(c2), std::begin(c2) + 5, std::begin(c1), std::begin(c1) + 5);
-    bool result2 = hpx::ranges::lexicographical_compare(policy, std::begin(c2),
-        sentinel<char>{*(std::begin(c2) + 5)}, std::begin(c1),
-        sentinel<char>{*(std::begin(c1) + 5)});
-
-    bool actual_result3 = std::lexicographical_compare(
-        std::begin(c1), std::begin(c1) + 5, std::begin(c1), std::begin(c1) + 5);
-    bool result3 = hpx::ranges::lexicographical_compare(policy, std::begin(c1),
-        sentinel<char>{*(std::begin(c1) + 5)}, std::begin(c1),
-        sentinel<char>{*(std::begin(c1) + 5)});
-
-    HPX_TEST_EQ(actual_result1, result1);
-    HPX_TEST_EQ(actual_result2, result2);
-    HPX_TEST_EQ(actual_result3, result3);
-
-    // check corner cases
-    std::vector<char> c3 = {1, 1, 1, 1, 3, 2, 2, 8};
-    std::vector<char> c4 = {1, 1, 1, 1, 3, 5, 5, 8};
-    auto result4 = hpx::ranges::lexicographical_compare(policy, std::begin(c3),
-        sentinel<char>{3}, std::begin(c4), sentinel<char>{3});
-    auto result5 = hpx::ranges::lexicographical_compare(policy, std::begin(c3),
-        sentinel<char>{8}, std::begin(c4), sentinel<char>{8});
-
-    HPX_TEST_EQ(false, result4);
-    HPX_TEST_EQ(true, result5);
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 }
 
 template <typename IteratorTag>
-void test_lexicographical_compare(IteratorTag)
+void test_exclusive_scan(IteratorTag)
 {
-    std::vector<char> c1(10);
-    std::generate(
-        std::begin(c1), std::end(c1), []() { return 'a' + dis(gen); });
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
 
-    std::vector<char> c2(10);
-    std::generate(
-        std::begin(c2), std::end(c2), []() { return 'a' + dis(gen); });
+    std::size_t const val(0);
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    bool actual_result1 = std::lexicographical_compare(
-        std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
-    bool result1 = hpx::ranges::lexicographical_compare(c1, c2);
+    hpx::ranges::exclusive_scan(c, std::begin(d), val, op);
 
-    bool actual_result2 = std::lexicographical_compare(
-        std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
-    bool result2 = hpx::ranges::lexicographical_compare(c1, c2);
+    // verify values
+    std::vector<std::size_t> e(c.size());
+    hpx::parallel::v1::detail::sequential_exclusive_scan(
+        std::begin(c), std::end(c), std::begin(e), val, op);
 
-    bool actual_result3 = std::lexicographical_compare(
-        std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
-    bool result3 = hpx::ranges::lexicographical_compare(c1, c2);
-
-    HPX_TEST_EQ(actual_result1, result1);
-    HPX_TEST_EQ(actual_result2, result2);
-    HPX_TEST_EQ(actual_result3, result3);
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_lexicographical_compare(ExPolicy policy, IteratorTag)
+void test_exclusive_scan(ExPolicy policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    std::vector<char> c1(10);
-    std::generate(
-        std::begin(c1), std::end(c1), []() { return 'a' + dis(gen); });
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
 
-    std::vector<char> c2(10);
-    std::generate(
-        std::begin(c2), std::end(c2), []() { return 'a' + dis(gen); });
+    std::size_t const val(0);
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    bool actual_result1 = std::lexicographical_compare(
-        std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
-    bool result1 = hpx::ranges::lexicographical_compare(policy, c1, c2);
+    hpx::ranges::exclusive_scan(policy, c, std::begin(d), val, op);
 
-    bool actual_result2 = std::lexicographical_compare(
-        std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
-    bool result2 = hpx::ranges::lexicographical_compare(policy, c1, c2);
+    // verify values
+    std::vector<std::size_t> e(c.size());
+    hpx::parallel::v1::detail::sequential_exclusive_scan(
+        std::begin(c), std::end(c), std::begin(e), val, op);
 
-    bool actual_result3 = std::lexicographical_compare(
-        std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
-    bool result3 = hpx::ranges::lexicographical_compare(policy, c1, c2);
-
-    HPX_TEST_EQ(actual_result1, result1);
-    HPX_TEST_EQ(actual_result2, result2);
-    HPX_TEST_EQ(actual_result3, result3);
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_fill_async(ExPolicy policy, IteratorTag)
+void test_exclusive_scan_async(ExPolicy policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    std::vector<char> c1(10);
-    std::generate(
-        std::begin(c1), std::end(c1), []() { return 'a' + dis(gen); });
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
 
-    std::vector<char> c2(10);
-    std::generate(
-        std::begin(c2), std::end(c2), []() { return 'a' + dis(gen); });
+    std::size_t const val(0);
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    bool actual_result1 = std::lexicographical_compare(
-        std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
-    hpx::future<bool> result1 =
-        hpx::ranges::lexicographical_compare(policy, c1, c2);
+    hpx::future<void> fut =
+        hpx::ranges::exclusive_scan(policy, c, std::begin(d), val, op);
+    fut.wait();
 
-    bool actual_result2 = std::lexicographical_compare(
-        std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
-    hpx::future<bool> result2 =
-        hpx::ranges::lexicographical_compare(policy, c1, c2);
+    // verify values
+    std::vector<std::size_t> e(c.size());
+    hpx::parallel::v1::detail::sequential_exclusive_scan(
+        std::begin(c), std::end(c), std::begin(e), val, op);
 
-    bool actual_result3 = std::lexicographical_compare(
-        std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
-    hpx::future<bool> result3 =
-        hpx::ranges::lexicographical_compare(policy, c1, c2);
-
-    result1.wait();
-    result2.wait();
-    result3.wait();
-
-    HPX_TEST_EQ(actual_result1, result1.get());
-    HPX_TEST_EQ(actual_result2, result2.get());
-    HPX_TEST_EQ(actual_result3, result3.get());
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 }
-*/
+
 template <typename IteratorTag>
-void test_lexicographical_compare()
+void test_exclusive_scan()
 {
     using namespace hpx::execution;
 
-    /*test_lexicographical_compare(IteratorTag());
-    test_lexicographical_compare(seq, IteratorTag());
-    test_lexicographical_compare(par, IteratorTag());
-    test_lexicographical_compare(par_unseq, IteratorTag());
+    test_exclusive_scan(IteratorTag());
+    test_exclusive_scan(seq, IteratorTag());
+    test_exclusive_scan(par, IteratorTag());
+    test_exclusive_scan(par_unseq, IteratorTag());
 
-    test_fill_async(seq(task), IteratorTag());
-    test_fill_async(par(task), IteratorTag());*/
+    test_exclusive_scan_async(seq(task), IteratorTag());
+    test_exclusive_scan_async(par(task), IteratorTag());
 
-    test_fill_sent(IteratorTag());
-    /*test_fill_sent(seq);
-    test_fill_sent(par);
-    test_fill_sent(par_unseq);*/
+    test_exclusive_scan_sent(IteratorTag());
+    test_exclusive_scan_sent(seq, IteratorTag());
+    test_exclusive_scan_sent(par, IteratorTag());
+    test_exclusive_scan_sent(par_unseq, IteratorTag());
 }
 
-void lexicographical_compare_test()
+void exclusive_scan_test()
 {
-    test_lexicographical_compare<std::random_access_iterator_tag>();
-    test_lexicographical_compare<std::forward_iterator_tag>();
+    test_exclusive_scan<std::random_access_iterator_tag>();
+    test_exclusive_scan<std::forward_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -249,7 +180,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     seed = seed1;
     gen = std::mt19937(seed);
 
-    lexicographical_compare_test();
+    exclusive_scan_test();
     return hpx::local::finalize();
 }
 
