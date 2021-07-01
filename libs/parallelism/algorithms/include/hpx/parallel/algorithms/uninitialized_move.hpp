@@ -236,7 +236,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             FwdIter2 current = dest;
             try
             {
-                for (/* */; cond(first, current); (void) ++first, ++current)
+                for (/* */; HPX_INVOKE(cond, first, current);
+                     (void) ++first, ++current)
                 {
                     ::new (std::addressof(*current))
                         value_type(std::move(*first));
