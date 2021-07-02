@@ -13,6 +13,7 @@
 #include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/parallel/datapar/transform_loop.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+#include <hpx/parallel/util/transfer.hpp>
 
 #include <cstddef>
 #include <type_traits>

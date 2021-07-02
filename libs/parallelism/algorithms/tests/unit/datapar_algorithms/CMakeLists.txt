@@ -9,6 +9,8 @@ set(tests)
 if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
   set(tests
       ${tests}
+      copy_datapar
+      copyn_datapar
       count_datapar
       countif_datapar
       foreach_datapar
