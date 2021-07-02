@@ -209,8 +209,7 @@ namespace hpx { namespace parallel { namespace util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy, typename IterB, typename IterE,
-        typename OutIter, typename F>
+    template <typename IterB, typename IterE, typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_dispatch(hpx::parallel::util::transform_loop_t,
@@ -224,8 +223,7 @@ namespace hpx { namespace parallel { namespace util {
             std::move(ret.first), std::move(ret.second)};
     }
 
-    template <typename ExPolicy, typename IterB, typename IterE,
-        typename OutIter, typename F>
+    template <typename IterB, typename IterE, typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_dispatch(hpx::parallel::util::transform_loop_t,
@@ -272,14 +270,15 @@ namespace hpx { namespace parallel { namespace util {
                 std::pair<InIter, OutIter>>::type
             call(InIter first, InIter last, OutIter dest, F&& f)
             {
-                return util::transform_loop(
+                auto ret = util::transform_loop_ind(
                     hpx::execution::seq, first, last, dest, std::forward<F>(f));
+                return std::pair<InIter, OutIter>{
+                    std::move(ret.in), std::move(ret.out)};
             }
         };
     }    // namespace detail
 
-    template <typename ExPolicy, typename IterB, typename IterE,
-        typename OutIter, typename F>
+    template <typename IterB, typename IterE, typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_dispatch(hpx::parallel::util::transform_loop_ind_t,
@@ -293,8 +292,7 @@ namespace hpx { namespace parallel { namespace util {
             std::move(ret.first), std::move(ret.second)};
     }
 
-    template <typename ExPolicy, typename IterB, typename IterE,
-        typename OutIter, typename F>
+    template <typename IterB, typename IterE, typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_dispatch(hpx::parallel::util::transform_loop_ind_t,
