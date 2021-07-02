@@ -121,7 +121,7 @@ namespace hpx { namespace parallel { namespace util {
             typedef typename std::iterator_traits<iterator_type>::value_type
                 value_type;
 
-            typedef typename traits::vector_pack_type<value_type> V;
+            typedef typename traits::vector_pack_type<value_type>::type V;
 
             template <typename Begin, typename End, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { namespace util {
             typedef typename std::iterator_traits<iterator_type>::value_type
                 value_type;
 
-            typedef typename traits::vector_pack_type<value_type> V;
+            typedef typename traits::vector_pack_type<value_type>::type V;
 
             template <typename Begin, typename End, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
@@ -426,8 +426,8 @@ namespace hpx { namespace parallel { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_dispatch(
-        hpx::parallel::util::loop_t, hpx::execution::simdpar_policy,
-        Begin begin, End end, F&& f)
+        hpx::parallel::util::loop_t, hpx::execution::simd_policy, Begin begin,
+        End end, F&& f)
     {
         return detail::datapar_loop<Begin>::call(
             begin, end, std::forward<F>(f));
@@ -435,7 +435,7 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_dispatch(
-        hpx::parallel::util::loop_t, hpx::execution::simdpar_task_policy,
+        hpx::parallel::util::loop_t, hpx::execution::simd_task_policy,
         Begin begin, End end, F&& f)
     {
         return detail::datapar_loop<Begin>::call(
