@@ -87,8 +87,6 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         // support with_annotation property
-        using supports_annotations = void;
-
         friend constexpr executor tag_dispatch(
             hpx::execution::experimental::with_annotation_t,
             executor const& exec, char const* annotation)
