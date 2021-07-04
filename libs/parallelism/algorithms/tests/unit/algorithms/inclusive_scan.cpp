@@ -18,6 +18,7 @@ void test_inclusive_scan1()
 {
     using namespace hpx::execution;
 
+    test_inclusive_scan1(IteratorTag());
     test_inclusive_scan1(seq, IteratorTag());
     test_inclusive_scan1(par, IteratorTag());
     test_inclusive_scan1(par_unseq, IteratorTag());
@@ -38,6 +39,7 @@ void test_inclusive_scan2()
 {
     using namespace hpx::execution;
 
+    test_inclusive_scan2(IteratorTag());
     test_inclusive_scan2(seq, IteratorTag());
     test_inclusive_scan2(par, IteratorTag());
     test_inclusive_scan2(par_unseq, IteratorTag());
@@ -58,6 +60,7 @@ void test_inclusive_scan3()
 {
     using namespace hpx::execution;
 
+    test_inclusive_scan3(IteratorTag());
     test_inclusive_scan3(seq, IteratorTag());
     test_inclusive_scan3(par, IteratorTag());
     test_inclusive_scan3(par_unseq, IteratorTag());
