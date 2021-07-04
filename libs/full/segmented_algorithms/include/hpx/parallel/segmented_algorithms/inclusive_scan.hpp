@@ -251,62 +251,132 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::forward<Conv>(conv));
             }
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        // segmented implementation
-        template <typename ExPolicy, typename InIter, typename OutIter,
-            typename T, typename Op, typename Conv>
-        static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        inclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
-            OutIter dest, T&& init, Op&& op, std::true_type, Conv&& conv)
-        {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
-            if (first == last)
-            {
-                return util::detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::move(dest));
-            }
-
-            return segmented_inclusive_scan(std::forward<ExPolicy>(policy),
-                first, last, dest, std::forward<T>(init), std::forward<Op>(op),
-                is_seq(), std::forward<Conv>(conv));
-        }
-
-        template <typename ExPolicy, typename InIter, typename OutIter,
-            typename Op, typename Conv>
-        static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        inclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
-            OutIter dest, Op&& op, std::true_type, Conv&& conv)
-        {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-            typedef
-                typename std::iterator_traits<InIter>::value_type value_type;
-
-            if (first == last)
-            {
-                return util::detail::algorithm_result<ExPolicy, OutIter>::get(
-                    std::move(dest));
-            }
-
-            return segmented_inclusive_scan(std::forward<ExPolicy>(policy),
-                first, last, dest, value_type{}, std::forward<Op>(op), is_seq(),
-                std::forward<Conv>(conv));
-        }
-
-        // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename OutIter,
-            typename T, typename Op, typename Conv>
-        static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        inclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
-            OutIter dest, T&& init, Op&& op, std::false_type, Conv&& conv);
-
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Op, typename Conv>
-        static typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-        inclusive_scan_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, Op&& op, std::false_type, Conv&& conv);
-
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
+
+// The segmented iterators we support all live in namespace hpx::segmented
+namespace hpx { namespace segmented {
+
+    // clang-format off
+    template <typename InIter, typename OutIter,
+            typename Op, typename Conv,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator<InIter>::value &&
+            hpx::traits::is_segmented_iterator<InIter>::value &&
+            hpx::traits::is_iterator<OutIter>::value &&
+            hpx::traits::is_segmented_iterator<OutIter>::value
+        )>
+    // clang-format on
+    OutIter tag_dispatch(hpx::inclusive_scan_t, InIter first, InIter last,
+        OutIter dest, Op&& op, Conv&& conv)
+    {
+        static_assert(hpx::traits::is_input_iterator<InIter>::value,
+            "Requires at least input iterator.");
+
+        static_assert(hpx::traits::is_output_iterator<OutIter>::value,
+            "Requires at least output iterator.");
+
+        if (first == last)
+            return dest;
+
+        using value_type = typename std::iterator_traits<InIter>::value_type;
+
+        return hpx::parallel::v1::detail::segmented_inclusive_scan(
+            hpx::execution::seq, first, last, dest, value_type{},
+            std::forward<Op>(op), std::true_type{}, std::forward<Conv>(conv));
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename Op, typename Conv,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_segmented_iterator<FwdIter1>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::traits::is_segmented_iterator<FwdIter2>::value
+        )>
+    // clang-format on
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    tag_dispatch(hpx::inclusive_scan_t, ExPolicy&& policy, FwdIter1 first,
+        FwdIter1 last, FwdIter2 dest, Op&& op, Conv&& conv)
+    {
+        static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            "Requires at least forward iterator.");
+
+        static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+            "Requires at least forward iterator.");
+
+        if (first == last)
+            return util::detail::algorithm_result<ExPolicy, FwdIter2>::get(
+                std::move(dest));
+
+        using value_type = typename std::iterator_traits<InIter>::value_type;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        return hpx::parallel::v1::detail::segmented_inclusive_scan(
+            std::forward<ExPolicy>(policy), first, last, dest, value_type{},
+            std::forward<Op>(op), is_seq(), std::forward<Conv>(conv));
+    }
+
+    // clang-format off
+    template <typename InIter, typename OutIter,
+            typename T, typename Op, typename Conv,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator<InIter>::value &&
+            hpx::traits::is_segmented_iterator<InIter>::value &&
+            hpx::traits::is_iterator<OutIter>::value &&
+            hpx::traits::is_segmented_iterator<OutIter>::value
+        )>
+    // clang-format on
+    OutIter tag_dispatch(hpx::inclusive_scan_t, InIter first, InIter last,
+        OutIter dest, T&& init, Op&& op, Conv&& conv)
+    {
+        static_assert(hpx::traits::is_input_iterator<InIter>::value,
+            "Requires at least input iterator.");
+
+        static_assert(hpx::traits::is_output_iterator<OutIter>::value,
+            "Requires at least output iterator.");
+
+        if (first == last)
+            return dest;
+
+        return hpx::parallel::v1::detail::segmented_inclusive_scan(
+            hpx::execution::seq, first, last, dest, std::forward<T>(init),
+            std::forward<Op>(op), std::true_type{}, std::forward<Conv>(conv));
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename T, typename Op, typename Conv,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_segmented_iterator<FwdIter1>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::traits::is_segmented_iterator<FwdIter2>::value
+        )>
+    // clang-format on
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    tag_dispatch(hpx::inclusive_scan_t, ExPolicy&& policy, FwdIter1 first,
+        FwdIter1 last, FwdIter2 dest, T&& init, Op&& op, Conv&& conv)
+    {
+        static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            "Requires at least forward iterator.");
+
+        static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+            "Requires at least forward iterator.");
+
+        if (first == last)
+            return util::detail::algorithm_result<ExPolicy, FwdIter2>::get(
+                std::move(dest));
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        return hpx::parallel::v1::detail::segmented_inclusive_scan(
+            std::forward<ExPolicy>(policy), first, last, dest,
+            std::forward<T>(init), std::forward<Op>(op), is_seq(),
+            std::forward<Conv>(conv));
+    }
+}}    // namespace hpx::segmented
