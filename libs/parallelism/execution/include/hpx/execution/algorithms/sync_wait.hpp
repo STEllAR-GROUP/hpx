@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_CXX17_STD_VARIANT)
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution_base/operation_state.hpp>
@@ -170,7 +171,12 @@ namespace hpx { namespace execution { namespace experimental {
       : hpx::functional::tag_fallback<sync_wait_t>
     {
     private:
-        template <typename S>
+        // clang-format off
+        template <typename S,
+            HPX_CONCEPT_REQUIRES_(
+                is_sender_v<S>
+            )>
+        // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             sync_wait_t, S&& s)
         {

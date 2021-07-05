@@ -297,7 +297,7 @@ namespace hpx { namespace execution { namespace experimental {
     struct is_sender
       : std::integral_constant<bool,
             std::is_move_constructible<std::decay_t<Sender>>::value &&
-                detail::specialized<Sender>(nullptr)>
+                detail::specialized<std::decay_t<Sender>>(nullptr)>
     {
     };
 
