@@ -17,6 +17,7 @@ template <typename IteratorTag>
 void test_uninitialized_move()
 {
     using namespace hpx::execution;
+    test_uninitialized_move(IteratorTag());
     test_uninitialized_move(seq, IteratorTag());
     test_uninitialized_move(par, IteratorTag());
     test_uninitialized_move(par_unseq, IteratorTag());
