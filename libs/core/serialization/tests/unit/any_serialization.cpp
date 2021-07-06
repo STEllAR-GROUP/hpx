@@ -105,6 +105,6 @@ int main(int argc, char* argv[])
 
     hpx::local::init(hpx_main, argc, argv, init_args);
 
-    return EXIT_SUCCESS;
+    return hpx::util::report_errors();
 }
 // EOF

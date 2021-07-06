@@ -34,7 +34,9 @@ if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
   set(tests ${tests} serialization_boost_variant)
 endif()
 
-set(full_tests any_serialization serializable_any serializable_boost_any)
+set(full_tests any_serialization not_bitwise_serializable serializable_any
+               serializable_boost_any
+)
 
 add_subdirectory(polymorphic)
 
@@ -71,8 +73,7 @@ foreach(test ${full_tests})
   # add example executable
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
-    SOURCES ${sources} ${${test}_FLAGS}
-    EXCLUDE_FROM_ALL
+    SOURCES ${sources} ${${test}_FLAGS} EXCLUDE_FROM_ALL
     FOLDER ${folder_name}
   )
 

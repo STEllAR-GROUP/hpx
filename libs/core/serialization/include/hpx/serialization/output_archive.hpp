@@ -15,6 +15,7 @@
 #include <hpx/serialization/detail/raw_ptr.hpp>
 #include <hpx/serialization/output_container.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -182,7 +183,9 @@ namespace hpx { namespace serialization {
             !std::is_enum<T>::value>::type
         save(T const& t)
         {
-            using use_optimized = hpx::traits::is_bitwise_serializable<T>;
+            using use_optimized = std::integral_constant<bool,
+                hpx::traits::is_bitwise_serializable_v<T> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<T>>;
 
             save_bitwise(t, use_optimized());
         }
