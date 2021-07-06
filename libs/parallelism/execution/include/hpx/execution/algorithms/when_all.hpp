@@ -87,7 +87,9 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename... Ss>
         struct when_all_sender
         {
-            hpx::util::member_pack_for<std::decay_t<Ss>...> senders;
+            using senders_type =
+                hpx::util::member_pack_for<std::decay_t<Ss>...>;
+            senders_type senders;
 
             template <typename... Ss_>
             explicit constexpr when_all_sender(Ss_&&... ss)
@@ -125,12 +127,11 @@ namespace hpx { namespace execution { namespace experimental {
             static_assert(num_predecessors > 0,
                 "when_all expects at least one predecessor sender");
 
-            // define operation state for each connected sender
-            template <typename R, std::size_t I>
+            template <typename R, typename Senders, std::size_t I>
             struct operation_state;
 
-            template <typename R>
-            struct operation_state<R, 0>
+            template <typename R, typename Senders>
+            struct operation_state<R, Senders, 0>
             {
                 static constexpr std::size_t I = 0;
                 std::atomic<std::size_t> predecessors_remaining =
@@ -144,17 +145,16 @@ namespace hpx { namespace execution { namespace experimental {
 
                 using operation_state_type =
                     std::decay_t<decltype(hpx::execution::experimental::connect(
-                        std::move(senders.template get<I>()),
+                        std::declval<Senders>().template get<I>(),
                         when_all_receiver<I, operation_state>(
                             std::declval<std::decay_t<operation_state>&>())))>;
                 operation_state_type os;
 
-                template <typename R_>
-                operation_state(R_&& r,
-                    hpx::util::member_pack_for<std::decay_t<Ss>...>& senders)
+                template <typename R_, typename Senders_>
+                operation_state(R_&& r, Senders_&& senders)
                   : r(std::forward<R_>(r))
                   , os(hpx::execution::experimental::connect(
-                        std::move(senders.template get<I>()),
+                        std::forward<Senders_>(senders).template get<I>(),
                         when_all_receiver<I, operation_state>(*this)))
                 {
                 }
@@ -205,24 +205,24 @@ namespace hpx { namespace execution { namespace experimental {
                 }
             };
 
-            template <typename R, std::size_t I>
-            struct operation_state : operation_state<R, I - 1>
+            template <typename R, typename Senders, std::size_t I>
+            struct operation_state : operation_state<R, Senders, I - 1>
             {
-                using base_type = operation_state<R, I - 1>;
+                using base_type = operation_state<R, Senders, I - 1>;
 
                 using operation_state_type =
                     std::decay_t<decltype(hpx::execution::experimental::connect(
-                        std::move(senders.template get<I>()),
+                        std::forward<Senders>(senders).template get<I>(),
                         when_all_receiver<I, operation_state>(
                             std::declval<std::decay_t<operation_state>&>())))>;
                 operation_state_type os;
 
-                template <typename R_>
-                operation_state(R_&& r,
-                    hpx::util::member_pack_for<std::decay_t<Ss>...>& senders)
-                  : base_type(std::forward<R_>(r), senders)
+                template <typename R_, typename Senders_>
+                operation_state(R_&& r, Senders_&& senders)
+                  : base_type(
+                        std::forward<R_>(r), std::forward<Senders>(senders))
                   , os(hpx::execution::experimental::connect(
-                        std::move(senders.template get<I>()),
+                        std::forward<Senders_>(senders).template get<I>(),
                         when_all_receiver<I, operation_state>(*this)))
                 {
                 }
@@ -242,14 +242,15 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename R>
             auto connect(R&& r) &&
             {
-                return operation_state<R, num_predecessors - 1>(
-                    std::forward<R>(r), senders);
+                return operation_state<R, senders_type&&, num_predecessors - 1>(
+                    std::forward<R>(r), std::move(senders));
             }
 
             template <typename R>
             auto connect(R&& r) &
             {
-                return operation_state<R, num_predecessors - 1>(r, senders);
+                return operation_state<R, senders_type&, num_predecessors - 1>(
+                    r, senders);
             }
         };
     }    // namespace detail
