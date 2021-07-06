@@ -59,7 +59,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename... Ts>
-            void set_value(Ts&&... ts) noexcept
+                void set_value(Ts&&... ts) && noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
