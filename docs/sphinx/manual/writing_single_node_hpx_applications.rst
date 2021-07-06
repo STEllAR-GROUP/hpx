@@ -748,11 +748,11 @@ Parallel algorithms
      * Moves a number of objects to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_move_n`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_value_construct`
+   * * :cpp:func:`hpx::uninitialized_value_construct`
      * Constructs objects in an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_value_construct`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_value_construct_n`
+   * * :cpp:func:`hpx::uninitialized_value_construct_n`
      * Constructs objects in an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_value_construct_n`

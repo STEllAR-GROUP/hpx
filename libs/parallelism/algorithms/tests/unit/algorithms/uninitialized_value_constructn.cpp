@@ -40,8 +40,7 @@ void test_uninitialized_value_construct_n(ExPolicy policy, IteratorTag)
     std::memset(
         static_cast<void*>(p), 0xcd, data_size * sizeof(value_constructable));
 
-    hpx::parallel::uninitialized_value_construct_n(
-        policy, iterator(p), data_size);
+    hpx::uninitialized_value_construct_n(policy, iterator(p), data_size);
 
     std::size_t count = 0;
     std::for_each(p, p + data_size, [&count](value_constructable v1) {
@@ -64,8 +63,8 @@ void test_uninitialized_value_construct_n_async(ExPolicy policy, IteratorTag)
     std::memset(
         static_cast<void*>(p), 0xcd, data_size * sizeof(value_constructable));
 
-    auto f = hpx::parallel::uninitialized_value_construct_n(
-        policy, iterator(p), data_size);
+    auto f =
+        hpx::uninitialized_value_construct_n(policy, iterator(p), data_size);
     f.wait();
 
     std::size_t count = 0;
@@ -122,7 +121,7 @@ void test_uninitialized_value_construct_n_exception(
     bool caught_exception = false;
     try
     {
-        hpx::parallel::uninitialized_value_construct_n(policy,
+        hpx::uninitialized_value_construct_n(policy,
             decorated_iterator(p,
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -170,7 +169,7 @@ void test_uninitialized_value_construct_n_exception_async(
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::uninitialized_value_construct_n(policy,
+        auto f = hpx::uninitialized_value_construct_n(policy,
             decorated_iterator(p,
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -250,7 +249,7 @@ void test_uninitialized_value_construct_n_bad_alloc(
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::uninitialized_value_construct_n(policy,
+        hpx::uninitialized_value_construct_n(policy,
             decorated_iterator(p,
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -298,7 +297,7 @@ void test_uninitialized_value_construct_n_bad_alloc_async(
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::uninitialized_value_construct_n(policy,
+        auto f = hpx::uninitialized_value_construct_n(policy,
             decorated_iterator(p,
                 [&throw_after]() {
                     if (throw_after-- == 0)
