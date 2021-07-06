@@ -68,6 +68,16 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         return event_callback_queue;
     }
 
+    std::size_t get_number_of_enqueued_events()
+    {
+        return get_event_callback_queue().size_approx();
+    }
+
+    std::size_t get_number_of_active_events()
+    {
+        return get_event_callback_vector().size();
+    }
+
     void add_to_event_callback_queue(event_callback&& continuation)
     {
         HPX_ASSERT_MSG(get_register_polling_count() != 0,
@@ -77,8 +87,9 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         get_event_callback_queue().enqueue(std::move(continuation));
 
         cud_debug.debug(debug::str<>("event queued"), "event",
-            debug::hex<8>(continuation.event), "callbacks in vector",
-            debug::dec<3>(get_event_callback_vector().size()));
+            debug::hex<8>(continuation.event), "enqueued events",
+            debug::dec<3>(get_number_of_enqueued_events()), "active events",
+            debug::dec<3>(get_number_of_active_events()));
     }
 
     void add_to_event_callback_vector(event_callback&& continuation)
@@ -87,8 +98,9 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
 
         cud_debug.debug(
             debug::str<>("event callback moved from queue to vector"), "event",
-            debug::hex<8>(continuation.event), "callbacks in vector",
-            debug::dec<3>(get_event_callback_vector().size()));
+            debug::hex<8>(continuation.event), "enqueued events",
+            debug::dec<3>(get_number_of_enqueued_events()), "active events",
+            debug::dec<3>(get_number_of_active_events()));
     }
 
     void add_event_callback(
@@ -104,16 +116,6 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
 
         detail::add_to_event_callback_queue(
             event_callback{event, std::move(f)});
-    }
-
-    std::size_t get_number_of_enqueued_events()
-    {
-        return get_event_callback_queue().size_approx();
-    }
-
-    std::size_t get_number_of_active_events()
-    {
-        return get_event_callback_vector().size();
     }
 
     // Background progress function for async CUDA operations. Checks for completed
@@ -137,8 +139,10 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
             {
                 static auto poll_deb =
                     cud_debug.make_timer(1, debug::str<>("Poll - lock failed"));
-                cud_debug.timed(poll_deb, "callbacks in vector",
-                    debug::dec<3>(event_callback_vector.size()));
+                cud_debug.timed(poll_deb, "enqueued events",
+                    debug::dec<3>(get_number_of_enqueued_events()),
+                    "active events",
+                    debug::dec<3>(get_number_of_active_events()));
             }
             return polling_status::idle;
         }
@@ -147,8 +151,9 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         {
             static auto poll_deb =
                 cud_debug.make_timer(1, debug::str<>("Poll - lock success"));
-            cud_debug.timed(poll_deb, "callbacks in vector",
-                debug::dec<3>(event_callback_vector.size()));
+            cud_debug.timed(poll_deb, "enqueued events",
+                debug::dec<3>(get_number_of_enqueued_events()), "active events",
+                debug::dec<3>(get_number_of_active_events()));
         }
 
         // Grab the handle to the event pool so we can return completed events
@@ -168,9 +173,10 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
                     }
 
                     cud_debug.debug(debug::str<>("set ready vector"), "event",
-                        debug::hex<8>(continuation.event),
-                        "callbacks in vector",
-                        debug::dec<3>(event_callback_vector.size()));
+                        debug::hex<8>(continuation.event), "enqueued events",
+                        debug::dec<3>(get_number_of_enqueued_events()),
+                        "active events",
+                        debug::dec<3>(get_number_of_active_events()));
                     continuation.f(status);
                     pool.push(std::move(continuation.event));
                     return true;
@@ -189,8 +195,10 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
             else
             {
                 cud_debug.debug(debug::str<>("set ready queue"), "event",
-                    debug::hex<8>(continuation.event), "callbacks in vector",
-                    debug::dec<3>(event_callback_vector.size()));
+                    debug::hex<8>(continuation.event), "enqueued events",
+                    debug::dec<3>(get_number_of_enqueued_events()),
+                    "active events",
+                    debug::dec<3>(get_number_of_active_events()));
                 continuation.f(status);
                 pool.push(std::move(continuation.event));
             }
