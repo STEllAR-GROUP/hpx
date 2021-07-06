@@ -370,7 +370,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         for (std::size_t i = 0; i != iterations; ++i)
         {
             cu::transform_stream(ex::just(), f, cuda_stream) |
-                ex::on(ex::executor{}) | ex::sync_wait();
+                ex::on(ex::thread_pool_scheduler{}) | ex::sync_wait();
         }
         double elapsed = timer.elapsed();
         std::cout
@@ -405,14 +405,14 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 cu::transform_stream(f, cuda_stream) |
                 cu::transform_stream(f, cuda_stream) |
                 cu::transform_stream(f, cuda_stream) |
-                cu::transform_stream(f, cuda_stream) | ex::on(ex::executor{}) |
-                ex::sync_wait();
+                cu::transform_stream(f, cuda_stream) |
+                ex::on(ex::thread_pool_scheduler{}) | ex::sync_wait();
         }
         // Do the remainder one-by-one
         for (std::size_t i = 0; i < non_batch_iterations; ++i)
         {
             cu::transform_stream(ex::just(), f, cuda_stream) |
-                ex::on(ex::executor{}) | ex::sync_wait();
+                ex::on(ex::thread_pool_scheduler{}) | ex::sync_wait();
         }
         double elapsed = timer.elapsed();
         std::cout
