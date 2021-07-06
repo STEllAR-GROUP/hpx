@@ -191,8 +191,8 @@ namespace hpx {
     /// \a inclusive_scan may be non-deterministic.
     ///
     template <typename InIter, typename OutIter,typename T, typename Op>
-    FwdIter2 exclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, T init, Op&& op);
+    OutIter exclusive_scan(InIter first, InIter last, OutIter dest,
+        T init, Op&& op);
 
         ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
@@ -207,10 +207,10 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam OutIter     The type of the iterator representing the
+    /// \tparam FwdIter2    The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -455,7 +455,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 8,
+    HPX_DEPRECATED_V(1, 7,
         "hpx::parallel::exclusive_scan is deprecated, use hpx::exclusive_scan "
         "instead")
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
@@ -488,7 +488,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 8,
+    HPX_DEPRECATED_V(1, 7,
         "hpx::parallel::exclusive_scan is deprecated, use hpx::exclusive_scan "
         "instead")
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type

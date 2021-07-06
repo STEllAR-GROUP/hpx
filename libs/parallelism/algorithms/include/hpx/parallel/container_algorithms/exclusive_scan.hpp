@@ -13,357 +13,532 @@
 
 namespace hpx { namespace ranges {
 
-    /// Checks if the first range [first1, last1) is lexicographically less than
-    /// the second range [first2, last2). uses a provided predicate to compare
-    /// elements.
+    ///////////////////////////////////////////////////////////////////////////
+    /// Assigns through each iterator \a i in [result, result + (last - first))
+    /// the value of
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(+, init, *first, ...,
+    /// *(first + (i - result) - 1))
     ///
-    /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where N1 = std::distance(first1, last)
-    ///         and N2 = std::distance(first2, last2).
+    /// \note   Complexity: O(\a last - \a first) applications of the
+    ///         predicate \a std::plus<T>.
     ///
-    /// \tparam InIter1     The type of the source iterators used for the
-    ///                     first range (deduced).
+    /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
-    /// \tparam Sent1       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter1.
-    /// \tparam InIter2     The type of the source iterators used for the
-    ///                     second range (deduced).
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for InIter.
+    /// \tparam OutIter     The type of the iterator representing the
+    ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam Sent2       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter2.
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a exclusive_scan requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible. This defaults
-    ///                     to std::less<>
-    /// \tparam Proj1       The type of an optional projection function for FwdIter1. This
-    ///                     defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function for FwdIter2. This
-    ///                     defaults to \a util::projection_identity
+    ///                     output iterator.
+    /// \tparam T           The type of the value to be used as initial (and
+    ///                     intermediate) values (deduced).
     ///
-    /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last1        Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the sequence of elements
-    ///                     of the second range the algorithm will be applied to.
-    /// \param last2        Refers to the end of the sequence of elements of
-    ///                     the second range the algorithm will be applied to.
-    /// \param pred         Refers to the comparison function that the first
-    ///                     and second ranges will be applied to
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the first range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the second range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to sentinel value denoting the end of the
+    ///                     sequence of elements the algorithm will be applied.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param init         The initial value for the generalized sum.
     ///
-    /// The comparison operations in the parallel \a exclusive_scan
-    /// algorithm invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
-    ///
-    /// The comparison operations in the parallel \a exclusive_scan
-    /// algorithm invoked with an execution policy object of type
-    /// \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \note     Lexicographical comparison is an operation with the
-    ///           following properties
-    ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range
-    ///               is lexicographically
-    ///               \a less or \a greater than the other
-    ///             - If one range is a prefix of another, the shorter range is
-    ///               lexicographically \a less than the other
-    ///             - If two ranges have equivalent elements and are of the same length,
-    ///               then the ranges are lexicographically \a equal
-    ///             - An empty range is lexicographically \a less than any non-empty
-    ///               range
-    ///             - Two empty ranges are lexicographically \a equal
-    ///
-    /// \returns  The \a lexicographically_compare algorithm returns a
-    ///           \a hpx::future<bool> if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a lexicographically_compare algorithm returns true
-    ///           if the first range is lexicographically less, otherwise
-    ///           it returns false.
-    ///           range [first2, last2), it returns false.
-    template <typename InIter1, typename Sent1, typename InIter2,
-        typename Sent2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
-    bool exclusive_scan(InIter1 first1, Sent1 last1, InIter2 first2,
-        Sent2 last2, Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
-        Proj2&& proj2 = Proj2());
-
-    /// Checks if the first range [first1, last1) is lexicographically less than
-    /// the second range [first2, last2). uses a provided predicate to compare
-    /// elements.
-    ///
-    /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where N1 = std::distance(first1, last)
-    ///         and N2 = std::distance(first2, last2).
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Sent1       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter1.
-    /// \tparam FwdIter2    The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Sent2       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter2.
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a exclusive_scan requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible. This defaults
-    ///                     to std::less<>
-    /// \tparam Proj1       The type of an optional projection function for FwdIter1. This
-    ///                     defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function for FwdIter2. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last1        Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the sequence of elements
-    ///                     of the second range the algorithm will be applied to.
-    /// \param last2        Refers to the end of the sequence of elements of
-    ///                     the second range the algorithm will be applied to.
-    /// \param pred         Refers to the comparison function that the first
-    ///                     and second ranges will be applied to
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the first range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the second range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The comparison operations in the parallel \a exclusive_scan
-    /// algorithm invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
-    ///
-    /// The comparison operations in the parallel \a exclusive_scan
-    /// algorithm invoked with an execution policy object of type
-    /// \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \note     Lexicographical comparison is an operation with the
-    ///           following properties
-    ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range
-    ///               is lexicographically
-    ///               \a less or \a greater than the other
-    ///             - If one range is a prefix of another, the shorter range is
-    ///               lexicographically \a less than the other
-    ///             - If two ranges have equivalent elements and are of the same length,
-    ///               then the ranges are lexicographically \a equal
-    ///             - An empty range is lexicographically \a less than any non-empty
-    ///               range
-    ///             - Two empty ranges are lexicographically \a equal
-    ///
-    /// \returns  The \a lexicographically_compare algorithm returns a
-    ///           \a hpx::future<bool> if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a lexicographically_compare algorithm returns true
-    ///           if the first range is lexicographically less, otherwise
-    ///           it returns false.
-    ///           range [first2, last2), it returns false.
-
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter2, typename Sent2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
-    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    exclusive_scan(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
-        FwdIter2 first2, Sent2 last2, Pred&& pred = Pred(),
-        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
-
-    /// Checks if the first range rng1 is lexicographically less than
-    /// the second range rng2. uses a provided predicate to compare
-    /// elements.
-    ///
-    /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where N1 = std::distance(std::begin(rng1), std::end(rng1))
-    ///         and N2 = std::distance(std::begin(rng2), std::end(rng2)).
-    ///
-    /// \tparam Rng1        The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Rng2        The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a exclusive_scan requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible. This defaults
-    ///                     to std::less<>
-    /// \tparam Proj1       The type of an optional projection function for elements of the first range.
-    ///                     This defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function for elements of the second range.
-    ///                     This defaults to \a util::projection_identity
-    ///
-    /// \param rng1         Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param rng2         Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param pred         Refers to the comparison function that the first
-    ///                     and second ranges will be applied to
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the first range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the second range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The comparison operations in the parallel \a exclusive_scan
-    /// algorithm invoked without an execution policy object  execute in sequential
+    /// The reduce operations in the parallel \a exclusive_scan algorithm
+    /// invoked without an execution policy object will execute in sequential
     /// order in the calling thread.
     ///
-    /// \note     Lexicographical comparison is an operation with the
-    ///           following properties
-    ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range
-    ///               is lexicographically
-    ///               \a less or \a greater than the other
-    ///             - If one range is a prefix of another, the shorter range is
-    ///               lexicographically \a less than the other
-    ///             - If two ranges have equivalent elements and are of the same length,
-    ///               then the ranges are lexicographically \a equal
-    ///             - An empty range is lexicographically \a less than any non-empty
-    ///               range
-    ///             - Two empty ranges are lexicographically \a equal
+    /// \returns  The \a exclusive_scan algorithm returns \a OutIter.
+    ///           The \a exclusive_scan algorithm returns the output iterator
+    ///           to the element in the destination range, one past the last
+    ///           element copied.
     ///
-    /// \returns  The \a lexicographically_compare algorithm returns \a bool.
-    ///           The \a lexicographically_compare algorithm returns true
-    ///           if the first range is lexicographically less, otherwise
-    ///           it returns false.
-    ///           range [first2, last2), it returns false.
-    template <typename Rng1, typename Rng2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
-    bool exclusive_scan(Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(),
-        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aN) is defined as:
+    ///         * a1 when N is 1
+    ///         * GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aK)
+    ///           + GENERALIZED_NONCOMMUTATIVE_SUM(+, aM, ..., aN)
+    ///           where 1 < K+1 = M <= N.
+    ///
+    /// The difference between \a exclusive_scan and \a inclusive_scan is that
+    /// \a inclusive_scan includes the ith input element in the ith sum.
+    ///
+    template <typename InIter, typename Sent, typename OutIter, typename T>
+    OutIter exclusive_scan(InIter first, Sent last, OutIter dest, T init);
 
-    /// Checks if the first range rng1 is lexicographically less than
-    /// the second range rng2. uses a provided predicate to compare
-    /// elements.
+    ///////////////////////////////////////////////////////////////////////////
+    /// Assigns through each iterator \a i in [result, result + (last - first))
+    /// the value of
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(+, init, *first, ...,
+    /// *(first + (i - result) - 1))
     ///
-    /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where N1 = std::distance(std::begin(rng1), std::end(rng1))
-    ///         and N2 = std::distance(std::begin(rng2), std::end(rng2)).
+    /// \note   Complexity: O(\a last - \a first) applications of the
+    ///         predicate \a std::plus<T>.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1        The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Rng2        The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a exclusive_scan requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible. This defaults
-    ///                     to std::less<>
-    /// \tparam Proj1       The type of an optional projection function for elements of the first range.
-    ///                     This defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function for elements of the second range.
-    ///                     This defaults to \a util::projection_identity
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam T           The type of the value to be used as initial (and
+    ///                     intermediate) values (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param rng1         Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param rng2         Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param pred         Refers to the comparison function that the first
-    ///                     and second ranges will be applied to
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the first range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the second range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to sentinel value denoting the end of the
+    ///                     sequence of elements the algorithm will be applied.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param init         The initial value for the generalized sum.
     ///
-    /// The comparison operations in the parallel \a exclusive_scan
-    /// algorithm invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
+    /// The reduce operations in the parallel \a exclusive_scan algorithm
+    /// invoked with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a exclusive_scan
-    /// algorithm invoked with an execution policy object of type
-    /// \a parallel_policy
+    /// The reduce operations in the parallel \a exclusive_scan algorithm
+    /// invoked with an execution policy object of type \a parallel_policy
     /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     Lexicographical comparison is an operation with the
-    ///           following properties
-    ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range
-    ///               is lexicographically
-    ///               \a less or \a greater than the other
-    ///             - If one range is a prefix of another, the shorter range is
-    ///               lexicographically \a less than the other
-    ///             - If two ranges have equivalent elements and are of the same length,
-    ///               then the ranges are lexicographically \a equal
-    ///             - An empty range is lexicographically \a less than any non-empty
-    ///               range
-    ///             - Two empty ranges are lexicographically \a equal
-    ///
-    /// \returns  The \a lexicographically_compare algorithm returns a
-    ///           \a hpx::future<bool> if the execution policy is of type
+    /// \returns  The \a exclusive_scan algorithm returns a
+    ///           \a hpx::future<FwdIter2> if
+    ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a lexicographically_compare algorithm returns true
-    ///           if the first range is lexicographically less, otherwise
-    ///           it returns false.
-    ///           range [first2, last2), it returns false.
+    ///           returns \a FwdIter2 otherwise.
+    ///           The \a exclusive_scan algorithm returns the output iterator
+    ///           to the element in the destination range, one past the last
+    ///           element copied.
+    ///
+    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aN) is defined as:
+    ///         * a1 when N is 1
+    ///         * GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aK)
+    ///           + GENERALIZED_NONCOMMUTATIVE_SUM(+, aM, ..., aN)
+    ///           where 1 < K+1 = M <= N.
+    ///
+    /// The difference between \a exclusive_scan and \a inclusive_scan is that
+    /// \a inclusive_scan includes the ith input element in the ith sum.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename Sent,
+        typename FwdIter2, typename T>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    exclusive_scan(
+        ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest, T init);
 
-    template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
-    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    exclusive_scan(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
-        Pred&& pred = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+    ///////////////////////////////////////////////////////////////////////////
+    /// Assigns through each iterator \a i in [result, result + (last - first))
+    /// the value of
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(binary_op, init, *first, ...,
+    /// *(first + (i - result) - 1)).
+    ///
+    /// \note   Complexity: O(\a last - \a first) applications of the
+    ///         predicate \a op.
+    ///
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for InIter.
+    /// \tparam OutIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
+    /// \tparam T           The type of the value to be used as initial (and
+    ///                     intermediate) values (deduced).
+    /// \tparam Op          The type of the binary function object used for
+    ///                     the reduction operation.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to sentinel value denoting the end of the
+    ///                     sequence of elements the algorithm will be applied.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param init         The initial value for the generalized sum.
+    /// \param op           Specifies the function (or function object) which
+    ///                     will be invoked for each of the values of the input
+    ///                     sequence. This is a
+    ///                     binary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type1 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///                     The types \a Type1 and \a Ret must be
+    ///                     such that an object of a type as given by the input
+    ///                     sequence can be implicitly converted to any
+    ///                     of those types.
+    ///
+    /// The reduce operations in the parallel \a exclusive_scan algorithm
+    /// invoked without an execution policy object will execute in sequential
+    /// order in the calling thread.
+    ///
+    /// \returns  The \a exclusive_scan algorithm returns \a OutIter.
+    ///           The \a exclusive_scan algorithm returns the output iterator
+    ///           to the element in the destination range, one past the last
+    ///           element copied.
+    ///
+    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aN) is defined as:
+    ///         * a1 when N is 1
+    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK),
+    ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN))
+    ///           where 1 < K+1 = M <= N.
+    ///
+    /// The difference between \a exclusive_scan and \a inclusive_scan is that
+    /// \a inclusive_scan includes the ith input element in the ith sum. If
+    /// \a op is not mathematically associative, the behavior of
+    /// \a inclusive_scan may be non-deterministic.
+    ///
+    template <typename InIter, typename Sent, typename OutIter, typename T,
+        typename Op>
+    OutIter exclusive_scan(
+        InIter first, Sent last, OutIter dest, T init, Op&& op);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Assigns through each iterator \a i in [result, result + (last - first))
+    /// the value of
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(binary_op, init, *first, ...,
+    /// *(first + (i - result) - 1)).
+    ///
+    /// \note   Complexity: O(\a last - \a first) applications of the
+    ///         predicate \a op.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter1.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam T           The type of the value to be used as initial (and
+    ///                     intermediate) values (deduced).
+    /// \tparam Op          The type of the binary function object used for
+    ///                     the reduction operation.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to sentinel value denoting the end of the
+    ///                     sequence of elements the algorithm will be applied.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param init         The initial value for the generalized sum.
+    /// \param op           Specifies the function (or function object) which
+    ///                     will be invoked for each of the values of the input
+    ///                     sequence. This is a
+    ///                     binary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type1 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///                     The types \a Type1 and \a Ret must be
+    ///                     such that an object of a type as given by the input
+    ///                     sequence can be implicitly converted to any
+    ///                     of those types.
+    ///
+    /// The reduce operations in the parallel \a exclusive_scan algorithm
+    /// invoked with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The reduce operations in the parallel \a exclusive_scan algorithm
+    /// invoked with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a exclusive_scan algorithm returns a
+    ///           \a hpx::future<OutIter> if
+    ///           the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a OutIter otherwise.
+    ///           The \a exclusive_scan algorithm returns the output iterator
+    ///           to the element in the destination range, one past the last
+    ///           element copied.
+    ///
+    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aN) is defined as:
+    ///         * a1 when N is 1
+    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK),
+    ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN))
+    ///           where 1 < K+1 = M <= N.
+    ///
+    /// The difference between \a exclusive_scan and \a inclusive_scan is that
+    /// \a inclusive_scan includes the ith input element in the ith sum. If
+    /// \a op is not mathematically associative, the behavior of
+    /// \a inclusive_scan may be non-deterministic.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename Sent,
+        typename FwdIter2, typename T, typename Op>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    exclusive_scan(ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest,
+        T init, Op&& op);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Assigns through each iterator \a i in [result, result + (last - first))
+    /// the value of
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(+, init, *first, ...,
+    /// *(first + (i - result) - 1))
+    ///
+    /// \note   Complexity: O(\a last - \a first) applications of the
+    ///         predicate \a std::plus<T>.
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam O           The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
+    /// \tparam T           The type of the value to be used as initial (and
+    ///                     intermediate) values (deduced).
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param init         The initial value for the generalized sum.
+    ///
+    /// The reduce operations in the parallel \a exclusive_scan algorithm
+    /// invoked without an execution policy object will execute in sequential
+    /// order in the calling thread.
+    ///
+    /// \returns  The \a exclusive_scan algorithm returns \a O.
+    ///           The \a exclusive_scan algorithm returns the output iterator
+    ///           to the element in the destination range, one past the last
+    ///           element copied.
+    ///
+    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aN) is defined as:
+    ///         * a1 when N is 1
+    ///         * GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aK)
+    ///           + GENERALIZED_NONCOMMUTATIVE_SUM(+, aM, ..., aN)
+    ///           where 1 < K+1 = M <= N.
+    ///
+    /// The difference between \a exclusive_scan and \a inclusive_scan is that
+    /// \a inclusive_scan includes the ith input element in the ith sum.
+    ///
+    template <typename Rng, typename O, typename T>
+    O exclusive_scan(Rng&& rng, O dest, T init);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Assigns through each iterator \a i in [result, result + (last - first))
+    /// the value of
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(+, init, *first, ...,
+    /// *(first + (i - result) - 1))
+    ///
+    /// \note   Complexity: O(\a last - \a first) applications of the
+    ///         predicate \a std::plus<T>.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam O           The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam T           The type of the value to be used as initial (and
+    ///                     intermediate) values (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param init         The initial value for the generalized sum.
+    ///
+    /// The reduce operations in the parallel \a exclusive_scan algorithm
+    /// invoked with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The reduce operations in the parallel \a exclusive_scan algorithm
+    /// invoked with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a exclusive_scan algorithm returns a
+    ///           \a hpx::future<O> if
+    ///           the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a O otherwise.
+    ///           The \a exclusive_scan algorithm returns the output iterator
+    ///           to the element in the destination range, one past the last
+    ///           element copied.
+    ///
+    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aN) is defined as:
+    ///         * a1 when N is 1
+    ///         * GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aK)
+    ///           + GENERALIZED_NONCOMMUTATIVE_SUM(+, aM, ..., aN)
+    ///           where 1 < K+1 = M <= N.
+    ///
+    /// The difference between \a exclusive_scan and \a inclusive_scan is that
+    /// \a inclusive_scan includes the ith input element in the ith sum.
+    ///
+    template <typename ExPolicy, typename Rng, typename O, typename T>
+    typename util::detail::algorithm_result<ExPolicy, O>::type exclusive_scan(
+        ExPolicy&& policy, Rng&& rng, O dest, T init);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Assigns through each iterator \a i in [result, result + (last - first))
+    /// the value of
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(+, init, *first, ...,
+    /// *(first + (i - result) - 1))
+    ///
+    /// \note   Complexity: O(\a last - \a first) applications of the
+    ///         predicate \a std::plus<T>.
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam O           The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
+    /// \tparam T           The type of the value to be used as initial (and
+    ///                     intermediate) values (deduced).
+    /// \tparam Op          The type of the binary function object used for
+    ///                     the reduction operation.
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param init         The initial value for the generalized sum.
+    /// \param op           Specifies the function (or function object) which
+    ///                     will be invoked for each of the values of the input
+    ///                     sequence. This is a
+    ///                     binary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type1 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///                     The types \a Type1 and \a Ret must be
+    ///                     such that an object of a type as given by the input
+    ///                     sequence can be implicitly converted to any
+    ///                     of those types.
+    ///
+    /// The reduce operations in the parallel \a exclusive_scan algorithm
+    /// invoked without an execution policy object will execute in sequential
+    /// order in the calling thread.
+    ///
+    /// \returns  The \a exclusive_scan algorithm returns \a O.
+    ///           The \a exclusive_scan algorithm returns the output iterator
+    ///           to the element in the destination range, one past the last
+    ///           element copied.
+    ///
+    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aN) is defined as:
+    ///         * a1 when N is 1
+    ///         * GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aK)
+    ///           + GENERALIZED_NONCOMMUTATIVE_SUM(+, aM, ..., aN)
+    ///           where 1 < K+1 = M <= N.
+    ///
+    /// The difference between \a exclusive_scan and \a inclusive_scan is that
+    /// \a inclusive_scan includes the ith input element in the ith sum.
+    ///
+    template <typename Rng, typename O, typename T, typename Op>
+    O exclusive_scan(Rng&& rng, O dest, T init, Op&& op);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Assigns through each iterator \a i in [result, result + (last - first))
+    /// the value of
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(+, init, *first, ...,
+    /// *(first + (i - result) - 1))
+    ///
+    /// \note   Complexity: O(\a last - \a first) applications of the
+    ///         predicate \a std::plus<T>.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam O           The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam T           The type of the value to be used as initial (and
+    ///                     intermediate) values (deduced).
+    /// \tparam Op          The type of the binary function object used for
+    ///                     the reduction operation.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param init         The initial value for the generalized sum.
+    /// \param op           Specifies the function (or function object) which
+    ///                     will be invoked for each of the values of the input
+    ///                     sequence. This is a
+    ///                     binary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type1 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///                     The types \a Type1 and \a Ret must be
+    ///                     such that an object of a type as given by the input
+    ///                     sequence can be implicitly converted to any
+    ///                     of those types.
+    ///
+    /// The reduce operations in the parallel \a exclusive_scan algorithm
+    /// invoked with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The reduce operations in the parallel \a exclusive_scan algorithm
+    /// invoked with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a exclusive_scan algorithm returns a
+    ///           \a hpx::future<O> if
+    ///           the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a O otherwise.
+    ///           The \a exclusive_scan algorithm returns the output iterator
+    ///           to the element in the destination range, one past the last
+    ///           element copied.
+    ///
+    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aN) is defined as:
+    ///         * a1 when N is 1
+    ///         * GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aK)
+    ///           + GENERALIZED_NONCOMMUTATIVE_SUM(+, aM, ..., aN)
+    ///           where 1 < K+1 = M <= N.
+    ///
+    /// The difference between \a exclusive_scan and \a inclusive_scan is that
+    /// \a inclusive_scan includes the ith input element in the ith sum.
+    ///
+    template <typename ExPolicy, typename Rng, typename O, typename T,
+        typename Op>
+    typename util::detail::algorithm_result<ExPolicy, O>::type exclusive_scan(
+        ExPolicy&& policy, Rng&& rng, O dest, T init, Op&& op);
 }}    // namespace hpx::ranges
 #else
 
