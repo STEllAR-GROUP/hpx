@@ -63,7 +63,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // handle [[deprecated]]
-#if defined(HPX_HAVE_DEPRECATION_WARNINGS) && !defined(HPX_INTEL_VERSION)
+#if HPX_HAVE_DEPRECATION_WARNINGS && !defined(HPX_INTEL_VERSION)
 #  define HPX_DEPRECATED_MSG \
    "This functionality is deprecated and will be removed in the future."
 #  define HPX_DEPRECATED(x) [[deprecated(x)]]
