@@ -11,7 +11,6 @@
 
 namespace hpx {
     using hpx::parallel::adjacent_difference;
-    using hpx::parallel::exclusive_scan;
     using hpx::parallel::transform_exclusive_scan;
     using hpx::parallel::transform_inclusive_scan;
 }    // namespace hpx
