@@ -10,4 +10,7 @@ find_package(Threads REQUIRED)
 
 if(NOT HPX_FIND_PACKAGE)
   target_link_libraries(hpx_base_libraries INTERFACE Threads::Threads)
+
+  hpx_add_compile_flag_if_available(-pthread PUBLIC)
+  hpx_add_link_flag_if_available(-pthread PUBLIC)
 endif()

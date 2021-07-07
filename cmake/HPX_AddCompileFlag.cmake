@@ -5,7 +5,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 include(CMakeParseArguments)
-include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 
 function(hpx_add_target_compile_option FLAG)
@@ -179,12 +178,17 @@ function(hpx_add_compile_flag)
 endfunction()
 
 function(hpx_add_compile_flag_if_available FLAG)
+  set(options PUBLIC)
   set(one_value_args NAME)
   set(multi_value_args CONFIGURATIONS LANGUAGES)
   cmake_parse_arguments(
     HPX_ADD_COMPILE_FLAG_IA "${options}" "${one_value_args}"
     "${multi_value_args}" ${ARGN}
   )
+
+  if(HPX_ADD_COMPILE_FLAG_IA_PUBLIC)
+    set(_public PUBLIC)
+  endif()
 
   if(HPX_ADD_COMPILE_FLAG_IA_NAME)
     string(TOUPPER ${HPX_ADD_COMPILE_FLAG_IA_NAME} _name)
@@ -211,7 +215,7 @@ function(hpx_add_compile_flag_if_available FLAG)
     if(HPX_WITH_${_lang}_FLAG_${_name})
       hpx_add_compile_flag(
         ${FLAG} CONFIGURATIONS ${HPX_ADD_COMPILE_FLAG_IA_CONFIGURATIONS}
-        LANGUAGES ${_lang}
+        LANGUAGES ${_lang} ${_public}
       )
     else()
       hpx_info("\"${FLAG}\" not available for language ${_lang}.")
