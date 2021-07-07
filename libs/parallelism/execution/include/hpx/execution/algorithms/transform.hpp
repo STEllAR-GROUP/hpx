@@ -27,13 +27,6 @@ namespace hpx { namespace execution { namespace experimental {
             std::decay_t<R> r;
             std::decay_t<F> f;
 
-            template <typename R_, typename F_>
-            transform_receiver(R_&& r, F_&& f)
-              : r(std::forward<R_>(r))
-              , f(std::forward<F_>(f))
-            {
-            }
-
             template <typename E>
                 void set_error(E&& e) && noexcept
             {
@@ -126,14 +119,14 @@ namespace hpx { namespace execution { namespace experimental {
             auto connect(R&& r) &&
             {
                 return hpx::execution::experimental::connect(std::move(s),
-                    transform_receiver<R, F>(std::forward<R>(r), std::move(f)));
+                    transform_receiver<R, F>{std::forward<R>(r), std::move(f)});
             }
 
             template <typename R>
             auto connect(R&& r) &
             {
                 return hpx::execution::experimental::connect(
-                    s, transform_receiver<R, F>(std::forward<R>(r), f));
+                    s, transform_receiver<R, F>{std::forward<R>(r), f});
             }
         };
     }    // namespace detail
