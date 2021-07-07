@@ -8,6 +8,7 @@
 
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 
 #include <complex>
 #include <type_traits>
@@ -35,6 +36,13 @@ namespace hpx { namespace traits {
     template <typename T>
     struct is_bitwise_serializable<std::complex<T>>
       : is_bitwise_serializable<typename std::remove_const<T>::type>
+    {
+    };
+
+    template <typename T>
+    struct is_not_bitwise_serializable<std::complex<T>>
+      : std::integral_constant<bool,
+            !is_bitwise_serializable_v<std::complex<T>>>
     {
     };
 }}    // namespace hpx::traits

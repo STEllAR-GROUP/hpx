@@ -13,6 +13,8 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 
+#include <vector>
+
 bool serialize_A = false;
 bool serialize_B = false;
 

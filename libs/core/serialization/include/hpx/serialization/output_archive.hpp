@@ -233,7 +233,11 @@ namespace hpx { namespace serialization {
         {
             static_assert(!std::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
-            if (disable_array_optimization())
+
+            bool archive_endianess_differs =
+                endian::native == endian::big ? endian_little() : endian_big();
+
+            if (disable_array_optimization() || archive_endianess_differs)
             {
                 access::serialize(*this, t, 0);
             }

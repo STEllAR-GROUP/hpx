@@ -35,6 +35,7 @@
 #include <hpx/plugin/traits/plugin_config_data.hpp>
 #include <hpx/serialization/traits/brace_initializable_traits.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 #include <hpx/serialization/traits/needs_automatic_registration.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 #include <hpx/serialization/traits/serialization_access_data.hpp>
