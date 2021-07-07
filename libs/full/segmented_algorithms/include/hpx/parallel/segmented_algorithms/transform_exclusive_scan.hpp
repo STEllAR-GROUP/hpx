@@ -41,9 +41,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::move(dest));
 
-            return exclusive_scan_(std::forward<ExPolicy>(policy), first, last,
-                dest, std::forward<T>(init), std::forward<Op>(op),
-                std::true_type(), std::forward<Conv>(conv));
+            return hpx::parallel::v1::detail::segmented_exclusive_scan(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                std::forward<T>(init), std::forward<Op>(op), std::true_type(),
+                std::forward<Conv>(conv));
         }
 
         // forward declare the non-segmented version of this algorithm
