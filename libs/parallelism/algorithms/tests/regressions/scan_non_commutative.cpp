@@ -24,7 +24,7 @@ void test_scan_non_commutative()
     for (unsigned int i = 0; i < vs.size(); ++i)
     {
         std::vector<std::string> rs(vs.size());
-        hpx::parallel::inclusive_scan(
+        hpx::inclusive_scan(
             hpx::execution::par.with(hpx::execution::static_chunk_size(i)),
             vs.cbegin(), vs.cend(), rs.begin());
         std::cout << rs.back() << "\n";

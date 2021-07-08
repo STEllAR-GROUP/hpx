@@ -137,7 +137,7 @@ namespace hpx { namespace traits {
                     std::vector<arg_type> dest;
                     dest.resize(data.size());
 
-                    hpx::parallel::inclusive_scan(hpx::execution::seq,
+                    hpx::inclusive_scan(hpx::execution::seq,
                         data.begin(), data.end(), dest.begin(),
                         std::forward<F>(op));
 
