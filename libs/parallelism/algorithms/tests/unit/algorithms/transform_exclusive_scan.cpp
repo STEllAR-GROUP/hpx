@@ -35,7 +35,7 @@ void test_transform_exclusive_scan(ExPolicy policy, IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::parallel::transform_exclusive_scan(policy, iterator(std::begin(c)),
+    hpx::transform_exclusive_scan(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(d), val, op, conv);
 
     // verify values
@@ -69,7 +69,7 @@ void test_transform_exclusive_scan_async(ExPolicy p, IteratorTag)
     auto conv = [](std::size_t val) { return 2 * val; };
 
     hpx::future<void> fut =
-        hpx::parallel::transform_exclusive_scan(p, iterator(std::begin(c)),
+        hpx::transform_exclusive_scan(p, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(d), val, op, conv);
     fut.wait();
 
@@ -125,7 +125,7 @@ void test_transform_exclusive_scan_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::transform_exclusive_scan(
+        hpx::transform_exclusive_scan(
             policy, iterator(std::begin(c)), iterator(std::end(c)),
             std::begin(d), std::size_t(0),
             [](std::size_t v1, std::size_t v2) {
@@ -162,7 +162,7 @@ void test_transform_exclusive_scan_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::transform_exclusive_scan(
+        hpx::future<void> f = hpx::transform_exclusive_scan(
             p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
             std::size_t(0),
             [](std::size_t v1, std::size_t v2) {
@@ -227,7 +227,7 @@ void test_transform_exclusive_scan_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::transform_exclusive_scan(
+        hpx::transform_exclusive_scan(
             policy, iterator(std::begin(c)), iterator(std::end(c)),
             std::begin(d), std::size_t(0),
             [](std::size_t v1, std::size_t v2) {
@@ -263,7 +263,7 @@ void test_transform_exclusive_scan_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::transform_exclusive_scan(
+        hpx::future<void> f = hpx::transform_exclusive_scan(
             p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
             std::size_t(0),
             [](std::size_t v1, std::size_t v2) {
