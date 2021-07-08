@@ -15,6 +15,7 @@
 #include <hpx/serialization/detail/raw_ptr.hpp>
 #include <hpx/serialization/input_container.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -75,7 +76,9 @@ namespace hpx { namespace serialization {
             !std::is_enum<T>::value>::type
         load(T& t)
         {
-            typedef hpx::traits::is_bitwise_serializable<T> use_optimized;
+            using use_optimized = std::integral_constant<bool,
+                hpx::traits::is_bitwise_serializable_v<T> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<T>>;
 
             load_bitwise(t, use_optimized());
         }
@@ -138,7 +141,11 @@ namespace hpx { namespace serialization {
         {
             static_assert(!std::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
-            if (disable_array_optimization())
+
+            bool archive_endianess_differs =
+                endian::native == endian::big ? endian_little() : endian_big();
+
+            if (disable_array_optimization() || archive_endianess_differs)
             {
                 access::serialize(*this, t, 0);
             }

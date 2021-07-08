@@ -6,9 +6,11 @@
 
 #pragma once
 
+#include <hpx/config/endian.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -23,10 +25,17 @@ namespace hpx {
         template <typename Key, typename Value>
         struct is_bitwise_serializable<std::pair<Key, Value>>
           : std::integral_constant<bool,
-                is_bitwise_serializable<
-                    typename std::remove_const<Key>::type>::value &&
-                    is_bitwise_serializable<
-                        typename std::remove_const<Value>::type>::value>
+                is_bitwise_serializable_v<
+                    typename std::remove_const<Key>::type> &&
+                    is_bitwise_serializable_v<
+                        typename std::remove_const<Value>::type>>
+        {
+        };
+
+        template <typename Key, typename Value>
+        struct is_not_bitwise_serializable<std::pair<Key, Value>>
+          : std::integral_constant<bool,
+                !is_bitwise_serializable_v<std::pair<Key, Value>>>
         {
         };
     }    // namespace traits
@@ -49,7 +58,12 @@ namespace hpx {
             void load_pair_impl(
                 input_archive& ar, std::pair<Key, Value>& t, std::true_type)
             {
-                if (ar.disable_array_optimization())
+                bool archive_endianess_differs = endian::native == endian::big ?
+                    ar.endian_little() :
+                    ar.endian_big();
+
+                if (ar.disable_array_optimization() ||
+                    archive_endianess_differs)
                     load_pair_impl(ar, t, std::false_type());
                 else
                     load_binary(ar, &t, sizeof(std::pair<Key, Value>));
@@ -67,7 +81,12 @@ namespace hpx {
             void save_pair_impl(output_archive& ar,
                 const std::pair<Key, Value>& t, std::true_type)
             {
-                if (ar.disable_array_optimization())
+                bool archive_endianess_differs = endian::native == endian::big ?
+                    ar.endian_little() :
+                    ar.endian_big();
+
+                if (ar.disable_array_optimization() ||
+                    archive_endianess_differs)
                     save_pair_impl(ar, t, std::false_type());
                 else
                     save_binary(ar, &t, sizeof(std::pair<Key, Value>));
@@ -80,7 +99,8 @@ namespace hpx {
         {
             using pair_type = std::pair<Key, Value>;
             using optimized = std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable<pair_type>::value>;
+                hpx::traits::is_bitwise_serializable_v<pair_type> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<pair_type>>;
 
             detail::load_pair_impl(ar, t, optimized());
         }
@@ -91,7 +111,8 @@ namespace hpx {
         {
             using pair_type = std::pair<Key, Value>;
             using optimized = std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable<pair_type>::value>;
+                hpx::traits::is_bitwise_serializable_v<pair_type> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<pair_type>>;
 
             detail::save_pair_impl(ar, t, optimized());
         }

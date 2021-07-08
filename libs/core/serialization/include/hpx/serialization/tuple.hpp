@@ -13,6 +13,7 @@
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
@@ -24,6 +25,13 @@ namespace hpx { namespace traits {
     struct is_bitwise_serializable<::hpx::tuple<Ts...>>
       : ::hpx::util::all_of<hpx::traits::is_bitwise_serializable<
             typename std::remove_const<Ts>::type>...>
+    {
+    };
+
+    template <typename... Ts>
+    struct is_not_bitwise_serializable<::hpx::tuple<Ts...>>
+      : std::integral_constant<bool,
+            !is_bitwise_serializable_v<::hpx::tuple<Ts...>>>
     {
     };
 }}    // namespace hpx::traits

@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,22 @@ hpx_option(
 if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
   hpx_add_config_define_namespace(
     DEFINE HPX_SERIALIZATION_HAVE_BOOST_TYPES NAMESPACE SERIALIZATION
+  )
+endif()
+
+# This flag can be used in systems that assume that all types are bitwise
+# serializable by default (like SHAD).
+hpx_option(
+  HPX_SERIALIZATION_WITH_ALL_TYPES_ARE_BITWISE_SERIALIZABLE BOOL
+  "Assume all types are bitwise serializable. (default: OFF)" OFF ADVANCED
+  CATEGORY "Modules"
+  MODULE SERIALIZATION
+)
+
+if(HPX_SERIALIZATION_WITH_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE
+    NAMESPACE SERIALIZATION
   )
 endif()
 
@@ -74,6 +90,7 @@ set(serialization_headers
     hpx/serialization/serialize.hpp
     hpx/serialization/traits/brace_initializable_traits.hpp
     hpx/serialization/traits/is_bitwise_serializable.hpp
+    hpx/serialization/traits/is_not_bitwise_serializable.hpp
     hpx/serialization/traits/needs_automatic_registration.hpp
     hpx/serialization/traits/polymorphic_traits.hpp
     hpx/serialization/traits/serialization_access_data.hpp

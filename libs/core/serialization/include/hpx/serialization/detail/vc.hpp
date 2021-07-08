@@ -12,6 +12,7 @@
 #include <hpx/serialization/array.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -113,6 +114,27 @@ namespace hpx { namespace traits {
       : is_bitwise_serializable<typename std::remove_const<T>::type>
     {
     };
+
+    template <typename T, typename Abi>
+    struct is_not_bitwise_serializable<Vc::Vector<T, Abi>>
+      : std::integral_constant<bool,
+            !is_bitwise_serializable_v<Vc::Vector<T, Abi>>>
+    {
+    };
+
+    template <typename T>
+    struct is_not_bitwise_serializable<Vc::Scalar::Vector<T>>
+      : std::integral_constant<bool,
+            !is_bitwise_serializable_v<Vc::Scalar::Vector<T>>>
+    {
+    };
+
+    template <typename T, std::size_t N, typename V, std::size_t W>
+    struct is_not_bitwise_serializable<Vc::SimdArray<T, N, V, W>>
+      : std::integral_constant<bool,
+            !is_bitwise_serializable_v<Vc::SimdArray<T, N, V, W>>>
+    {
+    };
 }}    // namespace hpx::traits
 
 #else
@@ -146,6 +168,13 @@ namespace hpx { namespace traits {
     template <typename T, typename Abi>
     struct is_bitwise_serializable<Vc::datapar<T, Abi>>
       : is_bitwise_serializable<typename std::remove_const<T>::type>
+    {
+    };
+
+    template <typename T, typename Abi>
+    struct is_not_bitwise_serializable<Vc::datapar<T, Abi>>
+      : std::integral_constant<bool,
+            !is_bitwise_serializable_v<Vc::datapar<T, Abi>>>
     {
     };
 }}    // namespace hpx::traits
