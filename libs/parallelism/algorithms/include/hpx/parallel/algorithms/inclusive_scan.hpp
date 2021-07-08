@@ -635,9 +635,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::inclusive_scan is deprecated, use hpx::inclusive_scan "
         "instead")
-    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, Op&& op, T init)
+        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, Op&& op, T init)
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
@@ -672,9 +672,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::inclusive_scan is deprecated, use hpx::inclusive_scan "
         "instead")
-    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, Op&& op)
+        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, Op&& op)
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
@@ -704,9 +704,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::inclusive_scan is deprecated, use hpx::inclusive_scan "
         "instead")
-    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    inclusive_scan(
-        ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        inclusive_scan(
+            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
