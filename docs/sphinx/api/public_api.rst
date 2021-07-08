@@ -565,8 +565,8 @@ more information about the parallel algorithms.
 Functions
 ---------
 
-- :cpp:func:`hpx::parallel::v1::uninitialized_copy`
-- :cpp:func:`hpx::parallel::v1::uninitialized_copy_n`
+- :cpp:func:`hpx::uninitialized_copy`
+- :cpp:func:`hpx::uninitialized_copy_n`
 - :cpp:func:`hpx::uninitialized_default_construct`
 - :cpp:func:`hpx::uninitialized_default_construct_n`
 - :cpp:func:`hpx::parallel::v1::uninitialized_fill`
@@ -576,12 +576,17 @@ Functions
 - :cpp:func:`hpx::uninitialized_value_construct`
 - :cpp:func:`hpx::uninitialized_value_construct_n`
 
+- :cpp:func:`hpx::ranges::uninitialized_copy`
+- :cpp:func:`hpx::ranges::uninitialized_copy_n`
 - :cpp:func:`hpx::ranges::uninitialized_default_construct`
 - :cpp:func:`hpx::ranges::uninitialized_default_construct_n`
 - :cpp:func:`hpx::ranges::uninitialized_move`
 - :cpp:func:`hpx::ranges::uninitialized_move_n`
 - :cpp:func:`hpx::ranges::uninitialized_value_construct`
 - :cpp:func:`hpx::ranges::uninitialized_value_construct_n`
+
+- :cpp:func:`hpx::ranges::uninitialized_copy`
+- :cpp:func:`hpx::ranges::uninitialized_copy_n`
 
 Header ``hpx/numeric.hpp``
 ==========================
