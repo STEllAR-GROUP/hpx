@@ -11,6 +11,7 @@
 #include <hpx/parallel/container_algorithms/exclusive_scan.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iostream>
 #include <iterator>
 #include <random>
