@@ -78,8 +78,7 @@ void adjacent_difference_tests(std::vector<hpx::id_type>& localities)
 
     hpx::partitioned_vector<T> v(
         length, T(1), hpx::container_layout(localities));
-    hpx::parallel::inclusive_scan(
-        hpx::execution::seq, v.begin(), v.end(), v.begin());
+    hpx::inclusive_scan(hpx::execution::seq, v.begin(), v.end(), v.begin());
     hpx::partitioned_vector<T> w(length, hpx::container_layout(localities));
     test_adjacent_difference(hpx::execution::seq, v, w, T(1));
     test_adjacent_difference(hpx::execution::par, v, w, T(1));

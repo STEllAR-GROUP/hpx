@@ -677,7 +677,7 @@ Parallel algorithms
      * Sums up a range of elements.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`reduce`
-   * * :cpp:func:`hpx::parallel::v1::inclusive_scan`
+   * * :cpp:func:`hpx::inclusive_scan`
      * Does an inclusive parallel scan over a range of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`inclusive_scan`

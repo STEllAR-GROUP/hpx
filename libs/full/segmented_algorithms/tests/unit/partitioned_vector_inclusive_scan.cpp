@@ -59,7 +59,7 @@ void inclusive_scan_algo_tests_with_policy(std::size_t size,
     double e1 = t1.elapsed();
     t1.restart();
 
-    hpx::parallel::inclusive_scan(
+    hpx::inclusive_scan(
         policy, in.begin(), in.end(), out.begin(), opt<T>(), val);
 
     double e2 = t1.elapsed();
@@ -90,7 +90,7 @@ void inclusive_scan_algo_tests_segmented_out_with_policy(std::size_t size,
     double e1 = t1.elapsed();
     t1.restart();
 
-    hpx::parallel::inclusive_scan(
+    hpx::inclusive_scan(
         policy, in.begin(), in.end(), out.begin(), opt<T>(), val);
 
     double e2 = t1.elapsed();
@@ -120,7 +120,7 @@ void inclusive_scan_algo_tests_inplace_with_policy(std::size_t size,
     double e1 = t1.elapsed();
     t1.restart();
 
-    hpx::parallel::inclusive_scan(
+    hpx::inclusive_scan(
         policy, in.begin(), in.end(), in.begin(), opt<T>(), val);
 
     double e2 = t1.elapsed();
@@ -151,7 +151,7 @@ void inclusive_scan_algo_tests_with_policy_async(std::size_t size,
     double e1 = t1.elapsed();
     t1.restart();
 
-    auto res = hpx::parallel::inclusive_scan(
+    auto res = hpx::inclusive_scan(
         policy, in.begin(), in.end(), out.begin(), opt<T>(), val);
     res.get();
 
@@ -183,7 +183,7 @@ void inclusive_scan_algo_tests_segmented_out_with_policy_async(std::size_t size,
     double e1 = t1.elapsed();
     t1.restart();
 
-    auto res = hpx::parallel::inclusive_scan(
+    auto res = hpx::inclusive_scan(
         policy, in.begin(), in.end(), out.begin(), opt<T>(), val);
     res.get();
 
@@ -214,7 +214,7 @@ void inclusive_scan_algo_tests_inplace_with_policy_async(std::size_t size,
     double e1 = t1.elapsed();
     t1.restart();
 
-    auto res = hpx::parallel::inclusive_scan(
+    auto res = hpx::inclusive_scan(
         policy, in.begin(), in.end(), in.begin(), opt<T>(), val);
     res.get();
 
