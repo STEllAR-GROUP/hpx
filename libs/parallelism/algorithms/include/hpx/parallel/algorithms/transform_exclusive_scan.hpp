@@ -16,11 +16,11 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
     /// the value of
-    /// GENERALIZED_NONCOMMUTATIVE_SUM(+, init, *first, ...,
-    /// *(first + (i - result) - 1))
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(binary_op, init, conv(*first), ...,
+    /// conv(*(first + (i - result) - 1))).
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
-    ///         predicate \a std::plus<T>.
+    ///         predicates \a op and \a conv.
     ///
     /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -29,45 +29,86 @@ namespace hpx {
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
+    /// \tparam Conv        The type of the unary function object used for
+    ///                     the conversion operation.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
+    /// \tparam Op          The type of the binary function object used for
+    ///                     the reduction operation.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
+    /// \param conv         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is a
+    ///                     unary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     R fun(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///                     The type \a R must be such that an object of this
+    ///                     type can be implicitly converted to \a T.
     /// \param init         The initial value for the generalized sum.
+    /// \param op           Specifies the function (or function object) which
+    ///                     will be invoked for each of the values of the input
+    ///                     sequence. This is a
+    ///                     binary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type1 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///                     The types \a Type1 and \a Ret must be
+    ///                     such that an object of a type as given by the input
+    ///                     sequence can be implicitly converted to any
+    ///                     of those types.
     ///
-    /// The reduce operations in the parallel \a exclusive_scan algorithm
-    /// invoked without an execution policy object will execute in sequential
-    /// order in the calling thread.
+    /// The reduce operations in the parallel \a transform_exclusive_scan
+    /// algorithm invoked without an execution policy object execute in
+    /// sequential order in the calling thread.
     ///
-    /// \returns  The \a exclusive_scan algorithm returns \a OutIter.
-    ///           The \a exclusive_scan algorithm returns the output iterator
-    ///           to the element in the destination range, one past the last
-    ///           element copied.
+    /// \returns  The \a transform_exclusive_scan algorithm returns a
+    ///           returns \a OutIter.
+    ///           The \a transform_exclusive_scan algorithm returns the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element copied.
     ///
-    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aN) is defined as:
+    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aN) is defined as:
     ///         * a1 when N is 1
-    ///         * GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aK)
-    ///           + GENERALIZED_NONCOMMUTATIVE_SUM(+, aM, ..., aN)
+    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK),
+    ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
     ///
-    /// The difference between \a exclusive_scan and \a inclusive_scan is that
-    /// \a inclusive_scan includes the ith input element in the ith sum.
+    /// Neither \a conv nor \a op shall invalidate iterators or subranges, or
+    /// modify elements in the ranges [first,last) or [result,result +
+    /// (last - first)).
     ///
-    template <typename InIter, typename OutIter, typename T>
-    OutIter exclusive_scan(InIter first, InIter last, OutIter dest, T init);
+    /// The behavior of transform_exclusive_scan may be non-deterministic for
+    /// a non-associative predicate.
+    ///
+    template <typename InIter, typename OutIter, typename T, typename BinOp,
+        typename UnOp>
+    OutIter transform_exclusive_scan(InIter first, InIter last, OutIter dest,
+        T init, BinOp&& binary_op, UnOp&& unary_op);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
     /// the value of
-    /// GENERALIZED_NONCOMMUTATIVE_SUM(+, init, *first, ...,
-    /// *(first + (i - result) - 1))
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(binary_op, init, conv(*first), ...,
+    /// conv(*(first + (i - result) - 1))).
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
-    ///         predicate \a std::plus<T>.
+    ///         predicates \a op and \a conv.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -80,8 +121,12 @@ namespace hpx {
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
+    /// \tparam Conv        The type of the unary function object used for
+    ///                     the conversion operation.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
+    /// \tparam Op          The type of the binary function object used for
+    ///                     the reduction operation.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -90,195 +135,78 @@ namespace hpx {
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
+    /// \param conv         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is a
+    ///                     unary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     R fun(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///                     The type \a R must be such that an object of this
+    ///                     type can be implicitly converted to \a T.
     /// \param init         The initial value for the generalized sum.
+    /// \param op           Specifies the function (or function object) which
+    ///                     will be invoked for each of the values of the input
+    ///                     sequence. This is a
+    ///                     binary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type1 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///                     The types \a Type1 and \a Ret must be
+    ///                     such that an object of a type as given by the input
+    ///                     sequence can be implicitly converted to any
+    ///                     of those types.
     ///
-    /// The reduce operations in the parallel \a exclusive_scan algorithm
-    /// invoked with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
+    /// The reduce operations in the parallel \a transform_exclusive_scan
+    /// algorithm invoked with an execution policy object of type \a
+    /// sequenced_policy execute in sequential order in the calling thread.
     ///
-    /// The reduce operations in the parallel \a exclusive_scan algorithm
-    /// invoked with an execution policy object of type \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
+    /// The reduce operations in the parallel \a transform_exclusive_scan
+    /// algorithm invoked with an execution policy object of type \a
+    /// parallel_policy or \a parallel_task_policy are permitted to execute
+    /// in an unordered fashion in unspecified threads, and indeterminately
+    /// sequenced within each thread.
     ///
-    /// \returns  The \a exclusive_scan algorithm returns a
+    /// \returns  The \a transform_exclusive_scan algorithm returns a
     ///           \a hpx::future<FwdIter2> if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a FwdIter2 otherwise.
-    ///           The \a exclusive_scan algorithm returns the output iterator
-    ///           to the element in the destination range, one past the last
-    ///           element copied.
-    ///
-    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aN) is defined as:
-    ///         * a1 when N is 1
-    ///         * GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aK)
-    ///           + GENERALIZED_NONCOMMUTATIVE_SUM(+, aM, ..., aN)
-    ///           where 1 < K+1 = M <= N.
-    ///
-    /// The difference between \a exclusive_scan and \a inclusive_scan is that
-    /// \a inclusive_scan includes the ith input element in the ith sum.
-    ///
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    exclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, T init);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Assigns through each iterator \a i in [result, result + (last - first))
-    /// the value of
-    /// GENERALIZED_NONCOMMUTATIVE_SUM(binary_op, init, *first, ...,
-    /// *(first + (i - result) - 1)).
-    ///
-    /// \note   Complexity: O(\a last - \a first) applications of the
-    ///         predicate \a op.
-    ///
-    /// \tparam InIter      The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam OutIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
-    /// \tparam T           The type of the value to be used as initial (and
-    ///                     intermediate) values (deduced).
-    /// \tparam Op          The type of the binary function object used for
-    ///                     the reduction operation.
-    ///
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    /// \param init         The initial value for the generalized sum.
-    /// \param op           Specifies the function (or function object) which
-    ///                     will be invoked for each of the values of the input
-    ///                     sequence. This is a
-    ///                     binary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     Ret fun(const Type1 &a, const Type1 &b);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it.
-    ///                     The types \a Type1 and \a Ret must be
-    ///                     such that an object of a type as given by the input
-    ///                     sequence can be implicitly converted to any
-    ///                     of those types.
-    ///
-    /// The reduce operations in the parallel \a exclusive_scan algorithm
-    /// invoked without an execution policy object will execute in sequential
-    /// order in the calling thread.
-    ///
-    /// \returns  The \a exclusive_scan algorithm returns \a OutIter.
-    ///           The \a exclusive_scan algorithm returns the output iterator
-    ///           to the element in the destination range, one past the last
-    ///           element copied.
+    ///           The \a transform_exclusive_scan algorithm returns the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element copied.
     ///
     /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aN) is defined as:
     ///         * a1 when N is 1
     ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK),
-    ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN))
+    ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
     ///
-    /// The difference between \a exclusive_scan and \a inclusive_scan is that
-    /// \a inclusive_scan includes the ith input element in the ith sum. If
-    /// \a op is not mathematically associative, the behavior of
-    /// \a inclusive_scan may be non-deterministic.
+    /// Neither \a conv nor \a op shall invalidate iterators or subranges, or
+    /// modify elements in the ranges [first,last) or [result,result +
+    /// (last - first)).
     ///
-    template <typename InIter, typename OutIter,typename T, typename Op>
-    OutIter exclusive_scan(InIter first, InIter last, OutIter dest,
-        T init, Op&& op);
-
-        ///////////////////////////////////////////////////////////////////////////
-    /// Assigns through each iterator \a i in [result, result + (last - first))
-    /// the value of
-    /// GENERALIZED_NONCOMMUTATIVE_SUM(binary_op, init, *first, ...,
-    /// *(first + (i - result) - 1)).
-    ///
-    /// \note   Complexity: O(\a last - \a first) applications of the
-    ///         predicate \a op.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam T           The type of the value to be used as initial (and
-    ///                     intermediate) values (deduced).
-    /// \tparam Op          The type of the binary function object used for
-    ///                     the reduction operation.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    /// \param init         The initial value for the generalized sum.
-    /// \param op           Specifies the function (or function object) which
-    ///                     will be invoked for each of the values of the input
-    ///                     sequence. This is a
-    ///                     binary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     Ret fun(const Type1 &a, const Type1 &b);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it.
-    ///                     The types \a Type1 and \a Ret must be
-    ///                     such that an object of a type as given by the input
-    ///                     sequence can be implicitly converted to any
-    ///                     of those types.
-    ///
-    /// The reduce operations in the parallel \a exclusive_scan algorithm
-    /// invoked with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The reduce operations in the parallel \a exclusive_scan algorithm
-    /// invoked with an execution policy object of type \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a exclusive_scan algorithm returns a
-    ///           \a hpx::future<OutIter> if
-    ///           the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a OutIter otherwise.
-    ///           The \a exclusive_scan algorithm returns the output iterator
-    ///           to the element in the destination range, one past the last
-    ///           element copied.
-    ///
-    /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aN) is defined as:
-    ///         * a1 when N is 1
-    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK),
-    ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN))
-    ///           where 1 < K+1 = M <= N.
-    ///
-    /// The difference between \a exclusive_scan and \a inclusive_scan is that
-    /// \a inclusive_scan includes the ith input element in the ith sum. If
-    /// \a op is not mathematically associative, the behavior of
-    /// \a inclusive_scan may be non-deterministic.
+    /// The behavior of transform_exclusive_scan may be non-deterministic for
+    /// a non-associative predicate.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T, typename Op>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    exclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, T init, Op&& op);
+        typename T, typename BinOp, typename UnOp>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        FwdIter2>::type
+     transform_exclusive_scan(ExPolicy&& policy, FwdIter1 first,
+         FwdIter1 last, FwdIter2 dest, T init, BinOp&& binary_op,
+         UnOp&& unary_op);
     // clang-format on
 }    // namespace hpx
 
