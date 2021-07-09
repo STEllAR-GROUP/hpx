@@ -36,7 +36,10 @@ General changes
   algorithms with equivalent behaviour to the non-task policies
   ``hpx::execution::seq``, ``hpx::execution::par``, and
   ``hpx::execution::par_unseq``.
-- Vc support has been fixed, after being broken in 1.6.0.
+- Vc support has been fixed, after being broken in 1.6.0. In addition, |hpx| now
+  experimentally supports GCC's SIMD implementation, when available. The
+  implementation can be used through the ``hpx::execution::simd`` and
+  ``hpx::execution::simdpar`` execution policies.
 - The customization points ``sync_execute``, ``async_execute``,
   ``then_execute``, ``post``, ``bulk_sync_execute``, ``bulk_async_execute``, and
   ``bulk_then_execute`` are now implemented using ``tag_dispatch`` (previously
@@ -64,12 +67,19 @@ General changes
 - All ``hpx::init`` and ``hpx::start`` overloads now take ``std::function``\ s
   instead of ``hpx::util::function_nonser``. No changes should be required in
   user code to accommodate this change.
+- ``hpx::util::unwrapping`` and other related unwrapping functionality has been
+  moved up into the ``hpx`` namespace. Names in ``hpx::util`` are still usable
+  with a deprecation warning. This functionality can now be accessed through the
+  ``hpx/unwrap.hpp`` and ``hpx/local/unwrap.hpp`` headers.
 - The default tag for APEX has been update from 2.3.1 to 2.4.0. In particular,
   this fixes a bug which could lead to hangs in distributed runs.
-- The dependency on Boost.ASIO has been replaced with the standalone ASIO
-  available at https://github.com/chriskohlhoff/asio. ASIO will be fetched
-  automatically using CMake's fetchcontent, unless ``ASIO_ROOT`` is set as a
-  CMake variable. In general, dependencies on Boost have again been reduced.
+- The dependency on Boost.Asio has been replaced with the standalone Asio
+  available at https://github.com/chriskohlhoff/asio. By default, a
+  system-installed Asio will be used. ``ASIO_ROOT`` can be given as a hint to
+  tell CMake where to find Asio. Alternatively, Asio can be fetched
+  automatically  using CMake's fetchcontent by setting
+  ``HPX_WITH_FETCH_ASIO=ON``. In general, dependencies on Boost have again been
+  reduced.
 - Modularization of the library has continued. In this release almost all
   functionality has been moved into modules. These changes do not generally
   affect user code. Warnings are still issued for headers that have moved.
