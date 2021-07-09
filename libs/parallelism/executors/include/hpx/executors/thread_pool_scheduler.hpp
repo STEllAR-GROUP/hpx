@@ -22,26 +22,31 @@
 #include <utility>
 
 namespace hpx { namespace execution { namespace experimental {
-    struct executor
+    struct thread_pool_scheduler
     {
-        constexpr executor() = default;
+        constexpr thread_pool_scheduler() = default;
+        explicit thread_pool_scheduler(hpx::threads::thread_pool_base* pool)
+          : pool_(pool)
+        {
+        }
 
         /// \cond NOINTERNAL
-        bool operator==(executor const& rhs) const noexcept
+        bool operator==(thread_pool_scheduler const& rhs) const noexcept
         {
             return pool_ == rhs.pool_ && priority_ == rhs.priority_ &&
                 stacksize_ == rhs.stacksize_ &&
                 schedulehint_ == rhs.schedulehint_;
         }
 
-        bool operator!=(executor const& rhs) const noexcept
+        bool operator!=(thread_pool_scheduler const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
         // support with_priority property
-        friend executor tag_dispatch(
-            hpx::execution::experimental::with_priority_t, executor const& exec,
+        friend thread_pool_scheduler tag_dispatch(
+            hpx::execution::experimental::with_priority_t,
+            thread_pool_scheduler const& exec,
             hpx::threads::thread_priority priority)
         {
             auto exec_with_priority = exec;
@@ -50,15 +55,17 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         friend hpx::threads::thread_priority tag_dispatch(
-            hpx::execution::experimental::get_priority_t, executor const& exec)
+            hpx::execution::experimental::get_priority_t,
+            thread_pool_scheduler const& exec)
         {
             return exec.priority_;
         }
 
         // support with_stacksize property
-        friend executor tag_dispatch(
+        friend thread_pool_scheduler tag_dispatch(
             hpx::execution::experimental::with_stacksize_t,
-            executor const& exec, hpx::threads::thread_stacksize stacksize)
+            thread_pool_scheduler const& exec,
+            hpx::threads::thread_stacksize stacksize)
         {
             auto exec_with_stacksize = exec;
             exec_with_stacksize.stacksize_ = stacksize;
@@ -66,14 +73,17 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         friend hpx::threads::thread_stacksize tag_dispatch(
-            hpx::execution::experimental::get_stacksize_t, executor const& exec)
+            hpx::execution::experimental::get_stacksize_t,
+            thread_pool_scheduler const& exec)
         {
             return exec.stacksize_;
         }
 
         // support with_hint property
-        friend executor tag_dispatch(hpx::execution::experimental::with_hint_t,
-            executor const& exec, hpx::threads::thread_schedule_hint hint)
+        friend thread_pool_scheduler tag_dispatch(
+            hpx::execution::experimental::with_hint_t,
+            thread_pool_scheduler const& exec,
+            hpx::threads::thread_schedule_hint hint)
         {
             auto exec_with_hint = exec;
             exec_with_hint.schedulehint_ = hint;
@@ -81,26 +91,25 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         friend hpx::threads::thread_schedule_hint tag_dispatch(
-            hpx::execution::experimental::get_hint_t, executor const& exec)
+            hpx::execution::experimental::get_hint_t,
+            thread_pool_scheduler const& exec)
         {
             return exec.schedulehint_;
         }
 
         // support with_annotation property
-        using supports_annotations = void;
-
-        friend constexpr executor tag_dispatch(
+        friend constexpr thread_pool_scheduler tag_dispatch(
             hpx::execution::experimental::with_annotation_t,
-            executor const& exec, char const* annotation)
+            thread_pool_scheduler const& exec, char const* annotation)
         {
             auto exec_with_annotation = exec;
             exec_with_annotation.annotation_ = annotation;
             return exec_with_annotation;
         }
 
-        friend executor tag_dispatch(
+        friend thread_pool_scheduler tag_dispatch(
             hpx::execution::experimental::with_annotation_t,
-            executor const& exec, std::string annotation)
+            thread_pool_scheduler const& exec, std::string annotation)
         {
             auto exec_with_annotation = exec;
             exec_with_annotation.annotation_ =
@@ -112,7 +121,7 @@ namespace hpx { namespace execution { namespace experimental {
         // support get_annotation property
         friend constexpr char const* tag_dispatch(
             hpx::execution::experimental::get_annotation_t,
-            executor const& exec) noexcept
+            thread_pool_scheduler const& exec) noexcept
         {
             return exec.annotation_;
         }
@@ -130,15 +139,15 @@ namespace hpx { namespace execution { namespace experimental {
                 std::forward<F>(f));
         }
 
-        template <typename Executor, typename R>
+        template <typename Scheduler, typename R>
         struct operation_state
         {
-            std::decay_t<Executor> exec;
+            std::decay_t<Scheduler> exec;
             std::decay_t<R> r;
 
-            template <typename Executor_, typename R_>
-            operation_state(Executor_&& exec, R_&& r)
-              : exec(std::forward<Executor_>(exec))
+            template <typename Scheduler_, typename R_>
+            operation_state(Scheduler_&& exec, R_&& r)
+              : exec(std::forward<Scheduler_>(exec))
               , r(std::forward<R_>(r))
             {
             }
@@ -165,10 +174,10 @@ namespace hpx { namespace execution { namespace experimental {
             }
         };
 
-        template <typename Executor>
+        template <typename Scheduler>
         struct sender
         {
-            std::decay_t<Executor> exec;
+            std::decay_t<Scheduler> exec;
 
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
@@ -180,13 +189,13 @@ namespace hpx { namespace execution { namespace experimental {
             static constexpr bool sends_done = false;
 
             template <typename R>
-            operation_state<Executor, R> connect(R&& r) &&
+            operation_state<Scheduler, R> connect(R&& r) &&
             {
                 return {std::move(exec), std::forward<R>(r)};
             }
 
             template <typename R>
-            operation_state<Executor, R> connect(R&& r) &
+            operation_state<Scheduler, R> connect(R&& r) &
             {
                 return {exec, std::forward<R>(r)};
             }
@@ -202,12 +211,12 @@ namespace hpx { namespace execution { namespace experimental {
         static constexpr bool sends_done = false;
 
         template <typename R>
-        operation_state<executor, R> connect(R&& r) &&
+        operation_state<thread_pool_scheduler, R> connect(R&& r) &&
         {
             return {*this, std::forward<R>(r)};
         }
 
-        constexpr sender<executor> schedule() const
+        constexpr sender<thread_pool_scheduler> schedule() const
         {
             return {*this};
         }

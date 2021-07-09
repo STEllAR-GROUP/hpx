@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -25,13 +26,6 @@ namespace hpx { namespace execution { namespace experimental {
         {
             std::decay_t<R> r;
             std::decay_t<F> f;
-
-            template <typename R_, typename F_>
-            transform_receiver(R_&& r, F_&& f)
-              : r(std::forward<R_>(r))
-              , f(std::forward<F_>(f))
-            {
-            }
 
             template <typename E>
                 void set_error(E&& e) && noexcept
@@ -125,14 +119,14 @@ namespace hpx { namespace execution { namespace experimental {
             auto connect(R&& r) &&
             {
                 return hpx::execution::experimental::connect(std::move(s),
-                    transform_receiver<R, F>(std::forward<R>(r), std::move(f)));
+                    transform_receiver<R, F>{std::forward<R>(r), std::move(f)});
             }
 
             template <typename R>
             auto connect(R&& r) &
             {
                 return hpx::execution::experimental::connect(
-                    s, transform_receiver<R, F>(std::forward<R>(r), f));
+                    s, transform_receiver<R, F>{std::forward<R>(r), f});
             }
         };
     }    // namespace detail
@@ -141,7 +135,12 @@ namespace hpx { namespace execution { namespace experimental {
       : hpx::functional::tag_fallback<transform_t>
     {
     private:
-        template <typename S, typename F>
+        // clang-format off
+        template <typename S, typename F,
+            HPX_CONCEPT_REQUIRES_(
+                is_sender_v<S>
+            )>
+        // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             transform_t, S&& s, F&& f)
         {

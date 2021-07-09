@@ -121,6 +121,11 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp
     hpx/parallel/container_algorithms/transform_reduce.hpp
+    hpx/parallel/container_algorithms/uninitialized_copy.hpp
+    hpx/parallel/container_algorithms/uninitialized_default_construct.hpp
+    hpx/parallel/container_algorithms/uninitialized_fill.hpp
+    hpx/parallel/container_algorithms/uninitialized_move.hpp
+    hpx/parallel/container_algorithms/uninitialized_value_construct.hpp
     hpx/parallel/container_algorithms/unique.hpp
     hpx/parallel/container_memory.hpp
     hpx/parallel/container_numeric.hpp

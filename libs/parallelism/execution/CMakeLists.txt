@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(execution_headers
+    hpx/execution/algorithms/bulk.hpp
     hpx/execution/algorithms/detach.hpp
     hpx/execution/algorithms/detail/is_negative.hpp
     hpx/execution/algorithms/detail/partial_algorithm.hpp
@@ -18,6 +19,7 @@ set(execution_headers
     hpx/execution/algorithms/keep_future.hpp
     hpx/execution/algorithms/let_error.hpp
     hpx/execution/algorithms/let_value.hpp
+    hpx/execution/algorithms/make_future.hpp
     hpx/execution/algorithms/on.hpp
     hpx/execution/algorithms/sync_wait.hpp
     hpx/execution/algorithms/transform.hpp
@@ -41,7 +43,6 @@ set(execution_headers
     hpx/execution/executors/polymorphic_executor.hpp
     hpx/execution/executors/rebind_executor.hpp
     hpx/execution/executors/static_chunk_size.hpp
-    hpx/execution/sender_future.hpp
     hpx/execution/traits/detail/simd/vector_pack_alignment_size.hpp
     hpx/execution/traits/detail/simd/vector_pack_count_bits.hpp
     hpx/execution/traits/detail/simd/vector_pack_load_store.hpp

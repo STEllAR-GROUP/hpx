@@ -88,9 +88,25 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////
     template <typename I, typename O>
+    std::pair<I, O> get_pair(util::in_out_result<I, O>&& p)
+    {
+        return std::pair<I, O>{p.in, p.out};
+    }
+
+    template <typename I, typename O>
     O get_second_element(util::in_out_result<I, O>&& p)
     {
         return p.out;
+    }
+
+    template <typename I, typename O>
+    hpx::future<std::pair<I, O>> get_pair(
+        hpx::future<util::in_out_result<I, O>>&& f)
+    {
+        return hpx::make_future<std::pair<I, O>>(
+            std::move(f), [](util::in_out_result<I, O>&& p) {
+                return std::pair<I, O>{p.in, p.out};
+            });
     }
 
     template <typename I, typename O>

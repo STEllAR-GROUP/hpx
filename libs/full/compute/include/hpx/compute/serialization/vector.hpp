@@ -8,10 +8,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/endian.hpp>
 
 #if !defined(__CUDA_ARCH__)
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 #else
 #include <hpx/serialization/serialization_fwd.hpp>
 #endif
@@ -52,7 +54,11 @@ namespace hpx { namespace serialization {
         void load_impl(
             input_archive& ar, compute::vector<T, Allocator>& v, std::true_type)
         {
-            if (ar.disable_array_optimization())
+            bool archive_endianess_differs = endian::native == endian::big ?
+                ar.endian_little() :
+                ar.endian_big();
+
+            if (ar.disable_array_optimization() || archive_endianess_differs)
             {
                 load_impl(ar, v, std::false_type());
             }
@@ -79,11 +85,11 @@ namespace hpx { namespace serialization {
     void serialize(
         input_archive& ar, compute::vector<T, Allocator>& v, unsigned)
     {
-        typedef std::integral_constant<bool,
-            hpx::traits::is_bitwise_serializable<
-                typename std::remove_const<typename compute::vector<T,
-                    Allocator>::value_type>::type>::value>
-            use_optimized;
+        using element_type = typename std::remove_const<
+            typename compute::vector<T, Allocator>::value_type>::type;
+        using use_optimized = std::integral_constant<bool,
+            hpx::traits::is_bitwise_serializable_v<element_type> ||
+                !hpx::traits::is_not_bitwise_serializable_v<element_type>>;
 
         v.clear();
         detail::load_impl(ar, v, use_optimized());
@@ -106,7 +112,11 @@ namespace hpx { namespace serialization {
         void save_impl(output_archive& ar,
             compute::vector<T, Allocator> const& v, std::true_type)
         {
-            if (ar.disable_array_optimization())
+            bool archive_endianess_differs = endian::native == endian::big ?
+                ar.endian_little() :
+                ar.endian_big();
+
+            if (ar.disable_array_optimization() || archive_endianess_differs)
             {
                 save_impl(ar, v, std::false_type());
             }
@@ -124,11 +134,11 @@ namespace hpx { namespace serialization {
     void serialize(
         output_archive& ar, compute::vector<T, Allocator> const& v, unsigned)
     {
-        typedef std::integral_constant<bool,
-            hpx::traits::is_bitwise_serializable<
-                typename std::remove_const<typename compute::vector<T,
-                    Allocator>::value_type>::type>::value>
-            use_optimized;
+        using element_type = typename std::remove_const<
+            typename compute::vector<T, Allocator>::value_type>::type;
+        using use_optimized = std::integral_constant<bool,
+            hpx::traits::is_bitwise_serializable_v<element_type> ||
+                !hpx::traits::is_not_bitwise_serializable_v<element_type>>;
 
         ar << v.size();    //-V128
         if (v.empty())

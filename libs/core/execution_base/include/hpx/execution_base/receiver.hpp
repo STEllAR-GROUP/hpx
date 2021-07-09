@@ -172,7 +172,7 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     template <typename T, typename E = std::exception_ptr>
-    constexpr bool is_receiver_v = is_receiver<T, E>::value;
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_receiver_v = is_receiver<T, E>::value;
 
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -199,7 +199,8 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     template <typename T, typename... As>
-    constexpr bool is_receiver_of_v = is_receiver_of<T, As...>::value;
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_receiver_of_v =
+        is_receiver_of<T, As...>::value;
 
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -227,6 +228,6 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     template <typename T, typename... As>
-    constexpr bool is_nothrow_receiver_of_v =
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_nothrow_receiver_of_v =
         is_nothrow_receiver_of<T, As...>::value;
 }}}    // namespace hpx::execution::experimental

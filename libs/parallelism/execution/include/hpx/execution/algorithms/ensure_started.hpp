@@ -8,7 +8,10 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_CXX17_STD_VARIANT)
+#include <hpx/allocator_support/allocator_deleter.hpp>
+#include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
@@ -407,8 +410,14 @@ namespace hpx { namespace execution { namespace experimental {
       : hpx::functional::tag_fallback<ensure_started_t>
     {
     private:
+        // clang-format off
         template <typename S,
-            typename Allocator = hpx::util::internal_allocator<>>
+            typename Allocator = hpx::util::internal_allocator<>,
+            HPX_CONCEPT_REQUIRES_(
+                is_sender_v<S> &&
+                hpx::traits::is_allocator_v<Allocator>
+            )>
+        // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             ensure_started_t, S&& s, Allocator const& a = {})
         {
@@ -424,7 +433,12 @@ namespace hpx { namespace execution { namespace experimental {
             return s;
         }
 
-        template <typename Allocator = hpx::util::internal_allocator<>>
+        // clang-format off
+        template <typename Allocator = hpx::util::internal_allocator<>,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_allocator_v<Allocator>
+            )>
+        // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             ensure_started_t, Allocator const& a = {})
         {

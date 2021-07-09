@@ -521,6 +521,11 @@ jobs:
           name: Installing
           command: |
               ./bin/hello_world_distributed --hpx:bind=none
+              # Disable Vc here as the target machine of the container image may
+              # not support the same vector intrinsics as this machine. The
+              # "Test Docker Image" below fails with "Illegal instruction" if VC
+              # is enabled, and other machines may fail similarly.
+              cmake -DHPX_WITH_DATAPAR_VC=Off .
               ninja -j2 install
           working_directory: /hpx/build
           when: always

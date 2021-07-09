@@ -7,6 +7,8 @@
 #pragma once
 
 #include <hpx/assert.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -30,31 +32,33 @@ namespace hpx { namespace execution { namespace experimental {
 
             void start() & noexcept
             {
-                try
-                {
-                    auto state = hpx::traits::detail::get_shared_state(future);
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() {
+                        auto state =
+                            hpx::traits::detail::get_shared_state(future);
 
-                    if (!state)
-                    {
-                        HPX_THROW_EXCEPTION(no_state, "operation_state::start",
-                            "the future has no valid shared state asdasd");
-                    }
+                        if (!state)
+                        {
+                            HPX_THROW_EXCEPTION(no_state,
+                                "operation_state::start",
+                                "the future has no valid shared state");
+                        }
 
-                    // The operation state has to be kept alive until set_value
-                    // is called, which means that we don't need to move
-                    // receiver and future into the on_completed callback.
-                    state->set_on_completed([this]() mutable {
-                        hpx::execution::experimental::set_value(
-                            std::move(receiver), std::move(future));
+                        // The operation state has to be kept alive until set_value
+                        // is called, which means that we don't need to move
+                        // receiver and future into the on_completed callback.
+                        state->set_on_completed([this]() mutable {
+                            hpx::execution::experimental::set_value(
+                                std::move(receiver), std::move(future));
+                        });
+                    },
+                    [&](std::exception_ptr ep) {
+                        hpx::execution::experimental::set_error(
+                            std::move(receiver), std::move(ep));
                     });
-                }
-                catch (...)
-                {
-                    hpx::execution::experimental::set_error(
-                        std::move(receiver), std::current_exception());
-                }
             }
         };
+
         template <typename Future>
         struct keep_future_sender_base
         {
@@ -143,9 +147,12 @@ namespace hpx { namespace execution { namespace experimental {
       : hpx::functional::tag_fallback<keep_future_t>
     {
     private:
+        // clang-format off
         template <typename Future,
-            typename = std::enable_if_t<
-                hpx::traits::is_future<std::decay_t<Future>>::value>>
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_future_v<std::decay_t<Future>>
+            )>
+        // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
             keep_future_t, Future&& future)
         {

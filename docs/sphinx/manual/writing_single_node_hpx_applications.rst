@@ -716,43 +716,43 @@ Parallel algorithms
      * Destroys a range of objects.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`destroy_n`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_copy`
+   * * :cpp:func:`hpx::uninitialized_copy`
      * Copies a range of objects to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_copy`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_copy_n`
+   * * :cpp:func:`hpx::uninitialized_copy_n`
      * Copies a number of objects to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_copy_n`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_default_construct`
+   * * :cpp:func:`hpx::uninitialized_default_construct`
      * Copies a range of objects to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_default_construct`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_default_construct_n`
+   * * :cpp:func:`hpx::uninitialized_default_construct_n`
      * Copies a number of objects to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_default_construct_n`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_fill`
+   * * :cpp:func:`hpx::uninitialized_fill`
      * Copies an object to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_fill`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_fill_n`
+   * * :cpp:func:`hpx::uninitialized_fill_n`
      * Copies an object to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_fill_n`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_move`
+   * * :cpp:func:`hpx::uninitialized_move`
      * Moves a range of objects to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_move`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_move_n`
+   * * :cpp:func:`hpx::uninitialized_move_n`
      * Moves a number of objects to an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_move_n`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_value_construct`
+   * * :cpp:func:`hpx::uninitialized_value_construct`
      * Constructs objects in an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_value_construct`
-   * * :cpp:func:`hpx::parallel::v1::uninitialized_value_construct_n`
+   * * :cpp:func:`hpx::uninitialized_value_construct_n`
      * Constructs objects in an uninitialized area of memory.
      * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_value_construct_n`

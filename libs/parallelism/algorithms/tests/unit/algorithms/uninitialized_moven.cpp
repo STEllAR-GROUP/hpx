@@ -19,6 +19,28 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_uninitialized_move_n(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    hpx::uninitialized_move_n(iterator(std::begin(c)), c.size(), std::begin(d));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_move_n(ExPolicy policy, IteratorTag)
 {
@@ -32,7 +54,7 @@ void test_uninitialized_move_n(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    hpx::parallel::uninitialized_move_n(
+    hpx::uninitialized_move_n(
         policy, iterator(std::begin(c)), c.size(), std::begin(d));
 
     std::size_t count = 0;
@@ -55,7 +77,7 @@ void test_uninitialized_move_n_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto f = hpx::parallel::uninitialized_move_n(
+    auto f = hpx::uninitialized_move_n(
         p, iterator(std::begin(c)), c.size(), std::begin(d));
     f.wait();
 
@@ -72,6 +94,7 @@ void test_uninitialized_move_n_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_uninitialized_move_n()
 {
+    test_uninitialized_move_n(IteratorTag());
     test_uninitialized_move_n(hpx::execution::seq, IteratorTag());
     test_uninitialized_move_n(hpx::execution::par, IteratorTag());
     test_uninitialized_move_n(hpx::execution::par_unseq, IteratorTag());
@@ -109,7 +132,7 @@ void test_uninitialized_move_n_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::uninitialized_move_n(policy,
+        hpx::uninitialized_move_n(policy,
             decorated_iterator(std::begin(c),
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -150,7 +173,7 @@ void test_uninitialized_move_n_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::uninitialized_move_n(p,
+        auto f = hpx::uninitialized_move_n(p,
             decorated_iterator(std::begin(c),
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -220,7 +243,7 @@ void test_uninitialized_move_n_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::uninitialized_move_n(policy,
+        hpx::uninitialized_move_n(policy,
             decorated_iterator(std::begin(c),
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -261,7 +284,7 @@ void test_uninitialized_move_n_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::uninitialized_move_n(p,
+        auto f = hpx::uninitialized_move_n(p,
             decorated_iterator(std::begin(c),
                 [&throw_after]() {
                     if (throw_after-- == 0)

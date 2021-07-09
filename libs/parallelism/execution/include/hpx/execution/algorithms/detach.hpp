@@ -9,7 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -102,10 +104,16 @@ namespace hpx { namespace execution { namespace experimental {
       : hpx::functional::tag_fallback<detach_t>
     {
     private:
+        // clang-format off
         template <typename S,
-            typename Allocator = hpx::util::internal_allocator<>>
+            typename Allocator = hpx::util::internal_allocator<>,
+            HPX_CONCEPT_REQUIRES_(
+                is_sender_v<S> &&
+                hpx::traits::is_allocator_v<Allocator>
+            )>
+        // clang-format on
         friend constexpr HPX_FORCEINLINE void tag_fallback_dispatch(
-            detach_t, S&& s, Allocator&& a = Allocator{})
+            detach_t, S&& s, Allocator const& a = Allocator{})
         {
             using allocator_type = Allocator;
             using operation_state_type =
@@ -124,9 +132,16 @@ namespace hpx { namespace execution { namespace experimental {
             p.release();
         }
 
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(detach_t)
+        // clang-format off
+        template <typename Allocator = hpx::util::internal_allocator<>,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_allocator_v<Allocator>
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+            detach_t, Allocator const& a = Allocator{})
         {
-            return detail::partial_algorithm<detach_t>{};
+            return detail::partial_algorithm<detach_t, Allocator>{a};
         }
     } detach{};
 }}}    // namespace hpx::execution::experimental

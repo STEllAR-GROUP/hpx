@@ -13,6 +13,7 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 #include <boost/array.hpp>
@@ -71,9 +72,10 @@ namespace hpx { namespace serialization {
         template <class Archive>
         void serialize(Archive& ar, unsigned int v)
         {
+            using element_type = typename std::remove_const<T>::type;
             using use_optimized = std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable<
-                    typename std::remove_const<T>::type>::value>;
+                hpx::traits::is_bitwise_serializable_v<element_type> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<element_type>>;
 
             bool archive_endianess_differs = endian::native == endian::big ?
                 ar.endian_little() :

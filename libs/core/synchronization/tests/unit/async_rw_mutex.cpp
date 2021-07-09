@@ -19,9 +19,9 @@
 #include <vector>
 
 using hpx::execution::experimental::execute;
-using hpx::execution::experimental::executor;
 using hpx::execution::experimental::on;
 using hpx::execution::experimental::sync_wait;
+using hpx::execution::experimental::thread_pool_scheduler;
 using hpx::execution::experimental::transform;
 using hpx::experimental::async_rw_mutex;
 
@@ -196,7 +196,7 @@ template <typename ReadWriteT, typename ReadT = ReadWriteT>
 void test_multiple_accesses(
     async_rw_mutex<ReadWriteT, ReadT> rwm, std::size_t iterations)
 {
-    executor exec{};
+    thread_pool_scheduler exec{};
 
     std::atomic<std::size_t> count{0};
 

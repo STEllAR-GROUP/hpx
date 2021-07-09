@@ -94,6 +94,16 @@ set(tests
     transform_reduce_binary_exception_range
     transform_reduce_binary_range
     transform_reduce_range
+    uninitialized_copy_range
+    uninitialized_copy_n_range
+    uninitialized_default_construct_range
+    uninitialized_default_constructn_range
+    uninitialized_fill_range
+    uninitialized_filln_range
+    uninitialized_move_range
+    uninitialized_move_n_range
+    uninitialized_value_construct_range
+    uninitialized_value_constructn_range
     unique_range
     unique_copy_range
 )

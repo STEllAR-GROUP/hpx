@@ -16,6 +16,11 @@ namespace hpx { namespace traits {
     struct is_bitwise_serializable : std::is_arithmetic<T>
     {
     };
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_bitwise_serializable_v =
+        is_bitwise_serializable<T>::value;
+
 }}    // namespace hpx::traits
 
 #define HPX_IS_BITWISE_SERIALIZABLE(T)                                         \

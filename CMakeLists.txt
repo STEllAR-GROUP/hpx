@@ -323,7 +323,10 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
   set(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL ON)
 
   add_library(hpx_precompiled_headers OBJECT libs/src/dummy.cpp)
-  target_link_libraries(hpx_precompiled_headers PRIVATE hpx_private_flags)
+  target_link_libraries(
+    hpx_precompiled_headers PRIVATE hpx_public_flags hpx_private_flags
+                                    hpx_base_libraries
+  )
   target_precompile_headers(
     hpx_precompiled_headers
     PRIVATE
@@ -1730,8 +1733,6 @@ if(NOT WIN32)
   # System libraries
   # ############################################################################
   if(NOT MSVC)
-    hpx_add_compile_flag_if_available(-pthread)
-    hpx_add_link_flag_if_available(-pthread TARGETS EXE SHARED)
     if(HPX_CXX11_STD_ATOMIC_LIBRARIES)
       target_link_libraries(
         hpx_base_libraries INTERFACE ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
@@ -2014,7 +2015,9 @@ else()
      AND NOT WIN32
      AND NOT HPX_WITH_SANITIZERS
   )
-    hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
+    hpx_add_link_flag_if_available(
+      -Wl,-z,defs TARGETS SHARED_LIBRARY EXECUTABLE
+    )
   endif()
   if(WIN32)
     target_link_libraries(hpx_base_libraries INTERFACE psapi WS2_32 mswsock)
@@ -2026,7 +2029,9 @@ else()
 
   if(HPX_WITH_HIDDEN_VISIBILITY)
     hpx_add_compile_flag_if_available(-fvisibility=hidden)
-    hpx_add_link_flag_if_available(-fvisibility=hidden TARGETS SHARED EXE)
+    hpx_add_link_flag_if_available(
+      -fvisibility=hidden TARGETS SHARED_LIBRARY EXECUTABLE
+    )
     hpx_add_config_define(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
     hpx_add_config_define(HPX_HAVE_COROUTINE_GCC_HIDDEN_VISIBILITY)
     hpx_add_config_define(HPX_HAVE_PLUGIN_GCC_HIDDEN_VISIBILITY)
@@ -2146,6 +2151,8 @@ endif()
 # Find Our dependencies: These are all dependencies needed to build the core
 # library. Dependencies that are only needed by plugins, examples or tests
 # should be found separately in the appropriate subdirectory.
+
+include(HPX_SetupThreads)
 
 # Setup our required Boost libraries.
 include(HPX_SetupBoost)

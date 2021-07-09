@@ -141,19 +141,21 @@ if(HPX_WITH_PKGCONFIG)
     hpx_pkgconfig_component INTERFACE "-std=c++${HPX_CXX_STANDARD}"
   )
 
+  set(exclude_targets hpx_interface Threads::Threads)
+
   # Generate the pkconfig files for HPX_APPLICATION (both for build and install)
   hpx_generate_pkgconfig_from_target(
-    hpx_pkgconfig_application hpx_application TRUE EXCLUDE hpx_interface
+    hpx_pkgconfig_application hpx_application TRUE EXCLUDE ${exclude_targets}
   )
   hpx_generate_pkgconfig_from_target(
-    hpx_pkgconfig_application hpx_application FALSE EXCLUDE hpx_interface
+    hpx_pkgconfig_application hpx_application FALSE EXCLUDE ${exclude_targets}
   )
   # Generate the pkconfig files for HPX_COMPONENT (both for build and install)
   hpx_generate_pkgconfig_from_target(
-    hpx_pkgconfig_component hpx_component TRUE EXCLUDE hpx_interface
+    hpx_pkgconfig_component hpx_component TRUE EXCLUDE ${exclude_targets}
   )
   hpx_generate_pkgconfig_from_target(
-    hpx_pkgconfig_component hpx_component FALSE EXCLUDE hpx_interface
+    hpx_pkgconfig_component hpx_component FALSE EXCLUDE ${exclude_targets}
   )
 
   string(TOLOWER ${CMAKE_BUILD_TYPE} build_type)

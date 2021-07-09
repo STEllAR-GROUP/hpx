@@ -52,7 +52,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename R>
-    constexpr bool is_future_v = is_future<R>::value;
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_future_v = is_future<R>::value;
 
     template <typename Future>
     struct is_ref_wrapped_future : std::false_type
@@ -66,5 +66,6 @@ namespace hpx { namespace traits {
     };
 
     template <typename R>
-    constexpr bool is_ref_wrapped_future_v = is_ref_wrapped_future<R>::value;
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_ref_wrapped_future_v =
+        is_ref_wrapped_future<R>::value;
 }}    // namespace hpx::traits

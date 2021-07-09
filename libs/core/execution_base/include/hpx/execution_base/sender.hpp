@@ -297,12 +297,12 @@ namespace hpx { namespace execution { namespace experimental {
     struct is_sender
       : std::integral_constant<bool,
             std::is_move_constructible<std::decay_t<Sender>>::value &&
-                detail::specialized<Sender>(nullptr)>
+                detail::specialized<std::decay_t<Sender>>(nullptr)>
     {
     };
 
     template <typename Sender>
-    constexpr bool is_sender_v = is_sender<Sender>::value;
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_sender_v = is_sender<Sender>::value;
 
     struct invocable_archetype
     {
@@ -649,10 +649,12 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     template <typename Executor>
-    constexpr bool is_executor_v = is_executor<Executor>::value;
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_executor_v =
+        is_executor<Executor>::value;
 
     template <typename Executor, typename F>
-    constexpr bool is_executor_of_v = is_executor_of<Executor, F>::value;
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_executor_of_v =
+        is_executor_of<Executor, F>::value;
 
     namespace detail {
         template <typename Executor>
@@ -941,7 +943,8 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     template <typename Scheduler>
-    constexpr bool is_scheduler_v = is_scheduler<Scheduler>::value;
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_scheduler_v =
+        is_scheduler<Scheduler>::value;
 
     template <typename S, typename R>
     using connect_result_t =
