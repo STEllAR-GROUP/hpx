@@ -2015,7 +2015,9 @@ else()
      AND NOT WIN32
      AND NOT HPX_WITH_SANITIZERS
   )
-    hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
+    hpx_add_link_flag_if_available(
+      -Wl,-z,defs TARGETS SHARED_LIBRARY EXECUTABLE
+    )
   endif()
   if(WIN32)
     target_link_libraries(hpx_base_libraries INTERFACE psapi WS2_32 mswsock)
@@ -2027,7 +2029,9 @@ else()
 
   if(HPX_WITH_HIDDEN_VISIBILITY)
     hpx_add_compile_flag_if_available(-fvisibility=hidden)
-    hpx_add_link_flag_if_available(-fvisibility=hidden TARGETS SHARED EXE)
+    hpx_add_link_flag_if_available(
+      -fvisibility=hidden TARGETS SHARED_LIBRARY EXECUTABLE
+    )
     hpx_add_config_define(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
     hpx_add_config_define(HPX_HAVE_COROUTINE_GCC_HIDDEN_VISIBILITY)
     hpx_add_config_define(HPX_HAVE_PLUGIN_GCC_HIDDEN_VISIBILITY)
