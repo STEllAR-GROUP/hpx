@@ -55,15 +55,15 @@ template <typename ExPolicy, typename T>
 void test_transform_exclusive_scan(ExPolicy&& policy,
     hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& out)
 {
-    hpx::parallel::transform_exclusive_scan(policy, xvalues.begin(),
-        xvalues.end(), out.begin(), T(0), op(), conv());
+    hpx::transform_exclusive_scan(policy, xvalues.begin(), xvalues.end(),
+        out.begin(), T(0), op(), conv());
 }
 
 template <typename ExPolicy, typename T>
 void test_transform_exclusive_scan_async(ExPolicy&& policy,
     hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& out)
 {
-    hpx::parallel::transform_exclusive_scan(
+    hpx::transform_exclusive_scan(
         policy, xvalues.begin(), xvalues.end(), out.begin(), T(0), op(), conv())
         .get();
 }

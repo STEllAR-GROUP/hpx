@@ -442,31 +442,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     });
             }
         };
-
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T, typename Op, typename Conv>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-        transform_exclusive_scan_(ExPolicy&& policy, FwdIter1 first,
-            FwdIter1 last, FwdIter2 dest, Conv&& conv, T&& init, Op&& op,
-            std::false_type)
-        {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-                "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-                "Requires at least forward iterator.");
-
-            return detail::transform_exclusive_scan<FwdIter2>().call(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::forward<Conv>(conv), std::forward<T>(init),
-                std::forward<Op>(op));
-        }
-
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T, typename Op, typename Conv>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-        transform_exclusive_scan_(ExPolicy&& policy, FwdIter1 first,
-            FwdIter1 last, FwdIter2 dest, Conv&& conv, T&& init, Op&& op,
-            std::true_type);
         /// \endcond
     }    // namespace detail
 
