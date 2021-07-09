@@ -577,6 +577,7 @@ namespace hpx { namespace ranges {
                         typename std::iterator_traits<InIter>::value_type>::type,
                     typename hpx::util::invoke_result<UnOp,
                         typename std::iterator_traits<InIter>::value_type>::type
+                >
             )>
         // clang-format on
         friend OutIter tag_fallback_dispatch(
