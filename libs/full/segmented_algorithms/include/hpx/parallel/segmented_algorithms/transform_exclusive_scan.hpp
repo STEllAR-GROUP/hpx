@@ -28,7 +28,6 @@
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
-
     // clang-format off
     template <typename InIter, typename OutIter,
         typename T, typename Op, typename Conv,
@@ -52,7 +51,7 @@ namespace hpx { namespace segmented {
             return dest;
 
         return hpx::parallel::v1::detail::segmented_exclusive_scan(
-            std::forward<ExPolicy>(policy), first, last, dest, std::move(init),
+            hpx::execution::seq, first, last, dest, std::move(init),
             std::forward<Op>(op), std::true_type{}, std::forward<Conv>(conv));
     }
 
