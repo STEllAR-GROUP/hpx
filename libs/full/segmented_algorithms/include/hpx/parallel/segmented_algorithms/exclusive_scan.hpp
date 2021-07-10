@@ -259,7 +259,7 @@ namespace hpx { namespace segmented {
 
     // clang-format off
     template <typename InIter, typename OutIter,
-        typename T, typename Op,
+        typename T, typename Op = std::plus<T>,
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_iterator<InIter>::value &&
             hpx::traits::is_segmented_iterator<InIter>::value &&
@@ -268,7 +268,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     OutIter tag_dispatch(hpx::exclusive_scan_t, InIter first, InIter last,
-        OutIter dest, T init, Op&& op)
+        OutIter dest, T init, Op&& op = Op())
     {
         static_assert(hpx::traits::is_input_iterator<InIter>::value,
             "Requires at least input iterator.");
@@ -287,7 +287,7 @@ namespace hpx { namespace segmented {
 
     // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T, typename Op,
+        typename T, typename Op = std::plus<T>,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_iterator<FwdIter1>::value &&
@@ -298,7 +298,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     tag_dispatch(hpx::exclusive_scan_t, ExPolicy&& policy, FwdIter1 first,
-        FwdIter1 last, FwdIter2 dest, T init, Op&& op)
+        FwdIter1 last, FwdIter2 dest, T init, Op&& op = Op())
     {
         static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
             "Requires at least forward iterator.");

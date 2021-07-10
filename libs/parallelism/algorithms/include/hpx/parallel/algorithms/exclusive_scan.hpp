@@ -455,7 +455,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 7,
+    HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::exclusive_scan is deprecated, use hpx::exclusive_scan "
         "instead")
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
@@ -488,7 +488,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 7,
+    HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::exclusive_scan is deprecated, use hpx::exclusive_scan "
         "instead")
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
