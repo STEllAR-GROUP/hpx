@@ -52,3 +52,4 @@
 
 // Parallelism TS V2
 #include <hpx/parallel/algorithms/for_loop.hpp>
+#include <hpx/parallel/algorithms/shift_left.hpp>
