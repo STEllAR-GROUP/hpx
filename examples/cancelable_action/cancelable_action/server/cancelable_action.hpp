@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,14 +11,14 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/util.hpp>
 
-#include <atomic>
+#include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace examples { namespace server
-{
+namespace examples { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     inline void delay(int c)
     {
@@ -50,19 +50,17 @@ namespace examples { namespace server
             explicit reset_id(cancelable_action& this_)
               : outer_(this_)
             {
-                {
-                    hpx::thread::id old_value =
-                        outer_.id_.exchange(hpx::this_thread::get_id());
-                    HPX_ASSERT(old_value == hpx::thread::id());
-                    HPX_UNUSED(old_value);
-                }
+                std::lock_guard<hpx::lcos::local::mutex> l(outer_.mtx_);
+                hpx::thread::id old_value = outer_.id_;
+                outer_.id_ = hpx::this_thread::get_id();
+                HPX_ASSERT(old_value == hpx::thread::id());
+                HPX_UNUSED(old_value);
             }
             ~reset_id()
             {
-                hpx::thread::id old_value =
-                    outer_.id_.exchange(hpx::thread::id());
+                hpx::thread::id old_value = outer_.id_;
+                outer_.id_ = hpx::thread::id();
                 HPX_ASSERT(old_value != hpx::thread::id());
-                HPX_ASSERT(outer_.id_ == hpx::thread::id());
                 HPX_UNUSED(old_value);
             }
 
@@ -73,15 +71,16 @@ namespace examples { namespace server
         // Do some lengthy work
         void do_it()
         {
-            reset_id r(*this);      // manage thread id
+            reset_id r(*this);    // manage thread id
 
-            while (true) {
+            while (true)
+            {
                 // do something useful ;-)
                 delay(1000);
 
                 // check whether this thread was interrupted and throw a special
                 // exception if it was interrupted
-                hpx::this_thread::suspend(); // interruption_point();
+                hpx::this_thread::suspend();    // interruption_point();
             }
         }
 
@@ -89,19 +88,25 @@ namespace examples { namespace server
         void cancel_it()
         {
             // Make sure id_ has been set
-            hpx::util::yield_while(
-                [this]() { return id_ == hpx::thread::id(); });
+            hpx::util::yield_while([this]() {
+                std::lock_guard<hpx::lcos::local::mutex> l(mtx_);
+                return id_ == hpx::thread::id();
+            });
+
+            std::lock_guard<hpx::lcos::local::mutex> l(mtx_);
             HPX_ASSERT(id_ != hpx::thread::id());
             hpx::thread::interrupt(id_);
         }
 
         HPX_DEFINE_COMPONENT_ACTION(cancelable_action, do_it, do_it_action);
-        HPX_DEFINE_COMPONENT_ACTION(cancelable_action, cancel_it, cancel_it_action);
+        HPX_DEFINE_COMPONENT_ACTION(
+            cancelable_action, cancel_it, cancel_it_action);
 
     private:
-        std::atomic<hpx::thread::id> id_;
+        hpx::lcos::local::mutex mtx_;
+        hpx::thread::id id_;
     };
-}}
+}}    // namespace examples::server
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_DECLARATION(
@@ -110,6 +115,5 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::cancelable_action::cancel_it_action,
     cancelable_action_cancel_it_action);
-
 
 #endif

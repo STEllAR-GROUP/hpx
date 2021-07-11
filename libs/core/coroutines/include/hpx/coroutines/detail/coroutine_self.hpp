@@ -76,7 +76,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         using yield_decorator_type =
             util::function_nonser<arg_type(result_type)>;
 
-        explicit coroutine_self(coroutine_self* next_self = nullptr)
+        explicit coroutine_self(coroutine_self* next_self)
           : next_self_(next_self)
         {
         }
@@ -120,7 +120,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         virtual arg_type yield_impl(result_type arg) = 0;
 
-        virtual thread_id_type get_thread_id() const = 0;
+        virtual thread_id_type const& get_thread_id() const = 0;
 
         virtual std::size_t get_thread_phase() const = 0;
 

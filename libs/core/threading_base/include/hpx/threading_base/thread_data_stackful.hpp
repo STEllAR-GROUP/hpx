@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -56,7 +56,7 @@ namespace hpx { namespace threads {
         static util::internal_allocator<thread_data_stackful> thread_alloc_;
 
     public:
-        coroutine_type::result_type call(
+        HPX_FORCEINLINE coroutine_type::result_type call(
             hpx::execution_base::this_thread::detail::agent_storage*
                 agent_storage)
         {
@@ -134,11 +134,14 @@ namespace hpx { namespace threads {
             HPX_ASSERT(coroutine_.is_ready());
         }
 
+        // The thread_id passed to the coroutine is not reference counted as the
+        // overall thread_data was already initialized with an appropriate
+        // reference count (see thread_id_type.hpp)
         thread_data_stackful(
             thread_init_data& init_data, void* queue, std::ptrdiff_t stacksize)
           : thread_data(init_data, queue, stacksize)
-          , coroutine_(
-                std::move(init_data.func), thread_id_type(this_()), stacksize)
+          , coroutine_(std::move(init_data.func),
+                thread_id_type(this_(), false), stacksize)
           , agent_(coroutine_.impl())
         {
             HPX_ASSERT(coroutine_.is_ready());

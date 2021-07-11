@@ -29,6 +29,7 @@
 #include <memory>
 #include <new>
 #include <type_traits>
+#include <utility>
 
 namespace boost { namespace lockfree {
 
@@ -71,6 +72,14 @@ namespace boost { namespace lockfree {
           : left(pointer(lptr, ltag))
           , right(pointer(rptr, rtag))
           , data(v)
+        {
+        }
+
+        deque_node(deque_node* lptr, deque_node* rptr, T&& v, tag_t ltag = 0,
+            tag_t rtag = 0)
+          : left(pointer(lptr, ltag))
+          , right(pointer(rptr, rtag))
+          , data(std::move(v))
         {
         }
     };
@@ -236,6 +245,18 @@ namespace boost { namespace lockfree {
             return chunk;
         }
 
+        node* alloc_node(
+            node* lptr, node* rptr, T&& v, tag_t ltag = 0, tag_t rtag = 0)
+        {
+            node* chunk = pool_.allocate();
+            if (chunk == nullptr)
+            {
+                throw std::bad_alloc();
+            }
+            new (chunk) node(lptr, rptr, std::move(v), ltag, rtag);
+            return chunk;
+        }
+
         void dealloc_node(node* n)
         {
             if (n != nullptr)
@@ -359,10 +380,10 @@ namespace boost { namespace lockfree {
         // from the operating system). Returns false if the freelist is not able to
         // allocate a new deque node.
         // Complexity: O(Processes)
-        bool push_left(T const& data)
+        bool push_left(T data)
         {
             // Allocate the new node which we will be inserting.
-            node* n = alloc_node(nullptr, nullptr, data);
+            node* n = alloc_node(nullptr, nullptr, std::move(data));
 
             if (n == nullptr)
                 return false;
@@ -417,10 +438,10 @@ namespace boost { namespace lockfree {
         // from the operating system). Returns false if the freelist is not able to
         // allocate a new deque node.
         // Complexity: O(Processes)
-        bool push_right(T const& data)
+        bool push_right(T data)
         {
             // Allocate the new node which we will be inserting.
-            node* n = alloc_node(nullptr, nullptr, data);
+            node* n = alloc_node(nullptr, nullptr, std::move(data));
 
             if (n == nullptr)
                 return false;
@@ -495,7 +516,7 @@ namespace boost { namespace lockfree {
                                 lrs.get_right_tag() + 1)))
                     {
                         // Set the result, deallocate the popped node, and return.
-                        r = lrs.get_left_ptr()->data;
+                        r = std::move(lrs.get_left_ptr()->data);
                         dealloc_node(lrs.get_left_ptr());
                         return true;
                     }
@@ -518,7 +539,7 @@ namespace boost { namespace lockfree {
                                 lrs.get_left_tag(), lrs.get_right_tag() + 1)))
                     {
                         // Set the result, deallocate the popped node, and return.
-                        r = lrs.get_left_ptr()->data;
+                        r = std::move(lrs.get_left_ptr()->data);
                         dealloc_node(lrs.get_left_ptr());
                         return true;
                     }
@@ -560,7 +581,7 @@ namespace boost { namespace lockfree {
                                 lrs.get_right_tag() + 1)))
                     {
                         // Set the result, deallocate the popped node, and return.
-                        r = lrs.get_right_ptr()->data;
+                        r = std::move(lrs.get_right_ptr()->data);
                         dealloc_node(lrs.get_right_ptr());
                         return true;
                     }
@@ -583,7 +604,7 @@ namespace boost { namespace lockfree {
                                 lrs.get_left_tag(), lrs.get_right_tag() + 1)))
                     {
                         // Set the result, deallocate the popped node, and return.
-                        r = lrs.get_right_ptr()->data;
+                        r = std::move(lrs.get_right_ptr()->data);
                         dealloc_node(lrs.get_right_ptr());
                         return true;
                     }

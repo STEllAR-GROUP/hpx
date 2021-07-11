@@ -64,7 +64,7 @@ namespace hpx { namespace threads { namespace coroutines {
 
         coroutine(functor_type&& f, thread_id_type id,
             std::ptrdiff_t stack_size = detail::default_stack_size)
-          : impl_(std::move(f), id, stack_size)
+          : impl_(std::move(f), std::move(id), stack_size)
         {
             HPX_ASSERT(impl_.is_ready());
         }
@@ -74,7 +74,7 @@ namespace hpx { namespace threads { namespace coroutines {
         coroutine(coroutine&& src) = delete;
         coroutine& operator=(coroutine&& src) = delete;
 
-        thread_id_type get_thread_id() const
+        thread_id_type const& get_thread_id() const
         {
             return impl_.get_thread_id();
         }
@@ -130,7 +130,7 @@ namespace hpx { namespace threads { namespace coroutines {
 
         void rebind(functor_type&& f, thread_id_type id)
         {
-            impl_.rebind(std::move(f), id);
+            impl_.rebind(std::move(f), std::move(id));
         }
 
         HPX_FORCEINLINE result_type operator()(arg_type arg = arg_type())

@@ -88,7 +88,7 @@ namespace hpx { namespace threads { namespace coroutines {
         stackless_coroutine(stackless_coroutine&& src) = delete;
         stackless_coroutine& operator=(stackless_coroutine&& src) = delete;
 
-        thread_id_type get_thread_id() const
+        thread_id_type const& get_thread_id() const
         {
             return id_;
         }
@@ -284,20 +284,22 @@ namespace hpx { namespace threads { namespace coroutines {
             detail::coroutine_stackless_self self(this);
             detail::reset_self_on_exit on_self_exit(&self, nullptr);
 
-            reset_on_exit on_exit{*this};
+            {
+                reset_on_exit on_exit{*this};
 
-            HPX_UNUSED(on_exit);
+                HPX_UNUSED(on_exit);
 
-            result = f_(arg);    // invoke wrapped function
+                result = f_(arg);    // invoke wrapped function
 
-            // we always have to run to completion
-            HPX_ASSERT(
-                result.first == threads::thread_schedule_state::terminated);
+                // we always have to run to completion
+                HPX_ASSERT(
+                    result.first == threads::thread_schedule_state::terminated);
+            }
 
             reset_tss();
+            reset();
         }
 
-        reset();
         return result;
     }
 

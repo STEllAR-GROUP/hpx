@@ -92,7 +92,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
           , libcds_dynamic_hazard_pointer_data_(0)
 #endif
           , m_type_info()
-          , m_thread_id(id)
+          , m_thread_id(std::move(id))
           , continuation_recursion_count_(0)
         {
         }
@@ -126,7 +126,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 #endif
 
-        thread_id_type get_thread_id() const
+        thread_id_type const& get_thread_id() const
         {
             return m_thread_id;
         }
@@ -323,7 +323,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         {
             HPX_ASSERT(exited());
 
-            m_thread_id = id;
+            m_thread_id = std::move(id);
             m_state = ctx_ready;
             m_exit_state = ctx_exit_not_requested;
             m_exit_status = ctx_not_exited;

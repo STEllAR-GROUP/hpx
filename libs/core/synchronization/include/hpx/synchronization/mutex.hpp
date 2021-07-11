@@ -23,7 +23,7 @@ namespace hpx { namespace threads {
 
     /// The function \a get_self_id returns the HPX thread id of the current
     /// thread (or zero if the current thread is not a HPX thread).
-    HPX_CORE_EXPORT thread_id_type get_self_id();
+    HPX_CORE_EXPORT thread_id_type const& get_self_id();
 
     /// The function \a get_self_ptr returns a pointer to the (OS thread
     /// specific) self reference to the current HPX thread.
