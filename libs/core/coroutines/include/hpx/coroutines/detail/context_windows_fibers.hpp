@@ -45,6 +45,11 @@
 #include <cstdint>
 #include <system_error>
 
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
+#include <processthreadsapi.h>
+#include <sanitizer/asan_interface.h>
+#endif
+
 #if defined(HPX_COROUTINES_HAVE_SWAP_CONTEXT_EMULATION)
 extern "C" void switch_to_fiber(void* lpFiber) noexcept;
 #endif
@@ -112,6 +117,11 @@ namespace hpx { namespace threads { namespace coroutines {
              */
             fibers_context_impl_base() noexcept
               : m_ctx(nullptr)
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
+              , asan_fake_stack(nullptr)
+              , asan_stack_bottom(nullptr)
+              , asan_stack_size(0)
+#endif
             {
             }
 
@@ -162,7 +172,33 @@ namespace hpx { namespace threads { namespace coroutines {
                 }
             }
 
-            ~fibers_context_impl_base() {}
+            ~fibers_context_impl_base() = default;
+
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
+            void start_switch_fiber(void** fake_stack)
+            {
+                if (asan_stack_bottom == nullptr)
+                {
+                    void const* dummy = nullptr;
+                    GetCurrentThreadStackLimits(
+                        (PULONG_PTR) &dummy, (PULONG_PTR) &asan_stack_bottom);
+                }
+                __sanitizer_start_switch_fiber(
+                    fake_stack, asan_stack_bottom, asan_stack_size);
+            }
+            void start_yield_fiber(
+                void** fake_stack, fibers_context_impl_base& caller)
+            {
+                __sanitizer_start_switch_fiber(fake_stack,
+                    caller.asan_stack_bottom, caller.asan_stack_size);
+            }
+            void finish_switch_fiber(
+                void* fake_stack, fibers_context_impl_base& caller)
+            {
+                __sanitizer_finish_switch_fiber(fake_stack,
+                    &caller.asan_stack_bottom, &caller.asan_stack_size);
+            }
+#endif
 
         protected:
             explicit fibers_context_impl_base(fiber_ptr ctx) noexcept
@@ -171,6 +207,13 @@ namespace hpx { namespace threads { namespace coroutines {
             }
 
             fiber_ptr m_ctx;
+
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
+        public:
+            void* asan_fake_stack;
+            void const* asan_stack_bottom;
+            std::size_t asan_stack_size;
+#endif
         };
 
         template <typename T>
@@ -202,10 +245,10 @@ namespace hpx { namespace threads { namespace coroutines {
              * Create a context that on restore invokes Functor on
              *  a new stack. The stack size can be optionally specified.
              */
-            explicit fibers_context_impl(std::ptrdiff_t stack_size)
-              : stacksize_(stack_size == -1 ?
+            explicit fibers_context_impl(std::ptrdiff_t stacksize)
+              : stacksize_(stacksize == -1 ?
                         std::ptrdiff_t(default_stack_size) :
-                        stack_size)
+                        stacksize)
             {
             }
 
@@ -214,7 +257,7 @@ namespace hpx { namespace threads { namespace coroutines {
                 if (m_ctx != nullptr)
                     return;
 
-                m_ctx = CreateFiberEx(stack_size, stack_size, 0,
+                m_ctx = CreateFiberEx(stacksize_, stacksize_, 0,
                     static_cast<LPFIBER_START_ROUTINE>(
                         &trampoline<CoroutineImpl>),
                     static_cast<LPVOID>(this));
@@ -223,6 +266,11 @@ namespace hpx { namespace threads { namespace coroutines {
                     throw std::system_error(
                         GetLastError(), std::system_category());
                 }
+
+#if defined(HPX_HAVE_ADDRESS_SANITIZER)
+                this->asan_stack_size = stacksize_;
+                this->asan_stack_bottom = nullptr;
+#endif
             }
 
             ~fibers_context_impl()
