@@ -178,6 +178,7 @@ namespace hpx { namespace util {
 
         backtrace bt(frames_no);
 
+        // avoid infinite recursion on handling errors
         auto* self = threads::get_self_ptr();
         if (nullptr == self ||
             self->get_thread_id() == threads::invalid_thread_id)
@@ -441,7 +442,7 @@ namespace hpx { namespace detail {
             hpx::detail::throw_hostname(hostname), hpx::detail::throw_pid(pid),
             hpx::detail::throw_shepherd(shepherd),
             hpx::detail::throw_thread_id(
-                reinterpret_cast<std::size_t>(thread_id.get())),
+                reinterpret_cast<std::size_t>(thread_id.get().get())),
             hpx::detail::throw_thread_name(util::as_string(thread_name)),
             hpx::detail::throw_function(func), hpx::detail::throw_file(file),
             hpx::detail::throw_line(line), hpx::detail::throw_env(env),

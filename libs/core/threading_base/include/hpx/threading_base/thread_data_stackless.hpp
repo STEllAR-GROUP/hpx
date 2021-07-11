@@ -130,10 +130,14 @@ namespace hpx { namespace threads {
             HPX_ASSERT(coroutine_.is_ready());
         }
 
+        // The thread_id passed to the coroutine is not reference counted as the
+        // overall thread_data was already initialized with an appropriate
+        // reference count (see thread_id_type.hpp)
         thread_data_stackless(
             thread_init_data& init_data, void* queue, std::ptrdiff_t stacksize)
           : thread_data(init_data, queue, stacksize, true)
-          , coroutine_(std::move(init_data.func), thread_id_type(this_()))
+          , coroutine_(
+                std::move(init_data.func), thread_id_type(this_(), false))
         {
             HPX_ASSERT(coroutine_.is_ready());
         }

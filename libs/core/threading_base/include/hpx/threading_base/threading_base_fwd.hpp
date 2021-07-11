@@ -41,6 +41,7 @@ namespace hpx { namespace threads {
 
     /// \cond NOINTERNAL
     using thread_id_type = thread_id;
+    using thread_id_noref_type = thread_id_noref;
 
     using coroutine_type = coroutines::coroutine;
     using stackless_coroutine_type = coroutines::stackless_coroutine;
@@ -70,16 +71,3 @@ namespace hpx { namespace threads {
 #endif
     /// \endcond
 }}    // namespace hpx::threads
-
-namespace std {
-    template <>
-    struct hash<::hpx::threads::thread_id>
-    {
-        std::size_t operator()(
-            ::hpx::threads::thread_id const& v) const noexcept
-        {
-            std::hash<::hpx::threads::thread_data const*> hasher_;
-            return hasher_(static_cast<::hpx::threads::thread_data*>(v.get()));
-        }
-    };
-}    // namespace std

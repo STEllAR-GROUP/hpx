@@ -466,8 +466,7 @@ namespace hpx { namespace this_thread {
             {
                 get_thread_id_data(nextid)
                     ->get_scheduler_base()
-                    ->schedule_thread(get_thread_id_data(nextid),
-                        threads::thread_schedule_hint());
+                    ->schedule_thread(nextid, threads::thread_schedule_hint());
                 statex = self.yield(threads::thread_result_type(
                     state, threads::invalid_thread_id));
             }
@@ -542,10 +541,10 @@ namespace hpx { namespace this_thread {
                 get_thread_id_data(nextid)->get_scheduler_base() !=
                     get_thread_id_data(id)->get_scheduler_base())
             {
-                get_thread_id_data(nextid)
-                    ->get_scheduler_base()
-                    ->schedule_thread(get_thread_id_data(nextid),
-                        threads::thread_schedule_hint());
+                auto* scheduler =
+                    get_thread_id_data(nextid)->get_scheduler_base();
+                scheduler->schedule_thread(
+                    std::move(nextid), threads::thread_schedule_hint());
                 statex = self.yield(threads::thread_result_type(
                     threads::thread_schedule_state::suspended,
                     threads::invalid_thread_id));
@@ -553,7 +552,8 @@ namespace hpx { namespace this_thread {
             else
             {
                 statex = self.yield(threads::thread_result_type(
-                    threads::thread_schedule_state::suspended, nextid));
+                    threads::thread_schedule_state::suspended,
+                    std::move(nextid)));
             }
 
             if (statex != threads::thread_restart_state::timeout)

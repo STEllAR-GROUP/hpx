@@ -48,7 +48,7 @@ namespace hpx { namespace threads {
         {
         }
 
-        thread_init_data& operator=(thread_init_data&& rhs)
+        thread_init_data& operator=(thread_init_data&& rhs) noexcept
         {
             func = std::move(rhs.func);
             priority = rhs.priority;
@@ -58,7 +58,7 @@ namespace hpx { namespace threads {
             run_now = rhs.run_now;
             scheduler_base = rhs.scheduler_base;
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            description = rhs.description;
+            description = std::move(rhs.description);
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_id = rhs.parent_locality_id;
@@ -73,10 +73,10 @@ namespace hpx { namespace threads {
             return *this;
         }
 
-        thread_init_data(thread_init_data&& rhs)
+        thread_init_data(thread_init_data&& rhs) noexcept
           : func(std::move(rhs.func))
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-          , description(rhs.description)
+          , description(std::move(rhs.description))
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
           , parent_locality_id(rhs.parent_locality_id)
@@ -139,7 +139,7 @@ namespace hpx { namespace threads {
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         std::uint32_t parent_locality_id;
-        threads::thread_id_type parent_id;
+        thread_id_noref_type parent_id;
         std::size_t parent_phase;
 #endif
 #ifdef HPX_HAVE_APEX

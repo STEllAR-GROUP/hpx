@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 #include <system_error>
+#include <utility>
 
 namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
@@ -99,6 +100,7 @@ namespace hpx { namespace threads { namespace detail {
         }
 
         thread_state previous_state;
+        std::size_t k = 0;
         do
         {
             // action depends on the current state
@@ -152,6 +154,10 @@ namespace hpx { namespace threads { namespace detail {
                 }
                 else
                 {
+                    hpx::execution_base::this_thread::yield_k(
+                        k, "hpx::threads::detail::set_thread_state");
+                    ++k;
+
                     // NOLINTNEXTLINE(bugprone-branch-clone)
                     LTM_(warning).format(
                         "set_thread_state: thread is currently active, but not "
@@ -159,8 +165,12 @@ namespace hpx { namespace threads { namespace detail {
                         "false, thread({}), description({}), new state({})",
                         thrd, get_thread_id_data(thrd)->get_description(),
                         get_thread_state_name(new_state));
-                    ec = make_success_code();
+
+                    continue;
                 }
+
+                if (&ec != &throws)
+                    ec = make_success_code();
 
                 return previous_state;    // done
             }
@@ -183,6 +193,7 @@ namespace hpx { namespace threads { namespace detail {
             }
             break;
             case thread_schedule_state::pending:
+                HPX_FALLTHROUGH;
             case thread_schedule_state::pending_boost:
                 if (thread_schedule_state::suspended == new_state)
                 {
@@ -242,7 +253,8 @@ namespace hpx { namespace threads { namespace detail {
             LTM_(error).format("set_thread_state: state has been changed since "
                                "it was fetched, retrying, thread({}), "
                                "description({}), new state({}), old state({})",
-                thrd, get_thread_id_data(thrd)->get_description(),
+                get_thread_id_data(thrd),
+                get_thread_id_data(thrd)->get_description(),
                 get_thread_state_name(new_state),
                 get_thread_state_name(previous_state_val));
         } while (true);
@@ -259,7 +271,7 @@ namespace hpx { namespace threads { namespace detail {
             auto* thrd_data = get_thread_id_data(thrd);
             auto* scheduler = thrd_data->get_scheduler_base();
             scheduler->schedule_thread(
-                thrd_data, schedulehint, false, thrd_data->get_priority());
+                thrd, schedulehint, false, thrd_data->get_priority());
             // NOTE: Don't care if the hint is a NUMA hint, just want to wake up
             // a thread.
             scheduler->do_some_work(schedulehint.hint);
@@ -277,7 +289,7 @@ namespace hpx { namespace threads { namespace detail {
     inline thread_result_type wake_timer_thread(thread_id_type const& thrd,
         thread_schedule_state /*newstate*/,
         thread_restart_state /*newstate_ex*/, thread_priority /*priority*/,
-        thread_id_type const& timer_id,
+        thread_id_type timer_id,
         std::shared_ptr<std::atomic<bool>> const& triggered,
         bool retry_on_active, thread_restart_state my_statex)
     {
@@ -304,9 +316,10 @@ namespace hpx { namespace threads { namespace detail {
         if (!triggered->load())
         {
             error_code ec(lightweight);    // do not throw
-            detail::set_thread_state(timer_id, thread_schedule_state::pending,
-                my_statex, thread_priority::boost, thread_schedule_hint(),
-                retry_on_active, ec);
+            detail::set_thread_state(std::move(timer_id),
+                thread_schedule_state::pending, my_statex,
+                thread_priority::boost, thread_schedule_hint(), retry_on_active,
+                ec);
         }
 
         return thread_result_type(

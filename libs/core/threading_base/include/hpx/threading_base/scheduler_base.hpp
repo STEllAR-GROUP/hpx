@@ -223,14 +223,14 @@ namespace hpx { namespace threads { namespace policies {
             thread_init_data& data, thread_id_type* id, error_code& ec) = 0;
 
         virtual bool get_next_thread(std::size_t num_thread, bool running,
-            threads::thread_data*& thrd, bool enable_stealing) = 0;
+            threads::thread_id_type& thrd, bool enable_stealing) = 0;
 
-        virtual void schedule_thread(threads::thread_data* thrd,
+        virtual void schedule_thread(threads::thread_id_type thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
             thread_priority priority = thread_priority::normal) = 0;
 
-        virtual void schedule_thread_last(threads::thread_data* thrd,
+        virtual void schedule_thread_last(threads::thread_id_type thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
             thread_priority priority = thread_priority::normal) = 0;

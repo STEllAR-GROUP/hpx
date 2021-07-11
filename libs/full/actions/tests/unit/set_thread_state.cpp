@@ -186,7 +186,7 @@ int hpx_main(variables_map& vm)
         thread_id_type thread = register_thread(data);
 
         tree_boot(futures, grain_size, prefix,
-            reinterpret_cast<std::uint64_t>(thread.get()));
+            reinterpret_cast<std::uint64_t>(thread.get().get()));
 
         set_thread_state(thread, hpx::threads::thread_schedule_state::pending,
             hpx::threads::thread_restart_state::terminate);

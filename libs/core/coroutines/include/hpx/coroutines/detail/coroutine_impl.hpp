@@ -1,5 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  This code may be used under either of the following two licences:
 //
@@ -69,7 +69,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         coroutine_impl(
             functor_type&& f, thread_id_type id, std::ptrdiff_t stack_size)
-          : context_base(stack_size, id)
+          : context_base(stack_size, std::move(id))
           , m_result(thread_schedule_state::unknown, invalid_thread_id)
           , m_arg(nullptr)
           , m_fun(std::move(f))
@@ -133,7 +133,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                 result_type(thread_schedule_state::unknown, invalid_thread_id);
             m_arg = nullptr;
             m_fun = std::move(f);
-            this->super_type::rebind_base(id);
+            this->super_type::rebind_base(std::move(id));
         }
 
     private:
