@@ -33,7 +33,7 @@ namespace hpx { namespace threads { namespace detail {
             threads::set_thread_lco_description(id_, old_desc_, ec_);
         }
 
-        threads::thread_id_type id_;
+        threads::thread_id_type const& id_;
         util::thread_description old_desc_;
         error_code& ec_;
     };

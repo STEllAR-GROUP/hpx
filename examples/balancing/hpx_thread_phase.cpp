@@ -8,6 +8,7 @@
 #include <hpx/local/barrier.hpp>
 #include <hpx/local/mutex.hpp>
 #include <hpx/local/thread.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <boost/lockfree/queue.hpp>
 
