@@ -34,10 +34,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // shift_left
     namespace detail {
-        /*
-        template <typename ExPolicy, typename FwdIter>
-        hpx::future<util::in_out_result<FwdIter, FwdIter>> rotate_helper(
-            ExPolicy policy, FwdIter first, FwdIter new_first, FwdIter last)
+        template <typename ExPolicy, typename FwdIter, typename Sent>
+        hpx::future<FwdIter> shift_left_helper(
+            ExPolicy policy, FwdIter first, Sent last, FwdIter new_first)
         {
             using non_seq = std::false_type;
 
@@ -47,31 +46,27 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             detail::reverse<FwdIter> r;
             return dataflow(
-                [=](hpx::future<FwdIter>&& f1,
-                    hpx::future<FwdIter>&& f2) mutable
-                -> hpx::future<util::in_out_result<FwdIter, FwdIter>> {
+                [=](hpx::future<FwdIter>&& f1) mutable -> hpx::future<FwdIter> {
                     // propagate exceptions
                     f1.get();
-                    f2.get();
 
                     hpx::future<FwdIter> f = r.call2(p, non_seq(), first, last);
-                    return f.then([=](hpx::future<FwdIter>&& f) mutable
-                        -> util::in_out_result<FwdIter, FwdIter> {
-                        f.get();    // propagate exceptions
-                        std::advance(first, std::distance(new_first, last));
-                        return util::in_out_result<FwdIter, FwdIter>{
-                            first, last};
-                    });
+                    return f.then(
+                        [=](hpx::future<FwdIter>&& f) mutable -> FwdIter {
+                            f.get();    // propagate exceptions
+                            std::advance(
+                                first, detail::distance(new_first, last));
+                            return first;
+                        });
                 },
-                r.call2(p, non_seq(), first, new_first),
                 r.call2(p, non_seq(), new_first, last));
-        }*/
+        }
 
         /* Sequential shift_left implementation borrowed
         from https://github.com/danra/shift_proposal */
 
-        template <class FwdIter, class N>
-        constexpr N bounded_advance(FwdIter& i, N n, FwdIter const bound)
+        template <class FwdIter, class N, typename Sent>
+        constexpr N bounded_advance(FwdIter& i, N n, Sent const bound)
         {
             for (; n > 0 && i != bound; --n, void(++i))
             {
@@ -81,10 +76,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return n;
         }
 
-        template <typename FwdIter, typename Size>
+        template <typename FwdIter, typename Sent, typename Size>
         static constexpr std::enable_if_t<
             hpx::traits::is_random_access_iterator_v<FwdIter>, FwdIter>
-        sequential_shift_left(FwdIter first, FwdIter last, Size n)
+        sequential_shift_left(FwdIter first, Sent last, Size n)
         {
             if (n <= 0)
             {
@@ -101,10 +96,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 mid, detail::distance(mid, last), std::move(first)));
         }
 
-        template <typename FwdIter, typename Size>
+        template <typename FwdIter, typename Sent, typename Size>
         static constexpr std::enable_if_t<
             !hpx::traits::is_random_access_iterator_v<FwdIter>, FwdIter>
-        sequential_shift_left(FwdIter first, FwdIter last, Size n)
+        sequential_shift_left(FwdIter first, Sent last, Size n)
         {
             if (n <= 0)
             {
@@ -117,8 +112,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return first;
             }
 
-            return parallel::util::get_second_element(util::move(
-                std::move(mid), std::move(last), std::move(first)));
+            return parallel::util::get_second_element(
+                util::move(std::move(mid), std::move(last), std::move(first)));
         }
 
         template <typename FwdIter2>
@@ -130,21 +125,28 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 
-            template <typename ExPolicy, typename FwdIter, typename Size>
+            template <typename ExPolicy, typename FwdIter, typename Sent,
+                typename Size>
             static FwdIter sequential(
-                ExPolicy, FwdIter first, FwdIter last, Size n)
+                ExPolicy, FwdIter first, Sent last, Size n)
             {
                 return detail::sequential_shift_left(first, last, n);
             }
 
-            template <typename ExPolicy>
+            template <typename ExPolicy, typename Sent, typename Size>
             static typename util::detail::algorithm_result<ExPolicy,
                 FwdIter2>::type
-            parallel(ExPolicy&& policy, FwdIter2 first, FwdIter2 new_first,
-                FwdIter2 last)
+            parallel(ExPolicy&& policy, FwdIter2 first, Sent last, Size n)
             {
+                if (n > detail::distance(first, last))
+                {
+                    return parallel::util::detail::algorithm_result<ExPolicy,
+                        FwdIter2>::get(std::move(first));
+                }
+
                 return util::detail::algorithm_result<ExPolicy, FwdIter2>::get(
-                    first);
+                    shift_left_helper(
+                        policy, first, last, std::next(first, n)));
             }
         };
         /// \endcond
@@ -167,6 +169,9 @@ namespace hpx {
         friend FwdIter tag_fallback_dispatch(
             shift_left_t, FwdIter first, FwdIter last, Size n)
         {
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+                "Requires at least forward iterator.");
+
             return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
                 hpx::execution::seq, first, last, n);
         }
@@ -182,6 +187,9 @@ namespace hpx {
         tag_fallback_dispatch(shift_left_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Size n)
         {
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+                "Requires at least forward iterator.");
+
             return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
                 std::forward<ExPolicy>(policy), first, last, n);
         }
