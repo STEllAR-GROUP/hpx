@@ -451,7 +451,7 @@ namespace hpx { namespace this_thread {
     ///         \a hpx#invalid_status.
     ///
     HPX_CORE_EXPORT threads::thread_restart_state suspend(
-        threads::thread_schedule_state state, threads::thread_id_type const& id,
+        threads::thread_schedule_state state, threads::thread_id_type id,
         util::thread_description const& description = util::thread_description(
             "this_thread::suspend"),
         error_code& ec = throws);
@@ -501,7 +501,7 @@ namespace hpx { namespace this_thread {
     ///
     HPX_CORE_EXPORT threads::thread_restart_state suspend(
         hpx::chrono::steady_time_point const& abs_time,
-        threads::thread_id_type const& id,
+        threads::thread_id_type id,
         util::thread_description const& description = util::thread_description(
             "this_thread::suspend"),
         error_code& ec = throws);
@@ -578,12 +578,12 @@ namespace hpx { namespace this_thread {
     ///
     inline threads::thread_restart_state suspend(
         hpx::chrono::steady_duration const& rel_time,
-        threads::thread_id_type const& id,
+        threads::thread_id_type id,
         util::thread_description const& description = util::thread_description(
             "this_thread::suspend"),
         error_code& ec = throws)
     {
-        return suspend(rel_time.from_now(), id, description, ec);
+        return suspend(rel_time.from_now(), std::move(id), description, ec);
     }
 
     /// The function \a suspend will return control to the thread manager

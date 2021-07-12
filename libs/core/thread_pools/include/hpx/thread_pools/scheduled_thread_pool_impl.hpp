@@ -656,8 +656,8 @@ namespace hpx { namespace threads { namespace detail {
         thread_restart_state newstate_ex, thread_priority priority,
         error_code& ec)
     {
-        return detail::set_thread_state_timed(*sched_, abs_time, id, newstate,
-            newstate_ex, priority,
+        return detail::set_thread_state_timed(sched_.get(), abs_time, id,
+            newstate, newstate_ex, priority,
             thread_schedule_hint(
                 static_cast<std::int16_t>(detail::get_local_thread_num_tss())),
             nullptr, true, ec);
@@ -1969,6 +1969,7 @@ namespace hpx { namespace threads { namespace detail {
             [&state]() { return state.load() == state_pre_sleep; },
             "scheduled_thread_pool::suspend_processing_unit_direct");
     }
+
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::resume_processing_unit_direct(
         std::size_t virt_core, error_code& ec)
