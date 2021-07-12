@@ -118,6 +118,7 @@ set(tests
     set_intersection
     set_symmetric_difference
     set_union
+    shift_left
     sort
     sort_by_key
     sort_exceptions
