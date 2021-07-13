@@ -49,7 +49,30 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-            while (!acquire_lock())
+            // Checking for the value in is_locked() ensures that
+            // acquire_lock is only called when is_locked computes
+            // to false. This way we spin only on a load operation
+            // which minimizes false sharing that comes with an
+            // exchange operation.
+            // Consider the following cases:
+            // 1. Only one thread wants access critical section:
+            //      is_locked() -> false; computes acquire_lock()
+            //      acquire_lock() -> false (new value set to true)
+            //      Thread acquires the lock and moves to critical
+            //      section.
+            // 2. Two threads simultaneously access critical section:
+            //      Thread 1: is_locked() || acquire_lock() -> false
+            //      Thread 1 acquires the lock and moves to critical
+            //      section.
+            //      Thread 2: is_locked() -> true; execution enters
+            //      inside while without computing acquire_lock().
+            //      Thread 2 yields while is_locked() computes to
+            //      false. Then it retries doing is_locked() -> false
+            //      followed by an acquire_lock() operation.
+            //      The above order can be changed arbitrarily but
+            //      the nature of execution will still remain the
+            //      same.
+            while (is_locked() || !acquire_lock())
             {
                 util::yield_while([this] { return is_locked(); },
                     "hpx::lcos::local::spinlock::lock");
@@ -88,18 +111,18 @@ namespace hpx { namespace lcos { namespace local {
 
     private:
         // returns whether the mutex has been acquired
-        bool acquire_lock()
+        HPX_FORCEINLINE bool acquire_lock()
         {
             return !v_.exchange(true, std::memory_order_acquire);
         }
 
         // relinquish lock
-        void relinquish_lock()
+        HPX_FORCEINLINE void relinquish_lock()
         {
             v_.store(false, std::memory_order_release);
         }
 
-        bool is_locked() const
+        HPX_FORCEINLINE bool is_locked() const
         {
             return v_.load(std::memory_order_relaxed);
         }
