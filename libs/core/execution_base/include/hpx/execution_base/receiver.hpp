@@ -230,4 +230,30 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename T, typename... As>
     HPX_INLINE_CONSTEXPR_VARIABLE bool is_nothrow_receiver_of_v =
         is_nothrow_receiver_of<T, As...>::value;
-}}}    // namespace hpx::execution::experimental
+
+    namespace detail {
+        template <typename CPO>
+        struct is_receiver_cpo : std::false_type
+        {
+        };
+
+        template <>
+        struct is_receiver_cpo<set_value_t> : std::true_type
+        {
+        };
+
+        template <>
+        struct is_receiver_cpo<set_error_t> : std::true_type
+        {
+        };
+
+        template <>
+        struct is_receiver_cpo<set_done_t> : std::true_type
+        {
+        };
+
+        template <typename CPO>
+        HPX_INLINE_CONSTEXPR_VARIABLE bool is_receiver_cpo_v =
+            is_receiver_cpo<CPO>::value;
+    }    // namespace detail
+}}}      // namespace hpx::execution::experimental
