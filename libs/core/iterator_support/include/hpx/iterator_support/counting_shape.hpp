@@ -12,7 +12,7 @@
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 
-namespace hpx { namespace util {
+namespace hpx { namespace util { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Incrementable>
@@ -27,4 +27,4 @@ namespace hpx { namespace util {
             hpx::util::make_counting_iterator(Incrementable(0)),
             hpx::util::make_counting_iterator(n));
     }
-}}    // namespace hpx::util
+}}}    // namespace hpx::util::detail

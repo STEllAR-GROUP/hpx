@@ -7,13 +7,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/threading_base/register_thread.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -41,6 +42,12 @@ namespace hpx { namespace execution { namespace experimental {
         bool operator!=(thread_pool_scheduler const& rhs) const noexcept
         {
             return !(*this == rhs);
+        }
+
+        hpx::threads::thread_pool_base* get_thread_pool()
+        {
+            HPX_ASSERT(pool_);
+            return pool_;
         }
 
         // support with_priority property
@@ -129,26 +136,26 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename F>
         void execute(F&& f) const
         {
-            hpx::util::thread_description desc(annotation_ == nullptr ?
-                    traits::get_function_annotation<std::decay_t<F>>::call(f) :
-                    annotation_);
+            char const* annotation = annotation_ == nullptr ?
+                traits::get_function_annotation<std::decay_t<F>>::call(f) :
+                annotation_;
 
-            hpx::parallel::execution::detail::post_policy_dispatch<
-                hpx::launch::async_policy>::call(hpx::launch::async, desc,
-                pool_, priority_, stacksize_, schedulehint_,
-                std::forward<F>(f));
+            threads::thread_init_data data(
+                threads::make_thread_function_nullary(std::forward<F>(f)),
+                annotation, priority_, schedulehint_, stacksize_);
+            threads::register_work(data, pool_);
         }
 
-        template <typename Scheduler, typename R>
+        template <typename Scheduler, typename Receiver>
         struct operation_state
         {
             std::decay_t<Scheduler> scheduler;
-            std::decay_t<R> r;
+            std::decay_t<Receiver> receiver;
 
-            template <typename Scheduler_, typename R_>
-            operation_state(Scheduler_&& scheduler, R_&& r)
+            template <typename Scheduler_, typename Receiver_>
+            operation_state(Scheduler_&& scheduler, Receiver_&& receiver)
               : scheduler(std::forward<Scheduler_>(scheduler))
-              , r(std::forward<R_>(r))
+              , receiver(std::forward<Receiver_>(receiver))
             {
             }
 
@@ -161,14 +168,15 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        scheduler.execute([r = std::move(r)]() mutable {
-                            hpx::execution::experimental::set_value(
-                                std::move(r));
-                        });
+                        scheduler.execute(
+                            [receiver = std::move(receiver)]() mutable {
+                                hpx::execution::experimental::set_value(
+                                    std::move(receiver));
+                            });
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
-                            std::move(r), std::move(ep));
+                            std::move(receiver), std::move(ep));
                     });
             }
         };
@@ -187,16 +195,26 @@ namespace hpx { namespace execution { namespace experimental {
 
             static constexpr bool sends_done = false;
 
-            template <typename R>
-            operation_state<Scheduler, R> connect(R&& r) &&
+            template <typename Receiver>
+            operation_state<Scheduler, Receiver> connect(Receiver&& receiver) &&
             {
-                return {std::move(scheduler), std::forward<R>(r)};
+                return {std::move(scheduler), std::forward<Receiver>(receiver)};
             }
 
-            template <typename R>
-            operation_state<Scheduler, R> connect(R&& r) &
+            template <typename Receiver>
+            operation_state<Scheduler, Receiver> connect(Receiver&& receiver) &
             {
-                return {scheduler, std::forward<R>(r)};
+                return {scheduler, std::forward<Receiver>(receiver)};
+            }
+
+            template <typename CPO,
+                HPX_CONCEPT_REQUIRES_(std::is_same_v<CPO,
+                    hpx::execution::experimental::set_value_t>)>
+            friend constexpr auto tag_dispatch(
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>,
+                sender const& s)
+            {
+                return s.scheduler;
             }
         };
 
@@ -209,10 +227,11 @@ namespace hpx { namespace execution { namespace experimental {
 
         static constexpr bool sends_done = false;
 
-        template <typename R>
-        operation_state<thread_pool_scheduler, R> connect(R&& r) &&
+        template <typename Receiver>
+        operation_state<thread_pool_scheduler, Receiver> connect(
+            Receiver&& receiver) &&
         {
-            return {*this, std::forward<R>(r)};
+            return {*this, std::forward<Receiver>(receiver)};
         }
 
         constexpr sender<thread_pool_scheduler> schedule() const

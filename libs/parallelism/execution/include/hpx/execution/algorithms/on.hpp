@@ -12,6 +12,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
+#include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -58,6 +59,36 @@ namespace hpx { namespace execution { namespace experimental {
                 scheduler_sender_error_types<Variant>>;
 
             static constexpr bool sends_done = false;
+
+            template <typename CPO,
+                // clang-format off
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::execution::experimental::detail::is_receiver_cpo_v<CPO> &&
+                    (std::is_same_v<CPO, hpx::execution::experimental::set_value_t> ||
+                        hpx::execution::experimental::detail::has_completion_scheduler_v<
+                                hpx::execution::experimental::set_error_t,
+                                std::decay_t<Sender>> ||
+                        hpx::execution::experimental::detail::has_completion_scheduler_v<
+                                hpx::execution::experimental::set_done_t,
+                                std::decay_t<Sender>>))
+                // clang-format on
+                >
+            friend constexpr auto tag_dispatch(
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>,
+                on_sender const& sender)
+            {
+                if constexpr (std::is_same_v<std::decay_t<CPO>,
+                                  hpx::execution::experimental::set_value_t>)
+                {
+                    return sender.scheduler;
+                }
+                else
+                {
+                    return hpx::execution::experimental::
+                        get_completion_scheduler<CPO>(
+                            sender.predecessor_sender);
+                }
+            }
 
             template <typename Receiver>
             struct operation_state
