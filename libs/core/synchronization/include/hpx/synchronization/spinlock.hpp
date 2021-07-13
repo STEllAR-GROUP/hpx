@@ -72,11 +72,11 @@ namespace hpx { namespace lcos { namespace local {
             //      The above order can be changed arbitrarily but
             //      the nature of execution will still remain the
             //      same.
-            while (is_locked() || !acquire_lock())
+            do
             {
                 util::yield_while([this] { return is_locked(); },
                     "hpx::lcos::local::spinlock::lock");
-            }
+            } while (!acquire_lock());
 
             HPX_ITT_SYNC_ACQUIRED(this);
             util::register_lock(this);
