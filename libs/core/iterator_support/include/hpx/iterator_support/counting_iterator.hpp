@@ -11,6 +11,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
 

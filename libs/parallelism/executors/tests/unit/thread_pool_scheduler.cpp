@@ -21,7 +21,9 @@
 #include <string>
 #include <thread>
 #include <type_traits>
+#include <unordered_set>
 #include <utility>
+#include <vector>
 
 struct custom_type_non_default_constructible_non_copyable
 {
@@ -1480,6 +1482,183 @@ void test_keep_future_sender()
     }
 }
 
+void test_bulk()
+{
+    std::vector<int> const ns = {0, 1, 10, 43};
+
+    for (int n : {0, 1, 10, 43})
+    {
+        std::vector<int> v(n, -1);
+        hpx::thread::id parent_id = hpx::this_thread::get_id();
+
+        ex::schedule(ex::thread_pool_scheduler{}) | ex::bulk(n, [&](int i) {
+            v[i] = i;
+            HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
+        }) | ex::sync_wait();
+
+        for (int i = 0; i < n; ++i)
+        {
+            HPX_TEST_EQ(v[i], i);
+        }
+    }
+
+    for (auto n : ns)
+    {
+        std::vector<int> v(n, -1);
+        hpx::thread::id parent_id = hpx::this_thread::get_id();
+
+        auto v_out = ex::just_on(ex::thread_pool_scheduler{}, std::move(v)) |
+            ex::bulk(n,
+                [&parent_id](int i, std::vector<int>& v) {
+                    v[i] = i;
+                    HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
+                }) |
+            ex::sync_wait();
+
+        for (int i = 0; i < n; ++i)
+        {
+            HPX_TEST_EQ(v_out[i], i);
+        }
+    }
+
+    {
+        std::unordered_set<std::string> string_map;
+        std::vector<std::string> v = {"hello", "brave", "new", "world"};
+
+        hpx::mutex mtx;
+
+        ex::schedule(ex::thread_pool_scheduler{}) |
+            ex::bulk(std::move(v),
+                [&](std::string const& s) {
+                    std::lock_guard lk(mtx);
+                    string_map.insert(s);
+                }) |
+            ex::sync_wait();
+
+        for (auto const& s : v)
+        {
+            HPX_TEST(string_map.find(s) != string_map.end());
+        }
+    }
+
+    for (auto n : ns)
+    {
+        int const i_fail = 3;
+
+        std::vector<int> v(n, -1);
+        bool const expect_exception = n > i_fail;
+
+        try
+        {
+            ex::just_on(ex::thread_pool_scheduler{}) | ex::bulk(n, [&v](int i) {
+                if (i == i_fail)
+                {
+                    throw std::runtime_error("error");
+                }
+                v[i] = i;
+            }) | ex::sync_wait();
+
+            if (expect_exception)
+            {
+                HPX_TEST(false);
+            }
+        }
+        catch (std::runtime_error const& e)
+        {
+            if (!expect_exception)
+            {
+                HPX_TEST(false);
+            }
+
+            HPX_TEST_EQ(std::string(e.what()), std::string("error"));
+        }
+
+        for (int i = 0; i < n; ++i)
+        {
+            if (i == i_fail)
+            {
+                HPX_TEST_EQ(v[i], -1);
+            }
+            else
+            {
+                HPX_TEST_EQ(v[i], i);
+            }
+        }
+    }
+}
+
+void test_completion_scheduler()
+{
+    {
+        auto sender = ex::schedule(ex::thread_pool_scheduler{});
+        auto completion_scheduler =
+            ex::get_completion_scheduler<ex::set_value_t>(sender);
+        static_assert(
+            std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
+                ex::thread_pool_scheduler>,
+            "the completion scheduler should be a thread_pool_scheduler");
+    }
+
+    {
+        auto sender =
+            ex::transform(ex::schedule(ex::thread_pool_scheduler{}), []() {});
+        using hpx::functional::tag_dispatch;
+        auto completion_scheduler =
+            ex::get_completion_scheduler<ex::set_value_t>(sender);
+        static_assert(
+            std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
+                ex::thread_pool_scheduler>,
+            "the completion scheduler should be a thread_pool_scheduler");
+    }
+
+    {
+        auto sender = ex::just_on(ex::thread_pool_scheduler{}, 42);
+        auto completion_scheduler =
+            ex::get_completion_scheduler<ex::set_value_t>(sender);
+        static_assert(
+            std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
+                ex::thread_pool_scheduler>,
+            "the completion scheduler should be a thread_pool_scheduler");
+    }
+
+    {
+        auto sender =
+            ex::bulk(ex::schedule(ex::thread_pool_scheduler{}), 10, [](int) {});
+        auto completion_scheduler =
+            ex::get_completion_scheduler<ex::set_value_t>(sender);
+        static_assert(
+            std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
+                ex::thread_pool_scheduler>,
+            "the completion scheduler should be a thread_pool_scheduler");
+    }
+
+    {
+        auto sender =
+            ex::transform(ex::bulk(ex::just_on(ex::thread_pool_scheduler{}, 42),
+                              10, [](int, int) {}),
+                [](int) {});
+        auto completion_scheduler =
+            ex::get_completion_scheduler<ex::set_value_t>(sender);
+        static_assert(
+            std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
+                ex::thread_pool_scheduler>,
+            "the completion scheduler should be a thread_pool_scheduler");
+    }
+
+    {
+        auto sender =
+            ex::bulk(ex::transform(ex::just_on(ex::thread_pool_scheduler{}, 42),
+                         [](int) {}),
+                10, [](int, int) {});
+        auto completion_scheduler =
+            ex::get_completion_scheduler<ex::set_value_t>(sender);
+        static_assert(
+            std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
+                ex::thread_pool_scheduler>,
+            "the completion scheduler should be a thread_pool_scheduler");
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
@@ -1507,6 +1686,8 @@ int hpx_main()
     test_let_value();
     test_let_error();
     test_detach();
+    test_bulk();
+    test_completion_scheduler();
 
     return hpx::local::finalize();
 }
