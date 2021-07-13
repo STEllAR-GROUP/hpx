@@ -45,15 +45,18 @@ namespace hpx { namespace util { namespace detail {
         void lock() noexcept
         {
             // Optimistically assume the lock is free on the first try
-            if (!m.exchange(true, std::memory_order_acquire))
+            if (!m.load(std::memory_order_relaxed) &&
+                !m.exchange(true, std::memory_order_acquire))
                 return;
 
             // Wait for lock to be released without generating cache misses
+            // Similar implementation to hpx::lcos::local::spinlock
             unsigned k = 0;
-            do
+            while (m.load(std::memory_order_relaxed) ||
+                m.exchange(true, std::memory_order_acquire))
             {
                 yield_k(k++);
-            } while (!try_lock());
+            }
         }
 
         HPX_FORCEINLINE void unlock() noexcept
