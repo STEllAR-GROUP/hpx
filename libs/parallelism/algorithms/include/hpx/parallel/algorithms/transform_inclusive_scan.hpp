@@ -186,11 +186,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     });
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename Conv,
-                typename Op>
+            template <typename ExPolicy, typename FwdIter1, typename Sent,
+                typename Conv, typename Op>
             static typename util::detail::algorithm_result<ExPolicy,
                 FwdIter2>::type
-            parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            parallel(ExPolicy&& policy, FwdIter1 first, Sent last,
                 FwdIter2 dest, Conv&& conv, Op&& op)
             {
                 if (first != last)
