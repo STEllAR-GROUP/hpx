@@ -76,7 +76,7 @@ namespace hpx { namespace functional {
         is_nothrow_tag_dispatchable<Tag, Args...>::value;
 
     /// `hpx::functional::tag_dispatch_result<Tag, Args...>` is the trait
-    /// returning the result type of the call hpx::functioanl::tag_dispatch. This
+    /// returning the result type of the call hpx::functional::tag_dispatch. This
     /// can be used in a SFINAE context.
     template <typename Tag, typename... Args>
     using tag_dispatch_result =
