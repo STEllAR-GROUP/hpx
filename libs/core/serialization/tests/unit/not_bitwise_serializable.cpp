@@ -34,6 +34,12 @@ struct A
     }
 };
 
+struct A_nonser
+{
+    int a;
+    double b;
+};
+
 struct B
 {
     int a;
@@ -61,14 +67,30 @@ int hpx_main()
         serialize_A = false;
         A oa{42, 42.0};
         oarchive << oa;
-        HPX_TEST(!serialize_A);
+        HPX_TEST(serialize_A);
 
         hpx::serialization::input_archive iarchive(buffer);
         A ia{0, 0.0};
 
         serialize_A = false;
         iarchive >> ia;
-        HPX_TEST(!serialize_A);
+        HPX_TEST(serialize_A);
+
+        HPX_TEST_EQ(ia.a, 42);
+        HPX_TEST_EQ(ia.b, 42.0);
+    }
+
+    {
+        std::vector<char> buffer;
+        hpx::serialization::output_archive oarchive(buffer);
+
+        A_nonser oa{42, 42.0};
+        oarchive << oa;
+
+        hpx::serialization::input_archive iarchive(buffer);
+        A_nonser ia{0, 0.0};
+
+        iarchive >> ia;
 
         HPX_TEST_EQ(ia.a, 42);
         HPX_TEST_EQ(ia.b, 42.0);

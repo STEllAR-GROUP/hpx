@@ -27,14 +27,26 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_intrusive_polymorphic_v =
+        is_intrusive_polymorphic<T>::value;
+
+    template <typename T>
     struct is_nonintrusive_polymorphic : std::false_type
     {
     };
 
     template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_nonintrusive_polymorphic_v =
+        is_nonintrusive_polymorphic<T>::value;
+
+    template <typename T>
     struct is_serialized_with_id : detail::has_serialized_with_id<T>
     {
     };
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_serialized_with_id_v =
+        is_serialized_with_id<T>::value;
 }}    // namespace hpx::traits
 
 #define HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class)                             \
