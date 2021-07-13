@@ -237,6 +237,7 @@ namespace hpx { namespace serialization {
             bool archive_endianess_differs =
                 endian::native == endian::big ? endian_little() : endian_big();
 
+#if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
             if (disable_array_optimization() || archive_endianess_differs)
             {
                 access::serialize(*this, t, 0);
@@ -245,6 +246,11 @@ namespace hpx { namespace serialization {
             {
                 save_binary(&t, sizeof(t));
             }
+#else
+            HPX_ASSERT(
+                !(disable_array_optimization() || archive_endianess_differs));
+            save_binary(&t, sizeof(t));
+#endif
         }
 
         template <typename T>

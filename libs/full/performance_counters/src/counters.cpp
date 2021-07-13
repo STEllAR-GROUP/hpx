@@ -30,6 +30,7 @@
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/string.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/util/from_string.hpp>
