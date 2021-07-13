@@ -4,6 +4,7 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2008 Peter Dimov
 //  Copyright (c) 2018 Patrick Diehl
+//  Copyright (c) 2021 Nikunj Gupta
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
