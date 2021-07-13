@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -512,7 +513,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static typename util::detail::algorithm_result<ExPolicy,
                 FwdIter2>::type
             parallel(ExPolicy&& policy, FwdIter1 first, Sent last,
-                FwdIter2 dest, Conv&& conv, T init, Op&& op)
+                FwdIter2 dest, Conv&& conv, T&& init, Op&& op)
             {
                 using result =
                     util::detail::algorithm_result<ExPolicy, FwdIter2>;

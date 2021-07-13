@@ -693,7 +693,7 @@ Parallel algorithms
      * Sums up a range of elements after applying a function. Also, accumulates the inner products of two input ranges.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`transform_reduce`
-   * * :cpp:func:`hpx::parallel::v1::transform_inclusive_scan`
+   * * :cpp:func:`hpx::transform_inclusive_scan`
      * Does an inclusive parallel scan over a range of elements after applying a function.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`transform_inclusive_scan`
