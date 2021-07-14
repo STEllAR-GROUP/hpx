@@ -65,7 +65,7 @@ namespace hpx { namespace threads {
         }
 
 #if defined(HPX_DEBUG)
-        thread_id_type get_thread_id() const override
+        thread_id_noref get_thread_id() const override
         {
             HPX_ASSERT(this == coroutine_.get_thread_id().get());
             return this->thread_data::get_thread_id();
@@ -125,7 +125,7 @@ namespace hpx { namespace threads {
         {
             this->thread_data::rebind_base(init_data);
 
-            coroutine_.rebind(std::move(init_data.func), thread_id_type(this));
+            coroutine_.rebind(std::move(init_data.func), thread_id_noref(this));
 
             HPX_ASSERT(coroutine_.is_ready());
         }
@@ -137,7 +137,7 @@ namespace hpx { namespace threads {
             thread_init_data& init_data, void* queue, std::ptrdiff_t stacksize)
           : thread_data(init_data, queue, stacksize, true)
           , coroutine_(
-                std::move(init_data.func), thread_id_type(this_(), false))
+                std::move(init_data.func), thread_id_noref(this_()))
         {
             HPX_ASSERT(coroutine_.is_ready());
         }

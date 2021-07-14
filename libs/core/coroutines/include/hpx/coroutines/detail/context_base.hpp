@@ -72,7 +72,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         using deleter_type = void(context_base const*);
         using thread_id_type = hpx::threads::thread_id;
 
-        context_base(std::ptrdiff_t stack_size, thread_id_type id)
+        context_base(std::ptrdiff_t stack_size, thread_id_noref id)
           : default_context_impl<CoroutineImpl>(stack_size)
           , m_caller()
           , m_state(ctx_ready)
@@ -126,7 +126,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 #endif
 
-        thread_id_type const& get_thread_id() const
+        thread_id_noref const& get_thread_id() const
         {
             return m_thread_id;
         }
@@ -319,7 +319,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             ctx_exited_abnormally    // process exited uncleanly.
         };
 
-        void rebind_base(thread_id_type id)
+        void rebind_base(thread_id_noref id)
         {
             HPX_ASSERT(exited());
 
@@ -409,7 +409,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         // This is used to generate a meaningful exception trace.
         std::exception_ptr m_type_info;
-        thread_id_type m_thread_id;
+        thread_id_noref m_thread_id;
 
         std::size_t continuation_recursion_count_;
     };

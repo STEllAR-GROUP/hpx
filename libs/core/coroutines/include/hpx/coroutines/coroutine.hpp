@@ -62,7 +62,7 @@ namespace hpx { namespace threads { namespace coroutines {
         using functor_type =
             util::unique_function_nonser<result_type(arg_type)>;
 
-        coroutine(functor_type&& f, thread_id_type id,
+        coroutine(functor_type&& f, thread_id_noref id,
             std::ptrdiff_t stack_size = detail::default_stack_size)
           : impl_(std::move(f), std::move(id), stack_size)
         {
@@ -74,7 +74,7 @@ namespace hpx { namespace threads { namespace coroutines {
         coroutine(coroutine&& src) = delete;
         coroutine& operator=(coroutine&& src) = delete;
 
-        thread_id_type const& get_thread_id() const
+        thread_id_noref const& get_thread_id() const
         {
             return impl_.get_thread_id();
         }
@@ -128,7 +128,7 @@ namespace hpx { namespace threads { namespace coroutines {
         }
 #endif
 
-        void rebind(functor_type&& f, thread_id_type id)
+        void rebind(functor_type&& f, thread_id_noref id)
         {
             impl_.rebind(std::move(f), std::move(id));
         }

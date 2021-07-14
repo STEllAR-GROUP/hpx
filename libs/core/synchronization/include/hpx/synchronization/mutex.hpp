@@ -23,7 +23,7 @@ namespace hpx { namespace threads {
 
     /// The function \a get_self_id returns the HPX thread id of the current
     /// thread (or zero if the current thread is not a HPX thread).
-    HPX_CORE_EXPORT thread_id_type const& get_self_id();
+    HPX_CORE_EXPORT thread_id_noref get_self_id();
 
     /// The function \a get_self_ptr returns a pointer to the (OS thread
     /// specific) self reference to the current HPX thread.
@@ -66,7 +66,7 @@ namespace hpx { namespace lcos { namespace local {
 
     protected:
         mutable mutex_type mtx_;
-        threads::thread_id_type owner_id_;
+        threads::thread_id_noref_type owner_id_;
         lcos::local::detail::condition_variable cond_;
     };
 
