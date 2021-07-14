@@ -1,4 +1,7 @@
-* Wed Feb 17 2020 STE||AR Group <contact@stellar-group.org> 1.6.0
+* Wed Jul 14 2021 STE||AR Group <contact@stellar-group.org> 1.7.0
+- HPX Release 1.7.0 (https://hpx-docs.stellar-group.org/tags/1.7.0/html/releases/whats_new_1_7_0.html)
+
+* Wed Feb 17 2021 STE||AR Group <contact@stellar-group.org> 1.6.0
 - HPX Release 1.6.0 (https://hpx-docs.stellar-group.org/tags/1.6.0/html/releases/whats_new_1_6_0.html)
 
 * Wed Sep 30 2020 STE||AR Group <contact@stellar-group.org> 1.5.1

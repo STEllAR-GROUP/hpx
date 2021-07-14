@@ -33,7 +33,7 @@ It is also recommended that you check out the latest stable tag:
 
 .. code-block:: sh
 
-    git checkout 1.6.0
+    git checkout 1.7.0
 
 |hpx| dependencies
 ==================

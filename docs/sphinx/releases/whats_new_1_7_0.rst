@@ -8,9 +8,9 @@
 
 .. _hpx_1_7_0:
 
-==================
-|hpx| V1.7.0 (TBD)
-==================
+===========================
+|hpx| V1.7.0 (Jul 14, 2021)
+===========================
 
 This release is again focused on C++20 conformance of algorithms. Additionally,
 many new experimental sender-based algorithms have been added based on the
