@@ -52,6 +52,19 @@ namespace hpx { namespace parallel { namespace util {
         }
     };
 
+    template <typename I1, typename I2>
+    I2 get_in2_element(util::in_in_result<I1, I2>&& p)
+    {
+        return p.in2;
+    }
+
+    template <typename I1, typename I2>
+    hpx::future<I2> get_in2_element(hpx::future<util::in_in_result<I1, I2>>&& f)
+    {
+        return hpx::make_future<I2>(
+            std::move(f), [](util::in_in_result<I1, I2>&& p) { return p.in2; });
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename I, typename O>
     struct in_out_result

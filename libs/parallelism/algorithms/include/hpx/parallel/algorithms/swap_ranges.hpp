@@ -17,6 +17,7 @@
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
@@ -25,22 +26,23 @@
 #include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1 {
+    template <typename Iter1, typename Iter2>
+    using swap_ranges_result = hpx::parallel::util::in_in_result<Iter1, Iter2>;
+
     ///////////////////////////////////////////////////////////////////////////
     // swap ranges
     namespace detail {
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Size>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        typename util::detail::algorithm_result<ExPolicy,
+            swap_ranges_result<FwdIter1, FwdIter2>>::type
         parallel_swap_ranges(
             ExPolicy&& policy, FwdIter1 first1, FwdIter2 first2, Size n)
         {
             using zip_iterator = hpx::util::zip_iterator<FwdIter1, FwdIter2>;
             using reference = typename zip_iterator::reference;
-            using result_type =
-                typename util::detail::algorithm_result<ExPolicy,
-                    FwdIter2>::type;
 
-            return get_iter<1, result_type>(for_each_n<zip_iterator>().call(
+            return get_iter_in_in_result(for_each_n<zip_iterator>().call(
                 std::forward<ExPolicy>(policy),
                 hpx::util::make_zip_iterator(first1, first2), n,
                 [](reference t) -> void {
@@ -50,16 +52,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 util::projection_identity()));
         }
 
-        template <typename FwdIter2>
+        template <typename IterPair>
         struct swap_ranges
-          : public detail::algorithm<swap_ranges<FwdIter2>, FwdIter2>
+          : public detail::algorithm<swap_ranges<IterPair>, IterPair>
         {
             swap_ranges()
               : swap_ranges::algorithm("swap_ranges")
             {
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename Sent>
+            template <typename ExPolicy, typename FwdIter1, typename Sent,
+                typename FwdIter2>
             static FwdIter2 sequential(
                 ExPolicy, FwdIter1 first1, Sent last1, FwdIter2 first2)
             {
@@ -73,9 +76,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent1,
-                typename Sent2>
-            static FwdIter2 sequential(ExPolicy, FwdIter1 first1, Sent1 last1,
-                FwdIter2 first2, Sent2 last2)
+                typename FwdIter2, typename Sent2>
+            static swap_ranges_result<FwdIter1, FwdIter2> sequential(ExPolicy,
+                FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2)
             {
                 while (first1 != last1 && first2 != last2)
                 {
@@ -83,31 +86,32 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     first1++;
                     first2++;
                 }
-                return first2;
+                return util::in_in_result<FwdIter1, FwdIter2>{first1, first2};
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename Sent>
+            template <typename ExPolicy, typename FwdIter1, typename Sent,
+                typename FwdIter2>
             static typename util::detail::algorithm_result<ExPolicy,
                 FwdIter2>::type
             parallel(
                 ExPolicy&& policy, FwdIter1 first1, Sent last1, FwdIter2 first2)
             {
-                return parallel_swap_ranges(std::forward<ExPolicy>(policy),
-                    first1, first2, detail::distance(first1, last1));
+                return util::get_in2_element(
+                    parallel_swap_ranges(std::forward<ExPolicy>(policy), first1,
+                        first2, detail::distance(first1, last1)));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent1,
-                typename Sent2>
+                typename FwdIter2, typename Sent2>
             static typename util::detail::algorithm_result<ExPolicy,
-                FwdIter2>::type
+                swap_ranges_result<FwdIter1, FwdIter2>>::type
             parallel(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
                 FwdIter2 first2, Sent2 last2)
             {
                 auto dist1 = detail::distance(first1, last1);
                 auto dist2 = detail::distance(first2, last2);
                 return parallel_swap_ranges(std::forward<ExPolicy>(policy),
-                    first1, first2,
-                    dist1 < dist2 ? dist1 : dist2);
+                    first1, first2, dist1 < dist2 ? dist1 : dist2);
             }
         };
         /// \endcond
