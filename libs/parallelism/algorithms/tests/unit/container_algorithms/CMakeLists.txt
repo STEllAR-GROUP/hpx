@@ -88,6 +88,7 @@ set(tests
     set_union_range
     sort_range
     stable_sort_range
+    swap_ranges_range
     transform_range
     transform_range_binary
     transform_range2
