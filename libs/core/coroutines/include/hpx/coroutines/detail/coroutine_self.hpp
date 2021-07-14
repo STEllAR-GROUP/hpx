@@ -120,7 +120,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         virtual arg_type yield_impl(result_type arg) = 0;
 
-        virtual thread_id_type const& get_thread_id() const = 0;
+        virtual thread_id_noref const& get_thread_id() const = 0;
 
         virtual std::size_t get_thread_phase() const = 0;
 

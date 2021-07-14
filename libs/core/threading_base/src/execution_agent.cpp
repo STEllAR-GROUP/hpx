@@ -41,7 +41,7 @@ namespace hpx { namespace threads {
 
     std::string execution_agent::description() const
     {
-        thread_id_type const& id = self_.get_thread_id();
+        thread_id_noref_type const& id = self_.get_thread_id();
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROW_EXCEPTION(null_thread_id, "execution_agent::description",

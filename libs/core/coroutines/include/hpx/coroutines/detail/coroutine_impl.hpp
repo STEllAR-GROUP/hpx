@@ -68,7 +68,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             util::unique_function_nonser<result_type(arg_type)>;
 
         coroutine_impl(
-            functor_type&& f, thread_id_type id, std::ptrdiff_t stack_size)
+            functor_type&& f, thread_id_noref id, std::ptrdiff_t stack_size)
           : context_base(stack_size, std::move(id))
           , m_result(thread_schedule_state::unknown, invalid_thread_id)
           , m_arg(nullptr)
@@ -124,7 +124,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             this->reset_stack();
         }
 
-        void rebind(functor_type&& f, thread_id_type id)
+        void rebind(functor_type&& f, thread_id_noref id)
         {
             HPX_ASSERT(m_result.first == thread_schedule_state::unknown ||
                 m_result.first == thread_schedule_state::terminated);

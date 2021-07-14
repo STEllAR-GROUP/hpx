@@ -915,12 +915,12 @@ namespace hpx { namespace lcos { namespace detail {
         typedef typename task_base<Result>::init_no_addref init_no_addref;
 
     protected:
-        threads::thread_id_type get_thread_id() const
+        threads::thread_id_noref_type get_thread_id() const
         {
             std::lock_guard<mutex_type> l(this->mtx_);
             return id_;
         }
-        void set_thread_id(threads::thread_id_type id)
+        void set_thread_id(threads::thread_id_noref_type id)
         {
             std::lock_guard<mutex_type> l(this->mtx_);
             id_ = id;
@@ -1006,7 +1006,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
     protected:
-        threads::thread_id_type id_;
+        threads::thread_id_noref_type id_;
     };
 }}}    // namespace hpx::lcos::detail
 

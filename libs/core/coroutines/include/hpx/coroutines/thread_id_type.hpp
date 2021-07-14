@@ -23,6 +23,139 @@
 
 namespace hpx { namespace threads {
 
+    ///////////////////////////////////////////////////////////////////////////
+    // same as below, just not holding a reference count
+    struct thread_id_noref
+    {
+    private:
+        using thread_id_repr = void*;
+
+    public:
+        thread_id_noref() noexcept = default;
+
+        thread_id_noref(thread_id_noref const&) = default;
+        thread_id_noref& operator=(thread_id_noref const&) = default;
+
+        constexpr thread_id_noref(thread_id_noref&& rhs) noexcept
+          : thrd_(rhs.thrd_)
+        {
+            rhs.thrd_ = nullptr;
+        }
+        constexpr thread_id_noref& operator=(thread_id_noref&& rhs) noexcept
+        {
+            thrd_ = rhs.thrd_;
+            rhs.thrd_ = nullptr;
+            return *this;
+        }
+
+        explicit constexpr thread_id_noref(thread_id_repr const& thrd) noexcept
+          : thrd_(thrd)
+        {
+        }
+        constexpr thread_id_noref& operator=(thread_id_repr const& rhs) noexcept
+        {
+            thrd_ = rhs;
+            return *this;
+        }
+
+        explicit constexpr operator bool() const noexcept
+        {
+            return nullptr != thrd_;
+        }
+
+        constexpr thread_id_repr get() const noexcept
+        {
+            return thrd_;
+        }
+
+        constexpr void reset() noexcept
+        {
+            thrd_ = nullptr;
+        }
+
+        friend constexpr bool operator==(
+            std::nullptr_t, thread_id_noref const& rhs) noexcept
+        {
+            return nullptr == rhs.thrd_;
+        }
+
+        friend constexpr bool operator!=(
+            std::nullptr_t, thread_id_noref const& rhs) noexcept
+        {
+            return nullptr != rhs.thrd_;
+        }
+
+        friend constexpr bool operator==(
+            thread_id_noref const& lhs, std::nullptr_t) noexcept
+        {
+            return nullptr == lhs.thrd_;
+        }
+
+        friend constexpr bool operator!=(
+            thread_id_noref const& lhs, std::nullptr_t) noexcept
+        {
+            return nullptr != lhs.thrd_;
+        }
+
+        friend constexpr bool operator==(
+            thread_id_noref const& lhs, thread_id_noref const& rhs) noexcept
+        {
+            return lhs.thrd_ == rhs.thrd_;
+        }
+
+        friend constexpr bool operator!=(
+            thread_id_noref const& lhs, thread_id_noref const& rhs) noexcept
+        {
+            return lhs.thrd_ != rhs.thrd_;
+        }
+
+        friend constexpr bool operator<(
+            thread_id_noref const& lhs, thread_id_noref const& rhs) noexcept
+        {
+            return std::less<thread_id_repr>{}(lhs.thrd_, rhs.thrd_);
+        }
+
+        friend constexpr bool operator>(
+            thread_id_noref const& lhs, thread_id_noref const& rhs) noexcept
+        {
+            return std::less<thread_id_repr>{}(rhs.thrd_, lhs.thrd_);
+        }
+
+        friend constexpr bool operator<=(
+            thread_id_noref const& lhs, thread_id_noref const& rhs) noexcept
+        {
+            return !(rhs > lhs);
+        }
+
+        friend constexpr bool operator>=(
+            thread_id_noref const& lhs, thread_id_noref const& rhs) noexcept
+        {
+            return !(rhs < lhs);
+        }
+
+        template <typename Char, typename Traits>
+        friend std::basic_ostream<Char, Traits>& operator<<(
+            std::basic_ostream<Char, Traits>& os, thread_id_noref const& id)
+        {
+            os << id.get();
+            return os;
+        }
+
+        friend void format_value(
+            std::ostream& os, boost::string_ref spec, thread_id_noref const& id)
+        {
+            // propagate spec
+            char format[16];
+            std::snprintf(
+                format, 16, "{:%.*s}", (int) spec.size(), spec.data());
+            hpx::util::format_to(os, format, id.get());
+        }
+
+    private:
+        thread_id_repr thrd_ = nullptr;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
         struct thread_data_reference_counting;
@@ -32,11 +165,11 @@ namespace hpx { namespace threads {
 
         struct thread_data_reference_counting
         {
-            // the initial reference count is two as each newely created thread
-            // a) contains a self-reference and b) it will be held alive by the
-            // variable returned from the creation function
+            // the initial reference count is one as each newely created thread
+            // will be held alive by the variable returned from the creation
+            // function
             thread_data_reference_counting()
-              : count_(2)
+              : count_(1)
             {
             }
 
@@ -108,6 +241,30 @@ namespace hpx { namespace threads {
         thread_id& operator=(thread_repr* rhs) noexcept
         {
             thrd_.reset(rhs);
+            return *this;
+        }
+
+        thread_id(thread_id_noref const& noref)
+          : thrd_(reinterpret_cast<thread_repr*>(noref.get()))
+        {
+        }
+
+        thread_id(thread_id_noref&& noref) noexcept
+          : thrd_(reinterpret_cast<thread_repr*>(noref.get()))
+        {
+            noref.reset();
+        }
+
+        thread_id& operator=(thread_id_noref const& noref)
+        {
+            thrd_.reset(reinterpret_cast<thread_repr*>(noref.get()));
+            return *this;
+        }
+
+        thread_id& operator=(thread_id_noref&& noref) noexcept
+        {
+            thrd_.reset(reinterpret_cast<thread_repr*>(noref.get()));
+            noref.reset();
             return *this;
         }
 
@@ -218,142 +375,10 @@ namespace hpx { namespace threads {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
     // We can't actually refer to this in device code. This is only to satisfy
     // the compiler.
-    extern HPX_DEVICE thread_id invalid_thread_id;
+    extern HPX_DEVICE thread_id_noref invalid_thread_id;
 #else
-    static thread_id const invalid_thread_id;
+    HPX_INLINE_CONSTEXPR_VARIABLE thread_id_noref const invalid_thread_id;
 #endif
-
-    ///////////////////////////////////////////////////////////////////////////
-    // same as above, just not holding a reference count
-    struct thread_id_noref
-    {
-    private:
-        using thread_id_repr = void*;
-
-    public:
-        thread_id_noref() noexcept = default;
-
-        thread_id_noref(thread_id_noref const&) = default;
-        thread_id_noref& operator=(thread_id_noref const&) = default;
-
-        thread_id_noref(thread_id_noref&& rhs) noexcept
-          : thrd_(rhs.thrd_)
-        {
-            rhs.thrd_ = nullptr;
-        }
-        thread_id_noref& operator=(thread_id_noref&& rhs) noexcept
-        {
-            thrd_ = rhs.thrd_;
-            rhs.thrd_ = nullptr;
-            return *this;
-        }
-
-        explicit thread_id_noref(thread_id_repr const& thrd) noexcept
-          : thrd_(thrd)
-        {
-        }
-        thread_id_noref& operator=(thread_id_repr const& rhs) noexcept
-        {
-            thrd_ = rhs;
-            return *this;
-        }
-
-        explicit operator bool() const noexcept
-        {
-            return nullptr != thrd_;
-        }
-
-        thread_id_repr get() const noexcept
-        {
-            return thrd_;
-        }
-
-        void reset() noexcept
-        {
-            thrd_ = nullptr;
-        }
-
-        friend bool operator==(
-            std::nullptr_t, thread_id_noref const& rhs) noexcept
-        {
-            return nullptr == rhs.thrd_;
-        }
-
-        friend bool operator!=(
-            std::nullptr_t, thread_id_noref const& rhs) noexcept
-        {
-            return nullptr != rhs.thrd_;
-        }
-
-        friend bool operator==(
-            thread_id_noref const& lhs, std::nullptr_t) noexcept
-        {
-            return nullptr == lhs.thrd_;
-        }
-
-        friend bool operator!=(
-            thread_id_noref const& lhs, std::nullptr_t) noexcept
-        {
-            return nullptr != lhs.thrd_;
-        }
-
-        friend bool operator==(
-            thread_id_noref const& lhs, thread_id_noref const& rhs) noexcept
-        {
-            return lhs.thrd_ == rhs.thrd_;
-        }
-
-        friend bool operator!=(
-            thread_id_noref const& lhs, thread_id_noref const& rhs) noexcept
-        {
-            return lhs.thrd_ != rhs.thrd_;
-        }
-
-        friend bool operator<(
-            thread_id_noref const& lhs, thread_id_noref const& rhs) noexcept
-        {
-            return std::less<thread_id_repr>{}(lhs.thrd_, rhs.thrd_);
-        }
-
-        friend bool operator>(
-            thread_id_noref const& lhs, thread_id_noref const& rhs) noexcept
-        {
-            return std::less<thread_id_repr>{}(rhs.thrd_, lhs.thrd_);
-        }
-
-        friend bool operator<=(
-            thread_id_noref const& lhs, thread_id_noref const& rhs) noexcept
-        {
-            return !(rhs > lhs);
-        }
-
-        friend bool operator>=(
-            thread_id_noref const& lhs, thread_id_noref const& rhs) noexcept
-        {
-            return !(rhs < lhs);
-        }
-
-        template <typename Char, typename Traits>
-        friend std::basic_ostream<Char, Traits>& operator<<(
-            std::basic_ostream<Char, Traits>& os, thread_id_noref const& id)
-        {
-            os << id.get();
-            return os;
-        }
-
-        friend void format_value(
-            std::ostream& os, boost::string_ref spec, thread_id_noref const& id)
-        {
-            // propagate spec
-            char format[16];
-            std::snprintf(
-                format, 16, "{:%.*s}", (int) spec.size(), spec.data());
-            hpx::util::format_to(os, format, id.get());
-        }
-
-    private:
-        thread_id_repr thrd_ = nullptr;
-    };
 }}    // namespace hpx::threads
 
 namespace std {
@@ -361,8 +386,8 @@ namespace std {
     template <>
     struct hash<::hpx::threads::thread_id>
     {
-        std::size_t operator()(::hpx::threads::thread_id const& v) const
-            noexcept
+        std::size_t operator()(
+            ::hpx::threads::thread_id const& v) const noexcept
         {
             std::hash<std::size_t> hasher_;
             return hasher_(reinterpret_cast<std::size_t>(v.get().get()));

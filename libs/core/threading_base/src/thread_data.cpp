@@ -299,13 +299,13 @@ namespace hpx { namespace threads {
         return p;
     }
 
-    thread_id_type const& get_self_id()
+    thread_id_noref get_self_id()
     {
         thread_self* self = get_self_ptr();
         if (HPX_LIKELY(nullptr != self))
             return self->get_thread_id();
 
-        return threads::invalid_thread_id;
+        return thread_id_noref();
     }
 
     thread_data* get_self_id_data()
