@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config/endian.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
@@ -62,11 +63,22 @@ namespace hpx {
                     ar.endian_little() :
                     ar.endian_big();
 
+#if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
                 if (ar.disable_array_optimization() ||
                     archive_endianess_differs)
+                {
                     load_pair_impl(ar, t, std::false_type());
+                }
                 else
+                {
                     load_binary(ar, &t, sizeof(std::pair<Key, Value>));
+                }
+#else
+                (void) archive_endianess_differs;
+                HPX_ASSERT(!(ar.disable_array_optimization() ||
+                    archive_endianess_differs));
+                load_binary(ar, &t, sizeof(std::pair<Key, Value>));
+#endif
             }
 
             template <typename Key, typename Value>
@@ -85,11 +97,22 @@ namespace hpx {
                     ar.endian_little() :
                     ar.endian_big();
 
+#if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
                 if (ar.disable_array_optimization() ||
                     archive_endianess_differs)
+                {
                     save_pair_impl(ar, t, std::false_type());
+                }
                 else
+                {
                     save_binary(ar, &t, sizeof(std::pair<Key, Value>));
+                }
+#else
+                (void) archive_endianess_differs;
+                HPX_ASSERT(!(ar.disable_array_optimization() ||
+                    archive_endianess_differs));
+                save_binary(ar, &t, sizeof(std::pair<Key, Value>));
+#endif
             }
 
         }    // namespace detail
