@@ -17,6 +17,7 @@
 #include <hpx/numeric.hpp>
 #include <hpx/optional.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/serialization.hpp>
 #include <hpx/task_block.hpp>
 #include <hpx/tuple.hpp>
 #include <hpx/type_traits.hpp>

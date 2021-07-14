@@ -39,6 +39,7 @@ endif()
 # Default location is $HPX_ROOT/libs/serialization/include
 set(serialization_headers
     hpx/serialization.hpp
+    hpx/serialization/detail/constructor_selector.hpp
     hpx/serialization/detail/extra_archive_data.hpp
     hpx/serialization/detail/non_default_constructible.hpp
     hpx/serialization/detail/pointer.hpp
