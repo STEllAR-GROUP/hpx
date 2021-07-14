@@ -45,17 +45,13 @@ namespace hpx { namespace util { namespace detail {
 
         void lock() noexcept
         {
-            // Optimistically assume the lock is free on the first try
-            if (try_lock())
-                return;
-
             // Wait for lock to be released without generating cache misses
             // Similar implementation to hpx::lcos::local::spinlock
             unsigned k = 0;
-            do
+            while (!try_lock())
             {
                 yield_k(k++);
-            } while (!try_lock());
+            }
         }
 
         HPX_FORCEINLINE void unlock() noexcept
