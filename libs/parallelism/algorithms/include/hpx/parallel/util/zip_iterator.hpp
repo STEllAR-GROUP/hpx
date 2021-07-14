@@ -13,6 +13,7 @@
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/parallel/util/tagged_pair.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <utility>
 
@@ -114,6 +115,44 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         return lcos::make_future<result_type>(
             std::move(zipiter), [](ZipIter&& zipiter) {
                 return get_iter_tagged_pair<Tag1, Tag2>(std::move(zipiter));
+            });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ZipIter>
+    util::in_in_result<typename hpx::tuple_element<0,
+                           typename ZipIter::iterator_tuple_type>::type,
+        typename hpx::tuple_element<1,
+            typename ZipIter::iterator_tuple_type>::type>
+    get_iter_in_in_result(ZipIter&& zipiter)
+    {
+        using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
+
+        using result_type = util::in_in_result<
+            typename hpx::tuple_element<0, iterator_tuple_type>::type,
+            typename hpx::tuple_element<1, iterator_tuple_type>::type>;
+
+        iterator_tuple_type t = zipiter.get_iterator_tuple();
+        return result_type{hpx::get<0>(t), hpx::get<1>(t)};
+    }
+
+    template <typename ZipIter>
+    hpx::future<
+        util::in_in_result<typename hpx::tuple_element<0,
+                               typename ZipIter::iterator_tuple_type>::type,
+            typename hpx::tuple_element<1,
+                typename ZipIter::iterator_tuple_type>::type>>
+    get_iter_in_in_result(hpx::future<ZipIter>&& zipiter)
+    {
+        using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
+
+        using result_type = util::in_in_result<
+            typename hpx::tuple_element<0, iterator_tuple_type>::type,
+            typename hpx::tuple_element<1, iterator_tuple_type>::type>;
+
+        return lcos::make_future<result_type>(
+            std::move(zipiter), [](ZipIter zipiter) {
+                return get_iter_in_in_result(std::move(zipiter));
             });
     }
 }}}}    // namespace hpx::parallel::v1::detail
