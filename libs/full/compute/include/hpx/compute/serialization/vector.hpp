@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/endian.hpp>
+#include <hpx/assert.hpp>
 
 #if !defined(__CUDA_ARCH__)
 #include <hpx/serialization/serialize.hpp>
@@ -31,9 +32,9 @@ namespace hpx { namespace serialization {
             std::false_type)
         {
             // normal load ...
-            typedef
-                typename compute::vector<T, Allocator>::value_type value_type;
-            typedef typename compute::vector<T, Allocator>::size_type size_type;
+            using value_type =
+                typename compute::vector<T, Allocator>::value_type;
+            using size_type = typename compute::vector<T, Allocator>::size_type;
 
             size_type size;
             value_type v;
@@ -58,26 +59,31 @@ namespace hpx { namespace serialization {
                 ar.endian_little() :
                 ar.endian_big();
 
+#if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
             if (ar.disable_array_optimization() || archive_endianess_differs)
             {
                 load_impl(ar, v, std::false_type());
+                return;
             }
-            else
+#else
+            (void) archive_endianess_differs;
+            HPX_ASSERT(!(
+                ar.disable_array_optimization() || archive_endianess_differs));
+#endif
+            // bitwise load ...
+            using value_type =
+                typename compute::vector<T, Allocator>::value_type;
+            using size_type = typename compute::vector<T, Allocator>::size_type;
+
+            size_type size;
+            ar >> size;    //-V128
+            if (size == 0)
             {
-                // bitwise load ...
-                typedef typename compute::vector<T, Allocator>::value_type
-                    value_type;
-                typedef
-                    typename compute::vector<T, Allocator>::size_type size_type;
-
-                size_type size;
-                ar >> size;    //-V128
-                if (size == 0)
-                    return;
-
-                v.resize(size);
-                load_binary(ar, v.device_data(), v.size() * sizeof(value_type));
+                return;
             }
+
+            v.resize(size);
+            load_binary(ar, v.device_data(), v.size() * sizeof(value_type));
         }
     }    // namespace detail
 
@@ -85,11 +91,13 @@ namespace hpx { namespace serialization {
     void serialize(
         input_archive& ar, compute::vector<T, Allocator>& v, unsigned)
     {
-        using element_type = typename std::remove_const<
-            typename compute::vector<T, Allocator>::value_type>::type;
+        using element_type = std::remove_const_t<
+            typename compute::vector<T, Allocator>::value_type>;
+
         using use_optimized = std::integral_constant<bool,
-            hpx::traits::is_bitwise_serializable_v<element_type> ||
-                !hpx::traits::is_not_bitwise_serializable_v<element_type>>;
+            std::is_default_constructible_v<element_type> &&
+                (hpx::traits::is_bitwise_serializable_v<element_type> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<element_type>)>;
 
         v.clear();
         detail::load_impl(ar, v, use_optimized());
@@ -116,17 +124,21 @@ namespace hpx { namespace serialization {
                 ar.endian_little() :
                 ar.endian_big();
 
+#if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
             if (ar.disable_array_optimization() || archive_endianess_differs)
             {
                 save_impl(ar, v, std::false_type());
+                return;
             }
-            else
-            {
-                // bitwise save ...
-                typedef typename compute::vector<T, Allocator>::value_type
-                    value_type;
-                save_binary(ar, v.device_data(), v.size() * sizeof(value_type));
-            }
+#else
+            (void) archive_endianess_differs;
+            HPX_ASSERT(!(
+                ar.disable_array_optimization() || archive_endianess_differs));
+#endif
+            // bitwise save ...
+            using value_type =
+                typename compute::vector<T, Allocator>::value_type;
+            save_binary(ar, v.device_data(), v.size() * sizeof(value_type));
         }
     }    // namespace detail
 
@@ -136,13 +148,17 @@ namespace hpx { namespace serialization {
     {
         using element_type = typename std::remove_const<
             typename compute::vector<T, Allocator>::value_type>::type;
+
         using use_optimized = std::integral_constant<bool,
-            hpx::traits::is_bitwise_serializable_v<element_type> ||
-                !hpx::traits::is_not_bitwise_serializable_v<element_type>>;
+            std::is_default_constructible_v<element_type> &&
+                (hpx::traits::is_bitwise_serializable_v<element_type> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<element_type>)>;
 
         ar << v.size();    //-V128
         if (v.empty())
+        {
             return;
+        }
 
         detail::save_impl(ar, v, use_optimized());
     }

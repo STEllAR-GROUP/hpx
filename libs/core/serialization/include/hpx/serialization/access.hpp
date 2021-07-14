@@ -47,9 +47,9 @@ namespace hpx { namespace serialization {
         static std::false_type test(...);
 
         template <typename T1,
-            typename = decltype(serialize(
-                std::declval<hpx::serialization::output_archive&>(),
-                std::declval<typename std::remove_const<T1>::type&>(), 0u))>
+            typename = decltype(
+                serialize(std::declval<hpx::serialization::output_archive&>(),
+                    std::declval<typename std::remove_const<T1>::type&>(), 0u))>
         static std::true_type test(int);
 
     public:
@@ -155,13 +155,11 @@ namespace hpx { namespace serialization {
             // to implement if there hadn't been an issue with gcc:
             // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82478
             template <typename T1,
-                typename =
-                    decltype(std::declval<
-                             typename std::remove_const<T1>::type&>()
-                                 .serialize(
-                                     std::declval<
-                                         hpx::serialization::output_archive&>(),
-                                     0u))>
+                typename = decltype(
+                    std::declval<typename std::remove_const<T1>::type&>()
+                        .serialize(
+                            std::declval<hpx::serialization::output_archive&>(),
+                            0u))>
             static std::true_type test(int);
 
         public:
