@@ -28,7 +28,28 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // swap ranges
     namespace detail {
-        /// \cond NOINTERNAL
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename Size>
+        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        parallel_swap_ranges(
+            ExPolicy&& policy, FwdIter1 first1, FwdIter2 first2, Size n)
+        {
+            using zip_iterator = hpx::util::zip_iterator<FwdIter1, FwdIter2>;
+            using reference = typename zip_iterator::reference;
+            using result_type =
+                typename util::detail::algorithm_result<ExPolicy,
+                    FwdIter2>::type;
+
+            return get_iter<1, result_type>(for_each_n<zip_iterator>().call(
+                std::forward<ExPolicy>(policy),
+                hpx::util::make_zip_iterator(first1, first2), n,
+                [](reference t) -> void {
+                    using hpx::get;
+                    std::swap(get<0>(t), get<1>(t));
+                },
+                util::projection_identity()));
+        }
+
         template <typename FwdIter2>
         struct swap_ranges
           : public detail::algorithm<swap_ranges<FwdIter2>, FwdIter2>
@@ -51,27 +72,42 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return first2;
             }
 
+            template <typename ExPolicy, typename FwdIter1, typename Sent1,
+                typename Sent2>
+            static FwdIter2 sequential(ExPolicy, FwdIter1 first1, Sent1 last1,
+                FwdIter2 first2, Sent2 last2)
+            {
+                while (first1 != last1 && first2 != last2)
+                {
+                    std::swap(*first1, *first2);
+                    first1++;
+                    first2++;
+                }
+                return first2;
+            }
+
             template <typename ExPolicy, typename FwdIter1, typename Sent>
             static typename util::detail::algorithm_result<ExPolicy,
                 FwdIter2>::type
             parallel(
                 ExPolicy&& policy, FwdIter1 first1, Sent last1, FwdIter2 first2)
             {
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
-                typedef typename zip_iterator::reference reference;
-                typedef typename util::detail::algorithm_result<ExPolicy,
-                    FwdIter2>::type result_type;
+                return parallel_swap_ranges(std::forward<ExPolicy>(policy),
+                    first1, first2, detail::distance(first1, last1));
+            }
 
-                return get_iter<1, result_type>(for_each_n<zip_iterator>().call(
-                    std::forward<ExPolicy>(policy),
-                    hpx::util::make_zip_iterator(first1, first2),
-                    detail::distance(first1, last1),
-                    [](reference t) -> void {
-                        using hpx::get;
-                        std::swap(get<0>(t), get<1>(t));
-                    },
-                    util::projection_identity()));
+            template <typename ExPolicy, typename FwdIter1, typename Sent1,
+                typename Sent2>
+            static typename util::detail::algorithm_result<ExPolicy,
+                FwdIter2>::type
+            parallel(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
+                FwdIter2 first2, Sent2 last2)
+            {
+                auto dist1 = detail::distance(first1, last1);
+                auto dist2 = detail::distance(first2, last2);
+                return parallel_swap_ranges(std::forward<ExPolicy>(policy),
+                    first1, first2,
+                    dist1 < dist2 ? dist1 : dist2);
             }
         };
         /// \endcond
