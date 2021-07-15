@@ -165,7 +165,7 @@ namespace hpx { namespace threads {
 
         struct thread_data_reference_counting
         {
-            // the initial reference count is one as each newely created thread
+            // the initial reference count is one as each newly created thread
             // will be held alive by the variable returned from the creation
             // function
             thread_data_reference_counting()
@@ -245,25 +245,25 @@ namespace hpx { namespace threads {
         }
 
         thread_id(thread_id_noref const& noref)
-          : thrd_(reinterpret_cast<thread_repr*>(noref.get()))
+          : thrd_(static_cast<thread_repr*>(noref.get()))
         {
         }
 
         thread_id(thread_id_noref&& noref) noexcept
-          : thrd_(reinterpret_cast<thread_repr*>(noref.get()))
+          : thrd_(static_cast<thread_repr*>(noref.get()))
         {
             noref.reset();
         }
 
         thread_id& operator=(thread_id_noref const& noref)
         {
-            thrd_.reset(reinterpret_cast<thread_repr*>(noref.get()));
+            thrd_.reset(static_cast<thread_repr*>(noref.get()));
             return *this;
         }
 
         thread_id& operator=(thread_id_noref&& noref) noexcept
         {
-            thrd_.reset(reinterpret_cast<thread_repr*>(noref.get()));
+            thrd_.reset(static_cast<thread_repr*>(noref.get()));
             noref.reset();
             return *this;
         }
@@ -382,6 +382,17 @@ namespace hpx { namespace threads {
 }}    // namespace hpx::threads
 
 namespace std {
+
+    template <>
+    struct hash<::hpx::threads::thread_id_noref>
+    {
+        std::size_t operator()(
+            ::hpx::threads::thread_id_noref const& v) const noexcept
+        {
+            std::hash<std::size_t> hasher_;
+            return hasher_(reinterpret_cast<std::size_t>(v.get()));
+        }
+    };
 
     template <>
     struct hash<::hpx::threads::thread_id>

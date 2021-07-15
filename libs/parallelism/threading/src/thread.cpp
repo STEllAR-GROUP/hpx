@@ -153,7 +153,7 @@ namespace hpx {
 
     thread::id thread::get_id() const noexcept
     {
-        return id(native_handle());
+        return id(threads::thread_id_noref_type(native_handle().get().get()));
     }
 
     unsigned int thread::hardware_concurrency() noexcept

@@ -160,7 +160,7 @@ namespace hpx {
     class thread::id
     {
     private:
-        threads::thread_id_type id_;
+        threads::thread_id_noref_type id_;
 
         friend bool operator==(
             thread::id const& x, thread::id const& y) noexcept;
@@ -182,20 +182,27 @@ namespace hpx {
         friend class thread;
 
     public:
-        id() noexcept
-          : id_(threads::invalid_thread_id)
-        {
-        }
-        explicit id(threads::thread_id_type const& i) noexcept
+        id() noexcept = default;
+
+        explicit id(threads::thread_id_noref_type const& i) noexcept
           : id_(i)
         {
         }
-        explicit id(threads::thread_id_type&& i) noexcept
+        explicit id(threads::thread_id_noref_type&& i) noexcept
           : id_(std::move(i))
         {
         }
 
-        threads::thread_id_type const& native_handle() const
+        explicit id(threads::thread_id_type const& i) noexcept
+          : id_(i.get().get())
+        {
+        }
+        explicit id(threads::thread_id_type&& i) noexcept
+          : id_(std::move(i).get().get())
+        {
+        }
+
+        threads::thread_id_noref_type const& native_handle() const
         {
             return id_;
         }
