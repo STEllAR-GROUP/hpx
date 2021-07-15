@@ -206,9 +206,8 @@ def _histogram_plot(title, before, after, output):
 def _add_comparison_plots(report, before_outs, after_outs, cis):
     with report.image_grid('Details') as grid:
         for k, ci in cis.items():
-            if ci.significant():
-                title = (str(k) + ': ' + str(ci))
-                _histogram_plot(title, before_outs[k], after_outs[k],
+            title = (str(k) + ': ' + str(ci))
+            _histogram_plot(title, before_outs[k], after_outs[k],
                                 grid.image())
 
 
