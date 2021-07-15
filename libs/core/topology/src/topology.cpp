@@ -951,7 +951,7 @@ namespace hpx { namespace threads {
                 break;
 
             case HWLOC_OBJ_NODE:
-                print_info(os, obj, "Node ", comma);
+                print_info(os, obj, "NUMANode ", comma);
                 break;
 
             default:
