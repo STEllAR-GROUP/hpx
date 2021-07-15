@@ -55,12 +55,12 @@ void test_swap_ranges_sent(IteratorTag)
             }
             else
             {
-                HPX_TEST_EQ(v, 200);
+                HPX_TEST_EQ(v, static_cast<std::size_t>(200));
             }
         });
 
     std::for_each(
-        std::begin(c), std::end(c), [&count, len, begin_num](std::size_t v) {
+        std::begin(c), std::end(c), [&count, begin_num](std::size_t v) {
             if (count >= 1)
             {
                 HPX_TEST_EQ(v, count + begin_num - 1);
@@ -68,7 +68,7 @@ void test_swap_ranges_sent(IteratorTag)
             }
             else
             {
-                HPX_TEST_EQ(v, 100);
+                HPX_TEST_EQ(v, static_cast<std::size_t>(100));
             }
         });
 }
@@ -105,12 +105,12 @@ void test_swap_ranges_sent(ExPolicy policy, IteratorTag)
             }
             else
             {
-                HPX_TEST_EQ(v, 200);
+                HPX_TEST_EQ(v, static_cast<std::size_t>(200));
             }
         });
 
     std::for_each(
-        std::begin(c), std::end(c), [&count, len, begin_num](std::size_t v) {
+        std::begin(c), std::end(c), [&count, begin_num](std::size_t v) {
             if (count >= 1)
             {
                 HPX_TEST_EQ(v, count + begin_num - 1);
@@ -118,7 +118,7 @@ void test_swap_ranges_sent(ExPolicy policy, IteratorTag)
             }
             else
             {
-                HPX_TEST_EQ(v, 100);
+                HPX_TEST_EQ(v, static_cast<std::size_t>(100));
             }
         });
 }
@@ -137,7 +137,6 @@ void test_swap_ranges(IteratorTag)
 
     hpx::ranges::swap_ranges(c, d);
 
-    std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), e.rbegin()));
     HPX_TEST(std::equal(std::begin(d), std::end(d), e.begin()));
 }
@@ -159,7 +158,6 @@ void test_swap_ranges(ExPolicy policy, IteratorTag)
 
     hpx::ranges::swap_ranges(policy, c, d);
 
-    std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), e.rbegin()));
     HPX_TEST(std::equal(std::begin(d), std::end(d), e.begin()));
 }
@@ -182,7 +180,6 @@ void test_swap_ranges_async(ExPolicy policy, IteratorTag)
     auto fut = hpx::ranges::swap_ranges(policy, c, d);
     fut.wait();
 
-    std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), e.rbegin()));
     HPX_TEST(std::equal(std::begin(d), std::end(d), e.begin()));
 }
