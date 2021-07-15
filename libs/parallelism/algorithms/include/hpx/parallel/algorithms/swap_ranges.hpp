@@ -6,6 +6,103 @@
 
 /// \file parallel/algorithms/swap_ranges.hpp
 
+#if defined(DOXYGEN)
+
+namespace hpx {
+    // clang-format off
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Exchanges elements between range [first1, last1) and another range
+    /// starting at \a first2.
+    ///
+    /// \note   Complexity: Linear in the distance between \a first1 and \a
+    ///  last1
+    ///
+    /// \tparam FwdIter1    The type of the first range of iterators to swap
+    ///                     (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the second range of iterators to swap
+    ///                     (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param first1       Refers to the beginning of the first sequence of
+    ///                     elements the algorithm will be applied to.
+    /// \param last1        Refers to the end of the first sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the second  sequence of
+    ///                     elements the algorithm will be applied to.
+    ///
+    /// The swap operations in the parallel \a swap_ranges algorithm
+    /// invoked without an execution policy object  execute in sequential
+    /// order in the calling thread.
+    ///
+    /// \returns  The \a swap_ranges algorithm returns \a FwdIter2.
+    ///           The \a swap_ranges algorithm returns iterator to the element
+    ///           past the last element exchanged in the range beginning with
+    ///           \a first2.
+    ///
+    template <typename FwdIter1, typename FwdIter2>
+    FwdIter2 swap_ranges(FwdIter1 first1, FwdIter1 last1, FwdIter2 first2);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Exchanges elements between range [first1, last1) and another range
+    /// starting at \a first2.
+    ///
+    /// \note   Complexity: Linear in the distance between \a first1 and \a last1
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the swap operations.
+    /// \tparam FwdIter1    The type of the first range of iterators to swap
+    ///                     (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the second range of iterators to swap
+    ///                     (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first1       Refers to the beginning of the first sequence of
+    ///                     elements the algorithm will be applied to.
+    /// \param last1        Refers to the end of the first sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the second  sequence of
+    ///                     elements the algorithm will be applied to.
+    ///
+    /// The swap operations in the parallel \a swap_ranges algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequenced_policy execute in sequential order in
+    /// the calling thread.
+    ///
+    /// The swap operations in the parallel \a swap_ranges algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_policy or \a parallel_task_policy are
+    /// permitted to execute in an unordered fashion in unspecified
+    /// threads, and indeterminately sequenced within each thread.
+    ///
+    /// \returns  The \a swap_ranges algorithm returns a
+    ///           \a hpx::future<FwdIter2>  if the execution policy is of
+    ///           type \a parallel_task_policy and returns \a FwdIter2
+    ///           otherwise.
+    ///           The \a swap_ranges algorithm returns iterator to the element
+    ///           past the last element exchanged in the range beginning with
+    ///           \a first2.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    swap_ranges(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2);
+
+    // clang-format on
+}    // namespace hpx
+
+#else    // DOXYGEN
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -117,52 +214,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Exchanges elements between range [first1, last1) and another range
-    /// starting at \a first2.
-    ///
-    /// \note   Complexity: Linear in the distance between \a first1 and \a last1
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the swap operations.
-    /// \tparam FwdIter1    The type of the first range of iterators to swap
-    ///                     (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the second range of iterators to swap
-    ///                     (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first1       Refers to the beginning of the first sequence of
-    ///                     elements the algorithm will be applied to.
-    /// \param last1        Refers to the end of the first sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the second  sequence of
-    ///                     elements the algorithm will be applied to.
-    ///
-    /// The swap operations in the parallel \a swap_ranges algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in
-    /// the calling thread.
-    ///
-    /// The swap operations in the parallel \a swap_ranges algorithm
-    /// invoked with an execution policy object of type
-    /// \a parallel_policy or \a parallel_task_policy are
-    /// permitted to execute in an unordered fashion in unspecified
-    /// threads, and indeterminately sequenced within each thread.
-    ///
-    /// \returns  The \a swap_ranges algorithm returns a
-    ///           \a hpx::future<FwdIter2>  if the execution policy is of
-    ///           type \a parallel_task_policy and returns \a FwdIter2
-    ///           otherwise.
-    ///           The \a swap_ranges algorithm returns iterator to the element
-    ///           past the last element exchanged in the range beginning with
-    ///           \a first2.
-    ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::transform_exclusive_scan is deprecated, use "
@@ -237,3 +288,5 @@ namespace hpx {
         }
     } swap_ranges{};
 }    // namespace hpx
+
+#endif    // DOXYGEN
