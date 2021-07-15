@@ -17,9 +17,12 @@ VERSION_MAJOR=$(sed -n 's/set(HPX_VERSION_MAJOR \(.*\))/\1/p' CMakeLists.txt)
 VERSION_MINOR=$(sed -n 's/set(HPX_VERSION_MINOR \(.*\))/\1/p' CMakeLists.txt)
 VERSION_SUBMINOR=$(sed -n 's/set(HPX_VERSION_SUBMINOR \(.*\))/\1/p' CMakeLists.txt)
 VERSION_TAG=$(sed -n 's/set(HPX_VERSION_TAG "\(.*\)")/\1/p' CMakeLists.txt)
-VERSION_FULL_NOTAG=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_SUBMINOR
-VERSION_FULL_TAG=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_SUBMINOR$VERSION_TAG
-VERSION_DESCRIPTION="HPX V${VERSION_FULL_NOTAG}: The C++ Standards Library for Parallelism and Concurrency"
+VERSION_FULL_NOTAG=${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_SUBMINOR}
+VERSION_FULL_TAG=${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_SUBMINOR}${VERSION_TAG}
+VERSION_FULL_NOTAG_UNDERSCORE=${VERSION_MAJOR}_${VERSION_MINOR}_${VERSION_SUBMINOR}
+VERSION_TITLE="HPX V${VERSION_FULL_NOTAG}: The C++ Standards Library for Parallelism and Concurrency"
+VERSION_RELEASE_NOTES_URL="https://hpx-docs.stellar-group.org/tags/${VERSION_FULL_TAG}/html/releases/whats_new_${VERSION_FULL_NOTAG_UNDERSCORE}.html"
+VERSION_DESCRIPTION="[Release notes](${VERSION_RELEASE_NOTES_URL})"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 if ! which hub > /dev/null 2>&1; then
@@ -27,12 +30,12 @@ if ! which hub > /dev/null 2>&1; then
     exit 1
 fi
 
-if [ "$CURRENT_BRANCH" != "release" ]; then
+if [ "${CURRENT_BRANCH}" != "release" ]; then
     echo "Not on release branch. Not continuing to make release."
     exit 1
 fi
 
-if [ -z "$VERSION_TAG" ]; then
+if [ -z "${VERSION_TAG}" ]; then
     echo "You are about to tag and create a final release on GitHub."
 else
     echo "You are about to tag and create a pre-release on GitHub."
@@ -41,6 +44,8 @@ fi
 
 echo ""
 echo "The version is \"${VERSION_FULL_TAG}\"."
+echo "The version title is:"
+echo "\"${VERSION_TITLE}\"."
 echo "The version description is:"
 echo "\"${VERSION_DESCRIPTION}\"."
 echo ""
@@ -53,7 +58,7 @@ select yn in "Yes" "No"; do
     esac
 done
 
-if [ -z "$VERSION_TAG" ]; then
+if [ -z "${VERSION_TAG}" ]; then
     PRERELEASE_FLAG=""
 else
     PRERELEASE_FLAG="--prerelease"
@@ -67,14 +72,15 @@ git config user.name "STE||AR Group"
 
 echo ""
 echo "Tagging release."
-git tag --sign --annotate "${VERSION_FULL_TAG}" --message="${VERSION_DESCRIPTION}"
+git tag --sign --annotate "${VERSION_FULL_TAG}" --message="${VERSION_TITLE}"
 git push origin "${VERSION_FULL_TAG}"
 
 echo ""
 echo "Creating release."
 hub release create \
     ${PRERELEASE_FLAG} \
-    --message "${VERSION_DESCRIPTION}" \
+    --message "${VERSION_TITLE}" \
+    --message "${VERSION_DESCRIPTION}"
     "${VERSION_FULL_TAG}"
 
 # Unset the local config used for the release
