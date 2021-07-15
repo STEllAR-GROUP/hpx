@@ -44,16 +44,16 @@ namespace hpx { namespace execution { namespace experimental {
 
             static constexpr bool sends_done = false;
 
-            template <typename R>
+            template <typename Receiver>
             struct operation_state
             {
-                std::decay_t<R> r;
+                std::decay_t<Receiver> receiver;
                 hpx::util::member_pack_for<std::decay_t<Ts>...> ts;
 
-                template <typename R_>
-                operation_state(
-                    R_&& r, hpx::util::member_pack_for<std::decay_t<Ts>...> ts)
-                  : r(std::forward<R_>(r))
+                template <typename Receiver_>
+                operation_state(Receiver_&& receiver,
+                    hpx::util::member_pack_for<std::decay_t<Ts>...> ts)
+                  : receiver(std::forward<Receiver_>(receiver))
                   , ts(std::move(ts))
                 {
                 }
@@ -68,26 +68,28 @@ namespace hpx { namespace execution { namespace experimental {
                     hpx::detail::try_catch_exception_ptr(
                         [&]() {
                             hpx::execution::experimental::set_value(
-                                std::move(r),
+                                std::move(receiver),
                                 std::move(ts).template get<Is>()...);
                         },
                         [&](std::exception_ptr ep) {
                             hpx::execution::experimental::set_error(
-                                std::move(r), std::move(ep));
+                                std::move(receiver), std::move(ep));
                         });
                 }
             };
 
-            template <typename R>
-            auto connect(R&& r) &&
+            template <typename Receiver>
+            auto connect(Receiver&& receiver) &&
             {
-                return operation_state<R>{std::forward<R>(r), std::move(ts)};
+                return operation_state<Receiver>{
+                    std::forward<Receiver>(receiver), std::move(ts)};
             }
 
-            template <typename R>
-            auto connect(R&& r) &
+            template <typename Receiver>
+            auto connect(Receiver&& receiver) &
             {
-                return operation_state<R>{std::forward<R>(r), ts};
+                return operation_state<Receiver>{
+                    std::forward<Receiver>(receiver), ts};
             }
         };
     }    // namespace detail

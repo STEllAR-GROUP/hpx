@@ -86,47 +86,48 @@ namespace hpx { namespace execution { namespace experimental {
             }
         };
 
-        template <typename T, typename Allocator, typename OS>
+        template <typename T, typename Allocator, typename OperationState>
         struct future_data
           : hpx::lcos::detail::future_data_allocator<T, Allocator>
         {
             HPX_NON_COPYABLE(future_data);
 
-            using operation_state_type = std::decay_t<OS>;
+            using operation_state_type = std::decay_t<OperationState>;
             using init_no_addref =
                 typename hpx::lcos::detail::future_data_allocator<T,
                     Allocator>::init_no_addref;
             using other_allocator = typename std::allocator_traits<
                 Allocator>::template rebind_alloc<future_data>;
 
-            operation_state_type os;
+            operation_state_type op_state;
 
-            template <typename S>
-            future_data(
-                init_no_addref no_addref, other_allocator const& alloc, S&& s)
+            template <typename Sender>
+            future_data(init_no_addref no_addref, other_allocator const& alloc,
+                Sender&& sender)
               : hpx::lcos::detail::future_data_allocator<T, Allocator>(
                     no_addref, alloc)
-              , os(hpx::execution::experimental::connect(std::forward<S>(s),
+              , op_state(hpx::execution::experimental::connect(
+                    std::forward<Sender>(sender),
                     detail::make_future_receiver<T, Allocator>{this}))
             {
-                hpx::execution::experimental::start(os);
+                hpx::execution::experimental::start(op_state);
             }
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename S, typename Allocator>
-        auto make_future(S&& s, Allocator const& a)
+        template <typename Sender, typename Allocator>
+        auto make_future(Sender&& sender, Allocator const& allocator)
         {
             using allocator_type = Allocator;
 
             using value_types =
                 typename hpx::execution::experimental::sender_traits<
-                    std::decay_t<S>>::template value_types<hpx::util::pack,
+                    std::decay_t<Sender>>::template value_types<hpx::util::pack,
                     hpx::util::pack>;
             using result_type =
                 std::decay_t<detail::single_result_t<value_types>>;
             using operation_state_type = hpx::util::invoke_result_t<
-                hpx::execution::experimental::connect_t, S,
+                hpx::execution::experimental::connect_t, Sender,
                 detail::make_future_receiver<result_type, allocator_type>>;
 
             using shared_state = detail::future_data<result_type,
@@ -138,12 +139,12 @@ namespace hpx { namespace execution { namespace experimental {
             using unique_ptr = std::unique_ptr<shared_state,
                 util::allocator_deleter<other_allocator>>;
 
-            other_allocator alloc(a);
+            other_allocator alloc(allocator);
             unique_ptr p(allocator_traits::allocate(alloc, 1),
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
-            allocator_traits::construct(
-                alloc, p.get(), init_no_addref{}, alloc, std::forward<S>(s));
+            allocator_traits::construct(alloc, p.get(), init_no_addref{}, alloc,
+                std::forward<Sender>(sender));
 
             return hpx::traits::future_access<future<result_type>>::create(
                 p.release(), false);
@@ -156,17 +157,18 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         // clang-format off
-        template <typename S,
+        template <typename Sender,
             typename Allocator = hpx::util::internal_allocator<>,
             HPX_CONCEPT_REQUIRES_(
-                is_sender_v<S> &&
+                is_sender_v<Sender> &&
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
-            make_future_t, S&& s, Allocator const& a = Allocator{})
+            make_future_t, Sender&& sender,
+            Allocator const& allocator = Allocator{})
         {
-            return detail::make_future(std::forward<S>(s), a);
+            return detail::make_future(std::forward<Sender>(sender), allocator);
         }
 
         // clang-format off
@@ -176,9 +178,10 @@ namespace hpx { namespace execution { namespace experimental {
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
-            make_future_t, Allocator const& a = Allocator{})
+            make_future_t, Allocator const& allocator = Allocator{})
         {
-            return detail::partial_algorithm<make_future_t, Allocator>{a};
+            return detail::partial_algorithm<make_future_t, Allocator>{
+                allocator};
         }
     } make_future{};
 }}}    // namespace hpx::execution::experimental

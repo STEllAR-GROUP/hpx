@@ -29,10 +29,10 @@
 
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
-        template <typename PS, typename F>
+        template <typename PredecessorSender, typename F>
         struct let_value_sender
         {
-            typename std::decay_t<PS> ps;
+            typename std::decay_t<PredecessorSender> predecessor_sender;
             typename std::decay_t<F> f;
 
             // Type of the potential values returned from the predecessor sender
@@ -40,7 +40,8 @@ namespace hpx { namespace execution { namespace experimental {
                 template <typename...> class Variant>
             using predecessor_value_types =
                 typename hpx::execution::experimental::sender_traits<
-                    std::decay_t<PS>>::template value_types<Tuple, Variant>;
+                    std::decay_t<PredecessorSender>>::
+                    template value_types<Tuple, Variant>;
 
             template <typename Tuple>
             struct successor_sender_types_helper;
@@ -95,34 +96,35 @@ namespace hpx { namespace execution { namespace experimental {
 
             static constexpr bool sends_done = false;
 
-            template <typename R>
+            template <typename Receiver>
             struct operation_state
             {
                 struct let_value_predecessor_receiver
                 {
-                    std::decay_t<R> r;
+                    std::decay_t<Receiver> receiver;
                     std::decay_t<F> f;
-                    operation_state& os;
+                    operation_state& op_state;
 
-                    template <typename R_, typename F_>
+                    template <typename Receiver_, typename F_>
                     let_value_predecessor_receiver(
-                        R_&& r, F_&& f, operation_state& os)
-                      : r(std::forward<R_>(r))
+                        Receiver_&& receiver, F_&& f, operation_state& op_state)
+                      : receiver(std::forward<Receiver_>(receiver))
                       , f(std::forward<F_>(f))
-                      , os(os)
+                      , op_state(op_state)
                     {
                     }
 
-                    template <typename E>
-                        void set_error(E&& e) && noexcept
+                    template <typename Error>
+                        void set_error(Error&& error) && noexcept
                     {
                         hpx::execution::experimental::set_error(
-                            std::move(r), std::forward<E>(e));
+                            std::move(receiver), std::forward<Error>(error));
                     }
 
                     void set_done() && noexcept
                     {
-                        hpx::execution::experimental::set_done(std::move(r));
+                        hpx::execution::experimental::set_done(
+                            std::move(receiver));
                     };
 
                     struct start_visitor
@@ -132,20 +134,20 @@ namespace hpx { namespace execution { namespace experimental {
                             HPX_UNREACHABLE;
                         }
 
-                        template <typename OS_,
+                        template <typename OperationState_,
                             typename = std::enable_if_t<!std::is_same_v<
-                                std::decay_t<OS_>, hpx::monostate>>>
-                        void operator()(OS_& os) const
+                                std::decay_t<OperationState_>, hpx::monostate>>>
+                        void operator()(OperationState_& op_state) const
                         {
-                            hpx::execution::experimental::start(os);
+                            hpx::execution::experimental::start(op_state);
                         }
                     };
 
                     struct set_value_visitor
                     {
-                        std::decay_t<R> r;
+                        std::decay_t<Receiver> receiver;
                         std::decay_t<F> f;
-                        operation_state& os;
+                        operation_state& op_state;
 
                         HPX_NORETURN void operator()(hpx::monostate) const
                         {
@@ -160,31 +162,32 @@ namespace hpx { namespace execution { namespace experimental {
                             using operation_state_type =
                                 decltype(hpx::execution::experimental::connect(
                                     hpx::util::invoke_fused(std::move(f), t),
-                                    std::declval<R>()));
+                                    std::declval<Receiver>()));
 
 #if defined(HPX_HAVE_CXX17_COPY_ELISION)
                             // with_result_of is used to emplace the operation state
                             // returned from connect without any intermediate copy
                             // construction (the operation state is not required to be
                             // copyable nor movable).
-                            os.successor_os
+                            op_state.successor_op_state
                                 .template emplace<operation_state_type>(
                                     hpx::util::detail::with_result_of([&]() {
                                         return hpx::execution::experimental::
                                             connect(hpx::util::invoke_fused(
                                                         std::move(f), t),
-                                                std::move(r));
+                                                std::move(receiver));
                                     }));
 #else
                             // MSVC doesn't get copy elision quite right, the operation
                             // state must be constructed explicitly directly in place
-                            os.successor_os
+                            op_state.successor_op_state
                                 .template emplace_f<operation_state_type>(
                                     hpx::execution::experimental::connect,
                                     hpx::util::invoke_fused(std::move(f), t),
-                                    std::move(r));
+                                    std::move(receiver));
 #endif
-                            hpx::visit(start_visitor{}, os.successor_os);
+                            hpx::visit(
+                                start_visitor{}, op_state.successor_op_state);
                         }
                     };
 
@@ -193,24 +196,26 @@ namespace hpx { namespace execution { namespace experimental {
                     {
                         hpx::detail::try_catch_exception_ptr(
                             [&]() {
-                                os.predecessor_ts
+                                op_state.predecessor_ts
                                     .template emplace<hpx::tuple<Ts...>>(
                                         std::forward<Ts>(ts)...);
-                                hpx::visit(set_value_visitor{std::move(r),
-                                               std::move(f), os},
-                                    os.predecessor_ts);
+                                hpx::visit(
+                                    set_value_visitor{std::move(receiver),
+                                        std::move(f), op_state},
+                                    op_state.predecessor_ts);
                             },
                             [&](std::exception_ptr ep) {
                                 hpx::execution::experimental::set_error(
-                                    std::move(r), std::move(ep));
+                                    std::move(receiver), std::move(ep));
                             });
                     }
                 };
 
                 // Type of the operation state returned when connecting the
                 // predecessor sender to the let_value_predecessor_receiver
-                using predecessor_operation_state_type = std::decay_t<
-                    connect_result_t<PS&&, let_value_predecessor_receiver>>;
+                using predecessor_operation_state_type =
+                    std::decay_t<connect_result_t<PredecessorSender&&,
+                        let_value_predecessor_receiver>>;
 
                 // Type of the potential operation states returned when
                 // connecting a sender in successor_sender_types to the receiver
@@ -218,7 +223,7 @@ namespace hpx { namespace execution { namespace experimental {
                 template <typename Sender>
                 struct successor_operation_state_types_helper
                 {
-                    using type = connect_result_t<Sender, R>;
+                    using type = connect_result_t<Sender, Receiver>;
                 };
                 template <template <typename...> class Tuple,
                     template <typename...> class Variant>
@@ -229,7 +234,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                 // Operation state from connecting predecessor sender to
                 // let_value_predecessor_receiver
-                predecessor_operation_state_type predecessor_os;
+                predecessor_operation_state_type predecessor_op_state;
 
                 // Potential values returned from the predecessor sender
                 hpx::util::detail::prepend_t<
@@ -243,14 +248,17 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::util::detail::prepend_t<
                     successor_operation_state_types<hpx::tuple, hpx::variant>,
                     hpx::monostate>
-                    successor_os;
+                    successor_op_state;
 
-                template <typename PS_, typename R_, typename F_>
-                operation_state(PS_&& ps, R_&& r, F_&& f)
-                  : predecessor_os{hpx::execution::experimental::connect(
-                        std::forward<PS_>(ps),
+                template <typename PredecessorSender_, typename Receiver_,
+                    typename F_>
+                operation_state(PredecessorSender_&& predecessor_sender,
+                    Receiver_&& receiver, F_&& f)
+                  : predecessor_op_state{hpx::execution::experimental::connect(
+                        std::forward<PredecessorSender_>(predecessor_sender),
                         let_value_predecessor_receiver(
-                            std::forward<R_>(r), std::forward<F_>(f), *this))}
+                            std::forward<Receiver_>(receiver),
+                            std::forward<F_>(f), *this))}
                 {
                 }
 
@@ -261,15 +269,15 @@ namespace hpx { namespace execution { namespace experimental {
 
                 void start() & noexcept
                 {
-                    hpx::execution::experimental::start(predecessor_os);
+                    hpx::execution::experimental::start(predecessor_op_state);
                 }
             };
 
-            template <typename R>
-            auto connect(R&& r) &&
+            template <typename Receiver>
+            auto connect(Receiver&& receiver) &&
             {
-                return operation_state<R>(
-                    std::move(ps), std::forward<R>(r), std::move(f));
+                return operation_state<Receiver>(std::move(predecessor_sender),
+                    std::forward<Receiver>(receiver), std::move(f));
             }
         };
     }    // namespace detail
@@ -279,16 +287,17 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         // clang-format off
-        template <typename PS, typename F,
+        template <typename PredecessorSender, typename F,
             HPX_CONCEPT_REQUIRES_(
-                is_sender_v<PS>
+                is_sender_v<PredecessorSender>
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
-            let_value_t, PS&& ps, F&& f)
+            let_value_t, PredecessorSender&& predecessor_sender, F&& f)
         {
-            return detail::let_value_sender<PS, F>{
-                std::forward<PS>(ps), std::forward<F>(f)};
+            return detail::let_value_sender<PredecessorSender, F>{
+                std::forward<PredecessorSender>(predecessor_sender),
+                std::forward<F>(f)};
         }
 
         template <typename F>

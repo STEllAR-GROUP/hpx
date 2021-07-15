@@ -38,34 +38,36 @@
 
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
-        template <typename R>
+        template <typename Receiver>
         struct error_visitor
         {
-            std::decay_t<R> r;
+            std::decay_t<Receiver> receiver;
 
-            template <typename E>
-            void operator()(E const& e)
+            template <typename Error>
+            void operator()(Error const& error)
             {
-                hpx::execution::experimental::set_error(std::move(r), e);
+                hpx::execution::experimental::set_error(
+                    std::move(receiver), error);
             }
         };
 
-        template <typename R>
+        template <typename Receiver>
         struct value_visitor
         {
-            std::decay_t<R> r;
+            std::decay_t<Receiver> receiver;
 
             template <typename Ts>
             void operator()(Ts const& ts)
             {
                 hpx::util::invoke_fused(
                     hpx::util::bind_front(
-                        hpx::execution::experimental::set_value, std::move(r)),
+                        hpx::execution::experimental::set_value,
+                        std::move(receiver)),
                     ts);
             }
         };
 
-        template <typename S, typename Allocator>
+        template <typename Sender, typename Allocator>
         struct ensure_started_sender
         {
             template <typename Tuple>
@@ -81,14 +83,14 @@ namespace hpx { namespace execution { namespace experimental {
                 template <typename...> class Variant>
             using value_types = hpx::util::detail::transform_t<
                 typename hpx::execution::experimental::sender_traits<
-                    S>::template value_types<Tuple, Variant>,
+                    Sender>::template value_types<Tuple, Variant>,
                 value_types_helper>;
 
             template <template <typename...> class Variant>
             using error_types =
                 hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
                     typename hpx::execution::experimental::sender_traits<
-                        S>::template error_types<Variant>,
+                        Sender>::template error_types<Variant>,
                     std::exception_ptr>>;
 
             static constexpr bool sends_done = false;
@@ -98,31 +100,31 @@ namespace hpx { namespace execution { namespace experimental {
             private:
                 struct ensure_started_receiver
                 {
-                    hpx::intrusive_ptr<shared_state> st;
+                    hpx::intrusive_ptr<shared_state> state;
 
-                    template <typename E>
-                        void set_error(E&& e) && noexcept
+                    template <typename Error>
+                        void set_error(Error&& error) && noexcept
                     {
-                        st->v.template emplace<error_type>(
-                            error_type(std::forward<E>(e)));
-                        st->set_predecessor_done();
-                        st.reset();
+                        state->v.template emplace<error_type>(
+                            error_type(std::forward<Error>(error)));
+                        state->set_predecessor_done();
+                        state.reset();
                     }
 
                     void set_done() && noexcept
                     {
-                        st->set_predecessor_done();
-                        st.reset();
+                        state->set_predecessor_done();
+                        state.reset();
                     };
 
                     template <typename... Ts>
                         void set_value(Ts&&... ts) && noexcept
                     {
-                        st->v.template emplace<value_type>(
+                        state->v.template emplace<value_type>(
                             hpx::make_tuple<>(std::forward<Ts>(ts)...));
 
-                        st->set_predecessor_done();
-                        st.reset();
+                        state->set_predecessor_done();
+                        state.reset();
                     }
                 };
 
@@ -135,8 +137,8 @@ namespace hpx { namespace execution { namespace experimental {
                 std::atomic<bool> start_called{false};
                 std::atomic<bool> predecessor_done{false};
 
-                using operation_state_type =
-                    std::decay_t<connect_result_t<S, ensure_started_receiver>>;
+                using operation_state_type = std::decay_t<
+                    connect_result_t<Sender, ensure_started_receiver>>;
                 operation_state_type os;
 
                 struct done_type
@@ -144,7 +146,7 @@ namespace hpx { namespace execution { namespace experimental {
                 };
                 using value_type =
                     typename hpx::execution::experimental::sender_traits<
-                        S>::template value_types<hpx::tuple, std::variant>;
+                        Sender>::template value_types<hpx::tuple, std::variant>;
                 using error_type =
                     hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
                         error_types<std::variant>, std::exception_ptr>>;
@@ -157,13 +159,14 @@ namespace hpx { namespace execution { namespace experimental {
                     continuations;
 
             public:
-                template <typename S_,
-                    typename = std::enable_if_t<
-                        !std::is_same<std::decay_t<S_>, shared_state>::value>>
-                shared_state(S_&& s, allocator_type const& alloc)
+                template <typename Sender_,
+                    typename = std::enable_if_t<!std::is_same<
+                        std::decay_t<Sender_>, shared_state>::value>>
+                shared_state(Sender_&& sender, allocator_type const& alloc)
                   : alloc(alloc)
                   , os(hpx::execution::experimental::connect(
-                        std::forward<S_>(s), ensure_started_receiver{this}))
+                        std::forward<Sender_>(sender),
+                        ensure_started_receiver{this}))
                 {
                 }
 
@@ -176,10 +179,10 @@ namespace hpx { namespace execution { namespace experimental {
                 }
 
             private:
-                template <typename R>
+                template <typename Receiver>
                 struct done_error_value_visitor
                 {
-                    std::decay_t<R> r;
+                    std::decay_t<Receiver> receiver;
 
                     HPX_NORETURN void operator()(std::monostate) const
                     {
@@ -188,17 +191,24 @@ namespace hpx { namespace execution { namespace experimental {
 
                     void operator()(done_type)
                     {
-                        hpx::execution::experimental::set_done(std::move(r));
+                        hpx::execution::experimental::set_done(
+                            std::move(receiver));
                     }
 
-                    void operator()(error_type const& e)
+                    void operator()(error_type const& error)
                     {
-                        std::visit(error_visitor<R>{std::forward<R>(r)}, e);
+                        std::visit(
+                            error_visitor<Receiver>{
+                                std::forward<Receiver>(receiver)},
+                            error);
                     }
 
                     void operator()(value_type const& ts)
                     {
-                        std::visit(value_visitor<R>{std::forward<R>(r)}, ts);
+                        std::visit(
+                            value_visitor<Receiver>{
+                                std::forward<Receiver>(receiver)},
+                            ts);
                     }
                 };
 
@@ -254,11 +264,11 @@ namespace hpx { namespace execution { namespace experimental {
                 }
 
             public:
-                template <typename R>
-                void add_continuation(R& r) = delete;
+                template <typename Receiver>
+                void add_continuation(Receiver& receiver) = delete;
 
-                template <typename R>
-                void add_continuation(R&& r)
+                template <typename Receiver>
+                void add_continuation(Receiver&& receiver)
                 {
                     if (predecessor_done)
                     {
@@ -267,7 +277,9 @@ namespace hpx { namespace execution { namespace experimental {
                         // values/errors have been stored into the shared state.
                         // We can trigger the continuation directly.
                         std::visit(
-                            done_error_value_visitor<R>{std::move(r)}, v);
+                            done_error_value_visitor<Receiver>{
+                                std::forward<Receiver>(receiver)},
+                            v);
                     }
                     else
                     {
@@ -284,7 +296,9 @@ namespace hpx { namespace execution { namespace experimental {
                             // directly again.
                             l.unlock();
                             std::visit(
-                                done_error_value_visitor<R>{std::move(r)}, v);
+                                done_error_value_visitor<Receiver>{
+                                    std::forward<Receiver>(receiver)},
+                                v);
                         }
                         else
                         {
@@ -295,12 +309,15 @@ namespace hpx { namespace execution { namespace experimental {
                             // to the vector and the vector is not threadsafe in
                             // itself. The continuation will be called later
                             // when set_error/set_done/set_value is called.
-                            continuations.emplace_back([this,
-                                                           r = std::move(r)]() {
-                                std::visit(
-                                    done_error_value_visitor<R>{std::move(r)},
-                                    v);
-                            });
+                            continuations.emplace_back(
+                                [this,
+                                    receiver =
+                                        std::forward<Receiver>(receiver)]() {
+                                    std::visit(
+                                        done_error_value_visitor<Receiver>{
+                                            std::move(receiver)},
+                                        v);
+                                });
                         }
                     }
                 }
@@ -331,10 +348,10 @@ namespace hpx { namespace execution { namespace experimental {
                 }
             };
 
-            hpx::intrusive_ptr<shared_state> st;
+            hpx::intrusive_ptr<shared_state> state;
 
-            template <typename S_>
-            ensure_started_sender(S_&& s, Allocator const& a)
+            template <typename Sender_>
+            ensure_started_sender(Sender_&& sender, Allocator const& allocator)
             {
                 using allocator_type = Allocator;
                 using other_allocator = typename std::allocator_traits<
@@ -343,23 +360,25 @@ namespace hpx { namespace execution { namespace experimental {
                 using unique_ptr = std::unique_ptr<shared_state,
                     util::allocator_deleter<other_allocator>>;
 
-                other_allocator alloc(a);
+                other_allocator alloc(allocator);
                 unique_ptr p(allocator_traits::allocate(alloc, 1),
                     hpx::util::allocator_deleter<other_allocator>{alloc});
 
-                new (p.get()) shared_state{std::forward<S_>(s), a};
-                st = p.release();
+                new (p.get())
+                    shared_state{std::forward<Sender_>(sender), allocator};
+                state = p.release();
 
                 // Eagerly start the work received until this point.
                 //
                 // P1897r3 says "When start is called on os2 [the operation
                 // state resulting from connecting the ensure_started_sender to
                 // a receiver], call execution::start(os [the operation state
-                // resulting from connecting S to ensure_started_receiver])",
-                // which would indicate that start should be called later.
-                // However, to fulfill the promise that ensure_started actually
-                // eagerly submits the sender S we call start already here.
-                st->start();
+                // resulting from connecting Sender to
+                // ensure_started_receiver])", which would indicate that start
+                // should be called later.  However, to fulfill the promise that
+                // ensure_started actually eagerly submits the sender Sender we
+                // call start already here.
+                state->start();
             }
 
             ensure_started_sender(ensure_started_sender const&) = default;
@@ -368,16 +387,17 @@ namespace hpx { namespace execution { namespace experimental {
             ensure_started_sender(ensure_started_sender&&) = default;
             ensure_started_sender& operator=(ensure_started_sender&&) = default;
 
-            template <typename R>
+            template <typename Receiver>
             struct operation_state
             {
-                std::decay_t<R> r;
-                hpx::intrusive_ptr<shared_state> st;
+                std::decay_t<Receiver> receiver;
+                hpx::intrusive_ptr<shared_state> state;
 
-                template <typename R_>
-                operation_state(R_&& r, hpx::intrusive_ptr<shared_state> st)
-                  : r(std::forward<R_>(r))
-                  , st(std::move(st))
+                template <typename Receiver_>
+                operation_state(Receiver_&& receiver,
+                    hpx::intrusive_ptr<shared_state> state)
+                  : receiver(std::forward<Receiver_>(receiver))
+                  , state(std::move(state))
                 {
                 }
 
@@ -388,20 +408,20 @@ namespace hpx { namespace execution { namespace experimental {
 
                 void start() & noexcept
                 {
-                    st->add_continuation(std::move(r));
+                    state->add_continuation(std::move(receiver));
                 }
             };
 
-            template <typename R>
-            operation_state<R> connect(R&& r) &&
+            template <typename Receiver>
+            operation_state<Receiver> connect(Receiver&& receiver) &&
             {
-                return {std::forward<R>(r), std::move(st)};
+                return {std::forward<Receiver>(receiver), std::move(state)};
             }
 
-            template <typename R>
-            operation_state<R> connect(R&& r) &
+            template <typename Receiver>
+            operation_state<Receiver> connect(Receiver&& receiver) &
             {
-                return {std::forward<R>(r), st};
+                return {std::forward<Receiver>(receiver), state};
             }
         };
     }    // namespace detail
@@ -411,26 +431,27 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         // clang-format off
-        template <typename S,
+        template <typename Sender,
             typename Allocator = hpx::util::internal_allocator<>,
             HPX_CONCEPT_REQUIRES_(
-                is_sender_v<S> &&
+                is_sender_v<Sender> &&
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
-            ensure_started_t, S&& s, Allocator const& a = {})
+            ensure_started_t, Sender&& sender, Allocator const& allocator = {})
         {
-            return detail::ensure_started_sender<S, Allocator>{
-                std::forward<S>(s), a};
+            return detail::ensure_started_sender<Sender, Allocator>{
+                std::forward<Sender>(sender), allocator};
         }
 
-        template <typename S, typename Allocator>
+        template <typename Sender, typename Allocator>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
-            ensure_started_t, detail::ensure_started_sender<S, Allocator> s,
+            ensure_started_t,
+            detail::ensure_started_sender<Sender, Allocator> sender,
             Allocator const& = {})
         {
-            return s;
+            return sender;
         }
 
         // clang-format off
@@ -440,9 +461,10 @@ namespace hpx { namespace execution { namespace experimental {
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
-            ensure_started_t, Allocator const& a = {})
+            ensure_started_t, Allocator const& allocator = {})
         {
-            return detail::partial_algorithm<ensure_started_t, Allocator>{a};
+            return detail::partial_algorithm<ensure_started_t, Allocator>{
+                allocator};
         }
     } ensure_started{};
 }}}    // namespace hpx::execution::experimental
