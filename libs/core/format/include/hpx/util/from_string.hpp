@@ -10,6 +10,7 @@
 #include <hpx/util/bad_lexical_cast.hpp>
 
 #include <algorithm>
+#include <cctype>
 #include <cstddef>
 #include <limits>
 #include <sstream>

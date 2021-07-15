@@ -198,7 +198,8 @@ namespace hpx { namespace util {
             return "<couldn't retrieve stack backtrace>";
 
         // make sure this thread is executed last
-        hpx::this_thread::yield_to(thread::id(std::move(tid)));
+        hpx::this_thread::yield_to(thread::id(
+            threads::thread_id_noref_type(threads::get_thread_id_data(tid))));
 
         return p.get_future().get(ec);
 #else
