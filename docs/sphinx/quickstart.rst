@@ -33,7 +33,7 @@ It is also recommended that you check out the latest stable tag:
 
 .. code-block:: sh
 
-    git checkout 1.7.0
+    git checkout 1.6.0
 
 |hpx| dependencies
 ==================
@@ -152,7 +152,7 @@ the distributed aspects of |hpx|.
 Installing and building |hpx| via vcpkg
 =======================================
 
-You can download and install |hpx| using the `vcpkg <https://github.com/Microsoft/vcpkg>` 
+You can download and install |hpx| using the `vcpkg <https://github.com/Microsoft/vcpkg>`
 dependency manager:
 
 .. code-block:: sh
@@ -163,8 +163,8 @@ dependency manager:
     ./vcpkg integrate install
     vcpkg install hpx
 
-The |hpx| port in vcpkg is kept up to date by Microsoft team members and community 
-contributors. If the version is out of date, please `create an issue or pull request 
+The |hpx| port in vcpkg is kept up to date by Microsoft team members and community
+contributors. If the version is out of date, please `create an issue or pull request
 <https://github.com/Microsoft/vcpkg>` on the vcpkg repository.
 
 Hello, World!
@@ -175,7 +175,7 @@ build an executable using |cmake| and |hpx|:
 
 .. code-block:: cmake
 
-   cmake_minimum_required(VERSION 3.17)
+   cmake_minimum_required(VERSION 3.13)
    project(my_hpx_project CXX)
    find_package(HPX REQUIRED)
    add_executable(my_hpx_program main.cpp)
@@ -330,6 +330,462 @@ tricky to get right (the continuation needs to take the future as an argument).
    If possible, try to use the provided parallel algorithms instead of
    writing your own implementation. This can save you time and the resulting
    program is often faster.
+
+Build specific instructions
+==========
+Platform specific notes
+-----------------------
+
+Some platforms require users to have special link and/or compiler flags specified to
+build |hpx|. This is handled via CMake's support for different toolchains (see
+`cmake-toolchains(7)
+<https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html>`_ for more
+information). This is also used for cross compilation.
+
+|hpx| ships with a set of toolchains that can be used for compilation of |hpx|
+itself and applications depending on |hpx|. Please see :ref:`cmake_toolchains`
+for more information.
+
+In order to enable full static linking with the libraries, the CMake variable
+:option:`HPX_WITH_STATIC_LINKING:BOOL` has to be set to ``On``.
+
+.. _debugging_core:
+
+Debugging applications using core files
+---------------------------------------
+
+For |hpx| to generate useful core files, |hpx| has to be compiled without signal
+and exception handlers
+:option:`HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS:BOOL`. If this option is
+not specified, the signal handlers change the application state. For example,
+after a segmentation fault the stack trace will show the signal handler.
+Similarly, unhandled exceptions are also caught by these handlers and the
+stack trace will not point to the location where the unhandled exception was
+thrown.
+
+In general, core files are a helpful tool to inspect the state of the
+application at the moment of the crash (post-mortem debugging), without the need
+of attaching a debugger beforehand. This approach to debugging is especially
+useful if the error cannot be reliably reproduced, as only a single crashed
+application run is required to gain potentially helpful information like a
+stacktrace.
+
+To debug with core files, the operating system first has to be told to actually
+write them. On most Unix systems this can be done by calling:
+
+.. code-block:: bash
+
+   ulimit -c unlimited
+
+in the shell. Now the debugger can be started up with:
+
+.. code-block:: bash
+
+   gdb <application> <core file name>
+
+The debugger should now display the last state of the application. The default
+file name for core files is ``core``.
+
+.. _build_recipes:
+
+Platform specific build recipes
+===============================
+
+.. note::
+
+   The following build recipes are mostly user-contributed and may be outdated.
+   We always welcome updated and new build recipes.
+
+.. _unix_installation:
+
+How to install |hpx| on Unix variants
+-------------------------------------
+
+* Create a build directory. |hpx| requires an out-of-tree build. This means you
+  will be unable to run CMake in the |hpx| source tree.
+
+  .. code-block:: bash
+
+     cd hpx
+     mkdir my_hpx_build
+     cd my_hpx_build
+
+* Invoke CMake from your build directory, pointing the CMake driver to the root
+  of your |hpx| source tree.
+
+  .. code-block:: bash
+
+     cmake -DBOOST_ROOT=/root/of/boost/installation \
+           -DHWLOC_ROOT=/root/of/hwloc/installation
+           [other CMake variable definitions] \
+           /path/to/source/tree
+
+  For instance:
+
+  .. code-block:: bash
+
+     cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_1.5.1
+
+* Invoke GNU make. If you are on a machine with multiple cores, add the -jN flag
+  to your make invocation, where N is the number of parallel processes |hpx|
+  gets compiled with.
+
+  .. code-block:: bash
+
+     gmake -j4
+
+  .. caution::
+
+     Compiling and linking |hpx| needs a considerable amount of memory. It is
+     advisable that at least 2 GB of memory per parallel process is available.
+
+  .. note::
+
+     Many Linux distributions use ``make`` as an alias for ``gmake``.
+
+* To complete the build and install |hpx|:
+
+  .. code-block:: bash
+
+     gmake install
+
+  .. important::
+
+     These commands will build and install the essential core components of
+     |hpx| only. In order to build and run the tests, please invoke:
+
+     .. code-block:: bash
+
+        gmake tests && gmake test
+
+     and in order to build (and install) all examples invoke:
+
+     .. code-block:: bash
+
+        cmake -DHPX_WITH_EXAMPLES=On .
+        gmake examples
+        gmake install
+
+For more detailed information about using |cmake|, please refer to its documentation
+and also the section :ref:`building_hpx`. Please pay special attention to the
+section about :option:`HPX_WITH_MALLOC:STRING` as this is crucial for getting
+decent performance.
+
+.. _macos_installation:
+
+How to install |hpx| on OS X (Mac)
+----------------------------------
+
+This section describes how to build |hpx| for OS X (Mac).
+
+Build (and install) a recent version of Boost, using Clang and libc++
+.....................................................................
+
+To build Boost with Clang and make it link to libc++ as standard library, you'll
+need to set up either of the following in your ``~/user-config.jam`` file:
+
+.. code-block:: text
+
+   # user-config.jam (put this file into your home directory)
+   # ...
+
+   using clang
+       :
+       : "/usr/bin/clang++"
+       : <cxxflags>"-std=c++11 -fcolor-diagnostics"
+         <linkflags>"-stdlib=libc++ -L/path/to/libcxx/lib"
+       ;
+
+(Again, remember to replace ``/path/to`` with whatever you used earlier.)
+
+Then, you can use one of the following for your build command:
+
+.. code-block:: bash
+
+   b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang install -j4
+
+or:
+
+.. code-block:: bash
+
+   b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang install -j4
+
+We verified this using Boost V1.53. If you use a different version, just
+remember to replace ``/usr/local/include/boost-1_53`` with whatever prefix
+you used in your installation.
+
+Build |hpx|, finally
+....................
+
+.. code-block:: bash
+
+   cd /path/to
+   git clone https://github.com/STEllAR-GROUP/hpx.git
+   mkdir build-hpx && cd build-hpx
+
+To build with Clang, execute:
+
+.. code-block:: bash
+
+   cmake ../hpx \
+       -DCMAKE_CXX_COMPILER=clang++ \
+       -DBOOST_ROOT=/path/to/boost \
+       -DHWLOC_ROOT=/path/to/hwloc \
+       -DHPX_WITH_GENERIC_CONTEXT_COROUTINES=On
+   make -j
+
+For more detailed information about using |cmake|, please refer its documentation
+and to the section :ref:`building_hpx`.
+
+Alternative installation method of |hpx| on OS X (Mac)
+......................................................
+
+Alternatively, you can install a recent version of gcc as well as all
+required libraries via MacPorts:
+
+#. Install |macports|
+
+#. Install CMake, gcc, hwloc:
+
+   .. code-block:: bash
+
+      sudo brew install cmake
+      sudo brew install boost
+      sudo brew install hwloc
+      sudo brew install make
+
+#. You may also want:
+
+   .. code-block:: bash
+
+      sudo brew install gperftools
+
+#. If you need to build Boost manually (the Boost package of MacPorts is built
+   with Clang, and unfortunately doesn't work with a GCC-build version of |hpx|):
+
+   .. code-block:: bash
+
+      wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.bz2
+      tar xjf boost_1_69_0.tar.bz2
+      pushd boost_1_69_0
+      export BOOST_ROOT=$HOME/boost_1_69_0
+      ./bootstrap.sh --prefix=$BOOST_DIR
+      ./b2 -j8
+      ./b2 -j8 install
+      export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$BOOST_ROOT/lib
+      popd
+
+#. Build |hpx|:
+
+   .. code-block:: bash
+
+      git clone https://github.com/STEllAR-GROUP/hpx.git
+      mkdir hpx-build
+      pushd hpx-build
+      export HPX_ROOT=$HOME/hpx
+      cmake -DCMAKE_CXX_COMPILER=g++ \
+          -DCMAKE_CXX_FLAGS="-Wno-unused-local-typedefs" \
+          -DBOOST_ROOT=$BOOST_ROOT \
+          -DHWLOC_ROOT=/opt/local \
+          -DCMAKE_INSTALL_PREFIX=$HOME/hpx \
+          -DHPX_WITH_GENERIC_CONTEXT_COROUTINES=On \
+               $(pwd)/../hpx
+      make -j8
+      make -j8 install
+      export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$HPX_ROOT/lib/hpx
+      popd
+
+#. Note that you need to set ``BOOST_ROOT``, ``HPX_ROOT`` and
+   ``DYLD_LIBRARY_PATH`` (for both ``BOOST_ROOT`` and ``HPX_ROOT``) every time
+   you configure, build, or run an |hpx| application.
+
+#. Note that you need to set ``HPX_WITH_GENERIC_CONTEXT_COROUTINES=On`` for
+   MacOS.
+
+#. If you want to use |hpx| with MPI, you need to enable the MPI parcelport, and
+   also specify the location of the MPI wrapper scripts. This can be done using
+   the following command:
+
+   .. code-block:: bash
+
+      cmake -DHPX_WITH_PARCELPORT_MPI=ON \
+           -DCMAKE_CXX_COMPILER=g++ \
+           -DMPI_CXX_COMPILER=openmpic++ \
+           -DCMAKE_CXX_FLAGS="-Wno-unused-local-typedefs" \
+           -DBOOST_ROOT=$BOOST_DIR \
+           -DHWLOC_ROOT=/opt/local \
+           -DCMAKE_INSTALL_PREFIX=$HOME/hpx
+               $(pwd)/../hpx
+
+.. _windows_installation:
+
+How to install |hpx| on Windows
+-------------------------------
+
+Installation of required prerequisites
+......................................
+
+* Download the Boost c++ libraries from |boost_downloads|_
+* Install the Boost library as explained in the section
+  :ref:`boost_installation`
+* Install the hwloc library as explained in the section
+  :ref:`hwloc_installation`
+* Download the latest version of |cmake| binaries, which are located under the
+  platform section of the downloads page at |cmake_download|_.
+* Download the latest version of |hpx| from the |stellar| website:
+  |stellar_hpx_download|_.
+
+Installation of the |hpx| library
+.................................
+
+* Create a build folder. |hpx| requires an out-of-tree-build. This means that
+  you will be unable to run CMake in the |hpx| source folder.
+* Open up the CMake GUI. In the input box labelled "Where is the source code:",
+  enter the full path to the source folder. The source directory is the one where
+  the sources were checked out. CMakeLists.txt files in the source directory as
+  well as the subdirectories describe the build to CMake. In addition to this,
+  there are CMake scripts (usually ending in .cmake) stored in a special CMake
+  directory. CMake does not alter any file in the source directory and doesn't
+  add new ones either. In the input box labelled "Where to build the binaries:",
+  enter the full path to the build folder you created before. The build
+  directory is one where all compiler outputs are stored, which includes object
+  files and final executables.
+* Add CMake variable definitions (if any) by clicking the "Add Entry" button.
+  There are two required variables you need to define: ``BOOST_ROOT`` and
+  ``HWLOC_ROOT`` These (``PATH``) variables need to be set to point to the root
+  folder of your Boost and hwloc installations. It is recommended to set
+  the variable ``CMAKE_INSTALL_PREFIX`` as well. This determines where the |hpx|
+  libraries will be built and installed. If this (``PATH``) variable is set, it
+  has to refer to the directory where the built |hpx| files should be installed
+  to.
+* Press the "Configure" button. A window will pop up asking you which compilers
+  to use. Select the Visual Studio 10 (64Bit) compiler (it usually is the
+  default if available). The Visual Studio 2012 (64Bit) and Visual Studio 2013
+  (64Bit) compilers are supported as well. Note that while it is possible to
+  build |hpx| for x86, we don't recommend doing so as 32 bit runs are severely
+  restricted by a 32 bit Windows system limitation affecting the number of |hpx|
+  threads you can create.
+* Press "Configure" again. Repeat this step until the "Generate" button becomes
+  clickable (and until no variable definitions are marked in red anymore).
+* Press "Generate".
+* Open up the build folder, and double-click hpx.sln.
+* Build the INSTALL target.
+
+For more detailed information about using |cmake|_ please refer its
+documentation and also the section :ref:`building_hpx`.
+
+.. _howto_win32:
+
+How to build |hpx| under Windows 10 x64 with Visual Studio 2015
+...............................................................
+
+* Download the CMake V3.18.1 installer (or latest version) from `here
+  <https://blog.kitware.com/cmake-3-18-1-available-for-download/>`__
+* Download the hwloc V1.11.0 (or the latest version) from `here
+  <http://www.open-mpi.org/software/hwloc/v1.11/downloads/hwloc-win64-build-1.11.0.zip>`__
+  and unpack it.
+* Download the latest Boost libraries from `here
+  <https://www.boost.org/users/download/>`__ and unpack them.
+* Build the Boost DLLs and LIBs by using these commands from Command Line (or
+  PowerShell). Open CMD/PowerShell inside the Boost dir and type in:
+
+  .. code-block:: bash
+
+     bootstrap.bat
+
+  This batch file will set up everything needed to create a successful build.
+  Now execute:
+
+  .. code-block:: bash
+
+     b2.exe link=shared variant=release,debug architecture=x86 address-model=64 threading=multi --build-type=complete install
+
+  This command will start a (very long) build of all available Boost libraries.
+  Please, be patient.
+
+* Open CMake-GUI.exe and set up your source directory (input field 'Where is the
+  source code') to the *base directory* of the source code you downloaded from
+  |hpx|'s GitHub pages. Here's an example of CMake path settings, which point to
+  the ``Documents/GitHub/hpx`` folder:
+
+  .. _win32_cmake_settings1:
+
+  .. figure:: ../_static/images/cmake_settings1.png
+
+     Example CMake path settings.
+
+  Inside 'Where is the source-code' enter the base directory of your |hpx|
+  source directory (do not enter the "src" sub-directory!). Inside 'Where to
+  build the binaries' you should put in the path where all the building processes
+  will happen. This is important because the building machinery will do an
+  "out-of-tree" build. CMake will not touch or change the original source files
+  in any way. Instead, it will generate Visual Studio Solution Files, which
+  will build |hpx| packages out of the |hpx| source tree.
+
+* Set three new environment variables (in CMake, not in Windows environment):
+  ``BOOST_ROOT``, ``HWLOC_ROOT``, ``CMAKE_INSTALL_PREFIX``. The meaning of
+  these variables is as follows:
+
+  * ``BOOST_ROOT`` the |hpx| root directory of the unpacked Boost headers/cpp files.
+  * ``HWLOC_ROOT`` the |hpx| root directory of the unpacked Portable Hardware Locality
+    files.
+  * ``CMAKE_INSTALL_PREFIX`` the |hpx| root directory where the future builds of |hpx|
+    should be installed.
+
+    .. note::
+
+       |hpx| is a very large software collection, so it is not recommended to use the
+       default ``C:\Program Files\hpx``. Many users may prefer to use simpler paths *without*
+       whitespace, like ``C:\bin\hpx`` or ``D:\bin\hpx`` etc.
+
+  To insert new env-vars click on "Add Entry" and then insert the name inside
+  "Name", select ``PATH`` as Type and put the path-name in the "Path" text field.
+  Repeat this for the first three variables.
+
+  This is how variable insertion will look:
+
+  .. _win32_cmake_settings2:
+
+  .. figure:: ../_static/images/cmake_settings2.png
+
+     Example CMake adding entry.
+
+  Alternatively, users could provide ``BOOST_LIBRARYDIR`` instead of
+  ``BOOST_ROOT``; the difference is that ``BOOST_LIBRARYDIR`` should point to
+  the subdirectory inside Boost root where all the compiled DLLs/LIBs are. For
+  example, ``BOOST_LIBRARYDIR`` may point to the ``bin.v2`` subdirectory under
+  the Boost rootdir. It is important to keep the meanings of these two variables
+  separated from each other: ``BOOST_DIR`` points to the ROOT folder of the
+  Boost library. ``BOOST_LIBRARYDIR`` points to the subdir inside the Boost root
+  folder where the compiled binaries are.
+
+* Click the 'Configure' button of CMake-GUI. You will be immediately presented with a
+  small window where you can select the C++ compiler to be used within Visual
+  Studio. This has been tested using the latest v14 (a.k.a C++ 2015) but older
+  versions should be sufficient too. Make sure to select the 64Bit compiler.
+
+* After the generate process has finished successfully, click the 'Generate'
+  button. Now, CMake will put new VS Solution files into the BUILD folder you
+  selected at the beginning.
+
+* Open Visual Studio and load the ``HPX.sln`` from your build folder.
+
+* Go to ``CMakePredefinedTargets`` and build the ``INSTALL`` project:
+
+  .. _win32_vs_targets:
+
+  .. figure:: ../_static/images/vs_targets_install.png
+
+     Visual Studio INSTALL target.
+
+  It will take some time to compile everything, and in the end you should see an
+  output similar to this one:
+
+  .. _win32_vs_build_output:
+
+  .. figure:: ../_static/images/vs_build_output.png
+
+     Visual Studio build output.
 
 Next steps
 ==========
