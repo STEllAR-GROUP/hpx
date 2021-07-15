@@ -1844,7 +1844,7 @@ if(WIN32)
   # ############################################################################
   add_definitions(-D_WINDOWS)
   add_definitions(-D_WIN32)
-  hpx_add_config_cond_define(_WIN32_WINNT 0x0601)
+  hpx_add_config_cond_define(_WIN32_WINNT 0x0602)
   hpx_add_config_cond_define(_SCL_SECURE_NO_WARNINGS)
   hpx_add_config_cond_define(_CRT_SECURE_NO_WARNINGS)
   hpx_add_config_cond_define(_SCL_SECURE_NO_DEPRECATE)

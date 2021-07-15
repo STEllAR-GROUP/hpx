@@ -176,7 +176,7 @@ namespace hpx { namespace threads { namespace coroutines {
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
         public:
             void* asan_fake_stack;
-            const void* asan_stack_bottom;
+            void const* asan_stack_bottom;
             std::size_t asan_stack_size;
 #endif
         };
