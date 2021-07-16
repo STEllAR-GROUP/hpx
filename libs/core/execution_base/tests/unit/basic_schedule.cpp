@@ -28,7 +28,7 @@ struct sender
 
     struct operation_state
     {
-        void start() && noexcept {};
+        void start() & noexcept {};
     };
 
     template <typename R>
