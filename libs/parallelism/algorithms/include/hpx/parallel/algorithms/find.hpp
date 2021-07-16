@@ -822,8 +822,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::greater<difference_type>>
                     tok(-1);
 
-                auto f1 = [count, diff, tok, first2,
-                              op = std::forward<Pred>(op),
+                auto f1 = [diff, tok, first2, op = std::forward<Pred>(op),
                               proj1 = std::forward<Proj1>(proj1),
                               proj2 = std::forward<Proj2>(proj2)](Iter1 it,
                               std::size_t part_size,
