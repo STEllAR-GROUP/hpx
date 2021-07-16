@@ -1,5 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  This code may be used under either of the following two licences:
 //
@@ -72,7 +72,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         using deleter_type = void(context_base const*);
         using thread_id_type = hpx::threads::thread_id;
 
-        context_base(std::ptrdiff_t stack_size, thread_id_noref id)
+        context_base(std::ptrdiff_t stack_size, thread_id_type id)
           : default_context_impl<CoroutineImpl>(stack_size)
           , m_caller()
           , m_state(ctx_ready)
@@ -92,7 +92,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
           , libcds_dynamic_hazard_pointer_data_(0)
 #endif
           , m_type_info()
-          , m_thread_id(std::move(id))
+          , m_thread_id(id)
           , continuation_recursion_count_(0)
         {
         }
@@ -126,7 +126,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 #endif
 
-        thread_id_noref const& get_thread_id() const
+        thread_id_type get_thread_id() const
         {
             return m_thread_id;
         }
@@ -319,11 +319,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             ctx_exited_abnormally    // process exited uncleanly.
         };
 
-        void rebind_base(thread_id_noref id)
+        void rebind_base(thread_id_type id)
         {
             HPX_ASSERT(exited());
 
-            m_thread_id = std::move(id);
+            m_thread_id = id;
             m_state = ctx_ready;
             m_exit_state = ctx_exit_not_requested;
             m_exit_status = ctx_not_exited;
@@ -409,7 +409,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         // This is used to generate a meaningful exception trace.
         std::exception_ptr m_type_info;
-        thread_id_noref m_thread_id;
+        thread_id_type m_thread_id;
 
         std::size_t continuation_recursion_count_;
     };

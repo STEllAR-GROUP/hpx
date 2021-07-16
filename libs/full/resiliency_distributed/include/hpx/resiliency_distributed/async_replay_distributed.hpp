@@ -66,7 +66,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                 // necessary
                 auto this_ = this->shared_from_this();
                 return f.then(hpx::launch::sync,
-                    [this_, ids, iteration](hpx::future<Result>&& f) {
+                    [this_ = std::move(this_), ids, iteration](
+                        hpx::future<Result>&& f) {
                         if (f.has_exception())
                         {
                             // rethrow abort_replay_exception, if caught
@@ -156,11 +157,7 @@ namespace hpx { namespace resiliency { namespace experimental {
             detail::replay_validator{}, std::forward<Action>(action),
             std::forward<Ts>(ts)...);
 
-        // keep everything alive
-        auto f = helper->call(ids);
-        hpx::traits::detail::get_shared_state(f)->set_on_completed(
-            [helper = std::move(helper)] { (void) helper; });
-        return f;
+        return helper->call(ids);
     }
 
     ///////////////////////////////////////////////////////////////////////////

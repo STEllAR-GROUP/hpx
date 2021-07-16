@@ -40,8 +40,8 @@ namespace hpx { namespace threads {
     class HPX_CORE_EXPORT thread_pool_base;
 
     /// \cond NOINTERNAL
+    using thread_id_ref_type = thread_id_ref;
     using thread_id_type = thread_id;
-    using thread_id_noref_type = thread_id_noref;
 
     using coroutine_type = coroutines::coroutine;
     using stackless_coroutine_type = coroutines::stackless_coroutine;
@@ -55,13 +55,6 @@ namespace hpx { namespace threads {
 
     using thread_self = coroutines::detail::coroutine_self;
     using thread_self_impl_type = coroutines::detail::coroutine_impl;
-
-    using thread_result_type = std::pair<thread_schedule_state, thread_id_type>;
-    using thread_arg_type = thread_restart_state;
-
-    using thread_function_sig = thread_result_type(thread_arg_type);
-    using thread_function_type =
-        util::unique_function_nonser<thread_function_sig>;
 
 #if defined(HPX_HAVE_APEX)
     HPX_CORE_EXPORT std::shared_ptr<hpx::util::external_timer::task_wrapper>

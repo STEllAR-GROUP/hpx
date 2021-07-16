@@ -37,7 +37,7 @@ namespace hpx { namespace threads { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////
     inline void write_state_log(policies::scheduler_base const& scheduler,
-        std::size_t num_thread, thread_id_type const& thrd,
+        std::size_t num_thread, thread_id_ref_type const& thrd,
         thread_schedule_state const old_state,
         thread_schedule_state const new_state)
     {
@@ -52,7 +52,7 @@ namespace hpx { namespace threads { namespace detail {
 
     inline void write_state_log_warning(
         policies::scheduler_base const& scheduler, std::size_t num_thread,
-        thread_id_type const& thrd, thread_schedule_state state,
+        thread_id_ref_type const& thrd, thread_schedule_state state,
         char const* info)
     {
         LTM_(warning).format("scheduling_loop state change failed: pool({}), "
@@ -69,7 +69,7 @@ namespace hpx { namespace threads { namespace detail {
     class switch_status
     {
     public:
-        switch_status(thread_id_type const& t, thread_state prev_state)
+        switch_status(thread_id_ref_type const& t, thread_state prev_state)
           : thread_(t)
           , prev_state_(prev_state)
           , next_thread_id_(nullptr)
@@ -132,21 +132,21 @@ namespace hpx { namespace threads { namespace detail {
             need_restore_state_ = false;
         }
 
-        thread_id_type const& get_next_thread() const
+        thread_id_ref_type const& get_next_thread() const
         {
             return next_thread_id_;
         }
 
-        thread_id_type move_next_thread()
+        thread_id_ref_type move_next_thread()
         {
             return std::move(next_thread_id_);
         }
 
     private:
-        thread_id_type const& thread_;
+        thread_id_ref_type const& thread_;
         thread_state prev_state_;
         thread_state orig_state_;
-        thread_id_type next_thread_id_;
+        thread_id_ref_type next_thread_id_;
         bool need_restore_state_;
     };
 
@@ -154,7 +154,7 @@ namespace hpx { namespace threads { namespace detail {
     {
     public:
         switch_status_background(
-            thread_id_type const& t, thread_state prev_state)
+            thread_id_ref_type const& t, thread_state prev_state)
           : thread_(t)
           , prev_state_(prev_state)
           , next_thread_id_(nullptr)
@@ -218,21 +218,21 @@ namespace hpx { namespace threads { namespace detail {
             need_restore_state_ = false;
         }
 
-        thread_id_type const& get_next_thread() const
+        thread_id_ref_type const& get_next_thread() const
         {
             return next_thread_id_;
         }
 
-        thread_id_type move_next_thread()
+        thread_id_ref_type move_next_thread()
         {
             return std::move(next_thread_id_);
         }
 
     private:
-        thread_id_type const& thread_;
+        thread_id_ref_type const& thread_;
         thread_state prev_state_;
         thread_state orig_state_;
-        thread_id_type next_thread_id_;
+        thread_id_ref_type next_thread_id_;
         bool need_restore_state_;
     };
 
@@ -426,13 +426,13 @@ namespace hpx { namespace threads { namespace detail {
     };
 
     template <typename SchedulingPolicy>
-    thread_id_type create_background_thread(SchedulingPolicy& scheduler,
+    thread_id_ref_type create_background_thread(SchedulingPolicy& scheduler,
         scheduling_callbacks& callbacks,
         std::shared_ptr<bool>& background_running,
         threads::thread_schedule_hint schedulehint,
         std::int64_t& idle_loop_count)
     {
-        thread_id_type background_thread;
+        thread_id_ref_type background_thread;
         background_running.reset(new bool(true));
         thread_init_data background_init(
             [&, background_running](
@@ -478,15 +478,15 @@ namespace hpx { namespace threads { namespace detail {
     template <typename SchedulingPolicy>
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
-    bool call_background_thread(thread_id_type& background_thread,
-        thread_id_type& next_thrd, SchedulingPolicy& scheduler,
+    bool call_background_thread(thread_id_ref_type& background_thread,
+        thread_id_ref_type& next_thrd, SchedulingPolicy& scheduler,
         std::size_t num_thread, bool /* running */,
         std::int64_t& background_work_exec_time_init,
         hpx::execution_base::this_thread::detail::agent_storage*
             context_storage)
 #else
-    bool call_background_thread(thread_id_type& background_thread,
-        thread_id_type& next_thrd, SchedulingPolicy& scheduler,
+    bool call_background_thread(thread_id_ref_type& background_thread,
+        thread_id_ref_type& next_thrd, SchedulingPolicy& scheduler,
         std::size_t num_thread, bool /* running */,
         hpx::execution_base::this_thread::detail::agent_storage*
             context_storage)
@@ -523,7 +523,7 @@ namespace hpx { namespace threads { namespace detail {
                         thrd_stat = (*get_thread_id_data(background_thread))(
                             context_storage);
 
-                        thread_id_type next = thrd_stat.move_next_thread();
+                        thread_id_ref_type next = thrd_stat.move_next_thread();
                         if (next != nullptr && next != background_thread)
                         {
                             if (next_thrd == nullptr)
@@ -602,7 +602,7 @@ namespace hpx { namespace threads { namespace detail {
         bool may_exit = false;
 
         std::shared_ptr<bool> background_running = nullptr;
-        thread_id_type background_thread;
+        thread_id_ref_type background_thread;
 
         if (scheduler.SchedulingPolicy::has_scheduler_mode(
                 policies::do_background_work) &&
@@ -620,11 +620,11 @@ namespace hpx { namespace threads { namespace detail {
                 hpx::execution_base::this_thread::detail::get_agent_storage();
 
         std::size_t added = std::size_t(-1);
-        thread_id_type next_thrd;
+        thread_id_ref_type next_thrd;
         while (true)
         {
-            thread_id_type thrd = std::move(next_thrd);
-            next_thrd = thread_id_type();
+            thread_id_ref_type thrd = std::move(next_thrd);
+            next_thrd = thread_id_ref_type();
 
             // Get the next HPX thread from the queue
             bool running =

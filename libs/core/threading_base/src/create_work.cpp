@@ -15,7 +15,7 @@
 
 namespace hpx { namespace threads { namespace detail {
 
-    void create_work(policies::scheduler_base* scheduler,
+    thread_id_ref_type create_work(policies::scheduler_base* scheduler,
         threads::thread_init_data& data, error_code& ec)
     {
         // verify parameters
@@ -31,7 +31,7 @@ namespace hpx { namespace threads { namespace detail {
         {
             HPX_THROWS_IF(ec, bad_parameter, "thread::detail::create_work",
                 "invalid initial state: {}", data.initial_state);
-            return;
+            return invalid_thread_id;
         }
         }
 
@@ -40,7 +40,7 @@ namespace hpx { namespace threads { namespace detail {
         {
             HPX_THROWS_IF(ec, bad_parameter, "thread::detail::create_work",
                 "description is nullptr");
-            return;
+            return invalid_thread_id;
         }
 #endif
 
@@ -62,7 +62,7 @@ namespace hpx { namespace threads { namespace detail {
         {
             if (self)
             {
-                data.parent_id = get_thread_id_data(threads::get_self_id());
+                data.parent_id = get_thread_id_data(self->get_thread_id());
                 data.parent_phase = self->get_thread_phase();
             }
         }
@@ -78,7 +78,7 @@ namespace hpx { namespace threads { namespace detail {
         {
             if (data.priority == thread_priority::default_ &&
                 thread_priority::high_recursive ==
-                    threads::get_self_id_data()->get_priority())
+                    get_thread_id_data(self->get_thread_id())->get_priority())
             {
                 data.priority = thread_priority::high_recursive;
             }
@@ -92,10 +92,13 @@ namespace hpx { namespace threads { namespace detail {
             thread_priority::high_recursive == data.priority ||
             thread_priority::boost == data.priority);
 
-        scheduler->create_thread(data, nullptr, ec);
+        thread_id_ref_type id = invalid_thread_id;
+        scheduler->create_thread(data, data.run_now ? &id : nullptr, ec);
 
         // NOTE: Don't care if the hint is a NUMA hint, just want to wake up a
         // thread.
         scheduler->do_some_work(data.schedulehint.hint);
+
+        return id;
     }
 }}}    // namespace hpx::threads::detail

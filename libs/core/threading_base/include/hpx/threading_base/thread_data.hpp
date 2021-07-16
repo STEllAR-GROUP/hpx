@@ -319,10 +319,10 @@ namespace hpx { namespace threads {
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         constexpr
 #endif
-            thread_id_noref_type
+            thread_id_type
             get_parent_thread_id() const noexcept
         {
-            return thread_id_noref_type();
+            return threads::invalid_thread_id;
         }
 
         /// Return the phase of the parent thread
@@ -342,7 +342,7 @@ namespace hpx { namespace threads {
         }
 
         /// Return the thread id of the parent thread
-        thread_id_noref_type get_parent_thread_id() const noexcept
+        thread_id_type get_parent_thread_id() const noexcept
         {
             return parent_thread_id_;
         }
@@ -557,9 +557,9 @@ namespace hpx { namespace threads {
             hpx::execution_base::this_thread::detail::agent_storage*
                 agent_storage);
 
-        virtual thread_id_noref get_thread_id() const
+        virtual thread_id_type get_thread_id() const
         {
-            return thread_id_noref{const_cast<thread_data*>(this)};
+            return thread_id_type{const_cast<thread_data*>(this)};
         }
 
 #if !defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
@@ -621,7 +621,7 @@ namespace hpx { namespace threads {
 
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         std::uint32_t parent_locality_id_;
-        thread_id_noref_type parent_thread_id_;
+        thread_id_type parent_thread_id_;
         std::size_t parent_thread_phase_;
 #endif
 
@@ -662,13 +662,13 @@ namespace hpx { namespace threads {
 #endif
     };
 
-    HPX_FORCEINLINE thread_data* get_thread_id_data(thread_id_type const& tid)
+    HPX_FORCEINLINE thread_data* get_thread_id_data(
+        thread_id_ref_type const& tid)
     {
         return static_cast<thread_data*>(tid.get().get());
     }
 
-    HPX_FORCEINLINE thread_data* get_thread_id_data(
-        thread_id_noref_type const& tid)
+    HPX_FORCEINLINE thread_data* get_thread_id_data(thread_id_type const& tid)
     {
         return static_cast<thread_data*>(tid.get());
     }
@@ -696,7 +696,7 @@ namespace hpx { namespace threads {
 
     /// The function \a get_self_id returns the HPX thread id of the current
     /// thread (or zero if the current thread is not a HPX thread).
-    HPX_CORE_EXPORT thread_id_noref_type get_self_id();
+    HPX_CORE_EXPORT thread_id_type get_self_id();
 
     /// The function \a get_parent_id returns the HPX thread id of the
     /// current thread's parent (or zero if the current thread is not a
@@ -705,7 +705,7 @@ namespace hpx { namespace threads {
     /// \note This function will return a meaningful value only if the
     ///       code was compiled with HPX_HAVE_THREAD_PARENT_REFERENCE
     ///       being defined.
-    HPX_CORE_EXPORT thread_id_noref_type get_parent_id();
+    HPX_CORE_EXPORT thread_id_type get_parent_id();
 
     /// The function \a get_parent_phase returns the HPX phase of the
     /// current thread's parent (or zero if the current thread is not a

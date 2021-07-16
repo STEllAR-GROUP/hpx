@@ -83,7 +83,7 @@ namespace hpx { namespace util {
                 if (id != threads::invalid_thread_id)
                 {
                     std::ptrdiff_t value =
-                        reinterpret_cast<std::ptrdiff_t>(id.get().get());
+                        reinterpret_cast<std::ptrdiff_t>(id.get());
                     util::format_to(to, "{:016x}", value);
                     return;
                 }
@@ -144,7 +144,7 @@ namespace hpx { namespace util {
     {
         void operator()(std::ostream& to) const override
         {
-            threads::thread_id_noref_type parent_id = threads::get_parent_id();
+            threads::thread_id_type parent_id = threads::get_parent_id();
             if (nullptr != parent_id)
             {
                 // called from inside a HPX thread

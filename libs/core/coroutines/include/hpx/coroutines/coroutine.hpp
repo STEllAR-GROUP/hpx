@@ -1,5 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  This code may be used under either of the following two licences:
 //
@@ -62,9 +62,9 @@ namespace hpx { namespace threads { namespace coroutines {
         using functor_type =
             util::unique_function_nonser<result_type(arg_type)>;
 
-        coroutine(functor_type&& f, thread_id_noref id,
+        coroutine(functor_type&& f, thread_id_type id,
             std::ptrdiff_t stack_size = detail::default_stack_size)
-          : impl_(std::move(f), std::move(id), stack_size)
+          : impl_(std::move(f), id, stack_size)
         {
             HPX_ASSERT(impl_.is_ready());
         }
@@ -74,7 +74,7 @@ namespace hpx { namespace threads { namespace coroutines {
         coroutine(coroutine&& src) = delete;
         coroutine& operator=(coroutine&& src) = delete;
 
-        thread_id_noref const& get_thread_id() const
+        thread_id_type get_thread_id() const
         {
             return impl_.get_thread_id();
         }
@@ -128,9 +128,9 @@ namespace hpx { namespace threads { namespace coroutines {
         }
 #endif
 
-        void rebind(functor_type&& f, thread_id_noref id)
+        void rebind(functor_type&& f, thread_id_type id)
         {
-            impl_.rebind(std::move(f), std::move(id));
+            impl_.rebind(std::move(f), id);
         }
 
         HPX_FORCEINLINE result_type operator()(arg_type arg = arg_type())

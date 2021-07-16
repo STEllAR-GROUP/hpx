@@ -190,16 +190,16 @@ namespace hpx { namespace util {
             [&bt]() { return bt.trace(); });
 
         error_code ec(lightweight);
-        threads::thread_id_type tid = p.apply("hpx::util::trace_on_new_stack",
-            launch::fork, threads::thread_priority::default_,
-            threads::thread_stacksize::medium, threads::thread_schedule_hint(),
-            ec);
+        threads::thread_id_ref_type tid =
+            p.apply("hpx::util::trace_on_new_stack", launch::fork,
+                threads::thread_priority::default_,
+                threads::thread_stacksize::medium,
+                threads::thread_schedule_hint(), ec);
         if (ec)
             return "<couldn't retrieve stack backtrace>";
 
         // make sure this thread is executed last
-        hpx::this_thread::yield_to(thread::id(
-            threads::thread_id_noref_type(threads::get_thread_id_data(tid))));
+        hpx::this_thread::yield_to(thread::id(tid));
 
         return p.get_future().get(ec);
 #else
@@ -443,7 +443,7 @@ namespace hpx { namespace detail {
             hpx::detail::throw_hostname(hostname), hpx::detail::throw_pid(pid),
             hpx::detail::throw_shepherd(shepherd),
             hpx::detail::throw_thread_id(
-                reinterpret_cast<std::size_t>(thread_id.get().get())),
+                reinterpret_cast<std::size_t>(thread_id.get())),
             hpx::detail::throw_thread_name(util::as_string(thread_name)),
             hpx::detail::throw_function(func), hpx::detail::throw_file(file),
             hpx::detail::throw_line(line), hpx::detail::throw_env(env),

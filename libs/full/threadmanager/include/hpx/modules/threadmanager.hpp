@@ -100,7 +100,8 @@ namespace hpx { namespace threads {
         ///               information is used for logging purposes mainly, but
         ///               might be useful for debugging as well. This parameter
         ///               is optional and defaults to an empty string.
-        void register_work(thread_init_data& data, error_code& ec = throws);
+        thread_id_ref_type register_work(
+            thread_init_data& data, error_code& ec = throws);
 
         /// The function \a register_thread adds a new work item to the thread
         /// manager. It creates a new \a thread, adds it to the internal
@@ -118,7 +119,7 @@ namespace hpx { namespace threads {
         ///               information is used for logging purposes mainly, but
         ///               might be useful for debugging as well. This parameter
         ///               is optional and defaults to an empty string.
-        void register_thread(thread_init_data& data, thread_id_type& id,
+        void register_thread(thread_init_data& data, thread_id_ref_type& id,
             error_code& ec = throws);
 
         /// \brief  Run the thread manager's work queue. This function
