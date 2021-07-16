@@ -44,7 +44,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             return *pimpl_->args();
         }
 
-        thread_id_noref const& get_thread_id() const override
+        thread_id_type get_thread_id() const override
         {
             HPX_ASSERT(pimpl_);
             return pimpl_->get_thread_id();

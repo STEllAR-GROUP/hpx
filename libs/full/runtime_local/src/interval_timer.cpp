@@ -159,7 +159,7 @@ namespace hpx { namespace util { namespace detail {
             if (timerid_)
             {
                 error_code ec(lightweight);    // avoid throwing on error
-                threads::set_thread_state(timerid_,
+                threads::set_thread_state(timerid_.noref(),
                     threads::thread_schedule_state::pending,
                     threads::thread_restart_state::abort,
                     threads::thread_priority::boost, true, ec);
@@ -168,7 +168,7 @@ namespace hpx { namespace util { namespace detail {
             if (id_)
             {
                 error_code ec(lightweight);    // avoid throwing on error
-                threads::set_thread_state(id_,
+                threads::set_thread_state(id_.noref(),
                     threads::thread_schedule_state::pending,
                     threads::thread_restart_state::abort,
                     threads::thread_priority::boost, true, ec);
@@ -294,7 +294,7 @@ namespace hpx { namespace util { namespace detail {
         error_code ec;
 
         // create a new suspended thread
-        threads::thread_id_type id;
+        threads::thread_id_ref_type id;
         {
             // FIXME: registering threads might lead to thread suspension since
             // the allocators use hpx::lcos::local::spinlock. Unlocking the
@@ -319,11 +319,11 @@ namespace hpx { namespace util { namespace detail {
         }
 
         // schedule this thread to be run after the given amount of seconds
-        threads::thread_id_type timerid =
-            threads::set_thread_state(id, std::chrono::microseconds(microsecs_),
-                threads::thread_schedule_state::pending,
-                threads::thread_restart_state::signaled,
-                threads::thread_priority::boost, true, ec);
+        threads::thread_id_ref_type timerid = threads::set_thread_state(
+            id.noref(), std::chrono::microseconds(microsecs_),
+            threads::thread_schedule_state::pending,
+            threads::thread_restart_state::signaled,
+            threads::thread_priority::boost, true, ec);
 
         if (ec)
         {
@@ -331,7 +331,7 @@ namespace hpx { namespace util { namespace detail {
             is_started_ = false;
 
             // abort the newly created thread
-            threads::set_thread_state(id,
+            threads::set_thread_state(id.noref(),
                 threads::thread_schedule_state::pending,
                 threads::thread_restart_state::abort,
                 threads::thread_priority::boost, true, ec);

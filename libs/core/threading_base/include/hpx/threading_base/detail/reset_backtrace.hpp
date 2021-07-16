@@ -42,7 +42,7 @@ namespace hpx { namespace threads { namespace detail {
             threads::set_thread_backtrace(id_, 0, ec_);
         }
 
-        threads::thread_id_type const& id_;
+        threads::thread_id_type id_;
         std::unique_ptr<hpx::util::backtrace> backtrace_;
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
         std::string full_backtrace_;

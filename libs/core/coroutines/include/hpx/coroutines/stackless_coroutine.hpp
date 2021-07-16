@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -57,7 +57,7 @@ namespace hpx { namespace threads { namespace coroutines {
         using functor_type =
             util::unique_function_nonser<result_type(arg_type)>;
 
-        stackless_coroutine(functor_type&& f, thread_id_noref id,
+        stackless_coroutine(functor_type&& f, thread_id_type id,
             std::ptrdiff_t /*stack_size*/ = default_stack_size)
           : f_(std::move(f))
           , state_(ctx_ready)
@@ -88,7 +88,7 @@ namespace hpx { namespace threads { namespace coroutines {
         stackless_coroutine(stackless_coroutine&& src) = delete;
         stackless_coroutine& operator=(stackless_coroutine&& src) = delete;
 
-        thread_id_noref const& get_thread_id() const
+        thread_id_type get_thread_id() const
         {
             return id_;
         }
@@ -165,12 +165,12 @@ namespace hpx { namespace threads { namespace coroutines {
         }
 #endif
 
-        void rebind(functor_type&& f, thread_id_noref id)
+        void rebind(functor_type&& f, thread_id_type id)
         {
             HPX_ASSERT(exited());
 
             f_ = std::move(f);
-            id_ = std::move(id);
+            id_ = id;
 
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
             phase_ = 0;
@@ -247,7 +247,7 @@ namespace hpx { namespace threads { namespace coroutines {
     protected:
         functor_type f_;
         context_state state_;
-        thread_id_noref id_;
+        thread_id_type id_;
 
 #ifdef HPX_HAVE_THREAD_PHASE_INFORMATION
         std::size_t phase_;

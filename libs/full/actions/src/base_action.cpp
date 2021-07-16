@@ -32,7 +32,7 @@ namespace hpx { namespace actions { namespace detail {
         }
 
         action_serialization_data(std::uint32_t parent_locality,
-            threads::thread_id_noref_type parent_id, std::uint64_t parent_phase,
+            threads::thread_id_type parent_id, std::uint64_t parent_phase,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize)
           : parent_locality_(parent_locality)
@@ -92,8 +92,8 @@ namespace hpx { namespace actions {
 
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         parent_locality_ = data.parent_locality_;
-        parent_id_ = threads::thread_id_noref_type(
-            reinterpret_cast<void*>(data.parent_id_));
+        parent_id_ =
+            threads::thread_id_type(reinterpret_cast<void*>(data.parent_id_));
         parent_phase_ = data.parent_phase_;
 #endif
         priority_ = data.priority_;
@@ -108,7 +108,7 @@ namespace hpx { namespace actions {
 
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         std::uint32_t parent_locality_ = naming::invalid_locality_id;
-        threads::thread_id_noref_type parent_id_;
+        threads::thread_id_type parent_id_;
         std::uint64_t parent_phase_ = 0;
 #endif
         detail::action_serialization_data data(
@@ -132,9 +132,9 @@ namespace hpx { namespace actions {
     }
 
     /// Return the thread id of the parent thread
-    threads::thread_id_noref_type base_action_data::get_parent_thread_id() const
+    threads::thread_id_type base_action_data::get_parent_thread_id() const
     {
-        return threads::thread_id_noref_type();
+        return threads::invalid_thread_id;
     }
 
     /// Return the phase of the parent thread
@@ -150,7 +150,7 @@ namespace hpx { namespace actions {
     }
 
     /// Return the thread id of the parent thread
-    threads::thread_id_noref_type base_action_data::get_parent_thread_id() const
+    threads::thread_id_type base_action_data::get_parent_thread_id() const
     {
         return parent_id_;
     }

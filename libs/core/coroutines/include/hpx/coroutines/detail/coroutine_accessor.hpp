@@ -31,8 +31,6 @@
 
 #include <hpx/config.hpp>
 
-#include <utility>
-
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
     struct coroutine_accessor

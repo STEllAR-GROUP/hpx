@@ -83,7 +83,7 @@ namespace hpx { namespace actions {
         virtual std::uint32_t get_parent_locality_id() const = 0;
 
         /// Return the thread id of the parent thread
-        virtual threads::thread_id_noref_type get_parent_thread_id() const = 0;
+        virtual threads::thread_id_type get_parent_thread_id() const = 0;
 
         /// Return the thread phase of the parent thread
         virtual std::uint64_t get_parent_thread_phase() const = 0;
@@ -147,7 +147,7 @@ namespace hpx { namespace actions {
         std::uint32_t get_parent_locality_id() const override;
 
         /// Return the thread id of the parent thread
-        threads::thread_id_noref_type get_parent_thread_id() const override;
+        threads::thread_id_type get_parent_thread_id() const override;
 
         /// Return the phase of the parent thread
         std::uint64_t get_parent_thread_phase() const override;
@@ -172,7 +172,7 @@ namespace hpx { namespace actions {
 
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         std::uint32_t parent_locality_;
-        threads::thread_id_noref_type parent_id_;
+        threads::thread_id_type parent_id_;
         std::uint64_t parent_phase_;
 #endif
     };

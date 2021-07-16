@@ -743,16 +743,17 @@ namespace hpx { namespace lcos { namespace detail {
                 threads::thread_schedule_hint(),
                 threads::thread_stacksize::current,
                 threads::thread_schedule_state::suspended, true);
-            threads::thread_id_type id = threads::register_thread(data, ec);
+            threads::thread_id_ref_type id = threads::register_thread(data, ec);
             if (ec)
             {
                 // thread creation failed, report error to the new future
                 this->base_type::set_exception(
                     hpx::detail::access_exception(ec));
+                return;
             }
 
             // start new thread at given point in time
-            threads::set_thread_state(id, abs_time,
+            threads::set_thread_state(id.noref(), abs_time,
                 threads::thread_schedule_state::pending,
                 threads::thread_restart_state::timeout,
                 threads::thread_priority::boost, true, ec);
@@ -867,7 +868,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         // run in a separate thread
-        virtual threads::thread_id_type apply(
+        virtual threads::thread_id_ref_type apply(
             threads::thread_pool_base* /*pool*/, const char* /*annotation*/,
             launch /*policy*/, threads::thread_priority /*priority*/,
             threads::thread_stacksize /*stacksize*/,
@@ -915,12 +916,12 @@ namespace hpx { namespace lcos { namespace detail {
         typedef typename task_base<Result>::init_no_addref init_no_addref;
 
     protected:
-        threads::thread_id_noref_type get_thread_id() const
+        threads::thread_id_type get_thread_id() const
         {
             std::lock_guard<mutex_type> l(this->mtx_);
             return id_;
         }
-        void set_thread_id(threads::thread_id_noref_type id)
+        void set_thread_id(threads::thread_id_type id)
         {
             std::lock_guard<mutex_type> l(this->mtx_);
             id_ = id;
@@ -1006,7 +1007,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
     protected:
-        threads::thread_id_noref_type id_;
+        threads::thread_id_type id_;
     };
 }}}    // namespace hpx::lcos::detail
 

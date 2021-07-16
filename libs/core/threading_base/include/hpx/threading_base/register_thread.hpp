@@ -128,13 +128,13 @@ namespace hpx { namespace threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    inline threads::thread_id_type register_thread(
+    inline threads::thread_id_ref_type register_thread(
         threads::thread_init_data& data, threads::thread_pool_base* pool,
         error_code& ec = throws)
     {
         HPX_ASSERT(pool);
         data.run_now = true;
-        threads::thread_id_type id = threads::invalid_thread_id;
+        threads::thread_id_ref_type id = threads::invalid_thread_id;
         pool->create_thread(data, id, ec);
         return id;
     }
@@ -159,7 +159,7 @@ namespace hpx { namespace threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    inline threads::thread_id_type register_thread(
+    inline threads::thread_id_ref_type register_thread(
         threads::thread_init_data& data, error_code& ec = throws)
     {
         return register_thread(data, detail::get_self_or_default_pool(), ec);
@@ -180,12 +180,12 @@ namespace hpx { namespace threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    inline void register_work(threads::thread_init_data& data,
+    inline thread_id_ref_type register_work(threads::thread_init_data& data,
         threads::thread_pool_base* pool, error_code& ec = throws)
     {
         HPX_ASSERT(pool);
         data.run_now = false;
-        pool->create_work(data, ec);
+        return pool->create_work(data, ec);
     }
 
     /// \brief Create a new work item using the given data on the same thread
@@ -204,10 +204,10 @@ namespace hpx { namespace threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    inline void register_work(
+    inline thread_id_ref_type register_work(
         threads::thread_init_data& data, error_code& ec = throws)
     {
-        register_work(data, detail::get_self_or_default_pool(), ec);
+        return register_work(data, detail::get_self_or_default_pool(), ec);
     }
 }}    // namespace hpx::threads
 

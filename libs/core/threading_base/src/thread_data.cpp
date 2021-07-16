@@ -88,7 +88,7 @@ namespace hpx { namespace threads {
             thread_self* self = get_self_ptr();
             if (self)
             {
-                parent_thread_id_ = get_thread_id_data(threads::get_self_id());
+                parent_thread_id_ = threads::get_self_id();
                 parent_thread_phase_ = self->get_thread_phase();
             }
         }
@@ -236,7 +236,7 @@ namespace hpx { namespace threads {
             thread_self* self = get_self_ptr();
             if (self)
             {
-                parent_thread_id_ = get_thread_id_data(threads::get_self_id());
+                parent_thread_id_ = threads::get_self_id();
                 parent_thread_phase_ = self->get_thread_phase();
             }
         }
@@ -299,13 +299,13 @@ namespace hpx { namespace threads {
         return p;
     }
 
-    thread_id_noref get_self_id()
+    thread_id_type get_self_id()
     {
         thread_self* self = get_self_ptr();
         if (HPX_LIKELY(nullptr != self))
             return self->get_thread_id();
 
-        return thread_id_noref();
+        return threads::invalid_thread_id;
     }
 
     thread_data* get_self_id_data()
@@ -334,9 +334,9 @@ namespace hpx { namespace threads {
     }
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
-    thread_id_noref_type get_parent_id()
+    thread_id_type get_parent_id()
     {
-        return thread_id_noref_type();
+        return threads::invalid_thread_id;
     }
 
     std::size_t get_parent_phase()
@@ -350,14 +350,14 @@ namespace hpx { namespace threads {
         return ~static_cast<std::uint32_t>(0);
     }
 #else
-    thread_id_noref_type get_parent_id()
+    thread_id_type get_parent_id()
     {
         thread_data* thrd_data = get_self_id_data();
         if (HPX_LIKELY(nullptr != thrd_data))
         {
             return thrd_data->get_parent_thread_id();
         }
-        return thread_id_noref_type();
+        return threads::invalid_thread_id;
     }
 
     std::size_t get_parent_phase()

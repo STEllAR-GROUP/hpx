@@ -92,9 +92,12 @@ namespace hpx { namespace test {
             // Flush pending reference counting operations on the target locality.
             agas::garbage_collect(locality_);
 
+            // keep ourselves alive
+            threads::thread_id_ref_type self_id = threads::get_self_id();
+
             // Schedule a wakeup.
-            threads::set_thread_state(threads::get_self_id(), d,
-                threads::thread_schedule_state::pending);
+            threads::set_thread_state(
+                self_id.noref(), d, threads::thread_schedule_state::pending);
 
             // Suspend this thread.
             threads::get_self().yield(threads::thread_result_type(

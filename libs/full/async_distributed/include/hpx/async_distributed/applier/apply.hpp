@@ -187,7 +187,7 @@ namespace hpx {
             data.description = actions::detail::get_action_name<Action>();
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-            data.parent_id = get_thread_id_data(threads::get_self_id());
+            data.parent_id = threads::get_self_id();
             data.parent_locality_id = get_locality_id();
 #endif
 #if defined(HPX_HAVE_APEX)
@@ -215,7 +215,7 @@ namespace hpx {
             data.description = actions::detail::get_action_name<Action>();
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-            data.parent_id = get_thread_id_data(threads::get_self_id());
+            data.parent_id = threads::get_self_id();
             data.parent_locality_id = get_locality_id();
 #endif
 #if defined(HPX_HAVE_APEX)
@@ -428,7 +428,7 @@ namespace hpx {
             data.description = actions::detail::get_action_name<Action>();
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-            data.parent_id = get_thread_id_data(threads::get_self_id());
+            data.parent_id = threads::get_self_id();
             data.parent_locality_id = get_locality_id();
 #endif
 #if defined(HPX_HAVE_APEX)

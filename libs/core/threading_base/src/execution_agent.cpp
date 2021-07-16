@@ -41,7 +41,7 @@ namespace hpx { namespace threads {
 
     std::string execution_agent::description() const
     {
-        thread_id_noref_type const& id = self_.get_thread_id();
+        thread_id_type id = self_.get_thread_id();
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROW_EXCEPTION(null_thread_id, "execution_agent::description",
@@ -137,7 +137,7 @@ namespace hpx { namespace threads {
     hpx::threads::thread_restart_state execution_agent::do_yield(
         const char* desc, threads::thread_schedule_state state)
     {
-        thread_id_type const& id = self_.get_thread_id();
+        thread_id_ref_type id = self_.get_thread_id();    // keep alive
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROW_EXCEPTION(null_thread_id, "execution_agent::do_yield",
@@ -159,7 +159,7 @@ namespace hpx { namespace threads {
         {
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             threads::detail::reset_lco_description desc(
-                id, util::thread_description(desc));
+                id.noref(), util::thread_description(desc));
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id);

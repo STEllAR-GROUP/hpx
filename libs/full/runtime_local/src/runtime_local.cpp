@@ -1388,7 +1388,7 @@ namespace hpx {
             threads::thread_schedule_hint(0), threads::thread_stacksize::large);
 
         this->runtime::starting();
-        threads::thread_id_type id = threads::invalid_thread_id;
+        threads::thread_id_ref_type id = threads::invalid_thread_id;
         thread_manager_->register_thread(data, id);
 
         // }}}

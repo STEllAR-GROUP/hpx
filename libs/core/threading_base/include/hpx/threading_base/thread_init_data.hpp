@@ -139,7 +139,7 @@ namespace hpx { namespace threads {
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         std::uint32_t parent_locality_id;
-        thread_id_noref_type parent_id;
+        threads::thread_id_type parent_id;
         std::size_t parent_phase;
 #endif
 #ifdef HPX_HAVE_APEX

@@ -289,8 +289,8 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to
         // pending
-        void create_thread(
-            thread_init_data& data, thread_id_type* id, error_code& ec) override
+        void create_thread(thread_init_data& data, thread_id_ref_type* id,
+            error_code& ec) override
         {
             std::size_t num_thread =
                 data.schedulehint.mode == thread_schedule_hint_mode::thread ?
@@ -329,7 +329,8 @@ namespace hpx { namespace threads { namespace policies {
         /// Return the next thread to be executed, return false if none is
         /// available
         virtual bool get_next_thread(std::size_t num_thread, bool running,
-            threads::thread_id_type& thrd, bool /*enable_stealing*/) override
+            threads::thread_id_ref_type& thrd,
+            bool /*enable_stealing*/) override
         {
             std::size_t queues_size = queues_.size();
 
@@ -455,7 +456,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_id_type thrd,
+        void schedule_thread(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
             thread_priority /* priority */ = thread_priority::normal) override
         {
@@ -498,7 +499,7 @@ namespace hpx { namespace threads { namespace policies {
             queues_[num_thread]->schedule_thread(thrd);
         }
 
-        void schedule_thread_last(threads::thread_id_type thrd,
+        void schedule_thread_last(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
             thread_priority /* priority */ = thread_priority::normal) override
         {

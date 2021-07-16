@@ -13,6 +13,7 @@
 
 namespace hpx { namespace threads { namespace detail {
 
-    HPX_CORE_EXPORT void create_work(policies::scheduler_base* scheduler,
-        threads::thread_init_data& data, error_code& ec = throws);
+    HPX_CORE_EXPORT thread_id_ref_type create_work(
+        policies::scheduler_base* scheduler, threads::thread_init_data& data,
+        error_code& ec = throws);
 }}}    // namespace hpx::threads::detail

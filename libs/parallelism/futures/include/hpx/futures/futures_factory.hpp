@@ -99,7 +99,7 @@ namespace hpx { namespace lcos { namespace local {
 
         protected:
             // run in a separate thread
-            threads::thread_id_type apply(threads::thread_pool_base* pool,
+            threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
                 const char* annotation, launch policy,
                 threads::thread_priority priority,
                 threads::thread_stacksize stacksize,
@@ -136,8 +136,7 @@ namespace hpx { namespace lcos { namespace local {
                     schedulehint, stacksize,
                     threads::thread_schedule_state::pending);
 
-                threads::register_work(data, pool, ec);
-                return threads::invalid_thread_id;
+                return threads::register_work(data, pool, ec);
             }
         };
 
@@ -251,7 +250,7 @@ namespace hpx { namespace lcos { namespace local {
 
         protected:
             // run in a separate thread
-            threads::thread_id_type apply(threads::thread_pool_base* pool,
+            threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
                 const char* annotation, launch policy,
                 threads::thread_priority priority,
                 threads::thread_stacksize stacksize,
@@ -761,7 +760,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         // asynchronous execution
-        threads::thread_id_type apply(
+        threads::thread_id_ref_type apply(
             const char* annotation = "futures_factory::apply",
             launch policy = launch::async,
             threads::thread_priority priority =
@@ -776,7 +775,7 @@ namespace hpx { namespace lcos { namespace local {
                 annotation, policy, priority, stacksize, schedulehint, ec);
         }
 
-        threads::thread_id_type apply(threads::thread_pool_base* pool,
+        threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
             const char* annotation = "futures_factory::apply",
             launch policy = launch::async,
             threads::thread_priority priority =

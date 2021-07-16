@@ -59,7 +59,7 @@ namespace hpx { namespace util {
             data_.desc_ = altname;
             return;
         }
-        hpx::threads::thread_id_type const& id = hpx::threads::get_self_id();
+        hpx::threads::thread_id_type id = hpx::threads::get_self_id();
         if (id)
         {
             // get the current task description

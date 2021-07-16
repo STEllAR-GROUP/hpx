@@ -60,7 +60,7 @@ namespace hpx { namespace threads { namespace policies {
             typename Map::const_iterator end = tm.end();
             for (typename Map::const_iterator it = tm.begin(); it != end; ++it)
             {
-                threads::thread_data const* thrd = *it;
+                threads::thread_data const* thrd = get_thread_id_data(*it);
                 threads::thread_schedule_state state =
                     thrd->get_state().state();
                 threads::thread_schedule_state marked_state =

@@ -18,7 +18,7 @@
 namespace hpx { namespace threads { namespace detail {
 
     void create_thread(policies::scheduler_base* scheduler,
-        threads::thread_init_data& data, threads::thread_id_type& id,
+        threads::thread_init_data& data, threads::thread_id_ref_type& id,
         error_code& ec)
     {
         // verify parameters
