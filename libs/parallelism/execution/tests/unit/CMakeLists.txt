@@ -22,6 +22,7 @@ if(HPX_CXX_STANDARD GREATER_EQUAL 17)
     algorithm_bulk
     algorithm_detach
     algorithm_ensure_started
+    algorithm_execute
     algorithm_just
     algorithm_just_on
     algorithm_let_value

@@ -179,76 +179,6 @@ struct void_receiver
     }
 };
 
-static std::size_t member_execute_calls = 0;
-static std::size_t tag_dispatch_execute_calls = 0;
-
-struct executor_1
-{
-    template <typename F>
-    void execute(F&& f) noexcept
-    {
-        ++member_execute_calls;
-        hpx::util::invoke(f);
-    }
-
-    bool operator==(executor_1 const&) const noexcept
-    {
-        return true;
-    }
-
-    bool operator!=(executor_1 const&) const noexcept
-    {
-        return false;
-    }
-};
-
-struct executor_2
-{
-    template <typename F>
-    void execute(F&& f) noexcept
-    {
-        ++member_execute_calls;
-        hpx::util::invoke(f);
-    }
-
-    bool operator==(executor_2 const&) const noexcept
-    {
-        return true;
-    }
-
-    bool operator!=(executor_2 const&) const noexcept
-    {
-        return false;
-    }
-};
-
-template <typename F>
-void tag_dispatch(hpx::execution::experimental::execute_t, executor_2, F&& f)
-{
-    ++tag_dispatch_execute_calls;
-    hpx::util::invoke(f);
-}
-
-struct executor_3
-{
-    bool operator==(executor_3 const&) const noexcept
-    {
-        return true;
-    }
-
-    bool operator!=(executor_3 const&) const noexcept
-    {
-        return false;
-    }
-};
-
-template <typename F>
-void tag_dispatch(hpx::execution::experimental::execute_t, executor_3, F&& f)
-{
-    ++tag_dispatch_execute_calls;
-    hpx::util::invoke(f);
-}
-
 template <typename Sender>
 constexpr bool unspecialized(...)
 {
@@ -364,36 +294,6 @@ int main()
         HPX_TEST_EQ(r3.i, 4711);
         HPX_TEST_EQ(member_connect_calls, std::size_t(2));
         HPX_TEST_EQ(tag_dispatch_connect_calls, std::size_t(1));
-    }
-
-    {
-        void_receiver vr1;
-        executor_1 ex1;
-        auto os = hpx::execution::experimental::connect(ex1, vr1);
-        hpx::execution::experimental::start(os);
-        HPX_TEST_EQ(void_receiver_set_value_calls, std::size_t(1));
-        HPX_TEST_EQ(member_execute_calls, std::size_t(1));
-        HPX_TEST_EQ(tag_dispatch_execute_calls, std::size_t(0));
-    }
-
-    {
-        void_receiver vr2;
-        executor_2 ex2;
-        auto os = hpx::execution::experimental::connect(ex2, vr2);
-        hpx::execution::experimental::start(os);
-        HPX_TEST_EQ(void_receiver_set_value_calls, std::size_t(2));
-        HPX_TEST_EQ(member_execute_calls, std::size_t(2));
-        HPX_TEST_EQ(tag_dispatch_execute_calls, std::size_t(0));
-    }
-
-    {
-        void_receiver vr3;
-        executor_3 ex3;
-        auto os = hpx::execution::experimental::connect(ex3, vr3);
-        hpx::execution::experimental::start(os);
-        HPX_TEST_EQ(void_receiver_set_value_calls, std::size_t(3));
-        HPX_TEST_EQ(member_execute_calls, std::size_t(2));
-        HPX_TEST_EQ(tag_dispatch_execute_calls, std::size_t(1));
     }
 
     return hpx::util::report_errors();
