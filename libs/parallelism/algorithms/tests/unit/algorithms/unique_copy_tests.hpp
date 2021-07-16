@@ -118,6 +118,29 @@ struct random_fill
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag, typename DataType, typename Pred>
+void test_unique_copy(IteratorTag, DataType, Pred pred, int rand_base)
+{
+    typedef typename std::vector<DataType>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    using hpx::get;
+
+    std::size_t const size = 10007;
+    std::vector<DataType> c(size), dest_res(size), dest_sol(size);
+    std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
+
+    auto result = hpx::unique_copy(iterator(std::begin(c)),
+        iterator(std::end(c)), iterator(std::begin(dest_res)), pred);
+    auto solution = std::unique_copy(
+        std::begin(c), std::end(c), std::begin(dest_sol), pred);
+
+    bool equality = test::equal(
+        std::begin(dest_res), result.base(), std::begin(dest_sol), solution);
+
+    HPX_TEST(equality);
+}
+
 template <typename ExPolicy, typename IteratorTag, typename DataType,
     typename Pred>
 void test_unique_copy(
@@ -135,13 +158,13 @@ void test_unique_copy(
     std::vector<DataType> c(size), dest_res(size), dest_sol(size);
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
 
-    auto result = hpx::parallel::unique_copy(policy, iterator(std::begin(c)),
+    auto result = hpx::unique_copy(policy, iterator(std::begin(c)),
         iterator(std::end(c)), iterator(std::begin(dest_res)), pred);
     auto solution = std::unique_copy(
         std::begin(c), std::end(c), std::begin(dest_sol), pred);
 
-    bool equality = test::equal(std::begin(dest_res), get<1>(result).base(),
-        std::begin(dest_sol), solution);
+    bool equality = test::equal(
+        std::begin(dest_res), result.base(), std::begin(dest_sol), solution);
 
     HPX_TEST(equality);
 }
@@ -163,14 +186,14 @@ void test_unique_copy_async(
     std::vector<DataType> c(size), dest_res(size), dest_sol(size);
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
 
-    auto f = hpx::parallel::unique_copy(policy, iterator(std::begin(c)),
+    auto f = hpx::unique_copy(policy, iterator(std::begin(c)),
         iterator(std::end(c)), iterator(std::begin(dest_res)), pred);
     auto result = f.get();
     auto solution = std::unique_copy(
         std::begin(c), std::end(c), std::begin(dest_sol), pred);
 
-    bool equality = test::equal(std::begin(dest_res), get<1>(result).base(),
-        std::begin(dest_sol), solution);
+    bool equality = test::equal(
+        std::begin(dest_res), result.base(), std::begin(dest_sol), solution);
 
     HPX_TEST(equality);
 }
@@ -192,9 +215,8 @@ void test_unique_copy_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        auto result = hpx::parallel::unique_copy(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            iterator(std::begin(dest)), throw_always());
+        auto result = hpx::unique_copy(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), iterator(std::begin(dest)), throw_always());
 
         HPX_UNUSED(result);
         HPX_TEST(false);
@@ -226,7 +248,7 @@ void test_unique_copy_exception_async(ExPolicy policy, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::unique_copy(policy, iterator(std::begin(c)),
+        auto f = hpx::unique_copy(policy, iterator(std::begin(c)),
             iterator(std::end(c)), iterator(std::begin(dest)), throw_always());
         returned_from_algorithm = true;
         f.get();
@@ -264,9 +286,9 @@ void test_unique_copy_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        auto result = hpx::parallel::unique_copy(policy,
-            iterator(std::begin(c)), iterator(std::end(c)),
-            iterator(std::begin(dest)), throw_bad_alloc());
+        auto result = hpx::unique_copy(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), iterator(std::begin(dest)),
+            throw_bad_alloc());
 
         HPX_UNUSED(result);
         HPX_TEST(false);
@@ -297,7 +319,7 @@ void test_unique_copy_bad_alloc_async(ExPolicy policy, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::unique_copy(policy, iterator(std::begin(c)),
+        auto f = hpx::unique_copy(policy, iterator(std::begin(c)),
             iterator(std::end(c)), iterator(std::begin(dest)),
             throw_bad_alloc());
         returned_from_algorithm = true;
@@ -338,13 +360,12 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
     {
         typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-        auto result =
-            hpx::parallel::unique_copy(policy, iterator(std::begin(c)),
-                iterator(std::end(c)), iterator(std::begin(dest_res)));
+        auto result = hpx::unique_copy(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), iterator(std::begin(dest_res)));
         auto solution =
             std::unique_copy(std::begin(c), std::end(c), std::begin(dest_sol));
 
-        bool equality = test::equal(std::begin(dest_res), get<1>(result).base(),
+        bool equality = test::equal(std::begin(dest_res), result.base(),
             std::begin(dest_sol), solution);
 
         HPX_TEST(equality);
@@ -355,7 +376,7 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
         typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
         DataType val;
-        auto result = hpx::parallel::unique_copy(
+        auto result = hpx::unique_copy(
             policy, iterator(std::begin(c)), iterator(std::end(c)),
             iterator(std::begin(dest_res)),
             [](DataType const& a, DataType const& b) -> bool { return a == b; },
@@ -364,7 +385,7 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
                 return val;
             });
 
-        auto dist = std::distance(std::begin(dest_res), get<1>(result).base());
+        auto dist = std::distance(std::begin(dest_res), result.base());
         HPX_TEST_EQ(dist, 1);
     }
 
@@ -384,7 +405,7 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
         auto solution =
             std::unique_copy(std::begin(c), std::end(c), std::begin(dest_sol));
 
-        bool equality = test::equal(std::begin(dest_res), get<1>(result).base(),
+        bool equality = test::equal(std::begin(dest_res), result.out.base(),
             std::begin(dest_sol), solution);
 
         HPX_TEST(equality);
@@ -401,6 +422,9 @@ void test_unique_copy()
 
     ////////// Test cases for 'int' type.
     test_unique_copy(
+        IteratorTag(), int(),
+        [](const int a, const int b) -> bool { return a == b; }, rand_base);
+    test_unique_copy(
         seq, IteratorTag(), int(),
         [](const int a, const int b) -> bool { return a == b; }, rand_base);
     test_unique_copy(
@@ -414,6 +438,12 @@ void test_unique_copy()
         [](const int a, const int b) -> bool { return a == b; }, rand_base);
 
     ////////// Test cases for user defined type.
+    test_unique_copy(
+        IteratorTag(), user_defined_type(),
+        [](user_defined_type const& a, user_defined_type const& b) -> bool {
+            return a == b;
+        },
+        rand_base);
     test_unique_copy(
         seq, IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {

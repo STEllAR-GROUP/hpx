@@ -82,10 +82,10 @@ void test_unique_copy(ExPolicy policy, DataType)
     auto solution =
         std::unique_copy(std::begin(c), std::end(c), std::begin(dest_sol));
 
-    HPX_TEST(get<0>(result) == std::end(c));
+    HPX_TEST(result.in == std::end(c));
 
     bool equality = test::equal(
-        std::begin(dest_res), get<1>(result), std::begin(dest_sol), solution);
+        std::begin(dest_res), result.out, std::begin(dest_sol), solution);
 
     HPX_TEST(equality);
 }
@@ -107,10 +107,10 @@ void test_unique_copy_async(ExPolicy policy, DataType)
     auto solution =
         std::unique_copy(std::begin(c), std::end(c), std::begin(dest_sol));
 
-    HPX_TEST(get<0>(result) == std::end(c));
+    HPX_TEST(result.in == std::end(c));
 
     bool equality = test::equal(
-        std::begin(dest_res), get<1>(result), std::begin(dest_sol), solution);
+        std::begin(dest_res), result.out, std::begin(dest_sol), solution);
 
     HPX_TEST(equality);
 }
