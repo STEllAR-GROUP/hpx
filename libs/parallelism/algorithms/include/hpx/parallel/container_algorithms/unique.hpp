@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +11,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
@@ -18,7 +21,6 @@
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/unique.hpp>
-#include <hpx/parallel/tagspec.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -97,12 +99,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     traits::projected_range<Proj, Rng>>::value)>
     typename util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type
-    unique(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
-        Proj&& proj = Proj())
+        HPX_DEPRECATED_V(1, 8,
+            "hpx::parallel::unique is deprecated, use hpx::unique instead")
+            unique(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
+                Proj&& proj = Proj())
     {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return unique(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), std::forward<Pred>(pred),
             std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     /// Copies the elements from the range \a rng,
@@ -189,12 +200,303 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     traits::projected_range<Proj, Rng>>::value)>
     typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<typename hpx::traits::range_iterator<Rng>::type,
-            FwdIter2>>::type
-    unique_copy(ExPolicy&& policy, Rng&& rng, FwdIter2 dest,
+            FwdIter2>>::type HPX_DEPRECATED_V(1, 8,
+        "hpx::parallel::unique_copy is deprecated, use hpx::unique_copy "
+        "instead") unique_copy(ExPolicy&& policy, Rng&& rng, FwdIter2 dest,
         Pred&& pred = Pred(), Proj&& proj = Proj())
     {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return unique_copy(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), hpx::util::end(rng), dest,
             std::forward<Pred>(pred), std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
+
+namespace hpx { namespace ranges {
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename I, typename S = I>
+    using subrange_t = hpx::util::iterator_range<I, S>;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // DPO for hpx::ranges::unique
+    HPX_INLINE_CONSTEXPR_VARIABLE struct unique_t final
+      : hpx::functional::tag_fallback<unique_t>
+    {
+    private:
+        // clang-format off
+        template <typename FwdIter, typename Sent,
+            typename Pred = ranges::equal_to,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<FwdIter>::value &&
+                hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
+                parallel::traits::is_projected<Proj, FwdIter>::value &&
+                parallel::traits::is_indirect_callable<
+                    hpx::execution::sequenced_policy, Pred,
+                    parallel::traits::projected<Proj, FwdIter>,
+                    parallel::traits::projected<Proj, FwdIter>>::value
+            )>
+        // clang-format on
+        friend subrange_t<FwdIter, Sent> tag_fallback_dispatch(
+            hpx::ranges::unique_t, FwdIter first, Sent last,
+            Pred&& pred = Pred(), Proj&& proj = Proj())
+        {
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+                "Requires at least forward iterator.");
+
+            return hpx::parallel::util::make_subrange<FwdIter, Sent>(
+                hpx::parallel::v1::detail::unique<FwdIter>().call(
+                    hpx::execution::seq, first, last, std::forward<Pred>(pred),
+                    std::forward<Proj>(proj)),
+                last);
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter, typename Sent,
+            typename Pred = ranges::equal_to,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter>::value &&
+                hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
+                parallel::traits::is_projected<Proj, FwdIter>::value &&
+                parallel::traits::is_indirect_callable<
+                    ExPolicy, Pred,
+                    parallel::traits::projected<Proj, FwdIter>,
+                    parallel::traits::projected<Proj, FwdIter>>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            subrange_t<FwdIter, Sent>>::type
+        tag_fallback_dispatch(hpx::ranges::unique_t, ExPolicy&& policy,
+            FwdIter first, Sent last, Pred&& pred = Pred(),
+            Proj&& proj = Proj())
+        {
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+                "Requires at least forward iterator.");
+
+            return hpx::parallel::util::make_subrange<FwdIter, Sent>(
+                hpx::parallel::v1::detail::unique<FwdIter>().call(
+                    std::forward<ExPolicy>(policy), first, last,
+                    std::forward<Pred>(pred), std::forward<Proj>(proj)),
+                last);
+        }
+
+        // clang-format off
+        template <typename Rng,
+            typename Pred = ranges::equal_to,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_range<Rng>::value &&
+                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
+                hpx::parallel::traits::is_indirect_callable<
+                    hpx::execution::sequenced_policy, Pred,
+                    hpx::parallel::traits::projected_range<Proj, Rng>,
+                    hpx::parallel::traits::projected_range<Proj, Rng>>::value
+            )>
+        // clang-format on
+        friend subrange_t<typename hpx::traits::range_iterator<Rng>::type>
+        tag_fallback_dispatch(hpx::ranges::unique_t, Rng&& rng,
+            Pred&& pred = Pred(), Proj&& proj = Proj())
+        {
+            using iterator_type =
+                typename hpx::traits::range_iterator<Rng>::type;
+
+            static_assert(
+                hpx::traits::is_forward_iterator<iterator_type>::value,
+                "Requires at least input iterator.");
+
+            return hpx::parallel::util::make_subrange<
+                typename hpx::traits::range_iterator<Rng>::type,
+                typename hpx::traits::range_sentinel<Rng>::type>(
+                hpx::parallel::v1::detail::unique<
+                    typename hpx::traits::range_iterator<Rng>::type>()
+                    .call(hpx::execution::seq, hpx::util::begin(rng),
+                        hpx::util::end(rng), std::forward<Pred>(pred),
+                        std::forward<Proj>(proj)),
+                hpx::util::end(rng));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename Rng,
+            typename Pred = ranges::equal_to,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_range<Rng>::value &&
+                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
+                hpx::parallel::traits::is_indirect_callable<
+                    ExPolicy, Pred,
+                    hpx::parallel::traits::projected_range<Proj, Rng>,
+                    hpx::parallel::traits::projected_range<Proj, Rng>>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            subrange_t<typename hpx::traits::range_iterator<Rng>::type>>::type
+        tag_fallback_dispatch(hpx::ranges::unique_t, ExPolicy&& policy,
+            Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj())
+        {
+            using iterator_type =
+                typename hpx::traits::range_iterator<Rng>::type;
+
+            static_assert(
+                hpx::traits::is_forward_iterator<iterator_type>::value,
+                "Requires at least forward iterator.");
+
+            return hpx::parallel::util::make_subrange<
+                typename hpx::traits::range_iterator<Rng>::type,
+                typename hpx::traits::range_sentinel<Rng>::type>(
+                hpx::parallel::v1::detail::unique<
+                    typename hpx::traits::range_iterator<Rng>::type>()
+                    .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                        hpx::util::end(rng), std::forward<Pred>(pred),
+                        std::forward<Proj>(proj)),
+                hpx::util::end(rng));
+        }
+    } unique{};
+
+    template <typename I, typename O>
+    using unique_copy_result = parallel::util::in_out_result<I, O>;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // DPO for hpx::ranges::unique_copy
+    HPX_INLINE_CONSTEXPR_VARIABLE struct unique_copy_t final
+      : hpx::functional::tag_fallback<unique_copy_t>
+    {
+    private:
+        // clang-format off
+        template <typename InIter, typename Sent, typename O,
+            typename Pred = ranges::equal_to,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<InIter>::value &&
+                hpx::traits::is_sentinel_for<Sent, InIter>::value &&
+                parallel::traits::is_projected<Proj, InIter>::value &&
+                parallel::traits::is_indirect_callable<
+                    hpx::execution::sequenced_policy, Pred,
+                    parallel::traits::projected<Proj, InIter>,
+                    parallel::traits::projected<Proj, InIter>>::value
+            )>
+        // clang-format on
+        friend unique_copy_result<InIter, O> tag_fallback_dispatch(
+            hpx::ranges::unique_copy_t, InIter first, Sent last, O dest,
+            Pred&& pred = Pred(), Proj&& proj = Proj())
+        {
+            static_assert(hpx::traits::is_input_iterator<InIter>::value,
+                "Requires at least input iterator.");
+
+            using result_type = unique_copy_result<InIter, O>;
+
+            return hpx::parallel::v1::detail::unique_copy<result_type>().call(
+                hpx::execution::seq, first, last, dest,
+                std::forward<Pred>(pred), std::forward<Proj>(proj));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter, typename Sent,
+            typename O,
+            typename Pred = ranges::equal_to,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter>::value &&
+                hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
+                parallel::traits::is_projected<Proj, FwdIter>::value &&
+                parallel::traits::is_indirect_callable<
+                    ExPolicy, Pred,
+                    parallel::traits::projected<Proj, FwdIter>,
+                    parallel::traits::projected<Proj, FwdIter>>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            unique_copy_result<FwdIter, O>>::type
+        tag_fallback_dispatch(hpx::ranges::unique_copy_t, ExPolicy&& policy,
+            FwdIter first, Sent last, O dest, Pred&& pred = Pred(),
+            Proj&& proj = Proj())
+        {
+            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+                "Requires at least forward iterator.");
+
+            using result_type = unique_copy_result<FwdIter, O>;
+
+            return hpx::parallel::v1::detail::unique_copy<result_type>().call(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                std::forward<Pred>(pred), std::forward<Proj>(proj));
+        }
+
+        // clang-format off
+        template <typename Rng, typename O,
+            typename Pred = ranges::equal_to,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_range<Rng>::value &&
+                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
+                hpx::parallel::traits::is_indirect_callable<
+                    hpx::execution::sequenced_policy, Pred,
+                    hpx::parallel::traits::projected_range<Proj, Rng>,
+                    hpx::parallel::traits::projected_range<Proj, Rng>>::value
+            )>
+        // clang-format on
+        friend unique_copy_result<
+            typename hpx::traits::range_iterator<Rng>::type, O>
+        tag_fallback_dispatch(hpx::ranges::unique_copy_t, Rng&& rng, O dest,
+            Pred&& pred = Pred(), Proj&& proj = Proj())
+        {
+            using iterator_type =
+                typename hpx::traits::range_iterator<Rng>::type;
+
+            static_assert(hpx::traits::is_input_iterator<iterator_type>::value,
+                "Requires at least input iterator.");
+
+            using result_type = unique_copy_result<
+                typename hpx::traits::range_iterator<Rng>::type, O>;
+
+            return hpx::parallel::v1::detail::unique_copy<result_type>().call(
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                dest, std::forward<Pred>(pred), std::forward<Proj>(proj));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename Rng, typename O,
+            typename Pred = ranges::equal_to,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_range<Rng>::value &&
+                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
+                hpx::parallel::traits::is_indirect_callable<
+                    ExPolicy, Pred,
+                    hpx::parallel::traits::projected_range<Proj, Rng>,
+                    hpx::parallel::traits::projected_range<Proj, Rng>>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            unique_copy_result<typename hpx::traits::range_iterator<Rng>::type,
+                O>>::type
+        tag_fallback_dispatch(hpx::ranges::unique_copy_t, ExPolicy&& policy,
+            Rng&& rng, O dest, Pred&& pred = Pred(), Proj&& proj = Proj())
+        {
+            using iterator_type =
+                typename hpx::traits::range_iterator<Rng>::type;
+
+            static_assert(
+                hpx::traits::is_forward_iterator<iterator_type>::value,
+                "Requires at least input iterator.");
+
+            using result_type = unique_copy_result<
+                typename hpx::traits::range_iterator<Rng>::type, O>;
+
+            return hpx::parallel::v1::detail::unique_copy<result_type>().call(
+                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                hpx::util::end(rng), dest, std::forward<Pred>(pred),
+                std::forward<Proj>(proj));
+        }
+    } unique_copy{};
+}}    // namespace hpx::ranges
