@@ -37,7 +37,7 @@ namespace hpx {
     ///           The \a unique algorithm returns the iterator to the new end
     ///           of the range.
     ///
-    template <typename ExPolicy, typename FwdIter>
+    template <typename FwdIter>
     FwdIter unique(FwdIter first, FwdIter last);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -914,13 +914,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             traits::is_indirect_callable<ExPolicy, Pred,
                                 traits::projected<Proj, FwdIter1>,
                                 traits::projected<Proj, FwdIter1>>::value)>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::parallel::unique_copy is deprecated, use "
+        "hpx::unique_copy instead")
     typename util::detail::algorithm_result<ExPolicy,
         parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
-        HPX_DEPRECATED_V(1, 8,
-            "hpx::parallel::unique_copy is deprecated, use "
-            "hpx::unique_copy instead")
-            unique_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-                FwdIter2 dest, Pred&& pred = Pred(), Proj&& proj = Proj())
+        unique_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, Pred&& pred = Pred(), Proj&& proj = Proj())
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Required at least forward iterator.");

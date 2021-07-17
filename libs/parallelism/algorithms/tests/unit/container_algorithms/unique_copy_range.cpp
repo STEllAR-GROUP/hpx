@@ -81,8 +81,8 @@ void test_unique_copy_sent()
 
     auto result = hpx::ranges::unique_copy(
         std::begin(c), sentinel<std::size_t>{10}, std::begin(dest_res));
-    auto solution =
-        std::unique_copy(std::begin(c), std::begin(c) + end_len, std::begin(dest_sol));
+    auto solution = std::unique_copy(
+        std::begin(c), std::begin(c) + end_len, std::begin(dest_sol));
 
     HPX_TEST(result.in == std::next(std::begin(c), end_len));
 
@@ -92,7 +92,7 @@ void test_unique_copy_sent()
     HPX_TEST(equality);
 }
 
-template<typename ExPolicy>
+template <typename ExPolicy>
 void test_unique_copy_sent(ExPolicy policy)
 {
     using hpx::get;
@@ -104,8 +104,8 @@ void test_unique_copy_sent(ExPolicy policy)
     auto end_len = std::rand() % 10006 + 1;
     c[end_len] = 10;
 
-    auto result = hpx::ranges::unique_copy(policy,
-        std::begin(c), sentinel<std::size_t>{10}, std::begin(dest_res));
+    auto result = hpx::ranges::unique_copy(
+        policy, std::begin(c), sentinel<std::size_t>{10}, std::begin(dest_res));
     auto solution = std::unique_copy(
         std::begin(c), std::begin(c) + end_len, std::begin(dest_sol));
 

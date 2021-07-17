@@ -197,13 +197,14 @@ namespace hpx { namespace ranges {
     ///
     /// \returns  The \a unique algorithm returns
     ///           \a subrange_t<typename hpx::traits::range_iterator<Rng>
-    ///           ::type>.
+    ///           ::type,typename hpx::traits::range_iterator<Rng>::type>.
     ///           The \a unique algorithm returns an object {ret, last},
     ///           where ret is a past-the-end iterator for a new
     ///           subrange.
     ///
     template <typename Rng, typename Pred, typename Proj>
-    subrange_t<typename hpx::traits::range_iterator<Rng>::type>
+    subrange_t<typename hpx::traits::range_iterator<Rng>::type,
+        typename hpx::traits::range_iterator<Rng>::type>
     unique(Rng&& rng, Pred&& pred, Proj&& proj);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -265,18 +266,21 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a unique algorithm returns a \a hpx::future
-    ///           <subrange_t<typename hpx::traits::range_iterator<Rng>::type>>
+    ///           <subrange_t<typename hpx::traits::range_iterator<Rng>::type,
+    ///           typename hpx::traits::range_iterator<Rng>::type>>
     ///           if the execution policy is of type \a sequenced_task_policy
     ///           or \a parallel_task_policy and returns
     ///           \a subrange_t<typename hpx::traits::range_iterator<Rng>
-    ///           ::type>. otherwise.
+    ///           ::type,typename hpx::traits::range_iterator<Rng>::type>.
+    ///           otherwise.
     ///           The \a unique algorithm returns an object {ret, last},
     ///           where ret is a past-the-end iterator for a new
     ///           subrange.
     ///
     template <typename ExPolicy, typename Rng, typename Pred, typename Proj>
     typename util::detail::algorithm_result<ExPolicy,
-    subrange_t<typename hpx::traits::range_iterator<Rng>::type>::type
+    subrange_t<typename hpx::traits::range_iterator<Rng>::type,
+    typename hpx::traits::range_iterator<Rng>::type>::type
     unique(ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -344,7 +348,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename InIter, typename Sent, typename OutIter,
         typename Pred, typename Proj>
-    util::in_out_result<FwdIter, OutIter> unique(FwdIter first,
+    util::in_out_result<FwdIter, OutIter> unique_copy(InIter first,
         Sent last, OutIter dest, Pred&& pred, Proj&& proj);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -418,7 +422,7 @@ namespace hpx { namespace ranges {
     /// \returns  The \a unique_copy algorithm returns areturns hpx::future<
     ///           parallel::util::in_out_result<FwdIter1, FwdIter2>> if the
     ///           execution policy is of type \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a 
+    ///           \a parallel_task_policy and returns \a
     ///           parallel::util::in_out_result<FwdIter1, FwdIter2> otherwise.
     ///           The \a unique_copy algorithm returns an in_out_result with
     ///           the source iterator to one past the last element and out
@@ -608,12 +612,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
                     Pred, traits::projected_range<Proj, Rng>,
                     traits::projected_range<Proj, Rng>>::value)>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::parallel::unique is deprecated, use hpx::unique instead")
     typename util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type
-        HPX_DEPRECATED_V(1, 8,
-            "hpx::parallel::unique is deprecated, use hpx::unique instead")
-            unique(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
-                Proj&& proj = Proj())
+        unique(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
+            Proj&& proj = Proj())
     {
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
@@ -636,12 +640,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     Rng>::value&& traits::is_indirect_callable<ExPolicy, Pred,
                     traits::projected_range<Proj, Rng>,
                     traits::projected_range<Proj, Rng>>::value)>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::parallel::unique_copy is deprecated, use hpx::unique_copy "
+        "instead")
     typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<typename hpx::traits::range_iterator<Rng>::type,
-            FwdIter2>>::type HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::unique_copy is deprecated, use hpx::unique_copy "
-        "instead") unique_copy(ExPolicy&& policy, Rng&& rng, FwdIter2 dest,
-        Pred&& pred = Pred(), Proj&& proj = Proj())
+            FwdIter2>>::type unique_copy(ExPolicy&& policy, Rng&& rng,
+        FwdIter2 dest, Pred&& pred = Pred(), Proj&& proj = Proj())
     {
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
@@ -659,7 +664,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename I, typename S = I>
+    template <typename I, typename S>
     using subrange_t = hpx::util::iterator_range<I, S>;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -740,7 +745,8 @@ namespace hpx { namespace ranges {
                     hpx::parallel::traits::projected_range<Proj, Rng>>::value
             )>
         // clang-format on
-        friend subrange_t<typename hpx::traits::range_iterator<Rng>::type>
+        friend subrange_t<typename hpx::traits::range_iterator<Rng>::type,
+            typename hpx::traits::range_iterator<Rng>::type>
         tag_fallback_dispatch(hpx::ranges::unique_t, Rng&& rng,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
@@ -777,7 +783,8 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            subrange_t<typename hpx::traits::range_iterator<Rng>::type>>::type
+            subrange_t<typename hpx::traits::range_iterator<Rng>::type,
+                typename hpx::traits::range_iterator<Rng>::type>>::type
         tag_fallback_dispatch(hpx::ranges::unique_t, ExPolicy&& policy,
             Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
