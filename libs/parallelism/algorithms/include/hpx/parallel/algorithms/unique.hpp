@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -608,8 +609,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
     typename util::detail::algorithm_result<ExPolicy,
         parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
         HPX_DEPRECATED_V(1, 8,
-            "hpx::parallel::unique is deprecated, use "
-            "hpx::unique instead")
+            "hpx::parallel::unique_copy is deprecated, use "
+            "hpx::unique_copy instead")
             unique_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
                 FwdIter2 dest, Pred&& pred = Pred(), Proj&& proj = Proj())
     {

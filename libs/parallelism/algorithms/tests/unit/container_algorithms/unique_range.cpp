@@ -1,9 +1,11 @@
 //  Copyright (c) 2017-2018 Taeguk Kwon
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/container_algorithms/unique.hpp>
@@ -46,7 +48,7 @@ struct user_defined_type
 };
 
 const std::vector<std::string> user_defined_type::name_list{
-    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
+    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB", "END"};
 
 struct random_fill
 {
@@ -66,6 +68,66 @@ struct random_fill
 };
 
 ////////////////////////////////////////////////////////////////////////////
+void test_unique_sent()
+{
+    std::size_t const size = 10007;
+    std::vector<std::size_t> c(size), d;
+    std::generate(std::begin(c), std::end(c),
+        []() -> std::size_t { return std::rand() % 10; });
+    d = c;
+
+    auto end_len = std::rand() % 10006 + 1;
+    c[end_len] = 10;
+
+    auto result = hpx::ranges::unique(std::begin(c), sentinel<std::size_t>{10});
+    auto solution = std::unique(std::begin(d), std::begin(d) + end_len);
+
+    bool equality =
+        test::equal(std::begin(c), result.begin(), std::begin(d), solution);
+
+    HPX_TEST(equality);
+}
+
+template <typename ExPolicy>
+void test_unique_sent(ExPolicy policy)
+{
+    std::size_t const size = 10007;
+    std::vector<std::size_t> c(size), d;
+    std::generate(std::begin(c), std::end(c),
+        []() -> std::size_t { return std::rand() % 10; });
+    d = c;
+
+    auto end_len = std::rand() % 10006 + 1;
+    c[end_len] = 10;
+
+    auto result =
+        hpx::ranges::unique(policy, std::begin(c), sentinel<std::size_t>{10});
+    auto solution = std::unique(std::begin(d), std::begin(d) + end_len);
+
+    bool equality =
+        test::equal(std::begin(c), result.begin(), std::begin(d), solution);
+
+    HPX_TEST(equality);
+}
+
+////////////////////////////////////////////////////////////////////////////
+template <typename DataType>
+void test_unique(DataType)
+{
+    std::size_t const size = 10007;
+    std::vector<DataType> c(size), d;
+    std::generate(std::begin(c), std::end(c), random_fill(0, 6));
+    d = c;
+
+    auto result = hpx::ranges::unique(c);
+    auto solution = std::unique(std::begin(d), std::end(d));
+
+    bool equality =
+        test::equal(std::begin(c), result.begin(), std::begin(d), solution);
+
+    HPX_TEST(equality);
+}
+
 template <typename ExPolicy, typename DataType>
 void test_unique(ExPolicy policy, DataType)
 {
@@ -79,10 +141,11 @@ void test_unique(ExPolicy policy, DataType)
     std::generate(std::begin(c), std::end(c), random_fill(0, 6));
     d = c;
 
-    auto result = hpx::parallel::unique(policy, c);
+    auto result = hpx::ranges::unique(policy, c);
     auto solution = std::unique(std::begin(d), std::end(d));
 
-    bool equality = test::equal(std::begin(c), result, std::begin(d), solution);
+    bool equality =
+        test::equal(std::begin(c), result.begin(), std::begin(d), solution);
 
     HPX_TEST(equality);
 }
@@ -100,11 +163,12 @@ void test_unique_async(ExPolicy policy, DataType)
     std::generate(std::begin(c), std::end(c), random_fill(0, 6));
     d = c;
 
-    auto f = hpx::parallel::unique(policy, c);
+    auto f = hpx::ranges::unique(policy, c);
     auto result = f.get();
     auto solution = std::unique(std::begin(d), std::end(d));
 
-    bool equality = test::equal(std::begin(c), result, std::begin(d), solution);
+    bool equality =
+        test::equal(std::begin(c), result.begin(), std::begin(d), solution);
 
     HPX_TEST(equality);
 }
@@ -114,6 +178,12 @@ void test_unique()
 {
     using namespace hpx::execution;
 
+    test_unique_sent();
+    test_unique_sent(seq);
+    test_unique_sent(par);
+    test_unique_sent(par_unseq);
+
+    test_unique(DataType());
     test_unique(seq, DataType());
     test_unique(par, DataType());
     test_unique(par_unseq, DataType());

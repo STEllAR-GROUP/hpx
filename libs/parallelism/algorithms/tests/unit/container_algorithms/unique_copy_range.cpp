@@ -1,9 +1,11 @@
 //  Copyright (c) 2017-2018 Taeguk Kwon
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/container_algorithms/unique.hpp>
@@ -66,6 +68,77 @@ struct random_fill
 };
 
 ////////////////////////////////////////////////////////////////////////////
+void test_unique_copy_sent()
+{
+    using hpx::get;
+
+    std::size_t const size = 10007;
+    std::vector<std::size_t> c(size), dest_res(size), dest_sol(size);
+    std::generate(std::begin(c), std::end(c), random_fill(0, 6));
+
+    auto end_len = std::rand() % 10006 + 1;
+    c[end_len] = 10;
+
+    auto result = hpx::ranges::unique_copy(
+        std::begin(c), sentinel<std::size_t>{10}, std::begin(dest_res));
+    auto solution =
+        std::unique_copy(std::begin(c), std::begin(c) + end_len, std::begin(dest_sol));
+
+    HPX_TEST(result.in == std::next(std::begin(c), end_len));
+
+    bool equality = test::equal(
+        std::begin(dest_res), result.out, std::begin(dest_sol), solution);
+
+    HPX_TEST(equality);
+}
+
+template<typename ExPolicy>
+void test_unique_copy_sent(ExPolicy policy)
+{
+    using hpx::get;
+
+    std::size_t const size = 10007;
+    std::vector<std::size_t> c(size), dest_res(size), dest_sol(size);
+    std::generate(std::begin(c), std::end(c), random_fill(0, 6));
+
+    auto end_len = std::rand() % 10006 + 1;
+    c[end_len] = 10;
+
+    auto result = hpx::ranges::unique_copy(policy,
+        std::begin(c), sentinel<std::size_t>{10}, std::begin(dest_res));
+    auto solution = std::unique_copy(
+        std::begin(c), std::begin(c) + end_len, std::begin(dest_sol));
+
+    HPX_TEST(result.in == std::next(std::begin(c), end_len));
+
+    bool equality = test::equal(
+        std::begin(dest_res), result.out, std::begin(dest_sol), solution);
+
+    HPX_TEST(equality);
+}
+
+////////////////////////////////////////////////////////////////////////////
+template <typename DataType>
+void test_unique_copy(DataType)
+{
+    using hpx::get;
+
+    std::size_t const size = 10007;
+    std::vector<DataType> c(size), dest_res(size), dest_sol(size);
+    std::generate(std::begin(c), std::end(c), random_fill(0, 6));
+
+    auto result = hpx::ranges::unique_copy(c, std::begin(dest_res));
+    auto solution =
+        std::unique_copy(std::begin(c), std::end(c), std::begin(dest_sol));
+
+    HPX_TEST(result.in == std::end(c));
+
+    bool equality = test::equal(
+        std::begin(dest_res), result.out, std::begin(dest_sol), solution);
+
+    HPX_TEST(equality);
+}
+
 template <typename ExPolicy, typename DataType>
 void test_unique_copy(ExPolicy policy, DataType)
 {
@@ -78,7 +151,7 @@ void test_unique_copy(ExPolicy policy, DataType)
     std::vector<DataType> c(size), dest_res(size), dest_sol(size);
     std::generate(std::begin(c), std::end(c), random_fill(0, 6));
 
-    auto result = hpx::parallel::unique_copy(policy, c, std::begin(dest_res));
+    auto result = hpx::ranges::unique_copy(policy, c, std::begin(dest_res));
     auto solution =
         std::unique_copy(std::begin(c), std::end(c), std::begin(dest_sol));
 
@@ -102,7 +175,7 @@ void test_unique_copy_async(ExPolicy policy, DataType)
     std::vector<DataType> c(size), dest_res(size), dest_sol(size);
     std::generate(std::begin(c), std::end(c), random_fill(0, 6));
 
-    auto f = hpx::parallel::unique_copy(policy, c, std::begin(dest_res));
+    auto f = hpx::ranges::unique_copy(policy, c, std::begin(dest_res));
     auto result = f.get();
     auto solution =
         std::unique_copy(std::begin(c), std::end(c), std::begin(dest_sol));
@@ -118,6 +191,12 @@ void test_unique_copy_async(ExPolicy policy, DataType)
 template <typename DataType>
 void test_unique_copy()
 {
+    test_unique_copy_sent();
+    test_unique_copy_sent(hpx::execution::seq);
+    test_unique_copy_sent(hpx::execution::par);
+    test_unique_copy_sent(hpx::execution::par_unseq);
+
+    test_unique_copy(DataType());
     test_unique_copy(hpx::execution::seq, DataType());
     test_unique_copy(hpx::execution::par, DataType());
     test_unique_copy(hpx::execution::par_unseq, DataType());
