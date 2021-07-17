@@ -8,6 +8,172 @@
 
 #pragma once
 
+#if defined(DOXYGEN)
+namespace hpx{
+    /// Performs a left rotation on a range of elements. Specifically,
+    /// \a rotate swaps the elements in the range [first, last) in such a way
+    /// that the element new_first becomes the first element of the new range
+    /// and new_first - 1 becomes the last element.
+    ///
+    /// \note   Complexity: Linear in the distance between \a first and \a last.
+    ///
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param new_first    Refers to the element that should appear at the
+    ///                     beginning of the rotated range.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// The assignments in the parallel \a rotate algorithm 
+    /// execute in sequential order in the calling thread.
+    ///
+    /// \note The type of dereferenced \a FwdIter must meet the requirements
+    ///       of \a MoveAssignable and \a MoveConstructible.
+    ///
+    /// \returns  The \a rotate algorithm returns a FwdIter,          
+    ///           The \a rotate algorithm returns the iterator to the new location of 
+    ///           the element pointed by first,equal to first + (last - new_first).
+    ///
+    template< typename FwdIter >
+    FwdIter rotate( FwdIter first, FwdIter new_first, FwdIter last );
+    
+    /// Performs a left rotation on a range of elements. Specifically,
+    /// \a rotate swaps the elements in the range [first, last) in such a way
+    /// that the element new_first becomes the first element of the new range
+    /// and new_first - 1 becomes the last element.
+    ///
+    /// \note   Complexity: Linear in the distance between \a first and \a last.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param new_first    Refers to the element that should appear at the
+    ///                     beginning of the rotated range.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    ///
+    /// The assignments in the parallel \a rotate algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a rotate algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \note The type of dereferenced \a FwdIter must meet the requirements
+    ///       of \a MoveAssignable and \a MoveConstructible.
+    ///
+    /// \returns  The \a rotate algorithm returns a \a hpx::future<FwdIter>
+    ///           if the execution policy is of type
+    ///           \a sequenced_task_policy or \a parallel_task_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a rotate algorithm returns the iterator equal to
+    ///           first + (last - new_first).
+    ///
+    template <typename ExPolicy, typename FwdIter>
+    typename util::detail::algorithm_result<ExPolicy,FwdIter>::type rotate(
+        ExPolicy&& policy, FwdIter first, FwdIter new_first, FwdIter last)
+        
+    /// Copies the elements from the range [first, last), to another range
+    /// beginning at \a dest_first in such a way, that the element
+    /// \a new_first becomes the first element of the new range and
+    /// \a new_first - 1 becomes the last element.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam OutIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param new_first    Refers to the element that should appear at the
+    ///                     beginning of the rotated range.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest_first   Refers to the begin of the destination range.
+    ///
+    /// The assignments in the parallel \a rotate_copy algorithm 
+    /// execute in sequential order in the calling thread.
+    ///
+    /// \returns  The \a rotate_copy algorithm returns a output iterator,
+    ///           The \a rotate_copy algorithm returns the output iterator to the
+    ///           element past the last element copied.
+    ///
+    template <typename FwdIter, typename OutIter>
+    OutIter rotate_copy(FwdIter first, FwdIter new_first, FwdIter last, OutIter dest_first)    
+        
+    /// Copies the elements from the range [first, last), to another range
+    /// beginning at \a dest_first in such a way, that the element
+    /// \a new_first becomes the first element of the new range and
+    /// \a new_first - 1 becomes the last element.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param new_first    Refers to the element that should appear at the
+    ///                     beginning of the rotated range.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest_first   Refers to the begin of the destination range.
+    ///
+    /// The assignments in the parallel \a rotate_copy algorithm 
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a rotate_copy algorithm 
+    /// execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a rotate_copy algorithm returns a
+    ///           \a hpx::future<FwdIter2>
+    ///           if the execution policy is of type
+    ///           \a parallel_task_policy and
+    ///           returns FwdIter2
+    ///           otherwise.
+    ///           The \a rotate_copy algorithm returns the output iterator to the
+    ///           element past the last element copied.
+    ///  
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+    typename util::detail::algorithm_result<ExPolicy,FwdIter2>::type rotate_copy(
+        ExPolicy&& policy, FwdIter1 first, FwdIter1 new_first, FwdIter1 last, FwdIter2 dest_first)    
+            
+} // namespace hpx
+
+#else // DOXYGEN
+
 #include <hpx/config.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -97,52 +263,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Performs a left rotation on a range of elements. Specifically,
-    /// \a rotate swaps the elements in the range [first, last) in such a way
-    /// that the element new_first becomes the first element of the new range
-    /// and new_first - 1 becomes the last element.
-    ///
-    /// \note   Complexity: Linear in the distance between \a first and \a last.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param new_first    Refers to the element that should appear at the
-    ///                     beginning of the rotated range.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    ///
-    /// The assignments in the parallel \a rotate algorithm invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a rotate algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \note The type of dereferenced \a FwdIter must meet the requirements
-    ///       of \a MoveAssignable and \a MoveConstructible.
-    ///
-    /// \returns  The \a rotate algorithm returns a
-    ///           \a hpx::future<tagged_pair<tag::begin(FwdIter), tag::end(FwdIter)> >
-    ///           if the execution policy is of type
-    ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::begin(FwdIter), tag::end(FwdIter)>
-    ///           otherwise.
-    ///           The \a rotate algorithm returns the iterator equal to
-    ///           pair(first + (last - new_first), last).
-    ///
+
     template <typename ExPolicy, typename FwdIter,
         HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter>::value)>
@@ -236,54 +357,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Copies the elements from the range [first, last), to another range
-    /// beginning at \a dest_first in such a way, that the element
-    /// \a new_first becomes the first element of the new range and
-    /// \a new_first - 1 becomes the last element.
-    ///
-    /// \note   Complexity: Performs exactly \a last - \a first assignments.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     bidirectional iterator.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param new_first    Refers to the element that should appear at the
-    ///                     beginning of the rotated range.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param dest_first   Refers to the begin of the destination range.
-    ///
-    /// The assignments in the parallel \a rotate_copy algorithm invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a rotate_copy algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a rotate_copy algorithm returns a
-    ///           \a hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
-    ///           if the execution policy is of type
-    ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
-    ///           otherwise.
-    ///           The \a rotate_copy algorithm returns the output iterator to the
-    ///           element past the last element copied.
-    ///
+
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         HPX_CONCEPT_REQUIRES_(hpx::traits::is_iterator<FwdIter1>::value&&
                 hpx::is_execution_policy<ExPolicy>::value&&
@@ -308,3 +382,5 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 last, dest_first);
     }
 }}}    // namespace hpx::parallel::v1
+
+#endif // DOXYGEN
