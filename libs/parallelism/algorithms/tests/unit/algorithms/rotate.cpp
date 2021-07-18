@@ -37,7 +37,7 @@ void test_rotate(ExPolicy policy, IteratorTag)
     base_iterator mid = std::begin(c);
     std::advance(mid, mid_pos);
 
-    hpx::parallel::rotate(
+    hpx::rotate(
         policy, iterator(std::begin(c)), iterator(mid), iterator(std::end(c)));
 
     base_iterator mid1 = std::begin(d1);
@@ -71,7 +71,7 @@ void test_rotate_async(ExPolicy p, IteratorTag)
     base_iterator mid = std::begin(c);
     std::advance(mid, mid_pos);
 
-    auto f = hpx::parallel::rotate(
+    auto f = hpx::rotate(
         p, iterator(std::begin(c)), iterator(mid), iterator(std::end(c)));
     f.wait();
 
@@ -131,7 +131,7 @@ void test_rotate_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::rotate(policy,
+        hpx::rotate(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(mid), decorated_iterator(std::end(c)));
@@ -171,7 +171,7 @@ void test_rotate_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::rotate(p,
+        hpx::future<void> f = hpx::rotate(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(mid), decorated_iterator(std::end(c)));
@@ -239,7 +239,7 @@ void test_rotate_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::rotate(policy,
+        hpx::rotate(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(mid), decorated_iterator(std::end(c)));
         HPX_TEST(false);
@@ -277,7 +277,7 @@ void test_rotate_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::rotate(p,
+        hpx::future<void> f = hpx::rotate(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(mid), decorated_iterator(std::end(c)));
         returned_from_algorithm = true;
