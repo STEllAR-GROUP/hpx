@@ -1,4 +1,5 @@
 //  Copyright (c) 2015-2020 Hartmut Kaiser
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -97,13 +98,150 @@ namespace hpx { namespace parallel { inline namespace rangev1 {
             >::value
         )>
     // clang-format on
-    typename util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_iterator<Rng>::type>::type
-    sort(ExPolicy&& policy, Rng&& rng, Compare&& comp = Compare(),
-        Proj&& proj = Proj())
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::parallel::sort is deprecated, use hpx::sort instead")
+        typename util::detail::algorithm_result<ExPolicy,
+            typename hpx::traits::range_iterator<Rng>::type>::type
+        sort(ExPolicy&& policy, Rng&& rng, Compare&& comp = Compare(),
+            Proj&& proj = Proj())
     {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return v1::sort(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), std::forward<Compare>(comp),
             std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::rangev1
+
+namespace hpx { namespace ranges {
+    ///////////////////////////////////////////////////////////////////////////
+    // DPO for hpx::ranges::sort
+    HPX_INLINE_CONSTEXPR_VARIABLE struct sort_t final
+      : hpx::functional::tag_fallback<sort_t>
+    {
+    private:
+        // clang-format off
+        template <typename RandomIt, typename Sent,
+            typename Comp = ranges::less,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<RandomIt>::value &&
+                hpx::traits::is_sentinel_for<Sent, RandomIt>::value &&
+                parallel::traits::is_projected<Proj, RandomIt>::value &&
+                parallel::traits::is_indirect_callable<
+                    hpx::execution::sequenced_policy, Comp,
+                    parallel::traits::projected<Proj, RandomIt>,
+                    parallel::traits::projected<Proj, RandomIt>
+                >::value
+            )>
+        // clang-format on
+        friend RandomIt tag_fallback_dispatch(hpx::sort_t, RandomIt first,
+            Sent last, Comp&& comp = Comp(), Proj&& proj = Proj())
+        {
+            static_assert(
+                hpx::traits::is_random_access_iterator<RandomIt>::value,
+                "Requires a random access iterator.");
+
+            return hpx::parallel::v1::detail::sort<RandomIt>().call(
+                hpx::execution::seq, first, last, std::forward<Comp>(comp),
+                std::forward<Proj>(proj));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename RandomIt, typename Sent,
+            typename Comp = ranges::less,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<RandomIt>::value &&
+                hpx::traits::is_sentinel_for<Sent, RandomIt>::value &&
+                parallel::traits::is_projected<Proj, RandomIt>::value &&
+                parallel::traits::is_indirect_callable<ExPolicy, Comp,
+                    parallel::traits::projected<Proj, RandomIt>,
+                    parallel::traits::projected<Proj, RandomIt>
+                >::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            RandomIt>::type
+        tag_fallback_dispatch(hpx::ranges::sort_t, ExPolicy&& policy,
+            RandomIt first, Sent last, Comp&& comp = Comp(),
+            Proj&& proj = Proj())
+        {
+            static_assert(
+                hpx::traits::is_random_access_iterator<RandomIt>::value,
+                "Requires a random access iterator.");
+
+            return hpx::parallel::v1::detail::sort<RandomIt>().call(
+                std::forward<ExPolicy>(policy), first, last,
+                std::forward<Comp>(comp), std::forward<Proj>(proj));
+        }
+
+        // clang-format off
+        template <typename Rng,
+            typename Compare = ranges::less,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_range<Rng>::value &&
+                parallel::traits::is_projected_range<Proj, Rng>::value &&
+                parallel::traits::is_indirect_callable<
+                    hpx::execution::sequenced_policy, Compare,
+                    parallel::traits::projected_range<Proj, Rng>,
+                    parallel::traits::projected_range<Proj, Rng>
+                >::value
+            )>
+        // clang-format on
+        friend typename hpx::traits::range_iterator<Rng>::type
+        tag_fallback_dispatch(hpx::ranges::sort_t, Rng&& rng,
+            Compare&& comp = Compare(), Proj&& proj = Proj())
+        {
+            using iterator_type =
+                typename hpx::traits::range_traits<Rng>::iterator_type;
+
+            static_assert(
+                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                "Requires a random access iterator.");
+
+            return hpx::parallel::v1::detail::sort<iterator_type>().call(
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                std::forward<Compare>(comp), std::forward<Proj>(proj));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename Rng,
+            typename Compare = ranges::less,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_range<Rng>::value &&
+                parallel::traits::is_projected_range<Proj, Rng>::value &&
+                parallel::traits::is_indirect_callable<ExPolicy, Compare,
+                    parallel::traits::projected_range<Proj, Rng>,
+                    parallel::traits::projected_range<Proj, Rng>
+                >::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            typename hpx::traits::range_iterator<Rng>::type>::type
+        tag_fallback_dispatch(hpx::ranges::sort_t, ExPolicy&& policy, Rng&& rng,
+            Compare&& comp = Compare(), Proj&& proj = Proj())
+        {
+            using iterator_type =
+                typename hpx::traits::range_traits<Rng>::iterator_type;
+
+            static_assert(
+                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                "Requires a random access iterator.");
+
+            return hpx::parallel::v1::detail::sort<iterator_type>().call(
+                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                hpx::util::end(rng), std::forward<Compare>(comp),
+                std::forward<Proj>(proj));
+        }
+    } sort{};
+}}    // namespace hpx::ranges

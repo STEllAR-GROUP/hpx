@@ -23,6 +23,7 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
@@ -269,22 +270,26 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 
-            template <typename ExPolicy, typename Comp, typename Proj>
-            static RandomIt sequential(ExPolicy, RandomIt first, RandomIt last,
-                Comp&& comp, Proj&& proj)
+            template <typename ExPolicy, typename Sent, typename Comp,
+                typename Proj>
+            static RandomIt sequential(
+                ExPolicy, RandomIt first, Sent last, Comp&& comp, Proj&& proj)
             {
-                std::sort(first, last,
+                auto last_iter = detail::advance_to_sentinel(first, last);
+                std::sort(first, last_iter,
                     util::compare_projected<Comp, Proj>(
                         std::forward<Comp>(comp), std::forward<Proj>(proj)));
-                return last;
+                return last_iter;
             }
 
-            template <typename ExPolicy, typename Comp, typename Proj>
+            template <typename ExPolicy, typename Sent, typename Comp,
+                typename Proj>
             static typename util::detail::algorithm_result<ExPolicy,
                 RandomIt>::type
-            parallel(ExPolicy&& policy, RandomIt first, RandomIt last,
+            parallel(ExPolicy&& policy, RandomIt first, Sent last_s,
                 Comp&& comp, Proj&& proj)
             {
+                auto last = detail::advance_to_sentinel(first, last_s);
                 typedef util::detail::algorithm_result<ExPolicy, RandomIt>
                     algorithm_result;
 
@@ -388,14 +393,85 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    typename util::detail::algorithm_result<ExPolicy, RandomIt>::type sort(
-        ExPolicy&& policy, RandomIt first, RandomIt last, Comp&& comp = Comp(),
-        Proj&& proj = Proj())
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::parallel::sort is deprecated, use hpx::sort instead")
+        typename util::detail::algorithm_result<ExPolicy, RandomIt>::type
+        sort(ExPolicy&& policy, RandomIt first, RandomIt last,
+            Comp&& comp = Comp(), Proj&& proj = Proj())
     {
         static_assert((hpx::traits::is_random_access_iterator<RandomIt>::value),
             "Requires a random access iterator.");
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::sort<RandomIt>().call(std::forward<ExPolicy>(policy),
             first, last, std::forward<Comp>(comp), std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
+
+namespace hpx {
+    ///////////////////////////////////////////////////////////////////////////
+    // DPO for hpx::sort
+    HPX_INLINE_CONSTEXPR_VARIABLE struct sort_t final
+      : hpx::functional::tag_fallback<sort_t>
+    {
+        // clang-format off
+        template <typename RandomIt,
+            typename Comp = hpx::parallel::v1::detail::less,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<RandomIt>::value &&
+                parallel::traits::is_projected<Proj, RandomIt>::value &&
+                parallel::traits::is_indirect_callable<
+                    hpx::execution::sequenced_policy, Comp,
+                    parallel::traits::projected<Proj, RandomIt>,
+                    parallel::traits::projected<Proj, RandomIt>
+                >::value
+            )>
+        // clang-format on
+        friend RandomIt tag_fallback_dispatch(hpx::sort_t, RandomIt first,
+            RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
+        {
+            static_assert(
+                hpx::traits::is_random_access_iterator<RandomIt>::value,
+                "Requires a random access iterator.");
+
+            return hpx::parallel::v1::detail::sort<RandomIt>().call(
+                hpx::execution::seq, first, last, std::forward<Comp>(comp),
+                std::forward<Proj>(proj));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename RandomIt,
+            typename Comp = hpx::parallel::v1::detail::less,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<RandomIt>::value &&
+                parallel::traits::is_projected<Proj, RandomIt>::value &&
+                parallel::traits::is_indirect_callable<ExPolicy, Comp,
+                    parallel::traits::projected<Proj, RandomIt>,
+                    parallel::traits::projected<Proj, RandomIt>
+                >::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            RandomIt>::type
+        tag_fallback_dispatch(hpx::sort_t, ExPolicy&& policy, RandomIt first,
+            RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
+        {
+            static_assert(
+                hpx::traits::is_random_access_iterator<RandomIt>::value,
+                "Requires a random access iterator.");
+
+            return hpx::parallel::v1::detail::sort<RandomIt>().call(
+                std::forward<ExPolicy>(policy), first, last,
+                std::forward<Comp>(comp), std::forward<Proj>(proj));
+        }
+    } sort{};
+}    // namespace hpx

@@ -25,6 +25,7 @@ void test_sort1()
     using namespace hpx::execution;
 
     // default comparison operator (std::less)
+    test_sort1(int());
     test_sort1(seq, int());
     test_sort1(par, int());
     test_sort1(par_unseq, int());
