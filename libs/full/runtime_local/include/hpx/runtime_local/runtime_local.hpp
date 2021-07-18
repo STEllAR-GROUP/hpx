@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -74,12 +74,12 @@ namespace hpx {
 
         /// Construct a new HPX runtime instance
         explicit runtime(
-            hpx::util::runtime_configuration& rtcfg, bool initialize = true);
+            hpx::util::runtime_configuration& rtcfg, bool initialize);
 
     protected:
-        runtime(hpx::util::runtime_configuration& rtcfg,
-            notification_policy_type&& notifier,
-            notification_policy_type&& main_pool_notifier,
+        explicit runtime(hpx::util::runtime_configuration& rtcfg);
+
+        void set_notification_policies(notification_policy_type&& notifier,
 #ifdef HPX_HAVE_IO_POOL
             notification_policy_type&& io_pool_notifier,
 #endif
@@ -87,8 +87,7 @@ namespace hpx {
             notification_policy_type&& timer_pool_notifier,
 #endif
             threads::detail::network_background_callback_type
-                network_background_callback,
-            bool initialize);
+                network_background_callback);
 
         /// Common initialization for different constructors
         void init();
@@ -472,12 +471,6 @@ namespace hpx {
 
         void notify_finalize();
         void wait_finalize();
-
-        // avoid warnings about usage of this in member initializer list
-        runtime* This()
-        {
-            return this;
-        }
 
         void call_startup_functions(bool pre_startup);
 

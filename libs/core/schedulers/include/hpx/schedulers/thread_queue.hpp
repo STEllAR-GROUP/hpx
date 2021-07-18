@@ -165,6 +165,9 @@ namespace hpx { namespace threads { namespace policies {
                 data.initial_state = thread_schedule_state::pending;
             }
 
+            // ASAN gets confused by reusing threads/stacks
+#if !defined(HPX_HAVE_ADDRESS_SANITIZER)
+
             // Check for an unused thread object.
             if (!heap->empty())
             {
@@ -174,6 +177,7 @@ namespace hpx { namespace threads { namespace policies {
                 get_thread_id_data(thrd)->rebind(data);
             }
             else
+#endif
             {
                 hpx::util::unlock_guard<Lock> ull(lk);
 
@@ -221,8 +225,12 @@ namespace hpx { namespace threads { namespace policies {
 #endif
                 // create the new thread
                 threads::thread_init_data& data = task->data;
-                threads::thread_id_ref_type thrd;
 
+                bool schedule_now =
+                    data.initial_state == thread_schedule_state::pending;
+                (void) schedule_now;
+
+                threads::thread_id_ref_type thrd;
                 create_thread_object(thrd, data, lk);
 
                 task->~task_description();
@@ -249,8 +257,7 @@ namespace hpx { namespace threads { namespace policies {
 
                 // insert the thread into the work-items queue assuming it is
                 // in pending state, thread would go out of scope otherwise
-                HPX_ASSERT(
-                    data.initial_state == thread_schedule_state::pending);
+                HPX_ASSERT(schedule_now);
 
                 // pushing the new thread into the pending queue of the
                 // specified thread_queue

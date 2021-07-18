@@ -869,7 +869,7 @@ namespace hpx {
                 case runtime_mode::local:
                 {
                     LPROGRESS_ << "creating local runtime";
-                    rt.reset(new hpx::runtime(cmdline.rtcfg_));
+                    rt.reset(new hpx::runtime(cmdline.rtcfg_, true));
                     break;
                 }
                 default:
