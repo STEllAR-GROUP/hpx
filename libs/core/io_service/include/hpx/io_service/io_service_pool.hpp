@@ -104,6 +104,8 @@ namespace hpx { namespace util {
             return pool_name_;
         }
 
+        void init(std::size_t pool_size);
+
     protected:
         bool run_locked(
             std::size_t num_threads, bool join_threads, barrier* startup);
@@ -163,8 +165,8 @@ namespace hpx { namespace util {
             bool waiting_;
 
             // Barriers for waiting for work to finish on all worker threads
-            barrier wait_barrier_;
-            barrier continue_barrier_;
+            std::unique_ptr<barrier> wait_barrier_;
+            std::unique_ptr<barrier> continue_barrier_;
         };
 
         ///////////////////////////////////////////////////////////////////////////////

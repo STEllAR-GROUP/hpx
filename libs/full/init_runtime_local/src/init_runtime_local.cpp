@@ -514,7 +514,7 @@ namespace hpx {
 
                     // Command line handling should have updated this by now.
                     LPROGRESS_ << "creating local runtime";
-                    rt.reset(new hpx::runtime(cmdline.rtcfg_));
+                    rt.reset(new hpx::runtime(cmdline.rtcfg_, true));
 
                     result = run_or_start(blocking, std::move(rt), cmdline,
                         std::move(params.startup), std::move(params.shutdown));

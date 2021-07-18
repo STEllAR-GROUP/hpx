@@ -498,6 +498,9 @@ namespace hpx { namespace threads { namespace policies {
                 data.initial_state = thread_schedule_state::pending;
             }
 
+            // ASAN gets confused by reusing threads/stacks
+#if !defined(HPX_HAVE_ADDRESS_SANITIZER)
+
             // Check for an unused thread object.
             if (!heap->empty())
             {
@@ -510,6 +513,7 @@ namespace hpx { namespace threads { namespace policies {
                     debug::threadinfo<threads::thread_id_ref_type*>(&tid));
             }
             else
+#endif
             {
                 // Allocate a new thread object.
                 threads::thread_data* p = nullptr;

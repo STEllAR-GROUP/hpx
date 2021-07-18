@@ -27,22 +27,28 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
+
     io_service_pool::io_service_pool(std::size_t pool_size,
         threads::policies::callback_notifier const& notifier,
         char const* pool_name, char const* name_postfix)
       : next_io_service_(0)
       , stopped_(false)
-      , pool_size_(pool_size)
+      , pool_size_(0)
       , notifier_(notifier)
       , pool_name_(pool_name)
       , pool_name_postfix_(name_postfix)
       , waiting_(false)
-      , wait_barrier_(pool_size + 1)
-      , continue_barrier_(pool_size + 1)
+      , wait_barrier_()
+      , continue_barrier_()
     {
         LPROGRESS_ << pool_name;
+        init(pool_size);
+    }
 
-        if (pool_size == 0)
+    void io_service_pool::init(std::size_t pool_size)
+    {
+        pool_size_ = pool_size;
+        if (pool_size_ == 0)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "io_service_pool::io_service_pool",
@@ -50,9 +56,12 @@ namespace hpx { namespace util {
             return;
         }
 
+        wait_barrier_.reset(new barrier(pool_size + 1));
+        continue_barrier_.reset(new barrier(pool_size + 1));
+
         // Give all the io_services work to do so that their run() functions
         // will not exit until they are explicitly stopped.
-        for (std::size_t i = 0; i < pool_size; ++i)
+        for (std::size_t i = 0; i < pool_size_; ++i)
         {
             std::unique_ptr<asio::io_context> p(new asio::io_context);
             io_services_.emplace_back(std::move(p));
@@ -70,8 +79,8 @@ namespace hpx { namespace util {
       , pool_name_(pool_name)
       , pool_name_postfix_(name_postfix)
       , waiting_(false)
-      , wait_barrier_(1)
-      , continue_barrier_(1)
+      , wait_barrier_(nullptr)
+      , continue_barrier_(nullptr)
     {
         LPROGRESS_ << pool_name;
     }
@@ -99,8 +108,8 @@ namespace hpx { namespace util {
 
             if (waiting_)
             {
-                wait_barrier_.wait();
-                continue_barrier_.wait();
+                wait_barrier_->wait();
+                continue_barrier_->wait();
             }
             else
             {
@@ -244,7 +253,7 @@ namespace hpx { namespace util {
             // Clear work so that the run functions return when all work is done
             waiting_ = true;
             work_.clear();
-            wait_barrier_.wait();
+            wait_barrier_->wait();
 
             // Add back the work guard and restart the services
             waiting_ = false;
@@ -254,7 +263,7 @@ namespace hpx { namespace util {
                 io_services_[i]->reset();
             }
 
-            continue_barrier_.wait();
+            continue_barrier_->wait();
         }
     }
 

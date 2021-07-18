@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -373,13 +373,6 @@ namespace hpx {
         std::uint32_t assign_cores() override;
 
     private:
-        // avoid warnings about usage of this in member initializer list
-        runtime_distributed* This()
-        {
-            return this;
-        }
-
-        //
         threads::thread_result_type run_helper(
             util::function_nonser<runtime::hpx_main_function_type> const& func,
             int& result);

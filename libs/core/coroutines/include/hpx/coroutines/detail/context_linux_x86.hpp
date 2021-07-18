@@ -162,6 +162,11 @@ namespace hpx { namespace threads { namespace coroutines {
                 __sanitizer_start_switch_fiber(fake_stack,
                     caller.asan_stack_bottom, caller.asan_stack_size);
             }
+            void finish_yield_fiber(void* fake_stack)
+            {
+                __sanitizer_finish_switch_fiber(
+                    fake_stack, &asan_stack_bottom, &asan_stack_size);
+            }
             void finish_switch_fiber(
                 void* fake_stack, x86_linux_context_impl_base& caller)
             {
