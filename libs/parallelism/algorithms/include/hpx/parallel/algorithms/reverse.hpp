@@ -222,7 +222,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 for (auto tail{last2}; !(first == tail or first == --tail);
                      ++first)
                 {
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                    std::ranges::iter_swap(first, tail);
+#else
                     std::iter_swap(first, tail);
+#endif
                 }
                 return last2;
             }
