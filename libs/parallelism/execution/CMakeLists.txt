@@ -22,6 +22,7 @@ set(execution_headers
     hpx/execution/algorithms/let_value.hpp
     hpx/execution/algorithms/make_future.hpp
     hpx/execution/algorithms/on.hpp
+    hpx/execution/algorithms/split.hpp
     hpx/execution/algorithms/sync_wait.hpp
     hpx/execution/algorithms/transform.hpp
     hpx/execution/algorithms/when_all.hpp

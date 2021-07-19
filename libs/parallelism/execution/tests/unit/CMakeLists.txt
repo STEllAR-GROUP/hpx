@@ -28,6 +28,7 @@ if(HPX_CXX_STANDARD GREATER_EQUAL 17)
     algorithm_let_value
     algorithm_let_error
     algorithm_on
+    algorithm_split
     algorithm_sync_wait
     algorithm_transform
     algorithm_when_all
