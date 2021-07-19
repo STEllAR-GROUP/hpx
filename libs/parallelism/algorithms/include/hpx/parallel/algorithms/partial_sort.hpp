@@ -153,7 +153,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
             auto N2 = (last - first) >> 1;
             Iter it_val =
                 mid3(first + 1, first + N2, last - 1, std::forward<Comp>(comp));
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+            std::ranges::iter_swap(first, it_val);
+#else
             std::iter_swap(first, it_val);
+#endif
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -195,7 +199,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             while (c_first < c_last)
             {
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                std::ranges::iter_swap(c_first++, c_last--);
+#else
                 std::iter_swap(c_first++, c_last--);
+#endif
                 while (HPX_INVOKE(comp, *c_first, pivot))
                 {
                     ++c_first;
@@ -206,7 +214,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
             }
 
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+            std::ranges::iter_swap(first, c_last);
+#else
             std::iter_swap(first, c_last);
+#endif
             return c_last;
         }
 
@@ -244,7 +256,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     if (HPX_INVOKE(comp, *it, *first))
                     {
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                        std::ranges::iter_swap(it, first);
+#else
                         std::iter_swap(it, first);
+#endif
                     }
                 }
                 return;

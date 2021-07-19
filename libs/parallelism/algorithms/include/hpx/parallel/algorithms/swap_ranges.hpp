@@ -165,9 +165,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 while (first1 != last1)
                 {
-                    std::swap(*first1, *first2);
-                    first1++;
-                    first2++;
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                    std::ranges::iter_swap(first1++, first2++);
+#else
+                    std::iter_swap(first1++, first2++);
+#endif
                 }
                 return first2;
             }

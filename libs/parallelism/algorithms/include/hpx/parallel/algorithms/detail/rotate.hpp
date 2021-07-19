@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <iterator>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
@@ -25,7 +26,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Iter next = new_first;
         while (first != next)
         {
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+            std::ranges::iter_swap(first++, next++);
+#else
             std::iter_swap(first++, next++);
+#endif
             if (next == last)
             {
                 next = new_first;
