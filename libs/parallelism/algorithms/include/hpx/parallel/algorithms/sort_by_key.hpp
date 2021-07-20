@@ -134,7 +134,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         std::advance(value_last, std::distance(key_first, key_last));
 
         return detail::get_iter_tagged_pair<tag::in1, tag::in2>(
-            hpx::parallel::sort(std::forward<ExPolicy>(policy),
+            hpx::sort(std::forward<ExPolicy>(policy),
                 hpx::util::make_zip_iterator(key_first, value_first),
                 hpx::util::make_zip_iterator(key_last, value_last),
                 std::forward<Compare>(comp), detail::extract_key()));

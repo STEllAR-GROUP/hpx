@@ -641,7 +641,7 @@ Parallel algorithms
      * Returns the first unsorted element.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`is_sorted_until`
-   * * :cpp:func:`hpx::parallel::v1::sort`
+   * * :cpp:func:`hpx::sort`
      * Sorts the elements in a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`sort`

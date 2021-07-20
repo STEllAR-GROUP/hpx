@@ -8,10 +8,12 @@
 #pragma once
 
 #include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/container_algorithms/sort.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <iomanip>
@@ -116,6 +118,78 @@ int verify_(
 #define msg(a, b, c, d, e)                                                     \
     std::cout << std::setw(60) << a << std::setw(12) << b << std::setw(40)     \
               << c << std::setw(6) << #d << std::setw(8) << #e << "\t";
+
+////////////////////////////////////////////////////////////////////////////////
+// call sort with no comparison operator
+template <typename T>
+void test_sort1_sent(T)
+{
+    auto rand_max_val = std::rand() + 1;
+
+    // Fill vector with random values
+    std::vector<T> c(HPX_SORT_TEST_SIZE);
+    rnd_fill<T>(
+        c, (std::numeric_limits<T>::min)(), rand_max_val - 1, T(std::rand()));
+
+    c[HPX_SORT_TEST_SIZE - 1] = rand_max_val;
+    // sort, blocking when seq, par, par_vec
+    hpx::ranges::sort(std::begin(c), sentinel<T>{rand_max_val});
+
+    bool is_sorted =
+        std::is_sorted(std::begin(c), std::begin(c) + HPX_SORT_TEST_SIZE - 1);
+    HPX_TEST(is_sorted);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// call sort with no comparison operator
+template <typename ExPolicy, typename T>
+void test_sort1_sent(ExPolicy&& policy, T)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+    msg(typeid(ExPolicy).name(), typeid(T).name(), "default", sync, random);
+
+    auto rand_max_val = std::rand() + 1;
+
+    // Fill vector with random values
+    std::vector<T> c(HPX_SORT_TEST_SIZE);
+    rnd_fill<T>(
+        c, (std::numeric_limits<T>::min)(), rand_max_val - 1, T(std::rand()));
+
+    c[HPX_SORT_TEST_SIZE - 1] = rand_max_val;
+    // sort, blocking when seq, par, par_vec
+    hpx::ranges::sort(policy, std::begin(c), sentinel<T>{rand_max_val});
+
+    bool is_sorted =
+        std::is_sorted(std::begin(c), std::begin(c) + HPX_SORT_TEST_SIZE - 1);
+    HPX_TEST(is_sorted);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// call sort with a comparison operator
+template <typename ExPolicy, typename T, typename Compare = std::less<T>>
+void test_sort1_comp_sent(ExPolicy&& policy, T, Compare comp = Compare())
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), sync,
+        random);
+
+    auto rand_max_val = std::rand() + 1;
+
+    // Fill vector with random values
+    std::vector<T> c(HPX_SORT_TEST_SIZE);
+    rnd_fill<T>(
+        c, (std::numeric_limits<T>::min)(), rand_max_val - 1, T(std::rand()));
+
+    c[HPX_SORT_TEST_SIZE - 1] = rand_max_val;
+    // sort, blocking when seq, par, par_vec
+    hpx::ranges::sort(policy, std::begin(c), sentinel<T>{rand_max_val}, comp);
+
+    bool is_sorted =
+        std::is_sorted(std::begin(c), std::begin(c) + HPX_SORT_TEST_SIZE - 1);
+    HPX_TEST(is_sorted);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // call sort with no comparison operator
@@ -602,8 +676,7 @@ void test_sort2_comp(ExPolicy&& policy, T, Compare comp = Compare())
 
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
-    hpx::ranges::sort(
-        std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
+    hpx::ranges::sort(std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
@@ -676,8 +749,7 @@ void test_sort1_comp(
 
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
-    hpx::ranges::sort(
-        std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
+    hpx::ranges::sort(std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);

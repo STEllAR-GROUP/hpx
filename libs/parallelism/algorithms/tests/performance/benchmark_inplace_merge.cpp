@@ -111,8 +111,8 @@ void run_benchmark(std::size_t vector_left_size, std::size_t vector_right_size,
     using namespace hpx::execution;
     hpx::generate(par, first, middle, random_fill(random_range));
     hpx::generate(par, middle, last, random_fill(random_range));
-    hpx::parallel::sort(par, first, middle);
-    hpx::parallel::sort(par, middle, last);
+    hpx::sort(par, first, middle);
+    hpx::sort(par, middle, last);
     org_c = c;
 
     auto org_first = std::begin(org_c);
