@@ -108,8 +108,8 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
         par, std::begin(src1), std::end(src1), random_fill(random_range));
     hpx::generate(
         par, std::begin(src2), std::end(src2), random_fill(random_range));
-    hpx::parallel::sort(par, std::begin(src1), std::end(src1));
-    hpx::parallel::sort(par, std::begin(src2), std::end(src2));
+    hpx::sort(par, std::begin(src1), std::end(src1));
+    hpx::sort(par, std::begin(src2), std::end(src2));
 
     std::cout << "* Running Benchmark..." << std::endl;
     std::cout << "--- run_merge_benchmark_std ---" << std::endl;
