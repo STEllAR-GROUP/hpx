@@ -10,7 +10,6 @@
 #include <hpx/type_support/pack.hpp>
 
 #include <type_traits>
-
 #include <variant>
 
 namespace hpx {

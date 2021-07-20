@@ -184,7 +184,6 @@ function(add_hpx_executable name)
     set(exclude_from_all ${exclude_from_all} EXCLUDE_FROM_DEFAULT_BUILD TRUE)
   endif()
 
-  # Manage files with .cu extension in case When Cuda Clang is used
   if(HPX_WITH_HIP)
     foreach(source ${${name}_SOURCES})
       get_filename_component(extension ${source} EXT)
