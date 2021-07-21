@@ -1,10 +1,11 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/algorithms/rotate.hpp
+/// \file parallel/algorithms/shift_left.hpp
 
 #pragma once
 
@@ -18,8 +19,8 @@
 #include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/reverse.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/result_types.hpp>
@@ -39,7 +40,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             ExPolicy policy, FwdIter first, Sent last, FwdIter new_first)
         {
             using non_seq = std::false_type;
-
             auto p = hpx::execution::parallel_task_policy()
                          .on(policy.executor())
                          .with(policy.parameters());
@@ -81,11 +81,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_random_access_iterator_v<FwdIter>, FwdIter>
         sequential_shift_left(FwdIter first, Sent last, Size n)
         {
-            if (n <= 0)
-            {
-                return first;
-            }
-
             auto mid = first;
             if (detail::bounded_advance(mid, n, last))
             {
@@ -101,11 +96,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             !hpx::traits::is_random_access_iterator_v<FwdIter>, FwdIter>
         sequential_shift_left(FwdIter first, Sent last, Size n)
         {
-            if (n <= 0)
-            {
-                return first;
-            }
-
             auto mid = first;
             if (detail::bounded_advance(mid, n, last))
             {
@@ -130,6 +120,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static FwdIter sequential(
                 ExPolicy, FwdIter first, Sent last, Size n)
             {
+                if (n <= 0 || n >= detail::distance(first, last))
+                {
+                    return first;
+                }
+
                 return detail::sequential_shift_left(first, last, n);
             }
 
@@ -138,7 +133,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 FwdIter2>::type
             parallel(ExPolicy&& policy, FwdIter2 first, Sent last, Size n)
             {
-                if (n > detail::distance(first, last))
+                if (n <= 0 || n >= detail::distance(first, last))
                 {
                     return parallel::util::detail::algorithm_result<ExPolicy,
                         FwdIter2>::get(std::move(first));
