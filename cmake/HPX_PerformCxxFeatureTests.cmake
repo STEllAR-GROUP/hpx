@@ -91,8 +91,20 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_BUILTIN_MAKE_INTEGER_SEQ
   )
 
+  if(HPX_WITH_CUDA)
+    hpx_check_for_builtin_make_integer_seq_cuda(
+      DEFINITIONS HPX_HAVE_BUILTIN_MAKE_INTEGER_SEQ_CUDA
+    )
+  endif()
+
   hpx_check_for_builtin_type_pack_element(
     DEFINITIONS HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT
   )
+
+  if(HPX_WITH_CUDA)
+    hpx_check_for_builtin_type_pack_element_cuda(
+      DEFINITIONS HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT_CUDA
+    )
+  endif()
 
 endfunction()

@@ -1677,6 +1677,9 @@ hpx_option(
 # ##############################################################################
 # C++ feature tests
 # ##############################################################################
+# Need to include the CUDA setup before the config test to enable the CUDA
+# language
+include(HPX_SetupCUDA)
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
 
@@ -2171,7 +2174,6 @@ include(HPX_SetupMPI) # must come before APEX
 
 # Setup packages and subprojects
 include(HPX_SetupHIP)
-include(HPX_SetupCUDA)
 include(HPX_SetupApex)
 include(HPX_SetupPapi)
 include(HPX_SetupGooglePerfTools)
