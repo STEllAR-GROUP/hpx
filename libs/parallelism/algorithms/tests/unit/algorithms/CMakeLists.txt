@@ -119,6 +119,7 @@ set(tests
     set_symmetric_difference
     set_union
     shift_left
+    shift_right
     sort
     sort_by_key
     sort_exceptions
