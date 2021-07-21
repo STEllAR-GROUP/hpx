@@ -48,7 +48,7 @@ struct user_defined_type
 };
 
 const std::vector<std::string> user_defined_type::name_list{
-    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB", "END"};
+    "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill
 {

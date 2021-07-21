@@ -121,8 +121,8 @@ struct random_fill
 template <typename IteratorTag, typename DataType, typename Pred>
 void test_unique(IteratorTag, DataType, Pred pred, int rand_base)
 {
-    typedef typename std::vector<DataType>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size), d;
@@ -147,8 +147,8 @@ void test_unique(
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef typename std::vector<DataType>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size), d;
@@ -173,8 +173,8 @@ void test_unique_async(
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef typename std::vector<DataType>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size), d;
@@ -199,8 +199,8 @@ void test_unique_exception(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 10007;
     std::vector<int> c(size);
@@ -231,8 +231,8 @@ void test_unique_exception(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_unique_exception_async(ExPolicy policy, IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 10007;
     std::vector<int> c(size);
@@ -270,8 +270,8 @@ void test_unique_bad_alloc(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 10007;
     std::vector<int> c(size);
@@ -301,8 +301,8 @@ void test_unique_bad_alloc(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_unique_bad_alloc_async(ExPolicy policy, IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 10007;
     std::vector<int> c(size);
@@ -339,7 +339,7 @@ void test_unique_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef typename std::vector<DataType>::iterator base_iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size), d, org;
@@ -349,7 +349,7 @@ void test_unique_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
 
     // Test default predicate.
     {
-        typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+        using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
         auto result =
             hpx::unique(policy, iterator(std::begin(c)), iterator(std::end(c)));
@@ -363,7 +363,7 @@ void test_unique_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
 
     // Test projection.
     {
-        typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+        using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
         c = org;
 
