@@ -5,13 +5,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/include/datapar.hpp>
 #include <hpx/local/init.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "copyn_tests.hpp"
+#include "../algorithms/copyn_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -19,12 +20,13 @@ void test_copy_n()
 {
     test_copy_n(IteratorTag());
 
-    test_copy_n(hpx::execution::seq, IteratorTag());
-    test_copy_n(hpx::execution::par, IteratorTag());
-    test_copy_n(hpx::execution::par_unseq, IteratorTag());
+    test_copy_n(hpx::execution::simd, IteratorTag());
+    test_copy_n(hpx::execution::simdpar, IteratorTag());
 
-    test_copy_n_async(hpx::execution::seq(hpx::execution::task), IteratorTag());
-    test_copy_n_async(hpx::execution::par(hpx::execution::task), IteratorTag());
+    test_copy_n_async(
+        hpx::execution::simd(hpx::execution::task), IteratorTag());
+    test_copy_n_async(
+        hpx::execution::simdpar(hpx::execution::task), IteratorTag());
 }
 
 void n_copy_test()
@@ -39,16 +41,13 @@ void test_copy_n_exception()
 {
     test_copy_n_exception(IteratorTag());
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_copy_n_exception(hpx::execution::seq, IteratorTag());
-    test_copy_n_exception(hpx::execution::par, IteratorTag());
+    test_copy_n_exception(hpx::execution::simd, IteratorTag());
+    test_copy_n_exception(hpx::execution::simdpar, IteratorTag());
 
     test_copy_n_exception_async(
-        hpx::execution::seq(hpx::execution::task), IteratorTag());
+        hpx::execution::simd(hpx::execution::task), IteratorTag());
     test_copy_n_exception_async(
-        hpx::execution::par(hpx::execution::task), IteratorTag());
+        hpx::execution::simdpar(hpx::execution::task), IteratorTag());
 }
 
 void copy_n_exception_test()
@@ -61,16 +60,13 @@ void copy_n_exception_test()
 template <typename IteratorTag>
 void test_copy_n_bad_alloc()
 {
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_copy_n_bad_alloc(hpx::execution::seq, IteratorTag());
-    test_copy_n_bad_alloc(hpx::execution::par, IteratorTag());
+    test_copy_n_bad_alloc(hpx::execution::simd, IteratorTag());
+    test_copy_n_bad_alloc(hpx::execution::simdpar, IteratorTag());
 
     test_copy_n_bad_alloc_async(
-        hpx::execution::seq(hpx::execution::task), IteratorTag());
+        hpx::execution::simd(hpx::execution::task), IteratorTag());
     test_copy_n_bad_alloc_async(
-        hpx::execution::par(hpx::execution::task), IteratorTag());
+        hpx::execution::simdpar(hpx::execution::task), IteratorTag());
 }
 
 void copy_n_bad_alloc_test()

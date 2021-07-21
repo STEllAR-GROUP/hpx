@@ -5,13 +5,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/include/datapar.hpp>
 #include <hpx/local/init.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "copy_tests.hpp"
+#include "../algorithms/copy_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -21,12 +22,11 @@ void test_copy()
 
     test_copy(IteratorTag());
 
-    test_copy(seq, IteratorTag());
-    test_copy(par, IteratorTag());
-    test_copy(par_unseq, IteratorTag());
+    test_copy(simd, IteratorTag());
+    test_copy(simdpar, IteratorTag());
 
-    test_copy_async(seq(task), IteratorTag());
-    test_copy_async(par(task), IteratorTag());
+    test_copy_async(simd(task), IteratorTag());
+    test_copy_async(simdpar(task), IteratorTag());
 }
 
 void copy_test()
@@ -43,14 +43,11 @@ void test_copy_exception()
 
     test_copy_exception(IteratorTag());
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_copy_exception(seq, IteratorTag());
-    test_copy_exception(par, IteratorTag());
+    test_copy_exception(simd, IteratorTag());
+    test_copy_exception(simdpar, IteratorTag());
 
-    test_copy_exception_async(seq(task), IteratorTag());
-    test_copy_exception_async(par(task), IteratorTag());
+    test_copy_exception_async(simd(task), IteratorTag());
+    test_copy_exception_async(simdpar(task), IteratorTag());
 }
 
 void copy_exception_test()
@@ -63,16 +60,13 @@ void copy_exception_test()
 template <typename IteratorTag>
 void test_copy_bad_alloc()
 {
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_copy_bad_alloc(hpx::execution::seq, IteratorTag());
-    test_copy_bad_alloc(hpx::execution::par, IteratorTag());
+    test_copy_bad_alloc(hpx::execution::simd, IteratorTag());
+    test_copy_bad_alloc(hpx::execution::simdpar, IteratorTag());
 
     test_copy_bad_alloc_async(
-        hpx::execution::seq(hpx::execution::task), IteratorTag());
+        hpx::execution::simd(hpx::execution::task), IteratorTag());
     test_copy_bad_alloc_async(
-        hpx::execution::par(hpx::execution::task), IteratorTag());
+        hpx::execution::simdpar(hpx::execution::task), IteratorTag());
 }
 
 void copy_bad_alloc_test()
