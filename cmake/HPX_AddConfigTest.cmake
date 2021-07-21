@@ -14,7 +14,7 @@ set(HPX_ADDCONFIGTEST_LOADED TRUE)
 include(CheckLibraryExists)
 
 function(add_hpx_config_test variable)
-  set(options FILE EXECUTE)
+  set(options FILE EXECUTE CUDA)
   set(one_value_args SOURCE ROOT CMAKECXXFEATURE)
   set(multi_value_args
       INCLUDE_DIRECTORIES
@@ -32,7 +32,7 @@ function(add_hpx_config_test variable)
   set(_run_msg)
   # Check CMake feature tests if the user didn't override the value of this
   # variable:
-  if(NOT DEFINED ${variable})
+  if(NOT DEFINED ${variable} AND NOT ${variable}_CUDA)
     if(${variable}_CMAKECXXFEATURE)
       # We don't have to run our own feature test if there is a corresponding
       # cmake feature test and cmake reports the feature is supported on this
@@ -61,9 +61,15 @@ function(add_hpx_config_test variable)
         set(test_source "${PROJECT_SOURCE_DIR}/${${variable}_SOURCE}")
       endif()
     else()
-      set(test_source
-          "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc}.cpp"
-      )
+      if(${variable}_CUDA)
+        set(test_source
+            "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc}.cu"
+        )
+      else()
+        set(test_source
+            "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc}.cpp"
+        )
+      endif()
       file(WRITE "${test_source}" "${${variable}_SOURCE}\n")
     endif()
     set(test_binary
@@ -153,6 +159,7 @@ function(add_hpx_config_test variable)
       endif()
     else()
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${additional_cmake_flags}")
+      set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} ${additional_cmake_flags}")
       # cmake-format: off
       try_compile(
         ${variable}_RESULT
@@ -167,6 +174,7 @@ function(add_hpx_config_test variable)
         CXX_STANDARD ${HPX_CXX_STANDARD}
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS FALSE
+        CUDA_STANDARD ${CMAKE_CUDA_STANDARD}
         COPY_FILE ${test_binary}
       )
       # cmake-format: on
@@ -504,10 +512,28 @@ function(hpx_check_for_builtin_make_integer_seq)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_builtin_make_integer_seq_cuda)
+  add_hpx_config_test(
+    HPX_WITH_BUILTIN_MAKE_INTEGER_SEQ_CUDA
+    SOURCE cmake/tests/builtin_make_integer_seq.cu CUDA
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_builtin_type_pack_element)
   add_hpx_config_test(
     HPX_WITH_BUILTIN_TYPE_PACK_ELEMENT
     SOURCE cmake/tests/builtin_type_pack_element.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_builtin_type_pack_element_cuda)
+  add_hpx_config_test(
+    HPX_WITH_BUILTIN_TYPE_PACK_ELEMENT_CUDA
+    SOURCE cmake/tests/builtin_type_pack_element.cu CUDA
     FILE ${ARGN}
   )
 endfunction()
