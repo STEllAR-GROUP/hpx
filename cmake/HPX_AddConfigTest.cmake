@@ -115,12 +115,7 @@ function(add_hpx_config_test variable)
                               ${${variable}_LINK_DIRECTORIES}
     )
 
-    get_property(
-      _base_libraries
-      TARGET hpx_base_libraries
-      PROPERTY INTERFACE_LINK_LIBRARIES
-    )
-    set(CONFIG_TEST_LINK_LIBRARIES ${_base_libraries} ${${variable}_LIBRARIES})
+    set(CONFIG_TEST_LINK_LIBRARIES ${${variable}_LIBRARIES})
 
     set(additional_cmake_flags)
     if(MSVC)
