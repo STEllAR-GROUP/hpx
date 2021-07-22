@@ -232,67 +232,59 @@ namespace hpx {
         // clang-format off
         template <typename InIter1, typename InIter2,
             typename Pred = hpx::parallel::v1::detail::equal_to,
-            typename Proj1 = parallel::util::projection_identity,
-            typename Proj2 = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<InIter1>::value &&
-                hpx::traits::is_iterator<InIter2>::value &&
-                hpx::parallel::traits::is_indirect_callable<
-                    hpx::execution::sequenced_policy, Pred,
-                    hpx::parallel::traits::projected<Proj1, InIter1>,
-                    hpx::parallel::traits::projected<Proj2, InIter2>
-                >::value
+                hpx::traits::is_iterator_v<InIter1> &&
+                hpx::traits::is_iterator_v<InIter2> &&
+                hpx::is_invocable_v<Pred,
+                    typename std::iterator_traits<InIter1>::value_type,
+                    typename std::iterator_traits<InIter2>::value_type
+                >
             )>
         // clang-format on
         friend bool tag_fallback_dispatch(hpx::ends_with_t, InIter1 first1,
-            InIter1 last1, InIter2 first2, InIter2 last2, Pred&& pred = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+            InIter1 last1, InIter2 first2, InIter2 last2, Pred&& pred = Pred())
         {
-            static_assert(hpx::traits::is_input_iterator<InIter1>::value,
+            static_assert(hpx::traits::is_input_iterator_v<InIter1>,
                 "Required at least input iterator.");
 
-            static_assert(hpx::traits::is_input_iterator<InIter2>::value,
+            static_assert(hpx::traits::is_input_iterator_v<InIter2>,
                 "Required at least input iterator.");
 
             return hpx::parallel::v1::detail::ends_with().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                std::forward<Pred>(pred), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                std::forward<Pred>(pred), parallel::util::projection_identity{},
+                parallel::util::projection_identity{});
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred = ranges::equal_to,
-            typename Proj1 = parallel::util::projection_identity,
-            typename Proj2 = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value &&
-                hpx::parallel::traits::is_indirect_callable<
-                    ExPolicy, Pred,
-                    hpx::parallel::traits::projected<Proj1, FwdIter1>,
-                    hpx::parallel::traits::projected<Proj2, FwdIter2>
-                >::value
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
+                hpx::is_invocable_v<Pred,
+                    typename std::iterator_traits<FwdIter1>::value_type,
+                    typename std::iterator_traits<FwdIter2>::value_type
+                >
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
         tag_fallback_dispatch(hpx::ends_with_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
-            Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+            Pred&& pred = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Required at least forward iterator.");
 
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::ends_with().call(
                 std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                std::forward<Pred>(pred), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                std::forward<Pred>(pred), parallel::util::projection_identity{},
+                parallel::util::projection_identity{});
         }
     } ends_with{};
 

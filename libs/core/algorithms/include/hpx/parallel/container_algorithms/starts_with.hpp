@@ -301,9 +301,9 @@ namespace hpx { namespace ranges {
             typename Proj1 = parallel::util::projection_identity,
             typename Proj2 = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<Iter1>::value &&
+                hpx::traits::is_iterator_v<Iter1> &&
                 hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
-                hpx::traits::is_iterator<Iter2>::value &&
+                hpx::traits::is_iterator_v<Iter2> &&
                 hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
                 hpx::parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Pred,
@@ -317,10 +317,10 @@ namespace hpx { namespace ranges {
             Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_input_iterator<Iter1>::value,
+            static_assert(hpx::traits::is_input_iterator_v<Iter1>,
                 "Required at least input iterator.");
 
-            static_assert(hpx::traits::is_input_iterator<Iter2>::value,
+            static_assert(hpx::traits::is_input_iterator_v<Iter2>,
                 "Required at least input iterator.");
 
             return hpx::parallel::v1::detail::starts_with().call(
@@ -336,9 +336,9 @@ namespace hpx { namespace ranges {
             typename Proj2 = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::traits::is_sentinel_for<Sent2, FwdIter2>::value &&
                 hpx::parallel::traits::is_indirect_callable<
                     ExPolicy, Pred,
@@ -354,10 +354,10 @@ namespace hpx { namespace ranges {
             Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Required at least forward iterator.");
 
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::starts_with().call(
@@ -395,10 +395,10 @@ namespace hpx { namespace ranges {
             using iterator_type2 =
                 typename hpx::traits::range_iterator<Rng2>::type;
 
-            static_assert(hpx::traits::is_input_iterator<iterator_type1>::value,
+            static_assert(hpx::traits::is_input_iterator_v<iterator_type1>,
                 "Required at least input iterator.");
 
-            static_assert(hpx::traits::is_input_iterator<iterator_type2>::value,
+            static_assert(hpx::traits::is_input_iterator_v<iterator_type2>,
                 "Required at least input iterator.");
 
             return hpx::parallel::v1::detail::starts_with().call(
@@ -439,12 +439,10 @@ namespace hpx { namespace ranges {
             using iterator_type2 =
                 typename hpx::traits::range_iterator<Rng2>::type;
 
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type1>,
                 "Required at least forward iterator.");
 
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type2>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::starts_with().call(
