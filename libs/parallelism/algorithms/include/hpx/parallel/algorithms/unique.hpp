@@ -586,8 +586,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     // MSVC complains if pred or proj is captured by ref below
                     util::loop_n<std::decay_t<ExPolicy>>(++part_begin,
                         part_size, [base, pred, proj](zip_iterator it) mutable {
-                            bool f = HPX_INVOKE(pred, HPX_INVOKE(proj, *base),
-                                HPX_INVOKE(proj, get<0>(*it)));
+                            using hpx::util::invoke;
+
+                            bool f = invoke(pred, invoke(proj, *base),
+                                invoke(proj, get<0>(*it)));
 
                             if (!(get<1>(*it) = f))
                                 base = get<0>(it.get_iterator_tuple());
@@ -680,14 +682,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
+    // clang-format off
     template <typename ExPolicy, typename FwdIter,
         typename Pred = detail::equal_to,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&& hpx::
-                traits::is_iterator<FwdIter>::value&& traits::is_projected<Proj,
-                    FwdIter>::value&& traits::is_indirect_callable<ExPolicy,
-                    Pred, traits::projected<Proj, FwdIter>,
-                    traits::projected<Proj, FwdIter>>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator_v<FwdIter> &&
+            traits::is_projected<Proj, FwdIter>::value &&
+            traits::is_indirect_callable<ExPolicy, Pred,
+                    traits::projected<Proj, FwdIter>,
+                    traits::projected<Proj, FwdIter>>::value
+        )>
     // clang-format on
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::unique is deprecated, use "
@@ -696,7 +702,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         unique(ExPolicy&& policy, FwdIter first, FwdIter last,
             Pred&& pred = Pred(), Proj&& proj = Proj())
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
             "Required at least forward iterator.");
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -906,27 +912,31 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
+    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::equal_to,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter1>::value&&
-                    hpx::traits::is_iterator<FwdIter2>::value&&
-                        traits::is_projected<Proj, FwdIter1>::value&&
-                            traits::is_indirect_callable<ExPolicy, Pred,
-                                traits::projected<Proj, FwdIter1>,
-                                traits::projected<Proj, FwdIter1>>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
+            traits::is_projected<Proj, FwdIter1>::value &&
+            traits::is_indirect_callable<ExPolicy, Pred,
+                traits::projected<Proj, FwdIter1>,
+                traits::projected<Proj, FwdIter1>>::value
+        )>
+    // clang-format on
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::unique_copy is deprecated, use "
         "hpx::unique_copy instead")
-    typename util::detail::algorithm_result<ExPolicy,
-        parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
+        typename util::detail::algorithm_result<ExPolicy,
+            parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
         unique_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest, Pred&& pred = Pred(), Proj&& proj = Proj())
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
             "Required at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
             "Requires at least forward iterator.");
 
         using result_type = parallel::util::in_out_result<FwdIter1, FwdIter2>;
@@ -955,7 +965,7 @@ namespace hpx {
             typename Pred = hpx::parallel::v1::detail::equal_to,
             typename Proj = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value &&
+                hpx::traits::is_iterator_v<FwdIter> &&
                 parallel::traits::is_projected<Proj, FwdIter>::value &&
                 parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Pred,
@@ -966,7 +976,7 @@ namespace hpx {
         friend FwdIter tag_fallback_dispatch(hpx::unique_t, FwdIter first,
             FwdIter last, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::unique<FwdIter>().call(
@@ -980,7 +990,7 @@ namespace hpx {
             typename Proj = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter>::value &&
+                hpx::traits::is_iterator_v<FwdIter> &&
                 parallel::traits::is_projected<Proj, FwdIter>::value &&
                 parallel::traits::is_indirect_callable<ExPolicy, Pred,
                     parallel::traits::projected<Proj, FwdIter>,
@@ -992,7 +1002,7 @@ namespace hpx {
         tag_fallback_dispatch(hpx::unique_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::unique<FwdIter>().call(
@@ -1011,8 +1021,8 @@ namespace hpx {
             typename Pred = hpx::parallel::v1::detail::equal_to,
             typename Proj = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<InIter>::value &&
-                hpx::traits::is_iterator<OutIter>::value &&
+                hpx::traits::is_iterator_v<InIter> &&
+                hpx::traits::is_iterator_v<OutIter> &&
                 parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Pred,
                     parallel::traits::projected<Proj, InIter>,
@@ -1023,7 +1033,7 @@ namespace hpx {
             InIter last, OutIter dest, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator<InIter>::value,
+            static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
             using result_type = parallel::util::in_out_result<InIter, OutIter>;
@@ -1040,8 +1050,8 @@ namespace hpx {
             typename Proj = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
                 parallel::traits::is_indirect_callable<ExPolicy, Pred,
                     parallel::traits::projected<Proj, FwdIter1>,
                     parallel::traits::projected<Proj, FwdIter1>>::value
@@ -1053,7 +1063,7 @@ namespace hpx {
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
 
             using result_type =
