@@ -363,6 +363,45 @@ HPX is built using CMake which allows us to toggle some build options alongside 
  * HPX_WITH_TESTS                   ON
  * HPX_WITH_VALGRIND                OFF
 
+Documentation
+==========
+To build the |hpx| documentation, you need recent versions of the following
+packages:
+
+- ``python3``
+- ``sphinx`` (Python package)
+- ``sphinx_rtd_theme`` (Python package)
+- ``breathe 4.16.0`` (Python package)
+- ``doxygen``
+
+If the |python|_ dependencies are not available through your system package
+manager, you can install them using the Python package manager ``pip``:
+
+.. code-block:: bash
+
+   pip install --user sphinx sphinx_rtd_theme breathe
+
+You may need to set the following CMake variables to make sure CMake can
+find the required dependencies.
+
+.. option:: DOXYGEN_ROOT:PATH
+
+   Specifies where to look for the installation of the |doxygen|_ tool.
+
+.. option:: SPHINX_ROOT:PATH
+
+   Specifies where to look for the installation of the |sphinx|_ tool.
+
+.. option:: BREATHE_APIDOC_ROOT:PATH
+
+   Specifies where to look for the installation of the |breathe|_ tool.
+   
+We assume you are comfortable in looking at Sphinx and CMake, and here's how to build the documentation.
+
+.. code-block:: bash
+  
+   make docs
+
 Next steps
 ==========
 
