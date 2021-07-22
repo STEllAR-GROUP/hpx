@@ -1,5 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -45,8 +46,10 @@ namespace hpx { namespace ranges {
     /// invoked without an execution policy object will execute in sequential
     /// order in the calling thread.
     ///
-    /// \returns  The \a exclusive_scan algorithm returns \a OutIter.
-    ///           The \a exclusive_scan algorithm returns the output iterator
+    /// \returns  The \a exclusive_scan algorithm returns \a
+    ///           util::in_out_result<InIter, OutIter>.
+    ///           The \a exclusive_scan algorithm returns an input iterator to
+    ///           the point denoted by the sentinel and an output iterator
     ///           to the element in the destination range, one past the last
     ///           element copied.
     ///
@@ -60,7 +63,8 @@ namespace hpx { namespace ranges {
     /// \a inclusive_scan includes the ith input element in the ith sum.
     ///
     template <typename InIter, typename Sent, typename OutIter, typename T>
-    OutIter exclusive_scan(InIter first, Sent last, OutIter dest, T init);
+    parallel::util::in_out_result<InIter, OutIter> exclusive_scan(
+        InIter first, Sent last, OutIter dest, T init);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
@@ -107,12 +111,13 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a exclusive_scan algorithm returns a
-    ///           \a hpx::future<FwdIter2> if
+    ///           \a hpx::future<util::in_out_result<FwdIter1, FwdIter2>> if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a FwdIter2 otherwise.
-    ///           The \a exclusive_scan algorithm returns the output iterator
+    ///           returns \a util::in_out_result<FwdIter1, FwdIter2> otherwise.
+    ///           The \a exclusive_scan algorithm returns an input iterator to
+    ///           the point denoted by the sentinel and an output iterator
     ///           to the element in the destination range, one past the last
     ///           element copied.
     ///
@@ -127,7 +132,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename FwdIter1, typename Sent,
         typename FwdIter2, typename T>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    typename util::detail::algorithm_result<ExPolicy,
+        parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
     exclusive_scan(
         ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest, T init);
 
@@ -180,8 +186,10 @@ namespace hpx { namespace ranges {
     /// invoked without an execution policy object will execute in sequential
     /// order in the calling thread.
     ///
-    /// \returns  The \a exclusive_scan algorithm returns \a OutIter.
-    ///           The \a exclusive_scan algorithm returns the output iterator
+    /// \returns  The \a exclusive_scan algorithm returns \a
+    ///           util::in_out_result<InIter, OutIter>.
+    ///           The \a exclusive_scan algorithm returns an input iterator to
+    ///           the point denoted by the sentinel and an output iterator
     ///           to the element in the destination range, one past the last
     ///           element copied.
     ///
@@ -198,7 +206,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename InIter, typename Sent, typename OutIter, typename T,
         typename Op>
-    OutIter exclusive_scan(
+    parallel::util::in_out_result<InIter, OutIter> exclusive_scan(
         InIter first, Sent last, OutIter dest, T init, Op&& op);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -263,12 +271,13 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a exclusive_scan algorithm returns a
-    ///           \a hpx::future<OutIter> if
+    ///           \a hpx::future<util::in_out_result<FwdIter1, FwdIter2>> if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a OutIter otherwise.
-    ///           The \a exclusive_scan algorithm returns the output iterator
+    ///           returns \a util::in_out_result<FwdIter1, FwdIter2> otherwise.
+    ///           The \a exclusive_scan algorithm returns an input iterator to
+    ///           the point denoted by the sentinel and an output iterator
     ///           to the element in the destination range, one past the last
     ///           element copied.
     ///
@@ -285,7 +294,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename FwdIter1, typename Sent,
         typename FwdIter2, typename T, typename Op>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    typename util::detail::algorithm_result<ExPolicy,
+        parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
     exclusive_scan(ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest,
         T init, Op&& op);
 
@@ -317,8 +327,10 @@ namespace hpx { namespace ranges {
     /// invoked without an execution policy object will execute in sequential
     /// order in the calling thread.
     ///
-    /// \returns  The \a exclusive_scan algorithm returns \a O.
-    ///           The \a exclusive_scan algorithm returns the output iterator
+    /// \returns  The \a exclusive_scan algorithm returns \a util::in_out_result
+    ///           <typename hpx::traits::range_traits<Rng>::iterator_type, O>
+    ///           The \a exclusive_scan algorithm returns an input iterator to
+    ///           the point denoted by the sentinel and an output iterator
     ///           to the element in the destination range, one past the last
     ///           element copied.
     ///
@@ -332,7 +344,9 @@ namespace hpx { namespace ranges {
     /// \a inclusive_scan includes the ith input element in the ith sum.
     ///
     template <typename Rng, typename O, typename T>
-    O exclusive_scan(Rng&& rng, O dest, T init);
+    parallel::util::in_out_result<
+        typename hpx::traits::range_traits<Rng>::iterator_type, O>
+    exclusive_scan(Rng&& rng, O dest, T init);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
@@ -375,12 +389,16 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a exclusive_scan algorithm returns a
-    ///           \a hpx::future<O> if
-    ///           the execution policy is of type
+    ///           \a hpx::future<util::in_out_result
+    ///           <typename hpx::traits::range_traits<Rng>::iterator_type, O>>
+    ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a O otherwise.
-    ///           The \a exclusive_scan algorithm returns the output iterator
+    ///           returns \a util::in_out_result
+    ///           <typename hpx::traits::range_traits<Rng>::iterator_type, O>
+    ///           otherwise.
+    ///           The \a exclusive_scan algorithm returns an input iterator to
+    ///           the point denoted by the sentinel and an output iterator
     ///           to the element in the destination range, one past the last
     ///           element copied.
     ///
@@ -394,8 +412,10 @@ namespace hpx { namespace ranges {
     /// \a inclusive_scan includes the ith input element in the ith sum.
     ///
     template <typename ExPolicy, typename Rng, typename O, typename T>
-    typename util::detail::algorithm_result<ExPolicy, O>::type exclusive_scan(
-        ExPolicy&& policy, Rng&& rng, O dest, T init);
+    typename util::detail::algorithm_result<ExPolicy,
+        parallel::util::in_out_result<
+            typename hpx::traits::range_traits<Rng>::iterator_type, O>>::type
+    exclusive_scan(ExPolicy&& policy, Rng&& rng, O dest, T init);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
@@ -442,8 +462,10 @@ namespace hpx { namespace ranges {
     /// invoked without an execution policy object will execute in sequential
     /// order in the calling thread.
     ///
-    /// \returns  The \a exclusive_scan algorithm returns \a O.
-    ///           The \a exclusive_scan algorithm returns the output iterator
+    /// \returns  The \a exclusive_scan algorithm returns \a util::in_out_result
+    ///           <typename hpx::traits::range_traits<Rng>::iterator_type, O>
+    ///           The \a exclusive_scan algorithm returns an input iterator to
+    ///           the point denoted by the sentinel and an output iterator
     ///           to the element in the destination range, one past the last
     ///           element copied.
     ///
@@ -457,7 +479,9 @@ namespace hpx { namespace ranges {
     /// \a inclusive_scan includes the ith input element in the ith sum.
     ///
     template <typename Rng, typename O, typename T, typename Op>
-    O exclusive_scan(Rng&& rng, O dest, T init, Op&& op);
+    parallel::util::in_out_result<
+        typename hpx::traits::range_traits<Rng>::iterator_type, O>
+    exclusive_scan(Rng&& rng, O dest, T init, Op&& op);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
@@ -517,12 +541,16 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a exclusive_scan algorithm returns a
-    ///           \a hpx::future<O> if
-    ///           the execution policy is of type
+    ///           \a hpx::future<util::in_out_result
+    ///           <typename hpx::traits::range_traits<Rng>::iterator_type, O>>
+    ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a O otherwise.
-    ///           The \a exclusive_scan algorithm returns the output iterator
+    ///           returns \a util::in_out_result
+    ///           <typename hpx::traits::range_traits<Rng>::iterator_type, O>
+    ///           otherwise.
+    ///           The \a exclusive_scan algorithm returns an input iterator to
+    ///           the point denoted by the sentinel and an output iterator
     ///           to the element in the destination range, one past the last
     ///           element copied.
     ///
@@ -537,8 +565,10 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng, typename O, typename T,
         typename Op>
-    typename util::detail::algorithm_result<ExPolicy, O>::type exclusive_scan(
-        ExPolicy&& policy, Rng&& rng, O dest, T init, Op&& op);
+    typename util::detail::algorithm_result<ExPolicy,
+        parallel::util::in_out_result<
+            typename hpx::traits::range_traits<Rng>::iterator_type, O>>::type
+    exclusive_scan(ExPolicy&& policy, Rng&& rng, O dest, T init, Op&& op);
 }}    // namespace hpx::ranges
 #else
 
@@ -568,22 +598,25 @@ namespace hpx { namespace ranges {
         template <typename InIter, typename Sent, typename OutIter,
              typename T, typename Op = std::plus<T>,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<InIter>::value &&
+                hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for<Sent, InIter>::value &&
-                hpx::traits::is_iterator<OutIter>::value
+                hpx::traits::is_iterator_v<OutIter>
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(hpx::ranges::exclusive_scan_t,
-            InIter first, Sent last, OutIter dest, T init, Op&& op = Op())
+        friend parallel::util::in_out_result<InIter, OutIter>
+        tag_fallback_dispatch(hpx::ranges::exclusive_scan_t, InIter first,
+            Sent last, OutIter dest, T init, Op&& op = Op())
         {
-            static_assert(hpx::traits::is_input_iterator<InIter>::value,
+            static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_output_iterator<OutIter>::value,
+            static_assert(hpx::traits::is_output_iterator_v<OutIter>,
                 "Requires at least output iterator.");
 
-            return hpx::parallel::v1::detail::exclusive_scan<OutIter>().call(
-                hpx::execution::seq, first, last, dest, std::move(init),
-                std::forward<Op>(op));
+            using result_type = parallel::util::in_out_result<InIter, OutIter>;
+
+            return hpx::parallel::v1::detail::exclusive_scan<result_type>()
+                .call(hpx::execution::seq, first, last, dest, std::move(init),
+                    std::forward<Op>(op));
         }
 
         // clang-format off
@@ -591,24 +624,27 @@ namespace hpx { namespace ranges {
             typename FwdIter2, typename T, typename Op = std::plus<T>,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
+            parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
         tag_fallback_dispatch(hpx::ranges::exclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, Sent last, FwdIter2 dest, T init, Op&& op = Op())
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::exclusive_scan<FwdIter2>().call(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::move(init), std::forward<Op>(op));
+            using result_type =
+                parallel::util::in_out_result<FwdIter1, FwdIter2>;
+
+            return hpx::parallel::v1::detail::exclusive_scan<result_type>()
+                .call(std::forward<ExPolicy>(policy), first, last, dest,
+                    std::move(init), std::forward<Op>(op));
         }
 
         // clang-format off
@@ -618,8 +654,10 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend O tag_fallback_dispatch(hpx::ranges::exclusive_scan_t, Rng&& rng,
-            O dest, T init, Op&& op = Op())
+        friend parallel::util::in_out_result<
+            typename hpx::traits::range_traits<Rng>::iterator_type, O>
+        tag_fallback_dispatch(hpx::ranges::exclusive_scan_t, Rng&& rng, O dest,
+            T init, Op&& op = Op())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -627,9 +665,11 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_input_iterator<iterator_type>::value,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::exclusive_scan<O>().call(
-                hpx::execution::seq, std::begin(rng), std::end(rng), dest,
-                std::move(init), std::forward<Op>(op));
+            using result_type = parallel::util::in_out_result<iterator_type, O>;
+
+            return hpx::parallel::v1::detail::exclusive_scan<result_type>()
+                .call(hpx::execution::seq, std::begin(rng), std::end(rng), dest,
+                    std::move(init), std::forward<Op>(op));
         }
 
         // clang-format off
@@ -640,10 +680,12 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend
-            typename parallel::util::detail::algorithm_result<ExPolicy, O>::type
-            tag_fallback_dispatch(hpx::ranges::exclusive_scan_t,
-                ExPolicy&& policy, Rng&& rng, O dest, T init, Op&& op = Op())
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            parallel::util::in_out_result<
+                typename hpx::traits::range_traits<Rng>::iterator_type,
+                O>>::type
+        tag_fallback_dispatch(hpx::ranges::exclusive_scan_t, ExPolicy&& policy,
+            Rng&& rng, O dest, T init, Op&& op = Op())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -652,9 +694,11 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_forward_iterator<iterator_type>::value,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::exclusive_scan<O>().call(
-                std::forward<ExPolicy>(policy), std::begin(rng), std::end(rng),
-                dest, std::move(init), std::forward<Op>(op));
+            using result_type = parallel::util::in_out_result<iterator_type, O>;
+
+            return hpx::parallel::v1::detail::exclusive_scan<result_type>()
+                .call(std::forward<ExPolicy>(policy), std::begin(rng),
+                    std::end(rng), dest, std::move(init), std::forward<Op>(op));
         }
     } exclusive_scan{};
 }}    // namespace hpx::ranges
