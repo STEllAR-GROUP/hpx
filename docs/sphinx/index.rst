@@ -83,7 +83,7 @@ What's so special about |hpx|?
    why_hpx
    quickstart
    terminology
-   examples
+   tutorials
    manual
    additional_material
 
