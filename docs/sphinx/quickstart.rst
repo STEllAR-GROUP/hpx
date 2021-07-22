@@ -331,6 +331,38 @@ tricky to get right (the continuation needs to take the future as an argument).
    writing your own implementation. This can save you time and the resulting
    program is often faster.
 
+Some common flags while building HPX
+==========
+
+HPX is built using CMake which allows us to toggle some build options alongside the standard HPX build. Below are some examples that are used for HPX.
+.. code-block:: 
+
+ BUILD_TESTING                    ON  // Test the local HPX build
+ CMAKE_BUILD_TYPE                 Release // checks the release version
+ CMAKE_DIR                        cmake-3.17 // shows local cmake version
+ CMAKE_INSTALL_PREFIX             /usr/local
+ HPX_CXX11_STD_ATOMIC_LIBRARIES   atomic 
+ HPX_PLATFORM                     native
+ HPX_WITH_APEX                    OFF // Build HPX with APEX 
+ HPX_WITH_ASYNC_MPI               OFF // Build HPX with ASYNC
+ HPX_WITH_COMPILE_ONLY_TESTS      ON // build HPX with compilation test-cases
+ HPX_WITH_DOCUMENTATION           ON // Build docs
+ HPX_WITH_DOCUMENTATION_OUTPUT   html // Docs output format
+ HPX_WITH_EXAMPLES                ON // Build exmaples
+ HPX_WITH_EXECUTABLE_PREFIX       ON // Build executables      
+ HPX_WITH_FAIL_COMPILE_TESTS      ON // Build even after failing COMPILE_ONLY_TESTS
+ HPX_WITH_GOOGLE_PERFTOOLS        OFF 
+ HPX_WITH_ITTNOTIFY               OFF
+ HPX_WITH_MALLOC                  system // Allocate the system MALLOC, is a oommon error
+ HPX_WITH_NETWORKING              ON
+ HPX_WITH_PAPI                    OFF
+ HPX_WITH_PARCELPORT_ACTION_COU   OFF
+ HPX_WITH_PARCELPORT_MPI          OFF
+ HPX_WITH_PARCELPORT_TCP          ON
+ HPX_WITH_SANITIZERS              OFF
+ HPX_WITH_TESTS                   ON
+ HPX_WITH_VALGRIND                OFF
+
 Next steps
 ==========
 
