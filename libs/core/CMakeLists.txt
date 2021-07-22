@@ -46,6 +46,7 @@ set(_hpx_core_modules
     statistics
     string_util
     synchronization
+    tag_dispatch
     testing
     thread_pools
     thread_support
