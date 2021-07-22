@@ -579,7 +579,7 @@ hpx_option(
 # ##############################################################################
 # To avoid writing these strings out in multiple places, use vars to hold them
 set(CUDA_OPTION_STRING "Enable HPX_WITH_ASYNC_CUDA (CUDA or HIP futures) and\
- HPX_WITH_CUDA_COMPUTE (CUDA/HIP enabled parallel algorithms) (default: OFF)"
+ HPX_WITH_COMPUTE_CUDA (CUDA/HIP enabled parallel algorithms) (default: OFF)"
 )
 set(ASYNC_CUDA_STRING
     "Enable HPX CUDA/HIP compute capability (parallel algorithms) module\
@@ -595,11 +595,11 @@ set(HIP_OPTION_STRING "Enable compilation with HIPCC (default: OFF)")
 hpx_option(HPX_WITH_CUDA BOOL "${CUDA_OPTION_STRING}" OFF ADVANCED)
 
 # Those two will be renamed replacing CUDA with GPU
-hpx_option(HPX_WITH_CUDA_COMPUTE BOOL "${CUDA_COMPUTE_STRING}" ON ADVANCED)
+hpx_option(HPX_WITH_COMPUTE_CUDA BOOL "${CUDA_COMPUTE_STRING}" ON ADVANCED)
 hpx_option(HPX_WITH_ASYNC_CUDA BOOL "${ASYNC_CUDA_STRING}" ON ADVANCED)
 
-# HPX_WITH_CUDA_COMPUTE requires HPX_WITH_ASYNC_CUDA
-if(HPX_WITH_CUDA_COMPUTE)
+# HPX_WITH_COMPUTE_CUDA requires HPX_WITH_ASYNC_CUDA
+if(HPX_WITH_COMPUTE_CUDA)
   set(HPX_WITH_ASYNC_CUDA
       ON
       CACHE BOOL "${HPX_WITH_ASYNC_CUDA}" FORCE
