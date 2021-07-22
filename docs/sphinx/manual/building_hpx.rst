@@ -373,6 +373,12 @@ find the required dependencies.
 .. option:: BREATHE_APIDOC_ROOT:PATH
 
    Specifies where to look for the installation of the |breathe|_ tool.
+   
+We assume you are comfortable in looking at Sphinx and CMake, and here's how to build the documentation.
+
+.. code-block:: bash
+  
+   make docs
 
 .. _boost_installation:
 
