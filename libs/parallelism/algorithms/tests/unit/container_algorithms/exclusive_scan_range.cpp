@@ -1,5 +1,6 @@
 //  Copyright (c) 2018 Christopher Ogle
 //  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -38,8 +39,11 @@ void test_exclusive_scan_sent(IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::ranges::exclusive_scan(
+    auto res = hpx::ranges::exclusive_scan(
         std::begin(c), sentinel<std::size_t>{2}, std::begin(d), val, op);
+
+    HPX_TEST(res.in == std::begin(c) + end_len);
+    HPX_TEST(res.out == std::begin(d) + end_len);
 
     // verify values
     std::vector<std::size_t> e(end_len);
@@ -64,8 +68,11 @@ void test_exclusive_scan_sent(ExPolicy policy, IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::ranges::exclusive_scan(policy, std::begin(c), sentinel<std::size_t>{2},
-        std::begin(d), val, op);
+    auto res = hpx::ranges::exclusive_scan(policy, std::begin(c),
+        sentinel<std::size_t>{2}, std::begin(d), val, op);
+
+    HPX_TEST(res.in == std::begin(c) + end_len);
+    HPX_TEST(res.out == std::begin(d) + end_len);
 
     // verify values
     std::vector<std::size_t> e(end_len);
@@ -85,7 +92,10 @@ void test_exclusive_scan(IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::ranges::exclusive_scan(c, std::begin(d), val, op);
+    auto res = hpx::ranges::exclusive_scan(c, std::begin(d), val, op);
+
+    HPX_TEST(res.in == std::end(c));
+    HPX_TEST(res.out == std::end(d));
 
     // verify values
     std::vector<std::size_t> e(c.size());
@@ -108,7 +118,10 @@ void test_exclusive_scan(ExPolicy policy, IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::ranges::exclusive_scan(policy, c, std::begin(d), val, op);
+    auto res = hpx::ranges::exclusive_scan(policy, c, std::begin(d), val, op);
+
+    HPX_TEST(res.in == std::end(c));
+    HPX_TEST(res.out == std::end(d));
 
     // verify values
     std::vector<std::size_t> e(c.size());
