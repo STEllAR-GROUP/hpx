@@ -1,5 +1,6 @@
 //  Copyright (c) 2018 Christopher Ogle
 //  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -40,14 +41,23 @@ void test_inclusive_scan_sent(IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::ranges::inclusive_scan(
+    auto res1 = hpx::ranges::inclusive_scan(
         std::begin(c), sentinel<std::size_t>{2}, std::begin(d), op, val);
 
-    hpx::ranges::inclusive_scan(
+    auto res2 = hpx::ranges::inclusive_scan(
         std::begin(c), sentinel<std::size_t>{2}, std::begin(d1), op);
 
-    hpx::ranges::inclusive_scan(
+    auto res3 = hpx::ranges::inclusive_scan(
         std::begin(c), sentinel<std::size_t>{2}, std::begin(d2));
+
+    HPX_TEST(res1.in == std::begin(c) + end_len);
+    HPX_TEST(res1.out == std::begin(d) + end_len);
+
+    HPX_TEST(res2.in == std::begin(c) + end_len);
+    HPX_TEST(res2.out == std::begin(d1) + end_len);
+
+    HPX_TEST(res3.in == std::begin(c) + end_len);
+    HPX_TEST(res3.out == std::begin(d2) + end_len);
 
     // verify values
     std::vector<std::size_t> e(end_len);
@@ -76,14 +86,23 @@ void test_inclusive_scan_sent(ExPolicy policy, IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::ranges::inclusive_scan(policy, std::begin(c), sentinel<std::size_t>{2},
-        std::begin(d), op, val);
+    auto res1 = hpx::ranges::inclusive_scan(policy, std::begin(c),
+        sentinel<std::size_t>{2}, std::begin(d), op, val);
 
-    hpx::ranges::inclusive_scan(
+    auto res2 = hpx::ranges::inclusive_scan(
         policy, std::begin(c), sentinel<std::size_t>{2}, std::begin(d1), op);
 
-    hpx::ranges::inclusive_scan(
+    auto res3 = hpx::ranges::inclusive_scan(
         policy, std::begin(c), sentinel<std::size_t>{2}, std::begin(d2));
+
+    HPX_TEST(res1.in == std::begin(c) + end_len);
+    HPX_TEST(res1.out == std::begin(d) + end_len);
+
+    HPX_TEST(res2.in == std::begin(c) + end_len);
+    HPX_TEST(res2.out == std::begin(d1) + end_len);
+
+    HPX_TEST(res3.in == std::begin(c) + end_len);
+    HPX_TEST(res3.out == std::begin(d2) + end_len);
 
     // verify values
     std::vector<std::size_t> e(end_len);
@@ -107,9 +126,18 @@ void test_inclusive_scan(IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::ranges::inclusive_scan(c, std::begin(d), op, val);
-    hpx::ranges::inclusive_scan(c, std::begin(d1), op);
-    hpx::ranges::inclusive_scan(c, std::begin(d2));
+    auto res1 = hpx::ranges::inclusive_scan(c, std::begin(d), op, val);
+    auto res2 = hpx::ranges::inclusive_scan(c, std::begin(d1), op);
+    auto res3 = hpx::ranges::inclusive_scan(c, std::begin(d2));
+
+    HPX_TEST(res1.in == std::end(c));
+    HPX_TEST(res1.out == std::end(d));
+
+    HPX_TEST(res2.in == std::end(c));
+    HPX_TEST(res2.out == std::end(d1));
+
+    HPX_TEST(res3.in == std::end(c));
+    HPX_TEST(res3.out == std::end(d2));
 
     // verify values
     std::vector<std::size_t> e(c.size());
@@ -136,9 +164,18 @@ void test_inclusive_scan(ExPolicy policy, IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::ranges::inclusive_scan(policy, c, std::begin(d), op, val);
-    hpx::ranges::inclusive_scan(policy, c, std::begin(d1), op);
-    hpx::ranges::inclusive_scan(policy, c, std::begin(d2));
+    auto res1 = hpx::ranges::inclusive_scan(policy, c, std::begin(d), op, val);
+    auto res2 = hpx::ranges::inclusive_scan(policy, c, std::begin(d1), op);
+    auto res3 = hpx::ranges::inclusive_scan(policy, c, std::begin(d2));
+
+    HPX_TEST(res1.in == std::end(c));
+    HPX_TEST(res1.out == std::end(d));
+
+    HPX_TEST(res2.in == std::end(c));
+    HPX_TEST(res2.out == std::end(d1));
+
+    HPX_TEST(res3.in == std::end(c));
+    HPX_TEST(res3.out == std::end(d2));
 
     // verify values
     std::vector<std::size_t> e(c.size());

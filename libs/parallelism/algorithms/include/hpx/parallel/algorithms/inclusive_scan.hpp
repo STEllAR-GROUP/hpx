@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2020 Hartmut Kaiser
 //  Copyright (c) 2016 Minh-Khanh Do
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -428,12 +429,14 @@ namespace hpx {
 #include <hpx/pack_traversal/unwrap.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -456,7 +459,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // Our own version of the sequential inclusive_scan.
         template <typename InIter, typename Sent, typename OutIter, typename T,
             typename Op>
-        OutIter sequential_inclusive_scan(
+        static constexpr util::in_out_result<InIter, OutIter>
+        sequential_inclusive_scan(
             InIter first, Sent last, OutIter dest, T init, Op&& op)
         {
             for (/* */; first != last; (void) ++first, ++dest)
@@ -464,11 +468,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 init = hpx::util::invoke(op, init, *first);
                 *dest = init;
             }
-            return dest;
+            return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
         template <typename InIter, typename Sent, typename OutIter, typename Op>
-        OutIter sequential_inclusive_scan_noinit(
+        static constexpr util::in_out_result<InIter, OutIter>
+        sequential_inclusive_scan_noinit(
             InIter first, Sent last, OutIter dest, Op&& op)
         {
             if (first != last)
@@ -478,11 +483,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return sequential_inclusive_scan(
                     ++first, last, dest, std::move(init), std::forward<Op>(op));
             }
-            return dest;
+            return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
         template <typename InIter, typename OutIter, typename T, typename Op>
-        T sequential_inclusive_scan_n(
+        static constexpr T sequential_inclusive_scan_n(
             InIter first, std::size_t count, OutIter dest, T init, Op&& op)
         {
             for (/* */; count-- != 0; (void) ++first, ++dest)
@@ -494,9 +499,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename FwdIter2>
+        template <typename IterPair>
         struct inclusive_scan
-          : public detail::algorithm<inclusive_scan<FwdIter2>, FwdIter2>
+          : public detail::algorithm<inclusive_scan<IterPair>, IterPair>
         {
             inclusive_scan()
               : inclusive_scan::algorithm("inclusive_scan")
@@ -505,8 +510,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename OutIter, typename T, typename Op>
-            static OutIter sequential(ExPolicy, InIter first, Sent last,
-                OutIter dest, T const& init, Op&& op)
+            static constexpr util::in_out_result<InIter, OutIter> sequential(
+                ExPolicy, InIter first, Sent last, OutIter dest, T const& init,
+                Op&& op)
             {
                 return sequential_inclusive_scan(
                     first, last, dest, init, std::forward<Op>(op));
@@ -514,7 +520,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename OutIter, typename Op>
-            static OutIter sequential(
+            static constexpr util::in_out_result<InIter, OutIter> sequential(
                 ExPolicy, InIter first, Sent last, OutIter dest, Op&& op)
             {
                 return sequential_inclusive_scan_noinit(
@@ -522,23 +528,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
-                typename T, typename Op>
+                typename FwdIter2, typename T, typename Op>
             static typename util::detail::algorithm_result<ExPolicy,
-                FwdIter2>::type
+                util::in_out_result<FwdIter1, FwdIter2>>::type
             parallel(ExPolicy&& policy, FwdIter1 first, Sent last,
                 FwdIter2 dest, T init, Op&& op)
             {
-                typedef util::detail::algorithm_result<ExPolicy, FwdIter2>
-                    result;
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
-                typedef typename std::iterator_traits<FwdIter1>::difference_type
-                    difference_type;
+                using result = util::detail::algorithm_result<ExPolicy,
+                    util::in_out_result<FwdIter1, FwdIter2>>;
+                using zip_iterator =
+                    hpx::util::zip_iterator<FwdIter1, FwdIter2>;
+                using difference_type =
+                    typename std::iterator_traits<FwdIter1>::difference_type;
 
                 if (first == last)
-                    return result::get(std::move(dest));
+                    return result::get(
+                        util::in_out_result<FwdIter1, FwdIter2>{first, dest});
 
                 difference_type count = detail::distance(first, last);
+                FwdIter1 last_iter = detail::advance_to_sentinel(first, last);
 
                 FwdIter2 final_dest = dest;
                 std::advance(final_dest, count);
@@ -567,39 +575,44 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         });
                 };
 
-                return util::scan_partitioner<ExPolicy, FwdIter2, T>::call(
-                    std::forward<ExPolicy>(policy),
-                    make_zip_iterator(first, dest), count, init,
-                    // step 1 performs first part of scan algorithm
-                    [op, last](
-                        zip_iterator part_begin, std::size_t part_size) -> T {
-                        T part_init = get<0>(*part_begin);
-                        get<1>(*part_begin++) = part_init;
+                return util::scan_partitioner<ExPolicy,
+                    util::in_out_result<FwdIter1, FwdIter2>, T>::
+                    call(
+                        std::forward<ExPolicy>(policy),
+                        make_zip_iterator(first, dest), count, init,
+                        // step 1 performs first part of scan algorithm
+                        [op, last](zip_iterator part_begin,
+                            std::size_t part_size) -> T {
+                            T part_init = get<0>(*part_begin);
+                            get<1>(*part_begin++) = part_init;
 
-                        auto iters = part_begin.get_iterator_tuple();
-                        if (get<0>(iters) != last)
-                        {
-                            return sequential_inclusive_scan_n(get<0>(iters),
-                                part_size - 1, get<1>(iters), part_init, op);
-                        }
-                        return part_init;
-                    },
-                    // step 2 propagates the partition results from left
-                    // to right
-                    hpx::unwrapping(op),
-                    // step 3 runs final accumulation on each partition
-                    std::move(f3),
-                    // step 4 use this return value
-                    [final_dest](std::vector<hpx::shared_future<T>>&&,
-                        std::vector<hpx::future<void>>&&) {
-                        return final_dest;
-                    });
+                            auto iters = part_begin.get_iterator_tuple();
+                            if (get<0>(iters) != last)
+                            {
+                                return sequential_inclusive_scan_n(
+                                    get<0>(iters), part_size - 1, get<1>(iters),
+                                    part_init, op);
+                            }
+                            return part_init;
+                        },
+                        // step 2 propagates the partition results from left
+                        // to right
+                        hpx::unwrapping(op),
+                        // step 3 runs final accumulation on each partition
+                        std::move(f3),
+                        // step 4 use this return value
+                        [last_iter, final_dest](
+                            std::vector<hpx::shared_future<T>>&&,
+                            std::vector<hpx::future<void>>&&) {
+                            return util::in_out_result<FwdIter1, FwdIter2>{
+                                last_iter, final_dest};
+                        });
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
-                typename Op>
+                typename FwdIter2, typename Op>
             static typename util::detail::algorithm_result<ExPolicy,
-                FwdIter2>::type
+                util::in_out_result<FwdIter1, FwdIter2>>::type
             parallel(ExPolicy&& policy, FwdIter1 first, Sent last,
                 FwdIter2 dest, Op&& op)
             {
@@ -611,9 +624,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         last, dest, std::move(init), std::forward<Op>(op));
                 }
 
-                typedef util::detail::algorithm_result<ExPolicy, FwdIter2>
-                    result;
-                return result::get(std::move(dest));
+                using result = util::detail::algorithm_result<ExPolicy,
+                    util::in_out_result<FwdIter1, FwdIter2>>;
+                return result::get(
+                    util::in_out_result<FwdIter1, FwdIter2>{first, dest});
             }
         };
         /// \endcond
@@ -624,8 +638,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename Op, typename T,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
             hpx::is_invocable_v<Op,
                 typename std::iterator_traits<FwdIter1>::value_type,
                 typename std::iterator_traits<FwdIter1>::value_type
@@ -639,18 +653,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
         inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest, Op&& op, T init)
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
             "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
             "Requires at least forward iterator.");
+
+        using result_type = parallel::util::in_out_result<FwdIter1, FwdIter2>;
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return hpx::parallel::v1::detail::inclusive_scan<FwdIter2>().call(
-            std::forward<ExPolicy>(policy), first, last, dest, std::move(init),
-            std::forward<Op>(op));
+        return parallel::util::get_second_element(
+            hpx::parallel::v1::detail::inclusive_scan<result_type>().call(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                std::move(init), std::forward<Op>(op)));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -661,8 +678,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename Op,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
             hpx::is_invocable_v<Op,
                 typename std::iterator_traits<FwdIter1>::value_type,
                 typename std::iterator_traits<FwdIter1>::value_type
@@ -676,18 +693,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
         inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest, Op&& op)
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
             "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
             "Requires at least forward iterator.");
+
+        using result_type = parallel::util::in_out_result<FwdIter1, FwdIter2>;
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return hpx::parallel::v1::detail::inclusive_scan<FwdIter2>().call(
-            std::forward<ExPolicy>(policy), first, last, dest,
-            std::forward<Op>(op));
+        return parallel::util::get_second_element(
+            detail::inclusive_scan<result_type>().call(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                std::forward<Op>(op)));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -697,8 +717,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2>
         )>
     // clang-format on
     HPX_DEPRECATED_V(1, 8,
@@ -708,20 +728,22 @@ namespace hpx { namespace parallel { inline namespace v1 {
         inclusive_scan(
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
             "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
             "Requires at least forward iterator.");
 
         using value_type = typename std::iterator_traits<FwdIter1>::value_type;
+        using result_type = parallel::util::in_out_result<FwdIter1, FwdIter2>;
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return hpx::parallel::v1::detail::inclusive_scan<FwdIter2>().call(
-            std::forward<ExPolicy>(policy), first, last, dest,
-            std::plus<value_type>());
+        return parallel::util::get_second_element(
+            detail::inclusive_scan<result_type>().call(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                std::plus<value_type>()));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -737,32 +759,34 @@ namespace hpx {
         // clang-format off
         template <typename InIter, typename OutIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<InIter>::value &&
-                hpx::traits::is_iterator<OutIter>::value
+                hpx::traits::is_iterator_v<InIter> &&
+                hpx::traits::is_iterator_v<OutIter>
             )>
         // clang-format on
         friend OutIter tag_fallback_dispatch(
             hpx::inclusive_scan_t, InIter first, InIter last, OutIter dest)
         {
-            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+            static_assert((hpx::traits::is_input_iterator_v<InIter>),
                 "Requires at least input iterator.");
-            static_assert((hpx::traits::is_output_iterator<OutIter>::value),
+            static_assert((hpx::traits::is_output_iterator_v<OutIter>),
                 "Requires at least output iterator.");
 
+            using result_type = parallel::util::in_out_result<InIter, OutIter>;
             using value_type =
                 typename std::iterator_traits<InIter>::value_type;
 
-            return hpx::parallel::v1::detail::inclusive_scan<OutIter>().call(
-                hpx::execution::seq, first, last, dest,
-                std::plus<value_type>());
+            return parallel::util::get_second_element(
+                parallel::v1::detail::inclusive_scan<result_type>().call(
+                    hpx::execution::seq, first, last, dest,
+                    std::plus<value_type>()));
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_forward_iterator<FwdIter1>::value &&
-                hpx::traits::is_forward_iterator<FwdIter2>::value
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -770,24 +794,27 @@ namespace hpx {
         tag_fallback_dispatch(hpx::inclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
             using value_type =
                 typename std::iterator_traits<FwdIter1>::value_type;
+            using result_type =
+                parallel::util::in_out_result<FwdIter1, FwdIter2>;
 
-            return hpx::parallel::v1::detail::inclusive_scan<FwdIter2>().call(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::plus<value_type>());
+            return parallel::util::get_second_element(
+                parallel::v1::detail::inclusive_scan<result_type>().call(
+                    std::forward<ExPolicy>(policy), first, last, dest,
+                    std::plus<value_type>()));
         }
 
         // clang-format off
         template <typename InIter, typename OutIter, typename Op,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<InIter>::value &&
-                hpx::traits::is_iterator<OutIter>::value &&
+                hpx::traits::is_iterator_v<InIter> &&
+                hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Op,
                     typename std::iterator_traits<InIter>::value_type,
                     typename std::iterator_traits<InIter>::value_type
@@ -797,13 +824,17 @@ namespace hpx {
         friend OutIter tag_fallback_dispatch(hpx::inclusive_scan_t,
             InIter first, InIter last, OutIter dest, Op&& op)
         {
-            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+            static_assert((hpx::traits::is_input_iterator_v<InIter>),
                 "Requires at least input iterator.");
-            static_assert((hpx::traits::is_output_iterator<OutIter>::value),
+            static_assert((hpx::traits::is_output_iterator_v<OutIter>),
                 "Requires at least output iterator.");
 
-            return hpx::parallel::v1::detail::inclusive_scan<OutIter>().call(
-                hpx::execution::seq, first, last, dest, std::forward<Op>(op));
+            using result_type = parallel::util::in_out_result<InIter, OutIter>;
+
+            return parallel::util::get_second_element(
+                parallel::v1::detail::inclusive_scan<result_type>().call(
+                    hpx::execution::seq, first, last, dest,
+                    std::forward<Op>(op)));
         }
 
         // clang-format off
@@ -811,8 +842,8 @@ namespace hpx {
             typename Op,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_forward_iterator<FwdIter1>::value &&
-                hpx::traits::is_forward_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Op,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter1>::value_type
@@ -824,22 +855,26 @@ namespace hpx {
         tag_fallback_dispatch(hpx::inclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::inclusive_scan<FwdIter2>().call(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::forward<Op>(op));
+            using result_type =
+                parallel::util::in_out_result<FwdIter1, FwdIter2>;
+
+            return parallel::util::get_second_element(
+                parallel::v1::detail::inclusive_scan<result_type>().call(
+                    std::forward<ExPolicy>(policy), first, last, dest,
+                    std::forward<Op>(op)));
         }
 
         // clang-format off
         template <typename InIter, typename OutIter, typename T,
             typename Op,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<InIter>::value &&
-                hpx::traits::is_iterator<OutIter>::value &&
+                hpx::traits::is_iterator_v<InIter> &&
+                hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Op,
                     typename std::iterator_traits<InIter>::value_type,
                     typename std::iterator_traits<InIter>::value_type
@@ -849,14 +884,17 @@ namespace hpx {
         friend OutIter tag_fallback_dispatch(hpx::inclusive_scan_t,
             InIter first, InIter last, OutIter dest, Op&& op, T init)
         {
-            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+            static_assert((hpx::traits::is_input_iterator_v<InIter>),
                 "Requires at least input iterator.");
-            static_assert((hpx::traits::is_output_iterator<OutIter>::value),
+            static_assert((hpx::traits::is_output_iterator_v<OutIter>),
                 "Requires at least output iterator.");
 
-            return hpx::parallel::v1::detail::inclusive_scan<OutIter>().call(
-                hpx::execution::seq, first, last, dest, std::move(init),
-                std::forward<Op>(op));
+            using result_type = parallel::util::in_out_result<InIter, OutIter>;
+
+            return parallel::util::get_second_element(
+                parallel::v1::detail::inclusive_scan<result_type>().call(
+                    hpx::execution::seq, first, last, dest, std::move(init),
+                    std::forward<Op>(op)));
         }
 
         // clang-format off
@@ -864,8 +902,8 @@ namespace hpx {
             typename T, typename Op,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_forward_iterator<FwdIter1>::value &&
-                hpx::traits::is_forward_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Op,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter1>::value_type
@@ -877,14 +915,18 @@ namespace hpx {
         tag_fallback_dispatch(hpx::inclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::inclusive_scan<FwdIter2>().call(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::move(init), std::forward<Op>(op));
+            using result_type =
+                parallel::util::in_out_result<FwdIter1, FwdIter2>;
+
+            return parallel::util::get_second_element(
+                parallel::v1::detail::inclusive_scan<result_type>().call(
+                    std::forward<ExPolicy>(policy), first, last, dest,
+                    std::move(init), std::forward<Op>(op)));
         }
 
     } inclusive_scan{};
