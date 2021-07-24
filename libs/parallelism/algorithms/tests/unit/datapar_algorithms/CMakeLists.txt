@@ -13,6 +13,8 @@ if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
       copyn_datapar
       count_datapar
       countif_datapar
+      fill_datapar
+      filln_datapar
       foreach_datapar
       foreach_datapar_zipiter
       foreachn_datapar
