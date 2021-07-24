@@ -1,4 +1,5 @@
 //  Copyright (c) 2015-2020 Hartmut Kaiser
+//  Copyright (c) 2021 Akhli J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -42,7 +43,7 @@ namespace hpx { namespace ranges {
     /// order in the calling thread.
     ///
     /// \returns  The \a swap_ranges algorithm returns
-    ///           \a util::in_in_result<InIter1, InIter2>.
+    ///           \a swap_ranges_result<InIter1, InIter2>.
     ///           The \a swap_ranges algorithm returns in_in_result with the
     ///           first element as the iterator to the element past the last
     ///           element exchanged in range beginning with \a first1 and the
@@ -51,7 +52,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename InIter1, typename Sent1, typename InIter2,
         typename Sent2>
-    parallel::util::in_in_result<InIter1, InIter2>
+    swap_ranges_result<InIter1, InIter2>
     swap_ranges(InIter1 first1, Sent1 last1,InIter2 first2, Sent2 last2);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -96,7 +97,7 @@ namespace hpx { namespace ranges {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a swap_ranges algorithm returns a
-    ///           \a hpx::future<util::in_in_result<FwdIter1, FwdIter2>>
+    ///           \a hpx::future<swap_ranges_result<FwdIter1, FwdIter2>>
     ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns \a FwdIter2 otherwise.
     ///           The \a swap_ranges algorithm returns in_in_result with the
@@ -108,7 +109,7 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename FwdIter1, typename Sent1,
             typename FwdIter2, typename Sent2>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        util::in_in_result<FwdIter1, FwdIter2> >::type
+        swap_ranges_result<FwdIter1, FwdIter2> >::type
     swap_ranges(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
         FwdIter2 first2, Sent2 last2);
 
@@ -135,9 +136,9 @@ namespace hpx { namespace ranges {
     /// order in the calling thread.
     ///
     /// \returns  The \a swap_ranges algorithm returns
-    ///           \a util::in_in_result<
-    ///           typename hpx::traits::range_traits<Rng1>::iterator_type,
-    ///           typename hpx::traits::range_traits<Rng1>::iterator_type>.
+    ///           \a swap_ranges_result<
+    ///           hpx::traits::range_iterator_t<Rng1>,
+    ///           hpx::traits::range_iterator_t<Rng1>>.
     ///           The \a swap_ranges algorithm returns in_in_result with the
     ///           first element as the iterator to the element past the last
     ///           element exchanged in range beginning with \a first1 and the
@@ -145,9 +146,8 @@ namespace hpx { namespace ranges {
     ///           element exchanged in the range beginning with \a first2.
     ///
     template <typename Rng1, typename Rng2>
-    parallel::util::in_in_result<
-            typename hpx::traits::range_traits<Rng1>::iterator_type,
-            typename hpx::traits::range_traits<Rng2>::iterator_type>
+    swap_ranges_result<hpx::traits::range_iterator_t<Rng1>,
+            hpx::traits::range_iterator_t<Rng2>>
     swap_ranges(Rng1&& rng1, Rng2&& rng2);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -186,13 +186,13 @@ namespace hpx { namespace ranges {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a swap_ranges algorithm returns a
-    ///           \a hpx::future<util::in_in_result<
-    ///           typename hpx::traits::range_traits<Rng1>::iterator_type,
-    ///           typename hpx::traits::range_traits<Rng1>::iterator_type>>
+    ///           \a hpx::future<swap_ranges_result<
+    ///           hpx::traits::range_iterator_t<Rng1>,
+    ///           hpx::traits::range_iterator_t<Rng1>>>
     ///           if the execution policy is of type \a parallel_task_policy
-    ///           and returns \a util::in_in_result<
-    ///           typename hpx::traits::range_traits<Rng1>::iterator_type,
-    ///           typename hpx::traits::range_traits<Rng1>::iterator_type>.
+    ///           and returns \a swap_ranges_result<
+    ///           hpx::traits::range_iterator_t<Rng1>,
+    ///           hpx::traits::range_iterator_t<Rng1>>.
     ///           otherwise.
     ///           The \a swap_ranges algorithm returns in_in_result with the
     ///           first element as the iterator to the element past the last
@@ -202,9 +202,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng1, typename Rng2>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        parallel::util::in_in_result<
-                typename hpx::traits::range_traits<Rng1>::iterator_type,
-                typename hpx::traits::range_traits<Rng2>::iterator_type>>::type
+    swap_ranges_result<hpx::traits::range_iterator_t<Rng1>,
+                hpx::traits::range_iterator_t<Rng2>>>::type
     swap_ranges(ExPolicy&& policy, ExPolicy&& policy, Rng1&& rng1,
         Rng2&& rng2);
 
@@ -251,9 +250,9 @@ namespace hpx { namespace ranges {
             hpx::ranges::swap_ranges_t, InIter1 first1, Sent1 last1,
             InIter2 first2, Sent2 last2)
         {
-            static_assert(hpx::traits::is_input_iterator<InIter1>::value,
+            static_assert(hpx::traits::is_input_iterator_v<InIter1>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator<InIter2>::value,
+            static_assert(hpx::traits::is_input_iterator_v<InIter2>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::swap_ranges<
@@ -277,9 +276,9 @@ namespace hpx { namespace ranges {
         tag_fallback_dispatch(hpx::ranges::swap_ranges_t, ExPolicy&& policy,
             FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::swap_ranges<
@@ -295,20 +294,17 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng2>::value
             )>
         // clang-format on
-        friend swap_ranges_result<
-            typename hpx::traits::range_traits<Rng1>::iterator_type,
-            typename hpx::traits::range_traits<Rng2>::iterator_type>
+        friend swap_ranges_result<typename hpx::traits::range_iterator_t<Rng1>,
+            typename hpx::traits::range_iterator_t<Rng2>>
         tag_fallback_dispatch(
             hpx::ranges::swap_ranges_t, Rng1&& rng1, Rng2&& rng2)
         {
-            using iterator_type1 =
-                typename hpx::traits::range_traits<Rng1>::iterator_type;
-            using iterator_type2 =
-                typename hpx::traits::range_traits<Rng2>::iterator_type;
+            using iterator_type1 = typename hpx::traits::range_iterator_t<Rng1>;
+            using iterator_type2 = typename hpx::traits::range_iterator_t<Rng2>;
 
-            static_assert(hpx::traits::is_input_iterator<iterator_type1>::value,
+            static_assert(hpx::traits::is_input_iterator_v<iterator_type1>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator<iterator_type2>::value,
+            static_assert(hpx::traits::is_input_iterator_v<iterator_type2>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::swap_ranges<
@@ -326,22 +322,17 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            swap_ranges_result<
-                typename hpx::traits::range_traits<Rng1>::iterator_type,
-                typename hpx::traits::range_traits<Rng2>::iterator_type>>::type
+            swap_ranges_result<typename hpx::traits::range_iterator_t<Rng1>,
+                typename hpx::traits::range_iterator_t<Rng2>>>::type
         tag_fallback_dispatch(hpx::ranges::swap_ranges_t, ExPolicy&& policy,
             Rng1&& rng1, Rng2&& rng2)
         {
-            using iterator_type1 =
-                typename hpx::traits::range_traits<Rng1>::iterator_type;
-            using iterator_type2 =
-                typename hpx::traits::range_traits<Rng2>::iterator_type;
+            using iterator_type1 = typename hpx::traits::range_iterator_t<Rng1>;
+            using iterator_type2 = typename hpx::traits::range_iterator_t<Rng2>;
 
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type1>,
                 "Requires at least forward iterator.");
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type2>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::swap_ranges<

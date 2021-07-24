@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2021 Akhli J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -160,7 +161,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
                 typename FwdIter2>
-            static FwdIter2 sequential(
+            static constexpr FwdIter2 sequential(
                 ExPolicy, FwdIter1 first1, Sent last1, FwdIter2 first2)
             {
                 while (first1 != last1)
@@ -176,16 +177,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIter1, typename Sent1,
                 typename FwdIter2, typename Sent2>
-            static swap_ranges_result<FwdIter1, FwdIter2> sequential(ExPolicy,
-                FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2)
+            static constexpr swap_ranges_result<FwdIter1, FwdIter2> sequential(
+                ExPolicy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
+                Sent2 last2)
             {
                 while (first1 != last1 && first2 != last2)
                 {
-                    std::swap(*first1, *first2);
-                    first1++;
-                    first2++;
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                    std::ranges::iter_swap(first1++, first2++);
+#else
+                    std::iter_swap(first1++, first2++);
+#endif
                 }
-                return util::in_in_result<FwdIter1, FwdIter2>{first1, first2};
+                return swap_ranges_result<FwdIter1, FwdIter2>{first1, first2};
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
@@ -225,9 +229,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         swap_ranges(
             ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
             "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
             "Requires at least forward iterator.");
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -251,16 +255,16 @@ namespace hpx {
         // clang-format off
         template <typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator<FwdIter1>::value &&
-                hpx::traits::is_forward_iterator<FwdIter2>::value
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
         friend FwdIter2 tag_fallback_dispatch(hpx::swap_ranges_t,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
         {
-            static_assert(hpx::traits::is_input_iterator<FwdIter1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_output_iterator<FwdIter2>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::swap_ranges<FwdIter2>().call(
@@ -271,8 +275,8 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_forward_iterator<FwdIter1>::value &&
-                hpx::traits::is_forward_iterator<FwdIter2>::value
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -280,9 +284,9 @@ namespace hpx {
         tag_fallback_dispatch(hpx::swap_ranges_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
         {
-            static_assert(hpx::traits::is_input_iterator<FwdIter1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_output_iterator<FwdIter2>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::swap_ranges<FwdIter2>().call(
