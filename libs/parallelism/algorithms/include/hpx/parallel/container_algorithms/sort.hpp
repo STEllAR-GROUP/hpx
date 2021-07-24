@@ -56,7 +56,7 @@ namespace hpx { namespace ranges {
     ///                     \a comp is invoked.
     ///
     /// \a comp has to induce a strict weak ordering on the values.
-    /// 
+    ///
     /// The assignments in the parallel \a sort algorithm invoked without
     /// an execution policy object execute in sequential order in the
     /// calling thread.
