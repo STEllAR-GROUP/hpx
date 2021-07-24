@@ -1,5 +1,6 @@
 //  Copyright (c) 2018 Christopher Ogle
 //  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -39,8 +40,11 @@ void test_transform_exclusive_scan_sent(IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::ranges::transform_exclusive_scan(
+    auto res = hpx::ranges::transform_exclusive_scan(
         std::begin(c), sentinel<std::size_t>{2}, std::begin(d), val, op, conv);
+
+    HPX_TEST(res.in == std::begin(c) + end_len);
+    HPX_TEST(res.out == std::end(d));
 
     // verify values
     std::vector<std::size_t> e(end_len);
@@ -66,8 +70,11 @@ void test_transform_exclusive_scan_sent(ExPolicy policy, IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::ranges::transform_exclusive_scan(policy, std::begin(c),
+    auto res = hpx::ranges::transform_exclusive_scan(policy, std::begin(c),
         sentinel<std::size_t>{2}, std::begin(d), val, op, conv);
+
+    HPX_TEST(res.in == std::begin(c) + end_len);
+    HPX_TEST(res.out == std::end(d));
 
     // verify values
     std::vector<std::size_t> e(end_len);
@@ -88,7 +95,11 @@ void test_transform_exclusive_scan(IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::ranges::transform_exclusive_scan(c, std::begin(d), val, op, conv);
+    auto res =
+        hpx::ranges::transform_exclusive_scan(c, std::begin(d), val, op, conv);
+
+    HPX_TEST(res.in == std::end(c));
+    HPX_TEST(res.out == std::end(d));
 
     // verify values
     std::vector<std::size_t> e(c.size());
@@ -112,8 +123,11 @@ void test_transform_exclusive_scan(ExPolicy policy, IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::ranges::transform_exclusive_scan(
+    auto res = hpx::ranges::transform_exclusive_scan(
         policy, c, std::begin(d), val, op, conv);
+
+    HPX_TEST(res.in == std::end(c));
+    HPX_TEST(res.out == std::end(d));
 
     // verify values
     std::vector<std::size_t> e(c.size());
