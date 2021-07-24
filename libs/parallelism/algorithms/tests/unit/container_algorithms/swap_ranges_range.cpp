@@ -1,5 +1,6 @@
 //  Copyright (c) 2018 Christopher Ogle
 //  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,7 +33,7 @@ void test_swap_ranges_sent(IteratorTag)
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
 
-    std::size_t len = std::rand() % 10007 + 1;
+    std::size_t len = std::rand() % 10005 + 1;
     std::size_t begin_num = std::rand();
 
     std::iota(std::begin(c), std::begin(c) + len, begin_num);
@@ -82,7 +83,7 @@ void test_swap_ranges_sent(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
 
-    std::size_t len = std::rand() % 10007 + 1;
+    std::size_t len = std::rand() % 10005 + 1;
     std::size_t begin_num = std::rand();
 
     std::iota(std::begin(c), std::begin(c) + len, begin_num);
