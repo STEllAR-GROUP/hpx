@@ -43,12 +43,10 @@ namespace hpx {
     /// an execution policy object execute in sequential order in the
     /// calling thread.
     ///
-    /// \returns  The \a sort algorithm returns \a RandomIt.
-    ///           The algorithm returns an iterator pointing to the first
-    ///           element after the last element in the input sequence.
+    /// \returns  The \a sort algorithm does not return anything.
     ///
     template <typename RandomIt>
-    RandomIt sort(RandomIt first, RandomIt last);
+    void sort(RandomIt first, RandomIt last);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Sorts the elements in the range [first, last) in ascending order. The
@@ -92,16 +90,14 @@ namespace hpx {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a sort algorithm returns a
-    ///           \a hpx::future<RandomIt> if the execution policy is of
+    ///           \a hpx::future<void> if the execution policy is of
     ///           type
     ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a RandomIt
+    ///           \a parallel_task_policy and returns nothing
     ///           otherwise.
-    ///           The algorithm returns an iterator pointing to the first
-    ///           element after the last element in the input sequence.
     ///
     template <typename ExPolicy, typename RandomIt>
-    typename util::detail::algorithm_result<ExPolicy, RandomIt>::type
+    typename util::detail::algorithm_result<ExPolicy>::type
     sort(ExPolicy&& policy, RandomIt first, RandomIt last);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -149,11 +145,10 @@ namespace hpx {
     /// an execution policy object execute in sequential order in the
     /// calling thread.
     ///
-    /// \returns  The \a sort algorithm returns \a RandomIt.
-    ///           The algorithm returns an iterator pointing to the first
-    ///           element after the last element in the input sequence.
+    /// \returns  The \a sort algorithm returns nothing.
+    ///
     template <typename RandomIt, typename Comp, typename Proj>
-    RandomIt unique(RandomIt first, RandomIt last, Comp&& comp, Proj&& proj);
+    void sort(RandomIt first, RandomIt last, Comp&& comp, Proj&& proj);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Sorts the elements in the range [first, last) in ascending order. The
@@ -180,7 +175,7 @@ namespace hpx {
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a util::projection_identity.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -214,20 +209,17 @@ namespace hpx {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a sort algorithm returns a
-    ///           \a hpx::future<RandomIt> if the execution policy is of
+    ///           \a hpx::future<void> if the execution policy is of
     ///           type
     ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a RandomIt
+    ///           \a parallel_task_policy and returns nothing
     ///           otherwise.
-    ///           The algorithm returns an iterator pointing to the first
-    ///           element after the last element in the input sequence.
     ///
     template <typename ExPolicy, typename RandomIt, typename Comp,
         typename Proj>
-    typename parallel::util::detail::algorithm_result<ExPolicy,
-        RandomIt>::type
+    typename parallel::util::detail::algorithm_result<ExPolicy>::type
     sort(ExPolicy&& policy, RandomIt first, RandomIt last, Comp&& comp,
-        Proj&& proj;
+        Proj&& proj);
 
     // clang-format on
 }    // namespace hpx
@@ -545,7 +537,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<RandomIt>::value &&
+            hpx::traits::is_iterator_v<RandomIt> &&
             traits::is_projected<Proj, RandomIt>::value &&
             traits::is_indirect_callable<ExPolicy, Comp,
                 traits::projected<Proj, RandomIt>,
@@ -559,7 +551,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         sort(ExPolicy&& policy, RandomIt first, RandomIt last,
             Comp&& comp = Comp(), Proj&& proj = Proj())
     {
-        static_assert((hpx::traits::is_random_access_iterator<RandomIt>::value),
+        static_assert((hpx::traits::is_random_access_iterator_v<RandomIt>),
             "Requires a random access iterator.");
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -585,7 +577,7 @@ namespace hpx {
             typename Comp = hpx::parallel::v1::detail::less,
             typename Proj = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<RandomIt>::value &&
+                hpx::traits::is_iterator_v<RandomIt> &&
                 parallel::traits::is_projected<Proj, RandomIt>::value &&
                 parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Comp,
@@ -594,14 +586,13 @@ namespace hpx {
                 >::value
             )>
         // clang-format on
-        friend RandomIt tag_fallback_dispatch(hpx::sort_t, RandomIt first,
+        friend void tag_fallback_dispatch(hpx::sort_t, RandomIt first,
             RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RandomIt>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::sort<RandomIt>().call(
+            hpx::parallel::v1::detail::sort<RandomIt>().call(
                 hpx::execution::seq, first, last, std::forward<Comp>(comp),
                 std::forward<Proj>(proj));
         }
@@ -612,7 +603,7 @@ namespace hpx {
             typename Proj = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<RandomIt>::value &&
+                hpx::traits::is_iterator_v<RandomIt> &&
                 parallel::traits::is_projected<Proj, RandomIt>::value &&
                 parallel::traits::is_indirect_callable<ExPolicy, Comp,
                     parallel::traits::projected<Proj, RandomIt>,
@@ -620,18 +611,21 @@ namespace hpx {
                 >::value
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            RandomIt>::type
+        friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
         tag_fallback_dispatch(hpx::sort_t, ExPolicy&& policy, RandomIt first,
             RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RandomIt>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::sort<RandomIt>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Comp>(comp), std::forward<Proj>(proj));
+            using result_type =
+                typename hpx::parallel::util::detail::algorithm_result<
+                    ExPolicy>::type;
+
+            return hpx::util::void_guard<result_type>(),
+                   hpx::parallel::v1::detail::sort<RandomIt>().call(
+                       std::forward<ExPolicy>(policy), first, last,
+                       std::forward<Comp>(comp), std::forward<Proj>(proj));
         }
     } sort{};
 }    // namespace hpx
