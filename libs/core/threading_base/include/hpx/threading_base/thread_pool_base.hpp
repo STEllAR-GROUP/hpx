@@ -467,7 +467,7 @@ namespace hpx::threads {
             return false;
         }
 
-        virtual void reset_thread_distribution() {}
+        virtual void reset_thread_distribution() noexcept {}
 
         virtual void abort_all_suspended_threads() {}
         virtual bool cleanup_terminated(bool /*delete_all*/)

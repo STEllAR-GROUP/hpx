@@ -257,7 +257,7 @@ namespace hpx::debug {
         [[nodiscard]] char const* hostname_print_helper::get_hostname() const
         {
             static bool initialized = false;
-            static char hostname_[20] = {'\0'};
+            static char hostname_[32] = {'\0'};
             if (!initialized)
             {
                 initialized = true;
@@ -265,7 +265,7 @@ namespace hpx::debug {
                 gethostname(hostname_, static_cast<std::size_t>(12));
 #endif
                 int const rank = guess_rank();
-                if (rank != -1)
+                if (rank >= 0)
                 {
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
 #pragma GCC diagnostic push

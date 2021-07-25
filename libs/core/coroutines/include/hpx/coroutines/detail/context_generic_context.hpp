@@ -252,8 +252,11 @@ namespace hpx::threads::coroutines {
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
             }
 #endif
-            void reset_stack() const
+            void reset_stack(bool direct_execution)
             {
+                if (direct_execution)
+                    return;
+
                 if (ctx_)
                 {
 #if defined(HPX_USE_POSIX_STACK_UTILITIES)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2011      Bryce Lelbach
 //
@@ -72,6 +72,8 @@ namespace hpx::threads {
       , enabled_interrupt_(true)
       , ran_exit_funcs_(false)
       , is_stackless_(is_stackless)
+      , runs_as_child_(init_data.schedulehint.runs_as_child_mode() ==
+            hpx::threads::thread_execution_hint::run_as_child)
       , scheduler_base_(init_data.scheduler_base)
       , last_worker_thread_num_(static_cast<std::size_t>(-1))
       , stacksize_(stacksize)
@@ -88,8 +90,7 @@ namespace hpx::threads {
         // purposes
         if (parent_thread_id_ == nullptr)
         {
-            thread_self* self = get_self_ptr();
-            if (self)
+            if (thread_self const* self = get_self_ptr())
             {
                 parent_thread_id_ = threads::get_self_id();
                 parent_thread_phase_ = self->get_thread_phase();
@@ -142,7 +143,8 @@ namespace hpx::threads {
             spinlock_pool::spinlock_for(this));
 
         if (ran_exit_funcs_ ||
-            get_state().state() == thread_schedule_state::terminated)
+            get_state().state() == thread_schedule_state::terminated ||
+            get_state().state() == thread_schedule_state::deleted)
         {
             return false;
         }
@@ -218,6 +220,11 @@ namespace hpx::threads {
         requested_interrupt_ = false;
         enabled_interrupt_ = true;
         ran_exit_funcs_ = false;
+
+        runs_as_child_.store(init_data.schedulehint.runs_as_child_mode() ==
+                hpx::threads::thread_execution_hint::run_as_child,
+            std::memory_order_relaxed);
+
         exit_funcs_.clear();
         scheduler_base_ = init_data.scheduler_base;
         last_worker_thread_num_ = static_cast<std::size_t>(-1);
@@ -310,6 +317,16 @@ namespace hpx::threads {
             HPX_LIKELY(nullptr != self))
         {
             return self->get_thread_id();
+        }
+        return threads::invalid_thread_id;
+    }
+
+    thread_id_type get_outer_self_id() noexcept
+    {
+        if (thread_self const* self = get_self_ptr();
+            HPX_LIKELY(nullptr != self))
+        {
+            return self->get_outer_thread_id();
         }
         return threads::invalid_thread_id;
     }
@@ -408,8 +425,8 @@ namespace hpx::threads {
     std::shared_ptr<hpx::util::external_timer::task_wrapper>
     get_self_timer_data()
     {
-        thread_data* thrd_data = get_self_id_data();
-        if (HPX_LIKELY(nullptr != thrd_data))
+        if (thread_data* thrd_data = get_self_id_data();
+            HPX_LIKELY(nullptr != thrd_data))
         {
             return thrd_data->get_timer_data();
         }
@@ -419,8 +436,8 @@ namespace hpx::threads {
     void set_self_timer_data(
         std::shared_ptr<hpx::util::external_timer::task_wrapper> data)
     {
-        thread_data* thrd_data = get_self_id_data();
-        if (HPX_LIKELY(nullptr != thrd_data))
+        if (thread_data* thrd_data = get_self_id_data();
+            HPX_LIKELY(nullptr != thrd_data))
         {
             thrd_data->set_timer_data(data);
         }

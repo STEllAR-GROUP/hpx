@@ -1,5 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  This code may be used under either of the following two licences:
 //
@@ -34,6 +34,7 @@
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_stackful_self.hpp>
+#include <hpx/coroutines/detail/coroutine_stackful_self_direct.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -51,9 +52,10 @@ namespace hpx::threads::coroutines::detail {
 
     void coroutine_impl::operator()() noexcept
     {
+        using context_state = super_type::context_state;
         using context_exit_status = super_type::context_exit_status;
-        context_exit_status status =
-            super_type::context_exit_status::not_exited;
+
+        context_exit_status status = context_exit_status::not_exited;
 
         // yield value once the thread function has finished executing
         result_type result_last(
@@ -75,26 +77,76 @@ namespace hpx::threads::coroutines::detail {
                     result_last = m_fun(*this->args());
                     HPX_ASSERT(
                         result_last.first == thread_schedule_state::terminated);
-                    status = super_type::context_exit_status::exited_return;
+                    status = context_exit_status::exited_return;
                 }
                 catch (...)
                 {
-                    status = super_type::context_exit_status::exited_abnormally;
+                    status = context_exit_status::exited_abnormally;
                     tinfo = std::current_exception();
                 }
 
                 // Reset early as the destructors may still yield.
                 this->reset_tss();
-                this->reset();
+                this->reset(false);
 
                 // return value to other side of the fence
                 this->bind_result(result_last);
             }
 
             this->do_return(status, HPX_MOVE(tinfo));
-        } while (this->m_state == super_type::context_state::running);
+        } while (this->m_state == context_state::running);
 
         // should not get here, never
-        HPX_ASSERT(this->m_state == super_type::context_state::running);
+        HPX_ASSERT(this->m_state == context_state::running);
+    }
+
+    // execute the coroutine function directly in the context of the calling
+    // thread
+    coroutine_impl::result_type coroutine_impl::invoke_directly(
+        coroutine_impl::arg_type arg)
+    {
+        using context_state = super_type::context_state;
+        using context_exit_status = super_type::context_exit_status;
+
+        context_exit_status status = context_exit_status::not_exited;
+
+        result_type result_last(
+            thread_schedule_state::unknown, invalid_thread_id);
+
+        this->m_state = context_state::running;
+
+        std::exception_ptr tinfo;
+        {
+            coroutine_self* old_self = coroutine_self::get_self();
+            coroutine_stackful_self_direct self(this, old_self);
+            reset_self_on_exit on_exit(&self, old_self);
+            try
+            {
+                this->m_result = this->m_fun(arg);
+                HPX_ASSERT(
+                    this->m_result.first == thread_schedule_state::terminated);
+                status = context_exit_status::exited_return;
+            }
+            catch (...)
+            {
+                status = context_exit_status::exited_abnormally;
+                this->m_type_info = std::current_exception();
+            }
+
+            this->reset_tss();
+            this->reset(true);
+
+            this->bind_result(result_last);
+        }
+
+        HPX_ASSERT(this->m_state == context_state::running);
+        this->m_state = context_state::exited;
+        this->m_exit_status = status;
+
+        if (status == context_exit_status::exited_abnormally)
+        {
+            std::rethrow_exception(this->m_type_info);
+        }
+        return this->m_result;
     }
 }    // namespace hpx::threads::coroutines::detail

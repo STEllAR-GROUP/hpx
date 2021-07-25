@@ -299,6 +299,11 @@ namespace hpx::threads::policies {
             // safety check that task was created by this thread/scheduler
             HPX_ASSERT(data.scheduler_base == this);
 
+            // this scheduler assumes thread bindings for the scheduled
+            // threads in certain ways preventing direct execution
+            HPX_ASSERT(data.schedulehint.runs_as_child_mode() ==
+                hpx::threads::thread_execution_hint::none);
+
             std::size_t const local_num = local_thread_number();
 
             std::size_t thread_num = local_num;
@@ -327,6 +332,7 @@ namespace hpx::threads::policies {
                         , "parent offset", parent_pool_->get_thread_offset()
                         , parent_pool_->get_pool_name());
                     // clang-format on
+
                     // This is a task being injected from a thread on another
                     // pool - we can schedule on any thread available
                     thread_num = numa_holder_[0].thread_queue(0)->worker_next(
@@ -408,11 +414,15 @@ namespace hpx::threads::policies {
                     "Invalid schedule hint mode: {}",
                     static_cast<std::size_t>(data.schedulehint.mode));
             }
+
             // we do not allow threads created on other queues to 'run now'
             // as this causes cross-thread allocations and map accesses
-            if (local_num != thread_num)
+            if (local_num != thread_num &&
+                (data.initial_state == thread_schedule_state::pending ||
+                    data.initial_state == thread_schedule_state::pending_boost))
             {
                 data.run_now = false;
+
                 // clang-format off
                 spq_deb.debug(debug::str<>("create_thread")
                     , "pool", parent_pool_->get_pool_name()
@@ -705,7 +715,7 @@ namespace hpx::threads::policies {
 
             auto msg = spq_deb.declare_variable<char const*>(nullptr);
 
-            //std::unique_lock<Mutex> l(init_mutex);
+            std::unique_lock<pu_mutex_type> l;
 
             using threads::thread_schedule_hint_mode;
 
@@ -1334,6 +1344,12 @@ namespace hpx::threads::policies {
             return 0;
         }
 #endif
+        // this scheduler assumes thread bindings for the scheduled threads in
+        // certain ways preventing direct execution
+        bool supports_direct_execution() const noexcept override
+        {
+            return false;
+        }
 
     protected:
         typedef queue_holder_numa<thread_queue_type> numa_queues;

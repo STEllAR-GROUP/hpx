@@ -158,7 +158,8 @@ namespace hpx::threads::detail {
 
                 return previous_state;    // done
             }
-
+            case thread_schedule_state::deleted:
+                [[fallthrough]];
             case thread_schedule_state::terminated:
             {
                 LTM_(warning).format(

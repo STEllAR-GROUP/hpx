@@ -35,10 +35,12 @@
 #include <hpx/config.hpp>
 #include <hpx/coroutines/config/defines.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <system_error>
 
 #if defined(HPX_HAVE_COROUTINE_COUNTERS)
@@ -279,7 +281,7 @@ namespace hpx::threads::coroutines {
                 return stacksize_;
             }
 
-            static constexpr void reset_stack() noexcept {}
+            static constexpr void reset_stack(bool) noexcept {}
 
 #if defined(HPX_HAVE_COROUTINE_COUNTERS)
             void rebind_stack() noexcept
@@ -294,7 +296,8 @@ namespace hpx::threads::coroutines {
             // https://stackoverflow.com/a/20930496/269943
             static std::ptrdiff_t get_available_stack_space() noexcept
             {
-                MEMORY_BASIC_INFORMATION mbi = {};        // page range
+                MEMORY_BASIC_INFORMATION mbi = {};    // page range
+                std::memset(&mbi, '\0', sizeof(mbi));
                 VirtualQuery(&mbi, &mbi, sizeof(mbi));    // get range
                 return reinterpret_cast<std::ptrdiff_t>(&mbi) -
                     reinterpret_cast<std::ptrdiff_t>(mbi.AllocationBase);

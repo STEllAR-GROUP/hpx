@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/async_base/launch_policy.hpp>
@@ -70,6 +71,13 @@ namespace hpx::lcos::local {
             {
             }
 
+            task_object(task_object const&) = delete;
+            task_object(task_object&&) = delete;
+            task_object& operator=(task_object const&) = delete;
+            task_object& operator=(task_object&&) = delete;
+
+            ~task_object() = default;
+
             void do_run() noexcept override
             {
                 hpx::intrusive_ptr<base_type> this_(this);
@@ -95,7 +103,22 @@ namespace hpx::lcos::local {
             threads::thread_id_ref_type post(threads::thread_pool_base* pool,
                 char const* annotation, launch policy, error_code& ec) override
             {
-                this->check_started();
+                if (this->started_test_and_set())
+                {
+                    return threads::invalid_thread_id;
+                }
+
+                auto hint = policy.hint();
+                if (hint.runs_as_child_mode() ==
+                    hpx::threads::thread_execution_hint::run_as_child)
+                {
+                    if (!pool->get_scheduler()->supports_direct_execution())
+                    {
+                        hint.runs_as_child_mode(
+                            hpx::threads::thread_execution_hint::none);
+                        policy.set_hint(hint);
+                    }
+                }
 
                 hpx::intrusive_ptr<base_type> this_(this);
                 if (policy == launch::fork)
@@ -107,12 +130,49 @@ namespace hpx::lcos::local {
                         threads::thread_description(f_, annotation),
                         policy.priority(),
                         threads::thread_schedule_hint(
-                            static_cast<std::int16_t>(get_worker_thread_num())),
+                            hpx::threads::thread_schedule_hint_mode::thread,
+                            static_cast<std::int16_t>(get_worker_thread_num()),
+                            hint.placement_mode(), hint.runs_as_child_mode()),
                         policy.stacksize(),
                         threads::thread_schedule_state::pending_do_not_schedule,
                         true);
 
+                    if (hint.runs_as_child_mode() ==
+                        hpx::threads::thread_execution_hint::run_as_child)
+                    {
+                        HPX_ASSERT(
+                            this->runs_child_ == threads::invalid_thread_id);
+                        this->runs_child_ =
+                            threads::register_thread(data, pool, ec);
+                        return this->runs_child_;
+                    }
+
                     return threads::register_thread(data, pool, ec);
+                }
+
+                if (hint.runs_as_child_mode() ==
+                    hpx::threads::thread_execution_hint::run_as_child)
+                {
+                    // create the thread without running it
+                    threads::thread_init_data data(
+                        threads::make_thread_function_nullary(
+                            util::deferred_call(
+                                &base_type::run_impl, std::move(this_))),
+                        threads::thread_description(f_, annotation),
+                        policy.priority(), policy.hint(), policy.stacksize(),
+                        threads::thread_schedule_state::suspended, true);
+
+                    HPX_ASSERT(this->runs_child_ == threads::invalid_thread_id);
+                    this->runs_child_ =
+                        threads::register_thread(data, pool, ec);
+
+                    // now run the thread
+                    threads::set_thread_state(this->runs_child_.noref(),
+                        threads::thread_schedule_state::pending,
+                        threads::thread_restart_state::signaled,
+                        policy.priority(), true, ec);
+
+                    return this->runs_child_;
                 }
 
                 threads::thread_init_data data(
@@ -162,6 +222,14 @@ namespace hpx::lcos::local {
               , alloc_(alloc)
             {
             }
+
+            task_object_allocator(task_object_allocator const&) = delete;
+            task_object_allocator(task_object_allocator&&) = delete;
+            task_object_allocator& operator=(
+                task_object_allocator const&) = delete;
+            task_object_allocator& operator=(task_object_allocator&&) = delete;
+
+            ~task_object_allocator() = default;
 
         private:
             void destroy() noexcept override
@@ -230,6 +298,13 @@ namespace hpx::lcos::local {
             {
             }
 
+            task_object(task_object const&) = delete;
+            task_object(task_object&&) = delete;
+            task_object& operator=(task_object const&) = delete;
+            task_object& operator=(task_object&&) = delete;
+
+            ~task_object() = default;
+
         protected:
             // run in a separate thread
             threads::thread_id_ref_type post(threads::thread_pool_base* pool,
@@ -237,13 +312,14 @@ namespace hpx::lcos::local {
             {
                 if (exec_)
                 {
-                    this->check_started();
-
-                    hpx::intrusive_ptr<base_type> this_(this);
-                    parallel::execution::post(*exec_,
-                        util::deferred_call(
-                            &base_type::run_impl, HPX_MOVE(this_)),
-                        exec_->get_schedulehint(), annotation);
+                    if (!this->started_test_and_set())
+                    {
+                        hpx::intrusive_ptr<base_type> this_(this);
+                        parallel::execution::post(*exec_,
+                            util::deferred_call(
+                                &base_type::run_impl, HPX_MOVE(this_)),
+                            exec_->get_schedulehint(), annotation);
+                    }
                     return threads::invalid_thread_id;
                 }
 
@@ -284,6 +360,15 @@ namespace hpx::lcos::local {
               : base_type(no_addref, HPX_MOVE(f))
             {
             }
+
+            cancelable_task_object(cancelable_task_object const&) = delete;
+            cancelable_task_object(cancelable_task_object&&) = delete;
+            cancelable_task_object& operator=(
+                cancelable_task_object const&) = delete;
+            cancelable_task_object& operator=(
+                cancelable_task_object&&) = delete;
+
+            ~cancelable_task_object() = default;
         };
 
         template <typename Allocator, typename Result, typename F>
@@ -324,6 +409,17 @@ namespace hpx::lcos::local {
               , alloc_(alloc)
             {
             }
+
+            cancelable_task_object_allocator(
+                cancelable_task_object_allocator const&) = delete;
+            cancelable_task_object_allocator(
+                cancelable_task_object_allocator&&) = delete;
+            cancelable_task_object_allocator& operator=(
+                cancelable_task_object_allocator const&) = delete;
+            cancelable_task_object_allocator& operator=(
+                cancelable_task_object_allocator&&) = delete;
+
+            ~cancelable_task_object_allocator() = default;
 
         private:
             void destroy() noexcept override
@@ -389,6 +485,15 @@ namespace hpx::lcos::local {
               : base_type(exec, no_addref, HPX_MOVE(f))
             {
             }
+
+            cancelable_task_object(cancelable_task_object const&) = delete;
+            cancelable_task_object(cancelable_task_object&&) = delete;
+            cancelable_task_object& operator=(
+                cancelable_task_object const&) = delete;
+            cancelable_task_object& operator=(
+                cancelable_task_object&&) = delete;
+
+            ~cancelable_task_object() = default;
         };
     }    // namespace detail
 }    // namespace hpx::lcos::local
@@ -722,7 +827,7 @@ namespace hpx::lcos::local {
             launch policy = launch::async, error_code& ec = throws) const
         {
             return post(threads::detail::get_self_or_default_pool(), annotation,
-                policy, ec);
+                HPX_MOVE(policy), ec);
         }
 
         threads::thread_id_ref_type post(threads::thread_pool_base* pool,
@@ -736,7 +841,7 @@ namespace hpx::lcos::local {
                     "futures_factory invalid (has it been moved?)");
                 return threads::invalid_thread_id;
             }
-            return task_->post(pool, annotation, policy, ec);
+            return task_->post(pool, annotation, HPX_MOVE(policy), ec);
         }
 
         // This is the same as get_future, except that it moves the

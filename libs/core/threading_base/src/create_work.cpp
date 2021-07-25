@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
@@ -91,8 +92,11 @@ namespace hpx::threads::detail {
 
         // create the new thread
         if (data.priority == thread_priority::default_)
+        {
             data.priority = thread_priority::normal;
+        }
 
+        HPX_ASSERT(!data.run_now);
         data.run_now = (thread_priority::high == data.priority ||
             thread_priority::high_recursive == data.priority ||
             thread_priority::bound == data.priority ||
