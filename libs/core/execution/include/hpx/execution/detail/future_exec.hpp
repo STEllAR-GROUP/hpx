@@ -178,6 +178,7 @@ namespace hpx::lcos::detail {
         {
             id = threads::invalid_thread_id;
             hpx::parallel::execution::post(exec, HPX_FORWARD(F, f));
+            return threads::invalid_thread_id;
         }
     };
 
