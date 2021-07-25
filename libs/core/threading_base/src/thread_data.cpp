@@ -70,6 +70,7 @@ namespace hpx { namespace threads {
       , enabled_interrupt_(true)
       , ran_exit_funcs_(false)
       , is_stackless_(is_stackless)
+      , runs_as_child_(init_data.schedulehint.runs_as_child)
       , scheduler_base_(init_data.scheduler_base)
       , last_worker_thread_num_(std::size_t(-1))
       , stacksize_(stacksize)
@@ -142,7 +143,8 @@ namespace hpx { namespace threads {
             spinlock_pool::spinlock_for(this));
 
         if (ran_exit_funcs_ ||
-            get_state().state() == thread_schedule_state::terminated)
+            get_state().state() == thread_schedule_state::terminated ||
+            get_state().state() == thread_schedule_state::deleted)
         {
             return false;
         }
@@ -219,6 +221,9 @@ namespace hpx { namespace threads {
         requested_interrupt_ = false;
         enabled_interrupt_ = true;
         ran_exit_funcs_ = false;
+
+        runs_as_child_ = init_data.schedulehint.runs_as_child;
+
         exit_funcs_.clear();
         scheduler_base_ = init_data.scheduler_base;
         last_worker_thread_num_ = std::size_t(-1);
@@ -309,6 +314,15 @@ namespace hpx { namespace threads {
         thread_self* self = get_self_ptr();
         if (HPX_LIKELY(nullptr != self))
             return self->get_thread_id();
+
+        return threads::invalid_thread_id;
+    }
+
+    thread_id_type get_outer_self_id()
+    {
+        thread_self* self = get_self_ptr();
+        if (HPX_LIKELY(nullptr != self))
+            return self->get_outer_thread_id();
 
         return threads::invalid_thread_id;
     }

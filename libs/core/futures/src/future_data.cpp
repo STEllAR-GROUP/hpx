@@ -14,10 +14,13 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/futures/detail/execute_thread.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -87,8 +90,62 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    future_data_base<traits::detail::future_data_void>::~future_data_base() =
-        default;
+    future_data_base<traits::detail::future_data_void>::~future_data_base()
+    {
+        if (runs_child_ != threads::invalid_thread_id)
+        {
+            auto* thrd = get_thread_id_data(runs_child_);
+            (void) thrd;
+            LTM_(debug).format(
+                "task_object::~task_object({}), description({}): "
+                "destroy runs_as_child thread",
+                thrd, thrd->get_description(), thrd->get_thread_phase());
+
+            runs_child_ = threads::invalid_thread_id;
+        }
+    }
+
+    // try to performed scoped execution of the associated thread (if any)
+    bool future_data_base<traits::detail::future_data_void>::execute_thread()
+    {
+        // we try to directly execute the thread exactly once
+        threads::thread_id_ref_type runs_child = std::move(runs_child_);
+        if (runs_child)
+        {
+            auto state = this->state_.load(std::memory_order_acquire);
+            if (state == this->empty)
+            {
+                // this thread would block on the future
+                auto* thrd = get_thread_id_data(runs_child);
+                HPX_UNUSED(thrd);    // might be unused
+
+                LTM_(debug).format(
+                    "task_object::get_result_void: attempting to "
+                    "directly execute child({}), description({})",
+                    thrd, thrd->get_description());
+
+                if (threads::detail::execute_thread(runs_child))
+                {
+                    LTM_(debug).format(
+                        "task_object::get_result_void: successfully "
+                        "directly executed child({}), description({})",
+                        thrd, thrd->get_description());
+
+                    // thread terminated, mark as being destroyed
+                    HPX_ASSERT(thrd->get_state().state() ==
+                        threads::thread_schedule_state::deleted);
+
+                    return true;
+                }
+
+                LTM_(debug).format(
+                    "task_object::get_result_void: failed to "
+                    "directly execute child({}), description({})",
+                    thrd, thrd->get_description());
+            }
+        }
+        return false;
+    }
 
     static util::unused_type unused_;
 

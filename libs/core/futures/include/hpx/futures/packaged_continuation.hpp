@@ -283,7 +283,7 @@ namespace hpx { namespace lcos { namespace detail {
 
             hpx::intrusive_ptr<continuation> this_(this);
             hpx::util::thread_description desc(f_, "async");
-            spawner(
+            this->runs_child_ = spawner(
                 [this_ = HPX_MOVE(this_), f = HPX_MOVE(f)]() mutable -> void {
                     this_->async_impl(HPX_MOVE(f));
                 },
@@ -313,7 +313,7 @@ namespace hpx { namespace lcos { namespace detail {
 
             hpx::intrusive_ptr<continuation> this_(this);
             hpx::util::thread_description desc(f_, "async_nounwrap");
-            spawner(
+            this->runs_child_ = spawner(
                 [this_ = HPX_MOVE(this_), f = HPX_MOVE(f)]() mutable -> void {
                     this_->async_impl_nounwrap(HPX_MOVE(f));
                 },

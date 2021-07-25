@@ -253,27 +253,24 @@ namespace hpx { namespace local { namespace detail {
         const std::size_t init_cores =
             get_number_of_default_cores(use_process_mask);
 
-        std::size_t default_threads = init_threads;
-
         std::string threads_str = cfgmap.get_value<std::string>(
             "hpx.os_threads",
-            rtcfg.get_entry("hpx.os_threads", std::to_string(default_threads)));
+            rtcfg.get_entry("hpx.os_threads", std::to_string(init_threads)));
 
+        std::size_t threads = 0;
         if ("cores" == threads_str)
         {
-            default_threads = init_cores;
+            threads = init_cores;
         }
         else if ("all" == threads_str)
         {
-            default_threads = init_threads;
+            threads = init_threads;
         }
         else
         {
-            default_threads = hpx::util::from_string<std::size_t>(threads_str);
+            threads = cfgmap.get_value<std::size_t>("hpx.os_threads",
+                hpx::util::from_string<std::size_t>(threads_str));
         }
-
-        std::size_t threads =
-            cfgmap.get_value<std::size_t>("hpx.os_threads", default_threads);
 
         if (vm.count("hpx:threads"))
         {

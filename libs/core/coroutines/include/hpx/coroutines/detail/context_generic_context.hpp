@@ -239,8 +239,11 @@ namespace hpx { namespace threads { namespace coroutines {
 #endif
             }
 
-            void reset_stack()
+            void reset_stack(bool direct_execution)
             {
+                if (direct_execution)
+                    return;
+
                 if (ctx_)
                 {
 #if defined(_POSIX_VERSION)

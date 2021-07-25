@@ -83,6 +83,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         // execute the coroutine using normal context switching
         HPX_CORE_EXPORT void operator()() noexcept;
 
+        // execute the coroutine function directly in the context of the calling
+        // thread
+        HPX_CORE_EXPORT result_type invoke_directly(arg_type arg);
+
     public:
         void bind_result(result_type res)
         {
@@ -117,16 +121,18 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             this->super_type::init();
         }
 
-        void reset()
+        void reset(bool direct_execution)
         {
             // First reset the function and arguments
+            m_result =
+                result_type(thread_schedule_state::unknown, invalid_thread_id);
             m_arg = nullptr;
             m_fun.reset();
 
             // Then reset the id and stack as they may be used by the
             // destructors of the thread function above
             this->super_type::reset();
-            this->reset_stack();
+            this->reset_stack(direct_execution);
         }
 
         void rebind(functor_type&& f, thread_id_type id)

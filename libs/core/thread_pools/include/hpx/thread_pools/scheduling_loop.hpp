@@ -545,6 +545,9 @@ namespace hpx { namespace threads { namespace detail {
                     thrd_stat.store_state(state);
                     state_val = state.state();
 
+                    // background threads are not supposed to be executed
+                    // directly
+                    HPX_ASSERT(thread_schedule_state::deleted != state_val);
                     if (HPX_LIKELY(
                             state_val == thread_schedule_state::pending_boost))
                     {
@@ -718,8 +721,10 @@ namespace hpx { namespace threads { namespace detail {
 
                                 thrd_stat = (*thrdptr)(context_storage);
 
-                                if (thrd_stat.get_previous() ==
-                                    thread_schedule_state::terminated)
+                                thread_schedule_state s =
+                                    thrd_stat.get_previous();
+                                if (s == thread_schedule_state::terminated ||
+                                    s == thread_schedule_state::deleted)
                                 {
                                     profiler.stop();
                                     // just in case, clean up the now dead pointer.
@@ -845,7 +850,8 @@ namespace hpx { namespace threads { namespace detail {
                     }
                 }
                 else if (HPX_UNLIKELY(
-                             thread_schedule_state::active == state_val))
+                             thread_schedule_state::active == state_val &&
+                             !get_thread_id_data(thrd)->runs_as_child()))
                 {
                     auto* thrdptr = get_thread_id_data(thrd);
                     LTM_(warning).format("pool({}), scheduler({}), "
@@ -866,10 +872,9 @@ namespace hpx { namespace threads { namespace detail {
                     scheduler.SchedulingPolicy::do_some_work(num_thread);
                 }
 
-                // Remove the mapping from thread_map_ if HPX thread is depleted
+                // Remove the mapping from thread_map_ if HPX thread is deleted
                 // or terminated, this will delete the HPX thread.
-                // REVIEW: what has to be done with depleted HPX threads?
-                if (HPX_LIKELY(state_val == thread_schedule_state::depleted ||
+                if (HPX_LIKELY(state_val == thread_schedule_state::deleted ||
                         state_val == thread_schedule_state::terminated))
                 {
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS

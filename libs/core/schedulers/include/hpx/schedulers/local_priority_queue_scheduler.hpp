@@ -32,6 +32,7 @@
 #include <mutex>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -713,7 +714,8 @@ namespace hpx { namespace threads { namespace policies {
                     thrdptr->get_thread_id(), priority,
                     thrdptr->get_description());
 
-                high_priority_queues_[num].data_->schedule_thread(thrd);
+                high_priority_queues_[num].data_->schedule_thread(
+                    std::move(thrd));
             }
             else if (priority == thread_priority::low)
             {
@@ -725,7 +727,7 @@ namespace hpx { namespace threads { namespace policies {
                     *this->get_parent_pool(), *this, thrdptr->get_thread_id(),
                     priority, thrdptr->get_description());
 
-                low_priority_queue_.schedule_thread(thrd);
+                low_priority_queue_.schedule_thread(std::move(thrd));
             }
             else
             {
@@ -740,7 +742,7 @@ namespace hpx { namespace threads { namespace policies {
                     thrdptr->get_thread_id(), priority,
                     thrdptr->get_description());
 
-                queues_[num_thread].data_->schedule_thread(thrd);
+                queues_[num_thread].data_->schedule_thread(std::move(thrd));
             }
         }
 
@@ -777,16 +779,18 @@ namespace hpx { namespace threads { namespace policies {
                 priority == thread_priority::boost)
             {
                 std::size_t num = num_thread % num_high_priority_queues_;
-                high_priority_queues_[num].data_->schedule_thread(thrd, true);
+                high_priority_queues_[num].data_->schedule_thread(
+                    std::move(thrd), true);
             }
             else if (priority == thread_priority::low)
             {
-                low_priority_queue_.schedule_thread(thrd, true);
+                low_priority_queue_.schedule_thread(std::move(thrd), true);
             }
             else
             {
                 HPX_ASSERT(num_thread < num_queues_);
-                queues_[num_thread].data_->schedule_thread(thrd, true);
+                queues_[num_thread].data_->schedule_thread(
+                    std::move(thrd), true);
             }
         }
 

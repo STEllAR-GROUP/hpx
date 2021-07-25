@@ -290,7 +290,7 @@ namespace hpx { namespace threads { namespace coroutines {
                 return stacksize_;
             }
 
-            constexpr void reset_stack() noexcept {}
+            constexpr void reset_stack(bool) noexcept {}
 
             void rebind_stack() noexcept
             {

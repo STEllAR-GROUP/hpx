@@ -350,9 +350,17 @@ namespace hpx { namespace threads { namespace coroutines {
                             return m_stack_size;
                         }
 
-                        void reset_stack()
+                        void reset_stack(bool direct_execution)
                         {
-                            HPX_ASSERT(m_stack);
+                            // directly executed coroutine, no need to reset
+                            // the stack
+                            if (m_stack == nullptr)
+                            {
+                                HPX_ASSERT(direct_execution);
+                                (void) direct_execution;
+                                return;
+                            }
+
                             if (posix::reset_stack(m_stack,
                                     static_cast<std::size_t>(m_stack_size)))
                             {
@@ -364,7 +372,11 @@ namespace hpx { namespace threads { namespace coroutines {
 
                         void rebind_stack()
                         {
-                            HPX_ASSERT(m_stack);
+                            // directly executed coroutine, no need to allocate
+                            // a stack
+                            if (m_stack == nullptr)
+                                return;
+
 #if defined(HPX_HAVE_COROUTINE_COUNTERS)
                             increment_stack_recycle_count();
 #endif

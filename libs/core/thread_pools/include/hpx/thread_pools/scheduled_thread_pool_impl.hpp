@@ -610,6 +610,12 @@ namespace hpx { namespace threads { namespace detail {
             return;
         }
 
+        if (data.schedulehint.runs_as_child &&
+            !sched_->Scheduler::supports_direct_execution())
+        {
+            data.schedulehint.runs_as_child = false;
+        }
+
         detail::create_thread(sched_.get(), data, id, ec);    //-V601
 
         // update statistics
@@ -628,6 +634,12 @@ namespace hpx { namespace threads { namespace detail {
                 "thread_pool<Scheduler>::create_work",
                 "invalid state: thread pool is not running");
             return invalid_thread_id;
+        }
+
+        if (data.schedulehint.runs_as_child &&
+            !sched_->Scheduler::supports_direct_execution())
+        {
+            data.schedulehint.runs_as_child = false;
         }
 
         thread_id_ref_type id =

@@ -12,7 +12,6 @@ set(tests
     broadcast_apply
     broadcast_component
     channel_communicator
-    communication_set
     exclusive_scan_
     fold
     global_spmd_block
@@ -25,6 +24,13 @@ set(tests
 if(HPX_WITH_NETWORKING)
   set(tests ${tests} broadcast broadcast_direct gather scatter)
 endif()
+
+foreach(test ${tests})
+  set(${test}_PARAMETERS LOCALITIES 2)
+endforeach()
+
+# communication_set should run on one locality
+set(tests ${tests} communication_set)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
@@ -40,7 +46,5 @@ foreach(test ${tests})
     FOLDER "Tests/Unit/Modules/Full/Collectives"
   )
 
-  add_hpx_unit_test(
-    "modules.collectives" ${test} ${${test}_PARAMETERS} LOCALITIES 2
-  )
+  add_hpx_unit_test("modules.collectives" ${test} ${${test}_PARAMETERS})
 endforeach()

@@ -383,7 +383,7 @@ namespace hpx { namespace detail {
         if (hpx::detail::has_async_policy(policy))
         {
             return keep_alive(
-                hpx::async(action_invoker<action_type>(), addr.address_,
+                hpx::async(policy, action_invoker<action_type>(), addr.address_,
                     addr.type_, HPX_FORWARD(Ts, vs)...),
                 id, HPX_MOVE(r.second));
         }

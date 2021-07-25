@@ -34,6 +34,7 @@
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_stackful_self.hpp>
+#include <hpx/coroutines/detail/coroutine_stackful_self_direct.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -84,7 +85,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
                 // Reset early as the destructors may still yield.
                 this->reset_tss();
-                this->reset();
+                this->reset(false);
 
                 // return value to other side of the fence
                 this->bind_result(result_last);
@@ -95,5 +96,53 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         // should not get here, never
         HPX_ASSERT(this->m_state == super_type::ctx_running);
+    }
+
+    // execute the coroutine function directly in the context of the calling
+    // thread
+    coroutine_impl::result_type coroutine_impl::invoke_directly(
+        coroutine_impl::arg_type arg)
+    {
+        using context_exit_status = super_type::context_exit_status;
+        context_exit_status status = super_type::ctx_not_exited;
+
+        result_type result_last(
+            thread_schedule_state::unknown, invalid_thread_id);
+
+        this->m_state = ctx_running;
+
+        std::exception_ptr tinfo;
+        {
+            coroutine_self* old_self = coroutine_self::get_self();
+            coroutine_stackful_self_direct self(this, old_self);
+            reset_self_on_exit on_exit(&self, old_self);
+            try
+            {
+                result_last = this->m_fun(arg);
+                HPX_ASSERT(
+                    result_last.first == thread_schedule_state::terminated);
+                status = super_type::ctx_exited_return;
+            }
+            catch (...)
+            {
+                status = super_type::ctx_exited_abnormally;
+                this->m_type_info = std::current_exception();
+            }
+
+            this->reset_tss();
+            this->reset(true);
+
+            this->bind_result(result_last);
+        }
+
+        HPX_ASSERT(this->m_state == ctx_running);
+        this->m_state = ctx_exited;
+        this->m_exit_status = status;
+
+        if (status == super_type::ctx_exited_abnormally)
+        {
+            std::rethrow_exception(this->m_type_info);
+        }
+        return m_result;
     }
 }}}}    // namespace hpx::threads::coroutines::detail

@@ -15,6 +15,7 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -83,6 +84,17 @@ namespace hpx { namespace detail {
                 util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
             if (hpx::detail::has_async_policy(policy))
             {
+                // if one of the arguments is a future we play it conservatively
+                if constexpr (hpx::traits::is_future_any_v<std::decay_t<Ts>...>)
+                {
+                    auto hint = policy.hint();
+                    if (hint.runs_as_child)
+                    {
+                        hint.runs_as_child = false;
+                        policy.set_hint(hint);
+                    }
+                }
+
                 threads::thread_id_ref_type tid =
                     p.apply(pool, desc.get_description(), policy);
                 if (tid)
@@ -151,6 +163,15 @@ namespace hpx { namespace detail {
             using result_type =
                 util::detail::invoke_deferred_result_t<F, Ts...>;
 
+            // if one of the arguments is a future we play it conservatively
+            auto hint = policy.hint();
+            if (hpx::traits::is_future_any_v<std::decay_t<Ts>...> &&
+                hint.runs_as_child)
+            {
+                hint.runs_as_child = false;
+                policy.set_hint(hint);
+            }
+
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
@@ -159,11 +180,21 @@ namespace hpx { namespace detail {
 
             if (tid)
             {
-                // keep thread alive, if needed
-                auto&& result = p.get_future();
-                traits::detail::get_shared_state(result)->set_on_completed(
-                    [tid = HPX_MOVE(tid)]() { (void) tid; });
-                return HPX_MOVE(result);
+                bool runs_as_child = hint.runs_as_child;
+                if (runs_as_child)
+                {
+                    runs_as_child =
+                        pool->get_scheduler()->supports_direct_execution();
+                }
+
+                if (!runs_as_child)
+                {
+                    // keep thread alive, if needed
+                    auto&& result = p.get_future();
+                    traits::detail::get_shared_state(result)->set_on_completed(
+                        [tid = HPX_MOVE(tid)]() { (void) tid; });
+                    return result;
+                }
             }
             return p.get_future();
         }
@@ -193,6 +224,15 @@ namespace hpx { namespace detail {
             using result_type =
                 util::detail::invoke_deferred_result_t<F, Ts...>;
 
+            // if one of the arguments is a future we play it conservatively
+            auto hint = policy.hint();
+            if (hpx::traits::is_future_any_v<std::decay_t<Ts>...> &&
+                hint.runs_as_child)
+            {
+                hint.runs_as_child = false;
+                policy.set_hint(hint);
+            }
+
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
@@ -210,11 +250,21 @@ namespace hpx { namespace detail {
                     threads::thread_schedule_state::pending, tid.noref(),
                     desc.get_description());
 
-                // keep thread alive, if needed
-                auto&& result = p.get_future();
-                traits::detail::get_shared_state(result)->set_on_completed(
-                    [tid = HPX_MOVE(tid)]() { (void) tid; });
-                return HPX_MOVE(result);
+                bool runs_as_child = hint.runs_as_child;
+                if (runs_as_child)
+                {
+                    runs_as_child =
+                        pool->get_scheduler()->supports_direct_execution();
+                }
+
+                if (!runs_as_child)
+                {
+                    // keep thread alive, if needed
+                    auto&& result = p.get_future();
+                    traits::detail::get_shared_state(result)->set_on_completed(
+                        [tid = HPX_MOVE(tid)]() { (void) tid; });
+                    return result;
+                }
             }
             return p.get_future();
         }

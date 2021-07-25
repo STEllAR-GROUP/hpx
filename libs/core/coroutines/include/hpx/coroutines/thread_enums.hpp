@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/coroutines/config/defines.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
 
 #include <cstddef>
@@ -48,10 +49,12 @@ namespace hpx { namespace threads {
                                           but allows to create a thread in
                                           pending state without scheduling it
                                           (internal, do not use) */
-        pending_boost = 8             /*< this is not a real thread state,
+        pending_boost = 8,            /*< this is not a real thread state,
                                           but allows to suspend a thread in
                                           pending state without high priority
                                           rescheduling */
+        deleted = 9                   /*< thread has been stopped and was
+                                          deleted */
     };
     // clang-format on
 
@@ -356,6 +359,16 @@ namespace hpx { namespace threads {
 #undef HPX_THREAD_SCHEDULE_HINT_UNSCOPED_ENUM_DEPRECATION_MSG
 
     ///////////////////////////////////////////////////////////////////////////
+    /// Default value to use for runs-as-child mode (if \a true, then futures
+    /// will attempt to execute associated threads directly if they have not
+    /// started running).
+#if defined(HPX_COROUTINES_HAVE_THREAD_SCHEDULE_HINT_RUNS_AS_CHILD_DEFAULT)
+    HPX_INLINE_CONSTEXPR_VARIABLE bool default_runs_as_child_hint = true;
+#else
+    HPX_INLINE_CONSTEXPR_VARIABLE bool default_runs_as_child_hint = false;
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief A hint given to a scheduler to guide where a task should be
     /// scheduled.
     ///
@@ -367,6 +380,7 @@ namespace hpx { namespace threads {
         constexpr thread_schedule_hint() noexcept
           : hint(-1)
           , mode(thread_schedule_hint_mode::none)
+          , runs_as_child(default_runs_as_child_hint)
         {
         }
 
@@ -376,25 +390,31 @@ namespace hpx { namespace threads {
             std::int16_t thread_hint) noexcept
           : hint(thread_hint)
           , mode(thread_schedule_hint_mode::thread)
+          , runs_as_child(default_runs_as_child_hint)
         {
         }
 
         /// Construct a hint with the given mode and hint. The numerical hint is
         /// unused when the mode is thread_schedule_hint_mode::none.
-        constexpr thread_schedule_hint(
-            thread_schedule_hint_mode mode, std::int16_t hint) noexcept
+        constexpr thread_schedule_hint(thread_schedule_hint_mode mode,
+            std::int16_t hint,
+            bool runs_as_child = default_runs_as_child_hint) noexcept
           : hint(hint)
           , mode(mode)
+          , runs_as_child(runs_as_child)
         {
         }
 
         /// \cond NOINTERNAL
-        bool operator==(thread_schedule_hint const& rhs) const noexcept
+        constexpr bool operator==(
+            thread_schedule_hint const& rhs) const noexcept
         {
-            return mode == rhs.mode && hint == rhs.hint;
+            return mode == rhs.mode && hint == rhs.hint &&
+                runs_as_child == rhs.runs_as_child;
         }
 
-        bool operator!=(thread_schedule_hint const& rhs) const noexcept
+        constexpr bool operator!=(
+            thread_schedule_hint const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
@@ -406,5 +426,8 @@ namespace hpx { namespace threads {
 
         /// The mode of the scheduling hint.
         thread_schedule_hint_mode mode;
+
+        /// The thread will run as a child directly inline the current thread
+        bool runs_as_child;
     };
 }}    // namespace hpx::threads

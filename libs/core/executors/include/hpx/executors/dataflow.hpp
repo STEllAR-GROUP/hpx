@@ -46,8 +46,8 @@ namespace hpx { namespace lcos { namespace detail {
     struct dataflow_finalization;
 }}}    // namespace hpx::lcos::detail
 
-namespace hpx { namespace traits {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     // traits specialization to get annotation from dataflow_finalization
     template <typename Frame>
@@ -63,8 +63,8 @@ namespace hpx { namespace traits {
             return annotation;
         }
     };
-#endif
 }}    // namespace hpx::traits
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail {
@@ -211,8 +211,8 @@ namespace hpx { namespace lcos { namespace detail {
 
     private:
         ///////////////////////////////////////////////////////////////////////
-        /// Passes the futures into the evaluation function and
-        /// sets the result future.
+        // Passes the futures into the evaluation function and
+        // sets the result future.
         template <typename Futures_>
         HPX_FORCEINLINE void execute(std::false_type, Futures_&& futures)
         {
@@ -226,8 +226,8 @@ namespace hpx { namespace lcos { namespace detail {
                 });
         }
 
-        /// Passes the futures into the evaluation function and
-        /// sets the result future.
+        // Passes the futures into the evaluation function and
+        // sets the result future.
         template <typename Futures_>
         HPX_FORCEINLINE void execute(std::true_type, Futures_&& futures)
         {

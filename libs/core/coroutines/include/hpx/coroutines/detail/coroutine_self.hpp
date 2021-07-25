@@ -121,6 +121,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         virtual thread_id_type get_thread_id() const = 0;
 
+        virtual thread_id_type get_outer_thread_id() const
+        {
+            return get_thread_id();
+        }
+
         virtual std::size_t get_thread_phase() const = 0;
 
         virtual std::ptrdiff_t get_available_stack_space() = 0;

@@ -68,7 +68,9 @@ void threadLoop()
         auto exec = hpx::execution::parallel_executor(
             hpx::threads::thread_priority::bound,
             hpx::threads::thread_stacksize::default_,
-            hpx::threads::thread_schedule_hint(std::int16_t(i % threads)));
+            hpx::threads::thread_schedule_hint(
+                hpx::threads::thread_schedule_hint_mode::thread,
+                std::int16_t(i % threads), true));
         hpx::async(exec, f, i, (i % threads)).get();
     }
 

@@ -85,7 +85,7 @@ int hpx_main()
     }
 
     double elapsed = t.elapsed();
-    hpx::cout << "Elapsed time: " << elapsed << "\n" << hpx::flush;
+    hpx::cout << "Elapsed time: " << elapsed << "\n" << std::flush;
 
     return hpx::finalize();
 }

@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2017 Hartmut Kaiser
+# Copyright (c) 2007-2021 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -6,6 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    direct_scoped_execution
     future
     future_ref
     future_then

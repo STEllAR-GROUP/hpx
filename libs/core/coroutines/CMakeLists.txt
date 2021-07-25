@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,23 @@ hpx_option(
   ADVANCED
   MODULE COROUTINES
 )
+
+hpx_option(
+  HPX_COROUTINES_WITH_THREAD_SCHEDULE_HINT_RUNS_AS_CHILD_DEFAULT
+  BOOL
+  "Futures attempt to run associated threads directly if those have not been started (default: OFF)"
+  OFF
+  CATEGORY "Thread Manager"
+  ADVANCED
+  MODULE COROUTINES
+)
+
+if(HPX_COROUTINES_WITH_THREAD_SCHEDULE_HINT_RUNS_AS_CHILD_DEFAULT)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_COROUTINES_HAVE_THREAD_SCHEDULE_HINT_RUNS_AS_CHILD_DEFAULT
+    NAMESPACE COROUTINES
+  )
+endif()
 
 set(coroutines_headers
     hpx/coroutines/coroutine.hpp
@@ -29,6 +46,7 @@ set(coroutines_headers
     hpx/coroutines/detail/coroutine_impl.hpp
     hpx/coroutines/detail/coroutine_self.hpp
     hpx/coroutines/detail/coroutine_stackful_self.hpp
+    hpx/coroutines/detail/coroutine_stackful_self_direct.hpp
     hpx/coroutines/detail/coroutine_stackless_self.hpp
     hpx/coroutines/detail/get_stack_pointer.hpp
     hpx/coroutines/detail/posix_utility.hpp

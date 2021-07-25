@@ -87,9 +87,10 @@ namespace hpx { namespace iostreams { namespace server {
     {    // {{{
         // Perform the IO in another OS thread.
         detail::buffer in(buf_in);
-        hpx::get_thread_pool("io_pool")->get_io_service().post(util::bind_front(
-            &output_stream::call_write_sync, this, locality_id, count,
-            std::ref(in), threads::thread_id_ref_type(threads::get_self_id())));
+        hpx::get_thread_pool("io_pool")->get_io_service().post(
+            util::bind_front(&output_stream::call_write_sync, this, locality_id,
+                count, std::ref(in),
+                threads::thread_id_ref_type(threads::get_outer_self_id())));
 
         // Sleep until the worker thread wakes us up.
         this_thread::suspend(threads::thread_schedule_state::suspended,

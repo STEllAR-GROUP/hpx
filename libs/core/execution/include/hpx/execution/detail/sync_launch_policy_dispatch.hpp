@@ -12,6 +12,7 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -48,8 +49,19 @@ namespace hpx { namespace detail {
 
             if (hpx::detail::has_async_policy(policy))
             {
+                // if one of the arguments is a future we play it conservatively
+                if constexpr (hpx::traits::is_future_any_v<std::decay_t<Ts>...>)
+                {
+                    auto hint = policy.hint();
+                    if (hint.runs_as_child)
+                    {
+                        hint.runs_as_child = false;
+                        policy.set_hint(hint);
+                    }
+                }
+
                 threads::thread_id_ref_type tid =
-                    p.apply(policy, policy.priority());
+                    p.apply("sync_launch_policy_dispatch<fork>", policy);
                 if (tid && policy == launch::fork)
                 {
                     // make sure this thread is executed last

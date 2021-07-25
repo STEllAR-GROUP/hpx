@@ -228,9 +228,9 @@ int main()
 
     // create partitions and launch work
     partition p0(here, 0, 1000);
-    hpx::future<void> f0 = p0.do_work(100);
-
     partition p1(here, 1, 1000);
+
+    hpx::future<void> f0 = p0.do_work(100);
     hpx::future<void> f1 = p1.do_work(100);
 
     // wait for both partitions to be finished

@@ -369,6 +369,12 @@ namespace hpx { namespace threads { namespace policies {
             return work_count;
         }
 
+        // almost all schedulers support direct execution
+        virtual bool supports_direct_execution() const
+        {
+            return true;
+        }
+
     protected:
         // the scheduler mode, protected from false sharing
         util::cache_line_data<std::atomic<scheduler_mode>> mode_;

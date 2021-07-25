@@ -404,7 +404,9 @@ namespace hpx { namespace threads { namespace policies {
         void create_thread(thread_init_data& data, thread_id_ref_type* tid,
             std::size_t thread_num, error_code& ec)
         {
-            if (thread_num != thread_num_)
+            if (thread_num != thread_num_ &&
+                (data.initial_state == thread_schedule_state::pending ||
+                    data.initial_state == thread_schedule_state::pending_boost))
             {
                 data.run_now = false;
             }

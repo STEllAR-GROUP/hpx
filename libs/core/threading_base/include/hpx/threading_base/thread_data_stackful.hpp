@@ -68,6 +68,23 @@ namespace hpx { namespace threads {
             return coroutine_(set_state_ex(thread_restart_state::signaled));
         }
 
+        HPX_FORCEINLINE coroutine_type::result_type invoke_directly()
+        {
+            HPX_ASSERT(get_state().state() == thread_schedule_state::active);
+            HPX_ASSERT(this == coroutine_.get_thread_id().get());
+
+            coroutine_type::result_type result = coroutine_.invoke_directly(
+                set_state_ex(thread_restart_state::signaled));
+
+            if (result.first == thread_schedule_state::terminated &&
+                runs_as_child())
+            {
+                result.first = thread_schedule_state::deleted;
+            }
+
+            return result;
+        }
+
 #if defined(HPX_DEBUG)
         thread_id_type get_thread_id() const override
         {

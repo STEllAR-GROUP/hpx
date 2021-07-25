@@ -182,8 +182,9 @@ double wave(std::uint64_t t, std::uint64_t x)
     }
     else
     {
-        std::lock_guard<hpx::lcos::local::mutex> l(u[t][x].mtx);
         double u_tminus_x = async<wave_action>(here, t - 2, x).get();
+
+        std::lock_guard<hpx::lcos::local::mutex> l(u[t][x].mtx);
         u[t][x].u_value =
             calculate_u_tplus_x(u_t_xplus, u_t_x, u_t_xminus, u_tminus_x);
         return u[t][x].u_value;

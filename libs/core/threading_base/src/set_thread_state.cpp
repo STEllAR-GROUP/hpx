@@ -167,6 +167,8 @@ namespace hpx { namespace threads { namespace detail {
                 return previous_state;    // done
             }
             break;
+            case thread_schedule_state::deleted:
+                HPX_FALLTHROUGH;
             case thread_schedule_state::terminated:
             {
                 // NOLINTNEXTLINE(bugprone-branch-clone)

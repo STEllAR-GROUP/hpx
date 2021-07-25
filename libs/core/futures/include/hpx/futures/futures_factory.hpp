@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
@@ -31,6 +32,7 @@
 #include <utility>
 
 namespace hpx { namespace lcos { namespace local {
+
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename Result, typename F, typename Executor,
@@ -102,7 +104,20 @@ namespace hpx { namespace lcos { namespace local {
             threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
                 const char* annotation, launch policy, error_code& ec) override
             {
-                this->check_started();
+                if (this->started_test_and_set())
+                {
+                    return threads::invalid_thread_id;
+                }
+
+                auto hint = policy.hint();
+                if (hint.runs_as_child)
+                {
+                    if (!pool->get_scheduler()->supports_direct_execution())
+                    {
+                        hint.runs_as_child = false;
+                        policy.set_hint(hint);
+                    }
+                }
 
                 hpx::intrusive_ptr<base_type> this_(this);
                 if (policy == launch::fork)
@@ -114,12 +129,47 @@ namespace hpx { namespace lcos { namespace local {
                         util::thread_description(f_, annotation),
                         policy.priority(),
                         threads::thread_schedule_hint(
-                            static_cast<std::int16_t>(get_worker_thread_num())),
+                            hpx::threads::thread_schedule_hint_mode::thread,
+                            static_cast<std::int16_t>(get_worker_thread_num()),
+                            hint.runs_as_child),
                         policy.stacksize(),
                         threads::thread_schedule_state::pending_do_not_schedule,
                         true);
 
+                    if (hint.runs_as_child)
+                    {
+                        HPX_ASSERT(
+                            this->runs_child_ == threads::invalid_thread_id);
+                        this->runs_child_ =
+                            threads::register_thread(data, pool, ec);
+                        return this->runs_child_;
+                    }
+
                     return threads::register_thread(data, pool, ec);
+                }
+
+                if (hint.runs_as_child)
+                {
+                    // create the thread without running it
+                    threads::thread_init_data data(
+                        threads::make_thread_function_nullary(
+                            util::deferred_call(
+                                &base_type::run_impl, std::move(this_))),
+                        util::thread_description(f_, annotation),
+                        policy.priority(), policy.hint(), policy.stacksize(),
+                        threads::thread_schedule_state::suspended, true);
+
+                    HPX_ASSERT(this->runs_child_ == threads::invalid_thread_id);
+                    this->runs_child_ =
+                        threads::register_thread(data, pool, ec);
+
+                    // now run the thread
+                    threads::set_thread_state(this->runs_child_.noref(),
+                        threads::thread_schedule_state::pending,
+                        threads::thread_restart_state::signaled,
+                        policy.priority(), true, ec);
+
+                    return this->runs_child_;
                 }
 
                 threads::thread_init_data data(
@@ -248,13 +298,14 @@ namespace hpx { namespace lcos { namespace local {
             {
                 if (exec_)
                 {
-                    this->check_started();
-
-                    hpx::intrusive_ptr<base_type> this_(this);
-                    parallel::execution::post(*exec_,
-                        util::deferred_call(
-                            &base_type::run_impl, HPX_MOVE(this_)),
-                        exec_->get_schedulehint(), annotation);
+                    if (!this->started_test_and_set())
+                    {
+                        hpx::intrusive_ptr<base_type> this_(this);
+                        parallel::execution::post(*exec_,
+                            util::deferred_call(
+                                &base_type::run_impl, HPX_MOVE(this_)),
+                            exec_->get_schedulehint(), annotation);
+                    }
                     return threads::invalid_thread_id;
                 }
 

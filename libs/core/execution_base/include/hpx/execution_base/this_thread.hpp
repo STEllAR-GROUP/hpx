@@ -177,50 +177,25 @@ namespace hpx { namespace util {
             std::size_t count = 0;
             hpx::chrono::high_resolution_timer t;
 
-            if (allow_timed_suspension)
+            for (std::size_t k = 0;; ++k)
             {
-                for (std::size_t k = 0;; ++k)
+                if (use_timeout && duration_type(t.elapsed()) > timeout)
                 {
-                    if (use_timeout && duration_type(t.elapsed()) > timeout)
-                    {
-                        return false;
-                    }
+                    return false;
+                }
 
-                    if (!predicate())
+                if (!predicate())
+                {
+                    if (++count > required_count)
                     {
-                        if (++count > required_count)
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        count = 0;
-                        detail::yield_k(k, thread_name);
+                        return true;
                     }
                 }
-            }
-            else
-            {
-                for (std::size_t k = 0;; ++k)
+                else
                 {
-                    if (use_timeout && duration_type(t.elapsed()) > timeout)
-                    {
-                        return false;
-                    }
-
-                    if (!predicate())
-                    {
-                        if (++count > required_count)
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        count = 0;
-                        detail::yield_k(k % 16, thread_name);
-                    }
+                    count = 0;
+                    detail::yield_k(
+                        allow_timed_suspension ? k : k % 16, thread_name);
                 }
             }
         }

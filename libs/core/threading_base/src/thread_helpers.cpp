@@ -439,7 +439,7 @@ namespace hpx { namespace this_thread {
         threads::thread_self& self = threads::get_self();
 
         // keep alive
-        threads::thread_id_ref_type id = self.get_thread_id();
+        threads::thread_id_ref_type id = self.get_outer_thread_id();
 
         // handle interruption, if needed
         threads::interruption_point(id.noref(), ec);
@@ -511,7 +511,7 @@ namespace hpx { namespace this_thread {
         threads::thread_self& self = threads::get_self();
 
         // keep alive
-        threads::thread_id_ref_type id = self.get_thread_id();
+        threads::thread_id_ref_type id = self.get_outer_thread_id();
 
         // handle interruption, if needed
         threads::interruption_point(id.noref(), ec);

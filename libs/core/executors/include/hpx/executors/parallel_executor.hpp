@@ -162,7 +162,8 @@ namespace hpx { namespace execution {
             hpx::threads::thread_schedule_hint hint)
         {
             auto exec_with_hint = exec;
-            exec_with_hint.policy_ = hint;
+            hpx::execution::experimental::with_hint(
+                exec_with_hint.policy_, hint);
             return exec_with_hint;
         }
 
@@ -170,7 +171,7 @@ namespace hpx { namespace execution {
             hpx::execution::experimental::get_hint_t,
             parallel_policy_executor const& exec) noexcept
         {
-            return exec.policy_.hint();
+            return hpx::execution::experimental::get_hint(exec.policy_);
         }
 
         friend constexpr parallel_policy_executor tag_invoke(
@@ -179,7 +180,8 @@ namespace hpx { namespace execution {
             hpx::threads::thread_priority priority)
         {
             auto exec_with_priority = exec;
-            exec_with_priority.policy_ = priority;
+            hpx::execution::experimental::with_priority(
+                exec_with_priority.policy_, priority);
             return exec_with_priority;
         }
 
@@ -187,7 +189,25 @@ namespace hpx { namespace execution {
             hpx::execution::experimental::get_priority_t,
             parallel_policy_executor const& exec) noexcept
         {
-            return exec.policy_.priority();
+            return hpx::execution::experimental::get_priority(exec.policy_);
+        }
+
+        friend constexpr parallel_policy_executor tag_dispatch(
+            hpx::execution::experimental::with_stacksize_t,
+            parallel_policy_executor const& exec,
+            hpx::threads::thread_stacksize stacksize)
+        {
+            auto exec_with_stacksize = exec;
+            hpx::execution::experimental::with_stacksize(
+                exec_with_stacksize.policy_, stacksize);
+            return exec_with_stacksize;
+        }
+
+        friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+            hpx::execution::experimental::get_stacksize_t,
+            parallel_policy_executor const& exec) noexcept
+        {
+            return hpx::execution::experimental::get_stacksize(exec.policy_);
         }
 
         friend constexpr parallel_policy_executor tag_invoke(
