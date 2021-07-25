@@ -41,10 +41,16 @@ void test_transform_inclusive_scan_sent(IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::ranges::transform_inclusive_scan(
+    auto res1 = hpx::ranges::transform_inclusive_scan(
         std::begin(c), sentinel<std::size_t>{2}, std::begin(d), op, conv, val);
-    hpx::ranges::transform_inclusive_scan(
+    auto res2 = hpx::ranges::transform_inclusive_scan(
         std::begin(c), sentinel<std::size_t>{2}, std::begin(e), op, conv);
+
+    HPX_TEST(res1.in == std::begin(c) + end_len);
+    HPX_TEST(res1.out == std::end(d));
+
+    HPX_TEST(res2.in == std::begin(c) + end_len);
+    HPX_TEST(res2.out == std::end(e));
 
     // verify values
     std::vector<std::size_t> f(end_len);
@@ -72,10 +78,16 @@ void test_transform_inclusive_scan_sent(ExPolicy policy, IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::ranges::transform_inclusive_scan(policy, std::begin(c),
+    auto res1 = hpx::ranges::transform_inclusive_scan(policy, std::begin(c),
         sentinel<std::size_t>{2}, std::begin(d), op, conv, val);
-    hpx::ranges::transform_inclusive_scan(policy, std::begin(c),
+    auto res2 = hpx::ranges::transform_inclusive_scan(policy, std::begin(c),
         sentinel<std::size_t>{2}, std::begin(e), op, conv);
+
+    HPX_TEST(res1.in == std::begin(c) + end_len);
+    HPX_TEST(res1.out == std::end(d));
+
+    HPX_TEST(res2.in == std::begin(c) + end_len);
+    HPX_TEST(res2.out == std::end(e));
 
     // verify values
     std::vector<std::size_t> f(end_len);
@@ -98,8 +110,16 @@ void test_transform_inclusive_scan(IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::ranges::transform_inclusive_scan(c, std::begin(d), op, conv, val);
-    hpx::ranges::transform_inclusive_scan(c, std::begin(e), op, conv);
+    auto res1 =
+        hpx::ranges::transform_inclusive_scan(c, std::begin(d), op, conv, val);
+    auto res2 =
+        hpx::ranges::transform_inclusive_scan(c, std::begin(e), op, conv);
+
+    HPX_TEST(res1.in == std::end(c));
+    HPX_TEST(res1.out == std::end(d));
+
+    HPX_TEST(res2.in == std::end(c));
+    HPX_TEST(res2.out == std::end(e));
 
     // verify values
     std::vector<std::size_t> f(c.size());
@@ -125,9 +145,16 @@ void test_transform_inclusive_scan(ExPolicy policy, IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::ranges::transform_inclusive_scan(
+    auto res1 = hpx::ranges::transform_inclusive_scan(
         policy, c, std::begin(d), op, conv, val);
-    hpx::ranges::transform_inclusive_scan(policy, c, std::begin(e), op, conv);
+    auto res2 = hpx::ranges::transform_inclusive_scan(
+        policy, c, std::begin(e), op, conv);
+
+    HPX_TEST(res1.in == std::end(c));
+    HPX_TEST(res1.out == std::end(d));
+
+    HPX_TEST(res2.in == std::end(c));
+    HPX_TEST(res2.out == std::end(e));
 
     // verify values
     std::vector<std::size_t> f(c.size());
