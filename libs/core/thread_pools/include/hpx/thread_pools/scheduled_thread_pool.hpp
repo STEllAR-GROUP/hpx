@@ -123,7 +123,7 @@ namespace hpx::threads::detail {
             return sched_->Scheduler::enumerate_threads(f, state);
         }
 
-        void reset_thread_distribution() override
+        void reset_thread_distribution() noexcept override
         {
             return sched_->Scheduler::reset_thread_distribution();
         }

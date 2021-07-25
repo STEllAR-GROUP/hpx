@@ -205,6 +205,9 @@ namespace hpx::resource {
         // resource partitioner called in hpx_init
         HPX_CORE_EXPORT void configure_pools();
 
+        // Local runtime only: initialize first_core and pus_needed
+        HPX_CORE_EXPORT void assign_cores(std::size_t first_core);
+
     private:
         detail::partitioner& partitioner_;
     };

@@ -1623,6 +1623,7 @@ namespace hpx {
 
         std::uint32_t current = (*it).second;
         (*it).second += cores_needed;
+
         return current;
     }
 
@@ -1749,6 +1750,14 @@ namespace hpx {
         components::component_type type, error_code& ec)
     {
         std::vector<hpx::id_type> locality_ids;
+        if (nullptr == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::find_all_localities",
+                "the runtime system is not available at this time");
+            return locality_ids;
+        }
+
         hpx::applier::get_applier().get_localities(locality_ids, type, ec);
         return locality_ids;
     }
@@ -1756,6 +1765,14 @@ namespace hpx {
     std::vector<hpx::id_type> find_all_localities(error_code& ec)
     {
         std::vector<hpx::id_type> locality_ids;
+        if (nullptr == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::find_all_localities",
+                "the runtime system is not available at this time");
+            return locality_ids;
+        }
+
         hpx::applier::get_applier().get_localities(locality_ids, ec);
         return locality_ids;
     }
@@ -1764,6 +1781,14 @@ namespace hpx {
         components::component_type type, error_code& ec)
     {
         std::vector<hpx::id_type> locality_ids;
+        if (nullptr == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::find_remote_localities",
+                "the runtime system is not available at this time");
+            return locality_ids;
+        }
+
         hpx::applier::get_applier().get_remote_localities(
             locality_ids, type, ec);
         return locality_ids;
@@ -1772,14 +1797,30 @@ namespace hpx {
     std::vector<hpx::id_type> find_remote_localities(error_code& ec)
     {
         std::vector<hpx::id_type> locality_ids;
+        if (nullptr == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::find_remote_localities",
+                "the runtime system is not available at this time");
+            return locality_ids;
+        }
+
         hpx::applier::get_applier().get_remote_localities(
             locality_ids, components::component_invalid, ec);
+
         return locality_ids;
     }
 
     // find a locality supporting the given component
     hpx::id_type find_locality(components::component_type type, error_code& ec)
     {
+        if (nullptr == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::find_locality",
+                "the runtime system is not available at this time");
+            return hpx::invalid_id;
+        }
+
         std::vector<hpx::id_type> locality_ids;
         hpx::applier::get_applier().get_localities(locality_ids, type, ec);
 

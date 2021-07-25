@@ -133,7 +133,7 @@ namespace hpx::threads::detail {
     void scheduled_thread_pool<Scheduler>::print_pool(std::ostream& os) const
     {
         os << "[pool \"" << id_.name() << "\", #" << id_.index()    //-V128
-           << "] with scheduler " << Scheduler::get_scheduler_name()
+           << "] with scheduler: " << Scheduler::get_scheduler_name()
            << "\nis running on PUs : \n";
         os << hpx::threads::to_string(get_used_processing_units())
 #ifdef HPX_HAVE_MAX_CPU_COUNT
@@ -184,7 +184,8 @@ namespace hpx::threads::detail {
         std::size_t num_thread) const
     {
         HPX_ASSERT(num_thread != static_cast<std::size_t>(-1));
-        return sched_->Scheduler::get_state(num_thread).load();
+        return sched_->Scheduler::get_state(num_thread)
+            .load(std::memory_order_acquire);
     }
 
     template <typename Scheduler>
@@ -620,6 +621,14 @@ namespace hpx::threads::detail {
             return;
         }
 
+        if (data.schedulehint.runs_as_child_mode() ==
+                hpx::threads::thread_execution_hint::run_as_child &&
+            !sched_->Scheduler::supports_direct_execution())
+        {
+            data.schedulehint.runs_as_child_mode(
+                hpx::threads::thread_execution_hint::none);
+        }
+
         detail::create_thread(sched_.get(), data, id, ec);    //-V601
 
         // update statistics
@@ -639,6 +648,14 @@ namespace hpx::threads::detail {
                 "thread_pool<Scheduler>::create_work",
                 "invalid state: thread pool is not running");
             return invalid_thread_id;
+        }
+
+        if (data.schedulehint.runs_as_child_mode() ==
+                hpx::threads::thread_execution_hint::run_as_child &&
+            !sched_->Scheduler::supports_direct_execution())
+        {
+            data.schedulehint.runs_as_child_mode(
+                hpx::threads::thread_execution_hint::none);
         }
 
         thread_id_ref_type id =

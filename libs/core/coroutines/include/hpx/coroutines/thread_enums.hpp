@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <hpx/coroutines/config/defines.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
 
 #include <cstdint>
@@ -46,10 +47,12 @@ namespace hpx::threads {
                                           but allows to create a thread in
                                           pending state without scheduling it
                                           (internal, do not use) */
-        pending_boost = 8             /*!< this is not a real thread state,
+        pending_boost = 8,            /*!< this is not a real thread state,
                                           but allows to suspend a thread in
                                           pending state without high priority
                                           rescheduling */
+        deleted = 9                   /*!< thread has been stopped and was
+                                          deleted */
     };
     // clang-format on
 
@@ -220,7 +223,7 @@ namespace hpx::threads {
     /// \enum thread_placement_hint
     ///
     /// The type of hint given to the scheduler related to thread placement
-    enum class thread_placement_hint : std::uint8_t
+    enum class thread_placement_hint : std::int8_t
     {
         /// No hint is specified. The implementation is free to chose what
         /// placement methods to use.
@@ -254,7 +257,7 @@ namespace hpx::threads {
     ///
     /// The type of hint given to the scheduler related to whether it is ok to
     /// share the invoked function object between threads
-    enum class thread_sharing_hint : std::uint8_t
+    enum class thread_sharing_hint : std::int8_t
     {
         /// No hint is specified. The implementation is free to chose what
         /// sharing methods to use.
@@ -273,16 +276,15 @@ namespace hpx::threads {
 
     constexpr bool do_not_share_function(thread_sharing_hint hint) noexcept
     {
-        return static_cast<std::uint8_t>(hint) &
-            static_cast<std::uint8_t>(
+        return static_cast<std::int8_t>(hint) &
+            static_cast<std::int8_t>(
                 thread_sharing_hint::do_not_share_function);
     }
 
     constexpr bool do_not_combine_tasks(thread_sharing_hint hint) noexcept
     {
-        return static_cast<std::uint8_t>(hint) &
-            static_cast<std::uint8_t>(
-                thread_sharing_hint::do_not_combine_tasks);
+        return static_cast<std::int8_t>(hint) &
+            static_cast<std::int8_t>(thread_sharing_hint::do_not_combine_tasks);
     }
 
     constexpr thread_sharing_hint operator|(
@@ -291,6 +293,40 @@ namespace hpx::threads {
         return static_cast<thread_sharing_hint>(
             static_cast<std::uint8_t>(lhs) | static_cast<std::uint8_t>(rhs));
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \enum thread_placement_hint
+    ///
+    /// The type of hint given to the scheduler related running a thread as a
+    /// child directly in the context of the parent thread
+    enum class thread_execution_hint : std::int8_t
+    {
+        /// No hint is specified. Always run the thread in its own execution
+        /// environment.
+        none = 0,
+
+        /// Attempt to run the thread in the execution context of the parent
+        /// thread.
+        run_as_child = 1,
+    };
+
+    constexpr bool run_as_child(thread_execution_hint hint) noexcept
+    {
+        return static_cast<std::int8_t>(hint) &
+            static_cast<std::int8_t>(thread_execution_hint::run_as_child);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Default value to use for runs-as-child mode (if \a true, then futures
+    /// will attempt to execute associated threads directly if they have not
+    /// started running).
+#if defined(HPX_COROUTINES_HAVE_THREAD_SCHEDULE_HINT_RUNS_AS_CHILD)
+    inline constexpr thread_execution_hint default_runs_as_child_hint =
+        thread_execution_hint::run_as_child;
+#else
+    inline constexpr thread_execution_hint default_runs_as_child_hint =
+        thread_execution_hint::none;
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief A hint given to a scheduler to guide where a task should be
@@ -306,6 +342,8 @@ namespace hpx::threads {
                 static_cast<std::int8_t>(thread_placement_hint::none))
           , sharing_mode_bits(
                 static_cast<std::int8_t>(thread_sharing_hint::none))
+          , runs_as_child_mode_bits(
+                static_cast<std::int8_t>(default_runs_as_child_hint))
         {
         }
 
@@ -313,11 +351,13 @@ namespace hpx::threads {
         /// given hint as the local thread number.
         constexpr explicit thread_schedule_hint(std::int16_t thread_hint,
             thread_placement_hint placement = thread_placement_hint::none,
+            thread_execution_hint runs_as_child = default_runs_as_child_hint,
             thread_sharing_hint sharing = thread_sharing_hint::none) noexcept
           : hint(thread_hint)
           , mode(thread_schedule_hint_mode::thread)
           , placement_mode_bits(static_cast<std::int8_t>(placement))
           , sharing_mode_bits(static_cast<std::int8_t>(sharing))
+          , runs_as_child_mode_bits(static_cast<std::int8_t>(runs_as_child))
         {
         }
 
@@ -326,11 +366,13 @@ namespace hpx::threads {
         constexpr thread_schedule_hint(thread_schedule_hint_mode mode,
             std::int16_t hint,
             thread_placement_hint placement = thread_placement_hint::none,
+            thread_execution_hint runs_as_child = default_runs_as_child_hint,
             thread_sharing_hint sharing = thread_sharing_hint::none) noexcept
           : hint(hint)
           , mode(mode)
           , placement_mode_bits(static_cast<std::int8_t>(placement))
           , sharing_mode_bits(static_cast<std::int8_t>(sharing))
+          , runs_as_child_mode_bits(static_cast<std::int8_t>(runs_as_child))
         {
         }
 
@@ -340,7 +382,8 @@ namespace hpx::threads {
         {
             return mode == rhs.mode && hint == rhs.hint &&
                 placement_mode() == rhs.placement_mode() &&
-                sharing_mode() == rhs.sharing_mode();
+                sharing_mode() == rhs.sharing_mode() &&
+                runs_as_child_mode() == rhs.runs_as_child_mode();
         }
 
         constexpr bool operator!=(
@@ -359,7 +402,7 @@ namespace hpx::threads {
         }
         void placement_mode(thread_placement_hint bits) noexcept
         {
-            placement_mode_bits = static_cast<std::int8_t>(bits);
+            placement_mode_bits = static_cast<std::uint8_t>(bits);
         }
 
         [[nodiscard]] constexpr thread_sharing_hint sharing_mode()
@@ -369,7 +412,17 @@ namespace hpx::threads {
         }
         void sharing_mode(thread_sharing_hint bits) noexcept
         {
-            sharing_mode_bits = static_cast<std::int8_t>(bits);
+            sharing_mode_bits = static_cast<std::uint8_t>(bits);
+        }
+
+        [[nodiscard]] constexpr thread_execution_hint runs_as_child_mode()
+            const noexcept
+        {
+            return static_cast<thread_execution_hint>(runs_as_child_mode_bits);
+        }
+        void runs_as_child_mode(thread_execution_hint bits) noexcept
+        {
+            runs_as_child_mode_bits = static_cast<std::uint8_t>(bits);
         }
 
         /// The hint associated with the mode. The interpretation of this hint
@@ -380,9 +433,13 @@ namespace hpx::threads {
         thread_schedule_hint_mode mode = thread_schedule_hint_mode::none;
 
         /// The mode of the desired thread placement.
-        std::int8_t placement_mode_bits : 6;
+        std::uint8_t placement_mode_bits : 5;
 
         /// The mode of the desired sharing hint
-        std::int8_t sharing_mode_bits : 2;
+        std::uint8_t sharing_mode_bits : 2;
+
+        /// The thread will run as a child directly in the context of the
+        /// current thread
+        std::uint8_t runs_as_child_mode_bits : 1;
     };
 }    // namespace hpx::threads

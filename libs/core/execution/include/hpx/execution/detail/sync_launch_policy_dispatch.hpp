@@ -12,6 +12,7 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -29,7 +30,7 @@ namespace hpx::detail {
     {
         // launch::sync execute inline
         template <typename Policy, typename F, typename... Ts>
-        HPX_FORCEINLINE static decltype(auto) call(Policy, F&& f, Ts&&... ts)
+        HPX_FORCEINLINE static decltype(auto) call(Policy&&, F&& f, Ts&&... ts)
         {
             try
             {
@@ -51,7 +52,7 @@ namespace hpx::detail {
     {
         // launch::deferred execute inline
         template <typename Policy, typename F, typename... Ts>
-        HPX_FORCEINLINE static decltype(auto) call(Policy, F&& f, Ts&&... ts)
+        HPX_FORCEINLINE static decltype(auto) call(Policy&&, F&& f, Ts&&... ts)
         {
             try
             {
@@ -82,13 +83,14 @@ namespace hpx::detail {
             if (policy == launch::sync)
             {
                 return sync_launch_policy_dispatch<launch::sync_policy>::call(
-                    policy, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+                    HPX_MOVE(policy), HPX_FORWARD(F, f),
+                    HPX_FORWARD(Ts, ts)...);
             }
             else if (policy == launch::deferred)
             {
                 return sync_launch_policy_dispatch<
-                    launch::deferred_policy>::call(policy, HPX_FORWARD(F, f),
-                    HPX_FORWARD(Ts, ts)...);
+                    launch::deferred_policy>::call(HPX_MOVE(policy),
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
             lcos::local::futures_factory<result_type()> p(
@@ -96,6 +98,19 @@ namespace hpx::detail {
 
             if (hpx::detail::has_async_policy(policy))
             {
+                // if one of the arguments is a future we play it conservatively
+                if constexpr (hpx::traits::is_future_any_v<std::decay_t<Ts>...>)
+                {
+                    auto hint = policy.hint();
+                    if (hint.runs_as_child_mode() ==
+                        hpx::threads::thread_execution_hint::run_as_child)
+                    {
+                        hint.runs_as_child_mode(
+                            hpx::threads::thread_execution_hint::none);
+                        policy.set_hint(hint);
+                    }
+                }
+
                 threads::thread_id_ref_type tid =
                     p.post("sync_launch_policy_dispatch<fork>", policy,
                         policy.priority());

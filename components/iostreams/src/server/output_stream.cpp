@@ -13,6 +13,7 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
 #include <hpx/serialization/vector.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
 #include <hpx/components/iostreams/server/buffer.hpp>
@@ -25,11 +26,12 @@
 #include <memory>
 #include <utility>
 
-namespace hpx { namespace iostreams { namespace detail {
+namespace hpx::iostreams::detail {
+
     void buffer::save(serialization::output_archive& ar, unsigned) const
     {
-        bool valid = (data_.get() && !data_->empty());
-        ar& valid;
+        bool const valid = (data_.get() && !data_->empty());
+        ar << valid;
         if (valid)
         {
             ar& data_;
@@ -39,15 +41,15 @@ namespace hpx { namespace iostreams { namespace detail {
     void buffer::load(serialization::input_archive& ar, unsigned)
     {
         bool valid = false;
-        ar& valid;
+        ar >> valid;
         if (valid)
         {
             ar& data_;
         }
     }
-}}}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostreams::detail
 
-namespace hpx { namespace iostreams { namespace server {
+namespace hpx::iostreams::server {
     ///////////////////////////////////////////////////////////////////////////
     void output_stream::call_write_async(std::uint32_t locality_id,
         std::uint64_t count, detail::buffer const& in, hpx::id_type /*this_id*/)
@@ -87,12 +89,13 @@ namespace hpx { namespace iostreams { namespace server {
     {    // {{{
         // Perform the IO in another OS thread.
         detail::buffer in(buf_in);
-        hpx::get_thread_pool("io_pool")->get_io_service().post(hpx::bind_front(
-            &output_stream::call_write_sync, this, locality_id, count,
-            std::ref(in), threads::thread_id_ref_type(threads::get_self_id())));
+        hpx::get_thread_pool("io_pool")->get_io_service().post(
+            hpx::bind_front(&output_stream::call_write_sync, this, locality_id,
+                count, std::ref(in),
+                threads::thread_id_ref_type(threads::get_outer_self_id())));
 
         // Sleep until the worker thread wakes us up.
         this_thread::suspend(threads::thread_schedule_state::suspended,
             "output_stream::write_sync");
     }    // }}}
-}}}      // namespace hpx::iostreams::server
+}    // namespace hpx::iostreams::server

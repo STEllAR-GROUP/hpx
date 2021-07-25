@@ -500,6 +500,9 @@ namespace hpx {
                             return result;
                         }
 
+                        rp.assign_cores(hpx::util::get_entry_as<std::size_t>(
+                            cmdline.rtcfg_, "hpx.first_used_core", 0));
+
                         // If thread_pools initialization in user main
                         if (params.rp_callback)
                         {

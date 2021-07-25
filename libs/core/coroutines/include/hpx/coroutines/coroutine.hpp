@@ -1,5 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  This code may be used under either of the following two licences:
 //
@@ -149,6 +149,12 @@ namespace hpx::threads::coroutines {
             impl_.invoke();
 
             return impl_.result();
+        }
+
+        HPX_FORCEINLINE result_type invoke_directly(arg_type arg = arg_type())
+        {
+            HPX_ASSERT(impl_.is_ready());
+            return impl_.invoke_directly(arg);
         }
 
         bool is_ready() const noexcept

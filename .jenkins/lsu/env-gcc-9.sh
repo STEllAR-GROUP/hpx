@@ -28,3 +28,5 @@ configure_extra_options+=" -DHPX_WITH_PARCELPORT_GASNET=ON"
 
 # The pwrapi library still needs to be set up properly on rostam
 # configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"
+
+configure_extra_options+=" -DHPX_COROUTINES_WITH_THREAD_SCHEDULE_HINT_RUNS_AS_CHILD=ON"
