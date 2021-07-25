@@ -29,14 +29,14 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename FwdIter, typename Sent, typename Size,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value &&
+                hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
         // clang-format on
         friend FwdIter tag_fallback_dispatch(
             hpx::ranges::shift_left_t, FwdIter first, Sent last, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
@@ -48,7 +48,7 @@ namespace hpx { namespace ranges {
             typename Size,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter>::value &&
+                hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
         // clang-format on
@@ -57,7 +57,7 @@ namespace hpx { namespace ranges {
         tag_fallback_dispatch(hpx::ranges::shift_left_t, ExPolicy&& policy,
             FwdIter first, Sent last, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
@@ -76,8 +76,7 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::shift_left<iterator_type>().call(
@@ -99,8 +98,7 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::shift_left<iterator_type>().call(

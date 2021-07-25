@@ -79,9 +79,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::enable_if_t<
                 std::is_convertible_v<iterator_category_t<I>, Tag>>> = true;
 
-        template <class FwdIter, typename Sent>
+        template <class FwdIter>
         constexpr difference_type_t<FwdIter> bounded_advance_r(
-            FwdIter& i, difference_type_t<FwdIter> n, Sent const bound)
+            FwdIter& i, difference_type_t<FwdIter> n, FwdIter const bound)
         {
             if constexpr (is_category<FwdIter, std::bidirectional_iterator_tag>)
             {
@@ -99,9 +99,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return n;
         }
 
-        template <typename FwdIter, typename Sent>
+        template <typename FwdIter>
         FwdIter sequential_shift_right(
-            FwdIter first, Sent last, difference_type_t<FwdIter> n)
+            FwdIter first, FwdIter last, difference_type_t<FwdIter> n)
         {
             if (n <= 0)
             {
@@ -176,8 +176,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return first;
                 }
 
+                auto last_iter = detail::advance_to_sentinel(first, last);
                 return detail::sequential_shift_right(
-                    first, last, difference_type_t<FwdIter>(n));
+                    first, last_iter, difference_type_t<FwdIter>(n));
             }
 
             template <typename ExPolicy, typename Sent, typename Size>
@@ -185,15 +186,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 FwdIter2>::type
             parallel(ExPolicy&& policy, FwdIter2 first, Sent last, Size n)
             {
-                if (n <= 0 || n >= detail::distance(first, last))
+                auto dist = detail::distance(first, last);
+                if (n <= 0 || n >= dist)
                 {
                     return parallel::util::detail::algorithm_result<ExPolicy,
                         FwdIter2>::get(std::move(first));
                 }
 
+                auto new_first = std::next(first, dist - n);
                 return util::detail::algorithm_result<ExPolicy, FwdIter2>::get(
-                    shift_right_helper(
-                        policy, first, last, std::next(first, n)));
+                    shift_right_helper(policy, first, last, new_first));
             }
         };
         /// \endcond

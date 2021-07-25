@@ -19,7 +19,7 @@
 
 #include "test_utils.hpp"
 
-#define ARR_SIZE 10
+#define ARR_SIZE 100007
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -43,8 +43,7 @@ void test_shift_right(IteratorTag)
     std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c),
-        std::begin(c) + ((std::size_t) ARR_SIZE - n), std::begin(d)));
+    HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
 
     // ensure shift by more than n does not crash
     hpx::shift_right(std::begin(c), std::end(c), (std::size_t)(ARR_SIZE + 1));
@@ -74,8 +73,7 @@ void test_shift_right(ExPolicy policy, IteratorTag)
     std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c),
-        std::begin(c) + ((std::size_t) ARR_SIZE - n), std::begin(d)));
+    HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
 
     // ensure shift by more than n does not crash
     hpx::shift_right(
@@ -109,8 +107,7 @@ void test_shift_right_async(ExPolicy p, IteratorTag)
     std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c),
-        std::begin(c) + ((std::size_t) ARR_SIZE - n), std::begin(d)));
+    HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
 
     // ensure shift by more than n does not crash
     auto f3 = hpx::shift_right(
@@ -122,19 +119,19 @@ template <typename IteratorTag>
 void test_shift_right()
 {
     using namespace hpx::execution;
-    //test_shift_right(IteratorTag());
-    //test_shift_right(seq, IteratorTag());
+    test_shift_right(IteratorTag());
+    test_shift_right(seq, IteratorTag());
     test_shift_right(par, IteratorTag());
-    //test_shift_right(par_unseq, IteratorTag());
+    test_shift_right(par_unseq, IteratorTag());
 
-    //test_shift_right_async(seq(task), IteratorTag());
-    //test_shift_right_async(par(task), IteratorTag());
+    test_shift_right_async(seq(task), IteratorTag());
+    test_shift_right_async(par(task), IteratorTag());
 }
 
 void shift_right_test()
 {
     test_shift_right<std::random_access_iterator_tag>();
-    //test_shift_right<std::forward_iterator_tag>();
+    test_shift_right<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

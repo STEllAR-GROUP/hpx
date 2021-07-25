@@ -19,7 +19,7 @@
 
 #include "test_utils.hpp"
 
-#define ARR_SIZE 10007
+#define ARR_SIZE 100007
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
