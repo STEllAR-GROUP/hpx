@@ -96,6 +96,8 @@ Functions
 - :cpp:func:`hpx::set_intersection`
 - :cpp:func:`hpx::set_symmetric_difference`
 - :cpp:func:`hpx::set_union`
+- :cpp:func:`hpx::shift_left`
+- :cpp:func:`hpx::shift_right`
 - :cpp:func:`hpx::sort`
 - :cpp:func:`hpx::parallel::v1::stable_partition`
 - :cpp:func:`hpx::swap_ranges`
@@ -143,7 +145,12 @@ Functions
 - :cpp:func:`hpx::ranges::set_intersection`
 - :cpp:func:`hpx::ranges::set_symmetric_difference`
 - :cpp:func:`hpx::ranges::set_union`
+<<<<<<< HEAD
 - :cpp:func:`hpx::ranges::sort`
+=======
+- :cpp:func:`hpx::ranges::shift_left`
+- :cpp:func:`hpx::ranges::shift_right`
+>>>>>>> a34e9dd378 (added shift_left and shift_right to sphinx docs)
 - :cpp:func:`hpx::ranges::stable_sort`
 - :cpp:func:`hpx::ranges::swap_ranges`
 - :cpp:func:`hpx::ranges::unique`
