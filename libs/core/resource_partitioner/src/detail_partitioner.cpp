@@ -948,6 +948,8 @@ namespace hpx::resource::detail {
         affinity_data_ = affinity_data;
 
         fill_topology_vectors();
+
+        pus_needed_ = assign_cores(0);
     }
 
     scheduler_function partitioner::get_pool_creator(std::size_t index) const

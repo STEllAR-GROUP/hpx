@@ -75,9 +75,11 @@ namespace hpx {
         {
             strm << full_build_string();
 
-            std::string const* env = xi.get<hpx::detail::throw_env>();
-            if (env && !env->empty())
+            if (std::string const* env = xi.get<hpx::detail::throw_env>();
+                env && !env->empty())
+            {
                 strm << "{env}: " << *env;
+            }
         }
 
         if (verbosity >= 1)
@@ -90,10 +92,11 @@ namespace hpx {
                 strm << "{stack-trace}: " << *back_trace << "\n";
             }
 
-            std::uint32_t const* locality =
-                xi.get<hpx::detail::throw_locality>();
-            if (locality)
+            if (std::uint32_t const* locality =
+                    xi.get<hpx::detail::throw_locality>())
+            {
                 strm << "{locality-id}: " << *locality << "\n";
+            }
 
             std::string const* hostname_ =
                 xi.get<hpx::detail::throw_hostname>();
@@ -106,14 +109,15 @@ namespace hpx {
 
             bool thread_info = false;
             char const* const thread_prefix = "{os-thread}: ";
-            std::size_t const* shepherd = xi.get<hpx::detail::throw_shepherd>();
-            if (shepherd && std::size_t(-1) != *shepherd)
+            if (std::size_t const* shepherd =
+                    xi.get<hpx::detail::throw_shepherd>();
+                shepherd && static_cast<std::size_t>(-1) != *shepherd)
             {
                 strm << thread_prefix << *shepherd;
                 thread_info = true;
             }
 
-            std::string thread_name = hpx::get_thread_name();
+            std::string const thread_name = hpx::get_thread_name();
             if (!thread_info)
                 strm << thread_prefix;
             else
@@ -133,31 +137,28 @@ namespace hpx {
             if (thread_description && !thread_description->empty())
                 strm << "{thread-description}: " << *thread_description << "\n";
 
-            std::string const* state = xi.get<hpx::detail::throw_state>();
-            if (state)
+            if (std::string const* state = xi.get<hpx::detail::throw_state>())
                 strm << "{state}: " << *state << "\n";
 
-            std::string const* auxinfo = xi.get<hpx::detail::throw_auxinfo>();
-            if (auxinfo)
+            if (std::string const* auxinfo =
+                    xi.get<hpx::detail::throw_auxinfo>())
+            {
                 strm << "{auxinfo}: " << *auxinfo << "\n";
+            }
         }
 
-        std::string const* file = xi.get<hpx::detail::throw_file>();
-        if (file)
+        if (std::string const* file = xi.get<hpx::detail::throw_file>())
             strm << "{file}: " << *file << "\n";
 
-        long const* line = xi.get<hpx::detail::throw_line>();
-        if (line)
+        if (long const* line = xi.get<hpx::detail::throw_line>())
             strm << "{line}: " << *line << "\n";
 
-        std::string const* function = xi.get<hpx::detail::throw_function>();
-        if (function)
+        if (std::string const* function = xi.get<hpx::detail::throw_function>())
             strm << "{function}: " << *function << "\n";
 
         // Try a cast to std::exception - this should handle boost.system
         // error codes in addition to the standard library exceptions.
-        std::exception const* se = dynamic_cast<std::exception const*>(&xi);
-        if (se)
+        if (auto const* se = dynamic_cast<std::exception const*>(&xi))
             strm << "{what}: " << se->what() << "\n";
 
         return strm.str();
@@ -174,14 +175,13 @@ namespace hpx::util {
 #if defined(HPX_HAVE_STACKTRACES)
         if (frames_no == 0)
         {
-            return std::string();
+            return {};
         }
 
         backtrace bt(frames_no);
 
         // avoid infinite recursion on handling errors
-        auto* self = threads::get_self_ptr();
-        if (nullptr == self ||
+        if (auto const* self = threads::get_self_ptr(); nullptr == self ||
             self->get_thread_id() == threads::invalid_thread_id)
         {
             return bt.trace();
@@ -191,7 +191,7 @@ namespace hpx::util {
             [&bt]() { return bt.trace(); });
 
         error_code ec(throwmode::lightweight);
-        threads::thread_id_ref_type tid =
+        threads::thread_id_ref_type const tid =
             p.post("hpx::util::trace_on_new_stack",
                 launch::fork_policy(threads::thread_priority::default_,
                     threads::thread_stacksize::medium),
@@ -395,20 +395,20 @@ namespace hpx::detail {
     hpx::exception_info custom_exception_info(std::string const& func,
         std::string const& file, long line, std::string const& auxinfo)
     {
-        std::int64_t pid = ::getpid();
+        std::int64_t const pid = ::getpid();
 
-        std::size_t const trace_depth =
+        auto const trace_depth =
             util::from_string<std::size_t>(get_config_entry(
                 "hpx.trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH));
 
-        std::string back_trace(hpx::util::trace_on_new_stack(trace_depth));
+        std::string const back_trace(
+            hpx::util::trace_on_new_stack(trace_depth));
 
         std::string state_name("not running");
         std::string hostname;
-        hpx::runtime* rt = get_runtime_ptr();
-        if (rt)
+        if (hpx::runtime const* rt = get_runtime_ptr())
         {
-            state rts_state = rt->get_state();
+            state const rts_state = rt->get_state();
             state_name = get_runtime_state_name(rts_state);
 
             if (rts_state >= state::initialized && rts_state < state::stopped)
@@ -420,13 +420,13 @@ namespace hpx::detail {
         // if this is not a HPX thread we do not need to query neither for
         // the shepherd thread nor for the thread id
         error_code ec(throwmode::lightweight);
-        std::uint32_t node = get_locality_id(ec);
+        std::uint32_t const node = get_locality_id(ec);
 
-        std::size_t shepherd = std::size_t(-1);
+        auto shepherd = static_cast<std::size_t>(-1);
         threads::thread_id_type thread_id;
         threads::thread_description thread_name;
 
-        threads::thread_self* self = threads::get_self_ptr();
+        threads::thread_self const* self = threads::get_self_ptr();
         if (nullptr != self)
         {
             if (threads::threadmanager_is(hpx::state::running))
@@ -436,8 +436,8 @@ namespace hpx::detail {
             thread_name = threads::get_thread_description(thread_id);
         }
 
-        std::string env(get_execution_environment());
-        std::string config(configuration_string());
+        std::string const env(get_execution_environment());
+        std::string const config(configuration_string());
 
         return hpx::exception_info().set(
             hpx::detail::throw_stacktrace(back_trace),
@@ -463,15 +463,17 @@ namespace hpx {
         std::string const* hostname_ = xi.get<hpx::detail::throw_hostname>();
         if (hostname_ && !hostname_->empty())
             return *hostname_;
-        return std::string();
+        return {};
     }
 
     /// Return the locality where the exception was thrown.
     std::uint32_t get_error_locality_id(hpx::exception_info const& xi)
     {
-        std::uint32_t const* locality = xi.get<hpx::detail::throw_locality>();
-        if (locality)
+        if (std::uint32_t const* locality =
+                xi.get<hpx::detail::throw_locality>())
+        {
             return *locality;
+        }
 
         // same as naming::invalid_locality_id
         return ~static_cast<std::uint32_t>(0);
@@ -481,8 +483,7 @@ namespace hpx {
     /// exception was thrown.
     std::int64_t get_error_process_id(hpx::exception_info const& xi)
     {
-        std::int64_t const* pid_ = xi.get<hpx::detail::throw_pid>();
-        if (pid_)
+        if (std::int64_t const* pid_ = xi.get<hpx::detail::throw_pid>())
             return *pid_;
         return -1;
     }
@@ -491,9 +492,11 @@ namespace hpx {
     /// was thrown.
     std::string get_error_env(hpx::exception_info const& xi)
     {
-        std::string const* env = xi.get<hpx::detail::throw_env>();
-        if (env && !env->empty())
+        if (std::string const* env = xi.get<hpx::detail::throw_env>();
+            env && !env->empty())
+        {
             return *env;
+        }
 
         return "<unknown>";
     }
@@ -501,61 +504,76 @@ namespace hpx {
     /// Return the stack backtrace at the point the exception was thrown.
     std::string get_error_backtrace(hpx::exception_info const& xi)
     {
-        std::string const* back_trace = xi.get<hpx::detail::throw_stacktrace>();
-        if (back_trace && !back_trace->empty())
+        if (std::string const* back_trace =
+                xi.get<hpx::detail::throw_stacktrace>();
+            back_trace && !back_trace->empty())
+        {
             return *back_trace;
+        }
 
-        return std::string();
+        return {};
     }
 
     /// Return the sequence number of the OS-thread used to execute HPX-threads
     /// from which the exception was thrown.
     std::size_t get_error_os_thread(hpx::exception_info const& xi)
     {
-        std::size_t const* shepherd = xi.get<hpx::detail::throw_shepherd>();
-        if (shepherd && std::size_t(-1) != *shepherd)
+        if (std::size_t const* shepherd = xi.get<hpx::detail::throw_shepherd>();
+            shepherd && static_cast<std::size_t>(-1) != *shepherd)
+        {
             return *shepherd;
-        return std::size_t(-1);
+        }
+        return static_cast<std::size_t>(-1);
     }
 
     /// Return the unique thread id of the HPX-thread from which the exception
     /// was thrown.
     std::size_t get_error_thread_id(hpx::exception_info const& xi)
     {
-        std::size_t const* thread_id = xi.get<hpx::detail::throw_thread_id>();
-        if (thread_id && *thread_id)
+        if (std::size_t const* thread_id =
+                xi.get<hpx::detail::throw_thread_id>();
+            thread_id && *thread_id)
+        {
             return *thread_id;
-        return std::size_t(-1);
+        }
+        return static_cast<std::size_t>(-1);
     }
 
     /// Return any addition thread description of the HPX-thread from which the
     /// exception was thrown.
     std::string get_error_thread_description(hpx::exception_info const& xi)
     {
-        std::string const* thread_description =
-            xi.get<hpx::detail::throw_thread_name>();
-        if (thread_description && !thread_description->empty())
+        if (std::string const* thread_description =
+                xi.get<hpx::detail::throw_thread_name>();
+            thread_description && !thread_description->empty())
+        {
             return *thread_description;
-        return std::string();
+        }
+        return {};
     }
 
     /// Return the HPX configuration information point from which the
     /// exception was thrown.
     std::string get_error_config(hpx::exception_info const& xi)
     {
-        std::string const* config_info = xi.get<hpx::detail::throw_config>();
-        if (config_info && !config_info->empty())
+        if (std::string const* config_info =
+                xi.get<hpx::detail::throw_config>();
+            config_info && !config_info->empty())
+        {
             return *config_info;
-        return std::string();
+        }
+        return {};
     }
 
     /// Return the HPX runtime state information at which the exception was
     /// thrown.
     std::string get_error_state(hpx::exception_info const& xi)
     {
-        std::string const* state_info = xi.get<hpx::detail::throw_state>();
-        if (state_info && !state_info->empty())
+        if (std::string const* state_info = xi.get<hpx::detail::throw_state>();
+            state_info && !state_info->empty())
+        {
             return *state_info;
-        return std::string();
+        }
+        return {};
     }
 }    // namespace hpx

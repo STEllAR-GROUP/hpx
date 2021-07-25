@@ -12,7 +12,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
-#include <hpx/execution/detail/post_policy_dispatch.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/future_then_result_exec.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
@@ -25,6 +25,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/threading_base/register_thread.hpp>
+#include <hpx/threading_base/thread_description.hpp>
+#include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <exception>
@@ -150,10 +153,17 @@ namespace hpx::lcos::detail {
     struct post_policy_spawner
     {
         template <typename F>
-        void operator()(F&& f, hpx::threads::thread_description desc) const
+        threads::thread_id_ref_type operator()(
+            F&& f, hpx::threads::thread_description desc) const
         {
-            hpx::detail::post_policy_dispatch<hpx::launch::async_policy>::call(
-                hpx::launch::async, desc, HPX_FORWARD(F, f));
+            threads::thread_init_data data(
+                threads::make_thread_function_nullary(HPX_FORWARD(F, f)),
+                HPX_MOVE(desc), threads::thread_priority::default_,
+                threads::thread_schedule_hint(),
+                threads::thread_stacksize::default_,
+                threads::thread_schedule_state::pending);
+
+            return threads::register_thread(data);
         }
     };
 
@@ -163,9 +173,11 @@ namespace hpx::lcos::detail {
         Executor exec;
 
         template <typename F>
-        void operator()(F&& f, hpx::threads::thread_description) const
+        threads::thread_id_ref_type operator()(
+            F&& f, hpx::threads::thread_description) const
         {
             hpx::parallel::execution::post(exec, HPX_FORWARD(F, f));
+            return threads::invalid_thread_id;
         }
     };
 

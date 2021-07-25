@@ -239,7 +239,7 @@ namespace hpx::threads::policies {
             std::size_t num_thread = std::size_t(-1)) const = 0;
 #endif
 
-        virtual void reset_thread_distribution() {}
+        virtual void reset_thread_distribution() noexcept {}
 
         std::ptrdiff_t get_stack_size(
             threads::thread_stacksize stacksize) const noexcept;
@@ -269,6 +269,12 @@ namespace hpx::threads::policies {
 
         detail::polling_status custom_polling_function() const;
         std::size_t get_polling_work_count() const;
+
+        // almost all schedulers support direct execution
+        virtual bool supports_direct_execution() const noexcept
+        {
+            return true;
+        }
 
     protected:
         // the scheduler mode, protected from false sharing

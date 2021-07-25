@@ -225,12 +225,14 @@ namespace hpx::lcos::detail {
 
         future_data_base() noexcept
           : state_(empty)
+          , runs_child_(threads::invalid_thread_id)
         {
         }
 
         explicit future_data_base(init_no_addref no_addref) noexcept
           : future_data_refcnt_base(no_addref)
           , state_(empty)
+          , runs_child_(threads::invalid_thread_id)
         {
         }
 
@@ -319,11 +321,16 @@ namespace hpx::lcos::detail {
         virtual std::exception_ptr get_exception_ptr() const = 0;
 
     protected:
+        // try to perform scoped execution of the associated thread (if any)
+        bool execute_thread();
+
+    protected:
         mutable mutex_type mtx_;
         std::atomic<state> state_;    // current state
 
         completed_callback_vector_type on_completed_;
         local::detail::condition_variable cond_;    // threads waiting in read
+        threads::thread_id_ref_type runs_child_;
     };
 
     template <typename Result>
@@ -472,6 +479,10 @@ namespace hpx::lcos::detail {
                     "data has already been set for this future");
             }
 
+            // reset runs_child_ thread id to avoid keeping the thread
+            // alive as long as the future
+            this->base_type::runs_child_.reset();
+
             // 26111: Caller failing to release lock 'this->mtx_'
             // 26115: Failing to release lock 'this->mtx_'
             // 26800: Use of a moved from object 'l'
@@ -544,6 +555,10 @@ namespace hpx::lcos::detail {
                     "future_data_base::set_exception",
                     "data has already been set for this future");
             }
+
+            // reset runs_child_ thread id to avoid keeping the thread
+            // alive as long as the future
+            this->base_type::runs_child_.reset();
 
             // 26111: Caller failing to release lock 'this->mtx_'
             // 26115: Failing to release lock 'this->mtx_'
@@ -827,10 +842,15 @@ namespace hpx::lcos::detail {
         using base_type::mtx_;
 
     public:
-        task_base() = default;
+        task_base()
+          : base_type()
+          , started_(false)
+        {
+        }
 
         explicit task_base(init_no_addref no_addref) noexcept
           : base_type(no_addref)
+          , started_(false)
         {
         }
 
@@ -840,16 +860,22 @@ namespace hpx::lcos::detail {
             {
                 this->do_run();
             }
+
+            // attempt to directly execute thread
+            this->execute_thread();
         }
 
         // retrieving the value
-        result_type* get_result(error_code& ec = throws) override
+        util::unused_type* get_result_void(error_code& ec = throws) override
         {
             if (!started_test_and_set())
             {
                 this->do_run();
             }
-            return this->future_data<Result>::get_result(ec);
+
+            // attempt to directly execute thread
+            this->execute_thread();
+            return this->base_type::get_result_void(ec);
         }
 
         // wait support
@@ -859,57 +885,50 @@ namespace hpx::lcos::detail {
             {
                 this->do_run();
             }
-            return this->future_data<Result>::wait(ec);
+
+            // attempt to directly execute thread
+            this->execute_thread();
+            return this->base_type::wait(ec);
         }
 
         hpx::future_status wait_until(
             std::chrono::steady_clock::time_point const& abs_time,
             error_code& ec = throws) override
         {
-            if (!started_test())
+            if (!started_test_and_set())
             {
-                return hpx::future_status::deferred;    //-V110
+                this->do_run();
             }
-            return this->future_data<Result>::wait_until(abs_time, ec);
-        }
 
-    private:
-        bool started_test() const noexcept
-        {
-            std::lock_guard<mutex_type> l(mtx_);
-            return started_;
-        }
-
-        template <typename Lock>
-        bool started_test_and_set_locked(Lock& l)
-        {
-            HPX_ASSERT_OWNS_LOCK(l);
-            if (started_)
-            {
-                return true;
-            }
-            started_ = true;
-            return false;
+            // attempt to directly execute thread
+            this->execute_thread();
+            return this->base_type::wait_until(abs_time, ec);
         }
 
     protected:
+        bool started_test() const noexcept
+        {
+            return started_.load(std::memory_order_acquire);
+        }
+
+        // returns whether this task was started before
         bool started_test_and_set()
         {
-            std::lock_guard<mutex_type> l(mtx_);
-            return started_test_and_set_locked(l);
+            if (!started_.load(std::memory_order_relaxed))
+            {
+                return started_.exchange(true, std::memory_order_release);
+            }
+            return true;
         }
 
         void check_started()
         {
-            std::unique_lock<mutex_type> l(mtx_);
-            if (started_)
+            if (started_test_and_set())
             {
-                l.unlock();
                 HPX_THROW_EXCEPTION(hpx::error::task_already_started,
                     "task_base::check_started",
                     "this task has already been started");
             }
-            started_ = true;
         }
 
     public:
@@ -953,7 +972,7 @@ namespace hpx::lcos::detail {
         }
 
     protected:
-        bool started_ = false;
+        std::atomic<bool> started_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1030,7 +1049,7 @@ namespace hpx::lcos::detail {
             std::unique_lock<mutex_type> l(mtx_);
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    if (!this->started_)
+                    if (!this->started_test_and_set())
                     {
                         HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
                     }
@@ -1040,12 +1059,11 @@ namespace hpx::lcos::detail {
                         return;    // nothing we can do
                     }
 
+                    std::unique_lock<mutex_type> l(mtx_);
                     if (id_ != threads::invalid_thread_id)
                     {
                         // interrupt the executing thread
                         threads::interrupt_thread(id_);
-
-                        this->started_ = true;
 
                         l.unlock();
                         this->set_error(hpx::error::future_cancelled,
@@ -1062,7 +1080,7 @@ namespace hpx::lcos::detail {
                     }
                 },
                 [&](std::exception_ptr ep) {
-                    this->started_ = true;
+                    HPX_ASSERT(this->started_test());
                     this->set_exception(ep);
                     std::rethrow_exception(HPX_MOVE(ep));
                 });

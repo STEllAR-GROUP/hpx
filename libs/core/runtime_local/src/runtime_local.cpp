@@ -651,6 +651,17 @@ namespace hpx {
         return "console";
     }
 
+    std::uint32_t runtime::assign_cores(std::string const&, std::uint32_t)
+    {
+        return 0;
+    }
+
+    std::uint32_t runtime::assign_cores()
+    {
+        return static_cast<std::uint32_t>(
+            hpx::resource::get_partitioner().assign_cores(0));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     threads::policies::callback_notifier::on_startstop_type
     get_thread_on_start_func()

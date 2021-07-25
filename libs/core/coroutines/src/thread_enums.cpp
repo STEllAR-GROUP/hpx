@@ -29,7 +29,8 @@ namespace hpx::threads {
             "terminated",
             "staged",
             "pending_do_not_schedule",
-            "pending_boost"
+            "pending_boost",
+            "deleted"
         };
         // clang-format on
 
@@ -37,8 +38,8 @@ namespace hpx::threads {
 
     char const* get_thread_state_name(thread_schedule_state state) noexcept
     {
-        if (state < thread_schedule_state::active ||
-            state > thread_schedule_state::pending_boost)
+        if (state < thread_schedule_state::unknown ||
+            state > thread_schedule_state::deleted)
         {
             return "unknown";
         }

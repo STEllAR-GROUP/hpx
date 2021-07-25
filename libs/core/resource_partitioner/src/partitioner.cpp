@@ -228,4 +228,10 @@ namespace hpx::resource {
     {
         partitioner_.configure_pools();
     }
+
+    // Local runtime only: initialize first_core and pus_needed
+    void partitioner::assign_cores(std::size_t first_core)
+    {
+        partitioner_.assign_cores(first_core);
+    }
 }    // namespace hpx::resource

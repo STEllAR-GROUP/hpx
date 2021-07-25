@@ -282,8 +282,8 @@ namespace hpx::threads::coroutines::detail::lx {
 
         using context_impl_base = x86_linux_context_impl_base;
 
-        // Create a context that on restore invokes Functor on
-        //  a new stack. The stack size can be optionally specified.
+        // Create a context that on restore invokes Functor on a new stack. The
+        // stack size can be optionally specified.
         explicit x86_linux_context_impl(std::ptrdiff_t stack_size = -1)
           : m_stack_size(stack_size == -1 ?
                     static_cast<std::ptrdiff_t>(default_stack_size) :
@@ -365,8 +365,11 @@ namespace hpx::threads::coroutines::detail::lx {
             return m_stack_size;
         }
 
-        void reset_stack()
+        void reset_stack(bool direct_execution)
         {
+            if (direct_execution)
+                return;
+
             HPX_ASSERT(m_stack);
             if (posix::reset_stack(
                     m_stack, static_cast<std::size_t>(m_stack_size)))
@@ -379,7 +382,10 @@ namespace hpx::threads::coroutines::detail::lx {
 
         void rebind_stack()
         {
-            HPX_ASSERT(m_stack);
+            // directly executed coroutine, no need to allocate a stack
+            if (m_stack == nullptr)
+                return;
+
 #if defined(HPX_HAVE_COROUTINE_COUNTERS)
             increment_stack_recycle_count();
 #endif
@@ -527,8 +533,8 @@ namespace hpx::threads::coroutines::detail::lx {
 #endif
     };
 
-    // Free function. Saves the current context in @p from
-    // and restores the context in @p to.
+    // Free function. Saves the current context in @p from and restores the
+    // context in @p to.
     // @note This function is found by ADL.
     inline void swap_context(x86_linux_context_impl_base& from,
         x86_linux_context_impl_base const& to, default_hint) noexcept

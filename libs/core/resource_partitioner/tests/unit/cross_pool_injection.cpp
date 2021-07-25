@@ -35,11 +35,9 @@ std::size_t num_pools = 0;
 // dummy function we will call using async
 void dummy_task(std::size_t n)
 {
-    // no other work can take place on this thread whilst it sleeps
-    std::this_thread::sleep_for(std::chrono::milliseconds(n));
-    //
-    for (std::size_t i(0); i < n; ++i)
+    if (n != 0)
     {
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(n));
     }
 }
 
@@ -94,10 +92,13 @@ int hpx_main()
             hpx::threads::thread_priority::default_);
     }
 
-    // randomly create tasks that run on a random pool
-    // attach continuations to them that run on different
-    // random pools
+    // randomly create tasks that run on a random pool attach continuations to
+    // them that run on different random pools
     int const loops = 1000;
+
+    std::vector<hpx::future<void>> futures;
+    futures.resize(loops);
+
     //
     std::cout << "1: Starting HP " << loops << std::endl;
     std::atomic<int> counter(loops);
@@ -109,15 +110,14 @@ int hpx_main()
         auto& exec_1 = HP_executors[random_pool_1];
         auto& exec_2 = HP_executors[random_pool_2];
         auto f1 = hpx::async(exec_1, &dummy_task, 0);
-        auto f2 = f1.then(exec_2, [=, &counter](hpx::future<void>&&) {
+        futures[i] = f1.then(exec_2, [=, &counter](hpx::future<void>&&) {
             dummy_task(0);
             --counter;
         });
     }
-    do
-    {
-        hpx::this_thread::yield();
-    } while (counter > 0);
+
+    hpx::wait_all(futures);
+    HPX_TEST(counter == 0);
 
     std::cout << "2: Starting NP " << loops << std::endl;
     counter = loops;
@@ -129,15 +129,14 @@ int hpx_main()
         auto& exec_3 = NP_executors[random_pool_1];
         auto& exec_4 = NP_executors[random_pool_2];
         auto f3 = hpx::async(exec_3, &dummy_task, 0);
-        auto f4 = f3.then(exec_4, [=, &counter](hpx::future<void>&&) {
+        futures[i] = f3.then(exec_4, [=, &counter](hpx::future<void>&&) {
             dummy_task(0);
             --counter;
         });
     }
-    do
-    {
-        hpx::this_thread::yield();
-    } while (counter > 0);
+
+    hpx::wait_all(futures);
+    HPX_TEST(counter == 0);
 
     std::cout << "3: Starting HP->NP " << loops << std::endl;
     counter = loops;
@@ -149,15 +148,14 @@ int hpx_main()
         auto& exec_5 = HP_executors[random_pool_1];
         auto& exec_6 = NP_executors[random_pool_2];
         auto f5 = hpx::async(exec_5, &dummy_task, 0);
-        auto f6 = f5.then(exec_6, [=, &counter](hpx::future<void>&&) {
+        futures[i] = f5.then(exec_6, [=, &counter](hpx::future<void>&&) {
             dummy_task(0);
             --counter;
         });
     }
-    do
-    {
-        hpx::this_thread::yield();
-    } while (counter > 0);
+
+    hpx::wait_all(futures);
+    HPX_TEST(counter == 0);
 
     std::cout << "4: Starting NP->HP " << loops << std::endl;
     counter = loops;
@@ -169,15 +167,14 @@ int hpx_main()
         auto& exec_7 = NP_executors[random_pool_1];
         auto& exec_8 = HP_executors[random_pool_2];
         auto f7 = hpx::async(exec_7, &dummy_task, 0);
-        auto f8 = f7.then(exec_8, [=, &counter](hpx::future<void>&&) {
+        futures[i] = f7.then(exec_8, [=, &counter](hpx::future<void>&&) {
             dummy_task(0);
             --counter;
         });
     }
-    do
-    {
-        hpx::this_thread::yield();
-    } while (counter > 0);
+
+    hpx::wait_all(futures);
+    HPX_TEST(counter == 0);
 
     std::cout << "5: Starting suspending " << loops << std::endl;
     counter = loops;
@@ -189,19 +186,23 @@ int hpx_main()
         auto& exec_7 = NP_executors[random_pool_1];
         auto& exec_8 = HP_executors[random_pool_2];
         // random delay up to 5 milliseconds
-        std::size_t delay = st_rand(0, 5);
-        auto f7 = hpx::async(exec_7, &dummy_task, delay);
-        auto f8 = hpx::async(exec_8, [f7(std::move(f7)), &counter]() mutable {
-            // if f7 is not ready then f8 will suspend itself on get
-            f7.get();
-            dummy_task(0);
-            --counter;
-        });
+        //std::size_t delay = st_rand(0, 5);
+        auto f7 = hpx::async(exec_7, &dummy_task, 0);
+
+        // we pass f7 as an argument to prevent direct execution from happening
+        futures[i] = hpx::async(
+            exec_8,
+            [&counter](auto&& f7) mutable {
+                // if f7 is not ready then f8 will suspend itself on get
+                f7.get();
+                dummy_task(0);
+                --counter;
+            },
+            std::move(f7));
     }
-    do
-    {
-        hpx::this_thread::yield();
-    } while (counter > 0);
+
+    hpx::wait_all(futures);
+    HPX_TEST(counter == 0);
 
     return hpx::local::finalize();
 }
@@ -216,7 +217,7 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
     rp.set_default_pool_name("pool-0");
 
     auto seed = std::time(nullptr);
-    std::srand(seed);
+    std::srand((unsigned int) seed);
     std::cout << "Random seed " << seed << std::endl;
 
     // create N pools
@@ -224,6 +225,7 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
     std::string pool_name;
     std::size_t threads_remaining = max_threads;
     std::size_t threads_in_pool = 0;
+
     // create pools randomly and add a random number of PUs to each pool
     for (hpx::resource::numa_domain const& d : rp.numa_domains())
     {
@@ -234,12 +236,15 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
                 if (threads_in_pool == 0)
                 {
                     // pick a random number of threads less than the max
-                    threads_in_pool = 1 +
-                        st_rand(
-                            0, ((std::max)(std::size_t(1), max_threads / 2)));
+                    threads_in_pool =
+                        (std::max)(std::size_t(1), st_rand(0, max_threads / 2));
                     pool_name = "pool-" + std::to_string(num_pools);
                     rp.create_thread_pool(pool_name, policy);
                     num_pools++;
+
+                    std::cout << "Created pool: " << pool_name << "\n";
+                    std::cout << "  threads_in_pool: " << threads_in_pool
+                              << "\n";
                 }
                 std::cout << "Added pu " << p.id() << " to " << pool_name
                           << "\n";
@@ -247,7 +252,11 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
                 threads_in_pool--;
                 if (threads_remaining-- == 0)
                 {
-                    std::cerr << "This should not happen!" << std::endl;
+                    std::cerr << "This should not happen!\n";
+                    std::cerr << "  max_threads: " << max_threads << "\n";
+                    std::cerr << "  num_pools: " << num_pools << "\n";
+                    std::cerr << "  threads_in_pool: " << threads_in_pool
+                              << "\n";
                 }
             }
         }

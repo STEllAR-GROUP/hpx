@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/futures/detail/future_data.hpp>
@@ -225,12 +226,12 @@ namespace hpx::lcos::detail {
         {
             ensure_started();
 
+            HPX_ASSERT(!this->runs_child_);
+
             hpx::intrusive_ptr<continuation> this_(this);
             hpx::threads::thread_description desc(f_, "async");
-
-            spawner(
+            this->runs_child_ = spawner(
                 [this_ = HPX_MOVE(this_), f = HPX_MOVE(f)]() mutable -> void {
-                    reset_id r(*this_);
                     this_->template run_impl<Unwrap>(HPX_MOVE(f));
                 },
                 desc);
