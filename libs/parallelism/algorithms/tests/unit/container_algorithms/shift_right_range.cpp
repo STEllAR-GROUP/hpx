@@ -1,129 +1,226 @@
-//  Copyright (c) 2015 John Biddiscombe
+//  Copyright (c) 2018 Christopher Ogle
+//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/local/init.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/parallel/container_algorithms/shift_right.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <iostream>
+#include <iterator>
+#include <random>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
-// use smaller array sizes for debug tests
-#if defined(HPX_DEBUG)
-#define HPX_SORT_TEST_SIZE 50000
-#define HPX_SORT_TEST_SIZE_STRINGS 10000
-#endif
+#include "test_utils.hpp"
 
-#include "sort_range_tests.hpp"
+#define ARR_SIZE 100007
 
-////////////////////////////////////////////////////////////////////////////////
-void test_sort1()
+unsigned int seed;
+
+template <typename IteratorTag>
+void test_shift_right_sent(IteratorTag)
+{
+    std::vector<std::size_t> c(ARR_SIZE);
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::vector<std::size_t> d = c;
+
+    // shift by zero should have no effect
+    hpx::ranges::shift_right(
+        std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, 0);
+    HPX_TEST(std::equal(std::begin(c), std::end(c) - 1, std::begin(d)));
+
+    // shift by a negative number should have no effect
+    hpx::ranges::shift_right(
+        std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, -4);
+    HPX_TEST(std::equal(std::begin(c), std::end(c) - 1, std::begin(d)));
+
+    std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
+    hpx::ranges::shift_right(
+        std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, n);
+
+    std::move_backward(std::begin(d), std::end(d) - n - 1, std::end(d) - 1);
+
+    // verify values
+    HPX_TEST(std::equal(std::begin(c) + n, std::end(c) - 1, std::begin(d) + n));
+
+    // ensure shift by more than n does not crash
+    hpx::ranges::shift_right(std::begin(c),
+        sentinel<std::size_t>{*std::rbegin(c)}, (std::size_t)(ARR_SIZE + 1));
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_shift_right_sent(ExPolicy policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    std::vector<std::size_t> c(ARR_SIZE);
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::vector<std::size_t> d = c;
+
+    // shift by zero should have no effect
+    hpx::ranges::shift_right(
+        policy, std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, 0);
+    HPX_TEST(std::equal(std::begin(c), std::end(c) - 1, std::begin(d)));
+
+    // shift by a negative number should have no effect
+    hpx::ranges::shift_right(
+        policy, std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, -4);
+    HPX_TEST(std::equal(std::begin(c), std::end(c) - 1, std::begin(d)));
+
+    std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
+    hpx::ranges::shift_right(
+        policy, std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, n);
+
+    std::move_backward(std::begin(d), std::end(d) - n - 1, std::end(d) - 1);
+
+    // verify values
+    HPX_TEST(std::equal(std::begin(c) + n, std::end(c) - 1, std::begin(d) + n));
+
+    // ensure shift by more than n does not crash
+    hpx::ranges::shift_right(policy, std::begin(c),
+        sentinel<std::size_t>{*std::rbegin(c)}, (std::size_t)(ARR_SIZE + 1));
+}
+
+template <typename IteratorTag>
+void test_shift_right(IteratorTag)
+{
+    std::vector<std::size_t> c(ARR_SIZE);
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::vector<std::size_t> d = c;
+
+    // shift by zero should have no effect
+    hpx::ranges::shift_right(c, 0);
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
+
+    // shift by a negative number should have no effect
+    hpx::ranges::shift_right(c, -4);
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
+
+    std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
+    hpx::ranges::shift_right(c, n);
+
+    std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
+
+    // verify values
+    HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
+
+    // ensure shift by more than n does not crash
+    hpx::ranges::shift_right(c, (std::size_t)(ARR_SIZE + 1));
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_shift_right(ExPolicy policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    std::vector<std::size_t> c(ARR_SIZE);
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::vector<std::size_t> d = c;
+
+    // shift by zero should have no effect
+    hpx::ranges::shift_right(policy, c, 0);
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
+
+    // shift by a negative number should have no effect
+    hpx::ranges::shift_right(policy, c, -4);
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
+
+    std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
+    hpx::ranges::shift_right(policy, c, n);
+
+    std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
+
+    // verify values
+    HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
+
+    // ensure shift by more than n does not crash
+    hpx::ranges::shift_right(policy, c, (std::size_t)(ARR_SIZE + 1));
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_shift_right_async(ExPolicy policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    std::vector<std::size_t> c(ARR_SIZE);
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::vector<std::size_t> d = c;
+
+    // shift by zero should have no effect
+    auto fut1 = hpx::ranges::shift_right(policy, c, 0);
+    fut1.wait();
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
+
+    // shift by a negative number should have no effect
+    auto fut2 = hpx::ranges::shift_right(policy, c, -4);
+    fut2.wait();
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
+
+    std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
+    auto fut3 = hpx::ranges::shift_right(policy, c, n);
+    fut3.wait();
+
+    std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
+
+    // verify values
+    HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
+
+    // ensure shift by more than n does not crash
+    auto fut4 =
+        hpx::ranges::shift_right(policy, c, (std::size_t)(ARR_SIZE + 1));
+    fut4.wait();
+}
+
+template <typename IteratorTag>
+void test_shift_right()
 {
     using namespace hpx::execution;
 
-    // default comparison operator (std::less)
-    test_sort1(seq, int());
-    test_sort1(par, int());
-    test_sort1(par_unseq, int());
+    test_shift_right(IteratorTag());
+    test_shift_right(seq, IteratorTag());
+    test_shift_right(par, IteratorTag());
+    test_shift_right(par_unseq, IteratorTag());
 
-    // default comparison operator (std::less)
-    test_sort1(seq, double());
-    test_sort1(par, double());
-    test_sort1(par_unseq, double());
+    test_shift_right_async(seq(task), IteratorTag());
+    test_shift_right_async(par(task), IteratorTag());
 
-    // default comparison operator (std::less)
-    test_sort1(seq, std::string());
-    test_sort1(par, std::string());
-    test_sort1(par_unseq, std::string());
-
-    // user supplied comparison operator (std::less)
-    test_sort1_comp(seq, int(), std::less<std::size_t>());
-    test_sort1_comp(par, int(), std::less<std::size_t>());
-    test_sort1_comp(par_unseq, int(), std::less<std::size_t>());
-
-    // user supplied comparison operator (std::greater)
-    test_sort1_comp(seq, double(), std::greater<double>());
-    test_sort1_comp(par, double(), std::greater<double>());
-    test_sort1_comp(par_unseq, double(), std::greater<double>());
-
-    // default comparison operator (std::less)
-    test_sort1_comp(seq, std::string(), std::greater<std::string>());
-    test_sort1_comp(par, std::string(), std::greater<std::string>());
-    test_sort1_comp(par_unseq, std::string(), std::greater<std::string>());
-
-    // Async execution, default comparison operator
-    test_sort1_async(seq(task), int());
-    test_sort1_async(par(task), char());
-    test_sort1_async(seq(task), double());
-    test_sort1_async(par(task), float());
-    test_sort1_async_string(seq(task), std::string());
-    test_sort1_async_string(par(task), std::string());
-
-    // Async execution, user comparison operator
-    test_sort1_async(seq(task), int(), std::less<unsigned int>());
-    test_sort1_async(par(task), char(), std::less<char>());
-    //
-    test_sort1_async(seq(task), double(), std::greater<double>());
-    test_sort1_async(par(task), float(), std::greater<float>());
-    //
-    test_sort1_async_string(
-        seq(task), std::string(), std::greater<std::string>());
-    test_sort1_async_string(
-        par(task), std::string(), std::greater<std::string>());
+    test_shift_right_sent(IteratorTag());
+    test_shift_right_sent(seq, IteratorTag());
+    test_shift_right_sent(par, IteratorTag());
+    test_shift_right_sent(par_unseq, IteratorTag());
 }
 
-void test_sort2()
+void shift_right_test()
 {
-    using namespace hpx::execution;
-    // default comparison operator (std::less)
-    test_sort2(seq, int());
-    test_sort2(par, int());
-    test_sort2(par_unseq, int());
-
-    // default comparison operator (std::less)
-    test_sort2(seq, double());
-    test_sort2(par, double());
-    test_sort2(par_unseq, double());
-
-    // user supplied comparison operator (std::less)
-    test_sort2_comp(seq, int(), std::less<std::size_t>());
-    test_sort2_comp(par, int(), std::less<std::size_t>());
-    test_sort2_comp(par_unseq, int(), std::less<std::size_t>());
-
-    // user supplied comparison operator (std::greater)
-    test_sort2_comp(seq, double(), std::greater<double>());
-    test_sort2_comp(par, double(), std::greater<double>());
-    test_sort2_comp(par_unseq, double(), std::greater<double>());
-
-    // Async execution, default comparison operator
-    test_sort2_async(seq(task), int());
-    test_sort2_async(par(task), char());
-    test_sort2_async(seq(task), double());
-    test_sort2_async(par(task), float());
-
-    // Async execution, user comparison operator
-    test_sort2_async(seq(task), int(), std::less<unsigned int>());
-    test_sort2_async(par(task), char(), std::less<char>());
-    //
-    test_sort2_async(seq(task), double(), std::greater<double>());
-    test_sort2_async(par(task), float(), std::greater<float>());
+    test_shift_right<std::random_access_iterator_tag>();
+    test_shift_right<std::forward_iterator_tag>();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(nullptr);
+    unsigned int seed1 = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
-        seed = vm["seed"].as<unsigned int>();
+        seed1 = vm["seed"].as<unsigned int>();
 
-    std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    std::cout << "using seed: " << seed1 << std::endl;
+    std::srand(seed1);
 
-    test_sort1();
-    test_sort2();
+    seed = seed1;
+
+    shift_right_test();
     return hpx::local::finalize();
 }
 
@@ -140,6 +237,7 @@ int main(int argc, char* argv[])
     // By default this test should run on all available cores
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
+    // Initialize and run HPX
     hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
     init_args.cfg = cfg;
