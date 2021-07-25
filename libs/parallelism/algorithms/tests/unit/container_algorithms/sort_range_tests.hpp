@@ -125,18 +125,18 @@ template <typename T>
 void test_sort1_sent(T)
 {
     auto rand_max_val = std::rand() + 1;
+    std::size_t N = std::rand() % 10007;
 
     // Fill vector with random values
-    std::vector<T> c(HPX_SORT_TEST_SIZE);
+    std::vector<T> c(N);
     rnd_fill<T>(
         c, (std::numeric_limits<T>::min)(), rand_max_val - 1, T(std::rand()));
 
-    c[HPX_SORT_TEST_SIZE - 1] = rand_max_val;
+    c[N - 1] = rand_max_val;
     // sort, blocking when seq, par, par_vec
     hpx::ranges::sort(std::begin(c), sentinel<T>{rand_max_val});
 
-    bool is_sorted =
-        std::is_sorted(std::begin(c), std::begin(c) + HPX_SORT_TEST_SIZE - 1);
+    bool is_sorted = std::is_sorted(std::begin(c), std::begin(c) + N - 1);
     HPX_TEST(is_sorted);
 }
 
@@ -150,18 +150,18 @@ void test_sort1_sent(ExPolicy&& policy, T)
     msg(typeid(ExPolicy).name(), typeid(T).name(), "default", sync, random);
 
     auto rand_max_val = std::rand() + 1;
+    std::size_t N = std::rand() % 10007;
 
     // Fill vector with random values
-    std::vector<T> c(HPX_SORT_TEST_SIZE);
+    std::vector<T> c(N);
     rnd_fill<T>(
         c, (std::numeric_limits<T>::min)(), rand_max_val - 1, T(std::rand()));
 
-    c[HPX_SORT_TEST_SIZE - 1] = rand_max_val;
+    c[N - 1] = rand_max_val;
     // sort, blocking when seq, par, par_vec
     hpx::ranges::sort(policy, std::begin(c), sentinel<T>{rand_max_val});
 
-    bool is_sorted =
-        std::is_sorted(std::begin(c), std::begin(c) + HPX_SORT_TEST_SIZE - 1);
+    bool is_sorted = std::is_sorted(std::begin(c), std::begin(c) + N - 1);
     HPX_TEST(is_sorted);
 }
 
@@ -176,18 +176,18 @@ void test_sort1_comp_sent(ExPolicy&& policy, T, Compare comp = Compare())
         random);
 
     auto rand_max_val = std::rand() + 1;
+    std::size_t N = std::rand() % 10007;
 
     // Fill vector with random values
-    std::vector<T> c(HPX_SORT_TEST_SIZE);
+    std::vector<T> c(N);
     rnd_fill<T>(
         c, (std::numeric_limits<T>::min)(), rand_max_val - 1, T(std::rand()));
 
-    c[HPX_SORT_TEST_SIZE - 1] = rand_max_val;
+    c[N - 1] = rand_max_val;
     // sort, blocking when seq, par, par_vec
     hpx::ranges::sort(policy, std::begin(c), sentinel<T>{rand_max_val}, comp);
 
-    bool is_sorted =
-        std::is_sorted(std::begin(c), std::begin(c) + HPX_SORT_TEST_SIZE - 1);
+    bool is_sorted = std::is_sorted(std::begin(c), std::begin(c) + N - 1);
     HPX_TEST(is_sorted);
 }
 

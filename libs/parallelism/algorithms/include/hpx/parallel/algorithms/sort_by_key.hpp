@@ -133,8 +133,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         ValueIter value_last = value_first;
         std::advance(value_last, std::distance(key_first, key_last));
 
+        using iterator_type = hpx::util::zip_iterator<KeyIter, ValueIter>;
+
         return detail::get_iter_tagged_pair<tag::in1, tag::in2>(
-            hpx::sort(std::forward<ExPolicy>(policy),
+            detail::sort<iterator_type>().call(std::forward<ExPolicy>(policy),
                 hpx::util::make_zip_iterator(key_first, value_first),
                 hpx::util::make_zip_iterator(key_last, value_last),
                 std::forward<Compare>(comp), detail::extract_key()));
