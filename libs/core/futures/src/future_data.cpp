@@ -130,6 +130,7 @@ namespace hpx::lcos::detail {
         }
 
         // this thread would block on the future
+        threads::thread_id_ref_type runs_child = runs_child_;
 
         auto* thrd = get_thread_id_data(runs_child);
         HPX_UNUSED(thrd);    // might be unused
