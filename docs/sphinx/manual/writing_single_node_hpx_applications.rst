@@ -514,6 +514,14 @@ Parallel algorithms
      * Copies and rotates a range of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`rotate_copy`
+   * * :cpp:func:`hpx::shift_left`
+     * Shifts the elements in the range left by n positions.
+     * ``<hpx/algorithm.hpp>``
+     * :cppreference-algorithm:`shift_left`
+   * * :cpp:func:`hpx::shift_right`
+     * Shifts the elements in the range right by n positions.
+     * ``<hpx/algorithm.hpp>``
+     * :cppreference-algorithm:`shift_right`
    * * :cpp:func:`hpx::swap_ranges`
      * Swaps two ranges of elements.
      * ``<hpx/algorithm.hpp>``
