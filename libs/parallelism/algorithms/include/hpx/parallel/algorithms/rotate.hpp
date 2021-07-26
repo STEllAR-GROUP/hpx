@@ -416,8 +416,10 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::rotate<FwdIter>().call(
-                hpx::execution::seq, first, new_first, last);
+            return parallel::util::get_second_element(
+                parallel::v1::detail::rotate<
+                    hpx::parallel::util::in_out_result<FwdIter, FwdIter>>()
+                    .call(hpx::execution::seq, first, new_first, last));
         }
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
