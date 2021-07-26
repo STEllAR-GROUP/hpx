@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //add test w/o ExPolicy
 template <typename IteratorTag>
-void test_rotate(ExPolicy policy, IteratorTag)
+void test_rotate(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
