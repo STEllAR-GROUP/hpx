@@ -58,6 +58,7 @@ void test_stable_sort1()
     using namespace hpx::execution;
 
     // default comparison operator (std::less)
+    test_stable_sort1(int());
     test_stable_sort1(seq, int());
     test_stable_sort1(par, int());
     test_stable_sort1(par_unseq, int());
@@ -111,6 +112,7 @@ void test_stable_sort2()
 {
     using namespace hpx::execution;
     // default comparison operator (std::less)
+    test_stable_sort2(int());
     test_stable_sort2(seq, int());
     test_stable_sort2(par, int());
     test_stable_sort2(par_unseq, int());

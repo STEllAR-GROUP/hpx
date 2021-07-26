@@ -239,6 +239,7 @@ namespace hpx {
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/parallel_stable_sort.hpp>
 #include <hpx/parallel/algorithms/detail/spin_sort.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
@@ -301,7 +302,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         typename std::decay<Proj>::type>;
 
                 // number of elements to sort
-                std::size_t count = last - first;
+                std::size_t count = detail::distance(first, last);
 
                 // figure out the chunk size to use
                 std::size_t cores = execution::processing_units_count(
@@ -444,3 +445,5 @@ namespace hpx {
         }
     } stable_sort{};
 }    // namespace hpx
+
+#endif

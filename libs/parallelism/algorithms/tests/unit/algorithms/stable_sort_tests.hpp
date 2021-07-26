@@ -118,6 +118,25 @@ int verify_(
               << c << std::setw(6) << #d << std::setw(8) << #e << "\t";
 
 ////////////////////////////////////////////////////////////////////////////////
+// call stable_sort with no comparison operator
+template <typename T>
+void test_stable_sort1(T)
+{
+    // Fill vector with random values
+    std::vector<T> c(HPX_SORT_TEST_SIZE);
+    rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
+        (std::numeric_limits<T>::max)(), T(std::rand()));
+
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
+    // stable_sort, blocking when seq, par, par_vec
+    hpx::stable_sort(c.begin(), c.end());
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
+
+    bool is_sorted = (verify_(c, std::less<T>(), elapsed, true) != 0);
+    HPX_TEST(is_sorted);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // call sort with no comparison operator
 template <typename ExPolicy, typename T>
 void test_stable_sort1(ExPolicy&& policy, T)
@@ -528,6 +547,24 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T, Compare comp)
         else
             std::cout << "Failed " << std::endl;
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// already sorted
+template <typename T>
+void test_stable_sort2(T)
+{
+    // Fill vector with increasing values
+    std::vector<T> c(HPX_SORT_TEST_SIZE);
+    std::iota(std::begin(c), std::end(c), 0);
+
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
+    // stable_sort, blocking when seq, par, par_vec
+    hpx::stable_sort(c.begin(), c.end());
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
+
+    bool is_sorted = (verify_(c, std::less<T>(), elapsed, true) != 0);
+    HPX_TEST(is_sorted);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
