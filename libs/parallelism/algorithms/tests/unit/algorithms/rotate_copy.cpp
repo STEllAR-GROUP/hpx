@@ -18,6 +18,37 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+//add test w/o ExPolicy
+template <typename IteratorTag>
+void test_rotate_copy(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d1(c.size());
+    std::vector<std::size_t> d2(c.size());    //-V656
+
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    base_iterator mid = std::begin(c);
+    std::advance(mid, std::rand() % c.size());    //-V104
+
+    hpx::rotate_copy(iterator(std::begin(c)), iterator(mid),
+        iterator(std::end(c)), std::begin(d1));
+
+    std::rotate_copy(std::begin(c), mid, std::end(c), std::begin(d2));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(d1), std::end(d1), std::begin(d2),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d1.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_rotate_copy(ExPolicy policy, IteratorTag)
 {
@@ -36,7 +67,7 @@ void test_rotate_copy(ExPolicy policy, IteratorTag)
     base_iterator mid = std::begin(c);
     std::advance(mid, std::rand() % c.size());    //-V104
 
-    hpx::parallel::rotate_copy(policy, iterator(std::begin(c)), iterator(mid),
+    hpx::rotate_copy(policy, iterator(std::begin(c)), iterator(mid),
         iterator(std::end(c)), std::begin(d1));
 
     std::rotate_copy(std::begin(c), mid, std::end(c), std::begin(d2));
@@ -66,8 +97,8 @@ void test_rotate_copy_async(ExPolicy p, IteratorTag)
     base_iterator mid = std::begin(c);
     std::advance(mid, std::rand() % c.size());    //-V104
 
-    auto f = hpx::parallel::rotate_copy(p, iterator(std::begin(c)),
-        iterator(mid), iterator(std::end(c)), std::begin(d1));
+    auto f = hpx::rotate_copy(p, iterator(std::begin(c)), iterator(mid),
+        iterator(std::end(c)), std::begin(d1));
     f.wait();
 
     std::rotate_copy(std::begin(c), mid, std::end(c), std::begin(d2));
@@ -119,13 +150,13 @@ void test_rotate_copy_exception(ExPolicy policy, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
     try
     {
-        hpx::parallel::rotate_copy(policy,
+        hpx::rotate_copy(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(mid), decorated_iterator(std::end(c)),
@@ -160,14 +191,14 @@ void test_rotate_copy_exception_async(ExPolicy p, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::rotate_copy(p,
+        auto f = hpx::rotate_copy(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(mid), decorated_iterator(std::end(c)),
@@ -231,13 +262,13 @@ void test_rotate_copy_bad_alloc(ExPolicy policy, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::rotate_copy(policy,
+        hpx::rotate_copy(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(mid), decorated_iterator(std::end(c)),
             std::begin(d));
@@ -270,14 +301,14 @@ void test_rotate_copy_bad_alloc_async(ExPolicy p, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::rotate_copy(p,
+        auto f = hpx::rotate_copy(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(mid), decorated_iterator(std::end(c)),
             std::begin(d));
