@@ -12,7 +12,6 @@ set(functional_headers
     hpx/functional/detail/basic_function.hpp
     hpx/functional/detail/empty_function.hpp
     hpx/functional/detail/function_registration.hpp
-    hpx/functional/detail/invoke.hpp
     hpx/functional/detail/reset_function.hpp
     hpx/functional/detail/vtable/callable_vtable.hpp
     hpx/functional/detail/vtable/copyable_vtable.hpp
@@ -26,13 +25,9 @@ set(functional_headers
     hpx/functional/function_ref.hpp
     hpx/functional/invoke.hpp
     hpx/functional/invoke_fused.hpp
-    hpx/functional/invoke_result.hpp
     hpx/functional/mem_fn.hpp
     hpx/functional/one_shot.hpp
     hpx/functional/protect.hpp
-    hpx/functional/tag_fallback_dispatch.hpp
-    hpx/functional/tag_dispatch.hpp
-    hpx/functional/tag_priority_dispatch.hpp
     hpx/functional/unique_function.hpp
     hpx/functional/serialization/detail/serializable_basic_function.hpp
     hpx/functional/serialization/detail/vtable/serializable_function_vtable.hpp
@@ -44,15 +39,12 @@ set(functional_headers
     hpx/functional/traits/get_function_annotation.hpp
     hpx/functional/traits/is_action.hpp
     hpx/functional/traits/is_bind_expression.hpp
-    hpx/functional/traits/is_invocable.hpp
     hpx/functional/traits/is_placeholder.hpp
 )
 
 # Default location is $HPX_ROOT/libs/functional/include_compatibility
 # cmake-format: off
 set(functional_compat_headers
-    hpx/functional/result_of.hpp => hpx/functional/invoke_result.hpp
-    hpx/functional/traits/is_callable.hpp => hpx/functional/traits/is_invocable.hpp
     hpx/util/bind.hpp => hpx/functional.hpp
     hpx/util/bind_back.hpp => hpx/functional.hpp
     hpx/util/bind_front.hpp => hpx/functional.hpp
@@ -84,7 +76,6 @@ add_hpx_module(
     "hpx/functional/traits/get_function_annotation.hpp"
     "hpx/functional/traits/is_action.hpp"
     "hpx/functional/traits/is_bind_expression.hpp"
-    "hpx/functional/traits/is_callable.hpp"
     "hpx/functional/traits/is_placeholder.hpp"
   SOURCES ${functional_sources}
   HEADERS ${functional_headers}
@@ -97,6 +88,7 @@ add_hpx_module(
     hpx_errors
     hpx_itt_notify
     hpx_serialization
+    hpx_tag_dispatch
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

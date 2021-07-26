@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -36,7 +36,6 @@ set(function_tests
     protect_test
     stateless_test
     sum_avg
-    tag_dispatch
 )
 
 foreach(test ${function_tests})

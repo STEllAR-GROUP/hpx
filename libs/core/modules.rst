@@ -49,6 +49,7 @@ Core modules
    /libs/core/statistics/docs/index.rst
    /libs/core/string_util/docs/index.rst
    /libs/core/synchronization/docs/index.rst
+   /libs/core/tag_dispatch/docs/index.rst
    /libs/core/testing/docs/index.rst
    /libs/core/thread_pools/docs/index.rst
    /libs/core/thread_support/docs/index.rst
