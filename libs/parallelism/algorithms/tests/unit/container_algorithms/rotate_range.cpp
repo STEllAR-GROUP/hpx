@@ -19,6 +19,42 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+//add test w/o ExPolicy
+template <typename IteratorTag>
+void test_rotate(ExPolicy policy, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
+
+    test_vector c(10007);
+    std::vector<std::size_t> d1;
+
+    std::iota(std::begin(c.base()), std::end(c.base()), std::rand());
+    std::copy(std::begin(c.base()), std::end(c.base()), std::back_inserter(d1));
+
+    std::size_t mid_pos = std::rand() % c.size();    //-V104
+    auto mid = std::begin(c);
+    std::advance(mid, mid_pos);
+
+    hpx::ranges::rotate(c, iterator(mid));
+
+    base_iterator mid1 = std::begin(d1);
+    std::advance(mid1, mid_pos);
+    std::rotate(std::begin(d1), mid1, std::end(d1));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c.base()), std::end(c.base()),
+        std::begin(d1), [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d1.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_rotate(ExPolicy policy, IteratorTag)
 {
@@ -41,7 +77,7 @@ void test_rotate(ExPolicy policy, IteratorTag)
     auto mid = std::begin(c);
     std::advance(mid, mid_pos);
 
-    hpx::parallel::rotate(policy, c, iterator(mid));
+    hpx::ranges::rotate(policy, c, iterator(mid));
 
     base_iterator mid1 = std::begin(d1);
     std::advance(mid1, mid_pos);
@@ -77,7 +113,7 @@ void test_rotate_async(ExPolicy p, IteratorTag)
     auto mid = std::begin(c);
     std::advance(mid, mid_pos);
 
-    auto f = hpx::parallel::rotate(p, c, iterator(mid));
+    auto f = hpx::ranges::rotate(p, c, iterator(mid));
     f.wait();
 
     base_iterator mid1 = std::begin(d1);
@@ -136,7 +172,7 @@ void test_rotate_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::rotate(policy,
+        hpx::ranges::rotate(policy,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
@@ -178,7 +214,7 @@ void test_rotate_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::rotate(p,
+        auto f = hpx::ranges::rotate(p,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
@@ -248,7 +284,7 @@ void test_rotate_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::rotate(policy,
+        hpx::ranges::rotate(policy,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),
@@ -289,7 +325,7 @@ void test_rotate_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::rotate(p,
+        auto f = hpx::ranges::rotate(p,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),
