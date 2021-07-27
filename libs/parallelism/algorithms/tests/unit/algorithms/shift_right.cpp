@@ -11,6 +11,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <forward_list>
 #include <iostream>
 #include <iterator>
 #include <numeric>
@@ -22,6 +23,39 @@
 #define ARR_SIZE 100007
 
 ////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_shift_right_nonbidir(IteratorTag)
+{
+    std::forward_list<std::size_t> c(ARR_SIZE);
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::vector<std::size_t> d;
+
+    for (auto elem : c)
+    {
+        d.push_back(elem);
+    }
+
+    // shift by zero should have no effect
+    hpx::shift_right(std::begin(c), std::end(c), 0);
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
+
+    // shift by a negative number should have no effect
+    hpx::shift_right(std::begin(c), std::end(c), -4);
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
+
+    std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
+    hpx::shift_right(std::begin(c), std::end(c), n);
+
+    std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
+
+    // verify values
+    HPX_TEST(std::equal(
+        std::next(std::begin(c), n), std::end(c), std::begin(d) + n));
+
+    // ensure shift by more than n does not crash
+    hpx::shift_right(std::begin(c), std::end(c), (std::size_t)(ARR_SIZE + 1));
+}
+
 template <typename IteratorTag>
 void test_shift_right(IteratorTag)
 {
@@ -119,6 +153,7 @@ template <typename IteratorTag>
 void test_shift_right()
 {
     using namespace hpx::execution;
+    test_shift_right_nonbidir(IteratorTag());
     test_shift_right(IteratorTag());
     test_shift_right(seq, IteratorTag());
     test_shift_right(par, IteratorTag());
