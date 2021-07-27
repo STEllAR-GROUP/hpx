@@ -35,7 +35,7 @@ void sort_benchmark()
 
         hpx::chrono::high_resolution_timer t;
         // sort, blocking when seq, par, par_vec
-        hpx::parallel::stable_sort(par, c.begin(), c.end());
+        hpx::stable_sort(par, c.begin(), c.end());
         auto elapsed = static_cast<std::uint64_t>(t.elapsed_nanoseconds());
 
         bool is_sorted = (verify_(c, std::less<double>(), elapsed, true) != 0);

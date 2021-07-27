@@ -238,6 +238,7 @@ namespace hpx {
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/parallel_stable_sort.hpp>
@@ -282,10 +283,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::compare_projected<typename std::decay<Compare>::type,
                         typename std::decay<Proj>::type>;
 
-                spin_sort(first, last,
+                auto last_iter = detail::advance_to_sentinel(first, last);
+
+                spin_sort(first, last_iter,
                     compare_type(
                         std::forward<Compare>(comp), std::forward<Proj>(proj)));
-                return last;
+                return last_iter;
             }
 
             template <typename ExPolicy, typename Sentinel, typename Compare,
@@ -303,6 +306,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 // number of elements to sort
                 std::size_t count = detail::distance(first, last);
+                auto last_iter = detail::advance_to_sentinel(first, last);
 
                 // figure out the chunk size to use
                 std::size_t cores = execution::processing_units_count(
@@ -329,8 +333,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         std::forward<Proj>(proj));
 
                     return algorithm_result::get(
-                        parallel_stable_sort(policy.executor(), first, last,
-                            cores, chunk_size, std::move(comp)));
+                        parallel_stable_sort(policy.executor(), first,
+                            last_iter, cores, chunk_size, std::move(comp)));
                 }
                 catch (...)
                 {
