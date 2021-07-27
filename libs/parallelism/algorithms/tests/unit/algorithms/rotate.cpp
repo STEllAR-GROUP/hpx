@@ -141,6 +141,43 @@ void rotate_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_rotate_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    base_iterator mid = std::begin(c);
+
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta =
+        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+    std::advance(mid, delta);
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::rotate(decorated_iterator(std::begin(c),
+                        []() { throw std::runtime_error("test"); }),
+            decorated_iterator(mid), decorated_iterator(std::end(c)));
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_rotate_exception(ExPolicy policy, IteratorTag)
 {
@@ -235,6 +272,7 @@ void test_rotate_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_rotate_exception(IteratorTag());
     test_rotate_exception(seq, IteratorTag());
     test_rotate_exception(par, IteratorTag());
 
@@ -249,6 +287,43 @@ void rotate_exception_test()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_rotate_bad_alloc(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    base_iterator mid = std::begin(c);
+
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta =
+        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+    std::advance(mid, delta);
+
+    bool caught_bad_alloc = false;
+    try
+    {
+        hpx::rotate(
+            decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
+            decorated_iterator(mid), decorated_iterator(std::end(c)));
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_bad_alloc = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_rotate_bad_alloc(ExPolicy policy, IteratorTag)
 {

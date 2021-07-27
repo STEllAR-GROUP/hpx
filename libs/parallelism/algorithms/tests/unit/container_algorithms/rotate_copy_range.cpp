@@ -19,6 +19,83 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+void test_rotate_copy_sent()
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
+
+    test_vector c(10007);
+    std::vector<std::size_t> d1(c.size());
+    std::vector<std::size_t> d2(c.size());    //-V656
+
+    std::iota(std::begin(c.base()), std::end(c.base()), std::rand());
+
+    std::size_t mid_pos = std::rand() % c.size();
+
+    auto mid = std::begin(c);
+    std::advance(mid, mid_pos);
+
+    hpx::ranges::rotate_copy(std::begin(c), iterator(mid),
+        sentinel<std::size_t>{d1}, std::begin(d1));
+
+    auto mid_base = std::begin(c.base());
+    std::advance(mid_base, mid_pos);
+
+    std::rotate_copy(
+        std::begin(c.base()), mid_base, std::end(c.base()), std::begin(d2));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(d1), std::end(d1), std::begin(d2),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d1.size());
+}
+
+template <typename ExPolicy>
+void test_rotate_copy_sent(ExPolicy policy)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
+
+    test_vector c(10007);
+    std::vector<std::size_t> d1(c.size());
+    std::vector<std::size_t> d2(c.size());    //-V656
+
+    std::iota(std::begin(c.base()), std::end(c.base()), std::rand());
+
+    std::size_t mid_pos = std::rand() % c.size();
+
+    auto mid = std::begin(c);
+    std::advance(mid, mid_pos);
+
+    hpx::ranges::rotate_copy(policy, std::begin(c), iterator(mid),
+        sentinel<std::size_t>{d1}, std::begin(d1));
+
+    auto mid_base = std::begin(c.base());
+    std::advance(mid_base, mid_pos);
+
+    std::rotate_copy(
+        std::begin(c.base()), mid_base, std::end(c.base()), std::begin(d2));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(d1), std::end(d1), std::begin(d2),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d1.size());
+}
+
 //add test w/o ExPolicy
 template <typename IteratorTag>
 void test_rotate_copy(IteratorTag)
@@ -175,7 +252,7 @@ void test_rotate_copy_exception(ExPolicy policy, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -217,7 +294,7 @@ void test_rotate_copy_exception_async(ExPolicy p, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -257,6 +334,11 @@ void test_rotate_copy_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_rotate_copy_sent();
+    test_rotate_copy_sent(par);
+    test_rotate_copy_sent(par_unseq);
+
+    test_rotate_copy(IteratorTag());
     test_rotate_copy_exception(seq, IteratorTag());
     test_rotate_copy_exception(par, IteratorTag());
 
@@ -289,7 +371,7 @@ void test_rotate_copy_bad_alloc(ExPolicy policy, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
@@ -330,7 +412,7 @@ void test_rotate_copy_bad_alloc_async(ExPolicy p, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
