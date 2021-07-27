@@ -120,7 +120,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static FwdIter sequential(
                 ExPolicy, FwdIter first, Sent last, Size n)
             {
-                if (n <= 0 || n >= detail::distance(first, last))
+                auto dist =
+                    static_cast<std::size_t>(detail::distance(first, last));
+                if (n <= 0 || static_cast<std::size_t>(n) >= dist)
                 {
                     return first;
                 }
@@ -133,7 +135,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 FwdIter2>::type
             parallel(ExPolicy&& policy, FwdIter2 first, Sent last, Size n)
             {
-                if (n <= 0 || n >= detail::distance(first, last))
+                auto dist =
+                    static_cast<std::size_t>(detail::distance(first, last));
+                if (n <= 0 || static_cast<std::size_t>(n) >= dist)
                 {
                     return parallel::util::detail::algorithm_result<ExPolicy,
                         FwdIter2>::get(std::move(first));

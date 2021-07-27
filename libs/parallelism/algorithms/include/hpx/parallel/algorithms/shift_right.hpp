@@ -80,15 +80,30 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::is_convertible_v<iterator_category_t<I>, Tag>>> = true;
 
         template <class FwdIter>
-        constexpr difference_type_t<FwdIter> bounded_advance_r(
+        constexpr std::enable_if_t<
+            !is_category<FwdIter, std::bidirectional_iterator_tag>,
+            difference_type_t<FwdIter>>
+        bounded_advance_r(
             FwdIter& i, difference_type_t<FwdIter> n, FwdIter const bound)
         {
-            if constexpr (is_category<FwdIter, std::bidirectional_iterator_tag>)
+            for (; n > 0 && i != bound; --n, void(++i))
             {
-                for (; n < 0 && i != bound; ++n, void(--i))
-                {
-                    ;
-                }
+                ;
+            }
+
+            return n;
+        }
+
+        template <class FwdIter>
+        constexpr std::enable_if_t<
+            is_category<FwdIter, std::bidirectional_iterator_tag>,
+            difference_type_t<FwdIter>>
+        bounded_advance_r(
+            FwdIter& i, difference_type_t<FwdIter> n, FwdIter const bound)
+        {
+            for (; n < 0 && i != bound; ++n, void(--i))
+            {
+                ;
             }
 
             for (; n > 0 && i != bound; --n, void(++i))
@@ -100,7 +115,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
 
         template <typename FwdIter>
-        FwdIter sequential_shift_right(
+        std::enable_if_t<!is_category<FwdIter, std::bidirectional_iterator_tag>,
+            FwdIter>
+        sequential_shift_right(
             FwdIter first, FwdIter last, difference_type_t<FwdIter> n)
         {
             if (n <= 0)
@@ -108,53 +125,60 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return first;
             }
 
-            if constexpr (is_category<FwdIter, std::bidirectional_iterator_tag>)
+            auto result = first;
+            if (bounded_advance_r(result, n, last))
             {
-                auto mid = last;
-                if (bounded_advance_r(mid, -n, first))
-                {
-                    return last;
-                }
-                return std::move_backward(
-                    std::move(first), std::move(mid), std::move(last));
+                return last;
             }
-            else
+
+            auto lead = result;
+            auto trail = first;
+
+            for (; trail != result; ++lead, void(++trail))
             {
-                auto result = first;
-                if (bounded_advance_r(result, n, last))
+                if (lead == last)
                 {
-                    return last;
+                    std::move(
+                        std::move(first), std::move(trail), std::move(result));
+                    return result;
                 }
+            }
 
-                auto lead = result;
-                auto trail = first;
-
-                for (; trail != result; ++lead, void(++trail))
+            for (;;)
+            {
+                for (auto mid = first; mid != result;
+                     ++lead, void(++trail), ++mid)
                 {
                     if (lead == last)
                     {
-                        util::move(std::move(first), std::move(trail),
-                            std::move(result));
+                        trail = std::move(mid, result, std::move(trail));
+                        std::move(
+                            std::move(first), std::move(mid), std::move(trail));
                         return result;
                     }
-                }
-
-                for (;;)
-                {
-                    for (auto mid = first; mid != result;
-                         ++lead, void(++trail), ++mid)
-                    {
-                        if (lead == last)
-                        {
-                            trail = util::move(mid, result, std::move(trail));
-                            util::move(std::move(first), std::move(mid),
-                                std::move(trail));
-                            return result;
-                        }
-                        std::iter_swap(mid, trail);
-                    }
+                    std::iter_swap(mid, trail);
                 }
             }
+        }
+
+        template <typename FwdIter>
+        std::enable_if_t<is_category<FwdIter, std::bidirectional_iterator_tag>,
+            FwdIter>
+        sequential_shift_right(
+            FwdIter first, FwdIter last, difference_type_t<FwdIter> n)
+        {
+            if (n <= 0)
+            {
+                return first;
+            }
+
+            auto mid = last;
+            if (bounded_advance_r(mid, -n, first))
+            {
+                return last;
+            }
+            return std::move_backward(
+                std::move(first), std::move(mid), std::move(last));
         }
 
         template <typename FwdIter2>
@@ -171,7 +195,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static FwdIter sequential(
                 ExPolicy, FwdIter first, Sent last, Size n)
             {
-                if (n <= 0 || n >= detail::distance(first, last))
+                auto dist =
+                    static_cast<std::size_t>(detail::distance(first, last));
+                if (n <= 0 || static_cast<std::size_t>(n) >= dist)
                 {
                     return first;
                 }
@@ -186,8 +212,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 FwdIter2>::type
             parallel(ExPolicy&& policy, FwdIter2 first, Sent last, Size n)
             {
-                auto dist = detail::distance(first, last);
-                if (n <= 0 || n >= dist)
+                auto dist =
+                    static_cast<std::size_t>(detail::distance(first, last));
+                if (n <= 0 || static_cast<std::size_t>(n) >= dist)
                 {
                     return parallel::util::detail::algorithm_result<ExPolicy,
                         FwdIter2>::get(std::move(first));
