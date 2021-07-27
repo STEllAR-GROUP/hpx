@@ -1,5 +1,6 @@
 //  Copyright (c) 2015 Daniel Bourgeois
 //  Copyright (c) 2015 John Biddiscombe
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,11 +30,11 @@
 #include "test_utils.hpp"
 
 #if !defined(HPX_SORT_TEST_SIZE_STRINGS)
-#define HPX_SORT_TEST_SIZE_STRINGS 1000
+#define HPX_SORT_TEST_SIZE_STRINGS 1000000
 #endif
 
 #if !defined(HPX_SORT_TEST_SIZE)
-#define HPX_SORT_TEST_SIZE 5000
+#define HPX_SORT_TEST_SIZE 5000000
 #endif
 
 // --------------------------------------------------------------------
@@ -125,10 +126,10 @@ template <typename T>
 void test_stable_sort1_sent(T)
 {
     auto rand_max_val = std::rand() + 1;
-    std::size_t N = HPX_SORT_TEST_SIZE;
+    std::size_t N = std::rand() % 10007;
 
     // Fill vector with random values
-    std::vector<T> c(HPX_SORT_TEST_SIZE);
+    std::vector<T> c(N);
     rnd_fill<T>(
         c, (std::numeric_limits<T>::min)(), rand_max_val - 1, T(std::rand()));
 
@@ -150,10 +151,10 @@ void test_stable_sort1_sent(ExPolicy&& policy, T)
     msg(typeid(ExPolicy).name(), typeid(T).name(), "default", sync, random);
 
     auto rand_max_val = std::rand() + 1;
-    std::size_t N = HPX_SORT_TEST_SIZE;
+    std::size_t N = std::rand() % 10007;
 
     // Fill vector with random values
-    std::vector<T> c(HPX_SORT_TEST_SIZE);
+    std::vector<T> c(N);
     rnd_fill<T>(
         c, (std::numeric_limits<T>::min)(), rand_max_val - 1, T(std::rand()));
 
@@ -176,10 +177,10 @@ void test_stable_sort1_comp_sent(ExPolicy&& policy, T, Compare comp = Compare())
         random);
 
     auto rand_max_val = std::rand() + 1;
-    std::size_t N = HPX_SORT_TEST_SIZE;
+    std::size_t N = std::rand() % 10007;
 
     // Fill vector with random values
-    std::vector<T> c(HPX_SORT_TEST_SIZE);
+    std::vector<T> c(N);
     rnd_fill<T>(
         c, (std::numeric_limits<T>::min)(), rand_max_val - 1, T(std::rand()));
 

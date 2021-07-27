@@ -306,14 +306,14 @@ namespace hpx { namespace parallel { inline namespace rangev1 {
     {
         using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
 
-        static_assert(hpx::traits::is_random_access_iterator_v<iterator_type>,
-            "Requires a random access iterator.");
-
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::stable_sort<iterator_type>().call(
+        static_assert(hpx::traits::is_random_access_iterator_v<iterator_type>,
+            "Requires a random access iterator.");
+
+        return parallel::v1::detail::stable_sort<iterator_type>().call(
             std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), std::forward<Compare>(comp),
             std::forward<Proj>(proj));
@@ -335,7 +335,7 @@ namespace hpx { namespace ranges {
             typename Comp = ranges::less,
             typename Proj = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<RandomIt>::value &&
+                hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::traits::is_sentinel_for<Sent, RandomIt>::value &&
                 parallel::traits::is_projected<Proj, RandomIt>::value &&
                 parallel::traits::is_indirect_callable<
@@ -349,8 +349,7 @@ namespace hpx { namespace ranges {
             RandomIt first, Sent last, Comp&& comp = Comp(),
             Proj&& proj = Proj())
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RandomIt>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::stable_sort<RandomIt>().call(
@@ -364,7 +363,7 @@ namespace hpx { namespace ranges {
             typename Proj = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<RandomIt>::value &&
+                hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::traits::is_sentinel_for<Sent, RandomIt>::value &&
                 parallel::traits::is_projected<Proj, RandomIt>::value &&
                 parallel::traits::is_indirect_callable<ExPolicy, Comp,
@@ -379,8 +378,7 @@ namespace hpx { namespace ranges {
             RandomIt first, Sent last, Comp&& comp = Comp(),
             Proj&& proj = Proj())
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RandomIt>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::stable_sort<RandomIt>().call(
@@ -410,7 +408,7 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::stable_sort<iterator_type>().call(
@@ -441,7 +439,7 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::stable_sort<iterator_type>().call(
