@@ -9,7 +9,7 @@
 
 #pragma once
 
-#if defined(DOXGEN)
+#if defined(DOXYGEN)
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -269,7 +269,7 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a unique_copy algorithm returns areturns hpx::future<
+    /// \returns  The \a rotate_copy algorithm returns areturns hpx::future<
     ///           rotate_copy_result<FwdIter1, FwdIter2>> if the
     ///           execution policy is of type \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a
@@ -470,7 +470,7 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::util::make_subrange<FwdIter, Sent>(
-                hpx::parallel::v1::detail::unique<FwdIter>().call(
+                hpx::parallel::v1::detail::rotate<FwdIter>().call(
                     hpx::execution::seq, first, middle, last),
                 last);
         }
@@ -581,8 +581,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter1>::value&& 
                 hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_sentinel_for<Sent, FwdIter1>::value&&
-                hpx::traits::is_iterator<FwdIter2>::value           
-           )>
+                hpx::traits::is_iterator<FwdIter2>::value)>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             rotate_copy_result<FwdIter1, FwdIter2>>::type
@@ -620,8 +619,8 @@ namespace hpx { namespace ranges {
         {
             return hpx::parallel::v1::detail::rotate_copy<rotate_copy_result<
                 typename hpx::traits::range_iterator<Rng>::type, OutIter>>().call(
-                        hpx::execution::seq, hpx::util::begin(rng), middle, 
-                        hpx::util::end(rng), dest_first);       
+                    hpx::execution::seq, hpx::util::begin(rng), middle, 
+                    hpx::util::end(rng), dest_first);       
         }   
     
         // clang-format off
