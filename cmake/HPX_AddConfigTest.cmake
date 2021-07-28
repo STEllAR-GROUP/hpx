@@ -153,6 +153,9 @@ function(add_hpx_config_test variable)
         set(${variable}_RESULT FALSE)
       endif()
     else()
+      if (HPX_WITH_CUDA)
+        set(cuda_parameters CUDA_STANDARD ${CMAKE_CUDA_STANDARD})
+      endif()
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${additional_cmake_flags}")
       set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} ${additional_cmake_flags}")
       # cmake-format: off
@@ -169,7 +172,7 @@ function(add_hpx_config_test variable)
         CXX_STANDARD ${HPX_CXX_STANDARD}
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS FALSE
-        CUDA_STANDARD ${CMAKE_CUDA_STANDARD}
+        ${cuda_parameters}
         COPY_FILE ${test_binary}
       )
       # cmake-format: on
