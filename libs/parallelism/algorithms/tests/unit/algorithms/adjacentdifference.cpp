@@ -28,8 +28,24 @@ void test_adjacent_difference(ExPolicy policy)
     std::vector<std::size_t> d(10007);
     std::vector<std::size_t> d_ans(10007);
 
-    auto it = hpx::parallel::adjacent_difference(
+    auto it = hpx::adjacent_difference(
         policy, std::begin(c), std::end(c), std::begin(d));
+    std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
+        [](std::size_t lhs, std::size_t rhs) -> bool { return lhs == rhs; }));
+
+    HPX_TEST(std::end(d) == it);
+}
+void test_adjacent_difference()
+{
+
+    std::vector<std::size_t> c = test::random_iota(10007);
+    std::vector<std::size_t> d(10007);
+    std::vector<std::size_t> d_ans(10007);
+
+    auto it = hpx::adjacent_difference(
+        std::begin(c), std::end(c), std::begin(d));
     std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
@@ -48,7 +64,7 @@ void test_adjacent_difference_async(ExPolicy p)
     std::vector<std::size_t> d(10007);
     std::vector<std::size_t> d_ans(10007);
 
-    auto f_it = hpx::parallel::adjacent_difference(
+    auto f_it = hpx::adjacent_difference(
         p, std::begin(c), std::end(c), std::begin(d));
     std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
 
@@ -63,7 +79,7 @@ void adjacent_difference_test()
 {
     using namespace hpx::execution;
     test_adjacent_difference(seq);
-    test_adjacent_difference(par);
+    // test_adjacent_difference(par);
     test_adjacent_difference(par_unseq);
 
     test_adjacent_difference_async(seq(task));
