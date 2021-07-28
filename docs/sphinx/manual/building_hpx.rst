@@ -530,8 +530,9 @@ more recent standards can be opted into explicitly. If you want to force |hpx|
 to use a specific C++ standard version, you can use the following CMake
 variables:
 
-* ``HPX_WITH_CXX17``: Enables C++17 support (this is the minimum requirement)
-* ``HPX_WITH_CXX2A``: Enables (experimental) C++20 support
+* ``HPX_WITH_CXX17``: [Deprecated] C++17 is now the default C++ standard used in HPX.
+* ``HPX_WITH_CXX20``: [Deprecated] In order to use the C++20 standard, it is
+preferable to set CMAKE_CXX_STANDARD and HPX_USE_CMAKE_CXX_STANDARD to ON.
 
 .. _build_types:
 
