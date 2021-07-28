@@ -6,27 +6,4 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <tuple>
-#include <type_traits>
-
-template <typename... Ts>
-void test()
-{
-    static_assert(
-        std::is_same<__type_pack_element<0, Ts...>,
-            typename std::tuple_element<0, std::tuple<Ts...>>::type>::value,
-        "");
-    static_assert(
-        std::is_same<__type_pack_element<1, Ts...>,
-            typename std::tuple_element<1, std::tuple<Ts...>>::type>::value,
-        "");
-    static_assert(
-        std::is_same<__type_pack_element<2, Ts...>,
-            typename std::tuple_element<2, std::tuple<Ts...>>::type>::value,
-        "");
-}
-
-int main()
-{
-    test<int, float, double>();
-}
+#include "builtin_type_pack_element.cpp"
