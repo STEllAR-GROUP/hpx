@@ -25,8 +25,9 @@ set(benchmarks
 set(timed_task_spawn_SOURCES activate_counters.cpp)
 set(timed_task_spawn_HEADERS activate_counters.hpp)
 
-if(NOT HPX_WITH_CUDA)
+if(NOT HPX_WITH_CUDA_COMPUTE)
   list(APPEND benchmarks stream)
+  set(stream_FLAGS CUDA)
 endif()
 
 if(NOT HPX_WITH_SANITIZERS)
@@ -158,17 +159,6 @@ set(timed_task_spawn_PARAMETERS NO_HPX_MAIN)
 set(hpx_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(native_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(coroutines_call_overhead_PARAMETERS NO_HPX_MAIN)
-
-if(HPX_WITH_COMPUTE_CUDA)
-  set_source_files_properties(
-    stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ
-  )
-endif()
-if(HPX_WITH_CUDA_CLANG)
-  set_source_files_properties(
-    stream.cpp PROPERTIES COMPILE_FLAGS "-xcuda ${HPX_CUDA_CLANG_FLAGS}"
-  )
-endif()
 
 foreach(benchmark ${benchmarks})
   set(sources ${benchmark}.cpp ${${benchmark}_SOURCES})

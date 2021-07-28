@@ -94,12 +94,6 @@ struct increment
     }
 };
 
-// TODO: Rebase on C++17 branch. This can be removed then.
-void check_cuda_error_void(cudaError_t status)
-{
-    HPX_UNUSED(hpx::cuda::experimental::check_cuda_error(status));
-}
-
 struct cuda_memcpy_async
 {
     template <typename... Ts>
@@ -111,8 +105,8 @@ struct cuda_memcpy_async
 
 int hpx_main()
 {
-    namespace cu = hpx::cuda::experimental;
-    namespace ex = hpx::execution::experimental;
+    namespace cu = ::hpx::cuda::experimental;
+    namespace ex = ::hpx::execution::experimental;
 
     cu::enable_user_polling p;
 
@@ -272,11 +266,11 @@ int hpx_main()
         type p_h = 0;
 
         type* p;
-        cudaMalloc((void**) &p, sizeof(type));
+        cu::check_cuda_error(cudaMalloc((void**) &p, sizeof(type)));
 
         auto s = ex::just(p, &p_h, sizeof(type), cudaMemcpyHostToDevice) |
             cu::transform_stream(cuda_memcpy_async{}) |
-            ex::transform(&check_cuda_error_void) |
+            ex::transform(&cu::check_cuda_error) |
             ex::transform([p] { return p; }) |
             cu::transform_stream(increment{}) |
             cu::transform_stream(increment{}) |
@@ -284,11 +278,11 @@ int hpx_main()
         ex::when_all(ex::just(&p_h), std::move(s), ex::just(sizeof(type)),
             ex::just(cudaMemcpyDeviceToHost)) |
             cu::transform_stream(cuda_memcpy_async{}) |
-            ex::transform(&check_cuda_error_void) |
+            ex::transform(&cu::check_cuda_error) |
             ex::transform([&p_h] { HPX_TEST_EQ(p_h, 3); }) |
             ex::on(ex::thread_pool_scheduler{}) | ex::sync_wait();
 
-        cudaFree(p);
+        cu::check_cuda_error(cudaFree(p));
     }
 
     return hpx::local::finalize();

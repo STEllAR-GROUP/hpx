@@ -8,8 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) &&                             \
-    defined(HPX_HAVE_CXX17_IF_CONSTEXPR)
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -162,5 +160,3 @@ namespace hpx { namespace traits {
 #endif
     }    // namespace detail
 }}       // namespace hpx::traits
-
-#endif

@@ -63,11 +63,9 @@ namespace hpx { namespace util {
         return result_type(&gen);
     }
 
-#if defined(HPX_HAVE_CXX17_DEDUCTION_GUIDES)
     // clang-format produces inconsistent result between different versions
     // clang-format off
     template <typename Generator>
     generator_iterator(Generator*)->generator_iterator<Generator>;
     // clang-format on
-#endif
 }}    // namespace hpx::util

@@ -69,18 +69,6 @@ function(hpx_setup_target target)
 
   get_target_property(target_SOURCES ${target} SOURCES)
 
-  # Manage files with .cu extension in case When Cuda Clang is used
-  if(target_SOURCES AND HPX_WITH_CUDA_CLANG)
-    foreach(source ${target_SOURCES})
-      get_filename_component(extension ${source} EXT)
-      if(${extension} STREQUAL ".cu")
-        set_source_files_properties(
-          ${source} PROPERTIES COMPILE_FLAGS "${HPX_CUDA_CLANG_FLAGS}"
-        )
-      endif()
-    endforeach()
-  endif()
-
   if(target_COMPILE_FLAGS)
     hpx_append_property(${target} COMPILE_FLAGS ${target_COMPILE_FLAGS})
   endif()

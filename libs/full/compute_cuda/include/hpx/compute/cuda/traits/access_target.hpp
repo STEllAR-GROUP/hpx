@@ -31,8 +31,9 @@ namespace hpx { namespace compute { namespace traits {
             return *t;
 #else
             T tmp;
-            cudaMemcpyAsync(&tmp, t, sizeof(T), cudaMemcpyDeviceToHost,
-                tgt.native_handle().get_stream());
+            ::hpx::cuda::experimental::check_cuda_error(
+                cudaMemcpyAsync(&tmp, t, sizeof(T), cudaMemcpyDeviceToHost,
+                    tgt.native_handle().get_stream()));
             tgt.synchronize();
             return tmp;
 #endif
@@ -46,8 +47,9 @@ namespace hpx { namespace compute { namespace traits {
             HPX_UNUSED(tgt);
             *dst = *src;
 #else
-            cudaMemcpyAsync(dst, src, sizeof(T), cudaMemcpyHostToDevice,
-                tgt.native_handle().get_stream());
+            ::hpx::cuda::experimental::check_cuda_error(
+                cudaMemcpyAsync(dst, src, sizeof(T), cudaMemcpyHostToDevice,
+                    tgt.native_handle().get_stream()));
 #endif
         }
     };

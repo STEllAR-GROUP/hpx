@@ -10,9 +10,9 @@ export CXX_STD="17"
 export HWLOC_ROOT="${APPS_ROOT}/hwloc-2.0.3-gcc-8.3.0"
 
 module load daint-gpu
-module load cudatoolkit/10.2.89_3.29-7.0.2.1_3.27__g67354b4
+module load cudatoolkit/11.0.2_3.34-7.0.2.1_4.6__g017096a
 module load Boost/1.75.0-CrayCCE-20.11
-spack load cmake@3.17.3
+spack load cmake@3.18.6
 spack load ninja@1.10.0
 
 export CXX=`which CC`
@@ -20,14 +20,14 @@ export CC=`which cc`
 
 configure_extra_options="-DCMAKE_BUILD_TYPE=Debug"
 configure_extra_options+=" -DHPX_WITH_CUDA=ON"
-configure_extra_options+=" -DHPX_WITH_CUDA_CLANG=ON"
-configure_extra_options+=" -DHPX_CUDA_CLANG_FLAGS=\"--cuda-gpu-arch=sm_60\""
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
 configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"
 configure_extra_options+=" -DHPX_WITH_CXX${CXX_STD}=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
 configure_extra_options+=" -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=ON"
+configure_extra_options+=" -DCMAKE_CUDA_COMPILER=$(which $CXX)"
+configure_extra_options+=" -DCMAKE_CUDA_ARCHITECTURES=60"
 
 # The build unit test with HPX in Debug and the hello_world project in Debug
 # mode hangs on this configuration Release-Debug, Debug-Release, and
@@ -43,3 +43,4 @@ configure_extra_options+=" -DHPX_WITH_TESTS_EXTERNAL_BUILD=OFF"
 # clang and nvcc compiler configurations, with the exception that
 # BOOST_HAS_FLOAT128 is unconditionally disabled.
 configure_extra_options+=" \"-DCMAKE_CXX_FLAGS=-I${src_dir}/.jenkins/cscs/ -DBOOST_USER_CONFIG='<boost_user_config_cray_clang.hpp>'\""
+configure_extra_options+=" \"-DCMAKE_CUDA_FLAGS=--cuda-gpu-arch=sm_60 -I${src_dir}/.jenkins/cscs/ -DBOOST_USER_CONFIG='<boost_user_config_cray_clang.hpp>'\""

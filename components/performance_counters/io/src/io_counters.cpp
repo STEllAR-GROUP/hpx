@@ -30,6 +30,9 @@
 #include <fstream>
 #include <iterator>
 #include <string>
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
 
 // type to store parser output
 BOOST_FUSION_DEFINE_STRUCT(
@@ -80,7 +83,11 @@ namespace hpx { namespace performance_counters { namespace io
     ///////////////////////////////////////////////////////////////////////////
     void parse_proc_io(proc_io& pio)
     {
+#if defined(HPX_HAVE_UNISTD_H)
         pid_t pid = getpid();
+#else
+        pid_t pid = 0;
+#endif
         std::string fn = hpx::util::format("/proc/{1}/io", pid);
         std::ifstream ins(fn);
 

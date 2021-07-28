@@ -171,7 +171,6 @@ namespace hpx { namespace util {
                 std::forward<T>(x));
         }
 
-#if defined(HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
         template <typename T, typename... Ts,
             typename Enable = typename std::enable_if<
                 std::is_constructible<typename std::decay<T>::type,
@@ -206,7 +205,6 @@ namespace hpx { namespace util {
                 typename detail::any::get_table<value_type>::is_small(), il,
                 std::forward<Ts>(ts)...);
         }
-#endif
 
         ~basic_any()
         {
@@ -382,7 +380,6 @@ namespace hpx { namespace util {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
     template <typename T, typename Char, typename... Ts>
     basic_any<serialization::input_archive, serialization::output_archive, Char>
     make_any(Ts&&... ts)
@@ -400,7 +397,6 @@ namespace hpx { namespace util {
             serialization::output_archive, Char, std::true_type>(
             std::in_place_type<T>, il, std::forward<Ts>(ts)...);
     }
-#endif
 
     template <typename T, typename Char>
     HPX_DEPRECATED_V(1, 6,

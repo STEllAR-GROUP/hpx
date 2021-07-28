@@ -37,9 +37,9 @@ project is to create a high quality, freely available, open source
 implementation of ParalleX concepts for conventional and future systems by
 building a modular and standards conforming runtime system for SMP and
 distributed application environments. The API exposed by |hpx| is conformant to
-the interfaces defined by the C++11/14 ISO standard and adheres to the
-programming guidelines used by the |boost|_ collection of C++ libraries. We
-steer the development of |hpx| with real world applications and aim to provide a
-smooth migration path for domain scientists.
+the interfaces defined by the C++ ISO Standard and adheres to the programming
+guidelines used by the |boost|_ collection of C++ libraries. We steer the
+development of |hpx| with real world applications and aim to provide a smooth
+migration path for domain scientists.
 
 To learn more about |stellar|_ and ParalleX, see :ref:`people` and :ref:`why_hpx`.

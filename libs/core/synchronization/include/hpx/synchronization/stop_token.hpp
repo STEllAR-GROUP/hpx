@@ -522,13 +522,11 @@ namespace hpx {
             std::move(st), std::forward<Callback>(cb));
     }
 
-#if defined(HPX_HAVE_CXX17_DEDUCTION_GUIDES)
     // clang-format produces inconsistent result between different versions
     // clang-format off
     template <typename Callback>
     stop_callback(stop_token, Callback) -> stop_callback<Callback>;
     // clang-format on
-#endif
 
     // 32.3.3.4 Specialized algorithms
 

@@ -236,7 +236,7 @@ the project through discussions, pull requests, documentation patches, etc.
   specific patches for FreeBSD and MSVC12.
 * Agustin Berge, who contributed patches fixing some very nasty hidden template
   meta-programming issues. He rewrote large parts of the API elements ensuring
-  strict conformance with C++11/14.
+  strict conformance with the C++ ISO Standard.
 * Anton Bikineev for contributing changes to make using ``boost::lexical_cast``
   safer, he also contributed a thread safety fix to the iostreams module. He
   also contributed a complete rewrite of the serialization infrastructure

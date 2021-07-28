@@ -13,8 +13,6 @@
 #include <hpx/config.hpp>
 #include <hpx/serialization/boost_variant.hpp>    // for backwards compatibility
 
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
-
 #include <hpx/datastructures/variant_helper.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -105,5 +103,3 @@ namespace hpx { namespace serialization {
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
         (template <typename... Ts>), (std::variant<Ts...>) );
 }}    // namespace hpx::serialization
-
-#endif    // HPX_HAVE_CXX17_STD_VARIANT

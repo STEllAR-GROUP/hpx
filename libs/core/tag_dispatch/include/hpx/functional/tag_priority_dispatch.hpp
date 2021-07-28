@@ -192,6 +192,12 @@ namespace hpx { namespace functional {
         };
     }    // namespace detail
 
+    // CUDA versions less than 11.2 have a template instantiation bug which
+    // leaves out certain template arguments and leads to us not being able to
+    // correctly check this condition. We default to the more relaxed
+    // noexcept(true) to not falsely exclude correct overloads. However, this
+    // may lead to noexcept(false) overloads falsely being candidates.
+#if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION >= 1102)
     template <typename Tag, typename... Args>
     struct is_nothrow_tag_override_dispatchable
       : detail::is_nothrow_tag_override_dispatchable_impl<
@@ -200,6 +206,12 @@ namespace hpx { namespace functional {
             is_tag_override_dispatchable_v<Tag, Args...>>
     {
     };
+#else
+    template <typename Tag, typename... Args>
+    struct is_nothrow_tag_override_dispatchable : std::true_type
+    {
+    };
+#endif
 
     template <typename Tag, typename... Args>
     HPX_INLINE_CONSTEXPR_VARIABLE bool is_nothrow_tag_override_dispatchable_v =

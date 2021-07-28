@@ -226,7 +226,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
 .. note::
 
    When building Boost using gcc, please note that it is required to specify a
-   ``cxxflags=-std=c++14`` command line argument to ``b2`` (``bjam``).
+   ``cxxflags=-std=c++17`` command line argument to ``b2`` (``bjam``).
 
 .. list-table:: Software prerequisites for |hpx| on Windows systems
 
@@ -520,16 +520,12 @@ those are added to the ``Libs`` sections). In order to use the optional
 libraries, you need to specify them as link dependencies in your build (See
 :ref:`creating_hpx_projects`).
 
-As |hpx| is a modern C++ library, we require a certain minimum set of features
-from the C++11 standard. In addition, we make use of certain C++14 features if
-the used compiler supports them. This means that the |hpx| build system will try
-to determine the highest support C++ standard flavor and check for availability
-of those features. That is, the default will be the highest C++ standard version
-available. If you want to force |hpx| to use a specific C++ standard version, you
-can use the following CMake variables:
+As |hpx| is a modern C++ library which relies on C++17 by default. The use of
+more recent standards can be opted into explicitly. If you want to force |hpx|
+to use a specific C++ standard version, you can use the following CMake
+variables:
 
-* ``HPX_WITH_CXX14``: Enables C++14 support (this is the minimum requirement)
-* ``HPX_WITH_CXX17``: Enables C++17 support
+* ``HPX_WITH_CXX17``: Enables C++17 support (this is the minimum requirement)
 * ``HPX_WITH_CXX2A``: Enables (experimental) C++20 support
 
 .. _build_types:
