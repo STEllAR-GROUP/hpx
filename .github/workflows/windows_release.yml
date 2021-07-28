@@ -14,6 +14,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: jwlawson/actions-setup-cmake@v1.9
+      with:
+        cmake-version: '3.18.x'
     - name: Install dependencies
       run: |
         md C:\projects
