@@ -1,0 +1,32 @@
+# Copyright (c) 2021 Patrick Diehl
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+on:
+  pull_request:
+    paths:
+      - CITATION.cff
+  workflow_dispatch:
+
+name: CITATION.cff
+jobs:
+  Validate-CITATION-cff:
+    runs-on: ubuntu-latest
+    name: Validate CITATION.cff
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      RSPM: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # This is needed for workflows running on
+      # ubuntu-20.04 or later
+      - name: Install V8
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install -y libv8-dev
+      - name: Validate CITATION.cff
+        uses: dieghernan/cff-validator@main
