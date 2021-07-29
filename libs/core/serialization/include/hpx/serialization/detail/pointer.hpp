@@ -47,14 +47,14 @@ namespace hpx { namespace serialization {
         template <>
         struct extra_archive_data_helper<input_pointer_tracker>
         {
-            HPX_CORE_EXPORT static void id() noexcept;
+            HPX_CORE_EXPORT static extra_archive_data_id_type id() noexcept;
             static constexpr void reset(input_pointer_tracker*) noexcept {}
         };
 
         template <>
         struct extra_archive_data_helper<output_pointer_tracker>
         {
-            HPX_CORE_EXPORT static void id() noexcept;
+            HPX_CORE_EXPORT static extra_archive_data_id_type id() noexcept;
             HPX_CORE_EXPORT static void reset(output_pointer_tracker* data);
         };
     }    // namespace detail
