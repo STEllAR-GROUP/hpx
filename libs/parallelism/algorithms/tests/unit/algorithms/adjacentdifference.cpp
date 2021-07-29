@@ -39,7 +39,6 @@ void test_adjacent_difference(ExPolicy policy)
 }
 void test_adjacent_difference()
 {
-
     std::vector<std::size_t> c = test::random_iota(10007);
     std::vector<std::size_t> d(10007);
     std::vector<std::size_t> d_ans(10007);
@@ -79,11 +78,12 @@ void adjacent_difference_test()
 {
     using namespace hpx::execution;
     test_adjacent_difference(seq);
-    // test_adjacent_difference(par);
+    test_adjacent_difference(par);
     test_adjacent_difference(par_unseq);
 
     test_adjacent_difference_async(seq(task));
     test_adjacent_difference_async(par(task));
+    test_adjacent_difference();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
