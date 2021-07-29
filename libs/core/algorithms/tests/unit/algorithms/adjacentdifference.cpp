@@ -40,7 +40,6 @@ void test_adjacent_difference_exception()
 }
 void test_adjacent_difference()
 {
-
     std::vector<std::size_t> c = test::random_iota(10007);
     std::vector<std::size_t> d(10007);
     std::vector<std::size_t> d_ans(10007);
