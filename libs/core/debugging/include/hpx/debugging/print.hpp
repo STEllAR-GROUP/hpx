@@ -279,7 +279,6 @@ namespace hpx { namespace debug {
 
     namespace detail {
 
-#if defined(HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
         template <typename TupleType, std::size_t... I>
         void tuple_print(
             std::ostream& os, TupleType const& t, std::index_sequence<I...>)
@@ -292,36 +291,6 @@ namespace hpx { namespace debug {
         {
             tuple_print(os, t, std::make_index_sequence<sizeof...(Args)>());
         }
-#else
-        // C++14 version
-        // helper function to print a tuple of any size
-        template <typename TupleType, std::size_t... I>
-        void tuple_print(
-            std::ostream& os, TupleType const& t, std::index_sequence<I...>)
-        {
-            using expander = int[];
-            (void) expander{
-                0, (void(os << (I == 0 ? "" : " ") << std::get<I>(t)), 0)...};
-        }
-
-        // print a tuple of any size - forwards to helper with index
-        template <typename... Args>
-        void tuple_print(std::ostream& os, std::tuple<Args...> const& t)
-        {
-            detail::tuple_print(
-                os, t, std::make_index_sequence<sizeof...(Args)>{});
-        }
-
-        // print variadic list of args
-        template <typename Arg, typename... Args>
-        void variadic_print(
-            std::ostream& os, Arg const& arg, Args const&... args)
-        {
-            os << arg;
-            using expander = int[];
-            (void) expander{0, (void(os << ' ' << args), 0)...};
-        }
-#endif
     }    // namespace detail
 
     namespace detail {
@@ -343,7 +312,6 @@ namespace hpx { namespace debug {
         HPX_CORE_EXPORT void generate_prefix(std::ostream& os);
 
         ///////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
         template <typename... Args>
         void display(char const* prefix, Args const&... args)
         {
@@ -356,20 +324,6 @@ namespace hpx { namespace debug {
             tempstream << std::endl;
             std::cout << tempstream.str();
         }
-#else
-        template <typename... Args>
-        void display(char const* prefix, Args const&... args)
-        {
-            // using a temp stream object with a single copy to cout at the end
-            // prevents multiple threads from injecting overlapping text
-            std::stringstream tempstream;
-            tempstream << prefix;
-            generate_prefix(tempstream);
-            variadic_print(tempstream, args...);
-            tempstream << std::endl;
-            std::cout << tempstream.str();
-        }
-#endif
 
         template <typename... Args>
         void debug(Args const&... args)

@@ -86,7 +86,6 @@ namespace hpx { namespace actions {
         }
     };
 
-#if defined(HPX_HAVE_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS)
     template <typename R, typename... Ps, R (*F)(Ps...) noexcept,
         typename Derived>
     struct action<R (*)(Ps...) noexcept, F, Derived>
@@ -114,7 +113,6 @@ namespace hpx { namespace actions {
             return F(std::forward<Ts>(vs)...);
         }
     };
-#endif
 
     /// \endcond
 }}    // namespace hpx::actions

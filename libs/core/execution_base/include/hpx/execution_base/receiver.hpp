@@ -101,8 +101,12 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename T, typename... As>
     struct is_receiver_of;
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct set_value_t
-      : hpx::functional::tag_priority<set_value_t>
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+    HPX_DEVICE static const
+#else
+    HPX_INLINE_CONSTEXPR_VARIABLE
+#endif
+        struct set_value_t : hpx::functional::tag_priority<set_value_t>
     {
     private:
         template <typename R, typename... Args>
@@ -116,8 +120,12 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } set_value{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct set_error_t
-      : hpx::functional::tag_priority_noexcept<set_error_t>
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+    HPX_DEVICE static const
+#else
+    HPX_INLINE_CONSTEXPR_VARIABLE
+#endif
+        struct set_error_t : hpx::functional::tag_priority_noexcept<set_error_t>
     {
     private:
         template <typename R, typename E>
@@ -130,8 +138,12 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } set_error{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct set_done_t
-      : hpx::functional::tag_priority_noexcept<set_done_t>
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+    HPX_DEVICE static const
+#else
+    HPX_INLINE_CONSTEXPR_VARIABLE
+#endif
+        struct set_done_t : hpx::functional::tag_priority_noexcept<set_done_t>
     {
     private:
         template <typename R>

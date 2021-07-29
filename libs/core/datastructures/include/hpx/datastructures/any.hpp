@@ -648,7 +648,6 @@ namespace hpx { namespace util {
                 std::forward<T>(x));
         }
 
-#if defined(HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
         template <typename T, typename... Ts,
             typename Enable = typename std::enable_if<
                 std::is_constructible<typename std::decay<T>::type,
@@ -683,7 +682,6 @@ namespace hpx { namespace util {
                 typename detail::any::get_table<value_type>::is_small(), il,
                 std::forward<Ts>(ts)...);
         }
-#endif
 
         ~basic_any()
         {
@@ -868,7 +866,6 @@ namespace hpx { namespace util {
                 std::forward<T>(x));
         }
 
-#if defined(HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
         template <typename T, typename... Ts,
             typename Enable = typename std::enable_if<
                 std::is_constructible<typename std::decay<T>::type,
@@ -903,7 +900,6 @@ namespace hpx { namespace util {
                 typename detail::any::get_table<value_type>::is_small(), il,
                 std::forward<Ts>(ts)...);
         }
-#endif
 
         ~basic_any()
         {
@@ -1084,7 +1080,6 @@ namespace hpx { namespace util {
                 std::forward<T>(x));
         }
 
-#if defined(HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
         template <typename T, typename... Ts,
             typename Enable = typename std::enable_if<
                 std::is_constructible<typename std::decay<T>::type,
@@ -1119,7 +1114,6 @@ namespace hpx { namespace util {
                 typename detail::any::get_table<value_type>::is_small(), il,
                 std::forward<Ts>(ts)...);
         }
-#endif
 
         basic_any(basic_any const& x) = delete;
         basic_any& operator=(basic_any const& x) = delete;
@@ -1271,7 +1265,6 @@ namespace hpx { namespace util {
                 std::forward<T>(x));
         }
 
-#if defined(HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
         template <typename T, typename... Ts,
             typename Enable = typename std::enable_if<
                 std::is_constructible<typename std::decay<T>::type,
@@ -1306,7 +1299,6 @@ namespace hpx { namespace util {
                 typename detail::any::get_table<value_type>::is_small(), il,
                 std::forward<Ts>(ts)...);
         }
-#endif
 
         basic_any(basic_any const& x) = delete;
         basic_any& operator=(basic_any const& x) = delete;
@@ -1486,7 +1478,6 @@ namespace hpx { namespace util {
 }}    // namespace hpx::util
 
 namespace hpx {
-#if defined(HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
     template <typename T, typename... Ts>
     util::basic_any<void, void, void, std::true_type> make_any_nonser(
         Ts&&... ts)
@@ -1518,7 +1509,6 @@ namespace hpx {
         return util::basic_any<void, void, void, std::false_type>(
             std::in_place_type<T>, il, std::forward<Ts>(ts)...);
     }
-#endif
 
     template <typename T>
     util::basic_any<void, void, void, std::true_type> make_any_nonser(T&& t)
@@ -1588,7 +1578,6 @@ namespace hpx {
 }    // namespace hpx
 
 namespace hpx { namespace util {
-#if defined(HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
     ////////////////////////////////////////////////////////////////////////////
     // make copyable any
     template <typename T, typename... Ts>
@@ -1667,7 +1656,6 @@ namespace hpx { namespace util {
         return basic_any<void, void, Char, std::false_type>(
             std::in_place_type<T>, il, std::forward<Ts>(ts)...);
     }
-#endif
 
     // make copyable any
     template <typename T>

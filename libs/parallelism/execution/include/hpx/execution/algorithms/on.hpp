@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -119,8 +118,22 @@ namespace hpx { namespace execution { namespace experimental {
                         op_state.set_done_predecessor_sender();
                     }
 
+                    // This typedef is duplicated from the parent struct. The
+                    // parent typedef is not instantiated early enough for use
+                    // here.
+                    using value_type = hpx::util::detail::prepend_t<
+                        typename hpx::execution::experimental::sender_traits<
+                            Sender>::template value_types<hpx::tuple,
+                            hpx::variant>,
+                        hpx::monostate>;
+
                     template <typename... Ts>
-                        void set_value(Ts&&... ts) && noexcept
+                        auto set_value(Ts&&... ts) &&
+                        noexcept
+                        -> decltype(std::declval<value_type>()
+                                        .template emplace<hpx::tuple<Ts...>>(
+                                            std::forward<Ts>(ts)...),
+                            void())
                     {
                         op_state.set_value_predecessor_sender(
                             std::forward<Ts>(ts)...);
@@ -284,5 +297,3 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } on{};
 }}}    // namespace hpx::execution::experimental
-
-#endif

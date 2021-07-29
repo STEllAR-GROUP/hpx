@@ -235,6 +235,17 @@ function(hpx_sanitize_usage_requirements property is_build)
 
 endfunction(hpx_sanitize_usage_requirements)
 
+function(hpx_filter_cuda_flags cflag_list)
+  set(_cflag_list "${${cflag_list}}")
+  string(REGEX REPLACE "\\$<\\$<COMPILE_LANGUAGE:CUDA>:[^>]*>;?" "" _cflag_list
+                       "${_cflag_list}"
+  )
+  set(${cflag_list}
+      ${_cflag_list}
+      PARENT_SCOPE
+  )
+endfunction(hpx_filter_cuda_flags)
+
 # Append the corresponding (-D, -I) flags for the compilation
 function(
   hpx_construct_cflag_list
@@ -354,6 +365,8 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
     hpx_compile_definitions hpx_compile_options hpx_pic_option
     hpx_include_directories hpx_system_include_directories hpx_cflags_list
   )
+  # Cannot generate one file per language yet so filter out cuda
+  hpx_filter_cuda_flags(hpx_cflags_list)
   hpx_construct_library_list(
     hpx_link_libraries hpx_link_options hpx_library_list
   )
@@ -364,7 +377,8 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
     cmake/templates/${template}.pc.in
     ${OUTPUT_DIR}${template}_${build_type}.pc.in @ONLY ESCAPE_QUOTES
   )
-  # Can't use generator expression directly as name of output file
+  # Can't use generator expression directly as name of output file (solved in
+  # CMake 3.20)
   file(
     GENERATE
     OUTPUT ${OUTPUT_DIR}/${template}_${build_type}.pc
