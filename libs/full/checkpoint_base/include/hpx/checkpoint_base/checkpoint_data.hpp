@@ -1,5 +1,5 @@
 // Copyright (c) 2018 Adrian Serio
-// Copyright (c) 2018-2020 Hartmut Kaiser
+// Copyright (c) 2018-2021 Hartmut Kaiser
 //
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -138,7 +138,7 @@ namespace hpx { namespace serialization { namespace detail {
     template <>
     struct extra_archive_data_helper<hpx::util::checkpointing_tag>
     {
-        HPX_EXPORT static void id() noexcept;
+        HPX_EXPORT static extra_archive_data_id_type id() noexcept;
         static constexpr void reset(hpx::util::checkpointing_tag*) noexcept {}
     };
 }}}    // namespace hpx::serialization::detail
