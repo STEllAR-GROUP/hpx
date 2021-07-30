@@ -53,4 +53,7 @@ namespace hpx { namespace traits {
         typedef typename util::detail::iterator<R>::type iterator_type;
         typedef typename util::detail::sentinel<R>::type sentinel_type;
     };
+
+    template <typename T>
+    using range_iterator_t = typename range_iterator<T>::type;
 }}    // namespace hpx::traits
