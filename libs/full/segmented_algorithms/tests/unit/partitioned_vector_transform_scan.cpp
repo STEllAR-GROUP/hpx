@@ -51,19 +51,27 @@ void test_transform_inclusive_scan_async(ExPolicy&& policy,
         .get();
 }
 
+template <typename T>
+void test_transform_exclusive_scan(
+    hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& out)
+{
+    hpx::transform_exclusive_scan(
+        xvalues.begin(), xvalues.end(), out.begin(), T(0), op(), conv());
+}
+
 template <typename ExPolicy, typename T>
 void test_transform_exclusive_scan(ExPolicy&& policy,
     hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& out)
 {
-    hpx::parallel::transform_exclusive_scan(policy, xvalues.begin(),
-        xvalues.end(), out.begin(), T(0), op(), conv());
+    hpx::transform_exclusive_scan(policy, xvalues.begin(), xvalues.end(),
+        out.begin(), T(0), op(), conv());
 }
 
 template <typename ExPolicy, typename T>
 void test_transform_exclusive_scan_async(ExPolicy&& policy,
     hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& out)
 {
-    hpx::parallel::transform_exclusive_scan(
+    hpx::transform_exclusive_scan(
         policy, xvalues.begin(), xvalues.end(), out.begin(), T(0), op(), conv())
         .get();
 }
@@ -83,6 +91,8 @@ void transform_scan_tests(std::size_t num, hpx::partitioned_vector<T>& xvalues,
         hpx::execution::par(hpx::execution::task), xvalues, out);
     HPX_TEST_EQ((out[num - 1]), T(2 * num));
 
+    test_transform_exclusive_scan(xvalues, out);
+    HPX_TEST_EQ((out[num - 1]), T(2 * (num - 1)));
     test_transform_exclusive_scan(hpx::execution::seq, xvalues, out);
     HPX_TEST_EQ((out[num - 1]), T(2 * (num - 1)));
     test_transform_exclusive_scan(hpx::execution::par, xvalues, out);
