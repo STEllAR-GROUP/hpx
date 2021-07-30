@@ -19,7 +19,7 @@
 #   file while saving edits to disk
 # - Please do _not_ reformat a full source file without dire need.
 
-# PLEASE NOTE: This file requires clang-format V9.0
+# PLEASE NOTE: This file requires clang-format V11.0
 
 ---
 AccessModifierOffset: -4

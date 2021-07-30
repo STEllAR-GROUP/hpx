@@ -75,8 +75,8 @@ namespace std {
     template <>
     struct hash<::hpx::threads::thread_id>
     {
-        std::size_t operator()(::hpx::threads::thread_id const& v) const
-            noexcept
+        std::size_t operator()(
+            ::hpx::threads::thread_id const& v) const noexcept
         {
             std::hash<::hpx::threads::thread_data const*> hasher_;
             return hasher_(static_cast<::hpx::threads::thread_data*>(v.get()));
