@@ -123,6 +123,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp
     hpx/parallel/container_algorithms/transform_exclusive_scan.hpp
+    hpx/parallel/container_algorithms/transform_inclusive_scan.hpp
     hpx/parallel/container_algorithms/transform_reduce.hpp
     hpx/parallel/container_algorithms/uninitialized_copy.hpp
     hpx/parallel/container_algorithms/uninitialized_default_construct.hpp
