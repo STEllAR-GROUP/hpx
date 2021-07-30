@@ -18,6 +18,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/runtime.hpp>
 
 #include <cstddef>
 #include <vector>
