@@ -34,19 +34,43 @@ struct op
     }
 };
 
+template <typename T>
+void test_transform_inclusive_scan(
+    hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& out)
+{
+    hpx::transform_inclusive_scan(
+        xvalues.begin(), xvalues.end(), out.begin(), op(), conv(), T(0));
+}
+
+template <typename T>
+void test_transform_inclusive_scan_noinit(
+    hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& out)
+{
+    hpx::transform_inclusive_scan(
+        xvalues.begin(), xvalues.end(), out.begin(), op(), conv());
+}
+
+template <typename ExPolicy, typename T>
+void test_transform_inclusive_scan_noinit(ExPolicy&& policy,
+    hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& out)
+{
+    hpx::transform_inclusive_scan(
+        policy, xvalues.begin(), xvalues.end(), out.begin(), op(), conv());
+}
+
 template <typename ExPolicy, typename T>
 void test_transform_inclusive_scan(ExPolicy&& policy,
     hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& out)
 {
-    hpx::parallel::transform_inclusive_scan(policy, xvalues.begin(),
-        xvalues.end(), out.begin(), op(), conv(), T(0));
+    hpx::transform_inclusive_scan(policy, xvalues.begin(), xvalues.end(),
+        out.begin(), op(), conv(), T(0));
 }
 
 template <typename ExPolicy, typename T>
 void test_transform_inclusive_scan_async(ExPolicy&& policy,
     hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& out)
 {
-    hpx::parallel::transform_inclusive_scan(
+    hpx::transform_inclusive_scan(
         policy, xvalues.begin(), xvalues.end(), out.begin(), op(), conv(), T(0))
         .get();
 }
@@ -80,6 +104,12 @@ template <typename T>
 void transform_scan_tests(std::size_t num, hpx::partitioned_vector<T>& xvalues,
     hpx::partitioned_vector<T>& out)
 {
+    test_transform_inclusive_scan_noinit(xvalues, out);
+    HPX_TEST_EQ((out[num - 1]), T(2 * num));
+    test_transform_inclusive_scan_noinit(hpx::execution::seq, xvalues, out);
+    HPX_TEST_EQ((out[num - 1]), T(2 * num));
+    test_transform_inclusive_scan(xvalues, out);
+    HPX_TEST_EQ((out[num - 1]), T(2 * num));
     test_transform_inclusive_scan(hpx::execution::seq, xvalues, out);
     HPX_TEST_EQ((out[num - 1]), T(2 * num));
     test_transform_inclusive_scan(hpx::execution::par, xvalues, out);
