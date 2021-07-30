@@ -34,8 +34,8 @@ void exclusive_scan_benchmark()
         auto op = [](double v1, double v2) { return v1 + v2; };
 
         hpx::chrono::high_resolution_timer t;
-        hpx::parallel::exclusive_scan(hpx::execution::par, std::begin(c),
-            std::end(c), std::begin(d), val, op);
+        hpx::exclusive_scan(hpx::execution::par, std::begin(c), std::end(c),
+            std::begin(d), val, op);
         double elapsed = t.elapsed();
 
         // verify values
@@ -58,6 +58,36 @@ void exclusive_scan_benchmark()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_exclusive_scan1(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
+
+    std::size_t const val(0);
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
+
+    hpx::exclusive_scan(
+        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d), val, op);
+
+    // verify values
+    std::vector<std::size_t> e(c.size());
+    hpx::parallel::v1::detail::sequential_exclusive_scan(
+        std::begin(c), std::end(c), std::begin(e), val, op);
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_SCAN_ALGORITHMS)
+    std::vector<std::size_t> f(c.size());
+    std::exclusive_scan(std::begin(c), std::end(c), std::begin(f), val, op);
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_exclusive_scan1(ExPolicy policy, IteratorTag)
 {
@@ -74,8 +104,8 @@ void test_exclusive_scan1(ExPolicy policy, IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::parallel::exclusive_scan(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(d), val, op);
+    hpx::exclusive_scan(policy, iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), val, op);
 
     // verify values
     std::vector<std::size_t> e(c.size());
@@ -104,8 +134,8 @@ void test_exclusive_scan1_async(ExPolicy p, IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::future<void> fut = hpx::parallel::exclusive_scan(p,
-        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d), val, op);
+    hpx::future<void> fut = hpx::exclusive_scan(p, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(d), val, op);
     fut.wait();
 
     // verify values
@@ -127,6 +157,7 @@ void test_exclusive_scan1()
 {
     using namespace hpx::execution;
 
+    test_exclusive_scan1(IteratorTag());
     test_exclusive_scan1(seq, IteratorTag());
     test_exclusive_scan1(par, IteratorTag());
     test_exclusive_scan1(par_unseq, IteratorTag());

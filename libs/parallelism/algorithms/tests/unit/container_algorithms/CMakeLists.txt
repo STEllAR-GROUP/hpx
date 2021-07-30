@@ -24,6 +24,7 @@ set(tests
     distance
     equal_range
     equal_binary_range
+    exclusive_scan_range
     fill_range
     filln_range
     find_range

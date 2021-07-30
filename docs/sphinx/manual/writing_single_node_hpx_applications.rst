@@ -669,7 +669,7 @@ Parallel algorithms
      * Calculates the difference between each element in an input range and the preceding element.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`adjacent_difference`
-   * * :cpp:func:`hpx::parallel::v1::exclusive_scan`
+   * * :cpp:func:`hpx::exclusive_scan`
      * Does an exclusive parallel scan over a range of elements.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`exclusive_scan`

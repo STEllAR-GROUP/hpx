@@ -33,7 +33,7 @@ void test_exclusive_scan_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::exclusive_scan(policy, iterator(std::begin(c)),
+        hpx::exclusive_scan(policy, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(d), std::size_t(0),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), v1 + v2;
@@ -67,9 +67,9 @@ void test_exclusive_scan_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::exclusive_scan(p,
-            iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
-            std::size_t(0), [](std::size_t v1, std::size_t v2) {
+        hpx::future<void> f = hpx::exclusive_scan(p, iterator(std::begin(c)),
+            iterator(std::end(c)), std::begin(d), std::size_t(0),
+            [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), v1 + v2;
             });
 
