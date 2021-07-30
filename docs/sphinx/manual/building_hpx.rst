@@ -222,6 +222,9 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * |hwloc|_
      * 1.5
      *
+   * * |asio|_
+     * 1.12.0
+     *
 
 .. note::
 
@@ -254,14 +257,17 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * |hwloc|_
      * 1.5
      *
+   * * |asio|_
+     * 1.12.0
+     *
 
 .. note::
 
-   You need to build the following Boost libraries for |hpx|:
-   Boost.Filesystem, Boost.ProgramOptions, and Boost.System. The
-   following are not needed by default, but are required in certain
-   configurations: Boost.Chrono, Boost.DateTime, Boost.Log, Boost.LogSetup,
-   Boost.Regex, and Boost.Thread.
+   In most configurations, |hpx| depends only on header-only Boost.
+   Boost.Filesystem is required if the standard library does not support
+   filesystem. The following are not needed by default, but are required in
+   certain configurations: Boost.Chrono, Boost.DateTime, Boost.Log,
+   Boost.LogSetup, Boost.Regex, and Boost.Thread.
 
 Depending on the options you chose while building and installing |hpx|,
 you will find that |hpx| may depend on several other libraries such as those
