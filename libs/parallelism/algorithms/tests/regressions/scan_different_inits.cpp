@@ -27,10 +27,10 @@ void test_zero()
     std::vector<int> b, c, d, e, f, g;
     auto policy = hpx::execution::par;
 
-    Iter i_inc_add = hpx::parallel::inclusive_scan(
+    Iter i_inc_add = hpx::inclusive_scan(
         policy, a.begin(), a.end(), b.begin(),
         [](int bar, int baz) { return bar + baz; }, 100);
-    Iter i_inc_mult = hpx::parallel::inclusive_scan(
+    Iter i_inc_mult = hpx::inclusive_scan(
         policy, a.begin(), a.end(), c.begin(),
         [](int bar, int baz) { return bar * baz; }, 10);
     Iter i_exc_add = hpx::parallel::exclusive_scan(policy, a.begin(), a.end(),
@@ -61,10 +61,10 @@ void test_async_zero()
     std::vector<int> b, c, d, e, f, g;
     auto policy = hpx::execution::par(hpx::execution::task);
 
-    Fut_Iter f_inc_add = hpx::parallel::inclusive_scan(
+    Fut_Iter f_inc_add = hpx::inclusive_scan(
         policy, a.begin(), a.end(), b.begin(),
         [](int bar, int baz) { return bar + baz; }, 100);
-    Fut_Iter f_inc_mult = hpx::parallel::inclusive_scan(
+    Fut_Iter f_inc_mult = hpx::inclusive_scan(
         policy, a.begin(), a.end(), c.begin(),
         [](int bar, int baz) { return bar * baz; }, 10);
     Fut_Iter f_exc_add = hpx::parallel::exclusive_scan(policy, a.begin(),
@@ -101,9 +101,9 @@ void test_one(std::vector<int> a)
     auto fun_conv = [](int foo) { return foo - 3; };
     auto policy = hpx::execution::par;
 
-    Iter f_inc_add = hpx::parallel::inclusive_scan(
-        policy, a.begin(), a.end(), b.begin(), fun_add, 10);
-    Iter f_inc_mult = hpx::parallel::inclusive_scan(
+    Iter f_inc_add =
+        hpx::inclusive_scan(policy, a.begin(), a.end(), b.begin(), fun_add, 10);
+    Iter f_inc_mult = hpx::inclusive_scan(
         policy, a.begin(), a.end(), c.begin(), fun_mult, 10);
     Iter f_exc_add = hpx::parallel::exclusive_scan(
         policy, a.begin(), a.end(), d.begin(), 10, fun_add);
@@ -158,9 +158,9 @@ void test_async_one(std::vector<int> a)
     auto fun_conv = [](int foo) { return foo - 3; };
     auto policy = hpx::execution::par(hpx::execution::task);
 
-    Fut_Iter f_inc_add = hpx::parallel::inclusive_scan(
-        policy, a.begin(), a.end(), b.begin(), fun_add, 10);
-    Fut_Iter f_inc_mult = hpx::parallel::inclusive_scan(
+    Fut_Iter f_inc_add =
+        hpx::inclusive_scan(policy, a.begin(), a.end(), b.begin(), fun_add, 10);
+    Fut_Iter f_inc_mult = hpx::inclusive_scan(
         policy, a.begin(), a.end(), c.begin(), fun_mult, 10);
     Fut_Iter f_exc_add = hpx::parallel::exclusive_scan(
         policy, a.begin(), a.end(), d.begin(), 10, fun_add);
