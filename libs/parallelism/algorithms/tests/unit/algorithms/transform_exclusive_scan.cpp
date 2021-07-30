@@ -18,6 +18,39 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_transform_exclusive_scan(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
+
+    std::size_t const val(0);
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
+    auto conv = [](std::size_t val) { return 2 * val; };
+
+    hpx::transform_exclusive_scan(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(d), val, op, conv);
+
+    // verify values
+    std::vector<std::size_t> e(c.size());
+    hpx::parallel::v1::detail::sequential_transform_exclusive_scan(
+        std::begin(c), std::end(c), std::begin(e), conv, val, op);
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN_ALGORITHMS_ALGORITHMS)
+    std::vector<std::size_t> f(c.size());
+    std::transform_exclusive_scan(
+        std::begin(c), std::end(c), std::begin(f), val, op, conv);
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_transform_exclusive_scan(ExPolicy policy, IteratorTag)
 {
@@ -35,7 +68,7 @@ void test_transform_exclusive_scan(ExPolicy policy, IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::parallel::transform_exclusive_scan(policy, iterator(std::begin(c)),
+    hpx::transform_exclusive_scan(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(d), val, op, conv);
 
     // verify values
@@ -69,7 +102,7 @@ void test_transform_exclusive_scan_async(ExPolicy p, IteratorTag)
     auto conv = [](std::size_t val) { return 2 * val; };
 
     hpx::future<void> fut =
-        hpx::parallel::transform_exclusive_scan(p, iterator(std::begin(c)),
+        hpx::transform_exclusive_scan(p, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(d), val, op, conv);
     fut.wait();
 
@@ -94,6 +127,7 @@ void test_transform_exclusive_scan()
 {
     using namespace hpx::execution;
 
+    test_transform_exclusive_scan(IteratorTag());
     test_transform_exclusive_scan(seq, IteratorTag());
     test_transform_exclusive_scan(par, IteratorTag());
     test_transform_exclusive_scan(par_unseq, IteratorTag());
@@ -125,7 +159,7 @@ void test_transform_exclusive_scan_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::transform_exclusive_scan(
+        hpx::transform_exclusive_scan(
             policy, iterator(std::begin(c)), iterator(std::end(c)),
             std::begin(d), std::size_t(0),
             [](std::size_t v1, std::size_t v2) {
@@ -162,7 +196,7 @@ void test_transform_exclusive_scan_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::transform_exclusive_scan(
+        hpx::future<void> f = hpx::transform_exclusive_scan(
             p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
             std::size_t(0),
             [](std::size_t v1, std::size_t v2) {
@@ -227,7 +261,7 @@ void test_transform_exclusive_scan_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::transform_exclusive_scan(
+        hpx::transform_exclusive_scan(
             policy, iterator(std::begin(c)), iterator(std::end(c)),
             std::begin(d), std::size_t(0),
             [](std::size_t v1, std::size_t v2) {
@@ -263,7 +297,7 @@ void test_transform_exclusive_scan_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::parallel::transform_exclusive_scan(
+        hpx::future<void> f = hpx::transform_exclusive_scan(
             p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
             std::size_t(0),
             [](std::size_t v1, std::size_t v2) {
