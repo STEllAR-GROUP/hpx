@@ -17,6 +17,28 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_exclusive_scan2(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::fill(std::begin(c), std::end(c), std::size_t(1));
+
+    std::size_t const val(0);
+    hpx::exclusive_scan(
+        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d), val);
+
+    // verify values
+    std::vector<std::size_t> e(c.size());
+    hpx::parallel::v1::detail::sequential_exclusive_scan(std::begin(c),
+        std::end(c), std::begin(e), val, std::plus<std::size_t>());
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_exclusive_scan2(ExPolicy policy, IteratorTag)
 {
@@ -31,8 +53,8 @@ void test_exclusive_scan2(ExPolicy policy, IteratorTag)
     std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     std::size_t const val(0);
-    hpx::parallel::exclusive_scan(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(d), val);
+    hpx::exclusive_scan(policy, iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), val);
 
     // verify values
     std::vector<std::size_t> e(c.size());
@@ -53,7 +75,7 @@ void test_exclusive_scan2_async(ExPolicy p, IteratorTag)
     std::fill(std::begin(c), std::end(c), std::size_t(1));
 
     std::size_t const val(0);
-    hpx::future<void> f = hpx::parallel::exclusive_scan(
+    hpx::future<void> f = hpx::exclusive_scan(
         p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d), val);
     f.wait();
 
@@ -70,6 +92,7 @@ void test_exclusive_scan2()
 {
     using namespace hpx::execution;
 
+    test_exclusive_scan2(IteratorTag());
     test_exclusive_scan2(seq, IteratorTag());
     test_exclusive_scan2(par, IteratorTag());
     test_exclusive_scan2(par_unseq, IteratorTag());

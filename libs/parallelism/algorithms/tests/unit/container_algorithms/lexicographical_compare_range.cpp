@@ -25,7 +25,7 @@ unsigned int seed;
 std::mt19937 gen;
 std::uniform_int_distribution<> dis(0, 25);
 
-void test_fill_sent()
+void test_lexicographical_compare_sent()
 {
     // ensure all characters are unique
     std::unordered_set<unsigned char> uset;
@@ -88,7 +88,7 @@ void test_fill_sent()
 }
 
 template <typename ExPolicy>
-void test_fill_sent(ExPolicy policy)
+void test_lexicographical_compare_sent(ExPolicy policy)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -213,7 +213,7 @@ void test_lexicographical_compare(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_fill_async(ExPolicy policy, IteratorTag)
+void test_lexicographical_compare_async(ExPolicy policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -260,13 +260,13 @@ void test_lexicographical_compare()
     test_lexicographical_compare(par, IteratorTag());
     test_lexicographical_compare(par_unseq, IteratorTag());
 
-    test_fill_async(seq(task), IteratorTag());
-    test_fill_async(par(task), IteratorTag());
+    test_lexicographical_compare_async(seq(task), IteratorTag());
+    test_lexicographical_compare_async(par(task), IteratorTag());
 
-    test_fill_sent();
-    test_fill_sent(seq);
-    test_fill_sent(par);
-    test_fill_sent(par_unseq);
+    test_lexicographical_compare_sent();
+    test_lexicographical_compare_sent(seq);
+    test_lexicographical_compare_sent(par);
+    test_lexicographical_compare_sent(par_unseq);
 }
 
 void lexicographical_compare_test()

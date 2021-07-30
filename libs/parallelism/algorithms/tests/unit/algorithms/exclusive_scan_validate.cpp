@@ -63,7 +63,7 @@ void test_exclusive_scan_validate(
         std::ostream_iterator<int>(std::cout, ", "));
 #endif
     b.resize(a.size());
-    hpx::parallel::exclusive_scan(p, a.begin(), a.end(), b.begin(), INITIAL_VAL,
+    hpx::exclusive_scan(p, a.begin(), a.end(), b.begin(), INITIAL_VAL,
         [](int bar, int baz) { return bar + baz; });
 #ifdef DUMP_VALUES
     std::cout << "\nOutput : ";
@@ -97,7 +97,7 @@ void test_exclusive_scan_validate(
         std::ostream_iterator<int>(std::cout, ", "));
 #endif
     b.resize(a.size());
-    hpx::parallel::exclusive_scan(p, a.begin(), a.end(), b.begin(), INITIAL_VAL,
+    hpx::exclusive_scan(p, a.begin(), a.end(), b.begin(), INITIAL_VAL,
         [](int bar, int baz) { return bar + baz; });
 #ifdef DUMP_VALUES
     std::cout << "\nOutput : ";
@@ -130,7 +130,7 @@ void test_exclusive_scan_validate(
         std::ostream_iterator<int>(std::cout, ", "));
 #endif
     b.resize(a.size());
-    hpx::parallel::exclusive_scan(p, a.begin(), a.end(), b.begin(), INITIAL_VAL,
+    hpx::exclusive_scan(p, a.begin(), a.end(), b.begin(), INITIAL_VAL,
         [](int bar, int baz) { return bar + baz; });
 #ifdef DUMP_VALUES
     std::cout << "\nOutput : ";
