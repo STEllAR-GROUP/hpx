@@ -46,6 +46,12 @@ namespace hpx { namespace threads {
           , run_now(false)
           , scheduler_base(nullptr)
         {
+            if (initial_state == thread_schedule_state::staged)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "thread_init_data::thread_init_data",
+                    "threads shouldn't have 'staged' as their initial state");
+            }
         }
 
         thread_init_data& operator=(thread_init_data&& rhs) noexcept
@@ -130,6 +136,13 @@ namespace hpx { namespace threads {
           , scheduler_base(scheduler_base_)
         {
             HPX_UNUSED(desc);
+
+            if (initial_state == thread_schedule_state::staged)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "thread_init_data::thread_init_data",
+                    "threads shouldn't have 'staged' as their initial state");
+            }
         }
 
         threads::thread_function_type func;
