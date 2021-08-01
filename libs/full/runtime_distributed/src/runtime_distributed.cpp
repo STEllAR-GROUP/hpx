@@ -215,6 +215,10 @@ namespace hpx {
             threads::detail::network_background_callback_type(
                 &detail::network_background_callback));
 
+        // initialize our TLS
+        runtime::init_tss();
+        util::reinit_construct();    // call only after TLS was initialized
+
 #if defined(HPX_HAVE_NETWORKING)
         parcel_handler_notifier_ = runtime_distributed::get_notification_policy(
             "parcel-thread", runtime_local::os_thread_type::parcel_thread);

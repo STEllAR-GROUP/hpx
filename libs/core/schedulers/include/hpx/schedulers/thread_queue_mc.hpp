@@ -242,7 +242,12 @@ namespace hpx { namespace threads { namespace policies {
             // if the initial state is not pending, delayed creation will
             // fail as the newly created thread would go out of scope right
             // away (can't be scheduled).
-            HPX_ASSERT(data.initial_state == thread_schedule_state::pending);
+            if (data.initial_state != thread_schedule_state::pending)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "thread_queue_mc::create_thread",
+                    "staged tasks must have 'pending' as their initial state");
+            }
 
             // do not execute the work, but register a task description for
             // later thread creation

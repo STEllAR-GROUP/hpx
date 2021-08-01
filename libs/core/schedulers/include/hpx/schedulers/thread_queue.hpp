@@ -295,7 +295,7 @@ namespace hpx { namespace threads { namespace policies {
                     count + parameters_.min_add_new_count_)
                 {    //-V104
                     HPX_ASSERT(parameters_.max_thread_count_ - count <
-                        (std::numeric_limits<std::int64_t>::max)());
+                        (std::numeric_limits<std::int64_t>::max) ());
                     add_count = static_cast<std::int64_t>(
                         parameters_.max_thread_count_ - count);
                     if (add_count < parameters_.min_add_new_count_)
@@ -395,12 +395,14 @@ namespace hpx { namespace threads { namespace policies {
             else
             {
                 // delete only this many threads
-                std::int64_t delete_count = (std::min)(
-                    static_cast<std::int64_t>(terminated_items_count_ / 10),
-                    static_cast<std::int64_t>(parameters_.max_delete_count_));
+                std::int64_t delete_count =
+                    (std::min) (static_cast<std::int64_t>(
+                                    terminated_items_count_ / 10),
+                        static_cast<std::int64_t>(
+                            parameters_.max_delete_count_));
 
                 // delete at least this many threads
-                delete_count = (std::max)(delete_count,
+                delete_count = (std::max) (delete_count,
                     static_cast<std::int64_t>(parameters_.min_delete_count_));
 
                 thread_data* todelete;
@@ -730,7 +732,12 @@ namespace hpx { namespace threads { namespace policies {
             // if the initial state is not pending, delayed creation will
             // fail as the newly created thread would go out of scope right
             // away (can't be scheduled).
-            HPX_ASSERT(data.initial_state == thread_schedule_state::pending);
+            if (data.initial_state != thread_schedule_state::pending)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "thread_queue::create_thread",
+                    "staged tasks must have 'pending' as their initial state");
+            }
 
             // do not execute the work, but register a task description for
             // later thread creation
