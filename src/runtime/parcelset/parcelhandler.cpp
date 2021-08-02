@@ -11,7 +11,6 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/config/asio.hpp>
-#include <hpx/config/detail/compat_error_code.hpp>
 #include <hpx/config/endian.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>

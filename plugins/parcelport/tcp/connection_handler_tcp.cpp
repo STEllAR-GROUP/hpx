@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/config/detail/compat_error_code.hpp>
 #include <hpx/asio/asio_util.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/bind.hpp>
