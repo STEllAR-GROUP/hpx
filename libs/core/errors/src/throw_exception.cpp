@@ -8,9 +8,9 @@
 #include <hpx/config.hpp>
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/exception.hpp>
-#include <hpx/modules/filesystem.hpp>
 
 #include <exception>
+#include <filesystem>
 #include <string>
 #include <system_error>
 
@@ -18,7 +18,7 @@ namespace hpx { namespace detail {
     HPX_NORETURN void throw_exception(error errcode, std::string const& msg,
         std::string const& func, std::string const& file, long line)
     {
-        filesystem::path p(file);
+        std::filesystem::path p(file);
         hpx::detail::throw_exception(
             hpx::exception(errcode, msg, hpx::plain), func, p.string(), line);
     }
@@ -35,7 +35,7 @@ namespace hpx { namespace detail {
         throwmode mode, std::string const& /* func */, std::string const& file,
         long line, std::string const& auxinfo)
     {
-        filesystem::path p(file);
+        std::filesystem::path p(file);
         return hpx::detail::get_exception(hpx::exception(errcode, msg, mode),
             p.string(), file, line, auxinfo);
     }

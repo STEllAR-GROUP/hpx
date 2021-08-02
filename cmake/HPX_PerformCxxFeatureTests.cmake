@@ -37,8 +37,6 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX17_STD_EXECUTION_POLICES
   )
 
-  hpx_check_for_cxx17_filesystem(DEFINITIONS HPX_HAVE_CXX17_FILESYSTEM)
-
   hpx_check_for_cxx17_hardware_destructive_interference_size(
     DEFINITIONS HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE
   )

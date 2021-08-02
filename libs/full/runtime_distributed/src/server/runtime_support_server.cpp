@@ -24,7 +24,6 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
@@ -62,6 +61,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <filesystem>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -1219,7 +1219,7 @@ namespace hpx { namespace components { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_component_static(util::section& ini,
         std::string const& instance, std::string const& component,
-        filesystem::path const& lib, naming::gid_type const& /* prefix */,
+        std::filesystem::path const& lib, naming::gid_type const& /* prefix */,
         naming::resolver_client& /* agas_client */, bool /* isdefault */,
         bool /* isenabled */,
         hpx::program_options::options_description& options,
@@ -1327,7 +1327,7 @@ namespace hpx { namespace components { namespace server {
         iterator end = s.end();
         for (iterator i = s.begin(); i != end; ++i)
         {
-            namespace fs = filesystem;
+            namespace fs = std::filesystem;
 
             // the section name is the instance name of the component
             util::section const& sect = i->second;
@@ -1572,7 +1572,7 @@ namespace hpx { namespace components { namespace server {
 #if !defined(HPX_HAVE_STATIC_LINKING)
     bool runtime_support::load_component_dynamic(util::section& ini,
         std::string const& instance, std::string const& component,
-        filesystem::path lib, naming::gid_type const& prefix,
+        std::filesystem::path lib, naming::gid_type const& prefix,
         naming::resolver_client& agas_client, bool isdefault, bool isenabled,
         hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
@@ -1595,7 +1595,7 @@ namespace hpx { namespace components { namespace server {
         {
             // build path to component to load
             std::string libname(HPX_MAKE_DLL_STRING(component));
-            lib /= filesystem::path(libname);
+            lib /= std::filesystem::path(libname);
             d.load_library(ec);
             if (ec)
             {
@@ -1721,7 +1721,7 @@ namespace hpx { namespace components { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_component(hpx::util::plugin::dll& d,
         util::section& ini, std::string const& instance,
-        std::string const& /* component */, filesystem::path const& lib,
+        std::string const& /* component */, std::filesystem::path const& lib,
         naming::gid_type const& /* prefix */,
         naming::resolver_client& /* agas_client */, bool /* isdefault */,
         bool /* isenabled */,
@@ -1833,7 +1833,7 @@ namespace hpx { namespace components { namespace server {
         iterator end = s.end();
         for (iterator i = s.begin(); i != end; ++i)
         {
-            namespace fs = filesystem;
+            namespace fs = std::filesystem;
 
             // the section name is the instance name of the component
             util::section const& sect = i->second;
@@ -1927,7 +1927,7 @@ namespace hpx { namespace components { namespace server {
 #if !defined(HPX_HAVE_STATIC_LINKING)
     bool runtime_support::load_plugin(hpx::util::plugin::dll& d,
         util::section& ini, std::string const& instance,
-        std::string const& /* plugin */, filesystem::path const& lib,
+        std::string const& /* plugin */, std::filesystem::path const& lib,
         bool isenabled, hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
@@ -2013,7 +2013,7 @@ namespace hpx { namespace components { namespace server {
 
     bool runtime_support::load_plugin_dynamic(util::section& ini,
         std::string const& instance, std::string const& plugin,
-        filesystem::path lib, bool isenabled,
+        std::filesystem::path lib, bool isenabled,
         hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
@@ -2034,7 +2034,7 @@ namespace hpx { namespace components { namespace server {
         {
             // build path to component to load
             std::string libname(HPX_MAKE_DLL_STRING(plugin));
-            lib /= filesystem::path(libname);
+            lib /= std::filesystem::path(libname);
             d.load_library(ec);
             if (ec)
             {

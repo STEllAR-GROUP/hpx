@@ -10,14 +10,12 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/modules/filesystem.hpp>
 
-#include "deprecated_macro_check.hpp"
+#include <filesystem>
 #include <functional>
-#include "function_hyper.hpp"
 #include "boost/regex.hpp"
-
-namespace fs = hpx::filesystem;
+#include "deprecated_macro_check.hpp"
+#include "function_hyper.hpp"
 
 namespace
 {
@@ -103,8 +101,8 @@ namespace boost
    deprecated_macro_check::deprecated_macro_check()
      : m_files_with_errors(0)
      , m_from_boost_root(
-         fs::exists(search_root_path() / "boost") &&
-         fs::exists(search_root_path() / "libs"))
+         std::filesystem::exists(search_root_path() / "boost") &&
+         std::filesystem::exists(search_root_path() / "libs"))
    {
      register_signature( ".c" );
      register_signature( ".cpp" );

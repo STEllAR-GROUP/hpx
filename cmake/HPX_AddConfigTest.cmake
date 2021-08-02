@@ -366,15 +366,6 @@ function(hpx_check_for_cxx17_aligned_new)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx17_filesystem)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_FILESYSTEM
-    SOURCE cmake/tests/cxx17_filesystem.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx17_hardware_destructive_interference_size)
   add_hpx_config_test(
     HPX_WITH_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE

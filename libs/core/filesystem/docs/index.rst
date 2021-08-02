@@ -11,10 +11,8 @@
 filesystem
 ==========
 
-This module provides a compatibility layer for the C++17 filesystem library. If
-the filesystem library is available this module will simply forward its contents
-into the ``hpx::filesystem`` namespace. If the library is not available it will
-fall back to Boost.Filesystem instead.
+This module provides convenience utilities for the C++17 filesystem library.
+The utilities are based on those found in Boost.Filesystem.
 
 See the :ref:`API reference <modules_filesystem_api>` of the module for more
 details.

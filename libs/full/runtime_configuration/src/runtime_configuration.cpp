@@ -28,6 +28,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <filesystem>
 #include <iterator>
 #include <limits>
 #include <map>
@@ -555,9 +556,9 @@ namespace hpx { namespace util {
         std::vector<std::shared_ptr<components::component_registry_base>>&
             component_registries,
         std::string const& path, std::set<std::string>& component_paths,
-        std::map<std::string, filesystem::path>& basenames)
+        std::map<std::string, std::filesystem::path>& basenames)
     {
-        namespace fs = filesystem;
+        namespace fs = std::filesystem;
 
         using plugin_list_type =
             std::vector<std::shared_ptr<plugins::plugin_registry_base>>;
@@ -566,8 +567,8 @@ namespace hpx { namespace util {
         {
             fs::path this_p(path);
             std::error_code fsec;
-            fs::path canonical_p =
-                fs::canonical(this_p, fs::initial_path(), fsec);
+            fs::path canonical_p = hpx::filesystem::detail::canonical(
+                this_p, hpx::filesystem::detail::initial_path(), fsec);
             if (fsec)
                 canonical_p = this_p;
 
@@ -599,9 +600,9 @@ namespace hpx { namespace util {
         std::string const& component_base_paths,
         std::string const& component_path_suffixes,
         std::set<std::string>& component_paths,
-        std::map<std::string, filesystem::path>& basenames)
+        std::map<std::string, std::filesystem::path>& basenames)
     {
-        namespace fs = filesystem;
+        namespace fs = std::filesystem;
 
         // try to build default ini structure from shared libraries in default
         // installation location, this allows to install simple components
@@ -651,7 +652,7 @@ namespace hpx { namespace util {
         std::set<std::string> component_paths;
 
         // list of base names avoiding to load a module more than once
-        std::map<std::string, filesystem::path> basenames;
+        std::map<std::string, std::filesystem::path> basenames;
 
         // plugin registry object
         plugin_list_type plugin_registries;

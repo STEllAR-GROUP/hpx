@@ -8,7 +8,6 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/modules/filesystem.hpp>
 
 #include "length_check.hpp"
 #include "function_hyper.hpp"
@@ -23,7 +22,6 @@
 #include <string>
 
 using namespace std;
-namespace fs = hpx::filesystem;
 
 namespace boost
 {

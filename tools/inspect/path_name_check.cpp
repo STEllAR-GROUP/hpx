@@ -9,7 +9,6 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/modules/filesystem.hpp>
 #include <hpx/util/to_string.hpp>
 
 #include "path_name_check.hpp"
@@ -65,7 +64,7 @@ namespace boost
       // We want to inspect some of the hidden dirs
 
       ////  rules for dot characters differ slightly for directories and files
-      //if ( hpx::filesystem::is_directory( full_path ) )
+      //if ( std::filesystem::is_directory( full_path ) )
       //{
       //  if ( std::strchr( leaf.c_str(), '.' ) )
       //  {

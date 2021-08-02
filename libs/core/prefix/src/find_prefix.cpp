@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/string_util/classification.hpp>
@@ -37,6 +36,7 @@
 #include <boost/tokenizer.hpp>
 
 #include <cstdint>
+#include <filesystem>
 #include <string>
 
 namespace hpx { namespace util {
@@ -65,7 +65,7 @@ namespace hpx { namespace util {
             if (ec)
                 return hpx_prefix();
 
-            using hpx::filesystem::path;
+            using std::filesystem::path;
 
             std::string const prefix =
                 path(dll.get_directory(ec)).parent_path().string();
@@ -119,7 +119,7 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////////
     std::string get_executable_prefix(char const* argv0)
     {
-        using hpx::filesystem::path;
+        using std::filesystem::path;
         path p(get_executable_filename(argv0));
 
         return p.parent_path().parent_path().string();

@@ -29,6 +29,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -86,13 +87,11 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include "boost/test/included/prg_exec_monitor.hpp"
 #endif
 
-namespace fs = hpx::filesystem;
-
 using namespace boost::inspect;
 
 namespace
 {
-  fs::path search_root = fs::initial_path();
+  std::filesystem::path search_root = hpx::filesystem::detail::initial_path();
 
   class inspector_element
   {
@@ -157,7 +156,7 @@ namespace
 
 //   struct svn_check
 //   {
-//     explicit svn_check(const fs::path & inspect_root) :
+//     explicit svn_check(const std::filesystem::path & inspect_root) :
 //       inspect_root(inspect_root), fp(0) {}
 //
 //     int operator()() {
@@ -188,7 +187,7 @@ namespace
 //
 //     ~svn_check() { if (fp) PCLOSE(fp); }
 //
-//     const fs::path & inspect_root;
+//     const std::filesystem::path & inspect_root;
 //     std::string result;
 //     FILE* fp;
 //   private:
@@ -207,7 +206,7 @@ namespace
 
 //  get info (as a string) if inspect_root is svn working copy  --------------//
 
-//   string info( const fs::path & inspect_root )
+//   string info( const std::filesystem::path & inspect_root )
 //   {
 //     svn_check check_(inspect_root);
 //
@@ -257,7 +256,7 @@ namespace
       && local.find("doc/xml") != 0
       && local.find("doc\\xml") != 0
       // ignore if tag file present
-      && !hpx::filesystem::exists(pth / hpx_no_inspect)
+      && !std::filesystem::exists(pth / hpx_no_inspect)
       ;
   }
 
@@ -348,7 +347,7 @@ namespace
 
     for ( DirectoryIterator itr( dir_path ); itr != end_itr; ++itr )
     {
-      if ( fs::is_directory( *itr ) )
+      if ( std::filesystem::is_directory( *itr ) )
       {
         if ( visit_predicate( *itr ) )
         {
@@ -934,15 +933,15 @@ int cpp_main( int argc_param, char * argv_param[] )
         return 0;
     }
 
-    std::vector<fs::path> search_roots;
+    std::vector<std::filesystem::path> search_roots;
     if (vm.count("hpx:positional"))
     {
         for (auto const& s: vm["hpx:positional"].as<std::vector<std::string> >())
-            search_roots.push_back(fs::canonical(s, fs::initial_path()));
+            search_roots.push_back(hpx::filesystem::detail::canonical(s, hpx::filesystem::detail::initial_path()));
     }
     else
     {
-        search_roots.push_back(fs::canonical(fs::initial_path()));
+        search_roots.push_back(std::filesystem::canonical(hpx::filesystem::detail::initial_path()));
     }
 
     if (vm.count("text"))
@@ -1053,7 +1052,7 @@ int cpp_main( int argc_param, char * argv_param[] )
     for(auto const& search_root: search_roots)
     {
         ::search_root = search_root;
-        visit_all<fs::directory_iterator>( search_root.filename().string(),
+        visit_all<std::filesystem::directory_iterator>( search_root.filename().string(),
             search_root, inspectors );
     }
 

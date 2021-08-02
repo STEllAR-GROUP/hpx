@@ -14,16 +14,17 @@
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/shell_path.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/filesystem.hpp>
+
+#include <filesystem>
 
 namespace hpx { namespace components { namespace process { namespace posix
 {
-    filesystem::path shell_path()
+    std::filesystem::path shell_path()
     {
         return "/bin/sh";
     }
 
-    filesystem::path shell_path(hpx::error_code &ec)
+    std::filesystem::path shell_path(hpx::error_code& ec)
     {
         ec = hpx::make_success_code();
         return "/bin/sh";

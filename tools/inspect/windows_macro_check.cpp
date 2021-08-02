@@ -7,15 +7,12 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/modules/filesystem.hpp>
 
 #include "windows_macro_check.hpp"
 #include "function_hyper.hpp"
 #include <functional>
 #include <string>
 #include "boost/regex.hpp"
-
-namespace fs = hpx::filesystem;
 
 namespace
 {

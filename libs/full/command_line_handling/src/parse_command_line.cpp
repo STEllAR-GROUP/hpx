@@ -14,6 +14,7 @@
 
 #include <cctype>
 #include <cstddef>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -291,32 +292,24 @@ namespace hpx { namespace util {
             if (appname.empty())
                 return;
 
-            filesystem::path dir(filesystem::initial_path());
-            filesystem::path app(appname);
-            appname = filesystem::basename(app.filename());
+            std::filesystem::path dir(hpx::filesystem::detail::initial_path());
+            std::filesystem::path app(appname);
+            appname = hpx::filesystem::detail::basename(app.filename());
 
             // walk up the hierarchy, trying to find a file <appname>.cfg
             while (!dir.empty())
             {
-                filesystem::path filename = dir / (appname + ".cfg");
+                std::filesystem::path filename = dir / (appname + ".cfg");
                 bool result = read_config_file_options(filename.string(),
                     desc_cfgfile, vm, ini, node,
                     error_mode & ~util::report_missing_config_file);
                 if (result)
                     break;    // break on the first options file found
 
-                    // Boost filesystem and C++17 filesystem behave differently
-                    // here. Boost filesystem returns an empty path for
-                    // "/".parent_path() whereas C++17 filesystem will keep
-                    // returning "/".
-#if !defined(HPX_FILESYSTEM_HAVE_BOOST_FILESYSTEM_COMPATIBILITY)
                 auto dir_prev = dir;
                 dir = dir.parent_path();    // chop off last directory part
                 if (dir_prev == dir)
                     break;
-#else
-                dir = dir.parent_path();    // chop off last directory part
-#endif
             }
         }
 

@@ -9,7 +9,6 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/modules/filesystem.hpp>
 #include <hpx/util/to_string.hpp>
 
 #include "assert_macro_check.hpp"
@@ -17,8 +16,6 @@
 #include "boost/regex.hpp"
 
 #include <functional>
-
-namespace fs = hpx::filesystem;
 
 namespace
 {

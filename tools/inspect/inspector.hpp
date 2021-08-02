@@ -11,9 +11,8 @@
 
 #pragma once
 
-#include <hpx/modules/filesystem.hpp>
-
 #include <cstddef>
+#include <filesystem>
 #include <iostream>
 #include <ostream>
 #include <set>
@@ -21,7 +20,7 @@
 
 
 using std::string;
-using hpx::filesystem::path;
+using std::filesystem::path;
 
 namespace boost
 {

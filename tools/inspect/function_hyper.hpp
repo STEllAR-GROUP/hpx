@@ -9,13 +9,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/filesystem.hpp>
 
 #include "inspector.hpp"
 
+#include <filesystem>
 #include <string>
 
-using hpx::filesystem::path;
+using std::filesystem::path;
 
 // When you have a specific line and the line is the location of the link
 inline std::string linelink(path const& full_path, std::string const& linenumb)

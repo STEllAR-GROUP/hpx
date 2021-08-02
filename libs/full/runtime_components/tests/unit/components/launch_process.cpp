@@ -9,12 +9,12 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/process.hpp>
-#include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include "components/launch_process_test_server.hpp"
 
 #include <cstddef>
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -51,7 +51,7 @@ std::vector<std::string> get_environment()
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     namespace process = hpx::components::process;
-    namespace fs = hpx::filesystem;
+    namespace fs = std::filesystem;
 
     // find where the HPX core libraries are located
     fs::path base_dir = hpx::util::find_prefix();

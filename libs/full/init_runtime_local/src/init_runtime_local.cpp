@@ -52,6 +52,7 @@
 #include <cmath>
 #include <cstddef>
 #include <exception>
+#include <filesystem>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -360,7 +361,7 @@ namespace hpx {
             ////////////////////////////////////////////////////////////////////////
             void init_environment()
             {
-                HPX_UNUSED(hpx::filesystem::initial_path());
+                HPX_UNUSED(hpx::filesystem::detail::initial_path());
 
                 hpx::assertion::set_assertion_handler(
                     &hpx::detail::assertion_handler);

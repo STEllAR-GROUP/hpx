@@ -8,7 +8,6 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/string_util.hpp>
 
 #include "link_check.hpp"
@@ -17,9 +16,8 @@
 #include <cstdlib>
 #include <set>
 
+#include <filesystem>
 // #include <iostream>
-
-namespace fs = hpx::filesystem;
 
 namespace
 {
@@ -126,7 +124,7 @@ namespace boost
       const path & full_path )
     {
       // keep track of paths already encountered to reduce disk activity
-      if ( !fs::is_directory( full_path ) )
+      if ( !std::filesystem::is_directory( full_path ) )
         m_paths[ relative_to( full_path, search_root_path() ) ] |= m_present;
     }
 
@@ -435,7 +433,7 @@ namespace boost
       // convert to target_path, which is_complete()
       path target_path;
       try { target_path = source_path.parent_path() /= path( decoded_path ); }
-      catch ( const fs::filesystem_error & )
+      catch ( const std::filesystem::filesystem_error & )
       {
         if(!no_link_errors) {
           std::size_t ln = std::count( contents_begin, url_start, '\n' ) + 1;
@@ -452,7 +450,7 @@ namespace boost
       m_path_map::iterator itr( m_paths.find( entry.first ) );
       if ( itr == m_paths.end() )
       {
-        if ( fs::exists( target_path ) ) entry.second = m_present;
+        if ( std::filesystem::exists( target_path ) ) entry.second = m_present;
         itr = m_paths.insert( entry ).first;
       }
 

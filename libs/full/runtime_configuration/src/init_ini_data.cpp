@@ -21,6 +21,7 @@
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
+#include <filesystem>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -37,7 +38,7 @@ namespace hpx { namespace util {
     {
         try
         {
-            namespace fs = filesystem;
+            namespace fs = std::filesystem;
             std::error_code ec;
             if (!fs::exists(loc, ec) || ec)
                 return false;    // avoid exception on missing file
@@ -57,7 +58,7 @@ namespace hpx { namespace util {
         char const* env = getenv(env_var);
         if (nullptr != env)
         {
-            namespace fs = filesystem;
+            namespace fs = std::filesystem;
 
             fs::path inipath(env);
             if (nullptr != file_suffix)
@@ -80,7 +81,7 @@ namespace hpx { namespace util {
     // successfully
     bool init_ini_data_base(section& ini, std::string& hpx_ini_file)
     {
-        namespace fs = filesystem;
+        namespace fs = std::filesystem;
 
         // fall back: use compile time prefix
         std::string ini_paths(ini.get_entry("hpx.master_ini_path"));
@@ -145,7 +146,7 @@ namespace hpx { namespace util {
 
         if (!hpx_ini_file.empty())
         {
-            namespace fs = filesystem;
+            namespace fs = std::filesystem;
             std::error_code ec;
             if (!fs::exists(hpx_ini_file, ec) || ec)
             {
@@ -173,7 +174,7 @@ namespace hpx { namespace util {
     // global function to read component ini information
     void merge_component_inis(section& ini)
     {
-        namespace fs = filesystem;
+        namespace fs = std::filesystem;
 
         // now merge all information into one global structure
         std::string ini_path(
@@ -384,15 +385,15 @@ namespace hpx { namespace util {
 
     namespace detail {
         inline bool cmppath_less(
-            std::pair<filesystem::path, std::string> const& lhs,
-            std::pair<filesystem::path, std::string> const& rhs)
+            std::pair<std::filesystem::path, std::string> const& lhs,
+            std::pair<std::filesystem::path, std::string> const& rhs)
         {
             return lhs.first < rhs.first;
         }
 
         inline bool cmppath_equal(
-            std::pair<filesystem::path, std::string> const& lhs,
-            std::pair<filesystem::path, std::string> const& rhs)
+            std::pair<std::filesystem::path, std::string> const& lhs,
+            std::pair<std::filesystem::path, std::string> const& rhs)
         {
             return lhs.first == rhs.first;
         }
@@ -401,12 +402,12 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     std::vector<std::shared_ptr<plugins::plugin_registry_base>>
     init_ini_data_default(std::string const& libs, util::section& ini,
-        std::map<std::string, filesystem::path>& basenames,
+        std::map<std::string, std::filesystem::path>& basenames,
         std::map<std::string, hpx::util::plugin::dll>& modules,
         std::vector<std::shared_ptr<components::component_registry_base>>&
             component_registries)
     {
-        namespace fs = filesystem;
+        namespace fs = std::filesystem;
 
         typedef std::vector<std::shared_ptr<plugins::plugin_registry_base>>
             plugin_list_type;
@@ -444,7 +445,7 @@ namespace hpx { namespace util {
                     continue;
 
                 // instance name and module name are the same
-                std::string name(fs::basename(curr));
+                std::string name(hpx::filesystem::detail::basename(curr));
 
 #if !defined(HPX_WINDOWS)
                 if (0 == name.find("lib"))
@@ -459,8 +460,8 @@ namespace hpx { namespace util {
 #endif
                 // ensure base directory, remove symlinks, etc.
                 std::error_code fsec;
-                fs::path canonical_curr =
-                    fs::canonical(curr, fs::initial_path(), fsec);
+                fs::path canonical_curr = hpx::filesystem::detail::canonical(
+                    curr, hpx::filesystem::detail::initial_path(), fsec);
                 if (fsec)
                     canonical_curr = curr;
 

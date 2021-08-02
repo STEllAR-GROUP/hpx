@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/ini/ini.hpp>
-#include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/agas_service_mode.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
@@ -21,6 +20,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <filesystem>
 #include <map>
 #include <memory>
 #include <set>
@@ -170,7 +170,7 @@ namespace hpx { namespace util {
             std::string const& component_base_paths,
             std::string const& component_path_suffixes,
             std::set<std::string>& component_paths,
-            std::map<std::string, filesystem::path>& basenames);
+            std::map<std::string, std::filesystem::path>& basenames);
 
         void load_component_path(
             std::vector<std::shared_ptr<plugins::plugin_registry_base>>&
@@ -178,7 +178,7 @@ namespace hpx { namespace util {
             std::vector<std::shared_ptr<components::component_registry_base>>&
                 component_registries,
             std::string const& path, std::set<std::string>& component_paths,
-            std::map<std::string, filesystem::path>& basenames);
+            std::map<std::string, std::filesystem::path>& basenames);
 
     public:
         runtime_mode mode_;

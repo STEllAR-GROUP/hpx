@@ -6,7 +6,6 @@
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -19,6 +18,7 @@
 
 #include <cstddef>
 #include <cstdlib>    // for putenv
+#include <filesystem>
 #include <fstream>
 #include <functional>
 #include <iomanip>
@@ -363,7 +363,7 @@ int main()
     test_config_file(config_file);
 
     // delete the config file
-    hpx::filesystem::remove(config_file);
+    std::filesystem::remove(config_file);
 
     return hpx::util::report_errors();
 }

@@ -14,11 +14,11 @@
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
-#include <hpx/modules/filesystem.hpp>
 #include <hpx/serialization/string.hpp>
 
 #include <boost/shared_array.hpp>
 
+#include <filesystem>
 #include <string>
 
 namespace hpx { namespace components { namespace process { namespace posix {
@@ -82,7 +82,7 @@ inline run_exe_ run_exe(const std::string &s)
     return run_exe_(s);
 }
 
-inline run_exe_ run_exe(const filesystem::path &p)
+inline run_exe_ run_exe(const std::filesystem::path& p)
 {
     return run_exe_(p.string());
 }

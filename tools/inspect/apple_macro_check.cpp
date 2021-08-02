@@ -9,15 +9,15 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/modules/filesystem.hpp>
 
-#include "apple_macro_check.hpp"
-#include "function_hyper.hpp"
+#include <filesystem>
 #include <functional>
 #include <string>
+#include "apple_macro_check.hpp"
 #include "boost/regex.hpp"
+#include "function_hyper.hpp"
 
-namespace fs = hpx::filesystem;
+using std::filesystem::path;
 
 namespace
 {

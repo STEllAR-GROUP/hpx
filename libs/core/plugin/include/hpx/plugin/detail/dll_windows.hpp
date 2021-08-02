@@ -13,6 +13,7 @@
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
 
+#include <filesystem>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -70,10 +71,8 @@ namespace hpx { namespace util { namespace plugin {
           , dll_handle(nullptr)
         {
             // map_name defaults to dll base name
-            namespace fs = filesystem;
-
             fs::path dll_path(dll_name);
-            map_name = fs::basename(dll_path);
+            map_name = hpx::filesystem::detail::basename(dll_path);
         }
 
         void load_library(error_code& ec = throws)

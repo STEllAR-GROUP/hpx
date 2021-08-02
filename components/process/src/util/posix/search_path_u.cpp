@@ -14,13 +14,13 @@
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/search_path.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/filesystem.hpp>
 
 #include <boost/tokenizer.hpp>
 
 #include <unistd.h>
 
 #include <cstdlib>
+#include <filesystem>
 #include <stdexcept>
 #include <string>
 
@@ -45,7 +45,7 @@ namespace hpx { namespace components { namespace process { namespace posix
         tokenizer tok(path, sep);
         for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)
         {
-            filesystem::path p = *it;
+            std::filesystem::path p = *it;
             p /= filename;
             if (!::access(p.c_str(), X_OK))
             {

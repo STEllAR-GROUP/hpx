@@ -8,7 +8,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
-#include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/util/from_string.hpp>
 

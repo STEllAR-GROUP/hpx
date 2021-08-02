@@ -8,11 +8,11 @@
 #pragma once
 
 #include <hpx/ini/ini.hpp>
-#include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 
+#include <filesystem>
 #include <map>
 #include <memory>
 #include <string>
@@ -48,7 +48,7 @@ namespace hpx { namespace util {
     // default ini settings assuming all of those are components
     std::vector<std::shared_ptr<plugins::plugin_registry_base>>
     init_ini_data_default(std::string const& libs, section& ini,
-        std::map<std::string, filesystem::path>& basenames,
+        std::map<std::string, std::filesystem::path>& basenames,
         std::map<std::string, hpx::util::plugin::dll>& modules,
         std::vector<std::shared_ptr<components::component_registry_base>>&
             component_registries);

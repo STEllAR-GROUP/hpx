@@ -13,6 +13,7 @@
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
 
+#include <filesystem>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
@@ -136,10 +137,10 @@ namespace hpx { namespace util { namespace plugin {
           , mtx_(mutex_instance())
         {
             // map_name defaults to dll base name
-            namespace fs = filesystem;
+            namespace fs = std::filesystem;
 
             fs::path dll_path(dll_name);
-            map_name = fs::basename(dll_path);
+            map_name = hpx::filesystem::detail::basename(dll_path);
         }
 
         void load_library(error_code& ec = throws)
@@ -315,7 +316,7 @@ namespace hpx { namespace util { namespace plugin {
         std::string get_directory(error_code& ec = throws) const
         {
             // now find the full path of the loaded library
-            using filesystem::path;
+            using std::filesystem::path;
             std::string result;
 
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)

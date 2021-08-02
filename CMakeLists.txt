@@ -2118,20 +2118,6 @@ set(HPX_WITH_TARGET_ARCHITECTURE
     CACHE INTERNAL "" FORCE
 )
 
-# Compatibility with using Boost.FileSystem, introduced in V1.4.0
-set(__filesystem_compatibility_default ON)
-if(HPX_WITH_CXX17_FILESYSTEM)
-  set(__filesystem_compatibility_default OFF)
-endif()
-hpx_option(
-  HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY
-  BOOL
-  "Enable Boost.FileSystem compatibility. (default: ${__filesystem_compatibility_default})"
-  ${__filesystem_compatibility_default}
-  ADVANCED
-  CATEGORY "Modules"
-)
-
 # Compatibility with using Boost.Iterator traversal tags, introduced in V1.7.0
 hpx_option(
   HPX_ITERATOR_SUPPORT_WITH_BOOST_ITERATOR_TRAVERSAL_TAG_COMPATIBILITY BOOL
@@ -2154,7 +2140,6 @@ include(HPX_SetupThreads)
 
 # Setup our required Boost libraries.
 include(HPX_SetupBoost)
-include(HPX_SetupBoostFilesystem)
 include(HPX_SetupBoostIostreams)
 
 # Set up standalone Asio

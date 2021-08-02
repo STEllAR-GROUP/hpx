@@ -14,35 +14,32 @@
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/shell_path.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/filesystem.hpp>
 
+#include <filesystem>
 #include <windows.h>
 
-namespace hpx { namespace components { namespace process { namespace windows
-{
-    filesystem::path shell_path()
+namespace hpx { namespace components { namespace process { namespace windows {
+    std::filesystem::path shell_path()
     {
         TCHAR sysdir[MAX_PATH];
         UINT size = ::GetSystemDirectory(sysdir, sizeof(sysdir));
         if (!size)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "process::shell_path",
+            HPX_THROW_EXCEPTION(invalid_status, "process::shell_path",
                 "GetSystemDirectory() failed");
         }
-        filesystem::path p = sysdir;
+        std::filesystem::path p = sysdir;
         return p / "cmd.exe";
     }
 
-    filesystem::path shell_path(hpx::error_code &ec)
+    std::filesystem::path shell_path(hpx::error_code& ec)
     {
         TCHAR sysdir[MAX_PATH];
         UINT size = ::GetSystemDirectory(sysdir, sizeof(sysdir));
-        filesystem::path p;
+        std::filesystem::path p;
         if (!size)
         {
-            HPX_THROWS_IF(ec, invalid_status,
-                "process::shell_path",
+            HPX_THROWS_IF(ec, invalid_status, "process::shell_path",
                 "GetSystemDirectory() failed");
         }
         else
@@ -53,6 +50,6 @@ namespace hpx { namespace components { namespace process { namespace windows
         }
         return p;
     }
-}}}}
+}}}}    // namespace hpx::components::process::windows
 
 #endif

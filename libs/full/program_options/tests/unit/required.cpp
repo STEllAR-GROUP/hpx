@@ -6,11 +6,11 @@
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <hpx/modules/program_options.hpp>
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -147,7 +147,7 @@ int main()
     simple_required_test(config_file);
 
     // delete the config file
-    hpx::filesystem::remove(config_file);
+    std::filesystem::remove(config_file);
 
     return hpx::util::report_errors();
 }

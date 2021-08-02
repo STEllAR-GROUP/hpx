@@ -454,7 +454,6 @@ with section("parse"):
     'hpx_check_for_cxx11_std_quick_exit': {'pargs': {'nargs': 0}},
     'hpx_check_for_cxx11_std_shared_ptr_lwg3018': {'pargs': {'nargs': 0}},
     'hpx_check_for_cxx17_aligned_new': {'pargs': {'nargs': 0}},
-    'hpx_check_for_cxx17_filesystem': {'pargs': {'nargs': 0}},
     'hpx_check_for_cxx17_hardware_destructive_interference_size': { 'pargs': { 'nargs': 0}},
     'hpx_check_for_libfun_std_experimental_optional': {'pargs': {'nargs': 0}},
     'hpx_check_for_mm_prefetch': {'pargs': {'nargs': 0}},
