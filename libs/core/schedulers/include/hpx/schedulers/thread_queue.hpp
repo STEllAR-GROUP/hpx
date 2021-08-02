@@ -295,7 +295,7 @@ namespace hpx { namespace threads { namespace policies {
                     count + parameters_.min_add_new_count_)
                 {    //-V104
                     HPX_ASSERT(parameters_.max_thread_count_ - count <
-                        (std::numeric_limits<std::int64_t>::max) ());
+                        (std::numeric_limits<std::int64_t>::max)());
                     add_count = static_cast<std::int64_t>(
                         parameters_.max_thread_count_ - count);
                     if (add_count < parameters_.min_add_new_count_)
@@ -382,11 +382,9 @@ namespace hpx { namespace threads { namespace policies {
                     // this thread has to be in this map
                     HPX_ASSERT(thread_map_.find(tid) != thread_map_.end());
 
-                    bool deleted = thread_map_.erase(tid) != 0;
-                    HPX_ASSERT(deleted);
-                    if (deleted)
+                    if (thread_map_.erase(tid) != 0)
                     {
-                        deallocate(todelete);
+                        recycle_thread(tid);
                         --thread_map_count_;
                         HPX_ASSERT(thread_map_count_ >= 0);
                     }
@@ -395,14 +393,12 @@ namespace hpx { namespace threads { namespace policies {
             else
             {
                 // delete only this many threads
-                std::int64_t delete_count =
-                    (std::min) (static_cast<std::int64_t>(
-                                    terminated_items_count_ / 10),
-                        static_cast<std::int64_t>(
-                            parameters_.max_delete_count_));
+                std::int64_t delete_count = (std::min)(
+                    static_cast<std::int64_t>(terminated_items_count_ / 10),
+                    static_cast<std::int64_t>(parameters_.max_delete_count_));
 
                 // delete at least this many threads
-                delete_count = (std::max) (delete_count,
+                delete_count = (std::max)(delete_count,
                     static_cast<std::int64_t>(parameters_.min_delete_count_));
 
                 thread_data* todelete;
@@ -411,18 +407,16 @@ namespace hpx { namespace threads { namespace policies {
                     thread_id_type tid(todelete);
                     --terminated_items_count_;
 
-                    // this thread has to be in this map
+                    // this thread has to be in this map, except if it has changed
+                    // its priority, then it could be elsewhere
                     HPX_ASSERT(thread_map_.find(tid) != thread_map_.end());
 
-                    bool deleted = thread_map_.erase(tid) != 0;
-                    HPX_ASSERT(deleted);
-                    HPX_UNUSED(deleted);
-                    --thread_map_count_;
-
-                    HPX_ASSERT(thread_map_count_ >= 0);
-
-                    recycle_thread(tid);
-
+                    if (thread_map_.erase(tid) != 0)
+                    {
+                        recycle_thread(tid);
+                        --thread_map_count_;
+                        HPX_ASSERT(thread_map_count_ >= 0);
+                    }
                     --delete_count;
                 }
             }

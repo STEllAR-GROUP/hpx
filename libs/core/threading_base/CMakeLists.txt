@@ -70,6 +70,7 @@ set(threading_base_sources
     print.cpp
     scheduler_base.cpp
     set_thread_state.cpp
+    set_thread_state_timed.cpp
     thread_data.cpp
     thread_data_stackful.cpp
     thread_data_stackless.cpp

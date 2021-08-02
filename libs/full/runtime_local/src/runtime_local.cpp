@@ -302,7 +302,6 @@ namespace hpx {
 #endif
             threads::detail::network_background_callback_type{});
 
-
         // initialize our TLS
         runtime::init_tss();
         util::reinit_construct();    // call only after TLS was initialized
