@@ -584,7 +584,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     // step 4 use this return value
                     [last_iter, final_dest](
                         std::vector<hpx::shared_future<T>>&&,
-                        std::vector<hpx::future<void>> &&) -> result_type {
+                        std::vector<hpx::future<void>>&&) -> result_type {
                         return result_type{last_iter, final_dest};
                     });
             }
