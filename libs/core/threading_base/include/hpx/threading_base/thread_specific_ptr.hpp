@@ -12,6 +12,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
 #include <hpx/coroutines/detail/tss.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 
@@ -108,3 +109,4 @@ namespace hpx { namespace threads {
         }
     };
 }}    // namespace hpx::threads
+#endif
