@@ -47,13 +47,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             detail::reverse<FwdIter> r;
             return dataflow(
                 [=](hpx::future<FwdIter>&& f1) mutable -> hpx::future<FwdIter> {
-                    // propagate exceptions
                     f1.get();
 
                     hpx::future<FwdIter> f = r.call2(p, non_seq(), first, last);
                     return f.then(
                         [=](hpx::future<FwdIter>&& f) mutable -> FwdIter {
-                            f.get();    // propagate exceptions
+                            f.get();
                             std::advance(
                                 first, detail::distance(new_first, last));
                             return first;
@@ -62,48 +61,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 r.call2(p, non_seq(), new_first, last));
         }
 
-        /* Sequential shift_left implementation borrowed
+        /* Sequential shift_left implementation inspired
         from https://github.com/danra/shift_proposal */
 
-        template <class FwdIter, class N, typename Sent>
-        constexpr N bounded_advance(FwdIter& i, N n, Sent const bound)
-        {
-            for (; n > 0 && i != bound; --n, void(++i))
-            {
-                ;
-            }
-
-            return n;
-        }
-
         template <typename FwdIter, typename Sent, typename Size>
-        static constexpr std::enable_if_t<
-            hpx::traits::is_random_access_iterator_v<FwdIter>, FwdIter>
-        sequential_shift_left(FwdIter first, Sent last, Size n)
+        static constexpr FwdIter sequential_shift_left(
+            FwdIter first, Sent last, Size n, std::size_t dist)
         {
-            auto mid = first;
-            if (detail::bounded_advance(mid, n, last))
+            auto mid = std::next(first, n);
+
+            if constexpr (hpx::traits::is_random_access_iterator_v<FwdIter>)
             {
-                return first;
+                return parallel::util::get_second_element(
+                    util::move_n(mid, dist - n, std::move(first)));
             }
-
-            return parallel::util::get_second_element(util::move_n(
-                mid, detail::distance(mid, last), std::move(first)));
-        }
-
-        template <typename FwdIter, typename Sent, typename Size>
-        static constexpr std::enable_if_t<
-            !hpx::traits::is_random_access_iterator_v<FwdIter>, FwdIter>
-        sequential_shift_left(FwdIter first, Sent last, Size n)
-        {
-            auto mid = first;
-            if (detail::bounded_advance(mid, n, last))
+            else
             {
-                return first;
+                return parallel::util::get_second_element(util::move(
+                    std::move(mid), std::move(last), std::move(first)));
             }
-
-            return parallel::util::get_second_element(
-                util::move(std::move(mid), std::move(last), std::move(first)));
         }
 
         template <typename FwdIter2>
@@ -127,7 +103,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return first;
                 }
 
-                return detail::sequential_shift_left(first, last, n);
+                return detail::sequential_shift_left(first, last, n, dist);
             }
 
             template <typename ExPolicy, typename Sent, typename Size>

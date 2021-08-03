@@ -48,13 +48,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             detail::reverse<FwdIter> r;
             return dataflow(
                 [=](hpx::future<FwdIter>&& f1) mutable -> hpx::future<FwdIter> {
-                    // propagate exceptions
                     f1.get();
 
                     hpx::future<FwdIter> f = r.call2(p, non_seq(), first, last);
                     return f.then(
                         [=](hpx::future<FwdIter>&& f) mutable -> FwdIter {
-                            f.get();    // propagate exceptions
+                            f.get();
                             return new_first;
                         });
                 },
@@ -79,106 +78,48 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::enable_if_t<
                 std::is_convertible_v<iterator_category_t<I>, Tag>>> = true;
 
-        template <class FwdIter>
-        constexpr std::enable_if_t<
-            !is_category<FwdIter, std::bidirectional_iterator_tag>,
-            difference_type_t<FwdIter>>
-        bounded_advance_r(
-            FwdIter& i, difference_type_t<FwdIter> n, FwdIter const bound)
-        {
-            for (; n > 0 && i != bound; --n, void(++i))
-            {
-                ;
-            }
-
-            return n;
-        }
-
-        template <class FwdIter>
-        constexpr std::enable_if_t<
-            is_category<FwdIter, std::bidirectional_iterator_tag>,
-            difference_type_t<FwdIter>>
-        bounded_advance_r(
-            FwdIter& i, difference_type_t<FwdIter> n, FwdIter const bound)
-        {
-            for (; n < 0 && i != bound; ++n, void(--i))
-            {
-                ;
-            }
-
-            for (; n > 0 && i != bound; --n, void(++i))
-            {
-                ;
-            }
-
-            return n;
-        }
-
         template <typename FwdIter>
-        std::enable_if_t<!is_category<FwdIter, std::bidirectional_iterator_tag>,
-            FwdIter>
-        sequential_shift_right(
-            FwdIter first, FwdIter last, difference_type_t<FwdIter> n)
+        FwdIter sequential_shift_right(FwdIter first, FwdIter last,
+            difference_type_t<FwdIter> n, std::size_t dist)
         {
-            if (n <= 0)
+            if constexpr (is_category<FwdIter, std::bidirectional_iterator_tag>)
             {
-                return first;
+                auto mid = std::next(first, dist - n);
+                return std::move_backward(
+                    std::move(first), std::move(mid), std::move(last));
             }
-
-            auto result = first;
-            if (bounded_advance_r(result, n, last))
+            else
             {
-                return last;
-            }
+                auto result = std::next(first, n);
+                auto lead = result;
+                auto trail = first;
 
-            auto lead = result;
-            auto trail = first;
-
-            for (; trail != result; ++lead, void(++trail))
-            {
-                if (lead == last)
-                {
-                    std::move(
-                        std::move(first), std::move(trail), std::move(result));
-                    return result;
-                }
-            }
-
-            for (;;)
-            {
-                for (auto mid = first; mid != result;
-                     ++lead, void(++trail), ++mid)
+                for (; trail != result; ++lead, void(++trail))
                 {
                     if (lead == last)
                     {
-                        trail = std::move(mid, result, std::move(trail));
-                        std::move(
-                            std::move(first), std::move(mid), std::move(trail));
+                        std::move(std::move(first), std::move(trail),
+                            std::move(result));
                         return result;
                     }
-                    std::iter_swap(mid, trail);
+                }
+
+                for (;;)
+                {
+                    for (auto mid = first; mid != result;
+                         ++lead, void(++trail), ++mid)
+                    {
+                        if (lead == last)
+                        {
+                            trail = std::move(mid, result, std::move(trail));
+                            std::move(std::move(first), std::move(mid),
+                                std::move(trail));
+                            return result;
+                        }
+                        std::iter_swap(mid, trail);
+                    }
                 }
             }
-        }
-
-        template <typename FwdIter>
-        std::enable_if_t<is_category<FwdIter, std::bidirectional_iterator_tag>,
-            FwdIter>
-        sequential_shift_right(
-            FwdIter first, FwdIter last, difference_type_t<FwdIter> n)
-        {
-            if (n <= 0)
-            {
-                return first;
-            }
-
-            auto mid = last;
-            if (bounded_advance_r(mid, -n, first))
-            {
-                return last;
-            }
-            return std::move_backward(
-                std::move(first), std::move(mid), std::move(last));
         }
 
         template <typename FwdIter2>
@@ -204,7 +145,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 auto last_iter = detail::advance_to_sentinel(first, last);
                 return detail::sequential_shift_right(
-                    first, last_iter, difference_type_t<FwdIter>(n));
+                    first, last_iter, difference_type_t<FwdIter>(n), dist);
             }
 
             template <typename ExPolicy, typename Sent, typename Size>
