@@ -86,3 +86,8 @@ namespace hpx { namespace util {
         return iterator_range<Iterator, Sentinel>(iterator, sentinel);
     }
 }}    // namespace hpx::util
+
+namespace hpx { namespace ranges {
+    template <typename I, typename S = I>
+    using subrange_t = hpx::util::iterator_range<I, S>;
+}}    // namespace hpx::ranges
