@@ -223,8 +223,8 @@ namespace hpx { namespace ranges {
     ///
     /// \returns  The \a rotate_copy algorithm returns a \a
     ///           rotate_copy_result<FwdIter, OutIter>.
-    ///           The \a rotate_copy algorithm returns the output iterator to the
-    ///           element past the last element copied.
+    ///           The \a rotate_copy algorithm returns the output iterator to
+    ///           the element past the last element copied.
     ///
     template <typename FwdIter, typename Sent, typename OutIter>
     rotate_copy_result<FwdIter, OutIter> rotate_copy(
@@ -274,8 +274,8 @@ namespace hpx { namespace ranges {
     ///           execution policy is of type \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a
     ///           rotate_copy_result<FwdIter1, FwdIter2> otherwise.
-    ///           The \a rotate_copy algorithm returns the output iterator to the
-    ///           element past the last element copied.
+    ///           The \a rotate_copy algorithm returns the output iterator to
+    ///           the element past the last element copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Sent,
         typename FwdIter2>
@@ -314,8 +314,8 @@ namespace hpx { namespace ranges {
     /// \returns  The \a rotate algorithm returns a \a
     ///           rotate_copy_result<typename hpx::traits::range_iterator<Rng>
     ///           ::type,OutIter>.
-    ///           The \a rotate_copy algorithm returns the output iterator to the
-    ///           element past the last element copied.
+    ///           The \a rotate_copy algorithm returns the output iterator to
+    ///           the element past the last element copied.
     ///
     template <typename Rng, typename OutIter>
     typename rotate_copy_result<typename hpx::traits::range_iterator<Rng>::type,
@@ -372,8 +372,8 @@ namespace hpx { namespace ranges {
     ///           returns \a rotate_copy_result<
     ///           typename hpx::traits::range_iterator<Rng>::type, OutIter>
     ///           otherwise.
-    ///           The \a rotate_copy algorithm returns the output iterator to the
-    ///           element past the last element copied.
+    ///           The \a rotate_copy algorithm returns the output iterator to
+    ///           the element past the last element copied.
     ///
     template <typename ExPolicy, typename Rng, typename OutIter>
     typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -399,6 +399,7 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+#include <hpx/iterator_support/iterator_range.hpp> 
 
 #include <type_traits>
 #include <utility>
@@ -407,7 +408,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
     // clang-format off
     template <typename ExPolicy, typename Rng,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value)>
     // clang-format on
     HPX_DEPRECATED_V(1, 8,
@@ -426,17 +427,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format off
     template <typename ExPolicy, typename Rng, typename OutIter,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&& hpx::traits::is_range<
-                Rng>::value&& hpx::traits::is_iterator<OutIter>::value)>
+            hpx::is_execution_policy<ExPolicy>::value && hpx::traits::is_range<
+                Rng>::value && hpx::traits::is_iterator<OutIter>::value)>
     // clang-format on
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::rotate_copy is deprecated, use "
-        "hpx::ranges::rotate_copy "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        util::in_out_result<typename hpx::traits::range_iterator<Rng>::type,
-            OutIter>>::type rotate_copy(ExPolicy&& policy, Rng&& rng,
-        typename hpx::traits::range_iterator<Rng>::type middle,
-        OutIter dest_first)
+        "hpx::ranges::rotate_copy instead")
+        typename util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<typename hpx::traits::range_iterator<Rng>::type,
+                OutIter>>::type rotate_copy(ExPolicy&& policy, Rng&& rng,
+            typename hpx::traits::range_iterator<Rng>::type middle,
+            OutIter dest_first)
     {
         return rotate_copy(std::forward<ExPolicy>(policy),
             hpx::util::begin(rng), middle, hpx::util::end(rng), dest_first);
@@ -444,9 +445,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx { namespace ranges {
-    template <typename I, typename S = I>
-    using subrange_t = hpx::util::iterator_range<I, S>;
-
     template <typename I, typename O>
     using rotate_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
@@ -469,7 +467,7 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::util::make_subrange<FwdIter, Sent>(
+            return hpx::parallel::util::get_subrange<FwdIter, Sent>(
                 hpx::parallel::v1::detail::rotate<FwdIter>().call(
                     hpx::execution::seq, first, middle, last),
                 last);
@@ -496,7 +494,7 @@ namespace hpx { namespace ranges {
                     !hpx::traits::is_bidirectional_iterator<FwdIter>::value>
                 is_seq;
 
-            return hpx::parallel::util::make_subrange<FwdIter, Sent>(
+            return hpx::parallel::util::get_subrange<FwdIter, Sent>(
                 hpx::parallel::v1::detail::rotate<FwdIter>().call2(
                     std::forward<ExPolicy>(policy), is_seq(), first, middle,
                     last),
@@ -512,7 +510,7 @@ namespace hpx { namespace ranges {
         tag_fallback_dispatch(hpx::ranges::rotate_t, Rng&& rng,
             typename hpx::traits::range_iterator<Rng>::type middle)
         {
-            return hpx::parallel::util::make_subrange<
+            return hpx::parallel::util::get_subrange<
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::v1::detail::rotate<
@@ -524,8 +522,8 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename Rng,
-            HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                    hpx::traits::is_range<Rng>::value)>
+            HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value && 
+                hpx::traits::is_range<Rng>::value)>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             hpx::parallel::util::in_out_result<
@@ -536,7 +534,7 @@ namespace hpx { namespace ranges {
         {
             typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-            return hpx::parallel::util::make_subrange<
+            return hpx::parallel::util::get_subrange<
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::v1::detail::rotate<
@@ -556,32 +554,33 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename FwdIter, typename Sent, typename OutIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value&& 
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value&&
-                hpx::traits::is_iterator<OutIter>::value           
-           )>
-        // clang-format on   
+                hpx::traits::is_iterator<FwdIter>::value &&
+                hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
+                hpx::traits::is_iterator<OutIter>::value
+            )>
+        // clang-format on
         friend rotate_copy_result<FwdIter, OutIter> tag_fallback_dispatch(
-            hpx::ranges::rotate_copy_t,FwdIter first, 
+            hpx::ranges::rotate_copy_t,FwdIter first,
             FwdIter middle, Sent last, OutIter dest_first)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");
             static_assert((hpx::traits::is_output_iterator<OutIter>::value),
                 "Requires at least output iterator.");
-                
+
             return hpx::parallel::v1::detail::rotate_copy<
                 rotate_copy_result<FwdIter, OutIter>>()
                 .call(hpx::execution::seq, first, middle,last, dest_first);
         }
-        
+
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename Sent, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value&& 
-                hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_sentinel_for<Sent, FwdIter1>::value&&
-                hpx::traits::is_iterator<FwdIter2>::value)>
+        template <typename ExPolicy, typename FwdIter1, typename Sent,
+            typename FwdIter2, HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_sentinel_for<Sent, FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value
+            )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             rotate_copy_result<FwdIter1, FwdIter2>>::type
@@ -607,22 +606,22 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename Rng, typename OutIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value&& 
+                hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_iterator<OutIter>::value
             )>
-        // clang-format on 
-        friend rotate_copy_result<typename hpx::traits::range_iterator<Rng>::type, 
+        // clang-format on
+        friend rotate_copy_result<typename hpx::traits::range_iterator<Rng>::type,
             OutIter>
         tag_fallback_dispatch(hpx::ranges::rotate_copy_t, Rng&& rng,
-            typename hpx::traits::range_iterator<Rng>::type middle,          
+            typename hpx::traits::range_iterator<Rng>::type middle,
                 OutIter dest_first)
         {
             return hpx::parallel::v1::detail::rotate_copy<rotate_copy_result<
                 typename hpx::traits::range_iterator<Rng>::type, OutIter>>().call(
-                    hpx::execution::seq, hpx::util::begin(rng), middle, 
-                    hpx::util::end(rng), dest_first);       
-        }   
-    
+                    hpx::execution::seq, hpx::util::begin(rng), middle,
+                    hpx::util::end(rng), dest_first);
+        }
+
         // clang-format off
         template <typename ExPolicy, typename Rng, typename OutIter,
             HPX_CONCEPT_REQUIRES_(

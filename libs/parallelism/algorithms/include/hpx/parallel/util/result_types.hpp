@@ -1,6 +1,6 @@
 //  Copyright (c) 2020 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
-// 
+//
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -130,7 +130,7 @@ namespace hpx { namespace parallel { namespace util {
     {
         return hpx::make_future(ior, [](in_out_result<I, O> const& ior) {
             return hpx::util::iterator_range<I, O>(ior.in, ior.out);
-            });
+        });
     }
 
     ///////////////////////////////////////////////////////////////////////////

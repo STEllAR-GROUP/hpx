@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/container_algorithms/rotate.hpp>
@@ -21,7 +22,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // test case for iterator - sentinel_value
-void test_rotate_sent()
+void test_rotate_sent(typename IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -39,15 +40,15 @@ void test_rotate_sent()
     auto mid = std::begin(c);
     std::advance(mid, mid_pos);
 
-    hpx::ranges::rotate(
-        std::begin(c), iterator(mid), sentinel<std::size_t>{d1});
+    hpx::ranges::rotate(std::begin(c), iterator(mid),
+        sentinel<std::size_t>{*(std::end(c) - 1)});
 
     base_iterator mid1 = std::begin(d1);
     std::advance(mid1, mid_pos);
-    std::rotate(std::begin(d1), mid1, std::end(d1));
+    std::rotate(std::begin(d1), mid1, std::end(d1) - 1);
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c.base()), std::end(c.base()),
+    HPX_TEST(std::equal(std::begin(c.base()), std::end(c.base())-1,
         std::begin(d1), [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -56,8 +57,8 @@ void test_rotate_sent()
     HPX_TEST_EQ(count, d1.size());
 }
 
-template <typename ExPolicy>
-void test_rotate_sent(ExPolicy policy)
+template <typename ExPolicy, typename IteratorTag>
+void test_rotate_sent(ExPolicy policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -78,15 +79,15 @@ void test_rotate_sent(ExPolicy policy)
     auto mid = std::begin(c);
     std::advance(mid, mid_pos);
 
-    hpx::ranges::rotate(
-        policy, std::begin(c), iterator(mid), sentinel<std::size_t>{d1});
+    hpx::ranges::rotate(policy, std::begin(c), iterator(mid),
+        sentinel<std::size_t>{*(std::end(c) - 1)});
 
     base_iterator mid1 = std::begin(d1);
     std::advance(mid1, mid_pos);
-    std::rotate(std::begin(d1), mid1, std::end(d1));
+    std::rotate(std::begin(d1), mid1, std::end(d1)-1);
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c.base()), std::end(c.base()),
+    HPX_TEST(std::equal(std::begin(c.base()), std::end(c.base())-1,
         std::begin(d1), [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -95,7 +96,7 @@ void test_rotate_sent(ExPolicy policy)
     HPX_TEST_EQ(count, d1.size());
 }
 
-//add test w/o ExPolicy
+//add ranges test w/o ExPolicy
 template <typename IteratorTag>
 void test_rotate(IteratorTag)
 {
@@ -211,9 +212,10 @@ void test_rotate()
 {
     using namespace hpx::execution;
 
-    test_rotate_sent();
-    test_rotate_sent(par);
-    test_rotate_sent(par_unseq);
+    test_rotate_sent(IteratorTag());
+    test_rotate_sent(seq, IteratorTag());
+    test_rotate_sent(par, IteratorTag());
+    test_rotate_sent(par_unseq, IteratorTag());
 
     test_rotate(IteratorTag());
     test_rotate(seq, IteratorTag());
@@ -245,7 +247,7 @@ void test_rotate_exception(IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -287,7 +289,7 @@ void test_rotate_exception(ExPolicy policy, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -328,7 +330,7 @@ void test_rotate_exception_async(ExPolicy p, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -397,7 +399,7 @@ void test_rotate_bad_alloc(IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
@@ -439,7 +441,7 @@ void test_rotate_bad_alloc(ExPolicy policy, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
@@ -479,7 +481,7 @@ void test_rotate_bad_alloc_async(ExPolicy p, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
@@ -514,7 +516,6 @@ template <typename IteratorTag>
 void test_rotate_bad_alloc()
 {
     using namespace hpx::execution;
-    
     test_rotate_bad_alloc(IteratorTag());
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions

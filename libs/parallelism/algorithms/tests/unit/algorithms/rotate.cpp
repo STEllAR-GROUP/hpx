@@ -122,10 +122,11 @@ void test_rotate_async(ExPolicy p, IteratorTag)
     HPX_TEST_EQ(count, d1.size());
 }
 
-template <typename IteratorTag>
+template <typename IteratorTag> 
 void test_rotate()
 {
     using namespace hpx::execution;
+    test_rotate(IteratorTag());
     test_rotate(seq, IteratorTag());
     test_rotate(par, IteratorTag());
     test_rotate(par_unseq, IteratorTag());
@@ -155,7 +156,7 @@ void test_rotate_exception(IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -195,7 +196,7 @@ void test_rotate_exception(ExPolicy policy, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -234,7 +235,7 @@ void test_rotate_exception_async(ExPolicy p, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -301,7 +302,7 @@ void test_rotate_bad_alloc(IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
@@ -341,7 +342,7 @@ void test_rotate_bad_alloc(ExPolicy policy, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
@@ -378,7 +379,7 @@ void test_rotate_bad_alloc_async(ExPolicy p, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max) (std::rand() % c.size(), std::size_t(2));    //-V104
+        (std::max)(std::rand() % c.size(), std::size_t(2));    //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
@@ -410,10 +411,10 @@ template <typename IteratorTag>
 void test_rotate_bad_alloc()
 {
     using namespace hpx::execution;
-
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_rotate_bad_alloc(IteratorTag());
     test_rotate_bad_alloc(seq, IteratorTag());
     test_rotate_bad_alloc(par, IteratorTag());
 
