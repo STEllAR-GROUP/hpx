@@ -9,6 +9,101 @@
 
 #pragma once
 
+#if defined(DOXYGEN)
+namespace hpx {
+    // clang-format off
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Shifts the elements in the range [first, last) by n positions towards
+    /// the end of the range. For every integer i in [0, last - first - n),
+    /// moves the element originally at position first + i to position first
+    /// + n + i.
+    ///
+    /// \note   Complexity: At most (last - first) - n assignments.
+    ///
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     positions to shift by.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param n            Refers to the number of positions to shift.
+    ///
+    /// The assignment operations in the parallel \a shift_right algorithm
+    /// invoked without an execution policy object will execute in sequential
+    /// order in the calling thread.
+    ///
+    /// \note The type of dereferenced \a FwdIter must meet the requirements
+    ///       of \a MoveAssignable.
+    ///
+    /// \returns  The \a shift_right algorithm returns \a FwdIter.
+    ///           The \a shift_right algorithm returns an iterator to the
+    ///           end of the resulting range.
+    ///
+    template <typename FwdIter, typename Size>
+    FwdIter shift_right(FwdIter first, FwdIter last, Size n);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Shifts the elements in the range [first, last) by n positions towards
+    /// the end of the range. For every integer i in [0, last - first - n),
+    /// moves the element originally at position first + i to position first
+    /// + n + i.
+    ///
+    /// \note   Complexity: At most (last - first) - n assignments.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     positions to shift by.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param n            Refers to the number of positions to shift.
+    ///
+    /// The assignment operations in the parallel \a shift_right algorithm
+    /// invoked with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignment operations in the parallel \a shift_right algorithm
+    /// invoked with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \note The type of dereferenced \a FwdIter must meet the requirements
+    ///       of \a MoveAssignable.
+    ///
+    /// \returns  The \a shift_right algorithm returns a
+    ///           \a hpx::future<FwdIter> if
+    ///           the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a shift_right algorithm returns an iterator to the
+    ///           end of the resulting range.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename Size>
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>
+    shift_right(ExPolicy&& policy, FwdIter first, FwdIter last, Size n);
+
+    // clang-format on
+}    // namespace hpx
+
+#else    // DOXYGEN
+
 #include <hpx/config.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -27,6 +122,7 @@
 #include <hpx/parallel/util/transfer.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -98,8 +194,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     if (lead == last)
                     {
-                        std::move(std::move(first), std::move(trail),
-                            std::move(result));
+                        std::move(std::move(first), std::move(trail), result);
                         return result;
                     }
                 }
@@ -212,3 +307,5 @@ namespace hpx {
         }
     } shift_right{};
 }    // namespace hpx
+
+#endif    // DOXYGEN
