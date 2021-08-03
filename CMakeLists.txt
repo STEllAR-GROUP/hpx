@@ -528,11 +528,31 @@ if(NOT HPX_WITH_TESTS)
     VALUE OFF
     FORCE
   )
-  hpx_set_option(HPX_WITH_TESTS_REGRESSIONS VALUE OFF FORCE)
-  hpx_set_option(HPX_WITH_TESTS_UNIT VALUE OFF FORCE)
-  hpx_set_option(HPX_WITH_TESTS_HEADERS VALUE OFF FORCE)
-  hpx_set_option(HPX_WITH_TESTS_EXTERNAL_BUILD VALUE OFF FORCE)
-  hpx_set_option(HPX_WITH_TESTS_EXAMPLES VALUE OFF FORCE)
+  hpx_set_option(
+    HPX_WITH_TESTS_REGRESSIONS
+    VALUE OFF
+    FORCE
+  )
+  hpx_set_option(
+    HPX_WITH_TESTS_UNIT
+    VALUE OFF
+    FORCE
+  )
+  hpx_set_option(
+    HPX_WITH_TESTS_HEADERS
+    VALUE OFF
+    FORCE
+  )
+  hpx_set_option(
+    HPX_WITH_TESTS_EXTERNAL_BUILD
+    VALUE OFF
+    FORCE
+  )
+  hpx_set_option(
+    HPX_WITH_TESTS_EXAMPLES
+    VALUE OFF
+    FORCE
+  )
 endif()
 
 hpx_option(
@@ -540,7 +560,8 @@ hpx_option(
   BOOL
   "Enable the distributed runtime (default: ON). Turning off the distributed runtime completely disallows the creation and use of components and actions. Turning this option off is experimental!"
   ON
-  CATEGORY "Build Targets" ADVANCED
+  CATEGORY "Build Targets"
+  ADVANCED
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
@@ -762,7 +783,8 @@ hpx_option(
   STRING
   "HPX applications will not use more that this number of OS-Threads (empty string means dynamic) (default: ${HPX_MAX_CPU_COUNT_DEFAULT})"
   "${HPX_MAX_CPU_COUNT_DEFAULT}"
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 if(HPX_WITH_MAX_CPU_COUNT)
   hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
@@ -777,7 +799,8 @@ hpx_option(
   STRING
   "HPX applications will not run on machines with more NUMA domains (default: ${HPX_MAX_NUMA_DOMAIN_COUNT_DEFAULT})"
   ${HPX_MAX_NUMA_DOMAIN_COUNT_DEFAULT}
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 hpx_add_config_define(
   HPX_HAVE_MAX_NUMA_DOMAIN_COUNT ${HPX_WITH_MAX_NUMA_DOMAIN_COUNT}
@@ -786,24 +809,30 @@ hpx_add_config_define(
 hpx_option(
   HPX_WITH_THREAD_STACK_MMAP BOOL
   "Use mmap for stack allocation on appropriate platforms" ON
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 hpx_option(
   HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF BOOL
   "HPX scheduler threads do exponential backoff on idle queues (default: ON)" ON
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 hpx_option(
   HPX_WITH_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)"
-  ON CATEGORY "Thread Manager" ADVANCED
+  ON
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 hpx_option(
   HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION BOOL
   "Enable thread stack back trace being captured on suspension (default: OFF)"
-  OFF CATEGORY "Thread Manager" ADVANCED
+  OFF
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 # We create a target to contain libraries like rt, dl etc. in order to remove
@@ -824,7 +853,8 @@ if(HPX_WITH_STACKTRACES OR HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
   hpx_option(
     HPX_WITH_THREAD_BACKTRACE_DEPTH STRING
     "Thread stack back trace depth being captured (default: 20)" "20"
-    CATEGORY "Thread Manager" ADVANCED
+    CATEGORY "Thread Manager"
+    ADVANCED
   )
   hpx_add_config_define(
     HPX_HAVE_THREAD_BACKTRACE_DEPTH ${HPX_WITH_THREAD_BACKTRACE_DEPTH}
@@ -840,7 +870,8 @@ if(HPX_WITH_STACKTRACES OR HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
     hpx_option(
       HPX_WITH_STACKTRACES_STATIC_SYMBOLS BOOL
       "Thread stack back trace will resolve static symbols (default: OFF)" OFF
-      CATEGORY "Thread Manager" ADVANCED
+      CATEGORY "Thread Manager"
+      ADVANCED
     )
     hpx_add_config_define(
       HPX_HAVE_STACKTRACES_STATIC_SYMBOLS
@@ -851,7 +882,8 @@ if(HPX_WITH_STACKTRACES OR HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
     hpx_option(
       HPX_WITH_STACKTRACES_DEMANGLE_SYMBOLS BOOL
       "Thread stack back trace symbols will be demangled (default: ON)" ON
-      CATEGORY "Thread Manager" ADVANCED
+      CATEGORY "Thread Manager"
+      ADVANCED
     )
     if(HPX_WITH_STACKTRACES_DEMANGLE_SYMBOLS)
       hpx_add_config_define(HPX_HAVE_STACKTRACES_DEMANGLE_SYMBOLS)
@@ -865,7 +897,9 @@ if(HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
   hpx_option(
     HPX_WITH_THREAD_FULLBACKTRACE_ON_SUSPENSION BOOL
     "Enable thread stack back trace being captured on suspension (default: OFF)"
-    OFF CATEGORY "Thread Manager" ADVANCED
+    OFF
+    CATEGORY "Thread Manager"
+    ADVANCED
   )
   if(HPX_WITH_THREAD_FULLBACKTRACE_ON_SUSPENSION)
     hpx_add_config_define(HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION)
@@ -875,7 +909,9 @@ endif()
 hpx_option(
   HPX_WITH_THREAD_TARGET_ADDRESS BOOL
   "Enable storing target address in thread for NUMA awareness (default: OFF)"
-  OFF CATEGORY "Thread Manager" ADVANCED
+  OFF
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 if(HPX_WITH_THREAD_TARGET_ADDRESS)
@@ -885,7 +921,8 @@ endif()
 hpx_option(
   HPX_WITH_THREAD_QUEUE_WAITTIME BOOL
   "Enable collecting queue wait times for threads (default: OFF)" OFF
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 if(HPX_WITH_THREAD_QUEUE_WAITTIME)
@@ -897,13 +934,15 @@ hpx_option(
   BOOL
   "Enable measuring the percentage of overhead times spent in the scheduler (default: OFF)"
   OFF
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 hpx_option(
   HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES BOOL
   "Enable measuring thread creation and cleanup times (default: OFF)" OFF
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 if(HPX_WITH_THREAD_IDLE_RATES)
@@ -918,7 +957,8 @@ hpx_option(
   BOOL
   "Enable keeping track of cumulative thread counts in the schedulers (default: ON)"
   ON
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 if(HPX_WITH_THREAD_CUMULATIVE_COUNTS)
@@ -930,7 +970,8 @@ hpx_option(
   BOOL
   "Enable keeping track of counts of thread stealing incidents in the schedulers (default: OFF)"
   OFF
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 if(HPX_WITH_THREAD_STEALING_COUNTS)
@@ -940,7 +981,9 @@ endif()
 hpx_option(
   HPX_WITH_COROUTINE_COUNTERS BOOL
   "Enable keeping track of coroutine creation and rebind counts (default: OFF)"
-  OFF CATEGORY "Thread Manager" ADVANCED
+  OFF
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 if(HPX_WITH_COROUTINE_COUNTERS)
   hpx_add_config_define(HPX_HAVE_COROUTINE_COUNTERS)
@@ -949,7 +992,8 @@ endif()
 hpx_option(
   HPX_WITH_THREAD_LOCAL_STORAGE BOOL
   "Enable thread local storage for all HPX threads (default: OFF)" OFF
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 if(HPX_WITH_THREAD_LOCAL_STORAGE)
@@ -959,7 +1003,8 @@ endif()
 hpx_option(
   HPX_WITH_SCHEDULER_LOCAL_STORAGE BOOL
   "Enable scheduler local storage for all HPX schedulers (default: OFF)" OFF
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 if(HPX_WITH_SCHEDULER_LOCAL_STORAGE)
@@ -969,7 +1014,8 @@ endif()
 hpx_option(
   HPX_WITH_SPINLOCK_POOL_NUM STRING
   "Number of elements a spinlock pool manages (default: 128)" 128
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 hpx_add_config_define(HPX_HAVE_SPINLOCK_POOL_NUM ${HPX_WITH_SPINLOCK_POOL_NUM})
@@ -980,7 +1026,8 @@ hpx_option(
   STRING
   "[Deprecated] Maximum number of terminated threads collected before those are cleaned up (default: 100)"
   "0"
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 if(HPX_SCHEDULER_MAX_TERMINATED_THREADS GREATER 0)
@@ -996,7 +1043,8 @@ endif()
 hpx_option(
   HPX_WITH_SPINLOCK_DEADLOCK_DETECTION BOOL
   "Enable spinlock deadlock detection (default: OFF)" OFF
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 
 if(HPX_WITH_SPINLOCK_DEADLOCK_DETECTION)
@@ -1026,11 +1074,13 @@ hpx_option(
   BOOL
   "Use FetchContent to fetch Asio. By default an installed Asio will be used. (default: OFF)"
   OFF
-  CATEGORY "Build Targets" ADVANCED
+  CATEGORY "Build Targets"
+  ADVANCED
 )
 hpx_option(
   HPX_WITH_ASIO_TAG STRING "Asio repository tag or branch" "asio-1-18-2"
-  CATEGORY "Build Targets" ADVANCED
+  CATEGORY "Build Targets"
+  ADVANCED
 )
 
 # cmake-format: off
@@ -1095,7 +1145,8 @@ hpx_option(
   BOOL
   "Disable internal IO thread pool, do not change if not absolutely necessary (default: ON)"
   ON
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 if(HPX_WITH_IO_POOL)
   hpx_add_config_define(HPX_HAVE_IO_POOL)
@@ -1106,7 +1157,8 @@ hpx_option(
   BOOL
   "Disable internal timer thread pool, do not change if not absolutely necessary (default: ON)"
   ON
-  CATEGORY "Thread Manager" ADVANCED
+  CATEGORY "Thread Manager"
+  ADVANCED
 )
 if(HPX_WITH_TIMER_POOL)
   hpx_add_config_define(HPX_HAVE_TIMER_POOL)
@@ -1116,7 +1168,8 @@ endif()
 hpx_option(
   HPX_WITH_AGAS_DUMP_REFCNT_ENTRIES BOOL
   "Enable dumps of the AGAS refcnt tables to logs (default: OFF)" OFF
-  CATEGORY "AGAS" ADVANCED
+  CATEGORY "AGAS"
+  ADVANCED
 )
 if(HPX_WITH_AGAS_DUMP_REFCNT_ENTRIES)
   hpx_add_config_define(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
@@ -1148,7 +1201,9 @@ if(HPX_WITH_NETWORKING)
 
   hpx_option(
     HPX_WITH_PARCEL_PROFILING BOOL "Enable profiling data for parcels"
-    ${_parcel_profiling_default} CATEGORY "Parcelport" ADVANCED
+    ${_parcel_profiling_default}
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   if(HPX_WITH_PARCEL_PROFILING)
@@ -1161,7 +1216,8 @@ if(HPX_WITH_NETWORKING)
     BOOL
     "Enable the libfabric based parcelport. This is currently an experimental feature"
     OFF
-    CATEGORY "Parcelport" ADVANCED
+    CATEGORY "Parcelport"
+    ADVANCED
   )
   if(HPX_WITH_PARCELPORT_LIBFABRIC)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_LIBFABRIC)
@@ -1220,7 +1276,8 @@ if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
     STRING
     "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK)."
     "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK"
-    CATEGORY "Parcelport" ADVANCED
+    CATEGORY "Parcelport"
+    ADVANCED
   )
 
   # This list is to detect whether we run inside an mpi environment. If one of
@@ -1238,8 +1295,9 @@ if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
 
   hpx_option(
     HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
-    "Turn on MPI multithreading support (default: ON)." ON CATEGORY "Parcelport"
-                                                                    ADVANCED
+    "Turn on MPI multithreading support (default: ON)." ON
+    CATEGORY "Parcelport"
+    ADVANCED
   )
   if(HPX_WITH_PARCELPORT_MPI_MULTITHREADED)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
@@ -1257,7 +1315,8 @@ endif()
 hpx_option(
   HPX_WITH_EXAMPLES_OPENMP BOOL
   "Enable examples requiring OpenMP support (default: OFF)." OFF
-  CATEGORY "Build Targets" ADVANCED
+  CATEGORY "Build Targets"
+  ADVANCED
 )
 if(HPX_WITH_EXAMPLES_OPENMP)
   find_package(OpenMP)
@@ -1268,7 +1327,8 @@ endif()
 hpx_option(
   HPX_WITH_EXAMPLES_TBB BOOL
   "Enable examples requiring TBB support (default: OFF)." OFF
-  CATEGORY "Build Targets" ADVANCED
+  CATEGORY "Build Targets"
+  ADVANCED
 )
 if(HPX_WITH_EXAMPLES_TBB)
   find_package(TBB)
@@ -1279,7 +1339,8 @@ endif()
 hpx_option(
   HPX_WITH_EXAMPLES_QTHREADS BOOL
   "Enable examples requiring QThreads support (default: OFF)." OFF
-  CATEGORY "Build Targets" ADVANCED
+  CATEGORY "Build Targets"
+  ADVANCED
 )
 if(HPX_WITH_EXAMPLES_QTHREADS)
   find_package(QThreads)
@@ -1290,7 +1351,8 @@ endif()
 hpx_option(
   HPX_WITH_EXAMPLES_HDF5 BOOL
   "Enable examples requiring HDF5 support (default: OFF)." OFF
-  CATEGORY "Build Targets" ADVANCED
+  CATEGORY "Build Targets"
+  ADVANCED
 )
 if(HPX_WITH_EXAMPLES_HDF5)
   find_package(HDF5 COMPONENTS CXX)
@@ -1304,7 +1366,8 @@ if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_option(
     HPX_WITH_EXAMPLES_QT4 BOOL
     "Enable examples requiring Qt4 support (default: OFF)." OFF
-    CATEGORY "Build Targets" ADVANCED
+    CATEGORY "Build Targets"
+    ADVANCED
   )
   if(HPX_WITH_EXAMPLES_QT4)
     find_package(Qt4)
@@ -1330,32 +1393,37 @@ hpx_option(
   BOOL
   "Enable lock verification code (default: OFF, implicitly enabled in debug builds)"
   OFF
-  CATEGORY "Debugging" ADVANCED
+  CATEGORY "Debugging"
+  ADVANCED
 )
 hpx_option(
   HPX_WITH_VERIFY_LOCKS_GLOBALLY
   BOOL
   "Enable global lock verification code (default: OFF, implicitly enabled in debug builds)"
   OFF
-  CATEGORY "Debugging" ADVANCED
+  CATEGORY "Debugging"
+  ADVANCED
 )
 hpx_option(
   HPX_WITH_VERIFY_LOCKS_BACKTRACE
   BOOL
   "Enable thread stack back trace being captured on lock registration (to be used in combination with HPX_WITH_VERIFY_LOCKS=ON, default: OFF)"
   OFF
-  CATEGORY "Debugging" ADVANCED
+  CATEGORY "Debugging"
+  ADVANCED
 )
 hpx_option(
   HPX_WITH_THREAD_DEBUG_INFO
   BOOL
   "Enable thread debugging information (default: OFF, implicitly enabled in debug builds)"
   OFF
-  CATEGORY "Debugging" ADVANCED
+  CATEGORY "Debugging"
+  ADVANCED
 )
 hpx_option(
   HPX_WITH_THREAD_GUARD_PAGE BOOL "Enable thread guard page (default: ON)" ON
-  CATEGORY "Debugging" ADVANCED
+  CATEGORY "Debugging"
+  ADVANCED
 )
 
 if(HPX_WITH_VERIFY_LOCKS)
@@ -1384,13 +1452,15 @@ endif()
 hpx_option(
   HPX_WITH_THREAD_DESCRIPTION_FULL BOOL
   "Use function address for thread description (default: OFF)" OFF
-  CATEGORY "Debugging" ADVANCED
+  CATEGORY "Debugging"
+  ADVANCED
 )
 
 hpx_option(
   HPX_WITH_ATTACH_DEBUGGER_ON_TEST_FAILURE BOOL
   "Break the debugger if a test has failed  (default: OFF)" OFF
-  CATEGORY "Debugging" ADVANCED
+  CATEGORY "Debugging"
+  ADVANCED
 )
 if(HPX_WITH_ATTACH_DEBUGGER_ON_TEST_FAILURE)
   hpx_add_config_define(HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE)
@@ -1399,13 +1469,15 @@ endif()
 hpx_option(
   HPX_WITH_TESTS_DEBUG_LOG BOOL
   "Turn on debug logs (--hpx:debug-hpx-log) for tests (default: OFF)" OFF
-  CATEGORY "Debugging" ADVANCED
+  CATEGORY "Debugging"
+  ADVANCED
 )
 
 hpx_option(
   HPX_WITH_TESTS_DEBUG_LOG_DESTINATION STRING
-  "Destination for test debug logs (default: cout)" "cout" CATEGORY "Debugging"
-                                                                    ADVANCED
+  "Destination for test debug logs (default: cout)" "cout"
+  CATEGORY "Debugging"
+  ADVANCED
 )
 
 hpx_option(
@@ -1413,7 +1485,8 @@ hpx_option(
   STRING
   "Maximum number of threads to use for tests (default: 0, use the number of threads specified by the test)"
   0
-  CATEGORY "Debugging" ADVANCED
+  CATEGORY "Debugging"
+  ADVANCED
 )
 
 hpx_option(
@@ -1421,7 +1494,8 @@ hpx_option(
   BOOL
   "Pass --hpx:bind=none to tests that may run in parallel (cmake -j flag) (default: OFF)"
   OFF
-  CATEGORY "Debugging" ADVANCED
+  CATEGORY "Debugging"
+  ADVANCED
 )
 
 # If APEX is defined, the action timers need thread debug info.
@@ -1512,7 +1586,8 @@ hpx_option(
   BOOL
   "Enable swapping of rvalue tuples (needed for parallel::sort_by_key, default: ON)."
   ON
-  CATEGORY "Utility" ADVANCED
+  CATEGORY "Utility"
+  ADVANCED
 )
 if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
