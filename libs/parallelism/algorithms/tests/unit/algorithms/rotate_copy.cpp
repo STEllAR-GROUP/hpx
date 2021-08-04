@@ -154,9 +154,8 @@ void test_rotate_copy_exception(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::rotate_copy(
-            decorated_iterator(
-                std::begin(c), []() { throw std::runtime_error("test"); }),
+        hpx::rotate_copy(decorated_iterator(std::begin(c),
+                            []() { throw std::runtime_error("test"); }),
             decorated_iterator(mid), decorated_iterator(std::end(c)),
             std::begin(d));
         HPX_TEST(false);

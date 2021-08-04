@@ -48,7 +48,7 @@ void test_rotate_sent(typename IteratorTag)
     std::rotate(std::begin(d1), mid1, std::end(d1) - 1);
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c.base()), std::end(c.base())-1,
+    HPX_TEST(std::equal(std::begin(c.base()), std::end(c.base()) - 1,
         std::begin(d1), [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -84,10 +84,10 @@ void test_rotate_sent(ExPolicy policy, IteratorTag)
 
     base_iterator mid1 = std::begin(d1);
     std::advance(mid1, mid_pos);
-    std::rotate(std::begin(d1), mid1, std::end(d1)-1);
+    std::rotate(std::begin(d1), mid1, std::end(d1) - 1);
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c.base()), std::end(c.base())-1,
+    HPX_TEST(std::equal(std::begin(c.base()), std::end(c.base()) - 1,
         std::begin(d1), [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
