@@ -46,10 +46,10 @@ void test_rotate_copy_sent(typename IteratorTag)
     std::advance(mid_base, mid_pos);
 
     std::rotate_copy(
-        std::begin(c.base()), mid_base, std::end(c.base())-1, std::begin(d2));
+        std::begin(c.base()), mid_base, std::end(c.base()) - 1, std::begin(d2));
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(d1), std::end(d1)-1, std::begin(d2),
+    HPX_TEST(std::equal(std::begin(d1), std::end(d1) - 1, std::begin(d2),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -85,10 +85,10 @@ void test_rotate_copy_sent(ExPolicy policy, IteratorTag)
     std::advance(mid_base, mid_pos);
 
     std::rotate_copy(
-        std::begin(c.base()), mid_base, std::end(c.base())-1, std::begin(d2));
+        std::begin(c.base()), mid_base, std::end(c.base()) - 1, std::begin(d2));
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(d1), std::end(d1)-1, std::begin(d2),
+    HPX_TEST(std::equal(std::begin(d1), std::end(d1) - 1, std::begin(d2),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -417,11 +417,10 @@ void test_rotate_copy_bad_alloc(IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::ranges::rotate_copy(
-            hpx::util::make_iterator_range(
-                decorated_iterator(
-                    std::begin(c), []() { throw std::bad_alloc(); }),
-                decorated_iterator(std::end(c))),
+        hpx::ranges::rotate_copy(hpx::util::make_iterator_range(
+                                    decorated_iterator(std::begin(c),
+                                        []() { throw std::bad_alloc(); }),
+                                    decorated_iterator(std::end(c))),
             decorated_iterator(mid), std::begin(d));
         HPX_TEST(false);
     }

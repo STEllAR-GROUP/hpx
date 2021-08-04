@@ -122,7 +122,7 @@ void test_rotate_async(ExPolicy p, IteratorTag)
     HPX_TEST_EQ(count, d1.size());
 }
 
-template <typename IteratorTag> 
+template <typename IteratorTag>
 void test_rotate()
 {
     using namespace hpx::execution;
