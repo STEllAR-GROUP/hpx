@@ -38,5 +38,9 @@ namespace hpx { namespace traits {
     struct is_placeholder<T const> : is_placeholder<T>
     {
     };
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE int is_placeholder_v =
+        is_placeholder<T>::value;
 #endif
 }}    // namespace hpx::traits
