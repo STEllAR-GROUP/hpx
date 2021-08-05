@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2020 Hartmut Kaiser
+//  Copyright (c) 2015-2021 Hartmut Kaiser
 //  Copyright (c) 2015-2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -130,7 +130,7 @@ namespace hpx { namespace serialization { namespace detail {
     template <>
     struct extra_archive_data_helper<preprocess_gid_types>
     {
-        HPX_EXPORT static void id() noexcept;
+        HPX_EXPORT static extra_archive_data_id_type id() noexcept;
         static constexpr void reset(preprocess_gid_types*) noexcept {}
     };
 }}}    // namespace hpx::serialization::detail
