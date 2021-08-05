@@ -213,6 +213,10 @@ namespace hpx { namespace execution { namespace experimental {
         BaseScheduler sched_;
         /// \endcond
     };
+
+    template <typename BaseScheduler>
+    explicit scheduler_executor(BaseScheduler&& sched)
+        -> scheduler_executor<std::decay_t<BaseScheduler>>;
 }}}    // namespace hpx::execution::experimental
 
 namespace hpx { namespace parallel { namespace execution {
