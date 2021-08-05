@@ -257,6 +257,64 @@ program now, you should see the familiar ``Hello World!``:
    confusing compile time errors mentioning ``user_main`` or even runtime
    errors.
 
+.. _windows_installation:
+
+How to install |hpx| on Windows
+-------------------------------
+
+Installation of required prerequisites
+......................................
+
+* Download the Boost c++ libraries from |boost_downloads|_
+* Install the Boost library as explained in the section
+  :ref:`boost_installation`
+* Install the hwloc library as explained in the section
+  :ref:`hwloc_installation`
+* Download the latest version of |cmake| binaries, which are located under the
+  platform section of the downloads page at |cmake_download|_.
+* Download the latest version of |hpx| from the |stellar| website:
+  |stellar_hpx_download|_.
+
+Installation of the |hpx| library
+.................................
+
+* Create a build folder. |hpx| requires an out-of-tree-build. This means that
+  you will be unable to run CMake in the |hpx| source folder.
+* Open up the CMake GUI. In the input box labelled "Where is the source code:",
+  enter the full path to the source folder. The source directory is the one where
+  the sources were checked out. CMakeLists.txt files in the source directory as
+  well as the subdirectories describe the build to CMake. In addition to this,
+  there are CMake scripts (usually ending in .cmake) stored in a special CMake
+  directory. CMake does not alter any file in the source directory and doesn't
+  add new ones either. In the input box labelled "Where to build the binaries:",
+  enter the full path to the build folder you created before. The build
+  directory is one where all compiler outputs are stored, which includes object
+  files and final executables.
+* Add CMake variable definitions (if any) by clicking the "Add Entry" button.
+  There are two required variables you need to define: ``BOOST_ROOT`` and
+  ``HWLOC_ROOT`` These (``PATH``) variables need to be set to point to the root
+  folder of your Boost and hwloc installations. It is recommended to set
+  the variable ``CMAKE_INSTALL_PREFIX`` as well. This determines where the |hpx|
+  libraries will be built and installed. If this (``PATH``) variable is set, it
+  has to refer to the directory where the built |hpx| files should be installed
+  to.
+* Press the "Configure" button. A window will pop up asking you which compilers
+  to use. Select the Visual Studio 10 (64Bit) compiler (it usually is the
+  default if available). The Visual Studio 2012 (64Bit) and Visual Studio 2013
+  (64Bit) compilers are supported as well. Note that while it is possible to
+  build |hpx| for x86, we don't recommend doing so as 32 bit runs are severely
+  restricted by a 32 bit Windows system limitation affecting the number of |hpx|
+  threads you can create.
+* Press "Configure" again. Repeat this step until the "Generate" button becomes
+  clickable (and until no variable definitions are marked in red anymore).
+* Press "Generate".
+* Open up the build folder, and double-click hpx.sln.
+* Build the INSTALL target.
+
+For more detailed information about using |cmake|_ please refer its
+documentation and also the section :ref:`building_hpx`.
+
+
 Writing task-based applications
 ===============================
 
