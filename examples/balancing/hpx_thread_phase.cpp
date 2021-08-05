@@ -6,6 +6,7 @@
 
 #include <hpx/init.hpp>
 #include <hpx/local/barrier.hpp>
+#include <hpx/local/functional.hpp>
 #include <hpx/local/mutex.hpp>
 #include <hpx/local/thread.hpp>
 
@@ -21,37 +22,38 @@
 
 using boost::lockfree::queue;
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using std::chrono::milliseconds;
 
 using hpx::lcos::local::barrier;
 using hpx::lcos::local::mutex;
 
+using hpx::threads::make_thread_function_nullary;
 using hpx::threads::register_thread;
 using hpx::threads::thread_init_data;
-using hpx::threads::make_thread_function_nullary;
 
-using hpx::threads::get_thread_phase;
-using hpx::threads::get_self_id;
 using hpx::threads::get_self;
-using hpx::threads::thread_id_type;
+using hpx::threads::get_self_id;
+using hpx::threads::get_thread_phase;
 using hpx::threads::set_thread_state;
+using hpx::threads::thread_id_ref_type;
+using hpx::threads::thread_id_type;
 
 typedef std::pair<thread_id_type, std::size_t> value_type;
 typedef std::vector<value_type> fifo_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 void lock_and_wait(mutex& m, barrier& b0, barrier& b1, value_type& entry,
-    std::size_t /* wait */
-)
+    std::size_t /* wait */)
 {
     // Wait for all hpxthreads in this iteration to be created.
     b0.wait();
 
-    const thread_id_type this_ = get_self_id();
+    // keep this thread alive while being suspended
+    thread_id_ref_type this_ = get_self_id();
 
     while (true)
     {
@@ -60,12 +62,12 @@ void lock_and_wait(mutex& m, barrier& b0, barrier& b1, value_type& entry,
 
         if (l.owns_lock())
         {
-            entry = value_type(this_, get_thread_phase(this_));
+            entry = value_type(this_.noref(), get_thread_phase(this_.noref()));
             break;
         }
 
         // Schedule a wakeup.
-        set_thread_state(this_, milliseconds(30),
+        set_thread_state(this_.noref(), milliseconds(30),
             hpx::threads::thread_schedule_state::pending);
 
         // Suspend this HPX thread.
@@ -111,20 +113,19 @@ int hpx_main(variables_map& vm)
         std::vector<mutex> m(mutex_count);
         barrier b0(hpxthread_count + 1), b1(hpxthread_count + 1);
 
+        // keep created threads alive while they are suspended
+        std::vector<thread_id_ref_type> ids;
         for (std::size_t j = 0; j < hpxthread_count; ++j)
         {
             // Compute the mutex to be used for this thread.
             const std::size_t index = j % mutex_count;
 
-            thread_init_data data(make_thread_function_nullary(
-                hpx::util::bind
-                (&lock_and_wait, std::ref(m[index])
-                               , std::ref(b0)
-                               , std::ref(b1)
-                               , std::ref(hpxthreads[j])
-                               , wait))
-              , "lock_and_wait");
-            register_thread(data);
+            thread_init_data data(
+                make_thread_function_nullary(hpx::util::bind(&lock_and_wait,
+                    std::ref(m[index]), std::ref(b0), std::ref(b1),
+                    std::ref(hpxthreads[j]), wait)),
+                "lock_and_wait");
+            ids.push_back(register_thread(data));
         }
 
         // Tell all hpxthreads that they can start running.
@@ -134,7 +135,7 @@ int hpx_main(variables_map& vm)
         b1.wait();
 
         // {{{ Print results for this iteration.
-        for(value_type &entry: hpxthreads)
+        for (value_type& entry : hpxthreads)
         {
             std::cout << "  " << entry.first << "," << entry.second << "\n";
         }
@@ -153,6 +154,7 @@ int main(int argc, char* argv[])
     options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     desc_commandline.add_options()
         ("hpxthreads,T", value<std::size_t>()->default_value(128),
             "the number of PX threads to invoke")
@@ -163,6 +165,7 @@ int main(int argc, char* argv[])
         ("iterations", value<std::size_t>()->default_value(1),
             "the number of times to repeat the test")
         ;
+    // clang-format on
 
     // Initialize and run HPX.
     hpx::init_params init_args;
@@ -170,4 +173,3 @@ int main(int argc, char* argv[])
 
     return hpx::init(argc, argv, init_args);
 }
-

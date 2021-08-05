@@ -94,15 +94,23 @@ namespace hpx { namespace detail {
                 std::forward<F>(f), std::forward<Ts>(ts)...));
             if (hpx::detail::has_async_policy(policy))
             {
-                threads::thread_id_type tid = p.apply(pool,
+                threads::thread_id_ref_type tid = p.apply(pool,
                     desc.get_description(), policy, priority, stacksize, hint);
-                if (tid && policy == launch::fork)
+                if (tid)
                 {
-                    // make sure this thread is executed last
-                    // yield_to
-                    hpx::this_thread::suspend(
-                        threads::thread_schedule_state::pending, tid,
-                        desc.get_description());
+                    if (policy == launch::fork)
+                    {
+                        // make sure this thread is executed last
+                        // yield_to
+                        hpx::this_thread::suspend(
+                            threads::thread_schedule_state::pending,
+                            tid.noref(), desc.get_description());
+                    }
+
+                    auto&& result = p.get_future();
+                    traits::detail::get_shared_state(result)->set_on_completed(
+                        [tid = std::move(tid)]() { (void) tid; });
+                    return std::move(result);
                 }
             }
             return p.get_future();
@@ -173,8 +181,16 @@ namespace hpx { namespace detail {
             lcos::local::futures_factory<result_type()> p(util::deferred_call(
                 std::forward<F>(f), std::forward<Ts>(ts)...));
 
-            p.apply(pool, desc.get_description(), policy, priority, stacksize,
-                hint);
+            threads::thread_id_ref_type tid = p.apply(pool,
+                desc.get_description(), policy, priority, stacksize, hint);
+
+            if (tid)
+            {
+                auto&& result = p.get_future();
+                traits::detail::get_shared_state(result)->set_on_completed(
+                    [tid = std::move(tid)]() { (void) tid; });
+                return std::move(result);
+            }
             return p.get_future();
         }
 
@@ -214,8 +230,8 @@ namespace hpx { namespace detail {
                 std::forward<F>(f), std::forward<Ts>(ts)...));
 
             // make sure this thread is executed last
-            threads::thread_id_type tid = p.apply(pool, desc.get_description(),
-                policy, priority, stacksize, hint);
+            threads::thread_id_ref_type tid = p.apply(pool,
+                desc.get_description(), policy, priority, stacksize, hint);
             threads::thread_id_type tid_self = threads::get_self_id();
             if (tid && tid_self &&
                 get_thread_id_data(tid)->get_scheduler_base() ==
@@ -223,8 +239,13 @@ namespace hpx { namespace detail {
             {
                 // yield_to
                 hpx::this_thread::suspend(
-                    threads::thread_schedule_state::pending, tid,
+                    threads::thread_schedule_state::pending, tid.noref(),
                     desc.get_description());
+
+                auto&& result = p.get_future();
+                traits::detail::get_shared_state(result)->set_on_completed(
+                    [tid = std::move(tid)]() { (void) tid; });
+                return std::move(result);
             }
             return p.get_future();
         }

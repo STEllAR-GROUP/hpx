@@ -30,7 +30,7 @@ namespace hpx { namespace util {
         std::shared_ptr<task_wrapper> new_task(
             thread_description const& description,
             std::uint32_t /* parent_locality_id */,
-            threads::thread_id_type const& parent_task)
+            threads::thread_id_type parent_task)
         {
             std::shared_ptr<task_wrapper> parent_wrapper = nullptr;
             // Parent pointers aren't reliable in distributed runs.

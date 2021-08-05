@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2011      Bryce Lelbach
 //
@@ -13,6 +13,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>
@@ -67,12 +68,12 @@ namespace hpx { namespace threads {
       , requested_interrupt_(false)
       , enabled_interrupt_(true)
       , ran_exit_funcs_(false)
+      , is_stackless_(is_stackless)
       , scheduler_base_(init_data.scheduler_base)
       , last_worker_thread_num_(std::size_t(-1))
       , stacksize_(stacksize)
       , stacksize_enum_(init_data.stacksize)
       , queue_(queue)
-      , is_stackless_(is_stackless)
     {
         LTM_(debug).format(
             "thread::thread({}), description({})", this, get_description());
@@ -82,7 +83,7 @@ namespace hpx { namespace threads {
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         // store the thread id of the parent thread, mainly for debugging
         // purposes
-        if (parent_thread_id_)
+        if (parent_thread_id_ == nullptr)
         {
             thread_self* self = get_self_ptr();
             if (self)
@@ -101,7 +102,17 @@ namespace hpx { namespace threads {
 
     thread_data::~thread_data()
     {
+        LTM_(debug).format("thread_data::~thread_data({})", this);
         free_thread_exit_callbacks();
+    }
+
+    void thread_data::destroy_thread()
+    {
+        LTM_(debug).format(
+            "thread_data::destroy_thread({}), description({}), phase({})", this,
+            this->get_description(), this->get_thread_phase());
+
+        get_scheduler_base()->destroy_thread(this);
     }
 
     void thread_data::run_thread_exit_callbacks()
@@ -167,7 +178,10 @@ namespace hpx { namespace threads {
 
             // now interrupt this thread
             if (throw_on_interrupt)
+            {
+                requested_interrupt_ = false;    // avoid recursive exceptions
                 throw hpx::thread_interrupted();
+            }
 
             return true;
         }
@@ -176,7 +190,8 @@ namespace hpx { namespace threads {
 
     void thread_data::rebind_base(thread_init_data& init_data)
     {
-        LTM_(debug).format("~thread({}), description({}), phase({}), rebind",
+        LTM_(debug).format(
+            "thread_data::rebind_base({}), description({}), phase({}), rebind",
             this, get_description(), get_thread_phase());
 
         free_thread_exit_callbacks();
@@ -185,7 +200,7 @@ namespace hpx { namespace threads {
             init_data.initial_state, thread_restart_state::signaled));
 
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-        description_ = (init_data.description);
+        description_ = init_data.description;
         lco_description_ = util::thread_description();
 #endif
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
@@ -216,7 +231,7 @@ namespace hpx { namespace threads {
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         // store the thread id of the parent thread, mainly for debugging
         // purposes
-        if (nullptr == parent_thread_id_)
+        if (parent_thread_id_ == nullptr)
         {
             thread_self* self = get_self_ptr();
             if (self)

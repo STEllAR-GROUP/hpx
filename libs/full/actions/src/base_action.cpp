@@ -92,8 +92,8 @@ namespace hpx { namespace actions {
 
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         parent_locality_ = data.parent_locality_;
-        parent_id_ = threads::thread_id_type(
-            reinterpret_cast<threads::thread_data*>(data.parent_id_));
+        parent_id_ =
+            threads::thread_id_type(reinterpret_cast<void*>(data.parent_id_));
         parent_phase_ = data.parent_phase_;
 #endif
         priority_ = data.priority_;

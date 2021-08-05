@@ -188,10 +188,22 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     runtime_distributed::runtime_distributed(
         util::runtime_configuration& rtcfg, int (*pre_main)(runtime_mode))
-      : runtime(rtcfg,
+      : runtime(rtcfg)
+      , mode_(rtcfg_.mode_)
+#if defined(HPX_HAVE_NETWORKING)
+      , parcel_handler_notifier_()
+      , parcel_handler_(rtcfg_)
+#endif
+      , agas_client_(rtcfg_)
+      , applier_()
+      , runtime_support_()
+      , pre_main_(pre_main)
+    {
+        // set notification policies only after the object was completely
+        // initialized
+        runtime::set_notification_policies(
             runtime_distributed::get_notification_policy(
                 "worker-thread", runtime_local::os_thread_type::worker_thread),
-            notification_policy_type{},
 #ifdef HPX_HAVE_IO_POOL
             runtime_distributed::get_notification_policy(
                 "io-thread", runtime_local::os_thread_type::io_thread),
@@ -200,21 +212,25 @@ namespace hpx {
             runtime_distributed::get_notification_policy(
                 "timer-thread", runtime_local::os_thread_type::timer_thread),
 #endif
-            &detail::network_background_callback, false)
-      , mode_(rtcfg_.mode_)
+            threads::detail::network_background_callback_type(
+                &detail::network_background_callback));
+
+        // initialize our TLS
+        runtime::init_tss();
+        util::reinit_construct();    // call only after TLS was initialized
+
 #if defined(HPX_HAVE_NETWORKING)
-      , parcel_handler_notifier_(runtime_distributed::get_notification_policy(
-            "parcel-thread", runtime_local::os_thread_type::parcel_thread))
-      , parcel_handler_(rtcfg_, thread_manager_.get(), parcel_handler_notifier_)
-      , agas_client_(rtcfg_)
-      , applier_(parcel_handler_, *thread_manager_)
+        parcel_handler_notifier_ = runtime_distributed::get_notification_policy(
+            "parcel-thread", runtime_local::os_thread_type::parcel_thread);
+        parcel_handler_.set_notification_policies(
+            rtcfg_, thread_manager_.get(), parcel_handler_notifier_);
+
+        applier_.init(parcel_handler_, *thread_manager_);
 #else
-      , agas_client_(rtcfg_)
-      , applier_(*thread_manager_)
+        applier_.init(*thread_manager_);
 #endif
-      , runtime_support_(new components::server::runtime_support(rtcfg_))
-      , pre_main_(pre_main)
-    {
+        runtime_support_.reset(new components::server::runtime_support(rtcfg_));
+
         // This needs to happen first
         runtime::init();
 
@@ -469,7 +485,7 @@ namespace hpx {
             threads::thread_schedule_hint(0), threads::thread_stacksize::large);
 
         this->runtime::starting();
-        threads::thread_id_type id = threads::invalid_thread_id;
+        threads::thread_id_ref_type id = threads::invalid_thread_id;
         thread_manager_->register_thread(data, id);
 
         // }}}
@@ -1310,13 +1326,13 @@ namespace hpx {
         notification_policy_type notifier;
 
         notifier.add_on_start_thread_callback(
-            util::bind(&runtime_distributed::init_tss_helper, This(), prefix,
+            util::bind(&runtime_distributed::init_tss_helper, this, prefix,
                 type, _1, _2, _3, _4, false));
         notifier.add_on_stop_thread_callback(util::bind(
-            &runtime_distributed::deinit_tss_helper, This(), prefix, _1));
+            &runtime_distributed::deinit_tss_helper, this, prefix, _1));
         notifier.set_on_error_callback(util::bind(
             static_cast<report_error_t>(&runtime_distributed::report_error),
-            This(), _1, _2, true));
+            this, _1, _2, true));
 
         return notifier;
     }

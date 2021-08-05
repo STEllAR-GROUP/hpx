@@ -76,7 +76,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         using yield_decorator_type =
             util::function_nonser<arg_type(result_type)>;
 
-        explicit coroutine_self(coroutine_self* next_self = nullptr)
+        explicit coroutine_self(coroutine_self* next_self)
           : next_self_(next_self)
         {
         }

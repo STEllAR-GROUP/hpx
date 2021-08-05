@@ -35,16 +35,27 @@
 #include <vector>
 
 namespace hpx { namespace applier {
+
+    applier::applier()
 #if defined(HPX_HAVE_NETWORKING)
-    applier::applier(parcelset::parcelhandler& ph, threads::threadmanager& tm)
-      : parcel_handler_(ph)
-      , thread_manager_(tm)
+      : parcel_handler_(nullptr)
+      , thread_manager_(nullptr)
+#else
+      : thread_manager_(nullptr)
+#endif
     {
     }
-#else
-    applier::applier(threads::threadmanager& tm)
-      : thread_manager_(tm)
+
+#if defined(HPX_HAVE_NETWORKING)
+    void applier::init(parcelset::parcelhandler& ph, threads::threadmanager& tm)
     {
+        parcel_handler_ = &ph;
+        thread_manager_ = &tm;
+    }
+#else
+    void applier::init(threads::threadmanager& tm)
+    {
+        thread_manager_ = &tm;
     }
 #endif
 
@@ -59,13 +70,13 @@ namespace hpx { namespace applier {
 #if defined(HPX_HAVE_NETWORKING)
     parcelset::parcelhandler& applier::get_parcel_handler()
     {
-        return parcel_handler_;
+        return *parcel_handler_;
     }
 #endif
 
     threads::threadmanager& applier::get_thread_manager()
     {
-        return thread_manager_;
+        return *thread_manager_;
     }
 
     naming::gid_type const& applier::get_raw_locality(error_code& ec) const
@@ -83,7 +94,7 @@ namespace hpx { namespace applier {
         components::component_type type, error_code& ec) const
     {
 #if defined(HPX_HAVE_NETWORKING)
-        return parcel_handler_.get_raw_remote_localities(prefixes, type, ec);
+        return parcel_handler_->get_raw_remote_localities(prefixes, type, ec);
 #else
         HPX_UNUSED(prefixes);
         HPX_UNUSED(type);
@@ -97,7 +108,7 @@ namespace hpx { namespace applier {
     {
 #if defined(HPX_HAVE_NETWORKING)
         std::vector<naming::gid_type> raw_prefixes;
-        if (!parcel_handler_.get_raw_remote_localities(raw_prefixes, type, ec))
+        if (!parcel_handler_->get_raw_remote_localities(raw_prefixes, type, ec))
             return false;
 
         for (naming::gid_type& gid : raw_prefixes)
@@ -113,7 +124,7 @@ namespace hpx { namespace applier {
         components::component_type type) const
     {
 #if defined(HPX_HAVE_NETWORKING)
-        return parcel_handler_.get_raw_localities(prefixes, type);
+        return parcel_handler_->get_raw_localities(prefixes, type);
 #else
         naming::gid_type id;
         naming::get_agas_client().get_console_locality(id);
@@ -129,7 +140,7 @@ namespace hpx { namespace applier {
     {
         std::vector<naming::gid_type> raw_prefixes;
 #if defined(HPX_HAVE_NETWORKING)
-        if (!parcel_handler_.get_raw_localities(
+        if (!parcel_handler_->get_raw_localities(
                 raw_prefixes, components::component_invalid, ec))
             return false;
 
@@ -148,7 +159,7 @@ namespace hpx { namespace applier {
     {
 #if defined(HPX_HAVE_NETWORKING)
         std::vector<naming::gid_type> raw_prefixes;
-        if (!parcel_handler_.get_raw_localities(raw_prefixes, type, ec))
+        if (!parcel_handler_->get_raw_localities(raw_prefixes, type, ec))
             return false;
 
         for (naming::gid_type& gid : raw_prefixes)

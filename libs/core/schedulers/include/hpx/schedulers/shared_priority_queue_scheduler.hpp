@@ -295,7 +295,7 @@ namespace hpx { namespace threads { namespace policies {
         // ------------------------------------------------------------
         // create a new thread and schedule it if the initial state
         // is equal to pending
-        void create_thread(thread_init_data& data, thread_id_type* thrd,
+        void create_thread(thread_init_data& data, thread_id_ref_type* thrd,
             error_code& ec) override
         {
             // safety check that task was created by this thread/scheduler
@@ -601,7 +601,7 @@ namespace hpx { namespace threads { namespace policies {
 
         /// Return the next thread to be executed, return false if none available
         virtual bool get_next_thread(std::size_t thread_num, bool running,
-            threads::thread_data*& thrd, bool enable_stealing) override
+            threads::thread_id_ref_type& thrd, bool enable_stealing) override
         {
             std::size_t this_thread = local_thread_number();
             HPX_ASSERT(this_thread < num_workers_);
@@ -615,7 +615,7 @@ namespace hpx { namespace threads { namespace policies {
             auto get_next_thread_function_HP =
                 [&](std::size_t domain, std::size_t q_index,
                     thread_holder_type* /* receiver */,
-                    threads::thread_data*& thrd, bool stealing,
+                    threads::thread_id_ref_type& thrd, bool stealing,
                     bool allow_stealing) {
                     return numa_holder_[domain].get_next_thread_HP(
                         q_index, thrd, stealing, allow_stealing);
@@ -624,7 +624,7 @@ namespace hpx { namespace threads { namespace policies {
             auto get_next_thread_function =
                 [&](std::size_t domain, std::size_t q_index,
                     thread_holder_type* /* receiver */,
-                    threads::thread_data*& thrd, bool stealing,
+                    threads::thread_id_ref_type& thrd, bool stealing,
                     bool allow_stealing) {
                     return numa_holder_[domain].get_next_thread(
                         q_index, thrd, stealing, allow_stealing);
@@ -636,7 +636,7 @@ namespace hpx { namespace threads { namespace policies {
             // first try a high priority task, allow stealing
             // if stealing of HP tasks in on, this will be fine
             // but send a null function for normal tasks
-            bool result = steal_by_function<threads::thread_data*>(domain,
+            bool result = steal_by_function<threads::thread_id_ref_type>(domain,
                 q_index, numa_stealing_, core_stealing_, nullptr, thrd,
                 "SBF-get_next_thread", get_next_thread_function_HP,
                 get_next_thread_function);
@@ -707,11 +707,11 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_data* thrd,
+        void schedule_thread(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
             thread_priority priority = thread_priority::normal) override
         {
-            HPX_ASSERT(thrd->get_scheduler_base() == this);
+            HPX_ASSERT(get_thread_id_data(thrd)->get_scheduler_base() == this);
 
             std::size_t local_num = local_thread_number();
             std::size_t thread_num = local_num;
@@ -748,7 +748,7 @@ namespace hpx { namespace threads { namespace policies {
                                 , "pool", get_thread_nums_tss().thread_pool_num
                                 , "parent offset", parent_pool_->get_thread_offset()
                                 , parent_pool_->get_pool_name(),
-                                debug::threadinfo<threads::thread_data*>(thrd));
+                                debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
                     // clang-format on
                 }
                 else if (!round_robin_) /*assign_parent*/
@@ -757,7 +757,7 @@ namespace hpx { namespace threads { namespace policies {
                     q_index = q_lookup_[thread_num];
                     spq_deb.debug(debug::str<>("schedule_thread"),
                         "assign_work_thread_parent", "thread_num", thread_num,
-                        debug::threadinfo<threads::thread_data*>(thrd));
+                        debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
                 }
                 else /*(round_robin_)*/
                 {
@@ -768,7 +768,7 @@ namespace hpx { namespace threads { namespace policies {
                                      ->worker_next(num_workers_);
                     spq_deb.debug(debug::str<>("schedule_thread"),
                         "assign_work_round_robin", "thread_num", thread_num,
-                        debug::threadinfo<threads::thread_data*>(thrd));
+                        debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
                 }
                 thread_num = select_active_pu(l, thread_num, allow_fallback);
                 break;
@@ -823,7 +823,7 @@ namespace hpx { namespace threads { namespace policies {
 
         /// Put task on the back of the queue : not yet implemented
         /// just put it on the normal queue for now
-        void schedule_thread_last(threads::thread_data* thrd,
+        void schedule_thread_last(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
             thread_priority priority = thread_priority::normal) override
         {
