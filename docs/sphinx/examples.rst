@@ -28,3 +28,15 @@ powerful |hpx| concepts.
    examples/accumulator
    examples/interest_calculator
    examples/1d_stencil
+.. _additional_material:
+
+===================
+Additional material
+===================
+
+* 2-day workshop held at CSCS in 2016
+
+  * `Recorded lectures <https://www.youtube.com/playlist?list=PL1tk5lGm7zvSXfS-sqOOmIJ0lFNjKze18>`_
+  * `Slides <https://github.com/STEllAR-GROUP/tutorials/tree/master/cscs2016>`_
+* `Tutorials repository <https://github.com/STEllAR-GROUP/tutorials>`_
+* `STE||AR Group blog posts <http://stellar-group.org/blog/>`_
