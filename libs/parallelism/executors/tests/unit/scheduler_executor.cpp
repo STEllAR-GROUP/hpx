@@ -277,7 +277,7 @@ int hpx_main()
 {
     using namespace hpx::execution::experimental;
 
-    scheduler_executor<thread_pool_scheduler> exec(thread_pool_scheduler{});
+    scheduler_executor exec(thread_pool_scheduler{});
 
     test_executor(exec);
 
