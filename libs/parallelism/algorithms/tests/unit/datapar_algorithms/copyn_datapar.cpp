@@ -21,12 +21,12 @@ void test_copy_n()
     test_copy_n(IteratorTag());
 
     test_copy_n(hpx::execution::simd, IteratorTag());
-    test_copy_n(hpx::execution::simdpar, IteratorTag());
+    test_copy_n(hpx::execution::par_simd, IteratorTag());
 
     test_copy_n_async(
         hpx::execution::simd(hpx::execution::task), IteratorTag());
     test_copy_n_async(
-        hpx::execution::simdpar(hpx::execution::task), IteratorTag());
+        hpx::execution::par_simd(hpx::execution::task), IteratorTag());
 }
 
 void n_copy_test()
@@ -42,12 +42,12 @@ void test_copy_n_exception()
     test_copy_n_exception(IteratorTag());
 
     test_copy_n_exception(hpx::execution::simd, IteratorTag());
-    test_copy_n_exception(hpx::execution::simdpar, IteratorTag());
+    test_copy_n_exception(hpx::execution::par_simd, IteratorTag());
 
     test_copy_n_exception_async(
         hpx::execution::simd(hpx::execution::task), IteratorTag());
     test_copy_n_exception_async(
-        hpx::execution::simdpar(hpx::execution::task), IteratorTag());
+        hpx::execution::par_simd(hpx::execution::task), IteratorTag());
 }
 
 void copy_n_exception_test()
@@ -61,12 +61,12 @@ template <typename IteratorTag>
 void test_copy_n_bad_alloc()
 {
     test_copy_n_bad_alloc(hpx::execution::simd, IteratorTag());
-    test_copy_n_bad_alloc(hpx::execution::simdpar, IteratorTag());
+    test_copy_n_bad_alloc(hpx::execution::par_simd, IteratorTag());
 
     test_copy_n_bad_alloc_async(
         hpx::execution::simd(hpx::execution::task), IteratorTag());
     test_copy_n_bad_alloc_async(
-        hpx::execution::simdpar(hpx::execution::task), IteratorTag());
+        hpx::execution::par_simd(hpx::execution::task), IteratorTag());
 }
 
 void copy_n_bad_alloc_test()

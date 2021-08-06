@@ -20,10 +20,10 @@ void test_transform_binary()
     using namespace hpx::execution;
 
     test_transform_binary(simd, IteratorTag());
-    test_transform_binary(simdpar, IteratorTag());
+    test_transform_binary(par_simd, IteratorTag());
 
     test_transform_binary_async(simd(task), IteratorTag());
-    test_transform_binary_async(simdpar(task), IteratorTag());
+    test_transform_binary_async(par_simd(task), IteratorTag());
 }
 
 void transform_binary_test()
@@ -39,10 +39,10 @@ void test_transform_binary_exception()
     using namespace hpx::execution;
 
     test_transform_binary_exception(simd, IteratorTag());
-    test_transform_binary_exception(simdpar, IteratorTag());
+    test_transform_binary_exception(par_simd, IteratorTag());
 
     test_transform_binary_exception_async(simd(task), IteratorTag());
-    test_transform_binary_exception_async(simdpar(task), IteratorTag());
+    test_transform_binary_exception_async(par_simd(task), IteratorTag());
 }
 
 void transform_binary_exception_test()
@@ -58,10 +58,10 @@ void test_transform_binary_bad_alloc()
     using namespace hpx::execution;
 
     test_transform_binary_bad_alloc(simd, IteratorTag());
-    test_transform_binary_bad_alloc(simdpar, IteratorTag());
+    test_transform_binary_bad_alloc(par_simd, IteratorTag());
 
     test_transform_binary_bad_alloc_async(simd(task), IteratorTag());
-    test_transform_binary_bad_alloc_async(simdpar(task), IteratorTag());
+    test_transform_binary_bad_alloc_async(par_simd(task), IteratorTag());
 }
 
 void transform_binary_bad_alloc_test()

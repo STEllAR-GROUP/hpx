@@ -421,7 +421,7 @@ namespace hpx { namespace parallel { namespace util {
                 F&& f)
             {
                 auto ret = util::transform_binary_loop_n<
-                    hpx::execution::simdpar_policy>(first1,
+                    hpx::execution::par_simd_policy>(first1,
                     std::distance(first1, last1), first2, dest,
                     std::forward<F>(f));
 
@@ -465,7 +465,7 @@ namespace hpx { namespace parallel { namespace util {
                 // clang-format on
 
                 auto ret = util::transform_binary_loop_n<
-                    hpx::execution::simdpar_policy>(
+                    hpx::execution::par_simd_policy>(
                     first1, count, first2, dest, std::forward<F>(f));
 
                 return util::in_in_out_result<InIter1, InIter2, OutIter>{
