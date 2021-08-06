@@ -610,14 +610,14 @@ namespace hpx { namespace execution { inline namespace v1 {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Extension: The class simdpar_task_policy is an execution
+    /// Extension: The class par_simd_task_policy is an execution
     /// policy type used as a unique type to disambiguate parallel algorithm
     /// overloading and indicate that a parallel algorithm's execution may be
     /// parallelized.
     ///
     /// The algorithm returns a future representing the result of the
     /// corresponding algorithm when invoked with the parallel_policy.
-    struct simdpar_task_policy
+    struct par_simd_task_policy
     {
         /// The type of the executor associated with this execution policy
         typedef parallel_executor executor_type;
@@ -638,26 +638,26 @@ namespace hpx { namespace execution { inline namespace v1 {
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef simdpar_task_policy_shim<Executor_, Parameters_> type;
+            typedef par_simd_task_policy_shim<Executor_, Parameters_> type;
         };
 
         /// \cond NOINTERNAL
-        constexpr simdpar_task_policy() = default;
+        constexpr par_simd_task_policy() = default;
         /// \endcond
 
-        /// Create a new simdpar_task_policy from itself
+        /// Create a new par_simd_task_policy from itself
         ///
         /// \param tag          [in] Specify that the corresponding asynchronous
         ///                     execution policy should be used
         ///
-        /// \returns The new simdpar_task_policy
+        /// \returns The new par_simd_task_policy
         ///
-        constexpr simdpar_task_policy operator()(task_policy_tag) const
+        constexpr par_simd_task_policy operator()(task_policy_tag) const
         {
             return *this;
         }
 
-        /// Create a new simdpar_task_policy from given executor
+        /// Create a new par_simd_task_policy from given executor
         ///
         /// \tparam Executor    The type of the executor to associate with this
         ///                     execution policy.
@@ -668,10 +668,10 @@ namespace hpx { namespace execution { inline namespace v1 {
         ///
         /// \note Requires: is_executor<Executor>::value is true
         ///
-        /// \returns The new simdpar_task_policy
+        /// \returns The new par_simd_task_policy
         ///
         template <typename Executor>
-        typename parallel::execution::rebind_executor<simdpar_task_policy,
+        typename parallel::execution::rebind_executor<par_simd_task_policy,
             Executor, executor_parameters_type>::type
         on(Executor&& exec) const
         {
@@ -679,12 +679,12 @@ namespace hpx { namespace execution { inline namespace v1 {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef typename parallel::execution::rebind_executor<
-                simdpar_task_policy, Executor, executor_parameters_type>::type
+                par_simd_task_policy, Executor, executor_parameters_type>::type
                 rebound_type;
             return rebound_type(std::forward<Executor>(exec), parameters());
         }
 
-        /// Create a new simdpar_task_policy_shim from the given
+        /// Create a new par_simd_task_policy_shim from the given
         /// execution parameters
         ///
         /// \tparam Parameters  The type of the executor parameters to
@@ -697,17 +697,17 @@ namespace hpx { namespace execution { inline namespace v1 {
         /// \note Requires: all parameters are executor_parameters,
         ///                 different parameter types can't be duplicated
         ///
-        /// \returns The new simdpar_policy_shim
+        /// \returns The new par_simd_policy_shim
         ///
         template <typename... Parameters,
             typename ParametersType = typename parallel::execution::
                 executor_parameters_join<Parameters...>::type>
-        typename parallel::execution::rebind_executor<simdpar_task_policy,
+        typename parallel::execution::rebind_executor<par_simd_task_policy,
             executor_type, ParametersType>::type
         with(Parameters&&... params) const
         {
             typedef typename parallel::execution::rebind_executor<
-                simdpar_task_policy, executor_type, ParametersType>::type
+                par_simd_task_policy, executor_type, ParametersType>::type
                 rebound_type;
             return rebound_type(executor(),
                 parallel::execution::join_executor_parameters(
@@ -751,10 +751,10 @@ namespace hpx { namespace execution { inline namespace v1 {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The class simdpar_policy is an execution policy type used
+    /// The class par_simd_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
     /// indicate that a parallel algorithm's execution may be parallelized.
-    struct simdpar_policy
+    struct par_simd_policy
     {
         /// The type of the executor associated with this execution policy
         typedef parallel_executor executor_type;
@@ -775,36 +775,36 @@ namespace hpx { namespace execution { inline namespace v1 {
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef simdpar_policy_shim<Executor_, Parameters_> type;
+            typedef par_simd_policy_shim<Executor_, Parameters_> type;
         };
 
         /// \cond NOINTERNAL
-        constexpr simdpar_policy() = default;
+        constexpr par_simd_policy() = default;
         /// \endcond
 
-        /// Create a new simdpar_policy referencing a chunk size.
+        /// Create a new par_simd_policy referencing a chunk size.
         ///
         /// \param tag          [in] Specify that the corresponding asynchronous
         ///                     execution policy should be used
         ///
-        /// \returns The new simdpar_task_policy
+        /// \returns The new par_simd_task_policy
         ///
-        constexpr simdpar_task_policy operator()(task_policy_tag) const
+        constexpr par_simd_task_policy operator()(task_policy_tag) const
         {
-            return simdpar_task_policy();
+            return par_simd_task_policy();
         }
 
-        /// Create a new simdpar_policy referencing an executor and
+        /// Create a new par_simd_policy referencing an executor and
         /// a chunk size.
         ///
         /// \param exec         [in] The executor to use for the execution of
         ///                     the parallel algorithm the returned execution
         ///                     policy is used with
         ///
-        /// \returns The new simdpar_policy
+        /// \returns The new par_simd_policy
         ///
         template <typename Executor>
-        typename parallel::execution::rebind_executor<simdpar_policy, Executor,
+        typename parallel::execution::rebind_executor<par_simd_policy, Executor,
             executor_parameters_type>::type
         on(Executor&& exec) const
         {
@@ -812,12 +812,12 @@ namespace hpx { namespace execution { inline namespace v1 {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             typedef
-                typename parallel::execution::rebind_executor<simdpar_policy,
+                typename parallel::execution::rebind_executor<par_simd_policy,
                     Executor, executor_parameters_type>::type rebound_type;
             return rebound_type(std::forward<Executor>(exec), parameters());
         }
 
-        /// Create a new simdpar_policy from the given
+        /// Create a new par_simd_policy from the given
         /// execution parameters
         ///
         /// \tparam Parameters  The type of the executor parameters to
@@ -829,17 +829,17 @@ namespace hpx { namespace execution { inline namespace v1 {
         ///
         /// \note Requires: is_executor_parameters<Parameters>::value is true
         ///
-        /// \returns The new simdpar_policy
+        /// \returns The new par_simd_policy
         ///
         template <typename... Parameters,
             typename ParametersType = typename parallel::execution::
                 executor_parameters_join<Parameters...>::type>
-        typename parallel::execution::rebind_executor<simdpar_policy,
+        typename parallel::execution::rebind_executor<par_simd_policy,
             executor_type, ParametersType>::type
         with(Parameters&&... params) const
         {
             typedef
-                typename parallel::execution::rebind_executor<simdpar_policy,
+                typename parallel::execution::rebind_executor<par_simd_policy,
                     executor_type, ParametersType>::type rebound_type;
             return rebound_type(executor(),
                 parallel::execution::join_executor_parameters(
@@ -883,13 +883,13 @@ namespace hpx { namespace execution { inline namespace v1 {
     };
 
     /// Default data-parallel execution policy object.
-    static constexpr simdpar_policy simdpar{};
+    static constexpr par_simd_policy par_simd{};
 
-    /// The class simdpar_policy_shim is an execution policy type
+    /// The class par_simd_policy_shim is an execution policy type
     /// used as a unique type to disambiguate parallel algorithm overloading
     /// and indicate that a parallel algorithm's execution may be parallelized.
     template <typename Executor, typename Parameters>
-    struct simdpar_policy_shim : simdpar_policy
+    struct par_simd_policy_shim : par_simd_policy
     {
         /// The type of the executor associated with this execution policy
         typedef Executor executor_type;
@@ -910,24 +910,24 @@ namespace hpx { namespace execution { inline namespace v1 {
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef simdpar_policy_shim<Executor_, Parameters_> type;
+            typedef par_simd_policy_shim<Executor_, Parameters_> type;
         };
 
-        /// Create a new simdpar_task_policy_shim
+        /// Create a new par_simd_task_policy_shim
         ///
         /// \param tag          [in] Specify that the corresponding asynchronous
         ///                     execution policy should be used
         ///
-        /// \returns The new simdpar_task_policy_shim
+        /// \returns The new par_simd_task_policy_shim
         ///
-        constexpr simdpar_task_policy_shim<Executor, Parameters> operator()(
+        constexpr par_simd_task_policy_shim<Executor, Parameters> operator()(
             task_policy_tag) const
         {
-            return simdpar_task_policy_shim<Executor, Parameters>(
+            return par_simd_task_policy_shim<Executor, Parameters>(
                 exec_, params_);
         }
 
-        /// Create a new simdpar_task_policy_shim from the given
+        /// Create a new par_simd_task_policy_shim from the given
         /// executor
         ///
         /// \tparam Executor    The type of the executor to associate with this
@@ -942,7 +942,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         /// \returns The new parallel_policy
         ///
         template <typename Executor_>
-        typename parallel::execution::rebind_executor<simdpar_policy_shim,
+        typename parallel::execution::rebind_executor<par_simd_policy_shim,
             Executor_, executor_parameters_type>::type
         on(Executor_&& exec) const
         {
@@ -950,12 +950,12 @@ namespace hpx { namespace execution { inline namespace v1 {
                 "hpx::traits::is_executor_any<Executor_>::value");
 
             typedef typename parallel::execution::rebind_executor<
-                simdpar_policy_shim, Executor_, executor_parameters_type>::type
+                par_simd_policy_shim, Executor_, executor_parameters_type>::type
                 rebound_type;
             return rebound_type(std::forward<Executor_>(exec), params_);
         }
 
-        /// Create a new simdpar_policy_shim from the given
+        /// Create a new par_simd_policy_shim from the given
         /// execution parameters
         ///
         /// \tparam Parameters  The type of the executor parameters to
@@ -967,17 +967,17 @@ namespace hpx { namespace execution { inline namespace v1 {
         ///
         /// \note Requires: is_executor_parameters<Parameters>::value is true
         ///
-        /// \returns The new simdpar_policy_shim
+        /// \returns The new par_simd_policy_shim
         ///
         template <typename... Parameters_,
             typename ParametersType = typename parallel::execution::
                 executor_parameters_join<Parameters_...>::type>
-        typename parallel::execution::rebind_executor<simdpar_policy_shim,
+        typename parallel::execution::rebind_executor<par_simd_policy_shim,
             executor_type, ParametersType>::type
         with(Parameters_&&... params) const
         {
             typedef typename parallel::execution::rebind_executor<
-                simdpar_policy_shim, executor_type, ParametersType>::type
+                par_simd_policy_shim, executor_type, ParametersType>::type
                 rebound_type;
             return rebound_type(exec_,
                 parallel::execution::join_executor_parameters(
@@ -1007,10 +1007,10 @@ namespace hpx { namespace execution { inline namespace v1 {
         }
 
         /// \cond NOINTERNAL
-        constexpr simdpar_policy_shim() = default;
+        constexpr par_simd_policy_shim() = default;
 
         template <typename Executor_, typename Parameters_>
-        constexpr simdpar_policy_shim(Executor_&& exec, Parameters_&& params)
+        constexpr par_simd_policy_shim(Executor_&& exec, Parameters_&& params)
           : exec_(std::forward<Executor_>(exec))
           , params_(std::forward<Parameters_>(params))
         {
@@ -1033,13 +1033,13 @@ namespace hpx { namespace execution { inline namespace v1 {
         /// \endcond
     };
 
-    /// The class simdpar_task_policy_shim is an
+    /// The class par_simd_task_policy_shim is an
     /// execution policy type used as a unique type to disambiguate parallel
     /// algorithm overloading based on combining a underlying
-    /// \a simdpar_task_policy and an executor and indicate that
+    /// \a par_simd_task_policy and an executor and indicate that
     /// a parallel algorithm's execution may be parallelized and vectorized.
     template <typename Executor, typename Parameters>
-    struct simdpar_task_policy_shim : simdpar_task_policy
+    struct par_simd_task_policy_shim : par_simd_task_policy
     {
         /// The type of the executor associated with this execution policy
         typedef Executor executor_type;
@@ -1060,17 +1060,17 @@ namespace hpx { namespace execution { inline namespace v1 {
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef simdpar_task_policy_shim<Executor_, Parameters_> type;
+            typedef par_simd_task_policy_shim<Executor_, Parameters_> type;
         };
 
-        /// Create a new simdpar_task_policy_shim from itself
+        /// Create a new par_simd_task_policy_shim from itself
         ///
         /// \param tag          [in] Specify that the corresponding asynchronous
         ///                     execution policy should be used
         ///
         /// \returns The new sequenced_task_policy
         ///
-        constexpr simdpar_task_policy_shim operator()(task_policy_tag) const
+        constexpr par_simd_task_policy_shim operator()(task_policy_tag) const
         {
             return *this;
         }
@@ -1090,7 +1090,7 @@ namespace hpx { namespace execution { inline namespace v1 {
         /// \returns The new parallel_task_policy
         ///
         template <typename Executor_>
-        typename parallel::execution::rebind_executor<simdpar_task_policy_shim,
+        typename parallel::execution::rebind_executor<par_simd_task_policy_shim,
             Executor_, executor_parameters_type>::type
         on(Executor_&& exec) const
         {
@@ -1098,7 +1098,7 @@ namespace hpx { namespace execution { inline namespace v1 {
                 "hpx::traits::is_executor_any<Executor_>::value");
 
             typedef typename parallel::execution::rebind_executor<
-                simdpar_task_policy_shim, Executor_,
+                par_simd_task_policy_shim, Executor_,
                 executor_parameters_type>::type rebound_type;
             return rebound_type(std::forward<Executor_>(exec), params_);
         }
@@ -1121,12 +1121,12 @@ namespace hpx { namespace execution { inline namespace v1 {
         template <typename... Parameters_,
             typename ParametersType = typename parallel::execution::
                 executor_parameters_join<Parameters_...>::type>
-        typename parallel::execution::rebind_executor<simdpar_task_policy_shim,
+        typename parallel::execution::rebind_executor<par_simd_task_policy_shim,
             executor_type, ParametersType>::type
         with(Parameters_&&... params) const
         {
             typedef typename parallel::execution::rebind_executor<
-                simdpar_task_policy_shim, executor_type, ParametersType>::type
+                par_simd_task_policy_shim, executor_type, ParametersType>::type
                 rebound_type;
             return rebound_type(exec_,
                 parallel::execution::join_executor_parameters(
@@ -1156,10 +1156,10 @@ namespace hpx { namespace execution { inline namespace v1 {
         }
 
         /// \cond NOINTERNAL
-        constexpr simdpar_task_policy_shim() = default;
+        constexpr par_simd_task_policy_shim() = default;
 
         template <typename Executor_, typename Parameters_>
-        constexpr simdpar_task_policy_shim(
+        constexpr par_simd_task_policy_shim(
             Executor_&& exec, Parameters_&& params)
           : exec_(std::forward<Executor_>(exec))
           , params_(std::forward<Parameters_>(params))
@@ -1214,26 +1214,26 @@ namespace hpx { namespace detail {
     };
 
     template <>
-    struct is_execution_policy<hpx::execution::simdpar_policy> : std::true_type
+    struct is_execution_policy<hpx::execution::par_simd_policy> : std::true_type
     {
     };
 
     template <typename Executor, typename Parameters>
     struct is_execution_policy<
-        hpx::execution::simdpar_policy_shim<Executor, Parameters>>
+        hpx::execution::par_simd_policy_shim<Executor, Parameters>>
       : std::true_type
     {
     };
 
     template <>
-    struct is_execution_policy<hpx::execution::simdpar_task_policy>
+    struct is_execution_policy<hpx::execution::par_simd_task_policy>
       : std::true_type
     {
     };
 
     template <typename Executor, typename Parameters>
     struct is_execution_policy<
-        hpx::execution::simdpar_task_policy_shim<Executor, Parameters>>
+        hpx::execution::par_simd_task_policy_shim<Executor, Parameters>>
       : std::true_type
     {
     };
@@ -1283,14 +1283,14 @@ namespace hpx { namespace detail {
     };
 
     template <>
-    struct is_async_execution_policy<hpx::execution::simdpar_task_policy>
+    struct is_async_execution_policy<hpx::execution::par_simd_task_policy>
       : std::true_type
     {
     };
 
     template <typename Executor, typename Parameters>
     struct is_async_execution_policy<
-        hpx::execution::simdpar_task_policy_shim<Executor, Parameters>>
+        hpx::execution::par_simd_task_policy_shim<Executor, Parameters>>
       : std::true_type
     {
     };
@@ -1299,27 +1299,27 @@ namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
     template <>
-    struct is_parallel_execution_policy<hpx::execution::simdpar_policy>
+    struct is_parallel_execution_policy<hpx::execution::par_simd_policy>
       : std::true_type
     {
     };
 
     template <>
-    struct is_parallel_execution_policy<hpx::execution::simdpar_task_policy>
+    struct is_parallel_execution_policy<hpx::execution::par_simd_task_policy>
       : std::true_type
     {
     };
 
     template <typename Executor, typename Parameters>
     struct is_parallel_execution_policy<
-        hpx::execution::simdpar_policy_shim<Executor, Parameters>>
+        hpx::execution::par_simd_policy_shim<Executor, Parameters>>
       : std::true_type
     {
     };
 
     template <typename Executor, typename Parameters>
     struct is_parallel_execution_policy<
-        hpx::execution::simdpar_task_policy_shim<Executor, Parameters>>
+        hpx::execution::par_simd_task_policy_shim<Executor, Parameters>>
       : std::true_type
     {
     };
@@ -1353,27 +1353,27 @@ namespace hpx { namespace detail {
     };
 
     template <>
-    struct is_vectorpack_execution_policy<hpx::execution::simdpar_policy>
+    struct is_vectorpack_execution_policy<hpx::execution::par_simd_policy>
       : std::true_type
     {
     };
 
     template <>
-    struct is_vectorpack_execution_policy<hpx::execution::simdpar_task_policy>
+    struct is_vectorpack_execution_policy<hpx::execution::par_simd_task_policy>
       : std::true_type
     {
     };
 
     template <typename Executor, typename Parameters>
     struct is_vectorpack_execution_policy<
-        hpx::execution::simdpar_policy_shim<Executor, Parameters>>
+        hpx::execution::par_simd_policy_shim<Executor, Parameters>>
       : std::true_type
     {
     };
 
     template <typename Executor, typename Parameters>
     struct is_vectorpack_execution_policy<
-        hpx::execution::simdpar_task_policy_shim<Executor, Parameters>>
+        hpx::execution::par_simd_task_policy_shim<Executor, Parameters>>
       : std::true_type
     {
     };

@@ -22,7 +22,7 @@ int hpx_main()
     auto zip_it_end = hpx::util::make_zip_iterator(large.end());
 
     hpx::for_each(
-        hpx::execution::simdpar, zip_it_begin, zip_it_end, [](auto t) {
+        hpx::execution::par_simd, zip_it_begin, zip_it_end, [](auto t) {
             using comp_type = typename hpx::tuple_element<0, decltype(t)>::type;
             using var_type = typename std::decay<comp_type>::type;
 
