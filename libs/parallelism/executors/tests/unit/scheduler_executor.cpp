@@ -98,7 +98,7 @@ void test_then(Executor&& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test(int seq, int passed_through)    //-V813
+void bulk_test_void(int seq, int passed_through)    //-V813
 {
     HPX_TEST_EQ(passed_through, 42);
 
@@ -108,8 +108,20 @@ void bulk_test(int seq, int passed_through)    //-V813
     }
 }
 
+int bulk_test(int seq, int passed_through)    //-V813
+{
+    HPX_TEST_EQ(passed_through, 42);
+
+    if (seq == 0)
+    {
+        executed = true;
+    }
+
+    return seq;
+}
+
 template <typename Executor>
-void test_bulk_sync(Executor&& exec)
+void test_bulk_sync_void(Executor&& exec)
 {
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
@@ -129,7 +141,7 @@ void test_bulk_sync(Executor&& exec)
 }
 
 template <typename Executor>
-void test_bulk_async(Executor&& exec)
+void test_bulk_async_void(Executor&& exec)
 {
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
@@ -139,6 +151,35 @@ void test_bulk_async(Executor&& exec)
     auto result = hpx::parallel::execution::bulk_async_execute(
         exec, hpx::util::bind(&bulk_test, _1, _2), 107, 42);
     hpx::when_all(std::move(result)).get();
+
+    HPX_TEST(executed);
+
+    executed = false;
+
+    hpx::when_all(
+        hpx::parallel::execution::bulk_async_execute(exec, &bulk_test, 107, 42))
+        .get();
+
+    HPX_TEST(executed);
+}
+
+template <typename Executor>
+void test_bulk_async(Executor&& exec)
+{
+    using hpx::util::placeholders::_1;
+    using hpx::util::placeholders::_2;
+
+    executed = false;
+    int const n = 107;
+
+    auto fut_result = hpx::parallel::execution::bulk_async_execute(
+        exec, hpx::util::bind(&bulk_test, _1, _2), n, 42);
+    auto result = hpx::when_all(std::move(fut_result)).get();
+
+    for (int i = 0; i < n; ++i)
+    {
+        HPX_TEST_EQ(i, result[i].get());
+    }
 
     HPX_TEST(executed);
 
@@ -267,7 +308,8 @@ void test_executor(Executor&& exec)
     test_async(exec);
     test_then(exec);
 
-    test_bulk_sync(exec);
+    test_bulk_sync_void(exec);
+    test_bulk_async_void(exec);
     test_bulk_async(exec);
     test_bulk_then(exec);
     test_bulk_then_void(exec);

@@ -152,47 +152,54 @@ namespace hpx { namespace execution { namespace experimental {
             using result_type = hpx::util::detail::invoke_deferred_result_t<F,
                 shape_element, Ts...>;
 
-            using size_type = decltype(hpx::util::size(shape));
-            size_type const n = hpx::util::size(shape);
-
-            using promise_vector_type =
-                std::vector<hpx::lcos::local::promise<result_type>>;
-            using result_vector_type = std::vector<hpx::future<result_type>>;
-
-            promise_vector_type promises(n);
-            result_vector_type results;
-            results.reserve(n);
-
-            for (size_type i = 0; i < n; ++i)
+            if constexpr (std::is_void_v<result_type>)
             {
-                results.emplace_back(promises[i].get_future());
+                std::vector<hpx::future<void>> results;
+                results.reserve(1);
+                results.emplace_back(make_future(bulk(schedule(sched_), shape,
+                    hpx::util::bind_back(
+                        std::forward<F>(f), std::forward<Ts>(ts)...))));
+                return results;
             }
+            else
+            {
+                using promise_vector_type =
+                    std::vector<hpx::lcos::local::promise<result_type>>;
+                using result_vector_type =
+                    std::vector<hpx::future<result_type>>;
 
-            auto f_helper = [](size_type const i, promise_vector_type& promises,
-                                F& f, S const& shape, Ts&... ts) {
-                hpx::detail::try_catch_exception_ptr(
-                    [&]() mutable {
-                        if constexpr (std::is_void_v<result_type>)
-                        {
-                            HPX_INVOKE(f, hpx::util::begin(shape)[i], ts...);
-                            promises[i].set_value();
-                        }
-                        else
-                        {
+                using size_type = decltype(hpx::util::size(shape));
+                size_type const n = hpx::util::size(shape);
+
+                promise_vector_type promises(n);
+                result_vector_type results;
+                results.reserve(n);
+
+                for (size_type i = 0; i < n; ++i)
+                {
+                    results.emplace_back(promises[i].get_future());
+                }
+
+                auto f_helper = [](size_type const i,
+                                    promise_vector_type& promises, F& f,
+                                    S const& shape, Ts&... ts) {
+                    hpx::detail::try_catch_exception_ptr(
+                        [&]() mutable {
                             promises[i].set_value(HPX_INVOKE(
                                 f, hpx::util::begin(shape)[i], ts...));
-                        }
-                    },
-                    [&](std::exception_ptr&& ep) {
-                        promises[i].set_exception(std::move(ep));
-                    });
-            };
+                        },
+                        [&](std::exception_ptr&& ep) {
+                            promises[i].set_exception(std::move(ep));
+                        });
+                };
 
-            detach(bulk(just_on(sched_, std::move(promises), std::forward<F>(f),
-                            shape, std::forward<Ts>(ts)...),
-                n, std::move(f_helper)));
+                detach(bulk(
+                    just_on(sched_, std::move(promises), std::forward<F>(f),
+                        shape, std::forward<Ts>(ts)...),
+                    n, std::move(f_helper)));
 
-            return results;
+                return results;
+            }
         }
 
         template <typename F, typename S, typename... Ts>
