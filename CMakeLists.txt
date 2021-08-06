@@ -59,7 +59,7 @@ endif()
 # ##############################################################################
 set(HPX_VERSION_MAJOR 1)
 set(HPX_VERSION_MINOR 7)
-set(HPX_VERSION_SUBMINOR 0)
+set(HPX_VERSION_SUBMINOR 1)
 set(HPX_VERSION_DATE 20210714)
 set(HPX_VERSION_TAG "")
 
