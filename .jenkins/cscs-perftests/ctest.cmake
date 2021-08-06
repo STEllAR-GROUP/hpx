@@ -23,7 +23,7 @@ else()
   set(CTEST_BUILD_NAME
       "$ENV{git_local_branch}-${CTEST_BUILD_CONFIGURATION_NAME}"
   )
-  set(CTEST_TRACK "$ENV{git_local_branch}")
+  string(REGEX REPLACE "([^-]+).*" "\\1" CTEST_TRACK $ENV{git_local_branch})
 endif()
 
 ctest_start(Experimental TRACK "${CTEST_TRACK}")
