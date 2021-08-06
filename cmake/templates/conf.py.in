@@ -570,7 +570,7 @@ html_theme = 'insegel'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {}
+html_theme_options = {'wending_last_updated' : False}
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
@@ -598,7 +598,7 @@ html_extra_path = []
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
-# html_last_updated_fmt = '%b %d, %Y'
+html_last_updated_fmt = '%b %d, %Y'
 
 # If false, no module index is generated.
 html_domain_indices = True
