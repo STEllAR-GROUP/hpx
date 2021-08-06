@@ -37,7 +37,7 @@ void for_each_test()
 {
     using namespace hpx::execution;
     test_for_each(simd);
-    test_for_each(simdpar);
+    test_for_each(par_simd);
 }
 
 int hpx_main()

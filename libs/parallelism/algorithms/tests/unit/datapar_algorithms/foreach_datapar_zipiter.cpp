@@ -89,8 +89,8 @@ void for_each_zipiter_test()
 {
     using namespace hpx::execution;
 
-    for_each_zipiter_test(simdpar, IteratorTag());
-    //     test_for_each_async(simdpar(task), IteratorTag());
+    for_each_zipiter_test(par_simd, IteratorTag());
+    //     test_for_each_async(par_simd(task), IteratorTag());
 }
 
 void for_each_zipiter_test()
