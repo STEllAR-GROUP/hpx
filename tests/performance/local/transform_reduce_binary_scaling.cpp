@@ -96,7 +96,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         // do measurements
         std::uint64_t tr_time_datapar = measure_inner_product(
-            test_count, hpx::execution::simdpar, data1, data2);
+            test_count, hpx::execution::par_simd, data1, data2);
         std::uint64_t tr_time_par = measure_inner_product(
             test_count, hpx::execution::par, data1, data2);
 

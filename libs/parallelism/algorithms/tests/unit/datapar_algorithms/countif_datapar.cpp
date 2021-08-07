@@ -20,10 +20,10 @@ void test_count_if()
     using namespace hpx::execution;
 
     test_count_if(simd, IteratorTag());
-    test_count_if(simdpar, IteratorTag());
+    test_count_if(par_simd, IteratorTag());
 
     test_count_if_async(simd(task), IteratorTag());
-    test_count_if_async(simdpar(task), IteratorTag());
+    test_count_if_async(par_simd(task), IteratorTag());
 }
 
 void count_if_test()
@@ -39,10 +39,10 @@ void test_count_if_exception()
     using namespace hpx::execution;
 
     test_count_if_exception(simd, IteratorTag());
-    test_count_if_exception(simdpar, IteratorTag());
+    test_count_if_exception(par_simd, IteratorTag());
 
     test_count_if_exception_async(simd(task), IteratorTag());
-    test_count_if_exception_async(simdpar(task), IteratorTag());
+    test_count_if_exception_async(par_simd(task), IteratorTag());
 }
 
 void count_if_exception_test()
@@ -58,10 +58,10 @@ void test_count_if_bad_alloc()
     using namespace hpx::execution;
 
     test_count_if_bad_alloc(simd, IteratorTag());
-    test_count_if_bad_alloc(simdpar, IteratorTag());
+    test_count_if_bad_alloc(par_simd, IteratorTag());
 
     test_count_if_bad_alloc_async(simd(task), IteratorTag());
-    test_count_if_bad_alloc_async(simdpar(task), IteratorTag());
+    test_count_if_bad_alloc_async(par_simd(task), IteratorTag());
 }
 
 void count_if_bad_alloc_test()
