@@ -18,10 +18,7 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>
-#include <hpx/iterator_support/counting_iterator.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <exception>
@@ -128,20 +125,6 @@ namespace hpx { namespace execution { namespace experimental {
                 }
             };
         };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Incrementable>
-        using counting_shape_type = hpx::util::iterator_range<
-            hpx::util::counting_iterator<Incrementable>>;
-
-        template <typename Incrementable>
-        HPX_HOST_DEVICE inline counting_shape_type<Incrementable>
-        make_counting_shape(Incrementable n)
-        {
-            return hpx::util::make_iterator_range(
-                hpx::util::make_counting_iterator(Incrementable(0)),
-                hpx::util::make_counting_iterator(n));
-        }
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -160,9 +143,9 @@ namespace hpx { namespace execution { namespace experimental {
             bulk_t, Sender&& sender, Shape const& shape, F&& f)
         {
             return detail::bulk_sender<Sender,
-                detail::counting_shape_type<Shape>, F>{
+                hpx::util::counting_shape_type<Shape>, F>{
                 std::forward<Sender>(sender),
-                detail::make_counting_shape(shape), std::forward<F>(f)};
+                hpx::util::make_counting_shape(shape), std::forward<F>(f)};
         }
 
         // clang-format off

@@ -104,6 +104,7 @@ namespace hpx { namespace util {
                 return end(c);
             }
         }    // namespace range_impl
+
         using range_impl::begin_impl;
         using range_impl::end_impl;
 
@@ -125,13 +126,13 @@ namespace hpx { namespace util {
         template <typename T>
         struct result_of_begin
         {
-            typedef decltype(detail::begin_impl(std::declval<T&>(), 0L)) type;
+            using type = decltype(detail::begin_impl(std::declval<T&>(), 0L));
         };
 
         template <typename T, typename Iter = typename result_of_begin<T>::type>
         struct iterator
         {
-            typedef Iter type;
+            using type = Iter;
         };
 
         template <typename T>
@@ -143,13 +144,13 @@ namespace hpx { namespace util {
         template <typename T>
         struct result_of_end
         {
-            typedef decltype(detail::end_impl(std::declval<T&>(), 0L)) type;
+            using type = decltype(detail::end_impl(std::declval<T&>(), 0L));
         };
 
         template <typename T, typename Iter = typename result_of_end<T>::type>
         struct sentinel
         {
-            typedef Iter type;
+            using type = Iter;
         };
 
         template <typename T>
@@ -210,5 +211,6 @@ namespace hpx { namespace util {
             return detail::empty_impl(c, 0L);
         }
     }    // namespace range_adl
+
     using namespace range_adl;
 }}    // namespace hpx::util
