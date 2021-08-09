@@ -7,7 +7,7 @@
 source $SPACK_ROOT/share/spack/setup-env.sh
 
 spack load ccache@3.7.9
-spack load cmake@3.17.3
+spack load cmake@3.18.6
 spack load ninja@1.10.0
 
 export CMAKE_CXX_COMPILER_LAUNCHER=ccache

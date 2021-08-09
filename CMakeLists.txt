@@ -14,7 +14,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 # Overrides must go before the project() statement, otherwise they are ignored.
 
@@ -82,7 +82,7 @@ include(GNUInstallDirs)
 include(HPX_Utils)
 
 # explicitly set certain policies
-cmake_policy(VERSION 3.17)
+cmake_policy(VERSION 3.18)
 hpx_set_cmake_policy(CMP0042 NEW)
 hpx_set_cmake_policy(CMP0060 NEW)
 hpx_set_cmake_policy(CMP0074 NEW)
