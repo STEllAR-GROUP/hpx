@@ -145,7 +145,7 @@ namespace hpx { namespace util {
         void operator()(std::ostream& to) const override
         {
             threads::thread_id_type parent_id = threads::get_parent_id();
-            if (nullptr != parent_id && threads::invalid_thread_id != parent_id)
+            if (nullptr != parent_id)
             {
                 // called from inside a HPX thread
                 std::ptrdiff_t value =

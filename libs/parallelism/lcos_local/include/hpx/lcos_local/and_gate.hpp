@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/lcos_local/conditional_trigger.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/no_mutex.hpp>

@@ -47,6 +47,7 @@ namespace hpx { namespace threads { namespace policies {
         using value_type = T;
         using reference = T&;
         using const_reference = T const&;
+        using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
         lockfree_fifo_backend(size_type initial_size = 0,
@@ -61,6 +62,15 @@ namespace hpx { namespace threads { namespace policies {
             return queue_.push_left(val);
 #else
             return queue_.push(val);
+#endif
+        }
+
+        bool push(rvalue_reference val, bool /*other_end*/ = false)
+        {
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+            return queue_.push_left(std::move(val));
+#else
+            return queue_.push(std::move(val));
 #endif
         }
 
@@ -101,7 +111,7 @@ namespace hpx { namespace threads { namespace policies {
         using value_type = T;
         using reference = T&;
         using const_reference = T const&;
-        using rval_reference = T&&;
+        using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
         moodycamel_fifo_backend(size_type initial_size = 0,
@@ -110,14 +120,14 @@ namespace hpx { namespace threads { namespace policies {
         {
         }
 
-        bool push(rval_reference val, bool /*other_end*/ = false)
-        {
-            return queue_.enqueue(std::move(val));
-        }
-
         bool push(const_reference val, bool /*other_end*/ = false)
         {
             return queue_.enqueue(val);
+        }
+
+        bool push(rvalue_reference val, bool /*other_end*/ = false)
+        {
+            return queue_.enqueue(std::move(val));
         }
 
         bool pop(reference val, bool /* steal */ = true)
@@ -157,6 +167,7 @@ namespace hpx { namespace threads { namespace policies {
         using value_type = T;
         using reference = T&;
         using const_reference = T const&;
+        using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
         lockfree_lifo_backend(size_type initial_size = 0,
@@ -170,6 +181,13 @@ namespace hpx { namespace threads { namespace policies {
             if (other_end)
                 return queue_.push_right(val);
             return queue_.push_left(val);
+        }
+
+        bool push(rvalue_reference val, bool other_end = false)
+        {
+            if (other_end)
+                return queue_.push_right(std::move(val));
+            return queue_.push_left(std::move(val));
         }
 
         bool pop(reference val, bool /* steal */ = true)
@@ -210,6 +228,7 @@ namespace hpx { namespace threads { namespace policies {
         using value_type = T;
         using reference = T&;
         using const_reference = T const&;
+        using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
         lockfree_abp_fifo_backend(size_type initial_size = 0,
@@ -221,6 +240,11 @@ namespace hpx { namespace threads { namespace policies {
         bool push(const_reference val, bool /*other_end*/ = false)
         {
             return queue_.push_left(val);
+        }
+
+        bool push(rvalue_reference val, bool /*other_end*/ = false)
+        {
+            return queue_.push_left(std::move(val));
         }
 
         bool pop(reference val, bool steal = true)
@@ -262,6 +286,7 @@ namespace hpx { namespace threads { namespace policies {
         using value_type = T;
         using reference = T&;
         using const_reference = T const&;
+        using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
         lockfree_abp_lifo_backend(size_type initial_size = 0,
@@ -271,6 +296,13 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         bool push(const_reference val, bool other_end = false)
+        {
+            if (other_end)
+                return queue_.push_right(std::move(val));
+            return queue_.push_left(std::move(val));
+        }
+
+        bool push(rvalue_reference val, bool other_end = false)
         {
             if (other_end)
                 return queue_.push_right(val);

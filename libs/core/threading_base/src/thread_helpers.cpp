@@ -18,6 +18,7 @@
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
+#include <hpx/threading_base/set_thread_state_timed.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -37,6 +38,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads {
+
     ///////////////////////////////////////////////////////////////////////////
     thread_state set_thread_state(thread_id_type const& id,
         thread_schedule_state state, thread_restart_state stateex,
@@ -50,15 +52,15 @@ namespace hpx { namespace threads {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_id_type set_thread_state(thread_id_type const& id,
+    thread_id_ref_type set_thread_state(thread_id_type const& id,
         hpx::chrono::steady_time_point const& abs_time,
         std::atomic<bool>* timer_started, thread_schedule_state state,
         thread_restart_state stateex, thread_priority priority,
         bool retry_on_active, error_code& ec)
     {
         return detail::set_thread_state_timed(
-            *(get_thread_id_data(id)->get_scheduler_base()), abs_time, id,
-            state, stateex, priority, thread_schedule_hint(), timer_started,
+            get_thread_id_data(id)->get_scheduler_base(), abs_time, id, state,
+            stateex, priority, thread_schedule_hint(), timer_started,
             retry_on_active, ec);
     }
 
@@ -429,15 +431,17 @@ namespace hpx { namespace this_thread {
     /// If the suspension was aborted, this function will throw a
     /// \a yield_aborted exception.
     threads::thread_restart_state suspend(threads::thread_schedule_state state,
-        threads::thread_id_type const& nextid,
+        threads::thread_id_type nextid,
         util::thread_description const& description, error_code& ec)
     {
         // let the thread manager do other things while waiting
         threads::thread_self& self = threads::get_self();
-        threads::thread_id_type id = self.get_thread_id();
+
+        // keep alive
+        threads::thread_id_ref_type id = self.get_thread_id();
 
         // handle interruption, if needed
-        threads::interruption_point(id, ec);
+        threads::interruption_point(id.noref(), ec);
         if (ec)
             return threads::thread_restart_state::unknown;
 
@@ -450,7 +454,8 @@ namespace hpx { namespace this_thread {
             util::verify_no_locks();
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-            threads::detail::reset_lco_description desc(id, description, ec);
+            threads::detail::reset_lco_description desc(
+                id.noref(), description, ec);
 #else
             HPX_UNUSED(description);
 #endif
@@ -463,21 +468,22 @@ namespace hpx { namespace this_thread {
                 get_thread_id_data(nextid)->get_scheduler_base() !=
                     get_thread_id_data(id)->get_scheduler_base())
             {
-                get_thread_id_data(nextid)
-                    ->get_scheduler_base()
-                    ->schedule_thread(get_thread_id_data(nextid),
-                        threads::thread_schedule_hint());
+                auto* scheduler =
+                    get_thread_id_data(nextid)->get_scheduler_base();
+                scheduler->schedule_thread(
+                    std::move(nextid), threads::thread_schedule_hint());
                 statex = self.yield(threads::thread_result_type(
                     state, threads::invalid_thread_id));
             }
             else
             {
-                statex = self.yield(threads::thread_result_type(state, nextid));
+                statex = self.yield(
+                    threads::thread_result_type(state, std::move(nextid)));
             }
         }
 
         // handle interruption, if needed
-        threads::interruption_point(id, ec);
+        threads::interruption_point(id.noref(), ec);
         if (ec)
             return threads::thread_restart_state::unknown;
 
@@ -486,7 +492,7 @@ namespace hpx { namespace this_thread {
         {
             HPX_THROWS_IF(ec, yield_aborted, "suspend",
                 "thread({}, {}) aborted (yield returned wait_abort)",
-                threads::get_self_id(), threads::get_thread_description(id));
+                id.noref(), threads::get_thread_description(id.noref()));
         }
 
         if (&ec != &throws)
@@ -497,15 +503,17 @@ namespace hpx { namespace this_thread {
 
     threads::thread_restart_state suspend(
         hpx::chrono::steady_time_point const& abs_time,
-        threads::thread_id_type const& nextid,
+        threads::thread_id_type nextid,
         util::thread_description const& description, error_code& ec)
     {
         // schedule a thread waking us up at_time
         threads::thread_self& self = threads::get_self();
-        threads::thread_id_type id = self.get_thread_id();
+
+        // keep alive
+        threads::thread_id_ref_type id = self.get_thread_id();
 
         // handle interruption, if needed
-        threads::interruption_point(id, ec);
+        threads::interruption_point(id.noref(), ec);
         if (ec)
             return threads::thread_restart_state::unknown;
 
@@ -519,7 +527,8 @@ namespace hpx { namespace this_thread {
             util::verify_no_locks();
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-            threads::detail::reset_lco_description desc(id, description, ec);
+            threads::detail::reset_lco_description desc(
+                id.noref(), description, ec);
 #else
             HPX_UNUSED(description);
 #endif
@@ -527,8 +536,8 @@ namespace hpx { namespace this_thread {
             threads::detail::reset_backtrace bt(id, ec);
 #endif
             std::atomic<bool> timer_started(false);
-            threads::thread_id_type timer_id =
-                threads::set_thread_state(id, abs_time, &timer_started,
+            threads::thread_id_ref_type timer_id =
+                threads::set_thread_state(id.noref(), abs_time, &timer_started,
                     threads::thread_schedule_state::pending,
                     threads::thread_restart_state::timeout,
                     threads::thread_priority::boost, true, ec);
@@ -541,10 +550,10 @@ namespace hpx { namespace this_thread {
                 get_thread_id_data(nextid)->get_scheduler_base() !=
                     get_thread_id_data(id)->get_scheduler_base())
             {
-                get_thread_id_data(nextid)
-                    ->get_scheduler_base()
-                    ->schedule_thread(get_thread_id_data(nextid),
-                        threads::thread_schedule_hint());
+                auto* scheduler =
+                    get_thread_id_data(nextid)->get_scheduler_base();
+                scheduler->schedule_thread(
+                    std::move(nextid), threads::thread_schedule_hint());
                 statex = self.yield(threads::thread_result_type(
                     threads::thread_schedule_state::suspended,
                     threads::invalid_thread_id));
@@ -552,7 +561,8 @@ namespace hpx { namespace this_thread {
             else
             {
                 statex = self.yield(threads::thread_result_type(
-                    threads::thread_schedule_state::suspended, nextid));
+                    threads::thread_schedule_state::suspended,
+                    std::move(nextid)));
             }
 
             if (statex != threads::thread_restart_state::timeout)
@@ -563,7 +573,7 @@ namespace hpx { namespace this_thread {
                 hpx::util::yield_while(
                     [&timer_started]() { return !timer_started.load(); },
                     "set_thread_state_timed");
-                threads::set_thread_state(timer_id,
+                threads::set_thread_state(timer_id.noref(),
                     threads::thread_schedule_state::pending,
                     threads::thread_restart_state::abort,
                     threads::thread_priority::boost, true, ec1);
@@ -571,7 +581,7 @@ namespace hpx { namespace this_thread {
         }
 
         // handle interruption, if needed
-        threads::interruption_point(id, ec);
+        threads::interruption_point(id.noref(), ec);
         if (ec)
             return threads::thread_restart_state::unknown;
 
@@ -580,7 +590,7 @@ namespace hpx { namespace this_thread {
         {
             HPX_THROWS_IF(ec, yield_aborted, "suspend_at",
                 "thread({}, {}) aborted (yield returned wait_abort)",
-                threads::get_self_id(), threads::get_thread_description(id));
+                id.noref(), threads::get_thread_description(id.noref()));
         }
 
         if (&ec != &throws)

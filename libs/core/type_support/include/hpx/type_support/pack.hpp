@@ -68,6 +68,9 @@ namespace hpx { namespace util {
     {
     };
 
+    template <std::size_t N>
+    using make_index_pack_t = typename make_index_pack<N>::type;
+
     ///////////////////////////////////////////////////////////////////////////
     // Workaround for clang bug [https://bugs.llvm.org/show_bug.cgi?id=35077]
     namespace detail {

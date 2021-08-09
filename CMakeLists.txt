@@ -14,7 +14,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 # Overrides must go before the project() statement, otherwise they are ignored.
 
@@ -82,7 +82,7 @@ include(GNUInstallDirs)
 include(HPX_Utils)
 
 # explicitly set certain policies
-cmake_policy(VERSION 3.17)
+cmake_policy(VERSION 3.18)
 hpx_set_cmake_policy(CMP0042 NEW)
 hpx_set_cmake_policy(CMP0060 NEW)
 hpx_set_cmake_policy(CMP0074 NEW)
@@ -322,69 +322,95 @@ hpx_option(
 if(HPX_WITH_PRECOMPILED_HEADERS)
   set(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL ON)
 
+  set(system_precompiled_headers
+      <algorithm>
+      <array>
+      <atomic>
+      <bitset>
+      <cassert>
+      <cctype>
+      <cerrno>
+      <chrono>
+      <climits>
+      <cmath>
+      <complex>
+      <condition_variable>
+      <cstddef>
+      <cstdint>
+      <cstdio>
+      <cstdlib>
+      <cstring>
+      <ctime>
+      <deque>
+      <exception>
+      <execution>
+      <forward_list>
+      <fstream>
+      <functional>
+      <iomanip>
+      <ios>
+      <iosfwd>
+      <iostream>
+      <iterator>
+      <limits>
+      <list>
+      <locale>
+      <map>
+      <memory>
+      <mutex>
+      <new>
+      <numeric>
+      <ostream>
+      <random>
+      <regex>
+      <set>
+      <shared_mutex>
+      <sstream>
+      <stack>
+      <stdexcept>
+      <string>
+      <system_error>
+      <thread>
+      <tuple>
+      <type_traits>
+      <typeinfo>
+      <unordered_map>
+      <unordered_set>
+      <utility>
+      <variant>
+      <vector>
+      <hwloc.h>
+      <asio/basic_waitable_timer.hpp>
+      <asio/io_context.hpp>
+      <asio/ip/tcp.hpp>
+      <boost/config.hpp>
+      <boost/container/small_vector.hpp>
+      <boost/fusion/include/vector.hpp>
+      <boost/intrusive/slist.hpp>
+      <boost/lockfree/queue.hpp>
+      <boost/optional.hpp>
+      <boost/spirit/home/x3.hpp>
+      <boost/tokenizer.hpp>
+      <boost/utility/string_ref.hpp>
+  )
+
+  if(HPX_WITH_CXX17_FILESYSTEM)
+    list(APPEND system_precompiled_headers <filesystem>)
+  endif()
+
+  set(system_precompiled_headers_dependencies
+      hpx_dependencies_boost hpx_private_flags hpx_public_flags
+      ASIO::standalone_asio
+  )
+
   add_library(hpx_precompiled_headers OBJECT libs/src/dummy.cpp)
   target_link_libraries(
-    hpx_precompiled_headers PRIVATE hpx_public_flags hpx_private_flags
-                                    hpx_base_libraries
+    hpx_precompiled_headers
+    PRIVATE hpx_public_flags hpx_private_flags hpx_base_libraries
+            ${system_precompiled_headers_dependencies}
   )
   target_precompile_headers(
-    hpx_precompiled_headers
-    PRIVATE
-    <algorithm>
-    <array>
-    <atomic>
-    <bitset>
-    <cassert>
-    <cctype>
-    <cerrno>
-    <chrono>
-    <climits>
-    <cmath>
-    <complex>
-    <condition_variable>
-    <cstddef>
-    <cstdint>
-    <cstdio>
-    <cstdlib>
-    <cstring>
-    <ctime>
-    <deque>
-    <exception>
-    <forward_list>
-    <fstream>
-    <functional>
-    <iomanip>
-    <ios>
-    <iosfwd>
-    <iostream>
-    <iterator>
-    <limits>
-    <list>
-    <locale>
-    <map>
-    <memory>
-    <mutex>
-    <new>
-    <numeric>
-    <ostream>
-    <random>
-    <regex>
-    <set>
-    <shared_mutex>
-    <sstream>
-    <stack>
-    <stdexcept>
-    <string>
-    <system_error>
-    <thread>
-    <tuple>
-    <type_traits>
-    <typeinfo>
-    <unordered_map>
-    <unordered_set>
-    <utility>
-    <variant>
-    <vector>
+    hpx_precompiled_headers PRIVATE ${system_precompiled_headers}
   )
 
   set_target_properties(hpx_precompiled_headers PROPERTIES FOLDER "Core")

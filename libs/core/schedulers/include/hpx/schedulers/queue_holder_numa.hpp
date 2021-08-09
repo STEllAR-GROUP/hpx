@@ -96,7 +96,8 @@ namespace hpx { namespace threads { namespace policies {
 
         // ----------------------------------------------------------------
         inline bool get_next_thread_HP(std::size_t qidx,
-            threads::thread_data*& thrd, bool stealing, bool core_stealing)
+            threads::thread_id_ref_type& thrd, bool stealing,
+            bool core_stealing)
         {
             // loop over queues and take one task,
             std::size_t q = qidx;
@@ -113,7 +114,7 @@ namespace hpx { namespace threads { namespace policies {
                          , "Qidx",  debug::dec<3>(qidx)
                          , ((i==0 && !stealing) ? "taken" : "stolen from")
                          , typename ThreadQueue::queue_data_print(queues_[q])
-                         , debug::threadinfo<threads::thread_data*>(thrd));
+                         , debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
                     // clang-format on
                     return true;
                 }
@@ -126,7 +127,8 @@ namespace hpx { namespace threads { namespace policies {
 
         // ----------------------------------------------------------------
         inline bool get_next_thread(std::size_t qidx,
-            threads::thread_data*& thrd, bool stealing, bool core_stealing)
+            threads::thread_id_ref_type& thrd, bool stealing,
+            bool core_stealing)
         {
             // loop over queues and take one task,
             // starting with the requested queue
@@ -142,7 +144,7 @@ namespace hpx { namespace threads { namespace policies {
                         debug::dec<3>(qidx),
                         ((i == 0 && !stealing) ? "taken" : "stolen from"),
                         typename ThreadQueue::queue_data_print(queues_[q]),
-                        debug::threadinfo<threads::thread_data*>(thrd));
+                        debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
                     return true;
                 }
                 // if stealing disabled, do not check other queues
@@ -248,7 +250,7 @@ namespace hpx { namespace threads { namespace policies {
         {
             bool result = true;
             for (auto& q : queues_)
-                result = q->enumerate_threads(f, state) && result;
+                result = result && q->enumerate_threads(f, state);
             return result;
         }
 

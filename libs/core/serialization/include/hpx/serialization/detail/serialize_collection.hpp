@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/serialization/detail/constructor_selector.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
@@ -74,9 +75,9 @@ namespace hpx { namespace serialization { namespace detail {
         };
 
     public:
-        using type = typename std::conditional<
-            std::is_default_constructible<Value>::value, default_,
-            non_default_>::type;
+        using type =
+            std::conditional_t<std::is_default_constructible<Value>::value,
+                default_, non_default_>;
     };
 
     template <typename Value>
@@ -88,9 +89,17 @@ namespace hpx { namespace serialization { namespace detail {
             static void call(Archive& ar, Collection& collection,
                 typename Collection::size_type size)
             {
-                collection.resize(size);
-                for (auto& i : collection)
-                    ar >> i;
+                using value_type = typename Collection::value_type;
+
+                collection.clear();
+                reserve_if_container(collection, size);
+
+                while (size-- != 0)
+                {
+                    value_type elem;
+                    ar >> elem;
+                    collection.emplace_back(std::move(elem));
+                }
             }
         };
 
@@ -102,22 +111,51 @@ namespace hpx { namespace serialization { namespace detail {
             {
                 using value_type = typename Collection::value_type;
 
+                using is_polymorphic = std::integral_constant<bool,
+                    hpx::traits::is_intrusive_polymorphic_v<value_type> ||
+                        hpx::traits::is_nonintrusive_polymorphic_v<value_type>>;
+
+                call(ar, collection, size, is_polymorphic());
+            }
+
+            template <typename Archive, typename Collection>
+            static void call(Archive& ar, Collection& collection,
+                typename Collection::size_type size, std::false_type)
+            {
+                using value_type = typename Collection::value_type;
+
+                collection.clear();
+                reserve_if_container(collection, size);
+
+                while (size-- > 0)
+                {
+                    collection.emplace_back(
+                        constructor_selector<value_type>::create(ar));
+                }
+            }
+
+            template <typename Archive, typename Collection>
+            static void call(Archive& ar, Collection& collection,
+                typename Collection::size_type size, std::true_type)
+            {
+                using value_type = typename Collection::value_type;
+
                 collection.clear();
                 reserve_if_container(collection, size);
 
                 while (size-- > 0)
                 {
                     std::unique_ptr<value_type> data(
-                        constructor_selector<value_type>::create(ar));
-                    collection.push_back(std::move(*data));
+                        constructor_selector_ptr<value_type>::create(ar));
+                    collection.emplace_back(std::move(*data));
                 }
             }
         };
 
     public:
-        using type = typename std::conditional<
-            std::is_default_constructible<Value>::value, default_,
-            non_default_>::type;
+        using type =
+            std::conditional_t<std::is_default_constructible<Value>::value,
+                default_, non_default_>;
     };
 
     template <typename Archive, typename Collection>

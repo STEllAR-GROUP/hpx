@@ -477,6 +477,11 @@ namespace hpx { namespace components { namespace server {
             dijkstra_scoped_lock l(dijkstra_mtx_);
             do
             {
+                LRT_(info).format(
+                    "runtime_support::dijkstra_termination_detection: "
+                    "initiates a probe by making itself white and sending a "
+                    "white token to next machine.");
+
                 // Rule 4: Machine nr.0 initiates a probe by making itself white
                 // and sending a white token to machine nr.N - 1.
                 dijkstra_color_ = false;    // start off with white
@@ -488,6 +493,10 @@ namespace hpx { namespace components { namespace server {
                         dijkstra_color_);
                 }
 
+                LRT_(info).format(
+                    "runtime_support::dijkstra_termination_detection: "
+                    "wait for token to come back to us.");
+
                 // wait for token to come back to us
                 dijkstra_cond_.wait(l);
 
@@ -495,6 +504,14 @@ namespace hpx { namespace components { namespace server {
                 // nr.0 initiates a next probe.
 
                 ++count;
+
+                if (dijkstra_color_)
+                {
+                    LRT_(info).format(
+                        "runtime_support::dijkstra_termination_detection: "
+                        "After the completion of an unsuccessful probe, "
+                        "initiate next probe.");
+                }
 
             } while (dijkstra_color_);
         }

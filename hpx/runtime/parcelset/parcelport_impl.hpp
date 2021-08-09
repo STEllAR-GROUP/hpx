@@ -347,11 +347,11 @@ namespace hpx { namespace parcelset
                     static_cast<std::int16_t>(get_next_num_thread())),
                 threads::thread_stacksize::default_,
                 threads::thread_schedule_state::suspended, true);
-            threads::thread_id_type id =
+            threads::thread_id_ref_type id =
                 hpx::threads::register_thread(data, ec);
             if (ec) return;
 
-            threads::set_thread_state(id, std::chrono::milliseconds(100),
+            threads::set_thread_state(id.noref(), std::chrono::milliseconds(100),
                 threads::thread_schedule_state::pending,
                 threads::thread_restart_state::signaled,
                 threads::thread_priority::boost, true, ec);

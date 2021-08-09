@@ -23,10 +23,10 @@ void test_copy()
     test_copy(IteratorTag());
 
     test_copy(simd, IteratorTag());
-    test_copy(simdpar, IteratorTag());
+    test_copy(par_simd, IteratorTag());
 
     test_copy_async(simd(task), IteratorTag());
-    test_copy_async(simdpar(task), IteratorTag());
+    test_copy_async(par_simd(task), IteratorTag());
 }
 
 void copy_test()
@@ -44,10 +44,10 @@ void test_copy_exception()
     test_copy_exception(IteratorTag());
 
     test_copy_exception(simd, IteratorTag());
-    test_copy_exception(simdpar, IteratorTag());
+    test_copy_exception(par_simd, IteratorTag());
 
     test_copy_exception_async(simd(task), IteratorTag());
-    test_copy_exception_async(simdpar(task), IteratorTag());
+    test_copy_exception_async(par_simd(task), IteratorTag());
 }
 
 void copy_exception_test()
@@ -61,12 +61,12 @@ template <typename IteratorTag>
 void test_copy_bad_alloc()
 {
     test_copy_bad_alloc(hpx::execution::simd, IteratorTag());
-    test_copy_bad_alloc(hpx::execution::simdpar, IteratorTag());
+    test_copy_bad_alloc(hpx::execution::par_simd, IteratorTag());
 
     test_copy_bad_alloc_async(
         hpx::execution::simd(hpx::execution::task), IteratorTag());
     test_copy_bad_alloc_async(
-        hpx::execution::simdpar(hpx::execution::task), IteratorTag());
+        hpx::execution::par_simd(hpx::execution::task), IteratorTag());
 }
 
 void copy_bad_alloc_test()

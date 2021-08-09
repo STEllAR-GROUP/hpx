@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -41,11 +41,21 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads {
+
     namespace detail {
         using get_locality_id_type = std::uint32_t(hpx::error_code&);
         HPX_CORE_EXPORT void set_get_locality_id(get_locality_id_type* f);
         HPX_CORE_EXPORT std::uint32_t get_locality_id(hpx::error_code&);
     }    // namespace detail
+
+    ////////////////////////////////////////////////////////////////////////////
+    class HPX_CORE_EXPORT thread_data;    // forward declaration only
+
+    ////////////////////////////////////////////////////////////////////////////
+    /// The function \a get_self_id_data returns the data of the HPX thread id
+    /// associated with the current thread (or nullptr if the current thread is
+    /// not a HPX thread).
+    HPX_CORE_EXPORT thread_data* get_self_id_data();
 
     ////////////////////////////////////////////////////////////////////////////
     /// A \a thread is the representation of a ParalleX thread. It's a first
@@ -64,7 +74,7 @@ namespace hpx { namespace threads {
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a threads is
     /// implemented by the thread-manager.
-    class HPX_CORE_EXPORT thread_data
+    class thread_data : public threads::detail::thread_data_reference_counting
     {
     public:
         thread_data(thread_data const&) = delete;
@@ -137,20 +147,12 @@ namespace hpx { namespace threads {
             std::memory_order exchange_order =
                 std::memory_order_seq_cst) noexcept
         {
+            new_tagged_state = thread_state(
+                newstate, prev_state.state_ex(), prev_state.tag() + 1);
+
             thread_state tmp = prev_state;
-            thread_restart_state state_ex = tmp.state_ex();
-
-            new_tagged_state =
-                thread_state(newstate, state_ex, prev_state.tag() + 1);
-
-            if (!current_state_.compare_exchange_strong(
-                    tmp, new_tagged_state, exchange_order))
-            {
-                return false;
-            }
-
-            prev_state = tmp;
-            return true;
+            return current_state_.compare_exchange_strong(
+                tmp, new_tagged_state, exchange_order);
         }
 
         /// The restore_state function changes the state of this thread
@@ -179,14 +181,14 @@ namespace hpx { namespace threads {
             std::memory_order load_exchange =
                 std::memory_order_seq_cst) noexcept
         {
+            // ignore the state_ex while compare-exchanging
+            thread_state current_state = current_state_.load(load_order);
+            thread_restart_state state_ex = current_state.state_ex();
+
             // ABA prevention for state only (not for state_ex)
-            std::int64_t tag = old_state.tag();
+            std::int64_t tag = current_state.tag();
             if (new_state.state() != old_state.state())
                 ++tag;
-
-            // ignore the state_ex while compare-exchanging
-            thread_restart_state state_ex =
-                current_state_.load(load_order).state_ex();
 
             thread_state old_tmp(old_state.state(), state_ex, old_state.tag());
             thread_state new_tmp(new_state.state(), state_ex, tag);
@@ -506,6 +508,13 @@ namespace hpx { namespace threads {
         void run_thread_exit_callbacks();
         void free_thread_exit_callbacks();
 
+        HPX_FORCEINLINE bool is_stackless() const noexcept
+        {
+            return is_stackless_;
+        }
+
+        void destroy_thread() override;
+
         policies::scheduler_base* get_scheduler_base() const noexcept
         {
             return scheduler_base_;
@@ -594,7 +603,7 @@ namespace hpx { namespace threads {
         thread_data(thread_init_data& init_data, void* queue,
             std::ptrdiff_t stacksize, bool is_stackless = false);
 
-        virtual ~thread_data();
+        virtual ~thread_data() override;
         virtual void destroy() = 0;
 
     protected:
@@ -633,6 +642,7 @@ namespace hpx { namespace threads {
         bool requested_interrupt_;
         bool enabled_interrupt_;
         bool ran_exit_funcs_;
+        bool const is_stackless_;
 
         // Singly linked list (heap-allocated)
         std::forward_list<util::function_nonser<void()>> exit_funcs_;
@@ -650,10 +660,15 @@ namespace hpx { namespace threads {
 #if defined(HPX_HAVE_APEX)
         std::shared_ptr<util::external_timer::task_wrapper> timer_data_;
 #endif
-        bool is_stackless_;
     };
 
-    constexpr inline thread_data* get_thread_id_data(thread_id_type const& tid)
+    HPX_FORCEINLINE thread_data* get_thread_id_data(
+        thread_id_ref_type const& tid)
+    {
+        return static_cast<thread_data*>(tid.get().get());
+    }
+
+    HPX_FORCEINLINE thread_data* get_thread_id_data(thread_id_type const& tid)
     {
         return static_cast<thread_data*>(tid.get());
     }
@@ -682,11 +697,6 @@ namespace hpx { namespace threads {
     /// The function \a get_self_id returns the HPX thread id of the current
     /// thread (or zero if the current thread is not a HPX thread).
     HPX_CORE_EXPORT thread_id_type get_self_id();
-
-    /// The function \a get_self_id_data returns the data of the HPX thread id
-    /// associated with the current thread (or nullptr if the current thread is
-    /// not a HPX thread).
-    HPX_CORE_EXPORT thread_data* get_self_id_data();
 
     /// The function \a get_parent_id returns the HPX thread id of the
     /// current thread's parent (or zero if the current thread is not a
@@ -740,10 +750,10 @@ namespace hpx { namespace threads {
 
 namespace hpx { namespace threads {
 
-    inline coroutine_type::result_type thread_data::operator()(
+    HPX_FORCEINLINE coroutine_type::result_type thread_data::operator()(
         hpx::execution_base::this_thread::detail::agent_storage* agent_storage)
     {
-        if (is_stackless_)
+        if (is_stackless())
         {
             return static_cast<thread_data_stackless*>(this)->call();
         }

@@ -21,9 +21,19 @@ namespace hpx { namespace serialization {
     namespace detail {
         // This is explicitly instantiated to ensure that the id is stable across
         // shared libraries.
-        void extra_archive_data_helper<input_pointer_tracker>::id() noexcept {}
+        extra_archive_data_id_type
+        extra_archive_data_helper<input_pointer_tracker>::id() noexcept
+        {
+            static std::uint8_t id;
+            return &id;
+        }
 
-        void extra_archive_data_helper<output_pointer_tracker>::id() noexcept {}
+        extra_archive_data_id_type
+        extra_archive_data_helper<output_pointer_tracker>::id() noexcept
+        {
+            static std::uint8_t id;
+            return &id;
+        }
 
         void extra_archive_data_helper<output_pointer_tracker>::reset(
             output_pointer_tracker* data)

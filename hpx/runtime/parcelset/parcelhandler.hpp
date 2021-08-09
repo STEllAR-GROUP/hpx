@@ -43,8 +43,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace parcelset
-{
+namespace hpx { namespace parcelset {
     /// The \a parcelhandler is the representation of the parcelset inside a
     /// locality. It is built on top of a single parcelport. Several
     /// parcel-handlers may be connected to a single parcelport.
@@ -66,11 +65,10 @@ namespace hpx { namespace parcelset
         typedef lcos::local::spinlock mutex_type;
 
     public:
-
         typedef std::pair<locality, std::string> handler_key_type;
-        typedef std::map<
-            handler_key_type, std::shared_ptr<policies::message_handler> >
-        message_handler_map;
+        typedef std::map<handler_key_type,
+            std::shared_ptr<policies::message_handler>>
+            message_handler_map;
 
         typedef parcelport::read_handler_type read_handler_type;
         typedef parcelport::write_handler_type write_handler_type;
@@ -86,15 +84,18 @@ namespace hpx { namespace parcelset
         ///                 parcelhandler is connected to. This \a parcelport
         ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
-        parcelhandler(util::runtime_configuration& cfg,
-            threads::threadmanager* tm,
-            threads::policies::callback_notifier const& notifier);
+        parcelhandler(util::runtime_configuration& cfg);
 
         ~parcelhandler() = default;
 
+        void set_notification_policies(util::runtime_configuration& cfg,
+            threads::threadmanager* tm,
+            threads::policies::callback_notifier const& notifier);
+
         std::shared_ptr<parcelport> get_bootstrap_parcelport() const;
 
-        void initialize(naming::resolver_client &resolver, applier::applier *applier);
+        void initialize(
+            naming::resolver_client& resolver, applier::applier* applier);
 
         void flush_parcels();
 
@@ -127,7 +128,8 @@ namespace hpx { namespace parcelset
         /// \returns The function returns \a true if there is at least one
         ///          remote locality known by AGAS
         ///          (!prefixes.empty()).
-        bool get_raw_remote_localities(std::vector<naming::gid_type>& locality_ids,
+        bool get_raw_remote_localities(
+            std::vector<naming::gid_type>& locality_ids,
             components::component_type type = components::component_invalid,
             error_code& ec = throws) const;
 
@@ -229,7 +231,7 @@ namespace hpx { namespace parcelset
 
         /// \brief Factory function used in serialization to create a given
         /// locality endpoint
-        locality create_locality(std::string const & name) const
+        locality create_locality(std::string const& name) const
         {
             return find_parcelport(name)->create_locality();
         }
@@ -246,12 +248,12 @@ namespace hpx { namespace parcelset
 
         /// \brief Make sure the specified locality is not held by any
         /// connection caches anymore
-        void remove_from_connection_cache(naming::gid_type const& gid,
-            endpoints_type const& endpoints);
+        void remove_from_connection_cache(
+            naming::gid_type const& gid, endpoints_type const& endpoints);
 
         /// \brief return the endpoints associated with this parcelhandler
         /// \returns all connection information for the enabled parcelports
-        endpoints_type const & endpoints() const
+        endpoints_type const& endpoints() const
         {
             return endpoints_;
         }
@@ -272,8 +274,7 @@ namespace hpx { namespace parcelset
         ///////////////////////////////////////////////////////////////////////
         policies::message_handler* get_message_handler(char const* action,
             char const* message_handler_type, std::size_t num_messages,
-             std::size_t interval, locality const& loc,
-             error_code& ec = throws);
+            std::size_t interval, locality const& loc, error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
         // Performance counter data
@@ -342,14 +343,12 @@ namespace hpx { namespace parcelset
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
         // same as above, just separated data for each action
         // number of parcels sent
-        std::int64_t get_action_parcel_send_count(
-            std::string const& pp_type, std::string const& action,
-            bool reset) const;
+        std::int64_t get_action_parcel_send_count(std::string const& pp_type,
+            std::string const& action, bool reset) const;
 
         // number of parcels received
-        std::int64_t get_action_parcel_receive_count(
-            std::string const& pp_type, std::string const& action,
-            bool reset) const;
+        std::int64_t get_action_parcel_receive_count(std::string const& pp_type,
+            std::string const& action, bool reset) const;
 
         // the total time it took for all sender-side serialization operations
         // (nanoseconds)
@@ -386,7 +385,7 @@ namespace hpx { namespace parcelset
 
         // manage default exception handler
         void invoke_write_handler(
-            std::error_code const& ec, parcel const & p) const;
+            std::error_code const& ec, parcel const& p) const;
 
         write_handler_type set_write_handler(write_handler_type f)
         {
@@ -404,24 +403,30 @@ namespace hpx { namespace parcelset
         std::int64_t get_outgoing_queue_length(bool reset) const;
 
         std::pair<std::shared_ptr<parcelport>, locality>
-        find_appropriate_destination(naming::gid_type const & dest_gid);
-        locality find_endpoint(endpoints_type const & eps, std::string const & name);
+        find_appropriate_destination(naming::gid_type const& dest_gid);
+        locality find_endpoint(
+            endpoints_type const& eps, std::string const& name);
 
         void register_counter_types(std::string const& pp_type);
-        void register_connection_cache_counter_types(std::string const& pp_type);
+        void register_connection_cache_counter_types(
+            std::string const& pp_type);
 
     private:
         int get_priority(std::string const& name) const
         {
-            std::map<std::string, int>::const_iterator it = priority_.find(name);
-            if(it == priority_.end()) return 0;
+            std::map<std::string, int>::const_iterator it =
+                priority_.find(name);
+            if (it == priority_.end())
+                return 0;
             return it->second;
         }
 
-        parcelport *find_parcelport(std::string const& type, error_code& = throws) const
+        parcelport* find_parcelport(
+            std::string const& type, error_code& = throws) const
         {
             int priority = get_priority(type);
-            if(priority <= 0) return nullptr;
+            if (priority <= 0)
+                return nullptr;
             HPX_ASSERT(pports_.find(priority) != pports_.end());
             return pports_.find(priority)->second.get();    // -V783
         }
@@ -430,11 +435,11 @@ namespace hpx { namespace parcelset
         void attach_parcelport(std::shared_ptr<parcelport> const& pp);
 
         /// The AGAS client
-        naming::resolver_client *resolver_;
+        naming::resolver_client* resolver_;
 
         /// the parcelport this handler is associated with
-        using pports_type = std::map<int, std::shared_ptr<parcelport>,
-            std::greater<int> >;
+        using pports_type =
+            std::map<int, std::shared_ptr<parcelport>, std::greater<int>>;
         pports_type pports_;
 
         std::map<std::string, int> priority_;
@@ -468,18 +473,18 @@ namespace hpx { namespace parcelset
         bool is_networking_enabled_;
 
     public:
-        static std::vector<plugins::parcelport_factory_base *> &
-            get_parcelport_factories();
+        static std::vector<plugins::parcelport_factory_base*>&
+        get_parcelport_factories();
 
-        static void add_parcelport_factory(plugins::parcelport_factory_base *);
+        static void add_parcelport_factory(plugins::parcelport_factory_base*);
 
-        static void init(int *argc, char ***argv, util::command_line_handling &cfg);
+        static void init(
+            int* argc, char*** argv, util::command_line_handling& cfg);
     };
 
     std::vector<std::string> load_runtime_configuration();
-}}
+}}    // namespace hpx::parcelset
 
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-

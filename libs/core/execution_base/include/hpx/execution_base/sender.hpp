@@ -335,12 +335,8 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_DEVICE static const
-#else
-    HPX_INLINE_CONSTEXPR_VARIABLE
-#endif
-        struct execute_t : hpx::functional::tag_priority<execute_t>
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
+    struct execute_t : hpx::functional::tag_priority<execute_t>
     {
         template <typename Executor, typename F,
             typename =
@@ -435,12 +431,8 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_DEVICE static const
-#else
-    HPX_INLINE_CONSTEXPR_VARIABLE
-#endif
-        struct connect_t : hpx::functional::tag_priority<connect_t>
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
+    struct connect_t : hpx::functional::tag_priority<connect_t>
     {
         template <typename S, typename R,
             typename = std::enable_if_t<is_sender_v<S> && is_receiver_v<R>>>
@@ -547,12 +539,8 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_DEVICE static const
-#else
-    HPX_INLINE_CONSTEXPR_VARIABLE
-#endif
-        struct submit_t : hpx::functional::tag_priority<submit_t>
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
+    struct submit_t : hpx::functional::tag_priority<submit_t>
     {
         template <typename S, typename R,
             typename = std::enable_if_t<is_sender_to<S, R>::value>>
@@ -723,12 +711,8 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_DEVICE static const
-#else
-    HPX_INLINE_CONSTEXPR_VARIABLE
-#endif
-        struct schedule_t : hpx::functional::tag_priority<schedule_t>
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
+    struct schedule_t : hpx::functional::tag_priority<schedule_t>
     {
         template <typename S,
             typename = std::enable_if_t<is_sender_v<

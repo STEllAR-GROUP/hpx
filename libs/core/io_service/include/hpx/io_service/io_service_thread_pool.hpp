@@ -39,15 +39,16 @@ namespace hpx { namespace threads { namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
         void create_thread(
-            thread_init_data& data, thread_id_type& id, error_code& ec);
+            thread_init_data& data, thread_id_ref_type& id, error_code& ec);
 
-        void create_work(thread_init_data& data, error_code& ec);
+        thread_id_ref_type create_work(thread_init_data& data, error_code& ec);
 
         thread_state set_state(thread_id_type const& id,
             thread_schedule_state new_state, thread_restart_state new_state_ex,
             thread_priority priority, error_code& ec);
 
-        thread_id_type set_state(hpx::chrono::steady_time_point const& abs_time,
+        thread_id_ref_type set_state(
+            hpx::chrono::steady_time_point const& abs_time,
             thread_id_type const& id, thread_schedule_state newstate,
             thread_restart_state newstate_ex, thread_priority priority,
             error_code& ec);

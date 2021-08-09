@@ -214,7 +214,7 @@ namespace hpx {
 
         // register callback function to be called when thread exits
         if (threads::add_thread_exit_callback(
-                id_, util::bind_front(&resume_thread, this_id)))
+                id_.noref(), util::bind_front(&resume_thread, this_id)))
         {
             // wait for thread to be terminated
             util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
@@ -292,9 +292,9 @@ namespace hpx {
             typedef lcos::detail::future_data<void>::result_type result_type;
 
         public:
-            thread_task_base(threads::thread_id_type const& id)
+            thread_task_base(threads::thread_id_ref_type const& id)
             {
-                if (threads::add_thread_exit_callback(id,
+                if (threads::add_thread_exit_callback(id.noref(),
                         util::bind_front(
                             &thread_task_base::thread_exit_function,
                             future_base_type(this))))
@@ -319,7 +319,7 @@ namespace hpx {
                 std::lock_guard<mutex_type> l(this->mtx_);
                 if (!this->is_ready())
                 {
-                    threads::interrupt_thread(id_);
+                    threads::interrupt_thread(id_.noref());
                     this->set_error(thread_cancelled,
                         "thread_task_base::cancel", "future has been canceled");
                     id_ = threads::invalid_thread_id;
@@ -337,7 +337,7 @@ namespace hpx {
             }
 
         private:
-            threads::thread_id_type id_;
+            threads::thread_id_ref_type id_;
         };
     }    // namespace detail
 
@@ -365,6 +365,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace this_thread {
+
         void yield_to(thread::id id) noexcept
         {
             this_thread::suspend(threads::thread_schedule_state::pending,

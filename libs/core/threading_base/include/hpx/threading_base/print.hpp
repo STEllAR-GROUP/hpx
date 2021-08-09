@@ -53,6 +53,20 @@ namespace hpx { namespace debug {
     };
 
     template <>
+    struct threadinfo<threads::thread_id_ref_type*>
+    {
+        constexpr threadinfo(threads::thread_id_ref_type const* v)
+          : data(v)
+        {
+        }
+
+        threads::thread_id_ref_type const* data;
+
+        HPX_CORE_EXPORT friend std::ostream& operator<<(
+            std::ostream& os, threadinfo const& d);
+    };
+
+    template <>
     struct threadinfo<hpx::threads::thread_init_data>
     {
         constexpr threadinfo(hpx::threads::thread_init_data const& v)

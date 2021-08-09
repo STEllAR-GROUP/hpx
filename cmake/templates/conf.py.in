@@ -452,6 +452,8 @@ rst_prolog += '''
 .. |ini_file_format| replace:: Windows INI file format
 .. _ini_file_format: https://en.wikipedia.org/wiki/INI_file
 
+.. |asio| replace:: Asio
+.. _asio: https://think-async.com/Asio/
 .. |hwloc| replace:: Portable Hardware Locality (HWLOC)
 .. _hwloc: https://www.open-mpi.org/projects/hwloc/
 .. |tbb| replace:: Intel Threading Building Blocks (TBB)

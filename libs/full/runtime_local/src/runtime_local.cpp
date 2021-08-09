@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -271,34 +271,38 @@ namespace hpx {
       , on_error_func_(global_on_error_func)
       , result_(0)
       , main_pool_notifier_()
-      , main_pool_(1, main_pool_notifier_, "main_pool")
+      , main_pool_(main_pool_notifier_, "main_pool")
 #ifdef HPX_HAVE_IO_POOL
-      , io_pool_notifier_(runtime::get_notification_policy(
-            "io-thread", runtime_local::os_thread_type::io_thread))
-      , io_pool_(rtcfg_.get_thread_pool_size("io_pool"), io_pool_notifier_,
-            "io_pool")
+      , io_pool_notifier_()
+      , io_pool_(io_pool_notifier_, "io_pool")
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
-      , timer_pool_notifier_(runtime::get_notification_policy(
-            "timer-thread", runtime_local::os_thread_type::timer_thread))
-      , timer_pool_(rtcfg_.get_thread_pool_size("timer_pool"),
-            timer_pool_notifier_, "timer_pool")
+      , timer_pool_notifier_()
+      , timer_pool_(timer_pool_notifier_, "timer_pool")
 #endif
-      , notifier_(runtime::get_notification_policy(
-            "worker-thread", runtime_local::os_thread_type::worker_thread))
-      , thread_manager_(new hpx::threads::threadmanager(rtcfg_,
-#ifdef HPX_HAVE_TIMER_POOL
-            timer_pool_,
-#endif
-            notifier_))
+      , notifier_()
+      , thread_manager_()
       , stop_called_(false)
       , stop_done_(false)
     {
-        // This needs to happen as early as possible to set up the runtime
-        // pointer.
         LPROGRESS_;
 
-        // initialize our TSS
+        // set notification policies only after the object was completely
+        // initialized
+        runtime::set_notification_policies(
+            runtime::get_notification_policy(
+                "worker-thread", runtime_local::os_thread_type::worker_thread),
+#ifdef HPX_HAVE_IO_POOL
+            runtime::get_notification_policy(
+                "io-thread", runtime_local::os_thread_type::io_thread),
+#endif
+#ifdef HPX_HAVE_TIMER_POOL
+            runtime::get_notification_policy(
+                "timer-thread", runtime_local::os_thread_type::timer_thread),
+#endif
+            threads::detail::network_background_callback_type{});
+
+        // initialize our TLS
         runtime::init_tss();
         util::reinit_construct();    // call only after TLS was initialized
 
@@ -308,18 +312,8 @@ namespace hpx {
         }
     }
 
-    runtime::runtime(hpx::util::runtime_configuration& rtcfg,
-        notification_policy_type&& notifier,
-        notification_policy_type&& main_pool_notifier,
-#ifdef HPX_HAVE_IO_POOL
-        notification_policy_type&& io_pool_notifier,
-#endif
-#ifdef HPX_HAVE_TIMER_POOL
-        notification_policy_type&& timer_pool_notifier,
-#endif
-        threads::detail::network_background_callback_type
-            network_background_callback,
-        bool initialize)
+    // this constructor is called by the distributed runtime only
+    runtime::runtime(hpx::util::runtime_configuration& rtcfg)
       : rtcfg_(rtcfg)
       , instance_number_(++instance_number_counter_)
       , thread_support_(new util::thread_mapper)
@@ -329,39 +323,51 @@ namespace hpx {
       , on_stop_func_(global_on_stop_func)
       , on_error_func_(global_on_error_func)
       , result_(0)
-      , main_pool_notifier_(std::move(main_pool_notifier))
-      , main_pool_(1, main_pool_notifier_, "main_pool")
+      , main_pool_notifier_()
+      , main_pool_(main_pool_notifier_, "main_pool")
 #ifdef HPX_HAVE_IO_POOL
-      , io_pool_notifier_(std::move(io_pool_notifier))
-      , io_pool_(rtcfg_.get_thread_pool_size("io_pool"), io_pool_notifier_,
-            "io_pool")
+      , io_pool_notifier_()
+      , io_pool_(io_pool_notifier_, "io_pool")
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
-      , timer_pool_notifier_(std::move(timer_pool_notifier))
-      , timer_pool_(rtcfg_.get_thread_pool_size("timer_pool"),
-            timer_pool_notifier_, "timer_pool")
+      , timer_pool_notifier_()
+      , timer_pool_(timer_pool_notifier_, "timer_pool")
 #endif
-      , notifier_(std::move(notifier))
-      , thread_manager_(new hpx::threads::threadmanager(rtcfg_,
-#ifdef HPX_HAVE_TIMER_POOL
-            timer_pool_,
-#endif
-            notifier_, network_background_callback))
+      , notifier_()
+      , thread_manager_()
       , stop_called_(false)
       , stop_done_(false)
     {
-        // This needs to happen as early as possible to set up the runtime
-        // pointer.
         LPROGRESS_;
+    }
 
-        // initialize our TSS
-        runtime::init_tss();
-        util::reinit_construct();    // call only after TLS was initialized
+    void runtime::set_notification_policies(notification_policy_type&& notifier,
+#ifdef HPX_HAVE_IO_POOL
+        notification_policy_type&& io_pool_notifier,
+#endif
+#ifdef HPX_HAVE_TIMER_POOL
+        notification_policy_type&& timer_pool_notifier,
+#endif
+        threads::detail::network_background_callback_type
+            network_background_callback)
+    {
+        notifier_ = std::move(notifier);
 
-        if (initialize)
-        {
-            init();
-        }
+        main_pool_.init(1);
+#ifdef HPX_HAVE_IO_POOL
+        io_pool_notifier_ = std::move(io_pool_notifier);
+        io_pool_.init(rtcfg_.get_thread_pool_size("io_pool"));
+#endif
+#ifdef HPX_HAVE_TIMER_POOL
+        timer_pool_notifier_ = std::move(timer_pool_notifier);
+        timer_pool_.init(rtcfg_.get_thread_pool_size("timer_pool"));
+#endif
+
+        thread_manager_.reset(new hpx::threads::threadmanager(rtcfg_,
+#ifdef HPX_HAVE_TIMER_POOL
+            timer_pool_,
+#endif
+            notifier_, network_background_callback));
     }
 
     void runtime::init()
@@ -1388,7 +1394,7 @@ namespace hpx {
             threads::thread_schedule_hint(0), threads::thread_stacksize::large);
 
         this->runtime::starting();
-        threads::thread_id_type id = threads::invalid_thread_id;
+        threads::thread_id_ref_type id = threads::invalid_thread_id;
         thread_manager_->register_thread(data, id);
 
         // }}}
@@ -1755,13 +1761,13 @@ namespace hpx {
         notification_policy_type notifier;
 
         notifier.add_on_start_thread_callback(
-            util::bind(&runtime::init_tss_helper, This(), prefix, type, _1, _2,
+            util::bind(&runtime::init_tss_helper, this, prefix, type, _1, _2,
                 _3, _4, false));
         notifier.add_on_stop_thread_callback(
-            util::bind(&runtime::deinit_tss_helper, This(), prefix, _1));
+            util::bind(&runtime::deinit_tss_helper, this, prefix, _1));
         notifier.set_on_error_callback(
             util::bind(static_cast<report_error_t>(&runtime::report_error),
-                This(), _1, _2, true));
+                this, _1, _2, true));
 
         return notifier;
     }

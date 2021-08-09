@@ -79,7 +79,8 @@ namespace hpx { namespace threads { namespace policies {
         /// Return the next thread to be executed, return false if none is
         /// available
         bool get_next_thread(std::size_t num_thread, bool,
-            threads::thread_data*& thrd, bool /*enable_stealing*/) override
+            threads::thread_id_ref_type& thrd,
+            bool /*enable_stealing*/) override
         {
             typedef typename base_type::thread_queue_type thread_queue_type;
 

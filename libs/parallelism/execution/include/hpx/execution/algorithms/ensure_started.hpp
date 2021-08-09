@@ -21,8 +21,9 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/synchronization/mutex.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -32,6 +33,7 @@
 #include <cstddef>
 #include <exception>
 #include <memory>
+#include <mutex>
 #include <type_traits>
 #include <utility>
 #include <variant>
@@ -103,7 +105,7 @@ namespace hpx { namespace execution { namespace experimental {
                 using allocator_type = typename std::allocator_traits<
                     Allocator>::template rebind_alloc<shared_state>;
                 allocator_type alloc;
-                using mutex_type = hpx::util::spinlock;
+                using mutex_type = hpx::lcos::local::spinlock;
                 mutex_type mtx;
                 hpx::util::atomic_count reference_count{0};
                 std::atomic<bool> start_called{false};

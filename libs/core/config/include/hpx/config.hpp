@@ -7,13 +7,6 @@
 
 #pragma once
 
-// We need to detect if user code include boost/config.hpp before
-// including hpx/config.hpp
-// Everything else might lead to hard compile errors and possible very subtle bugs.
-#if defined(BOOST_CONFIG_HPP)
-#error Boost.Config was included before the hpx config header. This might lead to subtle failures and compile errors. Please include <hpx/config.hpp> before any other boost header
-#endif
-
 #include <hpx/config/defines.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)

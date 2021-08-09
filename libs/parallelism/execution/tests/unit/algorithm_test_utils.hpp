@@ -139,7 +139,7 @@ struct void_callback_helper
 
     // This overload is only used to satisfy tests that have a predecessor that
     // can send void, but never does in practice.
-    void operator()()
+    void operator()() const
     {
         HPX_TEST(false);
     }

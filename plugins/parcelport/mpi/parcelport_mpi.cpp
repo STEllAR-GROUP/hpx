@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c)      2020 Google
 //
@@ -11,9 +11,9 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/plugin/traits/plugin_config_data.hpp>
 
+#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/modules/mpi_base.hpp>
 #include <hpx/plugins/parcelport_factory.hpp>
-#include <hpx/command_line_handling/command_line_handling.hpp>
 
 // parcelport
 #include <hpx/runtime_distributed.hpp>
@@ -29,6 +29,7 @@
 #include <hpx/plugins/parcelport/mpi/receiver.hpp>
 
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/util/get_entry_as.hpp>
 
