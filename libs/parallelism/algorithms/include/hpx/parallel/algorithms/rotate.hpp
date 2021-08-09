@@ -207,7 +207,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
         /// \cond NOINTERNAL
         template <typename ExPolicy, typename FwdIter, typename Sent>
-        hpx::future<util::in_out_result<FwdIter, FwdIter>> rotate_helper(
+        hpx::future<util::in_out_result<FwdIter, Sent>> rotate_helper(
             ExPolicy policy, FwdIter first, FwdIter new_first, Sent last)
         {
             using non_seq = std::false_type;
@@ -220,18 +220,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return dataflow(
                 [=](hpx::future<FwdIter>&& f1,
                     hpx::future<FwdIter>&& f2) mutable
-                -> hpx::future<util::in_out_result<FwdIter, FwdIter>> {
+                -> hpx::future<util::in_out_result<FwdIter, Sent>> {
                     // propagate exceptions
                     f1.get();
                     f2.get();
 
                     hpx::future<FwdIter> f = r.call2(p, non_seq(), first, last);
                     return f.then([=](hpx::future<FwdIter>&& f) mutable
-                        -> util::in_out_result<FwdIter, FwdIter> {
+                        -> util::in_out_result<FwdIter, Sent> {
                         f.get();    // propagate exceptions
                         std::advance(first, detail::distance(new_first, last));
-                        return util::in_out_result<FwdIter, FwdIter>{
-                            first, last};
+                        return util::in_out_result<FwdIter, Sent>{first, last};
                     });
                 },
                 r.call2(p, non_seq(), first, new_first),
@@ -419,7 +418,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return parallel::util::get_second_element(
-                parallel::v1::detail::rotate<
+                hpx::parallel::v1::detail::rotate<
                     hpx::parallel::util::in_out_result<FwdIter, FwdIter>>()
                     .call(hpx::execution::seq, first, new_first, last));
         }
@@ -473,7 +472,7 @@ namespace hpx {
                 "Requires at least output iterator.");
 
             return parallel::util::get_second_element(
-                parallel::v1::detail::rotate_copy<
+                hpx::parallel::v1::detail::rotate_copy<
                     hpx::parallel::util::in_out_result<FwdIter, OutIter>>()
                     .call(hpx::execution::seq, first, new_first, last,
                         dest_first));
@@ -504,7 +503,7 @@ namespace hpx {
                 is_seq;
 
             return parallel::util::get_second_element(
-                parallel::v1::detail::rotate_copy<
+                hpx::parallel::v1::detail::rotate_copy<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
                     .call2(std::forward<ExPolicy>(policy), is_seq(), first,
                         new_first, last, dest_first));
