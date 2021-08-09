@@ -1,4 +1,5 @@
 ..
+    Copyright (c)      2021 ETH Zurich
     Copyright (c) 2007-2017 Louisiana State University
 
     SPDX-License-Identifier: BSL-1.0
@@ -20,6 +21,12 @@ One way to use this procedure is to print a copy and check off the lines as they
 are completed to avoid confusion.
 
 #. Notify developers that a release is imminent.
+
+#. For minor and major releases: create and check out a new branch at an
+   appropriate point on ``master`` with the name ``release-major.minor.X``.
+   ``major`` and ``minor`` should be the major and minor versions of the
+   release. For patch releases: check out the corresponding
+   ``release-major.minor.X`` branch.
 
 #. Write release notes in ``docs/sphinx/releases/whats_new_$VERSION.rst``. Keep
    adding merged PRs and closed issues to this until just before the release is
@@ -47,26 +54,6 @@ are completed to avoid confusion.
      release to synchronize with the |hpx| release (`APEX
      <http://github.com/khuck/xpress-apex>`_, `libCDS
      <https://github.com/STEllAR-GROUP/libcds>`_).
-
-#. If there have been any commits to the release branch since the last release,
-   create a tag from the old release branch before deleting the old release
-   branch in the next step.
-
-#. Unprotect the release branch in the github repository settings so that it can
-   be deleted and recreated (tick "Allow force pushes" in the release branch
-   settings of the repository).
-
-#. Reset the release branch to the latest stable state on master and force push
-   to origin/release. If you are creating a patch release, branch from the
-   release tag for which you want to create a patch release.
-
-   * ``git checkout -b release`` (or just ``checkout`` in case the it exists)
-   * ``git reset --hard stable``
-   * ``git push --force origin release``
-
-#. Protect the release branch again to disable force pushes.
-
-#. Check out the release branch.
 
 #. Make sure ``HPX_VERSION_MAJOR/MINOR/SUBMINOR`` in ``CMakeLists.txt`` contain
    the correct values. Change them if needed.
