@@ -72,8 +72,8 @@ namespace hpx { namespace serialization {
         }
 
         template <typename T>
-        std::enable_if_t<!std::is_integral_v<T> && !std::is_enum_v<T>> load(
-            T& t)
+        std::enable_if_t<!std::is_integral<T>::value && !std::is_enum<T>::value>
+        load(T& t)
         {
             using use_optimized = std::integral_constant<bool,
                 hpx::traits::is_bitwise_serializable_v<T> ||
@@ -83,8 +83,8 @@ namespace hpx { namespace serialization {
         }
 
         template <typename T>
-        std::enable_if_t<std::is_integral_v<T> || std::is_enum_v<T>> load(
-            T& t)    //-V659
+        std::enable_if_t<std::is_integral<T>::value || std::is_enum<T>::value>
+        load(T& t)    //-V659
         {
             load_integral(t, std::is_unsigned<T>());
         }

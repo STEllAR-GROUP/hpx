@@ -93,7 +93,7 @@ namespace hpx { namespace serialization {
             std::remove_const_t<typename std::vector<T, Allocator>::value_type>;
 
         using use_optimized = std::integral_constant<bool,
-            std::is_default_constructible_v<element_type> &&
+            std::is_default_constructible<element_type>::value &&
                 (hpx::traits::is_bitwise_serializable_v<element_type> ||
                     !hpx::traits::is_not_bitwise_serializable_v<element_type>)>;
 
@@ -172,7 +172,7 @@ namespace hpx { namespace serialization {
             std::remove_const_t<typename std::vector<T, Allocator>::value_type>;
 
         using use_optimized = std::integral_constant<bool,
-            std::is_default_constructible_v<element_type> &&
+            std::is_default_constructible<element_type>::value &&
                 (hpx::traits::is_bitwise_serializable_v<element_type> ||
                     !hpx::traits::is_not_bitwise_serializable_v<element_type>)>;
 
