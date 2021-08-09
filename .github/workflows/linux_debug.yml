@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     container: stellargroup/build_env:8
 
-
     steps:
     - uses: actions/checkout@v2
     - name: Configure
