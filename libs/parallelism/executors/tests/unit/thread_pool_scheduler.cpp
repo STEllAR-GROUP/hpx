@@ -1223,8 +1223,8 @@ void test_detach()
 
         {
             std::unique_lock<hpx::mutex> l(m);
-            hpx::cv_status st = cv.wait_for(l, std::chrono::seconds(1));
-            HPX_TEST(st == hpx::cv_status::no_timeout);
+            HPX_TEST(cv.wait_for(
+                l, std::chrono::seconds(1), [&]() { return called; }));
         }
         HPX_TEST(called);
     }
@@ -1243,8 +1243,8 @@ void test_detach()
 
         {
             std::unique_lock<hpx::mutex> l(m);
-            hpx::cv_status st = cv.wait_for(l, std::chrono::seconds(1));
-            HPX_TEST(st == hpx::cv_status::no_timeout);
+            HPX_TEST(cv.wait_for(
+                l, std::chrono::seconds(1), [&]() { return called; }));
         }
         HPX_TEST(called);
     }
