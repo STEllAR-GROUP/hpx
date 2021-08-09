@@ -11,11 +11,7 @@ on: [pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-<<<<<<< HEAD
     container: stellargroup/build_env:8
-=======
-    container: stellargroup/build_env:8
->>>>>>> origin/master
 
     steps:
     - uses: actions/checkout@v2

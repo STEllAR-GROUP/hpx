@@ -10,11 +10,8 @@ working_dir_default: &working_dir_default
 
 docker_default: &docker_default
     docker:
-<<<<<<< HEAD
       - image: stellargroup/build_env:8
-=======
-      - image: stellargroup/build_env:8
->>>>>>> origin/master
+
 
 defaults: &defaults
     <<: *working_dir_default
