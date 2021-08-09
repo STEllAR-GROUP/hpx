@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2021 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -117,6 +118,7 @@ template <typename IteratorTag>
 void test_rotate_copy()
 {
     using namespace hpx::execution;
+
     test_rotate_copy(IteratorTag());
     test_rotate_copy(seq, IteratorTag());
     test_rotate_copy(par, IteratorTag());
@@ -155,7 +157,7 @@ void test_rotate_copy_exception(IteratorTag)
     try
     {
         hpx::rotate_copy(decorated_iterator(std::begin(c),
-                            []() { throw std::runtime_error("test"); }),
+                             []() { throw std::runtime_error("test"); }),
             decorated_iterator(mid), decorated_iterator(std::end(c)),
             std::begin(d));
         HPX_TEST(false);
