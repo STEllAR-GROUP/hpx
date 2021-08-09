@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/endian.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
@@ -72,20 +73,34 @@ namespace hpx { namespace serialization {
         template <class Archive>
         void serialize(Archive& ar, unsigned int v)
         {
-            using element_type = typename std::remove_const<T>::type;
+            using element_type = std::remove_const_t<T>;
+
             using use_optimized = std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable_v<element_type> ||
-                    !hpx::traits::is_not_bitwise_serializable_v<element_type>>;
+                std::is_default_constructible_v<element_type> &&
+                    (hpx::traits::is_bitwise_serializable_v<element_type> ||
+                        !hpx::traits::is_not_bitwise_serializable_v<
+                            element_type>)>;
 
             bool archive_endianess_differs = endian::native == endian::big ?
                 ar.endian_little() :
                 ar.endian_big();
 
+#if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
             // NOLINTNEXTLINE(bugprone-branch-clone)
             if (ar.disable_array_optimization() || archive_endianess_differs)
+            {
                 serialize_optimized(ar, v, std::false_type());
+            }
             else
+            {
                 serialize_optimized(ar, v, use_optimized());
+            }
+#else
+            (void) archive_endianess_differs;
+            HPX_ASSERT(!(
+                ar.disable_array_optimization() || archive_endianess_differs));
+            serialize_optimized(ar, v, use_optimized());
+#endif
         }
 
     private:
@@ -106,7 +121,9 @@ namespace hpx { namespace serialization {
     void serialize(
         Archive& ar, boost::array<T, N>& a, const unsigned int /* version */)
     {
-        ar& hpx::serialization::make_array(a.begin(), a.size());
+        // clang-format off
+        ar & hpx::serialization::make_array(a.begin(), a.size());
+        // clang-format on
     }
 #endif
 
@@ -115,7 +132,9 @@ namespace hpx { namespace serialization {
     void serialize(
         Archive& ar, std::array<T, N>& a, const unsigned int /* version */)
     {
-        ar& hpx::serialization::make_array(a.data(), a.size());
+        // clang-format off
+        ar & hpx::serialization::make_array(a.data(), a.size());
+        // clang-format on
     }
 
     // allow our array to be serialized as prvalue

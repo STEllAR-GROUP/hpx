@@ -179,9 +179,8 @@ namespace hpx { namespace serialization {
         }
 
         template <typename T>
-        typename std::enable_if<!std::is_integral<T>::value &&
-            !std::is_enum<T>::value>::type
-        save(T const& t)
+        std::enable_if_t<!std::is_integral_v<T> && !std::is_enum_v<T>> save(
+            T const& t)
         {
             using use_optimized = std::integral_constant<bool,
                 hpx::traits::is_bitwise_serializable_v<T> ||
@@ -191,9 +190,8 @@ namespace hpx { namespace serialization {
         }
 
         template <typename T>
-        typename std::enable_if<std::is_integral<T>::value ||
-            std::is_enum<T>::value>::type
-        save(T t)    //-V659
+        std::enable_if_t<std::is_integral_v<T> || std::is_enum_v<T>> save(
+            T t)    //-V659
         {
             save_integral(t, std::is_unsigned<T>());
         }
@@ -226,8 +224,6 @@ namespace hpx { namespace serialization {
                 t, hpx::traits::is_nonintrusive_polymorphic<T>());
         }
 
-        // FIXME: think about removing this commented stuff below
-        // and adding new free function save_bitwise
         template <typename T>
         void save_bitwise(T const& t, std::true_type)
         {
@@ -237,6 +233,7 @@ namespace hpx { namespace serialization {
             bool archive_endianess_differs =
                 endian::native == endian::big ? endian_little() : endian_big();
 
+#if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
             if (disable_array_optimization() || archive_endianess_differs)
             {
                 access::serialize(*this, t, 0);
@@ -245,6 +242,12 @@ namespace hpx { namespace serialization {
             {
                 save_binary(&t, sizeof(t));
             }
+#else
+            (void) archive_endianess_differs;
+            HPX_ASSERT(
+                !(disable_array_optimization() || archive_endianess_differs));
+            save_binary(&t, sizeof(t));
+#endif
         }
 
         template <typename T>
