@@ -5,8 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
@@ -29,17 +27,14 @@ struct thing
         // clang-format on
     }
 };
-#endif
 
 int main(int argc, char* argv[])
 {
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
     std::vector<std::byte> cont;
     hpx::serialization::output_archive ar(cont);
 
     thing X;
     ar << X;
-#endif
 
     return 0;
 }

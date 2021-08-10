@@ -146,7 +146,6 @@ namespace hpx { namespace actions {
         }
     };
 
-#if defined(HPX_HAVE_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS)
     ///////////////////////////////////////////////////////////////////////////
     //  Specialized generic non-const noexcept component action types allowing
     //  to hold a different number of arguments
@@ -222,7 +221,6 @@ namespace hpx { namespace actions {
                 std::forward<Ts>(vs)...);
         }
     };
-#endif
 
     /// \endcond
 }}    // namespace hpx::actions

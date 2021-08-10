@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -39,7 +39,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Error>
-                void set_error(Error&& error) && noexcept
+            void set_error(Error&& error) && noexcept
             {
                 if (!op_state.set_done_error_called.exchange(true))
                 {
@@ -64,7 +64,7 @@ namespace hpx { namespace execution { namespace experimental {
             };
 
             template <typename T>
-                void set_value(T&& t) && noexcept
+            void set_value(T&& t) && noexcept
             {
                 if (!op_state.set_done_error_called)
                 {
@@ -280,4 +280,3 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } when_all{};
 }}}    // namespace hpx::execution::experimental
-#endif

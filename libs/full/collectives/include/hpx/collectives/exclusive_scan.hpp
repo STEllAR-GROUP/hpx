@@ -147,8 +147,8 @@ namespace hpx { namespace traits {
                     dest.resize(data.size());
 
                     auto it = data.begin();
-                    hpx::parallel::exclusive_scan(hpx::execution::seq, it,
-                        data.end(), dest.begin(), *it, std::forward<F>(op));
+                    hpx::exclusive_scan(hpx::execution::seq, it, data.end(),
+                        dest.begin(), *it, std::forward<F>(op));
 
                     std::swap(data, dest);
                     communicator.data_available_ = true;

@@ -700,6 +700,8 @@ void test_future_sender()
         bool exception_thrown = false;
         try
         {
+            // The move is intentional. sync_wait should throw.
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             ex::sync_wait(std::move(f));
             HPX_TEST(false);
         }
@@ -726,6 +728,8 @@ void test_future_sender()
         bool exception_thrown = false;
         try
         {
+            // The move is intentional. sync_wait should throw.
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             ex::sync_wait(std::move(f));
             HPX_TEST(false);
         }
@@ -1219,10 +1223,8 @@ void test_detach()
 
         {
             std::unique_lock<hpx::mutex> l(m);
-            while (!called)
-            {
-                cv.wait_for(l, std::chrono::seconds(1));
-            }
+            HPX_TEST(cv.wait_for(
+                l, std::chrono::seconds(1), [&]() { return called; }));
         }
         HPX_TEST(called);
     }
@@ -1241,10 +1243,8 @@ void test_detach()
 
         {
             std::unique_lock<hpx::mutex> l(m);
-            while (!called)
-            {
-                cv.wait_for(l, std::chrono::seconds(1));
-            }
+            HPX_TEST(cv.wait_for(
+                l, std::chrono::seconds(1), [&]() { return called; }));
         }
         HPX_TEST(called);
     }
@@ -1314,6 +1314,8 @@ void test_keep_future_sender()
         bool exception_thrown = false;
         try
         {
+            // The move is intentional. sync_wait should throw.
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             ex::sync_wait(std::move(f) | ex::keep_future());
             HPX_TEST(false);
         }
@@ -1343,6 +1345,8 @@ void test_keep_future_sender()
         bool exception_thrown = false;
         try
         {
+            // The move is intentional. sync_wait should throw.
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             ex::sync_wait(std::move(f) | ex::keep_future());
             HPX_TEST(false);
         }

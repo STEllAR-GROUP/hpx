@@ -5,14 +5,14 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 export CRAYPE_LINK_TYPE=dynamic
-export CXX_STD="14"
+export CXX_STD="17"
 
 module load daint-gpu
 module switch PrgEnv-cray PrgEnv-gnu
 module load cudatoolkit
 module load Boost/1.75.0-CrayGNU-20.11
 module load hwloc/.2.0.3
-spack load cmake@3.17.3
+spack load cmake@3.18.6
 spack load ninja@1.10.0
 
 export CXX=`which CC`

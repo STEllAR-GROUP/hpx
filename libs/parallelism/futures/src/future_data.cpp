@@ -63,9 +63,9 @@ namespace hpx { namespace lcos { namespace detail {
             policy = launch::async;
 
         // launch a new thread executing the given function
-        threads::thread_id_type tid = p.apply("run_on_completed_on_new_thread",
-            policy, threads::thread_priority::boost,
-            threads::thread_stacksize::current,
+        threads::thread_id_ref_type tid = p.apply(
+            "run_on_completed_on_new_thread", policy,
+            threads::thread_priority::boost, threads::thread_stacksize::current,
             threads::thread_schedule_hint());
 
         // wait for the task to run
@@ -73,7 +73,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             // make sure this thread is executed last
             this_thread::suspend(
-                threads::thread_schedule_state::pending, std::move(tid));
+                threads::thread_schedule_state::pending, tid.noref());
             return p.get_future().get();
         }
         // If we are not on a HPX thread, we need to return immediately, to

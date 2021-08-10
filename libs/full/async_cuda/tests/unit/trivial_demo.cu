@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assert.hpp>
+#include <hpx/async_cuda/cuda_exception.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 
 #include <iostream>
@@ -33,7 +34,7 @@ void cuda_trivial_kernel(T t, cudaStream_t stream)
 {
 #if !defined(HPX_HAVE_HIP)
     trivial_kernel<<<1, 1, 0, stream>>>(t);
-    cudaDeviceSynchronize();
+    ::hpx::cuda::experimental::check_cuda_error(cudaDeviceSynchronize());
 #else
     // Silence -Wuninitialized until [[uninitialized]] available
 #if defined(__clang__)
@@ -42,15 +43,19 @@ void cuda_trivial_kernel(T t, cudaStream_t stream)
 #endif
     T *d_in, *d_out;
     T* out = (T*) malloc(sizeof(T));
-    cudaMalloc((void**) &d_in, sizeof(T));
-    cudaMalloc((void**) &d_out, sizeof(T));
-    cudaMemcpy(d_in, &t, sizeof(T), cudaMemcpyHostToDevice);
+    ::hpx::cuda::experimental::check_cuda_error(
+        cudaMalloc((void**) &d_in, sizeof(T)));
+    ::hpx::cuda::experimental::check_cuda_error(
+        cudaMalloc((void**) &d_out, sizeof(T)));
+    ::hpx::cuda::experimental::check_cuda_error(
+        cudaMemcpy(d_in, &t, sizeof(T), cudaMemcpyHostToDevice));
     copy_kernel<<<1, 1, 0, stream>>>(d_in, d_out);
-    cudaDeviceSynchronize();
-    cudaMemcpy(out, d_out, sizeof(T), cudaMemcpyDeviceToHost);
+    ::hpx::cuda::experimental::check_cuda_error(cudaDeviceSynchronize());
+    ::hpx::cuda::experimental::check_cuda_error(
+        cudaMemcpy(out, d_out, sizeof(T), cudaMemcpyDeviceToHost));
     HPX_ASSERT(*out == t);
-    cudaFree(d_in);
-    cudaFree(d_out);
+    ::hpx::cuda::experimental::check_cuda_error(cudaFree(d_in));
+    ::hpx::cuda::experimental::check_cuda_error(cudaFree(d_out));
     free(out);
 #if defined(__clang__)
 #pragma clang diagnostic pop

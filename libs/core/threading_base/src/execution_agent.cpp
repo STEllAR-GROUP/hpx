@@ -17,6 +17,7 @@
 #include <hpx/threading_base/detail/reset_lco_description.hpp>
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
+#include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
@@ -136,7 +137,7 @@ namespace hpx { namespace threads {
     hpx::threads::thread_restart_state execution_agent::do_yield(
         const char* desc, threads::thread_schedule_state state)
     {
-        thread_id_type id = self_.get_thread_id();
+        thread_id_ref_type id = self_.get_thread_id();    // keep alive
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROW_EXCEPTION(null_thread_id, "execution_agent::do_yield",
@@ -158,7 +159,7 @@ namespace hpx { namespace threads {
         {
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             threads::detail::reset_lco_description desc(
-                id, util::thread_description(desc));
+                id.noref(), util::thread_description(desc));
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id);
@@ -192,110 +193,8 @@ namespace hpx { namespace threads {
     void execution_agent::do_resume(
         const char* /* desc */, hpx::threads::thread_restart_state statex)
     {
-        thread_id_type id = self_.get_thread_id();
-
-        thread_state previous_state;
-        std::size_t k = 0;
-        do
-        {
-            previous_state = get_thread_id_data(id)->get_state();
-            thread_schedule_state previous_state_val = previous_state.state();
-
-            // nothing to do here if the state doesn't change
-            if (previous_state_val ==
-                hpx::threads::thread_schedule_state::pending)
-            {
-                LTM_(warning).format(
-                    "execution_agent::do_resume: old thread state is already "
-                    "pending thread state, aborting state change, thread({}), "
-                    "description({})",
-                    id, get_thread_id_data(id)->get_description());
-                return;
-            }
-            switch (previous_state_val)
-            {
-            // The thread is still running... we yield our current context
-            // and retry..
-            case thread_schedule_state::active:
-            {
-                hpx::execution_base::this_thread::yield_k(
-                    k, "hpx::threads::execution_agent::resume");
-                ++k;
-                LTM_(warning).format(
-                    "execution_agent::do_resume: thread is active, retrying "
-                    "state change, thread({}), description({})",
-                    id, get_thread_id_data(id)->get_description());
-                continue;
-            }
-            case thread_schedule_state::terminated:
-            {
-                LTM_(warning).format(
-                    "execution_agent::do_resume: thread is terminated, "
-                    "aborting state change, thread({}), description({})",
-                    id, get_thread_id_data(id)->get_description());
-                return;
-            }
-            case thread_schedule_state::pending:
-            case thread_schedule_state::pending_boost:
-            case thread_schedule_state::suspended:
-                // We can now safely set the new state...
-                break;
-            case thread_schedule_state::pending_do_not_schedule:
-            default:
-            {
-                // should not happen...
-                HPX_ASSERT_MSG(false,
-                    hpx::util::format(
-                        "execution_agent::do_resume: previous state was {}",
-                        previous_state_val)
-                        .c_str());
-                break;
-            }
-            }
-
-            // If the previous state was pending we are supposed to remove the
-            // thread from the queue. But in order to avoid linearly looking
-            // through the queue we defer this to the thread function, which
-            // at some point will ignore this thread by simply skipping it
-            // (if it's not pending anymore).
-
-            LTM_(info).format("execution_agent::do_resume: thread({}), "
-                              "description({}), old state({})",
-                id, get_thread_id_data(id)->get_description(),
-                get_thread_state_name(previous_state_val));
-
-            // So all what we do here is to set the new state.
-            if (get_thread_id_data(id)->restore_state(
-                    thread_schedule_state::pending, statex, previous_state))
-            {
-                break;
-            }
-
-            // state has changed since we fetched it from the thread, retry
-            LTM_(error).format(
-                "execution_agent::do_resume: state has been changed since it "
-                "was fetched, "
-                "retrying, thread({}), description({}), old state({})",
-                id, get_thread_id_data(id)->get_description(),
-                get_thread_state_name(previous_state_val));
-
-        } while (true);
-
-        thread_schedule_state previous_state_val = previous_state.state();
-        if (!(previous_state_val == thread_schedule_state::pending ||
-                previous_state_val == thread_schedule_state::pending_boost))
-        {
-            LTM_(debug).format("execution_agent::do_resume: resuming thread, "
-                               "thread({}), description({})",
-                id, get_thread_id_data(id)->get_description());
-
-            auto* data = get_thread_id_data(id);
-            auto scheduler = data->get_scheduler_base();
-            auto hint = thread_schedule_hint(
-                static_cast<std::int16_t>(data->get_last_worker_thread_num()));
-            scheduler->schedule_thread(data, hint, true, data->get_priority());
-            // Wake up scheduler
-            scheduler->do_some_work(hint.hint);
-        }
+        threads::detail::set_thread_state(self_.get_thread_id(),
+            thread_schedule_state::pending, statex, thread_priority::normal,
+            thread_schedule_hint{}, false);
     }
 }}    // namespace hpx::threads

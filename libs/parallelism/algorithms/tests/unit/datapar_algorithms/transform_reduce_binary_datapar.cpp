@@ -20,10 +20,10 @@ void test_transform_reduce_binary()
     using namespace hpx::execution;
 
     test_transform_reduce_binary(simd, IteratorTag());
-    test_transform_reduce_binary(simdpar, IteratorTag());
+    test_transform_reduce_binary(par_simd, IteratorTag());
 
     test_transform_reduce_binary_async(simd(task), IteratorTag());
-    test_transform_reduce_binary_async(simdpar(task), IteratorTag());
+    test_transform_reduce_binary_async(par_simd(task), IteratorTag());
 }
 
 void transform_reduce_binary_test()

@@ -7,7 +7,7 @@
 export CRAYPE_LINK_TYPE=dynamic
 export APPS_ROOT="/apps/daint/SSL/HPX/packages"
 export GCC_VER="7.5.0"
-export CXX_STD="14"
+export CXX_STD="17"
 export BOOST_VER="1.71.0"
 export HWLOC_VER="1.11.5"
 export GCC_ROOT="${APPS_ROOT}/gcc-${GCC_VER}"
@@ -20,7 +20,7 @@ export CXX=${GCC_ROOT}/bin/g++
 export CC=${GCC_ROOT}/bin/gcc
 
 module load daint-mc
-spack load cmake@3.17.3
+spack load cmake@3.18.6
 spack load ninja@1.10.0
 
 configure_extra_options="-DCMAKE_BUILD_TYPE=Debug"

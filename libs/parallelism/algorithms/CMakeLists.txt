@@ -89,6 +89,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/count.hpp
     hpx/parallel/container_algorithms/destroy.hpp
     hpx/parallel/container_algorithms/equal.hpp
+    hpx/parallel/container_algorithms/exclusive_scan.hpp
     hpx/parallel/container_algorithms/fill.hpp
     hpx/parallel/container_algorithms/find.hpp
     hpx/parallel/container_algorithms/for_each.hpp
@@ -96,6 +97,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/generate.hpp
     hpx/parallel/container_algorithms.hpp
     hpx/parallel/container_algorithms/includes.hpp
+    hpx/parallel/container_algorithms/inclusive_scan.hpp
     hpx/parallel/container_algorithms/is_heap.hpp
     hpx/parallel/container_algorithms/is_partitioned.hpp
     hpx/parallel/container_algorithms/is_sorted.hpp
@@ -120,6 +122,8 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/sort.hpp
     hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp
+    hpx/parallel/container_algorithms/transform_exclusive_scan.hpp
+    hpx/parallel/container_algorithms/transform_inclusive_scan.hpp
     hpx/parallel/container_algorithms/transform_reduce.hpp
     hpx/parallel/container_algorithms/uninitialized_copy.hpp
     hpx/parallel/container_algorithms/uninitialized_default_construct.hpp
@@ -132,6 +136,7 @@ set(algorithms_headers
     hpx/parallel/datapar.hpp
     hpx/parallel/datapar/iterator_helpers.hpp
     hpx/parallel/datapar/loop.hpp
+    hpx/parallel/datapar/transfer.hpp
     hpx/parallel/datapar/transform_loop.hpp
     hpx/parallel/datapar/zip_iterator.hpp
     hpx/parallel/memory.hpp

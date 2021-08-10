@@ -5,14 +5,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests
-    basic_executor
-    basic_operation_state
-    basic_receiver
-    basic_sender
-    basic_schedule
-    basic_submit
-    execution_context
+set(tests basic_operation_state basic_receiver basic_sender basic_schedule
+          execution_context
 )
 
 foreach(test ${tests})

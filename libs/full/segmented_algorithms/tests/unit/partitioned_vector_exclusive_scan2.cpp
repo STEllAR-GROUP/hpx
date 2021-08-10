@@ -50,7 +50,7 @@ struct opt
 template <typename T, typename DistPolicy, typename ExPolicy>
 void exclusive_scan_algo_tests_with_policy(std::size_t size,
     DistPolicy const& dist_policy, hpx::partitioned_vector<T>& in,
-    std::vector<T> ver, ExPolicy const& policy)
+    std::vector<T> const& ver, ExPolicy const& policy)
 {
     msg7(typeid(ExPolicy).name(), typeid(DistPolicy).name(), typeid(T).name(),
         regular, size, dist_policy.get_num_partitions(),
@@ -63,7 +63,7 @@ void exclusive_scan_algo_tests_with_policy(std::size_t size,
     double e1 = t1.elapsed();
     t1.restart();
 
-    hpx::parallel::exclusive_scan(
+    hpx::exclusive_scan(
         policy, in.begin(), in.end(), out.begin(), val, opt<T>());
 
     double e2 = t1.elapsed();
@@ -80,7 +80,7 @@ template <typename T, typename DistPolicy, typename ExPolicy>
 void exclusive_scan_algo_tests_segmented_out_with_policy(std::size_t size,
     DistPolicy const& in_dist_policy, DistPolicy const& out_dist_policy,
     hpx::partitioned_vector<T>& in, hpx::partitioned_vector<T> out,
-    std::vector<T> ver, ExPolicy const& policy)
+    std::vector<T> const& ver, ExPolicy const& policy)
 {
     msg9(typeid(ExPolicy).name(), typeid(DistPolicy).name(), typeid(T).name(),
         segmented, size, in_dist_policy.get_num_partitions(),
@@ -94,7 +94,7 @@ void exclusive_scan_algo_tests_segmented_out_with_policy(std::size_t size,
     double e1 = t1.elapsed();
     t1.restart();
 
-    hpx::parallel::exclusive_scan(
+    hpx::exclusive_scan(
         policy, in.begin(), in.end(), out.begin(), val, opt<T>());
 
     double e2 = t1.elapsed();
@@ -109,7 +109,8 @@ void exclusive_scan_algo_tests_segmented_out_with_policy(std::size_t size,
 
 template <typename T, typename DistPolicy, typename ExPolicy>
 void exclusive_scan_algo_tests_inplace_with_policy(std::size_t size,
-    DistPolicy const& dist_policy, std::vector<T> ver, ExPolicy const& policy)
+    DistPolicy const& dist_policy, std::vector<T> const& ver,
+    ExPolicy const& policy)
 {
     msg7(typeid(ExPolicy).name(), typeid(DistPolicy).name(), typeid(T).name(),
         inplace, size, dist_policy.get_num_partitions(),
@@ -124,7 +125,7 @@ void exclusive_scan_algo_tests_inplace_with_policy(std::size_t size,
     double e1 = t1.elapsed();
     t1.restart();
 
-    hpx::parallel::exclusive_scan(
+    hpx::exclusive_scan(
         policy, in.begin(), in.end(), in.begin(), val, opt<T>());
 
     double e2 = t1.elapsed();
@@ -142,7 +143,7 @@ void exclusive_scan_algo_tests_inplace_with_policy(std::size_t size,
 template <typename T, typename DistPolicy, typename ExPolicy>
 void exclusive_scan_algo_tests_with_policy_async(std::size_t size,
     DistPolicy const& dist_policy, hpx::partitioned_vector<T>& in,
-    std::vector<T> ver, ExPolicy const& policy)
+    std::vector<T> const& ver, ExPolicy const& policy)
 {
     msg7(typeid(ExPolicy).name(), typeid(DistPolicy).name(), typeid(T).name(),
         async, size, dist_policy.get_num_partitions(),
@@ -155,7 +156,7 @@ void exclusive_scan_algo_tests_with_policy_async(std::size_t size,
     double e1 = t1.elapsed();
     t1.restart();
 
-    auto res = hpx::parallel::exclusive_scan(
+    auto res = hpx::exclusive_scan(
         policy, in.begin(), in.end(), out.begin(), val, opt<T>());
     res.get();
 
@@ -173,7 +174,7 @@ template <typename T, typename DistPolicy, typename ExPolicy>
 void exclusive_scan_algo_tests_segmented_out_with_policy_async(std::size_t size,
     DistPolicy const& in_dist_policy, DistPolicy const& out_dist_policy,
     hpx::partitioned_vector<T>& in, hpx::partitioned_vector<T> out,
-    std::vector<T> ver, ExPolicy const& policy)
+    std::vector<T> const& ver, ExPolicy const& policy)
 {
     msg9(typeid(ExPolicy).name(), typeid(DistPolicy).name(), typeid(T).name(),
         async_segmented, size, in_dist_policy.get_num_partitions(),
@@ -188,7 +189,7 @@ void exclusive_scan_algo_tests_segmented_out_with_policy_async(std::size_t size,
     double e1 = t1.elapsed();
     t1.restart();
 
-    auto res = hpx::parallel::exclusive_scan(
+    auto res = hpx::exclusive_scan(
         policy, in.begin(), in.end(), out.begin(), val, opt<T>());
     res.get();
 
@@ -204,7 +205,8 @@ void exclusive_scan_algo_tests_segmented_out_with_policy_async(std::size_t size,
 
 template <typename T, typename DistPolicy, typename ExPolicy>
 void exclusive_scan_algo_tests_inplace_with_policy_async(std::size_t size,
-    DistPolicy const& dist_policy, std::vector<T> ver, ExPolicy const& policy)
+    DistPolicy const& dist_policy, std::vector<T> const& ver,
+    ExPolicy const& policy)
 {
     msg7(typeid(ExPolicy).name(), typeid(DistPolicy).name(), typeid(T).name(),
         async_inplace, size, dist_policy.get_num_partitions(),
@@ -219,7 +221,7 @@ void exclusive_scan_algo_tests_inplace_with_policy_async(std::size_t size,
     double e1 = t1.elapsed();
     t1.restart();
 
-    auto res = hpx::parallel::exclusive_scan(
+    auto res = hpx::exclusive_scan(
         policy, in.begin(), in.end(), in.begin(), val, opt<T>());
     res.get();
 

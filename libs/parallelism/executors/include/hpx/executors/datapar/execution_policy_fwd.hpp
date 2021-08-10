@@ -23,15 +23,15 @@ namespace hpx { namespace execution { inline namespace v1 {
     struct simd_task_policy_shim;
 
     ///////////////////////////////////////////////////////////////////////////
-    struct simdpar_policy;
+    struct par_simd_policy;
 
     template <typename Executor, typename Parameters>
-    struct simdpar_policy_shim;
+    struct par_simd_policy_shim;
 
-    struct simdpar_task_policy;
+    struct par_simd_task_policy;
 
     template <typename Executor, typename Parameters>
-    struct simdpar_task_policy_shim;
+    struct par_simd_task_policy_shim;
 }}}    // namespace hpx::execution::v1
 
 #endif

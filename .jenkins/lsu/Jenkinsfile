@@ -19,7 +19,7 @@ pipeline {
         )
     }
     environment {
-        GITHUB_TOKEN = credentials('GITHUB_TOKEN')
+        GITHUB_TOKEN = credentials('STELLARBOT_GITHUB_TOKEN')
     }
     stages {
         stage('checkout') {

@@ -42,13 +42,14 @@ namespace hpx { namespace threads { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     void io_service_thread_pool::create_thread(thread_init_data& /* data */,
-        thread_id_type& /* id */, error_code& /* ec */)
+        thread_id_ref_type& /* id */, error_code& /* ec */)
     {
     }
 
-    void io_service_thread_pool::create_work(
+    thread_id_ref_type io_service_thread_pool::create_work(
         thread_init_data& /* data */, error_code& /* ec */)
     {
+        return invalid_thread_id;
     }
 
     threads::thread_state io_service_thread_pool::set_state(
@@ -60,7 +61,7 @@ namespace hpx { namespace threads { namespace detail {
             threads::thread_restart_state::unknown);
     }
 
-    threads::thread_id_type io_service_thread_pool::set_state(
+    threads::thread_id_ref_type io_service_thread_pool::set_state(
         hpx::chrono::steady_time_point const& /* abs_time */,
         thread_id_type const& id, thread_schedule_state /* newstate */,
         thread_restart_state /* newstate_ex */, thread_priority /* priority */,

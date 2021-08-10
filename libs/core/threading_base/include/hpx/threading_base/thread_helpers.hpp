@@ -98,7 +98,8 @@ namespace hpx { namespace threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_CORE_EXPORT thread_id_type set_thread_state(thread_id_type const& id,
+    HPX_CORE_EXPORT thread_id_ref_type set_thread_state(
+        thread_id_type const& id,
         hpx::chrono::steady_time_point const& abs_time,
         std::atomic<bool>* started,
         thread_schedule_state state = thread_schedule_state::pending,
@@ -106,7 +107,7 @@ namespace hpx { namespace threads {
         thread_priority priority = thread_priority::normal,
         bool retry_on_active = true, error_code& ec = throws);
 
-    inline thread_id_type set_thread_state(thread_id_type const& id,
+    inline thread_id_ref_type set_thread_state(thread_id_type const& id,
         hpx::chrono::steady_time_point const& abs_time,
         thread_schedule_state state = thread_schedule_state::pending,
         thread_restart_state stateex = thread_restart_state::timeout,
@@ -144,7 +145,7 @@ namespace hpx { namespace threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    inline thread_id_type set_thread_state(thread_id_type const& id,
+    inline thread_id_ref_type set_thread_state(thread_id_type const& id,
         hpx::chrono::steady_duration const& rel_time,
         thread_schedule_state state = thread_schedule_state::pending,
         thread_restart_state stateex = thread_restart_state::timeout,
@@ -451,7 +452,7 @@ namespace hpx { namespace this_thread {
     ///         \a hpx#invalid_status.
     ///
     HPX_CORE_EXPORT threads::thread_restart_state suspend(
-        threads::thread_schedule_state state, threads::thread_id_type const& id,
+        threads::thread_schedule_state state, threads::thread_id_type id,
         util::thread_description const& description = util::thread_description(
             "this_thread::suspend"),
         error_code& ec = throws);
@@ -501,7 +502,7 @@ namespace hpx { namespace this_thread {
     ///
     HPX_CORE_EXPORT threads::thread_restart_state suspend(
         hpx::chrono::steady_time_point const& abs_time,
-        threads::thread_id_type const& id,
+        threads::thread_id_type id,
         util::thread_description const& description = util::thread_description(
             "this_thread::suspend"),
         error_code& ec = throws);

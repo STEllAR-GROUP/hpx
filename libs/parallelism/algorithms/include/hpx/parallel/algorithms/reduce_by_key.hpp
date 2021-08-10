@@ -359,7 +359,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 //
                 typedef hpx::tuple<value_type, reduce_key_series_states>
                     lambda_type;
-                hpx::parallel::inclusive_scan(
+                hpx::inclusive_scan(
                     sync_policy, states_begin, states_end, states_out_begin,
                     // B is the current entry, A is the one passed in from 'previous'
                     [&func](zip_type_in a, zip_type_in b) -> lambda_type {

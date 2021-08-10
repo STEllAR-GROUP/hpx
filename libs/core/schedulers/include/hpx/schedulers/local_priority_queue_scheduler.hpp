@@ -120,7 +120,7 @@ namespace hpx { namespace threads { namespace policies {
           , affinity_data_(init.affinity_data_)
           , num_queues_(init.num_queues_)
           , num_high_priority_queues_(init.num_high_priority_queues_)
-          , low_priority_queue_(0, thread_queue_init_)
+          , low_priority_queue_(init.num_queues_ - 1, thread_queue_init_)
           , queues_(num_queues_)
           , high_priority_queues_(num_queues_)
           , victim_threads_(num_queues_)
@@ -506,8 +506,8 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to
         // pending
-        void create_thread(
-            thread_init_data& data, thread_id_type* id, error_code& ec) override
+        void create_thread(thread_init_data& data, thread_id_ref_type* id,
+            error_code& ec) override
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread =
@@ -595,7 +595,7 @@ namespace hpx { namespace threads { namespace policies {
         /// Return the next thread to be executed, return false if none is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
-            threads::thread_data*& thrd, bool enable_stealing) override
+            threads::thread_id_ref_type& thrd, bool enable_stealing) override
         {
             HPX_ASSERT(num_thread < num_queues_);
             thread_queue_type* this_high_priority_queue = nullptr;
@@ -666,7 +666,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_data* thrd,
+        void schedule_thread(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
             thread_priority priority = thread_priority::normal) override
@@ -694,19 +694,21 @@ namespace hpx { namespace threads { namespace policies {
             std::unique_lock<pu_mutex_type> l;
             num_thread = select_active_pu(l, num_thread, allow_fallback);
 
+            auto* thrdptr = get_thread_id_data(thrd);
+            (void) thrdptr;
             if (priority == thread_priority::high_recursive ||
                 priority == thread_priority::high ||
                 priority == thread_priority::boost)
             {
                 std::size_t num = num_thread % num_high_priority_queues_;
-
                 LTM_(debug).format(
                     "local_priority_queue_scheduler::schedule_thread, "
                     "high priority queue: "
                     "pool({}), scheduler({}), worker_thread({}), "
                     "thread({}), priority({}), description({})",
-                    *this->get_parent_pool(), *this, num, thrd->get_thread_id(),
-                    priority, thrd->get_description());
+                    *this->get_parent_pool(), *this, num,
+                    thrdptr->get_thread_id(), priority,
+                    thrdptr->get_description());
 
                 high_priority_queues_[num].data_->schedule_thread(thrd);
             }
@@ -717,8 +719,8 @@ namespace hpx { namespace threads { namespace policies {
                     "low priority queue: "
                     "pool({}), scheduler({}), "
                     "thread({}), priority({}), description({})",
-                    *this->get_parent_pool(), *this, thrd->get_thread_id(),
-                    priority, thrd->get_description());
+                    *this->get_parent_pool(), *this, thrdptr->get_thread_id(),
+                    priority, thrdptr->get_description());
 
                 low_priority_queue_.schedule_thread(thrd);
             }
@@ -732,13 +734,14 @@ namespace hpx { namespace threads { namespace policies {
                     "pool({}), scheduler({}), worker_thread({}), "
                     "thread({}), priority({}), description({})",
                     *this->get_parent_pool(), *this, num_thread,
-                    thrd->get_thread_id(), priority, thrd->get_description());
+                    thrdptr->get_thread_id(), priority,
+                    thrdptr->get_description());
 
                 queues_[num_thread].data_->schedule_thread(thrd);
             }
         }
 
-        void schedule_thread_last(threads::thread_data* thrd,
+        void schedule_thread_last(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
             thread_priority priority = thread_priority::normal) override

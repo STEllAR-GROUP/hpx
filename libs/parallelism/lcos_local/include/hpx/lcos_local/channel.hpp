@@ -252,7 +252,15 @@ namespace hpx { namespace lcos { namespace local {
                 empty_ = false;
                 push_active_ = false;
             }
-            void set_deferred(T&& val) noexcept
+            void set_deferred(T&& val)
+            // NVCC with GCC versions less than 10 don't compile push_pt
+            // correctly if this is noexcept. hpx::util::result_of (and
+            // std::result_of) inside deferred_call does not detect that the
+            // call is valid, and compilation fails.
+#if !(defined(HPX_CUDA_VERSION) && defined(HPX_GCC_VERSION) &&                 \
+    (HPX_GCC_VERSION < 100000))
+                noexcept
+#endif
             {
                 val_ = std::move(val);
                 empty_ = false;

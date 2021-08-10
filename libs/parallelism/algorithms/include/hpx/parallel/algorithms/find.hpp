@@ -802,8 +802,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 using result_type =
                     util::detail::algorithm_result<ExPolicy, Iter1>;
-                using reference =
-                    typename std::iterator_traits<Iter1>::reference;
+
                 using difference_type =
                     typename std::iterator_traits<Iter1>::difference_type;
 
@@ -823,32 +822,30 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::greater<difference_type>>
                     tok(-1);
 
-                auto f1 = [count, diff, tok, first2,
-                              op = std::forward<Pred>(op),
+                auto f1 = [diff, tok, first2, op = std::forward<Pred>(op),
                               proj1 = std::forward<Proj1>(proj1),
                               proj2 = std::forward<Proj2>(proj2)](Iter1 it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    Iter1 curr = it;
-
                     util::loop_idx_n(base_idx, it, part_size, tok,
-                        [=, &tok, &curr, &op, &proj1, &proj2](
-                            reference t, std::size_t i) -> void {
-                            ++curr;
+                        [=, &tok, &op, &proj1, &proj2](
+                            auto t, std::size_t i) -> void {
                             if (hpx::util::invoke(op,
                                     hpx::util::invoke(proj1, t),
                                     hpx::util::invoke(proj2, *first2)))
                             {
                                 difference_type local_count = 1;
-                                FwdIter mid = curr;
+                                auto mid = t;
+                                auto mid2 = first2;
+                                ++mid;
+                                ++mid2;
 
-                                for (difference_type len = 0;
-                                     local_count != diff && len != count;
-                                     (void) ++local_count, ++len, ++mid)
+                                for (; local_count != diff;
+                                     ++local_count, ++mid, ++mid2)
                                 {
                                     if (!hpx::util::invoke(op,
-                                            hpx::util::invoke(proj1, t),
-                                            hpx::util::invoke(proj2, *first2)))
+                                            hpx::util::invoke(proj1, mid),
+                                            hpx::util::invoke(proj2, *mid2)))
                                     {
                                         break;
                                     }

@@ -120,6 +120,8 @@ add_hpx_module(
     hpx_errors
     hpx_format
     hpx_functional
+    hpx_memory
+    hpx_thread_support
     hpx_type_support
     hpx_util
   CMAKE_SUBDIRS examples tests

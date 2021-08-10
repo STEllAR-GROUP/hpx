@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -284,20 +284,22 @@ namespace hpx { namespace threads { namespace coroutines {
             detail::coroutine_stackless_self self(this);
             detail::reset_self_on_exit on_self_exit(&self, nullptr);
 
-            reset_on_exit on_exit{*this};
+            {
+                reset_on_exit on_exit{*this};
 
-            HPX_UNUSED(on_exit);
+                HPX_UNUSED(on_exit);
 
-            result = f_(arg);    // invoke wrapped function
+                result = f_(arg);    // invoke wrapped function
 
-            // we always have to run to completion
-            HPX_ASSERT(
-                result.first == threads::thread_schedule_state::terminated);
+                // we always have to run to completion
+                HPX_ASSERT(
+                    result.first == threads::thread_schedule_state::terminated);
+            }
 
             reset_tss();
+            reset();
         }
 
-        reset();
         return result;
     }
 

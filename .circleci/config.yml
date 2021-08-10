@@ -10,7 +10,7 @@ working_dir_default: &working_dir_default
 
 docker_default: &docker_default
     docker:
-      - image: stellargroup/build_env:4
+      - image: stellargroup/build_env:7
 
 defaults: &defaults
     <<: *working_dir_default
@@ -159,8 +159,8 @@ jobs:
           name: Check that the modules are well clang-formatted
           command: |
               cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
-              clang-format-9 --version
-              clang-format-9 -i **/*.{cpp,hpp}
+              clang-format-11 --version
+              clang-format-11 -i **/*.{cpp,hpp}
               git diff --exit-code > /tmp/modified_clang_format_files.txt
       - store_artifacts:
           path: /tmp/modified_clang_format_files.txt

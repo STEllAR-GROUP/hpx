@@ -71,7 +71,7 @@ namespace hpx { namespace serialization {
 
     template <typename T>
     struct serialize_non_intrusive<T,
-        typename std::enable_if<has_serialize_adl<T>::value>::type>
+        std::enable_if_t<has_serialize_adl<T>::value>>
     {
         template <typename Archive>
         static void call(Archive& ar, T& t, unsigned)
@@ -85,7 +85,6 @@ namespace hpx { namespace serialization {
         }
     };
 
-#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS)
     template <typename T>
     class has_struct_serialization
     {
@@ -119,7 +118,7 @@ namespace hpx { namespace serialization {
 
     template <typename T>
     struct serialize_brace_initialized<T,
-        typename std::enable_if<has_struct_serialization<T>::value>::type>
+        std::enable_if_t<has_struct_serialization<T>::value>>
     {
         template <typename Archive>
         static void call(Archive& ar, T& t, unsigned)
@@ -134,19 +133,19 @@ namespace hpx { namespace serialization {
 
     template <typename T>
     struct serialize_non_intrusive<T,
-        typename std::enable_if<!has_serialize_adl<T>::value>::type>
+        std::enable_if_t<!has_serialize_adl<T>::value>>
       : serialize_brace_initialized<T>
     {
     };
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     class access
     {
-        template <class T>
+    public:
+        template <typename T>
         class has_serialize
         {
-            template <class T1>
+            template <typename T1>
             static std::false_type test(...);
 
             // the following expression sfinae trick
@@ -155,17 +154,20 @@ namespace hpx { namespace serialization {
             // note that this detection would have been much easier
             // to implement if there hadn't been an issue with gcc:
             // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82478
-            template <class T1,
-                class = decltype(
+            template <typename T1,
+                typename = decltype(
                     std::declval<typename std::remove_const<T1>::type&>()
-                        .serialize(std::declval<output_archive&>(), 0u))>
+                        .serialize(
+                            std::declval<hpx::serialization::output_archive&>(),
+                            0u))>
             static std::true_type test(int);
 
         public:
             static constexpr bool value = decltype(test<T>(0))::value;
         };
 
-        template <class T>
+    private:
+        template <typename T>
         class serialize_dispatcher
         {
             struct intrusive_polymorphic
@@ -210,23 +212,21 @@ namespace hpx { namespace serialization {
                 {
                     // cast it to let it be run for templated
                     // member functions
-                    const_cast<typename std::decay<T>::type&>(t).serialize(
-                        ar, 0);
+                    const_cast<std::decay_t<T>&>(t).serialize(ar, 0);
                 }
             };
 
         public:
-            using type = typename std::conditional<
-                hpx::traits::is_intrusive_polymorphic<T>::value,
-                intrusive_polymorphic,
-                typename std::conditional<has_serialize<T>::value,
-                    intrusive_usual,
-                    typename std::conditional<std::is_empty<T>::value, empty,
-                        non_intrusive>::type>::type>::type;
+            using type =
+                std::conditional_t<hpx::traits::is_intrusive_polymorphic_v<T>,
+                    intrusive_polymorphic,
+                    std::conditional_t<has_serialize<T>::value, intrusive_usual,
+                        std::conditional_t<std::is_empty<T>::value, empty,
+                            non_intrusive>>>;
         };
 
     public:
-        template <class Archive, class T>
+        template <typename Archive, typename T>
         static void serialize(Archive& ar, T& t, unsigned)
         {
             serialize_dispatcher<T>::type::call(ar, t, 0);

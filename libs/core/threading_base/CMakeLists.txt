@@ -13,6 +13,8 @@ set(threading_base_headers
     hpx/threading_base/create_work.hpp
     hpx/threading_base/detail/reset_backtrace.hpp
     hpx/threading_base/detail/reset_lco_description.hpp
+    hpx/threading_base/detail/get_default_pool.hpp
+    hpx/threading_base/detail/get_default_timer_service.hpp
     hpx/threading_base/execution_agent.hpp
     hpx/threading_base/external_timer.hpp
     hpx/threading_base/network_background_callback.hpp
@@ -22,6 +24,7 @@ set(threading_base_headers
     hpx/threading_base/scheduler_mode.hpp
     hpx/threading_base/scheduler_state.hpp
     hpx/threading_base/set_thread_state.hpp
+    hpx/threading_base/set_thread_state_timed.hpp
     hpx/threading_base/thread_data.hpp
     hpx/threading_base/thread_data_stackful.hpp
     hpx/threading_base/thread_data_stackless.hpp
@@ -58,11 +61,16 @@ set(threading_base_compat_headers
 
 set(threading_base_sources
     annotated_function.cpp
+    create_thread.cpp
+    create_work.cpp
     execution_agent.cpp
     external_timer.cpp
+    get_default_pool.cpp
+    get_default_timer_service.cpp
     print.cpp
-    register_thread.cpp
     scheduler_base.cpp
+    set_thread_state.cpp
+    set_thread_state_timed.cpp
     thread_data.cpp
     thread_data_stackful.cpp
     thread_data_stackless.cpp
@@ -102,6 +110,7 @@ add_hpx_module(
     hpx_itt_notify
     hpx_logging
     hpx_memory
+    hpx_timing
     hpx_type_support
     ${additional_dependencies}
   CMAKE_SUBDIRS examples tests

@@ -24,6 +24,7 @@ set(tests
     distance
     equal_range
     equal_binary_range
+    exclusive_scan_range
     fill_range
     filln_range
     find_range
@@ -46,6 +47,7 @@ set(tests
     foreach_range_projection
     generate_range
     includes_range
+    inclusive_scan_range
     inplace_merge_range
     is_heap_range
     is_heap_until_range
@@ -90,6 +92,8 @@ set(tests
     transform_range_binary
     transform_range2
     transform_range_binary2
+    transform_exclusive_scan_range
+    transform_inclusive_scan_range
     transform_reduce_binary_bad_alloc_range
     transform_reduce_binary_exception_range
     transform_reduce_binary_range

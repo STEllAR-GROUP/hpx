@@ -71,7 +71,7 @@ Quick start
 
 Here, you will use the command-line, non-interactive CMake interface.
 
-#. Download and install CMake here: |cmake_download|_. Version 3.17 is the
+#. Download and install CMake here: |cmake_download|_. Version 3.18 is the
    minimum required version for |hpx|.
 
 #. Open a shell. Your development tools must be reachable from this shell
@@ -211,8 +211,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |cmake|_
-     * 3.17
-     * Cuda support 3.9
+     * 3.18
    * * **Required Libraries**
      *
      *
@@ -222,11 +221,14 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * |hwloc|_
      * 1.5
      *
+   * * |asio|_
+     * 1.12.0
+     *
 
 .. note::
 
    When building Boost using gcc, please note that it is required to specify a
-   ``cxxflags=-std=c++14`` command line argument to ``b2`` (``bjam``).
+   ``cxxflags=-std=c++17`` command line argument to ``b2`` (``bjam``).
 
 .. list-table:: Software prerequisites for |hpx| on Windows systems
 
@@ -243,7 +245,7 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |cmake|_
-     * 3.17
+     * 3.18
      *
    * * **Required Libraries**
      *
@@ -254,14 +256,17 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * |hwloc|_
      * 1.5
      *
+   * * |asio|_
+     * 1.12.0
+     *
 
 .. note::
 
-   You need to build the following Boost libraries for |hpx|:
-   Boost.Filesystem, Boost.ProgramOptions, and Boost.System. The
-   following are not needed by default, but are required in certain
-   configurations: Boost.Chrono, Boost.DateTime, Boost.Log, Boost.LogSetup,
-   Boost.Regex, and Boost.Thread.
+   In most configurations, |hpx| depends only on header-only Boost.
+   Boost.Filesystem is required if the standard library does not support
+   filesystem. The following are not needed by default, but are required in
+   certain configurations: Boost.Chrono, Boost.DateTime, Boost.Log,
+   Boost.LogSetup, Boost.Regex, and Boost.Thread.
 
 Depending on the options you chose while building and installing |hpx|,
 you will find that |hpx| may depend on several other libraries such as those
@@ -520,17 +525,14 @@ those are added to the ``Libs`` sections). In order to use the optional
 libraries, you need to specify them as link dependencies in your build (See
 :ref:`creating_hpx_projects`).
 
-As |hpx| is a modern C++ library, we require a certain minimum set of features
-from the C++11 standard. In addition, we make use of certain C++14 features if
-the used compiler supports them. This means that the |hpx| build system will try
-to determine the highest support C++ standard flavor and check for availability
-of those features. That is, the default will be the highest C++ standard version
-available. If you want to force |hpx| to use a specific C++ standard version, you
-can use the following CMake variables:
+As |hpx| is a modern C++ library which relies on C++17 by default. The use of
+more recent standards can be opted into explicitly. If you want to force |hpx|
+to use a specific C++ standard version, you can use the following CMake
+variables:
 
-* ``HPX_WITH_CXX14``: Enables C++14 support (this is the minimum requirement)
-* ``HPX_WITH_CXX17``: Enables C++17 support
-* ``HPX_WITH_CXX2A``: Enables (experimental) C++20 support
+* ``HPX_WITH_CXX17``: [Deprecated] C++17 is now the default C++ standard used in HPX.
+* ``HPX_WITH_CXX20``: [Deprecated] In order to use the C++20 standard, it is
+preferable to set CMAKE_CXX_STANDARD and HPX_USE_CMAKE_CXX_STANDARD to ON.
 
 .. _build_types:
 

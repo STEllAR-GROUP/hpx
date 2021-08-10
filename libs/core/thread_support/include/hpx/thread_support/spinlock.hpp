@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2014 Peter Dimov
 //  Copyright (c) 2020 Agustin Berge
+//  Copyright (c) 2021 Nikunj Gupta
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -44,16 +45,13 @@ namespace hpx { namespace util { namespace detail {
 
         void lock() noexcept
         {
-            // Optimistically assume the lock is free on the first try
-            if (!m.exchange(true, std::memory_order_acquire))
-                return;
-
             // Wait for lock to be released without generating cache misses
+            // Similar implementation to hpx::lcos::local::spinlock
             unsigned k = 0;
-            do
+            while (!try_lock())
             {
                 yield_k(k++);
-            } while (!try_lock());
+            }
         }
 
         HPX_FORCEINLINE void unlock() noexcept

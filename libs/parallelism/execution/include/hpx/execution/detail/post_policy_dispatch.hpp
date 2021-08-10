@@ -124,7 +124,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                     static_cast<std::int16_t>(get_worker_thread_num())),
                 stacksize,
                 threads::thread_schedule_state::pending_do_not_schedule, true);
-            threads::thread_id_type tid = threads::register_thread(data, pool);
+            threads::thread_id_ref_type tid =
+                threads::register_thread(data, pool);
             threads::thread_id_type tid_self = threads::get_self_id();
 
             // make sure this thread is executed last
@@ -134,7 +135,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             {
                 // yield_to(tid)
                 hpx::this_thread::suspend(
-                    threads::thread_schedule_state::pending, tid,
+                    threads::thread_schedule_state::pending, tid.noref(),
                     "post_policy_dispatch(suspend)");
             }
         }

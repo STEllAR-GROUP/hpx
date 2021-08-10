@@ -14,24 +14,24 @@
 
 namespace hpx { namespace serialization { namespace detail {
 
+    using extra_archive_data_id_type = void*;
+
     template <typename T>
     struct extra_archive_data_helper
     {
         // this is intentionally left unimplemented, will lead to linker errors
         // if used with unknown data type
-        static void id() noexcept;
+        static extra_archive_data_id_type id() noexcept;
 
-        // this is a function that should e implemented in order to reset the
+        // this is a function that should be implemented in order to reset the
         // extra archive data item
-        static constexpr void reset(T* data) noexcept;
+        static void reset(T* data) noexcept;
     };
 
-    using extra_archive_data_id_type = void (*)();
-
     template <typename T>
-    constexpr extra_archive_data_id_type extra_archive_data_id() noexcept
+    extra_archive_data_id_type extra_archive_data_id() noexcept
     {
-        return &extra_archive_data_helper<T>::id;
+        return extra_archive_data_helper<T>::id();
     }
 
     template <typename T>
@@ -117,7 +117,7 @@ namespace hpx { namespace serialization { namespace detail {
     template <typename T>
     T* extra_archive_data_node::get() noexcept
     {
-        constexpr auto id = extra_archive_data_id<T>();
+        auto id = extra_archive_data_id<T>();
         if (id_ == nullptr)
         {
             HPX_ASSERT(!ptr_);

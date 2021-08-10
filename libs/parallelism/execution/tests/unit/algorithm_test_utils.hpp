@@ -132,6 +132,25 @@ struct error_callback_receiver
     }
 };
 
+template <typename F>
+struct void_callback_helper
+{
+    std::decay_t<F> f;
+
+    // This overload is only used to satisfy tests that have a predecessor that
+    // can send void, but never does in practice.
+    void operator()() const
+    {
+        HPX_TEST(false);
+    }
+
+    template <typename T>
+    void operator()(T&& t)
+    {
+        HPX_INVOKE(std::move(f), std::forward<T>(t));
+    }
+};
+
 template <typename T>
 struct error_typed_sender
 {

@@ -94,7 +94,10 @@ namespace hpx { namespace cuda { namespace experimental {
     void target::native_handle_type::reset() noexcept
     {
         if (stream_)
-            cudaStreamDestroy(stream_);    // ignore error
+        {
+            cudaError_t err = cudaStreamDestroy(stream_);    // ignore error
+            HPX_UNUSED(err);
+        }
     }
 
     target::native_handle_type::native_handle_type(

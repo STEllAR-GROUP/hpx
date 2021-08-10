@@ -46,9 +46,15 @@ namespace hpx { namespace threads {
           , run_now(false)
           , scheduler_base(nullptr)
         {
+            if (initial_state == thread_schedule_state::staged)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "thread_init_data::thread_init_data",
+                    "threads shouldn't have 'staged' as their initial state");
+            }
         }
 
-        thread_init_data& operator=(thread_init_data&& rhs)
+        thread_init_data& operator=(thread_init_data&& rhs) noexcept
         {
             func = std::move(rhs.func);
             priority = rhs.priority;
@@ -58,7 +64,7 @@ namespace hpx { namespace threads {
             run_now = rhs.run_now;
             scheduler_base = rhs.scheduler_base;
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            description = rhs.description;
+            description = std::move(rhs.description);
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_id = rhs.parent_locality_id;
@@ -73,10 +79,10 @@ namespace hpx { namespace threads {
             return *this;
         }
 
-        thread_init_data(thread_init_data&& rhs)
+        thread_init_data(thread_init_data&& rhs) noexcept
           : func(std::move(rhs.func))
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-          , description(rhs.description)
+          , description(std::move(rhs.description))
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
           , parent_locality_id(rhs.parent_locality_id)
@@ -130,6 +136,13 @@ namespace hpx { namespace threads {
           , scheduler_base(scheduler_base_)
         {
             HPX_UNUSED(desc);
+
+            if (initial_state == thread_schedule_state::staged)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "thread_init_data::thread_init_data",
+                    "threads shouldn't have 'staged' as their initial state");
+            }
         }
 
         threads::thread_function_type func;

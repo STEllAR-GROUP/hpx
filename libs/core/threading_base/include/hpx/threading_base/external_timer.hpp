@@ -210,7 +210,7 @@ namespace hpx { namespace util {
         HPX_CORE_EXPORT std::shared_ptr<task_wrapper> new_task(
             thread_description const& description,
             std::uint32_t parent_locality_id,
-            threads::thread_id_type const& parent_task);
+            threads::thread_id_type parent_task);
 
         HPX_CORE_EXPORT inline std::shared_ptr<task_wrapper> update_task(
             std::shared_ptr<task_wrapper> wrapper,
@@ -218,7 +218,7 @@ namespace hpx { namespace util {
         {
             if (wrapper == nullptr)
             {
-                threads::thread_id_type parent_task(nullptr);
+                threads::thread_id_type parent_task;
                 // doesn't matter which locality we use, the parent is null
                 return new_task(description, 0, parent_task);
             }
@@ -301,8 +301,8 @@ namespace hpx { namespace util {
         {
         };
 
-        inline std::shared_ptr<task_wrapper> new_task(thread_description const&,
-            std::uint32_t, threads::thread_id_type const&)
+        inline std::shared_ptr<task_wrapper> new_task(
+            thread_description const&, std::uint32_t, threads::thread_id_type)
         {
             return nullptr;
         }

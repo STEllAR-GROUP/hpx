@@ -46,7 +46,10 @@ namespace hpx { namespace util {
     struct make_index_pack
 #if defined(HPX_HAVE_BUILTIN_INTEGER_PACK)
       : index_pack<__integer_pack(N)...>
-#elif defined(HPX_HAVE_BUILTIN_MAKE_INTEGER_SEQ)
+#elif (defined(HPX_HAVE_BUILTIN_MAKE_INTEGER_SEQ) &&                           \
+    !defined(HPX_COMPUTE_DEVICE_CODE)) ||                                      \
+    (defined(HPX_HAVE_BUILTIN_MAKE_INTEGER_SEQ_CUDA) &&                        \
+        defined(HPX_COMPUTE_DEVICE_CODE))
       : __make_integer_seq<pack_c, std::size_t, N>
 #else
       : detail::make_index_pack_join<typename make_index_pack<N / 2>::type,
@@ -64,6 +67,9 @@ namespace hpx { namespace util {
     struct make_index_pack<1> : index_pack<0>
     {
     };
+
+    template <std::size_t N>
+    using make_index_pack_t = typename make_index_pack<N>::type;
 
     ///////////////////////////////////////////////////////////////////////////
     // Workaround for clang bug [https://bugs.llvm.org/show_bug.cgi?id=35077]
@@ -155,7 +161,10 @@ namespace hpx { namespace util {
         {
         };
 
-#if defined(HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT)
+#if (defined(HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT) &&                            \
+    !defined(HPX_COMPUTE_DEVICE_CODE)) ||                                      \
+    (defined(HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT_CUDA) &&                       \
+        defined(HPX_COMPUTE_DEVICE_CODE))
         template <std::size_t I, typename Ts, bool InBounds = (I < Ts::size)>
         struct at_index_impl : empty
         {

@@ -18,8 +18,8 @@ namespace hpx { namespace parallel { namespace util {
         using is_transparent = std::true_type;
 
         template <typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T&& operator()(T&& val) const
-            noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T&& operator()(
+            T&& val) const noexcept
         {
             return std::forward<T>(val);
         }

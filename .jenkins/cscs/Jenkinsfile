@@ -24,7 +24,7 @@ pipeline {
     }
     environment {
         SPACK_ROOT = '/apps/daint/SSL/HPX/spack'
-        GITHUB_TOKEN = credentials('97b30156-2f6f-47fc-94eb-68044d95ec50')
+        GITHUB_TOKEN = credentials('STELLARBOT_GITHUB_TOKEN')
     }
     stages {
         stage('checkout') {
@@ -40,7 +40,7 @@ pipeline {
                 axes {
                     axis {
                         name 'configuration_name'
-                        values 'gcc-newest', 'gcc-10', 'gcc-oldest', 'gcc-cuda', 'clang-newest', 'clang-10', 'clang-9', 'clang-8', 'clang-oldest', 'clang-cuda', 'clang-apex', 'icc'
+                        values 'gcc-newest', 'gcc-10', 'gcc-oldest', 'gcc-cuda', 'clang-newest', 'clang-10', 'clang-9', 'clang-8', 'clang-oldest', 'clang-cuda', 'clang-apex'
                     }
                 }
                 stages {

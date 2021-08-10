@@ -340,8 +340,8 @@ namespace std {
     {
         using result_type = std::size_t;
 
-        result_type operator()(hpx::memory::intrusive_ptr<T> const& p) const
-            noexcept
+        result_type operator()(
+            hpx::memory::intrusive_ptr<T> const& p) const noexcept
         {
             return hash<T*>{}(p.get());
         }

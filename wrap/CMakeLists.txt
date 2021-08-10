@@ -91,3 +91,7 @@ install(
 hpx_export_internal_targets(hpx_wrap)
 
 add_hpx_pseudo_dependencies(core hpx_wrap)
+
+if(HPX_WITH_PRECOMPILED_HEADERS)
+  target_precompile_headers(hpx_wrap REUSE_FROM hpx_precompiled_headers)
+endif()

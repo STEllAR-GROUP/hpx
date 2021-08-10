@@ -24,6 +24,7 @@
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
+#include <hpx/threading_base/set_thread_state_timed.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
@@ -596,7 +597,7 @@ namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::create_thread(
-        thread_init_data& data, thread_id_type& id, error_code& ec)
+        thread_init_data& data, thread_id_ref_type& id, error_code& ec)
     {
         // verify state
         if (thread_count_ == 0 && !sched_->Scheduler::is_state(state_running))
@@ -615,7 +616,7 @@ namespace hpx { namespace threads { namespace detail {
     }
 
     template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::create_work(
+    thread_id_ref_type scheduled_thread_pool<Scheduler>::create_work(
         thread_init_data& data, error_code& ec)
     {
         // verify state
@@ -625,13 +626,16 @@ namespace hpx { namespace threads { namespace detail {
             HPX_THROWS_IF(ec, invalid_status,
                 "thread_pool<Scheduler>::create_work",
                 "invalid state: thread pool is not running");
-            return;
+            return invalid_thread_id;
         }
 
-        detail::create_work(sched_.get(), data, ec);    //-V601
+        thread_id_ref_type id =
+            detail::create_work(sched_.get(), data, ec);    //-V601
 
         // update statistics
         ++tasks_scheduled_;
+
+        return id;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -649,14 +653,14 @@ namespace hpx { namespace threads { namespace detail {
     }
 
     template <typename Scheduler>
-    thread_id_type scheduled_thread_pool<Scheduler>::set_state(
+    thread_id_ref_type scheduled_thread_pool<Scheduler>::set_state(
         hpx::chrono::steady_time_point const& abs_time,
         thread_id_type const& id, thread_schedule_state newstate,
         thread_restart_state newstate_ex, thread_priority priority,
         error_code& ec)
     {
-        return detail::set_thread_state_timed(*sched_, abs_time, id, newstate,
-            newstate_ex, priority,
+        return detail::set_thread_state_timed(sched_.get(), abs_time, id,
+            newstate, newstate_ex, priority,
             thread_schedule_hint(
                 static_cast<std::int16_t>(detail::get_local_thread_num_tss())),
             nullptr, true, ec);
@@ -1968,6 +1972,7 @@ namespace hpx { namespace threads { namespace detail {
             [&state]() { return state.load() == state_pre_sleep; },
             "scheduled_thread_pool::suspend_processing_unit_direct");
     }
+
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::resume_processing_unit_direct(
         std::size_t virt_core, error_code& ec)

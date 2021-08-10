@@ -30,7 +30,7 @@ int hpx_main()
         Elem{1, true}, Elem{3, false}, Elem{2, true}, Elem{4, false}};
     std::vector<Elem> output(test.size());
 
-    hpx::parallel::transform_inclusive_scan(
+    hpx::transform_inclusive_scan(
         hpx::execution::par, test.cbegin(), test.cend(), output.begin(),
         [](Elem left, Elem right) -> Elem {
             if (right.begin)

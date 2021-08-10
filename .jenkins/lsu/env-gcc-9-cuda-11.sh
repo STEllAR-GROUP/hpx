@@ -12,7 +12,10 @@ module load hwloc
 module load cuda/11
 module load openmpi
 
+export CXX_STD="17"
+
 configure_extra_options="-DCMAKE_BUILD_TYPE=${build_type}"
+configure_extra_options+=" -DHPX_WITH_CXX${CXX_STD}=ON"
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
 configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
@@ -21,4 +24,4 @@ configure_extra_options+=" -DHPX_WITH_CUDA=ON"
 configure_extra_options+=" -DHPX_WITH_NETWORKING=OFF"
 configure_extra_options+=" -DHPX_WITH_DISTRIBUTED_RUNTIME=OFF"
 configure_extra_options+=" -DHPX_WITH_ASYNC_MPI=ON"
-configure_extra_options+=" -DCUDA_NVCC_FLAGS=-arch=sm_35"
+configure_extra_options+=" -DCMAKE_CUDA_ARCHITECTURES=35"

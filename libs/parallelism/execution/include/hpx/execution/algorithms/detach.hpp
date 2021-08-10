@@ -19,6 +19,7 @@
 #include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -38,7 +39,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::intrusive_ptr<operation_state_holder> op_state;
 
                 template <typename Error>
-                    HPX_NORETURN void set_error(Error&&) && noexcept
+                HPX_NORETURN void set_error(Error&&) && noexcept
                 {
                     HPX_ASSERT_MSG(false,
                         "set_error was called on the receiver of detach, "
@@ -54,7 +55,7 @@ namespace hpx { namespace execution { namespace experimental {
                 };
 
                 template <typename... Ts>
-                    void set_value(Ts&&...) && noexcept
+                void set_value(Ts&&...) && noexcept
                 {
                     op_state.reset();
                 }

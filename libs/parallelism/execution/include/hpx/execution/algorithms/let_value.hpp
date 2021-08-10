@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -99,6 +98,48 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename Receiver>
             struct operation_state
             {
+                struct let_value_predecessor_receiver;
+
+                // Type of the operation state returned when connecting the
+                // predecessor sender to the let_value_predecessor_receiver
+                using predecessor_operation_state_type =
+                    std::decay_t<connect_result_t<PredecessorSender&&,
+                        let_value_predecessor_receiver>>;
+
+                // Type of the potential operation states returned when
+                // connecting a sender in successor_sender_types to the receiver
+                // connected to the let_value_sender
+                template <typename Sender>
+                struct successor_operation_state_types_helper
+                {
+                    using type = connect_result_t<Sender, Receiver>;
+                };
+                template <template <typename...> class Tuple,
+                    template <typename...> class Variant>
+                using successor_operation_state_types =
+                    hpx::util::detail::transform_t<
+                        successor_sender_types<Tuple, Variant>,
+                        successor_operation_state_types_helper>;
+
+                // Operation state from connecting predecessor sender to
+                // let_value_predecessor_receiver
+                predecessor_operation_state_type predecessor_op_state;
+
+                using predecessor_ts_type = hpx::util::detail::prepend_t<
+                    predecessor_value_types<hpx::tuple, hpx::variant>,
+                    hpx::monostate>;
+
+                // Potential values returned from the predecessor sender
+                predecessor_ts_type predecessor_ts;
+
+                // Potential operation states returned when connecting a sender
+                // in successor_sender_types to the receiver connected to the
+                // let_value_sender
+                hpx::util::detail::prepend_t<
+                    successor_operation_state_types<hpx::tuple, hpx::variant>,
+                    hpx::monostate>
+                    successor_op_state;
+
                 struct let_value_predecessor_receiver
                 {
                     std::decay_t<Receiver> receiver;
@@ -115,7 +156,7 @@ namespace hpx { namespace execution { namespace experimental {
                     }
 
                     template <typename Error>
-                        void set_error(Error&& error) && noexcept
+                    void set_error(Error&& error) && noexcept
                     {
                         hpx::execution::experimental::set_error(
                             std::move(receiver), std::forward<Error>(error));
@@ -191,8 +232,19 @@ namespace hpx { namespace execution { namespace experimental {
                         }
                     };
 
+                    // This typedef is duplicated from the parent struct. The
+                    // parent typedef is not instantiated early enough for use
+                    // here.
+                    using predecessor_ts_type = hpx::util::detail::prepend_t<
+                        predecessor_value_types<hpx::tuple, hpx::variant>,
+                        hpx::monostate>;
+
                     template <typename... Ts>
-                        void set_value(Ts&&... ts) && noexcept
+                    auto set_value(Ts&&... ts) && noexcept
+                        -> decltype(std::declval<predecessor_ts_type>()
+                                        .template emplace<hpx::tuple<Ts...>>(
+                                            std::forward<Ts>(ts)...),
+                            void())
                     {
                         hpx::detail::try_catch_exception_ptr(
                             [&]() {
@@ -210,45 +262,6 @@ namespace hpx { namespace execution { namespace experimental {
                             });
                     }
                 };
-
-                // Type of the operation state returned when connecting the
-                // predecessor sender to the let_value_predecessor_receiver
-                using predecessor_operation_state_type =
-                    std::decay_t<connect_result_t<PredecessorSender&&,
-                        let_value_predecessor_receiver>>;
-
-                // Type of the potential operation states returned when
-                // connecting a sender in successor_sender_types to the receiver
-                // connected to the let_value_sender
-                template <typename Sender>
-                struct successor_operation_state_types_helper
-                {
-                    using type = connect_result_t<Sender, Receiver>;
-                };
-                template <template <typename...> class Tuple,
-                    template <typename...> class Variant>
-                using successor_operation_state_types =
-                    hpx::util::detail::transform_t<
-                        successor_sender_types<Tuple, Variant>,
-                        successor_operation_state_types_helper>;
-
-                // Operation state from connecting predecessor sender to
-                // let_value_predecessor_receiver
-                predecessor_operation_state_type predecessor_op_state;
-
-                // Potential values returned from the predecessor sender
-                hpx::util::detail::prepend_t<
-                    predecessor_value_types<hpx::tuple, hpx::variant>,
-                    hpx::monostate>
-                    predecessor_ts;
-
-                // Potential operation states returned when connecting a sender
-                // in successor_sender_types to the receiver connected to the
-                // let_value_sender
-                hpx::util::detail::prepend_t<
-                    successor_operation_state_types<hpx::tuple, hpx::variant>,
-                    hpx::monostate>
-                    successor_op_state;
 
                 template <typename PredecessorSender_, typename Receiver_,
                     typename F_>
@@ -309,5 +322,3 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } let_value{};
 }}}    // namespace hpx::execution::experimental
-
-#endif

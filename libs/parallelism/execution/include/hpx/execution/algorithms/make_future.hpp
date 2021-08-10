@@ -46,7 +46,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename U>
-                void set_value(U&& u) && noexcept
+            void set_value(U&& u) && noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() { data->set_value(std::forward<U>(u)); },

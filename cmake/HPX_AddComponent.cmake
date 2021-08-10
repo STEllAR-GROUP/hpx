@@ -240,28 +240,11 @@ function(add_hpx_component name)
     endif()
   endif()
 
-  # Manage files with .cu extension in case When Cuda Clang is used
-  if(HPX_WITH_CUDA_CLANG)
-    foreach(source ${${name}_SOURCES})
-      get_filename_component(extension ${source} EXT)
-      if(${extension} STREQUAL ".cu")
-        set_source_files_properties(${source} PROPERTIES LANGUAGE CXX)
-      endif()
-    endforeach()
-  endif()
-
-  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-    cuda_add_library(
-      ${name}_component ${${name}_lib_linktype} ${exclude_from_all}
-      ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY}
-    )
-  else()
-    add_library(
-      ${name}_component
-      ${${name}_lib_linktype} ${exclude_from_all} ${${name}_SOURCES}
-      ${${name}_HEADERS} ${${name}_AUXILIARY}
-    )
-  endif()
+  add_library(
+    ${name}_component
+    ${${name}_lib_linktype} ${exclude_from_all} ${${name}_SOURCES}
+    ${${name}_HEADERS} ${${name}_AUXILIARY}
+  )
 
   if(NOT ${${name}_HEADER_ROOT} STREQUAL ".")
     target_include_directories(

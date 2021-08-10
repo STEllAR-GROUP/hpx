@@ -10,15 +10,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-
-#include <asio/io_context.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -111,19 +109,6 @@ namespace hpx { namespace threads {
             std::forward<F>(f)}};
     }
 
-    namespace detail {
-        using get_default_pool_type =
-            util::function_nonser<thread_pool_base*()>;
-        HPX_CORE_EXPORT void set_get_default_pool(get_default_pool_type f);
-        HPX_CORE_EXPORT thread_pool_base* get_self_or_default_pool();
-
-        using get_default_timer_service_type =
-            util::function_nonser<asio::io_context*()>;
-        HPX_CORE_EXPORT void set_get_default_timer_service(
-            get_default_timer_service_type f);
-        HPX_CORE_EXPORT asio::io_context* get_default_timer_service();
-    }    // namespace detail
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given data.
     ///
@@ -143,13 +128,13 @@ namespace hpx { namespace threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    inline threads::thread_id_type register_thread(
+    inline threads::thread_id_ref_type register_thread(
         threads::thread_init_data& data, threads::thread_pool_base* pool,
         error_code& ec = throws)
     {
         HPX_ASSERT(pool);
         data.run_now = true;
-        threads::thread_id_type id = threads::invalid_thread_id;
+        threads::thread_id_ref_type id = threads::invalid_thread_id;
         pool->create_thread(data, id, ec);
         return id;
     }
@@ -174,7 +159,7 @@ namespace hpx { namespace threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    inline threads::thread_id_type register_thread(
+    inline threads::thread_id_ref_type register_thread(
         threads::thread_init_data& data, error_code& ec = throws)
     {
         return register_thread(data, detail::get_self_or_default_pool(), ec);
@@ -195,12 +180,12 @@ namespace hpx { namespace threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    inline void register_work(threads::thread_init_data& data,
+    inline thread_id_ref_type register_work(threads::thread_init_data& data,
         threads::thread_pool_base* pool, error_code& ec = throws)
     {
         HPX_ASSERT(pool);
         data.run_now = false;
-        pool->create_work(data, ec);
+        return pool->create_work(data, ec);
     }
 
     /// \brief Create a new work item using the given data on the same thread
@@ -219,10 +204,10 @@ namespace hpx { namespace threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    inline void register_work(
+    inline thread_id_ref_type register_work(
         threads::thread_init_data& data, error_code& ec = throws)
     {
-        register_work(data, detail::get_self_or_default_pool(), ec);
+        return register_work(data, detail::get_self_or_default_pool(), ec);
     }
 }}    // namespace hpx::threads
 

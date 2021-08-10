@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -182,7 +181,7 @@ namespace hpx { namespace execution { namespace experimental {
                     };
 
                     template <typename Error>
-                        void set_error(Error&& error) && noexcept
+                    void set_error(Error&& error) && noexcept
                     {
                         hpx::detail::try_catch_exception_ptr(
                             [&]() {
@@ -212,7 +211,7 @@ namespace hpx { namespace execution { namespace experimental {
                         typename = std::enable_if_t<hpx::is_invocable_v<
                             hpx::execution::experimental::set_value_t,
                             Receiver&&, Ts...>>>
-                        void set_value(Ts&&... ts) && noexcept
+                    void set_value(Ts&&... ts) && noexcept
                     {
                         hpx::execution::experimental::set_value(
                             std::move(receiver), std::forward<Ts>(ts)...);
@@ -318,5 +317,3 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } let_error{};
 }}}    // namespace hpx::execution::experimental
-
-#endif

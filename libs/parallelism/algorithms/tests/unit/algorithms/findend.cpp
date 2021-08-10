@@ -43,9 +43,10 @@ void test_find_end1(IteratorTag)
     iterator index = hpx::find_end(iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
 
-    HPX_TEST(index == iterator(test_index));
+    HPX_TEST(index == test_index);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -69,9 +70,10 @@ void test_find_end1(ExPolicy&& policy, IteratorTag)
     iterator index = hpx::find_end(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
 
-    HPX_TEST(index == iterator(test_index));
+    HPX_TEST(index == test_index);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -93,10 +95,10 @@ void test_find_end1_async(ExPolicy&& p, IteratorTag)
         iterator(std::end(c)), std::begin(h), std::end(h));
     f.wait();
 
-    // create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
 
-    HPX_TEST(f.get() == iterator(test_index));
+    HPX_TEST(f.get() == test_index);
 }
 
 template <typename IteratorTag>
@@ -140,9 +142,10 @@ void test_find_end2(IteratorTag)
     iterator index = hpx::find_end(iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
 
-    base_iterator test_index = std::begin(c) + c.size() - 2;
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
 
-    HPX_TEST(index == iterator(test_index));
+    HPX_TEST(index == test_index);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -168,9 +171,10 @@ void test_find_end2(ExPolicy&& policy, IteratorTag)
     iterator index = hpx::find_end(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
 
-    base_iterator test_index = std::begin(c) + c.size() - 2;
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
 
-    HPX_TEST(index == iterator(test_index));
+    HPX_TEST(index == test_index);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -195,10 +199,10 @@ void test_find_end2_async(ExPolicy&& p, IteratorTag)
         iterator(std::end(c)), std::begin(h), std::end(h));
     f.wait();
 
-    // create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() - 2;
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
 
-    HPX_TEST(f.get() == iterator(test_index));
+    HPX_TEST(f.get() == test_index);
 }
 
 template <typename IteratorTag>
@@ -242,9 +246,10 @@ void test_find_end3(IteratorTag)
     iterator index = hpx::find_end(iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
 
-    base_iterator test_index = std::begin(c);
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
 
-    HPX_TEST(index == iterator(test_index));
+    HPX_TEST(index == test_index);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -270,9 +275,10 @@ void test_find_end3(ExPolicy&& policy, IteratorTag)
     iterator index = hpx::find_end(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
 
-    base_iterator test_index = std::begin(c);
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
 
-    HPX_TEST(index == iterator(test_index));
+    HPX_TEST(index == test_index);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -298,10 +304,10 @@ void test_find_end3_async(ExPolicy&& p, IteratorTag)
         iterator(std::end(c)), std::begin(h), std::end(h));
     f.wait();
 
-    //create iterator at position of value to be found
-    base_iterator test_index = std::begin(c);
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
 
-    HPX_TEST(f.get() == iterator(test_index));
+    HPX_TEST(f.get() == test_index);
 }
 
 template <typename IteratorTag>
@@ -345,9 +351,11 @@ void test_find_end4(IteratorTag)
         iterator(std::end(c)), std::begin(h), std::end(h),
         [](std::size_t v1, std::size_t v2) { return !(v1 != v2); });
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h),
+        [](std::size_t v1, std::size_t v2) { return !(v1 != v2); });
 
-    HPX_TEST(index == iterator(test_index));
+    HPX_TEST(index == test_index);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -372,9 +380,11 @@ void test_find_end4(ExPolicy&& policy, IteratorTag)
         iterator(std::end(c)), std::begin(h), std::end(h),
         [](std::size_t v1, std::size_t v2) { return !(v1 != v2); });
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h),
+        [](std::size_t v1, std::size_t v2) { return !(v1 != v2); });
 
-    HPX_TEST(index == iterator(test_index));
+    HPX_TEST(index == test_index);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -398,10 +408,11 @@ void test_find_end4_async(ExPolicy&& p, IteratorTag)
         [](std::size_t v1, std::size_t v2) { return !(v1 != v2); });
     f.wait();
 
-    //create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h),
+        [](std::size_t v1, std::size_t v2) { return !(v1 != v2); });
 
-    HPX_TEST(f.get() == iterator(test_index));
+    HPX_TEST(f.get() == test_index);
 }
 
 template <typename IteratorTag>

@@ -46,72 +46,72 @@ namespace hpx { namespace execution { namespace experimental {
         // support with_priority property
         friend thread_pool_scheduler tag_dispatch(
             hpx::execution::experimental::with_priority_t,
-            thread_pool_scheduler const& exec,
+            thread_pool_scheduler const& sched,
             hpx::threads::thread_priority priority)
         {
-            auto exec_with_priority = exec;
+            auto exec_with_priority = sched;
             exec_with_priority.priority_ = priority;
             return exec_with_priority;
         }
 
         friend hpx::threads::thread_priority tag_dispatch(
             hpx::execution::experimental::get_priority_t,
-            thread_pool_scheduler const& exec)
+            thread_pool_scheduler const& sched)
         {
-            return exec.priority_;
+            return sched.priority_;
         }
 
         // support with_stacksize property
         friend thread_pool_scheduler tag_dispatch(
             hpx::execution::experimental::with_stacksize_t,
-            thread_pool_scheduler const& exec,
+            thread_pool_scheduler const& sched,
             hpx::threads::thread_stacksize stacksize)
         {
-            auto exec_with_stacksize = exec;
+            auto exec_with_stacksize = sched;
             exec_with_stacksize.stacksize_ = stacksize;
             return exec_with_stacksize;
         }
 
         friend hpx::threads::thread_stacksize tag_dispatch(
             hpx::execution::experimental::get_stacksize_t,
-            thread_pool_scheduler const& exec)
+            thread_pool_scheduler const& sched)
         {
-            return exec.stacksize_;
+            return sched.stacksize_;
         }
 
         // support with_hint property
         friend thread_pool_scheduler tag_dispatch(
             hpx::execution::experimental::with_hint_t,
-            thread_pool_scheduler const& exec,
+            thread_pool_scheduler const& sched,
             hpx::threads::thread_schedule_hint hint)
         {
-            auto exec_with_hint = exec;
+            auto exec_with_hint = sched;
             exec_with_hint.schedulehint_ = hint;
             return exec_with_hint;
         }
 
         friend hpx::threads::thread_schedule_hint tag_dispatch(
             hpx::execution::experimental::get_hint_t,
-            thread_pool_scheduler const& exec)
+            thread_pool_scheduler const& sched)
         {
-            return exec.schedulehint_;
+            return sched.schedulehint_;
         }
 
         // support with_annotation property
         friend constexpr thread_pool_scheduler tag_dispatch(
             hpx::execution::experimental::with_annotation_t,
-            thread_pool_scheduler const& exec, char const* annotation)
+            thread_pool_scheduler const& sched, char const* annotation)
         {
-            auto exec_with_annotation = exec;
+            auto exec_with_annotation = sched;
             exec_with_annotation.annotation_ = annotation;
             return exec_with_annotation;
         }
 
         friend thread_pool_scheduler tag_dispatch(
             hpx::execution::experimental::with_annotation_t,
-            thread_pool_scheduler const& exec, std::string annotation)
+            thread_pool_scheduler const& sched, std::string annotation)
         {
-            auto exec_with_annotation = exec;
+            auto exec_with_annotation = sched;
             exec_with_annotation.annotation_ =
                 hpx::util::detail::store_function_annotation(
                     std::move(annotation));
@@ -121,9 +121,9 @@ namespace hpx { namespace execution { namespace experimental {
         // support get_annotation property
         friend constexpr char const* tag_dispatch(
             hpx::execution::experimental::get_annotation_t,
-            thread_pool_scheduler const& exec) noexcept
+            thread_pool_scheduler const& sched) noexcept
         {
-            return exec.annotation_;
+            return sched.annotation_;
         }
 
         template <typename F>
@@ -142,12 +142,12 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Scheduler, typename R>
         struct operation_state
         {
-            std::decay_t<Scheduler> exec;
+            std::decay_t<Scheduler> sched;
             std::decay_t<R> r;
 
             template <typename Scheduler_, typename R_>
-            operation_state(Scheduler_&& exec, R_&& r)
-              : exec(std::forward<Scheduler_>(exec))
+            operation_state(Scheduler_&& sched, R_&& r)
+              : sched(std::forward<Scheduler_>(sched))
               , r(std::forward<R_>(r))
             {
             }
@@ -161,11 +161,10 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        hpx::execution::experimental::execute(
-                            exec, [r = std::move(r)]() mutable {
-                                hpx::execution::experimental::set_value(
-                                    std::move(r));
-                            });
+                        sched.execute([r = std::move(r)]() mutable {
+                            hpx::execution::experimental::set_value(
+                                std::move(r));
+                        });
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
@@ -177,7 +176,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Scheduler>
         struct sender
         {
-            std::decay_t<Scheduler> exec;
+            std::decay_t<Scheduler> sched;
 
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
@@ -191,13 +190,13 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename R>
             operation_state<Scheduler, R> connect(R&& r) &&
             {
-                return {std::move(exec), std::forward<R>(r)};
+                return {std::move(sched), std::forward<R>(r)};
             }
 
             template <typename R>
             operation_state<Scheduler, R> connect(R&& r) &
             {
-                return {exec, std::forward<R>(r)};
+                return {sched, std::forward<R>(r)};
             }
         };
 

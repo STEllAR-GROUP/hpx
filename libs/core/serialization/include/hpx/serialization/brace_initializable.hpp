@@ -8,9 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) &&                             \
-    defined(HPX_HAVE_CXX17_IF_CONSTEXPR)
-
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/serialization/brace_initializable_fwd.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -174,4 +171,3 @@ namespace hpx { namespace serialization {
         serialize_struct(ar, t, version, hpx::traits::detail::arity<T>());
     }
 }}    // namespace hpx::serialization
-#endif

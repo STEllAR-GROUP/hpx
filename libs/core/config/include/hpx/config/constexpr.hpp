@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/defines.hpp>
 
 /// This macro evaluates to ``constexpr`` if the compiler supports it.
@@ -24,12 +25,15 @@
 /// keyword. Prefer using ``constexpr`` directly instead.
 #define HPX_CONSTEXPR_OR_CONST constexpr
 
-/// This macro evaluates to ``inline constexpr`` if the compiler supports it,
-/// ``constexpr`` otherwise.
-#ifdef HPX_HAVE_CXX17_INLINE_CONSTEXPR_VARIABLE
+/// This macro evaluates to ``inline constexpr``
 #define HPX_INLINE_CONSTEXPR_VARIABLE inline constexpr
+
+/// This macro evaluates to ``inline constexpr`` for host code and
+// ``device static const`` for device code
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+#define HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE HPX_DEVICE static const
 #else
-#define HPX_INLINE_CONSTEXPR_VARIABLE constexpr
+#define HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE HPX_INLINE_CONSTEXPR_VARIABLE
 #endif
 
 /// This macro evaluates to ``static constexpr`` if the compiler supports it,

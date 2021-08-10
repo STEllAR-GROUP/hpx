@@ -32,7 +32,7 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
       include(FetchContent)
       fetchcontent_declare(
         apex
-        GIT_REPOSITORY https://github.com/khuck/xpress-apex.git
+        GIT_REPOSITORY https://github.com/UO-OACISS/apex.git
         GIT_TAG ${HPX_WITH_APEX_TAG}
       )
 

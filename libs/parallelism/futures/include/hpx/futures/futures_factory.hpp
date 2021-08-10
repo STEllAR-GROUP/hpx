@@ -99,7 +99,7 @@ namespace hpx { namespace lcos { namespace local {
 
         protected:
             // run in a separate thread
-            threads::thread_id_type apply(threads::thread_pool_base* pool,
+            threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
                 const char* annotation, launch policy,
                 threads::thread_priority priority,
                 threads::thread_stacksize stacksize,
@@ -111,14 +111,17 @@ namespace hpx { namespace lcos { namespace local {
                 hpx::intrusive_ptr<base_type> this_(this);
                 if (policy == launch::fork)
                 {
+                    schedulehint.mode =
+                        threads::thread_schedule_hint_mode::thread;
+                    schedulehint.hint =
+                        static_cast<std::int16_t>(get_worker_thread_num());
+
                     threads::thread_init_data data(
                         threads::make_thread_function_nullary(
                             util::deferred_call(
                                 &base_type::run_impl, std::move(this_))),
                         util::thread_description(f_, annotation),
-                        threads::thread_priority::boost,
-                        threads::thread_schedule_hint(
-                            static_cast<std::int16_t>(get_worker_thread_num())),
+                        threads::thread_priority::boost, schedulehint,
                         stacksize,
                         threads::thread_schedule_state::pending_do_not_schedule,
                         true);
@@ -133,8 +136,7 @@ namespace hpx { namespace lcos { namespace local {
                     schedulehint, stacksize,
                     threads::thread_schedule_state::pending);
 
-                threads::register_work(data, pool, ec);
-                return threads::invalid_thread_id;
+                return threads::register_work(data, pool, ec);
             }
         };
 
@@ -248,7 +250,7 @@ namespace hpx { namespace lcos { namespace local {
 
         protected:
             // run in a separate thread
-            threads::thread_id_type apply(threads::thread_pool_base* pool,
+            threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
                 const char* annotation, launch policy,
                 threads::thread_priority priority,
                 threads::thread_stacksize stacksize,
@@ -418,6 +420,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}      // namespace hpx::lcos::local
 
 namespace hpx { namespace traits { namespace detail {
+
     template <typename Result, typename F, typename Base, typename Allocator>
     struct shared_state_allocator<
         lcos::local::detail::task_object<Result, F, void, Base>, Allocator>
@@ -437,6 +440,7 @@ namespace hpx { namespace traits { namespace detail {
 }}}    // namespace hpx::traits::detail
 
 namespace hpx { namespace lcos { namespace local {
+
     ///////////////////////////////////////////////////////////////////////////
     // The futures_factory is very similar to a packaged_task except that it
     // allows for the owner to go out of scope before the future becomes ready.
@@ -756,7 +760,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         // asynchronous execution
-        threads::thread_id_type apply(
+        threads::thread_id_ref_type apply(
             const char* annotation = "futures_factory::apply",
             launch policy = launch::async,
             threads::thread_priority priority =
@@ -771,7 +775,7 @@ namespace hpx { namespace lcos { namespace local {
                 annotation, policy, priority, stacksize, schedulehint, ec);
         }
 
-        threads::thread_id_type apply(threads::thread_pool_base* pool,
+        threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
             const char* annotation = "futures_factory::apply",
             launch policy = launch::async,
             threads::thread_priority priority =

@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/config/defines.hpp>
 
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>    // for size_t
@@ -57,5 +56,3 @@ namespace hpx {
 
     using hpx::adl_barrier::get;
 }    // namespace hpx
-
-#endif

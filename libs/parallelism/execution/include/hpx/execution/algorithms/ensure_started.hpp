@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/allocator_support/allocator_deleter.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -21,8 +21,9 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/synchronization/mutex.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -32,6 +33,7 @@
 #include <cstddef>
 #include <exception>
 #include <memory>
+#include <mutex>
 #include <type_traits>
 #include <utility>
 #include <variant>
@@ -98,40 +100,12 @@ namespace hpx { namespace execution { namespace experimental {
             struct shared_state
             {
             private:
-                struct ensure_started_receiver
-                {
-                    hpx::intrusive_ptr<shared_state> state;
-
-                    template <typename Error>
-                        void set_error(Error&& error) && noexcept
-                    {
-                        state->v.template emplace<error_type>(
-                            error_type(std::forward<Error>(error)));
-                        state->set_predecessor_done();
-                        state.reset();
-                    }
-
-                    void set_done() && noexcept
-                    {
-                        state->set_predecessor_done();
-                        state.reset();
-                    };
-
-                    template <typename... Ts>
-                        void set_value(Ts&&... ts) && noexcept
-                    {
-                        state->v.template emplace<value_type>(
-                            hpx::make_tuple<>(std::forward<Ts>(ts)...));
-
-                        state->set_predecessor_done();
-                        state.reset();
-                    }
-                };
+                struct ensure_started_receiver;
 
                 using allocator_type = typename std::allocator_traits<
                     Allocator>::template rebind_alloc<shared_state>;
                 allocator_type alloc;
-                using mutex_type = hpx::util::spinlock;
+                using mutex_type = hpx::lcos::local::spinlock;
                 mutex_type mtx;
                 hpx::util::atomic_count reference_count{0};
                 std::atomic<bool> start_called{false};
@@ -157,6 +131,48 @@ namespace hpx { namespace execution { namespace experimental {
                     hpx::util::unique_function_nonser<void()>;
                 boost::container::small_vector<continuation_type, 1>
                     continuations;
+
+                struct ensure_started_receiver
+                {
+                    hpx::intrusive_ptr<shared_state> state;
+
+                    template <typename Error>
+                    void set_error(Error&& error) && noexcept
+                    {
+                        state->v.template emplace<error_type>(
+                            error_type(std::forward<Error>(error)));
+                        state->set_predecessor_done();
+                        state.reset();
+                    }
+
+                    void set_done() && noexcept
+                    {
+                        state->set_predecessor_done();
+                        state.reset();
+                    };
+
+                    // This typedef is duplicated from the parent struct. The
+                    // parent typedef is not instantiated early enough for use
+                    // here.
+                    using value_type =
+                        typename hpx::execution::experimental::sender_traits<
+                            Sender>::template value_types<hpx::tuple,
+                            std::variant>;
+
+                    template <typename... Ts>
+                    auto set_value(Ts&&... ts) && noexcept -> decltype(
+                        std::declval<std::variant<std::monostate, value_type>>()
+                            .template emplace<value_type>(
+                                hpx::make_tuple<>(std::forward<Ts>(ts)...)),
+                        void())
+                    {
+                        state->v.template emplace<value_type>(
+                            hpx::make_tuple<>(std::forward<Ts>(ts)...));
+
+                        state->set_predecessor_done();
+                        state.reset();
+                    }
+                };
 
             public:
                 template <typename Sender_,
@@ -468,4 +484,3 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } ensure_started{};
 }}}    // namespace hpx::execution::experimental
-#endif

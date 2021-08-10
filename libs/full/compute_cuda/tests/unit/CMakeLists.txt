@@ -7,21 +7,14 @@
 set(tests)
 
 set(tests ${tests} default_executor for_each_compute for_loop_compute)
-set(default_executor_CUDA On)
-set(for_each_compute_CUDA On)
-set(for_loop_compute_CUDA On)
 
-if(HPX_WITH_CUDA_CLANG OR HPX_WITH_HIP)
+# Note: transform_compute is still broken with cuda 11
+if(HPX_WITH_CLANG_CUDA OR HPX_WITH_HIP)
   set(tests ${tests} transform_compute)
-  set(transform_compute_CUDA On)
 endif()
 
 foreach(test ${tests})
-  if(${${test}_CUDA})
-    set(sources ${test}.cu)
-  else()
-    set(sources ${test}.cpp)
-  endif()
+  set(sources ${test}.cu)
 
   source_group("Source Files" FILES ${sources})
 

@@ -5,7 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(NOT HPX_WITH_FETCH_ASIO)
-  find_package(Asio REQUIRED)
+  find_package(Asio 1.12.0 REQUIRED)
 elseif(NOT TARGET Asio::asio AND NOT HPX_FIND_PACKAGE)
   if(FETCHCONTENT_SOURCE_DIR_ASIO)
     hpx_info(

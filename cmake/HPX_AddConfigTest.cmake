@@ -14,7 +14,7 @@ set(HPX_ADDCONFIGTEST_LOADED TRUE)
 include(CheckLibraryExists)
 
 function(add_hpx_config_test variable)
-  set(options FILE EXECUTE)
+  set(options FILE EXECUTE CUDA)
   set(one_value_args SOURCE ROOT CMAKECXXFEATURE)
   set(multi_value_args
       INCLUDE_DIRECTORIES
@@ -32,7 +32,7 @@ function(add_hpx_config_test variable)
   set(_run_msg)
   # Check CMake feature tests if the user didn't override the value of this
   # variable:
-  if(NOT DEFINED ${variable})
+  if(NOT DEFINED ${variable} AND NOT ${variable}_CUDA)
     if(${variable}_CMAKECXXFEATURE)
       # We don't have to run our own feature test if there is a corresponding
       # cmake feature test and cmake reports the feature is supported on this
@@ -61,9 +61,15 @@ function(add_hpx_config_test variable)
         set(test_source "${PROJECT_SOURCE_DIR}/${${variable}_SOURCE}")
       endif()
     else()
-      set(test_source
-          "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc}.cpp"
-      )
+      if(${variable}_CUDA)
+        set(test_source
+            "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc}.cu"
+        )
+      else()
+        set(test_source
+            "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc}.cpp"
+        )
+      endif()
       file(WRITE "${test_source}" "${${variable}_SOURCE}\n")
     endif()
     set(test_binary
@@ -109,12 +115,7 @@ function(add_hpx_config_test variable)
                               ${${variable}_LINK_DIRECTORIES}
     )
 
-    get_property(
-      _base_libraries
-      TARGET hpx_base_libraries
-      PROPERTY INTERFACE_LINK_LIBRARIES
-    )
-    set(CONFIG_TEST_LINK_LIBRARIES ${_base_libraries} ${${variable}_LIBRARIES})
+    set(CONFIG_TEST_LINK_LIBRARIES ${${variable}_LIBRARIES})
 
     set(additional_cmake_flags)
     if(MSVC)
@@ -152,7 +153,11 @@ function(add_hpx_config_test variable)
         set(${variable}_RESULT FALSE)
       endif()
     else()
+      if(HPX_WITH_CUDA)
+        set(cuda_parameters CUDA_STANDARD ${CMAKE_CUDA_STANDARD})
+      endif()
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${additional_cmake_flags}")
+      set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} ${additional_cmake_flags}")
       # cmake-format: off
       try_compile(
         ${variable}_RESULT
@@ -167,6 +172,7 @@ function(add_hpx_config_test variable)
         CXX_STANDARD ${HPX_CXX_STANDARD}
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS FALSE
+        ${cuda_parameters}
         COPY_FILE ${test_binary}
       )
       # cmake-format: on
@@ -369,109 +375,10 @@ function(hpx_check_for_cxx17_filesystem)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx17_fold_expressions)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_FOLD_EXPRESSIONS
-    SOURCE cmake/tests/cxx17_fold_expressions.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_fallthrough_attribute)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_FALLTHROUGH_ATTRIBUTE
-    SOURCE cmake/tests/cxx17_fallthrough_attribute.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_nodiscard_attribute)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_NODISCARD_ATTRIBUTE
-    SOURCE cmake/tests/cxx17_nodiscard_attribute.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx17_hardware_destructive_interference_size)
   add_hpx_config_test(
     HPX_WITH_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE
     SOURCE cmake/tests/cxx17_hardware_destructive_interference_size.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_std_in_place_type_t)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_STD_IN_PLACE_TYPE_T
-    SOURCE cmake/tests/cxx17_std_in_place_type_t.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_maybe_unused)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_MAYBE_UNUSED
-    SOURCE cmake/tests/cxx17_maybe_unused.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_deduction_guides)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_DEDUCTION_GUIDES
-    SOURCE cmake/tests/cxx17_deduction_guides.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_structured_bindings)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_STRUCTURED_BINDINGS
-    SOURCE cmake/tests/cxx17_structured_bindings.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_if_constexpr)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_IF_CONSTEXPR
-    SOURCE cmake/tests/cxx17_if_constexpr.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_inline_constexpr_variable)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_INLINE_CONSTEXPR_VALUE
-    SOURCE cmake/tests/cxx17_inline_constexpr_variable.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_noexcept_functions_as_nontype_template_arguments)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS
-    SOURCE cmake/tests/cxx17_noexcept_function.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx17_std_variant)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_STD_VARIANT
-    SOURCE cmake/tests/cxx17_std_variant.cpp
     FILE ${ARGN}
   )
 endfunction()
@@ -504,15 +411,6 @@ function(hpx_check_for_cxx17_shared_ptr_array)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx17_std_nontype_template_parameter_auto)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_NONTYPE_TEMPLATE_PARAMETER_AUTO
-    SOURCE cmake/tests/cxx17_std_nontype_template_parameter_auto.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx17_copy_elision)
   add_hpx_config_test(
     HPX_WITH_CXX17_COPY_ELISION
@@ -535,6 +433,15 @@ function(hpx_check_for_cxx20_lambda_capture)
   add_hpx_config_test(
     HPX_WITH_CXX20_LAMBDA_CAPTURE
     SOURCE cmake/tests/cxx20_lambda_capture.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx20_perfect_pack_capture)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_PERFECT_PACK_CAPTURE
+    SOURCE cmake/tests/cxx20_perfect_pack_capture.cpp
     FILE ${ARGN}
   )
 endfunction()
@@ -612,10 +519,28 @@ function(hpx_check_for_builtin_make_integer_seq)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_builtin_make_integer_seq_cuda)
+  add_hpx_config_test(
+    HPX_WITH_BUILTIN_MAKE_INTEGER_SEQ_CUDA
+    SOURCE cmake/tests/builtin_make_integer_seq.cu CUDA
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_builtin_type_pack_element)
   add_hpx_config_test(
     HPX_WITH_BUILTIN_TYPE_PACK_ELEMENT
     SOURCE cmake/tests/builtin_type_pack_element.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_builtin_type_pack_element_cuda)
+  add_hpx_config_test(
+    HPX_WITH_BUILTIN_TYPE_PACK_ELEMENT_CUDA
+    SOURCE cmake/tests/builtin_type_pack_element.cu CUDA
     FILE ${ARGN}
   )
 endfunction()

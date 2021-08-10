@@ -243,15 +243,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // copy
     namespace detail {
 
+        template <typename ExPolicy>
         struct copy_iteration
         {
+            using execution_policy_type = std::decay_t<ExPolicy>;
+
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
                 Iter part_begin, std::size_t part_size, std::size_t) const
             {
                 using hpx::get;
                 auto iters = part_begin.get_iterator_tuple();
-                util::copy_n(get<0>(iters), part_size, get<1>(iters));
+                util::copy_n<execution_policy_type>(
+                    get<0>(iters), part_size, get<1>(iters));
             }
         };
 
@@ -284,7 +288,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             sequential(ExPolicy, InIter first, Sent last, OutIter dest)
             {
                 util::in_out_result<InIter, OutIter> result =
-                    util::copy_n(first, detail::distance(first, last), dest);
+                    util::copy_n<ExPolicy>(
+                        first, detail::distance(first, last), dest);
                 util::copy_synchronize(first, dest);
                 return result;
             }
@@ -314,7 +319,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::foreach_partitioner<ExPolicy>::call(
                         std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, dest),
-                        detail::distance(first, last), copy_iteration(),
+                        detail::distance(first, last),
+                        copy_iteration<ExPolicy>(),
                         [](zip_iterator&& last) -> zip_iterator {
                             using hpx::get;
                             auto iters = last.get_iterator_tuple();
@@ -393,7 +399,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, InIter first, std::size_t count, OutIter dest)
             {
                 util::in_out_result<InIter, OutIter> result =
-                    util::copy_n(first, count, dest);
+                    util::copy_n<ExPolicy>(first, count, dest);
                 util::copy_synchronize(first, dest);
                 return result;
             }
@@ -416,7 +422,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             using hpx::get;
 
                             auto iters = part_begin.get_iterator_tuple();
-                            util::copy_n(
+                            util::copy_n<ExPolicy>(
                                 get<0>(iters), part_size, get<1>(iters));
                         },
                         [](zip_iterator&& last) -> zip_iterator {

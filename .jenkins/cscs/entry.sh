@@ -61,12 +61,9 @@ if [[ -n "${ghprbPullId:-}" ]]; then
     # Get the CDash dashboard build id
     cdash_build_id="$(cat jenkins-hpx-${configuration_name}-cdash-build-id.txt)"
 
-    # Extract actual token from GITHUB_TOKEN (in the form "username:token")
-    github_token=$(echo ${GITHUB_TOKEN} | cut -f2 -d':')
-
     # Set GitHub status with CDash url
     .jenkins/common/set_github_status.sh \
-        "${github_token}" \
+        "${GITHUB_TOKEN}" \
         "${github_commit_repo}" \
         "${ghprbActualCommit}" \
         "${github_commit_status}" \

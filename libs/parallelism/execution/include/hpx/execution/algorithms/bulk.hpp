@@ -9,6 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/datastructures/variant.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/transform.hpp>
@@ -16,10 +18,7 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>
-#include <hpx/iterator_support/counting_iterator.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <exception>
@@ -31,52 +30,6 @@ namespace hpx { namespace execution { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        template <typename Receiver, typename Shape, typename F>
-        struct bulk_receiver
-        {
-            std::decay_t<Receiver> receiver;
-            std::decay_t<Shape> shape;
-            std::decay_t<F> f;
-
-            template <typename Receiver_, typename Shape_, typename F_>
-            bulk_receiver(Receiver_&& receiver, Shape_&& shape, F_&& f)
-              : receiver(std::forward<Receiver_>(receiver))
-              , shape(std::forward<Shape_>(shape))
-              , f(std::forward<F_>(f))
-            {
-            }
-
-            template <typename E>
-                void set_error(E&& e) && noexcept
-            {
-                hpx::execution::experimental::set_error(
-                    std::move(receiver), std::forward<E>(e));
-            }
-
-            void set_done() && noexcept
-            {
-                hpx::execution::experimental::set_done(std::move(receiver));
-            }
-
-            template <typename... Ts>
-                void set_value(Ts&&... ts) && noexcept
-            {
-                hpx::detail::try_catch_exception_ptr(
-                    [&]() {
-                        for (auto const& s : shape)
-                        {
-                            HPX_INVOKE(f, s, ts...);
-                        }
-                        hpx::execution::experimental::set_value(
-                            std::move(receiver), std::forward<Ts>(ts)...);
-                    },
-                    [&](std::exception_ptr ep) {
-                        hpx::execution::experimental::set_error(
-                            std::move(receiver), std::move(ep));
-                    });
-            }
-        };
-
         template <typename Sender, typename Shape, typename F>
         struct bulk_sender
         {
@@ -115,21 +68,63 @@ namespace hpx { namespace execution { namespace experimental {
                     bulk_receiver<Receiver, Shape, F>(
                         std::forward<Receiver>(receiver), shape, f));
             }
+
+            template <typename Receiver, typename Shape_, typename F_>
+            struct bulk_receiver
+            {
+                std::decay_t<Receiver> receiver;
+                std::decay_t<Shape_> shape;
+                std::decay_t<F_> f;
+
+                template <typename Receiver_, typename Shape__, typename F__>
+                bulk_receiver(Receiver_&& receiver, Shape__&& shape, F__&& f)
+                  : receiver(std::forward<Receiver_>(receiver))
+                  , shape(std::forward<Shape__>(shape))
+                  , f(std::forward<F__>(f))
+                {
+                }
+
+                template <typename E>
+                void set_error(E&& e) && noexcept
+                {
+                    hpx::execution::experimental::set_error(
+                        std::move(receiver), std::forward<E>(e));
+                }
+
+                void set_done() && noexcept
+                {
+                    hpx::execution::experimental::set_done(std::move(receiver));
+                }
+
+                // The typedef is duplicated from parent struct as the parent one is
+                // not instantiated early enough to use it here.
+                using value_type =
+                    typename hpx::execution::experimental::sender_traits<
+                        Sender>::template value_types<hpx::tuple, hpx::variant>;
+
+                template <typename... Ts>
+                auto set_value(Ts&&... ts) && noexcept -> decltype(
+                    std::declval<hpx::variant<hpx::monostate, value_type>>()
+                        .template emplace<value_type>(
+                            hpx::make_tuple<>(std::forward<Ts>(ts)...)),
+                    void())
+                {
+                    hpx::detail::try_catch_exception_ptr(
+                        [&]() {
+                            for (auto const& s : shape)
+                            {
+                                HPX_INVOKE(f, s, ts...);
+                            }
+                            hpx::execution::experimental::set_value(
+                                std::move(receiver), std::forward<Ts>(ts)...);
+                        },
+                        [&](std::exception_ptr ep) {
+                            hpx::execution::experimental::set_error(
+                                std::move(receiver), std::move(ep));
+                        });
+                }
+            };
         };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Incrementable>
-        using counting_shape_type = hpx::util::iterator_range<
-            hpx::util::counting_iterator<Incrementable>>;
-
-        template <typename Incrementable>
-        HPX_HOST_DEVICE inline counting_shape_type<Incrementable>
-        make_counting_shape(Incrementable n)
-        {
-            return hpx::util::make_iterator_range(
-                hpx::util::make_counting_iterator(Incrementable(0)),
-                hpx::util::make_counting_iterator(n));
-        }
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -148,9 +143,9 @@ namespace hpx { namespace execution { namespace experimental {
             bulk_t, Sender&& sender, Shape const& shape, F&& f)
         {
             return detail::bulk_sender<Sender,
-                detail::counting_shape_type<Shape>, F>{
+                hpx::util::counting_shape_type<Shape>, F>{
                 std::forward<Sender>(sender),
-                detail::make_counting_shape(shape), std::forward<F>(f)};
+                hpx::util::make_counting_shape(shape), std::forward<F>(f)};
         }
 
         // clang-format off

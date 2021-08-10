@@ -14,7 +14,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 # Overrides must go before the project() statement, otherwise they are ignored.
 
@@ -58,10 +58,10 @@ endif()
 # Build all of HPX
 # ##############################################################################
 set(HPX_VERSION_MAJOR 1)
-set(HPX_VERSION_MINOR 7)
+set(HPX_VERSION_MINOR 8)
 set(HPX_VERSION_SUBMINOR 0)
 set(HPX_VERSION_DATE 20210714)
-set(HPX_VERSION_TAG "")
+set(HPX_VERSION_TAG "-trunk")
 
 set(HPX_VERSION
     "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}"
@@ -82,7 +82,7 @@ include(GNUInstallDirs)
 include(HPX_Utils)
 
 # explicitly set certain policies
-cmake_policy(VERSION 3.17)
+cmake_policy(VERSION 3.18)
 hpx_set_cmake_policy(CMP0042 NEW)
 hpx_set_cmake_policy(CMP0060 NEW)
 hpx_set_cmake_policy(CMP0074 NEW)
@@ -322,69 +322,95 @@ hpx_option(
 if(HPX_WITH_PRECOMPILED_HEADERS)
   set(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL ON)
 
+  set(system_precompiled_headers
+      <algorithm>
+      <array>
+      <atomic>
+      <bitset>
+      <cassert>
+      <cctype>
+      <cerrno>
+      <chrono>
+      <climits>
+      <cmath>
+      <complex>
+      <condition_variable>
+      <cstddef>
+      <cstdint>
+      <cstdio>
+      <cstdlib>
+      <cstring>
+      <ctime>
+      <deque>
+      <exception>
+      <execution>
+      <forward_list>
+      <fstream>
+      <functional>
+      <iomanip>
+      <ios>
+      <iosfwd>
+      <iostream>
+      <iterator>
+      <limits>
+      <list>
+      <locale>
+      <map>
+      <memory>
+      <mutex>
+      <new>
+      <numeric>
+      <ostream>
+      <random>
+      <regex>
+      <set>
+      <shared_mutex>
+      <sstream>
+      <stack>
+      <stdexcept>
+      <string>
+      <system_error>
+      <thread>
+      <tuple>
+      <type_traits>
+      <typeinfo>
+      <unordered_map>
+      <unordered_set>
+      <utility>
+      <variant>
+      <vector>
+      <hwloc.h>
+      <asio/basic_waitable_timer.hpp>
+      <asio/io_context.hpp>
+      <asio/ip/tcp.hpp>
+      <boost/config.hpp>
+      <boost/container/small_vector.hpp>
+      <boost/fusion/include/vector.hpp>
+      <boost/intrusive/slist.hpp>
+      <boost/lockfree/queue.hpp>
+      <boost/optional.hpp>
+      <boost/spirit/home/x3.hpp>
+      <boost/tokenizer.hpp>
+      <boost/utility/string_ref.hpp>
+  )
+
+  if(HPX_WITH_CXX17_FILESYSTEM)
+    list(APPEND system_precompiled_headers <filesystem>)
+  endif()
+
+  set(system_precompiled_headers_dependencies
+      hpx_dependencies_boost hpx_private_flags hpx_public_flags
+      ASIO::standalone_asio
+  )
+
   add_library(hpx_precompiled_headers OBJECT libs/src/dummy.cpp)
   target_link_libraries(
-    hpx_precompiled_headers PRIVATE hpx_public_flags hpx_private_flags
-                                    hpx_base_libraries
+    hpx_precompiled_headers
+    PRIVATE hpx_public_flags hpx_private_flags hpx_base_libraries
+            ${system_precompiled_headers_dependencies}
   )
   target_precompile_headers(
-    hpx_precompiled_headers
-    PRIVATE
-    <algorithm>
-    <array>
-    <atomic>
-    <bitset>
-    <cassert>
-    <cctype>
-    <cerrno>
-    <chrono>
-    <climits>
-    <cmath>
-    <complex>
-    <condition_variable>
-    <cstddef>
-    <cstdint>
-    <cstdio>
-    <cstdlib>
-    <cstring>
-    <ctime>
-    <deque>
-    <exception>
-    <forward_list>
-    <fstream>
-    <functional>
-    <iomanip>
-    <ios>
-    <iosfwd>
-    <iostream>
-    <iterator>
-    <limits>
-    <list>
-    <locale>
-    <map>
-    <memory>
-    <mutex>
-    <new>
-    <numeric>
-    <ostream>
-    <random>
-    <regex>
-    <set>
-    <shared_mutex>
-    <sstream>
-    <stack>
-    <stdexcept>
-    <string>
-    <system_error>
-    <thread>
-    <tuple>
-    <type_traits>
-    <typeinfo>
-    <unordered_map>
-    <unordered_set>
-    <utility>
-    <variant>
-    <vector>
+    hpx_precompiled_headers PRIVATE ${system_precompiled_headers}
   )
 
   set_target_properties(hpx_precompiled_headers PROPERTIES FOLDER "Core")
@@ -579,7 +605,7 @@ hpx_option(
 # ##############################################################################
 # To avoid writing these strings out in multiple places, use vars to hold them
 set(CUDA_OPTION_STRING "Enable HPX_WITH_ASYNC_CUDA (CUDA or HIP futures) and\
- HPX_WITH_CUDA_COMPUTE (CUDA/HIP enabled parallel algorithms) (default: OFF)"
+ HPX_WITH_COMPUTE_CUDA (CUDA/HIP enabled parallel algorithms) (default: OFF)"
 )
 set(ASYNC_CUDA_STRING
     "Enable HPX CUDA/HIP compute capability (parallel algorithms) module\
@@ -595,11 +621,11 @@ set(HIP_OPTION_STRING "Enable compilation with HIPCC (default: OFF)")
 hpx_option(HPX_WITH_CUDA BOOL "${CUDA_OPTION_STRING}" OFF ADVANCED)
 
 # Those two will be renamed replacing CUDA with GPU
-hpx_option(HPX_WITH_CUDA_COMPUTE BOOL "${CUDA_COMPUTE_STRING}" ON ADVANCED)
+hpx_option(HPX_WITH_COMPUTE_CUDA BOOL "${CUDA_COMPUTE_STRING}" ON ADVANCED)
 hpx_option(HPX_WITH_ASYNC_CUDA BOOL "${ASYNC_CUDA_STRING}" ON ADVANCED)
 
-# HPX_WITH_CUDA_COMPUTE requires HPX_WITH_ASYNC_CUDA
-if(HPX_WITH_CUDA_COMPUTE)
+# HPX_WITH_COMPUTE_CUDA requires HPX_WITH_ASYNC_CUDA
+if(HPX_WITH_COMPUTE_CUDA)
   set(HPX_WITH_ASYNC_CUDA
       ON
       CACHE BOOL "${HPX_WITH_ASYNC_CUDA}" FORCE
@@ -621,11 +647,6 @@ if(HPX_WITH_CUDA AND HPX_WITH_HIP)
  Note: HPX_WITH_HIP is automatically enabled when compiling with hipcc."
   )
 endif()
-
-hpx_option(
-  HPX_WITH_CUDA_CLANG BOOL "Use clang to compile CUDA code (default: OFF)" OFF
-  ADVANCED
-)
 
 # ##############################################################################
 # pkgconfig file generation
@@ -1682,6 +1703,9 @@ hpx_option(
 # ##############################################################################
 # C++ feature tests
 # ##############################################################################
+# Need to include the CUDA setup before the config test to enable the CUDA
+# language
+include(HPX_SetupCUDA)
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
 
@@ -2176,8 +2200,6 @@ include(HPX_SetupMPI) # must come before APEX
 
 # Setup packages and subprojects
 include(HPX_SetupHIP)
-include(HPX_SetupCUDA) # CUDA needs to come before Apex, to have
-                       # cuda_add_library available
 include(HPX_SetupApex)
 include(HPX_SetupPapi)
 include(HPX_SetupGooglePerfTools)
