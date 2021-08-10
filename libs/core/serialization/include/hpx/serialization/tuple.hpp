@@ -68,23 +68,27 @@ namespace hpx { namespace util { namespace detail {
         hpx::util::index_pack<Is...>, Ts...>
     {
         template <typename T>
+        static void load_element_helper(std::true_type, Archive& ar, T& t)
+        {
+            std::unique_ptr<T> data(
+                serialization::detail::constructor_selector_ptr<T>::create(ar));
+            t = std::move(*data);
+        }
+
+        template <typename T>
+        static void load_element_helper(std::false_type, Archive& ar, T& t)
+        {
+            t = serialization::detail::constructor_selector<T>::create(ar);
+        }
+
+        template <typename T>
         static void load_element(Archive& ar, T& t)
         {
             using is_polymorphic = std::integral_constant<bool,
                 hpx::traits::is_intrusive_polymorphic_v<T> ||
                     hpx::traits::is_nonintrusive_polymorphic_v<T>>;
 
-            if constexpr (is_polymorphic::value)
-            {
-                std::unique_ptr<T> data(
-                    serialization::detail::constructor_selector_ptr<T>::create(
-                        ar));
-                t = std::move(*data);
-            }
-            else
-            {
-                t = serialization::detail::constructor_selector<T>::create(ar);
-            }
+            load_element_helper(is_polymorphic{}, ar, t);
         }
 
         static void call(Archive& ar, hpx::tuple<Ts...>& t, unsigned int)
@@ -100,14 +104,24 @@ namespace hpx { namespace util { namespace detail {
         hpx::util::index_pack<Is...>, Ts...>
     {
         template <typename T>
+        static void save_element_helper(std::true_type, Archive& ar, T& t)
+        {
+            using serialization::detail::save_construct_data;
+            save_construct_data(ar, &t, 0);
+
+            ar << t;
+        }
+
+        template <typename T>
+        static void save_element_helper(std::false_type, Archive& ar, T& t)
+        {
+            ar << t;
+        }
+
+        template <typename T>
         static void save_element(Archive& ar, T& t)
         {
-            if constexpr (!std::is_default_constructible<T>::value)
-            {
-                using serialization::detail::save_construct_data;
-                save_construct_data(ar, &t, 0);
-            }
-            ar << t;
+            save_element_helper(std::is_default_constructible<T>{}, ar, t);
         }
 
         static void call(Archive& ar, hpx::tuple<Ts...> const& t, unsigned int)
