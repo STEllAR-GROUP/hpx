@@ -82,7 +82,7 @@ void test_rotate_sent(ExPolicy policy, IteratorTag)
             ++count;
             return v1 == v2;
         }));
-    HPX_TEST_EQ(count, d1.size() - 1）;
+    HPX_TEST_EQ(count, d1.size() - 1);
 }
 
 //add ranges test w/o ExPolicy
@@ -139,13 +139,13 @@ void test_rotate(ExPolicy policy, IteratorTag)
 
     hpx::ranges::rotate(policy, c, mid);
 
-    base_iterator mid1 = std::begin(d1);
+    auto mid1 = std::begin(d1);
     std::advance(mid1, mid_pos);
     std::rotate(std::begin(d1), mid1, std::end(d1));
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c.base()), std::end(c.base()),
-        std::begin(d1), [&count](std::size_t v1, std::size_t v2) -> bool {
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d1),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
@@ -160,10 +160,9 @@ void test_rotate_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d1;
 
     std::iota(std::begin(c), std::end(c), std::rand());
-    std::copy(std::begin(c), std::end(c), std::back_inserter(d1))
+    std::copy(std::begin(c), std::end(c), std::back_inserter(d1));
 
     std::size_t mid_pos = std::rand() % c.size();    //-V104
-
     auto mid = std::begin(c);
     std::advance(mid, mid_pos);
 
@@ -175,8 +174,8 @@ void test_rotate_async(ExPolicy p, IteratorTag)
     std::rotate(std::begin(d1), mid1, std::end(d1));
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c), std::end(c),
-        std::begin(d1), [&count](std::size_t v1, std::size_t v2) -> bool {
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d1),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
