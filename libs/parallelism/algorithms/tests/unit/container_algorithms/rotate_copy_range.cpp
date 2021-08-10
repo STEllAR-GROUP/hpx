@@ -28,7 +28,7 @@ void test_rotate_copy_sent(IteratorTag)
     std::vector<std::size_t> d1(c.size());
     std::vector<std::size_t> d2(c.size());    //-V656
 
-    std::iota(std::begin(c.base()), std::end(c.base()), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     std::size_t mid_pos = std::rand() % c.size();
 
@@ -38,7 +38,7 @@ void test_rotate_copy_sent(IteratorTag)
     hpx::ranges::rotate_copy(std::begin(c), mid,
         sentinel<std::size_t>{*(std::end(c) - 1)}), std::begin(d1));
 
-    auto mid_base = std::begin(c.base());
+    auto mid_base = std::begin(c);
     std::advance(mid_base, mid_pos);
 
     std::rotate_copy(std::begin(c), mid_base, std::end(c) - 1, std::begin(d2));
@@ -60,7 +60,7 @@ void test_rotate_copy_sent(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d1(c.size());
     std::vector<std::size_t> d2(c.size());    //-V656
 
-    std::iota(std::begin(c.base()), std::end(c.base()), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     std::size_t mid_pos = std::rand() % c.size();
 
@@ -70,7 +70,7 @@ void test_rotate_copy_sent(ExPolicy policy, IteratorTag)
     hpx::ranges::rotate_copy(policy, std::begin(c), mid,
         sentinel<std::size_t>{*(std::end(c) - 1)}), std::begin(d1));
 
-    auto mid_base = std::begin(c.base());
+    auto mid_base = std::begin(c);
     std::advance(mid_base, mid_pos);
 
     std::rotate_copy(std::begin(c), mid_base, std::end(c) - 1, std::begin(d2));
@@ -134,7 +134,7 @@ void test_rotate_copy(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d1(c.size());
     std::vector<std::size_t> d2(c.size());    //-V656
 
-    std::iota(std::begin(c.base()), std::end(c.base()), std::rand());
+    std::iota(std::begin(c), std::end(c), std::rand());
 
     std::size_t mid_pos = std::rand() % c.size();
 
@@ -175,7 +175,7 @@ void test_rotate_copy_async(ExPolicy p, IteratorTag)
     auto f = hpx::ranges::rotate_copy(p, c, mid, std::begin(d1));
     f.wait();
 
-    auto mid_base = std::begin(c.base());
+    auto mid_base = std::begin(c);
     std::advance(mid_base, mid_pos);
 
     std::rotate_copy(std::begin(c), mid_base, std::end(c), std::begin(d2));
