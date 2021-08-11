@@ -528,7 +528,11 @@ namespace hpx { namespace ranges {
         tag_fallback_dispatch(hpx::ranges::rotate_t, ExPolicy&& policy,
             Rng&& rng, typename hpx::traits::range_iterator<Rng>::type middle)
         {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            typedef std::integral_constant<bool,
+                hpx::is_sequenced_execution_policy<ExPolicy>::value ||
+                    !hpx::traits::is_bidirectional_iterator<
+                        typename hpx::traits::range_iterator<Rng>::type>::value>
+                is_seq;
 
             return hpx::parallel::util::get_subrange<
                 typename hpx::traits::range_iterator<Rng>::type,
@@ -634,10 +638,17 @@ namespace hpx { namespace ranges {
             Rng&& rng, typename hpx::traits::range_iterator<Rng>::type middle,
             OutIter dest_first)
         {
+            typedef std::integral_constant<bool,
+                hpx::is_sequenced_execution_policy<ExPolicy>::value ||
+                    !hpx::traits::is_bidirectional_iterator<
+                        typename hpx::traits::range_iterator<Rng>::type>::value>
+                is_seq;
+
             return hpx::parallel::v1::detail::rotate_copy<rotate_copy_result<
                 typename hpx::traits::range_iterator<Rng>::type, OutIter>>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                    middle, hpx::util::end(rng), dest_first);
+                .call2(std::forward<ExPolicy>(policy), is_seq(),
+                    hpx::util::begin(rng), middle, hpx::util::end(rng),
+                    dest_first);
         }
     } rotate_copy{};
 
