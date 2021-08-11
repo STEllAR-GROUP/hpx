@@ -36,7 +36,7 @@ void test_rotate_copy_sent(IteratorTag)
     std::advance(mid, mid_pos);
 
     hpx::ranges::rotate_copy(std::begin(c), mid,
-        sentinel<std::size_t>{*(std::end(c) - 1)}), std::begin(d1));
+        sentinel<std::size_t>{*(std::end(c) - 1)}, std::begin(d1));
 
     auto mid_base = std::begin(c);
     std::advance(mid_base, mid_pos);
@@ -68,7 +68,7 @@ void test_rotate_copy_sent(ExPolicy policy, IteratorTag)
     std::advance(mid, mid_pos);
 
     hpx::ranges::rotate_copy(policy, std::begin(c), mid,
-        sentinel<std::size_t>{*(std::end(c) - 1)}), std::begin(d1));
+        sentinel<std::size_t>{*(std::end(c) - 1)}, std::begin(d1));
 
     auto mid_base = std::begin(c);
     std::advance(mid_base, mid_pos);
