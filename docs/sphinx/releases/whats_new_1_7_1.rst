@@ -9,7 +9,7 @@
 .. _hpx_1_7_1:
 
 ===========================
-|hpx| V1.7.1 (Aug 11, 2021)
+|hpx| V1.7.1 (Aug 12, 2021)
 ===========================
 
 This is a bugfix release with a few minor fixes.
