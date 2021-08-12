@@ -49,6 +49,7 @@
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
 #include <hpx/threading/thread.hpp>
+#include <hpx/threading_base/detail/get_default_timer_service.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
@@ -869,7 +870,7 @@ namespace hpx {
                 case runtime_mode::local:
                 {
                     LPROGRESS_ << "creating local runtime";
-                    rt.reset(new hpx::runtime(cmdline.rtcfg_));
+                    rt.reset(new hpx::runtime(cmdline.rtcfg_, true));
                     break;
                 }
                 default:

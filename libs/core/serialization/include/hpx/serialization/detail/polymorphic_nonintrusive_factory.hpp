@@ -64,7 +64,7 @@ namespace hpx { namespace serialization { namespace detail {
     };
 
     template <typename T>
-    class constructor_selector
+    class constructor_selector_ptr
     {
     public:
         static T* create(input_archive& ar)
@@ -198,7 +198,7 @@ namespace hpx { namespace serialization { namespace detail {
         // this function is needed for pointer type serialization
         static void* create(input_archive& ar)
         {
-            return constructor_selector<Derived>::create(ar);
+            return constructor_selector_ptr<Derived>::create(ar);
         }
 
         register_class()
@@ -296,7 +296,7 @@ namespace hpx { namespace serialization { namespace detail {
 #define HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(Class, Func)                 \
     namespace hpx { namespace serialization { namespace detail {               \
                 template <>                                                    \
-                class constructor_selector<HPX_PP_STRIP_PARENS(Class)>         \
+                class constructor_selector_ptr<HPX_PP_STRIP_PARENS(Class)>     \
                 {                                                              \
                 public:                                                        \
                     static Class* create(input_archive& ar)                    \
@@ -312,7 +312,7 @@ namespace hpx { namespace serialization { namespace detail {
     Parameters, Template, Func)                                                \
     namespace hpx { namespace serialization { namespace detail {               \
                 HPX_PP_STRIP_PARENS(Parameters)                                \
-                class constructor_selector<HPX_PP_STRIP_PARENS(Template)>      \
+                class constructor_selector_ptr<HPX_PP_STRIP_PARENS(Template)>  \
                 {                                                              \
                 public:                                                        \
                     static HPX_PP_STRIP_PARENS(Template) *                     \

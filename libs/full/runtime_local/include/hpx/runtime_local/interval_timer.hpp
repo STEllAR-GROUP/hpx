@@ -83,11 +83,13 @@ namespace hpx { namespace util { namespace detail {
         mutable mutex_type mtx_;
         util::function_nonser<bool()> f_;    ///< function to call
         util::function_nonser<void()>
-            on_term_;                   ///< function to call on termination
-        std::int64_t microsecs_;        ///< time interval
-        threads::thread_id_type id_;    ///< id of currently scheduled thread
-        threads::thread_id_type timerid_;    ///< id of the timer thread for the
-                                             ///< currently scheduled thread
+            on_term_;               ///< function to call on termination
+        std::int64_t microsecs_;    ///< time interval
+        threads::thread_id_ref_type
+            id_;    ///< id of currently scheduled thread
+        threads::thread_id_ref_type
+            timerid_;                ///< id of the timer thread for the
+                                     ///< currently scheduled thread
         std::string description_;    ///< description of this interval timer
 
         bool pre_shutdown_;    ///< execute termination during pre-shutdown

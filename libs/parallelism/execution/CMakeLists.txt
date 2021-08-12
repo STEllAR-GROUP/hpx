@@ -14,6 +14,7 @@ set(execution_headers
     hpx/execution/algorithms/detail/predicates.hpp
     hpx/execution/algorithms/detail/single_result.hpp
     hpx/execution/algorithms/ensure_started.hpp
+    hpx/execution/algorithms/execute.hpp
     hpx/execution/algorithms/just.hpp
     hpx/execution/algorithms/just_on.hpp
     hpx/execution/algorithms/keep_future.hpp

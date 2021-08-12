@@ -33,6 +33,7 @@ using hpx::lcos::future;
 using hpx::this_thread::suspend;
 using hpx::threads::set_thread_state;
 using hpx::threads::thread_data;
+using hpx::threads::thread_id_ref_type;
 using hpx::threads::thread_id_type;
 
 using hpx::find_here;
@@ -183,12 +184,13 @@ int hpx_main(variables_map& vm)
             hpx::threads::make_thread_function_nullary(
                 hpx::util::deferred_call(&test_dummy_thread, futures)),
             "test_dummy_thread");
-        thread_id_type thread = register_thread(data);
+        thread_id_ref_type thread = register_thread(data);
 
         tree_boot(futures, grain_size, prefix,
-            reinterpret_cast<std::uint64_t>(thread.get()));
+            reinterpret_cast<std::uint64_t>(thread.get().get()));
 
-        set_thread_state(thread, hpx::threads::thread_schedule_state::pending,
+        set_thread_state(thread.noref(),
+            hpx::threads::thread_schedule_state::pending,
             hpx::threads::thread_restart_state::terminate);
     }
 

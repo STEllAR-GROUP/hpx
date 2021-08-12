@@ -178,6 +178,7 @@ namespace hpx { namespace util {
 
         backtrace bt(frames_no);
 
+        // avoid infinite recursion on handling errors
         auto* self = threads::get_self_ptr();
         if (nullptr == self ||
             self->get_thread_id() == threads::invalid_thread_id)
@@ -189,15 +190,16 @@ namespace hpx { namespace util {
             [&bt]() { return bt.trace(); });
 
         error_code ec(lightweight);
-        threads::thread_id_type tid = p.apply("hpx::util::trace_on_new_stack",
-            launch::fork, threads::thread_priority::default_,
-            threads::thread_stacksize::medium, threads::thread_schedule_hint(),
-            ec);
+        threads::thread_id_ref_type tid =
+            p.apply("hpx::util::trace_on_new_stack", launch::fork,
+                threads::thread_priority::default_,
+                threads::thread_stacksize::medium,
+                threads::thread_schedule_hint(), ec);
         if (ec)
             return "<couldn't retrieve stack backtrace>";
 
         // make sure this thread is executed last
-        hpx::this_thread::yield_to(thread::id(std::move(tid)));
+        hpx::this_thread::yield_to(thread::id(tid));
 
         return p.get_future().get(ec);
 #else

@@ -21,10 +21,10 @@ void test_for_each_n()
     using namespace hpx::execution;
 
     test_for_each_n(simd, IteratorTag());
-    test_for_each_n(simdpar, IteratorTag());
+    test_for_each_n(par_simd, IteratorTag());
 
     test_for_each_n_async(simd(task), IteratorTag());
-    test_for_each_n_async(simdpar(task), IteratorTag());
+    test_for_each_n_async(par_simd(task), IteratorTag());
 }
 
 void for_each_n_test()

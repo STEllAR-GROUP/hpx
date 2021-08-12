@@ -19,7 +19,7 @@ export CXX=${GCC_ROOT}/bin/g++
 export CC=${GCC_ROOT}/bin/gcc
 
 module load daint-mc
-spack load cmake@3.17.3
+spack load cmake@3.18.6
 spack load ninja@1.10.0
 
 configure_extra_options="-DCMAKE_BUILD_TYPE=Debug"

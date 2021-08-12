@@ -20,10 +20,10 @@ void test_transform()
     using namespace hpx::execution;
 
     test_transform(simd, IteratorTag());
-    test_transform(simdpar, IteratorTag());
+    test_transform(par_simd, IteratorTag());
 
     test_transform_async(simd(task), IteratorTag());
-    test_transform_async(simdpar(task), IteratorTag());
+    test_transform_async(par_simd(task), IteratorTag());
 }
 
 void transform_test()
@@ -38,10 +38,10 @@ void test_transform_exception()
     using namespace hpx::execution;
 
     test_transform_exception(simd, IteratorTag());
-    test_transform_exception(simdpar, IteratorTag());
+    test_transform_exception(par_simd, IteratorTag());
 
     test_transform_exception_async(simd(task), IteratorTag());
-    test_transform_exception_async(simdpar(task), IteratorTag());
+    test_transform_exception_async(par_simd(task), IteratorTag());
 }
 
 void transform_exception_test()
@@ -57,10 +57,10 @@ void test_transform_bad_alloc()
     using namespace hpx::execution;
 
     test_transform_bad_alloc(simd, IteratorTag());
-    test_transform_bad_alloc(simdpar, IteratorTag());
+    test_transform_bad_alloc(par_simd, IteratorTag());
 
     test_transform_bad_alloc_async(simd(task), IteratorTag());
-    test_transform_bad_alloc_async(simdpar(task), IteratorTag());
+    test_transform_bad_alloc_async(par_simd(task), IteratorTag());
 }
 
 void transform_bad_alloc_test()

@@ -26,6 +26,7 @@
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/serialization/detail/constructor_selector.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/exception_ptr.hpp>
@@ -72,12 +73,11 @@ namespace hpx { namespace lcos { namespace detail {
         typedef lcos::detail::future_data<value_type> shared_state;
         typedef typename shared_state::init_no_addref init_no_addref;
 
-        std::unique_ptr<value_type> value(
-            serialization::detail::constructor_selector<value_type>::create(
-                ar));
+        value_type&& value =
+            serialization::detail::constructor_selector<value_type>::create(ar);
 
         hpx::intrusive_ptr<shared_state> p(
-            new shared_state(init_no_addref{}, in_place{}, std::move(*value)),
+            new shared_state(init_no_addref{}, in_place{}, std::move(value)),
             false);
 
         f = hpx::traits::future_access<Future>::create(std::move(p));

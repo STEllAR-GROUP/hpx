@@ -1,5 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  This code may be used under either of the following two licences:
 //
@@ -197,7 +197,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             do_yield();
 
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
-            this->finish_switch_fiber(this->asan_fake_stack, m_caller);
+            this->finish_yield_fiber(this->asan_fake_stack);
 #endif
             m_exit_status = ctx_not_exited;
 
@@ -356,6 +356,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
             this->start_yield_fiber(&this->asan_fake_stack, m_caller);
 #endif
+
             do_yield();
         }
 

@@ -34,6 +34,7 @@ using hpx::lcos::future;
 using hpx::this_thread::suspend;
 using hpx::threads::set_thread_state;
 using hpx::threads::thread_id_type;
+using hpx::threads::thread_id_ref_type;
 
 using hpx::find_here;
 using hpx::init;
@@ -149,25 +150,27 @@ int hpx_main(variables_map& vm)
             hpx::threads::make_thread_function_nullary(
                 hpx::util::deferred_call(&test_dummy_thread, futures)),
             "test_dummy_thread");
-        thread_id_type thread_id = register_thread(data);
+        thread_id_ref_type thread_id = register_thread(data);
         HPX_TEST_NEQ(thread_id, hpx::threads::invalid_thread_id);
 
         // Flood the queues with suspension operations before the rescheduling
         // attempt.
-        future<void> before = async(&tree_boot, futures, grain_size, thread_id);
+        future<void> before =
+            async(&tree_boot, futures, grain_size, thread_id.noref());
 
-        set_thread_state(thread_id,
+        set_thread_state(thread_id.noref(),
             hpx::threads::thread_schedule_state::pending,
             hpx::threads::thread_restart_state::signaled);
 
         // Flood the queues with suspension operations after the rescheduling
         // attempt.
-        future<void> after = async(&tree_boot, futures, grain_size, thread_id);
+        future<void> after =
+            async(&tree_boot, futures, grain_size, thread_id.noref());
 
         before.get();
         after.get();
 
-        set_thread_state(thread_id,
+        set_thread_state(thread_id.noref(),
             hpx::threads::thread_schedule_state::pending,
             hpx::threads::thread_restart_state::terminate);
     }

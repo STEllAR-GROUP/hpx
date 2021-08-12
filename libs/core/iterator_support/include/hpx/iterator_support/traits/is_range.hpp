@@ -50,8 +50,8 @@ namespace hpx { namespace traits {
     struct range_traits<R, true>
       : std::iterator_traits<typename util::detail::iterator<R>::type>
     {
-        typedef typename util::detail::iterator<R>::type iterator_type;
-        typedef typename util::detail::sentinel<R>::type sentinel_type;
+        using iterator_type = typename util::detail::iterator<R>::type;
+        using sentinel_type = typename util::detail::sentinel<R>::type;
     };
 
     template <typename T>

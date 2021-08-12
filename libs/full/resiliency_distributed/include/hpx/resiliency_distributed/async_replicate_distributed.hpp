@@ -56,8 +56,8 @@ namespace hpx { namespace resiliency { namespace experimental {
             // wait for all threads to finish executing and return the first
             // result that passes the predicate, properly handle exceptions
             return hpx::dataflow(
-                hpx::launch::
-                    sync,    // do not schedule new thread for the lambda
+                // do not schedule new thread for the lambda
+                hpx::launch::sync,
                 [pred = std::forward<Pred>(pred),
                     vote = std::forward<Vote>(vote), ids](
                     std::vector<hpx::future<result_type>>&& results) mutable

@@ -172,7 +172,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
 
         template <typename Result>
-        struct handle_exception_impl<hpx::execution::simdpar_task_policy,
+        struct handle_exception_impl<hpx::execution::par_simd_task_policy,
             Result> : handle_exception_task_impl<Result>
         {
         };

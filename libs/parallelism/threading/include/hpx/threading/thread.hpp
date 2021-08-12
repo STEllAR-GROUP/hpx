@@ -108,7 +108,7 @@ namespace hpx {
         native_handle_type native_handle() const    //-V659
         {
             std::lock_guard<mutex_type> l(mtx_);
-            return id_;
+            return id_.noref();
         }
 
         HPX_NODISCARD static unsigned int hardware_concurrency() noexcept;
@@ -148,7 +148,7 @@ namespace hpx {
             util::unique_function_nonser<void()> const& func);
 
         mutable mutex_type mtx_;
-        threads::thread_id_type id_;
+        threads::thread_id_ref_type id_;
     };
 
     inline void swap(thread& x, thread& y) noexcept
@@ -182,16 +182,23 @@ namespace hpx {
         friend class thread;
 
     public:
-        id() noexcept
-          : id_(threads::invalid_thread_id)
-        {
-        }
+        id() noexcept = default;
+
         explicit id(threads::thread_id_type const& i) noexcept
           : id_(i)
         {
         }
         explicit id(threads::thread_id_type&& i) noexcept
           : id_(std::move(i))
+        {
+        }
+
+        explicit id(threads::thread_id_ref_type const& i) noexcept
+          : id_(i.get().get())
+        {
+        }
+        explicit id(threads::thread_id_ref_type&& i) noexcept
+          : id_(std::move(i).get().get())
         {
         }
 
@@ -319,7 +326,7 @@ namespace std {
     {
         std::size_t operator()(::hpx::thread::id const& id) const
         {
-            std::hash<::hpx::threads::thread_id_type> hasher_;
+            std::hash<::hpx::threads::thread_id_ref_type> hasher_;
             return hasher_(id.native_handle());
         }
     };
