@@ -261,6 +261,7 @@ program now, you should see the familiar ``Hello World!``:
 
 How to install |hpx| on Windows
 -------------------------------
+Building HPX on Windows is straightforward, and has 2 major ways of execution. First is via installation with Visual Studio and CMake GUI, and second is to add all dependencies and install by yourself.
 
 Installation of required prerequisites
 ......................................
@@ -278,41 +279,148 @@ Installation of required prerequisites
 Installation of the |hpx| library
 .................................
 
-* Create a build folder. |hpx| requires an out-of-tree-build. This means that
-  you will be unable to run CMake in the |hpx| source folder.
-* Open up the CMake GUI. In the input box labelled "Where is the source code:",
-  enter the full path to the source folder. The source directory is the one where
-  the sources were checked out. CMakeLists.txt files in the source directory as
-  well as the subdirectories describe the build to CMake. In addition to this,
-  there are CMake scripts (usually ending in .cmake) stored in a special CMake
-  directory. CMake does not alter any file in the source directory and doesn't
-  add new ones either. In the input box labelled "Where to build the binaries:",
+* Create a build folder, but do not run CMake inside the folder.
+* Open up the CMake GUI. Enter the directory location in where's my source code.
+  The source directory is one with the CMakeLists.txt and subdirectories.
+  In the input box labelled "Where to build the binaries:",
   enter the full path to the build folder you created before. The build
   directory is one where all compiler outputs are stored, which includes object
   files and final executables.
-* Add CMake variable definitions (if any) by clicking the "Add Entry" button.
+*  CMake variable definitons tell CMake how you wish HPX to be build, via "Add Entry" on the GUI. 
   There are two required variables you need to define: ``BOOST_ROOT`` and
   ``HWLOC_ROOT`` These (``PATH``) variables need to be set to point to the root
-  folder of your Boost and hwloc installations. It is recommended to set
+  folder of your Boost and hwloc installations. 
+  
+  It is recommended to set
   the variable ``CMAKE_INSTALL_PREFIX`` as well. This determines where the |hpx|
   libraries will be built and installed. If this (``PATH``) variable is set, it
   has to refer to the directory where the built |hpx| files should be installed
   to.
-* Press the "Configure" button. A window will pop up asking you which compilers
-  to use. Select the Visual Studio 10 (64Bit) compiler (it usually is the
-  default if available). The Visual Studio 2012 (64Bit) and Visual Studio 2013
-  (64Bit) compilers are supported as well. Note that while it is possible to
-  build |hpx| for x86, we don't recommend doing so as 32 bit runs are severely
-  restricted by a 32 bit Windows system limitation affecting the number of |hpx|
-  threads you can create.
+* Pressing the configure button sets the project building running. When asked about which complier to use. 
+  Visual Studio x64 is default, with support for 2012/2013. Note - the x32 build limits the number of threads 
+  created by HPX.
 * Press "Configure" again. Repeat this step until the "Generate" button becomes
   clickable (and until no variable definitions are marked in red anymore).
-* Press "Generate".
-* Open up the build folder, and double-click hpx.sln.
-* Build the INSTALL target.
+* Press "Generate" and  Open up the build folder, and double-click hpx.sln. An option for the build would show, Build the INSTALL target.
+
 
 For more detailed information about using |cmake|_ please refer its
 documentation and also the section :ref:`building_hpx`.
+
+
+How to build |hpx| under Windows 10 x64 with Visual Studio 2015
+...............................................................
+
+Please install all the dependencies needed for the Visual Studio Installation from above, with the link for CMake given below.
+
+
+* Download CMake V3.18.1 installer (or latest version) from `here
+  <https://blog.kitware.com/cmake-3-18-1-available-for-download/>`__ alongside to the hwloc V1.11.0 (or the latest version) from `here
+  <http://www.open-mpi.org/software/hwloc/v1.11/downloads/hwloc-win64-build-1.11.0.zip>`__ and the latest Boost libraries from `here
+  <https://www.boost.org/users/download/>`__ and unpack them.
+  
+* Build the Boost DLLs and LIBs by using these commands from Command Line (or
+  PowerShell). Make sure to run the commands in the folder where you've unpacked Boost, with CMD or Powershell
+
+  .. code-block:: bash
+
+     bootstrap.bat
+
+  This batch file will set up everything needed to create a successful build.
+  Now execute:
+
+  .. code-block:: bash
+
+     b2.exe link=shared variant=release,debug architecture=x86 address-model=64 threading=multi --build-type=complete install
+
+  This command will start a (very long) build of all available Boost libraries.
+  Please, be patient.
+
+* Open CMake-GUI.exe and inout the directory location where you unpacked the source code you downloaded from
+  |hpx|'s GitHub pages.
+ Here's an example of CMake path settings, which point to
+  the ``Documents/GitHub/hpx`` folder:
+
+  .. _win32_cmake_settings1:
+
+  .. figure:: ../_static/images/cmake_settings1.png
+
+     Example CMake path settings.
+
+  Inside 'Where is the source-code' enter the base directory of your |hpx|
+  source directory (do not enter the "src" sub-directory!). Inside 'Where to
+  build the binaries' you should put in the path where all the building processes
+  will happen. This is important because the building machinery will do an
+  "out-of-tree" build. CMake will not touch or change the original source files
+  in any way. Instead, it will generate Visual Studio Solution Files, which
+  will build |hpx| packages out of the |hpx| source tree.
+
+* Set three new environment variables (in CMake, not in Windows environment):
+  ``BOOST_ROOT``, ``HWLOC_ROOT``, ``CMAKE_INSTALL_PREFIX``. The meaning of
+  these variables is as follows:
+
+  * ``BOOST_ROOT`` the |hpx| root directory of the unpacked Boost headers/cpp files.
+  * ``HWLOC_ROOT`` the |hpx| root directory of the unpacked Portable Hardware Locality
+    files.
+  * ``CMAKE_INSTALL_PREFIX`` the |hpx| root directory where the future builds of |hpx|
+    should be installed.
+
+    .. note::
+
+       |hpx| is a very large software collection, so it is not recommended to use the
+       default ``C:\Program Files\hpx``. Many users may prefer to use simpler paths *without*
+       whitespace, like ``C:\bin\hpx`` or ``D:\bin\hpx`` etc.
+
+  To insert new env-vars click on "Add Entry" and then insert the name inside
+  "Name", select ``PATH`` as Type and put the path-name in the "Path" text field.
+  Repeat this for the first three variables.
+
+  This is how variable insertion will look:
+
+  .. _win32_cmake_settings2:
+
+  .. figure:: ../_static/images/cmake_settings2.png
+
+     Example CMake adding entry.
+
+  Alternatively, users could provide ``BOOST_LIBRARYDIR`` instead of
+  ``BOOST_ROOT``; the difference is that ``BOOST_LIBRARYDIR`` should point to
+  the subdirectory inside Boost root where all the compiled DLLs/LIBs are. For
+  example, ``BOOST_LIBRARYDIR`` may point to the ``bin.v2`` subdirectory under
+  the Boost rootdir. It is important to keep the meanings of these two variables
+  separated from each other: ``BOOST_DIR`` points to the ROOT folder of the
+  Boost library. ``BOOST_LIBRARYDIR`` points to the subdir inside the Boost root
+  folder where the compiled binaries are.
+
+* Click the 'Configure' button of CMake-GUI. You will be immediately presented with a
+  small window where you can select the C++ compiler to be used within Visual
+  Studio. This has been tested using the latest v14 (a.k.a C++ 2015) but older
+  versions should be sufficient too. Make sure to select the 64Bit compiler.
+
+* After the generate process has finished successfully, click the 'Generate'
+  button. Now, CMake will put new VS Solution files into the BUILD folder you
+  selected at the beginning.
+
+* Open Visual Studio and load the ``HPX.sln`` from your build folder.
+
+* Go to ``CMakePredefinedTargets`` and build the ``INSTALL`` project:
+
+  .. _win32_vs_targets:
+
+  .. figure:: ../_static/images/vs_targets_install.png
+
+     Visual Studio INSTALL target.
+
+  It will take some time to compile everything, and in the end you should see an
+  output similar to this one:
+
+  .. _win32_vs_build_output:
+
+  .. figure:: ../_static/images/vs_build_output.png
+
+     Visual Studio build output.
+
+.. _fedora_installation:
 
 
 Writing task-based applications
