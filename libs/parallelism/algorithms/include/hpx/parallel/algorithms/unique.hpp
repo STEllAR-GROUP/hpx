@@ -509,16 +509,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
             if (first == last)
                 return first;
 
-            util::compare_projected<Pred, Proj> pred_projected{
-                std::forward<Pred>(pred), std::forward<Proj>(proj)};
+            using element_type =
+                typename std::iterator_traits<FwdIter>::value_type;
 
             FwdIter result = first;
+            element_type result_projected = HPX_INVOKE(proj, *result);
             while (++first != last)
             {
-                if (!HPX_INVOKE(pred_projected, *result, *first) &&
-                    ++result != first)
+                if (!HPX_INVOKE(
+                        pred, result_projected, HPX_INVOKE(proj, *first)))
                 {
-                    *result = std::move(*first);
+                    if (++result != first)
+                    {
+                        *result = std::move(*first);
+                    }
+                    result_projected = HPX_INVOKE(proj, *result);
                 }
             }
             return ++result;
@@ -548,11 +553,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 parallel(ExPolicy&& policy, FwdIter first, Sent last,
                     Pred&& pred, Proj&& proj)
             {
-                typedef hpx::util::zip_iterator<FwdIter, bool*> zip_iterator;
-                typedef util::detail::algorithm_result<ExPolicy, FwdIter>
-                    algorithm_result;
-                typedef typename std::iterator_traits<FwdIter>::difference_type
-                    difference_type;
+                using zip_iterator = hpx::util::zip_iterator<FwdIter, bool*>;
+                using algorithm_result =
+                    util::detail::algorithm_result<ExPolicy, FwdIter>;
+                using difference_type =
+                    typename std::iterator_traits<FwdIter>::difference_type;
 
                 difference_type count = detail::distance(first, last);
 
@@ -573,9 +578,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 using hpx::get;
                 using hpx::util::make_zip_iterator;
-                typedef util::scan_partitioner<ExPolicy, FwdIter, std::size_t,
-                    void, util::scan_partitioner_sequential_f3_tag>
-                    scan_partitioner_type;
+                using scan_partitioner_type =
+                    util::scan_partitioner<ExPolicy, FwdIter, std::size_t, void,
+                        util::scan_partitioner_sequential_f3_tag>;
 
                 auto f1 = [pred = std::forward<Pred>(pred),
                               proj = std::forward<Proj>(proj)](
@@ -735,17 +740,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return unique_copy_result<FwdIter, OutIter>{
                     std::move(first), std::move(dest)};
 
-            FwdIter base = first;
+            using element_type =
+                typename std::iterator_traits<FwdIter>::value_type;
 
+            FwdIter base = first;
             *dest++ = *first;
+            element_type base_projected = HPX_INVOKE(proj, *base);
 
             while (++first != last)
             {
-                if (!HPX_INVOKE(pred, HPX_INVOKE(proj, *base),
-                        HPX_INVOKE(proj, *first)))
+                if (!HPX_INVOKE(pred, base_projected, HPX_INVOKE(proj, *first)))
                 {
                     base = first;
                     *dest++ = *first;
+                    base_projected = HPX_INVOKE(proj, *base);
                 }
             }
             return unique_copy_result<FwdIter, OutIter>{
@@ -762,17 +770,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return unique_copy_result<InIter, OutIter>{
                     std::move(first), std::move(dest)};
 
-            auto base_val = *first;
+            using element_type =
+                typename std::iterator_traits<InIter>::value_type;
+            element_type base_val = *first;
+            element_type base_projected = HPX_INVOKE(proj, base_val);
 
             *dest++ = base_val;
 
             while (++first != last)
             {
-                if (!HPX_INVOKE(pred, HPX_INVOKE(proj, base_val),
-                        HPX_INVOKE(proj, *first)))
+                if (!HPX_INVOKE(pred, base_projected, HPX_INVOKE(proj, *first)))
                 {
                     base_val = *first;
                     *dest++ = base_val;
+                    base_projected = HPX_INVOKE(proj, base_val);
                 }
             }
             return unique_copy_result<InIter, OutIter>{
@@ -805,12 +816,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             parallel(ExPolicy&& policy, FwdIter1 first, Sent last,
                 FwdIter2 dest, Pred&& pred, Proj&& proj)
             {
-                typedef hpx::util::zip_iterator<FwdIter1, bool*> zip_iterator;
-                typedef util::detail::algorithm_result<ExPolicy,
-                    unique_copy_result<FwdIter1, FwdIter2>>
-                    algorithm_result;
-                typedef typename std::iterator_traits<FwdIter1>::difference_type
-                    difference_type;
+                using zip_iterator = hpx::util::zip_iterator<FwdIter1, bool*>;
+                using algorithm_result =
+                    util::detail::algorithm_result<ExPolicy,
+                        unique_copy_result<FwdIter1, FwdIter2>>;
+                using difference_type =
+                    typename std::iterator_traits<FwdIter1>::difference_type;
 
                 difference_type count = detail::distance(first, last);
 
@@ -836,9 +847,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 using hpx::get;
                 using hpx::util::make_zip_iterator;
-                typedef util::scan_partitioner<ExPolicy,
-                    unique_copy_result<FwdIter1, FwdIter2>, std::size_t>
-                    scan_partitioner_type;
+                using scan_partitioner_type = util::scan_partitioner<ExPolicy,
+                    unique_copy_result<FwdIter1, FwdIter2>, std::size_t>;
 
                 auto f1 = [pred = std::forward<Pred>(pred),
                               proj = std::forward<Proj>(proj)](
