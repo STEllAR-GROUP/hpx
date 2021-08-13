@@ -52,7 +52,7 @@ docs_push_filter: &docs_push_filter
       branches:
         only:
           - master
-          - release
+          - /release.*/
       tags:
         ignore: stable
 
