@@ -404,7 +404,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format off
     template <typename ExPolicy, typename Rng,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_range<Rng>::value
         )>
     // clang-format on
@@ -424,7 +424,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format off
     template <typename ExPolicy, typename Rng, typename OutIter,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_range<Rng>::value &&
             hpx::traits::is_iterator_v<OutIter>
         )>
@@ -471,7 +471,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
@@ -485,7 +485,7 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             using is_seq = std::integral_constant<bool,
-                hpx::is_sequenced_execution_policy<ExPolicy>::value ||
+                hpx::is_sequenced_execution_policy_v<ExPolicy> ||
                     !hpx::traits::is_bidirectional_iterator_v<FwdIter>>;
 
             return hpx::parallel::util::get_subrange<FwdIter, Sent>(
@@ -517,7 +517,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Rng,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
@@ -528,7 +528,7 @@ namespace hpx { namespace ranges {
             Rng&& rng, hpx::traits::range_iterator_t<Rng> middle)
         {
             using is_seq = std::integral_constant<bool,
-                hpx::is_sequenced_execution_policy<ExPolicy>::value ||
+                hpx::is_sequenced_execution_policy_v<ExPolicy> ||
                     !hpx::traits::is_bidirectional_iterator_v<
                         hpx::traits::range_iterator_t<Rng>>>;
 
@@ -578,7 +578,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename FwdIter1, typename Sent,
             typename FwdIter2, HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter1>::value &&
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
@@ -594,8 +594,8 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             using is_seq = std::integral_constant<bool,
-                hpx::is_sequenced_execution_policy<ExPolicy>::value ||
-                    !hpx::traits::is_forward_iterator_v<FwdIter1>>;
+                hpx::is_sequenced_execution_policy_v<ExPolicy> ||
+                    !hpx::traits::is_bidirectional_iterator_v<FwdIter1>>;
 
             return hpx::parallel::v1::detail::rotate_copy<
                 rotate_copy_result<FwdIter1, FwdIter2>>()
@@ -623,7 +623,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Rng, typename OutIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_iterator_v<OutIter>
                 )>
@@ -636,7 +636,7 @@ namespace hpx { namespace ranges {
             OutIter dest_first)
         {
             using is_seq = std::integral_constant<bool,
-                hpx::is_sequenced_execution_policy<ExPolicy>::value ||
+                hpx::is_sequenced_execution_policy_v<ExPolicy> ||
                     !hpx::traits::is_bidirectional_iterator_v<
                         hpx::traits::range_iterator_t<Rng>>>;
 
