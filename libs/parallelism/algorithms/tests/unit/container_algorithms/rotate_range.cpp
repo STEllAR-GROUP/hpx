@@ -55,7 +55,7 @@ void test_rotate_sent(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_rotate_sent(ExPolicy policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
@@ -123,7 +123,7 @@ void test_rotate(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_rotate(ExPolicy policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
@@ -250,7 +250,7 @@ void test_rotate_exception(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_rotate_exception(ExPolicy policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     using base_iterator = std::vector<std::size_t>::iterator;
@@ -402,7 +402,7 @@ void test_rotate_bad_alloc(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_rotate_bad_alloc(ExPolicy policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     using base_iterator = std::vector<std::size_t>::iterator;

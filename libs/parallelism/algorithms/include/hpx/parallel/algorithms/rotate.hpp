@@ -269,7 +269,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format off
     template <typename ExPolicy, typename FwdIter,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<FwdIter>
         )>
     // clang-format on
@@ -284,7 +284,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         using is_seq = std::integral_constant<bool,
-            hpx::is_sequenced_execution_policy<ExPolicy>::value ||
+            hpx::is_sequenced_execution_policy_v<ExPolicy> ||
                 !hpx::traits::is_bidirectional_iterator_v<FwdIter>>;
 
         return detail::rotate<util::in_out_result<FwdIter, FwdIter>>().call2(
@@ -372,7 +372,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_iterator_v<FwdIter1> &&
-            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<FwdIter2>
         )>
     // clang-format on
@@ -389,7 +389,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         using is_seq = std::integral_constant<bool,
-            hpx::is_sequenced_execution_policy<ExPolicy>::value ||
+            hpx::is_sequenced_execution_policy_v<ExPolicy> ||
                 !hpx::traits::is_bidirectional_iterator_v<FwdIter1>>;
 
         return detail::rotate_copy<util::in_out_result<FwdIter1, FwdIter2>>()
@@ -425,7 +425,7 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
@@ -438,7 +438,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             using is_seq = std::integral_constant<bool,
-                hpx::is_sequenced_execution_policy<ExPolicy>::value ||
+                hpx::is_sequenced_execution_policy_v<ExPolicy> ||
                     !hpx::traits::is_bidirectional_iterator_v<FwdIter>>;
 
             return parallel::util::get_second_element(
@@ -481,7 +481,7 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
@@ -497,7 +497,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             using is_seq = std::integral_constant<bool,
-                hpx::is_sequenced_execution_policy<ExPolicy>::value ||
+                hpx::is_sequenced_execution_policy_v<ExPolicy> ||
                     !hpx::traits::is_forward_iterator_v<FwdIter1>>;
 
             return parallel::util::get_second_element(
