@@ -164,9 +164,9 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         template <typename F, typename S, typename... Ts>
-        decltype(auto) bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
+        void bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
         {
-            return sync_wait(bulk(schedule(sched_), shape,
+            sync_wait(bulk(schedule(sched_), shape,
                 hpx::util::bind_back(
                     std::forward<F>(f), std::forward<Ts>(ts)...)));
         }
