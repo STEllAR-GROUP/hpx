@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX17_STD_VARIANT) && defined(HPX_HAVE_CXX17_COPY_ELISION)
+#if defined(HPX_HAVE_CXX17_COPY_ELISION)
 #include <variant>
 
 namespace hpx {
