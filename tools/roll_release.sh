@@ -23,12 +23,12 @@ VERSION_DESCRIPTION="HPX V${VERSION_FULL_NOTAG}: The C++ Standards Library for P
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 if ! which hub > /dev/null 2>&1; then
-    echo "Hub not installed on this system. Exiting.."
+    echo "Hub not installed on this system (see https://hub.github.com/). Exiting."
     exit 1
 fi
 
-if [ "$CURRENT_BRANCH" != "release" ]; then
-    echo "Not on release branch. Not continuing to make release."
+if ! [[ "$CURRENT_BRANCH" =~ ^release-[0-9]+\.[0-9]+\.X$ ]]; then
+    echo "Not on release branch (current branch is \"${CURRENT_BRANCH}\"). Not continuing to make release."
     exit 1
 fi
 
