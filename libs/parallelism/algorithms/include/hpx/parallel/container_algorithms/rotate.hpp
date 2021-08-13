@@ -375,9 +375,17 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng, typename OutIter>
     typename parallel::util::detail::algorithm_result<ExPolicy,
+<<<<<<< HEAD
         rotate_copy_result<hpx::traits::range_iterator_t<Rng>, OutIter>>::type
     rotate_copy(ExPolicy&& policy, Rng&& rng,
         hpx::traits::range_iterator_t<Rng> middle, OutIter dest_first);
+=======
+        rotate_copy_result<hpx::traits::range_iterator_t<Rng>,
+            OutIter>>::type
+    rotate_copy(ExPolicy&& policy, Rng&& rng,
+        hpx::traits::range_iterator_t<Rng> middle,
+        OutIter dest_first);
+>>>>>>> 438914c614b19f5fcf8f029534258825e1942cfc
 
 }}    // namespace hpx::ranges
 
