@@ -477,6 +477,7 @@ namespace hpx { namespace ranges {
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/parallel/algorithms/remove.hpp>
 
 #include <type_traits>
@@ -533,9 +534,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx { namespace ranges {
-    template <typename I, typename S = I>
-    using subrange_t = hpx::util::iterator_range<I, S>;
-
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::remove_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct remove_if_t final

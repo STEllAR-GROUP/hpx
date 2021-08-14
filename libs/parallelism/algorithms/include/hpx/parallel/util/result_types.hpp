@@ -1,5 +1,6 @@
 //  Copyright (c) 2020 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
+//  Copyright (c) 2021 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -115,6 +116,23 @@ namespace hpx { namespace parallel { namespace util {
     {
         return hpx::make_future<O>(
             std::move(f), [](util::in_out_result<I, O>&& p) { return p.out; });
+    }
+
+    // converst a in_out_result into a iterator_range
+    template <typename I, typename O>
+    hpx::util::iterator_range<I, O> get_subrange(in_out_result<I, O> const& ior)
+    {
+        return hpx::util::iterator_range<I, O>(ior.in, ior.out);
+    }
+
+    template <typename I, typename O>
+    hpx::future<hpx::util::iterator_range<I, O>> get_subrange(
+        hpx::future<in_out_result<I, O>>&& ior)
+    {
+        return hpx::make_future<hpx::util::iterator_range<I, O>>(
+            std::move(ior), [](in_out_result<I, O>&& ior) {
+                return hpx::util::iterator_range<I, O>(ior.in, ior.out);
+            });
     }
 
     ///////////////////////////////////////////////////////////////////////////
