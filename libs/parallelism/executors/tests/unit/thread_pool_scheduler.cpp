@@ -1524,6 +1524,7 @@ void test_bulk()
     {
         std::unordered_set<std::string> string_map;
         std::vector<std::string> v = {"hello", "brave", "new", "world"};
+        std::vector<std::string> v_ref = v;
 
         hpx::mutex mtx;
 
@@ -1535,7 +1536,7 @@ void test_bulk()
                 }) |
             ex::sync_wait();
 
-        for (auto const& s : v)
+        for (auto const& s : v_ref)
         {
             HPX_TEST(string_map.find(s) != string_map.end());
         }
