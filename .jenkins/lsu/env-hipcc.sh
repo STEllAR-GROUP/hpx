@@ -1,4 +1,4 @@
-# Copyright (c) 2020 ETH Zurich
+# Copyright (c) 2020-2021 ETH Zurich
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,7 +6,6 @@
 
 module load rocm/4.0.1
 export CXX=hipcc
-export CC=clang
 
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="17"
