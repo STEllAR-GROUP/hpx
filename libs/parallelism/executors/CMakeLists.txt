@@ -33,6 +33,7 @@ set(executors_headers
     hpx/executors/sync.hpp
     hpx/executors/thread_pool_executor.hpp
     hpx/executors/thread_pool_scheduler.hpp
+    hpx/executors/thread_pool_scheduler_bulk.hpp
 )
 
 # Default location is $HPX_ROOT/libs/executors/include_compatibility

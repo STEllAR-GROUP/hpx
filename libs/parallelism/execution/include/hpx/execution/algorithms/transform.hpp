@@ -10,6 +10,7 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
+#include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>
@@ -115,6 +116,22 @@ namespace hpx { namespace execution { namespace experimental {
                     std::exception_ptr>>;
 
             static constexpr bool sends_done = false;
+
+            template <typename CPO,
+                // clang-format off
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::execution::experimental::detail::is_receiver_cpo_v<CPO> &&
+                    hpx::execution::experimental::detail::has_completion_scheduler_v<
+                        CPO, std::decay_t<Sender>>)
+                // clang-format on
+                >
+            friend constexpr auto tag_dispatch(
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>,
+                transform_sender const& sender)
+            {
+                return hpx::execution::experimental::get_completion_scheduler<
+                    CPO>(sender.sender);
+            }
 
             template <typename Receiver>
             auto connect(Receiver&& receiver) &&

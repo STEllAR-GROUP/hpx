@@ -14,10 +14,11 @@
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/transform.hpp>
+#include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/tag_priority_dispatch.hpp>
 #include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -52,43 +53,42 @@ namespace hpx { namespace execution { namespace experimental {
 
             static constexpr bool sends_done = false;
 
-            template <typename Receiver>
-            auto connect(Receiver&& receiver) &&
+            template <typename CPO,
+                // clang-format off
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::execution::experimental::detail::is_receiver_cpo_v<CPO> &&
+                    hpx::execution::experimental::detail::has_completion_scheduler_v<
+                        CPO, std::decay_t<Sender>>)
+                // clang-format on
+                >
+            friend constexpr auto tag_dispatch(
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>,
+                bulk_sender const& sender)
             {
-                return hpx::execution::experimental::connect(std::move(sender),
-                    bulk_receiver<Receiver, Shape, F>(
-                        std::forward<Receiver>(receiver), std::move(shape),
-                        std::move(f)));
+                return hpx::execution::experimental::get_completion_scheduler<
+                    CPO>(sender.sender);
             }
 
             template <typename Receiver>
-            auto connect(Receiver&& receiver) &
-            {
-                return hpx::execution::experimental::connect(sender,
-                    bulk_receiver<Receiver, Shape, F>(
-                        std::forward<Receiver>(receiver), shape, f));
-            }
-
-            template <typename Receiver, typename Shape_, typename F_>
             struct bulk_receiver
             {
                 std::decay_t<Receiver> receiver;
-                std::decay_t<Shape_> shape;
-                std::decay_t<F_> f;
+                std::decay_t<Shape> shape;
+                std::decay_t<F> f;
 
-                template <typename Receiver_, typename Shape__, typename F__>
-                bulk_receiver(Receiver_&& receiver, Shape__&& shape, F__&& f)
+                template <typename Receiver_, typename Shape_, typename F_>
+                bulk_receiver(Receiver_&& receiver, Shape_&& shape, F_&& f)
                   : receiver(std::forward<Receiver_>(receiver))
-                  , shape(std::forward<Shape__>(shape))
-                  , f(std::forward<F__>(f))
+                  , shape(std::forward<Shape_>(shape))
+                  , f(std::forward<F_>(f))
                 {
                 }
 
-                template <typename E>
-                void set_error(E&& e) && noexcept
+                template <typename Error>
+                void set_error(Error&& error) && noexcept
                 {
                     hpx::execution::experimental::set_error(
-                        std::move(receiver), std::forward<E>(e));
+                        std::move(receiver), std::forward<Error>(error));
                 }
 
                 void set_done() && noexcept
@@ -124,14 +124,49 @@ namespace hpx { namespace execution { namespace experimental {
                         });
                 }
             };
+
+            template <typename Receiver>
+            auto connect(Receiver&& receiver) &&
+            {
+                return hpx::execution::experimental::connect(std::move(sender),
+                    bulk_receiver<Receiver>(std::forward<Receiver>(receiver),
+                        std::move(shape), std::move(f)));
+            }
+
+            template <typename Receiver>
+            auto connect(Receiver&& receiver) &
+            {
+                return hpx::execution::experimental::connect(sender,
+                    bulk_receiver<Receiver>(
+                        std::forward<Receiver>(receiver), shape, f));
+            }
         };
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct bulk_t final
-      : hpx::functional::tag_fallback<bulk_t>
+      : hpx::functional::tag_priority<bulk_t>
     {
     private:
+        // clang-format off
+        template <typename Sender, typename Shape, typename F,
+            HPX_CONCEPT_REQUIRES_(
+                is_sender_v<Sender> &&
+                hpx::execution::experimental::detail::
+                    is_completion_scheduler_tag_dispatchable_v<
+                        hpx::execution::experimental::set_value_t, Sender,
+                        bulk_t, Shape, F>)>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_override_dispatch(
+            bulk_t, Sender&& sender, Shape const& shape, F&& f)
+        {
+            auto scheduler =
+                hpx::execution::experimental::get_completion_scheduler<
+                    hpx::execution::experimental::set_value_t>(sender);
+            return hpx::functional::tag_dispatch(bulk_t{}, std::move(scheduler),
+                std::forward<Sender>(sender), shape, std::forward<F>(f));
+        }
+
         // clang-format off
         template <typename Sender, typename Shape, typename F,
             HPX_CONCEPT_REQUIRES_(
@@ -143,9 +178,10 @@ namespace hpx { namespace execution { namespace experimental {
             bulk_t, Sender&& sender, Shape const& shape, F&& f)
         {
             return detail::bulk_sender<Sender,
-                hpx::util::counting_shape_type<Shape>, F>{
+                hpx::util::detail::counting_shape_type<Shape>, F>{
                 std::forward<Sender>(sender),
-                hpx::util::make_counting_shape(shape), std::forward<F>(f)};
+                hpx::util::detail::make_counting_shape(shape),
+                std::forward<F>(f)};
         }
 
         // clang-format off
