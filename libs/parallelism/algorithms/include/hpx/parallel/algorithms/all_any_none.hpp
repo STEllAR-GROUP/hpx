@@ -229,7 +229,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/void_guard.hpp>
@@ -557,7 +557,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::none_of
     HPX_INLINE_CONSTEXPR_VARIABLE struct none_of_t final
-      : hpx::functional::tag_fallback<none_of_t>
+      : hpx::detail::tag_parallel_algorithm<none_of_t>
     {
     private:
         // clang-format off
@@ -601,7 +601,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::any_of
     HPX_INLINE_CONSTEXPR_VARIABLE struct any_of_t final
-      : hpx::functional::tag_fallback<any_of_t>
+      : hpx::detail::tag_parallel_algorithm<any_of_t>
     {
     private:
         // clang-format off
@@ -645,7 +645,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::all_of
     HPX_INLINE_CONSTEXPR_VARIABLE struct all_of_t final
-      : hpx::functional::tag_fallback<all_of_t>
+      : hpx::detail::tag_parallel_algorithm<all_of_t>
     {
     private:
         // clang-format off

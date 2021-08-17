@@ -271,7 +271,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx { namespace ranges {
     HPX_INLINE_CONSTEXPR_VARIABLE struct adjacent_find_t final
-      : hpx::functional::tag_fallback<adjacent_find_t>
+      : hpx::detail::tag_parallel_algorithm<adjacent_find_t>
     {
     private:
         // clang-format off

@@ -332,3 +332,101 @@ void test_for_each_bad_alloc_async(ExPolicy p, IteratorTag)
     HPX_TEST(caught_exception);
     HPX_TEST(returned_from_algorithm);
 }
+
+template <typename ExPolicy, typename IteratorTag>
+void test_for_each_sender(ExPolicy&& p, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    namespace ex = hpx::execution::experimental;
+
+    auto rng = hpx::util::make_iterator_range(
+        iterator(std::begin(c)), iterator(std::end(c)));
+    auto f = [](std::size_t& v) { v = 42; };
+    auto result = ex::just(rng, f) |
+        hpx::ranges::for_each(std::forward<ExPolicy>(p)) | ex::sync_wait();
+    HPX_TEST(result == iterator(std::end(c)));
+
+    // verify values
+    std::size_t count = 0;
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, std::size_t(42));
+        ++count;
+    });
+    HPX_TEST_EQ(count, c.size());
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_for_each_exception_sender(ExPolicy p, IteratorTag)
+{
+    namespace ex = hpx::execution::experimental;
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    auto rng = hpx::util::make_iterator_range(
+        iterator(std::begin(c)), iterator(std::end(c)));
+    auto f = [](std::size_t&) { throw std::runtime_error("test"); };
+
+    bool caught_exception = false;
+    try
+    {
+        ex::just(rng, f) | hpx::ranges::for_each(std::forward<ExPolicy>(p)) |
+            ex::sync_wait();
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_for_each_bad_alloc_sender(ExPolicy p, IteratorTag)
+{
+    namespace ex = hpx::execution::experimental;
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    auto rng = hpx::util::make_iterator_range(
+        iterator(std::begin(c)), iterator(std::end(c)));
+    auto f = [](std::size_t&) { throw std::bad_alloc(); };
+
+    bool caught_exception = false;
+    try
+    {
+        ex::just(rng, f) | hpx::ranges::for_each(std::forward<ExPolicy>(p)) |
+            ex::sync_wait();
+
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_exception = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}

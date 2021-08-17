@@ -159,8 +159,8 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -336,7 +336,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::lexicographical_compare
     HPX_INLINE_CONSTEXPR_VARIABLE struct lexicographical_compare_t final
-      : hpx::functional::tag_fallback<lexicographical_compare_t>
+      : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
     {
         // clang-format off
         template <typename InIter1, typename InIter2,

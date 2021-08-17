@@ -106,7 +106,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
@@ -311,7 +311,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::destroy
     HPX_INLINE_CONSTEXPR_VARIABLE struct destroy_t final
-      : hpx::functional::tag_fallback<destroy_t>
+      : hpx::detail::tag_parallel_algorithm<destroy_t>
     {
     private:
         // clang-format off
@@ -354,7 +354,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::destroy_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct destroy_n_t final
-      : hpx::functional::tag_fallback<destroy_n_t>
+      : hpx::detail::tag_parallel_algorithm<destroy_n_t>
     {
     private:
         // clang-format off

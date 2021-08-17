@@ -242,7 +242,6 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
@@ -251,6 +250,7 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/set_intersection.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
@@ -267,7 +267,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::set_intersection
     HPX_INLINE_CONSTEXPR_VARIABLE struct set_intersection_t final
-      : hpx::functional::tag<set_intersection_t>
+      : hpx::detail::tag_parallel_algorithm<set_intersection_t>
     {
     private:
         // clang-format off
@@ -291,8 +291,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             set_intersection_result<Iter1, Iter2, Iter3>>::type
-        tag_dispatch(set_intersection_t, ExPolicy&& policy, Iter1 first1,
-            Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
+        tag_fallback_dispatch(set_intersection_t, ExPolicy&& policy,
+            Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -340,8 +340,8 @@ namespace hpx { namespace ranges {
             set_intersection_result<
                 typename hpx::traits::range_iterator<Rng1>::type,
                 typename hpx::traits::range_iterator<Rng2>::type, Iter3>>::type
-        tag_dispatch(set_intersection_t, ExPolicy&& policy, Rng1&& rng1,
-            Rng2&& rng2, Iter3 dest, Pred&& op = Pred(),
+        tag_fallback_dispatch(set_intersection_t, ExPolicy&& policy,
+            Rng1&& rng1, Rng2&& rng2, Iter3 dest, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             using iterator_type1 =
@@ -396,9 +396,9 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend set_intersection_result<Iter1, Iter2, Iter3> tag_dispatch(
-            set_intersection_t, Iter1 first1, Sent1 last1, Iter2 first2,
-            Sent2 last2, Iter3 dest, Pred&& op = Pred(),
+        friend set_intersection_result<Iter1, Iter2, Iter3>
+        tag_fallback_dispatch(set_intersection_t, Iter1 first1, Sent1 last1,
+            Iter2 first2, Sent2 last2, Iter3 dest, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             static_assert((hpx::traits::is_input_iterator<Iter1>::value),
@@ -437,8 +437,8 @@ namespace hpx { namespace ranges {
         friend set_intersection_result<
             typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, Iter3>
-        tag_dispatch(set_intersection_t, Rng1&& rng1, Rng2&& rng2, Iter3 dest,
-            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+        tag_fallback_dispatch(set_intersection_t, Rng1&& rng1, Rng2&& rng2,
+            Iter3 dest, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             using iterator_type1 =

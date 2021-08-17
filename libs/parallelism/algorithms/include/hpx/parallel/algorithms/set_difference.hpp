@@ -111,7 +111,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
@@ -307,7 +307,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::set_difference
     HPX_INLINE_CONSTEXPR_VARIABLE struct set_difference_t final
-      : hpx::functional::tag_fallback<set_difference_t>
+      : hpx::detail::tag_parallel_algorithm<set_difference_t>
     {
     private:
         // clang-format off

@@ -234,7 +234,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::generate
     HPX_INLINE_CONSTEXPR_VARIABLE struct generate_t final
-      : hpx::functional::tag_fallback<generate_t>
+      : hpx::detail::tag_parallel_algorithm<generate_t>
     {
     private:
         // clang-format off
@@ -321,7 +321,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::generate_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct generate_n_t final
-      : hpx::functional::tag_fallback<generate_n_t>
+      : hpx::detail::tag_parallel_algorithm<generate_n_t>
     {
     private:
         // clang-format off

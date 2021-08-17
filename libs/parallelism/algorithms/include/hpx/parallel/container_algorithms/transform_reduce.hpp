@@ -247,7 +247,7 @@ namespace hpx {
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -277,7 +277,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::transform_reduce
     HPX_INLINE_CONSTEXPR_VARIABLE struct transform_reduce_t final
-      : hpx::functional::tag_fallback<transform_reduce_t>
+      : hpx::detail::tag_parallel_algorithm<transform_reduce_t>
     {
     private:
         // clang-format off

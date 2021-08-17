@@ -204,7 +204,7 @@ namespace hpx {
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -654,7 +654,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::copy
     HPX_INLINE_CONSTEXPR_VARIABLE struct copy_t final
-      : hpx::functional::tag_fallback<copy_t>
+      : hpx::detail::tag_parallel_algorithm<copy_t>
     {
     private:
         // clang-format off
@@ -696,7 +696,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::copy_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct copy_n_t final
-      : hpx::functional::tag_fallback<copy_n_t>
+      : hpx::detail::tag_parallel_algorithm<copy_n_t>
     {
     private:
         // clang-format off
@@ -768,7 +768,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::copy_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct copy_if_t final
-      : hpx::functional::tag_fallback<copy_if_t>
+      : hpx::detail::tag_parallel_algorithm<copy_if_t>
     {
     private:
         // clang-format off

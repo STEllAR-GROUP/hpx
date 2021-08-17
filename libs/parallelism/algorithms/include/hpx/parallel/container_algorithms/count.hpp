@@ -245,7 +245,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::count
     HPX_INLINE_CONSTEXPR_VARIABLE struct count_t final
-      : hpx::functional::tag_fallback<count_t>
+      : hpx::detail::tag_parallel_algorithm<count_t>
     {
     private:
         // clang-format off
@@ -356,7 +356,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::count_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct count_if_t final
-      : hpx::functional::tag_fallback<count_if_t>
+      : hpx::detail::tag_parallel_algorithm<count_if_t>
     {
     private:
         // clang-format off

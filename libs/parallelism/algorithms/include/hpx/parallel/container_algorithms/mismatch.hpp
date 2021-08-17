@@ -222,6 +222,7 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -235,7 +236,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::mismatch
     HPX_INLINE_CONSTEXPR_VARIABLE struct mismatch_t final
-      : hpx::functional::tag<mismatch_t>
+      : hpx::detail::tag_parallel_algorithm<mismatch_t>
     {
     private:
         // clang-format off
@@ -255,8 +256,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             mismatch_result<Iter1, Iter2>>::type
-        tag_dispatch(mismatch_t, ExPolicy&& policy, Iter1 first1, Sent1 last1,
-            Iter2 first2, Sent2 last2, Pred&& op = Pred(),
+        tag_fallback_dispatch(mismatch_t, ExPolicy&& policy, Iter1 first1,
+            Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter1>::value),
@@ -292,8 +293,8 @@ namespace hpx { namespace ranges {
             mismatch_result<
                 typename hpx::traits::range_traits<Rng1>::iterator_type,
                 typename hpx::traits::range_traits<Rng2>::iterator_type>>::type
-        tag_dispatch(mismatch_t, ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
-            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+        tag_fallback_dispatch(mismatch_t, ExPolicy&& policy, Rng1&& rng1,
+            Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             static_assert(
@@ -331,7 +332,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend mismatch_result<Iter1, Iter2> tag_dispatch(mismatch_t,
+        friend mismatch_result<Iter1, Iter2> tag_fallback_dispatch(mismatch_t,
             Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -367,8 +368,9 @@ namespace hpx { namespace ranges {
         friend mismatch_result<
             typename hpx::traits::range_traits<Rng1>::iterator_type,
             typename hpx::traits::range_traits<Rng2>::iterator_type>
-        tag_dispatch(mismatch_t, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        tag_fallback_dispatch(mismatch_t, Rng1&& rng1, Rng2&& rng2,
+            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
         {
             static_assert(
                 (hpx::traits::is_forward_iterator<typename hpx::traits::

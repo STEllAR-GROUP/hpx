@@ -472,8 +472,8 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -880,7 +880,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::replace_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_if_t final
-      : hpx::functional::tag_fallback<replace_if_t>
+      : hpx::detail::tag_parallel_algorithm<replace_if_t>
     {
     private:
         // clang-format off
@@ -933,7 +933,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::replace
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_t final
-      : hpx::functional::tag_fallback<replace_t>
+      : hpx::detail::tag_parallel_algorithm<replace_t>
     {
     private:
         // clang-format off
@@ -983,7 +983,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::replace_copy_if
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_copy_if_t final
-      : hpx::functional::tag_fallback<replace_copy_if_t>
+      : hpx::detail::tag_parallel_algorithm<replace_copy_if_t>
     {
     private:
         // clang-format off
@@ -1049,7 +1049,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::replace_copy
     HPX_INLINE_CONSTEXPR_VARIABLE struct replace_copy_t final
-      : hpx::functional::tag_fallback<replace_copy_t>
+      : hpx::detail::tag_parallel_algorithm<replace_copy_t>
     {
     private:
         // clang-format off

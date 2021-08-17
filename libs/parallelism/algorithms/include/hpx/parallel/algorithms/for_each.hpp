@@ -240,13 +240,13 @@ namespace hpx {
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
@@ -678,7 +678,7 @@ namespace hpx {
     //       disabled for other, possibly external specializations.
     //
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_t final
-      : hpx::functional::tag_fallback<for_each_t>
+      : hpx::detail::tag_parallel_algorithm<for_each_t>
     {
     private:
         // clang-format off
@@ -736,7 +736,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_n_t final
-      : hpx::functional::tag_fallback<for_each_n_t>
+      : hpx::detail::tag_parallel_algorithm<for_each_n_t>
     {
     private:
         // clang-format off

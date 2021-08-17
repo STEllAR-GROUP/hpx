@@ -180,6 +180,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -442,7 +443,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::uninitialized_fill
     HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_fill_t final
-      : hpx::functional::tag_fallback<uninitialized_fill_t>
+      : hpx::detail::tag_parallel_algorithm<uninitialized_fill_t>
     {
         // clang-format off
         template <typename FwdIter, typename T,
@@ -489,7 +490,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::uninitialized_fill_n
     HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_fill_n_t final
-      : hpx::functional::tag_fallback<uninitialized_fill_n_t>
+      : hpx::detail::tag_parallel_algorithm<uninitialized_fill_n_t>
     {
         // clang-format off
         template <typename FwdIter, typename Size, typename T,
