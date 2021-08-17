@@ -399,8 +399,7 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
   endif()
 
   set(system_precompiled_headers_dependencies
-      hpx_dependencies_boost hpx_private_flags hpx_public_flags
-      ASIO::standalone_asio
+      hpx_dependencies_boost hpx_private_flags hpx_public_flags Asio::asio
   )
 
   add_library(hpx_precompiled_headers OBJECT libs/src/dummy.cpp)
