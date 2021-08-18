@@ -298,6 +298,8 @@ namespace hpx { namespace execution { namespace experimental {
                         // set_error/set_done/set_value has been called and
                         // values/errors have been stored into the shared state.
                         // We can trigger the continuation directly.
+                        // TODO: Should this preserve the scheduler? It does not
+                        // if we call set_* inline.
                         hpx::visit(
                             done_error_value_visitor<Receiver>{
                                 std::forward<Receiver>(receiver)},
