@@ -65,6 +65,10 @@ namespace hpx { namespace cuda { namespace experimental {
 #ifdef HPX_HAVE_HIP
             case HIPBLAS_STATUS_HANDLE_IS_NULLPTR:
                 return "HIPBLAS_STATUS_HANDLE_IS_NULLPTR";
+#if HPX_HIP_VERSION >= 40300000
+            case HIPBLAS_STATUS_INVALID_ENUM:
+                return "HIPBLAS_STATUS_INVALID_ENUM";
+#endif
 #else
             case CUBLAS_STATUS_LICENSE_ERROR:
                 return "CUBLAS_STATUS_LICENSE_ERROR";

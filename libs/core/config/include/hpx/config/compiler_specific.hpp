@@ -116,6 +116,8 @@
 #  endif
 // Detecting HIPCC
 #elif defined(__HIPCC__)
+#  include <hip/hip_version.h>
+#  define HPX_HIP_VERSION HIP_VERSION
 #  if defined(__clang__)
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wdeprecated-copy"
