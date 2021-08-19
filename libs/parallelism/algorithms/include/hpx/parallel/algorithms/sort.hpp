@@ -108,7 +108,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
             Iter itaux = mid9(first + 1, first + chunk, first + 2 * chunk,
                 first + 3 * chunk, first + 4 * chunk, first + 5 * chunk,
                 first + 6 * chunk, first + 7 * chunk, last - 1, comp);
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+            std::ranges::iter_swap(first, itaux);
+#else
             std::iter_swap(first, itaux);
+#endif
         }
 
         /// \brief this function is the work assigned to each thread in the
@@ -155,7 +159,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
             while (c_first < c_last)
             {
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                std::ranges::iter_swap(c_first++, c_last--);
+#else
                 std::iter_swap(c_first++, c_last--);
+#endif
                 while (comp(*c_first, val))
                 {
                     ++c_first;
@@ -166,7 +174,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
             }
 
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+            std::ranges::iter_swap(first, c_last);
+#else
             std::iter_swap(first, c_last);
+#endif
 
             // spawn tasks for each sub section
             hpx::future<RandomIt> left = execution::async_execute(

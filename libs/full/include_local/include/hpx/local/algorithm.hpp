@@ -19,7 +19,6 @@ namespace hpx {
     using hpx::parallel::sort;
     using hpx::parallel::stable_partition;
     using hpx::parallel::stable_sort;
-    using hpx::parallel::swap_ranges;
     using hpx::parallel::unique;
     using hpx::parallel::unique_copy;
 }    // namespace hpx

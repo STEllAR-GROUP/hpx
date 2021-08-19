@@ -18,6 +18,40 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_swap_ranges(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::fill(std::begin(d), std::end(d), std::rand());
+
+    hpx::swap_ranges(
+        iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
+
+    //equal begins at one, therefore counter is started at 1
+    std::size_t count = 1;
+    HPX_TEST(std::equal(std::begin(c) + 1, std::end(c), std::begin(c),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, c.size());
+
+    count = 1;
+    HPX_TEST(std::equal(std::begin(d) + 1, std::end(d), std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_NEQ(v1, v2);
+            ++count;
+            return !(v1 == v2);
+        }));
+    HPX_TEST_EQ(count, d.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_swap_ranges(ExPolicy policy, IteratorTag)
 {
@@ -32,7 +66,7 @@ void test_swap_ranges(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
     std::fill(std::begin(d), std::end(d), std::rand());
 
-    hpx::parallel::swap_ranges(
+    hpx::swap_ranges(
         policy, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
 
     //equal begins at one, therefore counter is started at 1
@@ -66,7 +100,7 @@ void test_swap_ranges_async(ExPolicy p, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
     std::fill(std::begin(d), std::end(d), std::rand());
 
-    hpx::future<base_iterator> f = hpx::parallel::swap_ranges(
+    hpx::future<base_iterator> f = hpx::swap_ranges(
         p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
 
     f.wait();
@@ -93,6 +127,7 @@ template <typename IteratorTag>
 void test_swap_ranges()
 {
     using namespace hpx::execution;
+    test_swap_ranges(IteratorTag());
     test_swap_ranges(seq, IteratorTag());
     test_swap_ranges(par, IteratorTag());
     test_swap_ranges(par_unseq, IteratorTag());
@@ -126,7 +161,7 @@ void test_swap_ranges_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::swap_ranges(policy,
+        hpx::swap_ranges(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), std::begin(d));
@@ -161,7 +196,7 @@ void test_swap_ranges_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<base_iterator> f = hpx::parallel::swap_ranges(p,
+        hpx::future<base_iterator> f = hpx::swap_ranges(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), std::begin(d));
@@ -224,7 +259,7 @@ void test_swap_ranges_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::swap_ranges(policy,
+        hpx::swap_ranges(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::begin(d));
         HPX_TEST(false);
@@ -257,7 +292,7 @@ void test_swap_ranges_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<base_iterator> f = hpx::parallel::swap_ranges(p,
+        hpx::future<base_iterator> f = hpx::swap_ranges(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::begin(d));
         returned_from_algorithm = true;

@@ -329,7 +329,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first == last)
                     break;
 
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                std::ranges::iter_swap(first++, last);
+#else
                 std::iter_swap(first++, last);
+#endif
             }
 
             return first;
@@ -354,7 +358,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
             for (FwdIter it = std::next(first); it != last; ++it)
             {
                 if (invoke(pred, invoke(proj, *it)))
+                {
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                    std::ranges::iter_swap(first++, it);
+#else
                     std::iter_swap(first++, it);
+#endif
+                }
             }
 
             return first;
@@ -580,7 +590,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 FwdIter1 first, FwdIter1 last, FwdIter2 dest)
             {
                 while (first != last)
+                {
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                    std::ranges::iter_swap(first++, dest++);
+#else
                     std::iter_swap(first++, dest++);
+#endif
+                }
 
                 return dest;
             }
@@ -620,7 +636,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     if (right_block.empty())
                         return left_block;
 
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                    std::ranges::iter_swap(
+                        left_block.first++, right_block.first++);
+#else
                     std::iter_swap(left_block.first++, right_block.first++);
+#endif
                 }
             }
 
@@ -678,7 +699,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     if (right_iter->empty() || right_iter->block_no < 0)
                         break;
 
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                    std::ranges::iter_swap(
+                        left_iter->first++, right_iter->first++);
+#else
                     std::iter_swap(left_iter->first++, right_iter->first++);
+#endif
                 }
 
                 if (left_iter < right_iter ||
