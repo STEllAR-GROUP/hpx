@@ -36,8 +36,8 @@ pipeline {
                     '''
                     checkout scm
                     echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-                }
-            }
+                } // dir
+            } // steps
         }
         stage('perftests') {
             matrix {
@@ -48,19 +48,32 @@ pipeline {
                     }
                 }
                 stages {
-                    stage('perftests') {
+                    stage('perftests run') {
+                        steps {
+                            dir('hpx') {
+                                // This stage is skipped without the catchError
+                                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                    sh '''
+                                    #!/bin/bash -l
+                                    .jenkins/cscs-perftests/entry.sh
+                                    '''
+                                }
+                            }
+                        }
+                    }
+                    stage('publish report (failure)') {
                         steps {
                             dir('hpx') {
                                 sh '''
                                 #!/bin/bash -l
-                                .jenkins/cscs-perftests/entry.sh
+                                .jenkins/cscs-perftests/comment_github.sh
                                 '''
-                            }
-                        }
-                    }
-                }
-            }
-        }
+                            } // dir
+                        } // steps
+                    } // stage publish report
+                } // stages
+            } // matrix
+        } // stage perftests
     }
 
     post {
