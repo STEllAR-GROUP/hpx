@@ -118,6 +118,25 @@ int verify_(
               << c << std::setw(6) << #d << std::setw(8) << #e << "\t";
 
 ////////////////////////////////////////////////////////////////////////////////
+// call stable_sort with no comparison operator
+template <typename T>
+void test_stable_sort1(T)
+{
+    // Fill vector with random values
+    std::vector<T> c(HPX_SORT_TEST_SIZE);
+    rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
+        (std::numeric_limits<T>::max)(), T(std::rand()));
+
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
+    // stable_sort, blocking when seq, par, par_vec
+    hpx::stable_sort(c.begin(), c.end());
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
+
+    bool is_sorted = (verify_(c, std::less<T>(), elapsed, true) != 0);
+    HPX_TEST(is_sorted);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // call sort with no comparison operator
 template <typename ExPolicy, typename T>
 void test_stable_sort1(ExPolicy&& policy, T)
@@ -133,8 +152,7 @@ void test_stable_sort1(ExPolicy&& policy, T)
 
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
-    hpx::parallel::stable_sort(
-        std::forward<ExPolicy>(policy), c.begin(), c.end());
+    hpx::stable_sort(std::forward<ExPolicy>(policy), c.begin(), c.end());
     std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, std::less<T>(), elapsed, true) != 0);
@@ -158,8 +176,7 @@ void test_stable_sort1_comp(ExPolicy&& policy, T, Compare comp = Compare())
 
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
-    hpx::parallel::stable_sort(
-        std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
+    hpx::stable_sort(std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
@@ -183,7 +200,7 @@ void test_stable_sort1_async(ExPolicy&& policy, T, Compare comp = Compare())
 
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, non blocking
-    hpx::future<void> f = hpx::parallel::stable_sort(
+    hpx::future<void> f = hpx::stable_sort(
         std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     f.get();
     std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
@@ -215,7 +232,7 @@ void test_stable_sort_exception(ExPolicy&& policy, T)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::parallel::stable_sort(std::forward<ExPolicy>(policy),
+            hpx::stable_sort(std::forward<ExPolicy>(policy),
                 decorated_iterator(
                     c.begin(), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(c.end()));
@@ -248,7 +265,7 @@ void test_stable_sort_exception(ExPolicy&& policy, T)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::parallel::stable_sort(std::forward<ExPolicy>(policy),
+            hpx::stable_sort(std::forward<ExPolicy>(policy),
                 decorated_iterator(c.begin(), []() { throw std::bad_alloc(); }),
                 decorated_iterator(c.end()));
 
@@ -294,7 +311,7 @@ void test_stable_sort_exception(ExPolicy&& policy, T, Compare comp)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::parallel::stable_sort(std::forward<ExPolicy>(policy),
+            hpx::stable_sort(std::forward<ExPolicy>(policy),
                 decorated_iterator(
                     c.begin(), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(c.end()), comp);
@@ -327,7 +344,7 @@ void test_stable_sort_exception(ExPolicy&& policy, T, Compare comp)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::parallel::stable_sort(std::forward<ExPolicy>(policy),
+            hpx::stable_sort(std::forward<ExPolicy>(policy),
                 decorated_iterator(c.begin(), []() { throw std::bad_alloc(); }),
                 decorated_iterator(c.end()), comp);
 
@@ -375,7 +392,7 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T)
                 decorated_iterator;
 
             hpx::future<void> f =
-                hpx::parallel::stable_sort(std::forward<ExPolicy>(policy),
+                hpx::stable_sort(std::forward<ExPolicy>(policy),
                     decorated_iterator(
                         c.begin(), []() { throw std::runtime_error("test"); }),
                     decorated_iterator(c.end()));
@@ -413,7 +430,7 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::future<void> f = hpx::parallel::stable_sort(
+            hpx::future<void> f = hpx::stable_sort(
                 std::forward<ExPolicy>(policy),
                 decorated_iterator(c.begin(), []() { throw std::bad_alloc(); }),
                 decorated_iterator(c.end()));
@@ -466,7 +483,7 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T, Compare comp)
                 decorated_iterator;
 
             hpx::future<void> f =
-                hpx::parallel::stable_sort(std::forward<ExPolicy>(policy),
+                hpx::stable_sort(std::forward<ExPolicy>(policy),
                     decorated_iterator(
                         c.begin(), []() { throw std::runtime_error("test"); }),
                     decorated_iterator(c.end()), comp);
@@ -504,7 +521,7 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T, Compare comp)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::future<void> f = hpx::parallel::stable_sort(
+            hpx::future<void> f = hpx::stable_sort(
                 std::forward<ExPolicy>(policy),
                 decorated_iterator(c.begin(), []() { throw std::bad_alloc(); }),
                 decorated_iterator(c.end()), comp);
@@ -534,6 +551,24 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T, Compare comp)
 
 ////////////////////////////////////////////////////////////////////////////////
 // already sorted
+template <typename T>
+void test_stable_sort2(T)
+{
+    // Fill vector with increasing values
+    std::vector<T> c(HPX_SORT_TEST_SIZE);
+    std::iota(std::begin(c), std::end(c), 0);
+
+    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
+    // stable_sort, blocking when seq, par, par_vec
+    hpx::stable_sort(c.begin(), c.end());
+    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
+
+    bool is_sorted = (verify_(c, std::less<T>(), elapsed, true) != 0);
+    HPX_TEST(is_sorted);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// already sorted
 template <typename ExPolicy, typename T>
 void test_stable_sort2(ExPolicy&& policy, T)
 {
@@ -547,8 +582,7 @@ void test_stable_sort2(ExPolicy&& policy, T)
 
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
-    hpx::parallel::stable_sort(
-        std::forward<ExPolicy>(policy), c.begin(), c.end());
+    hpx::stable_sort(std::forward<ExPolicy>(policy), c.begin(), c.end());
     std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, std::less<T>(), elapsed, true) != 0);
@@ -570,8 +604,7 @@ void test_stable_sort2_comp(ExPolicy&& policy, T, Compare comp = Compare())
 
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
-    hpx::parallel::stable_sort(
-        std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
+    hpx::stable_sort(std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
@@ -593,7 +626,7 @@ void test_stable_sort2_async(ExPolicy&& policy, T, Compare comp = Compare())
 
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, non blocking
-    hpx::future<void> f = hpx::parallel::stable_sort(
+    hpx::future<void> f = hpx::stable_sort(
         std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     f.get();
     std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
@@ -619,8 +652,7 @@ void test_stable_sort1(ExPolicy&& policy, const std::string&)
 
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
-    hpx::parallel::stable_sort(
-        std::forward<ExPolicy>(policy), c.begin(), c.end());
+    hpx::stable_sort(std::forward<ExPolicy>(policy), c.begin(), c.end());
     std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, std::less<std::string>(), elapsed, true) != 0);
@@ -645,8 +677,7 @@ void test_stable_sort1_comp(
 
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
-    hpx::parallel::stable_sort(
-        std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
+    hpx::stable_sort(std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
@@ -670,7 +701,7 @@ void test_stable_sort1_async_str(ExPolicy&& policy, Compare comp = Compare())
 
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     // sort, non blocking
-    hpx::future<void> f = hpx::parallel::stable_sort(
+    hpx::future<void> f = hpx::stable_sort(
         std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     f.get();
     std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;

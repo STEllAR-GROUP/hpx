@@ -24,7 +24,19 @@ void test_stable_sort1()
 {
     using namespace hpx::execution;
 
+    // default comparison operator (std::less) (sentinel)
+    test_stable_sort1_sent(int());
+    test_stable_sort1_sent(seq, int());
+    test_stable_sort1_sent(par, int());
+    test_stable_sort1_sent(par_unseq, int());
+
+    // user supplied comparison operator (std::less) (sentinel)
+    test_stable_sort1_comp_sent(seq, int(), std::less<int>());
+    test_stable_sort1_comp_sent(par, int(), std::less<int>());
+    test_stable_sort1_comp_sent(par_unseq, int(), std::less<int>());
+
     // default comparison operator (std::less)
+    test_stable_sort1(int());
     test_stable_sort1(seq, int());
     test_stable_sort1(par, int());
     test_stable_sort1(par_unseq, int());
