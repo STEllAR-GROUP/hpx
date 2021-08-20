@@ -18,6 +18,7 @@ function(add_hpx_config_test variable)
   set(options FILE EXECUTE CUDA)
   set(one_value_args SOURCE ROOT CMAKECXXFEATURE)
   set(multi_value_args
+      CXXFLAGS
       INCLUDE_DIRECTORIES
       LINK_DIRECTORIES
       COMPILE_DEFINITIONS
@@ -127,7 +128,9 @@ function(add_hpx_config_test variable)
 
     if(${variable}_EXECUTE)
       if(NOT CMAKE_CROSSCOMPILING)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${additional_cmake_flags}")
+        set(CMAKE_CXX_FLAGS
+            "${CMAKE_CXX_FLAGS} ${additional_cmake_flags} ${${variable}_CXXFLAGS}"
+        )
         # cmake-format: off
         try_run(
           ${variable}_RUN_RESULT ${variable}_COMPILE_RESULT
@@ -157,8 +160,12 @@ function(add_hpx_config_test variable)
       if(HPX_WITH_CUDA)
         set(cuda_parameters CUDA_STANDARD ${CMAKE_CUDA_STANDARD})
       endif()
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${additional_cmake_flags}")
-      set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} ${additional_cmake_flags}")
+      set(CMAKE_CXX_FLAGS
+          "${CMAKE_CXX_FLAGS} ${additional_cmake_flags} ${${variable}_CXXFLAGS}"
+      )
+      set(CMAKE_CUDA_FLAGS
+          "${CMAKE_CUDA_FLAGS} ${additional_cmake_flags} ${${variable}_CXXFLAGS}"
+      )
       # cmake-format: off
       try_compile(
         ${variable}_RESULT
@@ -431,11 +438,40 @@ endfunction()
 
 # ##############################################################################
 function(hpx_check_for_cxx20_coroutines)
+  if(NOT HPX_WITH_CXX20_COROUTINES)
+    unset(HPX_CXX20_COROUTINES_FLAGS)
+  endif()
+
   add_hpx_config_test(
     HPX_WITH_CXX20_COROUTINES
     SOURCE cmake/tests/cxx20_coroutines.cpp
     FILE ${ARGN}
   )
+
+  if(NOT HPX_WITH_CXX20_COROUTINES)
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+       AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 10
+       AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11
+    )
+      set(HPX_CXX20_COROUTINES_FLAGS
+          "-fcoroutines"
+          CACHE STRING "coroutines need an explicit flag" FORCE
+      )
+    endif()
+    if(HPX_CXX20_COROUTINES_FLAGS)
+      unset(HPX_WITH_CXX20_COROUTINES CACHE)
+      add_hpx_config_test(
+        HPX_WITH_CXX20_COROUTINES
+        SOURCE cmake/tests/cxx20_coroutines.cpp CXXFLAGS
+                                                "${HPX_CXX20_COROUTINES_FLAGS}"
+        FILE ${ARGN}
+      )
+      if(NOT HPX_WITH_CXX20_COROUTINES)
+        unset(HPX_CXX20_COROUTINES_FLAGS CACHE)
+        unset(HPX_WITH_CXX20_COROUTINES CACHE)
+      endif()
+    endif()
+  endif()
 endfunction()
 
 # ##############################################################################
