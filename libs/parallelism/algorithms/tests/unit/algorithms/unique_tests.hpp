@@ -118,6 +118,27 @@ struct random_fill
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag, typename DataType, typename Pred>
+void test_unique(IteratorTag, DataType, Pred pred, int rand_base)
+{
+    using base_iterator = typename std::vector<DataType>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    std::size_t const size = 10007;
+    std::vector<DataType> c(size), d;
+    std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
+    d = c;
+
+    auto result =
+        hpx::unique(iterator(std::begin(c)), iterator(std::end(c)), pred);
+    auto solution = std::unique(std::begin(d), std::end(d), pred);
+
+    bool equality =
+        test::equal(std::begin(c), result.base(), std::begin(d), solution);
+
+    HPX_TEST(equality);
+}
+
 template <typename ExPolicy, typename IteratorTag, typename DataType,
     typename Pred>
 void test_unique(
@@ -126,15 +147,15 @@ void test_unique(
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef typename std::vector<DataType>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size), d;
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
     d = c;
 
-    auto result = hpx::parallel::unique(
+    auto result = hpx::unique(
         policy, iterator(std::begin(c)), iterator(std::end(c)), pred);
     auto solution = std::unique(std::begin(d), std::end(d), pred);
 
@@ -152,15 +173,15 @@ void test_unique_async(
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef typename std::vector<DataType>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size), d;
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
     d = c;
 
-    auto f = hpx::parallel::unique(
+    auto f = hpx::unique(
         policy, iterator(std::begin(c)), iterator(std::end(c)), pred);
     auto result = f.get();
     auto solution = std::unique(std::begin(d), std::end(d), pred);
@@ -178,8 +199,8 @@ void test_unique_exception(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 10007;
     std::vector<int> c(size);
@@ -188,7 +209,7 @@ void test_unique_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        auto result = hpx::parallel::unique(policy, iterator(std::begin(c)),
+        auto result = hpx::unique(policy, iterator(std::begin(c)),
             iterator(std::end(c)), throw_always());
 
         HPX_UNUSED(result);
@@ -210,8 +231,8 @@ void test_unique_exception(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_unique_exception_async(ExPolicy policy, IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 10007;
     std::vector<int> c(size);
@@ -221,7 +242,7 @@ void test_unique_exception_async(ExPolicy policy, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::unique(policy, iterator(std::begin(c)),
+        auto f = hpx::unique(policy, iterator(std::begin(c)),
             iterator(std::end(c)), throw_always());
         returned_from_algorithm = true;
         f.get();
@@ -249,8 +270,8 @@ void test_unique_bad_alloc(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 10007;
     std::vector<int> c(size);
@@ -259,7 +280,7 @@ void test_unique_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        auto result = hpx::parallel::unique(policy, iterator(std::begin(c)),
+        auto result = hpx::unique(policy, iterator(std::begin(c)),
             iterator(std::end(c)), throw_bad_alloc());
 
         HPX_UNUSED(result);
@@ -280,8 +301,8 @@ void test_unique_bad_alloc(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_unique_bad_alloc_async(ExPolicy policy, IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 10007;
     std::vector<int> c(size);
@@ -291,7 +312,7 @@ void test_unique_bad_alloc_async(ExPolicy policy, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::unique(policy, iterator(std::begin(c)),
+        auto f = hpx::unique(policy, iterator(std::begin(c)),
             iterator(std::end(c)), throw_bad_alloc());
         returned_from_algorithm = true;
         f.get();
@@ -318,7 +339,7 @@ void test_unique_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef typename std::vector<DataType>::iterator base_iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size), d, org;
@@ -328,10 +349,10 @@ void test_unique_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
 
     // Test default predicate.
     {
-        typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+        using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
-        auto result = hpx::parallel::unique(
-            policy, iterator(std::begin(c)), iterator(std::end(c)));
+        auto result =
+            hpx::unique(policy, iterator(std::begin(c)), iterator(std::end(c)));
         auto solution = std::unique(std::begin(d), std::end(d));
 
         bool equality =
@@ -342,12 +363,12 @@ void test_unique_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
 
     // Test projection.
     {
-        typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+        using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
         c = org;
 
         DataType val;
-        auto result = hpx::parallel::unique(
+        auto result = hpx::unique(
             policy, iterator(std::begin(c)), iterator(std::end(c)),
             [](DataType const& a, DataType const& b) -> bool { return a == b; },
             [&val](DataType const&) -> DataType& {
@@ -389,6 +410,9 @@ void test_unique()
 
     ////////// Test cases for 'int' type.
     test_unique(
+        IteratorTag(), int(),
+        [](const int a, const int b) -> bool { return a == b; }, rand_base);
+    test_unique(
         seq, IteratorTag(), int(),
         [](const int a, const int b) -> bool { return a == b; }, rand_base);
     test_unique(
@@ -402,6 +426,12 @@ void test_unique()
         [](const int a, const int b) -> bool { return a == b; }, rand_base);
 
     ////////// Test cases for user defined type.
+    test_unique(
+        IteratorTag(), user_defined_type(),
+        [](user_defined_type const& a, user_defined_type const& b) -> bool {
+            return a == b;
+        },
+        rand_base);
     test_unique(
         seq, IteratorTag(), user_defined_type(),
         [](user_defined_type const& a, user_defined_type const& b) -> bool {

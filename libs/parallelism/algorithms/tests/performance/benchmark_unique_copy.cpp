@@ -69,7 +69,7 @@ double run_unique_copy_benchmark_hpx(int test_count, ExPolicy policy,
 
     for (int i = 0; i < test_count; ++i)
     {
-        hpx::parallel::unique_copy(policy, first, last, dest);
+        hpx::unique_copy(policy, first, last, dest);
     }
 
     time = hpx::chrono::high_resolution_clock::now() - time;

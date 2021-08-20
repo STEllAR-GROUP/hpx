@@ -522,12 +522,12 @@ Parallel algorithms
      * Applies a function to a range of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`transform`
-   * * :cpp:func:`hpx::parallel::v1::unique_copy`
+   * * :cpp:func:`hpx::unique`
      * Eliminates all but the first element from every consecutive group of equivalent elements from a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`unique`
-   * * :cpp:func:`hpx::parallel::v1::unique_copy`
-     * Eliminates all but the first element from every consecutive group of equivalent elements from a range.
+   * * :cpp:func:`hpx::unique_copy`
+     * Copies the elements from one range to another in such a way that there are no consecutive equal elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`unique_copy`
 

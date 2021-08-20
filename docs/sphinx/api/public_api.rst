@@ -101,8 +101,8 @@ Functions
 - :cpp:func:`hpx::parallel::v1::stable_sort`
 - :cpp:func:`hpx::swap_ranges`
 - :cpp:func:`hpx::transform`
-- :cpp:func:`hpx::parallel::v1::unique`
-- :cpp:func:`hpx::parallel::v1::unique_copy`
+- :cpp:func:`hpx::unique`
+- :cpp:func:`hpx::unique_copy`
 - :cpp:func:`hpx::for_loop`
 - :cpp:func:`hpx::for_loop_strided`
 - :cpp:func:`hpx::for_loop_n`
@@ -144,6 +144,8 @@ Functions
 - :cpp:func:`hpx::ranges::set_symmetric_difference`
 - :cpp:func:`hpx::ranges::set_union`
 - :cpp:func:`hpx::ranges::swap_ranges`
+- :cpp:func:`hpx::ranges::unique`
+- :cpp:func:`hpx::ranges::unique_copy`
 - :cpp:func:`hpx::ranges::for_loop`
 - :cpp:func:`hpx::ranges::for_loop_strided`
 
