@@ -4,8 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// This test case demonstrates the issue described in #1485:
-// `ignore_while_locked` doesn't support all Lockable types
+// This test case tests the workaround for the issue described in #1485:
+// `ignore_while_checking` doesn't support all Lockable types.
+// `ignore_all_while_checking` can be used instead to ignore all locks
+// (including the ones that are not supported by `ignore_while_checking`).
 
 #include <hpx/local/init.hpp>
 #include <hpx/local/thread.hpp>
@@ -46,7 +48,10 @@ struct wait_for_flag
             }
 
             std::unique_lock<hpx::lcos::local::spinlock> lk(mutex);
-            cond_var.wait(mutex);
+            if (!flag)
+            {
+                cond_var.wait(mutex);
+            }
         }
         ++woken;
     }
