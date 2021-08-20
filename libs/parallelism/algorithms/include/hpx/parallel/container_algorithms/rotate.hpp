@@ -394,6 +394,7 @@ namespace hpx { namespace ranges {
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/parallel/algorithms/rotate.hpp>
 #include <hpx/parallel/tagspec.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
@@ -447,7 +448,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::rotate
     HPX_INLINE_CONSTEXPR_VARIABLE struct rotate_t final
-      : hpx::functional::tag_fallback<rotate_t>
+      : hpx::detail::tag_parallel_algorithm<rotate_t>
     {
     private:
         // clang-format off
@@ -550,7 +551,7 @@ namespace hpx { namespace ranges {
     using rotate_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct rotate_copy_t final
-      : hpx::functional::tag_fallback<rotate_copy_t>
+      : hpx::detail::tag_parallel_algorithm<rotate_copy_t>
     {
     private:
         // clang-format off
