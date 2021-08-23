@@ -25,6 +25,29 @@ After the tests have been built, you can invoke separate tests with the help of
 the ``ctest`` command. You can list all available test targets using ``make help
 | grep tests``. Please see the |ctest_doc|_ for further details.
 
+Running performance tests
+=========================
+
+We run performance tests on Piz Daint for each pull request using Jenkins. To
+run those performance tests locally or on Piz Daint, a script is provided under
+``tools/perftests_ci/local_run.sh`` (to be run in the build directory specifying
+the |hpx| source directory as the argument to the script, default is
+``$HOME/projects/hpx_perftests_ci``.
+
+Adding new performance tests
+============================
+
+To add a new performance test, you need to wrap the portion of code to benchmark
+with ``hpx::util::perftests_report``, passing the test name, the executor name
+and the function to time (can be a lambda). This facility is used to output the
+time results in a json format (format needed to compare the results and plot
+them).  To effectively print them at the end of your test, call
+``hpx::util::perftests_print_times``. To see an example of use, see
+``future_overhead_report.cpp``.
+Finally, you can add the test to the CI report editing the ``hpx_targets`` for
+the executable name and ``hpx_test_options`` for the corresponding options to
+use for the run.
+
 Issue tracker
 =============
 
