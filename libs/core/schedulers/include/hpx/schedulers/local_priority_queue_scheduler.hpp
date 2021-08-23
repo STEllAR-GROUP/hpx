@@ -626,7 +626,9 @@ namespace hpx { namespace threads { namespace policies {
 
                 // Give up, we should have work to convert.
                 if (have_staged)
+                {
                     return false;
+                }
             }
 
             if (!running)
@@ -644,7 +646,7 @@ namespace hpx { namespace threads { namespace policies {
                         num_thread < num_high_priority_queues_)
                     {
                         thread_queue_type* q = high_priority_queues_[idx].data_;
-                        if (q->get_next_thread(thrd, running))
+                        if (q->get_next_thread(thrd, running, true))
                         {
                             q->increment_num_stolen_from_pending();
                             this_high_priority_queue
@@ -653,7 +655,8 @@ namespace hpx { namespace threads { namespace policies {
                         }
                     }
 
-                    if (queues_[idx].data_->get_next_thread(thrd, running))
+                    if (queues_[idx].data_->get_next_thread(
+                            thrd, running, true))
                     {
                         queues_[idx].data_->increment_num_stolen_from_pending();
                         this_queue->increment_num_stolen_to_pending();

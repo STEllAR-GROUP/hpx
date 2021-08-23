@@ -13,6 +13,8 @@
 #include <memory>
 #include <string>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace util { namespace detail {
 
     class pool_timer;
@@ -45,3 +47,5 @@ namespace hpx { namespace util {
         std::shared_ptr<detail::pool_timer> timer_;
     };
 }}    // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>
