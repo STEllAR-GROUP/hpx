@@ -185,6 +185,7 @@ namespace hpx { namespace util {
 
     private:
         mutable std::uint32_t num_localities;
+        mutable std::uint32_t num_os_threads;
         std::ptrdiff_t small_stacksize;
         std::ptrdiff_t medium_stacksize;
         std::ptrdiff_t large_stacksize;

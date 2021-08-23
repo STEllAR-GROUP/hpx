@@ -55,15 +55,15 @@ namespace boost { namespace lockfree {
         T data;
 
         deque_node()
-          : left(0)
-          , right(0)
+          : left(nullptr)
+          , right(nullptr)
           , data()
         {
         }
 
         deque_node(deque_node const& p)
-          : left(p.left.load())
-          , right(p.right.load())
+          : left(p.left.load(std::memory_order_relaxed))
+          , right(p.right.load(std::memory_order_relaxed))
         {
         }
 
@@ -109,7 +109,7 @@ namespace boost { namespace lockfree {
         }
 
         deque_anchor(deque_anchor const& p)
-          : pair_(p.pair_.load())
+          : pair_(p.pair_.load(std::memory_order_relaxed))
         {
         }
 
@@ -124,55 +124,68 @@ namespace boost { namespace lockfree {
         {
         }
 
-        pair lrs() const volatile
+        pair lrs(std::memory_order mo = std::memory_order_acquire) const
+            volatile
         {
-            return pair_.load();
+            return pair_.load(mo);
         }
 
-        node* left() const volatile
+        node* left(std::memory_order mo = std::memory_order_acquire) const
+            volatile
         {
-            return pair_.load().get_left_ptr();
+            return pair_.load(mo).get_left_ptr();
         }
 
-        node* right() const volatile
+        node* right(std::memory_order mo = std::memory_order_acquire) const
+            volatile
         {
-            return pair_.load().get_right_ptr();
+            return pair_.load(mo).get_right_ptr();
         }
 
-        tag_t status() const volatile
+        tag_t status(std::memory_order mo = std::memory_order_acquire) const
+            volatile
         {
-            return pair_.load().get_left_tag();
+            return pair_.load(mo).get_left_tag();
         }
 
-        tag_t tag() const volatile
+        tag_t tag(std::memory_order mo = std::memory_order_acquire) const
+            volatile
         {
-            return pair_.load().get_right_tag();
+            return pair_.load(mo).get_right_tag();
         }
 
-        bool cas(deque_anchor& expected, deque_anchor const& desired) volatile
+        bool cas(deque_anchor& expected, deque_anchor const& desired,
+            std::memory_order mo = std::memory_order_acq_rel) volatile
         {
             return pair_.compare_exchange_strong(
-                expected.load(), desired.load());
+                expected.load(std::memory_order_acquire),
+                desired.load(std::memory_order_acquire), mo);
         }
 
-        bool cas(pair& expected, deque_anchor const& desired) volatile
+        bool cas(pair& expected, deque_anchor const& desired,
+            std::memory_order mo = std::memory_order_acq_rel) volatile
         {
-            return pair_.compare_exchange_strong(expected, desired.load());
+            return pair_.compare_exchange_strong(
+                expected, desired.load(std::memory_order_acquire), mo);
         }
 
-        bool cas(deque_anchor& expected, pair const& desired) volatile
+        bool cas(deque_anchor& expected, pair const& desired,
+            std::memory_order mo = std::memory_order_acq_rel) volatile
         {
-            return pair_.compare_exchange_strong(expected.load(), desired);
+            return pair_.compare_exchange_strong(
+                expected.load(std::memory_order_acquire), desired, mo);
         }
 
-        bool cas(pair& expected, pair const& desired) volatile
+        bool cas(pair& expected, pair const& desired,
+            std::memory_order mo = std::memory_order_acq_rel) volatile
         {
-            return pair_.compare_exchange_strong(expected, desired);
+            return pair_.compare_exchange_strong(expected, desired, mo);
         }
 
         bool operator==(volatile deque_anchor const& rhs) const
         {
-            return pair_.load() == rhs.pair_.load();
+            return pair_.load(std::memory_order_acquire) ==
+                rhs.pair_.load(std::memory_order_acquire);
         }
 
         bool operator!=(volatile deque_anchor const& rhs) const
@@ -182,7 +195,7 @@ namespace boost { namespace lockfree {
 
         bool operator==(volatile pair const& rhs) const
         {
-            return pair_.load() == rhs;
+            return pair_.load(std::memory_order_acquire) == rhs;
         }
 
         bool operator!=(volatile pair const& rhs) const
@@ -270,14 +283,16 @@ namespace boost { namespace lockfree {
         {
             // Get the right node of the leftmost pointer held by lrs and its ABA
             // tag (tagged_ptr).
-            node_pointer prev = lrs.get_left_ptr()->right.load();
+            node_pointer prev =
+                lrs.get_left_ptr()->right.load(std::memory_order_acquire);
 
             if (anchor_ != lrs)
                 return;
 
             // Get the left node of prev and its tag (again, a tuple represented by
             // a tagged_ptr).
-            node_pointer prevnext = prev.get_ptr()->left.load();
+            node_pointer prevnext =
+                prev.get_ptr()->left.load(std::memory_order_acquire);
 
             // Check if prevnext is equal to r.
             if (prevnext.get_ptr() != lrs.get_left_ptr())
@@ -302,14 +317,16 @@ namespace boost { namespace lockfree {
         {
             // Get the left node of the rightmost pointer held by lrs and its ABA
             // tag (tagged_ptr).
-            node_pointer prev = lrs.get_right_ptr()->left.load();
+            node_pointer prev =
+                lrs.get_right_ptr()->left.load(std::memory_order_acquire);
 
             if (anchor_ != lrs)
                 return;
 
             // Get the right node of prev and its tag (again, a tuple represented
             // by a tagged_ptr).
-            node_pointer prevnext = prev.get_ptr()->right.load();
+            node_pointer prevnext =
+                prev.get_ptr()->right.load(std::memory_order_acquire);
 
             // Check if prevnext is equal to r.
             if (prevnext.get_ptr() != lrs.get_right_ptr())
@@ -366,7 +383,8 @@ namespace boost { namespace lockfree {
         // FIXME: Should we check both pointers here?
         bool empty() const
         {
-            return anchor_.lrs().get_left_ptr() == nullptr;
+            return anchor_.lrs(std::memory_order_relaxed).get_left_ptr() ==
+                nullptr;
         }
 
         // Thread-safe and non-blocking.
@@ -392,7 +410,7 @@ namespace boost { namespace lockfree {
             while (true)
             {
                 // Load the anchor.
-                anchor_pair lrs = anchor_.lrs();
+                anchor_pair lrs = anchor_.lrs(std::memory_order_relaxed);
 
                 // Check if the deque is empty.
                 // FIXME: Should we check both pointers here?
@@ -450,7 +468,7 @@ namespace boost { namespace lockfree {
             while (true)
             {
                 // Load the anchor.
-                anchor_pair lrs = anchor_.lrs();
+                anchor_pair lrs = anchor_.lrs(std::memory_order_relaxed);
 
                 // Check if the deque is empty.
                 // FIXME: Should we check both pointers here?
@@ -500,7 +518,7 @@ namespace boost { namespace lockfree {
             while (true)
             {
                 // Load the anchor.
-                anchor_pair lrs = anchor_.lrs();
+                anchor_pair lrs = anchor_.lrs(std::memory_order_relaxed);
 
                 // Check if the deque is empty.
                 // FIXME: Should we check both pointers here?
@@ -530,7 +548,8 @@ namespace boost { namespace lockfree {
                         continue;
 
                     // Get the leftmost nodes' right node.
-                    node_pointer prev = lrs.get_left_ptr()->right.load();
+                    node_pointer prev = lrs.get_left_ptr()->right.load(
+                        std::memory_order_acquire);
 
                     // Try to update the anchor to point to prev as the leftmost
                     // node.
@@ -565,7 +584,7 @@ namespace boost { namespace lockfree {
             while (true)
             {
                 // Load the anchor.
-                anchor_pair lrs = anchor_.lrs();
+                anchor_pair lrs = anchor_.lrs(std::memory_order_relaxed);
 
                 // Check if the deque is empty.
                 // FIXME: Should we check both pointers here?
@@ -595,7 +614,8 @@ namespace boost { namespace lockfree {
                         continue;
 
                     // Get the rightmost nodes' left node.
-                    node_pointer prev = lrs.get_right_ptr()->left.load();
+                    node_pointer prev = lrs.get_right_ptr()->left.load(
+                        std::memory_order_acquire);
 
                     // Try to update the anchor to point to prev as the rightmost
                     // node.
