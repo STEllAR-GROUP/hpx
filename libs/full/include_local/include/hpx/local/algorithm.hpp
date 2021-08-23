@@ -16,6 +16,5 @@ namespace hpx {
     using hpx::parallel::minmax_element;
     using hpx::parallel::partition;
     using hpx::parallel::partition_copy;
-    using hpx::parallel::sort;
     using hpx::parallel::stable_partition;
 }    // namespace hpx

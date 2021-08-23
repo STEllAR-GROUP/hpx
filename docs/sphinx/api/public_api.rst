@@ -96,7 +96,7 @@ Functions
 - :cpp:func:`hpx::set_intersection`
 - :cpp:func:`hpx::set_symmetric_difference`
 - :cpp:func:`hpx::set_union`
-- :cpp:func:`hpx::parallel::v1::sort`
+- :cpp:func:`hpx::sort`
 - :cpp:func:`hpx::parallel::v1::stable_partition`
 - :cpp:func:`hpx::swap_ranges`
 - :cpp:func:`hpx::stable_sort`
@@ -143,13 +143,11 @@ Functions
 - :cpp:func:`hpx::ranges::set_intersection`
 - :cpp:func:`hpx::ranges::set_symmetric_difference`
 - :cpp:func:`hpx::ranges::set_union`
-<<<<<<< HEAD
+- :cpp:func:`hpx::ranges::sort`
+- :cpp:func:`hpx::ranges::stable_sort`
 - :cpp:func:`hpx::ranges::swap_ranges`
 - :cpp:func:`hpx::ranges::unique`
 - :cpp:func:`hpx::ranges::unique_copy`
-=======
-- :cpp:func:`hpx::ranges::stable_sort`
->>>>>>> 41acac1b94 (added sphinx api docs made stable_sort work for sentinels)
 - :cpp:func:`hpx::ranges::for_loop`
 - :cpp:func:`hpx::ranges::for_loop_strided`
 

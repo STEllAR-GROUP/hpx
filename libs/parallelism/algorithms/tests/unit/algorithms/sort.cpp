@@ -35,7 +35,7 @@ void sort_benchmark()
 
         hpx::chrono::high_resolution_timer t;
         // sort, blocking when seq, par, par_vec
-        hpx::parallel::sort(par, c.begin(), c.end());
+        hpx::sort(par, c.begin(), c.end());
         auto elapsed = static_cast<std::uint64_t>(t.elapsed_nanoseconds());
 
         bool is_sorted = (verify_(c, std::less<double>(), elapsed, true) != 0);
@@ -58,6 +58,7 @@ void test_sort1()
     using namespace hpx::execution;
 
     // default comparison operator (std::less)
+    test_sort1(int());
     test_sort1(seq, int());
     test_sort1(par, int());
     test_sort1(par_unseq, int());
@@ -110,6 +111,7 @@ void test_sort2()
 {
     using namespace hpx::execution;
     // default comparison operator (std::less)
+    test_sort2(int());
     test_sort2(seq, int());
     test_sort2(par, int());
     test_sort2(par_unseq, int());
