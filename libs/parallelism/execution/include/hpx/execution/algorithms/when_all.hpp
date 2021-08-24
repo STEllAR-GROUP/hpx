@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/datastructures/optional.hpp>
+#include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -21,10 +23,8 @@
 #include <exception>
 #include <functional>
 #include <memory>
-#include <optional>
 #include <type_traits>
 #include <utility>
-#include <variant>
 
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
@@ -141,10 +141,10 @@ namespace hpx { namespace execution { namespace experimental {
                 static constexpr std::size_t I = 0;
                 std::atomic<std::size_t> predecessors_remaining =
                     num_predecessors;
-                hpx::util::member_pack_for<std::optional<
+                hpx::util::member_pack_for<hpx::optional<
                     std::decay_t<value_types_helper_t<Senders>>>...>
                     ts;
-                std::optional<error_types<std::variant>> error;
+                hpx::optional<error_types<hpx::variant>> error;
                 std::atomic<bool> set_done_error_called{false};
                 std::decay_t<Receiver> receiver;
 
@@ -193,7 +193,7 @@ namespace hpx { namespace execution { namespace experimental {
                         }
                         else if (error)
                         {
-                            std::visit(
+                            hpx::visit(
                                 [this](auto&& error) {
                                     hpx::execution::experimental::set_error(
                                         std::move(receiver),
