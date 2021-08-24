@@ -810,6 +810,7 @@ namespace hpx { namespace ranges {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -825,7 +826,7 @@ namespace hpx { namespace ranges {
     using transform_inclusive_scan_result = parallel::util::in_out_result<I, O>;
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct transform_inclusive_scan_t final
-      : hpx::functional::tag_fallback<transform_inclusive_scan_t>
+      : hpx::detail::tag_parallel_algorithm<transform_inclusive_scan_t>
     {
     private:
         // clang-format off

@@ -277,6 +277,7 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -320,7 +321,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::sort
     HPX_INLINE_CONSTEXPR_VARIABLE struct sort_t final
-      : hpx::functional::tag_fallback<sort_t>
+      : hpx::detail::tag_parallel_algorithm<sort_t>
     {
     private:
         // clang-format off

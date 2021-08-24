@@ -245,6 +245,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/spin_sort.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
@@ -389,7 +390,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::stable_sort
     HPX_INLINE_CONSTEXPR_VARIABLE struct stable_sort_t final
-      : hpx::functional::tag_fallback<stable_sort_t>
+      : hpx::detail::tag_parallel_algorithm<stable_sort_t>
     {
         // clang-format off
         template <typename RandomIt,
