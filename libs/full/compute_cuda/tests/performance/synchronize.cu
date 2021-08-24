@@ -50,7 +50,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         for (std::size_t i = 0; i != iterations; ++i)
         {
             dummy<<<1, 1, 0, cuda_stream>>>();
-            cudaStreamSynchronize(cuda_stream);
+            hpx::cuda::experimental::check_cuda_error(
+                cudaStreamSynchronize(cuda_stream));
         }
         double elapsed = timer.elapsed();
         std::cout
@@ -69,14 +70,16 @@ int hpx_main(hpx::program_options::variables_map& vm)
             {
                 dummy<<<1, 1, 0, cuda_stream>>>();
             }
-            cudaStreamSynchronize(cuda_stream);
+            hpx::cuda::experimental::check_cuda_error(
+                cudaStreamSynchronize(cuda_stream));
         }
 
         for (std::size_t i = 0; i < non_batch_iterations; ++i)
         {
             dummy<<<1, 1, 0, cuda_stream>>>();
         }
-        cudaStreamSynchronize(cuda_stream);
+        hpx::cuda::experimental::check_cuda_error(
+            cudaStreamSynchronize(cuda_stream));
 
         double elapsed = timer.elapsed();
         std::cout
