@@ -315,6 +315,7 @@ namespace hpx { namespace ranges {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/uninitialized_copy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -326,7 +327,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx { namespace ranges {
     HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_copy_t final
-      : hpx::functional::tag_fallback<uninitialized_copy_t>
+      : hpx::detail::tag_parallel_algorithm<uninitialized_copy_t>
     {
     private:
         // clang-format off
@@ -447,7 +448,7 @@ namespace hpx { namespace ranges {
     } uninitialized_copy{};
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_copy_n_t final
-      : hpx::functional::tag_fallback<uninitialized_copy_n_t>
+      : hpx::detail::tag_parallel_algorithm<uninitialized_copy_n_t>
     {
     private:
         // clang-format off

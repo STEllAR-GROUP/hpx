@@ -323,6 +323,7 @@ namespace hpx { namespace ranges {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/uninitialized_move.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -334,7 +335,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx { namespace ranges {
     HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_move_t final
-      : hpx::functional::tag_fallback<uninitialized_move_t>
+      : hpx::detail::tag_parallel_algorithm<uninitialized_move_t>
     {
     private:
         // clang-format off
@@ -455,7 +456,7 @@ namespace hpx { namespace ranges {
     } uninitialized_move{};
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_move_n_t final
-      : hpx::functional::tag_fallback<uninitialized_move_n_t>
+      : hpx::detail::tag_parallel_algorithm<uninitialized_move_n_t>
     {
     private:
         // clang-format off
