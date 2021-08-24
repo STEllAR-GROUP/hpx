@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +18,7 @@
 #include <utility>
 
 namespace hpx { namespace detail {
+
     // dispatch point used for launch_policy implementations
     template <typename Action, typename Enable = void>
     struct sync_launch_policy_dispatch;
@@ -25,17 +26,16 @@ namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     struct sync_launch_policy_dispatch<Action,
-        typename std::enable_if<!traits::is_action<Action>::value>::type>
+        std::enable_if_t<!traits::is_action_v<Action>>>
     {
         // general case execute on separate thread (except launch::sync)
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
-            call(launch policy, F&& f, Ts&&... ts)
+        HPX_FORCEINLINE static hpx::util::detail::invoke_deferred_result_t<F,
+            Ts...>
+        call(launch policy, F&& f, Ts&&... ts)
         {
-            typedef
-                typename util::detail::invoke_deferred_result<F, Ts...>::type
-                    result_type;
+            using result_type =
+                util::detail::invoke_deferred_result_t<F, Ts...>;
 
             if (policy == launch::sync)
             {
@@ -65,9 +65,9 @@ namespace hpx { namespace detail {
 
         // launch::sync execute inline
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
-            call(launch::sync_policy, F&& f, Ts&&... ts)
+        HPX_FORCEINLINE static hpx::util::detail::invoke_deferred_result_t<F,
+            Ts...>
+        call(launch::sync_policy, F&& f, Ts&&... ts)
         {
             try
             {

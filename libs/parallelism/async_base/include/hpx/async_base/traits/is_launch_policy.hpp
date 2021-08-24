@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <type_traits>
 
 namespace hpx { namespace traits {
+
     namespace detail {
         template <typename Policy>
         struct is_launch_policy
@@ -21,8 +22,11 @@ namespace hpx { namespace traits {
     }    // namespace detail
 
     template <typename Policy>
-    struct is_launch_policy
-      : detail::is_launch_policy<typename std::decay<Policy>::type>
+    struct is_launch_policy : detail::is_launch_policy<std::decay_t<Policy>>
     {
     };
+
+    template <typename Policy>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_launch_policy_v =
+        is_launch_policy<Policy>::value;
 }}    // namespace hpx::traits
