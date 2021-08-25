@@ -28,3 +28,5 @@ endif()
 
 ctest_start(Experimental TRACK "${CTEST_TRACK}")
 ctest_update()
+ctest_submit(PARTS Update)
+ctest_submit(PARTS ExtraFiles)
