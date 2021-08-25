@@ -577,6 +577,7 @@ namespace hpx { namespace ranges {
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/algorithms/exclusive_scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -592,7 +593,7 @@ namespace hpx { namespace ranges {
     using exclusive_scan_result = parallel::util::in_out_result<I, O>;
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct exclusive_scan_t final
-      : hpx::functional::tag_fallback<exclusive_scan_t>
+      : hpx::detail::tag_parallel_algorithm<exclusive_scan_t>
     {
     private:
         // clang-format off

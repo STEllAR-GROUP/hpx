@@ -414,6 +414,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
@@ -709,7 +710,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::transform_inclusive_scan
     HPX_INLINE_CONSTEXPR_VARIABLE struct transform_inclusive_scan_t final
-      : hpx::functional::tag_fallback<transform_inclusive_scan_t>
+      : hpx::detail::tag_parallel_algorithm<transform_inclusive_scan_t>
     {
         // clang-format off
         template <typename InIter, typename OutIter, typename BinOp,

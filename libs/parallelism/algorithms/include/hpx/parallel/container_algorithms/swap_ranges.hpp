@@ -220,6 +220,7 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/swap_ranges.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -233,7 +234,7 @@ namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::swap_ranges
     HPX_INLINE_CONSTEXPR_VARIABLE struct swap_ranges_t final
-      : hpx::functional::tag_fallback<swap_ranges_t>
+      : hpx::detail::tag_parallel_algorithm<swap_ranges_t>
     {
     private:
         // clang-format off
