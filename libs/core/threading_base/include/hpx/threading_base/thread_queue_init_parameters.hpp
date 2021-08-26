@@ -33,6 +33,8 @@ namespace hpx { namespace threads { namespace policies {
                 HPX_THREAD_QUEUE_MAX_DELETE_COUNT),
             std::int64_t max_terminated_threads = std::int64_t(
                 HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS),
+            std::int64_t init_threads_count = std::int64_t(
+                HPX_THREAD_QUEUE_INIT_THREADS_COUNT),
             double max_idle_backoff_time = double(HPX_IDLE_BACKOFF_TIME_MAX),
             std::ptrdiff_t small_stacksize = HPX_SMALL_STACK_SIZE,
             std::ptrdiff_t medium_stacksize = HPX_MEDIUM_STACK_SIZE,
@@ -46,6 +48,7 @@ namespace hpx { namespace threads { namespace policies {
           , min_delete_count_(min_delete_count)
           , max_delete_count_(max_delete_count)
           , max_terminated_threads_(max_terminated_threads)
+          , init_threads_count_(init_threads_count)
           , max_idle_backoff_time_(max_idle_backoff_time)
           , small_stacksize_(small_stacksize)
           , medium_stacksize_(medium_stacksize)
@@ -63,6 +66,7 @@ namespace hpx { namespace threads { namespace policies {
         std::int64_t min_delete_count_;
         std::int64_t max_delete_count_;
         std::int64_t max_terminated_threads_;
+        std::int64_t init_threads_count_;
         double max_idle_backoff_time_;
         std::ptrdiff_t const small_stacksize_;
         std::ptrdiff_t const medium_stacksize_;
