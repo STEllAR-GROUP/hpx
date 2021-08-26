@@ -24,7 +24,7 @@ pipeline {
     }
     environment {
         SPACK_ROOT = '/apps/daint/SSL/HPX/spack'
-        GITHUB_TOKEN = credentials('STELLARBOT_GITHUB_TOKEN')
+        GITHUB_TOKEN = credentials('AURIANER_TOKEN')
     }
     stages {
         stage('checkout') {
