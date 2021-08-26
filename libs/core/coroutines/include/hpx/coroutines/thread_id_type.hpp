@@ -10,6 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
@@ -156,6 +157,12 @@ namespace hpx { namespace threads {
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    enum class thread_id_addref
+    {
+        yes,
+        no
+    };
+
     namespace detail {
 
         struct thread_data_reference_counting;
@@ -165,11 +172,12 @@ namespace hpx { namespace threads {
 
         struct thread_data_reference_counting
         {
-            // the initial reference count is one as each newly created thread
-            // will be held alive by the variable returned from the creation
-            // function
-            thread_data_reference_counting()
-              : count_(1)
+            // the initial reference count is one by default as each newly
+            // created thread will be held alive by the variable returned from
+            // the creation function;
+            explicit thread_data_reference_counting(
+                thread_id_addref addref = thread_id_addref::yes)
+              : count_(addref == thread_id_addref::yes)
             {
             }
 
@@ -184,6 +192,7 @@ namespace hpx { namespace threads {
 
             friend void intrusive_ptr_release(thread_data_reference_counting* p)
             {
+                HPX_ASSERT(p->count_ != 0);
                 if (--p->count_ == 0)
                 {
                     // give this object back to the system
@@ -203,12 +212,6 @@ namespace hpx { namespace threads {
             hpx::intrusive_ptr<detail::thread_data_reference_counting>;
 
     public:
-        enum class addref
-        {
-            yes,
-            no
-        };
-
         thread_id_ref() noexcept = default;
 
         thread_id_ref(thread_id_ref const&) = default;
@@ -239,9 +242,9 @@ namespace hpx { namespace threads {
 
         using thread_repr = detail::thread_data_reference_counting;
 
-        explicit thread_id_ref(
-            thread_repr* thrd, addref addref = addref::yes) noexcept
-          : thrd_(thrd, addref == addref::yes)
+        explicit thread_id_ref(thread_repr* thrd,
+            thread_id_addref addref = thread_id_addref::yes) noexcept
+          : thrd_(thrd, addref == thread_id_addref::yes)
         {
         }
 

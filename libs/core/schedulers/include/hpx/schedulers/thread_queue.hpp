@@ -193,7 +193,7 @@ namespace hpx { namespace threads { namespace policies {
                     p = threads::thread_data_stackful::create(
                         data, this, stacksize);
                 }
-                thrd = thread_id_ref_type(p, thread_id_ref_type::addref::no);
+                thrd = thread_id_ref_type(p, thread_id_addref::no);
             }
         }
 

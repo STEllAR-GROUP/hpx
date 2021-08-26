@@ -527,7 +527,7 @@ namespace hpx { namespace threads { namespace policies {
                     p = threads::thread_data_stackful::create(
                         data, this, stacksize);
                 }
-                tid = thread_id_ref_type(p, thread_id_ref_type::addref::no);
+                tid = thread_id_ref_type(p, thread_id_addref::no);
 
                 tq_deb.debug(debug::str<>("create_thread_object"), "new",
                     queue_data_print(this),

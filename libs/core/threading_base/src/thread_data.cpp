@@ -46,8 +46,9 @@ namespace hpx { namespace threads {
     }    // namespace detail
 
     thread_data::thread_data(thread_init_data& init_data, void* queue,
-        std::ptrdiff_t stacksize, bool is_stackless)
-      : current_state_(thread_state(
+        std::ptrdiff_t stacksize, bool is_stackless, thread_id_addref addref)
+      : detail::thread_data_reference_counting(addref)
+      , current_state_(thread_state(
             init_data.initial_state, thread_restart_state::signaled))
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
       , description_(init_data.description)

@@ -130,9 +130,9 @@ namespace hpx { namespace threads {
             HPX_ASSERT(coroutine_.is_ready());
         }
 
-        thread_data_stackless(
-            thread_init_data& init_data, void* queue, std::ptrdiff_t stacksize)
-          : thread_data(init_data, queue, stacksize, true)
+        thread_data_stackless(thread_init_data& init_data, void* queue,
+            std::ptrdiff_t stacksize, thread_id_addref addref)
+          : thread_data(init_data, queue, stacksize, true, addref)
           , coroutine_(std::move(init_data.func), thread_id_type(this_()))
         {
             HPX_ASSERT(coroutine_.is_ready());
@@ -140,8 +140,9 @@ namespace hpx { namespace threads {
 
         ~thread_data_stackless();
 
-        inline static thread_data* create(
-            thread_init_data& init_data, void* queue, std::ptrdiff_t stacksize);
+        inline static thread_data* create(thread_init_data& data, void* queue,
+            std::ptrdiff_t stacksize,
+            thread_id_addref addref = thread_id_addref::yes);
 
         void destroy() override
         {
@@ -154,11 +155,11 @@ namespace hpx { namespace threads {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    inline thread_data* thread_data_stackless::create(
-        thread_init_data& data, void* queue, std::ptrdiff_t stacksize)
+    inline thread_data* thread_data_stackless::create(thread_init_data& data,
+        void* queue, std::ptrdiff_t stacksize, thread_id_addref addref)
     {
         thread_data* p = thread_alloc_.allocate(1);
-        new (p) thread_data_stackless(data, queue, stacksize);
+        new (p) thread_data_stackless(data, queue, stacksize, addref);
         return p;
     }
 }}    // namespace hpx::threads
