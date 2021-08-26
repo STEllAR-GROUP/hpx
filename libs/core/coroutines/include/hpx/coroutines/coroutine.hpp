@@ -128,6 +128,11 @@ namespace hpx { namespace threads { namespace coroutines {
         }
 #endif
 
+        void init()
+        {
+            impl_.init();
+        }
+
         void rebind(functor_type&& f, thread_id_type id)
         {
             impl_.rebind(std::move(f), id);

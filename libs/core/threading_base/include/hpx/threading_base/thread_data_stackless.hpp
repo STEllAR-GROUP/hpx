@@ -121,6 +121,8 @@ namespace hpx { namespace threads {
         }
 #endif
 
+        void init() override {}
+
         void rebind(thread_init_data& init_data) override
         {
             this->thread_data::rebind_base(init_data);

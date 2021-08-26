@@ -112,6 +112,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 #endif
 
+        void init()
+        {
+            this->super_type::init();
+        }
+
         void reset()
         {
             // First reset the function and arguments

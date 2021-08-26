@@ -584,6 +584,7 @@ namespace hpx { namespace threads {
             std::size_t data) = 0;
 #endif
 
+        virtual void init() = 0;
         virtual void rebind(thread_init_data& init_data) = 0;
 
 #if defined(HPX_HAVE_APEX)
