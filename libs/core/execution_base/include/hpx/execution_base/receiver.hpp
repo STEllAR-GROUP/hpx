@@ -106,11 +106,16 @@ namespace hpx { namespace execution { namespace experimental {
     {
     private:
         template <typename R, typename... Args>
-        friend constexpr HPX_FORCEINLINE auto
-        tag_override_dispatch(set_value_t, R&& r, Args&&... args) noexcept(
-            noexcept(std::forward<R>(r).set_value(std::forward<Args>(args)...)))
-            -> decltype(
-                std::forward<R>(r).set_value(std::forward<Args>(args)...))
+        friend constexpr HPX_FORCEINLINE auto tag_override_dispatch(
+            set_value_t, R&& r, Args&&... args)
+        // This does not compile with CUDA 11.4 (most recent at the moment)
+        // Removing the variadic ... makes it compile
+#if !defined(HPX_COMPUTE_DEVICE_CODE) || (HPX_CUDA_VERSION < 1104)
+            noexcept(noexcept(
+                std::forward<R>(r).set_value(std::forward<Args>(args)...)))
+#endif
+                -> decltype(
+                    std::forward<R>(r).set_value(std::forward<Args>(args)...))
         {
             return std::forward<R>(r).set_value(std::forward<Args>(args)...);
         }
