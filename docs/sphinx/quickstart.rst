@@ -32,8 +32,9 @@ unpack it or clone the repository directly using ``git``:
 It is also recommended that you check out the latest stable tag:
 
 .. code-block:: sh
-
-    git checkout 1.7.1
+    
+    cd hpx
+    git checkout 1.7.1 
 
 |hpx| dependencies
 ==================
@@ -53,59 +54,102 @@ versions, is available at :ref:`prerequisites`.
 Building |hpx|
 ==============
 
-Once you have the source code and the dependencies, set up a separate build
-directory and configure the project. Assuming all your dependencies are in paths
+Once you have the source code and the dependencies and assuming all your dependencies are in paths
 known to |cmake|, the following gets you started:
 
+#. First, set up a separate build directory to configure the project:
+
+   .. code-block:: sh
+
+      mkdir build && cd build
+
+#. To configure the project you have the following options:
+
+   * To build the core |hpx| libraries and examples, and install them to your chosen location (recommended):
+
+    .. code-block:: sh
+
+        cmake -DCMAKE_INSTALL_PREFIX=/install/path ..
+
+    .. tip::
+
+       If you want to change |cmake| variables for your build, it is usually a good
+       idea to start with a clean build directory to avoid configuration problems.
+       It is especially important that you use a clean build directory when changing
+       between ``Release`` and ``Debug`` modes.
+
+   * To install |hpx| to the default system folders, simply leave out the ``CMAKE_INSTALL_PREFIX`` option:
+
+    .. code-block:: sh
+
+        cmake ..
+
+   * If your dependencies are in custom locations, you may need to tell |cmake| where to find them by passing one or more of the following options to |cmake|:
+
+    .. code-block:: sh
+
+        -DBOOST_ROOT=/path/to/boost
+        -DHWLOC_ROOT=/path/to/hwloc
+        -DTCMALLOC_ROOT=/path/to/tcmalloc
+        -DJEMALLOC_ROOT=/path/to/jemalloc
+
+   * If you want to try |hpx| without using a custom allocator pass ``-DHPX_WITH_MALLOC=system`` to |cmake|:
+
+    .. code-block:: sh 
+
+        cmake -DCMAKE_INSTALL_PREFIX=/install/path -DHPX_WITH_MALLOC=system ..
+
+    .. important::
+
+       If you are building |hpx| for a system with more than 64 processing units,
+       you must change the |cmake| variable ``HPX_WITH_MAX_CPU_COUNT`` (to a value at least as big as the
+       number of (virtual) cores on your system). Note that the default value is 64.
+
+#. Once the configuration is complete, to build the project you run:
+
+  .. code-block:: sh
+
+      make -jN install # where N is the number of jobs
+
+  .. tip::
+
+     Do not set only ``-j`` (i.e. ``-j`` without an explicit number of jobs)
+     unless you have a lot of memory available on your machine.
+
+Tests and examples
+======================
+
+Run tests
+---------
+
+To build the tests:
+
 .. code-block:: sh
 
-    # In the HPX source directory
-    mkdir build && cd build
-    cmake -DCMAKE_INSTALL_PREFIX=/install/path ..
-    make install
+    make tests
 
-This will build the core |hpx| libraries and examples, and install them to your
-chosen location. If you want to install |hpx| to system folders, simply leave out
-the ``CMAKE_INSTALL_PREFIX`` option. This may take a while. To speed up the
-process, launch more jobs by passing the ``-jN`` option to ``make``.
-
-.. tip::
-
-   Do not set only ``-j`` (i.e. ``-j`` without an explicit number of jobs)
-   unless you have a lot of memory available on your machine.
-
-.. tip::
-
-   If you want to change |cmake| variables for your build, it is usually a good
-   idea to start with a clean build directory to avoid configuration problems.
-   It is especially important that you use a clean build directory when changing
-   between ``Release`` and ``Debug`` modes.
-
-If your dependencies are in custom locations, you may need to tell |cmake| where
-to find them by passing one or more of the following options to |cmake|:
+To run the tests:
 
 .. code-block:: sh
 
-    -DBOOST_ROOT=/path/to/boost
-    -DHWLOC_ROOT=/path/to/hwloc
-    -DTCMALLOC_ROOT=/path/to/tcmalloc
-    -DJEMALLOC_ROOT=/path/to/jemalloc
+    make test
 
-If you want to try |hpx| without using a custom allocator pass
-``-DHPX_WITH_MALLOC=system`` to |cmake|.
+To control which tests to run use ``ctest``:
 
-.. important::
+* To run single tests, for example a test for ``for_loop``:
 
-   If you are building |hpx| for a system with more than 64 processing units,
-   you must change the |cmake| variables ``HPX_WITH_MORE_THAN_64_THREADS`` (to
-   ``On``) and ``HPX_WITH_MAX_CPU_COUNT`` (to a value at least as big as the
-   number of (virtual) cores on your system).
+.. code-block:: sh
 
-To build the tests, run ``make tests``. To run the tests, run either ``make test``
-or use ``ctest`` for more control over which tests to run. You can run single
-tests for example with ``ctest --output-on-failure -R
-tests.unit.parallel.algorithms.for_loop`` or a whole group of tests with ``ctest
---output-on-failure -R tests.unit``.
+    ctest --output-on-failure -R tests.unit.modules.algorithms.for_loop
+
+* To run a whole group of tests:
+
+.. code-block:: sh
+
+    ctest --output-on-failure -R tests.unit
+
+Run examples
+------------
 
 If you did not run ``make install`` earlier, do so now or build the
 ``hello_world_1`` example by running:
