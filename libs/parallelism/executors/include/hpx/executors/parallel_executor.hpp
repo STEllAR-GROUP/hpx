@@ -178,6 +178,23 @@ namespace hpx { namespace execution {
             return exec_with_hint;
         }
 
+        friend constexpr parallel_policy_executor tag_dispatch(
+            hpx::execution::experimental::with_priority_t,
+            parallel_policy_executor const& exec,
+            hpx::threads::thread_priority priority)
+        {
+            auto exec_with_priority = exec;
+            exec_with_priority.priority_ = priority;
+            return exec_with_priority;
+        }
+
+        friend constexpr hpx::threads::thread_priority tag_dispatch(
+            hpx::execution::experimental::get_priority_t,
+            parallel_policy_executor const& exec) noexcept
+        {
+            return exec.priority_;
+        }
+
         friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
             hpx::execution::experimental::get_hint_t,
             parallel_policy_executor const& exec) noexcept
