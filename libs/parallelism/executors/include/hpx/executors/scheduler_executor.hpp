@@ -28,6 +28,7 @@
 #include <hpx/functional/invoke_fused.hpp>
 
 #include <exception>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -91,9 +92,94 @@ namespace hpx { namespace execution { namespace experimental {
         {
             return *this;
         }
-        /// \endcond
 
-        /// \cond NOINTERNAL
+        template <typename Enable =
+                      std::enable_if_t<hpx::is_invocable_v<with_priority_t,
+                          BaseScheduler, hpx::threads::thread_priority>>>
+        friend scheduler_executor tag_dispatch(
+            hpx::execution::experimental::with_priority_t,
+            scheduler_executor const& exec,
+            hpx::threads::thread_priority priority)
+        {
+            return scheduler_executor(with_priority(exec.sched_, priority));
+        }
+
+        template <typename Enable = std::enable_if_t<
+                      hpx::is_invocable_v<get_priority_t, BaseScheduler>>>
+        friend hpx::threads::thread_priority tag_dispatch(
+            hpx::execution::experimental::get_priority_t,
+            scheduler_executor const& exec)
+        {
+            return get_priority(exec.sched_);
+        }
+
+        template <typename Enable =
+                      std::enable_if_t<hpx::is_invocable_v<with_stacksize_t,
+                          BaseScheduler, hpx::threads::thread_stacksize>>>
+        friend scheduler_executor tag_dispatch(
+            hpx::execution::experimental::with_stacksize_t,
+            scheduler_executor const& exec,
+            hpx::threads::thread_stacksize stacksize)
+        {
+            return scheduler_executor(with_stacksize(exec.sched_, stacksize));
+        }
+
+        template <typename Enable = std::enable_if_t<
+                      hpx::is_invocable_v<get_stacksize_t, BaseScheduler>>>
+        friend hpx::threads::thread_stacksize tag_dispatch(
+            hpx::execution::experimental::get_stacksize_t,
+            scheduler_executor const& exec)
+        {
+            return get_stacksize(exec.sched_);
+        }
+
+        template <
+            typename Enable = std::enable_if_t<hpx::is_invocable_v<with_hint_t,
+                BaseScheduler, hpx::threads::thread_schedule_hint>>>
+        friend scheduler_executor tag_dispatch(
+            hpx::execution::experimental::with_hint_t,
+            scheduler_executor const& exec,
+            hpx::threads::thread_schedule_hint hint)
+        {
+            return scheduler_executor(with_hint(exec.sched_, hint));
+        }
+
+        template <typename Enable = std::enable_if_t<
+                      hpx::is_invocable_v<get_hint_t, BaseScheduler>>>
+        friend hpx::threads::thread_schedule_hint tag_dispatch(
+            hpx::execution::experimental::get_hint_t,
+            scheduler_executor const& exec)
+        {
+            return get_hint(exec.sched_);
+        }
+
+        template <typename Enable = std::enable_if_t<hpx::is_invocable_v<
+                      with_annotation_t, BaseScheduler, char const*>>>
+        friend scheduler_executor tag_dispatch(
+            hpx::execution::experimental::with_annotation_t,
+            scheduler_executor const& exec, char const* annotation)
+        {
+            return scheduler_executor(with_annotation(exec.sched_, annotation));
+        }
+
+        template <typename Enable = std::enable_if_t<hpx::is_invocable_v<
+                      with_annotation_t, BaseScheduler, std::string>>>
+        friend scheduler_executor tag_dispatch(
+            hpx::execution::experimental::with_annotation_t,
+            scheduler_executor const& exec, std::string annotation)
+        {
+            return scheduler_executor(with_annotation(exec.sched_, annotation));
+        }
+
+        template <typename Enable = std::enable_if_t<
+                      hpx::is_invocable_v<get_annotation_t, BaseScheduler>>>
+        friend char const* tag_dispatch(
+            hpx::execution::experimental::get_annotation_t,
+            scheduler_executor const& exec)
+        {
+            return get_annotation(exec.sched_);
+        }
+
         // Associate the parallel_execution_tag executor tag type as a default
         // with this executor.
         using execution_category = parallel_execution_tag;
