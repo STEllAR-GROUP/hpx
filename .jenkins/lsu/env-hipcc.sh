@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-module load rocm/4.0.1
+module load rocm/4.3.0
 export CXX=hipcc
 
 export HPXRUN_RUNWRAPPER=srun
