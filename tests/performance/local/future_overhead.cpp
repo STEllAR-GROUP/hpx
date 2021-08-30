@@ -91,6 +91,12 @@ const char* exec_name(
     return "parallel_executor_aggregated";
 }
 
+const char* exec_name(hpx::execution::experimental::scheduler_executor<
+    hpx::execution::experimental::thread_pool_scheduler> const&)
+{
+    return "scheduler_executor<thread_pool_scheduler>";
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
 double global_scratch = 0;
@@ -509,6 +515,9 @@ int hpx_main(variables_map& vm)
         hpx::execution::parallel_executor par_nostack(
             hpx::threads::thread_priority::default_,
             hpx::threads::thread_stacksize::nostack);
+        hpx::execution::experimental::scheduler_executor<
+            hpx::execution::experimental::thread_pool_scheduler>
+            sched_exec_tps;
 
         for (int i = 0; i < repetitions; i++)
         {
@@ -526,6 +535,7 @@ int hpx_main(variables_map& vm)
                 measure_function_futures_sliding_semaphore(count, csv, par);
                 measure_function_futures_for_loop(count, csv, par);
                 measure_function_futures_for_loop(count, csv, par_agg);
+                measure_function_futures_for_loop(count, csv, sched_exec_tps);
                 measure_function_futures_for_loop(
                     count, csv, par_nostack, "parallel_executor_nostack");
                 measure_function_futures_register_work(count, csv);
