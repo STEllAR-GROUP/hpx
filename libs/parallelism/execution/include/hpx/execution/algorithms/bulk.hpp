@@ -96,17 +96,10 @@ namespace hpx { namespace execution { namespace experimental {
                     hpx::execution::experimental::set_done(std::move(receiver));
                 }
 
-                // The typedef is duplicated from parent struct as the parent one is
-                // not instantiated early enough to use it here.
-                using value_type =
-                    typename hpx::execution::experimental::sender_traits<
-                        Sender>::template value_types<hpx::tuple, hpx::variant>;
-
                 template <typename... Ts>
                 auto set_value(Ts&&... ts) && noexcept -> decltype(
-                    std::declval<hpx::variant<hpx::monostate, value_type>>()
-                        .template emplace<value_type>(
-                            hpx::make_tuple<>(std::forward<Ts>(ts)...)),
+                    hpx::execution::experimental::set_value(
+                        std::move(receiver), std::forward<Ts>(ts)...),
                     void())
                 {
                     hpx::detail::try_catch_exception_ptr(

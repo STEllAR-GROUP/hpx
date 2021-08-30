@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution_base/operation_state.hpp>
@@ -19,10 +20,8 @@
 
 #include <atomic>
 #include <exception>
-#include <tuple>
 #include <type_traits>
 #include <utility>
-#include <variant>
 
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
@@ -80,7 +79,7 @@ namespace hpx { namespace execution { namespace experimental {
             // variant.
             using error_type =
                 hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
-                    predecessor_error_types<std::variant>, std::exception_ptr>>;
+                    predecessor_error_types<hpx::variant>, std::exception_ptr>>;
 
             // We use a spinlock here to allow taking the lock on non-HPX threads.
             using mutex_type = hpx::lcos::local::spinlock;
@@ -90,7 +89,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::lcos::local::condition_variable cond_var;
                 mutex_type mtx;
                 std::atomic<bool> set_called = false;
-                std::variant<std::monostate, error_type, value_type> value;
+                hpx::variant<hpx::monostate, error_type, value_type> value;
 
                 void wait()
                 {
@@ -114,16 +113,16 @@ namespace hpx { namespace execution { namespace experimental {
                         }
                         else
                         {
-                            return std::move(std::get<value_type>(value));
+                            return std::move(hpx::get<value_type>(value));
                         }
                     }
                     else if (std::holds_alternative<error_type>(value))
                     {
-                        std::visit(sync_wait_error_visitor{},
-                            std::get<error_type>(value));
+                        hpx::visit(sync_wait_error_visitor{},
+                            hpx::get<error_type>(value));
                     }
 
-                    // If the variant holds a std::monostate something has gone
+                    // If the variant holds a hpx::monostate something has gone
                     // wrong and we terminate
                     HPX_UNREACHABLE;
                 }

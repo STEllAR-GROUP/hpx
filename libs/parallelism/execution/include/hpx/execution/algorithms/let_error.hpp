@@ -21,7 +21,6 @@
 #include <hpx/type_support/pack.hpp>
 
 #include <exception>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 

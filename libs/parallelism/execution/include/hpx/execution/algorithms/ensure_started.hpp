@@ -13,6 +13,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution_base/operation_state.hpp>
@@ -36,7 +37,6 @@
 #include <mutex>
 #include <type_traits>
 #include <utility>
-#include <variant>
 
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
@@ -120,11 +120,11 @@ namespace hpx { namespace execution { namespace experimental {
                 };
                 using value_type =
                     typename hpx::execution::experimental::sender_traits<
-                        Sender>::template value_types<hpx::tuple, std::variant>;
+                        Sender>::template value_types<hpx::tuple, hpx::variant>;
                 using error_type =
                     hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
-                        error_types<std::variant>, std::exception_ptr>>;
-                std::variant<std::monostate, done_type, error_type, value_type>
+                        error_types<hpx::variant>, std::exception_ptr>>;
+                hpx::variant<hpx::monostate, done_type, error_type, value_type>
                     v;
 
                 using continuation_type =
@@ -157,11 +157,11 @@ namespace hpx { namespace execution { namespace experimental {
                     using value_type =
                         typename hpx::execution::experimental::sender_traits<
                             Sender>::template value_types<hpx::tuple,
-                            std::variant>;
+                            hpx::variant>;
 
                     template <typename... Ts>
                     auto set_value(Ts&&... ts) && noexcept -> decltype(
-                        std::declval<std::variant<std::monostate, value_type>>()
+                        std::declval<hpx::variant<hpx::monostate, value_type>>()
                             .template emplace<value_type>(
                                 hpx::make_tuple<>(std::forward<Ts>(ts)...)),
                         void())
@@ -200,7 +200,7 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     std::decay_t<Receiver> receiver;
 
-                    HPX_NORETURN void operator()(std::monostate) const
+                    HPX_NORETURN void operator()(hpx::monostate) const
                     {
                         HPX_UNREACHABLE;
                     }
@@ -213,7 +213,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                     void operator()(error_type const& error)
                     {
-                        std::visit(
+                        hpx::visit(
                             error_visitor<Receiver>{
                                 std::forward<Receiver>(receiver)},
                             error);
@@ -221,7 +221,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                     void operator()(value_type const& ts)
                     {
-                        std::visit(
+                        hpx::visit(
                             value_visitor<Receiver>{
                                 std::forward<Receiver>(receiver)},
                             ts);
@@ -292,7 +292,7 @@ namespace hpx { namespace execution { namespace experimental {
                         // set_error/set_done/set_value has been called and
                         // values/errors have been stored into the shared state.
                         // We can trigger the continuation directly.
-                        std::visit(
+                        hpx::visit(
                             done_error_value_visitor<Receiver>{
                                 std::forward<Receiver>(receiver)},
                             v);
@@ -311,7 +311,7 @@ namespace hpx { namespace execution { namespace experimental {
                             // release the lock early and call the continuation
                             // directly again.
                             l.unlock();
-                            std::visit(
+                            hpx::visit(
                                 done_error_value_visitor<Receiver>{
                                     std::forward<Receiver>(receiver)},
                                 v);
@@ -329,7 +329,7 @@ namespace hpx { namespace execution { namespace experimental {
                                 [this,
                                     receiver =
                                         std::forward<Receiver>(receiver)]() {
-                                    std::visit(
+                                    hpx::visit(
                                         done_error_value_visitor<Receiver>{
                                             std::move(receiver)},
                                         v);
