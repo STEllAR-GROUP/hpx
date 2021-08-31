@@ -135,6 +135,7 @@ set(algorithms_headers
     hpx/parallel/container_memory.hpp
     hpx/parallel/container_numeric.hpp
     hpx/parallel/datapar.hpp
+    hpx/parallel/datapar/fill.hpp
     hpx/parallel/datapar/iterator_helpers.hpp
     hpx/parallel/datapar/loop.hpp
     hpx/parallel/datapar/transfer.hpp

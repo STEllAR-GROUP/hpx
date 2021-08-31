@@ -166,9 +166,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename T>
             HPX_HOST_DEVICE static InIter sequential(
-                ExPolicy, InIter first, Sent last, T const& val)
+                ExPolicy&& policy, InIter first, Sent last, T const& val)
             {
-                return detail::sequential_fill(first, last, val);
+                return detail::sequential_fill(
+                    std::forward<ExPolicy>(policy), first, last, val);
             }
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
@@ -232,10 +233,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename InIter, typename T>
-            static InIter sequential(
-                ExPolicy, InIter first, std::size_t count, T const& val)
+            static InIter sequential(ExPolicy&& policy, InIter first,
+                std::size_t count, T const& val)
             {
-                return std::fill_n(first, count, val);
+                return detail::sequential_fill_n(
+                    std::forward<ExPolicy>(policy), first, count, val);
             }
 
             template <typename ExPolicy, typename T>
@@ -244,11 +246,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 parallel(ExPolicy&& policy, FwdIter first, std::size_t count,
                     T const& val)
             {
-                typedef typename std::iterator_traits<FwdIter>::value_type type;
-
                 return for_each_n<FwdIter>().call(
                     std::forward<ExPolicy>(policy), first, count,
-                    [val](type& v) -> void { v = val; },
+                    [val](auto& v) -> void { v = val; },
                     util::projection_identity());
             }
         };

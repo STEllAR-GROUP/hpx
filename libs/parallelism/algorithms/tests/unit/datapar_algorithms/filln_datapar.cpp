@@ -6,80 +6,74 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/include/datapar.hpp>
 #include <hpx/local/init.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "fill_tests.hpp"
+#include "../algorithms/filln_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_fill()
+void test_fill_n()
 {
     using namespace hpx::execution;
 
-    test_fill(IteratorTag());
+    test_fill_n(IteratorTag());
 
-    test_fill(seq, IteratorTag());
-    test_fill(par, IteratorTag());
-    test_fill(par_unseq, IteratorTag());
+    test_fill_n(simd, IteratorTag());
+    test_fill_n(simdpar, IteratorTag());
 
-    test_fill_async(seq(task), IteratorTag());
-    test_fill_async(par(task), IteratorTag());
+    test_fill_n_async(simd(task), IteratorTag());
+    test_fill_n_async(simdpar(task), IteratorTag());
 }
 
-void fill_test()
+void fill_n_test()
 {
-    test_fill<std::random_access_iterator_tag>();
-    test_fill<std::forward_iterator_tag>();
-}
-
-////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_fill_exception()
-{
-    using namespace hpx::execution;
-
-    test_fill_exception(IteratorTag());
-
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_fill_exception(seq, IteratorTag());
-    test_fill_exception(par, IteratorTag());
-
-    test_fill_exception_async(seq(task), IteratorTag());
-    test_fill_exception_async(par(task), IteratorTag());
-}
-
-void fill_exception_test()
-{
-    test_fill_exception<std::random_access_iterator_tag>();
-    test_fill_exception<std::forward_iterator_tag>();
+    test_fill_n<std::random_access_iterator_tag>();
+    test_fill_n<std::forward_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_fill_bad_alloc()
+void test_fill_n_exception()
 {
     using namespace hpx::execution;
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_fill_bad_alloc(seq, IteratorTag());
-    test_fill_bad_alloc(par, IteratorTag());
+    test_fill_n_exception(IteratorTag());
 
-    test_fill_bad_alloc_async(seq(task), IteratorTag());
-    test_fill_bad_alloc_async(par(task), IteratorTag());
+    test_fill_n_exception(simd, IteratorTag());
+    test_fill_n_exception(simdpar, IteratorTag());
+
+    test_fill_n_exception_async(simd(task), IteratorTag());
+    test_fill_n_exception_async(simdpar(task), IteratorTag());
 }
 
-void fill_bad_alloc_test()
+void fill_n_exception_test()
 {
-    test_fill_bad_alloc<std::random_access_iterator_tag>();
-    test_fill_bad_alloc<std::forward_iterator_tag>();
+    test_fill_n_exception<std::random_access_iterator_tag>();
+    test_fill_n_exception<std::forward_iterator_tag>();
+}
+
+////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_fill_n_bad_alloc()
+{
+    using namespace hpx::execution;
+
+    test_fill_n_bad_alloc(simd, IteratorTag());
+    test_fill_n_bad_alloc(simdpar, IteratorTag());
+
+    test_fill_n_bad_alloc_async(simd(task), IteratorTag());
+    test_fill_n_bad_alloc_async(simdpar(task), IteratorTag());
+}
+
+void fill_n_bad_alloc_test()
+{
+    test_fill_n_bad_alloc<std::random_access_iterator_tag>();
+    test_fill_n_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -90,9 +84,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     gen.seed(seed);
 
-    fill_test();
-    fill_exception_test();
-    fill_bad_alloc_test();
+    fill_n_test();
+    fill_n_exception_test();
+    fill_n_bad_alloc_test();
     return hpx::local::finalize();
 }
 

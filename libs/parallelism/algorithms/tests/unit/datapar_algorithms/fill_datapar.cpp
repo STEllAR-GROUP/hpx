@@ -6,13 +6,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/include/datapar.hpp>
 #include <hpx/local/init.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "fill_tests.hpp"
+#include "../algorithms/fill_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -22,12 +23,11 @@ void test_fill()
 
     test_fill(IteratorTag());
 
-    test_fill(seq, IteratorTag());
-    test_fill(par, IteratorTag());
-    test_fill(par_unseq, IteratorTag());
+    test_fill(simd, IteratorTag());
+    test_fill(simdpar, IteratorTag());
 
-    test_fill_async(seq(task), IteratorTag());
-    test_fill_async(par(task), IteratorTag());
+    test_fill_async(simd(task), IteratorTag());
+    test_fill_async(simdpar(task), IteratorTag());
 }
 
 void fill_test()
@@ -44,14 +44,11 @@ void test_fill_exception()
 
     test_fill_exception(IteratorTag());
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_fill_exception(seq, IteratorTag());
-    test_fill_exception(par, IteratorTag());
+    test_fill_exception(simd, IteratorTag());
+    test_fill_exception(simdpar, IteratorTag());
 
-    test_fill_exception_async(seq(task), IteratorTag());
-    test_fill_exception_async(par(task), IteratorTag());
+    test_fill_exception_async(simd(task), IteratorTag());
+    test_fill_exception_async(simdpar(task), IteratorTag());
 }
 
 void fill_exception_test()
@@ -66,14 +63,11 @@ void test_fill_bad_alloc()
 {
     using namespace hpx::execution;
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_fill_bad_alloc(seq, IteratorTag());
-    test_fill_bad_alloc(par, IteratorTag());
+    test_fill_bad_alloc(simd, IteratorTag());
+    test_fill_bad_alloc(simdpar, IteratorTag());
 
-    test_fill_bad_alloc_async(seq(task), IteratorTag());
-    test_fill_bad_alloc_async(par(task), IteratorTag());
+    test_fill_bad_alloc_async(simd(task), IteratorTag());
+    test_fill_bad_alloc_async(simdpar(task), IteratorTag());
 }
 
 void fill_bad_alloc_test()
