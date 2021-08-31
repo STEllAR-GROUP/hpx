@@ -18,6 +18,7 @@ void test_stable_partition()
 {
     using namespace hpx::execution;
 
+    test_stable_partition(IteratorTag());
     test_stable_partition(seq, IteratorTag());
     test_stable_partition(par, IteratorTag());
     test_stable_partition(par_unseq, IteratorTag());
