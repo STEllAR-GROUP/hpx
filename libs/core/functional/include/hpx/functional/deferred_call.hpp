@@ -25,10 +25,13 @@ namespace hpx { namespace traits { namespace detail {
 
     template <typename F, typename... Ts>
     struct is_deferred_invocable
-      : hpx::is_invocable<typename util::decay_unwrap<F>::type,
-            typename util::decay_unwrap<Ts>::type...>
+      : hpx::is_invocable<util::decay_unwrap_t<F>, util::decay_unwrap_t<Ts>...>
     {
     };
+
+    template <typename F, typename... Ts>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_deferred_invocable_v =
+        is_deferred_invocable<F, Ts...>::value;
 
 }}}    // namespace hpx::traits::detail
 
@@ -38,8 +41,8 @@ namespace hpx { namespace util {
 
         template <typename F, typename... Ts>
         struct invoke_deferred_result
-          : util::invoke_result<typename util::decay_unwrap<F>::type,
-                typename util::decay_unwrap<Ts>::type...>
+          : util::invoke_result<util::decay_unwrap_t<F>,
+                util::decay_unwrap_t<Ts>...>
         {
         };
 
@@ -58,8 +61,7 @@ namespace hpx { namespace util {
             deferred() = default;    // needed for serialization
 
             template <typename F_, typename... Ts_,
-                typename = typename std::enable_if<
-                    std::is_constructible<F, F_&&>::value>::type>
+                typename = std::enable_if_t<std::is_constructible_v<F, F_&&>>>
             explicit constexpr HPX_HOST_DEVICE deferred(F_&& f, Ts_&&... vs)
               : _f(std::forward<F_>(f))
               , _args(std::piecewise_construct, std::forward<Ts_>(vs)...)
@@ -79,9 +81,8 @@ namespace hpx { namespace util {
             deferred(deferred const&) = delete;
             deferred& operator=(deferred const&) = delete;
 
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-                typename util::invoke_result<F, Ts...>::type
-                operator()()
+            HPX_HOST_DEVICE HPX_FORCEINLINE util::invoke_result_t<F, Ts...>
+            operator()()
             {
                 return HPX_INVOKE(
                     std::move(_f), std::move(_args).template get<Is>()...);
@@ -90,8 +91,10 @@ namespace hpx { namespace util {
             template <typename Archive>
             void serialize(Archive& ar, unsigned int const /*version*/)
             {
-                ar& _f;
-                ar& _args;
+                // clang-format off
+                ar & _f;
+                ar & _args;
+                // clang-format on
             }
 
             constexpr std::size_t get_function_address() const
@@ -127,27 +130,25 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     template <typename F, typename... Ts>
-    detail::deferred<typename std::decay<F>::type,
-        typename util::make_index_pack<sizeof...(Ts)>::type,
-        typename util::decay_unwrap<Ts>::type...>
+    detail::deferred<std::decay_t<F>, util::make_index_pack_t<sizeof...(Ts)>,
+        util::decay_unwrap_t<Ts>...>
     deferred_call(F&& f, Ts&&... vs)
     {
-        static_assert(traits::detail::is_deferred_invocable<F, Ts...>::value,
+        static_assert(traits::detail::is_deferred_invocable_v<F, Ts...>,
             "F shall be Callable with decay_t<Ts> arguments");
 
-        typedef detail::deferred<typename std::decay<F>::type,
-            typename util::make_index_pack<sizeof...(Ts)>::type,
-            typename util::decay_unwrap<Ts>::type...>
-            result_type;
+        using result_type = detail::deferred<std::decay_t<F>,
+            util::make_index_pack_t<sizeof...(Ts)>,
+            util::decay_unwrap_t<Ts>...>;
 
         return result_type(std::forward<F>(f), std::forward<Ts>(vs)...);
     }
 
     // nullary functions do not need to be bound again
     template <typename F>
-    inline typename std::decay<F>::type deferred_call(F&& f)
+    inline std::decay_t<F> deferred_call(F&& f)
     {
-        static_assert(traits::detail::is_deferred_invocable<F>::value,
+        static_assert(traits::detail::is_deferred_invocable_v<F>,
             "F shall be Callable with no arguments");
 
         return std::forward<F>(f);

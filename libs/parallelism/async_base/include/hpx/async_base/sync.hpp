@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,10 +20,10 @@ namespace hpx { namespace detail {
 namespace hpx {
     template <typename F, typename... Ts>
     HPX_FORCEINLINE auto sync(F&& f, Ts&&... ts)
-        -> decltype(detail::sync_dispatch<typename std::decay<F>::type>::call(
+        -> decltype(detail::sync_dispatch<std::decay_t<F>>::call(
             std::forward<F>(f), std::forward<Ts>(ts)...))
     {
-        return detail::sync_dispatch<typename std::decay<F>::type>::call(
+        return detail::sync_dispatch<std::decay_t<F>>::call(
             std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }    // namespace hpx
