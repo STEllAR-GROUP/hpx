@@ -103,7 +103,7 @@ void test_partition(ExPolicy policy, DataType)
         std::begin(c), std::end(c), random_fill(rand_base, size / 10));
     c_org = c;
 
-    auto result = hpx::parallel::partition(policy, c, pred);
+    auto result = hpx::ranges::partition(policy, c, pred);
 
     bool is_partitioned = std::is_partitioned(std::begin(c), std::end(c), pred);
 
@@ -111,7 +111,7 @@ void test_partition(ExPolicy policy, DataType)
 
     auto solution = std::partition_point(std::begin(c), std::end(c), pred);
 
-    HPX_TEST(result == solution);
+    HPX_TEST(result.begin() == solution);
 
     std::sort(std::begin(c), std::end(c));
     std::sort(std::begin(c_org), std::end(c_org));
@@ -140,7 +140,7 @@ void test_partition_async(ExPolicy policy, DataType)
         std::begin(c), std::end(c), random_fill(rand_base, size / 10));
     c_org = c;
 
-    auto f = hpx::parallel::partition(policy, c, pred);
+    auto f = hpx::ranges::partition(policy, c, pred);
     auto result = f.get();
 
     bool is_partitioned = std::is_partitioned(std::begin(c), std::end(c), pred);
@@ -149,7 +149,7 @@ void test_partition_async(ExPolicy policy, DataType)
 
     auto solution = std::partition_point(std::begin(c), std::end(c), pred);
 
-    HPX_TEST(result == solution);
+    HPX_TEST(result.begin() == solution);
 
     std::sort(std::begin(c), std::end(c));
     std::sort(std::begin(c_org), std::end(c_org));
