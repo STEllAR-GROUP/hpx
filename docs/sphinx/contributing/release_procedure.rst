@@ -52,7 +52,7 @@ are completed to avoid confusion.
      the APEX/libCDS ``git_external`` section in the main ``CMakeLists.txt``.
      Please contact the maintainers of the respective packages to generate a new
      release to synchronize with the |hpx| release (`APEX
-     <http://github.com/khuck/xpress-apex>`_, `libCDS
+     <http://github.com/UO-OACISS/xpress-apex>`_, `libCDS
      <https://github.com/STEllAR-GROUP/libcds>`_).
 
 #. Make sure ``HPX_VERSION_MAJOR/MINOR/SUBMINOR`` in ``CMakeLists.txt`` contain
