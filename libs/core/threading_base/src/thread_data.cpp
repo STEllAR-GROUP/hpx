@@ -223,6 +223,10 @@ namespace hpx { namespace threads {
         scheduler_base_ = init_data.scheduler_base;
         last_worker_thread_num_ = std::size_t(-1);
 
+        // We explicitly set the logical stack size again as it can be different
+        // from what the previous use required. However, the physical stack size
+        // must be the same as before.
+        stacksize_enum_ = init_data.stacksize;
         HPX_ASSERT(stacksize_ == get_stack_size());
         HPX_ASSERT(stacksize_ != 0);
 
