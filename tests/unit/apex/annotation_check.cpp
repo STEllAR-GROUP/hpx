@@ -93,7 +93,7 @@ std::string policy_string(const hpx::launch& policy)
 template <typename Executor>
 std::string exec_string(const Executor&)
 {
-    return "Executor non-threaded";
+    return "Executor";
 }
 
 // --------------------------------------------------------------------------
@@ -111,6 +111,55 @@ typename std::enable_if<hpx::traits::is_launch_policy<Policy>::value,
 execution_string(const Policy& policy)
 {
     return policy_string(policy);
+}
+
+// --------------------------------------------------------------------------
+// use annotate_function
+void test_annotate_function()
+{
+    hpx::async([]() {
+        hpx::util::annotate_function annotate("4-char annotate_function");
+    }).get();
+
+    hpx::async([]() {
+        std::string s("4-string annotate_function");
+        hpx::util::annotate_function annotate(std::move(s));
+    }).get();
+}
+
+// --------------------------------------------------------------------------
+// no executor or policy
+hpx::future<void> test_none()
+{
+    std::string dfs = std::string("1-Dataflow");
+    std::string pcs = std::string("2-Continuation");
+    std::string pcsu = std::string("3-Unwrapping Continuation");
+
+    std::vector<hpx::future<void>> results;
+    {
+        hpx::future<int> f1 = hpx::async([]() { return 5; });
+        hpx::future<int> f2 = hpx::make_ready_future(5);
+        results.emplace_back(hpx::dataflow(
+            hpx::util::annotated_function(
+                [](auto&&, auto&&) { dummy_task(std::size_t(1000)); }, dfs),
+            f1, f2));
+    }
+
+    {
+        hpx::future<int> f1 = hpx::async([]() { return 5; });
+        results.emplace_back(f1.then(hpx::util::annotated_function(
+            [](auto&&) { dummy_task(std::size_t(1000)); }, pcs)));
+    }
+
+    {
+        hpx::future<int> f1 = hpx::async([]() { return 5; });
+        results.emplace_back(
+            f1.then(hpx::unwrapping(hpx::util::annotated_function(
+                [](auto&&) { dummy_task(std::size_t(1000)); }, pcsu))));
+    }
+
+    // wait for completion
+    return hpx::when_all(results);
 }
 
 // --------------------------------------------------------------------------
@@ -151,38 +200,13 @@ hpx::future<void> test_execution(Execution& exec)
     return hpx::when_all(results);
 }
 
-// --------------------------------------------------------------------------
-// no executor or policy
-hpx::future<void> test_none()
-{
-    std::string dfs = std::string("1-Dataflow");
-    std::string pcs = std::string("2-Continuation");
-
-    std::vector<hpx::future<void>> results;
-    {
-        hpx::future<int> f1 = hpx::async([]() { return 5; });
-        hpx::future<int> f2 = hpx::make_ready_future(5);
-        results.emplace_back(hpx::dataflow(
-            hpx::util::annotated_function(
-                [](auto&&, auto&&) { dummy_task(std::size_t(1000)); }, dfs),
-            f1, f2));
-    }
-
-    {
-        hpx::future<int> f1 = hpx::async([]() { return 5; });
-        results.emplace_back(f1.then(hpx::util::annotated_function(
-            [](auto&&) { dummy_task(std::size_t(1000)); }, pcs)));
-    }
-
-    // wait for completion
-    return hpx::when_all(results);
-}
-
 int hpx_main()
 {
     // setup executors
     hpx::execution::parallel_executor par_exec{};
 
+    test_annotate_function();
+    //
     test_none().get();
     //
     test_execution(hpx::launch::apply).get();

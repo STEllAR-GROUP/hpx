@@ -14,7 +14,7 @@
 #include <utility>
 
 namespace hpx { namespace util { namespace detail {
-    char const* store_function_annotation(std::string&& name)
+    char const* store_function_annotation(std::string name)
     {
         static thread_local std::unordered_set<std::string> names;
         auto r = names.emplace(std::move(name));
@@ -27,7 +27,7 @@ namespace hpx { namespace util { namespace detail {
 #include <string>
 
 namespace hpx { namespace util { namespace detail {
-    char const* store_function_annotation(std::string&&)
+    char const* store_function_annotation(std::string)
     {
         return "<unknown>";
     }
