@@ -30,6 +30,10 @@
 #include <utility>
 
 namespace hpx { namespace util {
+    namespace detail {
+        HPX_CORE_EXPORT char const* store_function_annotation(std::string name);
+    }    // namespace detail
+
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_COMPUTE_DEVICE_CODE)
@@ -78,8 +82,8 @@ namespace hpx { namespace util {
             auto* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
             {
-                threads::get_thread_id_data(self->get_thread_id())
-                    ->set_description(name);
+                desc_ = threads::get_thread_id_data(self->get_thread_id())
+                            ->set_description(name);
             }
 
 #if defined(HPX_HAVE_APEX)
@@ -89,14 +93,38 @@ namespace hpx { namespace util {
 #endif
         }
 
-        template <typename F>
+        explicit annotate_function(std::string name)
+        {
+            auto* self = hpx::threads::get_self_ptr();
+            if (self != nullptr)
+            {
+                char const* name_c_str =
+#if defined(HPX_HAVE_APEX)
+                    detail::store_function_annotation(name);
+#else
+                    detail::store_function_annotation(std::move(name));
+#endif
+                desc_ = threads::get_thread_id_data(self->get_thread_id())
+                            ->set_description(name_c_str);
+            }
+
+#if defined(HPX_HAVE_APEX)
+            /* update the task wrapper in APEX to use the specified name */
+            threads::set_self_timer_data(external_timer::update_task(
+                threads::get_self_timer_data(), std::move(name)));
+#endif
+        }
+
+        template <typename F,
+            typename =
+                std::enable_if_t<!std::is_same_v<std::decay_t<F>, std::string>>>
         explicit annotate_function(F&& f)
         {
             auto* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
             {
-                threads::get_thread_id_data(self->get_thread_id())
-                    ->set_description(hpx::util::thread_description(f));
+                desc_ = threads::get_thread_id_data(self->get_thread_id())
+                            ->set_description(hpx::util::thread_description(f));
             }
 
 #if defined(HPX_HAVE_APEX)
@@ -189,9 +217,6 @@ namespace hpx { namespace util {
             fun_type f_;
             char const* name_;
         };
-
-        HPX_CORE_EXPORT char const* store_function_annotation(
-            std::string&& name);
     }    // namespace detail
 
     template <typename F>
@@ -232,12 +257,6 @@ namespace hpx { namespace util {
         // add empty (but non-trivial) destructor to silence warnings
         HPX_HOST_DEVICE ~annotate_function() {}
     };
-
-    namespace detail {
-
-        HPX_CORE_EXPORT char const* store_function_annotation(
-            std::string&& name);
-    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Given a function as an argument, the user can annotate_function
