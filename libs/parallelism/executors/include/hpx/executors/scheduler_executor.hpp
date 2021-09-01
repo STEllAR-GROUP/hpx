@@ -69,6 +69,8 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename BaseScheduler>
     struct scheduler_executor
     {
+        constexpr scheduler_executor() = default;
+
         template <typename Scheduler,
             typename Enable = std::enable_if_t<
                 hpx::execution::experimental::is_scheduler_v<Scheduler>>>
@@ -76,6 +78,12 @@ namespace hpx { namespace execution { namespace experimental {
           : sched_(std::forward<Scheduler>(sched))
         {
         }
+
+        constexpr scheduler_executor(scheduler_executor&&) = default;
+        constexpr scheduler_executor& operator=(scheduler_executor&&) = default;
+        constexpr scheduler_executor(scheduler_executor const&) = default;
+        constexpr scheduler_executor& operator=(
+            scheduler_executor const&) = default;
 
         /// \cond NOINTERNAL
         constexpr bool operator==(scheduler_executor const& rhs) const noexcept
@@ -271,8 +279,9 @@ namespace hpx { namespace execution { namespace experimental {
                                     S const& shape, Ts&... ts) {
                     hpx::detail::try_catch_exception_ptr(
                         [&]() mutable {
-                            promises[i].set_value(HPX_INVOKE(
-                                f, hpx::util::begin(shape)[i], ts...));
+                            auto it = hpx::util::begin(shape);
+                            std::advance(it, i);
+                            promises[i].set_value(HPX_INVOKE(f, *it, ts...));
                         },
                         [&](std::exception_ptr&& ep) {
                             promises[i].set_exception(std::move(ep));

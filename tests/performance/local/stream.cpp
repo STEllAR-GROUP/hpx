@@ -106,8 +106,6 @@ void check_results(std::size_t iterations, Vector const& a_res,
     aj = 1.0;
     bj = 2.0;
     cj = 0.0;
-    /* a[] is modified during timing check */
-    aj = 2.0E0 * aj;
     /* now execute timing loop */
     scalar = 3.0;
     for (std::size_t k = 0; k < iterations; k++)
@@ -323,8 +321,9 @@ struct triad_step
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Allocator, typename Policy>
-std::vector<std::vector<double>> run_benchmark(std::size_t iterations,
-    std::size_t size, Allocator&& alloc, Policy&& policy)
+std::vector<std::vector<double>> run_benchmark(std::size_t warmup_iterations,
+    std::size_t iterations, std::size_t size, Allocator&& alloc,
+    Policy&& policy)
 {
     // Allocate our data
     using vector_type = hpx::compute::vector<STREAM_TYPE, Allocator>;
@@ -387,10 +386,35 @@ std::vector<std::vector<double>> run_benchmark(std::size_t iterations,
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Main Loop
-    std::vector<std::vector<double>> timing(4, std::vector<double>(iterations));
-
+    // Warmup loop
     double scalar = 3.0;
+    for (std::size_t iteration = 0; iteration != warmup_iterations; ++iteration)
+    {
+        // Copy
+        hpx::copy(policy, a.begin(), a.end(), c.begin());
+
+        // Scale
+        hpx::transform(policy, c.begin(), c.end(), b.begin(),
+            multiply_step<STREAM_TYPE>(scalar));
+
+        // Add
+        hpx::ranges::transform(policy, a.begin(), a.end(), b.begin(), b.end(),
+            c.begin(), add_step<STREAM_TYPE>());
+
+        // Triad
+        hpx::ranges::transform(policy, b.begin(), b.end(), c.begin(), c.end(),
+            a.begin(), triad_step<STREAM_TYPE>(scalar));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Reinitialize arrays (if needed)
+    hpx::fill(policy, a.begin(), a.end(), 1.0);
+    hpx::fill(policy, b.begin(), b.end(), 2.0);
+    hpx::fill(policy, c.begin(), c.end(), 0.0);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Main timing loop
+    std::vector<std::vector<double>> timing(4, std::vector<double>(iterations));
     for (std::size_t iteration = 0; iteration != iterations; ++iteration)
     {
         // Copy
@@ -436,6 +460,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
     std::size_t offset = vm["offset"].as<std::size_t>();
     std::size_t iterations = vm["iterations"].as<std::size_t>();
+    std::size_t warmup_iterations = vm["warmup_iterations"].as<std::size_t>();
     std::size_t chunk_size = vm["chunk_size"].as<std::size_t>();
     std::size_t executor = vm["executor"].as<std::size_t>();
     csv = vm.count("csv") > 0;
@@ -444,6 +469,18 @@ int hpx_main(hpx::program_options::variables_map& vm)
     HPX_UNUSED(chunk_size);
 
     std::string chunker = vm["chunker"].as<std::string>();
+
+    if (vector_size < 1)
+    {
+        HPX_THROW_EXCEPTION(hpx::commandline_option_error, "hpx_main",
+            "Invalid vector size, must be at least 1");
+    }
+
+    if (iterations < 1)
+    {
+        HPX_THROW_EXCEPTION(hpx::commandline_option_error, "hpx_main",
+            "Invalid number of iterations given, must be at least 1");
+    }
 
     // clang-format off
     if (!csv)
@@ -500,8 +537,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         auto policy = hpx::execution::par.on(exec);
 
         // perform benchmark
-        timing = run_benchmark<>(
-            iterations, vector_size, std::move(alloc), std::move(policy));
+        timing = run_benchmark<>(warmup_iterations, iterations, vector_size,
+            std::move(alloc), std::move(policy));
         //iterations, vector_size, std::move(target));
     }
     else
@@ -510,7 +547,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         if (executor == 0)
         {
             // Default parallel policy with serial allocator.
-            timing = run_benchmark<>(iterations, vector_size,
+            timing = run_benchmark<>(warmup_iterations, iterations, vector_size,
                 std::allocator<STREAM_TYPE>{}, hpx::execution::par);
         }
         else if (executor == 1)
@@ -525,8 +562,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             executor_type exec(numa_nodes);
             auto policy = hpx::execution::par.on(exec);
 
-            timing = run_benchmark<>(
-                iterations, vector_size, std::move(alloc), std::move(policy));
+            timing = run_benchmark<>(warmup_iterations, iterations, vector_size,
+                std::move(alloc), std::move(policy));
         }
         else if (executor == 2)
         {
@@ -536,8 +573,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 decltype(policy)>
                 alloc(policy);
 
-            timing = run_benchmark<>(
-                iterations, vector_size, std::move(alloc), std::move(policy));
+            timing = run_benchmark<>(warmup_iterations, iterations, vector_size,
+                std::move(alloc), std::move(policy));
         }
         else if (executor == 3)
         {
@@ -551,13 +588,29 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 decltype(policy)>
                 alloc(policy);
 
-            timing = run_benchmark<>(
-                iterations, vector_size, std::move(alloc), std::move(policy));
+            timing = run_benchmark<>(warmup_iterations, iterations, vector_size,
+                std::move(alloc), std::move(policy));
+        }
+        else if (executor == 4)
+        {
+            // thread_pool_scheduler used through a scheduler_executor.
+            using executor_type =
+                hpx::execution::experimental::scheduler_executor<
+                    hpx::execution::experimental::thread_pool_scheduler>;
+
+            executor_type exec;
+            auto policy = hpx::execution::par.on(exec);
+            hpx::compute::host::detail::policy_allocator<STREAM_TYPE,
+                decltype(policy)>
+                alloc(policy);
+
+            timing = run_benchmark<>(warmup_iterations, iterations, vector_size,
+                std::move(alloc), std::move(policy));
         }
         else
         {
             HPX_THROW_EXCEPTION(hpx::commandline_option_error, "hpx_main",
-                "Invalid executor id given (0-3 allowed");
+                "Invalid executor id given (0-4 allowed");
         }
     }
     time_total = mysecond() - time_total;
@@ -579,11 +632,18 @@ int hpx_main(hpx::program_options::variables_map& vm)
         3 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size),
         3 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size)};
 
-    // Note: skip first iteration
     std::vector<double> avgtime(num_stream_tests, 0.0);
     std::vector<double> mintime(
         num_stream_tests, (std::numeric_limits<double>::max)());
     std::vector<double> maxtime(num_stream_tests, 0.0);
+
+    for (std::size_t j = 0; j < num_stream_tests; j++)
+    {
+        avgtime[j] = timing[j][0];
+        mintime[j] = timing[j][0];
+        maxtime[j] = timing[j][0];
+    }
+
     for (std::size_t iteration = 1; iteration != iterations; ++iteration)
     {
         for (std::size_t j = 0; j < num_stream_tests; j++)
@@ -606,7 +666,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
         std::size_t const num_executors = 5;
         const char* executors[num_executors] = {"parallel-serial", "block",
-            "parallel-parallel", "fork_join_executor"};
+            "parallel-parallel", "fork_join_executor", "scheduler_executor"};
         hpx::util::format_to(std::cout, "{},{},{},", executors[executor],
             hpx::get_os_thread_count(), vector_size);
     }
@@ -618,7 +678,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     for (std::size_t j = 0; j < num_stream_tests; j++)
     {
-        avgtime[j] = avgtime[j] / (double) (iterations - 1);
+        avgtime[j] = avgtime[j] / (double) (iterations);
 
         if (csv)
         {
@@ -670,6 +730,9 @@ int main(int argc, char* argv[])
         (   "iterations",
             hpx::program_options::value<std::size_t>()->default_value(10),
             "number of iterations to repeat each test. (default: 10)")
+        (   "warmup_iterations",
+            hpx::program_options::value<std::size_t>()->default_value(1),
+            "number of warmup iterations to perform before timing. (default: 1)")
         (   "chunker",
             hpx::program_options::value<std::string>()->default_value("default"),
             "Which chunker to use for the parallel algorithms. "
@@ -679,7 +742,7 @@ int main(int argc, char* argv[])
             "size of vector (default: 1024)")
         (   "executor",
             hpx::program_options::value<std::size_t>()->default_value(2),
-            "executor to use (0-3) (default: 2, parallel_executor)")
+            "executor to use (0-4) (default: 2, parallel_executor)")
 
 #if defined(HPX_HAVE_COMPUTE)
         (   "use-accelerator",
