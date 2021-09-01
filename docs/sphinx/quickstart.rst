@@ -10,206 +10,44 @@
 ===========
 Quick start
 ===========
+The following steps will help you get started with |hpx|. 
 
-This section is intended to get you to the point of running a basic |hpx|
-program as quickly as possible. To that end we skip many details but instead
-give you hints and links to more details along the way.
 
-We assume that you are on a Unix system with access to reasonably recent
-packages. You should have ``cmake`` and ``make`` available for the build system
-(``pkg-config`` is also supported, see :ref:`pkgconfig`).
+Installing |hpx|
+================
 
-Getting |hpx|
-=============
+The easiest way to install |hpx| on your system is by choosing one of the steps below:
 
-Download a tarball of the latest release from |stellar_hpx_download|_ and
-unpack it or clone the repository directly using ``git``:
+* **vcpkg**
 
-.. code-block:: sh
+ You can download and install |hpx| using the `vcpkg <https://github.com/Microsoft/vcpkg>`_ dependency manager:
 
-    git clone https://github.com/STEllAR-GROUP/hpx.git
+ .. code-block:: sh
 
-It is also recommended that you check out the latest stable tag:
-
-.. code-block:: sh
-    
-    cd hpx
-    git checkout 1.7.1 
-
-|hpx| dependencies
-==================
-
-The minimum dependencies needed to use |hpx| are |boost|_ and |hwloc|_. If these
-are not available through your system package manager, see
-:ref:`boost_installation` and :ref:`hwloc_installation` for instructions on how
-to build them yourself. In addition to |boost| and |hwloc|, it is recommended
-that you don't use the system allocator, but instead use either ``tcmalloc``
-from |google_perftools|_ (default) or |jemalloc|_ for better performance. If you
-would like to try |hpx| without a custom allocator at this point, you can
-configure |hpx| to use the system allocator in the next step.
-
-A full list of required and optional dependencies, including recommended
-versions, is available at :ref:`prerequisites`.
-
-Building |hpx|
-==============
-
-Once you have the source code and the dependencies and assuming all your dependencies are in paths
-known to |cmake|, the following gets you started:
-
-#. First, set up a separate build directory to configure the project:
-
-   .. code-block:: sh
-
-      mkdir build && cd build
-
-#. To configure the project you have the following options:
-
-   * To build the core |hpx| libraries and examples, and install them to your chosen location (recommended):
-
-    .. code-block:: sh
-
-        cmake -DCMAKE_INSTALL_PREFIX=/install/path ..
-
-    .. tip::
-
-       If you want to change |cmake| variables for your build, it is usually a good
-       idea to start with a clean build directory to avoid configuration problems.
-       It is especially important that you use a clean build directory when changing
-       between ``Release`` and ``Debug`` modes.
-
-   * To install |hpx| to the default system folders, simply leave out the ``CMAKE_INSTALL_PREFIX`` option:
-
-    .. code-block:: sh
-
-        cmake ..
-
-   * If your dependencies are in custom locations, you may need to tell |cmake| where to find them by passing one or more of the following options to |cmake|:
-
-    .. code-block:: sh
-
-        -DBOOST_ROOT=/path/to/boost
-        -DHWLOC_ROOT=/path/to/hwloc
-        -DTCMALLOC_ROOT=/path/to/tcmalloc
-        -DJEMALLOC_ROOT=/path/to/jemalloc
-
-   * If you want to try |hpx| without using a custom allocator pass ``-DHPX_WITH_MALLOC=system`` to |cmake|:
-
-    .. code-block:: sh 
-
-        cmake -DCMAKE_INSTALL_PREFIX=/install/path -DHPX_WITH_MALLOC=system ..
-
-    .. important::
-
-       If you are building |hpx| for a system with more than 64 processing units,
-       you must change the |cmake| variable ``HPX_WITH_MAX_CPU_COUNT`` (to a value at least as big as the
-       number of (virtual) cores on your system). Note that the default value is 64.
-
-#. Once the configuration is complete, to build the project you run:
-
-  .. code-block:: sh
-
-      make -jN install # where N is the number of jobs
-
-  .. tip::
-
-     Do not set only ``-j`` (i.e. ``-j`` without an explicit number of jobs)
-     unless you have a lot of memory available on your machine.
-
-Tests and examples
-======================
-
-Run tests
----------
-
-To build the tests:
-
-.. code-block:: sh
-
-    make tests
-
-To run the tests:
-
-.. code-block:: sh
-
-    make test
-
-To control which tests to run use ``ctest``:
-
-* To run single tests, for example a test for ``for_loop``:
-
-.. code-block:: sh
-
-    ctest --output-on-failure -R tests.unit.modules.algorithms.for_loop
-
-* To run a whole group of tests:
-
-.. code-block:: sh
-
-    ctest --output-on-failure -R tests.unit
-
-Run examples
-------------
-
-If you did not run ``make install`` earlier, do so now or build the
-``hello_world_1`` example by running:
-
-.. code-block:: sh
-
-   make hello_world_1
-
-|hpx| executables end up in the ``bin`` directory in your build directory. You
-can now run ``hello_world_1`` and should see the following output:
-
-.. code-block:: sh
-
-   ./bin/hello_world_1
-   Hello World!
-
-You've just run an example which prints ``Hello World!`` from the |hpx| runtime.
-The source for the example is in ``examples/quickstart/hello_world_1.cpp``. The
-``hello_world_distributed`` example (also available in the
-``examples/quickstart`` directory) is a distributed hello world program, which is
-described in :ref:`examples_hello_world`. It provides a gentle introduction to
-the distributed aspects of |hpx|.
-
-.. tip::
-
-   Most build targets in |hpx| have two names: a simple name and
-   a hierarchical name corresponding to what type of example or
-   test the target is. If you are developing |hpx| it is often helpful to run
-   ``make help`` to get a list of available targets. For example, ``make help |
-   grep hello_world`` outputs the following:
-
-   .. code-block:: sh
-
-      ... examples.quickstart.hello_world_2
-      ... hello_world_2
-      ... examples.quickstart.hello_world_1
-      ... hello_world_1
-      ... examples.quickstart.hello_world_distributed
-      ... hello_world_distributed
-
-   It is also possible to build, for instance, all quickstart examples using ``make
-   examples.quickstart``.
-
-Installing and building |hpx| via vcpkg
-=======================================
-
-You can download and install |hpx| using the `vcpkg <https://github.com/Microsoft/vcpkg>` 
-dependency manager:
-
-.. code-block:: sh
-
-    git clone https://github.com/Microsoft/vcpkg.git
-    cd vcpkg
-    ./bootstrap-vcpkg.sh
-    ./vcpkg integrate install
     vcpkg install hpx
 
-The |hpx| port in vcpkg is kept up to date by Microsoft team members and community 
-contributors. If the version is out of date, please `create an issue or pull request 
-<https://github.com/Microsoft/vcpkg>` on the vcpkg repository.
+* **Spack**
+
+ Another way to install |hpx| is using `Spack <https://spack.readthedocs.io/en/latest/>`_:
+
+ .. code-block:: sh
+
+    spack install hpx
+
+* **Fedora**
+
+ Installation can be done with `Fedora <https://fedoraproject.org/wiki/DNF>`_ as well:
+
+ .. code-block:: sh
+
+    dnf install hpx*
+
+* **Arch Linux**
+
+ |hpx| is available in the `Arch User Repository (AUR) <https://wiki.archlinux.org/title/Arch_User_Repository>`_ as ``hpx`` too.
+
+
+More information or alternatives regarding the installation can be found in the :ref:`manual`, a detailed guide with thorough explanation of ways to build and use |hpx|.
 
 Hello, World!
 =============
