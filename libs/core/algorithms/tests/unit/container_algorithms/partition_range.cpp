@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/container_algorithms/partition.hpp>
@@ -53,6 +54,11 @@ struct user_defined_type
         return this->name == t.name && this->val == t.val;
     }
 
+    bool operator!=(user_defined_type const& t) const
+    {
+        return this->name != t.name || this->val != t.val;
+    }
+
     struct user_defined_type& operator++()
     {
         return *this;
@@ -85,6 +91,118 @@ struct random_fill
 };
 
 ////////////////////////////////////////////////////////////////////////////
+void test_partition_sent()
+{
+    using hpx::get;
+    using DataType = int;
+
+    int rand_base = std::rand();
+    auto pred = [rand_base](
+                    DataType const& t) -> bool { return t < rand_base; };
+
+    std::size_t const size = 300007;
+    std::vector<DataType> c(size), c_org;
+    std::generate(
+        std::begin(c), std::end(c), random_fill(rand_base, size / 10));
+    c_org = c;
+    c[size - 1] = INT_MAX;
+
+    auto result = hpx::ranges::partition(std::begin(c),
+        sentinel<DataType>{INT_MAX}, pred);
+
+    bool is_partitioned =
+        std::is_partitioned(std::begin(c), std::end(c) - 1, pred);
+
+    HPX_TEST(is_partitioned);
+
+    auto solution = std::partition_point(std::begin(c), std::end(c) - 1, pred);
+
+    HPX_TEST(result.begin() == solution);
+
+    std::sort(std::begin(c), std::end(c) - 1);
+    std::sort(std::begin(c_org), std::end(c_org) - 1);
+
+    bool unchanged = test::equal(
+        std::begin(c), std::end(c) - 1, std::begin(c_org), std::end(c_org) - 1);
+
+    HPX_TEST(unchanged);
+}
+
+template <typename ExPolicy>
+void test_partition_sent(ExPolicy policy)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    using hpx::get;
+    using DataType = int;
+
+    int rand_base = std::rand();
+    auto pred = [rand_base](
+                    DataType const& t) -> bool { return t < rand_base; };
+
+    std::size_t const size = 300007;
+    std::vector<DataType> c(size), c_org;
+    std::generate(
+        std::begin(c), std::end(c), random_fill(rand_base, size / 10));
+    c_org = c;
+    c[size - 1] = INT_MAX;
+
+    auto result = hpx::ranges::partition(policy, std::begin(c),
+        sentinel<DataType>{INT_MAX}, pred);
+
+    bool is_partitioned =
+        std::is_partitioned(std::begin(c), std::end(c) - 1, pred);
+
+    HPX_TEST(is_partitioned);
+
+    auto solution = std::partition_point(std::begin(c), std::end(c) - 1, pred);
+
+    HPX_TEST(result.begin() == solution);
+
+    std::sort(std::begin(c), std::end(c) - 1);
+    std::sort(std::begin(c_org), std::end(c_org) - 1);
+
+    bool unchanged = test::equal(
+        std::begin(c), std::end(c) - 1, std::begin(c_org), std::end(c_org) - 1);
+
+    HPX_TEST(unchanged);
+}
+
+template <typename DataType>
+void test_partition(DataType)
+{
+    using hpx::get;
+
+    int rand_base = std::rand();
+    auto pred = [rand_base](
+                    DataType const& t) -> bool { return t < rand_base; };
+
+    std::size_t const size = 300007;
+    std::vector<DataType> c(size), c_org;
+    std::generate(
+        std::begin(c), std::end(c), random_fill(rand_base, size / 10));
+    c_org = c;
+
+    auto result = hpx::ranges::partition(c, pred);
+
+    bool is_partitioned = std::is_partitioned(std::begin(c), std::end(c), pred);
+
+    HPX_TEST(is_partitioned);
+
+    auto solution = std::partition_point(std::begin(c), std::end(c), pred);
+
+    HPX_TEST(result.begin() == solution);
+
+    std::sort(std::begin(c), std::end(c));
+    std::sort(std::begin(c_org), std::end(c_org));
+
+    bool unchanged = test::equal(
+        std::begin(c), std::end(c), std::begin(c_org), std::end(c_org));
+
+    HPX_TEST(unchanged);
+}
+
 template <typename ExPolicy, typename DataType>
 void test_partition(ExPolicy policy, DataType)
 {
@@ -165,12 +283,18 @@ void test_partition()
 {
     using namespace hpx::execution;
 
+    test_partition(DataType());
     test_partition(seq, DataType());
     test_partition(par, DataType());
     test_partition(par_unseq, DataType());
 
     test_partition_async(seq(task), DataType());
     test_partition_async(par(task), DataType());
+
+    test_partition_sent();
+    test_partition_sent(seq);
+    test_partition_sent(par);
+    test_partition_sent(par_unseq);
 }
 
 void test_partition()

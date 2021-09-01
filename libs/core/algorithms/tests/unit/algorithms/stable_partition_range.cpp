@@ -5,6 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/container_algorithms/partition.hpp>
@@ -56,6 +57,72 @@ struct great_equal_than
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
+void test_stable_partition_sent(IteratorTag)
+{
+    std::vector<int> c(10007);
+    std::vector<int> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::copy(std::begin(c), std::end(c), std::begin(d));
+
+    int partition_at = std::rand();
+
+    auto result = hpx::ranges::stable_partition(std::begin(c),
+        sentinel<int>{*std::next(std::begin(c), c.size() - 1)},
+        less_than(partition_at));
+
+    auto partition_pt = std::find_if(
+        std::begin(c), std::end(c) - 1, great_equal_than(partition_at));
+    HPX_TEST(result.begin() == partition_pt);
+
+    // verify values
+    std::stable_partition(
+        std::begin(d), std::end(d) - 1, less_than(partition_at));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), std::end(c) - 1, std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size() - 1);
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_stable_partition_sent(ExPolicy policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    std::vector<int> c(10007);
+    std::vector<int> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::copy(std::begin(c), std::end(c), std::begin(d));
+
+    int partition_at = std::rand();
+
+    auto result = hpx::ranges::stable_partition(policy, std::begin(c),
+        sentinel<int>{*std::next(std::begin(c), c.size() - 1)},
+        less_than(partition_at));
+
+    auto partition_pt = std::find_if(
+        std::begin(c), std::end(c) - 1, great_equal_than(partition_at));
+    HPX_TEST(result.begin() == partition_pt);
+
+    // verify values
+    std::stable_partition(std::begin(d), std::end(d) - 1, less_than(partition_at));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), std::end(c) - 1, std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size() - 1);
+}
+
+template <typename IteratorTag>
 void test_stable_partition(IteratorTag)
 {
     std::vector<int> c(10007);
@@ -97,7 +164,8 @@ void test_stable_partition(ExPolicy policy, IteratorTag)
 
     int partition_at = std::rand();
 
-    auto result = hpx::ranges::stable_partition(policy, c, less_than(partition_at));
+    auto result =
+        hpx::ranges::stable_partition(policy, c, less_than(partition_at));
 
     auto partition_pt = std::find_if(
         std::begin(c), std::end(c), great_equal_than(partition_at));
@@ -161,6 +229,11 @@ void test_stable_partition()
 
     test_stable_partition_async(seq(task), DataType());
     test_stable_partition_async(par(task), DataType());
+
+    test_stable_partition_sent(DataType());
+    test_stable_partition_sent(seq, DataType());
+    test_stable_partition_sent(par, DataType());
+    test_stable_partition_sent(par_unseq, DataType());
 }
 
 void test_stable_partition()
