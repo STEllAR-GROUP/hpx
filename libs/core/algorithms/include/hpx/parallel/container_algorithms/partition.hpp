@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -353,7 +354,7 @@ namespace hpx { namespace ranges {
         }
     } partition{};
 
-    /* HPX_INLINE_CONSTEXPR_VARIABLE struct stable_partition_t final
+    HPX_INLINE_CONSTEXPR_VARIABLE struct stable_partition_t final
       : hpx::functional::tag_fallback<stable_partition_t>
     {
     private:
@@ -363,26 +364,27 @@ namespace hpx { namespace ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 parallel::traits::is_projected_range<Proj, Rng>::value &&
-                parallel::traits::is_indirect_callable<ExPolicy, Pred,
+                parallel::traits::is_indirect_callable<
+                    hpx::execution::sequenced_policy, Pred,
                     parallel::traits::projected_range<Proj, Rng>>::value
-        )>
+            )>
         // clang-format on
         friend subrange_t<hpx::traits::range_iterator_t<Rng>>
-        tag_fallback_dispatch(hpx::ranges::stable_partition_t, Rng&& rng, Pred&& pred,
-            Proj&& proj = Proj())
+        tag_fallback_dispatch(hpx::ranges::stable_partition_t, Rng&& rng,
+            Pred&& pred, Proj&& proj = Proj())
         {
             using iterator = hpx::traits::range_iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator>,
-                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_bidirectional_iterator_v<iterator>,
+                "Requires at least bidirectional iterator.");
 
             return hpx::parallel::util::make_subrange<
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_sentinel<Rng>::type>(
-                hpx::parallel::v1::detail::stable_partition<iterator>().call(
-                    hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), std::forward<Pred>(pred),
-                    std::forward<Proj>(proj)),
+                hpx::parallel::v1::detail::stable_partition<iterator>().call2(
+                    hpx::execution::seq, std::true_type{},
+                    hpx::util::begin(rng), hpx::util::end(rng),
+                    std::forward<Pred>(pred), std::forward<Proj>(proj)),
                 hpx::util::end(rng));
         }
 
@@ -399,74 +401,82 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             subrange_t<hpx::traits::range_iterator_t<Rng>>>::type
-        tag_fallback_dispatch(hpx::ranges::stable_partition_t, ExPolicy&& policy,
-            Rng&& rng, Pred&& pred, Proj&& proj = Proj())
+        tag_fallback_dispatch(hpx::ranges::stable_partition_t,
+            ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
         {
             using iterator = hpx::traits::range_iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator>,
-                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_bidirectional_iterator_v<iterator>,
+                "Requires at least bidirectional iterator.");
+
+            using is_seq = std::integral_constant<bool,
+                hpx::is_sequenced_execution_policy<ExPolicy>::value ||
+                    !hpx::traits::is_random_access_iterator_v<iterator>>;
 
             return hpx::parallel::util::make_subrange<
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_sentinel<Rng>::type>(
-                hpx::parallel::v1::detail::stable_partition<iterator>().call(
-                    std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), std::forward<Pred>(pred),
-                    std::forward<Proj>(proj)),
+                hpx::parallel::v1::detail::stable_partition<iterator>().call2(
+                    std::forward<ExPolicy>(policy), is_seq(),
+                    hpx::util::begin(rng), hpx::util::end(rng),
+                    std::forward<Pred>(pred), std::forward<Proj>(proj)),
                 hpx::util::end(rng));
         }
 
         // clang-format off
-        template <typename FwdIter, typename Sent, typename Pred,
+        template <typename BidirIter, typename Sent, typename Pred,
             typename Proj = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
+                hpx::traits::is_iterator_v<BidirIter> &&
+                hpx::traits::is_sentinel_for<Sent, BidirIter>::value &&
                 parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Pred,
-                    parallel::traits::projected<Proj, FwdIter>>::value
+                    parallel::traits::projected<Proj, BidirIter>>::value
         )>
         // clang-format on
-        friend subrange_t<FwdIter, Sent> tag_fallback_dispatch(
-            hpx::ranges::stable_partition_t, FwdIter first, Sent last, Pred&& pred,
-            Proj&& proj = Proj())
+        friend subrange_t<BidirIter, Sent> tag_fallback_dispatch(
+            hpx::ranges::stable_partition_t, BidirIter first, Sent last,
+            Pred&& pred, Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
+                "Requires at least bidirectional iterator.");
 
-            return hpx::parallel::util::make_subrange<FwdIter, Sent>(
-                hpx::parallel::v1::detail::stable_partition<FwdIter>().call(
-                    hpx::execution::seq, first, last, std::forward<Pred>(pred),
-                    std::forward<Proj>(proj)),
+            return hpx::parallel::util::make_subrange<BidirIter, Sent>(
+                hpx::parallel::v1::detail::stable_partition<BidirIter>().call2(
+                    hpx::execution::seq, std::true_type{}, first, last,
+                    std::forward<Pred>(pred), std::forward<Proj>(proj)),
                 last);
         }
 
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename Sent,
+        template <typename ExPolicy, typename BidirIter, typename Sent,
             typename Pred,
             typename Proj = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
+                hpx::traits::is_iterator_v<BidirIter> &&
+                hpx::traits::is_sentinel_for<Sent, BidirIter>::value &&
                 parallel::traits::is_indirect_callable<ExPolicy, Pred,
-                    parallel::traits::projected<Proj, FwdIter>>::value
+                    parallel::traits::projected<Proj, BidirIter>>::value
         )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            subrange_t<FwdIter, Sent>>::type
-        tag_fallback_dispatch(hpx::ranges::stable_partition_t, ExPolicy&& policy,
-            FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
+            subrange_t<BidirIter, Sent>>::type
+        tag_fallback_dispatch(hpx::ranges::stable_partition_t,
+            ExPolicy&& policy, BidirIter first, Sent last, Pred&& pred,
+            Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
+                "Requires at least bidirectional iterator.");
 
-            return hpx::parallel::util::make_subrange<FwdIter, Sent>(
-                hpx::parallel::v1::detail::stable_partition<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), first, last,
+            using is_seq = std::integral_constant<bool,
+                !hpx::traits::is_random_access_iterator_v<BidirIter>>;
+
+            return hpx::parallel::util::make_subrange<BidirIter, Sent>(
+                hpx::parallel::v1::detail::stable_partition<BidirIter>().call2(
+                    std::forward<ExPolicy>(policy), is_seq(), first, last,
                     std::forward<Pred>(pred), std::forward<Proj>(proj)),
                 last);
         }
-    } stable_partition{};*/
+    } stable_partition{};
 }}    // namespace hpx::ranges

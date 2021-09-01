@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2017 Hartmut Kaiser
 //  Copyright (c)      2017 Taeguk Kwon
+//  Copyright (c)      2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -1464,7 +1465,7 @@ namespace hpx {
                 !hpx::traits::is_random_access_iterator_v<BidirIter>>;
 
             return hpx::parallel::v1::detail::stable_partition<BidirIter>()
-                .call2(hpx::execution::seq, is_seq(), first, last,
+                .call2(hpx::execution::seq, std::true_type{}, first, last,
                     std::forward<F>(f), std::forward<Proj>(proj));
         }
 
