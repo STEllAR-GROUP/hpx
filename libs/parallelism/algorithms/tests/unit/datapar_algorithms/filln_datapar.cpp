@@ -24,10 +24,10 @@ void test_fill_n()
     test_fill_n(IteratorTag());
 
     test_fill_n(simd, IteratorTag());
-    test_fill_n(simdpar, IteratorTag());
+    test_fill_n(par_simd, IteratorTag());
 
     test_fill_n_async(simd(task), IteratorTag());
-    test_fill_n_async(simdpar(task), IteratorTag());
+    test_fill_n_async(par_simd(task), IteratorTag());
 }
 
 void fill_n_test()
@@ -45,10 +45,10 @@ void test_fill_n_exception()
     test_fill_n_exception(IteratorTag());
 
     test_fill_n_exception(simd, IteratorTag());
-    test_fill_n_exception(simdpar, IteratorTag());
+    test_fill_n_exception(par_simd, IteratorTag());
 
     test_fill_n_exception_async(simd(task), IteratorTag());
-    test_fill_n_exception_async(simdpar(task), IteratorTag());
+    test_fill_n_exception_async(par_simd(task), IteratorTag());
 }
 
 void fill_n_exception_test()
@@ -64,10 +64,10 @@ void test_fill_n_bad_alloc()
     using namespace hpx::execution;
 
     test_fill_n_bad_alloc(simd, IteratorTag());
-    test_fill_n_bad_alloc(simdpar, IteratorTag());
+    test_fill_n_bad_alloc(par_simd, IteratorTag());
 
     test_fill_n_bad_alloc_async(simd(task), IteratorTag());
-    test_fill_n_bad_alloc_async(simdpar(task), IteratorTag());
+    test_fill_n_bad_alloc_async(par_simd(task), IteratorTag());
 }
 
 void fill_n_bad_alloc_test()
