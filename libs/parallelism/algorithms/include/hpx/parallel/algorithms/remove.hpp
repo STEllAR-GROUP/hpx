@@ -383,9 +383,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 auto f4 =
                     [dest_ptr, flags](
-                        std::vector<hpx::shared_future<std::size_t>>&&,
-                        std::vector<hpx::future<void>>&&) mutable -> Iter {
+                        std::vector<hpx::shared_future<std::size_t>>&& items,
+                        std::vector<hpx::future<void>>&& data) mutable -> Iter {
                     HPX_UNUSED(flags);
+
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    items.clear();
+                    data.clear();
+
                     return *dest_ptr;
                 };
 

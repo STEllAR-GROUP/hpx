@@ -137,10 +137,10 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/executors/execution.hpp>
@@ -224,7 +224,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         });
                 };
                 auto f2 =
-                    [tok](std::vector<hpx::future<void>>&&) mutable -> bool {
+                    [tok](
+                        std::vector<hpx::future<void>>&& data) mutable -> bool {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    data.clear();
+
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());
 
@@ -364,7 +369,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
                 auto f2 =
                     [tok, second](
-                        std::vector<hpx::future<void>>&&) mutable -> Iter {
+                        std::vector<hpx::future<void>>&& data) mutable -> Iter {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    data.clear();
+
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());
 

@@ -137,7 +137,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                     });
             };
 
-            auto f2 = [=](std::vector<hpx::future<void>>&&) mutable -> FwdIter {
+            auto f2 =
+                [=](std::vector<hpx::future<void>>&& data) mutable -> FwdIter {
+                // make sure iterators embedded in function object that is
+                // attached to futures are invalidated
+                data.clear();
                 difference_type search_res = tok.get_data();
                 if (search_res != count)
                     std::advance(first, search_res);
@@ -233,7 +237,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                     });
             };
 
-            auto f2 = [=](std::vector<hpx::future<void>>&&) mutable -> FwdIter {
+            auto f2 =
+                [=](std::vector<hpx::future<void>>&& data) mutable -> FwdIter {
+                // make sure iterators embedded in function object that is
+                // attached to futures are invalidated
+                data.clear();
                 difference_type search_res = tok.get_data();
                 if (search_res != s_difference_type(count))
                     std::advance(first, search_res);

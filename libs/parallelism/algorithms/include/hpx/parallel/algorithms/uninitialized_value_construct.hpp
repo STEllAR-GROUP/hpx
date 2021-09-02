@@ -175,9 +175,9 @@ namespace hpx {
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -267,9 +267,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 it, part_size, tok));
                     },
                     // finalize, called once if no error occurred
-                    [first, count](std::vector<
-                        hpx::future<partition_result_type>>&&) mutable
-                    -> FwdIter {
+                    [first, count](
+                        std::vector<hpx::future<partition_result_type>>&&
+                            data) mutable -> FwdIter {
+                        // make sure iterators embedded in function object that is
+                        // attached to futures are invalidated
+                        data.clear();
+
                         std::advance(first, count);
                         return first;
                     },

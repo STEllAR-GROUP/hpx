@@ -413,9 +413,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         }
                     }
                 };
-                auto f2 =
-                    [first, tok](
-                        std::vector<hpx::future<void>>&&) mutable -> FwdIter {
+                auto f2 = [first, tok](
+                              std::vector<hpx::future<void>>&& data) mutable
+                    -> FwdIter {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    data.clear();
+
                     difference_type loc = tok.get_data();
                     std::advance(first, loc);
                     return std::move(first);

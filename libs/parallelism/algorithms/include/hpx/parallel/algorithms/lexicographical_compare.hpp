@@ -266,7 +266,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 auto f2 =
                     [tok, first1, first2, last1, last2, pred, proj1, proj2](
-                        std::vector<hpx::future<void>>&&) mutable -> bool {
+                        std::vector<hpx::future<void>>&& data) mutable -> bool {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    data.clear();
+
                     std::size_t mismatched = tok.get_data();
 
                     std::advance(first1, mismatched);
