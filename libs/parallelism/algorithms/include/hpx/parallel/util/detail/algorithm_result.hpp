@@ -22,7 +22,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     struct algorithm_result_impl
     {
         // The return type of the initiating function.
-        typedef T type;
+        using type = T;
 
         // Obtain initiating function's return type.
         static constexpr type get()
@@ -47,12 +47,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     struct algorithm_result_impl<ExPolicy, void>
     {
         // The return type of the initiating function.
-        typedef void type;
+        using type = void;
 
         // Obtain initiating function's return type.
-        static constexpr void get() {}
+        static constexpr void get() noexcept {}
 
-        static constexpr void get(hpx::util::unused_type) {}
+        static constexpr void get(hpx::util::unused_type) noexcept {}
 
         static void get(hpx::future<void>&& t)
         {
@@ -70,7 +70,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     struct algorithm_result_impl<hpx::execution::sequenced_task_policy, T>
     {
         // The return type of the initiating function.
-        typedef hpx::future<T> type;
+        using type = hpx::future<T>;
 
         // Obtain initiating function's return type.
         static type get(T&& t)
@@ -88,7 +88,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     struct algorithm_result_impl<hpx::execution::sequenced_task_policy, void>
     {
         // The return type of the initiating function.
-        typedef hpx::future<void> type;
+        using type = hpx::future<void>;
 
         // Obtain initiating function's return type.
         static type get()
@@ -117,7 +117,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     struct algorithm_result_impl<hpx::execution::parallel_task_policy, T>
     {
         // The return type of the initiating function.
-        typedef hpx::future<T> type;
+        using type = hpx::future<T>;
 
         // Obtain initiating function's return type.
         static type get(T&& t)
@@ -135,7 +135,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     struct algorithm_result_impl<hpx::execution::parallel_task_policy, void>
     {
         // The return type of the initiating function.
-        typedef hpx::future<void> type;
+        using type = hpx::future<void>;
 
         // Obtain initiating function's return type.
         static type get()
@@ -252,6 +252,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         static_assert(!std::is_lvalue_reference<T>::value,
             "T shouldn't be a lvalue reference");
     };
+
+    template <typename ExPolicy, typename T = void>
+    using algorithm_result_t = typename algorithm_result<ExPolicy, T>::type;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename U, typename Conv,

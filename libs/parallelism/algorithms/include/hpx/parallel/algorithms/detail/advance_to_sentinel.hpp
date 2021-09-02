@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -16,34 +17,25 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     // Generic implementation for advancing a given iterator to its sentinel
     template <typename Iter, typename Sent>
-    constexpr inline Iter advance_to_sentinel(
-        Iter first, Sent last, std::false_type)
-    {
-        for (/**/; first != last; ++first)
-        {
-            /**/;
-        }
-        return first;
-    }
-
-    template <typename Iter, typename Sent>
-    constexpr inline Iter advance_to_sentinel(
-        Iter first, Sent last, std::true_type)
-    {
-        return first + (last - first);
-    }
-
-    template <typename Iter, typename Sent>
     constexpr inline Iter advance_to_sentinel(Iter first, Sent last)
     {
-        return advance_to_sentinel(first, last,
-            typename hpx::traits::is_sized_sentinel_for<Sent, Iter>::type{});
-    }
-
-    template <typename Iter>
-    constexpr inline Iter advance_to_sentinel(Iter, Iter last)
-    {
-        return last;
+        if constexpr (std::is_same<Iter, Sent>::value)
+        {
+            return last;
+        }
+        else if constexpr (hpx::traits::is_sized_sentinel_for_v<Sent, Iter>)
+        {
+            std::advance(first, last - first);
+            return first;
+        }
+        else
+        {
+            for (/**/; first != last; ++first)
+            {
+                /**/;
+            }
+            return first;
+        }
     }
 
 }}}}    // namespace hpx::parallel::v1::detail
