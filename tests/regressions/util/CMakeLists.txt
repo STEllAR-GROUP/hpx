@@ -5,16 +5,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests set_config_entry_deadlock)
-
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} iarchive_1237 serialize_buffer_1069
-            serialize_exception_4886
-  )
-  set(iarchive_1237_FLAGS DEPENDENCIES iostreams_component)
-  set(serialize_buffer_1069_FLAGS DEPENDENCIES iostreams_component)
-  set(serialize_exception_4886_PARAMETERS LOCALITIES 2)
-endif()
+set(tests iarchive_1237 serialize_buffer_1069 serialize_exception_4886)
+set(iarchive_1237_FLAGS DEPENDENCIES iostreams_component)
+set(serialize_buffer_1069_FLAGS DEPENDENCIES iostreams_component)
+set(serialize_exception_4886_PARAMETERS LOCALITIES 2)
 
 if(HPX_WITH_NETWORKING)
   set(tests ${tests} zero_copy_parcels_1001)
@@ -32,7 +26,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Util"
+    FOLDER "Tests/Regressions/Full/Util"
   )
 
   add_hpx_regression_test("util" ${test} ${${test}_PARAMETERS})

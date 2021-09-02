@@ -54,34 +54,11 @@ set(CONFIG_STRINGS_MODULES_INCLUDES)
 set(CONFIG_STRINGS_MODULES_ENTRIES)
 
 set(HPX_LIBS
-    core full
+    full
     CACHE INTERNAL "List of HPX libraries" FORCE
 )
 
-foreach(lib ${HPX_LIBS})
-  # NOTE: hpx_full (i.e. the target representing libhpx.so) is still created in
-  # src/CMakeLists.txt. When all of hpx_full has been modularized the target
-  # creation can move here as well.
-  if(NOT ${lib} STREQUAL "full")
-    string(TOUPPER ${lib} uppercase_lib)
-    add_library(hpx_${lib} SHARED src/dummy.cpp)
-    target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
-
-    set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")
-
-    install(
-      TARGETS hpx_${lib}
-      EXPORT HPXInternalTargets
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${lib}
-    )
-
-    hpx_export_internal_targets(hpx_${lib})
-  endif()
-
-  add_subdirectory(${lib})
-endforeach()
+add_subdirectory(full)
 
 # add_hpx_module populates HPX_ENABLED_MODULES
 foreach(module ${HPX_ENABLED_MODULES})
@@ -94,18 +71,6 @@ endforeach()
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/modules_enabled.hpp.in"
-  "${PROJECT_BINARY_DIR}/libs/core/config/include/hpx/config/modules_enabled.hpp"
+  "${PROJECT_BINARY_DIR}/libs/full/config/include/hpx/config/modules_enabled.hpp"
   @ONLY
 )
-
-if(MSVC AND HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
-  target_link_options(hpx_core PRIVATE "/EXPORT:switch_to_fiber")
-endif()
-
-if(HPX_WITH_DATAPAR_VC)
-  target_link_libraries(hpx_core PUBLIC Vc::vc)
-endif()
-
-if(HPX_WITH_ITTNOTIFY)
-  target_link_libraries(hpx_core PUBLIC Amplifier::amplifier)
-endif()

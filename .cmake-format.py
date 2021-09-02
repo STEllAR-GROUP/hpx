@@ -480,7 +480,6 @@ with section("parse"):
     'hpx_message': {'pargs': {'nargs': 1}},
     'hpx_option': { 'kwargs': {'CATEGORY': 1, 'MODULE': 1, 'STRINGS': '+'},
                     'pargs': {'flags': ['ADVANCED'], 'nargs': '4+'}},
-    'hpx_perform_cxx_feature_tests': {'pargs': {'nargs': 0}},
     'hpx_print_list': {'pargs': {'nargs': 3}},
     'hpx_remove_link_flag': { 'kwargs': {'CONFIGURATIONS': '+', 'TARGETS': '+'},
                               'pargs': {'flags': [], 'nargs': '1+'}},

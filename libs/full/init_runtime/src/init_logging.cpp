@@ -9,12 +9,9 @@
 #if defined(HPX_HAVE_LOGGING)
 #include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime_components/console_logging.hpp>
+#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -25,7 +22,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX component id of current thread
     struct thread_component_id : logging::formatter::manipulator
@@ -61,9 +57,6 @@ namespace hpx { namespace util {
                 dest_, static_cast<std::size_t>(level_), msg.full_string());
         }
     };    // namespace util
-#else
-    using console = console_local;
-#endif
 
     namespace detail {
 
@@ -77,9 +70,7 @@ namespace hpx { namespace util {
         {
             define_common_formatters(writer);
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             writer.set_formatter("hpxcomponent", thread_component_id());
-#endif
         }
 
         void init_logging_full(runtime_configuration& ini)

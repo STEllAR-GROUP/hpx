@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/hpx_init.hpp>

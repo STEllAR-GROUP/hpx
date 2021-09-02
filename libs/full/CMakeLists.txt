@@ -24,6 +24,7 @@ set(_hpx_full_modules
     components
     components_base
     compute
+    config
     distribution_policies
     executors_distributed
     include
@@ -37,6 +38,7 @@ set(_hpx_full_modules
     runtime_distributed
     segmented_algorithms
     statistics
+    version
 )
 # cmake-format: on
 

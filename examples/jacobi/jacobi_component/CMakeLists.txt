@@ -8,6 +8,6 @@ add_hpx_component(
   jacobi INTERNAL_FLAGS NOEXPORT AUTOGLOB
   SOURCE_GLOB "*.c*"
   HEADER_GLOB "*.h*" ${jacobi_component_FLAGS}
-  FOLDER "Examples/Jacobi"
+  FOLDER "Examples/Full/Jacobi"
   COMPONENT_DEPENDENCIES iostreams
 )

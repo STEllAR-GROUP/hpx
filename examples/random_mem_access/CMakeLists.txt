@@ -4,10 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  return()
-endif()
-
 # just recurse into all components subdirectories and execute the scripts there
 set(subdirs random_mem_access)
 
@@ -26,7 +22,7 @@ foreach(subdir ${subdirs})
     ${subdir}_client INTERNAL_FLAGS MODULE random_mem_access
     SOURCES ${sources}
     DEPENDENCIES ${subdir}_component
-    FOLDER "Examples/RandomMemoryAccess/random_mem_access"
+    FOLDER "Examples/Full/RandomMemoryAccess"
   )
 
   add_hpx_example_target_dependencies("random_mem_access" ${subdir}_client)

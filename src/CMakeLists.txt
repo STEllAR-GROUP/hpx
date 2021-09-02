@@ -9,34 +9,28 @@
 # ##############################################################################
 # gather sources
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(hpx_SOURCES
-      runtime/parcelset/detail/parcel_await.cpp
-      runtime/parcelset/detail/parcel_route_handler.cpp
-      runtime/parcelset/detail/per_action_data_counter.cpp
-      runtime/parcelset/locality.cpp
-      runtime/parcelset/parcel.cpp
-      runtime/parcelset/parcelhandler.cpp
-      runtime/parcelset/parcelport.cpp
-      runtime/parcelset/put_parcel.cpp
-      runtime/set_parcel_write_handler.cpp
-  )
-  list(TRANSFORM hpx_SOURCES PREPEND ${PROJECT_SOURCE_DIR}/src/)
-else()
-  set(hpx_SOURCES ${PROJECT_SOURCE_DIR}/libs/src/dummy.cpp)
-endif()
+set(hpx_SOURCES
+    runtime/parcelset/detail/parcel_await.cpp
+    runtime/parcelset/detail/parcel_route_handler.cpp
+    runtime/parcelset/detail/per_action_data_counter.cpp
+    runtime/parcelset/locality.cpp
+    runtime/parcelset/parcel.cpp
+    runtime/parcelset/parcelhandler.cpp
+    runtime/parcelset/parcelport.cpp
+    runtime/parcelset/put_parcel.cpp
+    runtime/set_parcel_write_handler.cpp
+)
+list(TRANSFORM hpx_SOURCES PREPEND ${PROJECT_SOURCE_DIR}/src/)
 
 set(hpx_external_objects_SOURCES)
 
-if(MSVC)
+if(MSVC AND MSVC14)
   # add natvis files to solution (supported starting VS2015)
-  if(MSVC14)
-    add_hpx_library_sources(
-      hpx_natvis_files GLOB GLOBS "${PROJECT_SOURCE_DIR}/tools/VS/*.natvis"
-    )
-    list(APPEND hpx_external_OBJECTS ${hpx_natvis_files_SOURCES})
-    source_group("Natvis Files" FILES ${hpx_natvis_files_SOURCES})
-  endif()
+  add_hpx_library_sources(
+    hpx_natvis_files GLOB GLOBS "${PROJECT_SOURCE_DIR}/tools/VS/*.natvis"
+  )
+  list(APPEND hpx_external_OBJECTS ${hpx_natvis_files_SOURCES})
+  source_group("Natvis Files" FILES ${hpx_natvis_files_SOURCES})
 endif()
 
 set(hpx_external_SOURCES)
@@ -52,58 +46,56 @@ endif()
 # List all headers (local and distributed)
 set(hpx_HEADERS)
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(hpx_HEADERS
-      hpx/plugins/binary_filter_factory_base.hpp
-      hpx/plugins/binary_filter_factory.hpp
-      hpx/plugins/message_handler_factory_base.hpp
-      hpx/plugins/message_handler_factory.hpp
-      hpx/plugins/parcel/coalescing_counter_registry.hpp
-      hpx/plugins/parcel/coalescing_message_handler.hpp
-      hpx/plugins/parcel/coalescing_message_handler_registration.hpp
-      hpx/plugins/parcel/message_buffer.hpp
-      hpx/plugins/parcelport_factory_base.hpp
-      hpx/plugins/parcelport_factory.hpp
-      hpx/plugins/parcelport/mpi/header.hpp
-      hpx/plugins/parcelport/mpi/locality.hpp
-      hpx/plugins/parcelport/mpi/receiver_connection.hpp
-      hpx/plugins/parcelport/mpi/receiver.hpp
-      hpx/plugins/parcelport/mpi/sender_connection.hpp
-      hpx/plugins/parcelport/mpi/sender.hpp
-      hpx/plugins/parcelport/mpi/tag_provider.hpp
-      hpx/plugins/parcelport/tcp/connection_handler.hpp
-      hpx/plugins/parcelport/tcp/locality.hpp
-      hpx/plugins/parcelport/tcp/receiver.hpp
-      hpx/plugins/parcelport/tcp/sender.hpp
-      hpx/plugins/plugin_factory_base.hpp
-      hpx/plugins/plugin_registry.hpp
-      hpx/plugins/unique_plugin_name.hpp
-      hpx/runtime/message_handler_fwd.hpp
-      hpx/runtime/parcelset/connection_cache.hpp
-      hpx/runtime/parcelset/decode_parcels.hpp
-      hpx/runtime/parcelset/detail/call_for_each.hpp
-      hpx/runtime/parcelset/detail/data_point.hpp
-      hpx/runtime/parcelset/detail/gatherer.hpp
-      hpx/runtime/parcelset/detail/parcel_await.hpp
-      hpx/runtime/parcelset/detail/parcel_route_handler.hpp
-      hpx/runtime/parcelset/detail/per_action_data_counter.hpp
-      hpx/runtime/parcelset/encode_parcels.hpp
-      hpx/runtime/parcelset_fwd.hpp
-      hpx/runtime/parcelset/locality.hpp
-      hpx/runtime/parcelset/parcel_buffer.hpp
-      hpx/runtime/parcelset/parcelhandler.hpp
-      hpx/runtime/parcelset/parcel.hpp
-      hpx/runtime/parcelset/parcelport_connection.hpp
-      hpx/runtime/parcelset/parcelport.hpp
-      hpx/runtime/parcelset/parcelport_impl.hpp
-      hpx/runtime/parcelset/policies/message_handler.hpp
-      hpx/runtime/parcelset/put_parcel.hpp
-      hpx/runtime/set_parcel_write_handler.hpp
-      hpx/traits/action_message_handler.hpp
-      hpx/traits/action_serialization_filter.hpp
-  )
-  list(TRANSFORM hpx_HEADERS PREPEND ${PROJECT_SOURCE_DIR}/)
-endif()
+set(hpx_HEADERS
+    hpx/plugins/binary_filter_factory_base.hpp
+    hpx/plugins/binary_filter_factory.hpp
+    hpx/plugins/message_handler_factory_base.hpp
+    hpx/plugins/message_handler_factory.hpp
+    hpx/plugins/parcel/coalescing_counter_registry.hpp
+    hpx/plugins/parcel/coalescing_message_handler.hpp
+    hpx/plugins/parcel/coalescing_message_handler_registration.hpp
+    hpx/plugins/parcel/message_buffer.hpp
+    hpx/plugins/parcelport_factory_base.hpp
+    hpx/plugins/parcelport_factory.hpp
+    hpx/plugins/parcelport/mpi/header.hpp
+    hpx/plugins/parcelport/mpi/locality.hpp
+    hpx/plugins/parcelport/mpi/receiver_connection.hpp
+    hpx/plugins/parcelport/mpi/receiver.hpp
+    hpx/plugins/parcelport/mpi/sender_connection.hpp
+    hpx/plugins/parcelport/mpi/sender.hpp
+    hpx/plugins/parcelport/mpi/tag_provider.hpp
+    hpx/plugins/parcelport/tcp/connection_handler.hpp
+    hpx/plugins/parcelport/tcp/locality.hpp
+    hpx/plugins/parcelport/tcp/receiver.hpp
+    hpx/plugins/parcelport/tcp/sender.hpp
+    hpx/plugins/plugin_factory_base.hpp
+    hpx/plugins/plugin_registry.hpp
+    hpx/plugins/unique_plugin_name.hpp
+    hpx/runtime/message_handler_fwd.hpp
+    hpx/runtime/parcelset/connection_cache.hpp
+    hpx/runtime/parcelset/decode_parcels.hpp
+    hpx/runtime/parcelset/detail/call_for_each.hpp
+    hpx/runtime/parcelset/detail/data_point.hpp
+    hpx/runtime/parcelset/detail/gatherer.hpp
+    hpx/runtime/parcelset/detail/parcel_await.hpp
+    hpx/runtime/parcelset/detail/parcel_route_handler.hpp
+    hpx/runtime/parcelset/detail/per_action_data_counter.hpp
+    hpx/runtime/parcelset/encode_parcels.hpp
+    hpx/runtime/parcelset_fwd.hpp
+    hpx/runtime/parcelset/locality.hpp
+    hpx/runtime/parcelset/parcel_buffer.hpp
+    hpx/runtime/parcelset/parcelhandler.hpp
+    hpx/runtime/parcelset/parcel.hpp
+    hpx/runtime/parcelset/parcelport_connection.hpp
+    hpx/runtime/parcelset/parcelport.hpp
+    hpx/runtime/parcelset/parcelport_impl.hpp
+    hpx/runtime/parcelset/policies/message_handler.hpp
+    hpx/runtime/parcelset/put_parcel.hpp
+    hpx/runtime/set_parcel_write_handler.hpp
+    hpx/traits/action_message_handler.hpp
+    hpx/traits/action_serialization_filter.hpp
+)
+list(TRANSFORM hpx_HEADERS PREPEND ${PROJECT_SOURCE_DIR}/)
 
 foreach(lib "hpx" "hpx_external" "hpx_generated")
   set(${lib}_SOURCES
@@ -175,15 +167,8 @@ target_link_libraries(
   PUBLIC hpx_public_flags
   PRIVATE hpx_private_flags
 )
-target_link_libraries(hpx_full PUBLIC hpx_core)
 target_link_libraries(hpx_full PUBLIC hpx_dependencies_boost)
-
-# Set the basic search paths for the HPX headers
-target_include_directories(
-  hpx_full
-  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
-         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}> $<INSTALL_INTERFACE:include>
-)
+target_link_libraries(hpx_full PUBLIC HPX::hpx_local)
 
 if(TARGET APEX::apex)
   # APEX won't get explicitly pulled into libhpx.so any more.  HOWEVER, we do
@@ -192,6 +177,13 @@ if(TARGET APEX::apex)
   # shared object library, we don't need to specify the whole archive.
   target_link_libraries(hpx_full INTERFACE APEX::apex)
 endif()
+
+# Set the basic search paths for the HPX headers
+target_include_directories(
+  hpx_full
+  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}> $<INSTALL_INTERFACE:include>
+)
 
 if(TARGET Gperftools::gperftools)
   target_link_libraries(hpx_full PRIVATE Gperftools::gperftools)
@@ -222,7 +214,6 @@ endif()
 target_link_libraries(hpx_full PUBLIC hpx_base_libraries)
 
 # Link to each parcelport plugin
-hpx_warn("HPX_STATIC_PARCELPORT_PLUGINS=\"${HPX_STATIC_PARCELPORT_PLUGINS}\"")
 foreach(_parcelport_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
   target_link_libraries(hpx_full PRIVATE ${_parcelport_plugin})
 endforeach()

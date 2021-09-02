@@ -5,13 +5,9 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests)
-
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} duplicate_id_registration_1596
-            pass_by_value_id_type_action send_gid_keep_component_1624
-  )
-endif()
+set(tests duplicate_id_registration_1596 pass_by_value_id_type_action
+          send_gid_keep_component_1624
+)
 
 if(HPX_WITH_NETWORKING)
   set(tests ${tests} register_with_basename_1804)
@@ -29,7 +25,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/AGAS"
+    FOLDER "Tests/Regressions/Full/AGAS"
   )
 
   add_hpx_regression_test("agas" ${test} ${${test}_PARAMETERS})

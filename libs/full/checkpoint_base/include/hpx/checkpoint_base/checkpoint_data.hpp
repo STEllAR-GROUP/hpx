@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <hpx/config/export_definitions.hpp>
 #include <hpx/serialization/detail/extra_archive_data.hpp>
 #include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/serialize.hpp>

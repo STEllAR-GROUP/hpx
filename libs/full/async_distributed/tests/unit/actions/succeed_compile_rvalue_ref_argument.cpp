@@ -15,7 +15,7 @@
 
 #include <utility>
 
-void test(int&& ref) {}
+void test(int&&) {}
 HPX_PLAIN_ACTION(test)
 
 ///////////////////////////////////////////////////////////////////////////////

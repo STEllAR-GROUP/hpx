@@ -41,6 +41,8 @@ typedef hpx::components::component<
     hpx::performance_counters::papi::server::papi_counter
 > papi_counter_type;
 
+#define HPX_PAPI_NS_STR "hpx::performance_counters::papi::"
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace papi
 {
@@ -50,8 +52,6 @@ namespace hpx { namespace performance_counters { namespace papi
     using hpx::performance_counters::counter_path_elements;
     using hpx::util::thread_mapper;
     using util::papi_call;
-
-#define NS_STR "hpx::performance_counters::papi::"
 
     // create PAPI counter
     hpx::naming::gid_type create_papi_counter(counter_info const& info,
@@ -65,7 +65,7 @@ namespace hpx { namespace performance_counters { namespace papi
         if (paths.parentinstance_is_basename_)
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter,
-                NS_STR "create_papi_counter()",
+                HPX_PAPI_NS_STR "create_papi_counter()",
                 "unsupported counter instance parent name: "+
                     paths.parentinstancename_);
             return hpx::naming::invalid_gid;
@@ -77,7 +77,7 @@ namespace hpx { namespace performance_counters { namespace papi
         if (tix == thread_mapper::invalid_index)
         {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                NS_STR "create_papi_counter()",
+                HPX_PAPI_NS_STR "create_papi_counter()",
                 "cannot find thread specified in "+info.fullname_);
         }
         // create a local PAPI counter component
@@ -323,6 +323,8 @@ namespace hpx { namespace performance_counters { namespace papi
     }
 
 }}}
+
+#undef HPX_PAPI_NS_STR
 
 ///////////////////////////////////////////////////////////////////////////////
 // register a startup function for PAPI performance counter

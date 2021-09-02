@@ -15,7 +15,7 @@
 
 #include "server_1950.hpp"
 
-int hpx_main(hpx::program_options::variables_map &vm) {
+int hpx_main() {
   {
     hpx::cout << "Hello World!\n" << hpx::flush;
 

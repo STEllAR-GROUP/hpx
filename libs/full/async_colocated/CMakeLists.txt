@@ -4,10 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  return()
-endif()
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(async_colocated_headers
@@ -51,7 +47,8 @@ add_hpx_module(
   SOURCES ${async_colocated_sources}
   HEADERS ${async_colocated_headers}
   COMPAT_HEADERS ${async_colocated_compat_headers}
-  DEPENDENCIES hpx_core
+  DEPENDENCIES HPX::hpx_local
   MODULE_DEPENDENCIES hpx_actions_base hpx_agas_base hpx_async_distributed
+                      hpx_config
   CMAKE_SUBDIRS examples tests
 )

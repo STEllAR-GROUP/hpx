@@ -5,10 +5,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  return()
-endif()
-
 set(example_programs spell_check_simple spell_check_file)
 
 set(spell_check_simple_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -23,7 +19,7 @@ foreach(example_program ${example_programs})
   add_hpx_executable(
     ${example_program} INTERNAL_FLAGS
     SOURCES ${sources} ${${example_program}_FLAGS}
-    FOLDER "Examples/SpellCheck"
+    FOLDER "Examples/Full/SpellCheck"
   )
 
   add_hpx_example_target_dependencies("spell_check" ${example_program})

@@ -38,7 +38,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/LCOs"
+    FOLDER "Tests/Regressions/Full/LCOs"
   )
 
   target_link_libraries(${test}_test PRIVATE ${${test}_LIBRARIES})
@@ -46,17 +46,15 @@ foreach(test ${tests})
 
 endforeach()
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  add_hpx_regression_test(
-    "lcos"
-    after_588_4
-    EXECUTABLE
-    after_588
-    PSEUDO_DEPS_NAME
-    after_588
-    LOCALITIES
-    2
-    THREADS_PER_LOCALITY
-    4
-  )
-endif()
+add_hpx_regression_test(
+  "lcos"
+  after_588_4
+  EXECUTABLE
+  after_588
+  PSEUDO_DEPS_NAME
+  after_588
+  LOCALITIES
+  2
+  THREADS_PER_LOCALITY
+  4
+)

@@ -4,10 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  return()
-endif()
-
 # Add component for this example
 add_subdirectory(cancelable_action)
 
@@ -21,7 +17,7 @@ add_hpx_executable(
   cancelable_action_client INTERNAL_FLAGS
   SOURCES ${sources}
   DEPENDENCIES cancelable_action_component
-  FOLDER "Examples/CancelableAction"
+  FOLDER "Examples/Full/CancelableAction"
 )
 
 add_hpx_example_target_dependencies(

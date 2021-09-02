@@ -16,12 +16,15 @@
 
 if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
   if(NOT HPX_FIND_PACKAGE)
+    if(NOT HPX_WITH_FETCH_HPXLOCAL AND NOT HPXLocal_WITH_APEX)
+      hpx_error(
+        "HPX is configured with APEX support (HPX_WITH_APEX=ON), but HPXLocal is configured without APEX support (HPXLocal_WITH_APEX=OFF). APEX support requires HPXLocal_WITH_APEX=ON."
+      )
+    endif()
+
     if(NOT "${APEX_ROOT}" AND "$ENV{APEX_ROOT}")
       set(APEX_ROOT "$ENV{APEX_ROOT}")
     endif()
-
-    # We want to track parent dependencies
-    hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
 
     if(APEX_ROOT)
       # Use given (external) APEX
@@ -48,7 +51,7 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
       # check again to make sure we have received a copy of APEX
       fetchcontent_getproperties(apex)
       if(NOT apex_POPULATED)
-        hpx_error("APEX could not be populated with HPX_WITH_APEX=On")
+        hpx_error("APEX could not be populated with HPXLocal_WITH_APEX=On")
       endif()
       set(APEX_ROOT ${apex_SOURCE_DIR})
 
@@ -76,10 +79,10 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
 
   # handle optional ITTNotify library (private dependency, skip when called in
   # find_package(HPX))
-  if(HPX_WITH_ITTNOTIFY AND NOT HPX_FIND_PACKAGE)
+  if(HPXLocal_WITH_ITTNOTIFY AND NOT HPX_FIND_PACKAGE)
     add_subdirectory(${APEX_ROOT}/src/ITTNotify)
     if(NOT ITTNOTIFY_FOUND)
-      hpx_error("ITTNotify could not be found and HPX_WITH_ITTNOTIFY=On")
+      hpx_error("ITTNotify could not be found and HPXLocal_WITH_ITTNOTIFY=On")
     endif()
 
     add_library(ITTNotify::ittnotify INTERFACE IMPORTED)

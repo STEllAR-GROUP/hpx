@@ -13,7 +13,7 @@
 #include <hpx/include/apply.hpp>
 #include <hpx/include/runtime.hpp>
 
-void test(int const& ref) {}
+void test(int const&) {}
 HPX_PLAIN_ACTION(test)
 
 ///////////////////////////////////////////////////////////////////////////////

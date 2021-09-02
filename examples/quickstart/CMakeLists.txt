@@ -6,74 +6,41 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
-    composable_guard
-    customize_async
-    disable_thread_stealing_executor
-    enumerate_threads
-    event_synchronization
-    executor_with_thread_hooks
-    fibonacci_await
-    fibonacci_dataflow
-    fibonacci_futures
-    fibonacci_local
-    file_serialization
-    latch_local
-    local_channel_docs
-    local_channel
-    matrix_multiplication
-    pipeline1
-    safe_object
-    shared_mutex
-    simple_future_continuation
-    timed_futures
-    timed_wake
-    use_main_thread
-    vector_counting_dotproduct
-    vector_zip_dotproduct
-    wait_composition
+    1d_wave_equation
+    allow_unknown_options
+    channel_docs
+    command_line_handling
+    component_ctors
+    component_in_executable
+    component_inheritance
+    component_with_custom_heap
+    component_with_executor
+    data_actions
+    error_handling
+    factorial
+    fibonacci
+    fibonacci_futures_distributed
+    fibonacci_one
+    hello_world_1
+    hello_world_2
+    hello_world_distributed
+    interest_calculator
+    invoke_function
+    latch_remote
+    partitioned_vector_spmd_foreach
+    pingpong
+    print_to_console
+    receive_buffer
+    sierpinski
+    zerocopy_rdma
 )
 
 if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
   set(example_programs ${example_programs} init_globally)
 endif()
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(example_programs
-      ${example_programs}
-      1d_wave_equation
-      allow_unknown_options
-      channel_docs
-      command_line_handling
-      component_ctors
-      component_in_executable
-      component_inheritance
-      component_with_custom_heap
-      component_with_executor
-      data_actions
-      error_handling
-      factorial
-      fibonacci
-      fibonacci_futures_distributed
-      fibonacci_one
-      hello_world_1
-      hello_world_2
-      hello_world_distributed
-      interest_calculator
-      interval_timer
-      invoke_function
-      latch_remote
-      partitioned_vector_spmd_foreach
-      pingpong
-      potpourri
-      print_to_console
-      receive_buffer
-      sierpinski
-      zerocopy_rdma
-  )
-endif()
-
 # TODO: These examples currently fail. Disabled until they are fixed.
-set(disabled_tests error_handling fibonacci_await non_atomic_rma zerocopy_rdma)
+set(disabled_tests error_handling zerocopy_rdma)
 
 set(1d_wave_equation_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(allow_unknown_options_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -94,13 +61,11 @@ if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
 else()
   set(hello_world_distributed_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
-set(interval_timer_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(sierpinski_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(partitioned_vector_spmd_foreach_FLAGS COMPONENT_DEPENDENCIES iostreams
                                           partitioned_vector
 )
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(potpourri_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 set(1d_wave_equation_PARAMETERS THREADS_PER_LOCALITY 4
                                 "-Ihpx.stacks.use_guard_pages!=0"
@@ -118,7 +83,6 @@ set(error_handling_PARAMETERS THREADS_PER_LOCALITY 4)
 set(hello_world_1_PARAMETERS THREADS_PER_LOCALITY 4)
 set(hello_world_2_PARAMETERS THREADS_PER_LOCALITY 4)
 set(hello_world_distributed_PARAMETERS THREADS_PER_LOCALITY 4)
-set(interval_timer_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_channel_PARAMETERS THREADS_PER_LOCALITY 4)
 set(sierpinski_PARAMETERS THREADS_PER_LOCALITY 4)
 set(partitioned_vector_spmd_foreach_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -142,7 +106,7 @@ foreach(example_program ${example_programs})
   add_hpx_executable(
     ${example_program} INTERNAL_FLAGS
     SOURCES ${sources} ${${example_program}_FLAGS}
-    FOLDER "Examples/Quickstart"
+    FOLDER "Examples/Full/Quickstart"
   )
 
   target_link_libraries(

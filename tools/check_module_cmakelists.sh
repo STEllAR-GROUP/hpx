@@ -78,7 +78,7 @@ source_dir=/hpx/source
 # Where to write the dependencies output files
 output_dir=/tmp
 # Helper to filter out the dependencies from other groups
-module_groups=(core full)
+module_groups=(full)
 
 pushd $source_dir/libs > /dev/null
 

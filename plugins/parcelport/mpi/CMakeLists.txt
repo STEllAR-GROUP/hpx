@@ -11,6 +11,7 @@ include(HPX_AddLibrary)
 # Decide whether to use the MPI based parcelport
 # ##############################################################################
 if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
+  hpx_local_setup_mpi()
   hpx_debug("add_parcelport_mpi_module")
   include(HPX_AddParcelport)
   add_parcelport(
@@ -24,8 +25,8 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender_connection.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/tag_provider.hpp"
-    DEPENDENCIES hpx_actions hpx_command_line_handling hpx_core
-                 hpx_dependencies_boost Mpi::mpi
+    DEPENDENCIES hpx_actions hpx_command_line_handling hpx_config
+                 hpx_dependencies_boost HPX::hpx_local Mpi::mpi
     INCLUDE_DIRS ${PROJECT_SOURCE_DIR}
     FOLDER "Core/Plugins/Parcelport/MPI"
   )

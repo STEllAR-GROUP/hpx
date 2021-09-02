@@ -480,11 +480,9 @@ namespace hpx { namespace util {
                   "sed-style search and replace (s/search/replace/) used to "
                   "transform host names to the proper network interconnect")
 #endif
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
                 ("hpx:localities", value<std::size_t>(),
                   "the number of localities to wait for at application "
                   "startup (default: 1)")
-#endif
 #if defined(HPX_HAVE_NETWORKING)
                 ("hpx:node", value<std::size_t>(),
                   "number of the node this locality is run on "
@@ -585,12 +583,10 @@ namespace hpx { namespace util {
                 ("hpx:debug-parcel-log", value<std::string>()->implicit_value("cout"),
                   "enable all messages on the parcel transport log channel and send all "
                   "parcel transport logs to the target destination")
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
                 ("hpx:list-symbolic-names", "list all registered symbolic "
                   "names after startup")
                 ("hpx:list-component-types", "list all dynamic component types "
                   "after startup")
-#endif
 #if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)
                 ("hpx:attach-debugger",
                   value<std::string>()->implicit_value("startup"),
@@ -602,7 +598,6 @@ namespace hpx { namespace util {
 #endif
             ;
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             options_description counter_options(
                 "HPX options related to performance counters");
             counter_options.add_options()
@@ -661,7 +656,6 @@ namespace hpx { namespace util {
                 ("hpx:print-counter-types",
                   "append counter type description to generated output")
             ;
-#endif
 
             hidden_options.add_options()
                 ("hpx:ignore", "this option will be silently ignored")
@@ -678,9 +672,7 @@ namespace hpx { namespace util {
                 .add(config_options).add(debugging_options)
                 .add(hidden_options)
             ;
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             desc_cmdline.add(counter_options);
-#endif
 
             options_description desc_cfgfile;
             desc_cfgfile
@@ -688,9 +680,7 @@ namespace hpx { namespace util {
                 .add(config_options)
                 .add(debugging_options).add(hidden_options)
             ;
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             desc_cfgfile.add(counter_options);
-#endif
 
             if (rtcfg.get_entry("hpx.commandline.allow_unknown", "0") == "0")
             {
@@ -761,9 +751,7 @@ namespace hpx { namespace util {
                         .add(hpx_options)
                         .add(debugging_options).add(config_options)
                     ;
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
                     (*visible).add(counter_options);
-#endif
                 }
                 return true;
             }

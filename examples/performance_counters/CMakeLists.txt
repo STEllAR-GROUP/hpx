@@ -4,10 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  return()
-endif()
-
 add_subdirectory(sine)
 
 set(example_programs access_counter_set simplest_performance_counter)
@@ -28,7 +24,7 @@ foreach(example_program ${example_programs})
   add_hpx_executable(
     ${example_program} INTERNAL_FLAGS
     SOURCES ${sources} ${${example_program}_FLAGS}
-    FOLDER "Examples/PerformanceCounters/${example_program}"
+    FOLDER "Examples/Full/PerformanceCounters"
   )
 
   add_hpx_example_target_dependencies("performance_counters" ${example_program})

@@ -13,7 +13,6 @@ endif()
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_stacksize_PARAMETERS LOCALITIES 2)
 set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4 RUN_SERIAL)
-set(thread_affinity_LIBRARIES DEPENDENCIES PRIVATE Hwloc::hwloc)
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set(threading_tests ${threading_tests} thread_stacksize_overflow)

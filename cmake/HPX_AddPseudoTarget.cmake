@@ -17,6 +17,10 @@ function(add_hpx_pseudo_target)
     hpx_debug("add_hpx_pseudo_target"
               "adding shortened pseudo target: ${shortened_args}"
     )
-    add_custom_target(${shortened_args})
+    foreach(target ${shortened_args})
+      if(NOT TARGET ${target})
+        add_custom_target(${shortened_args})
+      endif()
+    endforeach()
   endif()
 endfunction()

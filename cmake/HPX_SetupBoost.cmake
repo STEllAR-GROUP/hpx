@@ -85,7 +85,7 @@ if(NOT TARGET hpx_dependencies_boost)
     )
   endforeach()
 
-  if(HPX_WITH_HIP AND Boost_VERSION VERSION_LESS 1.78)
+  if(HPXLocal_WITH_HIP AND Boost_VERSION VERSION_LESS 1.78)
     target_compile_definitions(
       hpx_dependencies_boost
       INTERFACE "BOOST_NOINLINE=__attribute__ ((noinline))"
@@ -97,9 +97,6 @@ if(NOT TARGET hpx_dependencies_boost)
   # Boost preprocessor definitions
   if(NOT Boost_USE_STATIC_LIBS)
     hpx_add_config_cond_define(BOOST_ALL_DYN_LINK)
-  endif()
-  if(NOT MSVC)
-    hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
   endif()
   hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
   target_link_libraries(
