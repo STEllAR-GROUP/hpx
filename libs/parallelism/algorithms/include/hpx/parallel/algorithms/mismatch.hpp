@@ -90,8 +90,7 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::equal_to>
-    typename util::detail::algorithm_result<
-        ExPolicy, std::pair<FwdIter1, FwdIter2>>::type
+    util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
     mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred());
 
@@ -163,8 +162,7 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::equal_to>
-    typename util::detail::algorithm_result<
-        ExPolicy, std::pair<FwdIter1, FwdIter2>>::type
+    util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
     mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
         Pred&& op = Pred());
 
@@ -175,11 +173,12 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -203,15 +202,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
         ///////////////////////////////////////////////////////////////////////
         template <typename Iter1, typename Sent1, typename Iter2,
             typename Sent2, typename F, typename Proj1, typename Proj2>
-        util::in_in_result<Iter1, Iter2> sequential_mismatch_binary(
+        constexpr util::in_in_result<Iter1, Iter2> sequential_mismatch_binary(
             Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2, F&& f,
             Proj1&& proj1, Proj2&& proj2)
         {
             while (first1 != last1 && first2 != last2 &&
-                hpx::util::invoke(f, hpx::util::invoke(proj1, *first1),
-                    hpx::util::invoke(proj2, *first2)))
+                HPX_INVOKE(
+                    f, HPX_INVOKE(proj1, *first1), HPX_INVOKE(proj2, *first2)))
             {
-                ++first1, ++first2;
+                (void) ++first1, ++first2;
             }
             return {first1, first2};
         }
@@ -228,9 +227,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename Iter1, typename Sent1,
                 typename Iter2, typename Sent2, typename F, typename Proj1,
                 typename Proj2>
-            static util::in_in_result<Iter1, Iter2> sequential(ExPolicy,
-                Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2, F&& f,
-                Proj1&& proj1, Proj2&& proj2)
+            static constexpr util::in_in_result<Iter1, Iter2> sequential(
+                ExPolicy, Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
+                F&& f, Proj1&& proj1, Proj2&& proj2)
             {
                 return sequential_mismatch_binary(first1, last1, first2, last2,
                     std::forward<F>(f), std::forward<Proj1>(proj1),
@@ -240,8 +239,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename Iter1, typename Sent1,
                 typename Iter2, typename Sent2, typename F, typename Proj1,
                 typename Proj2>
-            static typename util::detail::algorithm_result<ExPolicy,
-                util::in_in_result<Iter1, Iter2>>::type
+            static util::detail::algorithm_result_t<ExPolicy,
+                util::in_in_result<Iter1, Iter2>>
             parallel(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
                 Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
             {
@@ -252,8 +251,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         get(util::in_in_result<Iter1, Iter2>{first1, first2});
                 }
 
-                typedef typename std::iterator_traits<Iter1>::difference_type
-                    difference_type1;
+                using difference_type1 =
+                    typename std::iterator_traits<Iter1>::difference_type;
                 difference_type1 count1 = detail::distance(first1, last1);
 
                 // The specification of std::mismatch(_binary) states that if FwdIter1
@@ -263,8 +262,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 //
                 // We perform this check for any iterator type better than input
                 // iterators. This could turn into a QoI issue.
-                typedef typename std::iterator_traits<Iter2>::difference_type
-                    difference_type2;
+                using difference_type2 =
+                    typename std::iterator_traits<Iter2>::difference_type;
                 difference_type2 count2 = detail::distance(first2, last2);
                 if (count1 != count2)
                 {
@@ -273,8 +272,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         get(util::in_in_result<Iter1, Iter2>{first1, first2});
                 }
 
-                typedef hpx::util::zip_iterator<Iter1, Iter2> zip_iterator;
-                typedef typename zip_iterator::reference reference;
+                using zip_iterator = hpx::util::zip_iterator<Iter1, Iter2>;
+                using reference = typename zip_iterator::reference;
 
                 util::cancellation_token<std::size_t> tok(count1);
 
@@ -285,17 +284,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n(base_idx, it, part_count, tok,
                         [&f, &proj1, &proj2, &tok](reference t, std::size_t i) {
-                            if (!hpx::util::invoke(f,
-                                    hpx::util::invoke(proj1, hpx::get<0>(t)),
-                                    hpx::util::invoke(proj2, hpx::get<1>(t))))
+                            if (!HPX_INVOKE(f,
+                                    HPX_INVOKE(proj1, hpx::get<0>(t)),
+                                    HPX_INVOKE(proj2, hpx::get<1>(t))))
                             {
                                 tok.cancel(i);
                             }
                         });
                 };
 
-                auto f2 = [=](std::vector<hpx::future<void>>&&) mutable
+                auto f2 = [=](std::vector<hpx::future<void>>&& data) mutable
                     -> util::in_in_result<Iter1, Iter2> {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    data.clear();
                     difference_type1 mismatched =
                         static_cast<difference_type1>(tok.get_data());
                     if (mismatched != count1)
@@ -305,8 +307,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     }
                     else
                     {
-                        first1 = last1;
-                        first2 = last2;
+                        first1 = detail::advance_to_sentinel(first1, last1);
+                        first2 = detail::advance_to_sentinel(first2, last2);
                     }
                     return {first1, first2};
                 };
@@ -341,9 +343,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::equal_to,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
             hpx::is_invocable_v<Pred,
                 typename std::iterator_traits<FwdIter1>::value_type,
                 typename std::iterator_traits<FwdIter2>::value_type
@@ -352,14 +354,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format on
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::mismatch is deprecated, use hpx::mismatch instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>>::type
-        mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
+        util::detail::algorithm_result_t<ExPolicy,
+            std::pair<FwdIter1, FwdIter2>> mismatch(ExPolicy&& policy,
+            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
+            Pred&& op = Pred())
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
             "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
             "Requires at least forward iterator.");
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -389,7 +391,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
-            static IterPair sequential(
+            static constexpr IterPair sequential(
                 ExPolicy, InIter1 first1, InIter1 last1, InIter2 first2, F&& f)
             {
                 return std::mismatch(first1, last1, first2, std::forward<F>(f));
@@ -397,8 +399,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
-            static typename util::detail::algorithm_result<ExPolicy,
-                IterPair>::type
+            static util::detail::algorithm_result_t<ExPolicy, IterPair>
             parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, F&& f)
             {
@@ -408,13 +409,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         IterPair>::get(std::make_pair(first1, first2));
                 }
 
-                typedef typename std::iterator_traits<FwdIter1>::difference_type
-                    difference_type;
+                using difference_type =
+                    typename std::iterator_traits<FwdIter1>::difference_type;
                 difference_type count = std::distance(first1, last1);
 
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
-                typedef typename zip_iterator::reference reference;
+                using zip_iterator =
+                    hpx::util::zip_iterator<FwdIter1, FwdIter2>;
+                using reference = typename zip_iterator::reference;
 
                 util::cancellation_token<std::size_t> tok(count);
 
@@ -423,15 +424,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n(base_idx, it, part_count, tok,
                         [&f, &tok](reference t, std::size_t i) {
-                            if (!hpx::util::invoke(
-                                    f, hpx::get<0>(t), hpx::get<1>(t)))
+                            if (!HPX_INVOKE(f, hpx::get<0>(t), hpx::get<1>(t)))
                             {
                                 tok.cancel(i);
                             }
                         });
                 };
-                auto f2 = [=](std::vector<hpx::future<void>>&&) mutable
+
+                auto f2 = [=](std::vector<hpx::future<void>>&& data) mutable
                     -> std::pair<FwdIter1, FwdIter2> {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    data.clear();
                     difference_type mismatched =
                         static_cast<difference_type>(tok.get_data());
                     if (mismatched != count)
@@ -455,9 +459,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::equal_to,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
             hpx::is_invocable_v<Pred,
                 typename std::iterator_traits<FwdIter1>::value_type,
                 typename std::iterator_traits<FwdIter2>::value_type
@@ -466,17 +470,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format on
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::mismatch is deprecated, use hpx::mismatch instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>>::type
-        mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, Pred&& op = Pred())
+        util::detail::algorithm_result_t<ExPolicy,
+            std::pair<FwdIter1, FwdIter2>> mismatch(ExPolicy&& policy,
+            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+            Pred&& op = Pred())
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
             "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
             "Requires at least forward iterator.");
 
-        typedef std::pair<FwdIter1, FwdIter2> result_type;
+        using result_type = std::pair<FwdIter1, FwdIter2>;
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
@@ -504,23 +508,23 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            std::pair<FwdIter1, FwdIter2>>
         tag_fallback_dispatch(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::get_pair(
@@ -535,19 +539,19 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            std::pair<FwdIter1, FwdIter2>>
         tag_fallback_dispatch(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::get_pair(
@@ -563,23 +567,23 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            std::pair<FwdIter1, FwdIter2>>
         tag_fallback_dispatch(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, Pred&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::mismatch<
@@ -591,19 +595,19 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            std::pair<FwdIter1, FwdIter2>>
         tag_fallback_dispatch(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::mismatch<
@@ -616,8 +620,8 @@ namespace hpx {
         template <typename FwdIter1, typename FwdIter2,
             typename Pred,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
@@ -628,9 +632,9 @@ namespace hpx {
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             Pred&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::get_pair(
@@ -645,16 +649,16 @@ namespace hpx {
         // clang-format off
         template <typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
         friend std::pair<FwdIter1, FwdIter2> tag_fallback_dispatch(mismatch_t,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::get_pair(
@@ -670,8 +674,8 @@ namespace hpx {
         template <typename FwdIter1, typename FwdIter2,
             typename Pred,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
@@ -681,9 +685,9 @@ namespace hpx {
         friend std::pair<FwdIter1, FwdIter2> tag_fallback_dispatch(mismatch_t,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, Pred&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::mismatch<
@@ -695,16 +699,16 @@ namespace hpx {
         // clang-format off
         template <typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
         friend std::pair<FwdIter1, FwdIter2> tag_fallback_dispatch(
             mismatch_t, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::mismatch<

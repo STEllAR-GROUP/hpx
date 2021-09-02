@@ -60,4 +60,8 @@ namespace hpx { namespace traits {
     {
     };
 
+    template <typename Sent, typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_sized_sentinel_for_v =
+        is_sized_sentinel_for<Sent, Iter>::value;
+
 }}    // namespace hpx::traits
