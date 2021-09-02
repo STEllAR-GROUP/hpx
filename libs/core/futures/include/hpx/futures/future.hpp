@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
@@ -169,7 +169,7 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT void preprocess_future(serialization::output_archive& ar,
+    HPX_LOCAL_EXPORT void preprocess_future(serialization::output_archive& ar,
         hpx::lcos::detail::future_data_refcnt_base& state);
 
     template <typename Archive, typename T>

@@ -347,7 +347,7 @@ namespace hpx { namespace ranges {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -686,7 +686,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::copy is deprecated, use hpx::ranges::copy instead")
         typename util::detail::algorithm_result<ExPolicy,
             hpx::ranges::copy_result<FwdIter1, FwdIter>>::type
@@ -712,7 +712,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::copy is deprecated, use hpx::ranges::copy instead")
         typename util::detail::algorithm_result<ExPolicy,
             ranges::copy_result<
@@ -746,7 +746,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::copy_if is deprecated, use "
         "hpx::ranges::copy_if instead")
         typename util::detail::algorithm_result<ExPolicy,

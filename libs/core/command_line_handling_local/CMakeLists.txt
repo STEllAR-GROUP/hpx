@@ -19,15 +19,15 @@ set(command_line_handling_local_sources
     parse_command_line_local.cpp
 )
 
-include(HPX_AddModule)
-add_hpx_module(
-  core command_line_handling_local
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local command_line_handling_local
   GLOBAL_HEADER_GEN ON
   SOURCES ${command_line_handling_local_sources}
   HEADERS ${command_line_handling_local_headers}
   DEPENDENCIES
   MODULE_DEPENDENCIES
-    hpx_config
+    hpx_config_local
     hpx_program_options
     hpx_runtime_configuration
     hpx_asio
@@ -37,6 +37,6 @@ add_hpx_module(
     hpx_format
     hpx_topology
     hpx_util
-    hpx_version
+    hpx_version_local
   CMAKE_SUBDIRS examples tests
 )

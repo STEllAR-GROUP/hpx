@@ -201,16 +201,16 @@ set(algorithms_compat_headers
 
 set(algorithms_sources handle_exception_termination_handler.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core algorithms
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local algorithms
   HEADERS ${algorithms_headers}
   COMPAT_HEADERS ${algorithms_compat_headers}
   SOURCES ${algorithms_sources}
   MODULE_DEPENDENCIES
     hpx_async_combinators
     hpx_async_local
-    hpx_config
+    hpx_config_local
     hpx_execution
     hpx_executors
     hpx_futures

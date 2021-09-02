@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -233,6 +233,6 @@ namespace hpx { namespace threads {
 
 #endif
 
-        HPX_CORE_EXPORT std::string to_string(mask_cref_type);
+        HPX_LOCAL_EXPORT std::string to_string(mask_cref_type);
         /// \endcond
 }}    // namespace hpx::threads

@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 
 #include <cstddef>
@@ -183,27 +183,27 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     };
 
     //////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT tss_data_node* find_tss_data(void const* key);
+    HPX_LOCAL_EXPORT tss_data_node* find_tss_data(void const* key);
 
-    HPX_CORE_EXPORT void* get_tss_data(void const* key);
+    HPX_LOCAL_EXPORT void* get_tss_data(void const* key);
 
-    HPX_CORE_EXPORT void add_new_tss_node(void const* key,
+    HPX_LOCAL_EXPORT void add_new_tss_node(void const* key,
         std::shared_ptr<tss_cleanup_function> const& func, void* tss_data);
 
-    HPX_CORE_EXPORT void erase_tss_node(
+    HPX_LOCAL_EXPORT void erase_tss_node(
         void const* key, bool cleanup_existing = false);
 
-    HPX_CORE_EXPORT void set_tss_data(void const* key,
+    HPX_LOCAL_EXPORT void set_tss_data(void const* key,
         std::shared_ptr<tss_cleanup_function> const& func,
         void* tss_data = nullptr, bool cleanup_existing = false);
 
     //////////////////////////////////////////////////////////////////////////
 
-    HPX_CORE_EXPORT tss_storage* create_tss_storage();
-    HPX_CORE_EXPORT void delete_tss_storage(tss_storage*& storage);
+    HPX_LOCAL_EXPORT tss_storage* create_tss_storage();
+    HPX_LOCAL_EXPORT void delete_tss_storage(tss_storage*& storage);
 
-    HPX_CORE_EXPORT std::size_t get_tss_thread_data(tss_storage* storage);
-    HPX_CORE_EXPORT std::size_t set_tss_thread_data(
+    HPX_LOCAL_EXPORT std::size_t get_tss_thread_data(tss_storage* storage);
+    HPX_LOCAL_EXPORT std::size_t set_tss_thread_data(
         tss_storage* storage, std::size_t);
 #endif
 }}}}    // namespace hpx::threads::coroutines::detail

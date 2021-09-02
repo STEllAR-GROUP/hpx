@@ -4,12 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx_init.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/functional/bind.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
 
 #include <atomic>
 #include <string>
@@ -36,8 +36,8 @@ int hpx_main()
     HPX_TEST(!val.empty());
     HPX_TEST_EQ(val, std::string("test"));
 
-    hpx::set_config_entry_callback("hpx.config.entry.test",
-        hpx::util::bind(&config_entry_callback));
+    hpx::set_config_entry_callback(
+        "hpx.config.entry.test", hpx::util::bind(&config_entry_callback));
 
     hpx::set_config_entry("hpx.config.entry.test", "test1");
     HPX_TEST(invoked_callback.load());
@@ -46,12 +46,12 @@ int hpx_main()
     HPX_TEST(!val.empty());
     HPX_TEST_EQ(val, std::string("test1"));
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
-    HPX_TEST_EQ(hpx::init(argc, argv), 0);
+    HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv), 0);
     return hpx::util::report_errors();
 }
 #endif

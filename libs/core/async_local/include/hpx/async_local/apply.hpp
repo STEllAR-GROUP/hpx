@@ -6,6 +6,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_base/apply.hpp>
 #include <hpx/executors/apply.hpp>

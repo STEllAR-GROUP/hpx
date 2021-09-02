@@ -15,7 +15,7 @@
 
 #include <hwi/include/bqc/A2_inlines.h>
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <cstdint>
 

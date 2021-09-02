@@ -98,9 +98,9 @@ if(TARGET Vc::vc)
   set(execution_optional_dependencies Vc::vc)
 endif()
 
-include(HPX_AddModule)
-add_hpx_module(
-  core execution
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local execution
   SOURCES ${execution_sources}
   HEADERS ${execution_headers}
   COMPAT_HEADERS ${execution_compat_headers}
@@ -108,7 +108,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_async_base
     hpx_async_combinators
-    hpx_config
+    hpx_config_local
     hpx_threading
     hpx_pack_traversal
     hpx_errors

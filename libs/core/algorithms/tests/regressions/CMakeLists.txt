@@ -4,6 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+return()
 set(tests
     count_3646
     fill_executor_5016
@@ -23,7 +24,7 @@ set(tests
     ranges_facilities
 )
 
-if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
+if(HPXLocal_WITH_DATAPAR_VC OR HPXLocal_WITH_CXX20_EXPERIMENTAL_SIMD)
   list(APPEND tests for_each_datapar)
 endif()
 
@@ -35,7 +36,7 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL ${${test}_FLAGS}
@@ -46,5 +47,7 @@ foreach(test ${tests})
     ${test}_test PRIVATE hpx_iterator_support_test_utilities
   )
 
-  add_hpx_regression_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
+  hpx_local_add_regression_test(
+    "modules.algorithms" ${test} ${${test}_PARAMETERS}
+  )
 endforeach()

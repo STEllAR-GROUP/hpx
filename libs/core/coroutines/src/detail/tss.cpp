@@ -9,7 +9,7 @@
 // (C) Copyright 2008 Anthony Williams
 // (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/coroutine.hpp>
@@ -46,7 +46,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
         throw std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
+            "please specify HPXLocal_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
         return nullptr;
 #endif
     }
@@ -85,7 +85,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
         throw std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
+            "please specify HPXLocal_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
         return 0;
 #endif
     }
@@ -124,7 +124,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         HPX_UNUSED(data);
         throw std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
+            "please specify HPXLocal_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
         return 0;
 #endif
     }
@@ -151,7 +151,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         HPX_UNUSED(key);
         throw std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
+            "please specify HPXLocal_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
         return nullptr;
 #endif
     }

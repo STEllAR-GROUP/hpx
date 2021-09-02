@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -23,7 +23,7 @@
 #include <jemalloc/jemalloc.h>
 #endif
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util {
 #if defined(HPX_HAVE_JEMALLOC_PREFIX)
@@ -124,4 +124,4 @@ namespace hpx { namespace util {
 #endif
 }}    // namespace hpx::util
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

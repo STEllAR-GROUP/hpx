@@ -21,16 +21,16 @@ set(affinity_compat_headers
 
 set(affinity_sources affinity_data.cpp parse_affinity_options.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core affinity
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local affinity
   GLOBAL_HEADER_GEN ON
   SOURCES ${affinity_sources}
   HEADERS ${affinity_headers}
   COMPAT_HEADERS ${affinity_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
-    hpx_config
+    hpx_config_local
     hpx_datastructures
     hpx_errors
     hpx_format

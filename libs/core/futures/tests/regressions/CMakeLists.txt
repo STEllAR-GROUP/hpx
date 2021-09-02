@@ -14,7 +14,7 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
@@ -22,14 +22,14 @@ foreach(test ${tests})
     FOLDER "Tests/Regressions/Modules/Core/Futures"
   )
 
-  add_hpx_regression_test("modules.futures" ${test} ${${test}_PARAMETERS})
+  hpx_local_add_regression_test("modules.futures" ${test} ${${test}_PARAMETERS})
 endforeach()
 
 # compile only tests
-if(HPX_WITH_COMPILE_ONLY_TESTS)
+if(HPXLocal_WITH_COMPILE_ONLY_TESTS)
   set(compile_tests future_range_ambiguity_2032)
 
-  if(HPX_WITH_FAIL_COMPILE_TESTS)
+  if(HPXLocal_WITH_FAIL_COMPILE_TESTS)
     set(fail_compile_tests fail_future_2667)
     foreach(fail_compile_test ${fail_compile_tests})
       set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
@@ -43,7 +43,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
 
     source_group("Source Files" FILES ${sources})
 
-    add_hpx_regression_compile_test(
+    hpx_local_add_regression_compile_test(
       "modules.futures" ${compile_test}
       SOURCES ${sources} ${${compile_test}_FLAGS}
       FOLDER "Tests/Regressions/Modules/Core/Futures/CompileOnly"

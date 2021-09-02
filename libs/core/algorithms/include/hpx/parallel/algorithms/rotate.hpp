@@ -178,7 +178,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
@@ -275,7 +275,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator_v<FwdIter>
         )>
     // clang-format on
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 8, "hpx::parallel::rotate is deprecated, use hpx::rotate instead ")
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<FwdIter, FwdIter>>::type
@@ -378,7 +378,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator_v<FwdIter2>
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 8,
+    HPX_LOCAL_DEPRECATED_V(1, 8,
         "hpx::parallel::rotate_copy is deprecated, use hpx::rotate_copy "
         "instead ") typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<FwdIter1, FwdIter2>>::type

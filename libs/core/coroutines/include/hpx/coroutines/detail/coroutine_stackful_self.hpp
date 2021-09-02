@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>

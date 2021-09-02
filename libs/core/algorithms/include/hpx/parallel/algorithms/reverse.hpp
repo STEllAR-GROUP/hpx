@@ -178,7 +178,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -267,7 +267,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<BidirIter>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::reverse is deprecated, use hpx::reverse "
         "instead")
         typename util::detail::algorithm_result<ExPolicy, BidirIter>::type
@@ -348,7 +348,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::reverse_copy is deprecated, use hpx::reverse_copy "
         "instead") typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<BidirIter, FwdIter>>::type

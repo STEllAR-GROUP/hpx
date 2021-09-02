@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/ini/ini.hpp>
@@ -226,7 +226,8 @@ namespace hpx { namespace resource { namespace detail {
                 hpx::util::format(
                     "Currently, HPX_HAVE_MAX_CPU_COUNT is set to {1} "
                     "while your system has {2} processing units. Please "
-                    "reconfigure HPX with -DHPX_WITH_MAX_CPU_COUNT={2} (or "
+                    "reconfigure HPX with -DHPXLocal_WITH_MAX_CPU_COUNT={2} "
+                    "(or "
                     "higher) to increase the maximal CPU count supported by "
                     "HPX.",
                     HPX_HAVE_MAX_CPU_COUNT, topo_.get_number_of_pus()));

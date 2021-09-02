@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_local/async.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/futures/future.hpp>

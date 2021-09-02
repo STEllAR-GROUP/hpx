@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 /// See N4310: 1.3/3
 #include <algorithm>

@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
+#include <hpx/local/config.hpp>
+#include <hpx/local/config/asio.hpp>
 #include <hpx/functional/function.hpp>
 
 #include <asio/io_context.hpp>
@@ -18,7 +18,7 @@
 namespace hpx { namespace threads { namespace detail {
     using get_default_timer_service_type =
         util::function_nonser<asio::io_context*()>;
-    HPX_CORE_EXPORT void set_get_default_timer_service(
+    HPX_LOCAL_EXPORT void set_get_default_timer_service(
         get_default_timer_service_type f);
-    HPX_CORE_EXPORT asio::io_context* get_default_timer_service();
+    HPX_LOCAL_EXPORT asio::io_context* get_default_timer_service();
 }}}    // namespace hpx::threads::detail

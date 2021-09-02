@@ -234,7 +234,7 @@ namespace hpx {
 
 #else
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
@@ -601,7 +601,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             FwdIter>>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::for_each_n is deprecated, use hpx::for_each_n "
         "instead")
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
@@ -646,7 +646,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
         >
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::for_each is deprecated, use hpx::for_each instead")
         typename util::detail::algorithm_result<ExPolicy, FwdIterB>::type
         for_each(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,

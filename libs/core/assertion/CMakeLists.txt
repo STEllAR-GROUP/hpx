@@ -23,13 +23,13 @@ set(assertion_compat_headers
 # Default location is $HPX_ROOT/libs/assertion/src
 set(assertion_sources assertion.cpp source_location.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core assertion
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local assertion
   GLOBAL_HEADER_GEN OFF
   SOURCES ${assertion_sources}
   HEADERS ${assertion_headers}
   COMPAT_HEADERS ${assertion_compat_headers}
-  MODULE_DEPENDENCIES hpx_config hpx_preprocessor
+  MODULE_DEPENDENCIES hpx_config_local hpx_preprocessor
   CMAKE_SUBDIRS examples tests
 )

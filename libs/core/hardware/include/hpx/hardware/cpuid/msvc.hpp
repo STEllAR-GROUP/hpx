@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #if defined(HPX_WINDOWS)
 
 #include <cstdint>

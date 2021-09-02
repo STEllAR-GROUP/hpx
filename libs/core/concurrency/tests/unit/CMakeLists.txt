@@ -13,7 +13,7 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS} ${${test}_LIBRARIES}
     EXCLUDE_FROM_ALL
@@ -21,5 +21,5 @@ foreach(test ${tests})
     FOLDER "Tests/Unit/Modules/Core/Concurrency"
   )
 
-  add_hpx_unit_test("modules.concurrency" ${test} ${${test}_PARAMETERS})
+  hpx_local_add_unit_test("modules.concurrency" ${test} ${${test}_PARAMETERS})
 endforeach()

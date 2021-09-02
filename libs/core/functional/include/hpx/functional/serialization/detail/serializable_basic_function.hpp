@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/detail/basic_function.hpp>
 #include <hpx/functional/detail/vtable/function_vtable.hpp>

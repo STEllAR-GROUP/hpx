@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/type_support/pack.hpp>

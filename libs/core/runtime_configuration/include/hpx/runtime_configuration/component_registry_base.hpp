@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>
 
@@ -18,7 +18,7 @@ namespace hpx { namespace components {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a component_registry_base has to be used as a base class for all
     /// component registries.
-    struct HPX_CORE_EXPORT component_registry_base
+    struct HPX_LOCAL_EXPORT component_registry_base
     {
         virtual ~component_registry_base() {}
 

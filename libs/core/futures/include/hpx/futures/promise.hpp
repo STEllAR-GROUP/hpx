@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>

@@ -18,6 +18,7 @@
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/init_runtime_local/detail/init_logging.hpp>
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
+#include <hpx/local/version.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
@@ -368,7 +369,7 @@ namespace hpx {
                 hpx::util::set_test_failure_handler(
                     &hpx::detail::test_failure_handler);
                 hpx::set_custom_exception_info_handler(
-                    &hpx::detail::custom_exception_info);
+                    &hpx::local::detail::custom_exception_info);
                 hpx::serialization::detail::set_save_custom_exception_handler(
                     &hpx::runtime_local::detail::save_custom_exception);
                 hpx::serialization::detail::set_load_custom_exception_handler(
@@ -381,6 +382,8 @@ namespace hpx {
                     [](std::exception_ptr const& e) {
                         hpx::detail::report_exception_and_terminate(e);
                     });
+                hpx::detail::set_get_full_build_string(
+                    &hpx::local::full_build_string);
 #if defined(HPX_HAVE_VERIFY_LOCKS)
                 hpx::util::set_registered_locks_error_handler(
                     &hpx::detail::registered_locks_error_handler);

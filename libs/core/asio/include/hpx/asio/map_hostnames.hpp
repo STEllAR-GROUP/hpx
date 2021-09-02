@@ -21,7 +21,7 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // Try to map a given host name based on the list of mappings read from a
     // file
-    struct HPX_CORE_EXPORT map_hostnames
+    struct HPX_LOCAL_EXPORT map_hostnames
     {
         typedef util::function_nonser<std::string(std::string const&)>
             transform_function_type;

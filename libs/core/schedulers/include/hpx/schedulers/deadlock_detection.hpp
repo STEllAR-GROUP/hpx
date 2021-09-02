@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 namespace hpx { namespace threads { namespace policies {
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-    HPX_CORE_EXPORT void set_minimal_deadlock_detection_enabled(bool enabled);
-    HPX_CORE_EXPORT bool get_minimal_deadlock_detection_enabled();
+    HPX_LOCAL_EXPORT void set_minimal_deadlock_detection_enabled(bool enabled);
+    HPX_LOCAL_EXPORT bool get_minimal_deadlock_detection_enabled();
 #endif
 }}}    // namespace hpx::threads::policies

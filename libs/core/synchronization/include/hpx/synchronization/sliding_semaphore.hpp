@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/synchronization/detail/sliding_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 

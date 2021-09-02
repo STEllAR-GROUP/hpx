@@ -8,6 +8,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/serialization/detail/serializable_basic_function.hpp>

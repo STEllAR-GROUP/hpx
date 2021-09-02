@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <windows.h>
 
 namespace hpx { namespace util {
-    HPX_CORE_EXPORT void set_thread_name(
+    HPX_LOCAL_EXPORT void set_thread_name(
         char const* /*threadName*/, DWORD /*dwThreadID*/ = DWORD(-1));
 }}    // namespace hpx::util
 

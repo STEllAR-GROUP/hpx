@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -34,7 +34,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_CORE_EXPORT section
+    class HPX_LOCAL_EXPORT section
     {
     public:
         typedef util::function_nonser<void(

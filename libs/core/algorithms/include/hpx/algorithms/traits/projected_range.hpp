@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 

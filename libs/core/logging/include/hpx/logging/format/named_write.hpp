@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/logging/format/destinations.hpp>
 #include <hpx/logging/format/formatters.hpp>
 
@@ -143,7 +143,7 @@ You could have an output like this:
         // recomputes the write steps - note that this takes place after
         // each operation for instance, the user might have first set the
         // string and later added the formatters
-        HPX_CORE_EXPORT void compute_write_steps();
+        HPX_LOCAL_EXPORT void compute_write_steps();
 
     private:
         struct write_step
@@ -259,7 +259,7 @@ In the above example, I know that the available destinations are @c out_file,
         // recomputes the write steps - note that this takes place after
         // each operation for instance, the user might have first set the
         // string and later added the formatters
-        HPX_CORE_EXPORT void compute_write_steps();
+        HPX_LOCAL_EXPORT void compute_write_steps();
 
     private:
         std::vector<named<ptr_type>> destinations;
@@ -358,7 +358,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
 */
     struct named_write
     {
-        HPX_CORE_EXPORT named_write();
+        HPX_LOCAL_EXPORT named_write();
 
         /** @brief sets the format string: what should be before,
     and what after the original message, separated by "|"
@@ -442,8 +442,8 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         }
 
     private:
-        HPX_CORE_EXPORT void configure_formatter(std::string const& format);
-        HPX_CORE_EXPORT void configure_destination(std::string const& format);
+        HPX_LOCAL_EXPORT void configure_formatter(std::string const& format);
+        HPX_LOCAL_EXPORT void configure_destination(std::string const& format);
 
     private:
         detail::named_formatters m_format;

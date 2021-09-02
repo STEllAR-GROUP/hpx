@@ -6,18 +6,18 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 namespace hpx { namespace util {
 
     // Always provide function exports, which guarantees ABI compatibility of
     // Debug and Release builds.
 
-#if defined(HPX_HAVE_VERIFY_LOCKS_GLOBALLY) || defined(HPX_CORE_EXPORTS)
-    HPX_CORE_EXPORT bool register_lock_globally(void const* lock);
-    HPX_CORE_EXPORT bool unregister_lock_globally(void const* lock);
-    HPX_CORE_EXPORT void enable_global_lock_detection();
-    HPX_CORE_EXPORT void disable_global_lock_detection();
+#if defined(HPX_HAVE_VERIFY_LOCKS_GLOBALLY) || defined(HPX_LOCAL_EXPORTS)
+    HPX_LOCAL_EXPORT bool register_lock_globally(void const* lock);
+    HPX_LOCAL_EXPORT bool unregister_lock_globally(void const* lock);
+    HPX_LOCAL_EXPORT void enable_global_lock_detection();
+    HPX_LOCAL_EXPORT void disable_global_lock_detection();
 #else
     inline bool register_lock_globally(void const*)
     {

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/rebind_executor.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>

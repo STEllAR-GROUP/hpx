@@ -251,7 +251,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -343,7 +343,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected<Proj, T const*>>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::remove_if is deprecated, use hpx::remove_if instead")
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<FwdIter1, FwdIter2>>::type
@@ -433,7 +433,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter2>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::remove_if is deprecated, use hpx::remove_if instead")
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<FwdIter1, FwdIter2>>::type

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/config/defines.hpp>
 
 #include <hpx/type_support/pack.hpp>

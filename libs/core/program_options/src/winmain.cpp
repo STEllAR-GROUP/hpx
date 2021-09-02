@@ -4,7 +4,7 @@
 //  (See accompanying file LICENSE_1_0.txt
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if defined(HPX_WINDOWS)
 #include <hpx/program_options/parsers.hpp>
@@ -24,7 +24,7 @@ namespace hpx { namespace program_options {
     // The rules are pretty funny, see
     //    http://article.gmane.org/gmane.comp.lib.boost.user/3005
     //    http://msdn.microsoft.com/library/en-us/vccelng/htm/progs_12.asp
-    HPX_CORE_EXPORT
+    HPX_LOCAL_EXPORT
     std::vector<std::string> split_winmain(const std::string& input)
     {
         std::vector<std::string> result;

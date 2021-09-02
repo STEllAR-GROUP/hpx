@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 namespace hpx { namespace threads { namespace policies {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-    HPX_CORE_EXPORT void set_maintain_queue_wait_times_enabled(bool enabled);
-    HPX_CORE_EXPORT bool get_maintain_queue_wait_times_enabled();
+    HPX_LOCAL_EXPORT void set_maintain_queue_wait_times_enabled(bool enabled);
+    HPX_LOCAL_EXPORT bool get_maintain_queue_wait_times_enabled();
 #endif
 }}}    // namespace hpx::threads::policies

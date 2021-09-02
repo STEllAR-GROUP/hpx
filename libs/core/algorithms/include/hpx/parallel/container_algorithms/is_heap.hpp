@@ -287,7 +287,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -317,7 +317,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::is_heap is deprecated, use hpx::ranges::is_heap "
         "instead") typename util::detail::algorithm_result<ExPolicy, bool>::type
         is_heap(ExPolicy&& policy, Rng&& rng, Comp&& comp = Comp(),
@@ -355,7 +355,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::is_heap is deprecated, use hpx::ranges::is_heap "
         "instead") typename util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type

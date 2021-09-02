@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -143,7 +143,7 @@ namespace hpx { namespace execution {
 }}    // namespace hpx::execution
 
 namespace hpx { namespace parallel { namespace execution {
-    using persistent_auto_chunk_size HPX_DEPRECATED_V(1, 6,
+    using persistent_auto_chunk_size HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::persistent_auto_chunk_size is deprecated. "
         "Use hpx::execution::persistent_auto_chunk_size instead.") =
         hpx::execution::persistent_auto_chunk_size;

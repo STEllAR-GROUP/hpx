@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/errors/exception.hpp>
 #include <hpx/modules/threading.hpp>
 #include <hpx/synchronization/mutex.hpp>

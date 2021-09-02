@@ -8,7 +8,7 @@
 // user code attempts to "block" OS-threads
 
 #include <hpx/functional/bind.hpp>
-#include <hpx/init.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
@@ -103,7 +103,7 @@ int hpx_main()
             HPX_TEST_LTE(blocked_threads[i].load(), std::uint64_t(1));
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -122,9 +122,9 @@ int main(int argc, char* argv[])
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX.
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
     init_args.cfg = cfg;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }

@@ -6,8 +6,8 @@
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-hpx_option(
-  HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION BOOL
+hpx_local_option(
+  HPXLocal_COROUTINES_WITH_SWAP_CONTEXT_EMULATION BOOL
   "Emulate SwapContext API for coroutines (Windows only, default: OFF)" OFF
   CATEGORY "Thread Manager"
   ADVANCED
@@ -60,21 +60,21 @@ set(coroutines_sources
 )
 
 if(MSVC)
-  if(HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
+  if(HPXLocal_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
     # ##########################################################################
     # Emulation of SwapContext on Windows
     # ##########################################################################
     enable_language(ASM_MASM)
     if(NOT CMAKE_ASM_MASM_COMPILER)
-      hpx_error(
+      hpx_local_error(
         "SwitchToFiber emulation can not be enabled. The masm compiler \
          could not be found. Try setting the ASM_MASM environment variable to the \
          assembler executable (ml.exe/ml64.exe) or disable the emulation by setting \
-         HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION to Off"
+         HPXLocal_COROUTINES_WITH_SWAP_CONTEXT_EMULATION to Off"
       )
     endif()
 
-    hpx_add_config_define_namespace(
+    hpx_local_add_config_define_namespace(
       DEFINE HPX_COROUTINES_HAVE_SWAP_CONTEXT_EMULATION NAMESPACE COROUTINES
     )
 
@@ -92,9 +92,9 @@ if(MSVC)
       VERBATIM
     )
   endif()
-elseif(HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
-  hpx_error(
-    "The option HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION is not supported on "
+elseif(HPXLocal_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
+  hpx_local_error(
+    "The option HPXLocal_COROUTINES_WITH_SWAP_CONTEXT_EMULATION is not supported on "
     "this platform, please disable the emulation by setting it to Off"
   )
 endif()
@@ -106,9 +106,9 @@ set_source_files_properties(
   src/detail/coroutine_self.cpp PROPERTIES SKIP_UNITY_BUILD_INCLUSION TRUE
 )
 
-include(HPX_AddModule)
-add_hpx_module(
-  core coroutines
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local coroutines
   GLOBAL_HEADER_GEN ON
   SOURCES ${coroutines_sources}
   HEADERS ${coroutines_headers}
@@ -116,7 +116,7 @@ add_hpx_module(
   COMPAT_HEADERS ${coroutines_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
-    hpx_config
+    hpx_config_local
     hpx_errors
     hpx_format
     hpx_functional
@@ -127,8 +127,12 @@ add_hpx_module(
   CMAKE_SUBDIRS examples tests
 )
 
-if(MSVC AND HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
-  hpx_info(
+target_link_libraries(
+  hpx_coroutines PUBLIC $<TARGET_NAME_IF_EXISTS:Valgrind::valgrind>
+)
+
+if(MSVC AND HPXLocal_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
+  hpx_local_info(
     "    SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'"
   )
 endif()

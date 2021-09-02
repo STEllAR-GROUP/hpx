@@ -17,4 +17,11 @@ export CCACHE_MAXSIZE=100G
 export CCACHE_MAXFILES=50000
 
 configure_extra_options+=" -DCMAKE_BUILD_TYPE=${build_type}"
-configure_extra_options+=" -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=ON"
+configure_extra_options+=" -DHPXLocal_WITH_CHECK_MODULE_DEPENDENCIES=ON"
+configure_extra_options+=" -DHPXLocal_WITH_EXAMPLES=ON"
+configure_extra_options+=" -DHPXLocal_WITH_TESTS=ON"
+configure_extra_options+=" -DHPXLocal_WITH_TESTS_UNIT=ON"
+configure_extra_options+=" -DHPXLocal_WITH_TESTS_REGRESSIONS=ON"
+configure_extra_options+=" -DHPXLocal_WITH_TESTS_BENCHMARKS=ON"
+configure_extra_options+=" -DHPXLocal_WITH_TESTS_EXAMPLES=ON"
+configure_extra_options+=" -DHPXLocal_WITH_TESTS_EXTERNAL_BUILD=ON"

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/serialization/access.hpp>
 #include <hpx/serialization/basic_archive.hpp>
 #include <hpx/serialization/detail/extra_archive_data.hpp>
@@ -47,26 +47,26 @@ namespace hpx { namespace serialization {
         template <>
         struct extra_archive_data_helper<input_pointer_tracker>
         {
-            HPX_CORE_EXPORT static extra_archive_data_id_type id() noexcept;
+            HPX_LOCAL_EXPORT static extra_archive_data_id_type id() noexcept;
             static constexpr void reset(input_pointer_tracker*) noexcept {}
         };
 
         template <>
         struct extra_archive_data_helper<output_pointer_tracker>
         {
-            HPX_CORE_EXPORT static extra_archive_data_id_type id() noexcept;
-            HPX_CORE_EXPORT static void reset(output_pointer_tracker* data);
+            HPX_LOCAL_EXPORT static extra_archive_data_id_type id() noexcept;
+            HPX_LOCAL_EXPORT static void reset(output_pointer_tracker* data);
         };
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT void register_pointer(
+    HPX_LOCAL_EXPORT void register_pointer(
         input_archive& ar, std::uint64_t pos, detail::ptr_helper_ptr helper);
 
-    HPX_CORE_EXPORT detail::ptr_helper& tracked_pointer(
+    HPX_LOCAL_EXPORT detail::ptr_helper& tracked_pointer(
         input_archive& ar, std::uint64_t pos);
 
-    HPX_CORE_EXPORT std::uint64_t track_pointer(
+    HPX_LOCAL_EXPORT std::uint64_t track_pointer(
         output_archive& ar, void const* pos);
 
     ////////////////////////////////////////////////////////////////////////////

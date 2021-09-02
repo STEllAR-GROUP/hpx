@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 

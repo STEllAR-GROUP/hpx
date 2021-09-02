@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 
 #include <memory>

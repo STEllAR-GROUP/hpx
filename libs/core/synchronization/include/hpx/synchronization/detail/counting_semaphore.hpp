@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
@@ -29,25 +29,25 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         typedef lcos::local::spinlock mutex_type;
 
     public:
-        HPX_CORE_EXPORT counting_semaphore(std::ptrdiff_t value = 0);
-        HPX_CORE_EXPORT ~counting_semaphore();
+        HPX_LOCAL_EXPORT counting_semaphore(std::ptrdiff_t value = 0);
+        HPX_LOCAL_EXPORT ~counting_semaphore();
 
-        HPX_CORE_EXPORT void wait(
+        HPX_LOCAL_EXPORT void wait(
             std::unique_lock<mutex_type>& l, std::ptrdiff_t count);
 
-        HPX_CORE_EXPORT bool wait_until(std::unique_lock<mutex_type>& l,
+        HPX_LOCAL_EXPORT bool wait_until(std::unique_lock<mutex_type>& l,
             hpx::chrono::steady_time_point const& abs_time,
             std::ptrdiff_t count);
 
-        HPX_CORE_EXPORT bool try_wait(
+        HPX_LOCAL_EXPORT bool try_wait(
             std::unique_lock<mutex_type>& l, std::ptrdiff_t count = 1);
 
-        HPX_CORE_EXPORT bool try_acquire(std::unique_lock<mutex_type>& l);
+        HPX_LOCAL_EXPORT bool try_acquire(std::unique_lock<mutex_type>& l);
 
-        HPX_CORE_EXPORT void signal(
+        HPX_LOCAL_EXPORT void signal(
             std::unique_lock<mutex_type> l, std::ptrdiff_t count);
 
-        HPX_CORE_EXPORT std::ptrdiff_t signal_all(
+        HPX_LOCAL_EXPORT std::ptrdiff_t signal_all(
             std::unique_lock<mutex_type> l);
 
     private:

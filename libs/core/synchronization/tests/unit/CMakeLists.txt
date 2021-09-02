@@ -60,7 +60,7 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
@@ -68,15 +68,17 @@ foreach(test ${tests})
     FOLDER "Tests/Unit/Modules/Core/Synchronization"
   )
 
-  add_hpx_unit_test("modules.synchronization" ${test} ${${test}_PARAMETERS})
+  hpx_local_add_unit_test(
+    "modules.synchronization" ${test} ${${test}_PARAMETERS}
+  )
 
 endforeach()
 
-if(HPX_WITH_COMPILE_ONLY_TESTS)
+if(HPXLocal_WITH_COMPILE_ONLY_TESTS)
   # add compile time tests
   set(compile_tests)
 
-  if(HPX_WITH_FAIL_COMPILE_TESTS)
+  if(HPXLocal_WITH_FAIL_COMPILE_TESTS)
     set(fail_compile_tests fail_compile_mutex_move fail_compile_spinlock_move
                            fail_compile_spinlock_no_backoff_move
     )
@@ -90,7 +92,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
   foreach(compile_test ${compile_tests})
     set(sources ${compile_test}.cpp)
 
-    add_hpx_unit_compile_test(
+    hpx_local_add_unit_compile_test(
       "modules.synchronization" ${compile_test}
       SOURCES ${sources} ${${compile_test}_FLAGS}
       FOLDER "Tests/Unit/Modules/Core/Synchronization/CompileOnly"
@@ -105,9 +107,9 @@ set(subdirs shared_mutex)
 
 # add sub directories
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.modules.synchronization.${subdir})
+  hpx_local_add_pseudo_target(tests.unit.modules.synchronization.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(
+  hpx_local_add_pseudo_dependencies(
     tests.unit.modules.synchronization
     tests.unit.modules.synchronization.${subdir}
   )

@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -30,7 +30,7 @@ namespace hpx { namespace program_options {
         options should be given the name X1, following M options should be given
         the name X2 and so on.
     */
-    class HPX_CORE_EXPORT positional_options_description
+    class HPX_LOCAL_EXPORT positional_options_description
     {
     public:
         positional_options_description();
@@ -63,4 +63,4 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

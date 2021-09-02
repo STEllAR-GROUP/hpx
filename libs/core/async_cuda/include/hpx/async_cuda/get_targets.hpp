@@ -8,15 +8,15 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/futures.hpp>
 
 #include <vector>
 
 namespace hpx { namespace cuda { namespace experimental {
-    struct HPX_CORE_EXPORT target;
+    struct HPX_LOCAL_EXPORT target;
 
-    HPX_CORE_EXPORT std::vector<target> get_local_targets();
-    HPX_CORE_EXPORT void print_local_targets();
+    HPX_LOCAL_EXPORT std::vector<target> get_local_targets();
+    HPX_LOCAL_EXPORT void print_local_targets();
 
 }}}    // namespace hpx::cuda::experimental

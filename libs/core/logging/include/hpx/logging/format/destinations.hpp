@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/logging/manipulator.hpp>
 
 #include <ios>
@@ -32,9 +32,9 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 */
     struct cout : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<cout> make();
+        HPX_LOCAL_EXPORT static std::unique_ptr<cout> make();
 
-        HPX_CORE_EXPORT ~cout();
+        HPX_LOCAL_EXPORT ~cout();
 
     protected:
         cout() = default;
@@ -45,9 +45,9 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 */
     struct cerr : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<cerr> make();
+        HPX_LOCAL_EXPORT static std::unique_ptr<cerr> make();
 
-        HPX_CORE_EXPORT ~cerr();
+        HPX_LOCAL_EXPORT ~cerr();
 
     protected:
         cerr() = default;
@@ -62,10 +62,10 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 */
     struct stream : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<stream> make(
+        HPX_LOCAL_EXPORT static std::unique_ptr<stream> make(
             std::ostream* stream_ptr);
 
-        HPX_CORE_EXPORT ~stream();
+        HPX_LOCAL_EXPORT ~stream();
 
         /**
         @brief resets the stream. Further output will be written to this stream
@@ -100,9 +100,9 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 */
     struct dbg_window : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<dbg_window> make();
+        HPX_LOCAL_EXPORT static std::unique_ptr<dbg_window> make();
 
-        HPX_CORE_EXPORT ~dbg_window();
+        HPX_LOCAL_EXPORT ~dbg_window();
 
     protected:
         dbg_window() = default;
@@ -144,10 +144,10 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         @param set [optional] file settings - see file_settings class,
         and @ref dealing_with_flags
     */
-        HPX_CORE_EXPORT static std::unique_ptr<file> make(
+        HPX_LOCAL_EXPORT static std::unique_ptr<file> make(
             std::string const& file_name, file_settings set = {});
 
-        HPX_CORE_EXPORT ~file();
+        HPX_LOCAL_EXPORT ~file();
 
     protected:
         file(std::string const& file_name, file_settings set)

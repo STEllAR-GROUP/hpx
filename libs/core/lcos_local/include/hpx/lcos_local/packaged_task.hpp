@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/functional/unique_function.hpp>

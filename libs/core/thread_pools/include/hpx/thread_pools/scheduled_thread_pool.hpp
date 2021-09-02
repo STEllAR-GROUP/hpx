@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/barrier.hpp>
@@ -32,7 +32,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
@@ -402,4 +402,4 @@ namespace hpx { namespace threads { namespace detail {
     };
 }}}    // namespace hpx::threads::detail
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

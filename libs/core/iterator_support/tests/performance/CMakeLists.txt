@@ -12,14 +12,14 @@ foreach(benchmark ${benchmarks})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL ${${benchmark}_FLAGS}
     FOLDER "Benchmarks/Modules/Core/IteratorSupport"
   )
 
-  add_hpx_performance_test(
+  hpx_local_add_performance_test(
     "modules.iterator_support" ${benchmark} ${${benchmark}_PARAMETERS}
   )
 

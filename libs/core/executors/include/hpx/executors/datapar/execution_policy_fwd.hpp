@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 // TODO: Should this be experimental?
 #if defined(HPX_HAVE_DATAPAR)

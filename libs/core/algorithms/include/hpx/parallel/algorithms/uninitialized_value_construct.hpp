@@ -168,7 +168,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
@@ -321,7 +321,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter,
         HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter>::value)>
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::uninitialized_value_construct is deprecated, use "
         "hpx::uninitialized_value_construct "
         "instead")
@@ -416,7 +416,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename FwdIter, typename Size,
         HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter>::value)>
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::uninitialized_value_construct_n is deprecated, use "
         "hpx::uninitialized_value_construct_n "
         "instead")

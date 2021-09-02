@@ -8,9 +8,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(properties_headers hpx/property.hpp hpx/properties/property.hpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core properties
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local properties
   GLOBAL_HEADER_GEN ON
   HEADERS ${properties_headers}
   DEPENDENCIES hpx_tag_dispatch

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
@@ -31,8 +31,8 @@ namespace hpx { namespace parallel { namespace execution {
     namespace detail {
 
         struct shape_iter_impl_base;
-        HPX_CORE_EXPORT void intrusive_ptr_add_ref(shape_iter_impl_base* p);
-        HPX_CORE_EXPORT void intrusive_ptr_release(shape_iter_impl_base* p);
+        HPX_LOCAL_EXPORT void intrusive_ptr_add_ref(shape_iter_impl_base* p);
+        HPX_LOCAL_EXPORT void intrusive_ptr_release(shape_iter_impl_base* p);
 
         struct shape_iter_impl_base
         {
@@ -203,7 +203,7 @@ namespace hpx { namespace parallel { namespace execution {
         {
         };    // must be trivial and empty
 
-        HPX_NORETURN HPX_CORE_EXPORT void throw_bad_polymorphic_executor();
+        HPX_NORETURN HPX_LOCAL_EXPORT void throw_bad_polymorphic_executor();
 
         template <typename R>
         HPX_NORETURN inline R throw_bad_polymorphic_executor()
@@ -600,7 +600,7 @@ namespace hpx { namespace parallel { namespace execution {
         static constexpr std::size_t polymorphic_executor_storage_size =
             3 * sizeof(void*);
 
-        class HPX_CORE_EXPORT polymorphic_executor_base
+        class HPX_LOCAL_EXPORT polymorphic_executor_base
         {
             using vtable = vtable_base;
 

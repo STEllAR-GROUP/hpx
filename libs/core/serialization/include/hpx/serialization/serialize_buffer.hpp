@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 #include <hpx/modules/errors.hpp>

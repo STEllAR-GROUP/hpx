@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_cuda/cuda_event.hpp>
 #include <hpx/async_cuda/cuda_exception.hpp>
@@ -223,11 +223,11 @@ namespace hpx { namespace cuda { namespace experimental {
 
         // -------------------------------------------------------------
         // non allocator version of : get future with a callback set
-        HPX_CORE_EXPORT hpx::future<void> get_future_with_callback(
+        HPX_LOCAL_EXPORT hpx::future<void> get_future_with_callback(
             cudaStream_t);
 
         // -------------------------------------------------------------
         // non allocator version of : get future with an event set
-        HPX_CORE_EXPORT hpx::future<void> get_future_with_event(cudaStream_t);
+        HPX_LOCAL_EXPORT hpx::future<void> get_future_with_event(cudaStream_t);
     }    // namespace detail
 }}}      // namespace hpx::cuda::experimental

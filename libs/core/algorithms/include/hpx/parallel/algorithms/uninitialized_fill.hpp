@@ -169,7 +169,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -322,7 +322,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }    // namespace detail
 
     template <typename ExPolicy, typename FwdIter, typename T>
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::uninitialized_fill is deprecated, use "
         "hpx::uninitialized_fill "
         "instead")
@@ -413,7 +413,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }    // namespace detail
 
     template <typename ExPolicy, typename FwdIter, typename Size, typename T>
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::uninitialized_fill_n is deprecated, use "
         "hpx::uninitialized_fill_n "
         "instead")

@@ -24,7 +24,7 @@ namespace hpx { namespace program_options {
 
     // First, performs semantic actions for 'oa'.
     // Then, stores in 'm' all options that are defined in 'desc'.
-    HPX_CORE_EXPORT
+    HPX_LOCAL_EXPORT
     void store(const parsed_options& options, variables_map& xm, bool utf8)
     {
         // TODO: what if we have different definition

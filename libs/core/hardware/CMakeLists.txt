@@ -40,10 +40,10 @@ set(hardware_compat_headers
 # Default location is $HPX_ROOT/libs/hardware/src
 set(hardware_sources)
 
-include(HPX_AddModule)
+include(HPXLocal_AddModule)
 
-add_hpx_module(
-  core hardware
+hpx_local_add_module(
+  local hardware
   EXCLUDE_FROM_GLOBAL_HEADER
     "hpx/hardware/cpuid/linux_x86.hpp"
     "hpx/hardware/cpuid/msvc.hpp"
@@ -56,6 +56,6 @@ add_hpx_module(
   SOURCES ${hardware_sources}
   HEADERS ${hardware_headers}
   COMPAT_HEADERS ${hardware_compat_headers}
-  MODULE_DEPENDENCIES hpx_config
+  MODULE_DEPENDENCIES hpx_config_local
   CMAKE_SUBDIRS examples tests
 )

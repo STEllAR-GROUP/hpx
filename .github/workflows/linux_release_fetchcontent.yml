@@ -23,14 +23,16 @@ jobs:
               -Bbuild \
               -GNinja \
               -DCMAKE_BUILD_TYPE=Release \
-              -DHPX_WITH_MALLOC=system \
-              -DHPX_WITH_FETCH_ASIO=ON \
-              -DHPX_WITH_APEX=ON \
-              -DHPX_WITH_EXAMPLES=ON \
-              -DHPX_WITH_TESTS=OFF \
-              -DHPX_REPOSITORY="file:////$(pwd)" \
-              -DHPX_TAG="$GITHUB_SHA" \
-              -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On
+              -DHPXLocal_REPOSITORY="file:////$(pwd)" \
+              -DHPXLocal_TAG="$GITHUB_SHA" \
+              -DHPXLocal_WITH_UNITY_BUILD=ON \
+              -DHPXLocal_WITH_MALLOC=system \
+              -DHPXLocal_WITH_FETCH_ASIO=ON \
+              -DHPXLocal_WITH_EXAMPLES=ON \
+              -DHPXLocal_WITH_TESTS=OFF \
+              -DHPXLocal_WITH_CHECK_MODULE_DEPENDENCIES=On \
+              -DHPX_WITH_APEX=ON
+
     - name: Build
       shell: bash
       run: |

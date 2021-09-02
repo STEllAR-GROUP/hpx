@@ -41,9 +41,9 @@ set(runtime_configuration_sources
     runtime_mode.cpp static_factory_data.cpp
 )
 
-include(HPX_AddModule)
-add_hpx_module(
-  core runtime_configuration
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local runtime_configuration
   GLOBAL_HEADER_GEN ON
   SOURCES ${runtime_configuration_sources}
   HEADERS ${runtime_configuration_headers}
@@ -58,7 +58,7 @@ add_hpx_module(
     hpx_ini
     hpx_prefix
     hpx_coroutines
-    hpx_version
+    hpx_version_local
     hpx_synchronization
   CMAKE_SUBDIRS examples tests
 )

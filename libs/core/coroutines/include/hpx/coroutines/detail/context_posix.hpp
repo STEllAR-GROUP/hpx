@@ -189,7 +189,7 @@ namespace hpx { namespace threads { namespace coroutines {
         public:
             // on some platforms SIGSTKSZ resolves to a syscall, we can't make
             // this constexpr
-            HPX_CORE_EXPORT static std::ptrdiff_t default_stack_size;
+            HPX_LOCAL_EXPORT static std::ptrdiff_t default_stack_size;
 
             ucontext_context_impl_base()
             {

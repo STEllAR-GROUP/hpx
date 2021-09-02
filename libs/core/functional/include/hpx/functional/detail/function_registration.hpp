@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>

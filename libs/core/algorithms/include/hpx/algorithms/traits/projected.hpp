@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution/traits/vector_pack_load_store.hpp>

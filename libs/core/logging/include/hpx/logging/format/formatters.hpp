@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/logging/manipulator.hpp>
 
 #include <memory>
@@ -42,9 +42,9 @@ This will output something similar to:
 */
     struct idx : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<idx> make();
+        HPX_LOCAL_EXPORT static std::unique_ptr<idx> make();
 
-        HPX_CORE_EXPORT ~idx();
+        HPX_LOCAL_EXPORT ~idx();
 
     protected:
         idx() = default;
@@ -85,10 +85,10 @@ std::(w)string and the string that holds your logged message. See convert_format
 */
     struct high_precision_time : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<high_precision_time> make(
+        HPX_LOCAL_EXPORT static std::unique_ptr<high_precision_time> make(
             std::string const& format);
 
-        HPX_CORE_EXPORT ~high_precision_time();
+        HPX_LOCAL_EXPORT ~high_precision_time();
 
     protected:
         explicit high_precision_time(std::string const& format)
@@ -105,9 +105,9 @@ std::(w)string and the string that holds your logged message. See convert_format
 */
     struct thread_id : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<thread_id> make();
+        HPX_LOCAL_EXPORT static std::unique_ptr<thread_id> make();
 
-        HPX_CORE_EXPORT ~thread_id();
+        HPX_LOCAL_EXPORT ~thread_id();
 
     protected:
         thread_id() = default;

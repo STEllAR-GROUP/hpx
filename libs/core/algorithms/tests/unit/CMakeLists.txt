@@ -7,14 +7,14 @@
 # add subdirectories
 set(subdirs algorithms block container_algorithms)
 
-if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
+if(HPXLocal_WITH_DATAPAR_VC OR HPXLocal_WITH_CXX20_EXPERIMENTAL_SIMD)
   set(subdirs ${subdirs} datapar_algorithms)
 endif()
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.modules.algorithms.${subdir})
+  hpx_local_add_pseudo_target(tests.unit.modules.algorithms.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(
+  hpx_local_add_pseudo_dependencies(
     tests.unit.modules.algorithms tests.unit.modules.algorithms.${subdir}
   )
 endforeach()

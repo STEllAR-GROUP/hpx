@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 
 #include <type_traits>

@@ -1,0 +1,97 @@
+# Copyright (c) 2014 Thomas Heller
+# Copyright (c) 2015 Andreas Schaefer
+# Copyright (c) 2019 Patrick Diehl
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@HPXLocal_CMAKE_MODULE_PATH@")
+
+include(GNUInstallDirs)
+include(HPXLocal_Utils)
+
+function(hpx_check_compiler_compatibility)
+  if(HPXLocal_IGNORE_COMPILER_COMPATIBILITY)
+    return()
+  endif()
+
+  if(HPXLocal_WITH_BUILD_BINARY_PACKAGE)
+    string(REGEX MATCH "[0-9]+" HPXLocal_MAJOR_VERSION "${HPXLocal_CXX_COMPILER_VERSION}")
+    string(REGEX MATCH "[0-9]+" CXX_MAJOR_VERSION "${CMAKE_CXX_COMPILER_VERSION}")
+
+    if(NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL ${HPXLocal_CXX_COMPILER_ID} AND
+      ${HPXLocal_MAJOR_VERSION} STREQUAL ${CXX_MAJOR_VERSION}))
+      set(MESSAGE "Compilers do not match. In order to compile HPX application it is"
+          " recommended to use the same major version of the compiler as you did for HPX. "
+          "HPXLocal_CXX_COMPILER=${HPXLocal_CXX_COMPILER}, "
+          "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}. "
+          "HPXLocal_CXX_COMPILER_ID=${HPXLocal_CXX_COMPILER_ID}, "
+          "CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}. "
+          "HPXLocal_CXX_MAJOR_VERSION=${HPXLocal_MAJOR_VERSION}, "
+          "CMAKE_CXX_COMPILER_VERSION=${CXX_MAJOR_VERSION}."
+          "To disable this message set HPXLocal_IGNORE_COMPILER_COMPATIBILITY to On.")
+
+      if(HPXLocal_FIND_REQUIRED)
+        hpx_error("${MESSAGE}")
+      else()
+        hpx_warn("${MESSAGE}")
+        set(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE "${MESSAGE}" PARENT_SCOPE)
+        set(${CMAKE_FIND_PACKAGE_NAME}_FOUND False PARENT_SCOPE)
+      endif()
+    endif()
+  else()
+    if(NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL ${HPXLocal_CXX_COMPILER_ID} AND
+      ${CMAKE_CXX_COMPILER_VERSION} STREQUAL ${HPXLocal_CXX_COMPILER_VERSION}))
+      set(MESSAGE "Compilers do not match. In order to compile HPX application it is"
+          " recommended to use the same compiler as you did for HPX. "
+          "HPXLocal_CXX_COMPILER=${HPXLocal_CXX_COMPILER}, "
+          "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}. "
+          "HPXLocal_CXX_COMPILER_ID=${HPXLocal_CXX_COMPILER_ID}, "
+          "CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}. "
+          "HPXLocal_CXX_COMPILER_VERSION=${HPXLocal_CXX_COMPILER_VERSION}, "
+          "CMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}."
+          "To disable this message set HPXLocal_IGNORE_COMPILER_COMPATIBILITY to On.")
+
+      if(HPXLocal_FIND_REQUIRED)
+        hpx_error("${MESSAGE}")
+      else()
+        hpx_warn("${MESSAGE}")
+        set(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE "${MESSAGE}" PARENT_SCOPE)
+        set(${CMAKE_FIND_PACKAGE_NAME}_FOUND False PARENT_SCOPE)
+      endif()
+    endif()
+  endif()
+endfunction()
+
+function(hpx_check_boost_compatibility)
+  if(HPXLocal_IGNORE_BOOST_COMPATIBILITY)
+    return()
+  endif()
+  if(NOT DEFINED BOOST_ROOT)
+    return()
+  endif()
+
+  # make sure paths are tested even if not string identical
+  get_filename_component(PATH1 "${HPXLocal_BOOST_ROOT}" ABSOLUTE)
+  get_filename_component(PATH2 "${BOOST_ROOT}" ABSOLUTE)
+
+  if(NOT PATH1 STREQUAL PATH2)
+    hpx_error("The specified BOOST_ROOT differs from what has been used when"
+              " configuring and building HPX. Please use the same Boost "
+              "versions. HPX boost is ${HPXLocal_BOOST_ROOT} and users is ${BOOST_ROOT}. "
+              "To disable this message set HPXLocal_IGNORE_BOOST_COMPATIBILITY On."
+    )
+  endif()
+endfunction()
+
+function(hpx_check_allocator_compatibility)
+  string(TOUPPER "${HPXLocal_WITH_MALLOC}" HPXLocal_MALLOC_UPPER)
+  string(TOUPPER "${HPXLocal_WITH_MALLOC_DEFAULT}" HPXLocal_MALLOC_DEFAULT_UPPER)
+  if(NOT (HPXLocal_MALLOC_UPPER STREQUAL HPXLocal_MALLOC_DEFAULT_UPPER))
+    hpx_error("HPXLocal_WITH_MALLOC has been changed by this project. This project "
+      "has set HPXLocal_WITH_MALLOC='${HPXLocal_WITH_MALLOC}' and HPX was configured "
+      "with '${HPXLocal_WITH_MALLOC_DEFAULT}'. HPXLocal_WITH_MALLOC is only provided for "
+      "informational purposes to dependent projects and should not be changed.")
+  endif()
+endfunction()

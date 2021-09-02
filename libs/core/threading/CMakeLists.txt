@@ -16,9 +16,9 @@ set(threading_compat_headers
 
 set(threading_sources thread.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core threading
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local threading
   GLOBAL_HEADER_GEN ON
   SOURCES ${threading_sources}
   HEADERS ${threading_headers}

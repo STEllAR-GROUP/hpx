@@ -66,16 +66,16 @@ set(executors_compat_headers
 
 set(executors_sources current_executor.cpp exception_list_callbacks.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core executors
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local executors
   GLOBAL_HEADER_GEN ON
   SOURCES ${executors_sources}
   HEADERS ${executors_headers}
   COMPAT_HEADERS ${executors_compat_headers}
   MODULE_DEPENDENCIES
     hpx_async_base
-    hpx_config
+    hpx_config_local
     hpx_execution
     hpx_futures
     hpx_io_service

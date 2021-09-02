@@ -34,13 +34,13 @@ set(async_combinators_compat_headers
 )
 # cmake-format: on
 
-include(HPX_AddModule)
-add_hpx_module(
-  core async_combinators
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local async_combinators
   GLOBAL_HEADER_GEN ON
   HEADERS ${async_combinators_headers}
   COMPAT_HEADERS ${async_combinators_compat_headers}
-  MODULE_DEPENDENCIES hpx_async_base hpx_config hpx_errors hpx_futures
+  MODULE_DEPENDENCIES hpx_async_base hpx_config_local hpx_errors hpx_futures
                       hpx_memory hpx_pack_traversal
   CMAKE_SUBDIRS examples tests
 )

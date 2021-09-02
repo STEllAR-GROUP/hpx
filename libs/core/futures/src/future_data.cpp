@@ -7,7 +7,7 @@
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/execution_base/this_thread.hpp>
@@ -233,7 +233,7 @@ namespace hpx { namespace lcos { namespace detail {
     using completed_callback_vector_type =
         future_data_refcnt_base::completed_callback_vector_type;
 
-    template HPX_CORE_EXPORT void
+    template HPX_LOCAL_EXPORT void
     future_data_base<traits::detail::future_data_void>::handle_on_completed<
         completed_callback_vector_type>(completed_callback_vector_type&&);
 

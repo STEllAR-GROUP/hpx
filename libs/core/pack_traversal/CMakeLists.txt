@@ -26,9 +26,9 @@ set(pack_traversal_compat_headers
 )
 # cmake-format: on
 
-include(HPX_AddModule)
-add_hpx_module(
-  core pack_traversal
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local pack_traversal
   GLOBAL_HEADER_GEN ON
   HEADERS ${pack_traversal_headers}
   COMPAT_HEADERS ${pack_traversal_compat_headers}

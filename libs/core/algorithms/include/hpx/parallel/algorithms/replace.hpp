@@ -469,7 +469,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -565,7 +565,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected<Proj, T1 const*>>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::replace is deprecated, use hpx::replace "
         "instead")
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
@@ -652,7 +652,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             traits::is_indirect_callable<ExPolicy, F,
                 traits::projected<Proj, FwdIter>>::value)>
     // clang-format on
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::replace_if is deprecated, use hpx::replace_if "
         "instead")
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
@@ -752,7 +752,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected<Proj, T1 const*>>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::replace_copy is deprecated, use "
         "hpx::replace_copy "
         "instead") typename util::detail::algorithm_result<ExPolicy,
@@ -856,7 +856,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected<Proj, FwdIter1>>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::replace_copy_if is deprecated, use "
         "hpx::replace_copy_if "
         "instead") typename util::detail::algorithm_result<ExPolicy,

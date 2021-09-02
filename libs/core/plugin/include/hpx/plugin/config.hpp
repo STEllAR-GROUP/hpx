@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/plugin/config/defines.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 

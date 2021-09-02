@@ -22,13 +22,13 @@ set(format_compat_headers
 # Default location is $HPX_ROOT/libs/format/src
 set(format_sources format.cpp util/bad_lexical_cast.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core format
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local format
   GLOBAL_HEADER_GEN OFF
   SOURCES ${format_sources}
   HEADERS ${format_headers}
   COMPAT_HEADERS ${format_compat_headers}
-  MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_type_support
+  MODULE_DEPENDENCIES hpx_assertion hpx_config_local hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

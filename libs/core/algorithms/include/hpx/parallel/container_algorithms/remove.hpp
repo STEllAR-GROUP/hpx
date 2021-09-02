@@ -467,7 +467,7 @@ namespace hpx { namespace ranges {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -495,7 +495,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             traits::is_projected_range<Proj, Rng>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::remove is deprecated, use hpx::ranges::remove "
         "instead") typename util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type
@@ -519,7 +519,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Pred, traits::projected_range<Proj, Rng>>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::remove is deprecated, use hpx::ranges::remove "
         "instead") typename util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type

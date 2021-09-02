@@ -9,12 +9,12 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
 namespace hpx { namespace threads { namespace detail {
     using get_default_pool_type = util::function_nonser<thread_pool_base*()>;
-    HPX_CORE_EXPORT void set_get_default_pool(get_default_pool_type f);
-    HPX_CORE_EXPORT thread_pool_base* get_self_or_default_pool();
+    HPX_LOCAL_EXPORT void set_get_default_pool(get_default_pool_type f);
+    HPX_LOCAL_EXPORT thread_pool_base* get_self_or_default_pool();
 }}}    // namespace hpx::threads::detail

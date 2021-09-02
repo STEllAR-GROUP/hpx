@@ -24,14 +24,14 @@ if(TARGET Amplifier::amplifier)
   set(itt_notify_optional_dependencies Amplifier::amplifier)
 endif()
 
-include(HPX_AddModule)
-add_hpx_module(
-  core itt_notify
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local itt_notify
   GLOBAL_HEADER_GEN OFF
   SOURCES ${itt_notify_sources}
   HEADERS ${itt_notify_headers}
   COMPAT_HEADERS ${itt_notify_compat_headers}
   DEPENDENCIES ${itt_notify_optional_dependencies}
-  MODULE_DEPENDENCIES hpx_config
+  MODULE_DEPENDENCIES hpx_config_local
   CMAKE_SUBDIRS examples tests
 )

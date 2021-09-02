@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -98,7 +98,7 @@ inline void __aligned_free(void* p) noexcept
 
 #endif
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util {
 
@@ -196,4 +196,4 @@ namespace hpx { namespace util {
     }
 }}    // namespace hpx::util
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

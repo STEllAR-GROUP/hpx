@@ -11,9 +11,9 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/memory/config/defines.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/memory/config/defines.hpp>
 #include <hpx/memory/detail/sp_convertible.hpp>
 
 #include <cstddef>

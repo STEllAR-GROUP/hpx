@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace cache { namespace policies {

@@ -10,13 +10,13 @@
 if(NOT TARGET Asio::asio)
   find_path(
     ASIO_INCLUDE_DIR asio.hpp
-    HINTS "${ASIO_ROOT}" ENV ASIO_ROOT "${HPX_ASIO_ROOT}"
+    HINTS "${ASIO_ROOT}" ENV ASIO_ROOT "${HPXLocal_ASIO_ROOT}"
     PATH_SUFFIXES include
   )
 
   if(NOT ASIO_INCLUDE_DIR)
-    hpx_error(
-      "Could not find Asio. Set ASIO_ROOT as a CMake or environment variable to point to the Asio root install directory. Alternatively, set HPX_WITH_FETCH_ASIO=ON to fetch Asio using CMake's FetchContent (when using this option Asio will be installed together with HPX, be careful about conflicts with separately installed versions of Asio)."
+    hpx_local_error(
+      "Could not find Asio. Set ASIO_ROOT as a CMake or environment variable to point to the Asio root install directory. Alternatively, set HPXLocal_WITH_FETCH_ASIO=ON to fetch Asio using CMake's FetchContent (when using this option Asio will be installed together with HPX, be careful about conflicts with separately installed versions of Asio)."
     )
   endif()
 

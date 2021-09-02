@@ -1,0 +1,125 @@
+# Copyright (c) 2014 Thomas Heller
+# Copyright (c) 2015 Andreas Schaefer
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+set(HPXLocal_FIND_PACKAGE ON)
+cmake_policy(VERSION 3.18)
+
+# Forward HPXLocal_* cache variables
+include("${CMAKE_CURRENT_LIST_DIR}/HPXLocalCacheVariables.cmake")
+
+# include HPX cmake utilities
+include("${CMAKE_CURRENT_LIST_DIR}/HPXLocalMacros.cmake")
+
+# include exported targets
+
+# Asio can be installed by HPX or externally installed. In the first case we use
+# exported targets, in the second we find Asio again using find_package.
+if(HPXLocal_WITH_FETCH_ASIO)
+  include("${CMAKE_CURRENT_LIST_DIR}/HPXAsioTarget.cmake")
+else()
+  set(HPXLocal_ASIO_ROOT "@ASIO_ROOT@")
+  include(HPXLocal_SetupAsio)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/HPXLocalInternalTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/HPXLocalTargets.cmake")
+
+get_filename_component(
+  _hpx_root_dir "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE
+)
+
+set(HPXLocal_VERSION_STRING "@HPXLocal_VERSION@")
+set(HPXLocal_VERSION_MAJOR @HPXLocal_VERSION_MAJOR@)
+set(HPXLocal_VERSION_MINOR @HPXLocal_VERSION_MINOR@)
+set(HPXLocal_VERSION_SUBMINOR @HPXLocal_VERSION_SUBMINOR@)
+
+set(HPX_PREFIX "${_hpx_root_dir}")
+set(HPXLocal_DEBUG_POSTFIX "@HPXLocal_DEBUG_POSTFIX@")
+set(HPXLocal_BUILD_TYPE "@CMAKE_BUILD_TYPE@")
+set(HPXLocal_CXX_STANDARD "@HPXLocal_CXX_STANDARD@")
+# We explicitly set the default to 98 to force CMake to emit a -std=c++XX flag.
+# Some compilers (clang) have a different default standard for cpp and cu files,
+# but CMake does not know about this difference. If the standard is set to the
+# .cpp default in CMake, CMake will omit the flag, resulting in the wrong
+# standard for .cu files.
+set(CMAKE_CXX_STANDARD_DEFAULT 98)
+
+set(HPXLocal_GIT_COMMIT
+    "@HPXLocal_WITH_GIT_COMMIT@"
+    CACHE STRING "Revision of HPX from Git" FORCE
+)
+
+set(HPXLocal_CXX_COMPILER
+    "@CMAKE_CXX_COMPILER@"
+    CACHE STRING "CXX compiler for HPX" FORCE
+)
+set(HPXLocal_CXX_COMPILER_ID
+    "@CMAKE_CXX_COMPILER_ID@"
+    CACHE STRING "CXX compiler id for HPX" FORCE
+)
+set(HPXLocal_CXX_COMPILER_VERSION
+    "@CMAKE_CXX_COMPILER_VERSION@"
+    CACHE STRING "CXX compiler version for HPX" FORCE
+)
+
+# ##############################################################################
+# Setup the imported libraries (publicly linked) #
+
+# Allocator
+set(HPXLocal_JEMALLOC_ROOT "@JEMALLOC_ROOT@")
+set(HPXLocal_TCMALLOC_ROOT "@TCMALLOC_ROOT@")
+set(HPXLocal_TBBMALLOC_ROOT "@TBBMALLOC_ROOT@")
+# Special handle for mimalloc cause we can't specify HPXLocal_MIMALLOC_ROOT as a HINT
+# to find_package
+set(HPXLocal_MIMALLOC_ROOT "@MIMALLOC_ROOT@")
+if(NOT MIMALLOC_ROOT AND NOT "$ENV{MIMALLOC_ROOT}")
+  set(MIMALLOC_ROOT ${HPXLocal_MIMALLOC_ROOT})
+endif()
+include(HPXLocal_SetupAllocator)
+
+include(HPXLocal_SetupThreads)
+
+# Boost Separate boost targets to be unarily linked to some modules
+set(HPXLocal_BOOST_ROOT "@BOOST_ROOT@")
+# By default BOOST_ROOT is set to HPXLocal_BOOST_ROOT (not necessary for PAPI or
+# HWLOC cause we are specifying HPXLocal_<lib>_ROOT as an HINT to find_package)
+if(NOT BOOST_ROOT AND NOT "$ENV{BOOST_ROOT}")
+  set(BOOST_ROOT ${HPXLocal_BOOST_ROOT})
+endif()
+include(HPXLocal_SetupBoost)
+include(HPXLocal_SetupBoostFilesystem)
+
+# HIP
+include(HPXLocal_SetupHIP)
+
+# Hwloc
+set(HPXLocal_HWLOC_ROOT "@HWLOC_ROOT@")
+include(HPXLocal_SetupHwloc)
+
+# CUDA
+include(HPXLocal_SetupCUDA)
+
+include(HPXLocal_SetupMPI)
+
+set(HPXLocal_WITH_MALLOC_DEFAULT @HPXLocal_WITH_MALLOC@)
+
+if(HPXLocal_WITH_DATAPAR_VC AND NOT Vc_DIR)
+  set(Vc_DIR "@Vc_DIR@")
+endif()
+include(HPXLocal_SetupVc)
+
+if(NOT HPXLocal_CMAKE_LOGLEVEL)
+  set(HPXLocal_CMAKE_LOGLEVEL "WARN")
+endif()
+
+hpx_check_compiler_compatibility()
+hpx_check_boost_compatibility()
+hpx_check_allocator_compatibility()
+
+if(NOT DEFINED ${CMAKE_FIND_PACKAGE_NAME}_FOUND)
+  set(${CMAKE_FIND_PACKAGE_NAME}_FOUND true)
+endif()

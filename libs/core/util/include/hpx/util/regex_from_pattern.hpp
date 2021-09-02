@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/errors.hpp>
 
 #include <string>
 
 namespace hpx { namespace util {
-    HPX_CORE_EXPORT std::string regex_from_pattern(
+    HPX_LOCAL_EXPORT std::string regex_from_pattern(
         std::string const& pattern, error_code& ec = throws);
 }}    // namespace hpx::util

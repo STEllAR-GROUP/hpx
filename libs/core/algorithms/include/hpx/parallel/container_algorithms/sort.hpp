@@ -269,7 +269,7 @@ namespace hpx { namespace ranges {
 
 #else
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
@@ -297,7 +297,7 @@ namespace hpx { namespace parallel { inline namespace rangev1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 8, "hpx::parallel::sort is deprecated, use hpx::sort instead")
         typename util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type

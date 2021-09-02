@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
@@ -80,22 +80,22 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         };
 
     public:
-        HPX_CORE_EXPORT condition_variable();
+        HPX_LOCAL_EXPORT condition_variable();
 
-        HPX_CORE_EXPORT ~condition_variable();
+        HPX_LOCAL_EXPORT ~condition_variable();
 
-        HPX_CORE_EXPORT bool empty(
+        HPX_LOCAL_EXPORT bool empty(
             std::unique_lock<mutex_type> const& lock) const;
 
-        HPX_CORE_EXPORT std::size_t size(
+        HPX_LOCAL_EXPORT std::size_t size(
             std::unique_lock<mutex_type> const& lock) const;
 
         // Return false if no more threads are waiting (returns true if queue
         // is non-empty).
-        HPX_CORE_EXPORT bool notify_one(std::unique_lock<mutex_type> lock,
+        HPX_LOCAL_EXPORT bool notify_one(std::unique_lock<mutex_type> lock,
             threads::thread_priority priority, error_code& ec = throws);
 
-        HPX_CORE_EXPORT void notify_all(std::unique_lock<mutex_type> lock,
+        HPX_LOCAL_EXPORT void notify_all(std::unique_lock<mutex_type> lock,
             threads::thread_priority priority, error_code& ec = throws);
 
         bool notify_one(
@@ -112,9 +112,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
                 std::move(lock), threads::thread_priority::default_, ec);
         }
 
-        HPX_CORE_EXPORT void abort_all(std::unique_lock<mutex_type> lock);
+        HPX_LOCAL_EXPORT void abort_all(std::unique_lock<mutex_type> lock);
 
-        HPX_CORE_EXPORT threads::thread_restart_state wait(
+        HPX_LOCAL_EXPORT threads::thread_restart_state wait(
             std::unique_lock<mutex_type>& lock, char const* description,
             error_code& ec = throws);
 
@@ -124,7 +124,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             return wait(lock, "condition_variable::wait", ec);
         }
 
-        HPX_CORE_EXPORT threads::thread_restart_state wait_until(
+        HPX_LOCAL_EXPORT threads::thread_restart_state wait_until(
             std::unique_lock<mutex_type>& lock,
             hpx::chrono::steady_time_point const& abs_time,
             char const* description, error_code& ec = throws);
@@ -160,7 +160,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         void abort_all(std::unique_lock<Mutex> lock);
 
         // re-add the remaining items to the original queue
-        HPX_CORE_EXPORT void prepend_entries(
+        HPX_LOCAL_EXPORT void prepend_entries(
             std::unique_lock<mutex_type>& lock, queue_type& queue);
 
     private:
@@ -170,8 +170,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     struct condition_variable_data;
 
-    HPX_CORE_EXPORT void intrusive_ptr_add_ref(condition_variable_data* p);
-    HPX_CORE_EXPORT void intrusive_ptr_release(condition_variable_data* p);
+    HPX_LOCAL_EXPORT void intrusive_ptr_add_ref(condition_variable_data* p);
+    HPX_LOCAL_EXPORT void intrusive_ptr_release(condition_variable_data* p);
 
     struct condition_variable_data
     {
@@ -186,9 +186,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         util::cache_aligned_data_derived<detail::condition_variable> cond_;
 
     private:
-        friend HPX_CORE_EXPORT void intrusive_ptr_add_ref(
+        friend HPX_LOCAL_EXPORT void intrusive_ptr_add_ref(
             condition_variable_data*);
-        friend HPX_CORE_EXPORT void intrusive_ptr_release(
+        friend HPX_LOCAL_EXPORT void intrusive_ptr_release(
             condition_variable_data*);
 
         hpx::util::atomic_count count_;

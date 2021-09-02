@@ -6,9 +6,12 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_cuda/cuda_exception.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
+#include <hpx/async_cuda/detail/cuda_event_callback.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/transform.hpp>
 #include <hpx/execution_base/receiver.hpp>

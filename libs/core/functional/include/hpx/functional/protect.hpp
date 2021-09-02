@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/traits/is_bind_expression.hpp>
 
 #include <type_traits>

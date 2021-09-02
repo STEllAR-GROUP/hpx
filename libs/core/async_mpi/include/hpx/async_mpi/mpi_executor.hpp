@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_mpi/mpi_future.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution_base/execution.hpp>

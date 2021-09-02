@@ -104,7 +104,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>

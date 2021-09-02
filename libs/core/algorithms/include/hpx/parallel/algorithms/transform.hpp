@@ -171,7 +171,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #include <hpx/functional/traits/get_function_address.hpp>
@@ -423,7 +423,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected<Proj, FwdIter1>>
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::transform is deprecated, use hpx::transform "
         "instead") typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<FwdIter1, FwdIter2>>::type
@@ -667,7 +667,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected<Proj2, FwdIter2>>
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::transform is deprecated, use hpx::transform instead")
         typename util::detail::algorithm_result<ExPolicy,
             util::in_in_out_result<FwdIter1, FwdIter2, FwdIter3>>::type
@@ -792,7 +792,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected<Proj2, FwdIter2>>
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::transform is deprecated, use hpx::transform instead")
         typename util::detail::algorithm_result<ExPolicy,
             util::in_in_out_result<FwdIter1, FwdIter2, FwdIter3>>::type

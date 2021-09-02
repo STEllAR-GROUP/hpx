@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/ini/ini.hpp>
@@ -20,7 +20,7 @@
 #include <vector>
 
 namespace hpx { namespace resource { namespace detail {
-    HPX_CORE_EXPORT partitioner& create_partitioner(
+    HPX_LOCAL_EXPORT partitioner& create_partitioner(
         resource::partitioner_mode rpmode, hpx::util::section rtcfg,
         hpx::threads::policies::detail::affinity_data affinity_data);
 

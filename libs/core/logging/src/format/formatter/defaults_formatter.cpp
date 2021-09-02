@@ -16,7 +16,7 @@
 
 #include <hpx/logging/format/formatters.hpp>
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/format.hpp>
 
 #include <cstdint>

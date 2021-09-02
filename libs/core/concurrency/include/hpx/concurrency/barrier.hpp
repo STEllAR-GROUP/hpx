@@ -8,17 +8,17 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <climits>
 #include <condition_variable>
 #include <cstddef>
 #include <mutex>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util {
-    class HPX_CORE_EXPORT barrier
+    class HPX_LOCAL_EXPORT barrier
     {
     private:
         typedef std::mutex mutex_type;
@@ -41,4 +41,4 @@ namespace hpx { namespace util {
     };
 }}    // namespace hpx::util
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

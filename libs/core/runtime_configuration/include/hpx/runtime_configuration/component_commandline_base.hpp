@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/modules/program_options.hpp>
 
@@ -16,7 +16,7 @@ namespace hpx { namespace components {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a component_commandline_base has to be used as a base class
     /// for all component command-line line handling registries.
-    struct HPX_CORE_EXPORT component_commandline_base
+    struct HPX_LOCAL_EXPORT component_commandline_base
     {
         virtual ~component_commandline_base() = default;
 

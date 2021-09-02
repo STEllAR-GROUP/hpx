@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/serialization/config/defines.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/serialization/detail/extra_archive_data.hpp>
 
@@ -19,7 +18,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace serialization {
 
@@ -178,4 +177,4 @@ namespace hpx { namespace serialization {
     }
 }}    // namespace hpx::serialization
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

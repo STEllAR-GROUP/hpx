@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/execution.hpp>
@@ -22,7 +22,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 // --------------------------------------------------------------------
 //
@@ -354,4 +354,4 @@ namespace hpx { namespace parallel { namespace execution {
     };
 }}}    // namespace hpx::parallel::execution
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

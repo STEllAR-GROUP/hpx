@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>

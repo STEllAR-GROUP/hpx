@@ -24,9 +24,9 @@ set(resiliency_headers
 # Default location is $HPX_ROOT/libs/resiliency/src
 set(resiliency_sources resiliency.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core resiliency
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local resiliency
   GLOBAL_HEADER_GEN ON
   SOURCES ${resiliency_sources}
   HEADERS ${resiliency_headers}

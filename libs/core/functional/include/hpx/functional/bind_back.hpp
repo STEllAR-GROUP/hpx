@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/member_pack.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>

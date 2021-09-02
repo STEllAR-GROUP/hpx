@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <string>
 
@@ -20,5 +20,5 @@ namespace hpx {
     /// This function returns the name of the calling thread. This name uniquely
     /// identifies the thread in the context of HPX. If the function is called
     /// while no HPX runtime system is active, the result will be "<unknown>".
-    HPX_CORE_EXPORT std::string get_thread_name();
+    HPX_LOCAL_EXPORT std::string get_thread_name();
 }    // namespace hpx

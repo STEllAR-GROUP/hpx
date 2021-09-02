@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -19,7 +19,7 @@
 #include <cstdint>
 #include <utility>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local {
@@ -231,7 +231,7 @@ namespace hpx { namespace lcos { namespace local {
     ///         and it can't be triggered using the action (parcel) mechanism.
     ///         It is just a low level synchronization primitive allowing to
     ///         synchronize a given number of \a threads.
-    class HPX_CORE_EXPORT barrier
+    class HPX_LOCAL_EXPORT barrier
     {
     private:
         typedef lcos::local::spinlock mutex_type;
@@ -275,4 +275,4 @@ namespace hpx { namespace lcos { namespace local {
     };
 }}}    // namespace hpx::lcos::local
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

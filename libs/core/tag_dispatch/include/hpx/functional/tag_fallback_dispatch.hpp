@@ -103,7 +103,7 @@ namespace hpx { namespace functional {
 }}    // namespace hpx::functional
 #else
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>

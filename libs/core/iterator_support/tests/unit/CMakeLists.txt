@@ -21,10 +21,10 @@ set(tests
 )
 
 set(is_range_FLAGS NOLIBS)
-set(is_range_LIBS DEPENDENCIES hpx_core)
+set(is_range_LIBS DEPENDENCIES hpx_local)
 
 set(range_FLAGS NOLIBS)
-set(range_LIBS DEPENDENCIES hpx_core)
+set(range_LIBS DEPENDENCIES hpx_local)
 
 # Add the tests
 foreach(test ${tests})
@@ -32,7 +32,7 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS} ${${test}_LIBS}
     EXCLUDE_FROM_ALL
@@ -44,5 +44,7 @@ foreach(test ${tests})
     ${test}_test PRIVATE hpx_iterator_support_test_utilities
   )
 
-  add_hpx_unit_test("modules.iterator_support" ${test} ${${test}_PARAMETERS})
+  hpx_local_add_unit_test(
+    "modules.iterator_support" ${test} ${${test}_PARAMETERS}
+  )
 endforeach()

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -16,7 +16,7 @@
 namespace hpx { namespace util {
 
     template <typename T>
-    struct HPX_DEPRECATED_V(
+    struct HPX_LOCAL_DEPRECATED_V(
         1, 6, "hpx::util::decay is deprecated, use std::decay instead.") decay
       : std::decay<T>
     {

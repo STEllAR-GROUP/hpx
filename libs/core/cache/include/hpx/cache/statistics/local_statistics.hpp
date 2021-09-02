@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/cache/statistics/no_statistics.hpp>
 
 #include <cstddef>

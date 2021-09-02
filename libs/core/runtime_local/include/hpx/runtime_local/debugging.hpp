@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <string>
 
 namespace hpx { namespace util {
     /// Attaches a debugger if \c category is equal to the configuration entry
     /// hpx.attach-debugger.
-    void HPX_CORE_EXPORT may_attach_debugger(std::string const& category);
+    void HPX_LOCAL_EXPORT may_attach_debugger(std::string const& category);
 }}    // namespace hpx::util

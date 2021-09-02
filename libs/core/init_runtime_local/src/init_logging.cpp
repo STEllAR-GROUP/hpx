@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
 #include <hpx/init_runtime_local/detail/init_logging.hpp>
@@ -1096,7 +1096,7 @@ namespace hpx { namespace util {
                     << "hpx::init_logging: warning: logging is requested even "
                        "while it was disabled at compile time. If you "
                        "need logging to be functional, please reconfigure and "
-                       "rebuild HPX with HPX_WITH_LOGGING set to ON."
+                       "rebuild HPX with HPXLocal_WITH_LOGGING set to ON."
                     << std::endl;
             }
         }

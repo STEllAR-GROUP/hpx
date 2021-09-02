@@ -6,7 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 // System Header Files
 #include <cerrno>
@@ -1018,10 +1018,10 @@ namespace hpx { namespace util {
     }
 
     // explicit instantiation for the correct archive types
-    template HPX_CORE_EXPORT void section::save(
+    template HPX_LOCAL_EXPORT void section::save(
         serialization::output_archive&, const unsigned int version) const;
 
-    template HPX_CORE_EXPORT void section::load(
+    template HPX_LOCAL_EXPORT void section::load(
         serialization::input_archive&, const unsigned int version);
 
 }}    // namespace hpx::util

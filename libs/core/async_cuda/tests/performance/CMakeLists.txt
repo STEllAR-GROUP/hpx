@@ -5,7 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(benchmarks)
-if(HPX_WITH_GPUBLAS)
+if(HPXLocal_WITH_GPUBLAS)
   set(benchmarks ${benchmarks} cuda_executor_throughput)
 endif()
 
@@ -18,7 +18,7 @@ foreach(benchmark ${benchmarks})
   source_group("Source Files" FILES ${sources})
 
   # add benchmark executable
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL ${${benchmark}_FLAGS}
@@ -27,7 +27,7 @@ foreach(benchmark ${benchmarks})
   )
 
   # add a custom target for this benchmark
-  add_hpx_performance_test(
+  hpx_local_add_performance_test(
     "modules.async_cuda" ${benchmark} ${${benchmark}_PARAMETERS}
   )
 

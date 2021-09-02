@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -714,7 +714,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected_range<Proj2, Rng2>
             >::value
         )>
-    HPX_DEPRECATED_V(1, 6, "Please use hpx::ranges::search instead.")
+    HPX_LOCAL_DEPRECATED_V(1, 6, "Please use hpx::ranges::search instead.")
     // clang-format on
     typename util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng1>::type>::type
@@ -743,7 +743,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected_range<Proj2, Rng2>
             >::value
         )>
-    HPX_DEPRECATED_V(1, 6, "Please use hpx::ranges::search_n instead.")
+    HPX_LOCAL_DEPRECATED_V(1, 6, "Please use hpx::ranges::search_n instead.")
     // clang-format on
     typename util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng1>::type>::type

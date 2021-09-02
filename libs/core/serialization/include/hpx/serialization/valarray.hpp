@@ -6,7 +6,7 @@
 //
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 

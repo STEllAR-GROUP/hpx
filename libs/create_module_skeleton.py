@@ -87,8 +87,8 @@ set({module_name}_compat_headers)
 
 set({module_name}_sources)
 
-include(HPX_AddModule)
-add_hpx_module(
+include(HPXLocal_AddModule)
+hpx_local_add_module(
   {lib_name} {module_name}
   GLOBAL_HEADER_GEN ON
   SOURCES ${{{module_name}_sources}}
@@ -100,12 +100,12 @@ add_hpx_module(
 '''
 
 examples_cmakelists_template = cmake_header + f'''
-if(HPX_WITH_EXAMPLES)
-  add_hpx_pseudo_target(examples.modules.{module_name})
-  add_hpx_pseudo_dependencies(examples.modules examples.modules.{module_name})
-  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-    add_hpx_pseudo_target(tests.examples.modules.{module_name})
-    add_hpx_pseudo_dependencies(
+if(HPXLocal_WITH_EXAMPLES)
+  hpx_local_add_pseudo_target(examples.modules.{module_name})
+  hpx_local_add_pseudo_dependencies(examples.modules examples.modules.{module_name})
+  if(HPXLocal_WITH_TESTS AND HPXLocal_WITH_TESTS_EXAMPLES)
+    hpx_local_add_pseudo_target(tests.examples.modules.{module_name})
+    hpx_local_add_pseudo_dependencies(
       tests.examples.modules tests.examples.modules.{module_name}
     )
   endif()
@@ -113,39 +113,39 @@ endif()
 '''
 
 tests_cmakelists_template = cmake_header + f'''
-include(HPX_Message)
+include(HPXLocal_Message)
 
-if(HPX_WITH_TESTS)
-  if(HPX_WITH_TESTS_UNIT)
-    add_hpx_pseudo_target(tests.unit.modules.{module_name})
-    add_hpx_pseudo_dependencies(
+if(HPXLocal_WITH_TESTS)
+  if(HPXLocal_WITH_TESTS_UNIT)
+    hpx_local_add_pseudo_target(tests.unit.modules.{module_name})
+    hpx_local_add_pseudo_dependencies(
       tests.unit.modules tests.unit.modules.{module_name}
     )
     add_subdirectory(unit)
   endif()
 
-  if(HPX_WITH_TESTS_REGRESSIONS)
-    add_hpx_pseudo_target(tests.regressions.modules.{module_name})
-    add_hpx_pseudo_dependencies(
+  if(HPXLocal_WITH_TESTS_REGRESSIONS)
+    hpx_local_add_pseudo_target(tests.regressions.modules.{module_name})
+    hpx_local_add_pseudo_dependencies(
       tests.regressions.modules tests.regressions.modules.{module_name}
     )
     add_subdirectory(regressions)
   endif()
 
-  if(HPX_WITH_TESTS_BENCHMARKS)
-    add_hpx_pseudo_target(tests.performance.modules.{module_name})
-    add_hpx_pseudo_dependencies(
+  if(HPXLocal_WITH_TESTS_BENCHMARKS)
+    hpx_local_add_pseudo_target(tests.performance.modules.{module_name})
+    hpx_local_add_pseudo_dependencies(
       tests.performance.modules tests.performance.modules.{module_name}
     )
     add_subdirectory(performance)
   endif()
 
-  if(HPX_WITH_TESTS_HEADERS)
-    add_hpx_header_tests(
+  if(HPXLocal_WITH_TESTS_HEADERS)
+    hpx_local_add_header_tests(
       modules.{module_name}
       HEADERS ${{{module_name}_headers}}
       HEADER_ROOT ${{PROJECT_SOURCE_DIR}}/include
-      DEPENDENCIES hpx_{module_name}
+      DEPENDENCIES hpx_local_{module_name}
     )
   endif()
 endif()
@@ -229,10 +229,10 @@ modules_cmakelists = cmake_header + f'''
 '''
 
 modules_cmakelists += f'''
-include(HPX_Message)
+include(HPXLocal_Message)
 
 # cmake-format: off
-set(_hpx_{lib_name}_modules
+set(_hpx_local_{lib_name}_modules
 '''
 for module in modules:
     if not module.startswith('_'):
@@ -240,10 +240,10 @@ for module in modules:
 modules_cmakelists += ')\n# cmake-format: on\n'
 
 modules_cmakelists += f'''
-hpx_info("")
-hpx_info("  Configuring libhpx{"_" + lib_name if lib_name != "full" else ""} modules:")
+hpx_local_info("")
+hpx_local_info("  Configuring libhpx{"_" + lib_name if lib_name != "full" else ""} modules:")
 
-foreach(module ${{_hpx_{lib_name}_modules}})
+foreach(module ${{_hpx_local_{lib_name}_modules}})
   add_subdirectory(${{module}})
 endforeach()
 '''

@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/unique_function.hpp>
 
 namespace hpx {
@@ -34,7 +34,7 @@ namespace hpx {
     ///       exception.
     ///
     /// \see    \a hpx::register_shutdown_function()
-    HPX_CORE_EXPORT void register_pre_shutdown_function(
+    HPX_LOCAL_EXPORT void register_pre_shutdown_function(
         shutdown_function_type f);
 
     /// \brief Add a function to be executed by a HPX thread during
@@ -54,5 +54,5 @@ namespace hpx {
     ///       exception.
     ///
     /// \see    \a hpx::register_pre_shutdown_function()
-    HPX_CORE_EXPORT void register_shutdown_function(shutdown_function_type f);
+    HPX_LOCAL_EXPORT void register_shutdown_function(shutdown_function_type f);
 }    // namespace hpx

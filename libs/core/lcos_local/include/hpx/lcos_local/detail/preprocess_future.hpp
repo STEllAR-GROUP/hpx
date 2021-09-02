@@ -189,7 +189,7 @@ namespace hpx { namespace serialization { namespace detail {
     template <>
     struct extra_archive_data_helper<preprocess_futures>
     {
-        HPX_CORE_EXPORT static extra_archive_data_id_type id() noexcept;
+        HPX_LOCAL_EXPORT static extra_archive_data_id_type id() noexcept;
         static constexpr void reset(preprocess_futures*) noexcept {}
     };
 }}}    // namespace hpx::serialization::detail

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_base/sync.hpp>
 #include <hpx/async_local/sync_fwd.hpp>
 #include <hpx/executors/sync.hpp>

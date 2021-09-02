@@ -4,18 +4,18 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# Note: HPX_WITH_ASYNC_MPI is handled in the main CMakeLists.txt
+# Note: HPXLocal_WITH_ASYNC_MPI is handled in the main CMakeLists.txt
 
 # if the user does not want mpi async futures, quit - the module will not be
 # enabled
-if(NOT ${HPX_WITH_ASYNC_MPI})
+if(NOT ${HPXLocal_WITH_ASYNC_MPI})
   return()
 endif()
 
 # setup MPI, if necessary
 if(NOT TARGET Mpi::mpi)
-  include(HPX_SetupMPI)
-  setup_mpi()
+  include(HPXLocal_SetupMPI)
+  hpx_local_setup_mpi()
 endif()
 
 # Default location is $HPX_ROOT/libs/mpi/include
@@ -26,9 +26,9 @@ set(async_mpi_headers hpx/async_mpi/mpi_executor.hpp
 # Default location is $HPX_ROOT/libs/mpi/src
 set(mpi_sources mpi_future.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core async_mpi
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local async_mpi
   GLOBAL_HEADER_GEN ON
   SOURCES ${mpi_sources}
   HEADERS ${async_mpi_headers}
@@ -41,6 +41,6 @@ add_hpx_module(
     hpx_threading_base
     hpx_mpi_base
     hpx_runtime_local
-    hpx_config
+    hpx_config_local
   CMAKE_SUBDIRS examples tests
 )

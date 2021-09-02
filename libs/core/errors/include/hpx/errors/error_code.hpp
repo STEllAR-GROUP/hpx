@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/exception_fwd.hpp>
 
@@ -22,7 +22,7 @@
 namespace hpx {
     /// \cond NODETAIL
     namespace detail {
-        HPX_CORE_EXPORT std::exception_ptr access_exception(error_code const&);
+        HPX_LOCAL_EXPORT std::exception_ptr access_exception(error_code const&);
 
         ///////////////////////////////////////////////////////////////////////
         struct command_line_error : std::logic_error
@@ -42,16 +42,17 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Returns generic HPX error category used for new errors.
-    HPX_CORE_EXPORT std::error_category const& get_hpx_category();
+    HPX_LOCAL_EXPORT std::error_category const& get_hpx_category();
 
     /// \brief Returns generic HPX error category used for errors re-thrown
     ///        after the exception has been de-serialized.
-    HPX_CORE_EXPORT std::error_category const& get_hpx_rethrow_category();
+    HPX_LOCAL_EXPORT std::error_category const& get_hpx_rethrow_category();
 
     /// \cond NOINTERNAL
-    HPX_CORE_EXPORT std::error_category const& get_lightweight_hpx_category();
+    HPX_LOCAL_EXPORT std::error_category const& get_lightweight_hpx_category();
 
-    HPX_CORE_EXPORT std::error_category const& get_hpx_category(throwmode mode);
+    HPX_LOCAL_EXPORT std::error_category const& get_hpx_category(
+        throwmode mode);
 
     inline std::error_code make_system_error_code(
         error e, throwmode mode = plain)
@@ -105,7 +106,7 @@ namespace hpx {
         ///               (if mode is \a rethrow).
         ///
         /// \throws nothing
-        HPX_CORE_EXPORT explicit error_code(error e, throwmode mode = plain);
+        HPX_LOCAL_EXPORT explicit error_code(error e, throwmode mode = plain);
 
         /// Construct an object of type error_code.
         ///
@@ -122,7 +123,7 @@ namespace hpx {
         ///               (if mode is \a rethrow).
         ///
         /// \throws nothing
-        HPX_CORE_EXPORT error_code(error e, char const* func, char const* file,
+        HPX_LOCAL_EXPORT error_code(error e, char const* func, char const* file,
             long line, throwmode mode = plain);
 
         /// Construct an object of type error_code.
@@ -139,7 +140,7 @@ namespace hpx {
         ///
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
-        HPX_CORE_EXPORT error_code(
+        HPX_LOCAL_EXPORT error_code(
             error e, char const* msg, throwmode mode = plain);
 
         /// Construct an object of type error_code.
@@ -160,7 +161,7 @@ namespace hpx {
         ///
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
-        HPX_CORE_EXPORT error_code(error e, char const* msg, char const* func,
+        HPX_LOCAL_EXPORT error_code(error e, char const* msg, char const* func,
             char const* file, long line, throwmode mode = plain);
 
         /// Construct an object of type error_code.
@@ -177,7 +178,7 @@ namespace hpx {
         ///
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
-        HPX_CORE_EXPORT error_code(
+        HPX_LOCAL_EXPORT error_code(
             error e, std::string const& msg, throwmode mode = plain);
 
         /// Construct an object of type error_code.
@@ -198,14 +199,14 @@ namespace hpx {
         ///
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
-        HPX_CORE_EXPORT error_code(error e, std::string const& msg,
+        HPX_LOCAL_EXPORT error_code(error e, std::string const& msg,
             char const* func, char const* file, long line,
             throwmode mode = plain);
 
         /// Return a reference to the error message stored in the hpx::error_code.
         ///
         /// \throws nothing
-        HPX_CORE_EXPORT std::string get_message() const;
+        HPX_LOCAL_EXPORT std::string get_message() const;
 
         /// \brief Clear this error_code object.
         /// The postconditions of invoking this method are
@@ -220,21 +221,21 @@ namespace hpx {
         ///
         /// \note This function maintains the error category of the left hand
         ///       side if the right hand side is a success code.
-        HPX_CORE_EXPORT error_code(error_code const& rhs);
+        HPX_LOCAL_EXPORT error_code(error_code const& rhs);
 
         /// Assignment operator for error_code
         ///
         /// \note This function maintains the error category of the left hand
         ///       side if the right hand side is a success code.
-        HPX_CORE_EXPORT error_code& operator=(error_code const& rhs);
+        HPX_LOCAL_EXPORT error_code& operator=(error_code const& rhs);
 
     private:
         friend std::exception_ptr detail::access_exception(error_code const&);
         friend class exception;
         friend error_code make_error_code(std::exception_ptr const&);
 
-        HPX_CORE_EXPORT error_code(int err, hpx::exception const& e);
-        HPX_CORE_EXPORT explicit error_code(std::exception_ptr const& e);
+        HPX_LOCAL_EXPORT error_code(int err, hpx::exception const& e);
+        HPX_LOCAL_EXPORT explicit error_code(std::exception_ptr const& e);
 
         std::exception_ptr exception_;
     };

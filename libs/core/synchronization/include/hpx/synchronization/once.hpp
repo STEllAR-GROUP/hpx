@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/synchronization/event.hpp>
 

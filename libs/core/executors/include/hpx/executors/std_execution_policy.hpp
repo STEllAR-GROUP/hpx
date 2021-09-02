@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if defined(HPX_HAVE_CXX17_STD_EXECUTION_POLICES)
 #include <hpx/execution/traits/is_execution_policy.hpp>

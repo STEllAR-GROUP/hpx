@@ -1067,7 +1067,7 @@ namespace hpx { namespace ranges {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
@@ -1096,7 +1096,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected<Proj, T1 const*>>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::replace is deprecated, use hpx::ranges::replace "
         "instead") typename util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_traits<Rng>::iterator_type>::type
@@ -1121,7 +1121,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     F, traits::projected_range<Proj, Rng>>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::replace_if is deprecated, use hpx::ranges::replace_if "
         "instead") typename util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_traits<Rng>::iterator_type>::type
@@ -1147,7 +1147,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     traits::projected<Proj, T1 const*>>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::replace_copy is deprecated, use "
         "hpx::ranges::replace_copy "
         "instead") typename util::detail::algorithm_result<ExPolicy,
@@ -1174,7 +1174,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 F, traits::projected_range<Proj, Rng>>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::replace_copy_if is deprecated, use "
         "hpx::ranges::replace_copy_if "
         "instead") typename util::detail::algorithm_result<ExPolicy,

@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>

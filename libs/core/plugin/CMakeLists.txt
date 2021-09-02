@@ -39,15 +39,15 @@ set(plugin_compat_headers
 )
 # cmake-format: on
 
-include(HPX_AddModule)
-add_hpx_module(
-  core plugin
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local plugin
   GLOBAL_HEADER_GEN OFF
   HEADERS ${plugin_headers}
   COMPAT_HEADERS ${plugin_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
-    hpx_config
+    hpx_config_local
     hpx_errors
     hpx_datastructures
     hpx_filesystem

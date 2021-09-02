@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/preprocessor/stringize.hpp>
@@ -24,7 +24,7 @@
 #include <type_traits>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace serialization { namespace detail {
     class id_registry
@@ -40,15 +40,15 @@ namespace hpx { namespace serialization { namespace detail {
 
         HPX_STATIC_CONSTEXPR std::uint32_t invalid_id = ~0u;
 
-        HPX_CORE_EXPORT void register_factory_function(
+        HPX_LOCAL_EXPORT void register_factory_function(
             const std::string& type_name, ctor_t ctor);
 
-        HPX_CORE_EXPORT void register_typename(
+        HPX_LOCAL_EXPORT void register_typename(
             const std::string& type_name, std::uint32_t id);
 
-        HPX_CORE_EXPORT void fill_missing_typenames();
+        HPX_LOCAL_EXPORT void fill_missing_typenames();
 
-        HPX_CORE_EXPORT std::uint32_t try_get_id(
+        HPX_LOCAL_EXPORT std::uint32_t try_get_id(
             const std::string& type_name) const;
 
         std::uint32_t get_max_registered_id() const
@@ -56,10 +56,10 @@ namespace hpx { namespace serialization { namespace detail {
             return max_id;
         }
 
-        HPX_CORE_EXPORT std::vector<std::string> get_unassigned_typenames()
+        HPX_LOCAL_EXPORT std::vector<std::string> get_unassigned_typenames()
             const;
 
-        HPX_CORE_EXPORT static id_registry& instance();
+        HPX_LOCAL_EXPORT static id_registry& instance();
 
     private:
         id_registry()
@@ -70,7 +70,7 @@ namespace hpx { namespace serialization { namespace detail {
         friend struct ::hpx::util::static_<id_registry>;
         friend class polymorphic_id_factory;
 
-        HPX_CORE_EXPORT void cache_id(std::uint32_t id, ctor_t ctor);
+        HPX_LOCAL_EXPORT void cache_id(std::uint32_t id, ctor_t ctor);
 
         std::uint32_t max_id;
         typename_to_ctor_t typename_to_ctor;
@@ -117,14 +117,14 @@ namespace hpx { namespace serialization { namespace detail {
             return static_cast<T*>(ctor());
         }
 
-        HPX_CORE_EXPORT static std::uint32_t get_id(
+        HPX_LOCAL_EXPORT static std::uint32_t get_id(
             const std::string& type_name);
 
     private:
         polymorphic_id_factory() {}
 
-        HPX_CORE_EXPORT static polymorphic_id_factory& instance();
-        HPX_CORE_EXPORT static std::string collect_registered_typenames();
+        HPX_LOCAL_EXPORT static polymorphic_id_factory& instance();
+        HPX_LOCAL_EXPORT static std::string collect_registered_typenames();
 
         friend struct hpx::util::static_<polymorphic_id_factory>;
     };
@@ -179,7 +179,7 @@ namespace hpx { namespace serialization { namespace detail {
 
 }}}    // namespace hpx::serialization::detail
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>
 
 #define HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(String, Id)                       \
     namespace hpx { namespace serialization { namespace detail {               \

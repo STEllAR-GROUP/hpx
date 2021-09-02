@@ -382,7 +382,7 @@ namespace hpx { namespace ranges {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -423,7 +423,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::merge is deprecated, use hpx::ranges::merge instead")
         typename util::detail::algorithm_result<ExPolicy,
             hpx::parallel::util::in_in_out_result<
@@ -483,7 +483,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::inplace_merge is deprecated, use "
         "hpx::ranges::inplace_merge instead")
         typename util::detail::algorithm_result<ExPolicy, RandIter>::type

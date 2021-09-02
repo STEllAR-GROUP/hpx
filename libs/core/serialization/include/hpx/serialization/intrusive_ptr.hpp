@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/functional/deferred_call.hpp>

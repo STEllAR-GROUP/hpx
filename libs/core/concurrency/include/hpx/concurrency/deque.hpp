@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concurrency/detail/freelist.hpp>
 #include <hpx/concurrency/detail/tagged_ptr_pair.hpp>
 

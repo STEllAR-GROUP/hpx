@@ -7,7 +7,7 @@
 // enforce that types are bitwise serializable by default
 #define HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>

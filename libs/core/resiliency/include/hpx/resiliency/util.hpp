@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/local/config/export_definitions.hpp>
 
 #include <exception>
 #include <stdexcept>
@@ -16,12 +16,12 @@
 namespace hpx { namespace resiliency { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_ALWAYS_EXPORT abort_replicate_exception : std::exception
+    struct abort_replicate_exception : std::exception
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_ALWAYS_EXPORT abort_replay_exception : std::exception
+    struct abort_replay_exception : std::exception
     {
     };
 

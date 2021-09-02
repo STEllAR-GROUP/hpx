@@ -44,16 +44,16 @@ set(execution_base_sources agent_ref.cpp any_sender.cpp register_locks.cpp
                            spinlock_deadlock_detection.cpp this_thread.cpp
 )
 
-include(HPX_AddModule)
-add_hpx_module(
-  core execution_base
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local execution_base
   GLOBAL_HEADER_GEN ON
   SOURCES ${execution_base_sources}
   HEADERS ${execution_base_headers}
   COMPAT_HEADERS ${execution_base_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
-    hpx_config
+    hpx_config_local
     hpx_errors
     hpx_format
     hpx_functional

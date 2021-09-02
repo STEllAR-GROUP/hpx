@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 namespace hpx { namespace threads {
 
     // The thread-manager class is the central instance of management for
     // all (non-depleted) threads
-    class HPX_CORE_EXPORT threadmanager;
+    class HPX_LOCAL_EXPORT threadmanager;
 
 }}    // namespace hpx::threads

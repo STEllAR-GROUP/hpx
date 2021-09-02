@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 namespace hpx { namespace traits { namespace detail {
     // wraps int so that int argument is favored over wrap_int

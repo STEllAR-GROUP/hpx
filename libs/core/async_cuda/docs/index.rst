@@ -46,18 +46,5 @@ without fetching a future, and multiple futures may be obtained
 from the helper. Please refer to the unit tests and examples
 for further examples.
 
-CMake variables
----------------
-
-``HPX_WITH_CUDA`` - this is a general option that will enable both ``HPX_WITH_ASYNC_CUDA``
-and ``HPX_WITH_COMPUTE_CUDA`` when turned ``ON``.
-
-``HPX_WITH_ASYNC_CUDA=ON`` enables the building of this module which requires
-only the presence of CUDA on the system and only exposes cuda+fuures support
-(``HPX_WITH_ASYNC_CUDA`` may be used when ``HPX_WITH_COMPUTE_CUDA=OFF``).
-
-``HPX_WITH_COMPUTE_CUDA=ON`` enables building HPX compute features that allow parallel
-algorithms to be passed through to the GPU/CUDA backend.
-
 See the :ref:`API reference <modules_async_cuda_api>` of this module for more
 details.

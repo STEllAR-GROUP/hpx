@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
@@ -37,7 +37,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos {
@@ -54,7 +54,7 @@ namespace hpx { namespace lcos {
 namespace hpx { namespace lcos { namespace detail {
     using run_on_completed_error_handler_type =
         util::function_nonser<void(std::exception_ptr const& e)>;
-    HPX_CORE_EXPORT void set_run_on_completed_error_handler(
+    HPX_LOCAL_EXPORT void set_run_on_completed_error_handler(
         run_on_completed_error_handler_type f);
 
     ///////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ namespace hpx { namespace lcos { namespace detail {
     void intrusive_ptr_release(future_data_refcnt_base* p);
 
     ///////////////////////////////////////////////////////////////////////
-    struct HPX_CORE_EXPORT future_data_refcnt_base
+    struct HPX_LOCAL_EXPORT future_data_refcnt_base
     {
     public:
         typedef util::unique_function_nonser<void()> completed_callback_type;
@@ -193,7 +193,7 @@ namespace hpx { namespace lcos { namespace detail {
     struct future_data_base;
 
     template <>
-    struct HPX_CORE_EXPORT future_data_base<traits::detail::future_data_void>
+    struct HPX_LOCAL_EXPORT future_data_base<traits::detail::future_data_void>
       : future_data_refcnt_base
     {
         future_data_base()
@@ -1017,4 +1017,4 @@ namespace hpx { namespace traits { namespace detail {
     };
 }}}    // namespace hpx::traits::detail
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

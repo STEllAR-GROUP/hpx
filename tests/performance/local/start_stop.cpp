@@ -8,9 +8,9 @@
 // This is meant to be compared to resume_suspend and openmp_parallel_region.
 
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/init.hpp>
 #include <hpx/local/chrono.hpp>
 #include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -20,7 +20,7 @@
 
 int hpx_main()
 {
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char** argv)
@@ -40,12 +40,12 @@ int main(int argc, char** argv)
 
     std::uint64_t repetitions = vm["repetitions"].as<std::uint64_t>();
 
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    hpx::start(argc, argv, init_args);
+    hpx::local::start(hpx_main, argc, argv, init_args);
     std::uint64_t threads = hpx::resource::get_num_threads("default");
-    hpx::stop();
+    hpx::local::stop();
 
     std::cout << "threads, resume [s], apply [s], suspend [s]" << std::endl;
 
@@ -57,10 +57,10 @@ int main(int argc, char** argv)
     {
         timer.restart();
 
-        hpx::init_params init_args;
+        hpx::local::init_params init_args;
         init_args.desc_cmdline = desc_commandline;
 
-        hpx::start(argc, argv, init_args);
+        hpx::local::start(hpx_main, argc, argv, init_args);
         auto t_start = timer.elapsed();
         start_time += t_start;
 
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
         auto t_apply = timer.elapsed();
 
-        hpx::stop();
+        hpx::local::stop();
         auto t_stop = timer.elapsed();
         stop_time += t_stop;
 

@@ -59,15 +59,15 @@ set(synchronization_sources
     detail/sliding_semaphore.cpp local_barrier.cpp mutex.cpp stop_token.cpp
 )
 
-include(HPX_AddModule)
-add_hpx_module(
-  core synchronization
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local synchronization
   GLOBAL_HEADER_GEN ON
   SOURCES ${synchronization_sources}
   HEADERS ${synchronization_headers}
   COMPAT_HEADERS ${synchronization_compat_headers}
   MODULE_DEPENDENCIES
-    hpx_config
+    hpx_config_local
     hpx_assertion
     hpx_execution_base
     hpx_concurrency

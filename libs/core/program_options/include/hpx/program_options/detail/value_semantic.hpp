@@ -23,7 +23,7 @@
 
 namespace hpx { namespace program_options {
 
-    extern HPX_CORE_EXPORT std::string arg;
+    extern HPX_LOCAL_EXPORT std::string arg;
 
     template <class T, class Char>
     std::string typed_value<T, Char>::name() const
@@ -87,7 +87,7 @@ namespace hpx { namespace program_options {
         }
 
         /* Throws multiple_occurrences if 'value' is not empty. */
-        HPX_CORE_EXPORT void check_first_occurrence(
+        HPX_LOCAL_EXPORT void check_first_occurrence(
             const hpx::any_nonser& value);
     }    // namespace validators
 
@@ -116,18 +116,18 @@ namespace hpx { namespace program_options {
         }
     }
 
-    HPX_CORE_EXPORT void validate(
+    HPX_LOCAL_EXPORT void validate(
         hpx::any_nonser& v, const std::vector<std::string>& xs, bool*, int);
 
-    HPX_CORE_EXPORT void validate(
+    HPX_LOCAL_EXPORT void validate(
         hpx::any_nonser& v, const std::vector<std::wstring>& xs, bool*, int);
 
     // For some reason, this declaration, which is require by the standard,
     // cause msvc 7.1 to not generate code to specialization defined in
     // value_semantic.cpp
-    HPX_CORE_EXPORT void validate(hpx::any_nonser& v,
+    HPX_LOCAL_EXPORT void validate(hpx::any_nonser& v,
         const std::vector<std::string>& xs, std::string*, int);
-    HPX_CORE_EXPORT void validate(hpx::any_nonser& v,
+    HPX_LOCAL_EXPORT void validate(hpx::any_nonser& v,
         const std::vector<std::wstring>& xs, std::string*, int);
 
     /** Validates sequences. Allows multiple values per option occurrence

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <hpx/assertion/source_location.hpp>
 
@@ -15,7 +15,7 @@
 
 namespace hpx { namespace assertion { namespace detail {
     /// \cond NOINTERNAL
-    HPX_CORE_EXPORT void handle_assert(source_location const& loc,
+    HPX_LOCAL_EXPORT void handle_assert(source_location const& loc,
         const char* expr, std::string const& msg) noexcept;
     /// \endcond
 }}}    // namespace hpx::assertion::detail

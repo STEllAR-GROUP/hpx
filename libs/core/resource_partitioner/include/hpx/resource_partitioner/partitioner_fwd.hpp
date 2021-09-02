@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/threading_base/network_background_callback.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -24,17 +24,17 @@ namespace hpx { namespace resource {
     class partitioner;
 
     namespace detail {
-        class HPX_CORE_EXPORT partitioner;
-        void HPX_CORE_EXPORT delete_partitioner();
+        class HPX_LOCAL_EXPORT partitioner;
+        void HPX_LOCAL_EXPORT delete_partitioner();
     }    // namespace detail
 
     /// May be used anywhere in code and returns a reference to the single,
     /// global resource partitioner.
-    HPX_CORE_EXPORT detail::partitioner& get_partitioner();
+    HPX_LOCAL_EXPORT detail::partitioner& get_partitioner();
 
     /// Returns true if the resource partitioner has been initialized.
     /// Returns false otherwise.
-    HPX_CORE_EXPORT bool is_partitioner_valid();
+    HPX_LOCAL_EXPORT bool is_partitioner_valid();
 
     /// This enumeration describes the modes available when creating a
     /// resource partitioner.

@@ -35,9 +35,9 @@ set(concurrency_compat_headers
 # Default location is $HPX_ROOT/libs/concurrency/src
 set(concurrency_sources barrier.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core concurrency
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local concurrency
   GLOBAL_HEADER_GEN ON
   SOURCES ${concurrency_sources}
   HEADERS ${concurrency_headers}
@@ -45,7 +45,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_assertion
     hpx_concepts
-    hpx_config
+    hpx_config_local
     hpx_datastructures
     hpx_execution_base
     hpx_errors

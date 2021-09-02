@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/errors/exception.hpp>
 #include <hpx/thread_support/spinlock.hpp>
 
@@ -19,7 +19,7 @@
 #include <string>
 #include <system_error>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
@@ -30,7 +30,7 @@ namespace hpx {
     /// The type exception_list::const_iterator fulfills the requirements of
     /// a forward iterator.
     ///
-    class HPX_CORE_EXPORT exception_list : public hpx::exception
+    class HPX_LOCAL_EXPORT exception_list : public hpx::exception
     {
     private:
         /// \cond NOINTERNAL
@@ -102,4 +102,4 @@ namespace hpx {
     };
 }    // namespace hpx
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/pack_traversal/detail/unwrap_impl.hpp>
 
 #include <cstddef>
@@ -209,7 +209,7 @@ namespace hpx {
 
     namespace util {
         template <typename... Args>
-        HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrap instead.")
+        HPX_LOCAL_DEPRECATED_V(1, 7, "Please use hpx::unwrap instead.")
         auto unwrap(Args&&... args) -> decltype(
             detail::unwrap_depth_impl<1U>(std::forward<Args>(args)...))
         {
@@ -217,7 +217,7 @@ namespace hpx {
         }
 
         namespace functional {
-            struct HPX_DEPRECATED_V(
+            struct HPX_LOCAL_DEPRECATED_V(
                 1, 7, "Please use hpx::functional::unwrap instead.") unwrap
             {
                 template <typename... Args>
@@ -230,7 +230,7 @@ namespace hpx {
         }    // namespace functional
 
         template <std::size_t Depth, typename... Args>
-        HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrap_n instead.")
+        HPX_LOCAL_DEPRECATED_V(1, 7, "Please use hpx::unwrap_n instead.")
         auto unwrap_n(Args&&... args) -> decltype(
             detail::unwrap_depth_impl<Depth>(std::forward<Args>(args)...))
         {
@@ -241,7 +241,7 @@ namespace hpx {
 
         namespace functional {
             template <std::size_t Depth>
-            struct HPX_DEPRECATED_V(
+            struct HPX_LOCAL_DEPRECATED_V(
                 1, 7, "Please use hpx::functional::unwrap instead.") unwrap_n
             {
                 template <typename... Args>
@@ -254,7 +254,7 @@ namespace hpx {
         }    // namespace functional
 
         template <typename... Args>
-        HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrap_all instead.")
+        HPX_LOCAL_DEPRECATED_V(1, 7, "Please use hpx::unwrap_all instead.")
         auto unwrap_all(Args&&... args) -> decltype(
             detail::unwrap_depth_impl<0U>(std::forward<Args>(args)...))
         {
@@ -262,7 +262,7 @@ namespace hpx {
         }
 
         namespace functional {
-            struct HPX_DEPRECATED_V(
+            struct HPX_LOCAL_DEPRECATED_V(
                 1, 7, "Please use hpx::functional::unwrap instead.") unwrap_all
             {
                 template <typename... Args>
@@ -275,7 +275,7 @@ namespace hpx {
         }    // namespace functional
 
         template <typename T>
-        HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrapping instead.")
+        HPX_LOCAL_DEPRECATED_V(1, 7, "Please use hpx::unwrapping instead.")
         auto unwrapping(T&& callable) -> decltype(
             detail::functional_unwrap_depth_impl<1U>(std::forward<T>(callable)))
         {
@@ -284,7 +284,7 @@ namespace hpx {
         }
 
         template <std::size_t Depth, typename T>
-        HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrapping_n instead.")
+        HPX_LOCAL_DEPRECATED_V(1, 7, "Please use hpx::unwrapping_n instead.")
         auto unwrapping_n(T&& callable)
             -> decltype(detail::functional_unwrap_depth_impl<Depth>(
                 std::forward<T>(callable)))
@@ -295,7 +295,7 @@ namespace hpx {
         }
 
         template <typename T>
-        HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrapping_all instead.")
+        HPX_LOCAL_DEPRECATED_V(1, 7, "Please use hpx::unwrapping_all instead.")
         auto unwrapping_all(T&& callable) -> decltype(
             detail::functional_unwrap_depth_impl<0U>(std::forward<T>(callable)))
         {

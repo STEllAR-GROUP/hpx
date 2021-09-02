@@ -17,10 +17,6 @@ set(tests
     threads_all_1422
 )
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  list(APPEND tests resume_priority)
-endif()
-
 set(block_os_threads_1036_PARAMETERS THREADS_PER_LOCALITY 4 RUN_SERIAL)
 set(thread_rescheduling_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_suspend_pending_PARAMETERS THREADS_PER_LOCALITY 1)
@@ -33,7 +29,7 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
@@ -41,6 +37,6 @@ foreach(test ${tests})
     FOLDER "Tests/Regressions/Threads"
   )
 
-  add_hpx_regression_test("threads" ${test} ${${test}_PARAMETERS})
+  hpx_local_add_regression_test("threads" ${test} ${${test}_PARAMETERS})
 
 endforeach()

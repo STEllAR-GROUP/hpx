@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #if (HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX))
 #include <hpx/modules/itt_notify.hpp>
 #endif

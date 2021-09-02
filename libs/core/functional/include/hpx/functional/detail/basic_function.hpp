@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/detail/empty_function.hpp>
 #include <hpx/functional/detail/vtable/function_vtable.hpp>
@@ -29,7 +29,7 @@ namespace hpx { namespace util { namespace detail {
     static const std::size_t function_storage_size = 3 * sizeof(void*);
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_CORE_EXPORT function_base
+    class HPX_LOCAL_EXPORT function_base
     {
         using vtable = function_base_vtable;
 

@@ -20,7 +20,7 @@
 #endif
 // clang-format on
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/testing.hpp>
 

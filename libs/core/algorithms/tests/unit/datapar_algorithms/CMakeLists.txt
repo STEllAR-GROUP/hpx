@@ -6,7 +6,7 @@
 
 set(tests)
 
-if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
+if(HPXLocal_WITH_DATAPAR_VC OR HPXLocal_WITH_CXX20_EXPERIMENTAL_SIMD)
   set(tests
       ${tests}
       copy_datapar
@@ -33,7 +33,7 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
@@ -41,5 +41,5 @@ foreach(test ${tests})
     FOLDER "Tests/Unit/Modules/Core/Algorithms/Datapar"
   )
 
-  add_hpx_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
+  hpx_local_add_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
 endforeach()

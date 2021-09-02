@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_cuda/cuda_exception.hpp>
 #include <hpx/async_cuda/cuda_future.hpp>
 #include <hpx/async_cuda/target.hpp>

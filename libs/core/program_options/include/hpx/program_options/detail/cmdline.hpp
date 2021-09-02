@@ -18,7 +18,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options { namespace detail {
 
@@ -49,7 +49,7 @@ namespace hpx { namespace program_options { namespace detail {
 
         @todo minimal match length for guessing?
     */
-    class HPX_CORE_EXPORT cmdline
+    class HPX_LOCAL_EXPORT cmdline
     {
     public:
         using style_t = ::hpx::program_options::command_line_style::style_t;
@@ -140,4 +140,4 @@ namespace hpx { namespace program_options { namespace detail {
 
 }}}    // namespace hpx::program_options::detail
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

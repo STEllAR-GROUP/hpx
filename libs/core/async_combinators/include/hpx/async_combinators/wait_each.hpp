@@ -115,7 +115,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_combinators/when_each.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/type_support/pack.hpp>

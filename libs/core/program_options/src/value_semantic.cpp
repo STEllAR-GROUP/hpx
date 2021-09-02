@@ -155,7 +155,7 @@ namespace hpx { namespace program_options {
     // since wstring can't be constructed/compared with char*. We'd need to
     // create auxiliary 'widen' routine to convert from char* into
     // needed string type, and that's more work.
-    HPX_CORE_EXPORT
+    HPX_LOCAL_EXPORT
     void validate(hpx::any_nonser& v, const vector<wstring>& xs, bool*, int)
     {
         check_first_occurrence(v);
@@ -172,7 +172,7 @@ namespace hpx { namespace program_options {
             throw invalid_bool_value(convert_value(s));
     }
 
-    HPX_CORE_EXPORT
+    HPX_LOCAL_EXPORT
     void validate(
         hpx::any_nonser& v, const vector<string>& xs, std::string*, int)
     {
@@ -180,7 +180,7 @@ namespace hpx { namespace program_options {
         v = hpx::any_nonser(get_single_string(xs));
     }
 
-    HPX_CORE_EXPORT
+    HPX_LOCAL_EXPORT
     void validate(
         hpx::any_nonser& v, const vector<wstring>& xs, std::string*, int)
     {
@@ -190,7 +190,7 @@ namespace hpx { namespace program_options {
 
     namespace validators {
 
-        HPX_CORE_EXPORT
+        HPX_LOCAL_EXPORT
         void check_first_occurrence(const hpx::any_nonser& value)
         {
             if (value.has_value())

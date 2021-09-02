@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/function.hpp>
 
 #include <cstddef>
@@ -16,21 +16,21 @@
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// Retrieve the string value of a configuration entry given by \p key.
-    HPX_CORE_EXPORT std::string get_config_entry(
+    HPX_LOCAL_EXPORT std::string get_config_entry(
         std::string const& key, std::string const& dflt);
     /// Retrieve the integer value of a configuration entry given by \p key.
-    HPX_CORE_EXPORT std::string get_config_entry(
+    HPX_LOCAL_EXPORT std::string get_config_entry(
         std::string const& key, std::size_t dflt);
 
     /// Set the string value of a configuration entry given by \p key.
-    HPX_CORE_EXPORT void set_config_entry(
+    HPX_LOCAL_EXPORT void set_config_entry(
         std::string const& key, std::string const& value);
     /// Set the integer value of a configuration entry given by \p key.
-    HPX_CORE_EXPORT void set_config_entry(
+    HPX_LOCAL_EXPORT void set_config_entry(
         std::string const& key, std::size_t value);
 
     /// Set the string value of a configuration entry given by \p key.
-    HPX_CORE_EXPORT void set_config_entry_callback(std::string const& key,
+    HPX_LOCAL_EXPORT void set_config_entry_callback(std::string const& key,
         util::function_nonser<void(
             std::string const&, std::string const&)> const& callback);
 }    // namespace hpx

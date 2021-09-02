@@ -9,7 +9,7 @@
 #pragma once
 
 // clang-format off
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #if defined(HPX_MSVC)
 # pragma warning(push)
 # pragma warning(disable: 4522) // multiple assignment operators specified warning

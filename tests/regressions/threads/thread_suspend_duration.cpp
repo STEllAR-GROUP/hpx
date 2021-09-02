@@ -5,9 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/init.hpp>
 #include <hpx/local/barrier.hpp>
 #include <hpx/local/functional.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -17,16 +17,13 @@
 #include <string>
 #include <vector>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using hpx::threads::register_work;
 
 using hpx::lcos::local::barrier;
-
-using hpx::init;
-using hpx::finalize;
 
 using hpx::util::report_errors;
 
@@ -70,48 +67,43 @@ int hpx_main(variables_map& vm)
         for (std::size_t i = 0; i < pxthreads; ++i)
         {
             hpx::threads::thread_init_data data(
-                hpx::threads::make_thread_function_nullary(
-                    hpx::util::bind(
-                        &suspend_test, std::ref(b), iterations, suspend_duration)),
+                hpx::threads::make_thread_function_nullary(hpx::util::bind(
+                    &suspend_test, std::ref(b), iterations, suspend_duration)),
                 "suspend_test");
             register_work(data);
         }
 
-        b.wait(); // Wait for all hpx-threads to enter the barrier.
+        b.wait();    // Wait for all hpx-threads to enter the barrier.
     }
 
     // Initiate shutdown of the runtime system.
-    return finalize();
+    return hpx::local::finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("pxthreads,T", value<std::size_t>()->default_value(0x100),
-            "the number of PX threads to invoke")
-        ("iterations", value<std::size_t>()->default_value(32),
-            "the number of iterations to execute in each thread")
-        ("suspend-duration", value<std::size_t>()->default_value(1000),
-            "the number of microseconds to wait in each thread")
-        ;
+    desc_commandline.add_options()("pxthreads,T",
+        value<std::size_t>()->default_value(0x100),
+        "the number of PX threads to invoke")("iterations",
+        value<std::size_t>()->default_value(32),
+        "the number of iterations to execute in each thread")(
+        "suspend-duration", value<std::size_t>()->default_value(1000),
+        "the number of microseconds to wait in each thread");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
     init_args.cfg = cfg;
 
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv, init_args), 0,
         "HPX main exited with non-zero status");
     return report_errors();
 }
-

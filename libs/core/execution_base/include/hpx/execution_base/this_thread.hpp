@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/execution_base/agent_base.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
 #include <hpx/execution_base/detail/spinlock_deadlock_detection.hpp>
@@ -23,7 +23,7 @@
 
 namespace hpx { namespace execution_base {
     namespace detail {
-        HPX_CORE_EXPORT agent_base& get_default_agent();
+        HPX_LOCAL_EXPORT agent_base& get_default_agent();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -31,10 +31,10 @@ namespace hpx { namespace execution_base {
         namespace detail {
 
             struct agent_storage;
-            HPX_CORE_EXPORT agent_storage* get_agent_storage();
+            HPX_LOCAL_EXPORT agent_storage* get_agent_storage();
         }    // namespace detail
 
-        struct HPX_CORE_EXPORT reset_agent
+        struct HPX_LOCAL_EXPORT reset_agent
         {
             reset_agent(detail::agent_storage*, agent_base& impl);
             reset_agent(agent_base& impl);
@@ -44,13 +44,13 @@ namespace hpx { namespace execution_base {
             agent_base* old_;
         };
 
-        HPX_CORE_EXPORT hpx::execution_base::agent_ref agent();
+        HPX_LOCAL_EXPORT hpx::execution_base::agent_ref agent();
 
-        HPX_CORE_EXPORT void yield(
+        HPX_LOCAL_EXPORT void yield(
             char const* desc = "hpx::execution_base::this_thread::yield");
-        HPX_CORE_EXPORT void yield_k(std::size_t k,
+        HPX_LOCAL_EXPORT void yield_k(std::size_t k,
             char const* desc = "hpx::execution_base::this_thread::yield_k");
-        HPX_CORE_EXPORT void suspend(
+        HPX_LOCAL_EXPORT void suspend(
             char const* desc = "hpx::execution_base::this_thread::suspend");
 
         template <typename Rep, typename Period>

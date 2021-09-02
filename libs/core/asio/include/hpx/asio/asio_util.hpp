@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <cstdint>
 #include <string>
 
-#include <hpx/config/asio.hpp>
+#include <hpx/local/config/asio.hpp>
 
 #include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
@@ -26,29 +26,29 @@
 namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT bool get_endpoint(std::string const& addr,
+    HPX_LOCAL_EXPORT bool get_endpoint(std::string const& addr,
         std::uint16_t port, asio::ip::tcp::endpoint& ep);
 
-    HPX_CORE_EXPORT std::string get_endpoint_name(
+    HPX_LOCAL_EXPORT std::string get_endpoint_name(
         asio::ip::tcp::endpoint const& ep);
 
     ///////////////////////////////////////////////////////////////////////////
     // properly resolve a give host name to the corresponding IP address
-    HPX_CORE_EXPORT asio::ip::tcp::endpoint resolve_hostname(
+    HPX_LOCAL_EXPORT asio::ip::tcp::endpoint resolve_hostname(
         std::string const& hostname, std::uint16_t port,
         asio::io_context& io_service);
 
     ///////////////////////////////////////////////////////////////////////////
     // return the public IP address of the local node
-    HPX_CORE_EXPORT std::string resolve_public_ip_address();
+    HPX_LOCAL_EXPORT std::string resolve_public_ip_address();
 
     ///////////////////////////////////////////////////////////////////////
     // Take an ip v4 or v6 address and "standardize" it for comparison checks
-    HPX_CORE_EXPORT std::string cleanup_ip_address(std::string const& addr);
+    HPX_LOCAL_EXPORT std::string cleanup_ip_address(std::string const& addr);
 
     using endpoint_iterator_type = asio::ip::tcp::resolver::iterator;
 
-    endpoint_iterator_type HPX_CORE_EXPORT connect_begin(
+    endpoint_iterator_type HPX_LOCAL_EXPORT connect_begin(
         std::string const& address, std::uint16_t port,
         asio::io_context& io_service);
 
@@ -62,12 +62,12 @@ namespace hpx { namespace util {
         return connect_begin(loc.address(), loc.port(), io_service);
     }
 
-    inline endpoint_iterator_type HPX_CORE_EXPORT connect_end()
+    inline endpoint_iterator_type HPX_LOCAL_EXPORT connect_end()
     {
         return endpoint_iterator_type();
     }
 
-    endpoint_iterator_type HPX_CORE_EXPORT accept_begin(
+    endpoint_iterator_type HPX_LOCAL_EXPORT accept_begin(
         std::string const& address, std::uint16_t port,
         asio::io_context& io_service);
 
@@ -92,6 +92,6 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
-    HPX_CORE_EXPORT bool split_ip_address(
+    HPX_LOCAL_EXPORT bool split_ip_address(
         std::string const& v, std::string& host, std::uint16_t& port);
 }}    // namespace hpx::util

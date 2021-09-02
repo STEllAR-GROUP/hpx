@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/function.hpp>
@@ -32,7 +32,7 @@
 #include <type_traits>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 // TODO: add branch prediction and function heat
 
@@ -54,7 +54,7 @@ namespace hpx { namespace threads { namespace policies {
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
             default_local_queue_scheduler_terminated_queue>
-    class HPX_CORE_EXPORT local_queue_scheduler : public scheduler_base
+    class HPX_LOCAL_EXPORT local_queue_scheduler : public scheduler_base
     {
     public:
         typedef std::false_type has_periodic_maintenance;
@@ -946,4 +946,4 @@ namespace hpx { namespace threads { namespace policies {
     };
 }}}    // namespace hpx::threads::policies
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

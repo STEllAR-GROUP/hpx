@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/filesystem/config/defines.hpp>
 
 #if !defined(HPX_FILESYSTEM_HAVE_BOOST_FILESYSTEM_COMPATIBILITY)
@@ -64,7 +64,7 @@ namespace hpx { namespace filesystem {
 
 }}    // namespace hpx::filesystem
 #else
-#include <hpx/config/detail/compat_error_code.hpp>
+#include <hpx/local/config/detail/compat_error_code.hpp>
 
 #include <boost/filesystem.hpp>
 

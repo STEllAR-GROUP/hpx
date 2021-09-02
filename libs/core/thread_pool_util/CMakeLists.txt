@@ -14,9 +14,9 @@ set(thread_pool_util_compat_headers)
 
 set(thread_pool_util_sources thread_pool_suspension_helpers.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core thread_pool_util
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local thread_pool_util
   GLOBAL_HEADER_GEN ON
   SOURCES ${thread_pool_util_sources}
   HEADERS ${thread_pool_util_headers}

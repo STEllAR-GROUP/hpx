@@ -146,7 +146,7 @@ namespace hpx { namespace ranges {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_range<Rng>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::count is deprecated, use hpx::ranges::count instead")
         typename util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<typename hpx::traits::range_traits<
@@ -211,7 +211,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::count_if is deprecated, use "
         "hpx::ranges::count_if instead")
         typename util::detail::algorithm_result<ExPolicy,

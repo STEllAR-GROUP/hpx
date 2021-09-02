@@ -4,16 +4,16 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(CPACK_PACKAGE_VERSION ${HPX_VERSION})
+set(CPACK_PACKAGE_VERSION ${HPXLocal_VERSION})
 set(CPACK_GENERATOR "RPM")
-set(CPACK_PACKAGE_NAME "hpx")
+set(CPACK_PACKAGE_NAME "hpx-local")
 set(CPACK_PACKAGE_RELEASE 1)
 set(CPACK_PACKAGE_CONTACT "contact@stellar-group.org")
 set(CPACK_PACKAGE_VENDOR "STE||AR Group")
 set(CPACK_RPM_PACKAGE_LICENSE "BSL-1.0")
-set(CPACK_RPM_PACKAGE_URL "https://github.com/STEllAR-GROUP/hpx")
+set(CPACK_RPM_PACKAGE_URL "https://github.com/STEllAR-GROUP/hpx-local")
 set(CPACK_RPM_PACKAGE_SUMMARY
-    "The C++ Standard Library for Parallelism and Concurrency (HPX)"
+    "The C++ Standard Library for Parallelism and Concurrency (HPXLocal)"
 )
 set(CPACK_RPM_PACKAGE_DESCRIPTION
     "The C++ Standard Library for Parallelism and Concurrency compiled for educational usage"

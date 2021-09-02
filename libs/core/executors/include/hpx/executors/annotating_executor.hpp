@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>

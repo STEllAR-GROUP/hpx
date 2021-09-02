@@ -406,7 +406,7 @@ namespace hpx { namespace ranges {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/range.hpp>

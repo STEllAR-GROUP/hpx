@@ -7,7 +7,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/modules/testing.hpp>

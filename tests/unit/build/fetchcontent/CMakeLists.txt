@@ -18,12 +18,12 @@ find_package(Boost COMPONENTS filesystem program_options)
 include(FetchContent)
 
 fetchcontent_declare(
-  hpx
-  GIT_REPOSITORY ${HPX_REPOSITORY}
-  GIT_TAG ${HPX_TAG}
+  HPXLocal
+  GIT_REPOSITORY ${HPXLocal_REPOSITORY}
+  GIT_TAG ${HPXLocal_TAG}
 )
-fetchcontent_getproperties(hpx)
-if(NOT hpx_POPULATED)
-  fetchcontent_populate(hpx)
-  add_subdirectory(${hpx_SOURCE_DIR} ${hpx_BINARY_DIR})
+fetchcontent_getproperties(HPXLocal)
+if(NOT hpxlocal_POPULATED)
+  fetchcontent_populate(HPXLocal)
+  add_subdirectory(${hpxlocal_SOURCE_DIR} ${hpxlocal_BINARY_DIR})
 endif()

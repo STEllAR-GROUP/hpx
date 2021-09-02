@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
 
 #include <cstddef>
@@ -59,36 +59,36 @@ namespace hpx { namespace threads {
     "The unscoped thread_state_enum names are deprecated. Please use "         \
     "thread_schedule_state::state instead."
 
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_schedule_state unknown =
         thread_schedule_state::unknown;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_schedule_state active =
         thread_schedule_state::active;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_schedule_state pending =
         thread_schedule_state::pending;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_schedule_state suspended =
         thread_schedule_state::suspended;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_schedule_state depleted =
         thread_schedule_state::depleted;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_schedule_state terminated =
         thread_schedule_state::terminated;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_schedule_state staged =
         thread_schedule_state::staged;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_schedule_state pending_do_not_schedule =
         thread_schedule_state::pending_do_not_schedule;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(1, 6, HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_schedule_state pending_boost =
         thread_schedule_state::pending_boost;
 #undef HPX_THREAD_STATE_UNSCOPED_ENUM_DEPRECATION_MSG
 
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_LOCAL_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_schedule_state const t);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -98,7 +98,7 @@ namespace hpx { namespace threads {
     /// thread_state constant.
     ///
     /// \param state this represents the thread state.
-    HPX_CORE_EXPORT char const* get_thread_state_name(
+    HPX_LOCAL_EXPORT char const* get_thread_state_name(
         thread_schedule_state state);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -146,35 +146,44 @@ namespace hpx { namespace threads {
     "The unscoped thread_priority names are deprecated. Please use "           \
     "thread_priority::priority instead."
 
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_priority thread_priority_unknown =
         thread_priority::unknown;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_priority thread_priority_default =
         thread_priority::default_;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_priority thread_priority_low = thread_priority::low;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_priority thread_priority_normal =
         thread_priority::normal;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_priority thread_priority_high_recursive =
         thread_priority::high_recursive;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_priority thread_priority_boost =
         thread_priority::boost;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_priority thread_priority_high =
         thread_priority::high;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_priority thread_priority_bound =
         thread_priority::bound;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_priority thread_priority_critical =
         thread_priority::critical;
 #undef HPX_THREAD_PRIORITY_UNSCOPED_ENUM_DEPRECATION_MSG
 
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_LOCAL_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_priority const t);
 
     ////////////////////////////////////////////////////////////////////////////
@@ -184,7 +193,7 @@ namespace hpx { namespace threads {
     /// constant.
     ///
     /// \param this represents the thread priority.
-    HPX_CORE_EXPORT char const* get_thread_priority_name(
+    HPX_LOCAL_EXPORT char const* get_thread_priority_name(
         thread_priority priority);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -206,29 +215,34 @@ namespace hpx { namespace threads {
     "The unscoped thread_state_ex_enum names are deprecated. Please use "      \
     "thread_restart_state::state instead."
 
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_restart_state wait_unknown =
         thread_restart_state::unknown;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_restart_state wait_signaled =
         thread_restart_state::signaled;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_restart_state wait_timeout =
         thread_restart_state::timeout;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_restart_state wait_terminate =
         thread_restart_state::terminate;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_restart_state wait_abort =
         thread_restart_state::abort;
 #undef HPX_THREAD_STATE_EX_UNSCOPED_ENUM_DEPRECATION_MSG
 
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_LOCAL_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_restart_state const t);
 
     /// Get the readable string representing the name of the given
     /// thread_restart_state constant.
-    HPX_CORE_EXPORT char const* get_thread_state_ex_name(
+    HPX_LOCAL_EXPORT char const* get_thread_state_ex_name(
         thread_restart_state state);
 
     /// \cond NOINTERNAL
@@ -240,7 +254,7 @@ namespace hpx { namespace threads {
 
     /// Get the readable string representing the name of the given
     /// thread_state constant.
-    HPX_CORE_EXPORT char const* get_thread_state_name(thread_state state);
+    HPX_LOCAL_EXPORT char const* get_thread_state_name(thread_state state);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \enum thread_stacksize
@@ -268,39 +282,49 @@ namespace hpx { namespace threads {
     "The unscoped thread_stacksize names are deprecated. Please use "          \
     "thread_stacksize::size instead."
 
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_stacksize thread_stacksize_unknown =
         thread_stacksize::unknown;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_stacksize thread_stacksize_small =
         thread_stacksize::small_;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_stacksize thread_stacksize_medium =
         thread_stacksize::medium;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_stacksize thread_stacksize_large =
         thread_stacksize::large;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_stacksize thread_stacksize_huge =
         thread_stacksize::huge;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_stacksize thread_stacksize_nostack =
         thread_stacksize::nostack;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_stacksize thread_stacksize_current =
         thread_stacksize::current;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_stacksize thread_stacksize_default =
         thread_stacksize::default_;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_stacksize thread_stacksize_minimal =
         thread_stacksize::minimal;
-    HPX_DEPRECATED_V(1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_LOCAL_DEPRECATED_V(
+        1, 6, HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_stacksize thread_stacksize_maximal =
         thread_stacksize::maximal;
 #undef HPX_THREAD_STACKSIZE_UNSCOPED_ENUM_DEPRECATION_MSG
 
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_LOCAL_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_stacksize const t);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -310,7 +334,8 @@ namespace hpx { namespace threads {
     /// constant.
     ///
     /// \param size this represents the stack size
-    HPX_CORE_EXPORT char const* get_stack_size_enum_name(thread_stacksize size);
+    HPX_LOCAL_EXPORT char const* get_stack_size_enum_name(
+        thread_stacksize size);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \enum thread_schedule_hint_mode
@@ -341,15 +366,15 @@ namespace hpx { namespace threads {
     "The unscoped thread_schedule_hint_mode names are deprecated. Please use " \
     "thread_schedule_hint_mode::hint instead."
 
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 6, HPX_THREAD_SCHEDULE_HINT_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_schedule_hint_mode thread_schedule_hint_mode_none =
         thread_schedule_hint_mode::none;
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 6, HPX_THREAD_SCHEDULE_HINT_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_schedule_hint_mode
         thread_schedule_hint_mode_thread = thread_schedule_hint_mode::thread;
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 6, HPX_THREAD_SCHEDULE_HINT_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr thread_schedule_hint_mode thread_schedule_hint_mode_numa =
         thread_schedule_hint_mode::numa;

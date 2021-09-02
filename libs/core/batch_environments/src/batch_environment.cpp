@@ -5,8 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
+#include <hpx/local/config.hpp>
+#include <hpx/local/config/asio.hpp>
 #include <hpx/asio/asio_util.hpp>
 #include <hpx/batch_environments/alps_environment.hpp>
 #include <hpx/batch_environments/batch_environment.hpp>
@@ -81,7 +81,6 @@ namespace hpx { namespace util {
         std::string nodes_list;
         bool found_agas_host = false;
 
-#if defined(HPX_HAVE_NETWORKING)
         asio::io_context io_service;
 
         std::size_t agas_node_num = 0;
@@ -118,7 +117,6 @@ namespace hpx { namespace util {
                 nodes_list += s + ' ';
             }
         }
-#endif
 
         // if an AGAS host is specified, it needs to be in the list
         // of nodes participating in this run

@@ -4,41 +4,41 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-include(HPX_Message)
-include(HPX_Option)
+include(HPXLocal_Message)
+include(HPXLocal_Option)
 
-if(HPX_WITH_TESTS)
-  if(HPX_WITH_TESTS_UNIT)
-    add_hpx_pseudo_target(tests.unit.modules.string_util)
-    add_hpx_pseudo_dependencies(
+if(HPXLocal_WITH_TESTS)
+  if(HPXLocal_WITH_TESTS_UNIT)
+    hpx_local_add_pseudo_target(tests.unit.modules.string_util)
+    hpx_local_add_pseudo_dependencies(
       tests.unit.modules tests.unit.modules.string_util
     )
     add_subdirectory(unit)
   endif()
 
-  if(HPX_WITH_TESTS_REGRESSIONS)
-    add_hpx_pseudo_target(tests.regressions.modules.string_util)
-    add_hpx_pseudo_dependencies(
+  if(HPXLocal_WITH_TESTS_REGRESSIONS)
+    hpx_local_add_pseudo_target(tests.regressions.modules.string_util)
+    hpx_local_add_pseudo_dependencies(
       tests.regressions.modules tests.regressions.modules.string_util
     )
     add_subdirectory(regressions)
   endif()
 
-  if(HPX_WITH_TESTS_BENCHMARKS)
-    add_hpx_pseudo_target(tests.performance.modules.string_util)
-    add_hpx_pseudo_dependencies(
+  if(HPXLocal_WITH_TESTS_BENCHMARKS)
+    hpx_local_add_pseudo_target(tests.performance.modules.string_util)
+    hpx_local_add_pseudo_dependencies(
       tests.performance.modules tests.performance.modules.string_util
     )
     add_subdirectory(performance)
   endif()
 
-  if(HPX_WITH_TESTS_HEADERS)
-    add_hpx_header_tests(
+  if(HPXLocal_WITH_TESTS_HEADERS)
+    hpx_local_add_header_tests(
       modules.string_util
       HEADERS ${string_util_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
       NOLIBS
-      DEPENDENCIES hpx_core
+      DEPENDENCIES hpx_local
     )
   endif()
 endif()

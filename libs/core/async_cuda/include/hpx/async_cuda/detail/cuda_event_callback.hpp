@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -25,10 +25,11 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     using event_callback_function_type =
         hpx::util::unique_function_nonser<void(cudaError_t)>;
 
-    HPX_CORE_EXPORT void add_event_callback(
+    HPX_LOCAL_EXPORT void add_event_callback(
         event_callback_function_type&& f, cudaStream_t stream);
 
-    HPX_CORE_EXPORT void register_polling(hpx::threads::thread_pool_base& pool);
-    HPX_CORE_EXPORT void unregister_polling(
+    HPX_LOCAL_EXPORT void register_polling(
+        hpx::threads::thread_pool_base& pool);
+    HPX_LOCAL_EXPORT void unregister_polling(
         hpx::threads::thread_pool_base& pool);
 }}}}    // namespace hpx::cuda::experimental::detail

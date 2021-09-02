@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
@@ -399,7 +399,7 @@ namespace hpx { namespace util {
     }
 
     template <typename T, typename Char>
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::make_any is deprecated. Please use hpx::make_any instead.")
     basic_any<serialization::input_archive, serialization::output_archive,
         Char> make_any(T&& t)
@@ -411,7 +411,7 @@ namespace hpx { namespace util {
 
     ////////////////////////////////////////////////////////////////////////////
     // backwards compatibility
-    using any HPX_DEPRECATED_V(
+    using any HPX_LOCAL_DEPRECATED_V(
         1, 6, "hpx::util::any is deprecated. Please use hpx::any instead.") =
         basic_any<serialization::input_archive, serialization::output_archive,
             char, std::true_type>;
@@ -423,7 +423,7 @@ namespace hpx { namespace util {
     struct hash_any
     {
         template <typename Char>
-        HPX_CORE_EXPORT std::size_t
+        HPX_LOCAL_EXPORT std::size_t
         operator()(const basic_any<serialization::input_archive,
             serialization::output_archive, Char, std::true_type>& elem) const;
     };

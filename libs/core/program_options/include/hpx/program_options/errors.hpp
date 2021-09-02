@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -444,4 +444,4 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

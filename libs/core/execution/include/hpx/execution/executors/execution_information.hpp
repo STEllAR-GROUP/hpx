@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>

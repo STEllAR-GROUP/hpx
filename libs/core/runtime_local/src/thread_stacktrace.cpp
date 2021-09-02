@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/runtime_local/thread_stacktrace.hpp>
@@ -67,7 +67,7 @@ namespace hpx { namespace util { namespace debug {
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
                 data->backtrace()
 #else
-                "Enable HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION in CMake"
+                "Enable HPXLocal_WITH_THREAD_BACKTRACE_ON_SUSPENSION in CMake"
 #endif
 
             );

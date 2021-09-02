@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_base/scheduling_properties.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
@@ -106,9 +106,9 @@ namespace hpx {
         private:
             friend class serialization::access;
 
-            HPX_CORE_EXPORT void load(
+            HPX_LOCAL_EXPORT void load(
                 serialization::input_archive& ar, unsigned);
-            HPX_CORE_EXPORT void save(
+            HPX_LOCAL_EXPORT void save(
                 serialization::output_archive& ar, unsigned) const;
 
             HPX_SERIALIZATION_SPLIT_MEMBER()
@@ -852,28 +852,28 @@ namespace hpx {
 
         ///////////////////////////////////////////////////////////////////////
         /// Predefined launch policy representing asynchronous execution
-        HPX_CORE_EXPORT static const detail::async_policy async;
+        HPX_LOCAL_EXPORT static const detail::async_policy async;
 
         /// Predefined launch policy representing asynchronous execution.The
         /// new thread is executed in a preferred way
-        HPX_CORE_EXPORT static const detail::fork_policy fork;
+        HPX_LOCAL_EXPORT static const detail::fork_policy fork;
 
         /// Predefined launch policy representing synchronous execution
-        HPX_CORE_EXPORT static const detail::sync_policy sync;
+        HPX_LOCAL_EXPORT static const detail::sync_policy sync;
 
         /// Predefined launch policy representing deferred execution
-        HPX_CORE_EXPORT static const detail::deferred_policy deferred;
+        HPX_LOCAL_EXPORT static const detail::deferred_policy deferred;
 
         /// Predefined launch policy representing fire and forget execution
-        HPX_CORE_EXPORT static const detail::apply_policy apply;
+        HPX_LOCAL_EXPORT static const detail::apply_policy apply;
 
         /// Predefined launch policy representing delayed policy selection
-        HPX_CORE_EXPORT static const detail::select_policy_generator select;
+        HPX_LOCAL_EXPORT static const detail::select_policy_generator select;
 
         /// \cond NOINTERNAL
-        HPX_CORE_EXPORT static const detail::policy_holder<> all;
-        HPX_CORE_EXPORT static const detail::policy_holder<> sync_policies;
-        HPX_CORE_EXPORT static const detail::policy_holder<> async_policies;
+        HPX_LOCAL_EXPORT static const detail::policy_holder<> all;
+        HPX_LOCAL_EXPORT static const detail::policy_holder<> sync_policies;
+        HPX_LOCAL_EXPORT static const detail::policy_holder<> async_policies;
         /// \endcond
     };
 

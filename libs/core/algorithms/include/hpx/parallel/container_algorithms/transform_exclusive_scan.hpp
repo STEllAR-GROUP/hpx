@@ -417,7 +417,7 @@ namespace hpx { namespace ranges {
 }}    // namespace hpx::ranges
 #else
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>

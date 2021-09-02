@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/serialization/boost_variant.hpp>    // for backwards compatibility
 
 #include <hpx/datastructures/variant_helper.hpp>

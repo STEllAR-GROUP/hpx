@@ -13,13 +13,13 @@ set(memory_headers
 # Default location is $HPX_ROOT/libs/memory/src
 set(memory_sources)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core memory
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local memory
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/memory/serialization/intrusive_ptr.hpp"
   SOURCES ${memory_sources}
   HEADERS ${memory_headers}
-  MODULE_DEPENDENCIES hpx_config hpx_assertion hpx_serialization
+  MODULE_DEPENDENCIES hpx_config_local hpx_assertion hpx_serialization
   CMAKE_SUBDIRS examples tests
 )

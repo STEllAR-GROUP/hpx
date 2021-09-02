@@ -12,7 +12,7 @@
 //
 //  Adapted to HPX naming scheme
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 namespace hpx { namespace assertion { namespace detail {
 

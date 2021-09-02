@@ -51,16 +51,16 @@ set(logging_sources
     format/formatter/thread_id.cpp
 )
 
-include(HPX_AddModule)
-add_hpx_module(
-  core logging
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local logging
   GLOBAL_HEADER_GEN OFF
   SOURCES ${logging_sources}
   HEADERS ${logging_headers}
   COMPAT_HEADERS ${logging_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
-    hpx_config
+    hpx_config_local
     hpx_format
     hpx_filesystem
     hpx_format

@@ -6,10 +6,9 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
-    defined(HPX_HAVE_MODULE_MPI_BASE)
+#if defined(HPX_HAVE_MODULE_MPI_BASE)
 
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/mpi_base/mpi.hpp>
@@ -18,10 +17,10 @@
 #include <cstdlib>
 #include <string>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util {
-    struct HPX_CORE_EXPORT mpi_environment
+    struct HPX_LOCAL_EXPORT mpi_environment
     {
         static bool check_mpi_environment(runtime_configuration const& cfg);
 
@@ -41,7 +40,7 @@ namespace hpx { namespace util {
 
         static std::string get_processor_name();
 
-        struct HPX_CORE_EXPORT scoped_lock
+        struct scoped_lock
         {
             scoped_lock();
             scoped_lock(scoped_lock const&) = delete;
@@ -50,7 +49,7 @@ namespace hpx { namespace util {
             void unlock();
         };
 
-        struct HPX_CORE_EXPORT scoped_try_lock
+        struct scoped_try_lock
         {
             scoped_try_lock();
             scoped_try_lock(scoped_try_lock const&) = delete;
@@ -74,21 +73,21 @@ namespace hpx { namespace util {
     };
 }}    // namespace hpx::util
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>
 
 #else
 
 #include <hpx/modules/runtime_configuration.hpp>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util {
-    struct HPX_CORE_EXPORT mpi_environment
+    struct HPX_LOCAL_EXPORT mpi_environment
     {
         static bool check_mpi_environment(runtime_configuration const& cfg);
     };
 }}    // namespace hpx::util
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>
 
 #endif

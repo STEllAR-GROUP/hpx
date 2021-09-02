@@ -6,17 +6,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/actions_base/plain_action.hpp>
-#include <hpx/async_distributed/continuation.hpp>
-#include <hpx/future.hpp>
-#include <hpx/runtime.hpp>
-#endif
-#include <hpx/init.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/local/algorithm.hpp>
 #include <hpx/local/execution.hpp>
 #include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/local/runtime.hpp>
 #include <hpx/local/thread.hpp>
 #include <hpx/modules/format.hpp>
@@ -128,46 +122,6 @@ struct scratcher
         global_scratch += r.get();
     }
 };
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
-HPX_PLAIN_ACTION(null_function, null_action)
-
-// Time async action execution using wait each on futures vector
-void measure_action_futures_wait_each(std::uint64_t count, bool csv)
-{
-    const hpx::naming::id_type here = hpx::find_here();
-    std::vector<future<double>> futures;
-    futures.reserve(count);
-
-    // start the clock
-    high_resolution_timer walltime;
-    for (std::uint64_t i = 0; i < count; ++i)
-        futures.push_back(async<null_action>(here));
-    wait_each(scratcher(), futures);
-
-    // stop the clock
-    const double duration = walltime.elapsed();
-    print_stats("action", "WaitEach", "no-executor", count, duration, csv);
-}
-
-// Time async action execution using wait each on futures vector
-void measure_action_futures_wait_all(std::uint64_t count, bool csv)
-{
-    const hpx::naming::id_type here = hpx::find_here();
-    std::vector<future<double>> futures;
-    futures.reserve(count);
-
-    // start the clock
-    high_resolution_timer walltime;
-    for (std::uint64_t i = 0; i < count; ++i)
-        futures.push_back(async<null_action>(here));
-    wait_all(futures);
-
-    // stop the clock
-    const double duration = walltime.elapsed();
-    print_stats("action", "WaitAll", "no-executor", count, duration, csv);
-}
-#endif
 
 // Time async execution using wait each on futures vector
 template <typename Executor>
@@ -526,10 +480,6 @@ int hpx_main(variables_map& vm)
             if (test_all)
             {
                 measure_function_futures_limiting_executor(count, csv, par);
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
-                measure_action_futures_wait_each(count, csv);
-                measure_action_futures_wait_all(count, csv);
-#endif
                 measure_function_futures_wait_each(count, csv, par);
                 measure_function_futures_wait_all(count, csv, par);
                 measure_function_futures_sliding_semaphore(count, csv, par);
@@ -546,7 +496,7 @@ int hpx_main(variables_map& vm)
         }
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -573,8 +523,8 @@ int main(int argc, char* argv[])
     // clang-format on
 
     // Initialize and run HPX.
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }

@@ -29,7 +29,7 @@ Core modules
    /libs/core/command_line_handling_local/docs/index.rst
    /libs/core/concepts/docs/index.rst
    /libs/core/concurrency/docs/index.rst
-   /libs/core/config/docs/index.rst
+   /libs/core/config_local/docs/index.rst
    /libs/core/config_registry/docs/index.rst
    /libs/core/coroutines/docs/index.rst
    /libs/core/datastructures/docs/index.rst
@@ -82,4 +82,4 @@ Core modules
    /libs/core/topology/docs/index.rst
    /libs/core/type_support/docs/index.rst
    /libs/core/util/docs/index.rst
-   /libs/core/version/docs/index.rst
+   /libs/core/version_local/docs/index.rst

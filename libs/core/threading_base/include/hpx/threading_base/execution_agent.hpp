@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_stackful_self.hpp>
@@ -20,11 +20,12 @@
 #include <cstddef>
 #include <string>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace threads {
 
-    struct HPX_CORE_EXPORT execution_context : hpx::execution_base::context_base
+    struct HPX_LOCAL_EXPORT execution_context
+      : hpx::execution_base::context_base
     {
         hpx::execution_base::resource_base const& resource() const override
         {
@@ -33,7 +34,7 @@ namespace hpx { namespace threads {
         hpx::execution_base::resource_base resource_;
     };
 
-    struct HPX_CORE_EXPORT execution_agent : hpx::execution_base::agent_base
+    struct HPX_LOCAL_EXPORT execution_agent : hpx::execution_base::agent_base
     {
         explicit execution_agent(
             coroutines::detail::coroutine_impl* coroutine) noexcept;
@@ -68,4 +69,4 @@ namespace hpx { namespace threads {
     };
 }}    // namespace hpx::threads
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

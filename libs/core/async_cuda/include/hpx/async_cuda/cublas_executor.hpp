@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #if defined(HPX_HAVE_GPU_SUPPORT) && defined(HPX_HAVE_GPUBLAS)
 #include <hpx/async_cuda/cuda_exception.hpp>
 #include <hpx/async_cuda/cuda_executor.hpp>
@@ -80,7 +80,7 @@ namespace hpx { namespace cuda { namespace experimental {
 
     // -------------------------------------------------------------------------
     // exception type for failed launch of cuda functions
-    struct HPX_CORE_EXPORT cublas_exception : hpx::exception
+    struct HPX_LOCAL_EXPORT cublas_exception : hpx::exception
     {
         cublas_exception(const std::string& msg, cublasStatus_t err)
           : hpx::exception(hpx::bad_function_call, msg)

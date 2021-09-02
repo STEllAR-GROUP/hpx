@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
@@ -20,11 +20,11 @@
 #include <mutex>
 #include <utility>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_CORE_EXPORT io_service_thread_pool : public thread_pool_base
+    class HPX_LOCAL_EXPORT io_service_thread_pool : public thread_pool_base
     {
     public:
         explicit io_service_thread_pool(
@@ -83,4 +83,4 @@ namespace hpx { namespace threads { namespace detail {
     };
 }}}    // namespace hpx::threads::detail
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

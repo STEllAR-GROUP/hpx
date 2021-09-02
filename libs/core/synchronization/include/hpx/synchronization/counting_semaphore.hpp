@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/synchronization/detail/counting_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/timing/steady_clock.hpp>

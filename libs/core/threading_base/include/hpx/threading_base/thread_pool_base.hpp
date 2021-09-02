@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/functional/function.hpp>
@@ -32,7 +32,7 @@
 #include <thread>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace threads {
     /// \brief Data structure which stores statistics collected by an
@@ -63,7 +63,7 @@ namespace hpx { namespace threads {
         ///////////////////////////////////////////////////////////////////////
         // The interface below is used by the resource manager to
         // interact with the executor.
-        struct HPX_CORE_EXPORT manage_executor
+        struct HPX_LOCAL_EXPORT manage_executor
         {
             virtual ~manage_executor() {}
 
@@ -161,7 +161,7 @@ namespace hpx { namespace threads {
     // note: this data structure has to be protected from races from the outside
 
     /// \brief The base class used to manage a pool of OS threads.
-    class HPX_CORE_EXPORT thread_pool_base
+    class HPX_LOCAL_EXPORT thread_pool_base
     {
     public:
         /// \cond NOINTERNAL
@@ -555,8 +555,8 @@ namespace hpx { namespace threads {
         /// \endcond
     };
 
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_LOCAL_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_pool_base const& thread_pool);
 }}    // namespace hpx::threads
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

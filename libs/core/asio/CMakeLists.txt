@@ -17,15 +17,15 @@ set(asio_compat_headers
 
 set(asio_sources asio_util.cpp map_hostnames.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core asio
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local asio
   GLOBAL_HEADER_GEN ON
   SOURCES ${asio_sources}
   HEADERS ${asio_headers}
   COMPAT_HEADERS ${asio_compat_headers}
   DEPENDENCIES Asio::asio
-  MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_errors hpx_format
+  MODULE_DEPENDENCIES hpx_assertion hpx_config_local hpx_errors hpx_format
                       hpx_functional
   CMAKE_SUBDIRS examples tests
 )

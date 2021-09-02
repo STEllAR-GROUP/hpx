@@ -36,16 +36,16 @@ set(errors_sources error_code.cpp exception.cpp exception_list.cpp
                    throw_exception.cpp
 )
 
-include(HPX_AddModule)
-add_hpx_module(
-  core errors
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local errors
   GLOBAL_HEADER_GEN ON
   SOURCES ${errors_sources}
   HEADERS ${errors_headers}
   COMPAT_HEADERS ${errors_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
-    hpx_config
+    hpx_config_local
     hpx_filesystem
     hpx_format
     hpx_logging

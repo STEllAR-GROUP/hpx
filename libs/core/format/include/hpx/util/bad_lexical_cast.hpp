@@ -6,15 +6,15 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <typeinfo>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util {
 
-    class HPX_CORE_EXPORT bad_lexical_cast : public std::bad_cast
+    class HPX_LOCAL_EXPORT bad_lexical_cast : public std::bad_cast
     {
     public:
         bad_lexical_cast() noexcept
@@ -51,7 +51,7 @@ namespace hpx { namespace util {
 
     namespace detail {
 
-        HPX_NORETURN HPX_CORE_EXPORT void throw_bad_lexical_cast(
+        HPX_NORETURN HPX_LOCAL_EXPORT void throw_bad_lexical_cast(
             std::type_info const& source_type,
             std::type_info const& target_type);
 
@@ -64,4 +64,4 @@ namespace hpx { namespace util {
 
 }}    // namespace hpx::util
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

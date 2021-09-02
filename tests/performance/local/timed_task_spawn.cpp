@@ -112,7 +112,7 @@ void print_results(std::uint64_t cores, double walltime, double warmup_estimate,
         cout << "# BENCHMARK: " << benchmark_name << " (" << scaling
              << " scaling, " << distribution << " distribution)\n";
 
-        cout << "# VERSION: " << HPX_HAVE_GIT_COMMIT << " "
+        cout << "# VERSION: " << HPX_LOCAL_HAVE_GIT_COMMIT << " "
              << format_build_date() << "\n"
              << "#\n";
 

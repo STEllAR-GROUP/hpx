@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
 #include <iterator>

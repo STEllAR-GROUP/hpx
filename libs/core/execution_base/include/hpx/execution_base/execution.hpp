@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>
@@ -54,19 +54,19 @@ namespace hpx { namespace execution {
 
 namespace hpx { namespace parallel { namespace execution {
 
-    using parallel_execution_tag HPX_DEPRECATED_V(1, 6,
+    using parallel_execution_tag HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::parallel_execution_tag is deprecated. Use "
         "hpx::execution::parallel_execution_tag instead.") =
         hpx::execution::parallel_execution_tag;
-    using sequenced_execution_tag HPX_DEPRECATED_V(1, 6,
+    using sequenced_execution_tag HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::sequenced_execution_tag is deprecated. Use "
         "hpx::execution::sequenced_execution_tag instead.") =
         hpx::execution::sequenced_execution_tag;
-    using task_policy_tag HPX_DEPRECATED_V(1, 6,
+    using task_policy_tag HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::task_policy_tag is deprecated. Use "
         "hpx::execution::task_policy_tag instead.") =
         hpx::execution::task_policy_tag;
-    using unsequenced_execution_tag HPX_DEPRECATED_V(1, 6,
+    using unsequenced_execution_tag HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::unsequenced_execution_tag is deprecated. "
         "Use hpx::execution::unsequenced_execution_tag instead.") =
         hpx::execution::unsequenced_execution_tag;

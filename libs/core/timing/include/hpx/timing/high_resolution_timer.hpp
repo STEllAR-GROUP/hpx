@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstdint>
@@ -78,7 +78,7 @@ namespace hpx { namespace chrono {
 }}    // namespace hpx::chrono
 
 namespace hpx { namespace util {
-    using high_resolution_timer HPX_DEPRECATED_V(1, 6,
+    using high_resolution_timer HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::high_resolution_timer is deprecated. Use "
         "hpx::chrono::high_resolution_timer instead.") =
         hpx::chrono::high_resolution_timer;

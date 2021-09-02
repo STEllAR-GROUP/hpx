@@ -7,7 +7,7 @@
 =============================================================================*/
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <string>

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <type_traits>
 
@@ -171,37 +171,37 @@ namespace hpx {
 namespace hpx { namespace parallel { namespace execution {
 
     template <typename T>
-    using is_execution_policy HPX_DEPRECATED_V(1, 6,
+    using is_execution_policy HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::is_execution_policy is deprecated, use "
         "hpx::is_execution_policy instead") = hpx::is_execution_policy<T>;
 
     template <typename T>
-    using is_parallel_execution_policy HPX_DEPRECATED_V(1, 6,
+    using is_parallel_execution_policy HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::is_parallel_execution_policy is deprecated, "
         "use hpx::is_parallel_execution_policy instead") =
         hpx::is_parallel_execution_policy<T>;
 
     template <typename T>
-    using is_sequenced_execution_policy HPX_DEPRECATED_V(1, 6,
+    using is_sequenced_execution_policy HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::is_sequenced_execution_policy is "
         "deprecated, use hpx::is_sequenced_execution_policy instead") =
         hpx::is_sequenced_execution_policy<T>;
 
     /// \cond
     template <typename T>
-    using is_async_execution_policy HPX_DEPRECATED_V(1, 6,
+    using is_async_execution_policy HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::is_async_execution_policy is deprecated, "
         "use hpx::is_async_execution_policy instead") =
         hpx::is_async_execution_policy<T>;
 
     template <typename T>
-    using is_rebound_execution_policy HPX_DEPRECATED_V(1, 6,
+    using is_rebound_execution_policy HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::is_rebound_execution_policy is deprecated, "
         "use hpx::is_rebound_execution_policy instead") =
         hpx::is_rebound_execution_policy<T>;
 
     template <typename T>
-    using is_vectorpack_execution_policy HPX_DEPRECATED_V(1, 6,
+    using is_vectorpack_execution_policy HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx:parallel::execution:::is_vectorpack_execution_policy is "
         "deprecated, use hpx::is_vectorpack_execution_policy instead") =
         hpx::is_vectorpack_execution_policy<T>;

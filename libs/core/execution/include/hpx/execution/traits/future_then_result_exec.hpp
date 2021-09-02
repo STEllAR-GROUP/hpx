@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/invoke_result.hpp>

@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/config/endian.hpp>
-#include <hpx/serialization/config/defines.hpp>
+#include <hpx/local/config.hpp>
+#include <hpx/local/config/endian.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/serialization/basic_archive.hpp>
+#include <hpx/serialization/config/defines.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/detail/raw_ptr.hpp>
 #include <hpx/serialization/output_container.hpp>
@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace serialization {
 
@@ -325,4 +325,4 @@ namespace hpx { namespace serialization {
     };
 }}    // namespace hpx::serialization
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

@@ -6,12 +6,10 @@
 
 set(subdirs local)
 
-if(HPX_WITH_NETWORKING)
-  set(subdirs ${subdirs} network)
-endif()
-
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.performance.${subdir})
+  hpx_local_add_pseudo_target(tests.performance.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.performance tests.performance.${subdir})
+  hpx_local_add_pseudo_dependencies(
+    tests.performance tests.performance.${subdir}
+  )
 endforeach()

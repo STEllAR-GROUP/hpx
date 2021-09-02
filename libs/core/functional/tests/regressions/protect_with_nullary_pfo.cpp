@@ -5,7 +5,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/protect.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>

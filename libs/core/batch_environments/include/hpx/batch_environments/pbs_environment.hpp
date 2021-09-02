@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <cstddef>
 #include <string>
@@ -17,7 +17,7 @@ namespace hpx { namespace util { namespace batch_environments {
 
     struct pbs_environment
     {
-        HPX_CORE_EXPORT pbs_environment(
+        HPX_LOCAL_EXPORT pbs_environment(
             std::vector<std::string>& nodelist, bool have_mpi, bool debug);
 
         bool valid() const
@@ -46,9 +46,9 @@ namespace hpx { namespace util { namespace batch_environments {
         std::size_t num_threads_;
         bool valid_;
 
-        HPX_CORE_EXPORT void read_nodefile(
+        HPX_LOCAL_EXPORT void read_nodefile(
             std::vector<std::string>& nodelist, bool have_mpi, bool debug);
-        HPX_CORE_EXPORT void read_nodelist(
+        HPX_LOCAL_EXPORT void read_nodelist(
             std::vector<std::string>& nodelist, bool debug);
     };
 }}}    // namespace hpx::util::batch_environments

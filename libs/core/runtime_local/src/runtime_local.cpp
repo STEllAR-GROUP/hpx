@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling_local/late_command_line_handling_local.hpp>
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
@@ -15,6 +15,7 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
+#include <hpx/local/version.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>
@@ -36,7 +37,6 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/version.hpp>
 
 #include <atomic>
 #include <condition_variable>
@@ -77,7 +77,7 @@ namespace hpx {
 
             if (verbosity >= 2)
             {
-                std::cerr << full_build_string() << "\n";
+                std::cerr << hpx::local::full_build_string() << "\n";
             }
 
 #if defined(HPX_HAVE_STACKTRACES)
@@ -96,7 +96,7 @@ namespace hpx {
         }
     }
 
-    HPX_CORE_EXPORT BOOL WINAPI termination_handler(DWORD ctrl_type)
+    HPX_LOCAL_EXPORT BOOL WINAPI termination_handler(DWORD ctrl_type)
     {
         switch (ctrl_type)
         {
@@ -135,7 +135,7 @@ namespace hpx {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_NORETURN HPX_CORE_EXPORT void termination_handler(int signum)
+    HPX_NORETURN HPX_LOCAL_EXPORT void termination_handler(int signum)
     {
         if (signum != SIGINT &&
             get_config_entry("hpx.attach_debugger", "") == "exception")
@@ -152,7 +152,7 @@ namespace hpx {
 
             if (verbosity >= 2)
             {
-                std::cerr << full_build_string() << "\n";
+                std::cerr << hpx::local::full_build_string() << "\n";
             }
 
 #if defined(HPX_HAVE_STACKTRACES)
@@ -178,7 +178,7 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT void HPX_CDECL new_handler()
+    HPX_LOCAL_EXPORT void HPX_CDECL new_handler()
     {
         HPX_THROW_EXCEPTION(out_of_memory, "new_handler",
             "new allocator failed to allocate memory");
@@ -247,12 +247,14 @@ namespace hpx {
         };
     }
 
-    char const* get_runtime_state_name(state st)
-    {
-        if (st < state_invalid || st >= last_valid_runtime_state)
-            return "invalid (value out of bounds)";
-        return strings::runtime_state_names[st + 1];
-    }
+    namespace detail {
+        char const* get_runtime_state_name(state st)
+        {
+            if (st < state_invalid || st >= last_valid_runtime_state)
+                return "invalid (value out of bounds)";
+            return strings::runtime_state_names[st + 1];
+        }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     threads::policies::callback_notifier::on_startstop_type
@@ -502,7 +504,7 @@ namespace hpx {
 
     void runtime::set_state(state s)
     {
-        LPROGRESS_ << get_runtime_state_name(s);
+        LPROGRESS_ << hpx::detail::get_runtime_state_name(s);
         state_.store(s);
     }
 

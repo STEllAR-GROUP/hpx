@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
@@ -52,8 +52,8 @@ namespace hpx {
     namespace detail {
 
         struct stop_state;
-        HPX_CORE_EXPORT void intrusive_ptr_add_ref(stop_state* p);
-        HPX_CORE_EXPORT void intrusive_ptr_release(stop_state* p);
+        HPX_LOCAL_EXPORT void intrusive_ptr_add_ref(stop_state* p);
+        HPX_LOCAL_EXPORT void intrusive_ptr_release(stop_state* p);
 
         ///////////////////////////////////////////////////////////////////////
         struct stop_callback_base
@@ -110,7 +110,7 @@ namespace hpx {
                 return stop_possible(state_.load(std::memory_order_acquire));
             }
 
-            HPX_CORE_EXPORT bool request_stop() noexcept;
+            HPX_LOCAL_EXPORT bool request_stop() noexcept;
 
             void add_source_count()
             {
@@ -124,8 +124,8 @@ namespace hpx {
                     std::memory_order_acq_rel);
             }
 
-            HPX_CORE_EXPORT bool add_callback(stop_callback_base* cb) noexcept;
-            HPX_CORE_EXPORT void remove_callback(
+            HPX_LOCAL_EXPORT bool add_callback(stop_callback_base* cb) noexcept;
+            HPX_LOCAL_EXPORT void remove_callback(
                 stop_callback_base* cb) noexcept;
 
         private:
@@ -151,18 +151,18 @@ namespace hpx {
             //      signal
             //
             // Returns: false if stop was requested; otherwise, true.
-            HPX_CORE_EXPORT bool lock_and_request_stop() noexcept;
+            HPX_LOCAL_EXPORT bool lock_and_request_stop() noexcept;
 
             // Effect: locks the state if no stop was requested and stop is
             //      possible. Also executes callbacks if stop was requested.
             //
             // Returns: false if stop was requested or stop is not possible
-            HPX_CORE_EXPORT bool lock_if_not_stopped(
+            HPX_LOCAL_EXPORT bool lock_if_not_stopped(
                 stop_callback_base* cb) noexcept;
 
         public:
             // Effect: locks the state
-            HPX_CORE_EXPORT void lock() noexcept;
+            HPX_LOCAL_EXPORT void lock() noexcept;
 
             void unlock() noexcept
             {
@@ -173,8 +173,8 @@ namespace hpx {
             friend struct scoped_lock_if_not_stopped;
             friend struct scoped_lock_and_request_stop;
 
-            friend HPX_CORE_EXPORT void intrusive_ptr_add_ref(stop_state* p);
-            friend HPX_CORE_EXPORT void intrusive_ptr_release(stop_state* p);
+            friend HPX_LOCAL_EXPORT void intrusive_ptr_add_ref(stop_state* p);
+            friend HPX_LOCAL_EXPORT void intrusive_ptr_release(stop_state* p);
 
             std::atomic<std::uint64_t> state_;
             stop_callback_base* callbacks_ = nullptr;

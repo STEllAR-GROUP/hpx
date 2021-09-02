@@ -12,7 +12,7 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
@@ -20,12 +20,12 @@ foreach(test ${tests})
     FOLDER "Tests/Regressions/Modules/Core/AsyncCombinators"
   )
 
-  add_hpx_regression_test(
+  hpx_local_add_regression_test(
     "modules.async_combinators" ${test} ${${test}_PARAMETERS}
   )
 endforeach()
 
-if(HPX_WITH_COMPILE_ONLY_TESTS)
+if(HPXLocal_WITH_COMPILE_ONLY_TESTS)
   set(compile_tests wait_all_std_array_2035)
 
   foreach(compile_test ${compile_tests})
@@ -33,7 +33,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
 
     source_group("Source Files" FILES ${sources})
 
-    add_hpx_regression_compile_test(
+    hpx_local_add_regression_compile_test(
       "modules.async_combinators" ${compile_test}
       SOURCES ${sources} ${${compile_test}_FLAGS}
       FOLDER "Tests/Regressions/Modules/Core/AsyncCombinators/CompileOnly"

@@ -220,7 +220,7 @@ namespace hpx { namespace ranges {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -250,7 +250,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::none_of is deprecated, use "
         "hpx::ranges::none_of instead")
         typename util::detail::algorithm_result<ExPolicy, bool>::type
@@ -288,7 +288,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::any_of is deprecated, use hpx::ranges::any_of instead")
         typename util::detail::algorithm_result<ExPolicy, bool>::type
         any_of(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
@@ -324,7 +324,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::all_of is deprecated, use hpx::ranges::all_of instead")
         typename util::detail::algorithm_result<ExPolicy, bool>::type
         all_of(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())

@@ -10,14 +10,14 @@
 // hpxinspect:nodeprecatedinclude:boost/system/system_error.hpp
 // hpxinspect:nodeprecatedname:boost::system::system_error
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/asio/asio_util.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <cstdint>
 #include <string>
 
-#include <hpx/config/asio.hpp>
+#include <hpx/local/config/asio.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 

@@ -5,9 +5,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/ini/ini.hpp>
+#include <hpx/local/version.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/logging.hpp>
@@ -16,7 +17,6 @@
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/init_ini_data.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
-#include <hpx/version.hpp>
 
 #include <boost/tokenizer.hpp>
 
@@ -450,8 +450,10 @@ namespace hpx { namespace util {
                 if (0 == name.find("lib"))
                     name = name.substr(3);
 #endif
-#if defined(__APPLE__)    // shared library version is added berfore extension
-                const std::string version = hpx::full_version_as_string();
+#if defined(__APPLE__)    // shared library version is added before extension
+                // TODO: HPX or HPXLocal version?
+                const std::string version =
+                    hpx::local::full_version_as_string();
                 std::string::size_type i = name.find(version);
                 if (i != std::string::npos)
                     name.erase(

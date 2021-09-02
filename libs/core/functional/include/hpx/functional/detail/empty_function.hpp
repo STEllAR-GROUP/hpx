@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
 
 namespace hpx { namespace util { namespace detail {
@@ -17,7 +17,7 @@ namespace hpx { namespace util { namespace detail {
     {
     };    // must be trivial and empty
 
-    HPX_NORETURN HPX_CORE_EXPORT void throw_bad_function_call();
+    HPX_NORETURN HPX_LOCAL_EXPORT void throw_bad_function_call();
 
     template <typename R>
     HPX_NORETURN inline R throw_bad_function_call()

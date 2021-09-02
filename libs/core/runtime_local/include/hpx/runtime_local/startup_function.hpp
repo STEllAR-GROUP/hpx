@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/unique_function.hpp>
 
 namespace hpx {
@@ -40,7 +40,8 @@ namespace hpx {
     ///       system during its initialization (if necessary).
     ///
     /// \see    \a hpx::register_startup_function()
-    HPX_CORE_EXPORT void register_pre_startup_function(startup_function_type f);
+    HPX_LOCAL_EXPORT void register_pre_startup_function(
+        startup_function_type f);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Add a function to be executed by a HPX thread before hpx_main
@@ -65,5 +66,5 @@ namespace hpx {
     ///       system during its initialization (if necessary).
     ///
     /// \see    \a hpx::register_pre_startup_function()
-    HPX_CORE_EXPORT void register_startup_function(startup_function_type f);
+    HPX_LOCAL_EXPORT void register_startup_function(startup_function_type f);
 }    // namespace hpx

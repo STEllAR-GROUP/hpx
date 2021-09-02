@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/type_support/void_guard.hpp>

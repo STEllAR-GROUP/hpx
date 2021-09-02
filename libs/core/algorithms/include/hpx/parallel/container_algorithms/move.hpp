@@ -128,7 +128,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -243,7 +243,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::move is deprecated, use hpx::ranges::move instead")
         typename util::detail::algorithm_result<ExPolicy,
             ranges::move_result<FwdIter1, FwdIter>>::type
@@ -270,7 +270,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::move is deprecated, use hpx::ranges::move instead")
         typename util::detail::algorithm_result<ExPolicy,
             ranges::move_result<

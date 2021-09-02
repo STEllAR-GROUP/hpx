@@ -22,9 +22,9 @@ set(timed_execution_compat_headers
 )
 # cmake-format: on
 
-include(HPX_AddModule)
-add_hpx_module(
-  core timed_execution
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local timed_execution
   GLOBAL_HEADER_GEN ON
   HEADERS ${timed_execution_headers}
   COMPAT_HEADERS ${timed_execution_compat_headers}

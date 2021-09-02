@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/function.hpp>
@@ -30,13 +30,13 @@
 #include <vector>
 
 #if defined(__FreeBSD__)
-extern HPX_CORE_EXPORT char** freebsd_environ;
+extern HPX_LOCAL_EXPORT char** freebsd_environ;
 extern char** environ;
 #endif
 
 namespace hpx {
     namespace detail {
-        HPX_CORE_EXPORT int init_helper(hpx::program_options::variables_map&,
+        HPX_LOCAL_EXPORT int init_helper(hpx::program_options::variables_map&,
             util::function_nonser<int(int, char**)> const&);
     }
 
@@ -92,7 +92,7 @@ namespace hpx {
         };
 
         namespace detail {
-            HPX_CORE_EXPORT int run_or_start(
+            HPX_LOCAL_EXPORT int run_or_start(
                 util::function_nonser<int(
                     hpx::program_options::variables_map& vm)> const& f,
                 int argc, char** argv, init_params const& params,
@@ -197,9 +197,9 @@ namespace hpx {
                     std::move(main_f), argc, argv, params, false);
         }
 
-        HPX_CORE_EXPORT int finalize(error_code& ec = throws);
-        HPX_CORE_EXPORT int stop(error_code& ec = throws);
-        HPX_CORE_EXPORT int suspend(error_code& ec = throws);
-        HPX_CORE_EXPORT int resume(error_code& ec = throws);
+        HPX_LOCAL_EXPORT int finalize(error_code& ec = throws);
+        HPX_LOCAL_EXPORT int stop(error_code& ec = throws);
+        HPX_LOCAL_EXPORT int suspend(error_code& ec = throws);
+        HPX_LOCAL_EXPORT int resume(error_code& ec = throws);
     }    // namespace local
 }    // namespace hpx

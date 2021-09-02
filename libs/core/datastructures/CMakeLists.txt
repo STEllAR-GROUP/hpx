@@ -5,16 +5,16 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # Compatibility with using Boost.FileSystem, introduced in V1.4.0
-hpx_option(
-  HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE BOOL
+hpx_local_option(
+  HPXLocal_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE BOOL
   "Enable compatibility of hpx::tuple with std::tuple. (default: ON)" ON
   ADVANCED
   CATEGORY "Modules"
   MODULE DATASTRUCTURES
 )
 
-if(HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE)
-  hpx_add_config_define_namespace(
+if(HPXLocal_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE)
+  hpx_local_add_config_define_namespace(
     DEFINE HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE NAMESPACE DATASTRUCTURES
   )
 endif()
@@ -48,14 +48,15 @@ set(datastructures_compat_headers
 
 set(datastructures_sources)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core datastructures
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local datastructures
   GLOBAL_HEADER_GEN ON
   SOURCES ${datastructures_sources}
   HEADERS ${datastructures_headers}
   COMPAT_HEADERS ${datastructures_compat_headers}
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/datastructures/variant_helper.hpp"
-  MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_concepts hpx_type_support
+  MODULE_DEPENDENCIES hpx_assertion hpx_config_local hpx_concepts
+                      hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

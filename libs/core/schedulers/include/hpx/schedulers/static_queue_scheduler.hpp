@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <hpx/assert.hpp>
 #include <hpx/modules/logging.hpp>
@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 // TODO: add branch prediction and function heat
 
@@ -155,4 +155,4 @@ namespace hpx { namespace threads { namespace policies {
     };
 }}}    // namespace hpx::threads::policies
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

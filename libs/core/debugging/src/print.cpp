@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/debugging/environ.hpp>
 #include <hpx/debugging/print.hpp>
 
@@ -29,7 +29,7 @@
 #include <vector>
 
 #if defined(__FreeBSD__)
-HPX_CORE_EXPORT char** freebsd_environ = nullptr;
+HPX_LOCAL_EXPORT char** freebsd_environ = nullptr;
 #endif
 
 // ------------------------------------------------------------
@@ -42,24 +42,24 @@ namespace hpx { namespace debug {
     namespace detail {
 
         template <typename Int>
-        HPX_CORE_EXPORT void print_dec(std::ostream& os, Int const& v, int N)
+        HPX_LOCAL_EXPORT void print_dec(std::ostream& os, Int const& v, int N)
         {
             os << std::right << std::setfill('0') << std::setw(N)
                << std::noshowbase << std::dec << v;
         }
 
-        template HPX_CORE_EXPORT void print_dec(
+        template HPX_LOCAL_EXPORT void print_dec(
             std::ostream&, std::int16_t const&, int);
-        template HPX_CORE_EXPORT void print_dec(
+        template HPX_LOCAL_EXPORT void print_dec(
             std::ostream&, std::int32_t const&, int);
-        template HPX_CORE_EXPORT void print_dec(
+        template HPX_LOCAL_EXPORT void print_dec(
             std::ostream&, std::int64_t const&, int);
-        template HPX_CORE_EXPORT void print_dec(
+        template HPX_LOCAL_EXPORT void print_dec(
             std::ostream&, std::uint64_t const&, int);
 
-        template HPX_CORE_EXPORT void print_dec(
+        template HPX_LOCAL_EXPORT void print_dec(
             std::ostream&, std::atomic<int> const&, int);
-        template HPX_CORE_EXPORT void print_dec(
+        template HPX_LOCAL_EXPORT void print_dec(
             std::ostream&, std::atomic<unsigned int> const&, int);
     }    // namespace detail
 
@@ -88,25 +88,25 @@ namespace hpx { namespace debug {
     namespace detail {
 
         template <typename Int>
-        HPX_CORE_EXPORT void print_hex(std::ostream& os, Int v, int N)
+        HPX_LOCAL_EXPORT void print_hex(std::ostream& os, Int v, int N)
         {
             os << std::right << "0x" << std::setfill('0') << std::setw(N)
                << std::noshowbase << std::hex << v;
         }
 
-        template HPX_CORE_EXPORT void print_hex(
+        template HPX_LOCAL_EXPORT void print_hex(
             std::ostream&, std::thread::id, int);
-        template HPX_CORE_EXPORT void print_hex(
+        template HPX_LOCAL_EXPORT void print_hex(
             std::ostream&, unsigned long, int);
 
         template <typename Int>
-        HPX_CORE_EXPORT void print_ptr(std::ostream& os, Int v, int N)
+        HPX_LOCAL_EXPORT void print_ptr(std::ostream& os, Int v, int N)
         {
             os << std::right << std::setw(N) << std::noshowbase << std::hex
                << v;
         }
 
-        template HPX_CORE_EXPORT void print_ptr(std::ostream&, void*, int);
+        template HPX_LOCAL_EXPORT void print_ptr(std::ostream&, void*, int);
     }    // namespace detail
 
     // ------------------------------------------------------------------
@@ -115,7 +115,7 @@ namespace hpx { namespace debug {
     namespace detail {
 
         template <typename Int>
-        HPX_CORE_EXPORT void print_bin(std::ostream& os, Int v, int N)
+        HPX_LOCAL_EXPORT void print_bin(std::ostream& os, Int v, int N)
         {
             char const* beg = reinterpret_cast<char const*>(&v);
             char const* end = beg + sizeof(v);
@@ -127,12 +127,12 @@ namespace hpx { namespace debug {
             }
         }
 
-        template HPX_CORE_EXPORT void print_bin(
+        template HPX_LOCAL_EXPORT void print_bin(
             std::ostream&, std::uint64_t, int);
 
 #if defined(__APPLE__)
         // Explicit instantiation necessary to solve undefined symbol for MacOS
-        template HPX_CORE_EXPORT void print_bin(
+        template HPX_LOCAL_EXPORT void print_bin(
             std::ostream&, unsigned long, int);
 #endif
     }    // namespace detail
@@ -295,7 +295,7 @@ namespace hpx { namespace debug {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
-        HPX_CORE_EXPORT void print_array(
+        HPX_LOCAL_EXPORT void print_array(
             std::string const& name, T const* data, std::size_t size)
         {
             std::cout << str<20>(name.c_str()) << ": {" << debug::dec<4>(size)
@@ -305,7 +305,7 @@ namespace hpx { namespace debug {
             std::cout << "\n";
         }
 
-        template HPX_CORE_EXPORT void print_array(
+        template HPX_LOCAL_EXPORT void print_array(
             std::string const&, std::uint64_t const*, std::size_t);
     }    // namespace detail
 }}       // namespace hpx::debug

@@ -5,7 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(__boost_filesystem)
-if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
+if(HPXLocal_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
   set(__boost_filesystem Boost::filesystem)
 endif()
 
@@ -17,13 +17,13 @@ set(filesystem_compat_headers
 )
 # cmake-format: on
 
-include(HPX_AddModule)
-add_hpx_module(
-  core filesystem
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local filesystem
   GLOBAL_HEADER_GEN OFF
   HEADERS ${filesystem_headers}
   COMPAT_HEADERS ${filesystem_compat_headers}
-  MODULE_DEPENDENCIES hpx_config
+  MODULE_DEPENDENCIES hpx_config_local
   DEPENDENCIES ${__boost_filesystem}
   CMAKE_SUBDIRS examples tests
 )

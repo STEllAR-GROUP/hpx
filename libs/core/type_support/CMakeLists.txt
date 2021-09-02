@@ -39,13 +39,13 @@ set(type_support_compat_headers
 
 set(type_support_sources)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core type_support
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local type_support
   GLOBAL_HEADER_GEN ON
   SOURCES ${type_support_sources}
   HEADERS ${type_support_headers}
   COMPAT_HEADERS ${type_support_compat_headers}
-  MODULE_DEPENDENCIES hpx_assertion hpx_config
+  MODULE_DEPENDENCIES hpx_assertion hpx_config_local
   CMAKE_SUBDIRS examples tests
 )

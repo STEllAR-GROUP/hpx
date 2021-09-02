@@ -153,11 +153,11 @@ cat >${full_file} <<EOL
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/${module}/config/defines.hpp>
 #include <${new_path}/${f}>
 
-#if HPX_HAVE_DEPRECATION_WARNINGS
+#if HPX_LOCAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message( \\
     "The header ${old_path}/${f} is deprecated, \\

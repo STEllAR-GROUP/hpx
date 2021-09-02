@@ -27,12 +27,14 @@ foreach(test ${tests})
   set(folder_name "Tests/Unit/Modules/Core/ProgramOptions")
 
   # add example executable
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     FOLDER ${folder_name}
   )
 
-  add_hpx_unit_test("modules.program_options" ${test} ${${test}_PARAMETERS})
+  hpx_local_add_unit_test(
+    "modules.program_options" ${test} ${${test}_PARAMETERS}
+  )
 endforeach()

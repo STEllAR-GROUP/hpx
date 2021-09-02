@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 // Necessary to avoid circular include
 #include <hpx/execution_base/execution.hpp>
 

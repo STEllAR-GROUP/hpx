@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 
 #include <type_traits>

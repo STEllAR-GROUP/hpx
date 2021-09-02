@@ -8,16 +8,16 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <cstddef>
 #include <exception>
 
 namespace hpx {
     /// The function report_error reports the given exception to the console
-    HPX_CORE_EXPORT void report_error(
+    HPX_LOCAL_EXPORT void report_error(
         std::size_t num_thread, std::exception_ptr const& e);
 
     /// The function report_error reports the given exception to the console
-    HPX_CORE_EXPORT void report_error(std::exception_ptr const& e);
+    HPX_LOCAL_EXPORT void report_error(std::exception_ptr const& e);
 }    // namespace hpx

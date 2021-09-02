@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/futures.hpp>
 
 #include <string>
@@ -17,7 +17,7 @@ namespace hpx {
 
     namespace detail {
 
-        HPX_CORE_EXPORT std::string get_locality_name();
+        HPX_LOCAL_EXPORT std::string get_locality_name();
     }    // namespace detail
 
     /// \fn std::string get_locality_name()
@@ -32,5 +32,5 @@ namespace hpx {
     ///           networking layer and may be different for different parcelports.
     ///
     /// \see      \a future<std::string> get_locality_name(naming::id_type const& id)
-    HPX_CORE_EXPORT std::string get_locality_name();
+    HPX_LOCAL_EXPORT std::string get_locality_name();
 }    // namespace hpx

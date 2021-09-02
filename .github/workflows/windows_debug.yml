@@ -29,14 +29,15 @@ jobs:
           cmake . -Bbuild -G'Visual Studio 16 2019' \
               -DCMAKE_BUILD_TYPE=Debug \
               -DCMAKE_TOOLCHAIN_FILE='C:/projects/vcpkg/scripts/buildsystems/vcpkg.cmake' \
-              -DHPX_WITH_FETCH_ASIO=ON \
-              -DHPX_WITH_EXAMPLES=ON \
-              -DHPX_WITH_TESTS=ON \
-              -DHPX_WITH_TESTS_UNIT=ON \
-              -DHPX_WITH_DEPRECATION_WARNINGS=OFF \
-              -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
+              -DHPXLocal_WITH_UNITY_BUILD=system \
+              -DHPXLocal_WITH_FETCH_ASIO=ON \
+              -DHPXLocal_WITH_EXAMPLES=ON \
+              -DHPXLocal_WITH_TESTS=ON \
+              -DHPXLocal_WITH_TESTS_UNIT=ON \
+              -DHPXLocal_WITH_DEPRECATION_WARNINGS=OFF \
+              -DHPXLocal_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
               -DHPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION=ON \
-              -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On
+              -DHPXLocal_WITH_CHECK_MODULE_DEPENDENCIES=On
     - name: Build
       shell: bash
       run: |
@@ -56,11 +57,7 @@ jobs:
             --build-config Debug \
             --tests-regex tests.examples \
             --exclude-regex \
-          "tests.examples.1d_stencil.1d_stencil_6|\
-          tests.examples.1d_stencil.1d_stencil_7|\
-          tests.examples.async_io.async_io_simple|\
-          tests.examples.modules.checkpoint.1d_stencil_4_checkpoint|\
-          tests.examples.modules.program_options.config_file_types|\
+          "tests.examples.modules.program_options.config_file_types|\
           tests.examples.modules.program_options.custom_syntax|\
           tests.examples.modules.program_options.env_options|\
           tests.examples.modules.program_options.first|\
@@ -71,8 +68,6 @@ jobs:
           tests.examples.modules.program_options.real|\
           tests.examples.modules.program_options.regex|\
           tests.examples.modules.program_options.response_file|\
-          tests.examples.modules.resiliency_distributed.distributed.tcp.async_replay_distributed|\
-          tests.examples.modules.resiliency_distributed.distributed.tcp.async_replicate_distributed|\
           tests.examples.modules.resiliency.1d_stencil_replay_exception|\
           tests.examples.modules.resiliency.1d_stencil_replay_validate|\
           tests.examples.modules.resiliency.async_replay|\
@@ -86,7 +81,5 @@ jobs:
           tests.examples.modules.resource_partitioner.simple_resource_partitioner|\
           tests.examples.modules.resource_partitioner.simplest_resource_partitioner_1|\
           tests.examples.modules.resource_partitioner.simplest_resource_partitioner_2|\
-          tests.examples.quickstart.1d_wave_equation|\
           tests.examples.quickstart.partitioned_vector_spmd_foreach|\
-          tests.examples.quickstart.sort_by_key_demo|\
-          tests.examples.transpose.transpose_block_numa"
+          tests.examples.quickstart.sort_by_key_demo"

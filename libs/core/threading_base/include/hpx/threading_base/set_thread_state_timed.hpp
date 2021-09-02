@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/timing.hpp>
@@ -20,7 +20,7 @@ namespace hpx { namespace threads { namespace detail {
 
     /// Set a timer to set the state of the given \a thread to the given
     /// new value after it expired (at the given time)
-    HPX_CORE_EXPORT thread_id_ref_type set_thread_state_timed(
+    HPX_LOCAL_EXPORT thread_id_ref_type set_thread_state_timed(
         policies::scheduler_base* scheduler,
         hpx::chrono::steady_time_point const& abs_time,
         thread_id_type const& thrd, thread_schedule_state newstate,

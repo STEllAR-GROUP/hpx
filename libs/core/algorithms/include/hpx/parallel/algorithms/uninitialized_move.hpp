@@ -194,7 +194,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -419,7 +419,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter1>::value&&
                     hpx::traits::is_iterator<FwdIter2>::value)>
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::uninitialized_move is deprecated, use "
         "hpx::uninitialized_move "
         "instead")
@@ -556,7 +556,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIter1>::value&&
                     hpx::traits::is_iterator<FwdIter2>::value)>
-    HPX_DEPRECATED_V(1, 7,
+    HPX_LOCAL_DEPRECATED_V(1, 7,
         "hpx::parallel::uninitialized_move_n is deprecated, use "
         "hpx::uninitialized_move_n "
         "instead")

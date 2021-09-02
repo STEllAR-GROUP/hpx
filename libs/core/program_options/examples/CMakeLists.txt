@@ -20,13 +20,15 @@ set(examples
 
 set(disabled_tests)
 
-if(HPX_WITH_EXAMPLES)
-  add_hpx_pseudo_target(examples.modules.program_options)
-  add_hpx_pseudo_dependencies(examples.modules examples.modules.program_options)
+if(HPXLocal_WITH_EXAMPLES)
+  hpx_local_add_pseudo_target(examples.modules.program_options)
+  hpx_local_add_pseudo_dependencies(
+    examples.modules examples.modules.program_options
+  )
 
-  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-    add_hpx_pseudo_target(tests.examples.modules.program_options)
-    add_hpx_pseudo_dependencies(
+  if(HPXLocal_WITH_TESTS AND HPXLocal_WITH_TESTS_EXAMPLES)
+    hpx_local_add_pseudo_target(tests.examples.modules.program_options)
+    hpx_local_add_pseudo_dependencies(
       tests.examples.modules tests.examples.modules.program_options
     )
   endif()
@@ -40,22 +42,22 @@ if(HPX_WITH_EXAMPLES)
     set(folder_name "Examples/Modules/Core/ProgramOptions")
 
     # add example executable
-    add_hpx_executable(
+    hpx_local_add_executable(
       ${example} INTERNAL_FLAGS
       SOURCES ${sources} ${${example}_FLAGS}
       DEPENDENCIES ${${example}_LIBS}
       FOLDER ${folder_name}
     )
 
-    add_hpx_example_target_dependencies(
+    hpx_local_add_example_target_dependencies(
       "modules.program_options" ${example} ${${example}_PARAMETERS}
     )
 
-    if(HPX_WITH_TESTS
-       AND HPX_WITH_TESTS_EXAMPLES
+    if(HPXLocal_WITH_TESTS
+       AND HPXLocal_WITH_TESTS_EXAMPLES
        AND NOT ("${example_program}" IN_LIST disabled_tests)
     )
-      add_hpx_example_test(
+      hpx_local_add_example_test(
         "modules.program_options" ${example} ${${example}_PARAMETERS}
       )
     endif()

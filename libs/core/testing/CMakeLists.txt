@@ -20,14 +20,14 @@ set(testing_compat_headers
 # Default location is $HPX_ROOT/libs/testing/src
 set(testing_sources testing.cpp performance.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core testing
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local testing
   GLOBAL_HEADER_GEN OFF
   SOURCES ${testing_sources}
   HEADERS ${testing_headers}
   COMPAT_HEADERS ${testing_compat_headers}
-  MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_format hpx_functional
+  MODULE_DEPENDENCIES hpx_assertion hpx_config_local hpx_format hpx_functional
                       hpx_preprocessor hpx_util
   CMAKE_SUBDIRS examples tests
 )

@@ -27,9 +27,9 @@ set(preprocessor_compat_headers
 # Default location is $HPX_ROOT/libs/preprocessor/src
 set(preprocessor_sources)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core preprocessor
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local preprocessor
   SOURCES ${preprocessor_sources}
   HEADERS ${preprocessor_headers}
   COMPAT_HEADERS ${preprocessor_compat_headers}

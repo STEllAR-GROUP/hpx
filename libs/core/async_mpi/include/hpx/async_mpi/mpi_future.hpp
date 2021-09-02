@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/execution_base.hpp>
@@ -34,12 +34,12 @@ namespace hpx { namespace mpi { namespace experimental {
         using mutex_type = hpx::lcos::local::spinlock;
 
         // extract MPI error message
-        HPX_CORE_EXPORT std::string error_message(int code);
+        HPX_LOCAL_EXPORT std::string error_message(int code);
 
         // mutex needed to protect mpi request vector, note that the
         // mpi poll function takes place inside the main scheduling loop
         // of hpx and not on an hpx worker thread, so we must use std:mutex
-        HPX_CORE_EXPORT mutex_type& get_vector_mtx();
+        HPX_LOCAL_EXPORT mutex_type& get_vector_mtx();
 
         // -----------------------------------------------------------------
         // An implementation of future_data for MPI
@@ -90,19 +90,19 @@ namespace hpx { namespace mpi { namespace experimental {
         };
 
         // an instance of mpi_info that we store data in
-        HPX_CORE_EXPORT mpi_info& get_mpi_info();
+        HPX_LOCAL_EXPORT mpi_info& get_mpi_info();
 
         // stream operator to display debug mpi_info
-        HPX_CORE_EXPORT std::ostream& operator<<(
+        HPX_LOCAL_EXPORT std::ostream& operator<<(
             std::ostream& os, mpi_info const& i);
 
         // -----------------------------------------------------------------
         // an MPI error handling type that we can use to intercept
         // MPI errors is we enable the error handler
-        HPX_CORE_EXPORT extern MPI_Errhandler hpx_mpi_errhandler;
+        HPX_LOCAL_EXPORT extern MPI_Errhandler hpx_mpi_errhandler;
 
         // function that converts an MPI error into an exception
-        HPX_CORE_EXPORT void hpx_MPI_Handler(MPI_Comm*, int* errorcode, ...);
+        HPX_LOCAL_EXPORT void hpx_MPI_Handler(MPI_Comm*, int* errorcode, ...);
 
         // -----------------------------------------------------------------
         // we track requests and future data in two vectors even though
@@ -110,8 +110,8 @@ namespace hpx { namespace mpi { namespace experimental {
         // the reason for this is because we can use MPI_Testany
         // with a vector of requests to save overheads compared
         // to testing one by one every item (using a list)
-        HPX_CORE_EXPORT std::vector<MPI_Request>& get_active_requests();
-        HPX_CORE_EXPORT std::vector<future_data_ptr>& get_active_futures();
+        HPX_LOCAL_EXPORT std::vector<MPI_Request>& get_active_requests();
+        HPX_LOCAL_EXPORT std::vector<future_data_ptr>& get_active_futures();
 
         // -----------------------------------------------------------------
         // define a lockfree queue type to place requests in prior to handling
@@ -125,7 +125,7 @@ namespace hpx { namespace mpi { namespace experimental {
         // used internally to add an MPI_Request to the lockfree queue
         // that will be used by the polling routines to check when requests
         // have completed
-        HPX_CORE_EXPORT void add_to_request_queue(future_data_ptr data);
+        HPX_LOCAL_EXPORT void add_to_request_queue(future_data_ptr data);
 
         // -----------------------------------------------------------------
         // used internally to query how many requests are 'in flight'
@@ -133,29 +133,29 @@ namespace hpx { namespace mpi { namespace experimental {
         // too many mpi requests are being spawned at once
         // unfortunately, the lock-free queue can only return an estimate
         // of the queue size, so this is not guaranteed to be precise
-        HPX_CORE_EXPORT std::size_t get_number_of_enqueued_requests();
+        HPX_LOCAL_EXPORT std::size_t get_number_of_enqueued_requests();
 
         // -----------------------------------------------------------------
         // used internally to add a request to the main polling vector
         // that is passed to MPI_Testany
-        HPX_CORE_EXPORT void add_to_request_vector(future_data_ptr data);
+        HPX_LOCAL_EXPORT void add_to_request_vector(future_data_ptr data);
 
         // -----------------------------------------------------------------
         // used internally to query how many requests are 'in flight'
         // these are requests that are being polled for actively
         // and not the same as the requests enqueued
-        HPX_CORE_EXPORT std::size_t get_number_of_active_requests();
+        HPX_LOCAL_EXPORT std::size_t get_number_of_active_requests();
 
     }    // namespace detail
 
     // -----------------------------------------------------------------
     // set an error handler for communicators that will be called
     // on any error instead of the default behavior of program termination
-    HPX_CORE_EXPORT void set_error_handler();
+    HPX_LOCAL_EXPORT void set_error_handler();
 
     // -----------------------------------------------------------------
     // return a future object from a user supplied MPI_Request
-    HPX_CORE_EXPORT hpx::future<void> get_future(MPI_Request request);
+    HPX_LOCAL_EXPORT hpx::future<void> get_future(MPI_Request request);
 
     // -----------------------------------------------------------------
     // return a future from an async call to MPI_Ixxx function
@@ -185,7 +185,7 @@ namespace hpx { namespace mpi { namespace experimental {
     // Background progress function for MPI async operations
     // Checks for completed MPI_Requests and sets mpi::experimental::future ready
     // when found
-    HPX_CORE_EXPORT hpx::threads::policies::detail::polling_status poll();
+    HPX_LOCAL_EXPORT hpx::threads::policies::detail::polling_status poll();
 
     // -----------------------------------------------------------------
     // This is not completely safe as it will return when the request vector is
@@ -221,19 +221,19 @@ namespace hpx { namespace mpi { namespace experimental {
     // -----------------------------------------------------------------
     namespace detail {
 
-        HPX_CORE_EXPORT void register_polling(hpx::threads::thread_pool_base&);
-        HPX_CORE_EXPORT void unregister_polling(
+        HPX_LOCAL_EXPORT void register_polling(hpx::threads::thread_pool_base&);
+        HPX_LOCAL_EXPORT void unregister_polling(
             hpx::threads::thread_pool_base&);
     }    // namespace detail
 
     // initialize the hpx::mpi background request handler
     // All ranks should call this function,
     // but only one thread per rank needs to do so
-    HPX_CORE_EXPORT void init(bool init_mpi = false,
+    HPX_LOCAL_EXPORT void init(bool init_mpi = false,
         std::string const& pool_name = "", bool init_errorhandler = false);
 
     // -----------------------------------------------------------------
-    HPX_CORE_EXPORT void finalize(std::string const& pool_name = "");
+    HPX_LOCAL_EXPORT void finalize(std::string const& pool_name = "");
 
     // -----------------------------------------------------------------
     // This RAII helper class assumes that MPI initialization/finalization is

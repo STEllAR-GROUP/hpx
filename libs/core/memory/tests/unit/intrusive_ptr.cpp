@@ -9,7 +9,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if defined(HPX_MSVC)
 

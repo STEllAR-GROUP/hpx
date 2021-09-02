@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
@@ -38,7 +38,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
@@ -53,7 +53,7 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_CORE_EXPORT runtime
+    class HPX_LOCAL_EXPORT runtime
     {
     public:
         /// Generate a new notification policy instance for the given thread
@@ -484,18 +484,22 @@ namespace hpx {
         std::condition_variable wait_condition_;
     };
 
-    HPX_CORE_EXPORT void set_error_handlers();
+    HPX_LOCAL_EXPORT void set_error_handlers();
+
+    namespace detail {
+        HPX_LOCAL_EXPORT char const* get_runtime_state_name(hpx::state st);
+    }
 
     namespace util {
         ///////////////////////////////////////////////////////////////////////////
         // retrieve the command line arguments for the current locality
-        HPX_CORE_EXPORT bool retrieve_commandline_arguments(
+        HPX_LOCAL_EXPORT bool retrieve_commandline_arguments(
             hpx::program_options::options_description const& app_options,
             hpx::program_options::variables_map& vm);
 
         ///////////////////////////////////////////////////////////////////////////
         // retrieve the command line arguments for the current locality
-        HPX_CORE_EXPORT bool retrieve_commandline_arguments(
+        HPX_LOCAL_EXPORT bool retrieve_commandline_arguments(
             std::string const& appname,
             hpx::program_options::variables_map& vm);
     }    // namespace util
@@ -506,12 +510,12 @@ namespace hpx {
         /// Get the readable string representing the given stack size constant.
         ///
         /// \param size this represents the stack size
-        HPX_CORE_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
+        HPX_LOCAL_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
 
         /// \brief Returns the default stack size.
         ///
         /// Get the default stack size in bytes.
-        HPX_CORE_EXPORT std::ptrdiff_t get_default_stack_size();
+        HPX_LOCAL_EXPORT std::ptrdiff_t get_default_stack_size();
 
         /// \brief Returns the stack size corresponding to the given stack size
         ///        enumeration.
@@ -519,8 +523,8 @@ namespace hpx {
         /// Get the stack size corresponding to the given stack size enumeration.
         ///
         /// \param size this represents the stack size
-        HPX_CORE_EXPORT std::ptrdiff_t get_stack_size(thread_stacksize);
+        HPX_LOCAL_EXPORT std::ptrdiff_t get_stack_size(thread_stacksize);
     }    // namespace threads
 }    // namespace hpx
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

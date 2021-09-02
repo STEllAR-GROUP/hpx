@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <string>
 
 namespace hpx { namespace util {
     /// Tries to break an attached debugger, if not supported a loop is
     /// invoked which gives enough time to attach a debugger manually.
-    HPX_CORE_EXPORT void attach_debugger();
+    HPX_LOCAL_EXPORT void attach_debugger();
 }}    // namespace hpx::util

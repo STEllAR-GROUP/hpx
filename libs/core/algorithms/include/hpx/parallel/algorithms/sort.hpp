@@ -226,7 +226,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -546,7 +546,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 8, "hpx::parallel::sort is deprecated, use hpx::sort instead")
         typename util::detail::algorithm_result<ExPolicy, RandomIt>::type
         sort(ExPolicy&& policy, RandomIt first, RandomIt last,

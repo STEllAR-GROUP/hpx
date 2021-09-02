@@ -104,7 +104,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -125,7 +125,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_range<Rng>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::fill is deprecated, use hpx::ranges::fill instead")
         typename util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>::type
@@ -156,7 +156,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_range<Rng>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::fill_n is deprecated, use hpx::ranges::fill_n instead")
         typename util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>::type

@@ -23,16 +23,16 @@ set(resource_partitioner_compat_headers
 
 set(resource_partitioner_sources detail_partitioner.cpp partitioner.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core resource_partitioner
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local resource_partitioner
   GLOBAL_HEADER_GEN ON
   SOURCES ${resource_partitioner_sources}
   HEADERS ${resource_partitioner_headers}
   COMPAT_HEADERS ${resource_partitioner_compat_headers}
   MODULE_DEPENDENCIES
     hpx_affinity
-    hpx_config
+    hpx_config_local
     hpx_runtime_configuration
     hpx_errors
     hpx_format

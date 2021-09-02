@@ -5,7 +5,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 
@@ -20,7 +20,7 @@
 #else
 #error You are trying to use x86 context switching on a non-x86 platform. Your \
     platform may be supported with the CMake option \
-    HPX_WITH_GENERIC_CONTEXT_COROUTINES=ON.
+    HPXLocal_WITH_GENERIC_CONTEXT_COROUTINES=ON.
 #endif
 
 #endif

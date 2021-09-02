@@ -11,9 +11,9 @@ set(string_util_headers
     hpx/string_util/split.hpp hpx/string_util/trim.hpp
 )
 
-include(HPX_AddModule)
-add_hpx_module(
-  core string_util
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local string_util
   GLOBAL_HEADER_GEN ON
   HEADERS ${string_util_headers}
   CMAKE_SUBDIRS examples tests

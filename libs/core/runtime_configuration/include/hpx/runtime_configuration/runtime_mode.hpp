@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <string>
 
@@ -31,7 +31,7 @@ namespace hpx {
 
     /// Get the readable string representing the name of the given runtime_mode
     /// constant.
-    HPX_CORE_EXPORT char const* get_runtime_mode_name(runtime_mode state);
+    HPX_LOCAL_EXPORT char const* get_runtime_mode_name(runtime_mode state);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Returns the internal representation (runtime_mode constant) from
@@ -41,6 +41,6 @@ namespace hpx {
     /// representing the name.
     ///
     /// \param mode this represents the runtime mode
-    HPX_CORE_EXPORT runtime_mode get_runtime_mode_from_name(
+    HPX_LOCAL_EXPORT runtime_mode get_runtime_mode_from_name(
         std::string const& mode);
 }    // namespace hpx

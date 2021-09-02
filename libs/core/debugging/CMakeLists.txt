@@ -21,15 +21,15 @@ set(debugging_compat_headers
 
 set(debugging_sources attach_debugger.cpp backtrace.cpp print.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core debugging
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local debugging
   GLOBAL_HEADER_GEN ON
   SOURCES ${debugging_sources}
   HEADERS ${debugging_headers}
   COMPAT_HEADERS ${debugging_compat_headers}
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/debugging/backtrace/backtrace.hpp"
   DEPENDENCIES Asio::asio
-  MODULE_DEPENDENCIES hpx_config
+  MODULE_DEPENDENCIES hpx_config_local
   CMAKE_SUBDIRS examples tests
 )

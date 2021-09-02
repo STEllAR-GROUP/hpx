@@ -4,13 +4,15 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_WITH_EXAMPLES)
+if(HPXLocal_WITH_EXAMPLES)
 
-  add_hpx_pseudo_target(examples.modules.resiliency)
-  add_hpx_pseudo_dependencies(examples.modules examples.modules.resiliency)
-  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-    add_hpx_pseudo_target(tests.examples.modules.resiliency)
-    add_hpx_pseudo_dependencies(
+  hpx_local_add_pseudo_target(examples.modules.resiliency)
+  hpx_local_add_pseudo_dependencies(
+    examples.modules examples.modules.resiliency
+  )
+  if(HPXLocal_WITH_TESTS AND HPXLocal_WITH_TESTS_EXAMPLES)
+    hpx_local_add_pseudo_target(tests.examples.modules.resiliency)
+    hpx_local_add_pseudo_dependencies(
       tests.examples.modules tests.examples.modules.resiliency
     )
   endif()
@@ -34,16 +36,18 @@ if(HPX_WITH_EXAMPLES)
     source_group("Source Files" FILES ${sources})
 
     # add example executable
-    add_hpx_executable(
+    hpx_local_add_executable(
       ${example_program} INTERNAL_FLAGS
       SOURCES ${sources} ${${example_program}_FLAGS}
       FOLDER "Examples/Modules/Core/Resiliency"
     )
 
-    add_hpx_example_target_dependencies("modules.resiliency" ${example_program})
+    hpx_local_add_example_target_dependencies(
+      "modules.resiliency" ${example_program}
+    )
 
-    if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-      add_hpx_example_test(
+    if(HPXLocal_WITH_TESTS AND HPXLocal_WITH_TESTS_EXAMPLES)
+      hpx_local_add_example_test(
         "modules.resiliency" ${example_program}
         ${${example_program}_PARAMETERS}
       )

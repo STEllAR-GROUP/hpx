@@ -97,7 +97,7 @@
 
 namespace hpx { namespace program_options { namespace detail {
 
-    struct HPX_CORE_EXPORT utf8_codecvt_facet
+    struct HPX_LOCAL_EXPORT utf8_codecvt_facet
       : public std::codecvt<wchar_t, char, std::mbstate_t>
     {
     public:

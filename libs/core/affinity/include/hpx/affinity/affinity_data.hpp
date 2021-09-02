@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -16,13 +16,13 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace threads { namespace policies { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     // Structure holding the information related to thread affinity selection
     // for the shepherd threads of this instance
-    struct HPX_CORE_EXPORT affinity_data
+    struct HPX_LOCAL_EXPORT affinity_data
     {
         affinity_data();
         ~affinity_data();
@@ -107,4 +107,4 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
     };
 }}}}    // namespace hpx::threads::policies::detail
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

@@ -308,7 +308,7 @@ namespace hpx { namespace ranges {
 }}    // namespace hpx::ranges
 #else
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>

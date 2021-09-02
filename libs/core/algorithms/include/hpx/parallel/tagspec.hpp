@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/tagged.hpp>
 
 namespace hpx { namespace parallel { inline namespace v1 {

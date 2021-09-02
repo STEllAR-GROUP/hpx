@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/serialization/detail/pointer.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>

@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_mpi/mpi_future.hpp>
 #include <hpx/modules/errors.hpp>
@@ -58,7 +58,7 @@ namespace hpx { namespace mpi { namespace experimental {
         }
 
         // stream operator to display debug mpi_info
-        HPX_CORE_EXPORT std::ostream& operator<<(
+        HPX_LOCAL_EXPORT std::ostream& operator<<(
             std::ostream& os, mpi_info const&)
         {
             os << "R " << debug::dec<3>(get_mpi_info().rank_) << "/"

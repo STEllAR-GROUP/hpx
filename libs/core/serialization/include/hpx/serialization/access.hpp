@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/serialization/brace_initializable_fwd.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/brace_initializable_traits.hpp>

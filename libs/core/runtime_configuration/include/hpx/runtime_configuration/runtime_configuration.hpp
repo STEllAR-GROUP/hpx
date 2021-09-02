@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/filesystem.hpp>

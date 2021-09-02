@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <hpx/serialization/exception_ptr.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -15,9 +15,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace runtime_local { namespace detail {
-    HPX_CORE_EXPORT void save_custom_exception(
+    HPX_LOCAL_EXPORT void save_custom_exception(
         hpx::serialization::output_archive&, std::exception_ptr const&,
         unsigned int);
-    HPX_CORE_EXPORT void load_custom_exception(
+    HPX_LOCAL_EXPORT void load_custom_exception(
         hpx::serialization::input_archive&, std::exception_ptr&, unsigned int);
 }}}    // namespace hpx::runtime_local::detail

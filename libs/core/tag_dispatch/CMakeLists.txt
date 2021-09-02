@@ -24,13 +24,13 @@ set(tag_dispatch_compat_headers
 
 set(tag_dispatch_sources)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core tag_dispatch
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local tag_dispatch
   GLOBAL_HEADER_GEN ON
   SOURCES ${tag_dispatch_sources}
   HEADERS ${tag_dispatch_headers}
   COMPAT_HEADERS ${tag_dispatch_compat_headers}
-  MODULE_DEPENDENCIES hpx_config hpx_type_support
+  MODULE_DEPENDENCIES hpx_config_local hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
@@ -22,7 +22,7 @@
 #include <cstdint>
 #include <utility>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads {
@@ -44,7 +44,7 @@ namespace hpx { namespace threads {
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a threads is
     /// implemented by the thread-manager.
-    class HPX_CORE_EXPORT thread_data_stackful : public thread_data
+    class HPX_LOCAL_EXPORT thread_data_stackful : public thread_data
     {
     private:
         // Avoid warning about using 'this' in initializer list
@@ -176,4 +176,4 @@ namespace hpx { namespace threads {
     }
 }}    // namespace hpx::threads
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

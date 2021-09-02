@@ -6,44 +6,15 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(subdirs
-    1d_stencil
-    accumulators
-    async_io
-    balancing
-    cancelable_action
-    future_reduce
-    heartbeat
-    jacobi
-    jacobi_smp
-    nqueen
-    performance_counters
-    pipeline
-    quickstart
-    qt
-    random_mem_access
-    spell_check
-    startup_shutdown
-    throttle
-    tuplespace
-    transpose
-)
-
-if(HPX_WITH_EXAMPLES_HDF5)
-  set(subdirs ${subdirs} interpolate1d sheneos)
-endif()
-
-if(HPX_WITH_APEX)
-  set(subdirs ${subdirs} apex)
-endif()
+set(subdirs 1d_stencil balancing future_reduce jacobi_smp quickstart transpose)
 
 foreach(subdir ${subdirs})
-  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-    add_hpx_pseudo_target(tests.examples.${subdir})
-    add_hpx_pseudo_dependencies(tests.examples tests.examples.${subdir})
+  if(HPXLocal_WITH_TESTS AND HPXLocal_WITH_TESTS_EXAMPLES)
+    hpx_local_add_pseudo_target(tests.examples.${subdir})
+    hpx_local_add_pseudo_dependencies(tests.examples tests.examples.${subdir})
   endif()
 
-  add_hpx_pseudo_target(examples.${subdir})
+  hpx_local_add_pseudo_target(examples.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(examples examples.${subdir})
+  hpx_local_add_pseudo_dependencies(examples examples.${subdir})
 endforeach()

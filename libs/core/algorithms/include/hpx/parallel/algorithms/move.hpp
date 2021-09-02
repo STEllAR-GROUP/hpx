@@ -72,7 +72,7 @@ namespace hpx {
 
 #else // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
@@ -188,7 +188,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value)>
     // clang-format on
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 6, "hpx::parallel::move is deprecated, use hpx::move instead")
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<FwdIter1, FwdIter2>>::type

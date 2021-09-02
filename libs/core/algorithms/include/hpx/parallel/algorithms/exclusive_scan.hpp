@@ -285,7 +285,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>
@@ -476,7 +476,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 >
             )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 8,
+    HPX_LOCAL_DEPRECATED_V(1, 8,
         "hpx::parallel::exclusive_scan is deprecated, use hpx::exclusive_scan "
         "instead")
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
@@ -512,7 +512,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 8,
+    HPX_LOCAL_DEPRECATED_V(1, 8,
         "hpx::parallel::exclusive_scan is deprecated, use hpx::exclusive_scan "
         "instead")
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type

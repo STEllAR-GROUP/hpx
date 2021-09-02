@@ -171,7 +171,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -326,7 +326,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >
         )>
     // clang-format on
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 6, "hpx::parallel::equal is deprecated, use hpx::equal instead")
         typename util::detail::algorithm_result<ExPolicy, bool>::type
         equal(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
@@ -430,7 +430,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >
         )>
     // clang-format on
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 6, "hpx::parallel::equal is deprecated, use hpx::equal instead")
         typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type equal(ExPolicy&& policy, FwdIter1 first1,

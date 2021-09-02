@@ -80,13 +80,13 @@ set(threading_base_sources
     thread_pool_base.cpp
 )
 
-if(HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
+if(HPXLocal_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
   set(additional_dependencies hpx_debugging)
 endif()
 
-include(HPX_AddModule)
-add_hpx_module(
-  core threading_base
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local threading_base
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/threading_base/thread_data_stackful.hpp"
                              "hpx/threading_base/thread_data_stackless.hpp"
@@ -99,7 +99,7 @@ add_hpx_module(
     hpx_allocator_support
     hpx_assertion
     hpx_execution_base
-    hpx_config
+    hpx_config_local
     hpx_concurrency
     hpx_coroutines
     hpx_debugging

@@ -21,7 +21,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -33,7 +33,7 @@ namespace hpx { namespace program_options {
         never use second kind of properties \-- they are side effect free.
         @sa options_description
     */
-    class HPX_CORE_EXPORT option_description
+    class HPX_LOCAL_EXPORT option_description
     {
     public:
         option_description();
@@ -149,7 +149,7 @@ namespace hpx { namespace program_options {
 
     /** Class which provides convenient creation syntax to option_description.
      */
-    class HPX_CORE_EXPORT options_description_easy_init
+    class HPX_LOCAL_EXPORT options_description_easy_init
     {
     public:
         options_description_easy_init(options_description* owner);
@@ -174,7 +174,7 @@ namespace hpx { namespace program_options {
         See @ref a_adding_options "here" for option adding interface discussion.
         @sa option_description
     */
-    class HPX_CORE_EXPORT options_description
+    class HPX_LOCAL_EXPORT options_description
     {
     public:
         static const unsigned m_default_line_length;
@@ -230,7 +230,7 @@ namespace hpx { namespace program_options {
         /** Produces a human readable output of 'desc', listing options,
             their descriptions and allowed parameters. Other options_description
             instances previously passed to add will be output separately. */
-        friend HPX_CORE_EXPORT std::ostream& operator<<(
+        friend HPX_LOCAL_EXPORT std::ostream& operator<<(
             std::ostream& os, const options_description& desc);
 
         /** Outputs 'desc' to the specified stream, calling 'f' to output each
@@ -278,4 +278,4 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

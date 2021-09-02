@@ -6,7 +6,7 @@
 
 #include <boost/preprocessor/seq/for_each.hpp>
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <hpx/assert.hpp>
 #include <hpx/async_cuda/cuda_exception.hpp>

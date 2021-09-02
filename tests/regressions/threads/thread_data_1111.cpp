@@ -6,7 +6,7 @@
 
 // This test illustrates #1111: hpx::threads::get_thread_data always returns zero
 
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -28,7 +28,7 @@ int get_thread_num()
     return data ? data->thread_num : 0;
 }
 
-int main()
+int hpx_main()
 {
     std::unique_ptr<thread_data> data_struct(new thread_data());
     data_struct->thread_num = 42;
@@ -38,6 +38,13 @@ int main()
         thread_id, reinterpret_cast<std::size_t>(data_struct.get()));
 
     HPX_TEST_EQ(get_thread_num(), 42);
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char** argv)
+{
+    hpx::local::init(hpx_main, argc, argv);
 
     return hpx::util::report_errors();
 }

@@ -8,7 +8,7 @@ set(tests annotated_minmax_2593 bulk_then_execute_3182 chunk_size_4118
           future_then_async_executor is_executor_1691 parallel_executor_1781
 )
 
-if(HPX_WITH_DATAPAR)
+if(HPXLocal_WITH_DATAPAR)
   set(tests ${tests} lambda_arguments_2403 lambda_return_type_2402)
 endif()
 
@@ -20,7 +20,7 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
@@ -28,6 +28,8 @@ foreach(test ${tests})
     FOLDER "Tests/Regressions/Modules/Core/Execution"
   )
 
-  add_hpx_regression_test("modules.execution" ${test} ${${test}_PARAMETERS})
+  hpx_local_add_regression_test(
+    "modules.execution" ${test} ${${test}_PARAMETERS}
+  )
 
 endforeach()

@@ -59,8 +59,8 @@ void print_results(
     {
         cout << "# BENCHMARK: " << benchmark_name << "\n";
 
-        cout << "# VERSION: " << HPX_HAVE_GIT_COMMIT << " "
-                 << format_build_date() << "\n"
+        cout << "# VERSION: " << HPX_LOCAL_HAVE_GIT_COMMIT << " "
+             << format_build_date() << "\n"
              << "#\n";
 
         // Note that if we change the number of fields above, we have to

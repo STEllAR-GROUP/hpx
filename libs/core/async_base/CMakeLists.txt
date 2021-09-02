@@ -25,14 +25,14 @@ set(async_base_compat_headers
 )
 # cmake-format: on
 
-include(HPX_AddModule)
-add_hpx_module(
-  core async_base
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local async_base
   GLOBAL_HEADER_GEN ON
   HEADERS ${async_base_headers}
   COMPAT_HEADERS ${async_base_compat_headers}
   SOURCES ${async_base_sources}
-  MODULE_DEPENDENCIES hpx_allocator_support hpx_config hpx_coroutines
+  MODULE_DEPENDENCIES hpx_allocator_support hpx_config_local hpx_coroutines
                       hpx_tag_dispatch
   CMAKE_SUBDIRS examples tests
 )

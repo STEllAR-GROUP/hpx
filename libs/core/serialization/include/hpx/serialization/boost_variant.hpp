@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 

@@ -119,7 +119,7 @@ namespace hpx {
 }    // namespace hpx
 #else
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -227,7 +227,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
     template <typename ExPolicy, typename FwdIter,
         typename Pred = detail::equal_to>
-    HPX_DEPRECATED_V(1, 6, "Please use hpx::adjacent_find instead.")
+    HPX_LOCAL_DEPRECATED_V(1, 6, "Please use hpx::adjacent_find instead.")
     inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type>::type
         adjacent_find(ExPolicy&& policy, FwdIter first, FwdIter last,

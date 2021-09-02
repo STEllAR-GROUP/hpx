@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/threading_base/thread_data.hpp>

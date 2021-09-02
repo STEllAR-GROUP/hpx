@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 
@@ -59,7 +59,7 @@ namespace hpx {
 }    // namespace hpx
 
 namespace hpx { namespace util {
-    using bad_any_cast HPX_DEPRECATED_V(1, 6,
+    using bad_any_cast HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::bad_any_cast is deprecated. Use hpx::bad_any_cast "
         "instead.") = hpx::bad_any_cast;
 }}    // namespace hpx::util
@@ -1581,7 +1581,7 @@ namespace hpx { namespace util {
     ////////////////////////////////////////////////////////////////////////////
     // make copyable any
     template <typename T, typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::make_any_nonser is deprecated. Please use "
         "hpx::make_any_nonser instead.")
     basic_any<void, void, void, std::true_type> make_any_nonser(Ts&&... ts)
@@ -1591,7 +1591,7 @@ namespace hpx { namespace util {
     }
 
     template <typename T, typename U, typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::make_any_nonser is deprecated. Please use "
         "hpx::make_any_nonser instead.")
     basic_any<void, void, void, std::true_type> make_any_nonser(
@@ -1620,7 +1620,7 @@ namespace hpx { namespace util {
     ////////////////////////////////////////////////////////////////////////////
     // make unique_any
     template <typename T, typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::make_unique_any_nonser is deprecated. Please use "
         "hpx::make_unique_any_nonser instead.")
     basic_any<void, void, void, std::false_type> make_unique_any_nonser(
@@ -1631,7 +1631,7 @@ namespace hpx { namespace util {
     }
 
     template <typename T, typename U, typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::make_unique_any_nonser is deprecated. Please use "
         "hpx::make_unique_any_nonser instead.")
     basic_any<void, void, void, std::false_type> make_unique_any_nonser(
@@ -1659,7 +1659,7 @@ namespace hpx { namespace util {
 
     // make copyable any
     template <typename T>
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::make_any_nonser is deprecated. Please use "
         "hpx::make_any_nonser instead.")
     basic_any<void, void, void, std::true_type> make_any_nonser(T&& t)
@@ -1676,7 +1676,7 @@ namespace hpx { namespace util {
 
     // make unique_any
     template <typename T>
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::make_unique_any_nonser is deprecated. Please use "
         "hpx::make_unique_any_nonser instead.")
     basic_any<void, void, void, std::false_type> make_unique_any_nonser(T&& t)
@@ -1693,7 +1693,7 @@ namespace hpx { namespace util {
 
     ////////////////////////////////////////////////////////////////////////////
     // better names for copyable any
-    using any_nonser HPX_DEPRECATED_V(1, 6,
+    using any_nonser HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::any_nonser is deprecated. Please use hpx::any_nonser "
         "instead.") = basic_any<void, void, void, std::true_type>;
 
@@ -1703,7 +1703,7 @@ namespace hpx { namespace util {
 
     ////////////////////////////////////////////////////////////////////////////
     // better names for unique_any
-    using unique_any_nonser HPX_DEPRECATED_V(1, 6,
+    using unique_any_nonser HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::unique_any_nonser is deprecated. Please use "
         "hpx::unique_any_nonser instead.") =
         basic_any<void, void, void, std::false_type>;

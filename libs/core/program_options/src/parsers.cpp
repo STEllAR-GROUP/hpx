@@ -90,11 +90,11 @@ namespace hpx { namespace program_options {
         return basic_parsed_options<Char>(result);
     }
 
-    template HPX_CORE_EXPORT basic_parsed_options<char> parse_config_file(
+    template HPX_LOCAL_EXPORT basic_parsed_options<char> parse_config_file(
         std::basic_istream<char>& is, const options_description& desc,
         bool allow_unregistered);
 
-    template HPX_CORE_EXPORT basic_parsed_options<wchar_t> parse_config_file(
+    template HPX_LOCAL_EXPORT basic_parsed_options<wchar_t> parse_config_file(
         std::basic_istream<wchar_t>& is, const options_description& desc,
         bool allow_unregistered);
 
@@ -120,11 +120,11 @@ namespace hpx { namespace program_options {
         return result;
     }
 
-    template HPX_CORE_EXPORT basic_parsed_options<char> parse_config_file(
+    template HPX_LOCAL_EXPORT basic_parsed_options<char> parse_config_file(
         const char* filename, const options_description& desc,
         bool allow_unregistered);
 
-    template HPX_CORE_EXPORT basic_parsed_options<wchar_t> parse_config_file(
+    template HPX_LOCAL_EXPORT basic_parsed_options<wchar_t> parse_config_file(
         const char* filename, const options_description& desc,
         bool allow_unregistered);
 

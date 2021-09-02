@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
 #include <hpx/execution_base/this_thread.hpp>

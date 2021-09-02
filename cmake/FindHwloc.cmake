@@ -16,7 +16,7 @@ if(NOT TARGET Hwloc::hwloc)
     HINTS ${HWLOC_ROOT}
           ENV
           HWLOC_ROOT
-          ${HPX_HWLOC_ROOT}
+          ${HPXLocal_HWLOC_ROOT}
           ${PC_HWLOC_MINIMAL_INCLUDEDIR}
           ${PC_HWLOC_MINIMAL_INCLUDE_DIRS}
           ${PC_HWLOC_INCLUDEDIR}
@@ -30,7 +30,7 @@ if(NOT TARGET Hwloc::hwloc)
     HINTS ${HWLOC_ROOT}
           ENV
           HWLOC_ROOT
-          ${HPX_HWLOC_ROOT}
+          ${HPXLocal_HWLOC_ROOT}
           ${PC_HWLOC_MINIMAL_LIBDIR}
           ${PC_HWLOC_MINIMAL_LIBRARY_DIRS}
           ${PC_HWLOC_LIBDIR}

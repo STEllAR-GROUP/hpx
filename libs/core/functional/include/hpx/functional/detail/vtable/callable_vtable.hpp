@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/detail/empty_function.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
 #include <hpx/functional/invoke.hpp>

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/function.hpp>
 
 #include <chrono>
@@ -78,7 +78,7 @@ namespace hpx { namespace util {
             double time);
     }    // namespace detail
 
-    HPX_CORE_EXPORT void perf_test_report(std::string const& name,
+    HPX_LOCAL_EXPORT void perf_test_report(std::string const& name,
         std::string const& exec, const std::size_t steps,
         function_nonser<void(void)>&& test);
 

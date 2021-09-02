@@ -19,9 +19,9 @@ set(threadmanager_compat_headers
 
 set(threadmanager_sources threadmanager.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core threadmanager
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local threadmanager
   GLOBAL_HEADER_GEN OFF
   SOURCES ${threadmanager_sources}
   HEADERS ${threadmanager_headers}

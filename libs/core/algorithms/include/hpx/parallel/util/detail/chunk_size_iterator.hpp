@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>

@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include "worker_timed.hpp"
 
@@ -62,8 +62,8 @@ void print_results(
     {
         cout << "# BENCHMARK: " << benchmark_name << "\n";
 
-        cout << "# VERSION: " << HPX_HAVE_GIT_COMMIT << " "
-                 << format_build_date() << "\n"
+        cout << "# VERSION: " << HPX_LOCAL_HAVE_GIT_COMMIT << " "
+             << format_build_date() << "\n"
              << "#\n";
 
         // Note that if we change the number of fields above, we have to

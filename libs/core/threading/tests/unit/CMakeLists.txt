@@ -24,12 +24,12 @@ set(threading_tests
     thread_yield
 )
 
-if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
+if(HPXLocal_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set(threading_tests ${threading_tests} thread_stacksize_overflow)
   set(threading_tests ${threading_tests} thread_stacksize_overflow_v2)
 endif()
 
-if(HPX_WITH_THREAD_LOCAL_STORAGE)
+if(HPXLocal_WITH_THREAD_LOCAL_STORAGE)
   set(threading_tests ${threading_tests} tss)
 endif()
 
@@ -53,14 +53,14 @@ foreach(test ${threading_tests})
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL
     FOLDER "Tests/Unit/Modules/Core/Threading"
   )
 
-  add_hpx_unit_test("modules.threading" ${test})
+  hpx_local_add_unit_test("modules.threading" ${test})
 
 endforeach()
 
@@ -69,7 +69,7 @@ set_tests_properties(
   PROPERTIES PASS_REGULAR_EXPRESSION "std::terminate called\n"
 )
 
-if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
+if(HPXLocal_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set_tests_properties(
     tests.unit.threads.thread_stacksize_overflow
     PROPERTIES PASS_REGULAR_EXPRESSION

@@ -6,18 +6,18 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/function.hpp>
 
 #include <cstddef>
 #include <deque>
 #include <exception>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies {
-    class HPX_CORE_EXPORT callback_notifier
+    class HPX_LOCAL_EXPORT callback_notifier
     {
     public:
         typedef util::function_nonser<void(
@@ -97,4 +97,4 @@ namespace hpx { namespace threads { namespace policies {
 
 }}}    // namespace hpx::threads::policies
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

@@ -15,9 +15,9 @@ set(init_runtime_local_headers
 
 set(init_runtime_local_sources init_logging.cpp init_runtime_local.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core init_runtime_local
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local init_runtime_local
   GLOBAL_HEADER_GEN ON
   SOURCES ${init_runtime_local_sources}
   HEADERS ${init_runtime_local_headers}

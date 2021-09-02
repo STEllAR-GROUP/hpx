@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/hashing.hpp>
 #include <hpx/preprocessor/stringize.hpp>
@@ -32,12 +32,12 @@ namespace hpx { namespace serialization { namespace detail {
     public:
         polymorphic_intrusive_factory() {}
 
-        HPX_CORE_EXPORT static polymorphic_intrusive_factory& instance();
+        HPX_LOCAL_EXPORT static polymorphic_intrusive_factory& instance();
 
-        HPX_CORE_EXPORT void register_class(
+        HPX_LOCAL_EXPORT void register_class(
             std::string const& name, ctor_type fun);
 
-        HPX_CORE_EXPORT void* create(std::string const& name) const;
+        HPX_LOCAL_EXPORT void* create(std::string const& name) const;
 
         template <typename T>
         T* create(std::string const& name) const

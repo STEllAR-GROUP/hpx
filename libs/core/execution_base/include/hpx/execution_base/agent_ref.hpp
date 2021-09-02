@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <chrono>
@@ -17,7 +17,7 @@ namespace hpx { namespace execution_base {
 
     struct agent_base;
 
-    class HPX_CORE_EXPORT agent_ref
+    class HPX_LOCAL_EXPORT agent_ref
     {
     public:
         constexpr agent_ref() noexcept
@@ -99,7 +99,7 @@ namespace hpx { namespace execution_base {
             return lhs.impl_ != rhs.impl_;
         }
 
-        HPX_CORE_EXPORT friend std::ostream& operator<<(
+        HPX_LOCAL_EXPORT friend std::ostream& operator<<(
             std::ostream&, agent_ref const&);
     };
 }}    // namespace hpx::execution_base

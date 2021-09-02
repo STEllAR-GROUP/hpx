@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -64,7 +64,7 @@ namespace hpx { namespace program_options {
         - stores the passed char-based options for later use.
     */
     template <>
-    class HPX_CORE_EXPORT basic_parsed_options<wchar_t>
+    class HPX_LOCAL_EXPORT basic_parsed_options<wchar_t>
     {
     public:
         /** Constructs wrapped options from options in UTF8 encoding. */
@@ -177,7 +177,7 @@ namespace hpx { namespace program_options {
         Read from given stream.
     */
     template <class Char>
-    HPX_CORE_EXPORT basic_parsed_options<Char> parse_config_file(
+    HPX_LOCAL_EXPORT basic_parsed_options<Char> parse_config_file(
         std::basic_istream<Char>&, const options_description&,
         bool allow_unregistered = false);
 
@@ -187,7 +187,7 @@ namespace hpx { namespace program_options {
         passed to the file stream.
     */
     template <class Char = char>
-    HPX_CORE_EXPORT basic_parsed_options<Char> parse_config_file(
+    HPX_LOCAL_EXPORT basic_parsed_options<Char> parse_config_file(
         const char* filename, const options_description&,
         bool allow_unregistered = false);
 
@@ -219,7 +219,8 @@ namespace hpx { namespace program_options {
         This is done since naming of environment variables is typically
         different from the naming of command line options.
     */
-    HPX_CORE_EXPORT parsed_options parse_environment(const options_description&,
+    HPX_LOCAL_EXPORT parsed_options parse_environment(
+        const options_description&,
         const std::function<std::string(std::string)>& name_mapper);
 
     /** Parse environment.
@@ -228,7 +229,7 @@ namespace hpx { namespace program_options {
         name is obtained from variable name by removing the prefix and
         converting the remaining string into lower case.
     */
-    HPX_CORE_EXPORT parsed_options parse_environment(
+    HPX_LOCAL_EXPORT parsed_options parse_environment(
         const options_description&, const std::string& prefix);
 
     /** @overload
@@ -236,7 +237,7 @@ namespace hpx { namespace program_options {
         functions when second argument is of 'char*' type. There's implicit
         conversion to both std::function and string.
     */
-    HPX_CORE_EXPORT parsed_options parse_environment(
+    HPX_LOCAL_EXPORT parsed_options parse_environment(
         const options_description&, const char* prefix);
 
     /** Splits a given string to a collection of single strings which
@@ -246,12 +247,12 @@ namespace hpx { namespace program_options {
         Splitting is done in a unix style way, with respect to quotes '"'
         and escape characters '\'
     */
-    HPX_CORE_EXPORT std::vector<std::string> split_unix(
+    HPX_LOCAL_EXPORT std::vector<std::string> split_unix(
         const std::string& cmdline, const std::string& separator = " \t",
         const std::string& quote = "'\"", const std::string& escape = "\\");
 
     /** @overload */
-    HPX_CORE_EXPORT std::vector<std::wstring> split_unix(
+    HPX_LOCAL_EXPORT std::vector<std::wstring> split_unix(
         const std::wstring& cmdline, const std::wstring& separator = L" \t",
         const std::wstring& quote = L"'\"", const std::wstring& escape = L"\\");
 
@@ -262,16 +263,16 @@ namespace hpx { namespace program_options {
         runtime library and if it always exists.
         This function is available only on Windows.
     */
-    HPX_CORE_EXPORT std::vector<std::string> split_winmain(
+    HPX_LOCAL_EXPORT std::vector<std::string> split_winmain(
         const std::string& cmdline);
 
     /** @overload */
-    HPX_CORE_EXPORT std::vector<std::wstring> split_winmain(
+    HPX_LOCAL_EXPORT std::vector<std::wstring> split_winmain(
         const std::wstring& cmdline);
 #endif
 
 }}    // namespace hpx::program_options
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>
 
 #include <hpx/program_options/detail/parsers.hpp>

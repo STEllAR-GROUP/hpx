@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>

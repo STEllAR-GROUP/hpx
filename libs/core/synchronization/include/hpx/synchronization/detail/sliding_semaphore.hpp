@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
@@ -28,23 +28,25 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         typedef lcos::local::spinlock mutex_type;
 
     public:
-        HPX_CORE_EXPORT sliding_semaphore(
+        HPX_LOCAL_EXPORT sliding_semaphore(
             std::int64_t max_difference, std::int64_t lower_limit);
-        HPX_CORE_EXPORT ~sliding_semaphore();
+        HPX_LOCAL_EXPORT ~sliding_semaphore();
 
-        HPX_CORE_EXPORT void set_max_difference(std::unique_lock<mutex_type>& l,
-            std::int64_t max_difference, std::int64_t lower_limit);
+        HPX_LOCAL_EXPORT void set_max_difference(
+            std::unique_lock<mutex_type>& l, std::int64_t max_difference,
+            std::int64_t lower_limit);
 
-        HPX_CORE_EXPORT void wait(
+        HPX_LOCAL_EXPORT void wait(
             std::unique_lock<mutex_type>& l, std::int64_t upper_limit);
 
-        HPX_CORE_EXPORT bool try_wait(
+        HPX_LOCAL_EXPORT bool try_wait(
             std::unique_lock<mutex_type>& l, std::int64_t upper_limit);
 
-        HPX_CORE_EXPORT void signal(
+        HPX_LOCAL_EXPORT void signal(
             std::unique_lock<mutex_type> l, std::int64_t lower_limit);
 
-        HPX_CORE_EXPORT std::int64_t signal_all(std::unique_lock<mutex_type> l);
+        HPX_LOCAL_EXPORT std::int64_t signal_all(
+            std::unique_lock<mutex_type> l);
 
     private:
         std::int64_t max_difference_;

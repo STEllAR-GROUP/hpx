@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_base/scheduling_properties.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>

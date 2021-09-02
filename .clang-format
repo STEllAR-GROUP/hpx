@@ -71,13 +71,13 @@ DerivePointerAlignment: false
 FixNamespaceComments: true
 # ForEachMacros: ['']
 IncludeCategories:
-  - Regex:           '^<hpx/config\.hpp>'
+  - Regex:           '^<hpx/local/config\.hpp>'
     Priority:        1
-  - Regex:           '^<hpx/config/.*\.hpp>'
+  - Regex:           '^<hpx/local/config/defines\.hpp>'
     Priority:        2
-  - Regex:           '^<hpx/.*/config\.hpp>'
+  - Regex:           '^<hpx/local/config/.*>'
     Priority:        3
-  - Regex:           '^<hpx/.*/config/defines\.hpp>'
+  - Regex:           '^<hpx/.*/config\.hpp>'
     Priority:        4
   - Regex:           '^<hpx/.*\.hpp>'
     Priority:        5

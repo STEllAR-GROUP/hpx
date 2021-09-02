@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if defined(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
 

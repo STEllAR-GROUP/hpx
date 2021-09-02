@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config/constexpr.hpp>
+#include <hpx/local/config/constexpr.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/functional/invoke_result.hpp>

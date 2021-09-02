@@ -12,7 +12,7 @@
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 #if !defined(HPX_MODULE_STATIC_LINKING)
-#if defined(HPX_CORE_EXPORTS)
+#if defined(HPX_LOCAL_EXPORTS)
 #define HPX_CONFIG_REGISTRY_EXPORT __declspec(dllexport)
 #else
 #define HPX_CONFIG_REGISTRY_EXPORT __declspec(dllimport)
@@ -20,7 +20,7 @@
 #endif
 #elif defined(__NVCC__) || defined(__CUDACC__)
 #define HPX_CONFIG_REGISTRY_EXPORT /* empty */
-#elif defined(HPX_CORE_EXPORTS)
+#elif defined(HPX_LOCAL_EXPORTS)
 #define HPX_CONFIG_REGISTRY_EXPORT __attribute__((visibility("default")))
 #endif
 

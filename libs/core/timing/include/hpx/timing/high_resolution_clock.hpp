@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if defined(__bgq__)
 #include <hwi/include/bqc/A2_inlines.h>
@@ -52,7 +52,7 @@ namespace hpx { namespace chrono {
 }}    // namespace hpx::chrono
 
 namespace hpx { namespace util {
-    using high_resolution_clock HPX_DEPRECATED_V(1, 6,
+    using high_resolution_clock HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::high_resolution_clock is deprecated. Use "
         "hpx::chrono::high_resolution_clock instead.") =
         hpx::chrono::high_resolution_clock;

@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/assert.hpp>
@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace cuda { namespace experimental {
 
@@ -37,7 +37,7 @@ namespace hpx { namespace cuda { namespace experimental {
     struct target
     {
     public:
-        struct HPX_CORE_EXPORT native_handle_type
+        struct HPX_LOCAL_EXPORT native_handle_type
         {
             typedef hpx::lcos::local::spinlock mutex_type;
 
@@ -172,14 +172,14 @@ namespace hpx { namespace cuda { namespace experimental {
     };
 
     using detail::get_future_with_callback;
-    HPX_CORE_EXPORT target& get_default_target();
+    HPX_LOCAL_EXPORT target& get_default_target();
 }}}    // namespace hpx::cuda::experimental
 
 namespace hpx { namespace compute { namespace cuda {
-    using target HPX_DEPRECATED_V(1, 6,
+    using target HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::compute::cuda::target is deprecated. Please use "
         "hpx::cuda::experimental::target instead.") =
         hpx::cuda::experimental::target;
 }}}    // namespace hpx::compute::cuda
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

@@ -8,9 +8,9 @@
 set(subdirs detail util)
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.modules.algorithms.${subdir})
+  hpx_local_add_pseudo_target(tests.unit.modules.algorithms.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(
+  hpx_local_add_pseudo_dependencies(
     tests.unit.modules.algorithms tests.unit.modules.algorithms.${subdir}
   )
 endforeach()
@@ -150,7 +150,7 @@ set(tests
     unique_copy
 )
 
-if(HPX_WITH_CXX17_STD_EXECUTION_POLICES)
+if(HPXLocal_WITH_CXX17_STD_EXECUTION_POLICES)
   set(tests ${tests} foreach_std_policies)
 endif()
 
@@ -164,7 +164,7 @@ foreach(test ${tests})
   set(folder_name "Tests/Unit/Modules/Core/Algorithms")
 
   # add example executable
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
@@ -172,5 +172,5 @@ foreach(test ${tests})
     FOLDER ${folder_name}
   )
 
-  add_hpx_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
+  hpx_local_add_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
 endforeach()

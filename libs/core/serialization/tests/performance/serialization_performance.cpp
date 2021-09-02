@@ -5,12 +5,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/local/version.hpp>
 #include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/version.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -192,7 +192,7 @@ void hpx_serialization_test(std::size_t iterations)
         throw std::logic_error("hpx's case: deserialization failed");
     }
 
-    std::cout << "hpx: version = " << hpx::full_version_as_string()
+    std::cout << "hpx: version = " << hpx::local::full_version_as_string()
               << std::endl;
     std::cout << "hpx: size    = " << serialized.size() << " bytes"
               << std::endl;

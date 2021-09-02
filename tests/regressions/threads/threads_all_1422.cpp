@@ -7,7 +7,7 @@
 // This test demonstrates the issue described in #1422: hpx:threads=all
 // allocates too many os threads
 
-#include <hpx/init.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/local/runtime.hpp>
 #include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
@@ -28,7 +28,7 @@ int hpx_main()
 
     HPX_TEST_EQ(num_cores, os_threads);
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char** argv)
@@ -40,10 +40,10 @@ int main(int argc, char** argv)
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.cfg = cfg;
 
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, init_args), 0,
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv, init_args), 0,
         "HPX main exited with non-zero status");
     return hpx::util::report_errors();
 }

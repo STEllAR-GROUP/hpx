@@ -18,11 +18,12 @@ spack load ninja@1.10.0
 export CXX=`which CC`
 export CC=`which cc`
 
-configure_extra_options+=" -DHPX_WITH_MALLOC=system"
-configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"
-configure_extra_options+=" -DHPX_WITH_CXX${CXX_STD}=ON"
-configure_extra_options+=" -DHPX_WITH_CUDA=ON"
-configure_extra_options+=" -DHPX_WITH_EXAMPLES_OPENMP=ON"
-configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
-configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
+configure_extra_options+=" -DHPXLocal_CXX_STANDARD=${CXX_STD}"
+configure_extra_options+=" -DHPXLocal_WITH_MALLOC=system"
+configure_extra_options+=" -DHPXLocal_WITH_FETCH_ASIO=ON"
+configure_extra_options+=" -DHPXLocal_WITH_CUDA=ON"
+configure_extra_options+=" -DHPXLocal_WITH_EXAMPLES_OPENMP=ON"
+configure_extra_options+=" -DHPXLocal_WITH_COMPILER_WARNINGS=ON"
+configure_extra_options+=" -DHPXLocal_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
+configure_extra_options+=" -DHPXLocal_WITH_TESTS_HEADERS=ON"
 configure_extra_options+=" -DHWLOC_ROOT=${EBROOTHWLOC}"

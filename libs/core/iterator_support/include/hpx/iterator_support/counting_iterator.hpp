@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/iterator_support/range.hpp>

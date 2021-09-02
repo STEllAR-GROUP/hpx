@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/futures/future.hpp>
 
 #include <hpx/executors/execution_policy.hpp>

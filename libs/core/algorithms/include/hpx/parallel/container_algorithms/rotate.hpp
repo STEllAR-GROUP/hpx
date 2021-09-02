@@ -383,7 +383,7 @@ namespace hpx { namespace ranges {
 
 #else
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -410,7 +410,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_range<Rng>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 8,
+    HPX_LOCAL_DEPRECATED_V(1, 8,
         "hpx::parallel::rotate is deprecated, use hpx::ranges::rotate instead")
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<hpx::traits::range_iterator_t<Rng>,
@@ -431,7 +431,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator_v<OutIter>
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 8,
+    HPX_LOCAL_DEPRECATED_V(1, 8,
         "hpx::parallel::rotate_copy is deprecated, use "
         "hpx::ranges::rotate_copy instead")
         typename util::detail::algorithm_result<ExPolicy,

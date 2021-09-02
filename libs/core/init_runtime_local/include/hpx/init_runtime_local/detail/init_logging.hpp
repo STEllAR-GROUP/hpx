@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 
@@ -21,7 +21,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     // custom log destination: send generated strings to console
-    struct HPX_CORE_EXPORT console_local : logging::destination::manipulator
+    struct HPX_LOCAL_EXPORT console_local : logging::destination::manipulator
     {
         console_local(logging::level level, logging_destination dest)
           : level_(level)
@@ -51,34 +51,34 @@ namespace hpx { namespace util {
             std::string format_;
         };
 
-        HPX_CORE_EXPORT void define_common_formatters(
+        HPX_LOCAL_EXPORT void define_common_formatters(
             logging::writer::named_write& writer);
 
-        HPX_CORE_EXPORT void define_formatters_local(
+        HPX_LOCAL_EXPORT void define_formatters_local(
             logging::writer::named_write& writer);
 
-        HPX_CORE_EXPORT log_settings get_log_settings(
+        HPX_LOCAL_EXPORT log_settings get_log_settings(
             util::section const&, char const*);
 
-        HPX_CORE_EXPORT void init_logging(runtime_configuration& ini,
+        HPX_LOCAL_EXPORT void init_logging(runtime_configuration& ini,
             bool isconsole,
             void (*set_console_dest)(logging::writer::named_write&, char const*,
                 logging::level, logging_destination),
             void (*define_formatters)(logging::writer::named_write&));
 
-        HPX_CORE_EXPORT void init_logging_local(runtime_configuration&);
+        HPX_LOCAL_EXPORT void init_logging_local(runtime_configuration&);
     }    // namespace detail
 
     /// \endcond
 
     //////////////////////////////////////////////////////////////////////////
     /// Enable logging for given destination
-    HPX_CORE_EXPORT void enable_logging(logging_destination dest,
+    HPX_LOCAL_EXPORT void enable_logging(logging_destination dest,
         std::string const& lvl = "5", std::string logdest = "",
         std::string logformat = "");
 
     /// Disable all logging for the given destination
-    HPX_CORE_EXPORT void disable_logging(logging_destination dest);
+    HPX_LOCAL_EXPORT void disable_logging(logging_destination dest);
 }}    // namespace hpx::util
 
 #else    // HPX_HAVE_LOGGING
@@ -86,15 +86,15 @@ namespace hpx { namespace util {
 namespace hpx { namespace util {
     namespace detail {
 
-        HPX_CORE_EXPORT void warn_if_logging_requested(runtime_configuration&);
+        HPX_LOCAL_EXPORT void warn_if_logging_requested(runtime_configuration&);
     }
 
     //////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT void enable_logging(logging_destination dest,
+    HPX_LOCAL_EXPORT void enable_logging(logging_destination dest,
         std::string const& lvl = "5", std::string logdest = "",
         std::string logformat = "");
 
-    HPX_CORE_EXPORT void disable_logging(logging_destination dest);
+    HPX_LOCAL_EXPORT void disable_logging(logging_destination dest);
 }}    // namespace hpx::util
 
 #endif    // HPX_HAVE_LOGGING

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/threading_base.hpp>
@@ -31,7 +31,7 @@ namespace hpx { namespace util {
 
 namespace hpx { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_CORE_EXPORT interval_timer
+    class HPX_LOCAL_EXPORT interval_timer
       : public std::enable_shared_from_this<interval_timer>
     {
     private:
@@ -102,7 +102,7 @@ namespace hpx { namespace util { namespace detail {
 }}}    // namespace hpx::util::detail
 
 namespace hpx { namespace util {
-    class HPX_CORE_EXPORT interval_timer
+    class HPX_LOCAL_EXPORT interval_timer
     {
     public:
         HPX_NON_COPYABLE(interval_timer);

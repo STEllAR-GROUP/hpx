@@ -7,7 +7,7 @@
 #pragma once
 
 // clang-format off
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if defined(HPX_HAVE_HIP)
 

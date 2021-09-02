@@ -63,7 +63,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/deferred_call.hpp>

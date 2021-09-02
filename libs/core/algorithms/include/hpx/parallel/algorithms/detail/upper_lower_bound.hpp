@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/distance.hpp>

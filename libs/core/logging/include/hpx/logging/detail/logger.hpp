@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/level.hpp>
 #include <hpx/modules/format.hpp>
@@ -166,7 +166,7 @@ namespace hpx { namespace util { namespace logging {
         }
 
     public:
-        HPX_CORE_EXPORT void turn_cache_off();
+        HPX_LOCAL_EXPORT void turn_cache_off();
 
         // called after all data has been gathered
         void write(message msg)

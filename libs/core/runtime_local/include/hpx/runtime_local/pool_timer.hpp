@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <memory>
 #include <string>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util { namespace detail {
 
@@ -22,7 +22,7 @@ namespace hpx { namespace util { namespace detail {
 
 namespace hpx { namespace util {
 
-    class HPX_CORE_EXPORT pool_timer
+    class HPX_LOCAL_EXPORT pool_timer
     {
     public:
         HPX_NON_COPYABLE(pool_timer);
@@ -48,4 +48,4 @@ namespace hpx { namespace util {
     };
 }}    // namespace hpx::util
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

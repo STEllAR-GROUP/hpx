@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/executors/execution_policy_fwd.hpp>
 #include <hpx/functional/function.hpp>
@@ -181,10 +181,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         using exception_list_termination_handler_type =
             hpx::util::function_nonser<void()>;
 
-        HPX_CORE_EXPORT void set_exception_list_termination_handler(
+        HPX_LOCAL_EXPORT void set_exception_list_termination_handler(
             exception_list_termination_handler_type f);
 
-        HPX_NORETURN HPX_CORE_EXPORT void exception_list_termination_handler();
+        HPX_NORETURN HPX_LOCAL_EXPORT void exception_list_termination_handler();
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>

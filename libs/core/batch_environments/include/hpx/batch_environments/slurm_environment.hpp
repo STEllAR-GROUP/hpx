@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <cstddef>
 #include <string>
@@ -17,7 +17,7 @@ namespace hpx { namespace util { namespace batch_environments {
 
     struct slurm_environment
     {
-        HPX_CORE_EXPORT slurm_environment(
+        HPX_LOCAL_EXPORT slurm_environment(
             std::vector<std::string>& nodelist, bool debug);
 
         bool valid() const
@@ -47,10 +47,10 @@ namespace hpx { namespace util { namespace batch_environments {
         std::size_t num_localities_;
         bool valid_;
 
-        HPX_CORE_EXPORT void retrieve_number_of_localities(bool debug);
-        HPX_CORE_EXPORT void retrieve_number_of_tasks(bool debug);
-        HPX_CORE_EXPORT void retrieve_nodelist(
+        HPX_LOCAL_EXPORT void retrieve_number_of_localities(bool debug);
+        HPX_LOCAL_EXPORT void retrieve_number_of_tasks(bool debug);
+        HPX_LOCAL_EXPORT void retrieve_nodelist(
             std::vector<std::string>& nodes, bool debug);
-        HPX_CORE_EXPORT void retrieve_number_of_threads();
+        HPX_LOCAL_EXPORT void retrieve_number_of_threads();
     };
 }}}    // namespace hpx::util::batch_environments

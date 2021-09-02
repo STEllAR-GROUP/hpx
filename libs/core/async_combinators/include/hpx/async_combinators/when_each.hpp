@@ -125,7 +125,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/when_some.hpp>
 #include <hpx/datastructures/tuple.hpp>

@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 
 namespace hpx { namespace components {
 
-    struct HPX_CORE_EXPORT component_factory_base;
+    struct HPX_LOCAL_EXPORT component_factory_base;
 }}    // namespace hpx::components
 
 ///////////////////////////////////////////////////////////////////////////////

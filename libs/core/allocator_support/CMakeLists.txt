@@ -21,14 +21,14 @@ set(allocator_support_compat_headers
 
 set(allocator_support_sources)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core allocator_support
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local allocator_support
   GLOBAL_HEADER_GEN ON
   SOURCES ${allocator_support_sources}
   HEADERS ${allocator_support_headers}
   COMPAT_HEADERS ${allocator_support_compat_headers}
-  DEPENDENCIES hpx_dependencies_allocator
-  MODULE_DEPENDENCIES hpx_concepts hpx_config hpx_preprocessor
+  DEPENDENCIES hpx_local_dependencies_allocator
+  MODULE_DEPENDENCIES hpx_concepts hpx_config_local hpx_preprocessor
   CMAKE_SUBDIRS examples tests
 )

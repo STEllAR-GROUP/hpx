@@ -16,16 +16,16 @@ set(prefix_compat_headers
 
 set(prefix_sources find_prefix.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core prefix
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local prefix
   GLOBAL_HEADER_GEN ON
   SOURCES ${prefix_sources}
   HEADERS ${prefix_headers}
   COMPAT_HEADERS ${prefix_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
-    hpx_config
+    hpx_config_local
     hpx_errors
     hpx_filesystem
     hpx_plugin

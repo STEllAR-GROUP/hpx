@@ -103,7 +103,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>

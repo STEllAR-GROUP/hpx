@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config/compiler_specific.hpp>
+#include <hpx/local/config/compiler_specific.hpp>
 
 #if defined(HPX_WINDOWS)
 #define HPX_HAVE_THREADS_GET_STACK_POINTER

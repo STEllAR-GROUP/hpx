@@ -35,7 +35,7 @@
 #pragma warning(disable : 4355)    //this used in base member initializer
 #endif
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/coroutine_fwd.hpp>
 #include <hpx/coroutines/detail/context_base.hpp>
@@ -77,11 +77,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
 #if defined(HPX_DEBUG)
-        HPX_CORE_EXPORT ~coroutine_impl();
+        HPX_LOCAL_EXPORT ~coroutine_impl();
 #endif
 
         // execute the coroutine using normal context switching
-        HPX_CORE_EXPORT void operator()() noexcept;
+        HPX_LOCAL_EXPORT void operator()() noexcept;
 
     public:
         void bind_result(result_type res)

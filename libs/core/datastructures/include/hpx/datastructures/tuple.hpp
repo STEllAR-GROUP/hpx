@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/config/defines.hpp>
 #include <hpx/datastructures/member_pack.hpp>
 #include <hpx/modules/type_support.hpp>
@@ -1024,25 +1024,25 @@ namespace hpx {
 }    // namespace hpx
 
 namespace hpx { namespace util {
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 6, "hpx::util::ignore is deprecated. Use hpx::ignore instead.")
     hpx::detail::ignore_type const ignore = {};
 
     template <typename... Ts>
-    using tuple HPX_DEPRECATED_V(
+    using tuple HPX_LOCAL_DEPRECATED_V(
         1, 6, "hpx::util::tuple is deprecated. Use hpx::tuple instead.") =
         hpx::tuple<Ts...>;
     template <typename T>
-    using tuple_size HPX_DEPRECATED_V(1, 6,
+    using tuple_size HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::tuple_size is deprecated. Use hpx::tuple_size instead.") =
         hpx::tuple_size<T>;
     template <std::size_t I, typename T>
-    using tuple_element HPX_DEPRECATED_V(1, 6,
+    using tuple_element HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::tuple_element is deprecated. Use hpx::tuple_size "
         "instead.") = hpx::tuple_element<I, T>;
 
     template <typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::make_tuple is deprecated. Use hpx::make_tuple instead.")
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto make_tuple(Ts&&... vs)
     {
@@ -1050,7 +1050,7 @@ namespace hpx { namespace util {
     }
 
     template <typename... Ts>
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 6, "hpx::util::tie is deprecated. Use hpx::tie instead.")
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tie(Ts&&... vs)
     {
@@ -1058,7 +1058,7 @@ namespace hpx { namespace util {
     }
 
     template <typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::forward_as_tuple is deprecated. Use hpx::forward_as_tuple "
         "instead.")
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto forward_as_tuple(Ts&&... vs)
@@ -1067,7 +1067,7 @@ namespace hpx { namespace util {
     }
 
     template <typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::tuple_cat is deprecated. Use hpx::tuple_cat "
         "instead.")
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(Ts&&... vs)
@@ -1076,7 +1076,7 @@ namespace hpx { namespace util {
     }
 
     template <std::size_t I, typename Tuple>
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::util::get is deprecated. Use hpx::get "
         "instead.")
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto get(Tuple&& tuple)

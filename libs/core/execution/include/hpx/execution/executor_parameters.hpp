@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <hpx/execution/executors/auto_chunk_size.hpp>
 #include <hpx/execution/executors/dynamic_chunk_size.hpp>

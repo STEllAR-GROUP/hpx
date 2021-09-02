@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <boost/utility/string_ref.hpp>
 
@@ -253,11 +253,11 @@ namespace hpx { namespace util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CORE_EXPORT void format_to(std::ostream& os,
+        HPX_LOCAL_EXPORT void format_to(std::ostream& os,
             boost::string_ref format_str, format_arg const* args,
             std::size_t count);
 
-        HPX_CORE_EXPORT std::string format(boost::string_ref format_str,
+        HPX_LOCAL_EXPORT std::string format(boost::string_ref format_str,
             format_arg const* args, std::size_t count);
     }    // namespace detail
 

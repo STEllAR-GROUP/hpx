@@ -35,16 +35,16 @@ set(iterator_support_compat_headers
 
 set(iterator_support_sources)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core iterator_support
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local iterator_support
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/iterator_support/traits/is_iterator.hpp"
                              "hpx/iterator_support/traits/is_range.hpp"
   SOURCES ${iterator_support_sources}
   HEADERS ${iterator_support_headers}
   COMPAT_HEADERS ${iterator_support_compat_headers}
-  MODULE_DEPENDENCIES hpx_config hpx_datastructures hpx_functional
+  MODULE_DEPENDENCIES hpx_config_local hpx_datastructures hpx_functional
                       hpx_serialization hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/config/endian.hpp>
+#include <hpx/local/config.hpp>
+#include <hpx/local/config/endian.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>

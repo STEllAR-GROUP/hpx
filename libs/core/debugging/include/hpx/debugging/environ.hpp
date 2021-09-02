@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 // The 'environ' should be declared in some cases. E.g. Linux man page says:
 // (This variable must be declared in the user program, but is declared in
@@ -37,7 +37,7 @@ extern char*** _NSGetEnviron(void);
 // On FreeBSD the environment is available for executables only, so needs to be
 // handled explicitly (e.g. see hpx_init_impl.hpp)
 // The variable is defined in .../runtime_local/src/custom_exception_info.cpp
-extern HPX_CORE_EXPORT char** freebsd_environ;
+extern HPX_LOCAL_EXPORT char** freebsd_environ;
 #else
 extern char** environ;
 #endif

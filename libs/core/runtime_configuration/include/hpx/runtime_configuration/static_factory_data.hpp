@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/preprocessor/cat.hpp>
@@ -26,26 +26,26 @@ namespace hpx { namespace components {
         hpx::util::plugin::get_plugins_list_type get_factory;
     };
 
-    HPX_CORE_EXPORT bool& get_initial_static_loading();
+    HPX_LOCAL_EXPORT bool& get_initial_static_loading();
 
-    HPX_CORE_EXPORT std::vector<static_factory_load_data_type>&
+    HPX_LOCAL_EXPORT std::vector<static_factory_load_data_type>&
     get_static_module_data();
-    HPX_CORE_EXPORT
+    HPX_LOCAL_EXPORT
     void init_registry_module(static_factory_load_data_type const&);
 
-    HPX_CORE_EXPORT bool get_static_factory(
+    HPX_LOCAL_EXPORT bool get_static_factory(
         std::string const& instance, util::plugin::get_plugins_list_type& f);
-    HPX_CORE_EXPORT
+    HPX_LOCAL_EXPORT
     void init_registry_factory(static_factory_load_data_type const&);
 
-    HPX_CORE_EXPORT bool get_static_commandline(
+    HPX_LOCAL_EXPORT bool get_static_commandline(
         std::string const& instance, util::plugin::get_plugins_list_type& f);
-    HPX_CORE_EXPORT
+    HPX_LOCAL_EXPORT
     void init_registry_commandline(static_factory_load_data_type const&);
 
-    HPX_CORE_EXPORT bool get_static_startup_shutdown(
+    HPX_LOCAL_EXPORT bool get_static_startup_shutdown(
         std::string const& instance, util::plugin::get_plugins_list_type& f);
-    HPX_CORE_EXPORT
+    HPX_LOCAL_EXPORT
     void init_registry_startup_shutdown(static_factory_load_data_type const&);
 }}    // namespace hpx::components
 

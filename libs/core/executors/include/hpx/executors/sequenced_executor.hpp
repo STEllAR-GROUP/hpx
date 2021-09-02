@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/errors/exception_list.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
@@ -139,7 +139,7 @@ namespace hpx { namespace execution {
 }}    // namespace hpx::execution
 
 namespace hpx { namespace parallel { namespace execution {
-    using sequenced_executor HPX_DEPRECATED_V(1, 6,
+    using sequenced_executor HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::sequenced_executor is deprecated. Use "
         "hpx::execution::sequenced_executor instead.") =
         hpx::execution::sequenced_executor;

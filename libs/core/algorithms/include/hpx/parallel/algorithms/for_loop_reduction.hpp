@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>

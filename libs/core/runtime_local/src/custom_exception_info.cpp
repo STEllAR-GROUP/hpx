@@ -5,10 +5,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/futures/futures_factory.hpp>
+#include <hpx/local/version.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
@@ -23,7 +24,6 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/version.hpp>
 
 #if defined(HPX_WINDOWS)
 #include <process.h>
@@ -46,8 +46,6 @@
 #include <vector>
 
 namespace hpx {
-    char const* get_runtime_state_name(state st);
-
     ///////////////////////////////////////////////////////////////////////////
     // For testing purposes we sometime expect to see exceptions, allow those
     // to go through without attaching a debugger.
@@ -72,7 +70,7 @@ namespace hpx {
         // add full build information
         if (verbosity >= 2)
         {
-            strm << full_build_string();
+            strm << hpx::detail::get_full_build_string();
 
             std::string const* env = xi.get<hpx::detail::throw_env>();
             if (env && !env->empty())
@@ -163,11 +161,10 @@ namespace hpx {
     }
 }    // namespace hpx
 
-namespace hpx { namespace util {
+namespace hpx::detail {
     // This is a local helper used to get the backtrace on a new new stack if
     // possible.
-    std::string trace_on_new_stack(
-        std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
+    std::string trace_on_new_stack(std::size_t frames_no)
     {
 #if defined(HPX_HAVE_STACKTRACES)
         if (frames_no == 0)
@@ -175,7 +172,7 @@ namespace hpx { namespace util {
             return std::string();
         }
 
-        backtrace bt(frames_no);
+        hpx::util::backtrace bt(frames_no);
 
         // avoid infinite recursion on handling errors
         auto* self = threads::get_self_ptr();
@@ -190,7 +187,7 @@ namespace hpx { namespace util {
 
         error_code ec(lightweight);
         threads::thread_id_ref_type tid =
-            p.apply("hpx::util::trace_on_new_stack",
+            p.apply("hpx::detail::trace_on_new_stack",
                 launch::fork_policy(threads::thread_priority::default_,
                     threads::thread_stacksize::medium),
                 ec);
@@ -205,252 +202,278 @@ namespace hpx { namespace util {
         return "";
 #endif
     }
-}}    // namespace hpx::util
+}    // namespace hpx::detail
 
-namespace hpx { namespace detail {
-    void pre_exception_handler()
-    {
-        if (!expect_exception_flag.load(std::memory_order_relaxed))
+namespace hpx {
+    namespace detail {
+        void pre_exception_handler()
         {
-            hpx::util::may_attach_debugger("exception");
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // report an early or late exception and abort
-    void report_exception_and_continue(std::exception const& e)
-    {
-        pre_exception_handler();
-
-        std::cerr << e.what() << std::endl;
-    }
-
-    void report_exception_and_continue(std::exception_ptr const& e)
-    {
-        pre_exception_handler();
-
-        std::cerr << diagnostic_information(e) << std::endl;
-    }
-
-    void report_exception_and_continue(hpx::exception const& e)
-    {
-        pre_exception_handler();
-
-        std::cerr << diagnostic_information(e) << std::endl;
-    }
-
-    void report_exception_and_terminate(std::exception const& e)
-    {
-        report_exception_and_continue(e);
-        std::abort();
-    }
-
-    void report_exception_and_terminate(std::exception_ptr const& e)
-    {
-        report_exception_and_continue(e);
-        std::abort();
-    }
-
-    void report_exception_and_terminate(hpx::exception const& e)
-    {
-        report_exception_and_continue(e);
-        std::abort();
-    }
-
-    hpx::exception_info construct_exception_info(std::string const& func,
-        std::string const& file, long line, std::string const& back_trace,
-        std::uint32_t node, std::string const& hostname, std::int64_t pid,
-        std::size_t shepherd, std::size_t thread_id,
-        std::string const& thread_name, std::string const& env,
-        std::string const& config, std::string const& state_name,
-        std::string const& auxinfo)
-    {
-        return hpx::exception_info().set(
-            hpx::detail::throw_stacktrace(back_trace),
-            hpx::detail::throw_locality(node),
-            hpx::detail::throw_hostname(hostname), hpx::detail::throw_pid(pid),
-            hpx::detail::throw_shepherd(shepherd),
-            hpx::detail::throw_thread_id(thread_id),
-            hpx::detail::throw_thread_name(thread_name),
-            hpx::detail::throw_function(func), hpx::detail::throw_file(file),
-            hpx::detail::throw_line(line), hpx::detail::throw_env(env),
-            hpx::detail::throw_config(config),
-            hpx::detail::throw_state(state_name),
-            hpx::detail::throw_auxinfo(auxinfo));
-    }
-
-    template <typename Exception>
-    std::exception_ptr construct_exception(
-        Exception const& e, hpx::exception_info info)
-    {
-        // create a std::exception_ptr object encapsulating the Exception to
-        // be thrown and annotate it with all the local information we have
-        try
-        {
-            throw_with_info(e, std::move(info));
-        }
-        catch (...)
-        {
-            return std::current_exception();
+            if (!expect_exception_flag.load(std::memory_order_relaxed))
+            {
+                hpx::util::may_attach_debugger("exception");
+            }
         }
 
-        // need this return to silence a warning with icc
-        HPX_ASSERT(false);    // -V779
-        return std::exception_ptr();
-    }
+        static get_full_build_string_type get_full_build_string_f;
 
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        hpx::exception const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        std::system_error const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        std::exception const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        hpx::detail::std_exception const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        std::bad_exception const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        hpx::detail::bad_exception const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        std::bad_typeid const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        hpx::detail::bad_typeid const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        std::bad_cast const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        hpx::detail::bad_cast const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        std::bad_alloc const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        hpx::detail::bad_alloc const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        std::logic_error const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        std::runtime_error const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        std::out_of_range const&, hpx::exception_info info);
-    template HPX_CORE_EXPORT std::exception_ptr construct_exception(
-        std::invalid_argument const&, hpx::exception_info info);
-
-    ///////////////////////////////////////////////////////////////////////////
-    //  Figure out the size of the given environment
-    inline std::size_t get_arraylen(char** array)
-    {
-        std::size_t count = 0;
-        if (nullptr != array)
+        void set_get_full_build_string(get_full_build_string_type f)
         {
-            while (nullptr != array[count])
-                ++count;    // simply count the environment strings
+            get_full_build_string_f = f;
         }
-        return count;
-    }
 
-    std::string get_execution_environment()
-    {
-        std::vector<std::string> env;
+        std::string get_full_build_string()
+        {
+            if (detail::get_full_build_string_f)
+            {
+                return detail::get_full_build_string_f();
+            }
+            else
+            {
+                return hpx::local::full_build_string();
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        // report an early or late exception and abort
+        void report_exception_and_continue(std::exception const& e)
+        {
+            pre_exception_handler();
+
+            std::cerr << e.what() << std::endl;
+        }
+
+        void report_exception_and_continue(std::exception_ptr const& e)
+        {
+            pre_exception_handler();
+
+            std::cerr << diagnostic_information(e) << std::endl;
+        }
+
+        void report_exception_and_continue(hpx::exception const& e)
+        {
+            pre_exception_handler();
+
+            std::cerr << diagnostic_information(e) << std::endl;
+        }
+
+        void report_exception_and_terminate(std::exception const& e)
+        {
+            report_exception_and_continue(e);
+            std::abort();
+        }
+
+        void report_exception_and_terminate(std::exception_ptr const& e)
+        {
+            report_exception_and_continue(e);
+            std::abort();
+        }
+
+        void report_exception_and_terminate(hpx::exception const& e)
+        {
+            report_exception_and_continue(e);
+            std::abort();
+        }
+
+        hpx::exception_info construct_exception_info(std::string const& func,
+            std::string const& file, long line, std::string const& back_trace,
+            std::uint32_t node, std::string const& hostname, std::int64_t pid,
+            std::size_t shepherd, std::size_t thread_id,
+            std::string const& thread_name, std::string const& env,
+            std::string const& config, std::string const& state_name,
+            std::string const& auxinfo)
+        {
+            return hpx::exception_info().set(
+                hpx::detail::throw_stacktrace(back_trace),
+                hpx::detail::throw_locality(node),
+                hpx::detail::throw_hostname(hostname),
+                hpx::detail::throw_pid(pid),
+                hpx::detail::throw_shepherd(shepherd),
+                hpx::detail::throw_thread_id(thread_id),
+                hpx::detail::throw_thread_name(thread_name),
+                hpx::detail::throw_function(func),
+                hpx::detail::throw_file(file), hpx::detail::throw_line(line),
+                hpx::detail::throw_env(env), hpx::detail::throw_config(config),
+                hpx::detail::throw_state(state_name),
+                hpx::detail::throw_auxinfo(auxinfo));
+        }
+
+        template <typename Exception>
+        std::exception_ptr construct_exception(
+            Exception const& e, hpx::exception_info info)
+        {
+            // create a std::exception_ptr object encapsulating the Exception to
+            // be thrown and annotate it with all the local information we have
+            try
+            {
+                throw_with_info(e, std::move(info));
+            }
+            catch (...)
+            {
+                return std::current_exception();
+            }
+
+            // need this return to silence a warning with icc
+            HPX_ASSERT(false);    // -V779
+            return std::exception_ptr();
+        }
+
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            hpx::exception const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            std::system_error const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            std::exception const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            hpx::detail::std_exception const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            std::bad_exception const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            hpx::detail::bad_exception const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            std::bad_typeid const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            hpx::detail::bad_typeid const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            std::bad_cast const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            hpx::detail::bad_cast const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            std::bad_alloc const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            hpx::detail::bad_alloc const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            std::logic_error const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            std::runtime_error const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            std::out_of_range const&, hpx::exception_info info);
+        template HPX_LOCAL_EXPORT std::exception_ptr construct_exception(
+            std::invalid_argument const&, hpx::exception_info info);
+
+        ///////////////////////////////////////////////////////////////////////////
+        //  Figure out the size of the given environment
+        inline std::size_t get_arraylen(char** array)
+        {
+            std::size_t count = 0;
+            if (nullptr != array)
+            {
+                while (nullptr != array[count])
+                    ++count;    // simply count the environment strings
+            }
+            return count;
+        }
+
+        std::string get_execution_environment()
+        {
+            std::vector<std::string> env;
 
 #if defined(HPX_WINDOWS)
-        std::size_t len = get_arraylen(_environ);
-        env.reserve(len);
-        std::copy(&_environ[0], &_environ[len], std::back_inserter(env));
+            std::size_t len = get_arraylen(_environ);
+            env.reserve(len);
+            std::copy(&_environ[0], &_environ[len], std::back_inserter(env));
 #elif defined(linux) || defined(__linux) || defined(__linux__) ||              \
     defined(__AIX__)
-        std::size_t len = get_arraylen(environ);
-        env.reserve(len);
-        std::copy(&environ[0], &environ[len], std::back_inserter(env));
+            std::size_t len = get_arraylen(environ);
+            env.reserve(len);
+            std::copy(&environ[0], &environ[len], std::back_inserter(env));
 #elif defined(__FreeBSD__)
-        std::size_t len = get_arraylen(freebsd_environ);
-        env.reserve(len);
-        std::copy(&freebsd_environ[0], &freebsd_environ[len],
-            std::back_inserter(env));
+            std::size_t len = get_arraylen(freebsd_environ);
+            env.reserve(len);
+            std::copy(&freebsd_environ[0], &freebsd_environ[len],
+                std::back_inserter(env));
 #elif defined(__APPLE__)
-        std::size_t len = get_arraylen(environ);
-        env.reserve(len);
-        std::copy(&environ[0], &environ[len], std::back_inserter(env));
+            std::size_t len = get_arraylen(environ);
+            env.reserve(len);
+            std::copy(&environ[0], &environ[len], std::back_inserter(env));
 #else
 #error "Don't know, how to access the execution environment on this platform"
 #endif
 
-        std::sort(env.begin(), env.end());
+            std::sort(env.begin(), env.end());
 
-        static constexpr char const* ignored_env_patterns[] = {
-            "DOCKER", "GITHUB_TOKEN"};
-        std::string retval = hpx::util::format("{} entries:\n", env.size());
-        for (std::string const& s : env)
-        {
-            if (std::all_of(std::begin(ignored_env_patterns),
-                    std::end(ignored_env_patterns), [&s](auto const e) {
-                        return s.find(e) == std::string::npos;
-                    }))
+            static constexpr char const* ignored_env_patterns[] = {
+                "DOCKER", "GITHUB_TOKEN"};
+            std::string retval = hpx::util::format("{} entries:\n", env.size());
+            for (std::string const& s : env)
             {
-                retval += "  " + s + "\n";
+                if (std::all_of(std::begin(ignored_env_patterns),
+                        std::end(ignored_env_patterns), [&s](auto const e) {
+                            return s.find(e) == std::string::npos;
+                        }))
+                {
+                    retval += "  " + s + "\n";
+                }
             }
+            return retval;
         }
-        return retval;
-    }
+    }    // namespace detail
 
-    hpx::exception_info custom_exception_info(std::string const& func,
-        std::string const& file, long line, std::string const& auxinfo)
-    {
-        std::int64_t pid = ::getpid();
-
-        std::size_t const trace_depth =
-            util::from_string<std::size_t>(get_config_entry(
-                "hpx.trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH));
-
-        std::string back_trace(hpx::util::trace_on_new_stack(trace_depth));
-
-        std::string state_name("not running");
-        std::string hostname;
-        hpx::runtime* rt = get_runtime_ptr();
-        if (rt)
+    namespace local::detail {
+        hpx::exception_info custom_exception_info(std::string const& func,
+            std::string const& file, long line, std::string const& auxinfo)
         {
-            state rts_state = rt->get_state();
-            state_name = get_runtime_state_name(rts_state);
+            std::int64_t pid = ::getpid();
 
-            if (rts_state >= state_initialized && rts_state < state_stopped)
+            std::size_t const trace_depth =
+                util::from_string<std::size_t>(get_config_entry(
+                    "hpx.trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH));
+
+            std::string back_trace(
+                hpx::detail::trace_on_new_stack(trace_depth));
+
+            std::string state_name("not running");
+            std::string hostname;
+            hpx::runtime* rt = get_runtime_ptr();
+            if (rt)
             {
-                hostname = get_runtime().here();
+                state rts_state = rt->get_state();
+                state_name = hpx::detail::get_runtime_state_name(rts_state);
+
+                if (rts_state >= state_initialized && rts_state < state_stopped)
+                {
+                    hostname = get_runtime().here();
+                }
             }
+
+            // if this is not a HPX thread we do not need to query neither for
+            // the shepherd thread nor for the thread id
+            error_code ec(lightweight);
+            std::uint32_t node = get_locality_id(ec);
+
+            std::size_t shepherd = std::size_t(-1);
+            threads::thread_id_type thread_id;
+            util::thread_description thread_name;
+
+            threads::thread_self* self = threads::get_self_ptr();
+            if (nullptr != self)
+            {
+                if (threads::threadmanager_is(state_running))
+                    shepherd = hpx::get_worker_thread_num();
+
+                thread_id = threads::get_self_id();
+                thread_name = threads::get_thread_description(thread_id);
+            }
+
+            std::string env(hpx::detail::get_execution_environment());
+            std::string config(hpx::local::configuration_string());
+
+            return hpx::exception_info().set(
+                hpx::detail::throw_stacktrace(back_trace),
+                hpx::detail::throw_locality(node),
+                hpx::detail::throw_hostname(hostname),
+                hpx::detail::throw_pid(pid),
+                hpx::detail::throw_shepherd(shepherd),
+                hpx::detail::throw_thread_id(
+                    reinterpret_cast<std::size_t>(thread_id.get())),
+                hpx::detail::throw_thread_name(util::as_string(thread_name)),
+                hpx::detail::throw_function(func),
+                hpx::detail::throw_file(file), hpx::detail::throw_line(line),
+                hpx::detail::throw_env(env), hpx::detail::throw_config(config),
+                hpx::detail::throw_state(state_name),
+                hpx::detail::throw_auxinfo(auxinfo));
         }
-
-        // if this is not a HPX thread we do not need to query neither for
-        // the shepherd thread nor for the thread id
-        error_code ec(lightweight);
-        std::uint32_t node = get_locality_id(ec);
-
-        std::size_t shepherd = std::size_t(-1);
-        threads::thread_id_type thread_id;
-        util::thread_description thread_name;
-
-        threads::thread_self* self = threads::get_self_ptr();
-        if (nullptr != self)
-        {
-            if (threads::threadmanager_is(state_running))
-                shepherd = hpx::get_worker_thread_num();
-
-            thread_id = threads::get_self_id();
-            thread_name = threads::get_thread_description(thread_id);
-        }
-
-        std::string env(get_execution_environment());
-        std::string config(configuration_string());
-
-        return hpx::exception_info().set(
-            hpx::detail::throw_stacktrace(back_trace),
-            hpx::detail::throw_locality(node),
-            hpx::detail::throw_hostname(hostname), hpx::detail::throw_pid(pid),
-            hpx::detail::throw_shepherd(shepherd),
-            hpx::detail::throw_thread_id(
-                reinterpret_cast<std::size_t>(thread_id.get())),
-            hpx::detail::throw_thread_name(util::as_string(thread_name)),
-            hpx::detail::throw_function(func), hpx::detail::throw_file(file),
-            hpx::detail::throw_line(line), hpx::detail::throw_env(env),
-            hpx::detail::throw_config(config),
-            hpx::detail::throw_state(state_name),
-            hpx::detail::throw_auxinfo(auxinfo));
-    }
-}}    // namespace hpx::detail
+    }    // namespace local::detail
+}    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {

@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/serialization/config/defines.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
+#include <hpx/serialization/config/defines.hpp>
 
 #include <type_traits>
 

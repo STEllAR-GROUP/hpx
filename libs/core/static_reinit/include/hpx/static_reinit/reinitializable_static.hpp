@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>
@@ -20,9 +20,9 @@
 
 // clang-format off
 #if !defined(HPX_WINDOWS)
-#  define HPX_CORE_EXPORT_REINITIALIZABLE_STATIC HPX_CORE_EXPORT
+#  define HPX_LOCAL_EXPORT_REINITIALIZABLE_STATIC HPX_LOCAL_EXPORT
 #else
-#  define HPX_CORE_EXPORT_REINITIALIZABLE_STATIC
+#  define HPX_LOCAL_EXPORT_REINITIALIZABLE_STATIC
 #endif
 // clang-format on
 
@@ -40,11 +40,11 @@ namespace hpx { namespace util {
     //  functions used by the HPX runtime system to reinitialize the held data
     //  structures.
     template <typename T, typename Tag = T, std::size_t N = 1>
-    struct HPX_CORE_EXPORT_REINITIALIZABLE_STATIC reinitializable_static;
+    struct HPX_LOCAL_EXPORT_REINITIALIZABLE_STATIC reinitializable_static;
 
     //////////////////////////////////////////////////////////////////////////
     template <typename T, typename Tag, std::size_t N>
-    struct HPX_CORE_EXPORT_REINITIALIZABLE_STATIC reinitializable_static
+    struct HPX_LOCAL_EXPORT_REINITIALIZABLE_STATIC reinitializable_static
     {
     public:
         HPX_NON_COPYABLE(reinitializable_static);
@@ -161,4 +161,4 @@ namespace hpx { namespace util {
     std::once_flag reinitializable_static<T, Tag, N>::constructed_;
 }}    // namespace hpx::util
 
-#undef HPX_CORE_EXPORT_REINITIALIZABLE_STATIC
+#undef HPX_LOCAL_EXPORT_REINITIALIZABLE_STATIC

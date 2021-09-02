@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/functional/function.hpp>
@@ -34,7 +34,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies {
@@ -52,7 +52,7 @@ namespace hpx { namespace threads { namespace policies {
     ///////////////////////////////////////////////////////////////////////////
     /// The scheduler_base defines the interface to be implemented by all
     /// scheduler policies
-    struct HPX_CORE_EXPORT scheduler_base
+    struct HPX_LOCAL_EXPORT scheduler_base
     {
     public:
         HPX_NON_COPYABLE(scheduler_base);
@@ -428,8 +428,8 @@ namespace hpx { namespace threads { namespace policies {
 #endif
     };
 
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_LOCAL_EXPORT std::ostream& operator<<(
         std::ostream& os, scheduler_base const& scheduler);
 }}}    // namespace hpx::threads::policies
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

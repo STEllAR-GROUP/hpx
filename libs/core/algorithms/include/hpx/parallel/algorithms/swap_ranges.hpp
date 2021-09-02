@@ -106,7 +106,7 @@ namespace hpx {
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
@@ -222,7 +222,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }    // namespace detail
 
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    HPX_DEPRECATED_V(1, 8,
+    HPX_LOCAL_DEPRECATED_V(1, 8,
         "hpx::parallel::transform_exclusive_scan is deprecated, use "
         "hpx::transform_exclusive_scan instead")
     inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,

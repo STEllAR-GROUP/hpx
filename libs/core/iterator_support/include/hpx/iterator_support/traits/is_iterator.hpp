@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/iterator_support/boost_iterator_categories.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/equality.hpp>

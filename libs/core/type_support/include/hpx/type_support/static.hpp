@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <type_traits>
 
@@ -18,7 +18,7 @@
 
 // clang-format off
 #if !defined(HPX_WINDOWS)
-#  define HPX_EXPORT_STATIC_ HPX_CORE_EXPORT
+#  define HPX_EXPORT_STATIC_ HPX_LOCAL_EXPORT
 #else
 #  define HPX_EXPORT_STATIC_
 #endif

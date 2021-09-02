@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/detail/vtable/callable_vtable.hpp>
 #include <hpx/functional/detail/vtable/copyable_vtable.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>

@@ -7,7 +7,7 @@
 //  This code was partially taken from:
 //      http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 

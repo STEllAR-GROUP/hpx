@@ -15,16 +15,18 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources}
     NOLIBS
-    DEPENDENCIES hpx_core ${BOOST_UNDERLYING_THREAD_LIBRARY}
+    DEPENDENCIES hpx_local ${BOOST_UNDERLYING_THREAD_LIBRARY}
     EXCLUDE_FROM_ALL
     FOLDER "Tests/Unit/Modules/Core/ExecutionBase"
   )
 
-  add_hpx_unit_test("modules.execution_base" ${test} ${${test}_PARAMETERS})
+  hpx_local_add_unit_test(
+    "modules.execution_base" ${test} ${${test}_PARAMETERS}
+  )
   target_compile_definitions(${test}_test PRIVATE -DHPX_MODULE_STATIC_LINKING)
 
 endforeach()

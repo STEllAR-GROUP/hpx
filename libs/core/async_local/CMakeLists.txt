@@ -12,11 +12,12 @@ set(async_local_headers
     hpx/async_local/sync.hpp hpx/async_local/sync_fwd.hpp
 )
 
-include(HPX_AddModule)
-add_hpx_module(
-  core async_local
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local async_local
   GLOBAL_HEADER_GEN ON
   HEADERS ${async_local_headers}
-  MODULE_DEPENDENCIES hpx_async_base hpx_execution hpx_executors hpx_config
+  MODULE_DEPENDENCIES hpx_async_base hpx_execution hpx_executors
+                      hpx_config_local
   CMAKE_SUBDIRS examples tests
 )

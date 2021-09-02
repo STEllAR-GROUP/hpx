@@ -30,13 +30,13 @@ set(timing_compat_headers
 # $HPX_ROOT/libs/timing/src
 set(timing_sources)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core timing
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local timing
   GLOBAL_HEADER_GEN ON
   SOURCES ${timing_sources}
   HEADERS ${timing_headers}
   COMPAT_HEADERS ${timing_compat_headers}
-  MODULE_DEPENDENCIES hpx_config hpx_hardware hpx_type_support
+  MODULE_DEPENDENCIES hpx_config_local hpx_hardware hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

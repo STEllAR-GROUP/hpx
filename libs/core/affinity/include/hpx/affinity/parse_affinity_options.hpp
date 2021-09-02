@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/topology/cpu_mask.hpp>
@@ -47,7 +47,7 @@ namespace hpx { namespace threads {
                 core,
                 pu
             };
-            HPX_CORE_EXPORT static char const* type_name(type t);
+            HPX_LOCAL_EXPORT static char const* type_name(type t);
 
             static std::int64_t all_entities() noexcept
             {
@@ -96,14 +96,14 @@ namespace hpx { namespace threads {
         typedef boost::variant<distribution_type, mappings_spec_type>
             mappings_type;
 
-        HPX_CORE_EXPORT bounds_type extract_bounds(
+        HPX_LOCAL_EXPORT bounds_type extract_bounds(
             spec_type const& m, std::size_t default_last, error_code& ec);
 
-        HPX_CORE_EXPORT void parse_mappings(std::string const& spec,
+        HPX_LOCAL_EXPORT void parse_mappings(std::string const& spec,
             mappings_type& mappings, error_code& ec = throws);
     }    // namespace detail
 
-    HPX_CORE_EXPORT void parse_affinity_options(std::string const& spec,
+    HPX_LOCAL_EXPORT void parse_affinity_options(std::string const& spec,
         std::vector<mask_type>& affinities, std::size_t used_cores,
         std::size_t max_cores, std::size_t num_threads,
         std::vector<std::size_t>& num_pus, bool use_process_mask,

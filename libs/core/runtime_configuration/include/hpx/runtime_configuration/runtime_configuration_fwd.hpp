@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
 
     // forward declaration only
-    class HPX_CORE_EXPORT runtime_configuration;
+    class HPX_LOCAL_EXPORT runtime_configuration;
 }}    // namespace hpx::util

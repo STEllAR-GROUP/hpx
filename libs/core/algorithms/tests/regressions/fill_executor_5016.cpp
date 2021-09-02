@@ -7,7 +7,7 @@
 // #5016: hpx::parallel::fill fails compiling
 
 // suppress deprecation warnings for algorithms
-#define HPX_HAVE_DEPRECATION_WARNINGS_V1_6 0
+#define HPX_LOCAL_HAVE_DEPRECATION_WARNINGS_V1_6 0
 
 #include <hpx/local/execution.hpp>
 #include <hpx/local/init.hpp>

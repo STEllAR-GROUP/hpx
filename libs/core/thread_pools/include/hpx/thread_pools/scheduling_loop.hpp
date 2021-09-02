@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/unique_function.hpp>

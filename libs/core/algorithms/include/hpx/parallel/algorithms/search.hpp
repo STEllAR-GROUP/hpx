@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -317,7 +317,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 parallel::traits::projected<Proj1, FwdIter>,
                                 parallel::traits::projected<Proj2,
                                     FwdIter2>>::value)>
-    HPX_DEPRECATED_V(1, 6, "Please use hpx::search instead.")
+    HPX_LOCAL_DEPRECATED_V(1, 6, "Please use hpx::search instead.")
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
         search(ExPolicy&& policy, FwdIter first, FwdIter last, FwdIter2 s_first,
             FwdIter2 s_last, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
@@ -348,7 +348,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 parallel::traits::projected<Proj1, FwdIter>,
                                 parallel::traits::projected<Proj2,
                                     FwdIter2>>::value)>
-    HPX_DEPRECATED_V(1, 6, "Please use hpx::search_n instead.")
+    HPX_LOCAL_DEPRECATED_V(1, 6, "Please use hpx::search_n instead.")
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
         search_n(ExPolicy&& policy, FwdIter first, std::size_t count,
             FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred(),

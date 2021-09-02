@@ -9,7 +9,7 @@
 
 //  Contributed by Joerg Walter
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include "crlf_check.hpp"
 #include "function_hyper.hpp"

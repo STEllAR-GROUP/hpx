@@ -7,22 +7,10 @@
 
 set(subdirs build lcos util)
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(subdirs ${subdirs} actions component)
-endif()
-
-if(HPX_WITH_NETWORKING)
-  set(subdirs ${subdirs} parcelset)
-endif()
-
-if(HPX_WITH_APEX)
-  set(subdirs ${subdirs} apex)
-endif()
-
 foreach(subdir ${subdirs})
   if(NOT TARGET tests.unit.${subdir})
-    add_hpx_pseudo_target(tests.unit.${subdir})
+    hpx_local_add_pseudo_target(tests.unit.${subdir})
   endif()
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.unit tests.unit.${subdir})
+  hpx_local_add_pseudo_dependencies(tests.unit tests.unit.${subdir})
 endforeach()

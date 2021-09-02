@@ -41,12 +41,12 @@ set(cache_compat_headers
 # Default location is $HPX_ROOT/libs/cache/src
 set(cache_sources)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core cache
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local cache
   SOURCES ${cache_sources}
   HEADERS ${cache_headers}
   COMPAT_HEADERS ${cache_compat_headers}
-  MODULE_DEPENDENCIES hpx_config
+  MODULE_DEPENDENCIES hpx_config_local
   CMAKE_SUBDIRS examples tests
 )

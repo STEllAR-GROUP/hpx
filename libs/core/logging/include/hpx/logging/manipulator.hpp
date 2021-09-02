@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/logging/message.hpp>
 #include <hpx/modules/format.hpp>
 
@@ -37,7 +37,7 @@ namespace hpx { namespace util { namespace logging {
     namespace formatter {
 
         /// @brief What to use as base class, for your formatter classes
-        struct HPX_CORE_EXPORT manipulator
+        struct HPX_LOCAL_EXPORT manipulator
         {
             virtual void operator()(std::ostream&) const = 0;
 
@@ -70,7 +70,7 @@ namespace hpx { namespace util { namespace logging {
     namespace destination {
 
         /// @brief What to use as base class, for your destination classes
-        struct HPX_CORE_EXPORT manipulator
+        struct HPX_LOCAL_EXPORT manipulator
         {
             virtual void operator()(message const&) = 0;
 

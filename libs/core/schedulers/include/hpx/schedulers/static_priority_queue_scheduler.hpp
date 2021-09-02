@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <hpx/assert.hpp>
 #include <hpx/schedulers/local_priority_queue_scheduler.hpp>
@@ -19,7 +19,7 @@
 #include <mutex>
 #include <string>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies {
@@ -46,7 +46,7 @@ namespace hpx { namespace threads { namespace policies {
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
             default_static_priority_queue_scheduler_terminated_queue>
-    class HPX_CORE_EXPORT static_priority_queue_scheduler
+    class HPX_LOCAL_EXPORT static_priority_queue_scheduler
       : public local_priority_queue_scheduler<Mutex, PendingQueuing,
             StagedQueuing, TerminatedQueuing>
     {
@@ -80,4 +80,4 @@ namespace hpx { namespace threads { namespace policies {
     };
 }}}    // namespace hpx::threads::policies
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

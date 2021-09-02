@@ -17,7 +17,7 @@
 #include <set>
 #include <string>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options { namespace detail {
 
@@ -52,7 +52,7 @@ namespace hpx { namespace program_options { namespace detail {
          TODO: maybe, we should just accept a pointer to options_description
          class.
      */
-    class HPX_CORE_EXPORT common_config_file_iterator
+    class HPX_LOCAL_EXPORT common_config_file_iterator
       : public eof_iterator<common_config_file_iterator, option>
     {
     public:
@@ -166,4 +166,4 @@ namespace hpx { namespace program_options { namespace detail {
 
 }}}    // namespace hpx::program_options::detail
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

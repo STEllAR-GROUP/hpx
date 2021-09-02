@@ -11,14 +11,14 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources}
     NOLIBS
-    DEPENDENCIES hpx_core
+    DEPENDENCIES hpx_local
     EXCLUDE_FROM_ALL
     FOLDER "Tests/Unit/Modules/Core/Properties"
   )
 
-  add_hpx_unit_test("modules.properties" ${test} ${${test}_PARAMETERS})
+  hpx_local_add_unit_test("modules.properties" ${test} ${${test}_PARAMETERS})
 endforeach()

@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <atomic>
 
@@ -27,7 +27,7 @@ namespace hpx { namespace util { namespace detail {
     private:
         std::atomic<bool> m;
 
-        HPX_CORE_EXPORT void yield_k(unsigned) noexcept;
+        HPX_LOCAL_EXPORT void yield_k(unsigned) noexcept;
 
     public:
         constexpr spinlock() noexcept

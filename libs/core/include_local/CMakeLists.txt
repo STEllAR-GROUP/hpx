@@ -32,9 +32,9 @@ set(include_local_headers
     hpx/local/unwrap.hpp
 )
 
-include(HPX_AddModule)
-add_hpx_module(
-  core include_local
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local include_local
   GLOBAL_HEADER_GEN OFF
   HEADERS ${include_local_headers}
   MODULE_DEPENDENCIES

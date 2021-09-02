@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/runtime_configuration_fwd.hpp>
 
@@ -18,7 +18,7 @@ namespace hpx { namespace plugins {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a plugin_registry_base has to be used as a base class for all
     /// plugin registries.
-    struct HPX_CORE_EXPORT plugin_registry_base
+    struct HPX_LOCAL_EXPORT plugin_registry_base
     {
         virtual ~plugin_registry_base() {}
 

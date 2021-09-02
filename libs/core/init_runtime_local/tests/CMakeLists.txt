@@ -4,39 +4,40 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-include(HPX_Message)
-include(HPX_Option)
+include(HPXLocal_Message)
+include(HPXLocal_Option)
 
-if(HPX_WITH_TESTS_UNIT)
-  add_hpx_pseudo_target(tests.unit.modules.init_runtime_local)
-  add_hpx_pseudo_dependencies(
-    tests.unit.modules tests.unit.modules.init_runtime_local
-  )
-  add_subdirectory(unit)
-endif()
+if(HPXLocal_WITH_TESTS)
+  if(HPXLocal_WITH_TESTS_UNIT)
+    hpx_local_add_pseudo_target(tests.unit.modules.init_runtime_local)
+    hpx_local_add_pseudo_dependencies(
+      tests.unit.modules tests.unit.modules.init_runtime_local
+    )
+    add_subdirectory(unit)
+  endif()
+  if(HPXLocal_WITH_TESTS_REGRESSIONS)
+    hpx_local_add_pseudo_target(tests.regressions.modules.init_runtime_local)
+    hpx_local_add_pseudo_dependencies(
+      tests.regressions.modules tests.regressions.modules.init_runtime_local
+    )
+    add_subdirectory(regressions)
+  endif()
 
-if(HPX_WITH_TESTS_REGRESSIONS)
-  add_hpx_pseudo_target(tests.regressions.modules.init_runtime_local)
-  add_hpx_pseudo_dependencies(
-    tests.regressions.modules tests.regressions.modules.init_runtime_local
-  )
-  add_subdirectory(regressions)
-endif()
+  if(HPXLocal_WITH_TESTS_BENCHMARKS)
+    hpx_local_add_pseudo_target(tests.performance.modules.init_runtime_local)
+    hpx_local_add_pseudo_dependencies(
+      tests.performance.modules tests.performance.modules.init_runtime_local
+    )
+    add_subdirectory(performance)
+  endif()
 
-if(HPX_WITH_TESTS_BENCHMARKS)
-  add_hpx_pseudo_target(tests.performance.modules.init_runtime_local)
-  add_hpx_pseudo_dependencies(
-    tests.performance.modules tests.performance.modules.init_runtime_local
-  )
-  add_subdirectory(performance)
-endif()
-
-if(HPX_WITH_TESTS_HEADERS)
-  add_hpx_header_tests(
-    modules.init_runtime_local
-    HEADERS ${init_runtime_local_headers}
-    HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-    NOLIBS
-    DEPENDENCIES hpx_init_runtime_local
-  )
+  if(HPXLocal_WITH_TESTS_HEADERS)
+    hpx_local_add_header_tests(
+      modules.init_runtime_local
+      HEADERS ${init_runtime_local_headers}
+      HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+      NOLIBS
+      DEPENDENCIES hpx_init_runtime_local
+    )
+  endif()
 endif()

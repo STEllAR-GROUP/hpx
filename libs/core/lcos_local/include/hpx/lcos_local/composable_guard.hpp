@@ -80,7 +80,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
@@ -126,7 +126,7 @@ namespace hpx { namespace lcos { namespace local {
 
         typedef std::atomic<guard_task*> guard_atomic;
 
-        HPX_CORE_EXPORT void free(guard_task* task);
+        HPX_LOCAL_EXPORT void free(guard_task* task);
 
         typedef util::unique_function_nonser<void()> guard_function;
     }    // namespace detail
@@ -140,7 +140,7 @@ namespace hpx { namespace lcos { namespace local {
           : task(nullptr)
         {
         }
-        HPX_CORE_EXPORT ~guard();
+        HPX_LOCAL_EXPORT ~guard();
     };
 
     class guard_set : public detail::debug_object
@@ -177,13 +177,14 @@ namespace hpx { namespace lcos { namespace local {
             return guards.size();
         }
 
-        friend HPX_CORE_EXPORT void run_guarded(
+        friend HPX_LOCAL_EXPORT void run_guarded(
             guard_set& guards, detail::guard_function task);
     };
 
     /// Conceptually, a guard acts like a mutex on an asynchronous task. The
     /// mutex is locked before the task runs, and unlocked afterwards.
-    HPX_CORE_EXPORT void run_guarded(guard& guard, detail::guard_function task);
+    HPX_LOCAL_EXPORT void run_guarded(
+        guard& guard, detail::guard_function task);
 
     template <typename F, typename... Args>
     void run_guarded(guard& guard, F&& f, Args&&... args)
@@ -195,7 +196,7 @@ namespace hpx { namespace lcos { namespace local {
 
     /// Conceptually, a guard_set acts like a set of mutexes on an asynchronous task.
     /// The mutexes are locked before the task runs, and unlocked afterwards.
-    HPX_CORE_EXPORT void run_guarded(
+    HPX_LOCAL_EXPORT void run_guarded(
         guard_set& guards, detail::guard_function task);
 
     template <typename F, typename... Args>

@@ -16,13 +16,13 @@ set(hashing_compat_headers
 
 set(hashing_sources)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core hashing
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local hashing
   GLOBAL_HEADER_GEN ON
   SOURCES ${hashing_sources}
   HEADERS ${hashing_headers}
   COMPAT_HEADERS ${hashing_compat_headers}
-  MODULE_DEPENDENCIES hpx_config
+  MODULE_DEPENDENCIES hpx_config_local
   CMAKE_SUBDIRS examples tests
 )

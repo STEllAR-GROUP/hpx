@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/function.hpp>
@@ -27,17 +27,17 @@
 #include <type_traits>
 #include <utility>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     using thread_termination_handler_type =
         util::function_nonser<void(std::exception_ptr const& e)>;
-    HPX_CORE_EXPORT void set_thread_termination_handler(
+    HPX_LOCAL_EXPORT void set_thread_termination_handler(
         thread_termination_handler_type f);
 
-    class HPX_CORE_EXPORT thread
+    class HPX_LOCAL_EXPORT thread
     {
         typedef lcos::local::spinlock mutex_type;
         void terminate(const char* function, const char* reason) const;
@@ -251,22 +251,22 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace this_thread {
-        HPX_CORE_EXPORT thread::id get_id() noexcept;
+        HPX_LOCAL_EXPORT thread::id get_id() noexcept;
 
-        HPX_CORE_EXPORT void yield() noexcept;
-        HPX_CORE_EXPORT void yield_to(thread::id) noexcept;
+        HPX_LOCAL_EXPORT void yield() noexcept;
+        HPX_LOCAL_EXPORT void yield_to(thread::id) noexcept;
 
         // extensions
-        HPX_CORE_EXPORT threads::thread_priority get_priority();
-        HPX_CORE_EXPORT std::ptrdiff_t get_stack_size();
+        HPX_LOCAL_EXPORT threads::thread_priority get_priority();
+        HPX_LOCAL_EXPORT std::ptrdiff_t get_stack_size();
 
-        HPX_CORE_EXPORT void interruption_point();
-        HPX_CORE_EXPORT bool interruption_enabled();
-        HPX_CORE_EXPORT bool interruption_requested();
+        HPX_LOCAL_EXPORT void interruption_point();
+        HPX_LOCAL_EXPORT bool interruption_enabled();
+        HPX_LOCAL_EXPORT bool interruption_requested();
 
-        HPX_CORE_EXPORT void interrupt();
+        HPX_LOCAL_EXPORT void interrupt();
 
-        HPX_CORE_EXPORT void sleep_until(
+        HPX_LOCAL_EXPORT void sleep_until(
             hpx::chrono::steady_time_point const& abs_time);
 
         inline void sleep_for(hpx::chrono::steady_duration const& rel_time)
@@ -274,20 +274,21 @@ namespace hpx {
             sleep_until(rel_time.from_now());
         }
 
-        HPX_CORE_EXPORT std::size_t get_thread_data();
-        HPX_CORE_EXPORT std::size_t set_thread_data(std::size_t);
+        HPX_LOCAL_EXPORT std::size_t get_thread_data();
+        HPX_LOCAL_EXPORT std::size_t set_thread_data(std::size_t);
 
 #if defined(HPX_HAVE_LIBCDS)
-        HPX_CORE_EXPORT std::size_t get_libcds_data();
-        HPX_CORE_EXPORT std::size_t set_libcds_data(std::size_t);
-        HPX_CORE_EXPORT std::size_t get_libcds_hazard_pointer_data();
-        HPX_CORE_EXPORT std::size_t set_libcds_hazard_pointer_data(std::size_t);
-        HPX_CORE_EXPORT std::size_t get_libcds_dynamic_hazard_pointer_data();
-        HPX_CORE_EXPORT std::size_t set_libcds_dynamic_hazard_pointer_data(
+        HPX_LOCAL_EXPORT std::size_t get_libcds_data();
+        HPX_LOCAL_EXPORT std::size_t set_libcds_data(std::size_t);
+        HPX_LOCAL_EXPORT std::size_t get_libcds_hazard_pointer_data();
+        HPX_LOCAL_EXPORT std::size_t set_libcds_hazard_pointer_data(
+            std::size_t);
+        HPX_LOCAL_EXPORT std::size_t get_libcds_dynamic_hazard_pointer_data();
+        HPX_LOCAL_EXPORT std::size_t set_libcds_dynamic_hazard_pointer_data(
             std::size_t);
 #endif
 
-        class HPX_CORE_EXPORT disable_interruption
+        class HPX_LOCAL_EXPORT disable_interruption
         {
         private:
             disable_interruption(disable_interruption const&);
@@ -301,7 +302,7 @@ namespace hpx {
             ~disable_interruption();
         };
 
-        class HPX_CORE_EXPORT restore_interruption
+        class HPX_LOCAL_EXPORT restore_interruption
         {
         private:
             restore_interruption(restore_interruption const&);
@@ -330,4 +331,4 @@ namespace std {
     };
 }    // namespace std
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

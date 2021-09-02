@@ -23,12 +23,14 @@ jobs:
               -Bbuild \
               -GNinja \
               -DCMAKE_BUILD_TYPE=Debug \
-              -DHPX_WITH_MALLOC=system \
-              -DHPX_WITH_FETCH_ASIO=ON \
-              -DHPX_WITH_EXAMPLES=ON \
-              -DHPX_WITH_TESTS=ON \
-              -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
-              -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On
+              -DHPXLocal_WITH_UNITY_BUILD=system \
+              -DHPXLocal_WITH_MALLOC=system \
+              -DHPXLocal_WITH_FETCH_ASIO=ON \
+              -DHPXLocal_WITH_EXAMPLES=ON \
+              -DHPXLocal_WITH_TESTS=ON \
+              -DHPXLocal_WITH_TESTS_EXAMPLES=ON \
+              -DHPXLocal_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
+              -DHPXLocal_WITH_CHECK_MODULE_DEPENDENCIES=On
     - name: Build
       shell: bash
       run: |
@@ -40,5 +42,4 @@ jobs:
           cd build
           ctest \
             --output-on-failure \
-            --tests-regex tests.examples \
-            --exclude-regex tests.examples.transpose.transpose_block_numa
+            --tests-regex tests.examples

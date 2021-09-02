@@ -251,7 +251,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -421,7 +421,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::transform_reduce is deprecated, use "
         "hpx::transform_reduce instead")
         typename util::detail::algorithm_result<ExPolicy, T>::type
@@ -644,7 +644,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter2>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::transform_reduce is deprecated, use "
         "hpx::transform_reduce instead")
         typename util::detail::algorithm_result<ExPolicy, T>::type
@@ -684,7 +684,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::transform_reduce is deprecated, use "
         "hpx::transform_reduce instead")
         typename util::detail::algorithm_result<ExPolicy, T>::type

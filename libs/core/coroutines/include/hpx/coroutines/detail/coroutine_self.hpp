@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
@@ -159,7 +159,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
     public:
-        static HPX_CORE_EXPORT coroutine_self*& local_self();
+        static HPX_LOCAL_EXPORT coroutine_self*& local_self();
 
         static void set_self(coroutine_self* self)
         {

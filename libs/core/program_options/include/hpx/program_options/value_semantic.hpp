@@ -22,7 +22,7 @@ namespace hpx { namespace program_options {
     /** Class which specifies how the option's value is to be parsed
         and converted into C++ types.
     */
-    class HPX_CORE_EXPORT value_semantic
+    class HPX_LOCAL_EXPORT value_semantic
     {
     public:
         /** Returns the name of the option. The name is only meaningful
@@ -86,7 +86,7 @@ namespace hpx { namespace program_options {
         or with UTF8->ascii conversion.
     */
     template <>
-    class HPX_CORE_EXPORT value_semantic_codecvt_helper<char>
+    class HPX_LOCAL_EXPORT value_semantic_codecvt_helper<char>
       : public value_semantic
     {
     private:    // base overrides
@@ -107,7 +107,7 @@ namespace hpx { namespace program_options {
         pass it unmodified.
     */
     template <>
-    class HPX_CORE_EXPORT value_semantic_codecvt_helper<wchar_t>
+    class HPX_LOCAL_EXPORT value_semantic_codecvt_helper<wchar_t>
       : public value_semantic
     {
     private:    // base overrides
@@ -122,7 +122,7 @@ namespace hpx { namespace program_options {
 
     /** Class which specifies a simple handling of a value: the value will
         have string type and only one token is allowed. */
-    class HPX_CORE_EXPORT untyped_value
+    class HPX_LOCAL_EXPORT untyped_value
       : public value_semantic_codecvt_helper<char>
     {
     public:
@@ -426,11 +426,11 @@ namespace hpx { namespace program_options {
         value_semantic won't accept any explicit value. So, if the option
         is present on the command line, the value will be 'true'.
     */
-    HPX_CORE_EXPORT typed_value<bool>* bool_switch();
+    HPX_LOCAL_EXPORT typed_value<bool>* bool_switch();
 
     /** @overload
     */
-    HPX_CORE_EXPORT typed_value<bool>* bool_switch(bool* v);
+    HPX_LOCAL_EXPORT typed_value<bool>* bool_switch(bool* v);
 
 }}    // namespace hpx::program_options
 

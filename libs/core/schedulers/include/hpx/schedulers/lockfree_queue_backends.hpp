@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
 #include <hpx/concurrency/deque.hpp>

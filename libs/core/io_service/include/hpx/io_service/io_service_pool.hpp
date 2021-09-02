@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
+#include <hpx/local/config.hpp>
+#include <hpx/local/config/asio.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
@@ -29,12 +29,12 @@
 #include <thread>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
     /// A pool of io_service objects.
-    class HPX_CORE_EXPORT io_service_pool
+    class HPX_LOCAL_EXPORT io_service_pool
     {
     public:
         HPX_NON_COPYABLE(io_service_pool);
@@ -172,4 +172,4 @@ namespace hpx { namespace util {
         ///////////////////////////////////////////////////////////////////////////////
 }}    // namespace hpx::util
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

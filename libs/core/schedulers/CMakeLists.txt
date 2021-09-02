@@ -42,16 +42,16 @@ set(schedulers_compat_headers
 
 set(schedulers_sources deadlock_detection.cpp maintain_queue_wait_times.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core schedulers
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local schedulers
   GLOBAL_HEADER_GEN OFF
   SOURCES ${schedulers_sources}
   HEADERS ${schedulers_headers}
   COMPAT_HEADERS ${schedulers_compat_headers}
   SOURCES ${schedulers_sources}
   MODULE_DEPENDENCIES
-    hpx_config
+    hpx_config_local
     hpx_assertion
     hpx_errors
     hpx_format

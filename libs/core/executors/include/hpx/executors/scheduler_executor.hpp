@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/algorithms/detach.hpp>

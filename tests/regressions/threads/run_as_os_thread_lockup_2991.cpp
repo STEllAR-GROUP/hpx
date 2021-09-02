@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/init.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/runtime_local/run_as_os_thread.hpp>
 
 #include <iostream>
@@ -34,10 +34,10 @@ int hpx_main()
     }
     std::cout << std::this_thread::get_id() << ": exiting\n";
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char** argv)
 {
-    return hpx::init(argc, argv);
+    return hpx::local::init(hpx_main, argc, argv);
 }

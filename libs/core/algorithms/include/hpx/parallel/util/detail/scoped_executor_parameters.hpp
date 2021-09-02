@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 
 namespace hpx { namespace parallel { namespace util { namespace detail {

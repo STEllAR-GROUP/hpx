@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>

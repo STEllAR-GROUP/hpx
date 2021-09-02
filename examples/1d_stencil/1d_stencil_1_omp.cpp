@@ -15,7 +15,7 @@
 
 // Include before any Boost header and avoid issues with Intel14/libstdc++4.4
 // nullptr
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/program_options.hpp>
 
 #include <chrono>

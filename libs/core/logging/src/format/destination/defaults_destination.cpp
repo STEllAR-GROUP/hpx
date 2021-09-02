@@ -16,7 +16,7 @@
 
 #include <hpx/logging/format/destinations.hpp>
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/logging/message.hpp>
 
 #include <iostream>

@@ -26,13 +26,14 @@ set(thread_support_compat_headers
 
 set(thread_support_sources set_thread_name.cpp spinlock.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core thread_support
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local thread_support
   GLOBAL_HEADER_GEN ON
   SOURCES ${thread_support_sources}
   HEADERS ${thread_support_headers}
   COMPAT_HEADERS ${thread_support_compat_headers}
-  MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_concepts hpx_type_support
+  MODULE_DEPENDENCIES hpx_assertion hpx_config_local hpx_concepts
+                      hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

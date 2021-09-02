@@ -5,8 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/endian.hpp>
+#include <hpx/local/config/endian.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/local/version.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/prefix/find_prefix.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
-#include <hpx/version.hpp>
 
 #include <boost/tokenizer.hpp>
 
@@ -201,11 +201,9 @@ namespace hpx { namespace util {
             "[hpx.on_startup]",
             "wait_on_latch = ${HPX_ON_STARTUP_WAIT_ON_LATCH}",
 
-#if defined(HPX_HAVE_NETWORKING)
             // by default, enable networking
             "[hpx.parcel]",
             "enable = 1",
-#endif
 
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:" HPX_PP_STRINGIZE(
@@ -226,10 +224,8 @@ namespace hpx { namespace util {
             "io_pool_size = ${HPX_NUM_IO_POOL_SIZE:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_NUM_IO_POOL_SIZE)) "}",
 #endif
-#if defined(HPX_HAVE_NETWORKING)
             "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_SIZE:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_NUM_PARCEL_POOL_SIZE)) "}",
-#endif
 #if defined(HPX_HAVE_TIMER_POOL)
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_SIZE:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_NUM_TIMER_POOL_SIZE)) "}",
@@ -818,7 +814,6 @@ namespace hpx { namespace util {
     // this function should figure out whether networking has to be enabled.
     bool runtime_configuration::enable_networking() const
     {
-#if defined(HPX_HAVE_NETWORKING)
         if (util::section const* sec = get_section("hpx"); nullptr != sec)
         {
             // get the number of initial localities
@@ -850,7 +845,6 @@ namespace hpx { namespace util {
                 return true;
             }
         }
-#endif
         return false;
     }
 

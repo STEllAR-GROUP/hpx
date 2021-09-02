@@ -108,7 +108,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -244,7 +244,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::set_intersection is deprecated, use "
         "hpx::set_intersection instead")
         typename util::detail::algorithm_result<ExPolicy, FwdIter3>::type

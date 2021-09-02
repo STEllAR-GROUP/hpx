@@ -40,26 +40,9 @@ move_debug_log: &move_debug_log
         mkdir -p ${CIRCLE_JOB}
         cp debug-log.txt ${CIRCLE_JOB} || true
 
-gh_pages_filter: &gh_pages_filter
-    filters:
-      branches:
-        ignore: gh-pages
-      tags:
-        ignore: stable
-
-docs_push_filter: &docs_push_filter
-    filters:
-      branches:
-        only:
-          - master
-          - /release.*/
-      tags:
-        ignore: stable
-
 core_dependency: &core_dependency
     requires:
       - core
-    <<: *gh_pages_filter
 
 add_github_to_known_hosts: &add_github_to_known_hosts
     run:
@@ -192,41 +175,33 @@ jobs:
           name: Running CMake
           command: |
             cmake --version
-            if [ -z "$CIRCLE_PR_NUMBER" ] && \
-                ( [ "$CIRCLE_BRANCH" == "master" ] || \
-                  [ "$CIRCLE_BRANCH" == "release" ] || \
-                  [ -n "$CIRCLE_TAG" ] ); then
-                DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf"
-            else
-                DOCUMENTATION_OUTPUT_FORMATS="html"
-            fi
             cmake \
                 /hpx/source \
                 -G "Ninja" \
                 -DCMAKE_BUILD_TYPE=Debug \
-                -DHPX_WITH_MALLOC=system \
-                -DHPX_WITH_FETCH_ASIO=On \
-                -DHPX_WITH_DATAPAR_VC=On \
-                -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} \
-                -DHPX_WITH_GIT_BRANCH="${CIRCLE_BRANCH}" \
-                -DHPX_WITH_GIT_TAG="${CIRCLE_TAG}" \
-                -DHPX_WITH_TOOLS=On \
-                -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" \
-                -DHPX_WITH_TESTS_HEADERS=On \
-                -DHPX_WITH_COMPILER_WARNINGS=On \
-                -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=On \
-                -DHPX_WITH_DEPRECATION_WARNINGS=On \
                 -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
-                -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
-                -DHPX_WITH_STACKTRACES_STATIC_SYMBOLS=On \
-                -DHPX_WITH_STACKTRACES_DEMANGLE_SYMBOLS=Off \
-                -DHPX_WITH_TESTS_DEBUG_LOG=On \
-                -DHPX_WITH_TESTS_DEBUG_LOG_DESTINATION=/hpx/build/debug-log.txt \
-                -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=On \
-                -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On \
-                -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
-                -DHPX_WITH_DOCUMENTATION=On \
-                -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="${DOCUMENTATION_OUTPUT_FORMATS}"
+                -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" \
+                -DHPXLocal_WITH_GIT_COMMIT=${CIRCLE_SHA1} \
+                -DHPXLocal_WITH_GIT_BRANCH="${CIRCLE_BRANCH}" \
+                -DHPXLocal_WITH_GIT_TAG="${CIRCLE_TAG}" \
+                -DHPXLocal_WITH_FETCH_ASIO=On \
+                -DHPXLocal_WITH_TOOLS=On \
+                -DHPXLocal_WITH_MALLOC=system \
+                -DHPXLocal_WITH_EXAMPLES=On \
+                -DHPXLocal_WITH_TESTS=On \
+                -DHPXLocal_WITH_TESTS_HEADERS=On \
+                -DHPXLocal_WITH_DATAPAR_VC=On \
+                -DHPXLocal_WITH_COMPILER_WARNINGS=On \
+                -DHPXLocal_WITH_COMPILER_WARNINGS_AS_ERRORS=On \
+                -DHPXLocal_WITH_DEPRECATION_WARNINGS=On \
+                -DHPXLocal_WITH_THREAD_LOCAL_STORAGE=On \
+                -DHPXLocal_WITH_STACKTRACES_STATIC_SYMBOLS=On \
+                -DHPXLocal_WITH_STACKTRACES_DEMANGLE_SYMBOLS=Off \
+                -DHPXLocal_WITH_TESTS_DEBUG_LOG=On \
+                -DHPXLocal_WITH_TESTS_DEBUG_LOG_DESTINATION=/hpx/build/debug-log.txt \
+                -DHPXLocal_WITH_SPINLOCK_DEADLOCK_DETECTION=On \
+                -DHPXLocal_WITH_CHECK_MODULE_DEPENDENCIES=On \
+                -DCMAKE_EXPORT_COMPILE_COMMANDS=On
       - persist_to_workspace:
           root: /hpx
           paths:
@@ -243,10 +218,10 @@ jobs:
             cmake \
                 /hpx/source \
                 -G "Ninja" \
-                -DHPX_WITH_MALLOC=system \
-                -DHPX_WITH_FETCH_ASIO=On \
-                -DHPX_WITH_TESTS=On \
-                -DHPX_WITH_EXAMPLES=Off
+                -DHPXLocal_WITH_MALLOC=system \
+                -DHPXLocal_WITH_FETCH_ASIO=On \
+                -DHPXLocal_WITH_TESTS=On \
+                -DHPXLocal_WITH_EXAMPLES=Off
             rm -rf *
       - run:
           name: Running CMake with tests off and examples on
@@ -254,10 +229,10 @@ jobs:
             cmake \
                 /hpx/source \
                 -G "Ninja" \
-                -DHPX_WITH_MALLOC=system \
-                -DHPX_WITH_FETCH_ASIO=On \
-                -DHPX_WITH_TESTS=Off \
-                -DHPX_WITH_EXAMPLES=On
+                -DHPXLocal_WITH_MALLOC=system \
+                -DHPXLocal_WITH_FETCH_ASIO=On \
+                -DHPXLocal_WITH_TESTS=Off \
+                -DHPXLocal_WITH_EXAMPLES=On
             rm -rf *
       - run:
           name: Running CMake with APEX on
@@ -265,11 +240,11 @@ jobs:
             cmake \
                 /hpx/source \
                 -G "Ninja" \
-                -DHPX_WITH_MALLOC=system \
-                -DHPX_WITH_FETCH_ASIO=On \
-                -DHPX_WITH_APEX=On \
-                -DHPX_WITH_TESTS=On \
-                -DHPX_WITH_EXAMPLES=On
+                -DHPXLocal_WITH_MALLOC=system \
+                -DHPXLocal_WITH_FETCH_ASIO=On \
+                -DHPXLocal_WITH_APEX=On \
+                -DHPXLocal_WITH_TESTS=On \
+                -DHPXLocal_WITH_EXAMPLES=On
             rm -rf *
       - persist_to_workspace:
           root: /hpx
@@ -329,33 +304,6 @@ jobs:
           path: /tmp/spelling_suggestions.txt
           destination: /hpx/artifacts/spelling_suggestions.txt
 
-  docs:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Sphinx Documentation
-          command: |
-              ninja -j1 docs
-          no_output_timeout: 2h
-      - persist_to_workspace:
-          root: /hpx
-          paths:
-            - ./build
-
-  docs_push:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - <<: *add_github_to_known_hosts
-      - <<: *configure_local_git
-      - run:
-          name: Pushing Sphinx Documentation
-          command: |
-              ninja -j1 git_docs
-
   core:
     <<: *defaults
     steps:
@@ -364,7 +312,7 @@ jobs:
       - run:
           name: Building Core
           command: |
-              ninja -j2 -k 0 core
+              ninja -j2 -k 0 hpx_local
       - persist_to_workspace:
           root: /hpx
           paths:
@@ -414,7 +362,6 @@ jobs:
           name: Building Unit Tests
           command: |
               ninja -j2 -k 0 tests.unit
-              ninja -j1 -k 0 tests.unit.modules.segmented_algorithms
       - run:
           name: Running Unit Tests
           when: always
@@ -427,15 +374,8 @@ jobs:
                 --output-on-failure \
                 --tests-regex tests.unit \
                 --exclude-regex \
-              "tests.unit.modules.segmented_algorithms|\
-              tests.unit.modules.compute.numa_allocator|\
+              "tests.unit.modules.compute.numa_allocator|\
               tests.unit.modules.resource_partitioner.scheduler_binding_check"
-              ctest \
-                --timeout 120 \
-                -T test \
-                --no-compress-output \
-                --output-on-failure \
-                --tests-regex tests.unit.modules.segmented_algorithms
       - run:
           <<: *convert_xml
       - run:
@@ -520,12 +460,12 @@ jobs:
       - run:
           name: Installing
           command: |
-              ./bin/hello_world_distributed --hpx:bind=none
+              ./bin/hello_world --hpx:bind=none
               # Disable Vc here as the target machine of the container image may
               # not support the same vector intrinsics as this machine. The
               # "Test Docker Image" below fails with "Illegal instruction" if VC
               # is enabled, and other machines may fail similarly.
-              cmake -DHPX_WITH_DATAPAR_VC=Off .
+              cmake -DHPXLocal_WITH_DATAPAR_VC=Off .
               ninja -j2 install
           working_directory: /hpx/build
           when: always
@@ -539,11 +479,7 @@ jobs:
       - run:
           name: Testing installed HPX
           command: |
-              hello_world_distributed --hpx:bind=none
-              ldconfig
-              hpxcxx --exe=hello_world_distributed_test_build ../source/examples/quickstart/hello_world_distributed.cpp -g -lhpx_iostreamsd
-              ./hello_world_distributed_test_build --hpx:bind=none
-              hpxrun.py -l 2 -t 1 ./hello_world_distributed_test_build -- --hpx:bind=none
+              hello_world --hpx:bind=none
           working_directory: /hpx/build
           when: always
       - run:
@@ -559,28 +495,8 @@ jobs:
       - run:
           name: Test Docker Image
           command: |
-              docker run ${TARGET_IMAGE_NAME} hello_world_distributed --hpx:bind=none
-              docker create -v /hpx --name sources stellargroup/hpx:dev /bin/true
-              docker cp ./source/examples/quickstart/hello_world_distributed.cpp sources:/hpx
-              docker run --volumes-from sources -w /hpx ${TARGET_IMAGE_NAME} \
-                hpxcxx --exe=hello_world_distributed_test_build              \
-                hello_world_distributed.cpp -g -lhpx_iostreamsd
-              docker run --volumes-from sources -w /hpx ${TARGET_IMAGE_NAME} \
-                ./hello_world_distributed_test_build --hpx:bind=none
-              docker run --volumes-from sources -w /hpx ${TARGET_IMAGE_NAME} \
-                hpxrun.py -l 2 -t 2 ./hello_world_distributed_test_build -- --hpx:bind=none
+              docker run ${TARGET_IMAGE_NAME} hello_world --hpx:bind=none
           working_directory: /hpx
-      - <<: *add_github_to_known_hosts
-      - <<: *configure_local_git
-      - run:
-          name: Push Docker Image
-          command: |
-              if [[ -z "$CIRCLE_PR_NUMBER" ]] && [[ "$CIRCLE_BRANCH" == "master" ]]; then
-                  docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
-                  docker push ${TARGET_IMAGE_NAME}
-              else
-                  echo "Not on the master branch. The docker image will not be pushed."
-              fi
 
   # This is the final step once everything else passes. We need a full clone
   # here again to be able to push the new tag.
@@ -615,42 +531,32 @@ workflows:
   version: 2
   build-and-test:
     jobs:
-      - checkout_code:
-          <<: *gh_pages_filter
+      - checkout_code
       - check_circular_deps:
           requires:
             - checkout_code
-          <<: *gh_pages_filter
       - check_module_cmakelists:
           requires:
             - checkout_code
-          <<: *gh_pages_filter
       - clang_format:
           requires:
             - checkout_code
-          <<: *gh_pages_filter
       - cmake_format:
           requires:
             - checkout_code
-          <<: *gh_pages_filter
       - configure:
           requires:
             - checkout_code
-          <<: *gh_pages_filter
       - configure_test_combinations:
           requires:
             - checkout_code
-          <<: *gh_pages_filter
       - inspect:
           requires:
             - configure
-          <<: *gh_pages_filter
-      - spellcheck:
-          <<: *gh_pages_filter
+      - spellcheck
       - core:
           requires:
             - configure
-          <<: *gh_pages_filter
       - tests.examples:
           <<: *core_dependency
       - tests.unit:
@@ -661,17 +567,6 @@ workflows:
           <<: *core_dependency
       - tests.headers:
           <<: *core_dependency
-      - docs:
-          requires:
-            - configure
-            # Force docs to be built after examples so that workspace doesn't
-            # have conflicts
-            - tests.examples
-          <<: *gh_pages_filter
-      - docs_push:
-          requires:
-            - docs
-          <<: *docs_push_filter
       - install:
           requires:
             - core
@@ -680,8 +575,6 @@ workflows:
             - tests.regressions
             - tests.performance
             - tests.headers
-          <<: *gh_pages_filter
       - push_stable_tag:
           requires:
             - install
-          <<: *gh_pages_filter

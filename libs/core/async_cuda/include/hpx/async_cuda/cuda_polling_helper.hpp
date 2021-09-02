@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_cuda/detail/cuda_event_callback.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>

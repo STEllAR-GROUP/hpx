@@ -49,15 +49,15 @@ set(program_options_sources
     winmain.cpp
 )
 
-include(HPX_AddModule)
-add_hpx_module(
-  core program_options
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local program_options
   GLOBAL_HEADER_GEN OFF
   SOURCES ${program_options_sources}
   HEADERS ${program_options_headers}
   COMPAT_HEADERS ${program_options_compat_headers}
   DEPENDENCIES ${__boost_program_options}
-  MODULE_DEPENDENCIES hpx_config hpx_datastructures hpx_format
+  MODULE_DEPENDENCIES hpx_config_local hpx_datastructures hpx_format
                       hpx_iterator_support
   CMAKE_SUBDIRS examples tests
 )

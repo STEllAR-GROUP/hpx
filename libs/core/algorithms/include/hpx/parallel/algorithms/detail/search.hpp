@@ -9,7 +9,7 @@
 //  https://en.cppreference.com/w/cpp/algorithm/ranges/search
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/functional/detail/invoke.hpp>

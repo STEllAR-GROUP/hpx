@@ -38,7 +38,7 @@
  * we will play it safe and use an atomic count. The overhead shouldn't
  * be big.
  */
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 // This needs to be first for building on Macs
 #include <hpx/coroutines/detail/context_impl.hpp>

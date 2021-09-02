@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #include <hpx/functional/detail/invoke.hpp>
@@ -31,7 +31,8 @@
 
 namespace hpx { namespace util {
     namespace detail {
-        HPX_CORE_EXPORT char const* store_function_annotation(std::string name);
+        HPX_LOCAL_EXPORT char const* store_function_annotation(
+            std::string name);
     }    // namespace detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)

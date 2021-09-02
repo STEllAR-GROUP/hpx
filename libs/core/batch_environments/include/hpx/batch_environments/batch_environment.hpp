@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
+#include <hpx/local/config.hpp>
+#include <hpx/local/config/asio.hpp>
 
 #include <asio/ip/tcp.hpp>
 
@@ -26,7 +26,7 @@
 namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////
     // Try to retrieve default values from a batch environment
-    struct HPX_CORE_EXPORT batch_environment
+    struct HPX_LOCAL_EXPORT batch_environment
     {
         // the constructor tries to read initial values from a batch environment,
         // filling our map of nodes and thread counts

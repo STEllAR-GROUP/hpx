@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/topology/cpu_mask.hpp>
@@ -69,7 +69,7 @@ namespace hpx { namespace threads {
         }
 
         // stringify the bitmp using hwloc
-        friend HPX_CORE_EXPORT std::ostream& operator<<(
+        friend HPX_LOCAL_EXPORT std::ostream& operator<<(
             std::ostream& os, hpx_hwloc_bitmap_wrapper const* bmp);
 
     private:
@@ -96,9 +96,9 @@ namespace hpx { namespace threads {
         membind_user = HWLOC_MEMBIND_MIXED + 256
     };
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
-    struct HPX_CORE_EXPORT topology
+    struct HPX_LOCAL_EXPORT topology
     {
         topology();
         ~topology();
@@ -407,12 +407,12 @@ namespace hpx { namespace threads {
         std::vector<mask_type> thread_affinity_masks_;
     };
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT topology& create_topology();
+    HPX_LOCAL_EXPORT topology& create_topology();
 
-    HPX_NODISCARD HPX_CORE_EXPORT unsigned int hardware_concurrency();
+    HPX_NODISCARD HPX_LOCAL_EXPORT unsigned int hardware_concurrency();
 
     ///////////////////////////////////////////////////////////////////////////
     // abstract away memory page size, calls to system functions are

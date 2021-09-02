@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/member_pack.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/receiver.hpp>

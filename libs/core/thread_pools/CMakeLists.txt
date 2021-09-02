@@ -22,16 +22,16 @@ set(thread_pools_compat_headers
 
 set(thread_pools_sources scheduled_thread_pool.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core thread_pools
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local thread_pools
   GLOBAL_HEADER_GEN ON
   SOURCES ${thread_pools_sources}
   HEADERS ${thread_pools_headers}
   COMPAT_HEADERS ${thread_pools_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
-    hpx_config
+    hpx_config_local
     hpx_debugging
     hpx_errors
     hpx_itt_notify

@@ -11,12 +11,14 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     FOLDER "Tests/Unit/Modules/Core/PackTraversal"
   )
 
-  add_hpx_unit_test("modules.pack_traversal" ${test} ${${test}_PARAMETERS})
+  hpx_local_add_unit_test(
+    "modules.pack_traversal" ${test} ${${test}_PARAMETERS}
+  )
 endforeach()

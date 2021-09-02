@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/traits/is_tuple_like.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/testing.hpp>

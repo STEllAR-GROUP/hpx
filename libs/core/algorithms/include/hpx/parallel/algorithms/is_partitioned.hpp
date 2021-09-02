@@ -106,7 +106,7 @@ namespace hpx {
 }    // namespace hpx
 #else
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -231,7 +231,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }    // namespace detail
 
     template <typename ExPolicy, typename FwdIter, typename Pred>
-    HPX_DEPRECATED_V(1, 6, "Please use hpx::is_partitioned instead")
+    HPX_LOCAL_DEPRECATED_V(1, 6, "Please use hpx::is_partitioned instead")
     inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
         is_partitioned(

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/preprocessor/cat.hpp>
@@ -28,7 +28,7 @@
 namespace hpx { namespace util {
 
     using test_failure_handler_type = function_nonser<void()>;
-    HPX_CORE_EXPORT void set_test_failure_handler(test_failure_handler_type f);
+    HPX_LOCAL_EXPORT void set_test_failure_handler(test_failure_handler_type f);
 
     enum counter_type
     {
@@ -54,9 +54,9 @@ namespace hpx { namespace util {
             {
             }
 
-            HPX_CORE_EXPORT void increment(counter_type c);
+            HPX_LOCAL_EXPORT void increment(counter_type c);
 
-            HPX_CORE_EXPORT std::size_t get(counter_type c) const;
+            HPX_LOCAL_EXPORT std::size_t get(counter_type c) const;
 
             template <typename T>
             bool check_(char const* file, int line, char const* function,
@@ -173,15 +173,15 @@ namespace hpx { namespace util {
             }
         };
 
-        HPX_CORE_EXPORT extern fixture global_fixture;
+        HPX_LOCAL_EXPORT extern fixture global_fixture;
 
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT int report_errors();
-    HPX_CORE_EXPORT int report_errors(std::ostream& stream);
-    HPX_CORE_EXPORT void print_cdash_timing(const char* name, double time);
-    HPX_CORE_EXPORT void print_cdash_timing(
+    HPX_LOCAL_EXPORT int report_errors();
+    HPX_LOCAL_EXPORT int report_errors(std::ostream& stream);
+    HPX_LOCAL_EXPORT void print_cdash_timing(const char* name, double time);
+    HPX_LOCAL_EXPORT void print_cdash_timing(
         const char* name, std::uint64_t time);
 
 }}    // namespace hpx::util

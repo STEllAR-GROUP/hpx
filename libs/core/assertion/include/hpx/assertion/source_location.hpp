@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/local/config/export_definitions.hpp>
 
 #include <iosfwd>
 
@@ -19,6 +19,6 @@ namespace hpx { namespace assertion {
         unsigned line_number;
         const char* function_name;
     };
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_LOCAL_EXPORT std::ostream& operator<<(
         std::ostream& os, source_location const& loc);
 }}    // namespace hpx::assertion

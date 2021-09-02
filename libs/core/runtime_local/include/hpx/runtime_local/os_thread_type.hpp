@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <cstdint>
 #include <string>
@@ -28,7 +28,7 @@ namespace hpx { namespace runtime_local {
     };
 
     /// Return a human-readable name representing one of the kernel thread types
-    HPX_CORE_EXPORT std::string get_os_thread_type_name(os_thread_type type);
+    HPX_LOCAL_EXPORT std::string get_os_thread_type_name(os_thread_type type);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Registration data for kernel threads that is maintained by the runtime

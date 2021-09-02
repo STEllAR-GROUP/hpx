@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/ini/ini.hpp>
 #include <hpx/resource_partitioner/detail/create_partitioner.hpp>
@@ -147,19 +147,19 @@ namespace hpx { namespace resource {
     public:
         ///////////////////////////////////////////////////////////////////////
         // Create one of the predefined thread pools
-        HPX_CORE_EXPORT void create_thread_pool(std::string const& name,
+        HPX_LOCAL_EXPORT void create_thread_pool(std::string const& name,
             scheduling_policy sched = scheduling_policy::unspecified,
             hpx::threads::policies::scheduler_mode =
                 hpx::threads::policies::scheduler_mode::default_mode);
 
         // Create a custom thread pool with a callback function
-        HPX_CORE_EXPORT void create_thread_pool(
+        HPX_LOCAL_EXPORT void create_thread_pool(
             std::string const& name, scheduler_function scheduler_creation);
 
         // allow the default pool to be renamed to something else
-        HPX_CORE_EXPORT void set_default_pool_name(std::string const& name);
+        HPX_LOCAL_EXPORT void set_default_pool_name(std::string const& name);
 
-        HPX_CORE_EXPORT const std::string& get_default_pool_name() const;
+        HPX_LOCAL_EXPORT const std::string& get_default_pool_name() const;
 
         ///////////////////////////////////////////////////////////////////////
         // Functions to add processing units to thread pools via
@@ -169,35 +169,35 @@ namespace hpx { namespace resource {
         {
             add_resource(p, pool_name, true, num_threads);
         }
-        HPX_CORE_EXPORT void add_resource(hpx::resource::pu const& p,
+        HPX_LOCAL_EXPORT void add_resource(hpx::resource::pu const& p,
             std::string const& pool_name, bool exclusive,
             std::size_t num_threads = 1);
-        HPX_CORE_EXPORT void add_resource(
+        HPX_LOCAL_EXPORT void add_resource(
             std::vector<hpx::resource::pu> const& pv,
             std::string const& pool_name, bool exclusive = true);
-        HPX_CORE_EXPORT void add_resource(hpx::resource::core const& c,
+        HPX_LOCAL_EXPORT void add_resource(hpx::resource::core const& c,
             std::string const& pool_name, bool exclusive = true);
-        HPX_CORE_EXPORT void add_resource(std::vector<hpx::resource::core>& cv,
+        HPX_LOCAL_EXPORT void add_resource(std::vector<hpx::resource::core>& cv,
             std::string const& pool_name, bool exclusive = true);
-        HPX_CORE_EXPORT void add_resource(hpx::resource::numa_domain const& nd,
+        HPX_LOCAL_EXPORT void add_resource(hpx::resource::numa_domain const& nd,
             std::string const& pool_name, bool exclusive = true);
-        HPX_CORE_EXPORT void add_resource(
+        HPX_LOCAL_EXPORT void add_resource(
             std::vector<hpx::resource::numa_domain> const& ndv,
             std::string const& pool_name, bool exclusive = true);
 
         // Access all available NUMA domains
-        HPX_CORE_EXPORT std::vector<numa_domain> const& numa_domains() const;
+        HPX_LOCAL_EXPORT std::vector<numa_domain> const& numa_domains() const;
 
         // Returns the threads requested at startup --hpx:threads=cores
         // for example will return the number actually created
-        HPX_CORE_EXPORT std::size_t get_number_requested_threads();
+        HPX_LOCAL_EXPORT std::size_t get_number_requested_threads();
 
         // return the topology object managed by the internal partitioner
-        HPX_CORE_EXPORT hpx::threads::topology const& get_topology() const;
+        HPX_LOCAL_EXPORT hpx::threads::topology const& get_topology() const;
 
         // Does initialization of all resources and internal data of the
         // resource partitioner called in hpx_init
-        HPX_CORE_EXPORT void configure_pools();
+        HPX_LOCAL_EXPORT void configure_pools();
 
     private:
         detail::partitioner& partitioner_;

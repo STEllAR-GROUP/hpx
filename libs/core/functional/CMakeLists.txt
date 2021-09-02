@@ -67,9 +67,9 @@ set(functional_compat_headers
 # Default location is $HPX_ROOT/libs/functional/src
 set(functional_sources basic_function.cpp empty_function.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core functional
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local functional
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER
     "hpx/functional/traits/get_function_address.hpp"
@@ -82,7 +82,7 @@ add_hpx_module(
   COMPAT_HEADERS ${functional_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
-    hpx_config
+    hpx_config_local
     hpx_datastructures
     hpx_debugging
     hpx_errors

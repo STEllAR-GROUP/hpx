@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 
@@ -34,7 +34,7 @@ namespace hpx { namespace debug {
 
         threads::thread_data const* data;
 
-        HPX_CORE_EXPORT friend std::ostream& operator<<(
+        HPX_LOCAL_EXPORT friend std::ostream& operator<<(
             std::ostream& os, threadinfo const& d);
     };
 
@@ -48,7 +48,7 @@ namespace hpx { namespace debug {
 
         threads::thread_id_type const* data;
 
-        HPX_CORE_EXPORT friend std::ostream& operator<<(
+        HPX_LOCAL_EXPORT friend std::ostream& operator<<(
             std::ostream& os, threadinfo const& d);
     };
 
@@ -62,7 +62,7 @@ namespace hpx { namespace debug {
 
         threads::thread_id_ref_type const* data;
 
-        HPX_CORE_EXPORT friend std::ostream& operator<<(
+        HPX_LOCAL_EXPORT friend std::ostream& operator<<(
             std::ostream& os, threadinfo const& d);
     };
 
@@ -76,7 +76,7 @@ namespace hpx { namespace debug {
 
         hpx::threads::thread_init_data const& data;
 
-        HPX_CORE_EXPORT friend std::ostream& operator<<(
+        HPX_LOCAL_EXPORT friend std::ostream& operator<<(
             std::ostream& os, threadinfo const& d);
     };
 }}    // namespace hpx::debug

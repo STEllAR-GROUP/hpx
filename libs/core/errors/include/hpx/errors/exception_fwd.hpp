@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/errors/error.hpp>
 
 namespace hpx {
@@ -17,9 +17,9 @@ namespace hpx {
     // forward declaration
     class error_code;
 
-    class HPX_CORE_EXPORT exception;
+    class HPX_LOCAL_EXPORT exception;
 
-    struct HPX_CORE_EXPORT thread_interrupted;
+    struct HPX_LOCAL_EXPORT thread_interrupted;
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ namespace hpx {
     // the compiler.
     extern HPX_DEVICE error_code throws;
 #else
-    HPX_CORE_EXPORT extern error_code throws;
+    HPX_LOCAL_EXPORT extern error_code throws;
 #endif
 }    // namespace hpx
 

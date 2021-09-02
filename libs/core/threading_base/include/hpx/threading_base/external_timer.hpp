@@ -6,7 +6,7 @@
 
 #pragma once    // prevent multiple inclusions of this header file.
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/functional/function.hpp>
@@ -22,7 +22,7 @@ namespace hpx { namespace util {
 
     using enable_parent_task_handler_type = util::function_nonser<bool()>;
 
-    HPX_CORE_EXPORT void set_enable_parent_task_handler(
+    HPX_LOCAL_EXPORT void set_enable_parent_task_handler(
         enable_parent_task_handler_type f);
 
     namespace external_timer {
@@ -97,24 +97,24 @@ namespace hpx { namespace util {
         // The actual function pointers. Some of them need to be exported,
         // because through the miracle of chained headers they get referenced
         // outside of the HPX library.
-        HPX_CORE_EXPORT extern init_t* init_function;
-        HPX_CORE_EXPORT extern finalize_t* finalize_function;
-        HPX_CORE_EXPORT extern register_thread_t* register_thread_function;
-        HPX_CORE_EXPORT extern new_task_string_t* new_task_string_function;
-        HPX_CORE_EXPORT extern new_task_address_t* new_task_address_function;
-        HPX_CORE_EXPORT extern sample_value_t* sample_value_function;
-        HPX_CORE_EXPORT extern send_t* send_function;
-        HPX_CORE_EXPORT extern recv_t* recv_function;
-        HPX_CORE_EXPORT extern update_task_string_t*
+        HPX_LOCAL_EXPORT extern init_t* init_function;
+        HPX_LOCAL_EXPORT extern finalize_t* finalize_function;
+        HPX_LOCAL_EXPORT extern register_thread_t* register_thread_function;
+        HPX_LOCAL_EXPORT extern new_task_string_t* new_task_string_function;
+        HPX_LOCAL_EXPORT extern new_task_address_t* new_task_address_function;
+        HPX_LOCAL_EXPORT extern sample_value_t* sample_value_function;
+        HPX_LOCAL_EXPORT extern send_t* send_function;
+        HPX_LOCAL_EXPORT extern recv_t* recv_function;
+        HPX_LOCAL_EXPORT extern update_task_string_t*
             update_task_string_function;
-        HPX_CORE_EXPORT extern update_task_address_t*
+        HPX_LOCAL_EXPORT extern update_task_address_t*
             update_task_address_function;
-        HPX_CORE_EXPORT extern start_t* start_function;
-        HPX_CORE_EXPORT extern stop_t* stop_function;
-        HPX_CORE_EXPORT extern yield_t* yield_function;
+        HPX_LOCAL_EXPORT extern start_t* start_function;
+        HPX_LOCAL_EXPORT extern stop_t* stop_function;
+        HPX_LOCAL_EXPORT extern yield_t* yield_function;
 
         // The function registration interface
-        HPX_CORE_EXPORT void register_external_timer(
+        HPX_LOCAL_EXPORT void register_external_timer(
             registration_t& registration_record);
 
         // The actual API. For all cases, check if the function pointer is null,
@@ -207,12 +207,12 @@ namespace hpx { namespace util {
             }
         }
 
-        HPX_CORE_EXPORT std::shared_ptr<task_wrapper> new_task(
+        HPX_LOCAL_EXPORT std::shared_ptr<task_wrapper> new_task(
             thread_description const& description,
             std::uint32_t parent_locality_id,
             threads::thread_id_type parent_task);
 
-        HPX_CORE_EXPORT inline std::shared_ptr<task_wrapper> update_task(
+        HPX_LOCAL_EXPORT inline std::shared_ptr<task_wrapper> update_task(
             std::shared_ptr<task_wrapper> wrapper,
             thread_description const& description)
         {

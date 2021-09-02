@@ -8,10 +8,10 @@
 
 #pragma once
 
-namespace hpx {
+namespace hpx::local {
 
     char const* const config_strings[] =
-    {@hpx_config_information@
+    {@hpx_local_config_information@
         nullptr
     };
 }

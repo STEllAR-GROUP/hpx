@@ -522,7 +522,7 @@ namespace hpx { namespace ranges {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -555,7 +555,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::find_end is deprecated, use hpx::ranges::find_end "
         "instead")
         typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -603,7 +603,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::find_first_of is deprecated, use "
         "hpx::ranges::find_first_of instead")
         typename hpx::parallel::util::detail::algorithm_result<ExPolicy,

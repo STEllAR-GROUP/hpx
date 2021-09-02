@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT (HPX_WITH_CUDA OR HPX_WITH_HIP) OR NOT HPX_WITH_ASYNC_CUDA)
+if(NOT HPXLocal_WITH_GPU_SUPPORT)
   return()
 endif()
 
@@ -39,17 +39,17 @@ set(async_cuda_sources cuda_event_callback.cpp cuda_future.cpp cuda_target.cpp
                        get_targets.cpp
 )
 
-if(HPX_WITH_HIP AND TARGET roc::hipblas)
+if(HPXLocal_WITH_HIP AND TARGET roc::hipblas)
   set(async_cuda_extra_deps ${async_cuda_extra_deps} roc::hipblas)
-elseif(HPX_WITH_CUDA AND TARGET Cuda::cuda)
+elseif(HPXLocal_WITH_CUDA AND TARGET Cuda::cuda)
   set(async_cuda_extra_deps ${async_cuda_extra_deps} Cuda::cuda
                             ${CUDA_CUBLAS_LIBRARIES}
   )
 endif()
 
-include(HPX_AddModule)
-add_hpx_module(
-  core async_cuda
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local async_cuda
   GLOBAL_HEADER_GEN ON
   SOURCES ${async_cuda_sources}
   HEADERS ${async_cuda_headers}
@@ -58,7 +58,7 @@ add_hpx_module(
     hpx_allocator_support
     hpx_assertion
     hpx_concurrency
-    hpx_config
+    hpx_config_local
     hpx_debugging
     hpx_errors
     hpx_execution_base

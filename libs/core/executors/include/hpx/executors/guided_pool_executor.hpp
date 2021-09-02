@@ -23,7 +23,7 @@
 
 //#define GUIDED_POOL_EXECUTOR_FAKE_NOOP
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 #if !defined(GUIDED_POOL_EXECUTOR_DEBUG)
 #define GUIDED_POOL_EXECUTOR_DEBUG false
@@ -629,4 +629,4 @@ namespace hpx { namespace parallel { namespace execution {
 
 }}}    // namespace hpx::parallel::execution
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

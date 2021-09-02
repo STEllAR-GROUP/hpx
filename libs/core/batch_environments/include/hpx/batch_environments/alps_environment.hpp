@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <cstddef>
 #include <string>
@@ -17,7 +17,7 @@ namespace hpx { namespace util { namespace batch_environments {
 
     struct alps_environment
     {
-        HPX_CORE_EXPORT alps_environment(
+        HPX_LOCAL_EXPORT alps_environment(
             std::vector<std::string>& nodelist, bool debug);
 
         bool valid() const

@@ -10,7 +10,7 @@
 //
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <cstddef>
 #include <iosfwd>
@@ -20,11 +20,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
     namespace stack_trace {
-        HPX_CORE_EXPORT std::size_t trace(void** addresses, std::size_t size);
-        HPX_CORE_EXPORT void write_symbols(
+        HPX_LOCAL_EXPORT std::size_t trace(void** addresses, std::size_t size);
+        HPX_LOCAL_EXPORT void write_symbols(
             void* const* addresses, std::size_t size, std::ostream&);
-        HPX_CORE_EXPORT std::string get_symbol(void* address);
-        HPX_CORE_EXPORT std::string get_symbols(
+        HPX_LOCAL_EXPORT std::string get_symbol(void* address);
+        HPX_LOCAL_EXPORT std::string get_symbols(
             void* const* address, std::size_t size);
     }    // namespace stack_trace
 

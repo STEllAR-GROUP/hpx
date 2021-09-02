@@ -8,8 +8,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
+#include <hpx/local/config.hpp>
+#include <hpx/local/config/asio.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/io_service/io_service_pool.hpp>

@@ -376,7 +376,7 @@ namespace hpx { namespace ranges {
         Proj&& proj = Proj());
 }}    // namespace hpx::ranges
 #else
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
@@ -400,7 +400,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
                 hpx::parallel::traits::projected_range<Proj, Rng>>::value)>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::for_each is deprecated, use "
         "hpx::ranges::for_each instead")
         typename util::detail::algorithm_result<ExPolicy,

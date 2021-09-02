@@ -52,16 +52,16 @@ set(futures_compat_headers
 
 set(futures_sources future_data.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core futures
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local futures
   GLOBAL_HEADER_GEN ON
   SOURCES ${futures_sources}
   HEADERS ${futures_headers}
   COMPAT_HEADERS ${futures_compat_headers}
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/futures/detail/future_data.hpp"
                              "hpx/futures/detail/future_transforms.hpp"
-  MODULE_DEPENDENCIES hpx_async_base hpx_config hpx_allocator_support hpx_errors
-                      hpx_memory hpx_synchronization
+  MODULE_DEPENDENCIES hpx_async_base hpx_config_local hpx_allocator_support
+                      hpx_errors hpx_memory hpx_synchronization
   CMAKE_SUBDIRS examples tests
 )

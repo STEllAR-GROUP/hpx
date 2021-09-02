@@ -4,46 +4,51 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-include(HPX_Message)
-include(HPX_AddPseudoDependencies)
-include(HPX_AddPseudoTarget)
+include(HPXLocal_Message)
+include(HPXLocal_AddPseudoDependencies)
+include(HPXLocal_AddPseudoTarget)
 
 # add example pseudo targets needed for modules
-if(HPX_WITH_EXAMPLES)
-  add_hpx_pseudo_target(examples.modules)
-  add_hpx_pseudo_dependencies(examples examples.modules)
+if(HPXLocal_WITH_EXAMPLES)
+  hpx_local_add_pseudo_target(examples.modules)
+  hpx_local_add_pseudo_dependencies(examples examples.modules)
 endif()
 
 # add test pseudo targets needed for modules
-if(HPX_WITH_TESTS)
-  if(HPX_WITH_TESTS_UNIT)
-    add_hpx_pseudo_target(tests.unit.modules)
-    add_hpx_pseudo_dependencies(tests.unit tests.unit.modules)
+hpx_local_warn("HPXLocal_WITH_TESTS=${HPXLocal_WITH_TESTS}")
+if(HPXLocal_WITH_TESTS)
+  if(HPXLocal_WITH_TESTS_UNIT)
+    hpx_local_add_pseudo_target(tests.unit.modules)
+    hpx_local_add_pseudo_dependencies(tests.unit tests.unit.modules)
   endif()
 
-  if(HPX_WITH_EXAMPLES AND HPX_WITH_TESTS_EXAMPLES)
-    add_hpx_pseudo_target(tests.examples.modules)
-    add_hpx_pseudo_dependencies(tests.examples tests.examples.modules)
+  if(HPXLocal_WITH_EXAMPLES AND HPXLocal_WITH_TESTS_EXAMPLES)
+    hpx_local_add_pseudo_target(tests.examples.modules)
+    hpx_local_add_pseudo_dependencies(tests.examples tests.examples.modules)
   endif()
 
-  if(HPX_WITH_TESTS_REGRESSIONS)
-    add_hpx_pseudo_target(tests.regressions.modules)
-    add_hpx_pseudo_dependencies(tests.regressions tests.regressions.modules)
+  if(HPXLocal_WITH_TESTS_REGRESSIONS)
+    hpx_local_add_pseudo_target(tests.regressions.modules)
+    hpx_local_add_pseudo_dependencies(
+      tests.regressions tests.regressions.modules
+    )
   endif()
 
-  if(HPX_WITH_TESTS_BENCHMARKS)
-    add_hpx_pseudo_target(tests.performance.modules)
-    add_hpx_pseudo_dependencies(tests.performance tests.performance.modules)
+  if(HPXLocal_WITH_TESTS_BENCHMARKS)
+    hpx_local_add_pseudo_target(tests.performance.modules)
+    hpx_local_add_pseudo_dependencies(
+      tests.performance tests.performance.modules
+    )
   endif()
 
-  if(HPX_WITH_TESTS_HEADERS)
-    add_hpx_pseudo_target(tests.headers.modules)
-    add_hpx_pseudo_dependencies(tests.headers tests.headers.modules)
+  if(HPXLocal_WITH_TESTS_HEADERS)
+    hpx_local_add_pseudo_target(tests.headers.modules)
+    hpx_local_add_pseudo_dependencies(tests.headers tests.headers.modules)
   endif()
 endif()
 
-hpx_info("")
-hpx_info("Configuring modules:")
+hpx_local_info("")
+hpx_local_info("Configuring modules:")
 
 # Generate a file that lists all enabled modules for checks that might be
 # optional based on the presence of a module or not
@@ -53,38 +58,31 @@ set(MODULE_ENABLED_MODULE_DEFINES)
 set(CONFIG_STRINGS_MODULES_INCLUDES)
 set(CONFIG_STRINGS_MODULES_ENTRIES)
 
-set(HPX_LIBS
-    core full
-    CACHE INTERNAL "List of HPX libraries" FORCE
+string(TOUPPER local uppercase_lib)
+add_library(hpx_local SHARED src/dummy.cpp)
+target_compile_definitions(hpx_local PRIVATE HPX_LOCAL_EXPORTS)
+set_target_properties(hpx_local PROPERTIES FOLDER "Local")
+set_target_properties(
+  hpx_local
+  PROPERTIES VERSION ${HPXLocal_VERSION}
+             SOVERSION ${HPXLocal_SOVERSION}
+             CLEAN_DIRECT_OUTPUT 1
+             OUTPUT_NAME hpx_local
+             FOLDER "Local"
 )
+install(
+  TARGETS hpx_local
+  EXPORT HPXLocalTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT local
+)
+hpx_local_export_targets(hpx_local)
 
-foreach(lib ${HPX_LIBS})
-  # NOTE: hpx_full (i.e. the target representing libhpx.so) is still created in
-  # src/CMakeLists.txt. When all of hpx_full has been modularized the target
-  # creation can move here as well.
-  if(NOT ${lib} STREQUAL "full")
-    string(TOUPPER ${lib} uppercase_lib)
-    add_library(hpx_${lib} SHARED src/dummy.cpp)
-    target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
+add_subdirectory(core)
 
-    set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")
-
-    install(
-      TARGETS hpx_${lib}
-      EXPORT HPXInternalTargets
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${lib}
-    )
-
-    hpx_export_internal_targets(hpx_${lib})
-  endif()
-
-  add_subdirectory(${lib})
-endforeach()
-
-# add_hpx_module populates HPX_ENABLED_MODULES
-foreach(module ${HPX_ENABLED_MODULES})
+# hpx_local_add_module populates HPXLocal_ENABLED_MODULES
+foreach(module ${HPXLocal_ENABLED_MODULES})
   string(TOUPPER ${module} uppercase_module)
 
   set(MODULE_ENABLED_MODULE_DEFINES
@@ -94,18 +92,18 @@ endforeach()
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/modules_enabled.hpp.in"
-  "${PROJECT_BINARY_DIR}/libs/core/config/include/hpx/config/modules_enabled.hpp"
+  "${PROJECT_BINARY_DIR}/libs/core/config_local/include/hpx/local/config/modules_enabled.hpp"
   @ONLY
 )
 
-if(MSVC AND HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
-  target_link_options(hpx_core PRIVATE "/EXPORT:switch_to_fiber")
+if(MSVC AND HPXLocal_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
+  target_link_options(hpx_local PRIVATE "/EXPORT:switch_to_fiber")
 endif()
 
-if(HPX_WITH_DATAPAR_VC)
-  target_link_libraries(hpx_core PUBLIC Vc::vc)
+if(HPXLocal_WITH_DATAPAR_VC)
+  target_link_libraries(hpx_local PUBLIC Vc::vc)
 endif()
 
-if(HPX_WITH_ITTNOTIFY)
-  target_link_libraries(hpx_core PUBLIC Amplifier::amplifier)
+if(HPXLocal_WITH_ITTNOTIFY)
+  target_link_libraries(hpx_local PUBLIC Amplifier::amplifier)
 endif()

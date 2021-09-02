@@ -32,9 +32,9 @@
 #include <windows.h>
 #include <winnt.h>
 
-#include <hpx/config.hpp>
-#include <hpx/coroutines/config/defines.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/coroutines/config/defines.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>
 #include <hpx/type_support/unused.hpp>

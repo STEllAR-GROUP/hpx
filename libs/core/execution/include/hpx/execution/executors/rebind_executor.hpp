@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/execution.hpp>

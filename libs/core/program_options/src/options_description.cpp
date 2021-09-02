@@ -394,7 +394,7 @@ namespace hpx { namespace program_options {
         return found.get();
     }
 
-    HPX_CORE_EXPORT
+    HPX_LOCAL_EXPORT
     std::ostream& operator<<(std::ostream& os, const options_description& desc)
     {
         desc.print(os);

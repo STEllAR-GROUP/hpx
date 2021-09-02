@@ -14,7 +14,7 @@
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/coroutines/detail/posix_utility.hpp>
@@ -60,7 +60,7 @@
 #endif
 
 /*
- * Defining HPX_COROUTINE_NO_SEPARATE_CALL_SITES will disable separate
+ * Defining HPX_LOCAL_COROUTINE_NO_SEPARATE_CALL_SITES will disable separate
  * invoke, and yield swap_context functions. Separate calls sites
  * increase performance by 25% at least on P4 for invoke+yield back loops
  * at the cost of a slightly higher instruction cache use and is thus enabled by
@@ -540,7 +540,7 @@ namespace hpx { namespace threads { namespace coroutines {
                     {
                         //        HPX_ASSERT(*(void**)from.m_stack == (void*)~0);
                         to.prefetch();
-#if !defined(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
+#if !defined(HPX_LOCAL_COROUTINE_NO_SEPARATE_CALL_SITES)
                         swapcontext_stack2(&from.m_sp, to.m_sp);
 #else
             swapcontext_stack(&from.m_sp, to.m_sp);

@@ -587,7 +587,7 @@ namespace hpx { namespace ranges {
 
 #else
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
@@ -618,7 +618,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected_range<Proj, Rng>>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 8, "hpx::parallel::unique is deprecated, use hpx::unique instead")
         typename util::detail::algorithm_result<ExPolicy,
             hpx::traits::range_iterator_t<Rng>>::type unique(ExPolicy&& policy,
@@ -650,7 +650,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected_range<Proj, Rng>>::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 8,
+    HPX_LOCAL_DEPRECATED_V(1, 8,
         "hpx::parallel::unique_copy is deprecated, use hpx::unique_copy "
         "instead") typename util::detail::algorithm_result<ExPolicy,
         util::in_out_result<hpx::traits::range_iterator_t<Rng>, FwdIter2>>::type

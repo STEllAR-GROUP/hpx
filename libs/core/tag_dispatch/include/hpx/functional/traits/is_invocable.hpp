@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/type_support/always_void.hpp>
 
@@ -74,12 +74,12 @@ namespace hpx {
 
     namespace traits {
         template <typename F, typename... Ts>
-        using is_invocable HPX_DEPRECATED_V(1, 6,
+        using is_invocable HPX_LOCAL_DEPRECATED_V(1, 6,
             "hpx::traits::is_invocable is deprecated, use hpx::is_invocable "
             "instead") = hpx::is_invocable<F, Ts...>;
 
         template <typename R, typename F, typename... Ts>
-        using is_invocable_r HPX_DEPRECATED_V(1, 6,
+        using is_invocable_r HPX_LOCAL_DEPRECATED_V(1, 6,
             "hpx::traits::is_invocable_r is deprecated, use "
             "hpx::is_invocable_r instead") = hpx::is_invocable_r<R, F, Ts...>;
     }    // namespace traits

@@ -12,9 +12,3 @@ leak:hwloc_topology_init
 # Tmp: Topology leak which appeared when changing the base image used for the
 # github action. Ignored temporarily as it is not related to bumping cmake
 leak:*hpx::threads::topology::topology*
-
-# The performance counter leak reported in some cases is benign as analysis has
-# shown that the counter is allocated once and is supposed to be free at the end
-# of execution only. No 'repeating' leak can happen.
-leak:*simple_heap<hpx::performance_counters::server::raw_counter>::alloc*
-leak:*hpx::performance_counters::detail::create_raw_counter*

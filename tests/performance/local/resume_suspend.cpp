@@ -9,9 +9,9 @@
 // openmp_parallel_region.
 
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/init.hpp>
 #include <hpx/local/chrono.hpp>
 #include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <hpx/modules/program_options.hpp>
@@ -37,11 +37,11 @@ int main(int argc, char** argv)
 
     std::uint64_t repetitions = vm["repetitions"].as<std::uint64_t>();
 
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    hpx::start(nullptr, argc, argv, init_args);
-    hpx::suspend();
+    hpx::local::start(nullptr, argc, argv, init_args);
+    hpx::local::suspend();
 
     std::uint64_t threads = hpx::resource::get_num_threads("default");
 
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
     {
         timer.restart();
 
-        hpx::resume();
+        hpx::local::resume();
         auto t_resume = timer.elapsed();
         resume_time += t_resume;
 
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 
         auto t_apply = timer.elapsed();
 
-        hpx::suspend();
+        hpx::local::suspend();
         auto t_suspend = timer.elapsed();
         suspend_time += t_suspend;
 
@@ -77,7 +77,7 @@ int main(int argc, char** argv)
     hpx::util::print_cdash_timing("ResumeTime", resume_time);
     hpx::util::print_cdash_timing("SuspendTime", suspend_time);
 
-    hpx::resume();
-    hpx::apply([]() { hpx::finalize(); });
-    hpx::stop();
+    hpx::local::resume();
+    hpx::apply([]() { hpx::local::finalize(); });
+    hpx::local::stop();
 }

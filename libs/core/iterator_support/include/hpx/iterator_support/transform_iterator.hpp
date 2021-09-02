@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/type_support/identity.hpp>

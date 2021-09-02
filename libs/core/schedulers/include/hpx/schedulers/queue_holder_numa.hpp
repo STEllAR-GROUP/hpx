@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue_mc.hpp>
 #include <hpx/threading_base/print.hpp>

@@ -716,7 +716,7 @@ namespace hpx { namespace ranges {
 
 #else
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/executors.hpp>

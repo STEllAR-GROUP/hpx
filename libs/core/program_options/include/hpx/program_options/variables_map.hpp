@@ -14,7 +14,7 @@
 #include <set>
 #include <string>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -30,7 +30,7 @@ namespace hpx { namespace program_options {
         If 'm' already has a non-defaulted value of an option, that value
         is not changed, even if 'options' specify some value.
     */
-    HPX_CORE_EXPORT
+    HPX_LOCAL_EXPORT
     void store(const basic_parsed_options<char>& options, variables_map& m,
         bool utf8 = false);
 
@@ -39,16 +39,16 @@ namespace hpx { namespace program_options {
         is not changed, even if 'options' specify some value.
         This is wide character variant.
     */
-    HPX_CORE_EXPORT
+    HPX_LOCAL_EXPORT
     void store(const basic_parsed_options<wchar_t>& options, variables_map& m);
 
     /** Runs all 'notify' function for options in 'm'. */
-    HPX_CORE_EXPORT void notify(variables_map& m);
+    HPX_LOCAL_EXPORT void notify(variables_map& m);
 
     /** Class holding value of option. Contains details about how the
         value is set and allows to conveniently obtain the value.
     */
-    class HPX_CORE_EXPORT variable_value
+    class HPX_LOCAL_EXPORT variable_value
     {
     public:
         variable_value()
@@ -96,15 +96,15 @@ namespace hpx { namespace program_options {
         // be easily accessible, so we need to store semantic here.
         std::shared_ptr<const value_semantic> m_value_semantic;
 
-        friend HPX_CORE_EXPORT void store(
+        friend HPX_LOCAL_EXPORT void store(
             const basic_parsed_options<char>& options, variables_map& m, bool);
 
-        friend class HPX_CORE_EXPORT variables_map;
+        friend class HPX_LOCAL_EXPORT variables_map;
     };
 
     /** Implements string->string mapping with convenient value casting
         facilities. */
-    class HPX_CORE_EXPORT abstract_variables_map
+    class HPX_LOCAL_EXPORT abstract_variables_map
     {
     public:
         abstract_variables_map();
@@ -145,7 +145,7 @@ namespace hpx { namespace program_options {
         This class is derived from std::map<std::string, variable_value>,
         so you can use all map operators to examine its content.
     */
-    class HPX_CORE_EXPORT variables_map
+    class HPX_LOCAL_EXPORT variables_map
       : public abstract_variables_map
       , public std::map<std::string, variable_value>
     {
@@ -173,7 +173,7 @@ namespace hpx { namespace program_options {
             be changed by subsequence assignments. */
         std::set<std::string> m_final;
 
-        friend HPX_CORE_EXPORT void store(
+        friend HPX_LOCAL_EXPORT void store(
             const basic_parsed_options<char>& options, variables_map& xm,
             bool utf8);
 
@@ -210,4 +210,4 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

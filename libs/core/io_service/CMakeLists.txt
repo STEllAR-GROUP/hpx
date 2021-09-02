@@ -18,9 +18,9 @@ set(io_service_compat_headers
 
 set(io_service_sources io_service_pool.cpp io_service_thread_pool.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core io_service
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local io_service
   GLOBAL_HEADER_GEN ON
   SOURCES ${io_service_sources}
   HEADERS ${io_service_headers}
@@ -29,7 +29,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_assertion
     hpx_concurrency
-    hpx_config
+    hpx_config_local
     hpx_errors
     hpx_functional
     hpx_logging

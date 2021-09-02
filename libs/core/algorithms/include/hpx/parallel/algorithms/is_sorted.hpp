@@ -222,7 +222,7 @@ namespace hpx {
 
 #else
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -328,7 +328,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }    // namespace detail
 
     template <typename ExPolicy, typename FwdIter, typename Pred = detail::less>
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::is_sorted is deprecated, use hpx::is_sorted instead")
     inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
@@ -433,7 +433,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }    // namespace detail
 
     template <typename ExPolicy, typename FwdIter, typename Pred = detail::less>
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::is_sorted_until is deprecated, use "
         "hpx::is_sorted_until instead")
     inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,

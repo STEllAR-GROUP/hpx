@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/program_options/config/defines.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/optional.hpp>
+#include <hpx/program_options/config/defines.hpp>
 
 namespace hpx { namespace program_options {
 

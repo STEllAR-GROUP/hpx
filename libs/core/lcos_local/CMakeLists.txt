@@ -43,14 +43,14 @@ set(lcos_local_compat_headers
 
 set(lcos_local_sources composable_guard.cpp preprocess_future.cpp)
 
-include(HPX_AddModule)
-add_hpx_module(
-  core lcos_local
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local lcos_local
   SOURCES ${lcos_local_sources}
   HEADERS ${lcos_local_headers}
   COMPAT_HEADERS ${lcos_local_compat_headers}
   MODULE_DEPENDENCIES
-    hpx_config
+    hpx_config_local
     hpx_execution
     hpx_executors
     hpx_futures

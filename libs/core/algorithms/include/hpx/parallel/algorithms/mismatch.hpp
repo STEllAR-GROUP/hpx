@@ -171,7 +171,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -352,7 +352,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::mismatch is deprecated, use hpx::mismatch instead")
         util::detail::algorithm_result_t<ExPolicy,
             std::pair<FwdIter1, FwdIter2>> mismatch(ExPolicy&& policy,
@@ -472,7 +472,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >
         )>
     // clang-format on
-    HPX_DEPRECATED_V(1, 6,
+    HPX_LOCAL_DEPRECATED_V(1, 6,
         "hpx::parallel::mismatch is deprecated, use hpx::mismatch instead")
         util::detail::algorithm_result_t<ExPolicy,
             std::pair<FwdIter1, FwdIter2>> mismatch(ExPolicy&& policy,

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <cstddef>
 
@@ -16,7 +16,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
     ///        the current HPX-thread is associated with.
-    HPX_CORE_EXPORT std::size_t get_os_thread_count();
+    HPX_LOCAL_EXPORT std::size_t get_os_thread_count();
 
     namespace threads {
         class executor;
@@ -32,6 +32,6 @@ namespace hpx {
     /// threads used by HPX.
     ///
     /// \param exec [in] The executor to be used.
-    HPX_CORE_EXPORT std::size_t get_os_thread_count(
+    HPX_LOCAL_EXPORT std::size_t get_os_thread_count(
         threads::executor const& exec);
 }    // namespace hpx

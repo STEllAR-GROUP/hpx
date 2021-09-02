@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 
 #include <boost/utility/string_ref.hpp>
 
@@ -56,7 +56,7 @@ namespace hpx { namespace util { namespace logging {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT void format_value(
+    HPX_LOCAL_EXPORT void format_value(
         std::ostream& os, boost::string_ref spec, level value);
 
 }}}    // namespace hpx::util::logging

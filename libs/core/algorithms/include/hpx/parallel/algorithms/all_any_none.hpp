@@ -226,7 +226,7 @@ namespace hpx {
 }    // namespace hpx
 #else    // DOXYGEN
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -332,7 +332,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 6, "hpx::parallel::none_of is deprecated, use hpx::none_of instead")
         typename util::detail::algorithm_result<ExPolicy, bool>::type
         none_of(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
@@ -431,7 +431,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 6, "hpx::parallel::any_of is deprecated, use hpx::any_of instead")
         typename util::detail::algorithm_result<ExPolicy, bool>::type
         any_of(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
@@ -530,7 +530,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED_V(
+    HPX_LOCAL_DEPRECATED_V(
         1, 6, "hpx::parallel::all_of is deprecated, use hpx::all_of instead")
         typename util::detail::algorithm_result<ExPolicy, bool>::type
         all_of(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,

@@ -8,9 +8,9 @@
 set(subdirs replay replicate)
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.performance.modules.resiliency.${subdir})
+  hpx_local_add_pseudo_target(tests.performance.modules.resiliency.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(
+  hpx_local_add_pseudo_dependencies(
     tests.performance.modules.resiliency
     tests.performance.modules.resiliency.${subdir}
   )

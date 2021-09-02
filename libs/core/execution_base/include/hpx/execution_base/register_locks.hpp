@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/functional/function.hpp>
 
@@ -33,11 +33,11 @@ namespace hpx { namespace util {
     template <typename Lock, typename Enable = void>
     struct ignore_while_checking;
 
-#if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_CORE_EXPORTS)
+#if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_LOCAL_EXPORTS)
 
     namespace detail {
 
-        struct HPX_CORE_EXPORT lock_data
+        struct HPX_LOCAL_EXPORT lock_data
         {
 #ifdef HPX_HAVE_VERIFY_LOCKS
             lock_data(std::size_t trace_depth);
@@ -70,25 +70,25 @@ namespace hpx { namespace util {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT bool register_lock(
+    HPX_LOCAL_EXPORT bool register_lock(
         void const* lock, register_lock_data* data = nullptr);
-    HPX_CORE_EXPORT bool unregister_lock(void const* lock);
-    HPX_CORE_EXPORT void verify_no_locks();
-    HPX_CORE_EXPORT void force_error_on_lock();
-    HPX_CORE_EXPORT void enable_lock_detection();
-    HPX_CORE_EXPORT void disable_lock_detection();
-    HPX_CORE_EXPORT void trace_depth_lock_detection(std::size_t value);
-    HPX_CORE_EXPORT void ignore_lock(void const* lock);
-    HPX_CORE_EXPORT void reset_ignored(void const* lock);
-    HPX_CORE_EXPORT void ignore_all_locks();
-    HPX_CORE_EXPORT void reset_ignored_all();
+    HPX_LOCAL_EXPORT bool unregister_lock(void const* lock);
+    HPX_LOCAL_EXPORT void verify_no_locks();
+    HPX_LOCAL_EXPORT void force_error_on_lock();
+    HPX_LOCAL_EXPORT void enable_lock_detection();
+    HPX_LOCAL_EXPORT void disable_lock_detection();
+    HPX_LOCAL_EXPORT void trace_depth_lock_detection(std::size_t value);
+    HPX_LOCAL_EXPORT void ignore_lock(void const* lock);
+    HPX_LOCAL_EXPORT void reset_ignored(void const* lock);
+    HPX_LOCAL_EXPORT void ignore_all_locks();
+    HPX_LOCAL_EXPORT void reset_ignored_all();
 
     using registered_locks_error_handler_type = util::function_nonser<void()>;
 
     /// Sets a handler which gets called when verifying that no locks are held
     /// fails. Can be used to print information at the point of failure such as
     /// a backtrace.
-    HPX_CORE_EXPORT void set_registered_locks_error_handler(
+    HPX_LOCAL_EXPORT void set_registered_locks_error_handler(
         registered_locks_error_handler_type);
 
     using register_locks_predicate_type = util::function_nonser<bool()>;
@@ -100,7 +100,7 @@ namespace hpx { namespace util {
     /// register, unregister, or verify locks, depending on other factors (such
     /// as if lock detection is enabled globally). The predicate may return
     /// different values depending on context.
-    HPX_CORE_EXPORT void set_register_locks_predicate(
+    HPX_LOCAL_EXPORT void set_register_locks_predicate(
         register_locks_predicate_type);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -145,10 +145,10 @@ namespace hpx { namespace util {
     // after suspension even if the thread is being resumed on a different core.
 
     // retrieve the current thread_local data about held locks
-    HPX_CORE_EXPORT std::unique_ptr<held_locks_data> get_held_locks_data();
+    HPX_LOCAL_EXPORT std::unique_ptr<held_locks_data> get_held_locks_data();
 
     // set the current thread_local data about held locks
-    HPX_CORE_EXPORT void set_held_locks_data(
+    HPX_LOCAL_EXPORT void set_held_locks_data(
         std::unique_ptr<held_locks_data>&& data);
 
 #else

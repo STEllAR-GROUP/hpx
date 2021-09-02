@@ -6,17 +6,17 @@
 
 set(benchmarks htts2_payload_precision htts2_hpx)
 
-if(HPX_WITH_EXAMPLES_OPENMP)
+if(HPXLocal_WITH_EXAMPLES_OPENMP)
   set(benchmarks ${benchmarks} htts2_omp)
 endif()
 
-if(HPX_WITH_EXAMPLES_QTHREADS)
+if(HPXLocal_WITH_EXAMPLES_QTHREADS)
   set(benchmarks ${benchmarks} htts2_qthreads)
   set(htts2_qthreads_LIBRARIES ${QTHREADS_LIBRARY})
   set(htts2_qthreads_INCLUDE_DIRECTORIES ${QTHREADS_INCLUDE_DIR})
 endif()
 
-if(HPX_WITH_EXAMPLES_TBB)
+if(HPXLocal_WITH_EXAMPLES_TBB)
   set(benchmarks ${benchmarks} htts2_tbb)
   set(htts2_tbb_LIBRARIES ${TBB_LIBRARY})
   set(htts2_tbb_INCLUDE_DIRECTORIES ${TBB_INCLUDE_DIR})
@@ -28,7 +28,7 @@ foreach(benchmark ${benchmarks})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(
+  hpx_local_add_executable(
     ${benchmark} INTERNAL_FLAGS
     SOURCES ${sources} ${${benchmark}_FLAGS}
     DEPENDENCIES ${${benchmark}_LIBRARIES}
@@ -42,21 +42,21 @@ foreach(benchmark ${benchmarks})
   )
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.performance.local.htts_v2.${benchmark})
+  hpx_local_add_pseudo_target(tests.performance.local.htts_v2.${benchmark})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(
+  hpx_local_add_pseudo_dependencies(
     tests.performance.local.htts_v2
     tests.performance.local.htts_v2.${benchmark}
   )
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(
+  hpx_local_add_pseudo_dependencies(
     tests.performance.local.htts_v2.${benchmark} ${benchmark}
   )
 endforeach()
 
-if(HPX_WITH_EXAMPLES_OPENMP)
+if(HPXLocal_WITH_EXAMPLES_OPENMP)
   set_target_properties(htts2_omp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
   set_target_properties(htts2_omp PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()

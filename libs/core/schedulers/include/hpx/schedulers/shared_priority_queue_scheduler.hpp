@@ -10,7 +10,7 @@
 //# define SHARED_PRIORITY_SCHEDULER_DEBUG 1
 #endif
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/execution_base/this_thread.hpp>
@@ -40,7 +40,7 @@
 #include <type_traits>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 #if !defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
 #if defined(HPX_DEBUG)
@@ -1413,4 +1413,4 @@ namespace hpx { namespace threads { namespace policies {
     };
 }}}    // namespace hpx::threads::policies
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

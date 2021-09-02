@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/util/bad_lexical_cast.hpp>
 

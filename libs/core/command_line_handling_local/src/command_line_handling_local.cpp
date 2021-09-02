@@ -4,11 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling_local/command_line_handling_local.hpp>
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
 #include <hpx/functional/detail/reset_function.hpp>
+#include <hpx/local/version.hpp>
 #include <hpx/modules/asio.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/format.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/version.hpp>
 
 #include <boost/tokenizer.hpp>
 
@@ -54,15 +54,15 @@ namespace hpx { namespace local { namespace detail {
     ///////////////////////////////////////////////////////////////////////
     int print_version(std::ostream& out)
     {
-        out << std::endl << hpx::copyright() << std::endl;
-        out << hpx::complete_version() << std::endl;
+        out << std::endl << hpx::local::copyright() << std::endl;
+        out << hpx::local::complete_version() << std::endl;
         return 1;
     }
 
     int print_info(std::ostream& out, command_line_handling const& cfg)
     {
         out << "Static configuration:\n---------------------\n";
-        out << hpx::configuration_string() << std::endl;
+        out << hpx::local::configuration_string() << std::endl;
 
         out << "Runtime configuration:\n----------------------\n";
         out << runtime_configuration_string(cfg) << std::endl;
@@ -304,7 +304,7 @@ namespace hpx { namespace local { namespace detail {
                     throw hpx::detail::command_line_error("Requested more than "
                         HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
                         "to use for this application, use the option "
-                        "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
+                        "-DHPXLocal_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
                 // clang-format on
             }
 #endif
@@ -331,7 +331,7 @@ namespace hpx { namespace local { namespace detail {
                                             "to use for this "
                                             "application, "
                                             "use the option "
-                                            "-DHPX_WITH_MAX_CPU_COUNT=<"
+                                            "-DHPXLocal_WITH_MAX_CPU_COUNT=<"
                                             "N> "
                                             "when configuring HPX.");
         }
@@ -679,7 +679,7 @@ namespace hpx { namespace local { namespace detail {
             throw hpx::detail::command_line_error(
                 "Command line option error: can't enable logging while it "
                 "was disabled at configuration time. Please re-configure "
-                "HPX using the option -DHPX_WITH_LOGGING=On.");
+                "HPX using the option -DHPXLocal_WITH_LOGGING=On.");
             // clang-format on
         }
 

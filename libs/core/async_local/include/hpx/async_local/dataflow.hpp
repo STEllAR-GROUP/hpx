@@ -6,6 +6,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/async_base/dataflow.hpp>
 #include <hpx/executors/dataflow.hpp>

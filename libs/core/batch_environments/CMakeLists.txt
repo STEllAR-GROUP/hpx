@@ -27,15 +27,15 @@ set(batch_environments_sources alps_environment.cpp batch_environment.cpp
                                pbs_environment.cpp slurm_environment.cpp
 )
 
-include(HPX_AddModule)
-add_hpx_module(
-  core batch_environments
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local batch_environments
   GLOBAL_HEADER_GEN ON
   SOURCES ${batch_environments_sources}
   HEADERS ${batch_environments_headers}
   COMPAT_HEADERS ${batch_environments_compat_headers}
   MODULE_DEPENDENCIES
-    hpx_config
+    hpx_config_local
     hpx_assertion
     hpx_format
     hpx_string_util

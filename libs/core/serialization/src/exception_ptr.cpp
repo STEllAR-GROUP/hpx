@@ -284,7 +284,7 @@ namespace hpx { namespace serialization {
             return f;
         }
 
-        HPX_CORE_EXPORT void set_save_custom_exception_handler(
+        HPX_LOCAL_EXPORT void set_save_custom_exception_handler(
             save_custom_exception_handler_type f)
         {
             get_save_custom_exception_handler() = f;
@@ -296,7 +296,7 @@ namespace hpx { namespace serialization {
             return f;
         }
 
-        HPX_CORE_EXPORT void set_load_custom_exception_handler(
+        HPX_LOCAL_EXPORT void set_load_custom_exception_handler(
             load_custom_exception_handler_type f)
         {
             get_load_custom_exception_handler() = f;
@@ -339,9 +339,9 @@ namespace hpx { namespace serialization {
         }
     }
 
-    template HPX_CORE_EXPORT void save(hpx::serialization::output_archive&,
+    template HPX_LOCAL_EXPORT void save(hpx::serialization::output_archive&,
         std::exception_ptr const&, unsigned int);
 
-    template HPX_CORE_EXPORT void load(
+    template HPX_LOCAL_EXPORT void load(
         hpx::serialization::input_archive&, std::exception_ptr&, unsigned int);
 }}    // namespace hpx::serialization

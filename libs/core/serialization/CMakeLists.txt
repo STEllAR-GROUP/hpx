@@ -7,15 +7,15 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Compatibility with various Boost types, introduced in V1.4.0
-hpx_option(
-  HPX_SERIALIZATION_WITH_BOOST_TYPES BOOL
+hpx_local_option(
+  HPXLocal_SERIALIZATION_WITH_BOOST_TYPES BOOL
   "Enable serialization of certain Boost types. (default: ON)" ON ADVANCED
   CATEGORY "Modules"
   MODULE SERIALIZATION
 )
 
-if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
-  hpx_add_config_define_namespace(
+if(HPXLocal_SERIALIZATION_WITH_BOOST_TYPES)
+  hpx_local_add_config_define_namespace(
     DEFINE HPX_SERIALIZATION_HAVE_BOOST_TYPES NAMESPACE SERIALIZATION
   )
 endif()
@@ -25,9 +25,9 @@ endif()
 # Important note: The following flags are specific for using HPX as a
 # backend for SHAD (https://github.com/pnnl/SHAD):
 #
-# - HPX_SERIALIZATION_WITH_ALL_TYPES_ARE_BITWISE_SERIALIZABLE
-# - HPX_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION
-# - HPX_SERIALIZATION_WITH_ALLOW_CONST_TUPLE_MEMBERS
+# - HPXLocal_SERIALIZATION_WITH_ALL_TYPES_ARE_BITWISE_SERIALIZABLE
+# - HPXLocal_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION
+# - HPXLocal_SERIALIZATION_WITH_ALLOW_CONST_TUPLE_MEMBERS
 #
 # They all enable questionable functionalities, partially they even enable
 # undefined behavior. Please only use any of them if you know what you're
@@ -37,15 +37,15 @@ endif()
 
 # This flag can be used in systems that assume that all types are bitwise
 # serializable by default (like SHAD).
-hpx_option(
-  HPX_SERIALIZATION_WITH_ALL_TYPES_ARE_BITWISE_SERIALIZABLE BOOL
+hpx_local_option(
+  HPXLocal_SERIALIZATION_WITH_ALL_TYPES_ARE_BITWISE_SERIALIZABLE BOOL
   "Assume all types are bitwise serializable. (default: OFF)" OFF ADVANCED
   CATEGORY "Modules"
   MODULE SERIALIZATION
 )
 
-if(HPX_SERIALIZATION_WITH_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
-  hpx_add_config_define_namespace(
+if(HPXLocal_SERIALIZATION_WITH_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
+  hpx_local_add_config_define_namespace(
     DEFINE HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE
     NAMESPACE SERIALIZATION
   )
@@ -54,15 +54,15 @@ endif()
 # This flag can be used in systems that rely on sending raw pointers to other
 # localities (assuming those are being sent back to the originating locality
 # before they are dereferenced (like SHAD).
-hpx_option(
-  HPX_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION BOOL
+hpx_local_option(
+  HPXLocal_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION BOOL
   "Enable serializing raw pointers. (default: OFF)" OFF ADVANCED
   CATEGORY "Modules"
   MODULE SERIALIZATION
 )
 
-if(HPX_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION)
-  hpx_add_config_define_namespace(
+if(HPXLocal_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION)
+  hpx_local_add_config_define_namespace(
     DEFINE HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION
     NAMESPACE SERIALIZATION
   )
@@ -70,16 +70,16 @@ endif()
 
 # This flag can be used in systems that rely on sending constant values as part
 # of std::tuple. This option essentially casts away constness for tuple members.
-hpx_option(
-  HPX_SERIALIZATION_WITH_ALLOW_CONST_TUPLE_MEMBERS BOOL
+hpx_local_option(
+  HPXLocal_SERIALIZATION_WITH_ALLOW_CONST_TUPLE_MEMBERS BOOL
   "Enable serializing std::tuple with const members. (default: OFF)" OFF
   ADVANCED
   CATEGORY "Modules"
   MODULE SERIALIZATION
 )
 
-if(HPX_SERIALIZATION_WITH_ALLOW_CONST_TUPLE_MEMBERS)
-  hpx_add_config_define_namespace(
+if(HPXLocal_SERIALIZATION_WITH_ALLOW_CONST_TUPLE_MEMBERS)
+  hpx_local_add_config_define_namespace(
     DEFINE HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS
     NAMESPACE SERIALIZATION
   )
@@ -146,7 +146,7 @@ set(serialization_headers
     hpx/serialization/traits/serialization_access_data.hpp
 )
 
-if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
+if(HPXLocal_SERIALIZATION_WITH_BOOST_TYPES)
   set(serialization_headers ${serialization_headers}
                             hpx/serialization/boost_variant.hpp
   )
@@ -213,16 +213,16 @@ if(TARGET Vc::vc)
   set(serialization_optional_dependencies Vc::vc)
 endif()
 
-include(HPX_AddModule)
-add_hpx_module(
-  core serialization
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local serialization
   GLOBAL_HEADER_GEN ON
   SOURCES ${serialization_sources}
   HEADERS ${serialization_headers}
   COMPAT_HEADERS ${serialization_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
-    hpx_config
+    hpx_config_local
     hpx_datastructures
     hpx_debugging
     hpx_errors

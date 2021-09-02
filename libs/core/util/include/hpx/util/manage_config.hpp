@@ -6,17 +6,17 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <map>
 #include <string>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util {
-    struct HPX_CORE_EXPORT manage_config
+    struct HPX_LOCAL_EXPORT manage_config
     {
         typedef std::map<std::string, std::string> map_type;
 
@@ -37,4 +37,4 @@ namespace hpx { namespace util {
     };
 }}    // namespace hpx::util
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

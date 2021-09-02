@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>

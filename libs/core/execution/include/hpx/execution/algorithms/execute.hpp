@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/execution/algorithms/detach.hpp>
 #include <hpx/execution/algorithms/transform.hpp>
 #include <hpx/execution_base/sender.hpp>

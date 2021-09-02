@@ -55,7 +55,7 @@ set(runtime_local_compat_headers
     hpx/runtime/thread_hooks.hpp => hpx/modules/runtime_local.hpp
     hpx/runtime/thread_pool_helpers.hpp => hpx/modules/runtime_local.hpp
     hpx/runtime/threads/executors/service_executors.hpp => hpx/modules/runtime_local.hpp
-    hpx/runtime/threads/run_as_hpx_thread.hpp => hpx/include/run_as.hpp
+    hpx/runtime/threads/run_as_hpx_local_thread.hpp => hpx/include/run_as.hpp
     hpx/runtime/threads/run_as_os_thread.hpp => hpx/include/run_as.hpp
     hpx/runtime_handlers.hpp => hpx/modules/runtime_local.hpp
     hpx/util/pool_timer.hpp => hpx/modules/runtime_local.hpp
@@ -82,9 +82,9 @@ set(runtime_local_sources
     thread_stacktrace.cpp
 )
 
-include(HPX_AddModule)
-add_hpx_module(
-  core runtime_local
+include(HPXLocal_AddModule)
+hpx_local_add_module(
+  local runtime_local
   GLOBAL_HEADER_GEN ON
   SOURCES ${runtime_local_sources}
   HEADERS ${runtime_local_headers}

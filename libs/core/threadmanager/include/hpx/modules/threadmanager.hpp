@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
@@ -38,7 +38,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/local/config/warnings_prefix.hpp>
 
 namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
@@ -409,4 +409,4 @@ namespace hpx { namespace threads {
     };
 }}    // namespace hpx::threads
 
-#include <hpx/config/warnings_suffix.hpp>
+#include <hpx/local/config/warnings_suffix.hpp>

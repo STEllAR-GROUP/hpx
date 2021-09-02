@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
