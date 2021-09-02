@@ -227,9 +227,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         });
                 };
 
-                auto f2 =
-                    [dest, count](
-                        std::vector<hpx::future<void>>&&) mutable -> FwdIter2 {
+                auto f2 = [dest, count](
+                              std::vector<hpx::future<void>>&& data) mutable
+                    -> FwdIter2 {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    data.clear();
                     std::advance(dest, count);
                     return dest;
                 };

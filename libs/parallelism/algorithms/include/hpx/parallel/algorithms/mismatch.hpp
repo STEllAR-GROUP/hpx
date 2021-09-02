@@ -283,7 +283,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               zip_iterator it, std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n(base_idx, it, part_count, tok,
-                        [&f, &proj1, &proj2, &tok](reference t, std::size_t i) {
+                        [&](reference t, std::size_t i) {
                             if (!HPX_INVOKE(f,
                                     HPX_INVOKE(proj1, hpx::get<0>(t)),
                                     HPX_INVOKE(proj2, hpx::get<1>(t))))
@@ -423,7 +423,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n(base_idx, it, part_count, tok,
-                        [&f, &tok](reference t, std::size_t i) {
+                        [&](reference t, std::size_t i) {
                             if (!HPX_INVOKE(f, hpx::get<0>(t), hpx::get<1>(t)))
                             {
                                 tok.cancel(i);

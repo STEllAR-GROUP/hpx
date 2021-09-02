@@ -649,8 +649,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 auto f4 =
                     [dest_ptr = std::move(dest_ptr), first, count, flags](
-                        std::vector<hpx::shared_future<std::size_t>>&&,
-                        std::vector<hpx::future<void>>&&) mutable -> FwdIter {
+                        std::vector<hpx::shared_future<std::size_t>>&& items,
+                        std::vector<hpx::future<void>>&& data) mutable
+                    -> FwdIter {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    items.clear();
+                    data.clear();
+
                     if (!flags[count - 1])
                     {
                         std::advance(first, count - 1);
@@ -896,11 +902,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f4 =
                     [last_iter, dest, flags](
                         std::vector<hpx::shared_future<std::size_t>>&& items,
-                        std::vector<hpx::future<void>>&&) mutable
+                        std::vector<hpx::future<void>>&& data) mutable
                     -> unique_copy_result<FwdIter1, FwdIter2> {
                     HPX_UNUSED(flags);
 
                     std::advance(dest, items.back().get());
+
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    items.clear();
+                    data.clear();
+
                     return unique_copy_result<FwdIter1, FwdIter2>{
                         std::move(last_iter), std::move(dest)};
                 };

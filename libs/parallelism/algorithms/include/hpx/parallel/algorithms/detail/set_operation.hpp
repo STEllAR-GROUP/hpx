@@ -217,8 +217,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         // different versions of clang-format produce different formatting
         // clang-format off
         auto f2 = [buffer, chunks, cores, first1, first2, dest](
-                      std::vector<future<void>>&&) -> result_type {
+                      std::vector<future<void>>&& data) -> result_type {
             // clang-format on
+
+            // make sure iterators embedded in function object that is
+            // attached to futures are invalidated
+            data.clear();
 
             // accumulate real length and rightmost positions in input sequences
             std::size_t first1_pos = 0;

@@ -201,9 +201,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         });
                 };
 
-                auto f2 =
-                    [tok, count, first, last](
-                        std::vector<hpx::future<void>>&&) mutable -> FwdIter {
+                auto f2 = [tok, count, first, last](
+                              std::vector<hpx::future<void>>&& data) mutable
+                    -> FwdIter {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    data.clear();
                     difference_type adj_find_res = tok.get_data();
                     if (adj_find_res != count)
                         std::advance(first, adj_find_res);
