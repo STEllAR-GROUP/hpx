@@ -389,18 +389,22 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 
-            template <typename ExPolicy, typename InIter1, typename InIter2,
-                typename F>
+            template <typename ExPolicy, typename InIter1, typename Sent,
+                typename InIter2, typename F>
             static constexpr IterPair sequential(
-                ExPolicy, InIter1 first1, InIter1 last1, InIter2 first2, F&& f)
+                ExPolicy, InIter1 first1, Sent last1, InIter2 first2, F&& f)
             {
-                return std::mismatch(first1, last1, first2, std::forward<F>(f));
+                while (first1 != last1 && HPX_INVOKE(f, *first1, *first2))
+                {
+                    ++first1, ++first2;
+                }
+                return std::make_pair(first1, first2);
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-                typename F>
+            template <typename ExPolicy, typename FwdIter1, typename Sent,
+                typename FwdIter2, typename F>
             static util::detail::algorithm_result_t<ExPolicy, IterPair>
-            parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            parallel(ExPolicy&& policy, FwdIter1 first1, Sent last1,
                 FwdIter2 first2, F&& f)
             {
                 if (first1 == last1)
@@ -411,7 +415,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 using difference_type =
                     typename std::iterator_traits<FwdIter1>::difference_type;
-                difference_type count = std::distance(first1, last1);
+                difference_type count = detail::distance(first1, last1);
 
                 using zip_iterator =
                     hpx::util::zip_iterator<FwdIter1, FwdIter2>;
@@ -441,7 +445,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     if (mismatched != count)
                         std::advance(first1, mismatched);
                     else
-                        first1 = last1;
+                        first1 = detail::advance_to_sentinel(first1, last1);
 
                     std::advance(first2, mismatched);
                     return std::make_pair(first1, first2);
