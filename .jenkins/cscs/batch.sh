@@ -24,13 +24,13 @@ ctest \
     --verbose \
     -S ${src_dir}/.jenkins/cscs/ctest.cmake \
     -DCTEST_CONFIGURE_EXTRA_OPTIONS="${configure_extra_options}" \
-    -DCTEST_BUILD_CONFIGURATION_NAME="${configuration_name}" \
+    -DCTEST_BUILD_CONFIGURATION_NAME="${configuration_name_with_build_type}" \
     -DCTEST_SOURCE_DIRECTORY="${src_dir}" \
     -DCTEST_BINARY_DIRECTORY="${build_dir}"
 set -e
 
 # Copy the testing directory for saving as an artifact
-cp -r ${build_dir}/Testing ${orig_src_dir}/${configuration_name}-Testing
+cp -r ${build_dir}/Testing ${orig_src_dir}/${configuration_name_with_build_type}-Testing
 
 # Things went wrong by default
 ctest_exit_code=$?
@@ -56,5 +56,5 @@ if [[ -f ${build_dir}/Testing/TAG ]]; then
 fi
 ctest_status=$(( ctest_exit_code + file_errors + configure_errors + build_errors + test_errors ))
 
-echo "${ctest_status}" > "jenkins-hpx-${configuration_name}-ctest-status.txt"
+echo "${ctest_status}" > "jenkins-hpx-${configuration_name_with_build_type}-ctest-status.txt"
 exit $ctest_status
