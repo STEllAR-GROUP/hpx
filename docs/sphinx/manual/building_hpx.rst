@@ -352,7 +352,7 @@ To build the |hpx| documentation, you need recent versions of the following
 packages:
 
 - ``python3``
-- ``sphinx`` (Python package)
+- ``sphinx 3.5.4`` (Python package)
 - ``sphinx_rtd_theme`` (Python package)
 - ``breathe 4.16.0`` (Python package)
 - ``doxygen``
