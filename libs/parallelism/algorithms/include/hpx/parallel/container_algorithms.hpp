@@ -41,6 +41,8 @@
 #include <hpx/parallel/container_algorithms/set_intersection.hpp>
 #include <hpx/parallel/container_algorithms/set_symmetric_difference.hpp>
 #include <hpx/parallel/container_algorithms/set_union.hpp>
+#include <hpx/parallel/container_algorithms/shift_left.hpp>
+#include <hpx/parallel/container_algorithms/shift_right.hpp>
 #include <hpx/parallel/container_algorithms/sort.hpp>
 #include <hpx/parallel/container_algorithms/stable_sort.hpp>
 #include <hpx/parallel/container_algorithms/swap_ranges.hpp>
