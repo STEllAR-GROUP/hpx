@@ -584,8 +584,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::move(f3),
                     // step 4 use this return value
                     [last_iter, final_dest](
-                        std::vector<hpx::shared_future<T>>&&,
-                        std::vector<hpx::future<void>>&&) -> result_type {
+                        std::vector<hpx::shared_future<T>>&& items,
+                        std::vector<hpx::future<void>>&& data) -> result_type {
+                        // make sure iterators embedded in function object that is
+                        // attached to futures are invalidated
+                        items.clear();
+                        data.clear();
                         return result_type{last_iter, final_dest};
                     });
             }

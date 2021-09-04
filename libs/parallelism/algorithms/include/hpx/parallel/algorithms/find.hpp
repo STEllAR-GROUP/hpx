@@ -376,16 +376,16 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
-#include <hpx/parallel/algorithms/detail/find.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/find.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
@@ -454,7 +454,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 auto f2 =
                     [tok, count, first, last](
-                        std::vector<hpx::future<void>>&&) mutable -> Iter {
+                        std::vector<hpx::future<void>>&& data) mutable -> Iter {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    data.clear();
+
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());
 
@@ -553,7 +557,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 auto f2 =
                     [tok, count, first, last](
-                        std::vector<hpx::future<void>>&&) mutable -> Iter {
+                        std::vector<hpx::future<void>>&& data) mutable -> Iter {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    data.clear();
+
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());
 
@@ -658,7 +666,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 auto f2 =
                     [tok, count, first, last](
-                        std::vector<hpx::future<void>>&&) mutable -> Iter {
+                        std::vector<hpx::future<void>>&& data) mutable -> Iter {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    data.clear();
+
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());
 
@@ -859,9 +871,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         });
                 };
 
-                auto f2 =
-                    [tok, count, first1, last1](
-                        std::vector<hpx::future<void>>&&) mutable -> Iter1 {
+                auto f2 = [tok, count, first1, last1](
+                              std::vector<hpx::future<void>>&& data) mutable
+                    -> Iter1 {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    data.clear();
+
                     difference_type find_end_res = tok.get_data();
 
                     if (find_end_res >= 0 && find_end_res != count)
@@ -1006,9 +1022,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         });
                 };
 
-                auto f2 =
-                    [tok, count, first, last](
-                        std::vector<hpx::future<void>>&&) mutable -> FwdIter {
+                auto f2 = [tok, count, first, last](
+                              std::vector<hpx::future<void>>&& data) mutable
+                    -> FwdIter {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    data.clear();
+
                     difference_type find_first_of_res = tok.get_data();
 
                     if (find_first_of_res != count)

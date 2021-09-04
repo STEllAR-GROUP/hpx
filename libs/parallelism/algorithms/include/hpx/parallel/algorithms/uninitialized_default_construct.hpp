@@ -265,9 +265,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 it, part_size, tok));
                     },
                     // finalize, called once if no error occurred
-                    [first, count](std::vector<
-                        hpx::future<partition_result_type>>&&) mutable
-                    -> FwdIter {
+                    [first, count](
+                        std::vector<hpx::future<partition_result_type>>&&
+                            data) mutable -> FwdIter {
+                        // make sure iterators embedded in function object that is
+                        // attached to futures are invalidated
+                        data.clear();
+
                         std::advance(first, count);
                         return first;
                     },

@@ -204,8 +204,8 @@ namespace hpx {
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
@@ -586,12 +586,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f4 =
                     [first, dest, flags](
                         std::vector<hpx::shared_future<std::size_t>>&& items,
-                        std::vector<hpx::future<void>>&&) mutable
+                        std::vector<hpx::future<void>>&& data) mutable
                     -> util::in_out_result<FwdIter1, FwdIter3> {
                     HPX_UNUSED(flags);
 
-                    std::advance(dest, items.back().get());
-                    std::advance(first, items.back().get());
+                    auto dist = items.back().get();
+                    std::advance(first, dist);
+                    std::advance(dest, dist);
+
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    items.clear();
+                    data.clear();
+
                     return util::in_out_result<FwdIter1, FwdIter3>{
                         std::move(first), std::move(dest)};
                 };
