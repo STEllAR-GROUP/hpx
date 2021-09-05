@@ -14,6 +14,7 @@
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/tagged_tuple.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -203,10 +204,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename FwdIter3, typename Pred,
         typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_range<Rng>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
-            hpx::traits::is_iterator<FwdIter3>::value &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
+            hpx::traits::is_iterator_v<FwdIter3> &&
             traits::is_projected_range<Proj, Rng>::value &&
             traits::is_indirect_callable<ExPolicy, Pred,
                 traits::projected_range<Proj, Rng>>::value
@@ -215,8 +216,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::partition_copy is deprecated, use hpx::partition_copy "
         "instead") typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_tuple<
-            tag::in(typename hpx::traits::range_iterator<Rng>::type),
+        hpx::util::tagged_tuple<tag::in(hpx::traits::range_iterator_t<Rng>),
             tag::out1(FwdIter2), tag::out2(FwdIter3)>>::type
         partition_copy(ExPolicy&& policy, Rng&& rng, FwdIter2 dest_true,
             FwdIter3 dest_false, Pred&& pred, Proj&& proj = Proj())
@@ -235,6 +235,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx { namespace ranges {
+
+    template <typename I, typename O1, typename O2>
+    using partition_copy_result = parallel::util::in_out_out_result<I, O1, O2>;
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct partition_t final
       : hpx::functional::tag_fallback<partition_t>
@@ -479,4 +482,79 @@ namespace hpx { namespace ranges {
                 last);
         }
     } stable_partition{};
+
+    HPX_INLINE_CONSTEXPR_VARIABLE struct partition_copy_t final
+      : hpx::functional::tag_fallback<partition_copy_t>
+    {
+    private:
+        // clang-format off
+        template <typename Rng, typename OutIter2,
+            typename OutIter3, typename Pred,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_iterator_v<OutIter2> &&
+                hpx::traits::is_iterator_v<OutIter3> &&
+                parallel::traits::is_projected_range<Proj, Rng>::value &&
+                parallel::traits::is_indirect_callable<hpx::execution::sequenced_policy, Pred,
+                    parallel::traits::projected_range<Proj, Rng>>::value
+            )>
+        // clang-format on
+        friend partition_copy_result<hpx::traits::range_iterator_t<Rng>,
+            OutIter2, OutIter3>
+        tag_fallback_dispatch(hpx::ranges::partition_copy_t, Rng&& rng,
+            OutIter2 dest_true, OutIter3 dest_false, Pred&& pred,
+            Proj&& proj = Proj())
+        {
+            using iterator = hpx::traits::range_iterator_t<Rng>;
+            using result_type_1 = hpx::tuple<iterator, OutIter2, OutIter3>;
+            using result_type =
+                partition_copy_result<iterator, OutIter2, OutIter3>;
+
+            static_assert(hpx::traits::is_input_iterator_v<iterator>,
+                "Requires at least input iterator.");
+
+            return parallel::util::make_in_out_out_result(
+                parallel::v1::detail::partition_copy<result_type_1>().call(
+                    hpx::execution::seq, hpx::util::begin(rng),
+                    hpx::util::end(rng), dest_true, dest_false,
+                    std::forward<Pred>(pred), std::forward<Proj>(proj)));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename Rng, typename FwdIter2,
+            typename FwdIter3, typename Pred,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
+                hpx::traits::is_iterator_v<FwdIter3> &&
+                parallel::traits::is_projected_range<Proj, Rng>::value &&
+                parallel::traits::is_indirect_callable<ExPolicy, Pred,
+                    parallel::traits::projected_range<Proj, Rng>>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            partition_copy_result<hpx::traits::range_iterator_t<Rng>, FwdIter2,
+                FwdIter3>>::type
+        tag_fallback_dispatch(hpx::ranges::partition_copy_t, ExPolicy&& policy,
+            Rng&& rng, FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
+            Proj&& proj = Proj())
+        {
+            using iterator = hpx::traits::range_iterator_t<Rng>;
+            using result_type_1 = hpx::tuple<iterator, FwdIter2, FwdIter3>;
+            using result_type =
+                partition_copy_result<iterator, FwdIter2, FwdIter3>;
+
+            static_assert(hpx::traits::is_forward_iterator_v<iterator>,
+                "Requires at least forward iterator.");
+
+            return parallel::util::make_in_out_out_result(
+                parallel::v1::detail::partition_copy<result_type_1>().call(
+                    std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), dest_true, dest_false,
+                    std::forward<Pred>(pred), std::forward<Proj>(proj)));
+        }
+    } partition_copy{};
 }}    // namespace hpx::ranges

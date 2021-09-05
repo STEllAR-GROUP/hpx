@@ -97,13 +97,13 @@ void test_partition_copy(ExPolicy policy, DataType)
     std::generate(
         std::begin(c), std::end(c), random_fill(rand_base, size / 10));
 
-    auto result = hpx::parallel::partition_copy(
+    auto result = hpx::ranges::partition_copy(
         policy, c, std::begin(d_true_res), std::begin(d_false_res), pred);
     auto solution = std::partition_copy(std::begin(c), std::end(c),
         std::begin(d_true_sol), std::begin(d_false_sol), pred);
 
     HPX_UNUSED(solution);
-    HPX_TEST(get<0>(result) == std::end(c));
+    HPX_TEST(result.in == std::end(c));
 
     bool equality_true = test::equal(std::begin(d_true_res),
         std::end(d_true_res), std::begin(d_true_sol), std::end(d_true_sol));
@@ -132,14 +132,14 @@ void test_partition_copy_async(ExPolicy policy, DataType)
     std::generate(
         std::begin(c), std::end(c), random_fill(rand_base, size / 10));
 
-    auto f = hpx::parallel::partition_copy(
+    auto f = hpx::ranges::partition_copy(
         policy, c, std::begin(d_true_res), std::begin(d_false_res), pred);
     auto result = f.get();
     auto solution = std::partition_copy(std::begin(c), std::end(c),
         std::begin(d_true_sol), std::begin(d_false_sol), pred);
 
     HPX_UNUSED(solution);
-    HPX_TEST(get<0>(result) == std::end(c));
+    HPX_TEST(result.in == std::end(c));
 
     bool equality_true = test::equal(std::begin(d_true_res),
         std::end(d_true_res), std::begin(d_true_sol), std::end(d_true_sol));
