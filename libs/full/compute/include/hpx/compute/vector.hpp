@@ -32,20 +32,20 @@ namespace hpx { namespace compute {
 
     public:
         /// Member types (FIXME: add reference to std
-        typedef T value_type;
-        typedef Allocator allocator_type;
-        typedef typename alloc_traits::access_target access_target;
-        typedef std::size_t size_type;
-        typedef std::ptrdiff_t difference_type;
-        typedef typename alloc_traits::reference reference;
-        typedef typename alloc_traits::const_reference const_reference;
-        typedef typename alloc_traits::pointer pointer;
-        typedef typename alloc_traits::const_pointer const_pointer;
-        typedef detail::iterator<T, Allocator> iterator;
-        typedef detail::iterator<T const, Allocator> const_iterator;
-        typedef detail::reverse_iterator<T, Allocator> reverse_iterator;
-        typedef detail::const_reverse_iterator<T, Allocator>
-            const_reverse_iterator;
+        using value_type = T;
+        using allocator_type = Allocator;
+        using access_target = typename alloc_traits::access_target;
+        using size_type = std::size_t;
+        using difference_type = std::ptrdiff_t;
+        using reference = typename alloc_traits::reference;
+        using const_reference = typename alloc_traits::const_reference;
+        using pointer = typename alloc_traits::pointer;
+        using const_pointer = typename alloc_traits::const_pointer;
+        using iterator = detail::iterator<T, Allocator>;
+        using const_iterator = detail::iterator<T const, Allocator>;
+        using reverse_iterator = detail::reverse_iterator<T, Allocator>;
+        using const_reverse_iterator =
+            detail::const_reverse_iterator<T, Allocator>;
 
         // Default constructor. Constructs an empty container
         explicit vector(Allocator const& alloc = Allocator())
