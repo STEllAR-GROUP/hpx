@@ -167,10 +167,9 @@ namespace hpx { namespace parallel { namespace util {
         }
 
         template <typename II2, typename II1, typename O1,
-            typename Enable =
-                typename std::enable_if_t<std::is_convertible_v<I1, II1> &&
-                    std::is_convertible_v<I2, II2> &&
-                    std::is_convertible_v<O, O1>>>
+            typename Enable = typename std::enable_if_t<
+                std::is_convertible_v<I1, II1> &&
+                std::is_convertible_v<I2, II2> && std::is_convertible_v<O, O1>>>
         constexpr operator in_in_out_result<II1, II2, O1>() &&
         {
             return {std::move(in1), std::move(in2), std::move(out)};
@@ -405,5 +404,6 @@ namespace hpx { namespace ranges {
     using hpx::parallel::util::in_fun_result;
     using hpx::parallel::util::in_in_out_result;
     using hpx::parallel::util::in_in_result;
+    using hpx::parallel::util::in_out_out_result;
     using hpx::parallel::util::in_out_result;
 }}    // namespace hpx::ranges

@@ -906,6 +906,7 @@ namespace hpx {
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/tagged_tuple.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
@@ -916,67 +917,6 @@ namespace hpx {
 #include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1 {
-    /// Reorders the elements in the range \a rng in such a way that
-    /// all elements for which the predicate \a pred returns true precede
-    /// the elements for which the predicate \a pred returns false.
-    /// Relative order of the elements is not preserved.
-    ///
-    /// \note   Complexity: Performs at most 2 * N swaps,
-    ///         exactly N applications of the predicate and projection,
-    ///         where N = std::distance(begin(rng), end(rng)).
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam Pred        The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a partition requires \a Pred to meet
-    ///                     the requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param pred         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the sequence
-    ///                     specified by the range \a rng. This is an unary predicate
-    ///                     for partitioning the source iterators. The signature of
-    ///                     this predicate should be equivalent to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
-    ///                     implicitly converted to \a Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a partition algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a partition algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a partition algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type \a parallel_task_policy
-    ///           and returns \a FwdIter otherwise.
-    ///           The \a partition algorithm returns the iterator to
-    ///           the first element of the second group.
-    ///
     // clang-format off
     template <typename ExPolicy, typename Rng, typename Pred,
         typename Proj = util::projection_identity,
@@ -1007,88 +947,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
     }
 
-    /// Copies the elements in the range \a rng,
-    /// to two different ranges depending on the value returned by
-    /// the predicate \a pred. The elements, that satisfy the predicate \a pred,
-    /// are copied to the range beginning at \a dest_true. The rest of
-    /// the elements are copied to the range beginning at \a dest_false.
-    /// The order of the elements is preserved.
-    ///
-    /// \note   Complexity: Performs not more than N assignments,
-    ///         exactly N applications of the predicate \a pred,
-    ///         where N = std::distance(begin(rng), end(rng)).
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range for the elements that satisfy
-    ///                     the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter3    The type of the iterator representing the
-    ///                     destination range for the elements that don't satisfy
-    ///                     the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Pred        The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a partition_copy requires \a Pred to meet
-    ///                     the requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param dest_true    Refers to the beginning of the destination range for
-    ///                     the elements that satisfy the predicate \a pred.
-    /// \param dest_false   Refers to the beginning of the destination range for
-    ///                     the elements that don't satisfy the predicate \a pred.
-    /// \param pred         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the sequence
-    ///                     specified by the range \a rng. This is an unary predicate
-    ///                     for partitioning the source iterators. The signature of
-    ///                     this predicate should be equivalent to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
-    ///                     implicitly converted to \a Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a partition_copy algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a partition_copy algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a partition_copy algorithm returns a
-    /// \a hpx::future<tagged_tuple<tag::in(InIter), tag::out1(OutIter1), tag::out2(OutIter2)> >
-    ///           if the execution policy is of type \a parallel_task_policy
-    ///           and returns
-    /// \a tagged_tuple<tag::in(InIter), tag::out1(OutIter1), tag::out2(OutIter2)>
-    ///           otherwise.
-    ///           The \a partition_copy algorithm returns the tuple of
-    ///           the source iterator \a last,
-    ///           the destination iterator to the end of the \a dest_true range, and
-    ///           the destination iterator to the end of the \a dest_false range.
-    ///
     // clang-format off
     template <typename ExPolicy, typename Rng, typename FwdIter2,
         typename FwdIter3, typename Pred,
@@ -1130,7 +988,7 @@ namespace hpx { namespace ranges {
     using partition_copy_result = parallel::util::in_out_out_result<I, O1, O2>;
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct partition_t final
-      : hpx::functional::tag_fallback<partition_t>
+      : hpx::detail::tag_parallel_algorithm<partition_t>
     {
     private:
         // clang-format off
@@ -1216,7 +1074,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::v1::detail::partition<FwdIter>().call(
                     hpx::execution::seq, first, last, std::forward<Pred>(pred),
                     std::forward<Proj>(proj)),
-                parallel::v1::detail::advance_to_sentinel(first,last));
+                parallel::v1::detail::advance_to_sentinel(first, last));
         }
 
         // clang-format off
@@ -1243,12 +1101,12 @@ namespace hpx { namespace ranges {
                 hpx::parallel::v1::detail::partition<FwdIter>().call(
                     std::forward<ExPolicy>(policy), first, last,
                     std::forward<Pred>(pred), std::forward<Proj>(proj)),
-                parallel::v1::detail::advance_to_sentinel(first,last));
+                parallel::v1::detail::advance_to_sentinel(first, last));
         }
     } partition{};
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct stable_partition_t final
-      : hpx::functional::tag_fallback<stable_partition_t>
+      : hpx::detail::tag_parallel_algorithm<stable_partition_t>
     {
     private:
         // clang-format off
@@ -1365,7 +1223,7 @@ namespace hpx { namespace ranges {
             using is_seq = std::integral_constant<bool,
                 !hpx::traits::is_random_access_iterator_v<BidirIter>>;
 
-            return hpx::parallel::util::make_subrange<BidirIter, Sent>(
+            return hpx::parallel::util::make_subrange<BidirIter, BidirIter>(
                 hpx::parallel::v1::detail::stable_partition<BidirIter>().call2(
                     std::forward<ExPolicy>(policy), is_seq(), first, last,
                     std::forward<Pred>(pred), std::forward<Proj>(proj)),
@@ -1374,7 +1232,7 @@ namespace hpx { namespace ranges {
     } stable_partition{};
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct partition_copy_t final
-      : hpx::functional::tag_fallback<partition_copy_t>
+      : hpx::detail::tag_parallel_algorithm<partition_copy_t>
     {
     private:
         // clang-format off
@@ -1386,7 +1244,8 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator_v<OutIter2> &&
                 hpx::traits::is_iterator_v<OutIter3> &&
                 parallel::traits::is_projected_range<Proj, Rng>::value &&
-                parallel::traits::is_indirect_callable<hpx::execution::sequenced_policy, Pred,
+                parallel::traits::is_indirect_callable<
+                    hpx::execution::sequenced_policy, Pred,
                     parallel::traits::projected_range<Proj, Rng>>::value
             )>
         // clang-format on
@@ -1397,15 +1256,13 @@ namespace hpx { namespace ranges {
             Proj&& proj = Proj())
         {
             using iterator = hpx::traits::range_iterator_t<Rng>;
-            using result_type_1 = hpx::tuple<iterator, OutIter2, OutIter3>;
-            using result_type =
-                partition_copy_result<iterator, OutIter2, OutIter3>;
+            using result_type = hpx::tuple<iterator, OutIter2, OutIter3>;
 
             static_assert(hpx::traits::is_input_iterator_v<iterator>,
                 "Requires at least input iterator.");
 
             return parallel::util::make_in_out_out_result(
-                parallel::v1::detail::partition_copy<result_type_1>().call(
+                parallel::v1::detail::partition_copy<result_type>().call(
                     hpx::execution::seq, hpx::util::begin(rng),
                     hpx::util::end(rng), dest_true, dest_false,
                     std::forward<Pred>(pred), std::forward<Proj>(proj)));
@@ -1433,15 +1290,13 @@ namespace hpx { namespace ranges {
             Proj&& proj = Proj())
         {
             using iterator = hpx::traits::range_iterator_t<Rng>;
-            using result_type_1 = hpx::tuple<iterator, FwdIter2, FwdIter3>;
-            using result_type =
-                partition_copy_result<iterator, FwdIter2, FwdIter3>;
+            using result_type = hpx::tuple<iterator, FwdIter2, FwdIter3>;
 
             static_assert(hpx::traits::is_forward_iterator_v<iterator>,
                 "Requires at least forward iterator.");
 
             return parallel::util::make_in_out_out_result(
-                parallel::v1::detail::partition_copy<result_type_1>().call(
+                parallel::v1::detail::partition_copy<result_type>().call(
                     std::forward<ExPolicy>(policy), hpx::util::begin(rng),
                     hpx::util::end(rng), dest_true, dest_false,
                     std::forward<Pred>(pred), std::forward<Proj>(proj)));
@@ -1467,15 +1322,13 @@ namespace hpx { namespace ranges {
             Sent last, OutIter2 dest_true, OutIter3 dest_false, Pred&& pred,
             Proj&& proj = Proj())
         {
-            using result_type_1 = hpx::tuple<InIter, OutIter2, OutIter3>;
-            using result_type =
-                partition_copy_result<InIter, OutIter2, OutIter3>;
+            using result_type = hpx::tuple<InIter, OutIter2, OutIter3>;
 
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
             return parallel::util::make_in_out_out_result(
-                parallel::v1::detail::partition_copy<result_type_1>().call(
+                parallel::v1::detail::partition_copy<result_type>().call(
                     hpx::execution::seq, first, last, dest_true, dest_false,
                     std::forward<Pred>(pred), std::forward<Proj>(proj)));
         }
@@ -1502,18 +1355,18 @@ namespace hpx { namespace ranges {
             FwdIter first, Sent last, OutIter2 dest_true, OutIter3 dest_false,
             Pred&& pred, Proj&& proj = Proj())
         {
-            using result_type_1 = hpx::tuple<FwdIter, OutIter2, OutIter3>;
-            using result_type =
-                partition_copy_result<FwdIter, OutIter2, OutIter3>;
+            using result_type = hpx::tuple<FwdIter, OutIter2, OutIter3>;
 
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return parallel::util::make_in_out_out_result(
-                parallel::v1::detail::partition_copy<result_type_1>().call(
+                parallel::v1::detail::partition_copy<result_type>().call(
                     std::forward<ExPolicy>(policy), first, last, dest_true,
                     dest_false, std::forward<Pred>(pred),
                     std::forward<Proj>(proj)));
         }
     } partition_copy{};
 }}    // namespace hpx::ranges
+
+#endif    // DOXYGEN

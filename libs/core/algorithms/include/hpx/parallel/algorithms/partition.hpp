@@ -273,7 +273,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements in the range, defined by [first, last),
     /// to two different ranges depending on the value returned by
-    /// the predicate \a pred. The elements, that satisfy the predicate \a pred,
+    /// the predicate \a pred. The elements, that satisfy the predicate \a pred
     /// are copied to the range beginning at \a dest_true. The rest of
     /// the elements are copied to the range beginning at \a dest_false.
     /// The order of the elements is preserved.
@@ -291,14 +291,14 @@ namespace hpx {
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam FwdIter3    The type of the iterator representing the
-    ///                     destination range for the elements that don't satisfy
-    ///                     the predicate \a pred (deduced).
+    ///                     destination range for the elements that don't
+    ///                     satisfy the predicate \a pred (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a partition_copy requires \a Pred to meet
-    ///                     the requirements of \a CopyConstructible.
+    ///                     overload of \a partition_copy requires \a Pred to
+    ///                     meet the requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
@@ -306,14 +306,16 @@ namespace hpx {
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
-    /// \param dest_true    Refers to the beginning of the destination range for
-    ///                     the elements that satisfy the predicate \a pred.
-    /// \param dest_false   Refers to the beginning of the destination range for
-    ///                     the elements that don't satisfy the predicate \a pred.
+    /// \param dest_true    Refers to the beginning of the destination range
+    ///                     for the elements that satisfy the predicate \a pred
+    /// \param dest_false   Refers to the beginning of the destination range
+    ///                     for the elements that don't satisfy the predicate
+    ///                     \a pred.
     /// \param pred         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the sequence
-    ///                     specified by [first, last). This is an unary predicate
-    ///                     for partitioning the source iterators. The signature of
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is an
+    ///                     unary predicate for partitioning the source
+    ///                     iterators. The signature of
     ///                     this predicate should be equivalent to:
     ///                     \code
     ///                     bool pred(const Type &a);
@@ -337,8 +339,9 @@ namespace hpx {
     ///           tag::out2(OutIter2)>.
     ///           The \a partition_copy algorithm returns the tuple of
     ///           the source iterator \a last,
-    ///           the destination iterator to the end of the \a dest_true range, and
-    ///           the destination iterator to the end of the \a dest_false range.
+    ///           the destination iterator to the end of the \a dest_true
+    ///           range, and the destination iterator to the end of the \a
+    ///           dest_false range.
     ///
     template <typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename Pred, typename Proj>
@@ -372,14 +375,14 @@ namespace hpx {
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam FwdIter3    The type of the iterator representing the
-    ///                     destination range for the elements that don't satisfy
-    ///                     the predicate \a pred (deduced).
+    ///                     destination range for the elements that don't
+    ///                     satisfy the predicate \a pred (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a partition_copy requires \a Pred to meet
-    ///                     the requirements of \a CopyConstructible.
+    ///                     overload of \a partition_copy requires \a Pred to
+    ///                     meet the requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
@@ -389,14 +392,16 @@ namespace hpx {
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
-    /// \param dest_true    Refers to the beginning of the destination range for
-    ///                     the elements that satisfy the predicate \a pred.
-    /// \param dest_false   Refers to the beginning of the destination range for
-    ///                     the elements that don't satisfy the predicate \a pred.
+    /// \param dest_true    Refers to the beginning of the destination range
+    ///                     for the elements that satisfy the predicate \a pred
+    /// \param dest_false   Refers to the beginning of the destination range
+    ///                     for the elements that don't satisfy the predicate
+    ///                     \a pred.
     /// \param pred         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the sequence
-    ///                     specified by [first, last). This is an unary predicate
-    ///                     for partitioning the source iterators. The signature of
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is an
+    ///                     unary predicate for partitioning the source
+    ///                     iterators. The signature of
     ///                     this predicate should be equivalent to:
     ///                     \code
     ///                     bool pred(const Type &a);
@@ -411,26 +416,29 @@ namespace hpx {
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
     ///
-    /// The assignments in the parallel \a partition_copy algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
+    /// The assignments in the parallel \a partition_copy algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The assignments in the parallel \a partition_copy algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
+    /// The assignments in the parallel \a partition_copy algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
     /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
     /// \returns  The \a partition_copy algorithm returns a
-    /// \a hpx::future<tagged_tuple<tag::in(InIter), tag::out1(OutIter1), tag::out2(OutIter2)> >
+    ///           \a hpx::future<tagged_tuple<tag::in(InIter),
+    ///           tag::out1(OutIter1), tag::out2(OutIter2)> >
     ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns
-    /// \a tagged_tuple<tag::in(InIter), tag::out1(OutIter1), tag::out2(OutIter2)>
+    ///           \a tagged_tuple<tag::in(InIter),
+    ///           tag::out1(OutIter1), tag::out2(OutIter2)>
     ///           otherwise.
     ///           The \a partition_copy algorithm returns the tuple of
     ///           the source iterator \a last,
-    ///           the destination iterator to the end of the \a dest_true range, and
-    ///           the destination iterator to the end of the \a dest_false range.
+    ///           the destination iterator to the end of the \a dest_true
+    ///           range, and the destination iterator to the end of the \a
+    ///           dest_false range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename Pred, typename Proj>
@@ -835,7 +843,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     std::size_t begin_index = left_;
                     std::size_t end_index =
-                        (std::min) (left_ + block_size_, right_);
+                        (std::min)(left_ + block_size_, right_);
 
                     left_ += end_index - begin_index;
 
@@ -856,7 +864,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         return {first_, first_};
 
                     std::size_t begin_index =
-                        (std::max) (right_ - block_size_, left_);
+                        (std::max)(right_ - block_size_, left_);
                     std::size_t end_index = right_;
 
                     right_ -= end_index - begin_index;
@@ -1682,9 +1690,6 @@ namespace hpx {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
                 "Requires at least bidirectional iterator.");
 
-            using is_seq = std::integral_constant<bool,
-                !hpx::traits::is_random_access_iterator_v<BidirIter>>;
-
             return hpx::parallel::v1::detail::stable_partition<BidirIter>()
                 .call2(hpx::execution::seq, std::true_type{}, first, last,
                     std::forward<F>(f), std::forward<Proj>(proj));
@@ -1853,3 +1858,5 @@ namespace hpx {
         }
     } partition_copy{};
 }    // namespace hpx
+
+#endif    // DOXYGEN

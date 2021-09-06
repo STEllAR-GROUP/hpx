@@ -25,7 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 struct less_than
 {
-    less_than(int partition_at)
+    explicit less_than(int partition_at)
       : partition_at_(partition_at)
     {
     }
@@ -41,7 +41,7 @@ struct less_than
 
 struct great_equal_than
 {
-    great_equal_than(int partition_at)
+    explicit great_equal_than(int partition_at)
       : partition_at_(partition_at)
     {
     }
@@ -110,7 +110,8 @@ void test_stable_partition_sent(ExPolicy policy, IteratorTag)
     HPX_TEST(result.begin() == partition_pt);
 
     // verify values
-    std::stable_partition(std::begin(d), std::end(d) - 1, less_than(partition_at));
+    std::stable_partition(
+        std::begin(d), std::end(d) - 1, less_than(partition_at));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c) - 1, std::begin(d),
