@@ -9,7 +9,7 @@ module load cmake
 module load gcc/9
 module load boost/1.73.0-${build_type,,}
 module load hwloc
-module load cuda/11
+module load cuda/11.2
 module load openmpi
 
 export CXX_STD="17"
