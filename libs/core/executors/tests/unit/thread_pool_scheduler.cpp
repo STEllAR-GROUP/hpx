@@ -103,25 +103,6 @@ void test_sender_receiver_basic()
     HPX_TEST(executed);
 }
 
-void test_sender_receiver_basic2()
-{
-    hpx::thread::id parent_id = hpx::this_thread::get_id();
-    hpx::lcos::local::mutex mtx;
-    hpx::lcos::local::condition_variable cond;
-    std::atomic<bool> executed{false};
-
-    auto os = ex::connect(ex::thread_pool_scheduler{},
-        check_context_receiver{parent_id, cond, executed});
-    ex::start(os);
-
-    {
-        std::unique_lock<hpx::lcos::local::mutex> l{mtx};
-        cond.wait(l, [&]() { return executed.load(); });
-    }
-
-    HPX_TEST(executed);
-}
-
 hpx::thread::id sender_receiver_transform_thread_id;
 
 void test_sender_receiver_transform()
@@ -1796,7 +1777,6 @@ int hpx_main()
 {
     test_execute();
     test_sender_receiver_basic();
-    test_sender_receiver_basic2();
     test_sender_receiver_transform();
     test_sender_receiver_transform_wait();
     test_sender_receiver_transform_sync_wait();

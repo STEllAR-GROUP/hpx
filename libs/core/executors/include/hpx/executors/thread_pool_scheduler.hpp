@@ -218,22 +218,6 @@ namespace hpx { namespace execution { namespace experimental {
             }
         };
 
-        template <template <class...> class Tuple,
-            template <class...> class Variant>
-        using value_types = Variant<Tuple<>>;
-
-        template <template <class...> class Variant>
-        using error_types = Variant<std::exception_ptr>;
-
-        static constexpr bool sends_done = false;
-
-        template <typename Receiver>
-        operation_state<thread_pool_scheduler, Receiver> connect(
-            Receiver&& receiver) &&
-        {
-            return {*this, std::forward<Receiver>(receiver)};
-        }
-
         constexpr sender<thread_pool_scheduler> schedule() const
         {
             return {*this};
