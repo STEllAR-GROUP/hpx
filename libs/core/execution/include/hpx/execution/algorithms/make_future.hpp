@@ -34,26 +34,29 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::lcos::detail::future_data_allocator<T, Allocator>>
                 data;
 
-            void set_error(std::exception_ptr ep) && noexcept
+            friend void tag_dispatch(set_error_t, make_future_receiver&& r,
+                std::exception_ptr ep) noexcept
             {
-                data->set_exception(std::move(ep));
-                data.reset();
+                r.data->set_exception(std::move(ep));
+                r.data.reset();
             }
 
-            void set_done() && noexcept
+            friend void tag_dispatch(
+                set_done_t, make_future_receiver&&) noexcept
             {
                 std::terminate();
             }
 
             template <typename U>
-            void set_value(U&& u) && noexcept
+            friend void tag_dispatch(
+                set_value_t, make_future_receiver&& r, U&& u) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
-                    [&]() { data->set_value(std::forward<U>(u)); },
+                    [&]() { r.data->set_value(std::forward<U>(u)); },
                     [&](std::exception_ptr ep) {
-                        data->set_exception(std::move(ep));
+                        r.data->set_exception(std::move(ep));
                     });
-                data.reset();
+                r.data.reset();
             }
         };
 
@@ -64,25 +67,28 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::lcos::detail::future_data_allocator<void, Allocator>>
                 data;
 
-            void set_error(std::exception_ptr ep) && noexcept
+            friend void tag_dispatch(set_error_t, make_future_receiver&& r,
+                std::exception_ptr ep) noexcept
             {
-                data->set_exception(std::move(ep));
-                data.reset();
+                r.data->set_exception(std::move(ep));
+                r.data.reset();
             }
 
-            void set_done() && noexcept
+            friend void tag_dispatch(
+                set_done_t, make_future_receiver&&) noexcept
             {
                 std::terminate();
             }
 
-            void set_value() && noexcept
+            friend void tag_dispatch(
+                set_value_t, make_future_receiver&& r) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
-                    [&]() { data->set_value(hpx::util::unused); },
+                    [&]() { r.data->set_value(hpx::util::unused); },
                     [&](std::exception_ptr ep) {
-                        data->set_exception(std::move(ep));
+                        r.data->set_exception(std::move(ep));
                     });
-                data.reset();
+                r.data.reset();
             }
         };
 

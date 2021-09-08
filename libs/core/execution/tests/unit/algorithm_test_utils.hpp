@@ -31,14 +31,16 @@ struct void_sender
     struct operation_state
     {
         std::decay_t<R> r;
-        void start() noexcept
+        friend void tag_dispatch(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
-            hpx::execution::experimental::set_value(std::move(r));
+            hpx::execution::experimental::set_value(std::move(os.r));
         }
     };
 
     template <typename R>
-    operation_state<R> connect(R&& r)
+    friend operation_state<R> tag_dispatch(
+        hpx::execution::experimental::connect_t, void_sender, R&& r)
     {
         return {std::forward<R>(r)};
     }
@@ -59,7 +61,8 @@ struct error_sender
     struct operation_state
     {
         std::decay_t<R> r;
-        void start() noexcept
+        friend void tag_dispatch(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
             try
             {
@@ -68,13 +71,14 @@ struct error_sender
             catch (...)
             {
                 hpx::execution::experimental::set_error(
-                    std::move(r), std::current_exception());
+                    std::move(os.r), std::current_exception());
             }
         }
     };
 
     template <typename R>
-    operation_state<R> connect(R&& r)
+    friend operation_state<R> tag_dispatch(
+        hpx::execution::experimental::connect_t, error_sender, R&& r)
     {
         return {std::forward<R>(r)};
     }
@@ -87,22 +91,25 @@ struct callback_receiver
     std::atomic<bool>& set_value_called;
 
     template <typename E>
-    void set_error(E&&) noexcept
+    friend void tag_dispatch(hpx::execution::experimental::set_error_t,
+        callback_receiver&&, E&&) noexcept
     {
         HPX_TEST(false);
     }
 
-    void set_done() noexcept
+    friend void tag_dispatch(
+        hpx::execution::experimental::set_done_t, callback_receiver&&) noexcept
     {
         HPX_TEST(false);
     };
 
     template <typename... Ts>
-    auto set_value(Ts&&... ts) noexcept
+    friend auto tag_dispatch(hpx::execution::experimental::set_value_t,
+        callback_receiver&& r, Ts&&... ts) noexcept
         -> decltype(HPX_INVOKE(f, std::forward<Ts>(ts)...), void())
     {
-        HPX_INVOKE(f, std::forward<Ts>(ts)...);
-        set_value_called = true;
+        HPX_INVOKE(r.f, std::forward<Ts>(ts)...);
+        r.set_value_called = true;
     }
 };
 
@@ -114,21 +121,24 @@ struct error_callback_receiver
     bool expect_set_value = false;
 
     template <typename E>
-    void set_error(E&& e) noexcept
+    friend void tag_dispatch(hpx::execution::experimental::set_error_t,
+        error_callback_receiver&& r, E&& e) noexcept
     {
-        HPX_INVOKE(f, std::forward<E>(e));
-        set_error_called = true;
+        HPX_INVOKE(r.f, std::forward<E>(e));
+        r.set_error_called = true;
     }
 
-    void set_done() noexcept
+    friend void tag_dispatch(hpx::execution::experimental::set_done_t,
+        error_callback_receiver&&) noexcept
     {
         HPX_TEST(false);
     };
 
     template <typename... Ts>
-    void set_value(Ts&&...) noexcept
+    friend void tag_dispatch(hpx::execution::experimental::set_value_t,
+        error_callback_receiver&& r, Ts&&...) noexcept
     {
-        HPX_TEST(expect_set_value);
+        HPX_TEST(r.expect_set_value);
     }
 };
 
@@ -168,7 +178,8 @@ struct error_typed_sender
     {
         std::decay_t<R> r;
 
-        void start() noexcept
+        friend void tag_dispatch(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
             try
             {
@@ -177,13 +188,14 @@ struct error_typed_sender
             catch (...)
             {
                 hpx::execution::experimental::set_error(
-                    std::move(r), std::current_exception());
+                    std::move(os.r), std::current_exception());
             }
         };
     };
 
     template <typename R>
-    auto connect(R&& r) &&
+    friend auto tag_dispatch(
+        hpx::execution::experimental::connect_t, error_typed_sender&&, R&& r)
     {
         return operation_state<R>{std::forward<R>(r)};
     }
@@ -251,18 +263,20 @@ struct custom_sender
     {
         std::atomic<bool>& start_called;
         std::decay_t<R> r;
-        void start() noexcept
+        friend void tag_dispatch(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
-            start_called = true;
-            hpx::execution::experimental::set_value(std::move(r));
+            os.start_called = true;
+            hpx::execution::experimental::set_value(std::move(os.r));
         };
     };
 
     template <typename R>
-    auto connect(R&& r) &&
+    friend auto tag_dispatch(
+        hpx::execution::experimental::connect_t, custom_sender&& s, R&& r)
     {
-        connect_called = true;
-        return operation_state<R>{start_called, std::forward<R>(r)};
+        s.connect_called = true;
+        return operation_state<R>{s.start_called, std::forward<R>(r)};
     }
 };
 
@@ -290,19 +304,22 @@ struct custom_typed_sender
         std::decay_t<T> x;
         std::atomic<bool>& start_called;
         std::decay_t<R> r;
-        void start() noexcept
+        friend void tag_dispatch(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
-            start_called = true;
-            hpx::execution::experimental::set_value(std::move(r), std::move(x));
+            os.start_called = true;
+            hpx::execution::experimental::set_value(
+                std::move(os.r), std::move(os.x));
         };
     };
 
     template <typename R>
-    auto connect(R&& r) &&
+    friend auto tag_dispatch(
+        hpx::execution::experimental::connect_t, custom_typed_sender&& s, R&& r)
     {
-        connect_called = true;
+        s.connect_called = true;
         return operation_state<R>{
-            std::move(x), start_called, std::forward<R>(r)};
+            std::move(s.x), s.start_called, std::forward<R>(r)};
     }
 };
 
@@ -360,36 +377,11 @@ struct scheduler
     std::atomic<bool>& tag_dispatch_overload_called;
 
     template <typename F>
-    void execute(F&& f) const
+    friend void tag_dispatch(
+        hpx::execution::experimental::execute_t, scheduler s, F&& f)
     {
-        execute_called = true;
+        s.execute_called = true;
         HPX_INVOKE(std::forward<F>(f));
-    }
-
-    template <template <class...> class Tuple,
-        template <class...> class Variant>
-    using value_types = Variant<Tuple<>>;
-
-    template <template <class...> class Variant>
-    using error_types = Variant<std::exception_ptr>;
-
-    static constexpr bool sends_done = false;
-
-    template <typename R>
-    struct operation_state
-    {
-        std::decay_t<R> r;
-
-        void start() noexcept
-        {
-            hpx::execution::experimental::set_value(std::move(r));
-        };
-    };
-
-    template <typename R>
-    auto connect(R&& r) &&
-    {
-        return operation_state<R>{std::forward<R>(r)};
     }
 
     struct sender
@@ -404,15 +396,29 @@ struct scheduler
         static constexpr bool sends_done = false;
 
         template <typename R>
-        auto connect(R&& r) &&
+        struct operation_state
+        {
+            std::decay_t<R> r;
+
+            friend void tag_dispatch(hpx::execution::experimental::start_t,
+                operation_state& os) noexcept
+            {
+                hpx::execution::experimental::set_value(std::move(os.r));
+            };
+        };
+
+        template <typename R>
+        friend auto tag_dispatch(
+            hpx::execution::experimental::connect_t, sender&&, R&& r)
         {
             return operation_state<R>{std::forward<R>(r)};
         }
     };
 
-    sender schedule()
+    friend sender tag_dispatch(
+        hpx::execution::experimental::schedule_t, scheduler s)
     {
-        schedule_called = true;
+        s.schedule_called = true;
         return {};
     }
 

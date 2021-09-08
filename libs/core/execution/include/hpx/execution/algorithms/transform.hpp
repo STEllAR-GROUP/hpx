@@ -29,15 +29,17 @@ namespace hpx { namespace execution { namespace experimental {
             std::decay_t<F> f;
 
             template <typename Error>
-            void set_error(Error&& error) && noexcept
+            friend void tag_dispatch(
+                set_error_t, transform_receiver&& r, Error&& error) noexcept
             {
                 hpx::execution::experimental::set_error(
-                    std::move(receiver), std::forward<Error>(error));
+                    std::move(r.receiver), std::forward<Error>(error));
             }
 
-            void set_done() && noexcept
+            friend void tag_dispatch(
+                set_done_t, transform_receiver&& r) noexcept
             {
-                hpx::execution::experimental::set_done(std::move(receiver));
+                hpx::execution::experimental::set_done(std::move(r.receiver));
             }
 
         private:
@@ -74,11 +76,12 @@ namespace hpx { namespace execution { namespace experimental {
         public:
             template <typename... Ts,
                 typename = std::enable_if_t<hpx::is_invocable_v<F, Ts...>>>
-            void set_value(Ts&&... ts) && noexcept
+            friend void tag_dispatch(
+                set_value_t, transform_receiver&& r, Ts&&... ts) noexcept
             {
                 using is_void_result =
                     std::is_void<hpx::util::invoke_result_t<F, Ts...>>;
-                set_value_helper(is_void_result{}, std::forward<Ts>(ts)...);
+                r.set_value_helper(is_void_result{}, std::forward<Ts>(ts)...);
             }
         };
 
@@ -134,19 +137,22 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Receiver>
-            auto connect(Receiver&& receiver) &&
+            friend auto tag_dispatch(
+                connect_t, transform_sender&& s, Receiver&& receiver)
             {
-                return hpx::execution::experimental::connect(std::move(sender),
+                return hpx::execution::experimental::connect(
+                    std::move(s.sender),
                     transform_receiver<Receiver, F>{
-                        std::forward<Receiver>(receiver), std::move(f)});
+                        std::forward<Receiver>(receiver), std::move(s.f)});
             }
 
             template <typename Receiver>
-            auto connect(Receiver&& receiver) &
+            friend auto tag_dispatch(
+                connect_t, transform_sender& r, Receiver&& receiver)
             {
-                return hpx::execution::experimental::connect(sender,
+                return hpx::execution::experimental::connect(r.sender,
                     transform_receiver<Receiver, F>{
-                        std::forward<Receiver>(receiver), f});
+                        std::forward<Receiver>(receiver), r.f});
             }
         };
     }    // namespace detail

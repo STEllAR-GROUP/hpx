@@ -164,19 +164,19 @@ namespace hpx { namespace execution { namespace experimental {
             operation_state& operator=(operation_state&&) = delete;
             operation_state& operator=(operation_state const&) = delete;
 
-            void start() & noexcept
+            friend void tag_dispatch(start_t, operation_state& os) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        scheduler.execute(
-                            [receiver = std::move(receiver)]() mutable {
+                        os.scheduler.execute(
+                            [receiver = std::move(os.receiver)]() mutable {
                                 hpx::execution::experimental::set_value(
                                     std::move(receiver));
                             });
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
-                            std::move(receiver), std::move(ep));
+                            std::move(os.receiver), std::move(ep));
                     });
             }
         };
@@ -196,15 +196,18 @@ namespace hpx { namespace execution { namespace experimental {
             static constexpr bool sends_done = false;
 
             template <typename Receiver>
-            operation_state<Scheduler, Receiver> connect(Receiver&& receiver) &&
+            friend operation_state<Scheduler, Receiver> tag_dispatch(
+                connect_t, sender&& s, Receiver&& receiver)
             {
-                return {std::move(scheduler), std::forward<Receiver>(receiver)};
+                return {
+                    std::move(s.scheduler), std::forward<Receiver>(receiver)};
             }
 
             template <typename Receiver>
-            operation_state<Scheduler, Receiver> connect(Receiver&& receiver) &
+            friend operation_state<Scheduler, Receiver> tag_dispatch(
+                connect_t, sender& s, Receiver&& receiver)
             {
-                return {scheduler, std::forward<Receiver>(receiver)};
+                return {s.scheduler, std::forward<Receiver>(receiver)};
             }
 
             template <typename CPO,
@@ -218,9 +221,16 @@ namespace hpx { namespace execution { namespace experimental {
             }
         };
 
-        constexpr sender<thread_pool_scheduler> schedule() const
+        friend constexpr sender<thread_pool_scheduler> tag_dispatch(
+            schedule_t, thread_pool_scheduler&& sched)
         {
-            return {*this};
+            return {std::move(sched)};
+        }
+
+        friend constexpr sender<thread_pool_scheduler> tag_dispatch(
+            schedule_t, thread_pool_scheduler const& sched)
+        {
+            return {sched};
         }
         /// \endcond
 

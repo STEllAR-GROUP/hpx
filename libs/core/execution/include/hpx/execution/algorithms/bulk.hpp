@@ -85,22 +85,21 @@ namespace hpx { namespace execution { namespace experimental {
                 }
 
                 template <typename Error>
-                void set_error(Error&& error) && noexcept
+                friend void tag_dispatch(
+                    set_error_t, bulk_receiver&& r, Error&& error) noexcept
                 {
                     hpx::execution::experimental::set_error(
-                        std::move(receiver), std::forward<Error>(error));
+                        std::move(r.receiver), std::forward<Error>(error));
                 }
 
-                void set_done() && noexcept
+                friend void tag_dispatch(set_done_t, bulk_receiver&& r) noexcept
                 {
-                    hpx::execution::experimental::set_done(std::move(receiver));
+                    hpx::execution::experimental::set_done(
+                        std::move(r.receiver));
                 }
 
                 template <typename... Ts>
-                auto set_value(Ts&&... ts) && noexcept -> decltype(
-                    hpx::execution::experimental::set_value(
-                        std::move(receiver), std::forward<Ts>(ts)...),
-                    void())
+                void set_value(Ts&&... ts)
                 {
                     hpx::detail::try_catch_exception_ptr(
                         [&]() {
@@ -116,22 +115,40 @@ namespace hpx { namespace execution { namespace experimental {
                                 std::move(receiver), std::move(ep));
                         });
                 }
+
+                template <typename... Ts>
+                friend auto tag_dispatch(
+                    set_value_t, bulk_receiver&& r, Ts&&... ts) noexcept
+                    -> decltype(hpx::execution::experimental::set_value(
+                                    std::declval<std::decay_t<Receiver>&&>(),
+                                    std::forward<Ts>(ts)...),
+                        void())
+                {
+                    // set_value is in a member function only because of a
+                    // compiler bug in GCC 7. When the body of set_value is
+                    // inlined here compilation fails with an internal compiler
+                    // error.
+                    r.set_value(std::forward<Ts>(ts)...);
+                }
             };
 
             template <typename Receiver>
-            auto connect(Receiver&& receiver) &&
+            friend auto tag_dispatch(
+                connect_t, bulk_sender&& s, Receiver&& receiver)
             {
-                return hpx::execution::experimental::connect(std::move(sender),
+                return hpx::execution::experimental::connect(
+                    std::move(s.sender),
                     bulk_receiver<Receiver>(std::forward<Receiver>(receiver),
-                        std::move(shape), std::move(f)));
+                        std::move(s.shape), std::move(s.f)));
             }
 
             template <typename Receiver>
-            auto connect(Receiver&& receiver) &
+            friend auto tag_dispatch(
+                connect_t, bulk_sender& s, Receiver&& receiver)
             {
-                return hpx::execution::experimental::connect(sender,
+                return hpx::execution::experimental::connect(s.sender,
                     bulk_receiver<Receiver>(
-                        std::forward<Receiver>(receiver), shape, f));
+                        std::forward<Receiver>(receiver), s.shape, s.f));
             }
         };
     }    // namespace detail

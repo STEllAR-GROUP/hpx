@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/functional/tag_priority_dispatch.hpp>
+#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
 #include <exception>
@@ -102,50 +102,18 @@ namespace hpx { namespace execution { namespace experimental {
     struct is_receiver_of;
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct set_value_t : hpx::functional::tag_priority<set_value_t>
+    struct set_value_t : hpx::functional::tag<set_value_t>
     {
-    private:
-        template <typename R, typename... Args>
-        friend constexpr HPX_FORCEINLINE auto tag_override_dispatch(
-            set_value_t, R&& r, Args&&... args)
-        // This does not compile with CUDA 11.4 (most recent at the moment)
-        // Removing the variadic ... makes it compile
-#if !defined(HPX_COMPUTE_DEVICE_CODE) || (HPX_CUDA_VERSION < 1104)
-            noexcept(noexcept(
-                std::forward<R>(r).set_value(std::forward<Args>(args)...)))
-#endif
-                -> decltype(
-                    std::forward<R>(r).set_value(std::forward<Args>(args)...))
-        {
-            return std::forward<R>(r).set_value(std::forward<Args>(args)...);
-        }
     } set_value{};
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct set_error_t : hpx::functional::tag_priority_noexcept<set_error_t>
+    struct set_error_t : hpx::functional::tag_noexcept<set_error_t>
     {
-    private:
-        template <typename R, typename E>
-        friend constexpr HPX_FORCEINLINE auto
-        tag_override_dispatch(set_error_t, R&& r, E&& e) noexcept(
-            noexcept(std::declval<R&&>().set_error(std::forward<E>(e))))
-            -> decltype(std::declval<R&&>().set_error(std::forward<E>(e)))
-        {
-            return std::forward<R>(r).set_error(std::forward<E>(e));
-        }
     } set_error{};
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct set_done_t : hpx::functional::tag_priority_noexcept<set_done_t>
+    struct set_done_t : hpx::functional::tag_noexcept<set_done_t>
     {
-    private:
-        template <typename R>
-        friend constexpr HPX_FORCEINLINE auto tag_override_dispatch(set_done_t,
-            R&& r) noexcept(noexcept(std::declval<R&&>().set_done()))
-            -> decltype(std::declval<R&&>().set_done())
-        {
-            return std::forward<R>(r).set_done();
-        }
     } set_done{};
 
     ///////////////////////////////////////////////////////////////////////

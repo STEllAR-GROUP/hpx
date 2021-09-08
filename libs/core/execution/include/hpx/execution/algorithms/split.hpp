@@ -105,7 +105,6 @@ namespace hpx { namespace execution { namespace experimental {
 
             struct shared_state
             {
-            private:
                 struct split_receiver;
 
                 using allocator_type = typename std::allocator_traits<
@@ -143,18 +142,20 @@ namespace hpx { namespace execution { namespace experimental {
                     hpx::intrusive_ptr<shared_state> state;
 
                     template <typename Error>
-                    void set_error(Error&& error) && noexcept
+                    friend void tag_dispatch(
+                        set_error_t, split_receiver&& r, Error&& error) noexcept
                     {
-                        state->v.template emplace<error_type>(
+                        r.state->v.template emplace<error_type>(
                             error_type(std::forward<Error>(error)));
-                        state->set_predecessor_done();
-                        state.reset();
+                        r.state->set_predecessor_done();
+                        r.state.reset();
                     }
 
-                    void set_done() && noexcept
+                    friend void tag_dispatch(
+                        set_done_t, split_receiver&& r) noexcept
                     {
-                        state->set_predecessor_done();
-                        state.reset();
+                        r.state->set_predecessor_done();
+                        r.state.reset();
                     };
 
                     // This typedef is duplicated from the parent struct. The
@@ -166,21 +167,23 @@ namespace hpx { namespace execution { namespace experimental {
                             hpx::variant>;
 
                     template <typename... Ts>
-                    auto set_value(Ts&&... ts) && noexcept -> decltype(
-                        std::declval<hpx::variant<hpx::monostate, value_type>>()
-                            .template emplace<value_type>(
-                                hpx::make_tuple<>(std::forward<Ts>(ts)...)),
-                        void())
+                    friend auto tag_dispatch(
+                        set_value_t, split_receiver&& r, Ts&&... ts) noexcept
+                        -> decltype(
+                            std::declval<
+                                hpx::variant<hpx::monostate, value_type>>()
+                                .template emplace<value_type>(
+                                    hpx::make_tuple<>(std::forward<Ts>(ts)...)),
+                            void())
                     {
-                        state->v.template emplace<value_type>(
+                        r.state->v.template emplace<value_type>(
                             hpx::make_tuple<>(std::forward<Ts>(ts)...));
 
-                        state->set_predecessor_done();
-                        state.reset();
+                        r.state->set_predecessor_done();
+                        r.state.reset();
                     }
                 };
 
-            public:
                 template <typename Sender_,
                     typename = std::enable_if_t<!std::is_same<
                         std::decay_t<Sender_>, shared_state>::value>>
@@ -200,7 +203,6 @@ namespace hpx { namespace execution { namespace experimental {
                         "state?");
                 }
 
-            private:
                 template <typename Receiver>
                 struct done_error_value_visitor
                 {
@@ -285,7 +287,6 @@ namespace hpx { namespace execution { namespace experimental {
                     }
                 }
 
-            public:
                 template <typename Receiver>
                 void add_continuation(Receiver& receiver) = delete;
 
@@ -425,30 +426,32 @@ namespace hpx { namespace execution { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                void start() & noexcept
+                friend void tag_dispatch(start_t, operation_state& os) noexcept
                 {
                     // Lazy submission means that we wait to start the
                     // predecessor operation state when a downstream operation
                     // state is started, i.e. this start function is called.
                     if constexpr (Type == submission_type::lazy)
                     {
-                        state->start();
+                        os.state->start();
                     }
 
-                    state->add_continuation(std::move(receiver));
+                    os.state->add_continuation(std::move(os.receiver));
                 }
             };
 
             template <typename Receiver>
-            operation_state<Receiver> connect(Receiver&& receiver) &&
+            friend operation_state<Receiver> tag_dispatch(
+                connect_t, split_sender&& s, Receiver&& receiver)
             {
-                return {std::forward<Receiver>(receiver), std::move(state)};
+                return {std::forward<Receiver>(receiver), std::move(s.state)};
             }
 
             template <typename Receiver>
-            operation_state<Receiver> connect(Receiver&& receiver) &
+            friend operation_state<Receiver> tag_dispatch(
+                connect_t, split_sender& s, Receiver&& receiver)
             {
-                return {std::forward<Receiver>(receiver), state};
+                return {std::forward<Receiver>(receiver), s.state};
             }
         };
     }    // namespace detail

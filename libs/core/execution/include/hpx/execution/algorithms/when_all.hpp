@@ -39,51 +39,53 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Error>
-            void set_error(Error&& error) && noexcept
+            friend void tag_dispatch(
+                set_error_t, when_all_receiver&& r, Error&& error) noexcept
             {
-                if (!op_state.set_done_error_called.exchange(true))
+                if (!r.op_state.set_done_error_called.exchange(true))
                 {
                     try
                     {
-                        op_state.error = std::forward<Error>(error);
+                        r.op_state.error = std::forward<Error>(error);
                     }
                     catch (...)
                     {
                         // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
-                        op_state.error = std::current_exception();
+                        r.op_state.error = std::current_exception();
                     }
                 }
 
-                op_state.finish();
+                r.op_state.finish();
             }
 
-            void set_done() && noexcept
+            friend void tag_dispatch(set_done_t, when_all_receiver&& r) noexcept
             {
-                op_state.set_done_error_called = true;
-                op_state.finish();
+                r.op_state.set_done_error_called = true;
+                r.op_state.finish();
             };
 
             template <typename T>
-            void set_value(T&& t) && noexcept
+            friend void tag_dispatch(
+                set_value_t, when_all_receiver&& r, T&& t) noexcept
             {
-                if (!op_state.set_done_error_called)
+                if (!r.op_state.set_done_error_called)
                 {
                     try
                     {
-                        op_state.ts.template get<I>().emplace(
+                        r.op_state.ts.template get<I>().emplace(
                             std::forward<T>(t));
                     }
                     catch (...)
                     {
-                        if (!op_state.set_done_error_called.exchange(true))
+                        if (!r.op_state.set_done_error_called.exchange(true))
                         {
                             // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
-                            op_state.error = std::current_exception();
+                            r.op_state.error = std::current_exception();
                         }
                     }
                 }
 
-                op_state.finish();
+                r.op_state.finish();
             }
         };
 
@@ -245,19 +247,29 @@ namespace hpx { namespace execution { namespace experimental {
                 }
             };
 
-            template <typename Receiver>
-            auto connect(Receiver&& receiver) &&
+            template <typename Receiver, typename SendersPack>
+            friend void tag_dispatch(start_t,
+                operation_state<Receiver, SendersPack, num_predecessors - 1>&
+                    os) noexcept
             {
-                return operation_state<Receiver, senders_type&&,
-                    num_predecessors - 1>(
-                    std::forward<Receiver>(receiver), std::move(senders));
+                os.start();
             }
 
             template <typename Receiver>
-            auto connect(Receiver&& receiver) &
+            friend auto tag_dispatch(
+                connect_t, when_all_sender&& s, Receiver&& receiver)
+            {
+                return operation_state<Receiver, senders_type&&,
+                    num_predecessors - 1>(
+                    std::forward<Receiver>(receiver), std::move(s.senders));
+            }
+
+            template <typename Receiver>
+            friend auto tag_dispatch(
+                connect_t, when_all_sender& s, Receiver&& receiver)
             {
                 return operation_state<Receiver, senders_type&,
-                    num_predecessors - 1>(receiver, senders);
+                    num_predecessors - 1>(receiver, s.senders);
             }
         };
     }    // namespace detail

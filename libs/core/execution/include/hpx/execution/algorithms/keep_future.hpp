@@ -13,7 +13,7 @@
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
@@ -30,12 +30,12 @@ namespace hpx { namespace execution { namespace experimental {
             std::decay_t<Receiver> receiver;
             std::decay_t<Future> future;
 
-            void start() & noexcept
+            friend void tag_dispatch(start_t, operation_state& os) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
                         auto state =
-                            hpx::traits::detail::get_shared_state(future);
+                            hpx::traits::detail::get_shared_state(os.future);
 
                         if (!state)
                         {
@@ -47,14 +47,14 @@ namespace hpx { namespace execution { namespace experimental {
                         // The operation state has to be kept alive until set_value
                         // is called, which means that we don't need to move
                         // receiver and future into the on_completed callback.
-                        state->set_on_completed([this]() mutable {
+                        state->set_on_completed([&os]() mutable {
                             hpx::execution::experimental::set_value(
-                                std::move(receiver), std::move(future));
+                                std::move(os.receiver), std::move(os.future));
                         });
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
-                            std::move(receiver), std::move(ep));
+                            std::move(os.receiver), std::move(ep));
                     });
             }
         };
@@ -99,10 +99,10 @@ namespace hpx { namespace execution { namespace experimental {
             keep_future_sender& operator=(keep_future_sender const&) = delete;
 
             template <typename Receiver>
-            operation_state<Receiver, future_type> connect(
-                Receiver&& receiver) &&
+            friend operation_state<Receiver, future_type> tag_dispatch(
+                connect_t, keep_future_sender&& s, Receiver&& receiver)
             {
-                return {std::forward<Receiver>(receiver), std::move(future)};
+                return {std::forward<Receiver>(receiver), std::move(s.future)};
             }
         };
 
@@ -128,40 +128,36 @@ namespace hpx { namespace execution { namespace experimental {
             keep_future_sender& operator=(keep_future_sender const&) = default;
 
             template <typename Receiver>
-            operation_state<Receiver, future_type> connect(
-                Receiver&& receiver) &&
+            friend operation_state<Receiver, future_type> tag_dispatch(
+                connect_t, keep_future_sender&& s, Receiver&& receiver)
             {
-                return {std::forward<Receiver>(receiver), std::move(future)};
+                return {std::forward<Receiver>(receiver), std::move(s.future)};
             }
 
             template <typename Receiver>
-            operation_state<Receiver, future_type> connect(
-                Receiver&& receiver) &
+            friend operation_state<Receiver, future_type> tag_dispatch(
+                connect_t, keep_future_sender& s, Receiver&& receiver)
             {
-                return {std::forward<Receiver>(receiver), future};
+                return {std::forward<Receiver>(receiver), s.future};
             }
         };
     }    // namespace detail
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct keep_future_t final
-      : hpx::functional::tag_fallback<keep_future_t>
     {
-    private:
         // clang-format off
         template <typename Future,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_future_v<std::decay_t<Future>>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
-            keep_future_t, Future&& future)
+        constexpr HPX_FORCEINLINE auto operator()(Future&& future) const
         {
             return detail::keep_future_sender<std::decay_t<Future>>(
                 std::forward<Future>(future));
         }
 
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
-            keep_future_t)
+        constexpr HPX_FORCEINLINE auto operator()() const
         {
             return detail::partial_algorithm<keep_future_t>{};
         }

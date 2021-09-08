@@ -60,24 +60,26 @@ struct check_context_receiver
     std::atomic<bool>& executed;
 
     template <typename E>
-    void set_error(E&&) noexcept
+    friend void tag_dispatch(
+        ex::set_error_t, check_context_receiver&&, E&&) noexcept
     {
         HPX_TEST(false);
     }
 
-    void set_done() noexcept
+    friend void tag_dispatch(ex::set_done_t, check_context_receiver&&) noexcept
     {
         HPX_TEST(false);
     }
 
     template <typename... Ts>
-    void set_value(Ts&&...) noexcept
+    friend void tag_dispatch(
+        ex::set_value_t, check_context_receiver&& r, Ts&&...)
     {
-        HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
+        HPX_TEST_NEQ(r.parent_id, hpx::this_thread::get_id());
         HPX_TEST_NEQ(hpx::thread::id(hpx::threads::invalid_thread_id),
             hpx::this_thread::get_id());
-        executed = true;
-        cond.notify_one();
+        r.executed = true;
+        r.cond.notify_one();
     }
 };
 
@@ -227,22 +229,23 @@ struct callback_receiver
     std::atomic<bool>& executed;
 
     template <typename E>
-    void set_error(E&&) noexcept
+    friend void tag_dispatch(ex::set_error_t, callback_receiver&&, E&&) noexcept
     {
         HPX_TEST(false);
     }
 
-    void set_done() noexcept
+    friend void tag_dispatch(ex::set_done_t, callback_receiver&&) noexcept
     {
         HPX_TEST(false);
     }
 
     template <typename... Ts>
-    void set_value(Ts&&...) noexcept
+    friend void tag_dispatch(
+        ex::set_value_t, callback_receiver&& r, Ts&&...) noexcept
     {
-        HPX_INVOKE(f);
-        executed = true;
-        cond.notify_one();
+        HPX_INVOKE(r.f);
+        r.executed = true;
+        r.cond.notify_one();
     }
 };
 
@@ -1369,32 +1372,21 @@ void test_keep_future_sender()
     // the future should be passed to transform, not it's contained value
     {
         hpx::make_ready_future<void>() | ex::keep_future() |
-            ex::transform([](auto f) {
-                static_assert(std::is_same<std::decay_t<decltype(f)>,
-                                  hpx::future<void>>::value,
-                    "f should be a future<void>");
-                HPX_TEST(f.is_ready());
-            }) |
+            ex::transform(
+                [](hpx::future<void>&& f) { HPX_TEST(f.is_ready()); }) |
             ex::sync_wait();
     }
 
     {
         hpx::make_ready_future<void>().share() | ex::keep_future() |
-            ex::transform([](auto f) {
-                static_assert(std::is_same<std::decay_t<decltype(f)>,
-                                  hpx::shared_future<void>>::value,
-                    "f should be a shared_future<void>");
-                HPX_TEST(f.is_ready());
-            }) |
+            ex::transform(
+                [](hpx::shared_future<void>&& f) { HPX_TEST(f.is_ready()); }) |
             ex::sync_wait();
     }
 
     {
         hpx::make_ready_future<int>(42) | ex::keep_future() |
-            ex::transform([](auto f) {
-                static_assert(std::is_same<std::decay_t<decltype(f)>,
-                                  hpx::future<int>>::value,
-                    "f should be a future<int>");
+            ex::transform([](hpx::future<int>&& f) {
                 HPX_TEST(f.is_ready());
                 HPX_TEST_EQ(f.get(), 42);
             }) |
@@ -1403,10 +1395,7 @@ void test_keep_future_sender()
 
     {
         hpx::make_ready_future<int>(42).share() | ex::keep_future() |
-            ex::transform([](auto f) {
-                static_assert(std::is_same<std::decay_t<decltype(f)>,
-                                  hpx::shared_future<int>>::value,
-                    "f should be a shared_future<int>");
+            ex::transform([](hpx::shared_future<int>&& f) {
                 HPX_TEST(f.is_ready());
                 HPX_TEST_EQ(f.get(), 42);
             }) |

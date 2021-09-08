@@ -10,7 +10,7 @@
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_priority_dispatch.hpp>
+#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/type_support/equality.hpp>
 
@@ -178,22 +178,8 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct connect_t : hpx::functional::tag_priority<connect_t>
+    struct connect_t : hpx::functional::tag<connect_t>
     {
-        template <typename S, typename R,
-            typename = std::enable_if_t<is_sender_v<S> && is_receiver_v<R>>>
-        friend constexpr HPX_FORCEINLINE auto
-        tag_override_dispatch(connect_t, S&& s, R&& r) noexcept(
-            noexcept(std::forward<S>(s).connect(std::forward<R>(r))))
-            -> decltype(std::forward<S>(s).connect(std::forward<R>(r)))
-        {
-            static_assert(is_operation_state_v<decltype(
-                              std::forward<S>(s).connect(std::forward<R>(r)))>,
-                "hpx::execution::experimental::connect needs to return a "
-                "type satisfying the operation_state concept");
-
-            return std::forward<S>(s).connect(std::forward<R>(r));
-        }
     } connect{};
 
     namespace detail {
@@ -250,17 +236,8 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct schedule_t : hpx::functional::tag_priority<schedule_t>
+    struct schedule_t : hpx::functional::tag<schedule_t>
     {
-        template <typename S,
-            typename = std::enable_if_t<is_sender_v<
-                std::decay_t<decltype(std::declval<S>().schedule())>>>>
-        friend constexpr HPX_FORCEINLINE auto tag_override_dispatch(
-            schedule_t, S&& s) noexcept(noexcept(std::forward<S>(s).schedule()))
-            -> decltype(std::forward<S>(s).schedule())
-        {
-            return std::forward<S>(s).schedule();
-        }
     } schedule{};
 
     namespace detail {

@@ -38,7 +38,8 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::intrusive_ptr<operation_state_holder> op_state;
 
                 template <typename Error>
-                HPX_NORETURN void set_error(Error&&) && noexcept
+                HPX_NORETURN friend void tag_dispatch(
+                    set_error_t, detach_receiver&&, Error&&) noexcept
                 {
                     HPX_ASSERT_MSG(false,
                         "set_error was called on the receiver of detach, "
@@ -48,15 +49,17 @@ namespace hpx { namespace execution { namespace experimental {
                     std::terminate();
                 }
 
-                void set_done() && noexcept
+                friend void tag_dispatch(
+                    set_done_t, detach_receiver&& r) noexcept
                 {
-                    op_state.reset();
+                    r.op_state.reset();
                 };
 
                 template <typename... Ts>
-                void set_value(Ts&&...) && noexcept
+                friend void tag_dispatch(
+                    set_value_t, detach_receiver&& r, Ts&&...) noexcept
                 {
-                    op_state.reset();
+                    r.op_state.reset();
                 }
             };
 
