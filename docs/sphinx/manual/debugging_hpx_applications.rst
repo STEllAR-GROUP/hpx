@@ -43,7 +43,6 @@ can be helpful:
 Non-stop mode allows users to have a single thread stop on a breakpoint without
 stopping all other threads as well.
 
-
 Using sanitizers with |hpx| applications
 ========================================
 
@@ -60,3 +59,40 @@ used for |hpx|. The appropriate sanitizers can then be enabled using |cmake| by
 appending ``-fsanitize=address -fno-omit-frame-pointer`` to ``CMAKE_CXX_FLAGS``
 and ``-fsanitize=address`` to ``CMAKE_EXE_LINKER_FLAGS``. Replace ``address``
 with the sanitizer that you want to use.
+
+.. _debugging_core:
+
+Debugging applications using core files
+========================================
+
+For |hpx| to generate useful core files, |hpx| has to be compiled without signal
+and exception handlers
+:option:`HPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS:BOOL`. If this option is
+not specified, the signal handlers change the application state. For example,
+after a segmentation fault the stack trace will show the signal handler.
+Similarly, unhandled exceptions are also caught by these handlers and the
+stack trace will not point to the location where the unhandled exception was
+thrown.
+
+In general, core files are a helpful tool to inspect the state of the
+application at the moment of the crash (post-mortem debugging), without the need
+of attaching a debugger beforehand. This approach to debugging is especially
+useful if the error cannot be reliably reproduced, as only a single crashed
+application run is required to gain potentially helpful information like a
+stacktrace.
+
+To debug with core files, the operating system first has to be told to actually
+write them. On most Unix systems this can be done by calling:
+
+.. code-block:: bash
+
+   ulimit -c unlimited
+
+in the shell. Now the debugger can be started up with:
+
+.. code-block:: bash
+
+   gdb <application> <core file name>
+
+The debugger should now display the last state of the application. The default
+file name for core files is ``core``.

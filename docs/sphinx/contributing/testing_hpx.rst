@@ -10,12 +10,11 @@ Testing |hpx|
 =============
 
 To ensure correctness of |hpx|, we ship a large variety of unit and regression
-tests. The tests are driven by the |ctest|_ tool and are executed automatically
-by buildbot (see |hpx_buildbot|_) on each commit to the |hpx| |hpx_github|_
-repository. In addition, it is encouraged to run the test suite manually to
-ensure proper operation on your target system. If a test fails for your
-platform, we highly recommend submitting an issue on our |hpx_github_issues|_
-tracker with detailed information about the target system.
+tests. The tests are driven by the |ctest|_ tool and are executed automatically 
+on each commit to the |hpx| |hpx_github|_ repository. In addition, it is encouraged 
+to run the test suite manually to ensure proper operation on your target system. 
+If a test fails for your platform, we highly recommend submitting an issue on our 
+|hpx_github_issues|_ tracker with detailed information about the target system.
 
 Running tests manually
 ======================
@@ -37,8 +36,6 @@ please see the |support|_ page.
 Continuous testing
 ==================
 
-In addition to manual testing, we run automated tests on various platforms. You
-can see the status of the current master head by visiting the
-|hpx_buildbot|_. We also run tests on all pull requests using both
-|circleci|_ and a combination of |cdash|_ and |pycicle|_. You can see the
-dashboards here: |hpx_circleci|_ and |hpx_cdash|_ .
+In addition to manual testing, we run automated tests on various platforms. We also 
+run tests on all pull requests using both |circleci|_ and a combination of |cdash|_ 
+and |pycicle|_. You can see the dashboards here: |hpx_circleci|_ and |hpx_cdash|_ .

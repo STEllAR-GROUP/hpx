@@ -17,11 +17,44 @@ reference using |doxygen|_ and |breathe|_.
 We always welcome suggestions on how to improve our documentation, as well as
 pull requests with corrections and additions.
 
+Prerequisites
+=============
+
+To build the |hpx| documentation, you need recent versions of the following
+packages:
+
+- ``python3``
+- ``sphinx 3.5.4`` (Python package)
+- ``sphinx_rtd_theme`` (Python package)
+- ``breathe 4.16.0`` (Python package)
+- ``doxygen``
+
+If the |python|_ dependencies are not available through your system package
+manager, you can install them using the Python package manager ``pip``:
+
+.. code-block:: bash
+
+   pip install --user sphinx sphinx_rtd_theme breathe
+
+You may need to set the following CMake variables to make sure CMake can
+find the required dependencies.
+
+.. option:: DOXYGEN_ROOT:PATH
+
+   Specifies where to look for the installation of the |doxygen|_ tool.
+
+.. option:: SPHINX_ROOT:PATH
+
+   Specifies where to look for the installation of the |sphinx|_ tool.
+
+.. option:: BREATHE_APIDOC_ROOT:PATH
+
+   Specifies where to look for the installation of the |breathe|_ tool.
+
+
 Building documentation
 ======================
 
-Please see the :ref:`documentation prerequisites <documentation_prerequisites>`
-section for details on what you need in order to build the |hpx| documentation.
 Enable building of the documentation by setting ``HPX_WITH_DOCUMENTATION=ON``
 during |cmake|_ configuration. To build the documentation, build the ``docs``
 target using your build tool. The default output format is HTML documentation.
