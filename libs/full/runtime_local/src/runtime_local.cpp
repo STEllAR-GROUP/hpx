@@ -302,9 +302,8 @@ namespace hpx {
 #endif
             threads::detail::network_background_callback_type{});
 
-        // initialize our TLS
-        runtime::init_tss();
-        util::reinit_construct();    // call only after TLS was initialized
+        init_global_data();
+        util::reinit_construct();
 
         if (initialize)
         {
@@ -338,6 +337,9 @@ namespace hpx {
       , stop_called_(false)
       , stop_done_(false)
     {
+        init_global_data();
+        util::reinit_construct();
+
         LPROGRESS_;
     }
 
@@ -510,30 +512,27 @@ namespace hpx {
     namespace {
         std::uint64_t& runtime_uptime()
         {
-            static thread_local std::uint64_t uptime = 0;
+            static std::uint64_t uptime = 0;
             return uptime;
         }
     }    // namespace
 
-    void runtime::init_tss()
+    void runtime::init_global_data()
     {
-        // initialize our TSS
         runtime*& runtime_ = get_runtime_ptr();
-        if (nullptr == runtime_)
-        {
-            HPX_ASSERT(nullptr == threads::thread_self::get_self());
+        HPX_ASSERT(!runtime_);
+        HPX_ASSERT(nullptr == threads::thread_self::get_self());
 
-            runtime_ = this;
-            runtime_uptime() = hpx::chrono::high_resolution_clock::now();
-        }
+        runtime_ = this;
+        runtime_uptime() = hpx::chrono::high_resolution_clock::now();
     }
 
-    void runtime::deinit_tss()
+    void runtime::deinit_global_data()
     {
-        // reset our TSS
+        runtime*& runtime_ = get_runtime_ptr();
+        HPX_ASSERT(runtime_);
         runtime_uptime() = 0;
-        get_runtime_ptr() = nullptr;
-        threads::reset_continuation_recursion_count();
+        runtime_ = nullptr;
     }
 
     std::uint64_t runtime::get_system_uptime()
@@ -720,7 +719,7 @@ namespace hpx {
 
     runtime*& get_runtime_ptr()
     {
-        static thread_local runtime* runtime_ = nullptr;
+        static runtime* runtime_ = nullptr;
         return runtime_;
     }
 
@@ -1540,6 +1539,8 @@ namespace hpx {
         {
             thread_manager_->stop(blocking);    // wait for thread manager
 
+            deinit_global_data();
+
             // this disables all logging from the main thread
             deinit_tss_helper("main-thread", 0);
 
@@ -1574,6 +1575,8 @@ namespace hpx {
     {
         // wait for thread manager to exit
         thread_manager_->stop(blocking);    // wait for thread manager
+
+        deinit_global_data();
 
         // this disables all logging from the main thread
         deinit_tss_helper("main-thread", 0);
@@ -1787,9 +1790,6 @@ namespace hpx {
         std::size_t global_thread_num, char const* pool_name,
         char const* postfix, bool service_thread, error_code& ec)
     {
-        // initialize our TSS
-        runtime::init_tss();
-
         // set the thread's name, if it's not already set
         HPX_ASSERT(detail::thread_name().empty());
 
@@ -1857,14 +1857,13 @@ namespace hpx {
     void runtime::deinit_tss_helper(
         char const* context, std::size_t global_thread_num)
     {
+        threads::reset_continuation_recursion_count();
+
         // call thread-specific user-supplied on_stop handler
         if (on_stop_func_)
         {
             on_stop_func_(global_thread_num, global_thread_num, "", context);
         }
-
-        // reset our TSS
-        deinit_tss();
 
         // reset PAPI support
         thread_support_->unregister_thread();
@@ -1932,9 +1931,6 @@ namespace hpx {
     bool runtime::register_thread(char const* name,
         std::size_t global_thread_num, bool service_thread, error_code& ec)
     {
-        if (nullptr != get_runtime_ptr())
-            return false;    // already registered
-
         std::string thread_name(name);
         thread_name += "-thread";
 
@@ -1948,9 +1944,6 @@ namespace hpx {
     /// Unregister an external OS-thread with HPX
     bool runtime::unregister_thread()
     {
-        if (nullptr == get_runtime_ptr())
-            return false;    // never registered
-
         deinit_tss_helper(
             detail::thread_name().c_str(), hpx::get_worker_thread_num());
         return true;
