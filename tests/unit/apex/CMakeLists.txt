@@ -24,24 +24,38 @@ foreach(test ${tests})
 
 endforeach()
 
-# dataflow support works for the following (add sync - if it ever works)
-foreach(
-  launch
-  "" "Executor non-threaded "
-  # "Executor threaded "
-  "apply " "async " "deferred " "fork "
+set(launch_types_
+    ""
+    "Executor "
+    "apply "
+    "async "
+    "deferred "
+    "fork "
+    "sync "
 )
+
+# dataflow
+foreach(launch ${launch_types_})
   set(REGEX_MATCH_D_ "${REGEX_MATCH_D_}.*1-${launch}Dataflow")
 endforeach()
 
-# continuation support works for the following
-foreach(launch "" "Executor non-threaded " # Executor threaded "
-               "async " "fork "
-)
+# continuations
+foreach(launch ${launch_types_})
   set(REGEX_MATCH_C_ "${REGEX_MATCH_C_}.*2-${launch}Continuation")
+endforeach()
+
+# continuations with unwrapping
+foreach(launch ${launch_types_})
+  set(REGEX_MATCH_C_ "${REGEX_MATCH_C_}.*3-${launch}Unwrapping Continuation")
+endforeach()
+
+# annotate_function with std::string and char*
+foreach(type "char" "string")
+  set(REGEX_MATCH_ANN_ "${REGEX_MATCH_ANN_}.*4-${type} annotate_function")
 endforeach()
 
 set_tests_properties(
   tests.unit.apex.annotation_check
-  PROPERTIES PASS_REGULAR_EXPRESSION "${REGEX_MATCH_D_}${REGEX_MATCH_C_}"
+  PROPERTIES PASS_REGULAR_EXPRESSION
+             "${REGEX_MATCH_D_}${REGEX_MATCH_C_}${REGEX_MATCH_ANN_}"
 )
