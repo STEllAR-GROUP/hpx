@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -86,12 +86,13 @@ namespace hpx { namespace traits {
         }
 
         template <typename Result>
-        Result get(std::size_t, test::get_connected_to_zero)
+        Result get(std::size_t which, test::get_connected_to_zero)
         {
             // first forward request to parent
-            if (communicator_.connect_to_ != communicator_.site_)
+            if (communicator_.connect_to_ != communicator_.site_ &&
+                which == communicator_.site_)
             {
-                hpx::sync(test::get_connected_to_zero_action{},
+                hpx::apply(test::get_connected_to_zero_action{},
                     communicator_.connected_node_.get(), communicator_.site_,
                     test::get_connected_to_zero{});
             }
@@ -118,7 +119,8 @@ namespace hpx { namespace traits {
 
             communicator_.gate_.synchronize(1, l);
 
-            communicator_.gate_.set(communicator_.which_++, std::move(l));
+            which = communicator_.which_++;
+            communicator_.gate_.set(which, std::move(l));
 
             return f;
         }
