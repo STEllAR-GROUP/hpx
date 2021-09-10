@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    adjacentdifference_range
     adjacentfind_bad_alloc_range
     adjacentfind_binary_bad_alloc_range
     adjacentfind_binary_range
