@@ -74,10 +74,9 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     {
         typedef typename Closure::fun_type fun_type;
         typedef typename Closure::args_type args_type;
-        typedef void (*launch_function_type)(Closure);
 
         HPX_HOST_DEVICE
-        static launch_function_type get_launch_function()
+        static auto get_launch_function()
         {
             return launch_function<Closure>;
         }
@@ -89,8 +88,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         {
             // This is needed for the device code to make sure the kernel
             // is instantiated correctly.
-            launch_function_type launcher = get_launch_function();
-            HPX_UNUSED(launcher);
+            auto launcher = get_launch_function();
             Closure c{std::move(f), std::move(args)};
 
             static_assert(sizeof(Closure) < 256,
@@ -109,6 +107,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
                     std::string("kernel launch failed: ") +
                         cudaGetErrorString(error));
             }
+            HPX_UNUSED(launcher);
 #elif __CUDA_ARCH__ >= 350
             void* param_buffer = cudaGetParameterBuffer(
                 std::alignment_of<Closure>::value, sizeof(Closure));
@@ -123,6 +122,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
             HPX_UNUSED(tgt);
             HPX_UNUSED(grid_dim);
             HPX_UNUSED(block_dim);
+            HPX_UNUSED(launcher);
 #endif
         }
     };
