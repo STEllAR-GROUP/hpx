@@ -180,7 +180,7 @@ namespace hpx { namespace execution { namespace experimental {
                              it != std::end(op_state->shape); ++it)
                         {
                             auto task_f = [op_state = this->op_state,
-                                              it = std::move(it)]() mutable {
+                                              it]() mutable {
                                 try
                                 {
                                     hpx::visit(
