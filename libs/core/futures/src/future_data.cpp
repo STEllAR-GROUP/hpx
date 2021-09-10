@@ -62,11 +62,12 @@ namespace hpx { namespace lcos { namespace detail {
         if (!is_hpx_thread)
             policy = launch::async;
 
+        policy.set_priority(threads::thread_priority::boost);
+        policy.set_stacksize(threads::thread_stacksize::current);
+
         // launch a new thread executing the given function
-        threads::thread_id_ref_type tid = p.apply(
-            "run_on_completed_on_new_thread", policy,
-            threads::thread_priority::boost, threads::thread_stacksize::current,
-            threads::thread_schedule_hint());
+        threads::thread_id_ref_type tid =
+            p.apply("run_on_completed_on_new_thread", policy);
 
         // wait for the task to run
         if (is_hpx_thread)

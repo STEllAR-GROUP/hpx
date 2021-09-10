@@ -234,11 +234,13 @@ namespace hpx { namespace execution { namespace experimental {
 
                     thread_states_[t].data_ = thread_state::starting;
                     hpx::util::thread_description desc("fork_join_executor");
-                    threads::thread_schedule_hint hint{
-                        static_cast<std::int16_t>(t)};
+
+                    auto policy = launch::async_policy(priority_, stacksize_,
+                        threads::thread_schedule_hint{
+                            static_cast<std::int16_t>(t)});
+
                     hpx::detail::async_launch_policy_dispatch<
-                        launch::async_policy>::call(launch::async, desc, pool_,
-                        priority_, stacksize_, hint,
+                        launch::async_policy>::call(policy, desc, pool_,
                         thread_function{num_threads_, t, schedule_,
                             thread_states_[t].data_, exception_mutex_,
                             exception_, yield_delay_, thread_function_helper_,

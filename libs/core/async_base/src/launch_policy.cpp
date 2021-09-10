@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -39,19 +40,27 @@ namespace hpx {
             // clang-format off
             ar & value;
             policy_ = static_cast<launch_policy>(value);
+
             ar & value;
-            // clang-format on
             priority_ = static_cast<threads::thread_priority>(value);
+
+            ar & hint_.hint & value;
+            hint_.mode = static_cast<threads::thread_schedule_hint_mode>(value);
+            // clang-format on
         }
 
         void policy_holder_base::save(
             serialization::output_archive& ar, unsigned) const
         {
-            int value = static_cast<int>(policy_);
             // clang-format off
+            int value = static_cast<int>(policy_);
             ar & value;
+
             value = static_cast<int>(priority_);
             ar & value;
+
+            value = static_cast<int>(hint_.mode);
+            ar & value & hint_.hint;
             // clang-format on
         }
     }    // namespace detail

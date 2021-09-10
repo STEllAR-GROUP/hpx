@@ -100,29 +100,22 @@ namespace hpx { namespace lcos { namespace local {
         protected:
             // run in a separate thread
             threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
-                const char* annotation, launch policy,
-                threads::thread_priority priority,
-                threads::thread_stacksize stacksize,
-                threads::thread_schedule_hint schedulehint,
-                error_code& ec) override
+                const char* annotation, launch policy, error_code& ec) override
             {
                 this->check_started();
 
                 hpx::intrusive_ptr<base_type> this_(this);
                 if (policy == launch::fork)
                 {
-                    schedulehint.mode =
-                        threads::thread_schedule_hint_mode::thread;
-                    schedulehint.hint =
-                        static_cast<std::int16_t>(get_worker_thread_num());
-
                     threads::thread_init_data data(
                         threads::make_thread_function_nullary(
                             util::deferred_call(
                                 &base_type::run_impl, std::move(this_))),
                         util::thread_description(f_, annotation),
-                        threads::thread_priority::boost, schedulehint,
-                        stacksize,
+                        policy.priority(),
+                        threads::thread_schedule_hint(
+                            static_cast<std::int16_t>(get_worker_thread_num())),
+                        policy.stacksize(),
                         threads::thread_schedule_state::pending_do_not_schedule,
                         true);
 
@@ -132,8 +125,8 @@ namespace hpx { namespace lcos { namespace local {
                 threads::thread_init_data data(
                     threads::make_thread_function_nullary(util::deferred_call(
                         &base_type::run_impl, std::move(this_))),
-                    util::thread_description(f_, annotation), priority,
-                    schedulehint, stacksize,
+                    util::thread_description(f_, annotation), policy.priority(),
+                    policy.hint(), policy.stacksize(),
                     threads::thread_schedule_state::pending);
 
                 return threads::register_work(data, pool, ec);
@@ -251,11 +244,7 @@ namespace hpx { namespace lcos { namespace local {
         protected:
             // run in a separate thread
             threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
-                const char* annotation, launch policy,
-                threads::thread_priority priority,
-                threads::thread_stacksize stacksize,
-                threads::thread_schedule_hint schedulehint,
-                error_code& ec) override
+                const char* annotation, launch policy, error_code& ec) override
             {
                 if (exec_)
                 {
@@ -269,8 +258,7 @@ namespace hpx { namespace lcos { namespace local {
                     return threads::invalid_thread_id;
                 }
 
-                return this->base_type::apply(pool, annotation, policy,
-                    priority, stacksize, schedulehint, ec);
+                return this->base_type::apply(pool, annotation, policy, ec);
             }
         };
 
@@ -762,29 +750,15 @@ namespace hpx { namespace lcos { namespace local {
         // asynchronous execution
         threads::thread_id_ref_type apply(
             const char* annotation = "futures_factory::apply",
-            launch policy = launch::async,
-            threads::thread_priority priority =
-                threads::thread_priority::default_,
-            threads::thread_stacksize stacksize =
-                threads::thread_stacksize::default_,
-            threads::thread_schedule_hint schedulehint =
-                threads::thread_schedule_hint(),
-            error_code& ec = throws) const
+            launch policy = launch::async, error_code& ec = throws) const
         {
             return apply(threads::detail::get_self_or_default_pool(),
-                annotation, policy, priority, stacksize, schedulehint, ec);
+                annotation, policy, ec);
         }
 
         threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
             const char* annotation = "futures_factory::apply",
-            launch policy = launch::async,
-            threads::thread_priority priority =
-                threads::thread_priority::default_,
-            threads::thread_stacksize stacksize =
-                threads::thread_stacksize::default_,
-            threads::thread_schedule_hint schedulehint =
-                threads::thread_schedule_hint(),
-            error_code& ec = throws) const
+            launch policy = launch::async, error_code& ec = throws) const
         {
             if (!task_)
             {
@@ -793,8 +767,7 @@ namespace hpx { namespace lcos { namespace local {
                     "futures_factory invalid (has it been moved?)");
                 return threads::invalid_thread_id;
             }
-            return task_->apply(pool, annotation, policy, priority, stacksize,
-                schedulehint, ec);
+            return task_->apply(pool, annotation, policy, ec);
         }
 
         // This is the same as get_future, except that it moves the

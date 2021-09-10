@@ -869,9 +869,7 @@ namespace hpx { namespace lcos { namespace detail {
         // run in a separate thread
         virtual threads::thread_id_ref_type apply(
             threads::thread_pool_base* /*pool*/, const char* /*annotation*/,
-            launch /*policy*/, threads::thread_priority /*priority*/,
-            threads::thread_stacksize /*stacksize*/,
-            threads::thread_schedule_hint /*schedulehint*/, error_code& /*ec*/)
+            launch /*policy*/, error_code& /*ec*/)
         {
             HPX_ASSERT(false);    // shouldn't ever be called
             return threads::invalid_thread_id;

@@ -24,7 +24,7 @@ namespace hpx { namespace threads {
     ///
     /// The \a thread_schedule_state enumerator encodes the current state of a
     /// \a thread instance
-    enum class thread_schedule_state
+    enum class thread_schedule_state : std::int8_t
     {
         unknown = 0,
         active = 1,                   /*!< thread is currently active (running,
@@ -106,7 +106,7 @@ namespace hpx { namespace threads {
 
     /// This enumeration lists all possible thread-priorities for HPX threads.
     ///
-    enum class thread_priority
+    enum class thread_priority : std::int8_t
     {
         unknown = -1,
         default_ = 0, /*!< Will assign the priority of the
@@ -192,7 +192,7 @@ namespace hpx { namespace threads {
     ///
     /// The \a thread_restart_state enumerator encodes the reason why a
     /// thread is being restarted
-    enum class thread_restart_state
+    enum class thread_restart_state : std::int8_t
     {
         unknown = 0,
         signaled = 1,     ///< The thread has been signaled
@@ -247,7 +247,7 @@ namespace hpx { namespace threads {
     ///
     /// A \a thread_stacksize references any of the possible stack-sizes for
     /// HPX threads.
-    enum class thread_stacksize
+    enum class thread_stacksize : std::int8_t
     {
         unknown = -1,
         small_ = 1,     ///< use small stack size (the underscore is to work
@@ -316,7 +316,7 @@ namespace hpx { namespace threads {
     /// \enum thread_schedule_hint_mode
     ///
     /// The type of hint given when creating new tasks.
-    enum class thread_schedule_hint_mode : std::int16_t
+    enum class thread_schedule_hint_mode : std::int8_t
     {
         /// A hint that leaves the choice of scheduling entirely up to the
         /// scheduler.
@@ -365,16 +365,17 @@ namespace hpx { namespace threads {
     {
         /// Construct a default hint with mode thread_schedule_hint_mode::none.
         constexpr thread_schedule_hint() noexcept
-          : mode(thread_schedule_hint_mode::none)
-          , hint(-1)
+          : hint(-1)
+          , mode(thread_schedule_hint_mode::none)
         {
         }
 
         /// Construct a hint with mode thread_schedule_hint_mode::thread and the
         /// given hint as the local thread number.
-        constexpr explicit thread_schedule_hint(std::int16_t thread_hint)
-          : mode(thread_schedule_hint_mode::thread)
-          , hint(thread_hint)
+        constexpr explicit thread_schedule_hint(
+            std::int16_t thread_hint) noexcept
+          : hint(thread_hint)
+          , mode(thread_schedule_hint_mode::thread)
         {
         }
 
@@ -382,8 +383,8 @@ namespace hpx { namespace threads {
         /// unused when the mode is thread_schedule_hint_mode::none.
         constexpr thread_schedule_hint(
             thread_schedule_hint_mode mode, std::int16_t hint) noexcept
-          : mode(mode)
-          , hint(hint)
+          : hint(hint)
+          , mode(mode)
         {
         }
 
@@ -399,10 +400,11 @@ namespace hpx { namespace threads {
         }
         /// \endcond
 
-        /// The mode of the scheduling hint.
-        thread_schedule_hint_mode mode;
         /// The hint associated with the mode. The interepretation of this hint
         /// depends on the given mode.
         std::int16_t hint;
+
+        /// The mode of the scheduling hint.
+        thread_schedule_hint_mode mode;
     };
 }}    // namespace hpx::threads

@@ -130,19 +130,22 @@ namespace hpx { namespace parallel { namespace execution {
                 if (hp_sync_ &&
                     executor_.priority_ == hpx::threads::thread_priority::high)
                 {
-                    p.apply(executor_.pool_, "guided async", hpx::launch::sync,
-                        executor_.priority_, executor_.stacksize_,
-                        hpx::threads::thread_schedule_hint(
-                            hpx::threads::thread_schedule_hint_mode::numa,
-                            domain));
+                    p.apply(executor_.pool_, "guided sync",
+                        hpx::launch::sync_policy(
+                            hpx::threads::thread_priority::high,
+                            executor_.stacksize_,
+                            hpx::threads::thread_schedule_hint(
+                                hpx::threads::thread_schedule_hint_mode::numa,
+                                domain)));
                 }
                 else
                 {
-                    p.apply(executor_.pool_, "guided async", hpx::launch::async,
-                        executor_.priority_, executor_.stacksize_,
-                        hpx::threads::thread_schedule_hint(
-                            hpx::threads::thread_schedule_hint_mode::numa,
-                            domain));
+                    p.apply(executor_.pool_, "guided async",
+                        hpx::launch::async_policy(executor_.priority_,
+                            executor_.stacksize_,
+                            hpx::threads::thread_schedule_hint(
+                                hpx::threads::thread_schedule_hint_mode::numa,
+                                domain)));
                 }
 
                 return p.get_future();
@@ -188,19 +191,22 @@ namespace hpx { namespace parallel { namespace execution {
                 if (hp_sync_ &&
                     executor_.priority_ == hpx::threads::thread_priority::high)
                 {
-                    p.apply(executor_.pool_, "guided then", hpx::launch::sync,
-                        executor_.priority_, executor_.stacksize_,
-                        hpx::threads::thread_schedule_hint(
-                            hpx::threads::thread_schedule_hint_mode::numa,
-                            domain));
+                    p.apply(executor_.pool_, "guided then",
+                        hpx::launch::sync_policy(
+                            hpx::threads::thread_priority::high,
+                            executor_.stacksize_,
+                            hpx::threads::thread_schedule_hint(
+                                hpx::threads::thread_schedule_hint_mode::numa,
+                                domain)));
                 }
                 else
                 {
-                    p.apply(executor_.pool_, "guided then", hpx::launch::async,
-                        executor_.priority_, executor_.stacksize_,
-                        hpx::threads::thread_schedule_hint(
-                            hpx::threads::thread_schedule_hint_mode::numa,
-                            domain));
+                    p.apply(executor_.pool_, "guided then",
+                        hpx::launch::async_policy(executor_.priority_,
+                            executor_.stacksize_,
+                            hpx::threads::thread_schedule_hint(
+                                hpx::threads::thread_schedule_hint_mode::numa,
+                                domain)));
                 }
 
                 return p.get_future();
@@ -476,17 +482,20 @@ namespace hpx { namespace parallel { namespace execution {
 
             if (hp_sync_ && priority_ == hpx::threads::thread_priority::high)
             {
-                p.apply(pool_, "guided async", hpx::launch::sync, priority_,
-                    stacksize_,
-                    hpx::threads::thread_schedule_hint(
-                        hpx::threads::thread_schedule_hint_mode::numa, domain));
+                p.apply(pool_, "guided async",
+                    hpx::launch::sync_policy(
+                        hpx::threads::thread_priority::high, stacksize_,
+                        hpx::threads::thread_schedule_hint(
+                            hpx::threads::thread_schedule_hint_mode::numa,
+                            domain)));
             }
             else
             {
-                p.apply(pool_, "guided async", hpx::launch::async, priority_,
-                    stacksize_,
-                    hpx::threads::thread_schedule_hint(
-                        hpx::threads::thread_schedule_hint_mode::numa, domain));
+                p.apply(pool_, "guided async",
+                    hpx::launch::async_policy(priority_, stacksize_,
+                        hpx::threads::thread_schedule_hint(
+                            hpx::threads::thread_schedule_hint_mode::numa,
+                            domain)));
             }
             return p.get_future();
         }
@@ -550,9 +559,10 @@ namespace hpx { namespace parallel { namespace execution {
                 lcos::local::futures_factory<result_type()> p(
                     hpx::util::deferred_call(
                         std::forward<F>(f), std::forward<Ts>(ts)...));
-                p.apply(guided_exec_.pool_, "guided async", hpx::launch::async,
-                    guided_exec_.priority_, guided_exec_.stacksize_,
-                    hpx::threads::thread_schedule_hint());
+
+                p.apply(guided_exec_.pool_, "guided async",
+                    hpx::launch::async_policy(
+                        guided_exec_.priority_, guided_exec_.stacksize_));
                 return p.get_future();
             }
         }

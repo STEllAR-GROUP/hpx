@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The STE||AR-Group
+# Copyright (c) 2020-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,9 +7,13 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(async_base_headers
-    hpx/async_base/apply.hpp hpx/async_base/async.hpp
-    hpx/async_base/dataflow.hpp hpx/async_base/launch_policy.hpp
-    hpx/async_base/sync.hpp hpx/async_base/traits/is_launch_policy.hpp
+    hpx/async_base/apply.hpp
+    hpx/async_base/async.hpp
+    hpx/async_base/dataflow.hpp
+    hpx/async_base/launch_policy.hpp
+    hpx/async_base/sync.hpp
+    hpx/async_base/traits/is_launch_policy.hpp
+    hpx/async_base/scheduling_properties.hpp
 )
 
 set(async_base_sources launch_policy.cpp)
@@ -29,5 +33,6 @@ add_hpx_module(
   COMPAT_HEADERS ${async_base_compat_headers}
   SOURCES ${async_base_sources}
   MODULE_DEPENDENCIES hpx_allocator_support hpx_config hpx_coroutines
+                      hpx_tag_dispatch
   CMAKE_SUBDIRS examples tests
 )
