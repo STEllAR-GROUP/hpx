@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -15,10 +15,10 @@
 
 namespace hpx { namespace actions { namespace detail {
     template <typename Action>
-    char const* get_action_name();
+    char const* get_action_name() noexcept;
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
     template <typename Action>
-    util::itt::string_handle const& get_action_name_itt();
+    util::itt::string_handle const& get_action_name_itt() noexcept;
 #endif
 }}}    // namespace hpx::actions::detail
