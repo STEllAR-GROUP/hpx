@@ -24,70 +24,61 @@
 #include <utility>
 
 namespace hpx { namespace detail {
+
+    ///////////////////////////////////////////////////////////////////////////
     // dispatch point used for launch_policy implementations
     template <typename Action, typename Enable = void>
     struct async_launch_policy_dispatch;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
-    HPX_FORCEINLINE lcos::future<typename util::detail::invoke_deferred_result<
-        typename std::decay<F>::type, Ts...>::type>
-    call_sync(std::false_type, F&& f, Ts... vs)
+    HPX_FORCEINLINE hpx::future<
+        util::detail::invoke_deferred_result_t<std::decay_t<F>, Ts...>>
+    call_sync(F&& f, Ts... vs) noexcept
     {
-        using R = typename util::detail::invoke_deferred_result<
-            typename std::decay<F>::type, Ts...>::type;
-        try
-        {
-            return lcos::make_ready_future<R>(
-                HPX_INVOKE(std::forward<F>(f), std::move(vs)...));
-        }
-        catch (...)
-        {
-            return lcos::make_exceptional_future<R>(std::current_exception());
-        }
-    }
+        using R =
+            util::detail::invoke_deferred_result_t<std::decay_t<F>, Ts...>;
 
-    template <typename F, typename... Ts>
-    HPX_FORCEINLINE lcos::future<typename util::detail::invoke_deferred_result<
-        typename std::decay<F>::type, Ts...>::type>
-    call_sync(std::true_type, F&& f, Ts... vs)
-    {
         try
         {
-            HPX_INVOKE(std::forward<F>(f), std::move(vs)...);
-            return lcos::make_ready_future();
+            if constexpr (std::is_void_v<R>)
+            {
+                HPX_INVOKE(std::forward<F>(f), std::move(vs)...);
+                return make_ready_future();
+            }
+            else
+            {
+                return make_ready_future<R>(
+                    HPX_INVOKE(std::forward<F>(f), std::move(vs)...));
+            }
         }
         catch (...)
         {
-            return lcos::make_exceptional_future<void>(
-                std::current_exception());
+            return make_exceptional_future<R>(std::current_exception());
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     struct async_launch_policy_dispatch<Action,
-        typename std::enable_if<!traits::is_action<Action>::value>::type>
+        std::enable_if_t<!traits::is_action_v<Action>>>
     {
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            hpx::future<typename util::detail::invoke_deferred_result<F,
-                Ts...>::type>>::type
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(launch policy, hpx::util::thread_description const& desc,
             threads::thread_pool_base* pool, threads::thread_priority priority,
             threads::thread_stacksize stacksize,
             threads::thread_schedule_hint hint, F&& f, Ts&&... ts)
         {
-            typedef
-                typename util::detail::invoke_deferred_result<F, Ts...>::type
-                    result_type;
+            using result_type =
+                util::detail::invoke_deferred_result_t<F, Ts...>;
 
             if (policy == launch::sync)
             {
-                using is_void = typename std::is_void<result_type>::type;
                 return detail::call_sync(
-                    is_void{}, std::forward<F>(f), std::forward<Ts>(ts)...);
+                    std::forward<F>(f), std::forward<Ts>(ts)...);
             }
 
             lcos::local::futures_factory<result_type()> p(util::deferred_call(
@@ -117,10 +108,9 @@ namespace hpx { namespace detail {
         }
 
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            hpx::future<typename util::detail::invoke_deferred_result<F,
-                Ts...>::type>>::type
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(launch policy, hpx::util::thread_description const& desc,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize,
@@ -132,10 +122,9 @@ namespace hpx { namespace detail {
         }
 
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            hpx::future<typename util::detail::invoke_deferred_result<F,
-                Ts...>::type>>::type
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(launch policy, F&& f, Ts&&... ts)
         {
             hpx::util::thread_description desc(f);
@@ -147,26 +136,19 @@ namespace hpx { namespace detail {
         }
 
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            hpx::future<typename util::detail::invoke_deferred_result<F,
-                Ts...>::type>>::type
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(hpx::detail::sync_policy, F&& f, Ts&&... ts)
         {
-            typedef
-                typename util::detail::invoke_deferred_result<F, Ts...>::type
-                    result_type;
-
-            using is_void = typename std::is_void<result_type>::type;
             return detail::call_sync(
-                is_void{}, std::forward<F>(f), std::forward<Ts>(ts)...);
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            hpx::future<typename util::detail::invoke_deferred_result<F,
-                Ts...>::type>>::type
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(hpx::detail::async_policy policy,
             hpx::util::thread_description const& desc,
             threads::thread_pool_base* pool, threads::thread_priority priority,
@@ -174,9 +156,9 @@ namespace hpx { namespace detail {
             threads::thread_schedule_hint hint, F&& f, Ts&&... ts)
         {
             HPX_ASSERT(pool);
-            typedef
-                typename util::detail::invoke_deferred_result<F, Ts...>::type
-                    result_type;
+
+            using result_type =
+                util::detail::invoke_deferred_result_t<F, Ts...>;
 
             lcos::local::futures_factory<result_type()> p(util::deferred_call(
                 std::forward<F>(f), std::forward<Ts>(ts)...));
@@ -186,6 +168,7 @@ namespace hpx { namespace detail {
 
             if (tid)
             {
+                // keep thread alive, if needed
                 auto&& result = p.get_future();
                 traits::detail::get_shared_state(result)->set_on_completed(
                     [tid = std::move(tid)]() { (void) tid; });
@@ -195,10 +178,9 @@ namespace hpx { namespace detail {
         }
 
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            hpx::future<typename util::detail::invoke_deferred_result<F,
-                Ts...>::type>>::type
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(hpx::detail::async_policy policy, F&& f, Ts&&... ts)
         {
             hpx::util::thread_description desc(f);
@@ -211,10 +193,9 @@ namespace hpx { namespace detail {
         }
 
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            hpx::future<typename util::detail::invoke_deferred_result<F,
-                Ts...>::type>>::type
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(hpx::detail::fork_policy policy,
             hpx::util::thread_description const& desc,
             threads::thread_pool_base* pool, threads::thread_priority priority,
@@ -222,16 +203,17 @@ namespace hpx { namespace detail {
             threads::thread_schedule_hint hint, F&& f, Ts&&... ts)
         {
             HPX_ASSERT(pool);
-            typedef
-                typename util::detail::invoke_deferred_result<F, Ts...>::type
-                    result_type;
+
+            using result_type =
+                util::detail::invoke_deferred_result_t<F, Ts...>;
 
             lcos::local::futures_factory<result_type()> p(util::deferred_call(
                 std::forward<F>(f), std::forward<Ts>(ts)...));
 
-            // make sure this thread is executed last
             threads::thread_id_ref_type tid = p.apply(pool,
                 desc.get_description(), policy, priority, stacksize, hint);
+
+            // make sure this thread is executed last
             threads::thread_id_type tid_self = threads::get_self_id();
             if (tid && tid_self &&
                 get_thread_id_data(tid)->get_scheduler_base() ==
@@ -242,6 +224,7 @@ namespace hpx { namespace detail {
                     threads::thread_schedule_state::pending, tid.noref(),
                     desc.get_description());
 
+                // keep thread alive, if needed
                 auto&& result = p.get_future();
                 traits::detail::get_shared_state(result)->set_on_completed(
                     [tid = std::move(tid)]() { (void) tid; });
@@ -251,10 +234,9 @@ namespace hpx { namespace detail {
         }
 
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            hpx::future<typename util::detail::invoke_deferred_result<F,
-                Ts...>::type>>::type
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(hpx::detail::fork_policy policy, F&& f, Ts&&... ts)
         {
             hpx::util::thread_description desc(f);
@@ -267,15 +249,13 @@ namespace hpx { namespace detail {
         }
 
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            hpx::future<typename util::detail::invoke_deferred_result<F,
-                Ts...>::type>>::type
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(hpx::detail::deferred_policy, F&& f, Ts&&... ts)
         {
-            typedef
-                typename util::detail::invoke_deferred_result<F, Ts...>::type
-                    result_type;
+            using result_type =
+                util::detail::invoke_deferred_result_t<F, Ts...>;
 
             lcos::local::futures_factory<result_type()> p(util::deferred_call(
                 std::forward<F>(f), std::forward<Ts>(ts)...));

@@ -445,7 +445,7 @@ namespace hpx { namespace lcos { namespace detail {
                     spawner = std::move(spawner)]() mutable -> void {
                     if (hpx::detail::has_async_policy(policy))
                     {
-                        this_->async(std::move(state), spawner);
+                        this_->async(std::move(state), std::move(spawner));
                     }
                     else
                     {
@@ -518,7 +518,8 @@ namespace hpx { namespace lcos { namespace detail {
                     spawner = std::move(spawner)]() mutable -> void {
                     if (hpx::detail::has_async_policy(policy))
                     {
-                        this_->async_nounwrap(std::move(state), spawner);
+                        this_->async_nounwrap(
+                            std::move(state), std::move(spawner));
                     }
                     else
                     {
