@@ -36,7 +36,7 @@ void test_sen(ExPolicy policy)
     HPX_TEST(std::equal(std::begin(d), std::end(d)-1, std::begin(d_ans),
         [](std::size_t lhs, std::size_t rhs) -> bool { return lhs == rhs; }));
 
-    HPX_TEST(std::end(d) == it);
+    HPX_TEST(std::end(d)-1 == it);
 }
 void test_sen()
 {
@@ -52,7 +52,7 @@ void test_sen()
     HPX_TEST(std::equal(std::begin(d), std::end(d)-1, std::begin(d_ans),
         [](std::size_t lhs, std::size_t rhs) -> bool { return lhs == rhs; }));
 
-    HPX_TEST(std::end(d) == it);
+    HPX_TEST(std::end(d)-1 == it);
 }
 
 template <typename ExPolicy>

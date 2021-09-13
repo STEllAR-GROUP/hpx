@@ -257,7 +257,7 @@ namespace hpx { namespace ranges {
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/parallel/algorithms/adjacent_find.hpp>
+#include <hpx/parallel/algorithms/adjacent_difference.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
@@ -270,34 +270,36 @@ namespace hpx { namespace ranges {
 
 namespace hpx { namespace ranges {
     HPX_INLINE_CONSTEXPR_VARIABLE struct adjacent_difference_t final
-      : hpx::functional::tag<adjacent_difference_t>
+      : hpx::functional::tag_fallback<adjacent_difference_t>
     {
     private:
 
     // clang-format off
         template <typename FwdIter1, typename FwdIter2, typename Sent,
              HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_sentinel_for<Sent, FwdIter1>::value
             )>
 
         // clang-format on
         friend FwdIter2 tag_fallback_dispatch(
-            hpx::adjacent_difference_t, FwdIter1 first, Sent last, FwdIter2 dest)
+            hpx::ranges::adjacent_difference_t, FwdIter1 first, Sent last,
+            FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
-            typedef typename std::iterator_traits<FwdIter1>::value_type value_type;
+            typedef
+                typename std::iterator_traits<FwdIter1>::value_type value_type;
 
-            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>().call(
-                hpx::execution::seq, first,
-                last, dest, std::minus<value_type>());
+            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
+                .call(hpx::execution::seq, first, last, dest,
+                    std::minus<value_type>());
         }
 
         // clang-format off
         template <typename Rng, typename FwdIter2,
              HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value&&
+                hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
 
@@ -305,27 +307,29 @@ namespace hpx { namespace ranges {
         friend FwdIter2 tag_fallback_dispatch(
             hpx::ranges::adjacent_difference_t, Rng&& rng, FwdIter2 dest)
         {
-            static_assert((hpx::traits::is_forward_iterator<hpx::traits::range_iterator_t<Rng>>::value),
+            static_assert((hpx::traits::is_forward_iterator<
+                              hpx::traits::range_iterator_t<Rng>>::value),
                 "Required at least forward iterator.");
-            typedef typename std::iterator_traits<hpx::traits::range_iterator_t<Rng>>::value_type value_type;
+            typedef typename std::iterator_traits<
+                hpx::traits::range_iterator_t<Rng>>::value_type value_type;
 
-            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>().call(
-                hpx::execution::seq, hpx::util::begin(rng),
+            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
+            .call(hpx::execution::seq, hpx::util::begin(rng),
                 hpx::util::end(rng), dest, std::minus<value_type>());
         }
 
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename Sent
+        template <typename ExPolicy, typename FwdIter1, typename Sent, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_sentinel_for<Sent, FwdIter1>::value
             )>
 
         // // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
+        tag_fallback_dispatch(hpx::ranges::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
             Sent last, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
@@ -342,8 +346,8 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Rng, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_range<Rng>::value&&
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
 
@@ -359,7 +363,7 @@ namespace hpx { namespace ranges {
             // typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>().call(
-                hpx::execution::seq, hpx::util::begin(rng),
+                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
                 hpx::util::end(rng), dest, std::minus<value_type>());
                 
         }
@@ -367,53 +371,58 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename FwdIter1, typename FwdIter2, typename Op, typename Sent,
              HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_sentinel_for<Sent, FwdIter1>::value 
             )>
 
         // clang-format on
         friend FwdIter2 tag_fallback_dispatch(
-            hpx::adjacent_difference_t, FwdIter1 first, Sent last, FwdIter2 dest, Op op)
+            hpx::ranges::adjacent_difference_t, FwdIter1 first, Sent last,
+            FwdIter2 dest, Op op)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
-            typedef typename std::iterator_traits<FwdIter1>::value_type value_type;
+            typedef
+                typename std::iterator_traits<FwdIter1>::value_type value_type;
 
-            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>().call(
-                hpx::execution::sequenced_policy{}, first,
-                last, dest, op, std::minus<value_type>());
+            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
+            .call(hpx::execution::sequenced_policy{}, first, last, dest, op,
+                std::minus<value_type>());
         }
 
         // clang-format off
         template <typename Rng, typename FwdIter2, typename Op,
              HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value
+                hpx::traits::is_iterator<FwdIter2>::value
             )>
 
         // clang-format on
         friend FwdIter2 tag_fallback_dispatch(
             hpx::ranges::adjacent_difference_t, Rng&& rng, FwdIter2 dest, Op op)
         {
-            static_assert((hpx::traits::is_forward_iterator<hpx::traits::range_iterator_t<Rng>>::value),
+            static_assert((hpx::traits::is_forward_iterator<
+                              hpx::traits::range_iterator_t<Rng>>::value),
                 "Required at least forward iterator.");
-            typedef typename std::iterator_traits<hpx::traits::range_iterator_t<Rng>>::value_type value_type;
+            typedef typename std::iterator_traits<
+                hpx::traits::range_iterator_t<Rng>>::value_type value_type;
 
-            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>().call(
-                hpx::execution::seq, hpx::util::begin(rng),
+            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
+            .call(hpx::execution::seq, hpx::util::begin(rng),
                 hpx::util::end(rng), dest, std::minus<value_type>());
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename Op, typename Sent,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
 
         // // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
+        tag_fallback_dispatch(hpx::ranges::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
             Sent last, FwdIter2 dest, Op op)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
@@ -430,7 +439,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Rng, typename FwdIter2, typename Op,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
 

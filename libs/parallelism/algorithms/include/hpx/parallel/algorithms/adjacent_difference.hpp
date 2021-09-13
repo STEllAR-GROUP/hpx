@@ -153,6 +153,7 @@ namespace hpx
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -180,20 +181,32 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 
-            template <typename ExPolicy, typename InIter, typename OutIter,
+            template <typename ExPolicy, typename InIter, typename Sent, typename OutIter,
                 typename Op>
             static OutIter sequential(
-                ExPolicy, InIter first, InIter last, OutIter dest, Op&& op)
+                ExPolicy, InIter first, Sent last, OutIter dest, Op&& op)
             {
-                return std::adjacent_difference(
-                    first, last, dest, std::forward<Op>(op));
+                if (first == last)
+                    return dest;
+
+                using value_t = typename std::iterator_traits<InIter>::value_type;
+                value_t acc = *first;
+                *dest = acc;
+                while (++first != last)
+                {
+                    value_t val = *first;
+                    *++dest =
+                        op(val, std::move(acc));    // std::move since C++20
+                    acc = std::move(val);
+                }
+                return ++dest;
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            template <typename ExPolicy, typename FwdIter1, typename Sent, typename FwdIter2,
                 typename Op>
             static typename util::detail::algorithm_result<ExPolicy,
                 FwdIter2>::type
-            parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            parallel(ExPolicy&& policy, FwdIter1 first, Sent last,
                 FwdIter2 dest, Op&& op)
             {
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter1, FwdIter2>
@@ -206,7 +219,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first == last)
                     return result::get(std::move(dest));
 
-                difference_type count = std::distance(first, last) - 1;
+                difference_type count = detail::distance(first, last) - 1;
 
                 FwdIter1 prev = first;
                 *dest++ = *first++;
