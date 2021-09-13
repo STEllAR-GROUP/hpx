@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -202,7 +202,8 @@ namespace hpx { namespace serialization {
     HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                         \
     namespace hpx { namespace actions { namespace detail {                     \
                 template <>                                                    \
-                HPX_ALWAYS_EXPORT char const* get_action_name<action>()        \
+                HPX_ALWAYS_EXPORT char const*                                  \
+                get_action_name<action>() noexcept                             \
                 {                                                              \
                     return HPX_PP_STRINGIZE(actionname);                       \
                 }                                                              \
@@ -218,7 +219,7 @@ namespace hpx { namespace serialization {
     namespace hpx { namespace actions { namespace detail {                     \
                 template <>                                                    \
                 HPX_ALWAYS_EXPORT util::itt::string_handle const&              \
-                get_action_name_itt<action>()                                  \
+                get_action_name_itt<action>() noexcept                         \
                 {                                                              \
                     static util::itt::string_handle sh(                        \
                         HPX_PP_STRINGIZE(actionname));                         \
@@ -233,7 +234,7 @@ namespace hpx { namespace serialization {
     namespace hpx { namespace actions { namespace detail {                     \
                 template <>                                                    \
                 HPX_ALWAYS_EXPORT util::itt::string_handle const&              \
-                get_action_name_itt<action>();                                 \
+                get_action_name_itt<action>() noexcept;                        \
             }                                                                  \
         }                                                                      \
     }                                                                          \
@@ -247,7 +248,8 @@ namespace hpx { namespace serialization {
     HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)                \
     namespace hpx { namespace actions { namespace detail {                     \
                 template <>                                                    \
-                HPX_ALWAYS_EXPORT char const* get_action_name<action>();       \
+                HPX_ALWAYS_EXPORT char const*                                  \
+                get_action_name<action>() noexcept;                            \
             }                                                                  \
         }                                                                      \
     }                                                                          \

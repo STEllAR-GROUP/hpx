@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -94,7 +94,7 @@ namespace hpx { namespace actions { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_NETWORKING)
     template <typename Action>
-    char const* get_action_name()
+    char const* get_action_name() noexcept
 #if !defined(HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION)
         ;
 #else
@@ -110,7 +110,7 @@ namespace hpx { namespace actions { namespace detail {
 #endif
 #else    // HPX_HAVE_NETWORKING
     template <typename Action>
-    char const* get_action_name()
+    char const* get_action_name() noexcept
     {
         return util::debug::type_id<Action>::typeid_.type_id();
     }
@@ -127,7 +127,7 @@ namespace hpx { namespace actions { namespace detail {
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
     template <typename Action>
-    util::itt::string_handle const& get_action_name_itt()
+    util::itt::string_handle const& get_action_name_itt() noexcept
 #if !defined(HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION)
         ;
 #else
