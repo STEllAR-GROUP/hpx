@@ -22,6 +22,7 @@ namespace hpx {
             return_on_error,
             rethrow_on_error,
             allow_unregistered,
+            ignore_aliases = 0x40,
             report_missing_config_file = 0x80
         };
 

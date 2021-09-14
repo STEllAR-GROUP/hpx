@@ -1567,7 +1567,8 @@ namespace hpx { namespace util {
             // command line handling.
             hpx::program_options::variables_map prevm;
             if (!util::parse_commandline(rtcfg_, desc_cmdline, argv[0], args,
-                    prevm, std::size_t(-1), error_mode, rtcfg_.mode_))
+                    prevm, std::size_t(-1), error_mode | util::ignore_aliases,
+                    rtcfg_.mode_))
             {
                 return -1;
             }

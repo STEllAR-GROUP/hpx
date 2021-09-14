@@ -113,8 +113,9 @@ namespace hpx { namespace local { namespace detail {
     // resolve defined command line option aliases.
     struct option_parser
     {
-        option_parser(util::section const& ini)
+        option_parser(util::section const& ini, bool ignore_aliases)
           : ini_(ini)
+          , ignore_aliases_(ignore_aliases)
         {
         }
 
@@ -127,13 +128,16 @@ namespace hpx { namespace local { namespace detail {
                     std::string("hpx:options-file"), s.substr(1));
 
             // handle aliasing, if enabled
-            if (ini_.get_entry("hpx.commandline.aliasing", "1") == "1")
-                return handle_aliasing(ini_, s);
-
-            return std::make_pair(std::string("hpx:ignore"), std::string());
+            if (ini_.get_entry("hpx.commandline.aliasing", "0") == "0" ||
+                ignore_aliases_)
+            {
+                return std::make_pair(std::string(), std::string());
+            }
+            return handle_aliasing(ini_, s);
         }
 
         util::section const& ini_;
+        bool ignore_aliases_;
     };
 
     ///////////////////////////////////////////////////////////////////////
@@ -206,8 +210,9 @@ namespace hpx { namespace local { namespace detail {
                       command_line_parser(options)
                           .options(desc)
                           .style(unix_style)
-                          .extra_parser(detail::option_parser(rtcfg)),
-                      error_mode)
+                          .extra_parser(detail::option_parser(
+                              rtcfg, error_mode & util::ignore_aliases)),
+                      error_mode & ~util::ignore_aliases)
                       .run(),
                 vm);
             notify(vm);
@@ -451,8 +456,9 @@ namespace hpx { namespace local { namespace detail {
                             .options(desc_cmdline)
                             .positional(pd)
                             .style(unix_style)
-                            .extra_parser(detail::option_parser(rtcfg)),
-                        error_mode
+                            .extra_parser(detail::option_parser(rtcfg,
+                                error_mode & util::ignore_aliases)),
+                         error_mode & ~util::ignore_aliases
                     ).run()
                 );
 
@@ -473,8 +479,9 @@ namespace hpx { namespace local { namespace detail {
                         command_line_parser(args)
                             .options(desc_cmdline)
                             .style(unix_style)
-                            .extra_parser(detail::option_parser(rtcfg)),
-                        error_mode
+                            .extra_parser(detail::option_parser(rtcfg,
+                                error_mode & util::ignore_aliases)),
+                        error_mode & ~util::ignore_aliases
                     ).run()
                 );
 
