@@ -15,3 +15,5 @@ export CMAKE_GENERATOR=Ninja
 export CCACHE_DIR=/scratch/snx3000/simbergm/ccache-jenkins-hpx
 export CCACHE_MAXSIZE=100G
 export CCACHE_MAXFILES=50000
+
+configure_extra_options+=" -DCMAKE_BUILD_TYPE=${build_type}"
