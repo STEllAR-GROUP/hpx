@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/endian.hpp>
+#include <hpx/serialization/config/defines.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/serialization/basic_archive.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
@@ -109,6 +110,14 @@ namespace hpx { namespace serialization {
             load_binary(&b, sizeof(bool));
             HPX_ASSERT(0 == static_cast<int>(b) || 1 == static_cast<int>(b));
         }
+
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
+        template <typename T>
+        void load(T*& p)
+        {
+            load_binary(&p, sizeof(std::size_t));
+        }
+#endif
 
         std::size_t bytes_read() const
         {

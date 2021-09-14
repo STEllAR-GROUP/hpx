@@ -56,7 +56,7 @@ namespace hpx { namespace serialization {
     HPX_FORCEINLINE void serialize(                                            \
         hpx::serialization::output_archive& ar, T& t, unsigned)                \
     {                                                                          \
-        save(ar, const_cast<std::add_const<T>::type&>(t), 0);                  \
+        save(ar, const_cast<std::add_const_t<T>&>(t), 0);                      \
     }                                                                          \
     /**/
 
@@ -71,9 +71,7 @@ namespace hpx { namespace serialization {
     HPX_FORCEINLINE void serialize(hpx::serialization::output_archive& ar,     \
         HPX_PP_STRIP_PARENS(ARGS) & t, unsigned)                               \
     {                                                                          \
-        save(ar,                                                               \
-            const_cast<                                                        \
-                typename std::add_const<HPX_PP_STRIP_PARENS(ARGS)>::type&>(t), \
+        save(ar, const_cast<std::add_const_t<HPX_PP_STRIP_PARENS(ARGS)>&>(t),  \
             0);                                                                \
     }                                                                          \
     /**/

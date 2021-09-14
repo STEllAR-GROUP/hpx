@@ -36,6 +36,23 @@ if(HPX_SERIALIZATION_WITH_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
   )
 endif()
 
+# This flag can be used in systems that rely on sending raw pointers to other
+# localities (assuming those are being sent back to the originating locality
+# before they are dereferenced (like SHAD).
+hpx_option(
+  HPX_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION BOOL
+  "Enable serializing raw pointers. (default: OFF)" OFF ADVANCED
+  CATEGORY "Modules"
+  MODULE SERIALIZATION
+)
+
+if(HPX_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION
+    NAMESPACE SERIALIZATION
+  )
+endif()
+
 # Default location is $HPX_ROOT/libs/serialization/include
 set(serialization_headers
     hpx/serialization.hpp
