@@ -21,8 +21,9 @@
 #include <vector>
 
 namespace hpx { namespace lcos { namespace detail {
-    /// Returns true when the given future is ready,
-    /// the future is deferred executed if possible first.
+
+    // Returns true when the given future is ready,
+    // the future is deferred executed if possible first.
     template <typename T,
         typename std::enable_if<traits::is_future<
             typename std::decay<T>::type>::value>::type* = nullptr>
@@ -43,14 +44,14 @@ namespace hpx { namespace lcos { namespace detail {
             return true;
         }
 
-        // Execute_deferred might have made the future ready
+        // Execute_deferred might make the future ready
         state->execute_deferred();
 
         // Detach the context if the future isn't ready
         return state->is_ready();
     }
 
-    /// Attach the continuation next to the given future
+    // Attach the continuation next to the given future
     template <typename T, typename N,
         typename std::enable_if<traits::is_future<
             typename std::decay<T>::type>::value>::type* = nullptr>
@@ -64,7 +65,7 @@ namespace hpx { namespace lcos { namespace detail {
         state->set_on_completed(util::deferred_call(std::forward<N>(next)));
     }
 
-    /// Acquire a future range from the given begin and end iterator
+    // Acquire a future range from the given begin and end iterator
     template <typename Iterator,
         typename Container =
             std::vector<typename future_iterator_traits<Iterator>::type>>
@@ -83,8 +84,8 @@ namespace hpx { namespace lcos { namespace detail {
         return lazy_values;    // Should be optimized by RVO
     }
 
-    /// Acquire a future range from the given
-    /// begin iterator and count
+    // Acquire a future range from the given
+    // begin iterator and count
     template <typename Iterator,
         typename Container =
             std::vector<typename future_iterator_traits<Iterator>::type>>

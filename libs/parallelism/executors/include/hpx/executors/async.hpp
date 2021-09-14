@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +13,6 @@
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/future.hpp>
 
@@ -26,35 +25,36 @@ namespace hpx { namespace detail {
 
     template <typename Func>
     struct async_dispatch_launch_policy_helper<Func,
-        typename std::enable_if<!traits::is_action<Func>::value>::type>
+        std::enable_if_t<!traits::is_action_v<Func>>>
     {
         template <typename Policy_, typename F, typename... Ts>
-        HPX_FORCEINLINE static auto
-        call(Policy_&& launch_policy, F&& f, Ts&&... ts) -> decltype(
-            async_launch_policy_dispatch<typename std::decay<F>::type>::call(
+        HPX_FORCEINLINE static auto call(
+            Policy_&& launch_policy, F&& f, Ts&&... ts)
+            -> decltype(async_launch_policy_dispatch<std::decay_t<F>>::call(
                 std::forward<Policy_>(launch_policy), std::forward<F>(f),
                 std::forward<Ts>(ts)...))
         {
-            return async_launch_policy_dispatch<typename std::decay<F>::type>::
-                call(std::forward<Policy_>(launch_policy), std::forward<F>(f),
-                    std::forward<Ts>(ts)...);
+            return async_launch_policy_dispatch<std::decay_t<F>>::call(
+                std::forward<Policy_>(launch_policy), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
     };
 
     template <typename Policy>
     struct async_dispatch<Policy,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+        std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         template <typename Policy_, typename F, typename... Ts>
         HPX_FORCEINLINE static auto call(
             Policy_&& launch_policy, F&& f, Ts&&... ts)
-            -> decltype(async_dispatch_launch_policy_helper<typename std::decay<
-                    F>::type>::call(std::forward<Policy_>(launch_policy),
-                std::forward<F>(f), std::forward<Ts>(ts)...))
+            -> decltype(
+                async_dispatch_launch_policy_helper<std::decay_t<F>>::call(
+                    std::forward<Policy_>(launch_policy), std::forward<F>(f),
+                    std::forward<Ts>(ts)...))
         {
-            return async_dispatch_launch_policy_helper<typename std::decay<
-                F>::type>::call(std::forward<Policy_>(launch_policy),
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return async_dispatch_launch_policy_helper<std::decay_t<F>>::call(
+                std::forward<Policy_>(launch_policy), std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
     };
 
@@ -64,15 +64,14 @@ namespace hpx { namespace detail {
     struct async_dispatch
     {
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value,
-            hpx::future<typename util::detail::invoke_deferred_result<F,
-                Ts...>::type>>::type
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(F&& f, Ts&&... ts)
         {
-            execution::parallel_executor exec;
-            return exec.async_execute(
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return async_launch_policy_dispatch<std::decay_t<F>>::call(
+                hpx::launch::async, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
     };
 
@@ -83,8 +82,8 @@ namespace hpx { namespace detail {
     // threads::executor
     template <typename Executor>
     struct async_dispatch<Executor,
-        typename std::enable_if<traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value>::type>
+        std::enable_if_t<traits::is_one_way_executor_v<Executor> ||
+            traits::is_two_way_executor_v<Executor>>>
     {
         template <typename Executor_, typename F, typename... Ts>
         HPX_FORCEINLINE static decltype(auto) call(
