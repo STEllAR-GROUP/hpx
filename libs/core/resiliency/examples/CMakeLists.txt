@@ -37,7 +37,7 @@ if(HPX_WITH_EXAMPLES)
     add_hpx_executable(
       ${example_program} INTERNAL_FLAGS
       SOURCES ${sources} ${${example_program}_FLAGS}
-      FOLDER "Examples/Modules/Parallelism/Resiliency"
+      FOLDER "Examples/Modules/Core/Resiliency"
     )
 
     add_hpx_example_target_dependencies("modules.resiliency" ${example_program})

@@ -32,7 +32,7 @@ foreach(benchmark ${benchmarks})
     ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL ${${benchmark}_FLAGS}
-    FOLDER "Benchmarks/Modules/Parallelism/Algorithms"
+    FOLDER "Benchmarks/Modules/Core/Algorithms"
   )
 
   add_hpx_performance_test(

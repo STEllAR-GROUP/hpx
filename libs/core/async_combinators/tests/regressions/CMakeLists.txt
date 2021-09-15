@@ -17,7 +17,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Modules/Parallelism/AsyncCombinators"
+    FOLDER "Tests/Regressions/Modules/Core/AsyncCombinators"
   )
 
   add_hpx_regression_test(
@@ -37,7 +37,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
       "modules.async_combinators" ${compile_test}
       SOURCES ${sources} ${${compile_test}_FLAGS}
       FOLDER
-        "Tests/Regressions/Modules/Parallelism/AsyncCombinators/CompileOnly"
+        "Tests/Regressions/Modules/Core/AsyncCombinators/CompileOnly"
     )
   endforeach()
 endif()

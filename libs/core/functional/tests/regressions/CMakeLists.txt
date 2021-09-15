@@ -18,7 +18,7 @@ foreach(test ${function_tests})
     NOLIBS
     DEPENDENCIES hpx_core
     EXCLUDE_FROM_ALL
-    FOLDER "Tests/Regression/Modules/Core/Functional"
+    FOLDER "Tests/Regressions/Modules/Core/Functional"
   )
 
   add_hpx_regression_test("modules.functional" ${test} ${${test}_PARAMETERS})
