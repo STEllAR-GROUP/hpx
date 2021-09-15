@@ -89,4 +89,5 @@ jobs:
           tests.examples.quickstart.1d_wave_equation|\
           tests.examples.quickstart.partitioned_vector_spmd_foreach|\
           tests.examples.quickstart.sort_by_key_demo|\
-          tests.examples.transpose.transpose_block_numa"
+          tests.examples.transpose.transpose_block_numa|\
+          tests.examples.modules.collectives.distributed.tcp.channel_communicator"
