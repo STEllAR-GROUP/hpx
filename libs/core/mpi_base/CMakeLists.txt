@@ -30,7 +30,7 @@ set(mpi_base_sources mpi_environment.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
-  full mpi_base
+  core mpi_base
   GLOBAL_HEADER_GEN ON
   SOURCES ${mpi_base_sources}
   HEADERS ${mpi_base_headers}

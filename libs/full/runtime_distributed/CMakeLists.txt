@@ -55,11 +55,6 @@ set(runtime_distributed_sources
     stubs/runtime_support_stubs.cpp
 )
 
-set(MPI_DEPS)
-if(HPX_WITH_PARCELPORT_MPI OR HPX_WITH_ASYNC_MPI)
-  set(MPI_DEPS hpx_mpi_base)
-endif()
-
 include(HPX_AddModule)
 add_hpx_module(
   full runtime_distributed
@@ -76,7 +71,6 @@ add_hpx_module(
     hpx_collectives
     hpx_command_line_handling
     hpx_distribution_policies
-    ${MPI_DEPS}
     hpx_naming
     hpx_naming_base
     hpx_performance_counters
