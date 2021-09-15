@@ -24,19 +24,8 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender_connection.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/tag_provider.hpp"
-    DEPENDENCIES
-      hpx_actions
-      hpx_command_line_handling
-      hpx_mpi_base
-      hpx_performance_counters
-      hpx_program_options
-      hpx_runtime_configuration
-      hpx_runtime_local
-      hpx_threadmanager
-      hpx_parallelism
-      hpx_core
-      hpx_dependencies_boost
-      Mpi::mpi
+    DEPENDENCIES hpx_actions hpx_command_line_handling hpx_core
+                 hpx_dependencies_boost Mpi::mpi
     INCLUDE_DIRS ${PROJECT_SOURCE_DIR}
     FOLDER "Core/Plugins/Parcelport/MPI"
   )

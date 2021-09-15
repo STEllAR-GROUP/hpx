@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 
@@ -13,7 +14,8 @@
 
 namespace hpx { namespace util {
 
-    int handle_late_commandline_options(util::runtime_configuration& ini,
+    HPX_EXPORT int handle_late_commandline_options(
+        util::runtime_configuration& ini,
         hpx::program_options::options_description const& options,
         void (*handle_print_bind)(std::size_t),
         void (*handle_list_parcelports)() = nullptr);

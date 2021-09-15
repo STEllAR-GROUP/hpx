@@ -140,8 +140,8 @@ add_hpx_module(
   full include
   GLOBAL_HEADER_GEN OFF
   HEADERS ${include_headers}
-  DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_compute hpx_include_local hpx_resource_partitioner
-                      hpx_threadmanager ${include_optional_module_dependencies}
+  DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_command_line_handling hpx_compute
+                      ${include_optional_module_dependencies}
   CMAKE_SUBDIRS tests
 )

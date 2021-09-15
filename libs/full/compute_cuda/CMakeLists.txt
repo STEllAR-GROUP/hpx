@@ -23,14 +23,12 @@ set(compute_cuda_headers
     hpx/compute/cuda/detail/scoped_active_target.hpp
     hpx/compute/cuda.hpp
     hpx/compute/cuda/serialization/value_proxy.hpp
-    hpx/compute/cuda/target_distribution_policy.hpp
     hpx/compute/cuda/target_ptr.hpp
     hpx/compute/cuda/traits/access_target.hpp
     hpx/compute/cuda/transfer.hpp
     hpx/compute/cuda/value_proxy.hpp
     hpx/compute/detail/get_proxy_type.hpp
     hpx/compute/detail/iterator.hpp
-    hpx/compute/detail/target_distribution_policy.hpp
 )
 
 # cmake-format: off
@@ -51,8 +49,7 @@ add_hpx_module(
   SOURCES ${compute_cuda_sources}
   HEADERS ${compute_cuda_headers}
   COMPAT_HEADERS ${compute_cuda_compat_headers}
-  DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_compute hpx_async_cuda hpx_program_options
-                      ${compute_cuda_optional_module_dependencies}
+  DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_compute ${compute_cuda_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests
 )

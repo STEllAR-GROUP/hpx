@@ -17,8 +17,8 @@
 #include <hpx/compute/cuda/target_ptr.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/statistics/min.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/util/min.hpp>
 
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 
@@ -184,7 +184,7 @@ namespace hpx { namespace cuda { namespace experimental {
         )
         {
 #if defined(HPX_COMPUTE_CODE)
-            int threads_per_block = (hpx::util::min)(1024, int(count));
+            int threads_per_block = (hpx::detail::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block - 1) / threads_per_block);
 
@@ -232,7 +232,7 @@ namespace hpx { namespace cuda { namespace experimental {
         HPX_HOST_DEVICE void bulk_destroy(pointer p, std::size_t count)
         {
 #if defined(HPX_COMPUTE_CODE)
-            int threads_per_block = (hpx::util::min)(1024, int(count));
+            int threads_per_block = (hpx::detail::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block) / threads_per_block) - 1;
 

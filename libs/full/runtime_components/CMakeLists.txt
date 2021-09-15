@@ -61,7 +61,7 @@ add_hpx_module(
   HEADERS ${runtime_components_headers}
   SOURCES ${runtime_components_sources}
   COMPAT_HEADERS ${runtime_components_compat_headers}
-  DEPENDENCIES hpx_core hpx_parallelism
+  DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES
     hpx_actions
     hpx_agas
@@ -71,7 +71,5 @@ add_hpx_module(
     hpx_distribution_policies
     hpx_naming
     hpx_performance_counters
-    hpx_runtime_local
-    hpx_threadmanager
   CMAKE_SUBDIRS examples tests
 )

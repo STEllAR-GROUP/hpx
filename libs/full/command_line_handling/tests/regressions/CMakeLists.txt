@@ -8,9 +8,7 @@ set(tests late_commandline_options_5257 options_as_config_3339
           use_all_cores_2262
 )
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} configuration_1572)
-endif()
+set(tests ${tests} configuration_1572)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

@@ -22,7 +22,7 @@ add_hpx_module(
   GLOBAL_HEADER_GEN ON
   SOURCES ${resiliency_distributed_sources}
   HEADERS ${resiliency_distributed_headers}
-  DEPENDENCIES hpx_core hpx_parallelism
+  DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES hpx_actions_base hpx_naming
   CMAKE_SUBDIRS examples tests
 )

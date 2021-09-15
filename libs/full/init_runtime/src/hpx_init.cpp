@@ -35,6 +35,7 @@
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/variables_map.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/debugging.hpp>
@@ -66,6 +67,7 @@
 #include <hpx/modules/naming.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime_configuration/register_locks_globally.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
@@ -785,9 +787,16 @@ namespace hpx {
                     return result;
                 }
 
+#if defined(HPX_HAVE_NETWORKING)
                 hpx::util::command_line_handling cmdline{
-                    hpx::util::runtime_configuration(argv[0], params.mode),
+                    hpx::util::runtime_configuration(argv[0], params.mode,
+                        hpx::parcelset::load_runtime_configuration()),
                     hpx_startup::user_main_config(params.cfg), f};
+#else
+                hpx::util::command_line_handling cmdline{
+                    hpx::util::runtime_configuration(argv[0], params.mode, {}),
+                    hpx_startup::user_main_config(params.cfg), f};
+#endif
 
                 // scope exception handling to resource partitioner initialization
                 // any exception thrown during run_or_start below are handled
