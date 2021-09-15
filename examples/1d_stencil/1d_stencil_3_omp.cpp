@@ -18,7 +18,6 @@
 // Include before any Boost header and avoid issues with Intel14/libstdc++4.4
 // nullptr
 #include <hpx/config.hpp>
-
 #include <hpx/modules/program_options.hpp>
 
 #include <chrono>
@@ -42,10 +41,10 @@ inline std::uint64_t now()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool header = true; // print csv heading
-double k = 0.5;     // heat transfer coefficient
-double dt = 1.;     // time step
-double dx = 1.;     // grid spacing
+bool header = true;    // print csv heading
+double k = 0.5;        // heat transfer coefficient
+double dt = 1.;        // time step
+double dx = 1.;        // grid spacing
 
 inline std::size_t idx(std::size_t i, std::size_t size)
 {
@@ -58,7 +57,8 @@ struct partition_data
 {
     partition_data(std::size_t size = 0)
       : data_(size)
-    {}
+    {
+    }
 
     partition_data(std::size_t size, double initial_value)
       : data_(size)
@@ -68,10 +68,19 @@ struct partition_data
             data_[i] = base_value + double(i);
     }
 
-    double& operator[](std::size_t idx) { return data_[idx]; }
-    double operator[](std::size_t idx) const { return data_[idx]; }
+    double& operator[](std::size_t idx)
+    {
+        return data_[idx];
+    }
+    double operator[](std::size_t idx) const
+    {
+        return data_[idx];
+    }
 
-    std::size_t size() const { return data_.size(); }
+    std::size_t size() const
+    {
+        return data_.size();
+    }
 
 private:
     std::vector<double> data_;
@@ -100,7 +109,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
+        return middle + (k * dt / (dx * dx)) * (left - 2 * middle + right);
     }
 
     // The partitioned operator, it invokes the heat operator above on all
@@ -111,12 +120,12 @@ struct stepper
         std::size_t size = middle.size();
         partition_data next(size);
 
-        next[0] = heat(left[size-1], middle[0], middle[1]);
+        next[0] = heat(left[size - 1], middle[0], middle[1]);
 
-        for (std::size_t i = 1; i != size-1; ++i)
-            next[i] = heat(middle[i-1], middle[i], middle[i+1]);
+        for (std::size_t i = 1; i != size - 1; ++i)
+            next[i] = heat(middle[i - 1], middle[i], middle[i + 1]);
 
-        next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
+        next[size - 1] = heat(middle[size - 2], middle[size - 1], right[0]);
 
         return next;
     }
@@ -127,29 +136,29 @@ struct stepper
     {
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);
-        for (space& s: U)
+        for (space& s : U)
             s.resize(np);
 
-        // Initial conditions: f(0, i) = i
-        # pragma omp parallel
+// Initial conditions: f(0, i) = i
+#pragma omp parallel
         {
-        // Visual Studio requires OMP loop variables to be signed :/
-        # pragma omp for schedule(static)
-        for (std::int64_t i = 0; i < (std::int64_t)np; ++i)
-            U[0][i] = partition_data(nx, double(i));
+// Visual Studio requires OMP loop variables to be signed :/
+#pragma omp for schedule(static)
+            for (std::int64_t i = 0; i < (std::int64_t) np; ++i)
+                U[0][i] = partition_data(nx, double(i));
 
-        // Actual time step loop
-        for (std::size_t t = 0; t != nt; ++t)
-        {
-            space const& current = U[t % 2];
-            space& next = U[(t + 1) % 2];
+            // Actual time step loop
+            for (std::size_t t = 0; t != nt; ++t)
+            {
+                space const& current = U[t % 2];
+                space& next = U[(t + 1) % 2];
 
-            // Visual Studio requires OMP loop variables to be signed :/
-            # pragma omp for schedule(static)
-            for (std::int64_t i = 0; i < (std::int64_t)np; ++i)
-                next[i] =
-                heat_part(current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
-        }
+// Visual Studio requires OMP loop variables to be signed :/
+#pragma omp for schedule(static)
+                for (std::int64_t i = 0; i < (std::int64_t) np; ++i)
+                    next[i] = heat_part(current[idx(i - 1, np)], current[i],
+                        current[idx(i + 1, np)]);
+            }
         }
         // Return the solution at time-step 'nt'.
         return U[nt % 2];
@@ -159,13 +168,13 @@ struct stepper
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    std::uint64_t np = vm["np"].as<std::uint64_t>();   // Number of partitions.
-    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
-    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
+    std::uint64_t np = vm["np"].as<std::uint64_t>();    // Number of partitions.
+    std::uint64_t nx =
+        vm["nx"].as<std::uint64_t>();    // Number of grid points.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();    // Number of steps.
 
     if (vm.count("no-header"))
         header = false;
-
 
     // Create the stepper object
     stepper step;
@@ -184,11 +193,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
         for (std::size_t i = 0; i != np; ++i)
             std::cout << "U[" << i << "] = " << solution[i] << std::endl;
     }
-//  std::uint64_t const os_thread_count = omp_get_num_threads();
-    # pragma omp parallel
-    # pragma omp master
+    //  std::uint64_t const os_thread_count = omp_get_num_threads();
+#pragma omp parallel
+#pragma omp master
     print_time_results(omp_get_num_threads(), elapsed, nx, np, nt, header);
-
 
     return 0;
 }
@@ -198,6 +206,7 @@ int main(int argc, char* argv[])
     namespace po = hpx::program_options;
 
     po::options_description desc_commandline;
+    // clang-format off
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
         ("nx", po::value<std::uint64_t>()->default_value(10),
@@ -214,9 +223,14 @@ int main(int argc, char* argv[])
          "Local x dimension")
         ( "no-header", "do not print out the csv header row")
     ;
+    // clang-format on
 
     po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, desc_commandline), vm);
+    po::store(po::command_line_parser(argc, argv)
+                  .options(desc_commandline)
+                  .allow_unregistered()
+                  .run(),
+        vm);
     po::notify(vm);
 
     return hpx_main(vm);

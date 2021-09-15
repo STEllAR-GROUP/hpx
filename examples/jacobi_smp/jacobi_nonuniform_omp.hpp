@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/include/util.hpp>
+#include <hpx/local/chrono.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -19,12 +19,8 @@
 #include "jacobi_nonuniform.hpp"
 
 namespace jacobi_smp {
-    void jacobi(
-        crs_matrix<double> const & A
-      , std::vector<double> const & b
-      , std::size_t iterations
-      , std::size_t block_size
-    )
+    void jacobi(crs_matrix<double> const& A, std::vector<double> const& b,
+        std::size_t iterations, std::size_t block_size)
     {
         typedef std::vector<double> vector_type;
 
@@ -32,26 +28,21 @@ namespace jacobi_smp {
         std::shared_ptr<vector_type> src(new vector_type(b));
 
         hpx::chrono::high_resolution_timer t;
-        for(std::size_t i = 0; i < iterations; ++i)
+        for (std::size_t i = 0; i < iterations; ++i)
         {
             // MSVC is unhappy if the OMP loop variable is unsigned
 #pragma omp parallel for schedule(JACOBI_SMP_OMP_SCHEDULE)
-            for(std::int64_t row = 0; row < std::int64_t(b.size());  ++row)
+            for (std::int64_t row = 0; row < std::int64_t(b.size()); ++row)
             {
-                jacobi_kernel_nonuniform(
-                          A
-                        , *dst
-                        , *src
-                        , b
-                        , row
-                        );
+                jacobi_kernel_nonuniform(A, *dst, *src, b, row);
             }
             std::swap(dst, src);
         }
 
         double time_elapsed = t.elapsed();
         std::cout << dst->size() << " "
-            << ((double(dst->size() * iterations)/1e6)/time_elapsed) << " MLUPS/s\n"
-            << std::flush;
+                  << ((double(dst->size() * iterations) / 1e6) / time_elapsed)
+                  << " MLUPS/s\n"
+                  << std::flush;
     }
-}
+}    // namespace jacobi_smp

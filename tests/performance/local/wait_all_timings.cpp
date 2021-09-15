@@ -6,25 +6,24 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/iostream.hpp>
-#include <hpx/include/lcos.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 
-#include <hpx/modules/program_options.hpp>
-
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-std::vector<hpx::future<void> >
-create_tasks(std::size_t num_tasks, std::size_t delay)
+std::vector<hpx::future<void>> create_tasks(
+    std::size_t num_tasks, std::size_t delay)
 {
-    std::vector<hpx::future<void> > tasks;
+    std::vector<hpx::future<void>> tasks;
     tasks.reserve(num_tasks);
     for (std::size_t i = 0; i != num_tasks; ++i)
     {
@@ -34,8 +33,8 @@ create_tasks(std::size_t num_tasks, std::size_t delay)
         }
         else
         {
-            tasks.push_back(hpx::make_ready_future_after(
-                std::chrono::microseconds(delay)));
+            tasks.push_back(
+                hpx::make_ready_future_after(std::chrono::microseconds(delay)));
         }
     }
     return tasks;
@@ -45,13 +44,14 @@ double wait_tasks(std::size_t num_samples, std::size_t num_tasks,
     std::size_t num_chunks, std::size_t delay)
 {
     std::size_t num_chunk_tasks = ((num_tasks + num_chunks) / num_chunks) - 1;
-    std::size_t last_num_chunk_tasks = num_tasks - (num_chunks - 1) * num_chunk_tasks;
+    std::size_t last_num_chunk_tasks =
+        num_tasks - (num_chunks - 1) * num_chunk_tasks;
 
     double result = 0;
 
     for (std::size_t k = 0; k != num_samples; ++k)
     {
-        std::vector<std::vector<hpx::future<void> > > chunks;
+        std::vector<std::vector<hpx::future<void>>> chunks;
         chunks.reserve(num_chunks);
         for (std::size_t c = 0; c != num_chunks - 1; ++c)
         {
@@ -59,7 +59,7 @@ double wait_tasks(std::size_t num_samples, std::size_t num_tasks,
         }
         chunks.push_back(create_tasks(last_num_chunk_tasks, delay));
 
-        std::vector<hpx::future<void> > chunk_results;
+        std::vector<hpx::future<void>> chunk_results;
         chunk_results.reserve(num_chunks);
 
         // wait of tasks in chunks
@@ -73,8 +73,7 @@ double wait_tasks(std::size_t num_samples, std::size_t num_tasks,
             for (std::size_t c = 0; c != num_chunks; ++c)
             {
                 chunk_results.push_back(
-                    hpx::async([&chunks, c]() { hpx::wait_all(chunks[c]); })
-                );
+                    hpx::async([&chunks, c]() { hpx::wait_all(chunks[c]); }));
             }
             hpx::wait_all(chunk_results);
         }
@@ -117,30 +116,31 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     if (header)
     {
-        hpx::cout
+        std::cout
             << "Tasks,Chunks,Delay[s],Total Walltime[s],Walltime per Task[s]"
-             << hpx::endl;
+            << std::endl;
     }
 
     std::string const tasks_str = hpx::util::format("{}", num_tasks);
     std::string const chunks_str = hpx::util::format("{}", num_chunks);
     std::string const delay_str = hpx::util::format("{}", delay);
 
-    hpx::util::format_to(hpx::cout, "{:10},{:10},{:10},{:10},{:10.12}\n",
+    hpx::util::format_to(std::cout, "{:10},{:10},{:10},{:10},{:10.12}\n",
         tasks_str, std::string("1"), delay_str, elapsed_seq,
         elapsed_seq / num_tasks)
-        << hpx::endl;
+        << std::endl;
     hpx::util::print_cdash_timing("WaitAll", elapsed_seq / num_tasks);
 
     if (num_chunks != 1)
     {
-        hpx::util::format_to(hpx::cout,
-            "{:10},{:10},{:10},{:10},{:10.12},{:10.12}\n",
-            tasks_str, chunks_str, delay_str,
-            elapsed_chunks, elapsed_chunks / num_tasks) << hpx::endl;
-        hpx::util::print_cdash_timing("WaitAllChunks", elapsed_chunks / num_tasks);
+        hpx::util::format_to(std::cout,
+            "{:10},{:10},{:10},{:10},{:10.12},{:10.12}\n", tasks_str,
+            chunks_str, delay_str, elapsed_chunks, elapsed_chunks / num_tasks)
+            << std::endl;
+        hpx::util::print_cdash_timing(
+            "WaitAllChunks", elapsed_chunks / num_tasks);
     }
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -155,18 +155,18 @@ int main(int argc, char* argv[])
         po::value<std::uint64_t>()->default_value(1000),
         "number of tasks to concurrently wait for (default: 1000)")("futures,f",
         po::value<std::uint64_t>()->default_value(100),
-        "number of tasks to concurrently wait for (default: 100)")("chunks,c",
+        "number of tasks to concurrently wait for (default: 100)") ("chunks,c",
         po::value<std::uint64_t>()->default_value(1),
-        "number of chunks to split tasks into (default: 1)")("delay,d",
+        "number of chunks to split tasks into (default: 1)") ("delay,d",
         po::value<std::uint64_t>()->default_value(0),
-        "number of iterations in the delay loop")("no-header,n",
+        "number of iterations in the delay loop") ("no-header,n",
         po::value<bool>()->default_value(true),
         "do not print out the csv header row");
 
     // Initialize and run HPX.
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }
 #endif

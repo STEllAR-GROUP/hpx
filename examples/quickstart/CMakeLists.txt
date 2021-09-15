@@ -7,7 +7,10 @@
 
 set(example_programs
     composable_guard
+    customize_async
     disable_thread_stealing_executor
+    enumerate_threads
+    event_synchronization
     executor_with_thread_hooks
     fibonacci_await
     fibonacci_dataflow
@@ -15,10 +18,17 @@ set(example_programs
     fibonacci_local
     file_serialization
     latch_local
+    local_channel_docs
+    local_channel
     pipeline1
     safe_object
+    shared_mutex
+    simple_future_continuation
+    timed_futures
     timed_wake
     use_main_thread
+    vector_counting_dotproduct
+    vector_zip_dotproduct
     wait_composition
 )
 
@@ -38,11 +48,8 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       component_inheritance
       component_with_custom_heap
       component_with_executor
-      customize_async
       data_actions
-      enumerate_threads
       error_handling
-      event_synchronization
       factorial
       fibonacci
       fibonacci_futures_distributed
@@ -54,26 +61,18 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       interval_timer
       invoke_function
       latch_remote
-      local_channel_docs
-      local_channel
       partitioned_vector_spmd_foreach
       pingpong
       potpourri
       print_to_console
       receive_buffer
       sierpinski
-      simple_future_continuation
-      timed_futures
-      vector_counting_dotproduct
-      vector_zip_dotproduct
       zerocopy_rdma
   )
 endif()
 
 # TODO: These examples currently fail. Disabled until they are fixed.
-set(disabled_tests error_handling fibonacci_await non_atomic_rma shared_mutex
-                   zerocopy_rdma
-)
+set(disabled_tests error_handling fibonacci_await non_atomic_rma zerocopy_rdma)
 
 set(1d_wave_equation_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(allow_unknown_options_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -84,9 +83,6 @@ set(component_ctors_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_inheritance_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_with_custom_heap_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_with_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(customize_async_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(enumerate_threads_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(event_synchronization_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(hello_world_1_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(hello_world_2_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -98,19 +94,12 @@ else()
   set(hello_world_distributed_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
 set(interval_timer_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(local_channel_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(local_channel_docs_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(sierpinski_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(partitioned_vector_spmd_foreach_FLAGS COMPONENT_DEPENDENCIES iostreams
                                           partitioned_vector
 )
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(potpourri_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(shared_mutex_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(timed_futures_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(vector_counting_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(vector_zip_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 set(1d_wave_equation_PARAMETERS THREADS_PER_LOCALITY 4
                                 "-Ihpx.stacks.use_guard_pages!=0"
@@ -139,12 +128,8 @@ set(vector_counting_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_zip_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
 
 # the following example fails compiling on someversions of MSVC
-if(HPX_WITH_TUPLE_RVALUE_SWAP
-   AND (NOT MSVC)
-   AND HPX_WITH_DISTRIBUTED_RUNTIME
-)
-  set(example_programs ${example_programs} sort_by_key_demo)
-  set(sort_by_key_demo_FLAGS COMPONENT_DEPENDENCIES iostreams)
+if(HPX_WITH_TUPLE_RVALUE_SWAP AND (NOT MSVC))
+  list(APPEND example_programs sort_by_key_demo)
 endif()
 
 foreach(example_program ${example_programs})

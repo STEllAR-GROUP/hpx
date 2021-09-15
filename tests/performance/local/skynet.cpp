@@ -17,11 +17,12 @@
 // This code implements two versions of the skynet micro benchmark: a 'normal'
 // and a futurized one.
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/iostream.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 
 #include <cstdint>
+#include <iostream>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,7 +32,7 @@ std::int64_t skynet(std::int64_t num, std::int64_t size, std::int64_t div)
     {
         size /= div;
 
-        std::vector<hpx::future<std::int64_t> > results;
+        std::vector<hpx::future<std::int64_t>> results;
         results.reserve(div);
 
         for (std::int64_t i = 0; i != div; ++i)
@@ -43,7 +44,7 @@ std::int64_t skynet(std::int64_t num, std::int64_t size, std::int64_t div)
         hpx::wait_all(results);
 
         std::int64_t sum = 0;
-        for (auto & f : results)
+        for (auto& f : results)
             sum += f.get();
         return sum;
     }
@@ -51,14 +52,14 @@ std::int64_t skynet(std::int64_t num, std::int64_t size, std::int64_t div)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<std::int64_t>
-skynet_f(std::int64_t num, std::int64_t size, std::int64_t div)
+hpx::future<std::int64_t> skynet_f(
+    std::int64_t num, std::int64_t size, std::int64_t div)
 {
     if (size != 1)
     {
         size /= div;
 
-        std::vector<hpx::future<std::int64_t> > results;
+        std::vector<hpx::future<std::int64_t>> results;
         results.reserve(div);
 
         for (std::int64_t i = 0; i != div; ++i)
@@ -68,10 +69,9 @@ skynet_f(std::int64_t num, std::int64_t size, std::int64_t div)
         }
 
         return hpx::dataflow(
-            [](std::vector<hpx::future<std::int64_t> > && sums)
-            {
+            [](std::vector<hpx::future<std::int64_t>>&& sums) {
                 std::int64_t sum = 0;
-                for (auto & f : sums)
+                for (auto& f : sums)
                     sum += f.get();
                 return sum;
             },
@@ -81,7 +81,7 @@ skynet_f(std::int64_t num, std::int64_t size, std::int64_t div)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     {
         std::uint64_t t = hpx::chrono::high_resolution_clock::now();
@@ -91,9 +91,8 @@ int main()
 
         t = hpx::chrono::high_resolution_clock::now() - t;
 
-        hpx::cout
-            << "Result 1: " << result.get() << " in "
-            << (t / 1e6) << " ms.\n";
+        std::cout << "Result 1: " << result.get() << " in " << (t / 1e6)
+                  << " ms.\n";
     }
 
     {
@@ -104,10 +103,13 @@ int main()
 
         t = hpx::chrono::high_resolution_clock::now() - t;
 
-        hpx::cout
-            << "Result 2: " << result.get() << " in "
-            << (t / 1e6) << " ms.\n";
+        std::cout << "Result 2: " << result.get() << " in " << (t / 1e6)
+                  << " ms.\n";
     }
     return 0;
 }
 
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
+}

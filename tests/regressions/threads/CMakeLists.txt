@@ -11,13 +11,14 @@ set(tests
     run_as_os_thread_lockup_2991
     stackless_self_4155
     thread_data_1111
+    thread_rescheduling
     thread_suspend_pending
     thread_suspend_duration
     threads_all_1422
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} resume_priority thread_rescheduling)
+  list(APPEND tests resume_priority)
 endif()
 
 set(block_os_threads_1036_PARAMETERS THREADS_PER_LOCALITY 4 RUN_SERIAL)

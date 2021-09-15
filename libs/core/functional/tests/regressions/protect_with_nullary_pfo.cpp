@@ -6,12 +6,11 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/protect.hpp>
-#include <hpx/init.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -62,11 +61,10 @@ int hpx_main()
         ++i;
     }
 
-    return hpx::finalize();    // Handles HPX shutdown
+    return hpx::local::finalize();    // Handles HPX shutdown
 }
 
 int main(int argc, char* argv[])
 {
-    return hpx::init(argc, argv);
+    return hpx::local::init(hpx_main, argc, argv);
 }
-#endif

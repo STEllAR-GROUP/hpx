@@ -5,21 +5,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  return()
-endif()
-
-set(example_programs
-    1d_stencil_1
-    1d_stencil_2
-    1d_stencil_3
-    1d_stencil_4
-    1d_stencil_4_parallel
-    1d_stencil_5
-    1d_stencil_6
-    1d_stencil_7
-    1d_stencil_8
-    1d_stencil_channel
+set(example_programs 1d_stencil_1 1d_stencil_2 1d_stencil_3 1d_stencil_4
+                     1d_stencil_4_parallel
 )
 
 if(HPX_WITH_APEX)
@@ -33,8 +20,18 @@ endif()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
   set(example_programs ${example_programs} 1d_stencil_1_omp 1d_stencil_3_omp)
+endif()
 
-  set(disabled_tests 1d_stencil_1_omp 1d_stencil_3_omp)
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  list(
+    APPEND
+    example_programs
+    1d_stencil_5
+    1d_stencil_6
+    1d_stencil_7
+    1d_stencil_8
+    1d_stencil_channel
+  )
 endif()
 
 set(1d_stencil_1_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -46,10 +43,12 @@ set(1d_stencil_5_PARAMETERS THREADS_PER_LOCALITY 4)
 set(1d_stencil_6_PARAMETERS THREADS_PER_LOCALITY 4)
 set(1d_stencil_7_PARAMETERS THREADS_PER_LOCALITY 4)
 set(1d_stencil_8_PARAMETERS THREADS_PER_LOCALITY 4)
+set(1d_stencil_5_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(1d_stencil_6_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(1d_stencil_7_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(1d_stencil_8_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 foreach(example_program ${example_programs})
-
-  set(${example_program}_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
   set(sources ${example_program}.cpp)
 
@@ -64,15 +63,10 @@ foreach(example_program ${example_programs})
 
   add_hpx_example_target_dependencies("1d_stencil" ${example_program})
 
-  if(HPX_WITH_TESTS
-     AND HPX_WITH_TESTS_EXAMPLES
-     AND NOT ("${example_program}" IN_LIST disabled_tests)
-  )
-
+  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_example_test(
       "1d_stencil" ${example_program} ${${example_program}_PARAMETERS}
     )
-
   endif()
 
 endforeach()

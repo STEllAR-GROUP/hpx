@@ -13,8 +13,10 @@
 // The purpose is to be able to control the amount of work performed. The
 // example is still fully serial, no parallelization is performed.
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/hpx.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -25,16 +27,16 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables
-bool header = true; // print csv heading
-double k = 0.5;     // heat transfer coefficient
-double dt = 1.;     // time step
-double dx = 1.;     // grid spacing
+bool header = true;    // print csv heading
+double k = 0.5;        // heat transfer coefficient
+double dt = 1.;        // time step
+double dx = 1.;        // grid spacing
 
 inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 {
-    if(i == 0 && dir == -1)
-        return size-1;
-    if(i == size-1 && dir == +1)
+    if (i == 0 && dir == -1)
+        return size - 1;
+    if (i == size - 1 && dir == +1)
         return 0;
 
     HPX_ASSERT((i + dir) < size);
@@ -48,7 +50,8 @@ struct partition_data
 {
     partition_data(std::size_t size = 0)
       : data_(size)
-    {}
+    {
+    }
 
     partition_data(std::size_t size, double initial_value)
       : data_(size)
@@ -58,10 +61,19 @@ struct partition_data
             data_[i] = base_value + double(i);
     }
 
-    double& operator[](std::size_t idx) { return data_[idx]; }
-    double operator[](std::size_t idx) const { return data_[idx]; }
+    double& operator[](std::size_t idx)
+    {
+        return data_[idx];
+    }
+    double operator[](std::size_t idx) const
+    {
+        return data_[idx];
+    }
 
-    std::size_t size() const { return data_.size(); }
+    std::size_t size() const
+    {
+        return data_.size();
+    }
 
 private:
     std::vector<double> data_;
@@ -90,7 +102,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
+        return middle + (k * dt / (dx * dx)) * (left - 2 * middle + right);
     }
 
     // The partitioned operator, it invokes the heat operator above on all
@@ -101,12 +113,12 @@ struct stepper
         std::size_t size = middle.size();
         partition_data next(size);
 
-        next[0] = heat(left[size-1], middle[0], middle[1]);
+        next[0] = heat(left[size - 1], middle[0], middle[1]);
 
-        for (std::size_t i = 1; i != size-1; ++i)
-            next[i] = heat(middle[i-1], middle[i], middle[i+1]);
+        for (std::size_t i = 1; i != size - 1; ++i)
+            next[i] = heat(middle[i - 1], middle[i], middle[i + 1]);
 
-        next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
+        next[size - 1] = heat(middle[size - 2], middle[size - 1], right[0]);
 
         return next;
     }
@@ -117,7 +129,7 @@ struct stepper
     {
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);
-        for (space& s: U)
+        for (space& s : U)
             s.resize(np);
 
         // Initial conditions: f(0, i) = i
@@ -131,8 +143,8 @@ struct stepper
             space& next = U[(t + 1) % 2];
 
             for (std::size_t i = 0; i != np; ++i)
-                next[i] =
-                heat_part(current[idx(i, -1, np)], current[i], current[idx(i, +1, np)]);
+                next[i] = heat_part(current[idx(i, -1, np)], current[i],
+                    current[idx(i, +1, np)]);
         }
 
         // Return the solution at time-step 'nt'.
@@ -143,13 +155,13 @@ struct stepper
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    std::uint64_t np = vm["np"].as<std::uint64_t>();   // Number of partitions.
-    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
-    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
+    std::uint64_t np = vm["np"].as<std::uint64_t>();    // Number of partitions.
+    std::uint64_t nx =
+        vm["nx"].as<std::uint64_t>();    // Number of grid points.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();    // Number of steps.
 
     if (vm.count("no-header"))
         header = false;
-
 
     // Create the stepper object
     stepper step;
@@ -172,7 +184,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::uint64_t const os_thread_count = hpx::get_os_thread_count();
     print_time_results(os_thread_count, elapsed, nx, np, nt, header);
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -180,6 +192,7 @@ int main(int argc, char* argv[])
     namespace po = hpx::program_options;
 
     po::options_description desc_commandline;
+    // clang-format off
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
         ("nx", po::value<std::uint64_t>()->default_value(10),
@@ -196,10 +209,11 @@ int main(int argc, char* argv[])
          "Local x dimension")
         ( "no-header", "do not print out the csv header row")
     ;
+    // clang-format on
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }

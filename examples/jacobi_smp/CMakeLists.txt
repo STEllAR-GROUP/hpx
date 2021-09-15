@@ -25,8 +25,8 @@ if(HPX_WITH_EXAMPLES_OPENMP)
   set(jacobi_nonuniform_omp_static_sources jacobi_nonuniform.cpp)
   set(jacobi_nonuniform_omp_dynamic_sources jacobi_nonuniform.cpp)
 
-  set(disabled_tests ${disabled_tests} jacobi_omp_static jacobi_omp_dynamic
-                     jacobi_nonuniform_omp_static jacobi_nonuniform_omp_dynamic
+  set(disabled_tests ${disabled_tests} jacobi_nonuniform_omp_static
+                     jacobi_nonuniform_omp_dynamic
   )
 endif()
 

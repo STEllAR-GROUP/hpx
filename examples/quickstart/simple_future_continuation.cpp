@@ -4,10 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/iostream.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/include/threads.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/runtime.hpp>
+#include <hpx/local/thread.hpp>
 
 #include <iostream>
 
@@ -18,16 +19,16 @@ int get_id(int i)
 
 int func1()
 {
-    hpx::cout << "func1 thread id: " << hpx::this_thread::get_id() << hpx::endl;
+    std::cout << "func1 thread id: " << hpx::this_thread::get_id() << std::endl;
     return get_id(1) ? 123 : 0;
 }
 
 // this continuation function will be executed by an HPX thread
 int cont1(hpx::future<int> f)
 {
-    hpx::cout << "cont1 thread id: " << hpx::this_thread::get_id() << hpx::endl;
-    hpx::cout << "Status code (HPX thread): " << f.get() << hpx::endl;
-    hpx::cout << hpx::flush;
+    std::cout << "cont1 thread id: " << hpx::this_thread::get_id() << std::endl;
+    std::cout << "Status code (HPX thread): " << f.get() << std::endl;
+    std::cout << std::flush;
     return 1;
 }
 
@@ -39,12 +40,12 @@ int cont2(hpx::future<int> f)
     return 1;
 }
 
-int main()
+int hpx_main()
 {
     // executing continuation cont1 on same thread as func1
     {
         hpx::future<int> t = hpx::async(&func1);
-        hpx::future<int> t2 = t.then(&cont1);
+        hpx::future<int> t2 = t.then(hpx::launch::sync, &cont1);
         t2.get();
     }
 
@@ -63,5 +64,10 @@ int main()
         t2.get();
     }
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

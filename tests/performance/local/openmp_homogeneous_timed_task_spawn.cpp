@@ -31,12 +31,10 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <hpx/config.hpp>
-
 #include <hpx/assert.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/modules/timing.hpp>
-
 #include <hpx/modules/program_options.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -47,12 +45,12 @@
 
 #include "worker_timed.hpp"
 
-using hpx::program_options::variables_map;
-using hpx::program_options::options_description;
-using hpx::program_options::value;
-using hpx::program_options::store;
 using hpx::program_options::command_line_parser;
 using hpx::program_options::notify;
+using hpx::program_options::options_description;
+using hpx::program_options::store;
+using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using hpx::chrono::high_resolution_timer;
 
@@ -63,10 +61,7 @@ std::uint64_t delay = 0;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_results(
-    int cores
-  , double walltime
-    )
+void print_results(int cores, double walltime)
 {
     if (header)
         std::cout << "OS-threads,Tasks,Delay (iterations),"
@@ -76,16 +71,12 @@ void print_results(
     std::string const tasks_str = hpx::util::format("{},", tasks);
     std::string const delay_str = hpx::util::format("{},", delay);
 
-    hpx::util::format_to(std::cout,
-        "{:-21} {:-21} {:-21} {:10.12}, {:10.12}\n",
-        cores_str, tasks_str, delay_str,
-        walltime, walltime / tasks);
+    hpx::util::format_to(std::cout, "{:-21} {:-21} {:-21} {:10.12}, {:10.12}\n",
+        cores_str, tasks_str, delay_str, walltime, walltime / tasks);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int omp_main(
-    variables_map&
-    )
+int omp_main(variables_map&)
 {
     // Validate command line.
     if (0 == tasks)
@@ -94,19 +85,19 @@ int omp_main(
     // Start the clock.
     high_resolution_timer t;
 
-    #pragma omp parallel
-    #pragma omp single
+#pragma omp parallel
+#pragma omp single
     {
         for (std::uint64_t i = 0; i < tasks; ++i)
-            #if _OPENMP>=200805
-            #pragma omp task untied
-            #endif
+#if _OPENMP >= 200805
+#pragma omp task untied
+#endif
             worker_timed(delay * 1000);
 
-        // Yield until all work is done.
-        #if _OPENMP>=200805
-        #pragma omp taskwait
-        #endif
+// Yield until all work is done.
+#if _OPENMP >= 200805
+#pragma omp taskwait
+#endif
 
         print_results(omp_get_num_threads(), t.elapsed());
     }
@@ -115,16 +106,14 @@ int omp_main(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(
-    int argc
-  , char** argv
-    )
+int main(int argc, char** argv)
 {
     // Parse command line.
     variables_map vm;
 
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     cmdline.add_options()
         ( "help,h"
         , "print out program usage (this message)")
@@ -145,8 +134,13 @@ int main(
         , "do not print out the csv header row")
         ;
      ;
+     //clang-format on
 
-    store(command_line_parser(argc, argv).options(cmdline).run(), vm);
+    store(command_line_parser(argc, argv)
+              .allow_unregistered()
+              .options(cmdline)
+              .run(),
+        vm);
 
     notify(vm);
 

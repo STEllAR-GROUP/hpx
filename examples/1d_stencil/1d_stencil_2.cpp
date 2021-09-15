@@ -18,8 +18,10 @@
 // for every grid point and time step) is too small compared to the imposed
 // overheads.
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/hpx.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -30,16 +32,16 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables
-bool header = true; // print csv heading
-double k = 0.5;     // heat transfer coefficient
-double dt = 1.;     // time step
-double dx = 1.;     // grid spacing
+bool header = true;    // print csv heading
+double k = 0.5;        // heat transfer coefficient
+double dt = 1.;        // time step
+double dx = 1.;        // grid spacing
 
 inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 {
-    if(i == 0 && dir == -1)
-        return size-1;
-    if(i == size-1 && dir == +1)
+    if (i == 0 && dir == -1)
+        return size - 1;
+    if (i == size - 1 && dir == +1)
         return 0;
 
     HPX_ASSERT((i + dir) < size);
@@ -60,7 +62,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
+        return middle + (k * dt / (dx * dx)) * (left - 2 * middle + right);
     }
 
     // do all the work on 'nx' data points for 'nt' time steps
@@ -90,10 +92,9 @@ struct stepper
             // can compute U[t+1][i]
             for (std::size_t i = 0; i != nx; ++i)
             {
-                next[i] = dataflow(
-                        hpx::launch::async, Op,
-                        current[idx(i, -1, nx)], current[i], current[idx(i, +1, nx)]
-                    );
+                next[i] =
+                    dataflow(hpx::launch::async, Op, current[idx(i, -1, nx)],
+                        current[i], current[idx(i, +1, nx)]);
             }
         }
 
@@ -110,8 +111,9 @@ struct stepper
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
-    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
+    std::uint64_t nx =
+        vm["nx"].as<std::uint64_t>();    // Number of grid points.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();    // Number of steps.
 
     if (vm.count("no-header"))
         header = false;
@@ -140,7 +142,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::uint64_t const os_thread_count = hpx::get_os_thread_count();
     print_time_results(os_thread_count, elapsed, nx, nt, header);
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -148,6 +150,7 @@ int main(int argc, char* argv[])
     using namespace hpx::program_options;
 
     options_description desc_commandline;
+    // clang-format off
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
         ("nx", value<std::uint64_t>()->default_value(100),
@@ -162,11 +165,11 @@ int main(int argc, char* argv[])
          "Local x dimension")
         ( "no-header", "do not print out the csv header row")
     ;
+    // clang-format on
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }
-
