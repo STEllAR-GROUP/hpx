@@ -25,13 +25,11 @@ namespace hpx { namespace components {
         hpx::util::plugin::get_plugins_list_type get_factory;
     };
 
-    HPX_CORE_EXPORT void init_registry_module(
+    HPX_EXPORT void init_registry_module(static_factory_load_data_type const&);
+    HPX_EXPORT void init_registry_factory(static_factory_load_data_type const&);
+    HPX_EXPORT void init_registry_commandline(
         static_factory_load_data_type const&);
-    HPX_CORE_EXPORT void init_registry_factory(
-        static_factory_load_data_type const&);
-    HPX_CORE_EXPORT void init_registry_commandline(
-        static_factory_load_data_type const&);
-    HPX_CORE_EXPORT void init_registry_startup_shutdown(
+    HPX_EXPORT void init_registry_startup_shutdown(
         static_factory_load_data_type const&);
 }}    // namespace hpx::components
 

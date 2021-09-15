@@ -41,7 +41,7 @@ namespace hpx { namespace util {
 
         static std::string get_processor_name();
 
-        struct scoped_lock
+        struct HPX_CORE_EXPORT scoped_lock
         {
             scoped_lock();
             scoped_lock(scoped_lock const&) = delete;
@@ -50,7 +50,7 @@ namespace hpx { namespace util {
             void unlock();
         };
 
-        struct scoped_try_lock
+        struct HPX_CORE_EXPORT scoped_try_lock
         {
             scoped_try_lock();
             scoped_try_lock(scoped_try_lock const&) = delete;

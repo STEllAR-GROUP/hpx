@@ -45,7 +45,7 @@
 
 namespace hpx
 {
-    bool is_starting();
+    HPX_CORE_EXPORT bool is_starting();
 }
 
 namespace hpx { namespace parcelset

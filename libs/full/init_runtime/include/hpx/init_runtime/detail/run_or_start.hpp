@@ -18,7 +18,7 @@ namespace hpx {
                 hpx::program_options::variables_map& vm)> const& f,
             int argc, char** argv, init_params const& params, bool blocking);
 
-        HPX_EXPORT int init_helper(hpx::program_options::variables_map&,
+        HPX_CORE_EXPORT int init_helper(hpx::program_options::variables_map&,
             util::function_nonser<int(int, char**)> const&);
     }    // namespace detail
     /// \endcond
