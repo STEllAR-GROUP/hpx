@@ -19,7 +19,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Modules/Parallelism/Futures"
+    FOLDER "Tests/Regressions/Modules/Core/Futures"
   )
 
   add_hpx_regression_test("modules.futures" ${test} ${${test}_PARAMETERS})
@@ -46,7 +46,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
     add_hpx_regression_compile_test(
       "modules.futures" ${compile_test}
       SOURCES ${sources} ${${compile_test}_FLAGS}
-      FOLDER "Tests/Regressions/Modules/Parallelism/Futures/CompileOnly"
+      FOLDER "Tests/Regressions/Modules/Core/Futures/CompileOnly"
     )
   endforeach()
 endif()

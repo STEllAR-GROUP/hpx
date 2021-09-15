@@ -13,7 +13,7 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  set(folder_name "Tests/Unit/Modules/Parallelism/Algorithms/Util")
+  set(folder_name "Tests/Unit/Modules/Core/Algorithms/Util")
 
   # add example executable
   add_hpx_executable(

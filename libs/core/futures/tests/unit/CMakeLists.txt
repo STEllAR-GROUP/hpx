@@ -17,7 +17,7 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  set(folder_name "Tests/Unit/Modules/Parallelism/Futures")
+  set(folder_name "Tests/Unit/Modules/Core/Futures")
 
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
