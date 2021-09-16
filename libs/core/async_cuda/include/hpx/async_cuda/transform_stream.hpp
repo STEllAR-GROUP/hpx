@@ -137,8 +137,8 @@ namespace hpx { namespace cuda { namespace experimental {
 
             template <typename R_, typename F_>
             transform_stream_receiver(R_&& r, F_&& f, cudaStream_t stream)
-              : r(std::forward<R>(r))
-              , f(std::forward<F>(f))
+              : r(std::forward<R_>(r))
+              , f(std::forward<F_>(f))
               , stream(stream)
             {
             }
