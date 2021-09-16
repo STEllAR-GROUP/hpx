@@ -155,11 +155,10 @@ namespace hpx { namespace cuda { namespace experimental {
                 transform_stream_receiver&& r) noexcept
             {
                 hpx::execution::experimental::set_done(std::move(r.r));
-            };
+            }
 
             template <typename... Ts>
-            friend void tag_dispatch(hpx::execution::experimental::set_value_t,
-                transform_stream_receiver&& r, Ts&&... ts) noexcept
+            void set_value(Ts&&... ts) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
@@ -169,12 +168,12 @@ namespace hpx { namespace cuda { namespace experimental {
                         {
                             // When the return type is void, there is no value to
                             // forward to the receiver
-                            HPX_INVOKE(r.f, ts..., r.stream);
+                            HPX_INVOKE(f, ts..., stream);
 
                             if constexpr (is_transform_stream_receiver<
                                               std::decay_t<R>>::value)
                             {
-                                if (r.r.stream == r.stream)
+                                if (r.stream == stream)
                                 {
                                     // When the next receiver is also a
                                     // transform_stream_receiver, we can immediately
@@ -182,18 +181,16 @@ namespace hpx { namespace cuda { namespace experimental {
                                     // later receiver will synchronize the stream
                                     // when a non-transform_stream receiver is
                                     // connected.
-                                    set_value_immediate_void(r.stream,
-                                        std::move(r.r),
-                                        std::forward<Ts>(ts)...);
+                                    set_value_immediate_void(stream,
+                                        std::move(r), std::forward<Ts>(ts)...);
                                 }
                                 else
                                 {
                                     // When the streams are different, we add a
                                     // callback which will call set_value on the
                                     // receiver.
-                                    set_value_event_callback_void(r.stream,
-                                        std::move(r.r),
-                                        std::forward<Ts>(ts)...);
+                                    set_value_event_callback_void(stream,
+                                        std::move(r), std::forward<Ts>(ts)...);
                                 }
                             }
                             else
@@ -201,21 +198,21 @@ namespace hpx { namespace cuda { namespace experimental {
                                 // When the next receiver is not a
                                 // transform_stream_receiver, we add a callback
                                 // which will call set_value on the receiver.
-                                set_value_event_callback_void(r.stream,
-                                    std::move(r.r), std::forward<Ts>(ts)...);
+                                set_value_event_callback_void(stream,
+                                    std::move(r), std::forward<Ts>(ts)...);
                             }
                         }
                         else
                         {
                             // When the return type is non-void, we have to forward
                             // the value to the receiver
-                            auto t = HPX_INVOKE(
-                                r.f, std::forward<Ts>(ts)..., r.stream);
+                            auto t =
+                                HPX_INVOKE(f, std::forward<Ts>(ts)..., stream);
 
                             if constexpr (is_transform_stream_receiver<
                                               std::decay_t<R>>::value)
                             {
-                                if (r.r.stream == r.stream)
+                                if (r.stream == stream)
                                 {
                                     // When the next receiver is also a
                                     // transform_stream_receiver, we can immediately
@@ -223,8 +220,8 @@ namespace hpx { namespace cuda { namespace experimental {
                                     // later receiver will synchronize the stream
                                     // when a non-transform_stream receiver is
                                     // connected.
-                                    set_value_immediate_non_void(r.stream,
-                                        std::move(r.r), std::move(t),
+                                    set_value_immediate_non_void(stream,
+                                        std::move(r), std::move(t),
                                         std::forward<Ts>(ts)...);
                                 }
                                 else
@@ -232,8 +229,8 @@ namespace hpx { namespace cuda { namespace experimental {
                                     // When the streams are different, we add a
                                     // callback which will call set_value on the
                                     // receiver.
-                                    set_value_event_callback_non_void(r.stream,
-                                        std::move(r.r), std::move(t),
+                                    set_value_event_callback_non_void(stream,
+                                        std::move(r), std::move(t),
                                         std::forward<Ts>(ts)...);
                                 }
                             }
@@ -242,15 +239,15 @@ namespace hpx { namespace cuda { namespace experimental {
                                 // When the next receiver is not a
                                 // transform_stream_receiver, we add a callback
                                 // which will call set_value on the receiver.
-                                set_value_event_callback_non_void(r.stream,
-                                    std::move(r.r), std::move(t),
+                                set_value_event_callback_non_void(stream,
+                                    std::move(r), std::move(t),
                                     std::forward<Ts>(ts)...);
                             }
                         }
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
-                            std::move(r.r), std::current_exception());
+                            std::move(r), std::move(ep));
                     });
             }
         };
@@ -301,6 +298,17 @@ namespace hpx { namespace cuda { namespace experimental {
                         std::forward<R>(r), std::move(s.f), s.stream});
             }
         };
+
+        // This should be a hidden friend in transform_stream_receiver. However,
+        // nvcc does not know how to compile it with some argument types
+        // ("error: no instance of overloaded function std::forward matches the
+        // argument list").
+        template <typename R, typename F, typename... Ts>
+        void tag_dispatch(hpx::execution::experimental::set_value_t,
+            transform_stream_receiver<R, F>&& r, Ts&&... ts)
+        {
+            r.set_value(std::forward<Ts>(ts)...);
+        }
     }    // namespace detail
 
     // NOTE: This is not a customization of
