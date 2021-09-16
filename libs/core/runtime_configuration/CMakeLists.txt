@@ -21,22 +21,24 @@ set(runtime_configuration_headers
 )
 
 # cmake-format: off
-set(runtime_configuration_compat_headers
-    hpx/util/ini.hpp => hpx/modules/runtime_configuration.hpp
-    hpx/util/init_ini_data.hpp => hpx/modules/runtime_configuration.hpp
-    hpx/util/register_locks_globally.hpp => hpx/modules/runtime_configuration.hpp
-    hpx/util/runtime_configuration.hpp => hpx/modules/runtime_configuration.hpp
-    hpx/plugins/plugin_registry_base.hpp => hpx/modules/runtime_configuration.hpp
-    hpx/runtime/components/component_commandline_base.hpp => hpx/modules/runtime_configuration.hpp
-    hpx/runtime/components/component_factory_base.hpp => hpx/modules/runtime_configuration.hpp
-    hpx/runtime/components/component_registry_base.hpp => hpx/modules/runtime_configuration.hpp
-    hpx/runtime/components/static_factory_data.hpp => hpx/modules/runtime_configuration.hpp
-    hpx/runtime/runtime_mode.hpp => hpx/modules/runtime_configuration.hpp
+set(
+  runtime_configuration_compat_headers
+  hpx/util/ini.hpp => hpx/modules/runtime_configuration.hpp
+  hpx/util/init_ini_data.hpp => hpx/modules/runtime_configuration.hpp
+  hpx/util/register_locks_globally.hpp => hpx/modules/runtime_configuration.hpp
+  hpx/util/runtime_configuration.hpp => hpx/modules/runtime_configuration.hpp
+  hpx/plugins/plugin_registry_base.hpp => hpx/modules/runtime_configuration.hpp
+  hpx/runtime/components/component_commandline_base.hpp => hpx/modules/runtime_configuration.hpp
+  hpx/runtime/components/component_factory_base.hpp => hpx/modules/runtime_configuration.hpp
+  hpx/runtime/components/component_registry_base.hpp => hpx/modules/runtime_configuration.hpp
+  hpx/runtime/components/static_factory_data.hpp => hpx/modules/runtime_configuration.hpp
+  hpx/runtime/runtime_mode.hpp => hpx/modules/runtime_configuration.hpp
 )
 # cmake-format: on
 
-set(runtime_configuration_sources init_ini_data.cpp register_locks_globally.cpp
-                                  runtime_configuration.cpp runtime_mode.cpp
+set(runtime_configuration_sources
+    init_ini_data.cpp register_locks_globally.cpp runtime_configuration.cpp
+    runtime_mode.cpp static_factory_data.cpp
 )
 
 include(HPX_AddModule)

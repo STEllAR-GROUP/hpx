@@ -70,10 +70,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx {
-    HPX_CORE_EXPORT bool is_stopped_or_shutting_down();
-}
-
 namespace hpx { namespace detail {
     void dijkstra_make_black();    // forward declaration only
 }}                                 // namespace hpx::detail

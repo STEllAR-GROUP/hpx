@@ -43,11 +43,6 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx
-{
-    HPX_CORE_EXPORT bool is_starting();
-}
-
 namespace hpx { namespace parcelset
 {
     namespace policies { namespace mpi
