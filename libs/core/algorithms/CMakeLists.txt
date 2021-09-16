@@ -55,6 +55,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/minmax.hpp
     hpx/parallel/algorithms/mismatch.hpp
     hpx/parallel/algorithms/move.hpp
+    hpx/parallel/algorithms/nth_element.hpp
     hpx/parallel/algorithms/partial_sort.hpp
     hpx/parallel/algorithms/partition.hpp
     hpx/parallel/algorithms/reduce_by_key.hpp
