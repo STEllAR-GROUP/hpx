@@ -158,95 +158,94 @@ namespace hpx { namespace cuda { namespace experimental {
             template <typename... Ts>
             void set_value(Ts&&... ts) noexcept
             {
-                try
-                {
-                    if constexpr (std::is_void_v<
-                                      typename hpx::util::invoke_result<F,
-                                          Ts..., cudaStream_t>::type>)
-                    {
-                        // When the return type is void, there is no value to
-                        // forward to the receiver
-                        HPX_INVOKE(f, ts..., stream);
-
-                        if constexpr (is_transform_stream_receiver<
-                                          std::decay_t<R>>::value)
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() {
+                        if constexpr (std::is_void_v<hpx::util::invoke_result_t<
+                                          F, Ts..., cudaStream_t>>)
                         {
-                            if (r.stream == this->stream)
+                            // When the return type is void, there is no value to
+                            // forward to the receiver
+                            HPX_INVOKE(f, ts..., stream);
+
+                            if constexpr (is_transform_stream_receiver<
+                                              std::decay_t<R>>::value)
                             {
-                                // When the next receiver is also a
-                                // transform_stream_receiver, we can immediately
-                                // call set_value, with the knowledge that a
-                                // later receiver will synchronize the stream
-                                // when a non-transform_stream receiver is
-                                // connected.
-                                set_value_immediate_void(stream, std::move(r),
-                                    std::forward<Ts>(ts)...);
+                                if (r.stream == this->stream)
+                                {
+                                    // When the next receiver is also a
+                                    // transform_stream_receiver, we can immediately
+                                    // call set_value, with the knowledge that a
+                                    // later receiver will synchronize the stream
+                                    // when a non-transform_stream receiver is
+                                    // connected.
+                                    set_value_immediate_void(stream,
+                                        std::move(r), std::forward<Ts>(ts)...);
+                                }
+                                else
+                                {
+                                    // When the streams are different, we add a
+                                    // callback which will call set_value on the
+                                    // receiver.
+                                    set_value_event_callback_void(stream,
+                                        std::move(r), std::forward<Ts>(ts)...);
+                                }
                             }
                             else
                             {
-                                // When the streams are different, we add a
-                                // callback which will call set_value on the
-                                // receiver.
+                                // When the next receiver is not a
+                                // transform_stream_receiver, we add a callback
+                                // which will call set_value on the receiver.
                                 set_value_event_callback_void(stream,
                                     std::move(r), std::forward<Ts>(ts)...);
                             }
                         }
                         else
                         {
-                            // When the next receiver is not a
-                            // transform_stream_receiver, we add a callback
-                            // which will call set_value on the receiver.
-                            set_value_event_callback_void(
-                                stream, std::move(r), std::forward<Ts>(ts)...);
-                        }
-                    }
-                    else
-                    {
-                        // When the return type is non-void, we have to forward
-                        // the value to the receiver
-                        auto t = HPX_INVOKE(f, std::forward<Ts>(ts)..., stream);
+                            // When the return type is non-void, we have to forward
+                            // the value to the receiver
+                            auto t =
+                                HPX_INVOKE(f, std::forward<Ts>(ts)..., stream);
 
-                        if constexpr (is_transform_stream_receiver<
-                                          std::decay_t<R>>::value)
-                        {
-                            if (r.stream == this->stream)
+                            if constexpr (is_transform_stream_receiver<
+                                              std::decay_t<R>>::value)
                             {
-                                // When the next receiver is also a
-                                // transform_stream_receiver, we can immediately
-                                // call set_value, with the knowledge that a
-                                // later receiver will synchronize the stream
-                                // when a non-transform_stream receiver is
-                                // connected.
-                                set_value_immediate_non_void(stream,
-                                    std::move(r), std::move(t),
-                                    std::forward<Ts>(ts)...);
+                                if (r.stream == this->stream)
+                                {
+                                    // When the next receiver is also a
+                                    // transform_stream_receiver, we can immediately
+                                    // call set_value, with the knowledge that a
+                                    // later receiver will synchronize the stream
+                                    // when a non-transform_stream receiver is
+                                    // connected.
+                                    set_value_immediate_non_void(stream,
+                                        std::move(r), std::move(t),
+                                        std::forward<Ts>(ts)...);
+                                }
+                                else
+                                {
+                                    // When the streams are different, we add a
+                                    // callback which will call set_value on the
+                                    // receiver.
+                                    set_value_event_callback_non_void(stream,
+                                        std::move(r), std::move(t),
+                                        std::forward<Ts>(ts)...);
+                                }
                             }
                             else
                             {
-                                // When the streams are different, we add a
-                                // callback which will call set_value on the
-                                // receiver.
+                                // When the next receiver is not a
+                                // transform_stream_receiver, we add a callback
+                                // which will call set_value on the receiver.
                                 set_value_event_callback_non_void(stream,
                                     std::move(r), std::move(t),
                                     std::forward<Ts>(ts)...);
                             }
                         }
-                        else
-                        {
-                            // When the next receiver is not a
-                            // transform_stream_receiver, we add a callback
-                            // which will call set_value on the receiver.
-                            set_value_event_callback_non_void(stream,
-                                std::move(r), std::move(t),
-                                std::forward<Ts>(ts)...);
-                        }
-                    }
-                }
-                catch (...)
-                {
-                    hpx::execution::experimental::set_error(
-                        std::move(r), std::current_exception());
-                }
+                    },
+                    [&](std::exception_ptr ep) {
+                        hpx::execution::experimental::set_error(
+                            std::move(r), std::move(ep));
+                    });
             }
         };
 
