@@ -8,32 +8,41 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
 #include <iterator>
 #include <type_traits>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
-    // provide implementation of std::distance supporting iterators/sentinels
-    template <typename InIterB, typename InIterE>
-    constexpr inline typename std::iterator_traits<InIterB>::difference_type
-    distance(InIterB first, InIterE last)
+    // helper facility to both advance the iterator to the sentinel and return the
+    // distance
+    template <typename Iter, typename Sent>
+    constexpr inline typename std::iterator_traits<Iter>::difference_type
+    advance_and_get_distance(Iter& first, Sent last)
     {
+        using difference_type =
+            typename std::iterator_traits<Iter>::difference_type;
+
         // we add this since passing in random access iterators
         // as begin and end might not pass the sized sentinel check
-        if constexpr (std::is_same_v<InIterB, InIterE> &&
-            hpx::traits::is_random_access_iterator_v<InIterB>)
+        if constexpr (std::is_same_v<Iter, Sent> &&
+            hpx::traits::is_random_access_iterator_v<Iter>)
         {
-            return last - first;
+            difference_type offset = last - first;
+            first = last;
+            return offset;
         }
 
-        if constexpr (hpx::traits::is_sized_sentinel_for_v<InIterE, InIterB>)
+        if constexpr (hpx::traits::is_sized_sentinel_for_v<Sent, Iter>)
         {
-            return last - first;
+            difference_type offset = last - first;
+            std::advance(first, offset);
+            return offset;
         }
         else
         {
-            typename std::iterator_traits<InIterB>::difference_type offset = 0;
+            difference_type offset = 0;
             for (/**/; first != last; ++first)
             {
                 ++offset;
