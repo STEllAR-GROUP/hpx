@@ -36,8 +36,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
     add_hpx_regression_compile_test(
       "modules.async_combinators" ${compile_test}
       SOURCES ${sources} ${${compile_test}_FLAGS}
-      FOLDER
-        "Tests/Regressions/Modules/Core/AsyncCombinators/CompileOnly"
+      FOLDER "Tests/Regressions/Modules/Core/AsyncCombinators/CompileOnly"
     )
   endforeach()
 endif()
