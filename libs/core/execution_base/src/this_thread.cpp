@@ -92,14 +92,10 @@ namespace hpx { namespace execution_base {
 
         void default_agent::yield(char const* /* desc */)
         {
-#if defined(HPX_SMT_PAUSE)
-            HPX_SMT_PAUSE;
-#else
 #if defined(HPX_WINDOWS)
             Sleep(0);
 #else
             sched_yield();
-#endif
 #endif
         }
 
