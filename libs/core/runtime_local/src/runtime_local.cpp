@@ -23,6 +23,7 @@
 #include <hpx/runtime_local/debugging.hpp>
 #include <hpx/runtime_local/os_thread_type.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/runtime_local/state.hpp>
@@ -969,13 +970,13 @@ namespace hpx {
 #endif
     }
 
-    bool HPX_CORE_EXPORT is_starting()
+    bool is_starting()
     {
         runtime* rt = get_runtime_ptr();
         return nullptr != rt ? rt->get_state() <= state_startup : true;
     }
 
-    bool HPX_CORE_EXPORT is_pre_startup()
+    bool is_pre_startup()
     {
         runtime* rt = get_runtime_ptr();
         return nullptr != rt ? rt->get_state() < state_startup : true;
@@ -1017,22 +1018,22 @@ namespace hpx { namespace threads {
         return get_runtime().get_config().get_stack_size(stacksize);
     }
 
-    HPX_CORE_EXPORT void reset_thread_distribution()
+    void reset_thread_distribution()
     {
         get_runtime().get_thread_manager().reset_thread_distribution();
     }
 
-    HPX_CORE_EXPORT void set_scheduler_mode(threads::policies::scheduler_mode m)
+    void set_scheduler_mode(threads::policies::scheduler_mode m)
     {
         get_runtime().get_thread_manager().set_scheduler_mode(m);
     }
 
-    HPX_CORE_EXPORT void add_scheduler_mode(threads::policies::scheduler_mode m)
+    void add_scheduler_mode(threads::policies::scheduler_mode m)
     {
         get_runtime().get_thread_manager().add_scheduler_mode(m);
     }
 
-    HPX_CORE_EXPORT void add_remove_scheduler_mode(
+    void add_remove_scheduler_mode(
         threads::policies::scheduler_mode to_add_mode,
         threads::policies::scheduler_mode to_remove_mode)
     {
@@ -1040,13 +1041,12 @@ namespace hpx { namespace threads {
             to_add_mode, to_remove_mode);
     }
 
-    HPX_CORE_EXPORT void remove_scheduler_mode(
-        threads::policies::scheduler_mode m)
+    void remove_scheduler_mode(threads::policies::scheduler_mode m)
     {
         get_runtime().get_thread_manager().remove_scheduler_mode(m);
     }
 
-    HPX_CORE_EXPORT topology const& get_topology()
+    topology const& get_topology()
     {
         hpx::runtime* rt = hpx::get_runtime_ptr();
         if (rt == nullptr)
