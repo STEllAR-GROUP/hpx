@@ -47,7 +47,7 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename Receiver>
             struct operation_state
             {
-                std::decay_t<Receiver> receiver;
+                HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
                 hpx::util::member_pack_for<std::decay_t<Ts>...> ts;
 
                 template <typename Receiver_>

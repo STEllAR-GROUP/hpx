@@ -25,8 +25,8 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Receiver, typename F>
         struct transform_receiver
         {
-            std::decay_t<Receiver> receiver;
-            std::decay_t<F> f;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
             template <typename Error>
             void set_error(Error&& error) && noexcept
@@ -85,8 +85,8 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Sender, typename F>
         struct transform_sender
         {
-            std::decay_t<Sender> sender;
-            std::decay_t<F> f;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
             template <typename Tuple>
             struct invoke_result_helper;

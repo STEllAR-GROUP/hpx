@@ -63,7 +63,7 @@ namespace hpx { namespace execution { namespace experimental {
         private:
             using allocator_type = typename std::allocator_traits<
                 Allocator>::template rebind_alloc<operation_state_holder>;
-            allocator_type alloc;
+            HPX_NO_UNIQUE_ADDRESS allocator_type alloc;
             hpx::util::atomic_count count{0};
 
             using operation_state_type =

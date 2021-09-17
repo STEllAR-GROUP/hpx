@@ -32,8 +32,8 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Sender, typename Scheduler>
         struct on_sender
         {
-            std::decay_t<Sender> predecessor_sender;
-            std::decay_t<Scheduler> scheduler;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> predecessor_sender;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
 
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
@@ -93,8 +93,8 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename Receiver>
             struct operation_state
             {
-                std::decay_t<Scheduler> scheduler;
-                std::decay_t<Receiver> receiver;
+                HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
+                HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
                 struct predecessor_sender_receiver;
                 struct scheduler_sender_receiver;
@@ -236,7 +236,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                 struct scheduler_sender_value_visitor
                 {
-                    std::decay_t<Receiver> receiver;
+                    HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
                     HPX_NORETURN void operator()(hpx::monostate) const
                     {
