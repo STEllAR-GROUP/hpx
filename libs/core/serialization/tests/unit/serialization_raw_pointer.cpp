@@ -7,6 +7,9 @@
 // enforce pointers being serializable
 #define HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION
 
+// allow for const tuple members
+#define HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS
+
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/local/init.hpp>
@@ -22,6 +25,22 @@
 #include <string>
 #include <tuple>
 #include <vector>
+
+// non-bitwise copyable type
+struct A
+{
+    A() = default;
+
+    template <typename Archive>
+    void serialize(Archive&, unsigned)
+    {
+    }
+
+    friend bool operator==(A const&, A const&)
+    {
+        return true;
+    }
+};
 
 int hpx_main()
 {
@@ -99,6 +118,26 @@ int hpx_main()
 
         hpx::serialization::input_archive iarchive(buffer, size, &chunks);
         std::tuple<int*, int const> it{nullptr, 0};
+        iarchive >> it;
+        HPX_TEST(ot == it);
+    }
+
+    // serialize tuple with a non-zero-copyable type and a const
+    {
+        static_assert(
+            !hpx::traits::is_bitwise_serializable_v<hpx::tuple<A, int const>>);
+
+        int value = 42;
+        std::tuple<A, int const> ot{A(), value};
+
+        std::vector<char> buffer;
+        std::vector<hpx::serialization::serialization_chunk> chunks;
+        hpx::serialization::output_archive oarchive(buffer, 0, &chunks);
+        oarchive << ot;
+        std::size_t size = oarchive.bytes_written();
+
+        hpx::serialization::input_archive iarchive(buffer, size, &chunks);
+        std::tuple<A, int const> it{A(), 0};
         iarchive >> it;
         HPX_TEST(ot == it);
     }

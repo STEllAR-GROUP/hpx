@@ -6,7 +6,7 @@
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# Compatibility with using Boost.FileSystem, introduced in V1.4.0
+# Compatibility with various Boost types, introduced in V1.4.0
 hpx_option(
   HPX_SERIALIZATION_WITH_BOOST_TYPES BOOL
   "Enable serialization of certain Boost types. (default: ON)" ON ADVANCED
@@ -19,6 +19,21 @@ if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
     DEFINE HPX_SERIALIZATION_HAVE_BOOST_TYPES NAMESPACE SERIALIZATION
   )
 endif()
+
+# cmake-format: off
+#
+# Important note: The following flags are specific for using HPX as a
+# backend for SHAD (https://github.com/pnnl/SHAD):
+#
+# - HPX_SERIALIZATION_WITH_ALL_TYPES_ARE_BITWISE_SERIALIZABLE
+# - HPX_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION
+# - HPX_SERIALIZATION_WITH_ALLOW_CONST_TUPLE_MEMBERS
+#
+# They all enable questionable functionalities, partially they even enable
+# undefined behavior. Please only use any of them if you know what you're
+# doing.
+#
+# cmake-format: on
 
 # This flag can be used in systems that assume that all types are bitwise
 # serializable by default (like SHAD).
@@ -49,6 +64,23 @@ hpx_option(
 if(HPX_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION)
   hpx_add_config_define_namespace(
     DEFINE HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION
+    NAMESPACE SERIALIZATION
+  )
+endif()
+
+# This flag can be used in systems that rely on sending constant values as part
+# of std::tuple. This option essentially casts away constness for tuple members.
+hpx_option(
+  HPX_SERIALIZATION_WITH_ALLOW_CONST_TUPLE_MEMBERS BOOL
+  "Enable serializing std::tuple with const members. (default: OFF)" OFF
+  ADVANCED
+  CATEGORY "Modules"
+  MODULE SERIALIZATION
+)
+
+if(HPX_SERIALIZATION_WITH_ALLOW_CONST_TUPLE_MEMBERS)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS
     NAMESPACE SERIALIZATION
   )
 endif()
