@@ -10,6 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -33,7 +34,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // starts_with
     namespace detail {
-        /// \cond NOINTERNAL
+        template <typename FwdIter1, typename FwdIter2, typename Sent2>
+        bool get_starts_with_result(
+            util::in_in_result<FwdIter1, FwdIter2>&& p, Sent2 last2)
+        {
+            return p.in2 == last2;
+        }
+
+        template <typename FwdIter1, typename FwdIter2, typename Sent2>
+        hpx::future<bool> get_starts_with_result(
+            hpx::future<util::in_in_result<FwdIter1, FwdIter2>>&& f,
+            Sent2 last2)
+        {
+            return hpx::make_future<bool>(std::move(f),
+                [last2 = std::move(last2)](
+                    util::in_in_result<FwdIter1, FwdIter2>&& p) -> bool {
+                    return p.in2 == last2;
+                });
+        }
+
         struct starts_with : public detail::algorithm<starts_with, bool>
         {
             starts_with()
@@ -90,34 +109,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     Sent2>(
                     detail::mismatch_binary<
                         util::in_in_result<FwdIter1, FwdIter2>>()
-                        .call(std::forward<ExPolicy>(policy), std::move(first1),
-                            std::move(end_first), std::move(first2), last2,
-                            std::forward<Pred>(pred),
+                        .call(std::forward<ExPolicy>(policy), first1, end_first,
+                            first2, last2, std::forward<Pred>(pred),
                             std::forward<Proj1>(proj1),
                             std::forward<Proj2>(proj2)),
                     last2);
             }
         };
         /// \endcond
-
-        template <typename FwdIter1, typename FwdIter2, typename Sent2>
-        bool get_starts_with_result(
-            util::in_in_result<FwdIter1, FwdIter2>&& p, Sent2 last2)
-        {
-            return p.in2 == last2;
-        }
-
-        template <typename FwdIter1, typename FwdIter2, typename Sent2>
-        hpx::future<bool> get_starts_with_result(
-            hpx::future<util::in_in_result<FwdIter1, FwdIter2>>&& f,
-            Sent2 last2)
-        {
-            return hpx::make_future<bool>(std::move(f),
-                [last2 = std::move(last2)](
-                    util::in_in_result<FwdIter1, FwdIter2>&& p) -> bool {
-                    return p.in2 == last2;
-                });
-        }
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
 
