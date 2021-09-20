@@ -2019,8 +2019,6 @@ else()
       -fvisibility=hidden TARGETS SHARED_LIBRARY EXECUTABLE
     )
     hpx_add_config_define(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
-    hpx_add_config_define(HPX_HAVE_COROUTINE_GCC_HIDDEN_VISIBILITY)
-    hpx_add_config_define(HPX_HAVE_PLUGIN_GCC_HIDDEN_VISIBILITY)
   endif()
 
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
