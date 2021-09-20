@@ -9,8 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
@@ -189,5 +187,3 @@ namespace hpx { namespace serialization {
         bound.serialize(ar, version);
     }
 }}    // namespace hpx::serialization
-
-#endif

@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 namespace hpx { namespace util {
 
     // Always provide function exports, which guarantees ABI compatibility of
@@ -33,5 +32,3 @@ namespace hpx { namespace util {
 #endif
 
 }}    // namespace hpx::util
-
-#endif

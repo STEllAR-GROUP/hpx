@@ -9,10 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/async_local/async.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/async_colocated/async_colocated.hpp>
 #include <hpx/async_colocated/async_colocated_callback.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/async_distributed/async_callback.hpp>
 #include <hpx/async_distributed/async_continue_callback.hpp>
-#endif

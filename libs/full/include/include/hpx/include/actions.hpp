@@ -8,8 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/actions_base/lambda_to_action.hpp>
@@ -18,4 +16,3 @@
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/async_distributed/make_continuation.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#endif

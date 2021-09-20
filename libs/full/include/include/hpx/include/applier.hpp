@@ -8,11 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/async_colocated/apply_colocated.hpp>
 #include <hpx/async_colocated/apply_colocated_callback.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/applier/trigger.hpp>
 #include <hpx/runtime_distributed/applier.hpp>
-#endif

@@ -9,8 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions/invoke_function.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
@@ -201,5 +199,3 @@ namespace hpx { namespace parallel { namespace execution {
     };
     /// \endcond
 }}}    // namespace hpx::parallel::execution
-
-#endif

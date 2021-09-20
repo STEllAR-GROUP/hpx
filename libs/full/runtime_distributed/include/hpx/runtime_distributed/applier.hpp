@@ -9,8 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime_distributed/applier_fwd.hpp>    // this needs to go first
 
 #include <hpx/assert.hpp>
@@ -158,5 +156,3 @@ namespace hpx { namespace applier {
 }}    // namespace hpx::applier
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

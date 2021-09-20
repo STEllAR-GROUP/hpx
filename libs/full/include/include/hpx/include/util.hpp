@@ -19,6 +19,7 @@
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -35,10 +36,4 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/to_string.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>
-#endif
-
-#if defined(HPX_HAVE_MODULE_STRING_UTIL)
-#include <hpx/modules/string_util.hpp>
-#endif

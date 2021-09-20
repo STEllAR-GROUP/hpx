@@ -8,8 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/components/client_base.hpp>
 #include <hpx/runtime_configuration/component_factory_base.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>
-#endif

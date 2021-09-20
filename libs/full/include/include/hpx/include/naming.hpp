@@ -8,10 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/naming_base/unmanaged.hpp>
-#endif

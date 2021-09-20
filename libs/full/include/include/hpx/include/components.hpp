@@ -8,8 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/include/actions.hpp>
 
 #include <hpx/runtime_components/component_factory.hpp>
@@ -50,5 +48,3 @@
 #include <hpx/distribution_policies/colocating_distribution_policy.hpp>
 #include <hpx/distribution_policies/target_distribution_policy.hpp>
 #include <hpx/distribution_policies/unwrapping_result_policy.hpp>
-
-#endif
