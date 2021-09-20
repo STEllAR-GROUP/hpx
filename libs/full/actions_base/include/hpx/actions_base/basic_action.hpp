@@ -218,9 +218,11 @@ namespace hpx { namespace actions {
         typename Derived>
     struct basic_action<Component, R(Args...), Derived>
     {
+#if !defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
         // Flag the use of raw pointer types as action arguments
         static_assert(!util::any_of<std::is_pointer<Args>...>::value,
             "Using raw pointers as arguments for actions is not supported.");
+#endif
 
         // Flag the use of array types as action arguments
         static_assert(

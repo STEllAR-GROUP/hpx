@@ -31,7 +31,7 @@ if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
 endif()
 
 set(full_tests any_serialization not_bitwise_serializable serializable_any
-               serializable_boost_any
+               serializable_boost_any serialization_raw_pointer
 )
 
 add_subdirectory(polymorphic)

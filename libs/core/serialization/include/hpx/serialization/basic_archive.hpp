@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/config/defines.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/serialization/detail/extra_archive_data.hpp>
 
@@ -67,10 +68,11 @@ namespace hpx { namespace serialization {
         template <typename T>
         void invoke(T& t)
         {
+#if !defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
             static_assert(!std::is_pointer<T>::value,
                 "HPX does not support serialization of raw pointers. "
                 "Please use smart pointers.");
-
+#endif
             static_cast<Archive*>(this)->invoke_impl(t);
         }
 
