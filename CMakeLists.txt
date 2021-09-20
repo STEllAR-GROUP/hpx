@@ -1019,26 +1019,6 @@ hpx_option(
 
 hpx_add_config_define(HPX_HAVE_SPINLOCK_POOL_NUM ${HPX_WITH_SPINLOCK_POOL_NUM})
 
-# Deprecated in 1.4.0
-hpx_option(
-  HPX_SCHEDULER_MAX_TERMINATED_THREADS
-  STRING
-  "[Deprecated] Maximum number of terminated threads collected before those are cleaned up (default: 100)"
-  "0"
-  CATEGORY "Thread Manager"
-  ADVANCED
-)
-
-if(HPX_SCHEDULER_MAX_TERMINATED_THREADS GREATER 0)
-  hpx_warn(
-    "HPX_SCHEDULER_MAX_TERMINATED_THREADS is deprecated and will be removed in a future release. Use the configuration option hpx.thread_queue.max_terminated_threads instead to set the value."
-  )
-  hpx_add_config_define(
-    HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS
-    ${HPX_SCHEDULER_MAX_TERMINATED_THREADS}
-  )
-endif()
-
 hpx_option(
   HPX_WITH_SPINLOCK_DEADLOCK_DETECTION BOOL
   "Enable spinlock deadlock detection (default: OFF)" OFF
