@@ -115,10 +115,6 @@ endif()
 tests_cmakelists_template = cmake_header + f'''
 include(HPX_Message)
 
-if(NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
-  return()
-endif()
-
 if(HPX_WITH_TESTS)
   if(HPX_WITH_TESTS_UNIT)
     add_hpx_pseudo_target(tests.unit.modules.{module_name})
