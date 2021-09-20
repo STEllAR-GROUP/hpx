@@ -1105,13 +1105,6 @@ if(HPX_WITH_PAPI)
   endif()
   hpx_add_config_define(HPX_HAVE_PAPI)
 endif()
-hpx_option(
-  HPX_WITH_GOOGLE_PERFTOOLS BOOL
-  "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling"
-)
-if(HPX_WITH_GOOGLE_PERFTOOLS)
-  hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
-endif()
 
 hpx_option(
   HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF
@@ -2181,7 +2174,6 @@ include(HPX_SetupMPI) # must come before APEX
 include(HPX_SetupHIP)
 include(HPX_SetupApex)
 include(HPX_SetupPapi)
-include(HPX_SetupGooglePerfTools)
 include(HPX_SetupValgrind)
 if(HPX_WITH_CUDA OR HPX_WITH_HIP)
   hpx_add_config_define(HPX_HAVE_GPU_SUPPORT)
