@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,8 @@
 #include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/components_base/traits/component_type_is_compatible.hpp>
+#include <hpx/functional/traits/get_function_address.hpp>
+#include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/errors.hpp>
@@ -320,6 +322,47 @@ namespace hpx { namespace detail {
                 Action::invoker(lva, comptype, std::forward<Ts>(vs)...));
         }
     };
+}}    // namespace hpx::detail
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits {
+
+    template <typename Action>
+    struct get_function_address<hpx::detail::action_invoker<Action>>
+    {
+        static constexpr std::size_t call(
+            hpx::detail::action_invoker<Action> const&) noexcept
+        {
+            return reinterpret_cast<std::size_t>(&Action::invoker);
+        }
+    };
+
+    template <typename Action>
+    struct get_function_annotation<hpx::detail::action_invoker<Action>>
+    {
+        static constexpr char const* call(
+            hpx::detail::action_invoker<Action> const&) noexcept
+        {
+            return hpx::actions::detail::get_action_name<Action>();
+        }
+    };
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    template <typename Action>
+    struct get_function_annotation_itt<hpx::detail::action_invoker<Action>>
+    {
+        static util::itt::string_handle call(
+            hpx::detail::action_invoker<Action> const&) noexcept
+        {
+            return hpx::actions::detail::get_action_name_itt<Action>();
+        }
+    };
+#endif
+}}    // namespace hpx::traits
+#endif
+
+namespace hpx { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>

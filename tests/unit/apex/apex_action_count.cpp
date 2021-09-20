@@ -105,11 +105,11 @@ int main(int argc, char* argv[])
     apex_profile * prof = apex::get_profile("fibonacci_action");
     HPX_TEST(prof != nullptr);
 
-    // for some reason, the APEX count is off by 3, regardless of the N value.
+    // for some reason, the APEX count is off by 1, regardless of the N value.
     // This can be tested by running fibonacci of 0, 1, 2, and 3
     std::cout << "APEX measured calls to fibonacci_action: "
         << prof->calls << std::endl;
-    HPX_TEST_EQ(count-3, static_cast<std::uint64_t>(prof->calls));
+    HPX_TEST_EQ(count-1, static_cast<std::uint64_t>(prof->calls));
 
     return hpx::util::report_errors();
 }
