@@ -883,16 +883,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     return curr;
                 };
-                auto f3 =
-                    [dest, flags](zip_iterator part_begin,
-                        std::size_t part_size,
-                        hpx::shared_future<std::size_t> curr,
-                        hpx::shared_future<std::size_t> next) mutable -> void {
+                auto f3 = [dest, flags](zip_iterator part_begin,
+                              std::size_t part_size,
+                              std::size_t val) mutable -> void {
                     HPX_UNUSED(flags);
-
-                    next.get();    // rethrow exceptions
-
-                    std::advance(dest, curr.get());
+                    std::advance(dest, val);
                     util::loop_n<std::decay_t<ExPolicy>>(++part_begin,
                         part_size, [&dest](zip_iterator it) mutable {
                             if (!get<1>(*it))
@@ -926,7 +921,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::move(f1),
                     // step 2 propagates the partition results from left
                     // to right
-                    hpx::unwrapping(std::plus<std::size_t>()),
+                    std::plus<std::size_t>(),
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value

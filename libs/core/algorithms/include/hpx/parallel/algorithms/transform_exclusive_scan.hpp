@@ -338,11 +338,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using hpx::util::make_zip_iterator;
 
                 auto f3 = [op](zip_iterator part_begin, std::size_t part_size,
-                              hpx::shared_future<T> curr,
-                              hpx::shared_future<T> next) -> void {
-                    next.get();    // rethrow exceptions
-
-                    T val = curr.get();
+                              T val) -> void {
                     FwdIter2 dst = get<1>(part_begin.get_iterator_tuple());
                     *dst++ = val;
 
@@ -368,7 +364,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     },
                     // step 2 propagates the partition results from left
                     // to right
-                    hpx::unwrapping(op),
+                    op,
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // use this return value

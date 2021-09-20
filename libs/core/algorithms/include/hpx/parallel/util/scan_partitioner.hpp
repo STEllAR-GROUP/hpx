@@ -119,11 +119,12 @@ namespace hpx { namespace parallel { namespace util {
                         finalitems.reserve(size + 1);
 
                         hpx::shared_future<Result1> curr = workitems[1];
-                        finalitems.push_back(dataflow(hpx::launch::sync, f3,
-                            first_, count_ - count, workitems[0], curr));
+                        finalitems.push_back(
+                            execution::async_execute(policy.executor(), f3,
+                                first_, count_ - count, workitems[0].get()));
 
-                        workitems[1] =
-                            dataflow(hpx::launch::sync, f2, workitems[0], curr);
+                        workitems[1] = make_ready_future(
+                            HPX_INVOKE(f2, workitems[0].get(), curr.get()));
                     }
                     else
                     {
@@ -139,16 +140,36 @@ namespace hpx { namespace parallel { namespace util {
                         FwdIter it = hpx::get<0>(elem);
                         std::size_t size = hpx::get<1>(elem);
 
-                        hpx::shared_future<Result1> prev = workitems.back();
                         auto curr = execution::async_execute(
                             policy.executor(), f1, it, size)
                                         .share();
 
-                        finalitems.push_back(dataflow(
-                            hpx::launch::sync, f3, it, size, prev, curr));
+                        workitems.push_back(curr);
+                    }
 
-                        workitems.push_back(
-                            dataflow(hpx::launch::sync, f2, prev, curr));
+                    // Wait for all f1 tasks to finish
+                    hpx::wait_all(workitems);
+
+                    // perform f2 sequentially in one go
+                    std::vector<Result1> f2res(workitems.size());
+                    auto res = workitems[0].get();
+                    f2res[0] = res;
+                    for (std::size_t i = 1; i < workitems.size(); i++)
+                    {
+                        res = HPX_INVOKE(f2, res, workitems[i].get());
+                        f2res[i] = res;
+                    }
+
+                    // start all f3 tasks
+                    auto i = 0;
+                    for (auto const& elem : shape)
+                    {
+                        FwdIter it = hpx::get<0>(elem);
+                        std::size_t size = hpx::get<1>(elem);
+
+                        finalitems.push_back(execution::async_execute(
+                            policy.executor(), f3, it, size, f2res[i]));
+                        i++;
                     }
 
                     scoped_params.mark_end_of_scheduling();
