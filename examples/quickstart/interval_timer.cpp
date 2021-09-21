@@ -8,29 +8,28 @@
 // make_ready_future_after to orchestrate timed operations with 'normal'
 // asynchronous work.
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/threads.hpp>
-#include <hpx/include/util.hpp>
-#include <hpx/iostream.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <chrono>
+#include <iostream>
 
 ///////////////////////////////////////////////////////////////////////////////
 bool call_every_500_millisecs()
 {
     static int counter = 0;
 
-    hpx::cout << "Callback " << ++counter << std::endl;
-    return counter != 10;     // stop timer after 10 invocations
+    std::cout << "Callback " << ++counter << std::endl;
+    return counter != 10;    // stop timer after 10 invocations
 }
 
-int main()
+int hpx_main()
 {
     {
         // initialize timer to invoke given function every 500 milliseconds
         hpx::util::interval_timer timer(
-            &call_every_500_millisecs, std::chrono::milliseconds(500)
-        );
+            &call_every_500_millisecs, std::chrono::milliseconds(500));
 
         timer.start();
 
@@ -39,5 +38,10 @@ int main()
             hpx::this_thread::yield();
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

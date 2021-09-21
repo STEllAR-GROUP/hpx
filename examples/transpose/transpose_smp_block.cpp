@@ -4,14 +4,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/init.hpp>
 #include <hpx/local/algorithm.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/local/numeric.hpp>
 
 #include <boost/range/irange.hpp>
 
 #include <algorithm>
 #include <cstdint>
+#include <exception>
 #include <iostream>
 #include <vector>
 
@@ -144,10 +145,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
     {
         std::cout << "ERROR: Aggregate squared error " << errsq
                   << " exceeds threshold " << epsilon << "\n";
-        hpx::terminate();
+        std::terminate();
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -171,10 +172,10 @@ int main(int argc, char* argv[])
     ;
     // clang-format on
 
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }
 
 void transpose(sub_block A, sub_block B, std::uint64_t block_order,

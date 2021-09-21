@@ -4,9 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/init.hpp>
 #include <hpx/local/barrier.hpp>
 #include <hpx/local/functional.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/local/mutex.hpp>
 #include <hpx/local/thread.hpp>
 
@@ -143,7 +143,7 @@ int hpx_main(variables_map& vm)
     }
 
     // Initiate shutdown of the runtime system.
-    hpx::finalize();
+    hpx::local::finalize();
     return 0;
 }
 
@@ -151,8 +151,8 @@ int hpx_main(variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // clang-format off
     desc_commandline.add_options()
@@ -168,8 +168,8 @@ int main(int argc, char* argv[])
     // clang-format on
 
     // Initialize and run HPX.
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }

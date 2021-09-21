@@ -4,11 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-
-#include <hpx/algorithm.hpp>
-#include <hpx/numeric.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/numeric.hpp>
 
 #include <boost/range/irange.hpp>
 
@@ -330,8 +329,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             if (iter > 0 || iterations == 1)    // Skip the first iteration
             {
                 avgtime = avgtime + elapsed;
-                maxtime = (std::max)(maxtime, elapsed);
-                mintime = (std::min)(mintime, elapsed);
+                maxtime = (std::max) (maxtime, elapsed);
+                mintime = (std::min) (mintime, elapsed);
             }
 
             if (root)
@@ -348,8 +347,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             {
                 std::cout << "Solution validates\n";
                 avgtime = avgtime /
-                    static_cast<double>((std::max)(
-                        iterations - 1, static_cast<std::uint64_t>(1)));
+                    static_cast<double>((std::max) (iterations - 1,
+                        static_cast<std::uint64_t>(1)));
                 std::cout << "Rate (MB/s): " << 1.e-6 * bytes / mintime << ", "
                           << "Avg time (s): " << avgtime << ", "
                           << "Min time (s): " << mintime << ", "
@@ -367,7 +366,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -395,11 +394,11 @@ int main(int argc, char* argv[])
     // localities
     std::vector<std::string> const cfg = {"hpx.run_hpx_main!=1"};
 
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
     init_args.cfg = cfg;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }
 
 void transpose(sub_block const A, sub_block B, std::uint64_t block_order,
@@ -411,8 +410,8 @@ void transpose(sub_block const A, sub_block B, std::uint64_t block_order,
         {
             for (std::uint64_t j = 0; j != block_order; j += tile_size)
             {
-                std::uint64_t max_i = (std::min)(block_order, i + tile_size);
-                std::uint64_t max_j = (std::min)(block_order, j + tile_size);
+                std::uint64_t max_i = (std::min) (block_order, i + tile_size);
+                std::uint64_t max_j = (std::min) (block_order, j + tile_size);
 
                 for (std::uint64_t it = i; it != max_i; ++it)
                 {

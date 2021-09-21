@@ -4,15 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
-
-#include <hpx/future.hpp>
-#include <hpx/include/runtime.hpp>
-#include <hpx/iostream.hpp>
-#include <hpx/include/runtime.hpp>
-#include <hpx/modules/timing.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/runtime.hpp>
 //
+#include <iostream>
 #include <random>
 #include <utility>
 #include <vector>
@@ -28,95 +25,105 @@
 // Also. Routine can use either a lambda, or a function under control of USE_LAMBDA
 
 #define TEST_SUCCESS 1
-#define TEST_FAIL    0
+#define TEST_FAIL 0
 //
 #define FAILURE_RATE_PERCENT 5
-#define SAMPLES_PER_LOOP     10
-#define TEST_LOOPS           1000
+#define SAMPLES_PER_LOOP 10
+#define TEST_LOOPS 1000
 //
 std::random_device rseed;
 std::mt19937 gen(rseed());
-std::uniform_int_distribution<int> dist(0,99); // interval [0,100)
+std::uniform_int_distribution<int> dist(0, 99);    // interval [0,100)
 
 #define USE_LAMBDA
 
 //----------------------------------------------------------------------------
-int reduce(hpx::future<std::vector<hpx::future<int> > > &&futvec)
+int reduce(hpx::future<std::vector<hpx::future<int>>>&& futvec)
 {
-  int res = TEST_SUCCESS;
-  std::vector<hpx::future<int> > vfs = futvec.get();
-  for (hpx::future<int>& f: vfs) {
-    if (f.get() == TEST_FAIL) return TEST_FAIL;
-  }
-  return res;
+    int res = TEST_SUCCESS;
+    std::vector<hpx::future<int>> vfs = futvec.get();
+    for (hpx::future<int>& f : vfs)
+    {
+        if (f.get() == TEST_FAIL)
+            return TEST_FAIL;
+    }
+    return res;
 }
 
 //----------------------------------------------------------------------------
 int generate_one()
 {
-  // generate roughly x% fails
-  int result = TEST_SUCCESS;
-  if (dist(gen)>=(100-FAILURE_RATE_PERCENT)) {
-    result = TEST_FAIL;
-  }
-  return result;
+    // generate roughly x% fails
+    int result = TEST_SUCCESS;
+    if (dist(gen) >= (100 - FAILURE_RATE_PERCENT))
+    {
+        result = TEST_FAIL;
+    }
+    return result;
 }
 
 //----------------------------------------------------------------------------
 hpx::future<int> test_reduce()
 {
-  std::vector<hpx::future<int> > req_futures;
-  //
-  for (int i=0; i<SAMPLES_PER_LOOP; i++) {
-    // generate random sequence of pass/fails using % fail rate per incident
-    hpx::future<int> result = hpx::async(generate_one);
-    req_futures.push_back(std::move(result));
-  }
+    std::vector<hpx::future<int>> req_futures;
+    //
+    for (int i = 0; i < SAMPLES_PER_LOOP; i++)
+    {
+        // generate random sequence of pass/fails using % fail rate per incident
+        hpx::future<int> result = hpx::async(generate_one);
+        req_futures.push_back(std::move(result));
+    }
 
-  hpx::future<std::vector<hpx::future<int> > > all_ready = hpx::when_all(req_futures);
+    hpx::future<std::vector<hpx::future<int>>> all_ready =
+        hpx::when_all(req_futures);
 
 #ifdef USE_LAMBDA
-  hpx::future<int> result = all_ready.then(
-    [](hpx::future<std::vector<hpx::future<int> > > &&futvec) -> int {
-      // futvec is ready or the lambda would not be called
-      std::vector<hpx::future<int> > vfs = futvec.get();
-      // all futures in v are ready as fut is ready
-      int res = TEST_SUCCESS;
-      for (hpx::future<int>& f: vfs) {
-        if (f.get() == TEST_FAIL) return TEST_FAIL;
-      }
-      return res;
-  });
+    hpx::future<int> result = all_ready.then(
+        [](hpx::future<std::vector<hpx::future<int>>>&& futvec) -> int {
+            // futvec is ready or the lambda would not be called
+            std::vector<hpx::future<int>> vfs = futvec.get();
+            // all futures in v are ready as fut is ready
+            int res = TEST_SUCCESS;
+            for (hpx::future<int>& f : vfs)
+            {
+                if (f.get() == TEST_FAIL)
+                    return TEST_FAIL;
+            }
+            return res;
+        });
 #else
-  hpx::future<int> result = all_ready.then(reduce);
+    hpx::future<int> result = all_ready.then(reduce);
 #endif
-  //
-  return result;
+    //
+    return result;
 }
 
 //----------------------------------------------------------------------------
 int hpx_main()
 {
-  hpx::chrono::high_resolution_timer htimer;
-  // run N times and see if we get approximately the right amount of fails
-  int count = 0;
-  for (int i=0; i<TEST_LOOPS; i++) {
-    int result = test_reduce().get();
-    count += result;
-  }
-  double pr_pass  = std::pow(1.0 - FAILURE_RATE_PERCENT/100.0, SAMPLES_PER_LOOP);
-  double exp_pass = TEST_LOOPS*pr_pass;
-  hpx::cout << "From " << TEST_LOOPS << " tests, we got "
-    << "\n " << count << " passes"
-    << "\n " << exp_pass << " expected \n"
-    << "\n " << htimer.elapsed() << " seconds \n" << hpx::flush;
-  // Initiate shutdown of the runtime system.
-  return hpx::finalize();
+    hpx::chrono::high_resolution_timer htimer;
+    // run N times and see if we get approximately the right amount of fails
+    int count = 0;
+    for (int i = 0; i < TEST_LOOPS; i++)
+    {
+        int result = test_reduce().get();
+        count += result;
+    }
+    double pr_pass =
+        std::pow(1.0 - FAILURE_RATE_PERCENT / 100.0, SAMPLES_PER_LOOP);
+    double exp_pass = TEST_LOOPS * pr_pass;
+    std::cout << "From " << TEST_LOOPS << " tests, we got "
+              << "\n " << count << " passes"
+              << "\n " << exp_pass << " expected \n"
+              << "\n " << htimer.elapsed() << " seconds \n"
+              << std::flush;
+    // Initiate shutdown of the runtime system.
+    return hpx::local::finalize();
 }
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  // Initialize and run HPX.
-  return hpx::init(argc, argv);
+    // Initialize and run HPX.
+    return hpx::local::init(hpx_main, argc, argv);
 }

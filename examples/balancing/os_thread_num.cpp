@@ -4,19 +4,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
-
-#include <hpx/barrier.hpp>
-#include <hpx/include/util.hpp>
-#include <hpx/iostream.hpp>
+#include <hpx/local/barrier.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/runtime.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <boost/lockfree/queue.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <iostream>
 #include <map>
 
 template <typename T>
@@ -31,9 +31,6 @@ using hpx::lcos::local::barrier;
 
 using hpx::threads::register_work;
 using hpx::threads::thread_init_data;
-
-using hpx::cout;
-using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
@@ -111,17 +108,18 @@ int hpx_main(variables_map& vm)
         {
             if (csv)
                 hpx::util::format_to(
-                    cout, "{1},{2}\n", result.second, result.first)
-                    << flush;
+                    std::cout, "{1},{2}\n", result.second, result.first)
+                    << std::flush;
             else
-                hpx::util::format_to(cout, "OS-thread {1} ran {2} PX-threads\n",
-                    result.second, result.first)
-                    << flush;
+                hpx::util::format_to(std::cout,
+                    "OS-thread {1} ran {2} PX-threads\n", result.second,
+                    result.first)
+                    << std::flush;
         }
     }
 
     // initiate shutdown of the runtime system
-    hpx::finalize();
+    hpx::local::finalize();
     return 0;
 }
 
@@ -140,8 +138,8 @@ int main(int argc, char* argv[])
             ("csv", "output results as csv (format: OS-thread,PX-threads)");
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }

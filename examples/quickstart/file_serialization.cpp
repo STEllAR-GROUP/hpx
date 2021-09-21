@@ -7,13 +7,13 @@
 // This example demonstrates how the HPX serialization archives could be used
 // to directly store/load to/from a file.
 
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
 #include <cstring>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -21,7 +21,8 @@
 struct file_wrapper
 {
     file_wrapper(std::string const& name, std::ios_base::openmode mode)
-      : stream_(name.c_str(), mode), mode_(mode)
+      : stream_(name.c_str(), mode)
+      , mode_(mode)
     {
         if (!stream_.is_open())
             throw std::runtime_error("Couldn't open file: " + name);
@@ -71,8 +72,7 @@ private:
     std::ios_base::openmode mode_;
 };
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <>
     struct serialization_access_data<file_wrapper>
       : default_serialization_access_data<file_wrapper>
@@ -100,9 +100,9 @@ namespace hpx { namespace traits
             cont.read(address, count, current);
         }
     };
-}}
+}}    // namespace hpx::traits
 
-int main()
+int hpx_main()
 {
     std::size_t size = 0;
     std::vector<double> os;
@@ -110,7 +110,7 @@ int main()
         file_wrapper buffer("file_serialization_test.archive",
             std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
         hpx::serialization::output_archive oarchive(buffer);
-        for(double c = -100.0; c < +100.0; c += 1.3)
+        for (double c = -100.0; c < +100.0; c += 1.3)
         {
             os.push_back(c);
         }
@@ -124,16 +124,19 @@ int main()
         hpx::serialization::input_archive iarchive(buffer, size);
         std::vector<double> is;
         iarchive >> is;
-        for(std::size_t i = 0; i < os.size(); ++i)
+        for (std::size_t i = 0; i < os.size(); ++i)
         {
             if (os[i] != is[i])
             {
-                std::cerr << "Mismatch for element " << i << ":"
-                          << os[i] << " != " << is[i] << "\n";
+                std::cerr << "Mismatch for element " << i << ":" << os[i]
+                          << " != " << is[i] << "\n";
             }
         }
     }
-    return 0;
+    return hpx::local::finalize();
 }
 
-
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
+}

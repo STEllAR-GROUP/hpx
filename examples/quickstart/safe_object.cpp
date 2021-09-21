@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/init.hpp>
 #include <hpx/local/algorithm.hpp>
 #include <hpx/local/execution.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/local/runtime.hpp>
 
 #include <cstddef>
@@ -110,11 +110,11 @@ int hpx_main()
         }
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    return hpx::init(argc, argv);
+    return hpx::local::init(hpx_main, argc, argv);
 }

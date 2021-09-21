@@ -4,13 +4,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  return()
-endif()
-
 set(example_programs rnd_future_reduce)
 
-set(rnd_future_reduce_FLAGS DEPENDENCIES iostreams_component)
 set(rnd_future_reduce_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(example_program ${example_programs})
