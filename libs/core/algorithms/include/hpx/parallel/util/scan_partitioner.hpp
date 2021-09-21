@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c)      2015 Daniel Bourgeois
 //  Copyright (c)      2017 Taeguk Kwon
+//  Copyright (c)      2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -118,13 +119,12 @@ namespace hpx { namespace parallel { namespace util {
                         workitems.reserve(size + 2);
                         finalitems.reserve(size + 1);
 
-                        hpx::shared_future<Result1> curr = workitems[1];
                         finalitems.push_back(
                             execution::async_execute(policy.executor(), f3,
                                 first_, count_ - count, workitems[0].get()));
 
-                        workitems[1] = make_ready_future(
-                            HPX_INVOKE(f2, workitems[0].get(), curr.get()));
+                        workitems[1] = make_ready_future(HPX_INVOKE(
+                            f2, workitems[0].get(), workitems[1].get()));
                     }
                     else
                     {
@@ -133,8 +133,7 @@ namespace hpx { namespace parallel { namespace util {
                     }
 
                     // Schedule first step of scan algorithm, step 2 is
-                    // performed as soon as the current partition and the
-                    // partition to the left is ready.
+                    // performed when all f1 tasks are done
                     for (auto const& elem : shape)
                     {
                         FwdIter it = hpx::get<0>(elem);
@@ -151,24 +150,22 @@ namespace hpx { namespace parallel { namespace util {
                     hpx::wait_all(workitems);
 
                     // perform f2 sequentially in one go
-                    std::vector<Result1> f2res(workitems.size());
-                    auto res = workitems[0].get();
-                    f2res[0] = res;
+                    std::vector<Result1> f2results(workitems.size());
+                    auto result = workitems[0].get();
+                    f2results[0] = result;
                     for (std::size_t i = 1; i < workitems.size(); i++)
                     {
-                        res = HPX_INVOKE(f2, res, workitems[i].get());
-                        f2res[i] = res;
+                        result = HPX_INVOKE(f2, result, workitems[i].get());
+                        f2results[i] = result;
                     }
 
                     // start all f3 tasks
-                    auto i = 0;
+                    std::size_t i = 0;
                     for (auto const& elem : shape)
                     {
-                        FwdIter it = hpx::get<0>(elem);
-                        std::size_t size = hpx::get<1>(elem);
-
                         finalitems.push_back(execution::async_execute(
-                            policy.executor(), f3, it, size, f2res[i]));
+                            policy.executor(), f3, hpx::get<0>(elem),
+                            hpx::get<1>(elem), f2results[i]));
                         i++;
                     }
 

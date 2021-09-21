@@ -1584,25 +1584,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         true_count, part_size - true_count);
                 };
 
-                auto f2 =
-                    hpx::unwrapping([](output_iterator_offset const& prev_sum,
-                                        output_iterator_offset const& curr)
-                                        -> output_iterator_offset {
-                        return output_iterator_offset(
-                            get<0>(prev_sum) + get<0>(curr),
-                            get<1>(prev_sum) + get<1>(curr));
-                    });
-                auto f3 =
-                    [dest_true, dest_false, flags](zip_iterator part_begin,
-                        std::size_t part_size,
-                        hpx::shared_future<output_iterator_offset> curr,
-                        hpx::shared_future<output_iterator_offset> next) mutable
-                    -> void {
+                auto f2 = [](output_iterator_offset const& prev_sum,
+                              output_iterator_offset const& curr)
+                    -> output_iterator_offset {
+                    return output_iterator_offset(
+                        get<0>(prev_sum) + get<0>(curr),
+                        get<1>(prev_sum) + get<1>(curr));
+                };
+                auto f3 = [dest_true, dest_false, flags](
+                              zip_iterator part_begin, std::size_t part_size,
+                              output_iterator_offset val) mutable -> void {
                     HPX_UNUSED(flags);
-
-                    next.get();    // rethrow exceptions
-
-                    output_iterator_offset offset = curr.get();
+                    output_iterator_offset offset = val;
                     std::size_t count_true = get<0>(offset);
                     std::size_t count_false = get<1>(offset);
                     std::advance(dest_true, count_true);
