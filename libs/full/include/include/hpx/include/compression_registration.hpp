@@ -8,11 +8,9 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/plugins/binary_filter/bzip2_serialization_filter_registration.hpp>
 #include <hpx/plugins/binary_filter/snappy_serialization_filter_registration.hpp>
 #include <hpx/plugins/binary_filter/zlib_serialization_filter_registration.hpp>
-#endif
 
 #if HPX_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)

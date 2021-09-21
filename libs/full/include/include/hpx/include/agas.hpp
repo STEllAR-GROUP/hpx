@@ -8,6 +8,4 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/components_base/agas_interface.hpp>
-#endif

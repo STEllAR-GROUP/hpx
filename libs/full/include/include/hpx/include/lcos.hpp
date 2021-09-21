@@ -13,7 +13,6 @@
 #include <hpx/include/lcos_local.hpp>
 #include <hpx/modules/async_combinators.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/async_distributed/base_lco.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/packaged_action.hpp>
@@ -23,4 +22,3 @@
 #include <hpx/collectives/reduce.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/lcos_distributed/channel.hpp>
-#endif

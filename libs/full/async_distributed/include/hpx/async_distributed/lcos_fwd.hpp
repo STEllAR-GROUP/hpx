@@ -19,7 +19,6 @@ namespace hpx {
 
     /// \namespace lcos
     namespace lcos {
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         class HPX_EXPORT base_lco;
 
         template <typename Result,
@@ -49,7 +48,6 @@ namespace hpx {
             template <typename ValueType>
             struct object_semaphore;
         }
-#endif
 
         namespace local {
             class barrier;

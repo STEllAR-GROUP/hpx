@@ -11,6 +11,4 @@
 #include <hpx/parallel/algorithms/find.hpp>
 #include <hpx/parallel/container_algorithms/find.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/find.hpp>
-#endif
