@@ -29,8 +29,9 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename PredecessorSender, typename F>
         struct let_error_sender
         {
-            typename std::decay_t<PredecessorSender> predecessor_sender;
-            typename std::decay_t<F> f;
+            HPX_NO_UNIQUE_ADDRESS typename std::decay_t<PredecessorSender>
+                predecessor_sender;
+            HPX_NO_UNIQUE_ADDRESS typename std::decay_t<F> f;
 
             // Type of the potential values returned from the predecessor sender
             template <template <typename...> class Tuple,
@@ -102,8 +103,8 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 struct let_error_predecessor_receiver
                 {
-                    std::decay_t<Receiver> receiver;
-                    std::decay_t<F> f;
+                    HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
+                    HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
                     operation_state& op_state;
 
                     template <typename Receiver_, typename F_>
@@ -133,8 +134,8 @@ namespace hpx { namespace execution { namespace experimental {
 
                     struct set_error_visitor
                     {
-                        std::decay_t<Receiver> receiver;
-                        std::decay_t<F> f;
+                        HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
+                        HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
                         operation_state& op_state;
 
                         HPX_NORETURN void operator()(hpx::monostate) const

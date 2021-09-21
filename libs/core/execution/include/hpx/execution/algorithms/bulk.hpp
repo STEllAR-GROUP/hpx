@@ -34,9 +34,9 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Sender, typename Shape, typename F>
         struct bulk_sender
         {
-            std::decay_t<Sender> sender;
-            std::decay_t<Shape> shape;
-            std::decay_t<F> f;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
@@ -72,9 +72,9 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename Receiver>
             struct bulk_receiver
             {
-                std::decay_t<Receiver> receiver;
-                std::decay_t<Shape> shape;
-                std::decay_t<F> f;
+                HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
+                HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
+                HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
                 template <typename Receiver_, typename Shape_, typename F_>
                 bulk_receiver(Receiver_&& receiver, Shape_&& shape, F_&& f)

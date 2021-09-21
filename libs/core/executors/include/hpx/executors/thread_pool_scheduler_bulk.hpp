@@ -38,9 +38,9 @@ namespace hpx { namespace execution { namespace experimental {
         struct thread_pool_bulk_sender
         {
             thread_pool_scheduler scheduler;
-            std::decay_t<Sender> sender;
-            std::decay_t<Shape> shape;
-            std::decay_t<F> f;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
@@ -109,7 +109,7 @@ namespace hpx { namespace execution { namespace experimental {
                     template <typename Iterator>
                     struct set_value_loop_visitor
                     {
-                        std::decay_t<Iterator> it;
+                        HPX_NO_UNIQUE_ADDRESS std::decay_t<Iterator> it;
                         operation_state* op_state;
 
                         void operator()(hpx::monostate const&) const
@@ -237,9 +237,9 @@ namespace hpx { namespace execution { namespace experimental {
 
                 thread_pool_scheduler scheduler;
                 operation_state_type op_state;
-                std::decay_t<Shape> shape;
-                std::decay_t<F> f;
-                std::decay_t<Receiver> receiver;
+                HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
+                HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
+                HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
                 std::atomic<decltype(hpx::util::size(shape))> tasks_remaining{
                     hpx::util::size(shape)};
                 hpx::util::detail::prepend_t<

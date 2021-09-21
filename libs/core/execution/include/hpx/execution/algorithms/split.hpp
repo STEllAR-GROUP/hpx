@@ -49,7 +49,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Receiver>
         struct error_visitor
         {
-            std::decay_t<Receiver> receiver;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
             template <typename Error>
             void operator()(Error const& error)
@@ -62,7 +62,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Receiver>
         struct value_visitor
         {
-            std::decay_t<Receiver> receiver;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
             template <typename Ts>
             void operator()(Ts const& ts)
@@ -110,7 +110,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                 using allocator_type = typename std::allocator_traits<
                     Allocator>::template rebind_alloc<shared_state>;
-                allocator_type alloc;
+                HPX_NO_UNIQUE_ADDRESS allocator_type alloc;
                 using mutex_type = hpx::lcos::local::spinlock;
                 mutex_type mtx;
                 hpx::util::atomic_count reference_count{0};
@@ -204,7 +204,7 @@ namespace hpx { namespace execution { namespace experimental {
                 template <typename Receiver>
                 struct done_error_value_visitor
                 {
-                    std::decay_t<Receiver> receiver;
+                    HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
                     HPX_NORETURN void operator()(hpx::monostate) const
                     {
@@ -409,7 +409,7 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename Receiver>
             struct operation_state
             {
-                std::decay_t<Receiver> receiver;
+                HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
                 hpx::intrusive_ptr<shared_state> state;
 
                 template <typename Receiver_>

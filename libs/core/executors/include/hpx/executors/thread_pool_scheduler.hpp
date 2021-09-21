@@ -149,8 +149,8 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Scheduler, typename Receiver>
         struct operation_state
         {
-            std::decay_t<Scheduler> scheduler;
-            std::decay_t<Receiver> receiver;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
             template <typename Scheduler_, typename Receiver_>
             operation_state(Scheduler_&& scheduler, Receiver_&& receiver)
@@ -184,7 +184,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Scheduler>
         struct sender
         {
-            std::decay_t<Scheduler> scheduler;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
 
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>

@@ -146,7 +146,7 @@ namespace hpx { namespace execution { namespace experimental {
                     ts;
                 hpx::optional<error_types<hpx::variant>> error;
                 std::atomic<bool> set_done_error_called{false};
-                std::decay_t<Receiver> receiver;
+                HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
                 using operation_state_type =
                     std::decay_t<decltype(hpx::execution::experimental::connect(
