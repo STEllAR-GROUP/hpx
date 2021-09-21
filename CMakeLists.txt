@@ -1019,26 +1019,6 @@ hpx_option(
 
 hpx_add_config_define(HPX_HAVE_SPINLOCK_POOL_NUM ${HPX_WITH_SPINLOCK_POOL_NUM})
 
-# Deprecated in 1.4.0
-hpx_option(
-  HPX_SCHEDULER_MAX_TERMINATED_THREADS
-  STRING
-  "[Deprecated] Maximum number of terminated threads collected before those are cleaned up (default: 100)"
-  "0"
-  CATEGORY "Thread Manager"
-  ADVANCED
-)
-
-if(HPX_SCHEDULER_MAX_TERMINATED_THREADS GREATER 0)
-  hpx_warn(
-    "HPX_SCHEDULER_MAX_TERMINATED_THREADS is deprecated and will be removed in a future release. Use the configuration option hpx.thread_queue.max_terminated_threads instead to set the value."
-  )
-  hpx_add_config_define(
-    HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS
-    ${HPX_SCHEDULER_MAX_TERMINATED_THREADS}
-  )
-endif()
-
 hpx_option(
   HPX_WITH_SPINLOCK_DEADLOCK_DETECTION BOOL
   "Enable spinlock deadlock detection (default: OFF)" OFF
@@ -1124,13 +1104,6 @@ if(HPX_WITH_PAPI)
     )
   endif()
   hpx_add_config_define(HPX_HAVE_PAPI)
-endif()
-hpx_option(
-  HPX_WITH_GOOGLE_PERFTOOLS BOOL
-  "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling"
-)
-if(HPX_WITH_GOOGLE_PERFTOOLS)
-  hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
 endif()
 
 hpx_option(
@@ -1592,16 +1565,6 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
-# HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY : introduced in V1.5.0
-hpx_option(
-  HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY BOOL
-  "Enable deprecated init() and start() overloads functions (default: OFF)" OFF
-  ADVANCED
-)
-if(HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_INIT_START_OVERLOADS_COMPATIBILITY)
-endif()
-
 # ##############################################################################
 # Special diagnostic flags, do not enable by default, only if needed
 hpx_option(
@@ -2056,8 +2019,6 @@ else()
       -fvisibility=hidden TARGETS SHARED_LIBRARY EXECUTABLE
     )
     hpx_add_config_define(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
-    hpx_add_config_define(HPX_HAVE_COROUTINE_GCC_HIDDEN_VISIBILITY)
-    hpx_add_config_define(HPX_HAVE_PLUGIN_GCC_HIDDEN_VISIBILITY)
   endif()
 
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -2201,7 +2162,6 @@ include(HPX_SetupMPI) # must come before APEX
 include(HPX_SetupHIP)
 include(HPX_SetupApex)
 include(HPX_SetupPapi)
-include(HPX_SetupGooglePerfTools)
 include(HPX_SetupValgrind)
 if(HPX_WITH_CUDA OR HPX_WITH_HIP)
   hpx_add_config_define(HPX_HAVE_GPU_SUPPORT)

@@ -7,10 +7,6 @@
 include(HPX_Message)
 include(HPX_Option)
 
-if(NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
-  return()
-endif()
-
 if(HPX_WITH_TESTS_UNIT)
   add_hpx_pseudo_target(tests.unit.modules.init_runtime_local)
   add_hpx_pseudo_dependencies(

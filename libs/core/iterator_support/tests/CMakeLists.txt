@@ -7,10 +7,6 @@
 include(HPX_Message)
 include(HPX_Option)
 
-if(NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
-  return()
-endif()
-
 if(HPX_WITH_TESTS)
   add_library(hpx_iterator_support_test_utilities INTERFACE)
   target_include_directories(
