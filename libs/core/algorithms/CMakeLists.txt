@@ -18,6 +18,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/count.hpp
     hpx/parallel/algorithms/destroy.hpp
     hpx/parallel/algorithms/detail/accumulate.hpp
+    hpx/parallel/algorithms/detail/advance_and_get_distance.hpp
     hpx/parallel/algorithms/detail/advance_to_sentinel.hpp
     hpx/parallel/algorithms/detail/dispatch.hpp
     hpx/parallel/algorithms/detail/distance.hpp

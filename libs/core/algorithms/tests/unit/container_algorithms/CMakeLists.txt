@@ -89,6 +89,7 @@ set(tests
     shift_left_range
     shift_right_range
     sort_range
+    stable_partition_range
     stable_sort_range
     swap_ranges_range
     transform_range

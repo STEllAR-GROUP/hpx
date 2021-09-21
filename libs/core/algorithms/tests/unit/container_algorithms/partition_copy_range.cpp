@@ -1,9 +1,11 @@
 //  Copyright (c) 2017-2018 Taeguk Kwon
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/container_algorithms/partition.hpp>
@@ -47,6 +49,11 @@ struct user_defined_type
         return this->name == t.name && this->val == t.val;
     }
 
+    bool operator!=(user_defined_type const& t) const
+    {
+        return this->name != t.name || this->val != t.val;
+    }
+
     struct user_defined_type& operator++()
     {
         return *this;
@@ -79,6 +86,110 @@ struct random_fill
 };
 
 ////////////////////////////////////////////////////////////////////////////
+void test_partition_copy_sent()
+{
+    using hpx::get;
+
+    int rand_base = std::rand();
+    auto pred = [rand_base](int const& t) -> bool { return t < rand_base; };
+
+    std::size_t const size = 10007;
+    std::vector<int> c(size), d_true_res(size), d_false_res(size),
+        d_true_sol(size), d_false_sol(size);
+    std::generate(
+        std::begin(c), std::end(c), random_fill(rand_base, size / 10));
+    c[size - 1] = INT_MAX;
+
+    auto result =
+        hpx::ranges::partition_copy(std::begin(c), sentinel<int>{INT_MAX},
+            std::begin(d_true_res), std::begin(d_false_res), pred);
+    auto solution = std::partition_copy(std::begin(c), std::end(c) - 1,
+        std::begin(d_true_sol), std::begin(d_false_sol), pred);
+
+    HPX_UNUSED(solution);
+    HPX_TEST(result.in == std::end(c) - 1);
+
+    bool equality_true =
+        test::equal(std::begin(d_true_res), std::end(d_true_res) - 1,
+            std::begin(d_true_sol), std::end(d_true_sol) - 1);
+    bool equality_false =
+        test::equal(std::begin(d_false_res), std::end(d_false_res) - 1,
+            std::begin(d_false_sol), std::end(d_false_sol) - 1);
+
+    HPX_TEST(equality_true);
+    HPX_TEST(equality_false);
+}
+
+template <typename ExPolicy>
+void test_partition_copy_sent(ExPolicy policy)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    using hpx::get;
+
+    int rand_base = std::rand();
+    auto pred = [rand_base](int const& t) -> bool { return t < rand_base; };
+
+    std::size_t const size = 10007;
+    std::vector<int> c(size), d_true_res(size), d_false_res(size),
+        d_true_sol(size), d_false_sol(size);
+    std::generate(
+        std::begin(c), std::end(c), random_fill(rand_base, size / 10));
+    c[size - 1] = INT_MAX;
+
+    auto result = hpx::ranges::partition_copy(policy, std::begin(c),
+        sentinel<int>{INT_MAX}, std::begin(d_true_res), std::begin(d_false_res),
+        pred);
+    auto solution = std::partition_copy(std::begin(c), std::end(c) - 1,
+        std::begin(d_true_sol), std::begin(d_false_sol), pred);
+
+    HPX_UNUSED(solution);
+    HPX_TEST(result.in == std::end(c) - 1);
+
+    bool equality_true =
+        test::equal(std::begin(d_true_res), std::end(d_true_res) - 1,
+            std::begin(d_true_sol), std::end(d_true_sol) - 1);
+    bool equality_false =
+        test::equal(std::begin(d_false_res), std::end(d_false_res) - 1,
+            std::begin(d_false_sol), std::end(d_false_sol) - 1);
+
+    HPX_TEST(equality_true);
+    HPX_TEST(equality_false);
+}
+
+template <typename DataType>
+void test_partition_copy(DataType)
+{
+    using hpx::get;
+
+    int rand_base = std::rand();
+    auto pred = [rand_base](
+                    DataType const& t) -> bool { return t < rand_base; };
+
+    std::size_t const size = 10007;
+    std::vector<DataType> c(size), d_true_res(size), d_false_res(size),
+        d_true_sol(size), d_false_sol(size);
+    std::generate(
+        std::begin(c), std::end(c), random_fill(rand_base, size / 10));
+
+    auto result = hpx::ranges::partition_copy(
+        c, std::begin(d_true_res), std::begin(d_false_res), pred);
+    auto solution = std::partition_copy(std::begin(c), std::end(c),
+        std::begin(d_true_sol), std::begin(d_false_sol), pred);
+
+    HPX_UNUSED(solution);
+    HPX_TEST(result.in == std::end(c));
+
+    bool equality_true = test::equal(std::begin(d_true_res),
+        std::end(d_true_res), std::begin(d_true_sol), std::end(d_true_sol));
+    bool equality_false = test::equal(std::begin(d_false_res),
+        std::end(d_false_res), std::begin(d_false_sol), std::end(d_false_sol));
+
+    HPX_TEST(equality_true);
+    HPX_TEST(equality_false);
+}
+
 template <typename ExPolicy, typename DataType>
 void test_partition_copy(ExPolicy policy, DataType)
 {
@@ -97,13 +208,13 @@ void test_partition_copy(ExPolicy policy, DataType)
     std::generate(
         std::begin(c), std::end(c), random_fill(rand_base, size / 10));
 
-    auto result = hpx::parallel::partition_copy(
+    auto result = hpx::ranges::partition_copy(
         policy, c, std::begin(d_true_res), std::begin(d_false_res), pred);
     auto solution = std::partition_copy(std::begin(c), std::end(c),
         std::begin(d_true_sol), std::begin(d_false_sol), pred);
 
     HPX_UNUSED(solution);
-    HPX_TEST(get<0>(result) == std::end(c));
+    HPX_TEST(result.in == std::end(c));
 
     bool equality_true = test::equal(std::begin(d_true_res),
         std::end(d_true_res), std::begin(d_true_sol), std::end(d_true_sol));
@@ -132,14 +243,14 @@ void test_partition_copy_async(ExPolicy policy, DataType)
     std::generate(
         std::begin(c), std::end(c), random_fill(rand_base, size / 10));
 
-    auto f = hpx::parallel::partition_copy(
+    auto f = hpx::ranges::partition_copy(
         policy, c, std::begin(d_true_res), std::begin(d_false_res), pred);
     auto result = f.get();
     auto solution = std::partition_copy(std::begin(c), std::end(c),
         std::begin(d_true_sol), std::begin(d_false_sol), pred);
 
     HPX_UNUSED(solution);
-    HPX_TEST(get<0>(result) == std::end(c));
+    HPX_TEST(result.in == std::end(c));
 
     bool equality_true = test::equal(std::begin(d_true_res),
         std::end(d_true_res), std::begin(d_true_sol), std::end(d_true_sol));
@@ -155,12 +266,18 @@ void test_partition_copy()
 {
     using namespace hpx::execution;
 
+    test_partition_copy(DataType());
     test_partition_copy(seq, DataType());
     test_partition_copy(par, DataType());
     test_partition_copy(par_unseq, DataType());
 
     test_partition_copy_async(seq(task), DataType());
     test_partition_copy_async(par(task), DataType());
+
+    test_partition_copy_sent();
+    test_partition_copy_sent(seq);
+    test_partition_copy_sent(par);
+    test_partition_copy_sent(par_unseq);
 }
 
 void test_partition_copy()

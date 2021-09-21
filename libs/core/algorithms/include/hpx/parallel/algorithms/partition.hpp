@@ -1,11 +1,457 @@
 //  Copyright (c) 2014-2017 Hartmut Kaiser
 //  Copyright (c)      2017 Taeguk Kwon
+//  Copyright (c)      2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
+
+#if defined(DOXYGEN)
+namespace hpx {
+    // clang-format off
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Reorders the elements in the range [first, last) in such a way that
+    /// all elements for which the predicate \a pred returns true precede
+    /// the elements for which the predicate \a pred returns false.
+    /// Relative order of the elements is not preserved.
+    ///
+    /// \note   Complexity: At most 2 * (last - first) swaps.
+    ///         Exactly \a last - \a first applications of the predicate and
+    ///         projection.
+    ///
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a partition requires \a Pred to meet
+    ///                     the requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is an
+    ///                     unary predicate for partitioning the source
+    ///                     iterators. The signature of
+    ///                     this predicate should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a InIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a partition algorithm invoked without
+    /// an execution policy object execute in sequential order in the calling
+    /// thread.
+    ///
+    /// \returns  The \a partition algorithm returns returns \a FwdIter.
+    ///           The \a partition algorithm returns the iterator to
+    ///           the first element of the second group.
+    ///
+    template <typename FwdIter, typename Pred, typename Proj>
+    FwdIter partition(ExPolicy&& policy, FwdIter first, FwdIter last,
+        Pred&& pred, Proj&& proj);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Reorders the elements in the range [first, last) in such a way that
+    /// all elements for which the predicate \a pred returns true precede
+    /// the elements for which the predicate \a pred returns false.
+    /// Relative order of the elements is not preserved.
+    ///
+    /// \note   Complexity: At most 2 * (last - first) swaps.
+    ///         Exactly \a last - \a first applications of the predicate and
+    ///         projection.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a partition requires \a Pred to meet
+    ///                     the requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is an
+    ///                     unary predicate for partitioning the source
+    ///                     iterators. The signature of
+    ///                     this predicate should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a InIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a partition algorithm invoked with
+    /// an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a partition algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a partition algorithm returns a \a hpx::future<FwdIter>
+    ///           if the execution policy is of type \a parallel_task_policy
+    ///           and returns \a FwdIter otherwise.
+    ///           The \a partition algorithm returns the iterator to
+    ///           the first element of the second group.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename Pred, typename Proj>
+    util::detail::algorithm_result_t<ExPolicy, FwdIter>
+    partition(ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred,
+        Proj&& proj);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Permutes the elements in the range [first, last) such that there exists
+    /// an iterator i such that for every iterator j in the range [first, i)
+    /// INVOKE(f, INVOKE (proj, *j)) != false, and for every iterator k in the
+    /// range [i, last), INVOKE(f, INVOKE (proj, *k)) == false
+    ///
+    /// \note   Complexity: At most (last - first) * log(last - first) swaps,
+    ///         but only linear number of swaps if there is enough extra memory.
+    ///         Exactly \a last - \a first applications of the predicate and
+    ///         projection.
+    ///
+    /// \tparam BidirIter   The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a transform requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param f            Unary predicate which returns true if the element
+    ///                     should be ordered before other elements.
+    ///                     Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). The signature
+    ///                     of this predicate should be equivalent to:
+    ///                     \code
+    ///                     bool fun(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&.
+    ///                     The type \a Type must be such that an object of
+    ///                     type \a BidirIter can be dereferenced and then
+    ///                     implicitly converted to \a Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a f is invoked.
+    ///
+    /// The invocations of \a f in the parallel \a stable_partition algorithm
+    /// invoked without an execution policy object executes in sequential order
+    /// in the calling thread.
+    ///
+    /// \returns  The \a stable_partition algorithm returns an iterator i such
+    ///           that for every iterator j in the range [first, i), f(*j) !=
+    ///           false INVOKE(f, INVOKE(proj, *j)) != false, and for every
+    ///           iterator k in the range [i, last), f(*k) == false
+    ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
+    ///           the elements in both groups is preserved.
+    ///
+    template <typename BidirIter, typename F, typename Proj>
+    BidirIter stable_partition(BidirIter first, BidirIter last, F&& f,
+        Proj&& proj);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Permutes the elements in the range [first, last) such that there exists
+    /// an iterator i such that for every iterator j in the range [first, i)
+    /// INVOKE(f, INVOKE (proj, *j)) != false, and for every iterator k in the
+    /// range [i, last), INVOKE(f, INVOKE (proj, *k)) == false
+    ///
+    /// \note   Complexity: At most (last - first) * log(last - first) swaps,
+    ///         but only linear number of swaps if there is enough extra memory.
+    ///         Exactly \a last - \a first applications of the predicate and
+    ///         projection.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the invocations of \a f.
+    /// \tparam BidirIter   The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a transform requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param f            Unary predicate which returns true if the element
+    ///                     should be ordered before other elements.
+    ///                     Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). The signature
+    ///                     of this predicate should be equivalent to:
+    ///                     \code
+    ///                     bool fun(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&.
+    ///                     The type \a Type must be such that an object of
+    ///                     type \a BidirIter can be dereferenced and then
+    ///                     implicitly converted to \a Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a f is invoked.
+    ///
+    /// The invocations of \a f in the parallel \a stable_partition algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequenced_policy executes in sequential order in the
+    /// calling thread.
+    ///
+    /// The invocations of \a f in the parallel \a stable_partition algorithm
+    /// invoked with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a stable_partition algorithm returns an iterator i such
+    ///           that for every iterator j in the range [first, i), f(*j) !=
+    ///           false INVOKE(f, INVOKE(proj, *j)) != false, and for every
+    ///           iterator k in the range [i, last), f(*k) == false
+    ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
+    ///           the elements in both groups is preserved.
+    ///           If the execution policy is of type \a parallel_task_policy
+    ///           the algorithm returns a future<> referring to this iterator.
+    ///
+    template <typename ExPolicy, typename BidirIter, typename F,
+        typename Proj>
+    util::detail::algorithm_result_t<ExPolicy, BidirIter>
+    stable_partition(ExPolicy&& policy, BidirIter first, BidirIter last,
+        F&& f, Proj&& proj);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Copies the elements in the range, defined by [first, last),
+    /// to two different ranges depending on the value returned by
+    /// the predicate \a pred. The elements, that satisfy the predicate \a pred
+    /// are copied to the range beginning at \a dest_true. The rest of
+    /// the elements are copied to the range beginning at \a dest_false.
+    /// The order of the elements is preserved.
+    ///
+    /// \note   Complexity: Performs not more than \a last - \a first
+    ///         assignments, exactly \a last - \a first applications of the
+    ///         predicate \a f.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range for the elements that satisfy
+    ///                     the predicate \a pred (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter3    The type of the iterator representing the
+    ///                     destination range for the elements that don't
+    ///                     satisfy the predicate \a pred (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a partition_copy requires \a Pred to
+    ///                     meet the requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest_true    Refers to the beginning of the destination range
+    ///                     for the elements that satisfy the predicate \a pred
+    /// \param dest_false   Refers to the beginning of the destination range
+    ///                     for the elements that don't satisfy the predicate
+    ///                     \a pred.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is an
+    ///                     unary predicate for partitioning the source
+    ///                     iterators. The signature of
+    ///                     this predicate should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a partition_copy algorithm invoked
+    /// without an execution policy object execute in sequential order in the
+    /// calling thread.
+    ///
+    /// \returns  The \a partition_copy algorithm returns
+    ///           \a tagged_tuple<tag::in(InIter), tag::out1(OutIter1),
+    ///           tag::out2(OutIter2)>.
+    ///           The \a partition_copy algorithm returns the tuple of
+    ///           the source iterator \a last,
+    ///           the destination iterator to the end of the \a dest_true
+    ///           range, and the destination iterator to the end of the \a
+    ///           dest_false range.
+    ///
+    template <typename FwdIter1, typename FwdIter2,
+        typename FwdIter3, typename Pred, typename Proj>
+    hpx::util::tagged_tuple<tag::in(FwdIter1), tag::out1(FwdIter2),
+            tag::out2(FwdIter3)>
+    partition_copy(FwdIter1 first, FwdIter1 last,
+        FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Copies the elements in the range, defined by [first, last),
+    /// to two different ranges depending on the value returned by
+    /// the predicate \a pred. The elements, that satisfy the predicate \a pred,
+    /// are copied to the range beginning at \a dest_true. The rest of
+    /// the elements are copied to the range beginning at \a dest_false.
+    /// The order of the elements is preserved.
+    ///
+    /// \note   Complexity: Performs not more than \a last - \a first
+    ///         assignments, exactly \a last - \a first applications of the
+    ///         predicate \a f.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range for the elements that satisfy
+    ///                     the predicate \a pred (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter3    The type of the iterator representing the
+    ///                     destination range for the elements that don't
+    ///                     satisfy the predicate \a pred (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a partition_copy requires \a Pred to
+    ///                     meet the requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest_true    Refers to the beginning of the destination range
+    ///                     for the elements that satisfy the predicate \a pred
+    /// \param dest_false   Refers to the beginning of the destination range
+    ///                     for the elements that don't satisfy the predicate
+    ///                     \a pred.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is an
+    ///                     unary predicate for partitioning the source
+    ///                     iterators. The signature of
+    ///                     this predicate should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a partition_copy algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a partition_copy algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a partition_copy algorithm returns a
+    ///           \a hpx::future<tagged_tuple<tag::in(InIter),
+    ///           tag::out1(OutIter1), tag::out2(OutIter2)> >
+    ///           if the execution policy is of type \a parallel_task_policy
+    ///           and returns
+    ///           \a tagged_tuple<tag::in(InIter),
+    ///           tag::out1(OutIter1), tag::out2(OutIter2)>
+    ///           otherwise.
+    ///           The \a partition_copy algorithm returns the tuple of
+    ///           the source iterator \a last,
+    ///           the destination iterator to the end of the \a dest_true
+    ///           range, and the destination iterator to the end of the \a
+    ///           dest_false range.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename FwdIter3, typename Pred, typename Proj>
+    typename util::detail::algorithm_result<ExPolicy,
+        hpx::util::tagged_tuple<tag::in(FwdIter1), tag::out1(FwdIter2),
+            tag::out2(FwdIter3)>>::type
+    partition_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+        FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj);
+
+    // clang-format on
+}    // namespace hpx
+
+#else    // DOXYGEN
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
@@ -25,15 +471,20 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
+#include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
+#include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
@@ -127,6 +578,34 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
 
+        template <typename BidirIter, typename Sent, typename F, typename Proj>
+        static BidirIter stable_partition_seq(
+            BidirIter first, Sent last, F&& f, Proj&& proj)
+        {
+            using value_type =
+                typename std::iterator_traits<BidirIter>::value_type;
+            std::vector<value_type> falseValues;
+
+            BidirIter next = first;
+            while (first != last)
+            {
+                if (HPX_INVOKE(f, HPX_INVOKE(proj, *first)))
+                {
+                    *next = std::move(*first);
+                    ++next;
+                }
+                else
+                {
+                    falseValues.emplace_back(std::move(*first));
+                }
+
+                ++first;
+            }
+
+            util::move(std::begin(falseValues), std::end(falseValues), next);
+            return next;
+        }
+
         template <typename Iter>
         struct stable_partition
           : public detail::algorithm<stable_partition<Iter>, Iter>
@@ -136,21 +615,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 
-            template <typename ExPolicy, typename BidirIter, typename F,
-                typename Proj>
+            template <typename ExPolicy, typename BidirIter, typename Sent,
+                typename F, typename Proj>
             static BidirIter sequential(
-                ExPolicy&&, BidirIter first, BidirIter last, F&& f, Proj&& proj)
+                ExPolicy&&, BidirIter first, Sent last, F&& f, Proj&& proj)
             {
-                return std::stable_partition(first, last,
-                    util::invoke_projected<F, Proj>(
-                        std::forward<F>(f), std::forward<Proj>(proj)));
+                return stable_partition_seq(
+                    first, last, std::forward<F>(f), std::forward<Proj>(proj));
             }
 
-            template <typename ExPolicy, typename RandIter, typename F,
-                typename Proj>
+            template <typename ExPolicy, typename RandIter, typename Sent,
+                typename F, typename Proj>
             static typename util::detail::algorithm_result<ExPolicy,
                 RandIter>::type
-            parallel(ExPolicy&& policy, RandIter first, RandIter last, F&& f,
+            parallel(ExPolicy&& policy, RandIter first, Sent last, F&& f,
                 Proj&& proj)
             {
                 using algorithm_result =
@@ -159,14 +637,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     typename std::iterator_traits<RandIter>::difference_type;
 
                 future<RandIter> result;
+                auto last_iter = first;
 
                 try
                 {
-                    difference_type size = std::distance(first, last);
+                    // advances last_iter to last and gets distance
+                    difference_type size =
+                        detail::advance_and_get_distance(last_iter, last);
 
                     if (size == 0)
                     {
-                        result = hpx::make_ready_future(std::move(last));
+                        result = hpx::make_ready_future(std::move(last_iter));
                     }
                     else
                     {
@@ -187,8 +668,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             cores, size, chunk_size, max_chunks);
 
                         result = stable_partition_helper()(
-                            std::forward<ExPolicy>(policy), first, last, size,
-                            std::forward<F>(f), std::forward<Proj>(proj),
+                            std::forward<ExPolicy>(policy), first, last_iter,
+                            size, std::forward<F>(f), std::forward<Proj>(proj),
                             max_chunks);
                     }
                 }
@@ -211,96 +692,41 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Permutes the elements in the range [first, last) such that there exists
-    /// an iterator i such that for every iterator j in the range [first, i)
-    /// INVOKE(f, INVOKE (proj, *j)) != false, and for every iterator k in the
-    /// range [i, last), INVOKE(f, INVOKE (proj, *k)) == false
-    ///
-    /// \note   Complexity: At most (last - first) * log(last - first) swaps,
-    ///         but only linear number of swaps if there is enough extra memory.
-    ///         Exactly \a last - \a first applications of the predicate and
-    ///         projection.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the invocations of \a f.
-    /// \tparam BidirIter   The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a transform requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param f            Unary predicate which returns true if the element
-    ///                     should be ordered before other elements.
-    ///                     Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). The signature
-    ///                     of this predicate should be equivalent to:
-    ///                     \code
-    ///                     bool fun(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&.
-    ///                     The type \a Type must be such that an object of
-    ///                     type \a BidirIter can be dereferenced and then
-    ///                     implicitly converted to \a Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a f is invoked.
-    ///
-    /// The invocations of \a f in the parallel \a stable_partition algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequenced_policy executes in sequential order in the
-    /// calling thread.
-    ///
-    /// The invocations of \a f in the parallel \a stable_partition algorithm
-    /// invoked with an execution policy object of type \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an
-    /// unordered fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a stable_partition algorithm returns an iterator i such that
-    ///           for every iterator j in the range [first, i), f(*j) != false
-    ///           INVOKE(f, INVOKE(proj, *j)) != false, and for every iterator
-    ///           k in the range [i, last), f(*k) == false
-    ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
-    ///           the elements in both groups is preserved.
-    ///           If the execution policy is of type \a parallel_task_policy
-    ///           the algorithm returns a future<> referring to this iterator.
-    ///
+    // clang-format off
     template <typename ExPolicy, typename BidirIter, typename F,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<BidirIter>::value&&
-                    traits::is_projected<Proj, BidirIter>::value&&
-                        traits::is_indirect_callable<ExPolicy, F,
-                            traits::projected<Proj, BidirIter>>::value)>
-    typename util::detail::algorithm_result<ExPolicy, BidirIter>::type
-    stable_partition(ExPolicy&& policy, BidirIter first, BidirIter last, F&& f,
-        Proj&& proj = Proj())
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<BidirIter> &&
+            traits::is_projected_v<Proj, BidirIter> &&
+            traits::is_indirect_callable_v<ExPolicy, F,
+                            traits::projected<Proj, BidirIter>>
+        )>
+    // clang-format on
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::parallel::stable_partition is deprecated, use "
+        "hpx::stable_partition instead")
+        util::detail::algorithm_result_t<ExPolicy, BidirIter> stable_partition(
+            ExPolicy&& policy, BidirIter first, BidirIter last, F&& f,
+            Proj&& proj = Proj())
     {
-        static_assert(
-            (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
+        static_assert((hpx::traits::is_bidirectional_iterator_v<BidirIter>),
             "Requires at least bidirectional iterator.");
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         using is_seq = std::integral_constant<bool,
-            hpx::is_sequenced_execution_policy<ExPolicy>::value ||
-                !hpx::traits::is_random_access_iterator<BidirIter>::value>;
+            hpx::is_sequenced_execution_policy_v<ExPolicy> ||
+                !hpx::traits::is_random_access_iterator_v<BidirIter>>;
 
         return detail::stable_partition<BidirIter>().call2(
             std::forward<ExPolicy>(policy), is_seq(), first, last,
             std::forward<F>(f), std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -311,7 +737,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // sequential partition with projection function for bidirectional iterator.
         template <typename BidirIter, typename Pred, typename Proj,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_bidirectional_iterator<BidirIter>::value)>
+                hpx::traits::is_bidirectional_iterator_v<BidirIter>)>
         BidirIter sequential_partition(
             BidirIter first, BidirIter last, Pred&& pred, Proj&& proj)
         {
@@ -341,9 +767,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         // sequential partition with projection function for forward iterator.
         template <typename FwdIter, typename Pred, typename Proj,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator<FwdIter>::value &&
-                !hpx::traits::is_bidirectional_iterator<FwdIter>::value)>
+            HPX_CONCEPT_REQUIRES_(hpx::traits::is_forward_iterator_v<FwdIter> &&
+                !hpx::traits::is_bidirectional_iterator_v<FwdIter>)>
         FwdIter sequential_partition(
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
         {
@@ -422,8 +847,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             // block manager for random access iterator.
             template <typename RandIter>
             class block_manager<RandIter,
-                typename std::enable_if<hpx::traits::is_random_access_iterator<
-                    RandIter>::value>::type>
+                std::enable_if_t<
+                    hpx::traits::is_random_access_iterator_v<RandIter>>>
             {
             public:
                 block_manager(
@@ -497,10 +922,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             // block manager for forward access iterator.
             template <typename FwdIter>
             class block_manager<FwdIter,
-                typename std::enable_if<
-                    hpx::traits::is_forward_iterator<FwdIter>::value &&
-                    !hpx::traits::is_random_access_iterator<FwdIter>::value>::
-                    type>
+                std::enable_if_t<hpx::traits::is_forward_iterator_v<FwdIter> &&
+                    !hpx::traits::is_random_access_iterator_v<FwdIter>>>
             {
             public:
                 // In constructor, prepare all blocks for fast acquirements of blocks.
@@ -728,9 +1151,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             // Move remaining blocks to the adjacent left of the boundary.
             // In the end, all remaining blocks are merged into one block which
             //     is adjacent to the left of boundary.
+            // clang-format off
             template <typename BidirIter,
                 HPX_CONCEPT_REQUIRES_(
-                    hpx::traits::is_bidirectional_iterator<BidirIter>::value)>
+                    hpx::traits::is_bidirectional_iterator_v<BidirIter>
+                )>
+            // clang-format on
             static block<BidirIter> merge_leftside_remaining_blocks(
                 std::vector<block<BidirIter>>& remaining_blocks,
                 BidirIter boundary, BidirIter first)
@@ -764,10 +1190,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
             // Move remaining blocks to the adjacent left of the boundary.
             // In the end, all remaining blocks are merged into one block which
             //     is adjacent to the left of boundary.
+            // clang-format off
             template <typename FwdIter,
                 HPX_CONCEPT_REQUIRES_(
-                    hpx::traits::is_forward_iterator<FwdIter>::value &&
-                    !hpx::traits::is_bidirectional_iterator<FwdIter>::value)>
+                    hpx::traits::is_forward_iterator_v<FwdIter> &&
+                    !hpx::traits::is_bidirectional_iterator_v<FwdIter>
+                )>
+            // clang-format on
             static block<FwdIter> merge_leftside_remaining_blocks(
                 std::vector<block<FwdIter>>& remaining_blocks, FwdIter boundary,
                 FwdIter first)
@@ -981,29 +1410,31 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 
-            template <typename ExPolicy, typename Pred,
+            template <typename ExPolicy, typename Sent, typename Pred,
                 typename Proj = util::projection_identity>
             static FwdIter sequential(
-                ExPolicy, FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
+                ExPolicy, FwdIter first, Sent last, Pred&& pred, Proj&& proj)
             {
-                return sequential_partition(first, last,
+                auto last_iter = detail::advance_to_sentinel(first, last);
+                return sequential_partition(first, last_iter,
                     std::forward<Pred>(pred), std::forward<Proj>(proj));
             }
 
-            template <typename ExPolicy, typename Pred,
+            template <typename ExPolicy, typename Sent, typename Pred,
                 typename Proj = util::projection_identity>
             static
                 typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-                parallel(ExPolicy&& policy, FwdIter first, FwdIter last,
+                parallel(ExPolicy&& policy, FwdIter first, Sent last,
                     Pred&& pred, Proj&& proj)
             {
                 using algorithm_result =
                     util::detail::algorithm_result<ExPolicy, FwdIter>;
+                auto last_iter = detail::advance_to_sentinel(first, last);
 
                 try
                 {
                     return algorithm_result::get(parallel_partition(
-                        std::forward<ExPolicy>(policy), first, last,
+                        std::forward<ExPolicy>(policy), first, last_iter,
                         std::forward<Pred>(pred), std::forward<Proj>(proj)));
                 }
                 catch (...)
@@ -1017,84 +1448,36 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Reorders the elements in the range [first, last) in such a way that
-    /// all elements for which the predicate \a pred returns true precede
-    /// the elements for which the predicate \a pred returns false.
-    /// Relative order of the elements is not preserved.
-    ///
-    /// \note   Complexity: At most 2 * (last - first) swaps.
-    ///         Exactly \a last - \a first applications of the predicate and
-    ///         projection.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Pred        The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a partition requires \a Pred to meet
-    ///                     the requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param pred         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the sequence
-    ///                     specified by [first, last). This is an unary predicate
-    ///                     for partitioning the source iterators. The signature of
-    ///                     this predicate should be equivalent to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
-    ///                     implicitly converted to Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a partition algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a partition algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a partition algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type \a parallel_task_policy
-    ///           and returns \a FwdIter otherwise.
-    ///           The \a partition algorithm returns the iterator to
-    ///           the first element of the second group.
-    ///
+    // clang-format off
     template <typename ExPolicy, typename FwdIter, typename Pred,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&& hpx::
-                traits::is_iterator<FwdIter>::value&& traits::is_projected<Proj,
-                    FwdIter>::value&& traits::is_indirect_callable<ExPolicy,
-                    Pred, traits::projected<Proj, FwdIter>>::value)>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type partition(
-        ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred,
-        Proj&& proj = Proj())
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter> &&
+            traits::is_projected_v<Proj, FwdIter> &&
+            traits::is_indirect_callable_v<ExPolicy,
+                    Pred, traits::projected<Proj, FwdIter>>
+        )>
+    // clang-format on
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::parallel::partition is deprecated, use "
+        "hpx::partition instead")
+        util::detail::algorithm_result_t<ExPolicy, FwdIter> partition(
+            ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred,
+            Proj&& proj = Proj())
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
             "Required at least forward iterator.");
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return detail::partition<FwdIter>().call(std::forward<ExPolicy>(policy),
             first, last, std::forward<Pred>(pred), std::forward<Proj>(proj));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -1130,24 +1513,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 
-            template <typename ExPolicy, typename InIter, typename OutIter1,
-                typename OutIter2, typename Pred,
+            template <typename ExPolicy, typename InIter, typename Sent,
+                typename OutIter1, typename OutIter2, typename Pred,
                 typename Proj = util::projection_identity>
             static hpx::tuple<InIter, OutIter1, OutIter2> sequential(ExPolicy,
-                InIter first, InIter last, OutIter1 dest_true,
+                InIter first, Sent last, OutIter1 dest_true,
                 OutIter2 dest_false, Pred&& pred, Proj&& proj)
             {
-                return sequential_partition_copy(first, last, dest_true,
+                auto last_iter = detail::advance_to_sentinel(first, last);
+                return sequential_partition_copy(first, last_iter, dest_true,
                     dest_false, std::forward<Pred>(pred),
                     std::forward<Proj>(proj));
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-                typename FwdIter3, typename Pred,
+            template <typename ExPolicy, typename FwdIter1, typename Sent,
+                typename FwdIter2, typename FwdIter3, typename Pred,
                 typename Proj = util::projection_identity>
             static typename util::detail::algorithm_result<ExPolicy,
                 hpx::tuple<FwdIter1, FwdIter2, FwdIter3>>::type
-            parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            parallel(ExPolicy&& policy, FwdIter1 first, Sent last,
                 FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
                 Proj&& proj)
             {
@@ -1161,9 +1545,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 if (first == last)
                     return result::get(
-                        hpx::make_tuple(last, dest_true, dest_false));
+                        hpx::make_tuple(first, dest_true, dest_false));
 
-                difference_type count = std::distance(first, last);
+                auto last_iter = detail::advance_to_sentinel(first, last);
+                difference_type count = std::distance(first, last_iter);
 
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);
@@ -1232,7 +1617,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 auto f4 =
-                    [last, dest_true, dest_false, flags](
+                    [last_iter, dest_true, dest_false, flags](
                         std::vector<
                             hpx::shared_future<output_iterator_offset>>&& items,
                         std::vector<hpx::future<void>>&&) mutable
@@ -1245,7 +1630,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::advance(dest_true, count_true);
                     std::advance(dest_false, count_false);
 
-                    return hpx::make_tuple(last, dest_true, dest_false);
+                    return hpx::make_tuple(last_iter, dest_true, dest_false);
                 };
 
                 return scan_partitioner_type::call(
@@ -1265,114 +1650,38 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Copies the elements in the range, defined by [first, last),
-    /// to two different ranges depending on the value returned by
-    /// the predicate \a pred. The elements, that satisfy the predicate \a pred,
-    /// are copied to the range beginning at \a dest_true. The rest of
-    /// the elements are copied to the range beginning at \a dest_false.
-    /// The order of the elements is preserved.
-    ///
-    /// \note   Complexity: Performs not more than \a last - \a first
-    ///         assignments, exactly \a last - \a first applications of the
-    ///         predicate \a f.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range for the elements that satisfy
-    ///                     the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter3    The type of the iterator representing the
-    ///                     destination range for the elements that don't satisfy
-    ///                     the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Pred        The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a partition_copy requires \a Pred to meet
-    ///                     the requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param dest_true    Refers to the beginning of the destination range for
-    ///                     the elements that satisfy the predicate \a pred.
-    /// \param dest_false   Refers to the beginning of the destination range for
-    ///                     the elements that don't satisfy the predicate \a pred.
-    /// \param pred         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the sequence
-    ///                     specified by [first, last). This is an unary predicate
-    ///                     for partitioning the source iterators. The signature of
-    ///                     this predicate should be equivalent to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
-    ///                     implicitly converted to Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a partition_copy algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a partition_copy algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a partition_copy algorithm returns a
-    /// \a hpx::future<tagged_tuple<tag::in(InIter), tag::out1(OutIter1), tag::out2(OutIter2)> >
-    ///           if the execution policy is of type \a parallel_task_policy
-    ///           and returns
-    /// \a tagged_tuple<tag::in(InIter), tag::out1(OutIter1), tag::out2(OutIter2)>
-    ///           otherwise.
-    ///           The \a partition_copy algorithm returns the tuple of
-    ///           the source iterator \a last,
-    ///           the destination iterator to the end of the \a dest_true range, and
-    ///           the destination iterator to the end of the \a dest_false range.
-    ///
+    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename Pred,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter1>::value&&
-                    hpx::traits::is_iterator<FwdIter2>::value&&
-                        hpx::traits::is_iterator<FwdIter3>::value&&
-                            traits::is_projected<Proj, FwdIter1>::value&&
-                                traits::is_indirect_callable<ExPolicy, Pred,
-                                    traits::projected<Proj, FwdIter1>>::value)>
-    typename util::detail::algorithm_result<ExPolicy,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
+            hpx::traits::is_iterator_v<FwdIter3> &&
+            traits::is_projected_v<Proj, FwdIter1> &&
+            traits::is_indirect_callable_v<ExPolicy, Pred,
+                traits::projected<Proj, FwdIter1>>
+        )>
+    // clang-format on
+    util::detail::algorithm_result_t<ExPolicy,
         hpx::util::tagged_tuple<tag::in(FwdIter1), tag::out1(FwdIter2),
-            tag::out2(FwdIter3)>>::type
+            tag::out2(FwdIter3)>>
     partition_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
         Proj&& proj = Proj())
     {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
             "Required at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
             "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter3>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter3>),
             "Requires at least forward iterator.");
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         using result_type = hpx::tuple<FwdIter1, FwdIter2, FwdIter3>;
 
         return hpx::util::make_tagged_tuple<tag::in, tag::out1, tag::out2>(
@@ -1380,5 +1689,202 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::forward<ExPolicy>(policy), first, last, dest_true,
                 dest_false, std::forward<Pred>(pred),
                 std::forward<Proj>(proj)));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
     }
 }}}    // namespace hpx::parallel::v1
+
+namespace hpx {
+    ///////////////////////////////////////////////////////////////////////////
+    // DPO for hpx::stable_partition
+    HPX_INLINE_CONSTEXPR_VARIABLE struct stable_partition_t final
+      : hpx::detail::tag_parallel_algorithm<stable_partition_t>
+    {
+        // clang-format off
+        template <typename BidirIter, typename F,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator_v<BidirIter> &&
+                parallel::traits::is_projected_v<Proj, BidirIter> &&
+                parallel::traits::is_indirect_callable_v<
+                    hpx::execution::sequenced_policy, F,
+                    parallel::traits::projected<Proj, BidirIter>>
+        )>
+        // clang-format on
+        friend BidirIter tag_fallback_dispatch(hpx::stable_partition_t,
+            BidirIter first, BidirIter last, F&& f, Proj&& proj = Proj())
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
+                "Requires at least bidirectional iterator.");
+
+            return hpx::parallel::v1::detail::stable_partition<BidirIter>()
+                .call2(hpx::execution::seq, std::true_type{}, first, last,
+                    std::forward<F>(f), std::forward<Proj>(proj));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename BidirIter, typename F,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<BidirIter> &&
+                parallel::traits::is_projected_v<Proj, BidirIter> &&
+                parallel::traits::is_indirect_callable_v<ExPolicy, F,
+                    parallel::traits::projected<Proj, BidirIter>>
+        )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result_t<ExPolicy,
+            BidirIter>
+        tag_fallback_dispatch(hpx::stable_partition_t, ExPolicy&& policy,
+            BidirIter first, BidirIter last, F&& f, Proj&& proj = Proj())
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
+                "Requires at least bidirectional iterator.");
+
+            using is_seq = std::integral_constant<bool,
+                hpx::is_sequenced_execution_policy_v<ExPolicy> ||
+                    !hpx::traits::is_random_access_iterator_v<BidirIter>>;
+
+            return hpx::parallel::v1::detail::stable_partition<BidirIter>()
+                .call2(std::forward<ExPolicy>(policy), is_seq(), first, last,
+                    std::forward<F>(f), std::forward<Proj>(proj));
+        }
+    } stable_partition{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // DPO for hpx::partition
+    HPX_INLINE_CONSTEXPR_VARIABLE struct partition_t final
+      : hpx::detail::tag_parallel_algorithm<partition_t>
+    {
+        // clang-format off
+        template <typename FwdIter, typename Pred,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator_v<FwdIter> &&
+                parallel::traits::is_projected_v<Proj, FwdIter> &&
+                parallel::traits::is_indirect_callable_v<
+                    hpx::execution::sequenced_policy,
+                    Pred, parallel::traits::projected<Proj, FwdIter>>
+        )>
+        // clang-format on
+        friend FwdIter tag_fallback_dispatch(hpx::partition_t, FwdIter first,
+            FwdIter last, Pred&& pred, Proj&& proj = Proj())
+        {
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+                "Required at least forward iterator.");
+
+            return hpx::parallel::v1::detail::partition<FwdIter>().call(
+                hpx::execution::seq, first, last, std::forward<Pred>(pred),
+                std::forward<Proj>(proj));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter, typename Pred,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter> &&
+                parallel::traits::is_projected_v<Proj, FwdIter> &&
+                parallel::traits::is_indirect_callable_v<ExPolicy,
+                    Pred, parallel::traits::projected<Proj, FwdIter>>
+        )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result_t<ExPolicy,
+            FwdIter>
+        tag_fallback_dispatch(hpx::partition_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, Pred&& pred, Proj&& proj = Proj())
+        {
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+                "Required at least forward iterator.");
+
+            return hpx::parallel::v1::detail::partition<FwdIter>().call(
+                std::forward<ExPolicy>(policy), first, last,
+                std::forward<Pred>(pred), std::forward<Proj>(proj));
+        }
+    } partition{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // DPO for hpx::partition_copy
+    HPX_INLINE_CONSTEXPR_VARIABLE struct partition_copy_t final
+      : hpx::detail::tag_parallel_algorithm<partition_copy_t>
+    {
+        // clang-format off
+        template <typename FwdIter1, typename FwdIter2,
+            typename FwdIter3, typename Pred,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
+                hpx::traits::is_iterator_v<FwdIter3> &&
+                parallel::traits::is_projected_v<Proj, FwdIter1> &&
+                parallel::traits::is_indirect_callable_v<
+                    hpx::execution::sequenced_policy, Pred,
+                    parallel::traits::projected<Proj, FwdIter1>>
+            )>
+        // clang-format on
+        friend hpx::util::tagged_tuple<parallel::v1::tag::in(FwdIter1),
+            parallel::v1::tag::out1(FwdIter2),
+            parallel::v1::tag::out2(FwdIter3)>
+        tag_fallback_dispatch(hpx::partition_copy_t, FwdIter1 first,
+            FwdIter1 last, FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
+            Proj&& proj = Proj())
+        {
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+                "Required at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter3>),
+                "Requires at least forward iterator.");
+
+            using result_type = hpx::tuple<FwdIter1, FwdIter2, FwdIter3>;
+
+            return hpx::util::make_tagged_tuple<parallel::v1::tag::in,
+                parallel::v1::tag::out1, parallel::v1::tag::out2>(
+                parallel::v1::detail::partition_copy<result_type>().call(
+                    hpx::execution::seq, first, last, dest_true, dest_false,
+                    std::forward<Pred>(pred), std::forward<Proj>(proj)));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename FwdIter3, typename Pred,
+            typename Proj = parallel::util::projection_identity,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
+                hpx::traits::is_iterator_v<FwdIter3> &&
+                parallel::traits::is_projected_v<Proj, FwdIter1> &&
+                parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
+                    parallel::traits::projected<Proj, FwdIter1>>
+            )>
+        // clang-format on
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+            hpx::util::tagged_tuple<parallel::v1::tag::in(FwdIter1),
+                parallel::v1::tag::out1(FwdIter2),
+                parallel::v1::tag::out2(FwdIter3)>>
+        tag_fallback_dispatch(hpx::partition_copy_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest_true,
+            FwdIter3 dest_false, Pred&& pred, Proj&& proj = Proj())
+        {
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+                "Required at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter3>),
+                "Requires at least forward iterator.");
+
+            using result_type = hpx::tuple<FwdIter1, FwdIter2, FwdIter3>;
+
+            return hpx::util::make_tagged_tuple<parallel::v1::tag::in,
+                parallel::v1::tag::out1, parallel::v1::tag::out2>(
+                parallel::v1::detail::partition_copy<result_type>().call(
+                    std::forward<ExPolicy>(policy), first, last, dest_true,
+                    dest_false, std::forward<Pred>(pred),
+                    std::forward<Proj>(proj)));
+        }
+    } partition_copy{};
+}    // namespace hpx
+
+#endif    // DOXYGEN

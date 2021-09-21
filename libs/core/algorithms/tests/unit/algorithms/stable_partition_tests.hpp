@@ -70,14 +70,11 @@ struct throw_bad_alloc
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag>
-void test_stable_partition(ExPolicy policy, IteratorTag)
+template <typename IteratorTag>
+void test_stable_partition(IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
-
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
@@ -86,9 +83,44 @@ void test_stable_partition(ExPolicy policy, IteratorTag)
 
     int partition_at = std::rand();
 
-    auto result =
-        hpx::parallel::stable_partition(policy, iterator(std::begin(c)),
-            iterator(std::end(c)), less_than(partition_at));
+    auto result = hpx::stable_partition(iterator(std::begin(c)),
+        iterator(std::end(c)), less_than(partition_at));
+
+    auto partition_pt = std::find_if(
+        std::begin(c), std::end(c), great_equal_than(partition_at));
+    HPX_TEST(result.base() == partition_pt);
+
+    // verify values
+    std::stable_partition(std::begin(d), std::end(d), less_than(partition_at));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_stable_partition(ExPolicy policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    std::vector<int> c(10007);
+    std::vector<int> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::copy(std::begin(c), std::end(c), std::begin(d));
+
+    int partition_at = std::rand();
+
+    auto result = hpx::stable_partition(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), less_than(partition_at));
 
     auto partition_pt = std::find_if(
         std::begin(c), std::end(c), great_equal_than(partition_at));
@@ -113,8 +145,8 @@ void test_stable_partition_async(ExPolicy p, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
@@ -123,7 +155,7 @@ void test_stable_partition_async(ExPolicy p, IteratorTag)
 
     int partition_at = std::rand();
 
-    auto f = hpx::parallel::stable_partition(p, iterator(std::begin(c)),
+    auto f = hpx::stable_partition(p, iterator(std::begin(c)),
         iterator(std::end(c)), less_than(partition_at));
 
     auto result = f.get();
@@ -151,8 +183,8 @@ void test_stable_partition_exception(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
@@ -161,7 +193,7 @@ void test_stable_partition_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::stable_partition(policy, iterator(std::begin(c)),
+        hpx::stable_partition(policy, iterator(std::begin(c)),
             iterator(std::end(c)), throw_always());
 
         HPX_TEST(false);
@@ -182,8 +214,8 @@ void test_stable_partition_exception(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_stable_partition_exception_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
@@ -193,7 +225,7 @@ void test_stable_partition_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::stable_partition(
+        auto f = hpx::stable_partition(
             p, iterator(std::begin(c)), iterator(std::end(c)), throw_always());
         returned_from_algorithm = true;
         f.get();
@@ -221,8 +253,8 @@ void test_stable_partition_bad_alloc(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
@@ -231,7 +263,7 @@ void test_stable_partition_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::stable_partition(policy, iterator(std::begin(c)),
+        hpx::stable_partition(policy, iterator(std::begin(c)),
             iterator(std::end(c)), throw_bad_alloc());
 
         HPX_TEST(false);
@@ -251,8 +283,8 @@ void test_stable_partition_bad_alloc(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_stable_partition_bad_alloc_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
@@ -262,7 +294,7 @@ void test_stable_partition_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::stable_partition(p, iterator(std::begin(c)),
+        auto f = hpx::stable_partition(p, iterator(std::begin(c)),
             iterator(std::end(c)), throw_bad_alloc());
         returned_from_algorithm = true;
         f.get();

@@ -76,8 +76,8 @@ Functions
 - :cpp:func:`hpx::move`
 - :cpp:func:`hpx::none_of`
 - :cpp:func:`hpx::partial_sort`
-- :cpp:func:`hpx::parallel::v1::partition`
-- :cpp:func:`hpx::parallel::v1::partition_copy`
+- :cpp:func:`hpx::partition`
+- :cpp:func:`hpx::partition_copy`
 - :cpp:func:`hpx::remove`
 - :cpp:func:`hpx::remove_copy`
 - :cpp:func:`hpx::remove_copy_if`
@@ -88,8 +88,8 @@ Functions
 - :cpp:func:`hpx::replace_if`
 - :cpp:func:`hpx::reverse`
 - :cpp:func:`hpx::reverse_copy`
-- :cpp:func:`hpx::parallel::v1::rotate`
-- :cpp:func:`hpx::parallel::v1::rotate_copy`
+- :cpp:func:`hpx::rotate`
+- :cpp:func:`hpx::rotate_copy`
 - :cpp:func:`hpx::search`
 - :cpp:func:`hpx::search_n`
 - :cpp:func:`hpx::set_difference`
@@ -99,7 +99,7 @@ Functions
 - :cpp:func:`hpx::shift_left`
 - :cpp:func:`hpx::shift_right`
 - :cpp:func:`hpx::sort`
-- :cpp:func:`hpx::parallel::v1::stable_partition`
+- :cpp:func:`hpx::stable_partition`
 - :cpp:func:`hpx::swap_ranges`
 - :cpp:func:`hpx::stable_sort`
 - :cpp:func:`hpx::transform`
@@ -141,16 +141,16 @@ Functions
 - :cpp:func:`hpx::ranges::merge`
 - :cpp:func:`hpx::ranges::move`
 - :cpp:func:`hpx::ranges::none_of`
+- :cpp:func:`hpx::ranges::partition`
+- :cpp:func:`hpx::ranges::partition_copy`
 - :cpp:func:`hpx::ranges::set_difference`
 - :cpp:func:`hpx::ranges::set_intersection`
 - :cpp:func:`hpx::ranges::set_symmetric_difference`
 - :cpp:func:`hpx::ranges::set_union`
-<<<<<<< HEAD
-- :cpp:func:`hpx::ranges::sort`
-=======
 - :cpp:func:`hpx::ranges::shift_left`
 - :cpp:func:`hpx::ranges::shift_right`
->>>>>>> a34e9dd378 (added shift_left and shift_right to sphinx docs)
+- :cpp:func:`hpx::ranges::sort`
+- :cpp:func:`hpx::ranges::stable_partition`
 - :cpp:func:`hpx::ranges::stable_sort`
 - :cpp:func:`hpx::ranges::swap_ranges`
 - :cpp:func:`hpx::ranges::unique`

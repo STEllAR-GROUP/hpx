@@ -157,20 +157,19 @@ namespace hpx { namespace parallel { namespace util {
         HPX_NO_UNIQUE_ADDRESS O out;
 
         template <typename II1, typename II2, typename O1,
-            typename Enable = typename std::enable_if<
-                std::is_convertible<I1 const&, II1>::value &&
-                std::is_convertible<I2 const&, II2>::value &&
-                std::is_convertible<O const&, O1>::value>::type>
+            typename Enable = typename std::enable_if_t<
+                std::is_convertible_v<I1 const&, II1> &&
+                std::is_convertible_v<I2 const&, II2> &&
+                std::is_convertible_v<O const&, O1>>>
         constexpr operator in_in_out_result<II1, II2, O1>() const&
         {
             return {in1, in2, out};
         }
 
         template <typename II2, typename II1, typename O1,
-            typename Enable =
-                typename std::enable_if<std::is_convertible<I1, II1>::value &&
-                    std::is_convertible<I2, II2>::value &&
-                    std::is_convertible<O, O1>::value>::type>
+            typename Enable = typename std::enable_if_t<
+                std::is_convertible_v<I1, II1> &&
+                std::is_convertible_v<I2, II2> && std::is_convertible_v<O, O1>>>
         constexpr operator in_in_out_result<II1, II2, O1>() &&
         {
             return {std::move(in1), std::move(in2), std::move(out)};
@@ -198,6 +197,70 @@ namespace hpx { namespace parallel { namespace util {
     {
         return lcos::make_future<O>(std::move(f),
             [](in_in_out_result<I1, I2, O>&& p) { return p.out; });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename I, typename O1, typename O2>
+    struct in_out_out_result
+    {
+        HPX_NO_UNIQUE_ADDRESS I in;
+        HPX_NO_UNIQUE_ADDRESS O1 out1;
+        HPX_NO_UNIQUE_ADDRESS O2 out2;
+
+        template <typename II, typename OO1, typename OO2,
+            typename Enable =
+                typename std::enable_if_t<std::is_convertible_v<I const&, II> &&
+                    std::is_convertible_v<O1 const&, OO1> &&
+                    std::is_convertible_v<O2 const&, OO2>>>
+        constexpr operator in_out_out_result<II, OO1, OO2>() const&
+        {
+            return {in, out1, out2};
+        }
+
+        template <typename II, typename OO1, typename OO2,
+            typename Enable =
+                typename std::enable_if_t<std::is_convertible_v<I, II> &&
+                    std::is_convertible_v<O1, OO1> &&
+                    std::is_convertible_v<O2, OO2>>>
+        constexpr operator in_out_out_result<II, OO1, OO2>() &&
+        {
+            return {std::move(in), std::move(out1), std::move(out2)};
+        }
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            // clang-format off
+            ar & in & out1 & out2;
+            // clang-format on
+        }
+    };
+
+    template <typename... Ts>
+    constexpr HPX_FORCEINLINE in_out_out_result<Ts...> make_in_out_out_result(
+        hpx::tuple<Ts...>&& t)
+    {
+        static_assert(hpx::tuple_size<hpx::tuple<Ts...>>::value == 3,
+            "size of tuple should be 3 to convert to in_out_out_result");
+
+        using result_type = in_out_out_result<Ts...>;
+
+        return result_type{hpx::get<0>(t), hpx::get<1>(t), hpx::get<2>(t)};
+    }
+
+    template <typename... Ts>
+    hpx::future<in_out_out_result<Ts...>> make_in_out_out_result(
+        hpx::future<hpx::tuple<Ts...>>&& f)
+    {
+        static_assert(hpx::tuple_size<hpx::tuple<Ts...>>::value == 3,
+            "size of tuple should be 3 to convert to in_out_out_result");
+
+        using result_type = in_out_out_result<Ts...>;
+
+        return lcos::make_future<result_type>(
+            std::move(f), [](hpx::tuple<Ts...>&& t) -> result_type {
+                return make_in_out_out_result(std::move(t));
+            });
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -341,5 +404,6 @@ namespace hpx { namespace ranges {
     using hpx::parallel::util::in_fun_result;
     using hpx::parallel::util::in_in_out_result;
     using hpx::parallel::util::in_in_result;
+    using hpx::parallel::util::in_out_out_result;
     using hpx::parallel::util::in_out_result;
 }}    // namespace hpx::ranges

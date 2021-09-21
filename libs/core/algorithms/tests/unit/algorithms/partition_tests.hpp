@@ -102,6 +102,37 @@ struct random_fill
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag, typename DataType, typename Pred>
+void test_partition(
+    IteratorTag, DataType, Pred pred, std::size_t size, random_fill gen_functor)
+{
+    typedef typename std::vector<DataType>::iterator base_iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    std::vector<DataType> c(size), c_org;
+    std::generate(std::begin(c), std::end(c), gen_functor);
+    c_org = c;
+
+    auto result =
+        hpx::partition(iterator(std::begin(c)), iterator(std::end(c)), pred);
+
+    bool is_partitioned = std::is_partitioned(std::begin(c), std::end(c), pred);
+
+    HPX_TEST(is_partitioned);
+
+    auto solution = std::partition_point(std::begin(c), std::end(c), pred);
+
+    HPX_TEST(result.base() == solution);
+
+    std::sort(std::begin(c), std::end(c));
+    std::sort(std::begin(c_org), std::end(c_org));
+
+    bool unchanged = test::equal(
+        std::begin(c), std::end(c), std::begin(c_org), std::end(c_org));
+
+    HPX_TEST(unchanged);
+}
+
 template <typename ExPolicy, typename IteratorTag, typename DataType,
     typename Pred>
 void test_partition(ExPolicy policy, IteratorTag, DataType, Pred pred,
@@ -111,13 +142,13 @@ void test_partition(ExPolicy policy, IteratorTag, DataType, Pred pred,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::vector<DataType>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<DataType> c(size), c_org;
     std::generate(std::begin(c), std::end(c), gen_functor);
     c_org = c;
 
-    auto result = hpx::parallel::partition(
+    auto result = hpx::partition(
         policy, iterator(std::begin(c)), iterator(std::end(c)), pred);
 
     bool is_partitioned = std::is_partitioned(std::begin(c), std::end(c), pred);
@@ -146,13 +177,13 @@ void test_partition_async(ExPolicy policy, IteratorTag, DataType, Pred pred,
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef typename std::vector<DataType>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<DataType> c(size), c_org;
     std::generate(std::begin(c), std::end(c), gen_functor);
     c_org = c;
 
-    auto f = hpx::parallel::partition(
+    auto f = hpx::partition(
         policy, iterator(std::begin(c)), iterator(std::end(c)), pred);
     auto result = f.get();
 
@@ -180,8 +211,8 @@ void test_partition_exception(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 30007;
     std::vector<int> c(size);
@@ -190,7 +221,7 @@ void test_partition_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        auto result = hpx::parallel::partition(policy, iterator(std::begin(c)),
+        auto result = hpx::partition(policy, iterator(std::begin(c)),
             iterator(std::end(c)), throw_always());
 
         HPX_UNUSED(result);
@@ -212,8 +243,8 @@ void test_partition_exception(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_partition_exception_async(ExPolicy policy, IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 30007;
     std::vector<int> c(size);
@@ -223,7 +254,7 @@ void test_partition_exception_async(ExPolicy policy, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::partition(policy, iterator(std::begin(c)),
+        auto f = hpx::partition(policy, iterator(std::begin(c)),
             iterator(std::end(c)), throw_always());
         returned_from_algorithm = true;
         f.get();
@@ -251,8 +282,8 @@ void test_partition_bad_alloc(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 30007;
     std::vector<int> c(size);
@@ -261,7 +292,7 @@ void test_partition_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        auto result = hpx::parallel::partition(policy, iterator(std::begin(c)),
+        auto result = hpx::partition(policy, iterator(std::begin(c)),
             iterator(std::end(c)), throw_bad_alloc());
 
         HPX_UNUSED(result);
@@ -282,8 +313,8 @@ void test_partition_bad_alloc(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_partition_bad_alloc_async(ExPolicy policy, IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size = 30007;
     std::vector<int> c(size);
@@ -293,7 +324,7 @@ void test_partition_bad_alloc_async(ExPolicy policy, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::partition(policy, iterator(std::begin(c)),
+        auto f = hpx::partition(policy, iterator(std::begin(c)),
             iterator(std::end(c)), throw_bad_alloc());
         returned_from_algorithm = true;
         f.get();
@@ -311,6 +342,16 @@ void test_partition_bad_alloc_async(ExPolicy policy, IteratorTag)
 
     HPX_TEST(caught_bad_alloc);
     HPX_TEST(returned_from_algorithm);
+}
+
+template <typename IteratorTag, typename DataType, typename Pred>
+void test_partition(IteratorTag, DataType, Pred pred, int rand_base)
+{
+    const std::size_t size = 30007;
+    const int half_range = size / 10;
+
+    test_partition(IteratorTag(), DataType(), pred, size,
+        random_fill(rand_base, half_range));
 }
 
 template <typename ExPolicy, typename IteratorTag, typename DataType,
@@ -373,6 +414,9 @@ void test_partition()
 
     ////////// Test cases for 'int' type.
     test_partition(
+        IteratorTag(), int(),
+        [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
+    test_partition(
         seq, IteratorTag(), int(),
         [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
     test_partition(
@@ -383,6 +427,11 @@ void test_partition()
         [rand_base](const int n) -> bool { return n > rand_base; }, rand_base);
 
     ////////// Test cases for user defined type.
+    test_partition(
+        IteratorTag(), user_defined_type(),
+        [rand_base](
+            user_defined_type const& t) -> bool { return t < rand_base; },
+        rand_base);
     test_partition(
         seq, IteratorTag(), user_defined_type(),
         [rand_base](

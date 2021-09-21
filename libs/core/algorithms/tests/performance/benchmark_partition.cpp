@@ -81,7 +81,7 @@ double run_partition_benchmark_hpx(int test_count, ExPolicy policy,
         hpx::copy(hpx::execution::par, org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now();
-        hpx::parallel::partition(policy, first, last, pred);
+        hpx::partition(policy, first, last, pred);
         time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 

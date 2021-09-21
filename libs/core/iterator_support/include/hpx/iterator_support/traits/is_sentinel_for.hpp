@@ -26,11 +26,15 @@ namespace hpx { namespace traits {
 
     template <typename Sent, typename Iter>
     struct is_sentinel_for<Sent, Iter,
-        typename std::enable_if<is_iterator<Iter>::value &&
-            is_weakly_equality_comparable_with<Iter, Sent>::value>::type>
+        typename std::enable_if_t<is_iterator_v<Iter> &&
+            is_weakly_equality_comparable_with<Iter, Sent>::value>>
       : std::true_type
     {
     };
+
+    template <typename Sent, typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_sentinel_for_v =
+        is_sentinel_for<Sent, Iter>::value;
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR)
@@ -50,10 +54,9 @@ namespace hpx { namespace traits {
     template <typename Sent, typename Iter>
     struct is_sized_sentinel_for<Sent, Iter,
         typename util::always_void<
-            typename std::enable_if<
-                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
+            std::enable_if_t<hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 !disable_sized_sentinel_for<typename std::remove_cv<Sent>::type,
-                    typename std::remove_cv<Iter>::type>>::type,
+                    typename std::remove_cv<Iter>::type>>,
             typename detail::subtraction_result<Iter, Sent>::type,
             typename detail::subtraction_result<Sent, Iter>::type>::type>
       : std::true_type

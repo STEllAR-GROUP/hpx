@@ -626,11 +626,11 @@ Parallel algorithms
      * Divides elements into two groups without preserving their relative order.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`partition`
-   * * :cpp:func:`hpx::parallel::v1::partition_copy`
+   * * :cpp:func:`hpx::partition_copy`
      * Copies a range dividing the elements into two groups.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`partition_copy`
-   * * :cpp:func:`hpx::parallel::v1::stable_partition`
+   * * :cpp:func:`hpx::stable_partition`
      * Divides elements into two groups while preserving their relative order.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`stable_partition`
