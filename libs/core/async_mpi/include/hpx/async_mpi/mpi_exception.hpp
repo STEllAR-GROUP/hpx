@@ -34,9 +34,9 @@ namespace hpx::mpi::experimental {
 
     // -------------------------------------------------------------------------
     // exception type for failed launch of MPI functions
-    struct HPX_EXPORT mpi_exception : hpx::exception
+    struct mpi_exception : hpx::exception
     {
-        mpi_exception(int err_code, const std::string& msg = "")
+        explicit mpi_exception(int err_code, const std::string& msg = "")
           : err_code_(err_code)
         {
             hpx::exception(hpx::bad_function_call,
