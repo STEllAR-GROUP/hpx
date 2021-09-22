@@ -28,18 +28,18 @@ std::mt19937 gen(seed);
 template <typename IteratorTag>
 void test_fill(IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
     hpx::fill(iterator(std::begin(c)), iterator(std::end(c)), 10);
 
     // verify values
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(10));
+    std::for_each(std::begin(c), std::end(c), [&count](int v) -> void {
+        HPX_TEST_EQ(v, int(10));
         ++count;
     });
     HPX_TEST_EQ(count, c.size());
@@ -51,18 +51,18 @@ void test_fill(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
     hpx::fill(policy, iterator(std::begin(c)), iterator(std::end(c)), 10);
 
     // verify values
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(10));
+    std::for_each(std::begin(c), std::end(c), [&count](int v) -> void {
+        HPX_TEST_EQ(v, int(10));
         ++count;
     });
     HPX_TEST_EQ(count, c.size());
@@ -71,10 +71,10 @@ void test_fill(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_fill_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
     hpx::future<void> f =
@@ -82,8 +82,8 @@ void test_fill_async(ExPolicy p, IteratorTag)
     f.wait();
 
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(10));
+    std::for_each(std::begin(c), std::end(c), [&count](int v) -> void {
+        HPX_TEST_EQ(v, int(10));
         ++count;
     });
     HPX_TEST_EQ(count, c.size());
@@ -93,10 +93,10 @@ void test_fill_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_fill_exception(IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
@@ -127,10 +127,10 @@ void test_fill_exception(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
@@ -158,11 +158,11 @@ void test_fill_exception(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_fill_exception_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
@@ -199,11 +199,11 @@ void test_fill_bad_alloc(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c(100007);
+    std::vector<int> c(100007);
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
@@ -229,11 +229,11 @@ void test_fill_bad_alloc(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_fill_bad_alloc_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
