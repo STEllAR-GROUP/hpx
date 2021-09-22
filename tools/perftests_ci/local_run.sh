@@ -7,7 +7,7 @@
 
 # To execute from the build directory
 
-source_dir=~/projects/hpx_perftest_ci
+source_dir=${1:-~/projects/hpx_perftests_ci}
 build_dir=$PWD
 
 # Clean old artifacts if any
@@ -21,21 +21,40 @@ source /apps/daint/SSL/HPX/virtual_envs/perftests_env/bin/activate
 mkdir -p ${build_dir}/tools
 cp -r ${source_dir}/tools/perftests_ci ${build_dir}/tools
 perftests_dir=${build_dir}/tools/perftests_ci
-reference=${perftests_dir}/perftest/references/daint_default/local-priority-fifo.json
 mkdir -p ${build_dir}/reports
-result=${build_dir}/reports/local-priority-fifo.json
-logfile=log_perftest.tmp
+logfile=log_perftest_plot.tmp
+
+hpx_targets=("future_overhead_report_test" "stream_report_test")
+hpx_test_options=("--test-all --repetitions=100 --hpx:queuing=local-priority \
+    --hpx:threads=4" "--hpx:threads=4")
 
 # Build
-${perftests_dir}/driver.py -v -l $logfile build -b release -o build --source-dir ${source_dir} --build-dir ${build_dir} -t tests.performance.local.future_overhead_report
+${perftests_dir}/driver.py -v -l $logfile build -b release -o build \
+    --source-dir ${source_dir} --build-dir ${build_dir} \
+    -t "${hpx_targets[@]}"
 
-# Run
-${perftests_dir}/driver.py -v -l $logfile perftest run --local True \
---scheduling-policy local-priority --run_output $result --extra-opts \
-' --test-all --repetitions=100'
-# We add a space before --test-all because of the following issue
-# https://bugs.python.org/issue9334
+index=0
+result_files=""
+# Run and compare for each targets specified
+for executable in "${hpx_targets[@]}"
+do
+    test_opts=${hpx_test_options[$index]}
+    result=${build_dir}/reports/${executable}.json
+    reference=${perftests_dir}/perftest/references/daint_default/${executable}.json
+    logfile_tmp=log_perftest_${executable}.tmp
+    result_files+=(${result})
+    references_files+=(${reference})
+
+    run_command=("./bin/${executable} ${test_opts}")
+
+    # Run
+    ${perftests_dir}/driver.py -v -l $logfile_tmp perftest run --local True \
+    --run_output $result --targets-and-opts "${run_command[@]}"
+
+    index=$((index+1))
+done
 
 # Plot
-${perftests_dir}/driver.py -v -l $logfile perftest plot compare -i $reference \
- $result -o ${build_dir}/reports/reference-comparison
+${perftests_dir}/driver.py -v -l $logfile perftest plot compare --references \
+    ${references_files[@]} --results ${result_files[@]} \
+    -o ${build_dir}/reports/reference-comparison

@@ -1,0 +1,79 @@
+{
+  "outputs": [
+    {
+      "name": "Stream benchmark - Add",
+      "executor": "parallel_executor_default_parallel_policy_allocator",
+      "series": [
+        1.9703e-05,
+        1.7769e-05,
+        1.6576e-05,
+        1.639e-05,
+        1.6162e-05,
+        1.7264e-05,
+        1.6678e-05,
+        1.7928e-05,
+        1.5776e-05,
+        1.5911e-05
+      ]
+    },
+    {
+      "name": "Stream benchmark - Scale",
+      "executor": "parallel_executor_default_parallel_policy_allocator",
+      "series": [
+        9.1783e-05,
+        2.02e-05,
+        1.4971e-05,
+        1.5829e-05,
+        1.7313e-05,
+        1.6269e-05,
+        1.8664e-05,
+        1.5819e-05,
+        1.8006e-05,
+        1.6015e-05
+      ]
+    },
+    {
+      "name": "Stream benchmark - Triad",
+      "executor": "parallel_executor_default_parallel_policy_allocator",
+      "series": [
+        1.7183e-05,
+        1.5656e-05,
+        1.5856e-05,
+        5.8144e-05,
+        6.5227e-05,
+        5.8572e-05,
+        1.4926e-05,
+        1.7811e-05,
+        1.5796e-05,
+        1.7241e-05
+      ]
+    },
+    {
+      "name": "stream benchmark - Copy",
+      "executor": "parallel_executor_default_parallel_policy_allocator",
+      "series": [
+        0.000154863,
+        0.000188366,
+        0.000158193,
+        0.000158255,
+        0.000167772,
+        0.000152655,
+        0.000168753,
+        0.000175423,
+        0.000186618,
+        0.000167234
+      ]
+    }
+  ],
+  "HPX": {
+    "commit": "54b8b4c1b93a73a48109b96314c9c01e86ba740b",
+    "datetime": "2021-09-27T14:36:41+00:00"
+  },
+  "environment": {
+    "hostname": "nid01143",
+    "clustername": "daint",
+    "compiler": "/apps/daint/SSL/HPX/packages/llvm-11.0.0/bin/clang++ 11.0.0",
+    "datetime": "2021-09-27T16:52:34.576933+02:00",
+    "envfile": null
+  }
+}
