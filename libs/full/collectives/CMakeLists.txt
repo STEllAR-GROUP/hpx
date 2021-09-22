@@ -70,15 +70,8 @@ add_hpx_module(
   SOURCES ${collectives_sources}
   HEADERS ${collectives_headers}
   COMPAT_HEADERS ${collectives_compat_headers}
-  DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES
-    hpx_actions
-    hpx_async_colocated
-    hpx_async_distributed
-    hpx_components
-    hpx_program_options
-    hpx_runtime_components
-    hpx_runtime_configuration
-    hpx_threadmanager
+  DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_actions hpx_async_colocated hpx_async_distributed
+                      hpx_components hpx_runtime_components
   CMAKE_SUBDIRS examples tests
 )

@@ -14,7 +14,6 @@
 #include <hpx/compute/cuda/concurrent_executor.hpp>
 #include <hpx/compute/cuda/default_executor.hpp>
 #include <hpx/compute/cuda/serialization/value_proxy.hpp>
-#include <hpx/compute/cuda/target_distribution_policy.hpp>
 #include <hpx/compute/cuda/target_ptr.hpp>
 #include <hpx/compute/cuda/traits/access_target.hpp>
 #include <hpx/compute/cuda/transfer.hpp>

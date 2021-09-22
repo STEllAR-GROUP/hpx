@@ -20,12 +20,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests ${tests} resume_priority thread_rescheduling)
 endif()
 
-if(HPX_WITH_THREAD_POOL_OS_EXECUTORS_COMPATIBILITY)
-  set(tests ${tests} thread_pool_executor_1112)
-endif()
-
 set(block_os_threads_1036_PARAMETERS THREADS_PER_LOCALITY 4 RUN_SERIAL)
-set(thread_pool_executor_1112_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_rescheduling_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_suspend_pending_PARAMETERS THREADS_PER_LOCALITY 1)
 set(thread_suspend_duration_PARAMETERS THREADS_PER_LOCALITY 1)

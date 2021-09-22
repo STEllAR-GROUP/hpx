@@ -90,19 +90,9 @@ namespace hpx { namespace util {
 #define HPX_UNUSED(x) ::hpx::util::unused = (x)
 #endif
 
-// clang-format off
 /////////////////////////////////////////////////////////////
 // use this to silence compiler warnings for global variables
-#ifdef HPX_HAVE_CXX17_MAYBE_UNUSED
-#  define HPX_MAYBE_UNUSED [[maybe_unused]]
-#else
-#  if defined(HPX_GCC_VERSION)
-#    define HPX_MAYBE_UNUSED __attribute__((unused))
-#  else
-#    define HPX_MAYBE_UNUSED /* empty */
-#  endif
-#endif
-// clang-format on
+#define HPX_MAYBE_UNUSED [[maybe_unused]]
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)

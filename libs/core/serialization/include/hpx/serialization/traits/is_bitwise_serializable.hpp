@@ -12,10 +12,19 @@
 
 namespace hpx { namespace traits {
 
+#if !defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
     template <typename T>
     struct is_bitwise_serializable : std::is_arithmetic<T>
     {
     };
+#else
+    template <typename T>
+    struct is_bitwise_serializable
+      : std::integral_constant<bool,
+            std::is_arithmetic<T>::value || std::is_pointer<T>::value>
+    {
+    };
+#endif
 
     template <typename T>
     HPX_INLINE_CONSTEXPR_VARIABLE bool is_bitwise_serializable_v =

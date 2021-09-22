@@ -514,7 +514,15 @@ Parallel algorithms
      * Copies and rotates a range of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`rotate_copy`
-   * * :cpp:func:`hpx::parallel::v1::swap_ranges`
+   * * :cpp:func:`hpx::shift_left`
+     * Shifts the elements in the range left by n positions.
+     * ``<hpx/algorithm.hpp>``
+     * :cppreference-algorithm:`shift_left`
+   * * :cpp:func:`hpx::shift_right`
+     * Shifts the elements in the range right by n positions.
+     * ``<hpx/algorithm.hpp>``
+     * :cppreference-algorithm:`shift_right`
+   * * :cpp:func:`hpx::swap_ranges`
      * Swaps two ranges of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`swap_ranges`
@@ -522,12 +530,12 @@ Parallel algorithms
      * Applies a function to a range of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`transform`
-   * * :cpp:func:`hpx::parallel::v1::unique_copy`
+   * * :cpp:func:`hpx::unique`
      * Eliminates all but the first element from every consecutive group of equivalent elements from a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`unique`
-   * * :cpp:func:`hpx::parallel::v1::unique_copy`
-     * Eliminates all but the first element from every consecutive group of equivalent elements from a range.
+   * * :cpp:func:`hpx::unique_copy`
+     * Copies the elements from one range to another in such a way that there are no consecutive equal elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`unique_copy`
 
@@ -618,11 +626,11 @@ Parallel algorithms
      * Divides elements into two groups without preserving their relative order.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`partition`
-   * * :cpp:func:`hpx::parallel::v1::partition_copy`
+   * * :cpp:func:`hpx::partition_copy`
      * Copies a range dividing the elements into two groups.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`partition_copy`
-   * * :cpp:func:`hpx::parallel::v1::stable_partition`
+   * * :cpp:func:`hpx::stable_partition`
      * Divides elements into two groups while preserving their relative order.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`stable_partition`
@@ -641,11 +649,11 @@ Parallel algorithms
      * Returns the first unsorted element.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`is_sorted_until`
-   * * :cpp:func:`hpx::parallel::v1::sort`
+   * * :cpp:func:`hpx::sort`
      * Sorts the elements in a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`sort`
-   * * :cpp:func:`hpx::parallel::v1::stable_sort`
+   * * :cpp:func:`hpx::stable_sort`
      * Sorts the elements in a range, maintain sequence of equal elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`stable_sort`
@@ -669,7 +677,7 @@ Parallel algorithms
      * Calculates the difference between each element in an input range and the preceding element.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`adjacent_difference`
-   * * :cpp:func:`hpx::parallel::v1::exclusive_scan`
+   * * :cpp:func:`hpx::exclusive_scan`
      * Does an exclusive parallel scan over a range of elements.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`exclusive_scan`
@@ -677,7 +685,7 @@ Parallel algorithms
      * Sums up a range of elements.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`reduce`
-   * * :cpp:func:`hpx::parallel::v1::inclusive_scan`
+   * * :cpp:func:`hpx::inclusive_scan`
      * Does an inclusive parallel scan over a range of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`inclusive_scan`
@@ -693,7 +701,7 @@ Parallel algorithms
      * Sums up a range of elements after applying a function. Also, accumulates the inner products of two input ranges.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`transform_reduce`
-   * * :cpp:func:`hpx::parallel::v1::transform_inclusive_scan`
+   * * :cpp:func:`hpx::transform_inclusive_scan`
      * Does an inclusive parallel scan over a range of elements after applying a function.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`transform_inclusive_scan`

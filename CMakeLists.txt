@@ -14,7 +14,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 # Overrides must go before the project() statement, otherwise they are ignored.
 
@@ -82,7 +82,7 @@ include(GNUInstallDirs)
 include(HPX_Utils)
 
 # explicitly set certain policies
-cmake_policy(VERSION 3.17)
+cmake_policy(VERSION 3.18)
 hpx_set_cmake_policy(CMP0042 NEW)
 hpx_set_cmake_policy(CMP0060 NEW)
 hpx_set_cmake_policy(CMP0074 NEW)
@@ -322,69 +322,94 @@ hpx_option(
 if(HPX_WITH_PRECOMPILED_HEADERS)
   set(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL ON)
 
+  set(system_precompiled_headers
+      <algorithm>
+      <array>
+      <atomic>
+      <bitset>
+      <cassert>
+      <cctype>
+      <cerrno>
+      <chrono>
+      <climits>
+      <cmath>
+      <complex>
+      <condition_variable>
+      <cstddef>
+      <cstdint>
+      <cstdio>
+      <cstdlib>
+      <cstring>
+      <ctime>
+      <deque>
+      <exception>
+      <execution>
+      <forward_list>
+      <fstream>
+      <functional>
+      <iomanip>
+      <ios>
+      <iosfwd>
+      <iostream>
+      <iterator>
+      <limits>
+      <list>
+      <locale>
+      <map>
+      <memory>
+      <mutex>
+      <new>
+      <numeric>
+      <ostream>
+      <random>
+      <regex>
+      <set>
+      <shared_mutex>
+      <sstream>
+      <stack>
+      <stdexcept>
+      <string>
+      <system_error>
+      <thread>
+      <tuple>
+      <type_traits>
+      <typeinfo>
+      <unordered_map>
+      <unordered_set>
+      <utility>
+      <variant>
+      <vector>
+      <hwloc.h>
+      <asio/basic_waitable_timer.hpp>
+      <asio/io_context.hpp>
+      <asio/ip/tcp.hpp>
+      <boost/config.hpp>
+      <boost/container/small_vector.hpp>
+      <boost/fusion/include/vector.hpp>
+      <boost/intrusive/slist.hpp>
+      <boost/lockfree/queue.hpp>
+      <boost/optional.hpp>
+      <boost/spirit/home/x3.hpp>
+      <boost/tokenizer.hpp>
+      <boost/utility/string_ref.hpp>
+  )
+
+  if(HPX_WITH_CXX17_FILESYSTEM)
+    list(APPEND system_precompiled_headers <filesystem>)
+  endif()
+
+  set(system_precompiled_headers_dependencies
+      hpx_dependencies_boost hpx_private_flags hpx_public_flags Asio::asio
+  )
+
   add_library(hpx_precompiled_headers OBJECT libs/src/dummy.cpp)
   target_link_libraries(
-    hpx_precompiled_headers PRIVATE hpx_public_flags hpx_private_flags
-                                    hpx_base_libraries
+    hpx_precompiled_headers
+    PRIVATE hpx_public_flags hpx_private_flags hpx_base_libraries
+            ${system_precompiled_headers_dependencies}
   )
   target_precompile_headers(
-    hpx_precompiled_headers
-    PRIVATE
-    <algorithm>
-    <array>
-    <atomic>
-    <bitset>
-    <cassert>
-    <cctype>
-    <cerrno>
-    <chrono>
-    <climits>
-    <cmath>
-    <complex>
-    <condition_variable>
-    <cstddef>
-    <cstdint>
-    <cstdio>
-    <cstdlib>
-    <cstring>
-    <ctime>
-    <deque>
-    <exception>
-    <forward_list>
-    <fstream>
-    <functional>
-    <iomanip>
-    <ios>
-    <iosfwd>
-    <iostream>
-    <iterator>
-    <limits>
-    <list>
-    <locale>
-    <map>
-    <memory>
-    <mutex>
-    <new>
-    <numeric>
-    <ostream>
-    <random>
-    <regex>
-    <set>
-    <shared_mutex>
-    <sstream>
-    <stack>
-    <stdexcept>
-    <string>
-    <system_error>
-    <thread>
-    <tuple>
-    <type_traits>
-    <typeinfo>
-    <unordered_map>
-    <unordered_set>
-    <utility>
-    <variant>
-    <vector>
+    hpx_precompiled_headers PRIVATE ${system_precompiled_headers}
   )
 
   set_target_properties(hpx_precompiled_headers PROPERTIES FOLDER "Core")
@@ -621,11 +646,6 @@ if(HPX_WITH_CUDA AND HPX_WITH_HIP)
  Note: HPX_WITH_HIP is automatically enabled when compiling with hipcc."
   )
 endif()
-
-hpx_option(
-  HPX_WITH_CUDA_CLANG BOOL "Use clang to compile CUDA code (default: OFF)" OFF
-  ADVANCED
-)
 
 # ##############################################################################
 # pkgconfig file generation
@@ -999,26 +1019,6 @@ hpx_option(
 
 hpx_add_config_define(HPX_HAVE_SPINLOCK_POOL_NUM ${HPX_WITH_SPINLOCK_POOL_NUM})
 
-# Deprecated in 1.4.0
-hpx_option(
-  HPX_SCHEDULER_MAX_TERMINATED_THREADS
-  STRING
-  "[Deprecated] Maximum number of terminated threads collected before those are cleaned up (default: 100)"
-  "0"
-  CATEGORY "Thread Manager"
-  ADVANCED
-)
-
-if(HPX_SCHEDULER_MAX_TERMINATED_THREADS GREATER 0)
-  hpx_warn(
-    "HPX_SCHEDULER_MAX_TERMINATED_THREADS is deprecated and will be removed in a future release. Use the configuration option hpx.thread_queue.max_terminated_threads instead to set the value."
-  )
-  hpx_add_config_define(
-    HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS
-    ${HPX_SCHEDULER_MAX_TERMINATED_THREADS}
-  )
-endif()
-
 hpx_option(
   HPX_WITH_SPINLOCK_DEADLOCK_DETECTION BOOL
   "Enable spinlock deadlock detection (default: OFF)" OFF
@@ -1104,13 +1104,6 @@ if(HPX_WITH_PAPI)
     )
   endif()
   hpx_add_config_define(HPX_HAVE_PAPI)
-endif()
-hpx_option(
-  HPX_WITH_GOOGLE_PERFTOOLS BOOL
-  "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling"
-)
-if(HPX_WITH_GOOGLE_PERFTOOLS)
-  hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
 endif()
 
 hpx_option(
@@ -1572,16 +1565,6 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
 
-# HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY : introduced in V1.5.0
-hpx_option(
-  HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY BOOL
-  "Enable deprecated init() and start() overloads functions (default: OFF)" OFF
-  ADVANCED
-)
-if(HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY)
-  hpx_add_config_define(HPX_HAVE_INIT_START_OVERLOADS_COMPATIBILITY)
-endif()
-
 # ##############################################################################
 # Special diagnostic flags, do not enable by default, only if needed
 hpx_option(
@@ -1682,6 +1665,9 @@ hpx_option(
 # ##############################################################################
 # C++ feature tests
 # ##############################################################################
+# Need to include the CUDA setup before the config test to enable the CUDA
+# language
+include(HPX_SetupCUDA)
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
 
@@ -2033,8 +2019,6 @@ else()
       -fvisibility=hidden TARGETS SHARED_LIBRARY EXECUTABLE
     )
     hpx_add_config_define(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
-    hpx_add_config_define(HPX_HAVE_COROUTINE_GCC_HIDDEN_VISIBILITY)
-    hpx_add_config_define(HPX_HAVE_PLUGIN_GCC_HIDDEN_VISIBILITY)
   endif()
 
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -2176,11 +2160,8 @@ include(HPX_SetupMPI) # must come before APEX
 
 # Setup packages and subprojects
 include(HPX_SetupHIP)
-include(HPX_SetupCUDA) # CUDA needs to come before Apex, to have
-                       # cuda_add_library available
 include(HPX_SetupApex)
 include(HPX_SetupPapi)
-include(HPX_SetupGooglePerfTools)
 include(HPX_SetupValgrind)
 if(HPX_WITH_CUDA OR HPX_WITH_HIP)
   hpx_add_config_define(HPX_HAVE_GPU_SUPPORT)

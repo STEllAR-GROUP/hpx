@@ -4,18 +4,18 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests late_commandline_options_5257 options_as_config_3339
+set(tests ignore_aliases late_commandline_options_5257 options_as_config_3339
           use_all_cores_2262
 )
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} configuration_1572)
-endif()
+set(tests ${tests} configuration_1572)
+
+set(ignore_aliases_PARAMETERS "-wobble=1")
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
 
-  set(${test}_PARAMETERS THREADS_PER_LOCALITY 4)
+  set(${test}_PARAMETERS ${${test}_PARAMETERS} THREADS_PER_LOCALITY 4)
 
   source_group("Source Files" FILES ${sources})
 

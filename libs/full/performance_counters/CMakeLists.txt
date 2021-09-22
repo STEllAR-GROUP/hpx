@@ -86,7 +86,7 @@ add_hpx_module(
   GLOBAL_HEADER_GEN ON
   SOURCES ${performance_counters_sources}
   HEADERS ${performance_counters_headers}
-  DEPENDENCIES hpx_core hpx_parallelism
+  DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES
     hpx_actions
     hpx_agas
@@ -94,8 +94,7 @@ add_hpx_module(
     hpx_async_distributed
     hpx_naming
     hpx_runtime_components
-    hpx_runtime_local
     hpx_runtime_distributed
-    hpx_threadmanager
+    hpx_statistics
   CMAKE_SUBDIRS examples tests
 )

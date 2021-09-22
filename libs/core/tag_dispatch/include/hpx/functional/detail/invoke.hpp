@@ -59,7 +59,18 @@ namespace hpx { namespace util { namespace detail {
             noexcept(detail::mem_ptr_target<C>(std::forward<T1>(t1)).*pm))
             -> decltype(detail::mem_ptr_target<C>(std::forward<T1>(t1)).*pm)
         {
+            // This seems to trigger a bogus warning in GCC 11 with
+            // optimizations enabled (possibly the same as this:
+            // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98503) so we disable
+            // the warning locally.
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
             return detail::mem_ptr_target<C>(std::forward<T1>(t1)).*pm;
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
         }
     };
 
@@ -81,8 +92,19 @@ namespace hpx { namespace util { namespace detail {
                 -> decltype((detail::mem_ptr_target<C>(std::forward<T1>(t1)).*
                     pm)(std::forward<Tn>(tn)...))
         {
+            // This seems to trigger a bogus warning in GCC 11 with
+            // optimizations enabled (possibly the same as this:
+            // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98503) so we disable
+            // the warning locally.
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
             return (detail::mem_ptr_target<C>(std::forward<T1>(t1)).*pm)(
                 std::forward<Tn>(tn)...);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
         }
     };
 

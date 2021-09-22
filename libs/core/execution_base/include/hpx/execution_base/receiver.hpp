@@ -101,23 +101,28 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename T, typename... As>
     struct is_receiver_of;
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct set_value_t
-      : hpx::functional::tag_priority<set_value_t>
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
+    struct set_value_t : hpx::functional::tag_priority<set_value_t>
     {
     private:
         template <typename R, typename... Args>
-        friend constexpr HPX_FORCEINLINE auto
-        tag_override_dispatch(set_value_t, R&& r, Args&&... args) noexcept(
-            noexcept(std::forward<R>(r).set_value(std::forward<Args>(args)...)))
-            -> decltype(
-                std::forward<R>(r).set_value(std::forward<Args>(args)...))
+        friend constexpr HPX_FORCEINLINE auto tag_override_dispatch(
+            set_value_t, R&& r, Args&&... args)
+        // This does not compile with CUDA 11.4 (most recent at the moment)
+        // Removing the variadic ... makes it compile
+#if !defined(HPX_COMPUTE_DEVICE_CODE) || (HPX_CUDA_VERSION < 1104)
+            noexcept(noexcept(
+                std::forward<R>(r).set_value(std::forward<Args>(args)...)))
+#endif
+                -> decltype(
+                    std::forward<R>(r).set_value(std::forward<Args>(args)...))
         {
             return std::forward<R>(r).set_value(std::forward<Args>(args)...);
         }
     } set_value{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct set_error_t
-      : hpx::functional::tag_priority_noexcept<set_error_t>
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
+    struct set_error_t : hpx::functional::tag_priority_noexcept<set_error_t>
     {
     private:
         template <typename R, typename E>
@@ -130,8 +135,8 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } set_error{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct set_done_t
-      : hpx::functional::tag_priority_noexcept<set_done_t>
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
+    struct set_done_t : hpx::functional::tag_priority_noexcept<set_done_t>
     {
     private:
         template <typename R>
@@ -230,4 +235,30 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename T, typename... As>
     HPX_INLINE_CONSTEXPR_VARIABLE bool is_nothrow_receiver_of_v =
         is_nothrow_receiver_of<T, As...>::value;
-}}}    // namespace hpx::execution::experimental
+
+    namespace detail {
+        template <typename CPO>
+        struct is_receiver_cpo : std::false_type
+        {
+        };
+
+        template <>
+        struct is_receiver_cpo<set_value_t> : std::true_type
+        {
+        };
+
+        template <>
+        struct is_receiver_cpo<set_error_t> : std::true_type
+        {
+        };
+
+        template <>
+        struct is_receiver_cpo<set_done_t> : std::true_type
+        {
+        };
+
+        template <typename CPO>
+        HPX_INLINE_CONSTEXPR_VARIABLE bool is_receiver_cpo_v =
+            is_receiver_cpo<CPO>::value;
+    }    // namespace detail
+}}}      // namespace hpx::execution::experimental

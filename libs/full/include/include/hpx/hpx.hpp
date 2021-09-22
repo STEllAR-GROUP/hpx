@@ -17,6 +17,7 @@
 #include <hpx/numeric.hpp>
 #include <hpx/optional.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/serialization.hpp>
 #include <hpx/task_block.hpp>
 #include <hpx/tuple.hpp>
 #include <hpx/type_traits.hpp>
@@ -27,8 +28,6 @@
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/errors.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/include/components.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#endif

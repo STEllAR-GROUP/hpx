@@ -1,5 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  This code may be used under either of the following two licences:
 //
@@ -51,12 +51,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
     void coroutine_impl::operator()() noexcept
     {
-        typedef super_type::context_exit_status context_exit_status;
-        context_exit_status status = super_type::ctx_exited_return;
+        using context_exit_status = super_type::context_exit_status;
+        context_exit_status status = super_type::ctx_not_exited;
 
         // yield value once the thread function has finished executing
         result_type result_last(
-            thread_schedule_state::terminated, invalid_thread_id);
+            thread_schedule_state::unknown, invalid_thread_id);
 
         // loop as long this coroutine has been rebound
         do
@@ -74,6 +74,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                     result_last = m_fun(*this->args());
                     HPX_ASSERT(
                         result_last.first == thread_schedule_state::terminated);
+                    status = super_type::ctx_exited_return;
                 }
                 catch (...)
                 {

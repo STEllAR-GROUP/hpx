@@ -24,10 +24,6 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx {
-    bool is_stopped_or_shutting_down();
-}
-
 namespace hpx { namespace lcos {
     barrier::barrier(std::string const& base_name)
       : node_(new (hpx::components::component_heap<wrapping_type>().alloc())

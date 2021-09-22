@@ -99,6 +99,9 @@
 // Detecting CUDA compilation mode
 // Detecting NVCC
 #if defined(__NVCC__) || defined(__CUDACC__)
+// NVCC build version numbers can be high (without limit?) so we leave it out
+// from the version definition
+#  define HPX_CUDA_VERSION (__CUDACC_VER_MAJOR__*100 + __CUDACC_VER_MINOR__)
 #  define HPX_COMPUTE_CODE
 #  if defined(__CUDA_ARCH__)
      // nvcc compiling CUDA code, device mode.
@@ -113,6 +116,8 @@
 #  endif
 // Detecting HIPCC
 #elif defined(__HIPCC__)
+#  include <hip/hip_version.h>
+#  define HPX_HIP_VERSION HIP_VERSION
 #  if defined(__clang__)
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wdeprecated-copy"

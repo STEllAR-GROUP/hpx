@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -56,7 +56,7 @@ namespace hpx { namespace threads {
         static util::internal_allocator<thread_data_stackful> thread_alloc_;
 
     public:
-        coroutine_type::result_type call(
+        HPX_FORCEINLINE coroutine_type::result_type call(
             hpx::execution_base::this_thread::detail::agent_storage*
                 agent_storage)
         {

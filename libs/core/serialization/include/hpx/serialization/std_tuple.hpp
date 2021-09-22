@@ -2,7 +2,7 @@
 //  Copyright (c) 2011-2020 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //  Copyright (c) 2019 Mikael Simberg
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,11 +11,30 @@
 #pragma once
 
 #include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <tuple>
 #include <type_traits>
+
+namespace hpx { namespace traits {
+
+    template <typename... Ts>
+    struct is_bitwise_serializable<std::tuple<Ts...>>
+      : ::hpx::util::all_of<hpx::traits::is_bitwise_serializable<
+            typename std::remove_const<Ts>::type>...>
+    {
+    };
+
+    template <typename... Ts>
+    struct is_not_bitwise_serializable<std::tuple<Ts...>>
+      : std::integral_constant<bool,
+            !is_bitwise_serializable_v<std::tuple<Ts...>>>
+    {
+    };
+}}    // namespace hpx::traits
 
 namespace hpx { namespace serialization {
 
@@ -30,7 +49,14 @@ namespace hpx { namespace serialization {
         {
             static void call(Archive& ar, std::tuple<Ts...>& t, unsigned int)
             {
+#if !defined(HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS)
                 int const _sequencer[] = {((ar & std::get<Is>(t)), 0)...};
+#else
+                int const _sequencer[] = {
+                    ((ar &
+                         const_cast<std::remove_const_t<Ts>&>(std::get<Is>(t))),
+                        0)...};
+#endif
                 (void) _sequencer;
             }
         };

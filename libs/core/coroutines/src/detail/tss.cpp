@@ -10,6 +10,7 @@
 // (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
 #include <hpx/config.hpp>
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>
@@ -239,3 +240,4 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #endif
     }
 }}}}    // namespace hpx::threads::coroutines::detail
+#endif

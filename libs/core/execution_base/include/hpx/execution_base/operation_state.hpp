@@ -45,8 +45,8 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename O>
     struct is_operation_state;
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct start_t
-      : hpx::functional::tag_priority_noexcept<start_t>
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
+    struct start_t : hpx::functional::tag_priority_noexcept<start_t>
     {
     private:
         template <typename OperationState>

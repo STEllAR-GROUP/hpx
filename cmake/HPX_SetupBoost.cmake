@@ -82,6 +82,13 @@ if(NOT TARGET hpx_dependencies_boost)
     )
   endforeach()
 
+  if(HPX_WITH_HIP AND Boost_VERSION VERSION_LESS 1.78)
+    target_compile_definitions(
+      hpx_dependencies_boost
+      INTERFACE "BOOST_NOINLINE=__attribute__ ((noinline))"
+    )
+  endif()
+
   include(HPX_AddDefinitions)
 
   # Boost preprocessor definitions

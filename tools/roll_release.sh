@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c)      2020 ETH Zurich
-# Copyright (c)      2019 Mikael Simberg
+# Copyright (c) 2019-2021 ETH Zurich
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -26,17 +25,46 @@ VERSION_DESCRIPTION="[Release notes](${VERSION_RELEASE_NOTES_URL})"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 if ! which hub > /dev/null 2>&1; then
-    echo "Hub not installed on this system. Exiting.."
+    echo "Hub not installed on this system (see https://hub.github.com/). Exiting."
     exit 1
 fi
 
-if [ "${CURRENT_BRANCH}" != "release" ]; then
-    echo "Not on release branch. Not continuing to make release."
+if ! [[ "$CURRENT_BRANCH" =~ ^release-[0-9]+\.[0-9]+\.X$ ]]; then
+    echo "Not on release branch (current branch is \"${CURRENT_BRANCH}\"). Not continuing to make release."
     exit 1
 fi
 
 if [ -z "${VERSION_TAG}" ]; then
     echo "You are about to tag and create a final release on GitHub."
+
+    echo ""
+    echo "Sanity checking release"
+
+    sanity_errors=0
+
+    whats_new_file_nosuffix="whats_new_${VERSION_FULL_NOTAG_UNDERSCORE}"
+    whats_new_path="docs/sphinx/releases/${whats_new_file_nosuffix}.rst"
+    printf "Checking that %s exists... " "${whats_new_path}"
+    if [[ -f "${whats_new_path}" ]]; then
+        echo "OK"
+    else
+        echo "Missing"
+        sanity_errors=$((sanity_errors+1))
+    fi
+
+
+    printf "Checking that %s.rst is included in the docs/sphinx/releases.rst table of contents... " "${whats_new_file_nosuffix}"
+    if [[ $(grep "${whats_new_file_nosuffix}" docs/sphinx/releases.rst) ]]; then
+        echo "OK"
+    else
+        echo "Missing"
+        sanity_errors=$((sanity_errors+1))
+    fi
+
+    if [[ ${sanity_errors} -gt 0 ]]; then
+        echo "Found ${sanity_errors} error(s). Fix it/them and try again."
+        exit 1
+    fi
 else
     echo "You are about to tag and create a pre-release on GitHub."
     echo "If you intended to make a final release, remove the tag in the main CMakeLists.txt first."

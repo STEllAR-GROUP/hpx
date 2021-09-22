@@ -9,6 +9,4 @@
 #include <hpx/config.hpp>
 #include <hpx/async_local/dataflow.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/async_distributed/dataflow.hpp>
-#endif

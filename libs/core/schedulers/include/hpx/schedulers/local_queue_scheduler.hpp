@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/function.hpp>
@@ -19,6 +18,7 @@
 #include <hpx/schedulers/thread_queue.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -289,8 +289,8 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to
         // pending
-        void create_thread(
-            thread_init_data& data, thread_id_type* id, error_code& ec) override
+        void create_thread(thread_init_data& data, thread_id_ref_type* id,
+            error_code& ec) override
         {
             std::size_t num_thread =
                 data.schedulehint.mode == thread_schedule_hint_mode::thread ?
@@ -329,7 +329,8 @@ namespace hpx { namespace threads { namespace policies {
         /// Return the next thread to be executed, return false if none is
         /// available
         virtual bool get_next_thread(std::size_t num_thread, bool running,
-            threads::thread_data*& thrd, bool /*enable_stealing*/) override
+            threads::thread_id_ref_type& thrd,
+            bool /*enable_stealing*/) override
         {
             std::size_t queues_size = queues_.size();
 
@@ -455,7 +456,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_data* thrd,
+        void schedule_thread(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
             thread_priority /* priority */ = thread_priority::normal) override
         {
@@ -484,7 +485,7 @@ namespace hpx { namespace threads { namespace policies {
             std::unique_lock<pu_mutex_type> l;
             num_thread = select_active_pu(l, num_thread, allow_fallback);
 
-            HPX_ASSERT(thrd->get_scheduler_base() == this);
+            HPX_ASSERT(get_thread_id_data(thrd)->get_scheduler_base() == this);
 
             HPX_ASSERT(num_thread < queues_.size());
 
@@ -492,12 +493,13 @@ namespace hpx { namespace threads { namespace policies {
                                "pool({}), scheduler({}), worker_thread({}), "
                                "thread({}), description({})",
                 *this->get_parent_pool(), *this, num_thread,
-                thrd->get_thread_id(), thrd->get_description());
+                get_thread_id_data(thrd)->get_thread_id(),
+                get_thread_id_data(thrd)->get_description());
 
             queues_[num_thread]->schedule_thread(thrd);
         }
 
-        void schedule_thread_last(threads::thread_data* thrd,
+        void schedule_thread_last(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
             thread_priority /* priority */ = thread_priority::normal) override
         {
@@ -526,7 +528,7 @@ namespace hpx { namespace threads { namespace policies {
             std::unique_lock<pu_mutex_type> l;
             num_thread = select_active_pu(l, num_thread, allow_fallback);
 
-            HPX_ASSERT(thrd->get_scheduler_base() == this);
+            HPX_ASSERT(get_thread_id_data(thrd)->get_scheduler_base() == this);
 
             HPX_ASSERT(num_thread < queues_.size());
             queues_[num_thread]->schedule_thread(thrd, true);
@@ -868,6 +870,10 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread) override
         {
+            hpx::threads::detail::set_local_thread_num_tss(num_thread);
+            hpx::threads::detail::set_thread_pool_num_tss(
+                parent_pool_->get_pool_id().index());
+
             if (nullptr == queues_[num_thread])
             {
                 queues_[num_thread] =

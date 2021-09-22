@@ -6,7 +6,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -53,11 +52,9 @@ struct A
         ar& t_;
     }
 };
-#endif
 
 int main()
 {
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
     std::vector<char> buf;
     hpx::serialization::output_archive oar(buf);
     hpx::serialization::input_archive iar(buf);
@@ -117,7 +114,6 @@ int main()
         }
     }
     HPX_TEST(caught_exception);
-#endif
 
     return hpx::util::report_errors();
 }

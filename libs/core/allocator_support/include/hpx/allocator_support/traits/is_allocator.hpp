@@ -31,7 +31,7 @@ namespace hpx { namespace traits {
             static std::true_type test(decltype(std::declval<U>().allocate(0)));
 
         public:
-            static constexpr bool value = decltype(test<T>(0))::value;
+            static constexpr bool value = decltype(test<T>(nullptr))::value;
         };
 
         template <typename T>

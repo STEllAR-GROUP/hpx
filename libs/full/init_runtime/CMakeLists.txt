@@ -36,19 +36,14 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
   )
 endif()
 
-if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
-  list(APPEND init_runtime_optional_module_dependencies hpx_mpi_base)
-endif()
-
 include(HPX_AddModule)
 add_hpx_module(
   full init_runtime
   GLOBAL_HEADER_GEN OFF
   HEADERS ${init_runtime_headers}
   SOURCES ${init_runtime_sources}
-  DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES
-    hpx_init_runtime_local hpx_program_options hpx_runtime_local
-    hpx_threadmanager ${init_runtime_optional_module_dependencies}
+  DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_command_line_handling
+                      ${init_runtime_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests
 )

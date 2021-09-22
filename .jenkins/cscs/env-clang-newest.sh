@@ -8,7 +8,7 @@ export CRAYPE_LINK_TYPE=dynamic
 export APPS_ROOT="/apps/daint/SSL/HPX/packages"
 export CLANG_VER="12.0.0"
 export CXX_STD="20"
-export BOOST_VER="1.76.0"
+export BOOST_VER="1.77.0"
 export HWLOC_VER="2.2.0"
 export CLANG_ROOT="${APPS_ROOT}/llvm-${CLANG_VER}"
 export BOOST_ROOT="${APPS_ROOT}/boost-${BOOST_VER}-clang-${CLANG_VER}-c++20-release"
@@ -20,10 +20,9 @@ export CC="${CLANG_ROOT}/bin/clang"
 export CPP="${CLANG_ROOT}/bin/clang -E"
 
 module load daint-mc
-spack load cmake@3.17.3
+spack load cmake@3.18.6
 spack load ninja@1.10.0
 
-configure_extra_options="-DCMAKE_BUILD_TYPE=Release"
 configure_extra_options+=" -DHPX_WITH_MAX_CPU_COUNT=128"
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
 configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"

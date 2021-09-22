@@ -43,7 +43,7 @@ add_hpx_module(
   SOURCES ${components_sources}
   HEADERS ${components_headers}
   COMPAT_HEADERS ${components_compat_headers}
-  DEPENDENCIES hpx_core hpx_parallelism
-  MODULE_DEPENDENCIES hpx_actions_base hpx_components_base hpx_runtime_local
+  DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_actions_base hpx_components_base
   CMAKE_SUBDIRS examples tests
 )

@@ -75,18 +75,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // handle [[fallthrough]]
-#if defined(HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
-#   define HPX_FALLTHROUGH [[fallthrough]]
-#elif defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000) && \
-     !defined(HPX_INTEL_VERSION)
-#   define HPX_FALLTHROUGH __attribute__((fallthrough))
-#elif defined(HPX_CLANG_VERSION)
-// All versions of clang supported by HPX have the [[clang::fallthrough]]
-// attribute.
-#   define HPX_FALLTHROUGH [[clang::fallthrough]]
-#else
-#   define HPX_FALLTHROUGH
-#endif
+#define HPX_FALLTHROUGH [[fallthrough]]
 
 ///////////////////////////////////////////////////////////////////////////////
 // handle empty_bases
@@ -98,21 +87,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // handle [[nodiscard]]
-#if defined(HPX_HAVE_CXX17_NODISCARD_ATTRIBUTE)
-#   define HPX_NODISCARD [[nodiscard]]
-#   define HPX_NODISCARD_MSG(x) [[nodiscard(x)]]
-#elif defined(HPX_GCC_VERSION)
-#   define HPX_NODISCARD __attribute__((warn_unused_result))
-#   define HPX_NODISCARD_MSG(x) __attribute__((warn_unused_result))
-#elif defined(HPX_CLANG_VERSION)
-// All versions of clang supported by HPX have the [[clang::warn_unused_result]]
-// attribute.
-#   define HPX_NODISCARD [[clang::warn_unused_result]]
-#   define HPX_NODISCARD_MSG(x) [[clang::warn_unused_result(x)]]
-#else
-#   define HPX_NODISCARD
-#   define HPX_NODISCARD_MSG(x)
-#endif
+#define HPX_NODISCARD [[nodiscard]]
+#define HPX_NODISCARD_MSG(x) [[nodiscard(x)]]
 
 ///////////////////////////////////////////////////////////////////////////////
 // handle [[no_unique_address]]

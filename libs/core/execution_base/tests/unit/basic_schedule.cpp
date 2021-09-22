@@ -28,11 +28,11 @@ struct sender
 
     struct operation_state
     {
-        void start() && noexcept {};
+        void start() & noexcept {};
     };
 
     template <typename R>
-        operation_state connect(R&&) && noexcept
+    operation_state connect(R&&) && noexcept
     {
         return {};
     }

@@ -99,10 +99,10 @@ General changes
   eXascale). APEX is an instrumentation and software adaptation library that
   provides an interface to TAU profiling / tracing as well as runtime adaptation
   of HPX applications through policy definitions. For more information and
-  documentation, please see `<https://github.com/khuck/xpress-apex>`_. To enable APEX
-  at configuration time, specify ``-DHPX_WITH_APEX=On``. To also include support
-  for TAU profiling, specify ``-DHPX_WITH_TAU=On`` and specify the
-  ``-DTAU_ROOT``, ``-DTAU_ARCH`` and ``-DTAU_OPTIONS`` cmake parameters.
+  documentation, please see `<https://github.com/UO-OACISS/xpress-apex>`_. To
+  enable APEX at configuration time, specify ``-DHPX_WITH_APEX=On``. To also
+  include support for TAU profiling, specify ``-DHPX_WITH_TAU=On`` and specify
+  the ``-DTAU_ROOT``, ``-DTAU_ARCH`` and ``-DTAU_OPTIONS`` cmake parameters.
 * We have implemented many more of the :ref:`parallel_algorithms`. Please see
   :hpx-issue:`1141` for the list of all available parallel algorithms (thanks to
   Daniel Bourgeois and John Biddiscombe for contributing their work).

@@ -29,12 +29,15 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
     struct coroutine_accessor
     {
         template <typename Coroutine>
-        static typename Coroutine::impl_ptr get_impl(Coroutine& x)
+        HPX_FORCEINLINE static typename Coroutine::impl_ptr get_impl(
+            Coroutine& x)
         {
             return x.get_impl();
         }

@@ -21,7 +21,7 @@ component_name_upper = component_name.upper()
 header_str = '=' * len(component_name)
 
 # CMake minimum version
-cmake_version = '3.17'
+cmake_version = '3.18'
 
 cmake_header = f'''# Copyright (c) 2019 The STE||AR-Group
 #

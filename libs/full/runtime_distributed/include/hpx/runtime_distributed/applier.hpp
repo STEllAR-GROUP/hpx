@@ -9,8 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime_distributed/applier_fwd.hpp>    // this needs to go first
 
 #include <hpx/assert.hpp>
@@ -39,10 +37,12 @@ namespace hpx { namespace applier {
 
     public:
         // constructor
+        applier();
+
 #if defined(HPX_HAVE_NETWORKING)
-        applier(parcelset::parcelhandler& ph, threads::threadmanager& tm);
+        void init(parcelset::parcelhandler& ph, threads::threadmanager& tm);
 #else
-        explicit applier(threads::threadmanager& tm);
+        void init(threads::threadmanager& tm);
 #endif
 
         // destructor
@@ -148,13 +148,11 @@ namespace hpx { namespace applier {
 
     private:
 #if defined(HPX_HAVE_NETWORKING)
-        parcelset::parcelhandler& parcel_handler_;
+        parcelset::parcelhandler* parcel_handler_;
 #endif
-        threads::threadmanager& thread_manager_;
+        threads::threadmanager* thread_manager_;
         naming::id_type runtime_support_id_;
     };
 }}    // namespace hpx::applier
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

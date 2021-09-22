@@ -9,8 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
@@ -74,8 +72,9 @@ namespace hpx { namespace util {
             template <typename... Us>
             HPX_FORCEINLINE bool apply(Us&&... vs) const
             {
-                return hpx::apply<Action>(detail::bind_eval<Ts const&>::call(
-                    _args.template get<Is>(), std::forward<Us>(vs)...)...);
+                return hpx::apply<Action>(
+                    detail::bind_eval<Ts const&, sizeof...(Us)>::call(
+                        _args.template get<Is>(), std::forward<Us>(vs)...)...);
             }
 
             template <typename... Us>
@@ -83,7 +82,7 @@ namespace hpx { namespace util {
                 naming::id_type const& cont, Us&&... vs) const
             {
                 return hpx::apply_c<Action>(cont,
-                    detail::bind_eval<Ts const&>::call(
+                    detail::bind_eval<Ts const&, sizeof...(Us)>::call(
                         _args.template get<Is>(), std::forward<Us>(vs)...)...);
             }
 
@@ -93,7 +92,7 @@ namespace hpx { namespace util {
             apply_c(Continuation&& cont, Us&&... vs) const
             {
                 return hpx::apply<Action>(std::forward<Continuation>(cont),
-                    detail::bind_eval<Ts const&>::call(
+                    detail::bind_eval<Ts const&, sizeof...(Us)>::call(
                         _args.template get<Is>(), std::forward<Us>(vs)...)...);
             }
 
@@ -101,8 +100,9 @@ namespace hpx { namespace util {
             HPX_FORCEINLINE hpx::lcos::future<result_type> async(
                 Us&&... vs) const
             {
-                return hpx::async<Action>(detail::bind_eval<Ts const&>::call(
-                    _args.template get<Is>(), std::forward<Us>(vs)...)...);
+                return hpx::async<Action>(
+                    detail::bind_eval<Ts const&, sizeof...(Us)>::call(
+                        _args.template get<Is>(), std::forward<Us>(vs)...)...);
             }
 
             template <typename... Us>
@@ -187,5 +187,3 @@ namespace hpx { namespace serialization {
         bound.serialize(ar, version);
     }
 }}    // namespace hpx::serialization
-
-#endif

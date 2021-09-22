@@ -175,7 +175,7 @@ target_link_libraries(
   PUBLIC hpx_public_flags
   PRIVATE hpx_private_flags
 )
-target_link_libraries(hpx_full PUBLIC hpx_core hpx_parallelism)
+target_link_libraries(hpx_full PUBLIC hpx_core)
 target_link_libraries(hpx_full PUBLIC hpx_dependencies_boost)
 
 # Set the basic search paths for the HPX headers

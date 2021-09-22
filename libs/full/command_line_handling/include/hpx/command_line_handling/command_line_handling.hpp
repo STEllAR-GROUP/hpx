@@ -22,7 +22,7 @@
 namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct command_line_handling
+    struct HPX_EXPORT command_line_handling
     {
         command_line_handling(runtime_configuration rtcfg,
             std::vector<std::string> ini_config,

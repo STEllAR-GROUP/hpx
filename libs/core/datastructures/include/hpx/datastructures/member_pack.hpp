@@ -119,7 +119,7 @@ namespace hpx { namespace util {
         }
 
         template <std::size_t I>
-            constexpr decltype(auto) get() & noexcept
+        constexpr decltype(auto) get() & noexcept
         {
             return detail::member_get<I>(*this);
         }
@@ -129,7 +129,7 @@ namespace hpx { namespace util {
             return detail::member_get<I>(*this);
         }
         template <std::size_t I>
-            constexpr decltype(auto) get() && noexcept
+        constexpr decltype(auto) get() && noexcept
         {
             using T = decltype(detail::member_type<I>(*this));
             return std::forward<T>(detail::member_get<I>(*this));

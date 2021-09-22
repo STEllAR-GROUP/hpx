@@ -78,7 +78,7 @@ namespace hpx { namespace functional {
         is_nothrow_tag_fallback_dispatchable<Tag, Args...>::value;
 
     /// `hpx::functional::tag_fallback_dispatch_result<Tag, Args...>` is the trait
-    /// returning the result type of the call hpx::functioanl::tag_fallback_dispatch. This
+    /// returning the result type of the call hpx::functional::tag_fallback_dispatch. This
     /// can be used in a SFINAE context.
     template <typename Tag, typename... Args>
     using tag_fallback_dispatch_result =
@@ -190,6 +190,12 @@ namespace hpx { namespace functional {
         };
     }    // namespace detail
 
+    // CUDA versions less than 11.2 have a template instantiation bug which
+    // leaves out certain template arguments and leads to us not being able to
+    // correctly check this condition. We default to the more relaxed
+    // noexcept(true) to not falsely exclude correct overloads. However, this
+    // may lead to noexcept(false) overloads falsely being candidates.
+#if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION >= 1102)
     template <typename Tag, typename... Args>
     struct is_nothrow_tag_fallback_dispatchable
       : detail::is_nothrow_tag_fallback_dispatchable_impl<
@@ -198,6 +204,12 @@ namespace hpx { namespace functional {
             is_tag_fallback_dispatchable_v<Tag, Args...>>
     {
     };
+#else
+    template <typename Tag, typename... Args>
+    struct is_nothrow_tag_fallback_dispatchable : std::true_type
+    {
+    };
+#endif
 
     template <typename Tag, typename... Args>
     HPX_INLINE_CONSTEXPR_VARIABLE bool is_nothrow_tag_fallback_dispatchable_v =
@@ -299,8 +311,9 @@ namespace hpx { namespace functional {
 
             template <typename... Args>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto
-            tag_fallback_dispatch_impl(std::true_type, Args&&... args) const
-                noexcept -> tag_fallback_dispatch_result_t<Tag, Args&&...>
+            tag_fallback_dispatch_impl(
+                std::true_type, Args&&... args) const noexcept
+                -> tag_fallback_dispatch_result_t<Tag, Args&&...>
             {
                 return tag_fallback_dispatch(static_cast<Tag const&>(*this),
                     std::forward<Args>(args)...);

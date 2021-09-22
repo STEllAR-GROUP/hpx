@@ -10,7 +10,5 @@
 #include <hpx/parallel/algorithms/exclusive_scan.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/exclusive_scan.hpp>
 #include <hpx/parallel/segmented_algorithms/inclusive_scan.hpp>
-#endif

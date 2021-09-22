@@ -12,10 +12,18 @@ include(HPX_Message)
 # cmake-format: off
 set(_hpx_core_modules
     affinity
+    algorithms
     allocator_support
     asio
     assertion
+    async_base
+    async_combinators
+    async_cuda
+    async_local
+    async_mpi
+    batch_environments
     cache
+    command_line_handling_local
     concepts
     concurrency
     config
@@ -24,33 +32,49 @@ set(_hpx_core_modules
     datastructures
     debugging
     errors
+    execution
     execution_base
+    executors
     filesystem
     format
     functional
+    futures
     hardware
     hashing
+    include_local
     ini
+    init_runtime_local
     io_service
     iterator_support
     itt_notify
+    lcos_local
     logging
     memory
+    mpi_base
+    pack_traversal
     plugin
     prefix
     preprocessor
+    program_options
     properties
+    resiliency
+    resource_partitioner
+    runtime_configuration
+    runtime_local
     schedulers
     serialization
     static_reinit
-    statistics
     string_util
     synchronization
     tag_dispatch
     testing
+    thread_pool_util
     thread_pools
     thread_support
+    threading
     threading_base
+    threadmanager
+    timed_execution
     timing
     topology
     type_support

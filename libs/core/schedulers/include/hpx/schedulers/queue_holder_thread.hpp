@@ -297,16 +297,16 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ------------------------------------------------------------
-        void schedule_thread(threads::thread_data* thrd,
+        void schedule_thread(threads::thread_id_ref_type thrd,
             thread_priority priority, bool other_end = false)
         {
             if (bp_queue_ && (priority == thread_priority::bound))
             {
                 tq_deb.debug(debug::str<>("schedule_thread"),
                     queue_data_print(this),
-                    debug::threadinfo<threads::thread_data*>(thrd),
+                    debug::threadinfo<threads::thread_id_ref_type*>(&thrd),
                     "queueing thread_priority::bound");
-                bp_queue_->schedule_work(thrd, other_end);
+                bp_queue_->schedule_work(std::move(thrd), other_end);
             }
             else if (hp_queue_ &&
                 (priority == thread_priority::high ||
@@ -315,25 +315,25 @@ namespace hpx { namespace threads { namespace policies {
             {
                 tq_deb.debug(debug::str<>("schedule_thread"),
                     queue_data_print(this),
-                    debug::threadinfo<threads::thread_data*>(thrd),
+                    debug::threadinfo<threads::thread_id_ref_type*>(&thrd),
                     "queueing thread_priority::high");
-                hp_queue_->schedule_work(thrd, other_end);
+                hp_queue_->schedule_work(std::move(thrd), other_end);
             }
             else if (lp_queue_ && (priority == thread_priority::low))
             {
                 tq_deb.debug(debug::str<>("schedule_thread"),
                     queue_data_print(this),
-                    debug::threadinfo<threads::thread_data*>(thrd),
+                    debug::threadinfo<threads::thread_id_ref_type*>(&thrd),
                     "queueing thread_priority::low");
-                lp_queue_->schedule_work(thrd, other_end);
+                lp_queue_->schedule_work(std::move(thrd), other_end);
             }
             else
             {
                 tq_deb.debug(debug::str<>("schedule_thread"),
                     queue_data_print(this),
-                    debug::threadinfo<threads::thread_data*>(thrd),
+                    debug::threadinfo<threads::thread_id_ref_type*>(&thrd),
                     "queueing thread_priority::normal");
-                np_queue_->schedule_work(thrd, other_end);
+                np_queue_->schedule_work(std::move(thrd), other_end);
             }
         }
 
@@ -401,7 +401,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        void create_thread(thread_init_data& data, thread_id_type* tid,
+        void create_thread(thread_init_data& data, thread_id_ref_type* tid,
             std::size_t thread_num, error_code& ec)
         {
             if (thread_num != thread_num_)
@@ -460,7 +460,7 @@ namespace hpx { namespace threads { namespace policies {
         // it will use that, otherwise a new one is created.
         // Heaps store data ordered/sorted by stack size
         void create_thread_object(
-            threads::thread_id_type& tid, threads::thread_init_data& data)
+            threads::thread_id_ref_type& tid, threads::thread_init_data& data)
         {
             HPX_ASSERT(data.stacksize >= thread_stacksize::minimal);
             HPX_ASSERT(data.stacksize <= thread_stacksize::maximal);
@@ -498,6 +498,9 @@ namespace hpx { namespace threads { namespace policies {
                 data.initial_state = thread_schedule_state::pending;
             }
 
+            // ASAN gets confused by reusing threads/stacks
+#if !defined(HPX_HAVE_ADDRESS_SANITIZER)
+
             // Check for an unused thread object.
             if (!heap->empty())
             {
@@ -507,9 +510,10 @@ namespace hpx { namespace threads { namespace policies {
                 get_thread_id_data(tid)->rebind(data);
                 tq_deb.debug(debug::str<>("create_thread_object"), "rebind",
                     queue_data_print(this),
-                    debug::threadinfo<threads::thread_id_type*>(&tid));
+                    debug::threadinfo<threads::thread_id_ref_type*>(&tid));
             }
             else
+#endif
             {
                 // Allocate a new thread object.
                 threads::thread_data* p = nullptr;
@@ -523,10 +527,11 @@ namespace hpx { namespace threads { namespace policies {
                     p = threads::thread_data_stackful::create(
                         data, this, stacksize);
                 }
-                tid = thread_id_type(p);
+                tid = thread_id_ref_type(p, thread_id_ref_type::addref::no);
+
                 tq_deb.debug(debug::str<>("create_thread_object"), "new",
                     queue_data_print(this),
-                    debug::threadinfo<threads::thread_id_type*>(&tid));
+                    debug::threadinfo<threads::thread_data*>(p));
             }
         }
 
@@ -630,8 +635,8 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        bool get_next_thread_HP(
-            threads::thread_data*& thrd, bool stealing, bool check_new) HPX_HOT
+        bool get_next_thread_HP(threads::thread_id_ref_type& thrd,
+            bool stealing, bool check_new) HPX_HOT
         {
             // only take from BP queue if we are not stealing
             if (!stealing && bp_queue_ &&
@@ -639,7 +644,7 @@ namespace hpx { namespace threads { namespace policies {
             {
                 tq_deb.debug(debug::str<>("next_thread_BP"),
                     queue_data_print(this),
-                    debug::threadinfo<threads::thread_data*>(thrd),
+                    debug::threadinfo<threads::thread_id_ref_type*>(&thrd),
                     "thread_priority::bound");
                 return true;
             }
@@ -649,7 +654,7 @@ namespace hpx { namespace threads { namespace policies {
             {
                 tq_deb.debug(debug::str<>("get_next_thread_HP"),
                     queue_data_print(this),
-                    debug::threadinfo<threads::thread_data*>(thrd),
+                    debug::threadinfo<threads::thread_id_ref_type*>(&thrd),
                     "thread_priority::high");
                 return true;
             }
@@ -659,13 +664,14 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        bool get_next_thread(threads::thread_data*& thrd, bool stealing) HPX_HOT
+        bool get_next_thread(
+            threads::thread_id_ref_type& thrd, bool stealing) HPX_HOT
         {
             if (np_queue_->get_next_thread(thrd, stealing))
             {
                 tq_deb.debug(debug::str<>("next_thread_NP"),
                     queue_data_print(this),
-                    debug::threadinfo<threads::thread_data*>(thrd),
+                    debug::threadinfo<threads::thread_id_ref_type*>(&thrd),
                     "thread_priority::normal");
                 return true;
             }
@@ -674,7 +680,7 @@ namespace hpx { namespace threads { namespace policies {
             {
                 tq_deb.debug(debug::str<>("next_thread_LP"),
                     queue_data_print(this),
-                    debug::threadinfo<threads::thread_data*>(thrd),
+                    debug::threadinfo<threads::thread_id_ref_type*>(&thrd),
                     "thread_priority::low");
                 return true;
             }
@@ -924,7 +930,7 @@ namespace hpx { namespace threads { namespace policies {
                         thread_schedule_state::pending,
                         thread_restart_state::abort);
                     // np queue always exists so use that as priority doesn't matter
-                    np_queue_->schedule_work(get_thread_id_data(*it), true);
+                    np_queue_->schedule_work(*it, true);
                 }
             }
             throw std::runtime_error("This function needs to be reimplemented");

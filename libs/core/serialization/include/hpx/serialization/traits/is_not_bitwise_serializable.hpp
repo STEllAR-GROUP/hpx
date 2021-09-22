@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/access.hpp>
 
 #include <type_traits>
 
@@ -17,20 +18,29 @@ namespace hpx { namespace traits {
     // serialization for a given type.
 
 #if defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
+    // By default, any abstract type or type that exposes serialization will be
+    // treated as non-bitwise copyable.
     template <typename T>
-    struct is_not_bitwise_serializable : std::is_abstract<T>
+    struct is_not_bitwise_serializable
+      : std::integral_constant<bool,
+            std::is_abstract<T>::value ||
+                hpx::serialization::access::has_serialize<T>::value ||
+                hpx::serialization::has_serialize_adl<T>::value>
     {
     };
+
+    template <typename T>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_not_bitwise_serializable_v =
+        is_not_bitwise_serializable<T>::value;
 #else
     template <typename T>
     struct is_not_bitwise_serializable : std::true_type
     {
     };
-#endif
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_not_bitwise_serializable_v =
-        is_not_bitwise_serializable<T>::value;
+    HPX_INLINE_CONSTEXPR_VARIABLE bool is_not_bitwise_serializable_v = true;
+#endif
 
 }}    // namespace hpx::traits
 

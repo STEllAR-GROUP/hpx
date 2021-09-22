@@ -8,6 +8,7 @@
 function(add_hpx_executable name)
   # retrieve arguments
   set(options
+      CUDA
       EXCLUDE_FROM_ALL
       EXCLUDE_FROM_DEFAULT_BUILD
       AUTOGLOB
@@ -183,8 +184,7 @@ function(add_hpx_executable name)
     set(exclude_from_all ${exclude_from_all} EXCLUDE_FROM_DEFAULT_BUILD TRUE)
   endif()
 
-  # Manage files with .cu extension in case When Cuda Clang is used
-  if(HPX_WITH_CUDA_CLANG OR HPX_WITH_HIP)
+  if(HPX_WITH_HIP)
     foreach(source ${${name}_SOURCES})
       get_filename_component(extension ${source} EXT)
       if(${extension} STREQUAL ".cu")
@@ -193,15 +193,9 @@ function(add_hpx_executable name)
     endforeach()
   endif()
 
-  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-    cuda_add_executable(
-      ${name} ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY}
-    )
-  else()
-    add_executable(
-      ${name} ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY}
-    )
-  endif()
+  add_executable(
+    ${name} ${${name}_SOURCES} ${${name}_HEADERS} ${${name}_AUXILIARY}
+  )
 
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)
@@ -223,6 +217,10 @@ function(add_hpx_executable name)
                            "${PROJECT_BINARY_DIR}/bin/${${name}_OUTPUT_SUFFIX}"
       )
     endif()
+  endif()
+
+  if(${name}_CUDA)
+    set_target_properties(${name} PROPERTIES LANGUAGE CUDA)
   endif()
 
   set_target_properties(

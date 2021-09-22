@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,7 @@
 #include <hpx/async_distributed/detail/sync_implementations_fwd.hpp>
 #include <hpx/async_local/sync_fwd.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
@@ -32,10 +33,9 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static Result call(
             naming::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
         {
-            typedef typename Action::remote_result_type remote_result_type;
-
-            typedef traits::get_remote_result<Result, remote_result_type>
-                get_remote_result_type;
+            using remote_result_type = typename Action::remote_result_type;
+            using get_remote_result_type =
+                traits::get_remote_result<Result, remote_result_type>;
 
             return get_remote_result_type::call(Action::execute_function(
                 addr.address_, addr.type_, std::forward<Ts>(vs)...));
@@ -59,9 +59,9 @@ namespace hpx { namespace detail {
     typename hpx::traits::extract_action<Action>::type::local_result_type
     sync_impl(Launch&& policy, hpx::id_type const& id, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::local_result_type result_type;
-        typedef typename action_type::component_type component_type;
+        using action_type = typename hpx::traits::extract_action<Action>::type;
+        using result_type = typename action_type::local_result_type;
+        using component_type = typename action_type::component_type;
 
         std::pair<bool, components::pinned_ptr> r;
 

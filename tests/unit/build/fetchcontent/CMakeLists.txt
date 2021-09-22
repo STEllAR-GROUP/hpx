@@ -8,7 +8,7 @@
 # This project tests that HPX can be built using FetchContent. It is built by
 # the .github/workflows/linux_fetchcontent.yml GitHub actions workflow.
 
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.18)
 project(HPXFetchContent LANGUAGES CXX)
 
 # Test that HPX correctly handles having Boost Filesystem and ProgramOptions

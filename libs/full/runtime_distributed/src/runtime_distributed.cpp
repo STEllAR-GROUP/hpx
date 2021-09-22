@@ -188,10 +188,22 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     runtime_distributed::runtime_distributed(
         util::runtime_configuration& rtcfg, int (*pre_main)(runtime_mode))
-      : runtime(rtcfg,
+      : runtime(rtcfg)
+      , mode_(rtcfg_.mode_)
+#if defined(HPX_HAVE_NETWORKING)
+      , parcel_handler_notifier_()
+      , parcel_handler_(rtcfg_)
+#endif
+      , agas_client_(rtcfg_)
+      , applier_()
+      , runtime_support_()
+      , pre_main_(pre_main)
+    {
+        // set notification policies only after the object was completely
+        // initialized
+        runtime::set_notification_policies(
             runtime_distributed::get_notification_policy(
                 "worker-thread", runtime_local::os_thread_type::worker_thread),
-            notification_policy_type{},
 #ifdef HPX_HAVE_IO_POOL
             runtime_distributed::get_notification_policy(
                 "io-thread", runtime_local::os_thread_type::io_thread),
@@ -200,32 +212,26 @@ namespace hpx {
             runtime_distributed::get_notification_policy(
                 "timer-thread", runtime_local::os_thread_type::timer_thread),
 #endif
-            &detail::network_background_callback, false)
-      , mode_(rtcfg_.mode_)
+            threads::detail::network_background_callback_type(
+                &detail::network_background_callback));
+
 #if defined(HPX_HAVE_NETWORKING)
-      , parcel_handler_notifier_(runtime_distributed::get_notification_policy(
-            "parcel-thread", runtime_local::os_thread_type::parcel_thread))
-      , parcel_handler_(rtcfg_, thread_manager_.get(), parcel_handler_notifier_)
-      , agas_client_(rtcfg_)
-      , applier_(parcel_handler_, *thread_manager_)
+        parcel_handler_notifier_ = runtime_distributed::get_notification_policy(
+            "parcel-thread", runtime_local::os_thread_type::parcel_thread);
+        parcel_handler_.set_notification_policies(
+            rtcfg_, thread_manager_.get(), parcel_handler_notifier_);
+
+        applier_.init(parcel_handler_, *thread_manager_);
 #else
-      , agas_client_(rtcfg_)
-      , applier_(*thread_manager_)
+        applier_.init(*thread_manager_);
 #endif
-      , runtime_support_(new components::server::runtime_support(rtcfg_))
-      , pre_main_(pre_main)
-    {
+        runtime_support_.reset(new components::server::runtime_support(rtcfg_));
+
         // This needs to happen first
         runtime::init();
 
-        runtime_distributed*& runtime_distributed_ =
-            get_runtime_distributed_ptr();
-        if (nullptr == runtime_distributed_)
-        {
-            HPX_ASSERT(nullptr == threads::thread_self::get_self());
-
-            runtime_distributed_ = this;
-        }
+        init_global_data();
+        util::reinit_construct();
 
         LPROGRESS_;
 
@@ -469,7 +475,7 @@ namespace hpx {
             threads::thread_schedule_hint(0), threads::thread_stacksize::large);
 
         this->runtime::starting();
-        threads::thread_id_type id = threads::invalid_thread_id;
+        threads::thread_id_ref_type id = threads::invalid_thread_id;
         thread_manager_->register_thread(data, id);
 
         // }}}
@@ -617,6 +623,8 @@ namespace hpx {
             runtime_support_->stopped();    // re-activate shutdown HPX-thread
             thread_manager_->stop(blocking);    // wait for thread manager
 
+            deinit_global_data();
+
             // this disables all logging from the main thread
             deinit_tss_helper("main-thread", 0);
 
@@ -670,6 +678,8 @@ namespace hpx {
         // wait for thread manager to exit
         runtime_support_->stopped();        // re-activate shutdown HPX-thread
         thread_manager_->stop(blocking);    // wait for thread manager
+
+        deinit_global_data();
 
         // this disables all logging from the main thread
         deinit_tss_helper("main-thread", 0);
@@ -1310,13 +1320,13 @@ namespace hpx {
         notification_policy_type notifier;
 
         notifier.add_on_start_thread_callback(
-            util::bind(&runtime_distributed::init_tss_helper, This(), prefix,
+            util::bind(&runtime_distributed::init_tss_helper, this, prefix,
                 type, _1, _2, _3, _4, false));
         notifier.add_on_stop_thread_callback(util::bind(
-            &runtime_distributed::deinit_tss_helper, This(), prefix, _1));
+            &runtime_distributed::deinit_tss_helper, this, prefix, _1));
         notifier.set_on_error_callback(util::bind(
             static_cast<report_error_t>(&runtime_distributed::report_error),
-            This(), _1, _2, true));
+            this, _1, _2, true));
 
         return notifier;
     }
@@ -1340,17 +1350,6 @@ namespace hpx {
         char const* pool_name, char const* postfix, bool service_thread,
         error_code& ec)
     {
-        // initialize our TSS
-        runtime::init_tss();
-        runtime_distributed*& runtime_distributed_ =
-            get_runtime_distributed_ptr();
-        if (nullptr == runtime_distributed_)
-        {
-            HPX_ASSERT(nullptr == threads::thread_self::get_self());
-
-            runtime_distributed_ = this;
-        }
-
         // set the thread's name, if it's not already set
         HPX_ASSERT(detail::thread_name().empty());
 
@@ -1421,15 +1420,13 @@ namespace hpx {
     void runtime_distributed::deinit_tss_helper(
         char const* context, std::size_t global_thread_num)
     {
+        threads::reset_continuation_recursion_count();
+
         // call thread-specific user-supplied on_stop handler
         if (on_stop_func_)
         {
             on_stop_func_(global_thread_num, global_thread_num, "", context);
         }
-
-        // reset our TSS
-        runtime::deinit_tss();
-        get_runtime_distributed_ptr() = nullptr;
 
         // reset PAPI support
         thread_support_->unregister_thread();
@@ -1493,9 +1490,6 @@ namespace hpx {
     bool runtime_distributed::register_thread(char const* name,
         std::size_t global_thread_num, bool service_thread, error_code& ec)
     {
-        if (nullptr != get_runtime_ptr())
-            return false;    // already registered
-
         // prefix thread name with locality number, if needed
         std::string locality = locality_prefix(get_config());
 
@@ -1686,8 +1680,27 @@ namespace hpx {
 
     runtime_distributed*& get_runtime_distributed_ptr()
     {
-        static thread_local runtime_distributed* runtime_distributed_ = nullptr;
+        static runtime_distributed* runtime_distributed_ = nullptr;
         return runtime_distributed_;
+    }
+
+    void runtime_distributed::init_global_data()
+    {
+        runtime_distributed*& runtime_distributed_ =
+            get_runtime_distributed_ptr();
+        HPX_ASSERT(!runtime_distributed_);
+        HPX_ASSERT(nullptr == threads::thread_self::get_self());
+        runtime_distributed_ = this;
+    }
+
+    void runtime_distributed::deinit_global_data()
+    {
+        runtime_distributed*& runtime_distributed_ =
+            get_runtime_distributed_ptr();
+        HPX_ASSERT(runtime_distributed_);
+        runtime_distributed_ = nullptr;
+
+        runtime::deinit_global_data();
     }
 
     naming::gid_type const& get_locality()

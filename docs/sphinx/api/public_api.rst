@@ -76,8 +76,8 @@ Functions
 - :cpp:func:`hpx::move`
 - :cpp:func:`hpx::none_of`
 - :cpp:func:`hpx::partial_sort`
-- :cpp:func:`hpx::parallel::v1::partition`
-- :cpp:func:`hpx::parallel::v1::partition_copy`
+- :cpp:func:`hpx::partition`
+- :cpp:func:`hpx::partition_copy`
 - :cpp:func:`hpx::remove`
 - :cpp:func:`hpx::remove_copy`
 - :cpp:func:`hpx::remove_copy_if`
@@ -88,21 +88,23 @@ Functions
 - :cpp:func:`hpx::replace_if`
 - :cpp:func:`hpx::reverse`
 - :cpp:func:`hpx::reverse_copy`
-- :cpp:func:`hpx::parallel::v1::rotate`
-- :cpp:func:`hpx::parallel::v1::rotate_copy`
+- :cpp:func:`hpx::rotate`
+- :cpp:func:`hpx::rotate_copy`
 - :cpp:func:`hpx::search`
 - :cpp:func:`hpx::search_n`
 - :cpp:func:`hpx::set_difference`
 - :cpp:func:`hpx::set_intersection`
 - :cpp:func:`hpx::set_symmetric_difference`
 - :cpp:func:`hpx::set_union`
-- :cpp:func:`hpx::parallel::v1::sort`
-- :cpp:func:`hpx::parallel::v1::stable_partition`
-- :cpp:func:`hpx::parallel::v1::stable_sort`
-- :cpp:func:`hpx::parallel::v1::swap_ranges`
+- :cpp:func:`hpx::shift_left`
+- :cpp:func:`hpx::shift_right`
+- :cpp:func:`hpx::sort`
+- :cpp:func:`hpx::stable_partition`
+- :cpp:func:`hpx::swap_ranges`
+- :cpp:func:`hpx::stable_sort`
 - :cpp:func:`hpx::transform`
-- :cpp:func:`hpx::parallel::v1::unique`
-- :cpp:func:`hpx::parallel::v1::unique_copy`
+- :cpp:func:`hpx::unique`
+- :cpp:func:`hpx::unique_copy`
 - :cpp:func:`hpx::for_loop`
 - :cpp:func:`hpx::for_loop_strided`
 - :cpp:func:`hpx::for_loop_n`
@@ -139,10 +141,20 @@ Functions
 - :cpp:func:`hpx::ranges::merge`
 - :cpp:func:`hpx::ranges::move`
 - :cpp:func:`hpx::ranges::none_of`
+- :cpp:func:`hpx::ranges::partition`
+- :cpp:func:`hpx::ranges::partition_copy`
 - :cpp:func:`hpx::ranges::set_difference`
 - :cpp:func:`hpx::ranges::set_intersection`
 - :cpp:func:`hpx::ranges::set_symmetric_difference`
 - :cpp:func:`hpx::ranges::set_union`
+- :cpp:func:`hpx::ranges::shift_left`
+- :cpp:func:`hpx::ranges::shift_right`
+- :cpp:func:`hpx::ranges::sort`
+- :cpp:func:`hpx::ranges::stable_partition`
+- :cpp:func:`hpx::ranges::stable_sort`
+- :cpp:func:`hpx::ranges::swap_ranges`
+- :cpp:func:`hpx::ranges::unique`
+- :cpp:func:`hpx::ranges::unique_copy`
 - :cpp:func:`hpx::ranges::for_loop`
 - :cpp:func:`hpx::ranges::for_loop_strided`
 
@@ -605,12 +617,17 @@ Functions
 ---------
 
 - :cpp:func:`hpx::parallel::v1::adjacent_difference`
-- :cpp:func:`hpx::parallel::v1::exclusive_scan`
-- :cpp:func:`hpx::parallel::v1::inclusive_scan`
+- :cpp:func:`hpx::exclusive_scan`
+- :cpp:func:`hpx::inclusive_scan`
 - :cpp:func:`hpx::reduce`
-- :cpp:func:`hpx::parallel::v1::transform_exclusive_scan`
-- :cpp:func:`hpx::parallel::v1::transform_inclusive_scan`
+- :cpp:func:`hpx::transform_exclusive_scan`
+- :cpp:func:`hpx::transform_inclusive_scan`
 - :cpp:func:`hpx::transform_reduce`
+
+- :cpp:func:`hpx::ranges::exclusive_scan`
+- :cpp:func:`hpx::ranges::inclusive_scan`
+- :cpp:func:`hpx::ranges::transform_exclusive_scan`
+- :cpp:func:`hpx::ranges::transform_inclusive_scan`
 
 Header ``hpx/optional.hpp``
 ===========================

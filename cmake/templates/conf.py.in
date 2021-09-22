@@ -313,9 +313,9 @@ rst_prolog += '''
 .. _macports: https://www.macports.org/
 
 .. |apex| replace:: APEX
-.. _apex: https://khuck.github.io/xpress-apex/
+.. _apex: http://uo-oaciss.github.io/apex
 .. |apex_hpx_doc| replace:: APEX |hpx| documentation
-.. _apex_hpx_doc: https://khuck.github.io/xpress-apex/usage/#hpx-louisiana-state-university
+.. _apex_hpx_doc: https://uo-oaciss.github.io/apex/usage/#hpx-louisiana-state-university
 .. |tau| replace:: TAU
 .. _tau: https://www.cs.uoregon.edu/research/tau/home.php
 .. |cmake| replace:: CMake
@@ -452,6 +452,8 @@ rst_prolog += '''
 .. |ini_file_format| replace:: Windows INI file format
 .. _ini_file_format: https://en.wikipedia.org/wiki/INI_file
 
+.. |asio| replace:: Asio
+.. _asio: https://think-async.com/Asio/
 .. |hwloc| replace:: Portable Hardware Locality (HWLOC)
 .. _hwloc: https://www.open-mpi.org/projects/hwloc/
 .. |tbb| replace:: Intel Threading Building Blocks (TBB)

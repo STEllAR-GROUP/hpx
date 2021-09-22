@@ -51,13 +51,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_PARALLELISM_EXPORTS)
-# define  HPX_PARALLELISM_EXPORT HPX_SYMBOL_EXPORT
-#else
-# define  HPX_PARALLELISM_EXPORT HPX_SYMBOL_IMPORT
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_EXPORTS) || defined(HPX_FULL_EXPORTS)
 # define  HPX_EXPORT             HPX_SYMBOL_EXPORT
 #else
@@ -83,7 +76,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // helper macro for symbols which have to be exported from the runtime and all
 // components
-#if defined(HPX_CORE_EXPORTS) || defined(HPX_PARALLELISM_EXPORTS) || \
+#if defined(HPX_CORE_EXPORTS) || \
     defined(HPX_FULL_EXPORTS) || defined(HPX_EXPORTS) || \
     defined(HPX_COMPONENT_EXPORTS) || defined(HPX_APPLICATION_EXPORTS) || \
     defined(HPX_LIBRARY_EXPORTS)

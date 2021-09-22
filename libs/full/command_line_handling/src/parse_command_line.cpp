@@ -170,9 +170,11 @@ namespace hpx { namespace util {
         // resolve defined command line option aliases.
         struct option_parser
         {
-            option_parser(util::section const& ini, std::size_t node)
+            option_parser(
+                util::section const& ini, std::size_t node, bool ignore_aliases)
               : ini_(ini)
               , node_(node)
+              , ignore_aliases_(ignore_aliases)
             {
             }
 
@@ -190,14 +192,17 @@ namespace hpx { namespace util {
                     return opt;
 
                 // handle aliasing, if enabled
-                if (ini_.get_entry("hpx.commandline.aliasing", "1") == "1")
-                    return handle_aliasing(ini_, s);
-
-                return opt;
+                if (ini_.get_entry("hpx.commandline.aliasing", "0") == "0" ||
+                    ignore_aliases_)
+                {
+                    return opt;
+                }
+                return handle_aliasing(ini_, s);
             }
 
             util::section const& ini_;
             std::size_t node_;
+            bool ignore_aliases_;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -205,9 +210,12 @@ namespace hpx { namespace util {
         get_commandline_parser(
             hpx::program_options::basic_command_line_parser<char>& p, int mode)
         {
-            if ((mode & ~util::report_missing_config_file) ==
-                util::allow_unregistered)
+            if ((mode &
+                    ~(util::report_missing_config_file |
+                        util::ignore_aliases)) == util::allow_unregistered)
+            {
                 return p.allow_unregistered();
+            }
             return p;
         }
 
@@ -271,8 +279,9 @@ namespace hpx { namespace util {
                           command_line_parser(options)
                               .options(desc)
                               .style(unix_style)
-                              .extra_parser(detail::option_parser(rtcfg, node)),
-                          error_mode)
+                              .extra_parser(detail::option_parser(rtcfg, node,
+                                  error_mode & util::ignore_aliases)),
+                          error_mode & ~util::ignore_aliases)
                           .run(),
                     vm);
                 notify(vm);
@@ -703,8 +712,9 @@ namespace hpx { namespace util {
                             .options(desc_cmdline)
                             .positional(pd)
                             .style(unix_style)
-                            .extra_parser(detail::option_parser(rtcfg, node)),
-                        error_mode
+                            .extra_parser(detail::option_parser(rtcfg, node,
+                                error_mode & util::ignore_aliases)),
+                          error_mode & ~util::ignore_aliases
                     ).run()
                 );
 
@@ -725,8 +735,9 @@ namespace hpx { namespace util {
                         command_line_parser(args)
                             .options(desc_cmdline)
                             .style(unix_style)
-                            .extra_parser(detail::option_parser(rtcfg, node)),
-                        error_mode
+                            .extra_parser(detail::option_parser(rtcfg, node,
+                                error_mode & util::ignore_aliases)),
+                        error_mode & ~util::ignore_aliases
                     ).run()
                 );
 

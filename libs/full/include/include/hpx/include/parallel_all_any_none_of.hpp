@@ -11,6 +11,4 @@
 #include <hpx/parallel/algorithms/all_any_none.hpp>
 #include <hpx/parallel/container_algorithms/all_any_none.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/all_any_none.hpp>
-#endif

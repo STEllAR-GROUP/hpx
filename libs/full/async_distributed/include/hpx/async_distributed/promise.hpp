@@ -9,8 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/async_distributed/detail/promise_base.hpp>
 
 #include <exception>
@@ -253,4 +251,3 @@ namespace std {
     {
     };
 }    // namespace std
-#endif
