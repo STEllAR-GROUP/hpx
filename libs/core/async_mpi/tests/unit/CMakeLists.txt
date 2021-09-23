@@ -22,7 +22,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     DEPENDENCIES Mpi::mpi
-    FOLDER "Tests/Unit/Modules/Full/AsyncMPI"
+    FOLDER "Tests/Unit/Modules/Core/AsyncMPI"
   )
 
   add_hpx_unit_test("modules.async_mpi" ${test} ${${test}_PARAMETERS})
