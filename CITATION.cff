@@ -1,71 +1,90 @@
-# Copyright (c) 2021 The STE||AR Group
+# Copyright (c) 2021 Patrick Diehl
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
+# YAML 1.2
+# Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+message: If you use this software, please cite it using these metadata.
+title: 'STEllAR-GROUP/hpx: HPX V1.7.0: The C++ Standards Library for Parallelism and
+  Concurrency'
+doi: 10.5281/zenodo.5185328
 authors:
-- family-names: "Kaiser"
-  given-names: "Hartmut"
-  orcid: "https://orcid.org/0000-0002-8712-2806"
-- family-names: "Diehl"
-  given-names: "Patrick"
-  orcid: "https://orcid.org/0000-0003-3922-8419"
-- family-names: "Lemoine"
-  given-names: "Adrian S."
-- family-names: "Adelstein Lelbach"
-  given-names: "Bryce"
-  orcid: "https://orcid.org/0000-0002-7995-5226"
-- family-names: "Amini"
-  given-names: "Parsa"
-  orcid: "https://orcid.org/0000-0002-6439-8404"
-- family-names: "Berge"
-  given-names: "Agustín"
-- family-names: "Biddiscombe"
-  given-names: "John"
-  orcid: "https://orcid.org/0000-0002-6552-2833"
-- family-names: "Brandt"
-  given-names: "Steven R."
-  orcid: "https://orcid.org/0000-0002-7979-2906"
-- family-names: "Gupta"
-  given-names: "Nikunj"
-  orcid: "https://orcid.org/0000-0003-0525-3667"
-- family-names: "Heller"
-  given-names: "Thomas"
-  orcid: "https://orcid.org/0000-0003-2620-9438"
-- family-names: "Huck"
-  given-names: "Kevin"
-  orcid: "https://orcid.org/0000-0001-7064-8417"
-- family-names: "Khatami"
-  given-names: "Zahra"
-  orcid: "https://orcid.org/0000-0001-6654-6856"
-- family-names: "Kheirkhahan"
-  given-names: "Alireza"
-  orcid: "https://orcid.org/0000-0002-4624-4647"
-- family-names: "Reverdell"
-  given-names: "Auriane"
-  orcid: "https://orcid.org/0000-0002-5531-0458"
-- family-names: "Shirzad"
-  given-names: "Shahrzad"
-  orcid: "https://orcid.org/0000-0001-9496-8044"
-- family-names: "Simberg"
-  given-names: "Mikael"
-  orcid: "https://orcid.org/0000-0002-7238-8935"
-- family-names: "Wagle"
-  given-names: "Bibek"
-  orcid: "https://orcid.org/0000-0001-6619-7115"
-- family-names: "Wei"
-  given-names: "Weile"
-  orcid: "https://orcid.org/0000-0002-3065-4959"
-- family-names: "Zhang"
-  given-names: "Tianyi"
-  orcid: "https://orcid.org/0000-0002-1000-4887"
-title: "HPX - The C++ Standard Library for Parallelism and Concurrency"
-doi: 10.21105/joss.02352
-version: 1.7.0
-date-released: 2021-07-14
-repository-code: "https://github.com/STEllAR-GROUP/hpx"
-url: "https://hpx.stellar-group.org"
-license: "BSL V1.0"
+- given-names: Hartmut
+  family-names: Kaiser
+- given-names: Mikael
+  family-names: Simberg
+- given-names: Bryce
+  family-names: Adelstein Lelbach
+  affiliation: NVIDIA
+- given-names: Thomas
+  family-names: Heller
+- given-names: Agustin
+  family-names: Berge
+- given-names: John
+  family-names: Biddiscombe
+  affiliation: CSCS
+- given-names: Auriane
+  family-names: Reverdell
+- given-names: Anton
+  family-names: Bikineev
+  affiliation: stellar-group
+- given-names: Grant
+  family-names: Mercer
+- given-names: Andreas
+  family-names: Schaefer
+- given-names: Kevin
+  family-names: Huck
+  affiliation: University of Oregon
+- given-names: Adrian
+  family-names: Lemoine
+  affiliation: AMD
+- given-names: Taeguk
+  family-names: Kwon
+  affiliation: '@devsisters'
+- given-names: Jeroen
+  family-names: Habraken
+  affiliation: Pure Storage
+- given-names: Matthew
+  family-names: Anderson
+- given-names: Steven
+  family-names: Brandt
+  name-particle: R.
+- given-names: Marcin
+  family-names: Copik
+  affiliation: ETH Zuerich
+- given-names: Srinivas
+  family-names:  Yadav
+- given-names: Martin
+  family-names: Stumpf
+- given-names: Daniel
+  family-names: Bourgeois
+- given-names: Akhil
+  family-names: Nair
+- given-names: Denis
+  family-names: Blank
+  affiliation: Technical University of Munich
+- given-names: Giannis
+  family-names: Gonidelis
+- given-names: Rebecca
+  family-names: Stobaugh
+- given-names: Nikunj
+  family-names: Gupta
+- given-names: Shoshana
+  family-names: Jakobovits
+  affiliation: CSCS
+- given-names: Vinay
+  family-names: Amatya
+- given-names: Lars
+  family-names: Viklund
+- given-names: Patrick
+  family-names: Diehl
+  affiliation: Center of Computation and Technology, LSU
+- given-names: Zahra
+  family-names: Khatami
+  affiliation: Louisiana State University
+version: 1.7.1
+date-released: 2021-08-12
+repository-code: https://github.com/STEllAR-GROUP/hpx
+license: BSL-1.0
