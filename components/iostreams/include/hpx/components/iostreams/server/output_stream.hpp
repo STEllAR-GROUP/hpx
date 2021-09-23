@@ -44,7 +44,7 @@ namespace hpx { namespace iostreams { namespace server
         void call_write_async(std::uint32_t locality_id, std::uint64_t count,
             detail::buffer const& in, hpx::id_type /*this_id*/);
         void call_write_sync(std::uint32_t locality_id, std::uint64_t count,
-            detail::buffer const& in, threads::thread_id_type caller);
+            detail::buffer const& in, threads::thread_id_ref_type caller);
 
     public:
         explicit output_stream(write_function_type write_f_ = write_function_type())
