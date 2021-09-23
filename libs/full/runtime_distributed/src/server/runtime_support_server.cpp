@@ -633,7 +633,7 @@ namespace hpx { namespace components { namespace server {
                     },
                     shutdown_check_count,
                     std::chrono::duration<double>(timeout),
-                    "runtime_support::stop", false);
+                    "runtime_support::stop");
 
                 // If it took longer than expected, kill all suspended threads as
                 // well.
@@ -648,7 +648,7 @@ namespace hpx { namespace components { namespace server {
                         },
                         shutdown_check_count,
                         std::chrono::duration<double>(timeout),
-                        "runtime_support::dijkstra_termination", false);
+                        "runtime_support::stop");
                     HPX_UNUSED(success);
                 }
 

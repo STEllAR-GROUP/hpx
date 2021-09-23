@@ -74,14 +74,14 @@ namespace hpx { namespace iostreams { namespace server
     ///////////////////////////////////////////////////////////////////////////
     void output_stream::call_write_sync(std::uint32_t locality_id,
         std::uint64_t count, detail::buffer const& in,
-        threads::thread_id_type caller)
+        threads::thread_id_ref_type caller)
     {
         // Perform the IO operation.
         pending_output_.output(locality_id, count, in, write_f, mtx_);
 
         // Wake up caller.
         threads::set_thread_state(
-            caller, threads::thread_schedule_state::pending);
+            caller.noref(), threads::thread_schedule_state::pending);
     }
 
     void output_stream::write_sync(std::uint32_t locality_id,
@@ -90,8 +90,9 @@ namespace hpx { namespace iostreams { namespace server
         // Perform the IO in another OS thread.
         detail::buffer in(buf_in);
         hpx::get_thread_pool("io_pool")->get_io_service().post(
-            util::bind_front(&output_stream::call_write_sync, this,
-                locality_id, count, std::ref(in), threads::get_self_id()));
+            util::bind_front(&output_stream::call_write_sync, this, locality_id,
+                count, std::ref(in),
+                threads::thread_id_ref_type(threads::get_self_id())));
 
         // Sleep until the worker thread wakes us up.
         this_thread::suspend(threads::thread_schedule_state::suspended,

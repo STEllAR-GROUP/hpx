@@ -25,7 +25,7 @@
 namespace hpx { namespace threads { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_result_type set_active_state(thread_id_type const& thrd,
+    thread_result_type set_active_state(thread_id_ref_type thrd,
         thread_schedule_state newstate, thread_restart_state newstate_ex,
         thread_priority priority, thread_state previous_state)
     {
@@ -59,7 +59,7 @@ namespace hpx { namespace threads { namespace detail {
 
         // just retry, set_state will create new thread if target is still active
         error_code ec(lightweight);    // do not throw
-        detail::set_thread_state(thrd, newstate, newstate_ex, priority,
+        detail::set_thread_state(thrd.noref(), newstate, newstate_ex, priority,
             thread_schedule_hint(), true, ec);
 
         return thread_result_type(
@@ -134,8 +134,8 @@ namespace hpx { namespace threads { namespace detail {
                         get_thread_state_name(new_state));
 
                     thread_init_data data(
-                        util::bind(&set_active_state, thrd, new_state,
-                            new_state_ex, priority, previous_state),
+                        util::bind(&set_active_state, thread_id_ref_type(thrd),
+                            new_state, new_state_ex, priority, previous_state),
                         "set state for active thread", priority);
 
                     create_work(get_thread_id_data(thrd)->get_scheduler_base(),

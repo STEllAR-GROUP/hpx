@@ -138,15 +138,17 @@ namespace hpx { namespace execution { namespace experimental {
                     operation_state& op_state;
 
                     template <typename Error>
-                    void set_error(Error&& error) && noexcept
+                    friend void tag_dispatch(set_error_t,
+                        predecessor_sender_receiver&& r, Error&& error) noexcept
                     {
-                        op_state.set_error_predecessor_sender(
+                        r.op_state.set_error_predecessor_sender(
                             std::forward<Error>(error));
                     }
 
-                    void set_done() && noexcept
+                    friend void tag_dispatch(
+                        set_done_t, predecessor_sender_receiver&& r) noexcept
                     {
-                        op_state.set_done_predecessor_sender();
+                        r.op_state.set_done_predecessor_sender();
                     }
 
                     // This typedef is duplicated from the parent struct. The
@@ -159,13 +161,14 @@ namespace hpx { namespace execution { namespace experimental {
                         hpx::monostate>;
 
                     template <typename... Ts>
-                    auto set_value(Ts&&... ts) && noexcept
+                    friend auto tag_dispatch(set_value_t,
+                        predecessor_sender_receiver&& r, Ts&&... ts) noexcept
                         -> decltype(std::declval<value_type>()
                                         .template emplace<hpx::tuple<Ts...>>(
                                             std::forward<Ts>(ts)...),
                             void())
                     {
-                        op_state.set_value_predecessor_sender(
+                        r.op_state.set_value_predecessor_sender(
                             std::forward<Ts>(ts)...);
                     }
                 };
@@ -217,20 +220,23 @@ namespace hpx { namespace execution { namespace experimental {
                     operation_state& op_state;
 
                     template <typename Error>
-                    void set_error(Error&& error) && noexcept
+                    friend void tag_dispatch(set_error_t,
+                        scheduler_sender_receiver&& r, Error&& error) noexcept
                     {
-                        op_state.set_error_scheduler_sender(
+                        r.op_state.set_error_scheduler_sender(
                             std::forward<Error>(error));
                     }
 
-                    void set_done() && noexcept
+                    friend void tag_dispatch(
+                        set_done_t, scheduler_sender_receiver&& r) noexcept
                     {
-                        op_state.set_done_scheduler_sender();
+                        r.op_state.set_done_scheduler_sender();
                     }
 
-                    void set_value() && noexcept
+                    friend void tag_dispatch(
+                        set_value_t, scheduler_sender_receiver&& r) noexcept
                     {
-                        op_state.set_value_scheduler_sender();
+                        r.op_state.set_value_scheduler_sender();
                     }
                 };
 
@@ -278,23 +284,25 @@ namespace hpx { namespace execution { namespace experimental {
                         std::move(ts));
                 }
 
-                void start() & noexcept
+                friend void tag_dispatch(start_t, operation_state& os) noexcept
                 {
-                    hpx::execution::experimental::start(sender_os);
+                    hpx::execution::experimental::start(os.sender_os);
                 }
             };
 
             template <typename Receiver>
-            operation_state<Receiver> connect(Receiver&& receiver) &&
+            friend operation_state<Receiver> tag_dispatch(
+                connect_t, on_sender&& s, Receiver&& receiver)
             {
-                return {std::move(predecessor_sender), std::move(scheduler),
+                return {std::move(s.predecessor_sender), std::move(s.scheduler),
                     std::forward<Receiver>(receiver)};
             }
 
             template <typename Receiver>
-            operation_state<Receiver> connect(Receiver&& receiver) &
+            friend operation_state<Receiver> tag_dispatch(
+                connect_t, on_sender& s, Receiver&& receiver)
             {
-                return {predecessor_sender, scheduler,
+                return {s.predecessor_sender, s.scheduler,
                     std::forward<Receiver>(receiver)};
             }
         };

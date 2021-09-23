@@ -194,6 +194,7 @@ namespace hpx { namespace threads { namespace detail {
                 hpx_thread_offset;
         bool have_polling_work =
             sched_->Scheduler::get_polling_work_count() > 0;
+
         return have_hpx_threads || have_polling_work;
     }
 

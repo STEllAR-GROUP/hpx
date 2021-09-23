@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2016 Hartmut Kaiser
+//  Copyright (c) 2011-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/plain_action.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
@@ -66,7 +67,7 @@ namespace hpx { namespace iostreams { namespace detail
                 naming::id_type::managed);
 
             return agas::register_name(cout_name, cout_id).then(
-                util::bind_back(&return_id_type, cout_id));
+                hpx::launch::sync, util::bind_back(&return_id_type, cout_id));
         }
 
         // the console locality will create the ostream during startup

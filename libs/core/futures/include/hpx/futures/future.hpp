@@ -14,6 +14,9 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution_base/operation_state.hpp>
+#include <hpx/execution_base/receiver.hpp>
+#include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/detail/future_data.hpp>
@@ -504,13 +507,15 @@ namespace hpx { namespace lcos { namespace detail {
         operation_state(operation_state const&) = delete;
         operation_state& operator=(operation_state const&) = delete;
 
-        void start() noexcept
+        friend void tag_dispatch(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
-            start_helper(std::is_void<result_type>{});
+            os.start_helper(std::is_void<result_type>{});
         }
 
     private:
-        void start_helper(std::true_type) noexcept
+        // TODO: if constexpr
+        void start_helper(std::true_type) & noexcept
         {
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
@@ -603,14 +608,6 @@ namespace hpx { namespace lcos { namespace detail {
         using error_types = Variant<std::exception_ptr>;
 
         static constexpr bool sends_done = false;
-
-        template <typename Receiver>
-        detail::operation_state<Receiver, Derived> connect(
-            Receiver&& receiver) &&
-        {
-            return {std::forward<Receiver>(receiver),
-                std::move(static_cast<Derived&>(*this))};
-        }
 
     private:
         template <typename F>
@@ -906,10 +903,17 @@ namespace hpx { namespace lcos {
         using shared_state_type = typename base_type::shared_state_type;
 
         // Sender compatibility
-        using base_type::connect;
         using base_type::error_types;
         using base_type::sends_done;
         using base_type::value_types;
+
+        template <typename Receiver>
+        friend detail::operation_state<Receiver, future> tag_dispatch(
+            hpx::execution::experimental::connect_t, future&& f,
+            Receiver&& receiver)
+        {
+            return {std::forward<Receiver>(receiver), std::move(f)};
+        }
 
     private:
         struct invalidate
@@ -1230,16 +1234,24 @@ namespace hpx { namespace lcos {
         using shared_state_type = typename base_type::shared_state_type;
 
         // Sender compatibility
-        using base_type::connect;
         using base_type::error_types;
         using base_type::sends_done;
         using base_type::value_types;
 
         template <typename Receiver>
-        detail::operation_state<Receiver, shared_future> connect(
-            Receiver&& receiver) &
+        friend detail::operation_state<Receiver, shared_future> tag_dispatch(
+            hpx::execution::experimental::connect_t, shared_future&& f,
+            Receiver&& receiver)
         {
-            return {std::forward<Receiver>(receiver), *this};
+            return {std::forward<Receiver>(receiver), std::move(f)};
+        }
+
+        template <typename Receiver>
+        friend detail::operation_state<Receiver, shared_future> tag_dispatch(
+            hpx::execution::experimental::connect_t, shared_future& f,
+            Receiver&& receiver)
+        {
+            return {std::forward<Receiver>(receiver), f};
         }
 
     private:

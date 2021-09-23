@@ -139,27 +139,30 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Error>
-            void set_error(Error&& error) && noexcept
+            friend void tag_dispatch(
+                set_error_t, sync_wait_receiver&& r, Error&& error) noexcept
             {
-                state.value.template emplace<error_type>(
+                r.state.value.template emplace<error_type>(
                     std::forward<Error>(error));
-                signal_set_called();
+                r.signal_set_called();
             }
 
-            void set_done() && noexcept
+            friend void tag_dispatch(
+                set_done_t, sync_wait_receiver&& r) noexcept
             {
-                signal_set_called();
+                r.signal_set_called();
             }
 
             template <typename... Us,
                 typename =
                     std::enable_if_t<(is_void_result && sizeof...(Us) == 0) ||
                         (!is_void_result && sizeof...(Us) == 1)>>
-            void set_value(Us&&... us) && noexcept
+            friend void tag_dispatch(
+                set_value_t, sync_wait_receiver&& r, Us&&... us) noexcept
             {
-                state.value.template emplace<value_type>(
+                r.state.value.template emplace<value_type>(
                     std::forward<Us>(us)...);
-                signal_set_called();
+                r.signal_set_called();
             }
         };
     }    // namespace detail
