@@ -79,7 +79,7 @@ function(
       )
     else()
       set(_libraries
-          $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/$<TARGET_FILE_NAME:${target}>>$<BUILD_INTERFACE:$<TARGET_FILE:${target}>>
+          $<INSTALL_INTERFACE:-L${CMAKE_INSTALL_LIBDIR};-l$<TARGET_FILE_BASE_NAME:${target}>>$<BUILD_INTERFACE:$<TARGET_FILE:${target}>>
       )
     endif()
   else()
@@ -281,7 +281,14 @@ endfunction(hpx_construct_cflag_list)
 
 function(hpx_construct_library_list link_libraries link_options library_list)
   foreach(library IN LISTS ${link_libraries})
-    set(_library_list "${_library_list} ${library}")
+    if(IS_ABSOLUTE ${library})
+      get_filename_component(_library_path ${library} DIRECTORY)
+      get_filename_component(_library_name ${library} NAME_WE)
+      string(REPLACE ${CMAKE_SHARED_LIBRARY_PREFIX} "" _library_name ${_library_name})
+      set(_library_list "${_library_list} -L${_library_path} -l${_library_name}")
+    else()
+      set(_library_list "${_library_list} ${library}")
+    endif()
   endforeach()
   foreach(option IN LISTS ${link_options})
     set(_library_list "${_library_list} ${option}")
