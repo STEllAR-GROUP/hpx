@@ -94,16 +94,19 @@ namespace hpx { namespace execution { namespace experimental {
                     operation_state* op_state;
 
                     template <typename E>
-                    void set_error(E&& e) && noexcept
+                    friend void tag_dispatch(
+                        set_error_t, bulk_receiver&& r, E&& e) noexcept
                     {
                         hpx::execution::experimental::set_error(
-                            std::move(op_state->receiver), std::forward<E>(e));
+                            std::move(r.op_state->receiver),
+                            std::forward<E>(e));
                     }
 
-                    void set_done() && noexcept
+                    friend void tag_dispatch(
+                        set_done_t, bulk_receiver&& r) noexcept
                     {
                         hpx::execution::experimental::set_done(
-                            std::move(op_state->receiver));
+                            std::move(r.op_state->receiver));
                     };
 
                     template <typename Iterator>
@@ -158,28 +161,29 @@ namespace hpx { namespace execution { namespace experimental {
                         typename = std::enable_if_t<
                             hpx::is_invocable_v<F, range_value_type,
                                 std::add_lvalue_reference_t<Ts>...>>>
-                    void set_value(Ts&&... ts) && noexcept
+                    friend void tag_dispatch(
+                        set_value_t, bulk_receiver&& r, Ts&&... ts) noexcept
                     {
-                        auto const n = hpx::util::size(op_state->shape);
+                        auto const n = hpx::util::size(r.op_state->shape);
 
                         if (n == 0)
                         {
                             hpx::execution::experimental::set_value(
-                                std::move(op_state->receiver),
+                                std::move(r.op_state->receiver),
                                 std::forward<Ts>(ts)...);
                             return;
                         }
 
-                        op_state->ts.template emplace<hpx::tuple<Ts...>>(
+                        r.op_state->ts.template emplace<hpx::tuple<Ts...>>(
                             std::forward<Ts>(ts)...);
 
                         // TODO: chunking and hierarchical spawning?
                         using iterator_type =
                             hpx::traits::range_iterator_t<Shape>;
-                        for (iterator_type it = std::begin(op_state->shape);
-                             it != std::end(op_state->shape); ++it)
+                        for (iterator_type it = std::begin(r.op_state->shape);
+                             it != std::end(r.op_state->shape); ++it)
                         {
-                            auto task_f = [op_state = this->op_state,
+                            auto task_f = [op_state = r.op_state,
                                               it]() mutable {
                                 try
                                 {
@@ -222,11 +226,11 @@ namespace hpx { namespace execution { namespace experimental {
                             threads::thread_init_data data(
                                 threads::make_thread_function_nullary(task_f),
                                 "thread_pool_bulk_sender task",
-                                get_priority(op_state->scheduler),
-                                get_hint(op_state->scheduler),
-                                get_stacksize(op_state->scheduler));
+                                get_priority(r.op_state->scheduler),
+                                get_hint(r.op_state->scheduler),
+                                get_stacksize(r.op_state->scheduler));
                             threads::register_work(
-                                data, op_state->scheduler.get_thread_pool());
+                                data, r.op_state->scheduler.get_thread_pool());
                         }
                     }
                 };
@@ -262,25 +266,28 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                 }
 
-                void start() noexcept
+                friend void tag_dispatch(start_t, operation_state& os) noexcept
                 {
-                    op_state.start();
+                    hpx::execution::experimental::start(os.op_state);
                 }
             };
 
             template <typename Receiver>
-            auto connect(Receiver&& receiver) &&
+            friend auto tag_dispatch(
+                connect_t, thread_pool_bulk_sender&& s, Receiver&& receiver)
             {
                 return operation_state<std::decay_t<Receiver>>{
-                    std::move(scheduler), std::move(sender), std::move(shape),
-                    std::move(f), std::forward<Receiver>(receiver)};
+                    std::move(s.scheduler), std::move(s.sender),
+                    std::move(s.shape), std::move(s.f),
+                    std::forward<Receiver>(receiver)};
             }
 
             template <typename Receiver>
-            auto connect(Receiver&& receiver) &
+            auto tag_dispatch(
+                connect_t, thread_pool_bulk_sender& s, Receiver&& receiver)
             {
-                return operation_state<std::decay_t<Receiver>>{scheduler,
-                    sender, shape, f, std::forward<Receiver>(receiver)};
+                return operation_state<std::decay_t<Receiver>>{s.scheduler,
+                    s.sender, s.shape, s.f, std::forward<Receiver>(receiver)};
             }
         };
     }    // namespace detail

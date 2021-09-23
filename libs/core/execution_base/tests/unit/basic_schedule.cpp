@@ -12,7 +12,7 @@
 #include <exception>
 #include <type_traits>
 
-static std::size_t member_schedule_calls = 0;
+static std::size_t friend_tag_dispatch_schedule_calls = 0;
 static std::size_t tag_dispatch_schedule_calls = 0;
 
 struct sender
@@ -49,7 +49,8 @@ struct non_scheduler_2
 
 struct non_scheduler_3
 {
-    sender schedule()
+    friend sender tag_dispatch(
+        hpx::execution::experimental::schedule_t, non_scheduler_3)
     {
         return {};
     }
@@ -57,9 +58,10 @@ struct non_scheduler_3
 
 struct scheduler_1
 {
-    sender schedule()
+    friend sender tag_dispatch(
+        hpx::execution::experimental::schedule_t, scheduler_1)
     {
-        ++member_schedule_calls;
+        ++friend_tag_dispatch_schedule_calls;
         return {};
     }
 
@@ -93,31 +95,6 @@ sender tag_dispatch(hpx::execution::experimental::schedule_t, scheduler_2)
     return {};
 }
 
-struct scheduler_3
-{
-    sender schedule()
-    {
-        ++member_schedule_calls;
-        return {};
-    }
-
-    bool operator==(scheduler_3 const&) const noexcept
-    {
-        return true;
-    }
-
-    bool operator!=(scheduler_3 const&) const noexcept
-    {
-        return false;
-    }
-};
-
-sender tag_dispatch(hpx::execution::experimental::schedule_t, scheduler_3)
-{
-    ++tag_dispatch_schedule_calls;
-    return {};
-}
-
 int main()
 {
     using hpx::execution::experimental::is_scheduler;
@@ -132,25 +109,17 @@ int main()
         is_scheduler<scheduler_1>::value, "scheduler_1 is a scheduler");
     static_assert(
         is_scheduler<scheduler_2>::value, "scheduler_2 is a scheduler");
-    static_assert(
-        is_scheduler<scheduler_3>::value, "scheduler_3 is a scheduler");
 
     scheduler_1 s1;
     sender snd1 = hpx::execution::experimental::schedule(s1);
     HPX_UNUSED(snd1);
-    HPX_TEST_EQ(member_schedule_calls, std::size_t(1));
+    HPX_TEST_EQ(friend_tag_dispatch_schedule_calls, std::size_t(1));
     HPX_TEST_EQ(tag_dispatch_schedule_calls, std::size_t(0));
 
     scheduler_2 s2;
     sender snd2 = hpx::execution::experimental::schedule(s2);
     HPX_UNUSED(snd2);
-    HPX_TEST_EQ(member_schedule_calls, std::size_t(1));
-    HPX_TEST_EQ(tag_dispatch_schedule_calls, std::size_t(1));
-
-    scheduler_3 s3;
-    sender snd3 = hpx::execution::experimental::schedule(s3);
-    HPX_UNUSED(snd3);
-    HPX_TEST_EQ(member_schedule_calls, std::size_t(2));
+    HPX_TEST_EQ(friend_tag_dispatch_schedule_calls, std::size_t(1));
     HPX_TEST_EQ(tag_dispatch_schedule_calls, std::size_t(1));
 
     return hpx::util::report_errors();

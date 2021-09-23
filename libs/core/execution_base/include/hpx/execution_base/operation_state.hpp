@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/functional/tag_priority_dispatch.hpp>
+#include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
 #include <type_traits>
@@ -46,16 +46,8 @@ namespace hpx { namespace execution { namespace experimental {
     struct is_operation_state;
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct start_t : hpx::functional::tag_priority_noexcept<start_t>
+    struct start_t : hpx::functional::tag_noexcept<start_t>
     {
-    private:
-        template <typename OperationState>
-        friend constexpr HPX_FORCEINLINE auto tag_override_dispatch(
-            start_t, OperationState& o) noexcept(noexcept(o.start()))
-            -> decltype(o.start())
-        {
-            return o.start();
-        }
     } start{};
 
     namespace detail {

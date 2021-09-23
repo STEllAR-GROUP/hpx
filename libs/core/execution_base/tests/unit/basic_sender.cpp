@@ -14,7 +14,7 @@
 #include <type_traits>
 #include <utility>
 
-static std::size_t member_connect_calls = 0;
+static std::size_t friend_tag_dispatch_connect_calls = 0;
 static std::size_t tag_dispatch_connect_calls = 0;
 
 struct non_sender_1
@@ -68,11 +68,18 @@ struct non_sender_7
 
 struct receiver
 {
-    void set_error(std::exception_ptr) noexcept {}
-    void set_done() noexcept {}
-    void set_value(int v) &&
+    friend void tag_dispatch(hpx::execution::experimental::set_error_t,
+        receiver&&, std::exception_ptr) noexcept
     {
-        i = v;
+    }
+    friend void tag_dispatch(
+        hpx::execution::experimental::set_done_t, receiver&&) noexcept
+    {
+    }
+    friend void tag_dispatch(
+        hpx::execution::experimental::set_value_t, receiver&& r, int v)
+    {
+        r.i = v;
     }
 
     int i = -1;
@@ -92,15 +99,17 @@ struct sender_1
     struct operation_state
     {
         receiver& r;
-        void start() noexcept
+        friend void tag_dispatch(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
-            std::move(r).set_value(4711);
+            hpx::execution::experimental::set_value(std::move(os.r), 4711);
         };
     };
 
-    operation_state connect(receiver& r) &&
+    friend operation_state tag_dispatch(
+        hpx::execution::experimental::connect_t, sender_1&&, receiver& r)
     {
-        ++member_connect_calls;
+        ++friend_tag_dispatch_connect_calls;
         return {r};
     }
 };
@@ -119,17 +128,12 @@ struct sender_2
     struct operation_state
     {
         receiver& r;
-        void start() noexcept
+        friend void tag_dispatch(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
-            std::move(r).set_value(4711);
+            hpx::execution::experimental::set_value(std::move(os.r), 4711);
         };
     };
-
-    operation_state connect(receiver& r) &&
-    {
-        ++member_connect_calls;
-        return {r};
-    }
 };
 
 sender_2::operation_state tag_dispatch(
@@ -139,41 +143,20 @@ sender_2::operation_state tag_dispatch(
     return {r};
 }
 
-struct sender_3
-{
-    template <template <class...> class Tuple,
-        template <class...> class Variant>
-    using value_types = Variant<Tuple<int>>;
-
-    template <template <class...> class Variant>
-    using error_types = Variant<std::exception_ptr>;
-
-    static constexpr bool sends_done = false;
-
-    struct operation_state
-    {
-        receiver& r;
-        void start() noexcept
-        {
-            std::move(r).set_value(4711);
-        };
-    };
-};
-
-sender_3::operation_state tag_dispatch(
-    hpx::execution::experimental::connect_t, sender_3, receiver& r)
-{
-    ++tag_dispatch_connect_calls;
-    return {r};
-}
-
 static std::size_t void_receiver_set_value_calls = 0;
 
 struct void_receiver
 {
-    void set_error(std::exception_ptr) noexcept {}
-    void set_done() noexcept {}
-    void set_value() &&
+    friend void tag_dispatch(hpx::execution::experimental::set_error_t,
+        void_receiver&&, std::exception_ptr) noexcept
+    {
+    }
+    friend void tag_dispatch(
+        hpx::execution::experimental::set_done_t, void_receiver&&) noexcept
+    {
+    }
+    friend void tag_dispatch(
+        hpx::execution::experimental::set_value_t, void_receiver&&)
     {
         ++void_receiver_set_value_calls;
     }
@@ -221,8 +204,6 @@ int main()
         "sender_1 should have sender_traits");
     static_assert(!unspecialized<sender_2>(nullptr),
         "sender_2 should have sender_traits");
-    static_assert(!unspecialized<sender_3>(nullptr),
-        "sender_3 should have sender_traits");
 
     using hpx::execution::experimental::is_sender;
     using hpx::execution::experimental::is_sender_to;
@@ -248,7 +229,6 @@ int main()
         !is_sender<non_sender_7>::value, "non_sender_7 is not a sender");
     static_assert(is_sender<sender_1>::value, "sender_1 is a sender");
     static_assert(is_sender<sender_2>::value, "sender_2 is a sender");
-    static_assert(is_sender<sender_3>::value, "sender_3 is a sender");
 
     static_assert(is_sender_to<sender_1, receiver>::value,
         "sender_1 is a sender to receiver");
@@ -262,19 +242,13 @@ int main()
         "sender_2 is not a sender to non_sender_2");
     static_assert(!is_sender_to<sender_2, sender_2>::value,
         "sender_2 is not a sender to sender_2");
-    static_assert(is_sender_to<sender_3, receiver>::value,
-        "sender_3 is a sender to receiver");
-    static_assert(!is_sender_to<sender_3, non_sender_3>::value,
-        "sender_3 is not a sender to non_sender_3");
-    static_assert(!is_sender_to<sender_3, sender_3>::value,
-        "sender_3 is not a sender to sender_3");
 
     {
         receiver r1;
         auto os = hpx::execution::experimental::connect(sender_1{}, r1);
         hpx::execution::experimental::start(os);
         HPX_TEST_EQ(r1.i, 4711);
-        HPX_TEST_EQ(member_connect_calls, std::size_t(1));
+        HPX_TEST_EQ(friend_tag_dispatch_connect_calls, std::size_t(1));
         HPX_TEST_EQ(tag_dispatch_connect_calls, std::size_t(0));
     }
 
@@ -283,16 +257,7 @@ int main()
         auto os = hpx::execution::experimental::connect(sender_2{}, r2);
         hpx::execution::experimental::start(os);
         HPX_TEST_EQ(r2.i, 4711);
-        HPX_TEST_EQ(member_connect_calls, std::size_t(2));
-        HPX_TEST_EQ(tag_dispatch_connect_calls, std::size_t(0));
-    }
-
-    {
-        receiver r3;
-        auto os = hpx::execution::experimental::connect(sender_3{}, r3);
-        hpx::execution::experimental::start(os);
-        HPX_TEST_EQ(r3.i, 4711);
-        HPX_TEST_EQ(member_connect_calls, std::size_t(2));
+        HPX_TEST_EQ(friend_tag_dispatch_connect_calls, std::size_t(1));
         HPX_TEST_EQ(tag_dispatch_connect_calls, std::size_t(1));
     }
 

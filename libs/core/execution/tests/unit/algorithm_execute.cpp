@@ -11,7 +11,7 @@
 #include <exception>
 #include <type_traits>
 
-static std::size_t member_schedule_calls = 0;
+static std::size_t friend_tag_dispatch_schedule_calls = 0;
 static std::size_t tag_dispatch_execute_calls = 0;
 
 struct sender
@@ -27,11 +27,13 @@ struct sender
 
     struct operation_state
     {
-        void start() & noexcept {};
+        friend void tag_dispatch(hpx::execution::experimental::start_t,
+            operation_state&) noexcept {};
     };
 
     template <typename R>
-    operation_state connect(R&&) && noexcept
+    friend operation_state tag_dispatch(
+        hpx::execution::experimental::connect_t, sender&&, R&&) noexcept
     {
         return {};
     }
@@ -39,9 +41,10 @@ struct sender
 
 struct scheduler_1
 {
-    sender schedule()
+    friend sender tag_dispatch(
+        hpx::execution::experimental::schedule_t, scheduler_1)
     {
-        ++member_schedule_calls;
+        ++friend_tag_dispatch_schedule_calls;
         return {};
     }
 
@@ -75,31 +78,6 @@ void tag_dispatch(hpx::execution::experimental::execute_t, scheduler_2, F&&)
     ++tag_dispatch_execute_calls;
 }
 
-struct scheduler_3
-{
-    sender schedule()
-    {
-        ++member_schedule_calls;
-        return {};
-    }
-
-    bool operator==(scheduler_1 const&) const noexcept
-    {
-        return true;
-    }
-
-    bool operator!=(scheduler_1 const&) const noexcept
-    {
-        return false;
-    }
-};
-
-template <typename F>
-void tag_dispatch(hpx::execution::experimental::execute_t, scheduler_3, F&&)
-{
-    ++tag_dispatch_execute_calls;
-}
-
 struct f_struct_1
 {
     void operator()(){};
@@ -126,7 +104,7 @@ int main()
         hpx::execution::experimental::execute(s1, f_struct_1{});
         hpx::execution::experimental::execute(s1, f_struct_3{});
         hpx::execution::experimental::execute(s1, &f_fun_1);
-        HPX_TEST_EQ(member_schedule_calls, std::size_t(3));
+        HPX_TEST_EQ(friend_tag_dispatch_schedule_calls, std::size_t(3));
         HPX_TEST_EQ(tag_dispatch_execute_calls, std::size_t(0));
     }
 
@@ -135,17 +113,8 @@ int main()
         hpx::execution::experimental::execute(s2, f_struct_1{});
         hpx::execution::experimental::execute(s2, f_struct_3{});
         hpx::execution::experimental::execute(s2, &f_fun_1);
-        HPX_TEST_EQ(member_schedule_calls, std::size_t(3));
+        HPX_TEST_EQ(friend_tag_dispatch_schedule_calls, std::size_t(3));
         HPX_TEST_EQ(tag_dispatch_execute_calls, std::size_t(3));
-    }
-
-    {
-        scheduler_3 s3;
-        hpx::execution::experimental::execute(s3, f_struct_1{});
-        hpx::execution::experimental::execute(s3, f_struct_3{});
-        hpx::execution::experimental::execute(s3, &f_fun_1);
-        HPX_TEST_EQ(member_schedule_calls, std::size_t(3));
-        HPX_TEST_EQ(tag_dispatch_execute_calls, std::size_t(6));
     }
 
     return hpx::util::report_errors();

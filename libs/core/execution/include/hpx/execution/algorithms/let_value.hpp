@@ -157,16 +157,19 @@ namespace hpx { namespace execution { namespace experimental {
                     }
 
                     template <typename Error>
-                    void set_error(Error&& error) && noexcept
+                    friend void tag_dispatch(set_error_t,
+                        let_value_predecessor_receiver&& r,
+                        Error&& error) noexcept
                     {
                         hpx::execution::experimental::set_error(
-                            std::move(receiver), std::forward<Error>(error));
+                            std::move(r.receiver), std::forward<Error>(error));
                     }
 
-                    void set_done() && noexcept
+                    friend void tag_dispatch(
+                        set_done_t, let_value_predecessor_receiver&& r) noexcept
                     {
                         hpx::execution::experimental::set_done(
-                            std::move(receiver));
+                            std::move(r.receiver));
                     };
 
                     struct start_visitor
@@ -241,11 +244,7 @@ namespace hpx { namespace execution { namespace experimental {
                         hpx::monostate>;
 
                     template <typename... Ts>
-                    auto set_value(Ts&&... ts) && noexcept
-                        -> decltype(std::declval<predecessor_ts_type>()
-                                        .template emplace<hpx::tuple<Ts...>>(
-                                            std::forward<Ts>(ts)...),
-                            void())
+                    void set_value(Ts&&... ts)
                     {
                         hpx::detail::try_catch_exception_ptr(
                             [&]() {
@@ -261,6 +260,21 @@ namespace hpx { namespace execution { namespace experimental {
                                 hpx::execution::experimental::set_error(
                                     std::move(receiver), std::move(ep));
                             });
+                    }
+
+                    template <typename... Ts>
+                    friend auto tag_dispatch(set_value_t,
+                        let_value_predecessor_receiver&& r, Ts&&... ts) noexcept
+                        -> decltype(std::declval<predecessor_ts_type>()
+                                        .template emplace<hpx::tuple<Ts...>>(
+                                            std::forward<Ts>(ts)...),
+                            void())
+                    {
+                        // set_value is in a member function only because of a
+                        // compiler bug in GCC 7. When the body of set_value is
+                        // inlined here compilation fails with an internal
+                        // compiler error.
+                        r.set_value(std::forward<Ts>(ts)...);
                     }
                 };
 
@@ -281,17 +295,20 @@ namespace hpx { namespace execution { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                void start() & noexcept
+                friend void tag_dispatch(start_t, operation_state& os) noexcept
                 {
-                    hpx::execution::experimental::start(predecessor_op_state);
+                    hpx::execution::experimental::start(
+                        os.predecessor_op_state);
                 }
             };
 
             template <typename Receiver>
-            auto connect(Receiver&& receiver) &&
+            friend auto tag_dispatch(
+                connect_t, let_value_sender&& s, Receiver&& receiver)
             {
-                return operation_state<Receiver>(std::move(predecessor_sender),
-                    std::forward<Receiver>(receiver), std::move(f));
+                return operation_state<Receiver>(
+                    std::move(s.predecessor_sender),
+                    std::forward<Receiver>(receiver), std::move(s.f));
             }
         };
     }    // namespace detail

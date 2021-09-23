@@ -181,40 +181,44 @@ namespace hpx { namespace execution { namespace experimental {
                     };
 
                     template <typename Error>
-                    void set_error(Error&& error) && noexcept
+                    friend void tag_dispatch(set_error_t,
+                        let_error_predecessor_receiver&& r,
+                        Error&& error) noexcept
                     {
                         hpx::detail::try_catch_exception_ptr(
                             [&]() {
                                 // TODO: receiver is moved before the visit, but
                                 // the invoke inside the visit may throw.
-                                op_state.predecessor_error
+                                r.op_state.predecessor_error
                                     .template emplace<Error>(
                                         std::forward<Error>(error));
                                 hpx::visit(
-                                    set_error_visitor{std::move(receiver),
-                                        std::move(f), op_state},
-                                    op_state.predecessor_error);
+                                    set_error_visitor{std::move(r.receiver),
+                                        std::move(r.f), r.op_state},
+                                    r.op_state.predecessor_error);
                             },
                             [&](std::exception_ptr ep) {
                                 hpx::execution::experimental::set_error(
-                                    std::move(receiver), std::move(ep));
+                                    std::move(r.receiver), std::move(ep));
                             });
                     }
 
-                    void set_done() && noexcept
+                    friend void tag_dispatch(
+                        set_done_t, let_error_predecessor_receiver&& r) noexcept
                     {
                         hpx::execution::experimental::set_done(
-                            std::move(receiver));
+                            std::move(r.receiver));
                     };
 
                     template <typename... Ts,
                         typename = std::enable_if_t<hpx::is_invocable_v<
                             hpx::execution::experimental::set_value_t,
                             Receiver&&, Ts...>>>
-                    void set_value(Ts&&... ts) && noexcept
+                    friend void tag_dispatch(set_value_t,
+                        let_error_predecessor_receiver&& r, Ts&&... ts) noexcept
                     {
                         hpx::execution::experimental::set_value(
-                            std::move(receiver), std::forward<Ts>(ts)...);
+                            std::move(r.receiver), std::forward<Ts>(ts)...);
                     }
                 };
 
@@ -274,18 +278,20 @@ namespace hpx { namespace execution { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                void start() & noexcept
+                friend void tag_dispatch(start_t, operation_state& os) noexcept
                 {
                     hpx::execution::experimental::start(
-                        predecessor_operation_state);
+                        os.predecessor_operation_state);
                 }
             };
 
             template <typename Receiver>
-            auto connect(Receiver&& receiver) &&
+            friend auto tag_dispatch(
+                connect_t, let_error_sender&& s, Receiver&& receiver)
             {
-                return operation_state<Receiver>(std::move(predecessor_sender),
-                    std::forward<Receiver>(receiver), std::move(f));
+                return operation_state<Receiver>(
+                    std::move(s.predecessor_sender),
+                    std::forward<Receiver>(receiver), std::move(s.f));
             }
         };
     }    // namespace detail

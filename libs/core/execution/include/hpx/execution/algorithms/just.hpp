@@ -11,7 +11,6 @@
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
@@ -63,44 +62,43 @@ namespace hpx { namespace execution { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                void start() & noexcept
+                friend void tag_dispatch(start_t, operation_state& os) noexcept
                 {
                     hpx::detail::try_catch_exception_ptr(
                         [&]() {
                             hpx::execution::experimental::set_value(
-                                std::move(receiver),
-                                std::move(ts).template get<Is>()...);
+                                std::move(os.receiver),
+                                std::move(os.ts).template get<Is>()...);
                         },
                         [&](std::exception_ptr ep) {
                             hpx::execution::experimental::set_error(
-                                std::move(receiver), std::move(ep));
+                                std::move(os.receiver), std::move(ep));
                         });
                 }
             };
 
             template <typename Receiver>
-            auto connect(Receiver&& receiver) &&
+            friend auto tag_dispatch(
+                connect_t, just_sender&& s, Receiver&& receiver)
             {
                 return operation_state<Receiver>{
-                    std::forward<Receiver>(receiver), std::move(ts)};
+                    std::forward<Receiver>(receiver), std::move(s.ts)};
             }
 
             template <typename Receiver>
-            auto connect(Receiver&& receiver) &
+            friend auto tag_dispatch(
+                connect_t, just_sender& s, Receiver&& receiver)
             {
                 return operation_state<Receiver>{
-                    std::forward<Receiver>(receiver), ts};
+                    std::forward<Receiver>(receiver), s.ts};
             }
         };
     }    // namespace detail
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct just_t final
-      : hpx::functional::tag_fallback<just_t>
     {
-    private:
         template <typename... Ts>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
-            just_t, Ts&&... ts)
+        constexpr HPX_FORCEINLINE auto operator()(Ts&&... ts) const
         {
             return detail::just_sender<
                 typename hpx::util::make_index_pack<sizeof...(Ts)>::type,

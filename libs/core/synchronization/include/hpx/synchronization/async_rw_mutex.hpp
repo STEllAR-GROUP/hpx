@@ -9,7 +9,9 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/optional.hpp>
+#include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
+#include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/synchronization/mutex.hpp>
 
@@ -455,14 +457,15 @@ namespace hpx { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                void start() noexcept
+                friend void tag_dispatch(hpx::execution::experimental::start_t,
+                    operation_state& os) noexcept
                 {
-                    HPX_ASSERT_MSG(state,
+                    HPX_ASSERT_MSG(os.state,
                         "async_rw_lock::sender::operation_state state is "
                         "empty, was the sender already started?");
 
                     auto continuation =
-                        [r = std::move(r)](
+                        [r = std::move(os.r)](
                             shared_state_ptr_type state) mutable {
                             try
                             {
@@ -477,29 +480,31 @@ namespace hpx { namespace experimental {
                             }
                         };
 
-                    if (prev_state)
+                    if (os.prev_state)
                     {
-                        prev_state->add_continuation(std::move(continuation));
+                        os.prev_state->add_continuation(
+                            std::move(continuation));
 
                         // We release prev_state here to allow continuations to
                         // run. The operation state may otherwise keep it alive
                         // longer than needed.
-                        prev_state.reset();
+                        os.prev_state.reset();
                     }
                     else
                     {
                         // There is no previous state on the first access. We
                         // can immediately trigger the continuation.
-                        continuation(std::move(state));
+                        continuation(std::move(os.state));
                     }
                 }
             };
 
             template <typename R>
-            auto connect(R&& r) &&
+            friend auto tag_dispatch(
+                hpx::execution::experimental::connect_t, sender&& s, R&& r)
             {
                 return operation_state<R>{std::forward<R>(r),
-                    std::move(prev_state), std::move(state)};
+                    std::move(s.prev_state), std::move(s.state)};
             }
         };
 
@@ -646,14 +651,15 @@ namespace hpx { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                void start() noexcept
+                friend void tag_dispatch(hpx::execution::experimental::start_t,
+                    operation_state& os) noexcept
                 {
-                    HPX_ASSERT_MSG(state,
+                    HPX_ASSERT_MSG(os.state,
                         "async_rw_lock::sender::operation_state state is "
                         "empty, was the sender already started?");
 
                     auto continuation =
-                        [r = std::move(r)](
+                        [r = std::move(os.r)](
                             shared_state_ptr_type state) mutable {
                             try
                             {
@@ -668,28 +674,30 @@ namespace hpx { namespace experimental {
                             }
                         };
 
-                    if (prev_state)
+                    if (os.prev_state)
                     {
-                        prev_state->add_continuation(std::move(continuation));
+                        os.prev_state->add_continuation(
+                            std::move(continuation));
                         // We release prev_state here to allow continuations to
                         // run. The operation state may otherwise keep it alive
                         // longer than needed.
-                        prev_state.reset();
+                        os.prev_state.reset();
                     }
                     else
                     {
                         // There is no previous state on the first access. We
                         // can immediately trigger the continuation.
-                        continuation(std::move(state));
+                        continuation(std::move(os.state));
                     }
                 }
             };
 
             template <typename R>
-            auto connect(R&& r) &&
+            friend auto tag_dispatch(
+                hpx::execution::experimental::connect_t, sender&& s, R&& r)
             {
                 return operation_state<R>{std::forward<R>(r),
-                    std::move(prev_state), std::move(state)};
+                    std::move(s.prev_state), std::move(s.state)};
             }
         };
 
