@@ -15,11 +15,15 @@ set(benchmarks
     function_object_wrapper_overhead
     future_overhead
     future_overhead_report
+    hpx_heterogeneous_timed_task_spawn
     hpx_tls_overhead
     native_tls_overhead
+    parent_vs_child_stealing
     print_heterogeneous_payloads
     resume_suspend
     timed_task_spawn
+    skynet
+    wait_all_timings
 )
 
 set(timed_task_spawn_SOURCES activate_counters.cpp)
@@ -39,9 +43,7 @@ if(HPX_WITH_LIBCDS)
   set(libcds_hazard_pointer_overhead_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME AND (HPX_WITH_DATAPAR_VC
-                                     OR HPX_WITH_DATAPAR_BOOST_SIMD)
-)
+if(HPX_WITH_DATAPAR_VC)
   list(APPEND benchmarks transform_reduce_binary_scaling)
   set(transform_reduce_binary_scaling_FLAGS DEPENDENCIES iostreams_component)
 endif()
@@ -54,9 +56,7 @@ if(HPX_WITH_EXAMPLES_OPENMP)
   set(openmp_homogeneous_timed_task_spawn_FLAGS
       NOLIBS DEPENDENCIES ${boost_library_dependencies} hpx_core
   )
-  set(openmp_parallel_region_FLAGS NOLIBS DEPENDENCIES
-                                   ${boost_library_dependencies} hpx_core
-  )
+  set(openmp_parallel_region_FLAGS NOLIBS DEPENDENCIES hpx_core)
 endif()
 
 if(HPX_WITH_EXAMPLES_QTHREADS)
@@ -96,14 +96,10 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     benchmarks
     agas_cache_timings
     hpx_homogeneous_timed_task_spawn_executors
-    hpx_heterogeneous_timed_task_spawn
-    parent_vs_child_stealing
     partitioned_vector_foreach
-    skynet
     sizeof
     spinlock_overhead1
     spinlock_overhead2
-    wait_all_timings
   )
 endif()
 
@@ -125,13 +121,7 @@ set(native_tls_overhead_LIBRARIES hpx_dependencies_boost)
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES
                                                      iostreams_component
 )
-set(hpx_heterogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component
-                                             hpx_timing
-)
-set(parent_vs_child_stealing_FLAGS DEPENDENCIES iostreams_component)
 set(skynet_FLAGS DEPENDENCIES iostreams_component)
-set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component)
-set(future_overhead_FLAGS DEPENDENCIES)
 set(sizeof_FLAGS DEPENDENCIES iostreams_component)
 set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component)
 set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component)

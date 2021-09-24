@@ -4,15 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/hpx.hpp>
-
-#include <hpx/modules/timing.hpp>
-#include <hpx/include/parallel_transform_reduce.hpp>
-#include <hpx/iostream.hpp>
+#include <hpx/local/chrono.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/numeric.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <iomanip>
+#include <iostream>
 #include <iterator>
 #include <random>
 #include <stdexcept>
@@ -22,7 +21,7 @@
 struct plus
 {
     template <typename T1, typename T2>
-    auto operator()(T1 && t1, T2 && t2) const -> decltype(t1 + t2)
+    auto operator()(T1&& t1, T2&& t2) const -> decltype(t1 + t2)
     {
         return t1 + t2;
     }
@@ -31,7 +30,7 @@ struct plus
 struct multiplies
 {
     template <typename T1, typename T2>
-    auto operator()(T1 && t1, T2 && t2) const -> decltype(t1 * t2)
+    auto operator()(T1&& t1, T2&& t2) const -> decltype(t1 * t2)
     {
         return t1 * t2;
     }
@@ -39,23 +38,15 @@ struct multiplies
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy>
-float measure_inner_product(ExPolicy && policy,
-    std::vector<float> const& data1, std::vector<float> const& data2)
+float measure_inner_product(ExPolicy&& policy, std::vector<float> const& data1,
+    std::vector<float> const& data2)
 {
-    return
-        hpx::transform_reduce(
-            policy,
-            std::begin(data1),
-            std::end(data1),
-            std::begin(data2),
-            0.0f,
-            ::multiplies(),
-            ::plus()
-        );
+    return hpx::transform_reduce(policy, std::begin(data1), std::end(data1),
+        std::begin(data2), 0.0f, ::multiplies(), ::plus());
 }
 
 template <typename ExPolicy>
-std::int64_t measure_inner_product(int count, ExPolicy && policy,
+std::int64_t measure_inner_product(int count, ExPolicy&& policy,
     std::vector<float> const& data1, std::vector<float> const& data2)
 {
     std::int64_t start = hpx::chrono::high_resolution_clock::now();
@@ -68,15 +59,15 @@ std::int64_t measure_inner_product(int count, ExPolicy && policy,
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::random_device{}();
+    unsigned int seed = (unsigned int) std::random_device{}();
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
-    hpx::cout << "using seed: " << seed << std::endl;
+    std::cout << "using seed: " << seed << std::endl;
     std::mt19937 gen(seed);
 
     std::size_t size = vm["vector_size"].as<std::size_t>();
-    bool csvoutput = vm["csv_output"].as<int>() ?true : false;
+    bool csvoutput = vm["csv_output"].as<int>() ? true : false;
     int test_count = vm["test_count"].as<int>();
 
     std::vector<float> data1(size);
@@ -87,7 +78,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     if (test_count <= 0)
     {
-        hpx::cout << "test_count cannot be less than zero...\n" << hpx::flush;
+        std::cout << "test_count cannot be less than zero...\n" << std::flush;
     }
     else
     {
@@ -102,34 +93,31 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         if (csvoutput)
         {
-            hpx::cout
-                << "," << tr_time_par / 1e9
-                << "," << tr_time_datapar / 1e9
-                << "\n" << hpx::flush;
+            std::cout << "," << tr_time_par / 1e9 << ","
+                      << tr_time_datapar / 1e9 << "\n"
+                      << std::flush;
         }
         else
         {
-            hpx::cout
-                << "transform_reduce(execution::par): " << std::right
-                    << std::setw(15) << tr_time_par / 1e9 << "\n"
-                << "transform_reduce(datapar): " << std::right
-                    << std::setw(15) << tr_time_datapar / 1e9 << "\n"
-                << hpx::flush;
+            std::cout << "transform_reduce(execution::par): " << std::right
+                      << std::setw(15) << tr_time_par / 1e9 << "\n"
+                      << "transform_reduce(datapar): " << std::right
+                      << std::setw(15) << tr_time_datapar / 1e9 << "\n"
+                      << std::flush;
         }
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     hpx::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     cmdline.add_options()
         ("vector_size"
         , hpx::program_options::value<std::size_t>()->default_value(1024)
@@ -147,11 +135,11 @@ int main(int argc, char* argv[])
         , hpx::program_options::value<unsigned int>()
         , "the random number generator seed to use for this run")
         ;
+    // clang-format on
 
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
     init_args.cfg = cfg;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }
-

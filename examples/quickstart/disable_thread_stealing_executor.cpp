@@ -10,9 +10,9 @@
 // it is used with.
 
 #include <hpx/assert.hpp>
-#include <hpx/hpx_main.hpp>
 #include <hpx/local/algorithm.hpp>
 #include <hpx/local/execution.hpp>
+#include <hpx/local/init.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -112,7 +112,7 @@ namespace hpx { namespace parallel { namespace execution {
     };
 }}}    // namespace hpx::parallel::execution
 
-int main()
+int hpx_main()
 {
     std::vector<double> v(1000);
     std::iota(v.begin(), v.end(), 0.0);
@@ -124,5 +124,10 @@ int main()
     hpx::for_loop(
         hpx::execution::par.on(exec), 0, v.size(), [](std::size_t) {});
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

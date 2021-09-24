@@ -6,10 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <boost/dynamic_bitset.hpp>
@@ -24,20 +23,15 @@ using hpx::program_options::variables_map;
 
 using std::chrono::milliseconds;
 
-using hpx::naming::id_type;
-
 using hpx::threads::register_thread;
 
 using hpx::async;
-using hpx::lcos::future;
+using hpx::future;
 
 using hpx::this_thread::suspend;
 using hpx::threads::set_thread_state;
-using hpx::threads::thread_id_type;
 using hpx::threads::thread_id_ref_type;
-
-using hpx::find_here;
-using hpx::init;
+using hpx::threads::thread_id_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace detail {
@@ -175,7 +169,7 @@ int hpx_main(variables_map& vm)
             hpx::threads::thread_restart_state::terminate);
     }
 
-    hpx::finalize();
+    hpx::local::finalize();
 
     return 0;
 }
@@ -193,14 +187,12 @@ int main(int argc, char* argv[])
             "grain size of the future tree");
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
 
-    HPX_TEST_EQ(0, hpx::init(argc, argv, init_args));
+    HPX_TEST_EQ(0, hpx::local::init(hpx_main, argc, argv, init_args));
 
     HPX_TEST(woken);
 
     return hpx::util::report_errors();
 }
-
-#endif

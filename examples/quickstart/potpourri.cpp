@@ -4,11 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/parallel_generate.hpp>
-#include <hpx/include/parallel_sort.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/future.hpp>
 #include <hpx/iostream.hpp>
+#include <hpx/wrap_main.hpp>
 
 #include <random>
 #include <vector>
@@ -16,13 +15,6 @@
 void final_task(hpx::future<hpx::tuple<hpx::future<double>, hpx::future<void>>>)
 {
     hpx::cout << "in final_task" << hpx::endl;
-}
-
-// Avoid ABI incompatibilities between C++11/C++17 as std::rand has exception
-// specification in libstdc++.
-int rand_wrapper()
-{
-    return std::rand();
 }
 
 int main(int, char**)
@@ -55,8 +47,7 @@ int main(int, char**)
     std::vector<int> v(1000000);
 
     // We fill the vector synchronously and sequentially.
-    hpx::generate(
-        hpx::execution::seq, std::begin(v), std::end(v), &rand_wrapper);
+    hpx::generate(hpx::execution::seq, std::begin(v), std::end(v), &std::rand);
 
     // We can launch the sort in parallel and asynchronously.
     hpx::future<void> done_sorting =

@@ -7,11 +7,11 @@
 // This example demonstrates the use of a channel which is very similar to the
 // equally named feature in the Go language.
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/apply.hpp>
-#include <hpx/iostream.hpp>
-#include <hpx/include/lcos.hpp>
+#include <hpx/local/channel.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 
+#include <iostream>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -19,33 +19,31 @@
 ///////////////////////////////////////////////////////////////////////////////
 void sum(std::vector<int> const& s, hpx::lcos::local::channel<int> c)
 {
-    c.set(std::accumulate(s.begin(), s.end(), 0));      // send sum to channel
+    c.set(std::accumulate(s.begin(), s.end(), 0));    // send sum to channel
 }
 
 void calculate_sum()
 {
-    std::vector<int> s = { 7, 2, 8, -9, 4, 0 };
+    std::vector<int> s = {7, 2, 8, -9, 4, 0};
     hpx::lcos::local::channel<int> c;
 
-    hpx::apply(&sum, std::vector<int>(s.begin(), s.begin() + s.size()/2), c);
-    hpx::apply(&sum, std::vector<int>(s.begin() + s.size()/2, s.end()), c);
+    hpx::apply(&sum, std::vector<int>(s.begin(), s.begin() + s.size() / 2), c);
+    hpx::apply(&sum, std::vector<int>(s.begin() + s.size() / 2, s.end()), c);
 
     int x = c.get(hpx::launch::sync);    // receive from c
     int y = c.get(hpx::launch::sync);
 
-    hpx::cout << "sum: " << x + y << std::endl;
+    std::cout << "sum: " << x + y << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void ping(
-    hpx::lcos::local::send_channel<std::string> pings,
-    std::string const& msg)
+    hpx::lcos::local::send_channel<std::string> pings, std::string const& msg)
 {
     pings.set(msg);
 }
 
-void pong(
-    hpx::lcos::local::receive_channel<std::string> pings,
+void pong(hpx::lcos::local::receive_channel<std::string> pings,
     hpx::lcos::local::send_channel<std::string> pongs)
 {
     std::string msg = pings.get(hpx::launch::sync);
@@ -60,7 +58,7 @@ void pingpong()
     ping(pings, "passed message");
     pong(pings, pongs);
 
-    hpx::cout << "ping-ponged: " << pongs.get(hpx::launch::sync) << std::endl;
+    std::cout << "ping-ponged: " << pongs.get(hpx::launch::sync) << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -76,7 +74,7 @@ void pingpong1()
         pongs.get(hpx::launch::sync);
     }
 
-    hpx::cout << "ping-ponged 10 times\n";
+    std::cout << "ping-ponged 10 times\n";
 }
 
 void pingpong2()
@@ -85,16 +83,10 @@ void pingpong2()
     hpx::lcos::local::one_element_channel<std::string> pongs;
 
     ping(pings, "passed message");
-    hpx::future<void> f1 = hpx::async(
-        [=]() {
-            pong(pings, pongs);
-        });
+    hpx::future<void> f1 = hpx::async([=]() { pong(pings, pongs); });
 
     ping(pings, "passed message");
-    hpx::future<void> f2 = hpx::async(
-        [=]() {
-            pong(pings, pongs);
-        });
+    hpx::future<void> f2 = hpx::async([=]() { pong(pings, pongs); });
 
     pongs.get(hpx::launch::sync);
     pongs.get(hpx::launch::sync);
@@ -102,7 +94,7 @@ void pingpong2()
     f1.get();
     f2.get();
 
-    hpx::cout << "ping-ponged with waiting\n";
+    std::cout << "ping-ponged with waiting\n";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -111,34 +103,32 @@ void dispatch_work()
     hpx::lcos::local::channel<int> jobs;
     hpx::lcos::local::channel<> done;
 
-    hpx::apply(
-        [jobs, done]() mutable
+    hpx::apply([jobs, done]() mutable {
+        while (true)
         {
-            while(true)
+            hpx::error_code ec(hpx::lightweight);
+            int value = jobs.get(hpx::launch::sync, ec);
+            if (!ec)
             {
-                hpx::error_code ec(hpx::lightweight);
-                int value = jobs.get(hpx::launch::sync, ec);
-                if (!ec)
-                {
-                    hpx::cout << "received job: " << value << std::endl;
-                }
-                else
-                {
-                    hpx::cout << "received all jobs" << std::endl;
-                    done.set();
-                    break;
-                }
+                std::cout << "received job: " << value << std::endl;
             }
-        });
+            else
+            {
+                std::cout << "received all jobs" << std::endl;
+                done.set();
+                break;
+            }
+        }
+    });
 
     for (int j = 1; j <= 3; ++j)
     {
         jobs.set(j);
-        hpx::cout << "sent job: " << j << std::endl;
+        std::cout << "sent job: " << j << std::endl;
     }
 
     jobs.close();
-    hpx::cout << "sent all jobs" << std::endl;
+    std::cout << "sent all jobs" << std::endl;
 
     done.get(hpx::launch::sync);
 }
@@ -153,11 +143,11 @@ void channel_range()
     queue.close();
 
     for (auto const& elem : queue)
-        hpx::cout << elem << std::endl;
+        std::cout << elem << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     calculate_sum();
     pingpong();
@@ -166,5 +156,10 @@ int main()
     dispatch_work();
     channel_range();
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

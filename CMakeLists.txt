@@ -1291,10 +1291,7 @@ hpx_option(
   ADVANCED
 )
 if(HPX_WITH_EXAMPLES_OPENMP)
-  find_package(OpenMP)
-  if(NOT OPENMP_FOUND)
-    set(HPX_WITH_EXAMPLES_OPENMP OFF)
-  endif()
+  find_package(OpenMP REQUIRED)
 endif()
 hpx_option(
   HPX_WITH_EXAMPLES_TBB BOOL

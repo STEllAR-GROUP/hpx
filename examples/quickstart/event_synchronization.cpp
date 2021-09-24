@@ -6,13 +6,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/hpx_main.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/iostream.hpp>
-
-#include <functional>
+#include <hpx/assert.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <cstddef>
+#include <functional>
+#include <iostream>
 
 struct data
 {
@@ -21,7 +22,11 @@ struct data
 
     char const* msg;
 
-    data() : init(), msg("uninitialized") {}
+    data()
+      : init()
+      , msg("uninitialized")
+    {
+    }
 
     void initialize(char const* p)
     {
@@ -36,12 +41,12 @@ struct data
 void worker(std::size_t i, data& d, hpx::lcos::local::counting_semaphore& sem)
 {
     d.init.wait();
-    hpx::cout << d.msg << ": " << i << "\n" << hpx::flush;
-    sem.signal();                   // signal main thread
+    std::cout << d.msg << ": " << i << "\n" << std::flush;
+    sem.signal();    // signal main thread
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     data d;
     hpx::lcos::local::counting_semaphore sem;
@@ -54,5 +59,10 @@ int main()
     // Wait for all threads to finish executing.
     sem.wait(10);
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(JACOBI_SMP_NO_HPX)
-#include <hpx/init.hpp>
+#include <hpx/local/init.hpp>
 #endif
 
 #include <hpx/modules/program_options.hpp>
@@ -15,8 +15,8 @@
 #include <iostream>
 #include <string>
 
+using hpx::program_options::command_line_parser;
 using hpx::program_options::options_description;
-using hpx::program_options::parse_command_line;
 using hpx::program_options::store;
 using hpx::program_options::value;
 using hpx::program_options::variables_map;
@@ -62,7 +62,7 @@ int hpx_main(variables_map& vm)
 #if defined(JACOBI_SMP_NO_HPX)
     return 0;
 #else
-    return hpx::finalize();
+    return hpx::local::finalize();
 #endif
 }
 
@@ -85,7 +85,11 @@ int main(int argc, char** argv)
 #if defined(JACOBI_SMP_NO_HPX)
     variables_map vm;
     desc_cmd.add_options()("help", "This help message");
-    store(parse_command_line(argc, argv, desc_cmd), vm);
+    store(command_line_parser(argc, argv)
+              .options(desc_cmd)
+              .allow_unregistered()
+              .run(),
+        vm);
     if (vm.count("help"))
     {
         std::cout << desc_cmd;
@@ -93,9 +97,9 @@ int main(int argc, char** argv)
     }
     return hpx_main(vm);
 #else
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_cmd;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 #endif
 }

@@ -21,10 +21,12 @@ set(function_tests
     function_args
     function_arith
     function_bind_test
+    function_object_size
     function_ref
     function_ref_wrapper
     function_target
     function_test
+    is_invocable
     mem_fn_derived_test
     mem_fn_dm_test
     # mem_fn_eq_test

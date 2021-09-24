@@ -6,13 +6,12 @@
 
 // This example is meant for inclusion in the documentation.
 
-#include <hpx/hpx_main.hpp>
-
 #include <hpx/assert.hpp>
-#include <hpx/include/apply.hpp>
-#include <hpx/iostream.hpp>
-#include <hpx/include/lcos.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/modules/synchronization.hpp>
 
+#include <iostream>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -26,7 +25,7 @@ void minimal_channel()
     HPX_ASSERT(!f.is_ready());
     c.set(42);
     HPX_ASSERT(f.is_ready());
-    hpx::cout << f.get() << hpx::endl;
+    std::cout << f.get() << std::endl;
     //]
 }
 
@@ -36,7 +35,7 @@ void do_something(hpx::lcos::local::receive_channel<int> c,
     hpx::lcos::local::send_channel<> done)
 {
     // prints 43
-    hpx::cout << c.get(hpx::launch::sync) << hpx::endl;
+    std::cout << c.get(hpx::launch::sync) << std::endl;
     // signal back
     done.set();
 }
@@ -56,10 +55,15 @@ void send_receive_channel()
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     minimal_channel();
     send_receive_channel();
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

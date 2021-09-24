@@ -6,8 +6,6 @@
 
 set(tests config_entry)
 
-set(subdirs function)
-
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests ${tests} bind_action)
 endif()
@@ -31,11 +29,4 @@ foreach(test ${tests})
 
   add_hpx_unit_test("util" ${test} ${${test}_PARAMETERS})
 
-endforeach()
-
-# add sub directories
-foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.util.${subdir})
-  add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.unit.util tests.unit.util.${subdir})
 endforeach()

@@ -7,41 +7,38 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/local/functional.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/iostream.hpp>
-#include <hpx/include/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
 
 #include <cstdint>
 #include <functional>
+#include <iostream>
 #include <numeric>
 #include <random>
 #include <stdexcept>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "worker_timed.hpp"
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using hpx::get_os_thread_count;
 
+using hpx::threads::make_thread_function_nullary;
 using hpx::threads::register_work;
 using hpx::threads::thread_init_data;
-using hpx::threads::make_thread_function_nullary;
 
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
 
 using hpx::chrono::high_resolution_timer;
-
-using hpx::cout;
-using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables.
@@ -53,55 +50,43 @@ std::uint64_t seed = 0;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_results(
-    std::uint64_t cores
-  , double walltime
-    )
+void print_results(std::uint64_t cores, double walltime)
 {
     if (header)
-        cout << "OS-threads,Seed,Tasks,Minimum Delay (iterations),"
-                "Maximum Delay (iterations),Total Delay (iterations),"
-                "Total Walltime (seconds),Walltime per Task (seconds)\n"
-             << flush;
+        std::cout << "OS-threads,Seed,Tasks,Minimum Delay (iterations),"
+                     "Maximum Delay (iterations),Total Delay (iterations),"
+                     "Total Walltime (seconds),Walltime per Task (seconds)\n"
+                  << std::flush;
 
     std::string const cores_str = hpx::util::format("{},", cores);
-    std::string const seed_str  = hpx::util::format("{},", seed);
+    std::string const seed_str = hpx::util::format("{},", seed);
     std::string const tasks_str = hpx::util::format("{},", tasks);
 
-    std::string const min_delay_str
-        = hpx::util::format("{},", min_delay);
-    std::string const max_delay_str
-        = hpx::util::format("{},", max_delay);
-    std::string const total_delay_str
-        = hpx::util::format("{},", total_delay);
+    std::string const min_delay_str = hpx::util::format("{},", min_delay);
+    std::string const max_delay_str = hpx::util::format("{},", max_delay);
+    std::string const total_delay_str = hpx::util::format("{},", total_delay);
 
-    hpx::util::format_to(cout,
+    hpx::util::format_to(std::cout,
         "{:-21} {:-21} {:-21} {:-21} {:-21} {:-21} {:10.12}, {:10.12}\n",
-        cores_str, seed_str, tasks_str,
-        min_delay_str, max_delay_str, total_delay_str,
-        walltime, walltime / tasks) << flush;
+        cores_str, seed_str, tasks_str, min_delay_str, max_delay_str,
+        total_delay_str, walltime, walltime / tasks)
+        << std::flush;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-std::uint64_t shuffler(
-    std::mt19937_64& prng
-  , std::uint64_t high
-    )
+std::uint64_t shuffler(std::mt19937_64& prng, std::uint64_t high)
 {
     if (high == 0)
         throw std::logic_error("high value was 0");
 
     // Our range is [0, x).
-    std::uniform_int_distribution<std::uint64_t>
-        dist(0, high - 1);
+    std::uniform_int_distribution<std::uint64_t> dist(0, high - 1);
 
     return dist(prng);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(
-    variables_map& vm
-    )
+int hpx_main(variables_map& vm)
 {
     if (vm.count("no-header"))
         header = false;
@@ -112,7 +97,6 @@ int hpx_main(
         seed = std::uint64_t(std::time(nullptr));
 
     {
-
         ///////////////////////////////////////////////////////////////////////
         // Validate command-line arguments.
         if (0 == tasks)
@@ -156,24 +140,23 @@ int hpx_main(
         {
             // Credit to Spencer Ruport for putting this algorithm on
             // stackoverflow.
-            std::uint64_t const low_calc
-                = (total_delay - current_sum) - (max_delay * (tasks - 1 - i));
+            std::uint64_t const low_calc =
+                (total_delay - current_sum) - (max_delay * (tasks - 1 - i));
 
-            bool const negative
-                = (total_delay - current_sum) < (max_delay * (tasks - 1 - i));
+            bool const negative =
+                (total_delay - current_sum) < (max_delay * (tasks - 1 - i));
 
-            std::uint64_t const low
-                = (negative || (low_calc < min_delay)) ? min_delay : low_calc;
+            std::uint64_t const low =
+                (negative || (low_calc < min_delay)) ? min_delay : low_calc;
 
-            std::uint64_t const high_calc
-                = (total_delay - current_sum) - (min_delay * (tasks - 1 - i));
+            std::uint64_t const high_calc =
+                (total_delay - current_sum) - (min_delay * (tasks - 1 - i));
 
-            std::uint64_t const high
-                = (high_calc > max_delay) ? max_delay : high_calc;
+            std::uint64_t const high =
+                (high_calc > max_delay) ? max_delay : high_calc;
 
             // Our range is [low, high].
-            std::uniform_int_distribution<std::uint64_t>
-                dist(low, high);
+            std::uniform_int_distribution<std::uint64_t> dist(low, high);
 
             std::uint64_t const payload = dist(prng);
 
@@ -209,16 +192,16 @@ int hpx_main(
         // Queue the tasks in a serial loop.
         for (std::uint64_t i = 0; i < tasks; ++i)
         {
-            thread_init_data data(
-                make_thread_function_nullary(
-                    hpx::util::bind(&worker_timed, payloads[i] * 1000)),
+            thread_init_data data(make_thread_function_nullary(hpx::util::bind(
+                                      &worker_timed, payloads[i] * 1000)),
                 "worker_timed");
             register_work(data);
         }
 
         ///////////////////////////////////////////////////////////////////////
         // Wait for the work to finish.
-        do {
+        do
+        {
             // Reschedule hpx_main until all other HPX-threads have finished. We
             // should be resumed after most of the null HPX-threads have been
             // executed. If we haven't, we just reschedule ourselves again.
@@ -230,19 +213,17 @@ int hpx_main(
         print_results(get_os_thread_count(), t.elapsed());
     }
 
-    hpx::finalize();
+    hpx::local::finalize();
     return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(
-    int argc
-  , char* argv[]
-    )
+int main(int argc, char* argv[])
 {
     // Configure application-specific options.
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     cmdline.add_options()
         ( "tasks"
         , value<std::uint64_t>(&tasks)->default_value(500000)
@@ -268,11 +249,12 @@ int main(
         ( "no-header"
         , "do not print out the csv header row")
         ;
+    // clang-format on
 
     // Initialize and run HPX.
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }
 #endif

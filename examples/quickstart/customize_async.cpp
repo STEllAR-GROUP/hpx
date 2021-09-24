@@ -9,12 +9,12 @@
 // processing unit) for a thread which is created by calling hpx::apply() or
 // hpx::async().
 
-#include <hpx/execution.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
-#include <hpx/iostream.hpp>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 
 #include <algorithm>
+#include <iostream>
 
 ///////////////////////////////////////////////////////////////////////////////
 void run_with_large_stack()
@@ -28,26 +28,26 @@ void run_with_large_stack()
 
     std::fill(large_array, &large_array[array_size], '\0');
 
-    hpx::cout << "This thread runs with a "
+    std::cout << "This thread runs with a "
               << hpx::threads::get_stack_size_name(
                      hpx::this_thread::get_stack_size())
               << " stack and "
               << hpx::threads::get_thread_priority_name(
                      hpx::this_thread::get_priority())
-              << " priority." << hpx::endl;
+              << " priority." << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void run_with_high_priority()
 {
-    hpx::cout << "This thread runs with "
+    std::cout << "This thread runs with "
               << hpx::threads::get_thread_priority_name(
                      hpx::this_thread::get_priority())
-              << " priority." << hpx::endl;
+              << " priority." << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int hpx_main()
 {
     // run a thread on a large stack
     {
@@ -79,5 +79,10 @@ int main()
         f.wait();
     }
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

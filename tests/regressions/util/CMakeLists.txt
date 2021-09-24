@@ -5,7 +5,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests protect_with_nullary_pfo set_config_entry_deadlock)
+set(tests set_config_entry_deadlock)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests ${tests} iarchive_1237 serialize_buffer_1069

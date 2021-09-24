@@ -6,16 +6,15 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/iostream.hpp>
-#include <hpx/modules/timing.hpp>
-
 #include <hpx/modules/program_options.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <numeric>
 #include <vector>
 
@@ -34,7 +33,7 @@ void just_wait()
 template <typename Policy>
 double measure_one(Policy policy)
 {
-    std::vector<hpx::future<void> > threads;
+    std::vector<hpx::future<void>> threads;
     threads.reserve(iterations);
 
     std::uint64_t start = hpx::chrono::high_resolution_clock::now();
@@ -54,7 +53,7 @@ template <typename Policy>
 double measure(Policy policy)
 {
     std::size_t num_cores = hpx::get_os_thread_count();
-    std::vector<hpx::future<double> > cores;
+    std::vector<hpx::future<double>> cores;
     cores.reserve(num_cores);
 
     for (std::size_t i = 0; i != num_cores; ++i)
@@ -87,19 +86,16 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     if (print_header)
     {
-        hpx::cout
-            << "num_cores,num_threads,child_stealing_time[s],parent_stealing_time[s]"
-            << hpx::endl;
+        std::cout << "num_cores,num_threads,child_stealing_time[s],parent_"
+                     "stealing_time[s]"
+                  << std::endl;
     }
 
-    hpx::util::format_to(hpx::cout,
-        "{},{},{},{}",
-        num_cores,
-        iterations,
-        child_stealing_time,
-        parent_stealing_time) << hpx::endl;
+    hpx::util::format_to(std::cout, "{},{},{},{}", num_cores, iterations,
+        child_stealing_time, parent_stealing_time)
+        << std::endl;
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -109,6 +105,7 @@ int main(int argc, char* argv[])
     po::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     cmdline.add_options()
         ("delay",
             po::value<std::uint64_t>(&delay)->default_value(0),
@@ -125,10 +122,11 @@ int main(int argc, char* argv[])
         ("no-child", "do not test child-stealing (launch::fork only)")
         ("no-parent", "do not test child-stealing (launch::async only)")
         ;
+    // clang-format on
 
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }
 #endif
