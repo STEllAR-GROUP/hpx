@@ -56,8 +56,9 @@ void test_execute()
 struct check_context_receiver
 {
     hpx::thread::id parent_id;
+    hpx::lcos::local::mutex& mtx;
     hpx::lcos::local::condition_variable& cond;
-    std::atomic<bool>& executed;
+    bool& executed;
 
     template <typename E>
     friend void tag_dispatch(
@@ -78,6 +79,7 @@ struct check_context_receiver
         HPX_TEST_NEQ(r.parent_id, hpx::this_thread::get_id());
         HPX_TEST_NEQ(hpx::thread::id(hpx::threads::invalid_thread_id),
             hpx::this_thread::get_id());
+        std::lock_guard<hpx::lcos::local::mutex> l{r.mtx};
         r.executed = true;
         r.cond.notify_one();
     }
@@ -88,18 +90,18 @@ void test_sender_receiver_basic()
     hpx::thread::id parent_id = hpx::this_thread::get_id();
     hpx::lcos::local::mutex mtx;
     hpx::lcos::local::condition_variable cond;
-    std::atomic<bool> executed{false};
+    bool executed{false};
 
     ex::thread_pool_scheduler sched{};
 
     auto begin = ex::schedule(sched);
-    auto os = ex::connect(
-        std::move(begin), check_context_receiver{parent_id, cond, executed});
+    auto os = ex::connect(std::move(begin),
+        check_context_receiver{parent_id, mtx, cond, executed});
     ex::start(os);
 
     {
         std::unique_lock<hpx::lcos::local::mutex> l{mtx};
-        cond.wait(l, [&]() { return executed.load(); });
+        cond.wait(l, [&]() { return executed; });
     }
 
     HPX_TEST(executed);
@@ -113,7 +115,7 @@ void test_sender_receiver_transform()
     hpx::thread::id parent_id = hpx::this_thread::get_id();
     hpx::lcos::local::mutex mtx;
     hpx::lcos::local::condition_variable cond;
-    std::atomic<bool> executed{false};
+    bool executed{false};
 
     auto begin = ex::schedule(sched);
     auto work1 = ex::transform(std::move(begin), [=]() {
@@ -124,13 +126,13 @@ void test_sender_receiver_transform()
         HPX_TEST_EQ(
             sender_receiver_transform_thread_id, hpx::this_thread::get_id());
     });
-    auto os = ex::connect(
-        std::move(work2), check_context_receiver{parent_id, cond, executed});
+    auto os = ex::connect(std::move(work2),
+        check_context_receiver{parent_id, mtx, cond, executed});
     ex::start(os);
 
     {
         std::unique_lock<hpx::lcos::local::mutex> l{mtx};
-        cond.wait(l, [&]() { return executed.load(); });
+        cond.wait(l, [&]() { return executed; });
     }
 
     HPX_TEST(executed);
