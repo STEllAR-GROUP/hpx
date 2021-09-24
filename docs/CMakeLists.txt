@@ -122,39 +122,6 @@ configure_file(
   ${SPHINX_CMAKE_VARIABLES_RST_DEST} @ONLY
 )
 
-set(toolchains_base_dir ${PROJECT_SOURCE_DIR}/cmake/toolchains/)
-file(GLOB _toolchain_files ${toolchains_base_dir} ${toolchains_base_dir}*.cmake)
-
-set(HPX_CMAKE_TOOLCHAINS_LIST_RST "")
-set(HPX_CMAKE_TOOLCHAINS_RST "")
-foreach(_toolchain ${_toolchain_files})
-  get_filename_component(_toolchain_name ${_toolchain} NAME_WE)
-  string(REGEX REPLACE "[ -]" "_" _toolchain_anchor "${_toolchain_name}")
-  set(HPX_CMAKE_TOOLCHAINS_LIST_RST
-      "${HPX_CMAKE_TOOLCHAINS_LIST_RST}* :ref:`${_toolchain_name} <${_toolchain_anchor}>`\n"
-  )
-  string(REGEX REPLACE "." "-" _toolchain_underline ${_toolchain_name})
-  set(HPX_CMAKE_TOOLCHAINS_RST
-      "${HPX_CMAKE_TOOLCHAINS_RST}.. _${_toolchain_anchor}:\n\n${_toolchain_name}\n${_toolchain_underline}\n"
-  )
-  set(HPX_CMAKE_TOOLCHAINS_RST
-      "${HPX_CMAKE_TOOLCHAINS_RST}\n.. code-block:: cmake\n\n"
-  )
-  file(STRINGS ${_toolchain} _toolchain_content)
-  foreach(_line ${_toolchain_content})
-    set(HPX_CMAKE_TOOLCHAINS_RST "${HPX_CMAKE_TOOLCHAINS_RST}   ${_line}\n")
-  endforeach()
-  set(HPX_CMAKE_TOOLCHAINS_RST "${HPX_CMAKE_TOOLCHAINS_RST}\n")
-endforeach()
-
-set(SPHINX_CMAKE_TOOLCHAINS_RST_DEST
-    "${CMAKE_CURRENT_BINARY_DIR}/generated/cmake_toolchains.rst"
-)
-configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/cmake_toolchains.rst.in"
-  ${SPHINX_CMAKE_TOOLCHAINS_RST_DEST} @ONLY
-)
-
 # Configure Sphinx conf.py
 if(HPX_WITH_GIT_TAG)
   set(HPX_CONF_DOCUMENTATION_VERSION "${HPX_WITH_GIT_TAG}")

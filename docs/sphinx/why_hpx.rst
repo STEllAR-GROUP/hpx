@@ -197,7 +197,7 @@ think to be crucial for defeating **SLOW**. Some of those are focused on
 high-performance computing, others are more general.
 
 Focus on latency hiding instead of latency avoidance
-----------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 It is impossible to design a system exposing zero latencies. In an effort to
 come as close as possible to this goal many optimizations are mainly targeted
@@ -217,7 +217,7 @@ we propose is to go beyond anything we know today and to make latency hiding an
 intrinsic concept of the operation of the whole system stack.
 
 Embrace fine-grained parallelism instead of heavyweight threads
----------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If we plan to hide latencies even for very short operations, such as fetching
 the contents of a memory cell from main memory (if it is not already cached), we
@@ -238,7 +238,7 @@ reschedule the initial task after the required result has been calculated, which
 makes the implementation of latency hiding almost trivial.
 
 Rediscover constraint-based synchronization to replace global barriers
-----------------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The code we write today is riddled with implicit (and explicit) global barriers.
 By "global barriers," we mean the synchronization of the control flow between
@@ -269,7 +269,7 @@ results show that employing dataflow techniques in combination with the other
 ideas, as outlined herein, considerably improves scalability for many problems.
 
 Adaptive locality control instead of static data distribution
--------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 While this principle seems to be a given for single desktop or laptop computers
 (the operating system is your friend), it is everything but ubiquitous on modern
@@ -297,7 +297,7 @@ and adaptive :term:`locality` control is to provide a global, uniform address
 space to the applications, even on distributed systems.
 
 Prefer moving work to the data over moving data to the work
------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For the best performance it seems obvious to minimize the amount of bytes
 transferred from one part of the system to another. This is true on all levels.
@@ -328,7 +328,7 @@ data was placed, i.e., utilizing active messages (for instance based on
 scaling.
 
 Favor message driven computation over message passing
------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Today's prevalently used programming model on parallel (multi-node) systems is
 MPI. It is based on message passing, as the name implies, which means that
