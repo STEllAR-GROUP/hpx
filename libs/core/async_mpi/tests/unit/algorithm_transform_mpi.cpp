@@ -249,7 +249,11 @@ int main(int argc, char* argv[])
 {
     MPI_Init(&argc, &argv);
 
-    auto result = hpx::init(argc, argv);
+    std::vector<std::string> cfg = {"hpx.run_hpx_main!=2"};
+    hpx::init_params init_args;
+    init_args.cfg = cfg;
+
+    auto result = hpx::init(argc, argv, init_args);
 
     MPI_Finalize();
 
