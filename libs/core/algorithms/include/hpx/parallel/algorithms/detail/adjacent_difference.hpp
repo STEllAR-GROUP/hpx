@@ -16,6 +16,7 @@
 #include <functional>
 #include <iostream>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
@@ -45,8 +46,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     HPX_HOST_DEVICE HPX_FORCEINLINE OutIter sequential_adjacent_difference(
         InIter first, InIter last, OutIter dest, Op&& op)
     {
-        return sequential_adjacent_difference_t<
-            ExPolicy>{}(first, last, dest, std::forward<Op>(op));
+        return sequential_adjacent_difference_t<ExPolicy>{}(
+            first, last, dest, std::forward<Op>(op));
     }
 #endif
 

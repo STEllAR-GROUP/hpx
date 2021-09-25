@@ -50,7 +50,7 @@ set(tests
     findfirstof
     findfirstof_binary
     findif
-    findifnot    
+    findifnot
     findifnot_exception
     findifnot_bad_alloc
     foreach
