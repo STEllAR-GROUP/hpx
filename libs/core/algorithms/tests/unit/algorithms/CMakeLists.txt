@@ -18,8 +18,6 @@ endforeach()
 # add tests
 set(tests
     adjacentdifference
-    adjacentdifference_exception
-    adjacentdifference_bad_alloc
     adjacentfind
     adjacentfind_exception
     adjacentfind_bad_alloc
@@ -52,7 +50,7 @@ set(tests
     findfirstof
     findfirstof_binary
     findif
-    findifnot
+    findifnot    
     findifnot_exception
     findifnot_bad_alloc
     foreach
