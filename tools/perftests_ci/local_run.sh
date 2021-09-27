@@ -25,8 +25,10 @@ mkdir -p ${build_dir}/reports
 logfile=log_perftest_plot.tmp
 
 hpx_targets=("future_overhead_report_test" "stream_report_test")
-hpx_test_options=("--test-all --repetitions=100 --hpx:queuing=local-priority \
-    --hpx:threads=4" "--hpx:threads=4")
+hpx_test_options=("--hpx:queuing=local-priority --hpx:threads=4 --test-all \
+    --repetitions=100 --futures=500000" \
+    "--vector_size=1048576 --hpx:threads=4 --iterations=5000 \
+    --warmup_iterations=500")
 
 # Build
 ${perftests_dir}/driver.py -v -l $logfile build -b release -o build \

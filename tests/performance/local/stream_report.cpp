@@ -436,8 +436,8 @@ auto run_benchmark(std::size_t warmup_iterations,
         hpx::ranges::transform(policy, b.begin(), b.end(), c.begin(), c.end(),
             a.begin(), triad_step<STREAM_TYPE>(scalar));
     });
-    hpx::util::perftests_print_times();
 
+    // TODO: adapt the check result to work with the new version
     //// Check Results ...
     //check_results(iterations, a, b, c);
 }
@@ -449,7 +449,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::size_t iterations = vm["iterations"].as<std::size_t>();
     std::size_t warmup_iterations = vm["warmup_iterations"].as<std::size_t>();
     std::size_t chunk_size = vm["chunk_size"].as<std::size_t>();
-    std::size_t executor = vm["executor"].as<std::size_t>();
+    std::size_t executor;
     header = vm.count("header") > 0;
 
     HPX_UNUSED(chunk_size);
@@ -487,37 +487,17 @@ int hpx_main(hpx::program_options::variables_map& vm)
         auto policy = hpx::execution::par.on(exec);
 
         // perform benchmark
+        executor = 5;
         run_benchmark<>(warmup_iterations, iterations, vector_size,
-            std::move(alloc), std::move(policy), 5);
+            std::move(alloc), std::move(policy), executor);
         //iterations, vector_size, std::move(target));
     }
     else
 #endif
     {
-        if (executor == 0)
-        {
-            // Default parallel policy with serial allocator.
-            run_benchmark<>(warmup_iterations, iterations, vector_size,
-                std::allocator<STREAM_TYPE>{}, hpx::execution::par, executor);
-        }
-        else if (executor == 1)
-        {
-            // Block executor with block allocator.
-            using executor_type = hpx::compute::host::block_executor<>;
-            using allocator_type =
-                hpx::compute::host::block_allocator<STREAM_TYPE>;
-
-            auto numa_nodes = hpx::compute::host::numa_domains();
-            allocator_type alloc(numa_nodes);
-            executor_type exec(numa_nodes);
-            auto policy = hpx::execution::par.on(exec);
-
-            run_benchmark<>(warmup_iterations, iterations, vector_size,
-                std::move(alloc), std::move(policy), executor);
-        }
-        else if (executor == 2)
         {
             // Default parallel policy and allocator with default parallel policy.
+            executor = 2;
             auto policy = hpx::execution::par;
             hpx::compute::host::detail::policy_allocator<STREAM_TYPE,
                 decltype(policy)>
@@ -526,12 +506,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
             run_benchmark<>(warmup_iterations, iterations, vector_size,
                 std::move(alloc), std::move(policy), executor);
         }
-        else if (executor == 3)
+
         {
             // Fork-join executor and allocator with fork-join executor.
+            executor = 3;
             using executor_type =
                 hpx::execution::experimental::fork_join_executor;
-
             executor_type exec;
             auto policy = hpx::execution::par.on(exec);
             hpx::compute::host::detail::policy_allocator<STREAM_TYPE,
@@ -541,34 +521,25 @@ int hpx_main(hpx::program_options::variables_map& vm)
             run_benchmark<>(warmup_iterations, iterations, vector_size,
                 std::move(alloc), std::move(policy), executor);
         }
-        else if (executor == 4)
+
         {
             // thread_pool_scheduler used through a scheduler_executor.
+            executor = 4;
             using executor_type =
                 hpx::execution::experimental::scheduler_executor<
                     hpx::execution::experimental::thread_pool_scheduler>;
-
             executor_type exec;
             auto policy = hpx::execution::par.on(exec);
             hpx::compute::host::detail::policy_allocator<STREAM_TYPE,
                 decltype(policy)>
                 alloc(policy);
 
-             run_benchmark<>(warmup_iterations, iterations, vector_size,
-                std::move(alloc), std::move(policy), executor);
-        }
-        else
-        {
-            HPX_THROW_EXCEPTION(hpx::commandline_option_error, "hpx_main",
-                "Invalid executor id given (0-4 allowed");
+            run_benchmark<>(warmup_iterations, iterations, vector_size,
+               std::move(alloc), std::move(policy), executor);
         }
     }
 
-    /* --- SUMMARY --- */
-    std::size_t const num_stream_tests = 4;
-    std::vector<double> mintime(
-        num_stream_tests, (std::numeric_limits<double>::max)());
-    std::vector<double> maxtime(num_stream_tests, 0.0);
+    hpx::util::perftests_print_times();
 
     return hpx::finalize();
 }
@@ -595,9 +566,6 @@ int main(int argc, char* argv[])
         (   "chunk_size",
              hpx::program_options::value<std::size_t>()->default_value(0),
             "size of vector (default: 1024)")
-        (   "executor",
-            hpx::program_options::value<std::size_t>()->default_value(2),
-            "executor to use (0-4) (default: 2, parallel_executor)")
 
 #if defined(HPX_HAVE_COMPUTE)
         (   "use-accelerator",
