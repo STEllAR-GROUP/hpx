@@ -6,6 +6,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+set -eux
+
 # Computes the status of the job and store the artifacts
 status_computation_and_artifacts_storage() {
     ctest_exit_code=$?
