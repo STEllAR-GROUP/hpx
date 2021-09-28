@@ -259,6 +259,9 @@ namespace hpx { namespace util {
             "max_terminated_threads = "
             "${HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS)) "}",
+            "init_threads_count = "
+            "${HPX_THREAD_QUEUE_INIT_THREADS_COUNT:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_INIT_THREADS_COUNT)) "}",
 
             "[hpx.commandline]",
             // enable aliasing

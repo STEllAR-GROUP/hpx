@@ -74,7 +74,7 @@ namespace hpx { namespace threads {
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a threads is
     /// implemented by the thread-manager.
-    class thread_data : public threads::detail::thread_data_reference_counting
+    class thread_data : public detail::thread_data_reference_counting
     {
     public:
         thread_data(thread_data const&) = delete;
@@ -584,6 +584,7 @@ namespace hpx { namespace threads {
             std::size_t data) = 0;
 #endif
 
+        virtual void init() = 0;
         virtual void rebind(thread_init_data& init_data) = 0;
 
 #if defined(HPX_HAVE_APEX)
@@ -601,7 +602,8 @@ namespace hpx { namespace threads {
 
         // Construct a new \a thread
         thread_data(thread_init_data& init_data, void* queue,
-            std::ptrdiff_t stacksize, bool is_stackless = false);
+            std::ptrdiff_t stacksize, bool is_stackless = false,
+            thread_id_addref addref = thread_id_addref::yes);
 
         virtual ~thread_data() override;
         virtual void destroy() = 0;

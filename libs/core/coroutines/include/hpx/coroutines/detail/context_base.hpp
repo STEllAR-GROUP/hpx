@@ -68,12 +68,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     template <typename CoroutineImpl>
     class context_base : public default_context_impl<CoroutineImpl>
     {
+        using base_type = default_context_impl<CoroutineImpl>;
+
     public:
         using deleter_type = void(context_base const*);
         using thread_id_type = hpx::threads::thread_id;
 
         context_base(std::ptrdiff_t stack_size, thread_id_type id)
-          : default_context_impl<CoroutineImpl>(stack_size)
+          : base_type(stack_size)
           , m_caller()
           , m_state(ctx_ready)
           , m_exit_state(ctx_exit_not_requested)
@@ -149,6 +151,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             return m_state == ctx_exited;
         }
 
+        void init()
+        {
+            base_type::init();
+        }
+
         // Resume coroutine.
         // Pre:  The coroutine must be ready.
         // Post: The coroutine relinquished control. It might be ready
@@ -159,7 +166,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         // on return.
         void invoke()
         {
-            this->init();
+            base_type::init();
             HPX_ASSERT(is_ready());
             do_invoke();
 
@@ -208,7 +215,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         ~context_base() noexcept
         {
             HPX_ASSERT(!running());
-            HPX_ASSERT(exited());
+            HPX_ASSERT(exited() || (is_ready() && m_phase == 0));
             m_thread_id.reset();
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             delete_tss_storage(m_thread_data);
@@ -321,7 +328,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         void rebind_base(thread_id_type id)
         {
-            HPX_ASSERT(exited());
+            HPX_ASSERT(!running());
 
             m_thread_id = id;
             m_state = ctx_ready;
@@ -387,8 +394,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #endif
         }
 
-        typedef typename default_context_impl<CoroutineImpl>::context_impl_base
-            ctx_type;
+        using ctx_type = typename base_type::context_impl_base;
         ctx_type m_caller;
 
         context_state m_state;

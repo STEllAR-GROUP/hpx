@@ -444,6 +444,13 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Number of threads (of the default stack size) to pre-allocate when
+// initializing a thread queue.
+#if !defined(HPX_THREAD_QUEUE_INIT_THREADS_COUNT)
+#  define HPX_THREAD_QUEUE_INIT_THREADS_COUNT 10
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // Maximum sleep time for idle backoff in milliseconds (used only if
 // HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF is defined).
 #if !defined(HPX_IDLE_BACKOFF_TIME_MAX)

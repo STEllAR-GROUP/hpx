@@ -37,7 +37,6 @@
 #include <cstdint>
 #include <exception>
 #include <functional>
-#include <list>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -93,8 +92,8 @@ namespace hpx { namespace threads { namespace policies {
             std::hash<thread_id_type>, std::equal_to<thread_id_type>,
             util::internal_allocator<thread_id_type>>;
 
-        using thread_heap_type =
-            std::list<thread_id_type, util::internal_allocator<thread_id_type>>;
+        using thread_heap_type = std::vector<thread_id_type,
+            util::internal_allocator<thread_id_type>>;
 
         struct task_description
         {
@@ -172,8 +171,8 @@ namespace hpx { namespace threads { namespace policies {
             if (!heap->empty())
             {
                 // Take ownership of the thread object and rebind it.
-                thrd = heap->front();
-                heap->pop_front();
+                thrd = heap->back();
+                heap->pop_back();
                 get_thread_id_data(thrd)->rebind(data);
             }
             else
@@ -193,7 +192,7 @@ namespace hpx { namespace threads { namespace policies {
                     p = threads::thread_data_stackful::create(
                         data, this, stacksize);
                 }
-                thrd = thread_id_ref_type(p, thread_id_ref_type::addref::no);
+                thrd = thread_id_ref_type(p, thread_id_addref::no);
             }
         }
 
@@ -330,23 +329,23 @@ namespace hpx { namespace threads { namespace policies {
 
             if (stacksize == parameters_.small_stacksize_)
             {
-                thread_heap_small_.push_front(thrd);
+                thread_heap_small_.push_back(thrd);
             }
             else if (stacksize == parameters_.medium_stacksize_)
             {
-                thread_heap_medium_.push_front(thrd);
+                thread_heap_medium_.push_back(thrd);
             }
             else if (stacksize == parameters_.large_stacksize_)
             {
-                thread_heap_large_.push_front(thrd);
+                thread_heap_large_.push_back(thrd);
             }
             else if (stacksize == parameters_.huge_stacksize_)
             {
-                thread_heap_huge_.push_front(thrd);
+                thread_heap_huge_.push_back(thrd);
             }
             else if (stacksize == parameters_.nostack_stacksize_)
             {
-                thread_heap_nostack_.push_front(thrd);
+                thread_heap_nostack_.push_back(thrd);
             }
             else
             {
@@ -1112,7 +1111,43 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void on_start_thread(std::size_t /* num_thread */) {}
+        void on_start_thread(std::size_t /* num_thread */)
+        {
+            thread_heap_small_.reserve(parameters_.init_threads_count_);
+            thread_heap_medium_.reserve(parameters_.init_threads_count_);
+            thread_heap_large_.reserve(parameters_.init_threads_count_);
+            thread_heap_huge_.reserve(parameters_.init_threads_count_);
+
+            // Pre-allocate init_threads_count threads, with accompanying stack,
+            // with the default stack size
+            static_assert(
+                thread_stacksize::default_ == thread_stacksize::small_,
+                "This assumes that the default stacksize is \"small_\". If the "
+                "default changes, so should this code. If this static_assert "
+                "fails you've most likely changed the default without changing "
+                "the code here.");
+
+            std::lock_guard<mutex_type> lk(mtx_);
+            for (std::int64_t i = 0; i < parameters_.init_threads_count_; ++i)
+            {
+                // We don't care about the init parameters since this thread
+                // will be rebound once it is actually used
+                hpx::threads::thread_init_data init_data;
+
+                // We start the reference count at zero since the thread goes
+                // immediately into the list of recycled threads
+                threads::thread_data* p =
+                    threads::thread_data_stackful::create(init_data, this,
+                        parameters_.small_stacksize_, thread_id_addref::no);
+                HPX_ASSERT(p);
+
+                // We initialize the stack eagerly
+                p->init();
+
+                // Finally, store the thread for later use
+                thread_heap_small_.emplace_back(p);
+            }
+        }
         void on_stop_thread(std::size_t /* num_thread */) {}
         void on_error(
             std::size_t /* num_thread */, std::exception_ptr const& /* e */)
