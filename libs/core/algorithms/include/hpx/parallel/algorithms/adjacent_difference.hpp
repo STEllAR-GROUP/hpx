@@ -190,9 +190,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
     {
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
-        return detail::adjacent_difference_(
-            std::forward<ExPolicy>(policy), first, last, dest,
-            [](const auto& x, const auto& y) { return x - y; }, is_segmented());
+        return detail::adjacent_difference_(std::forward<ExPolicy>(policy),
+            first, last, dest, std::minus<>(), is_segmented());
     }
 
     ////////////////////////////////////////////////////////////////////////////
