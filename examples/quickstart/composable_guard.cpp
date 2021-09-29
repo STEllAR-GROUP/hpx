@@ -3,8 +3,8 @@
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+#include <hpx/local/init.hpp>
 #include <hpx/modules/lcos_local.hpp>
-#include <hpx/hpx_init.hpp>
 
 #include <atomic>
 #include <iostream>
@@ -35,38 +35,46 @@ hpx::lcos::local::guard_set guards;
 std::shared_ptr<hpx::lcos::local::guard> l1(new hpx::lcos::local::guard());
 std::shared_ptr<hpx::lcos::local::guard> l2(new hpx::lcos::local::guard());
 
-void incr1() {
+void incr1()
+{
     // implicitly lock l1
     int tmp = i1.load();
-    i1.compare_exchange_strong(tmp,tmp+1);
+    i1.compare_exchange_strong(tmp, tmp + 1);
     // implicitly unlock l1
 }
-void incr2() {
+void incr2()
+{
     // implicitly lock l2
     int tmp = i2.load();
-    i2.compare_exchange_strong(tmp,tmp+1);
+    i2.compare_exchange_strong(tmp, tmp + 1);
     // implicitly unlock l2
 }
-void both() {
+void both()
+{
     // implicitly lock l1 and l2
     int tmp = i1.load();
-    i1.compare_exchange_strong(tmp,tmp+1);
+    i1.compare_exchange_strong(tmp, tmp + 1);
     tmp = i2.load();
-    i2.compare_exchange_strong(tmp,tmp+1);
+    i2.compare_exchange_strong(tmp, tmp + 1);
     // implicitly unlock l1 and l2
 }
 
 int increments = 3000;
 
-void check_() {
-    if(2*increments == i1 && 2*increments == i2) {
+void check_()
+{
+    if (2 * increments == i1 && 2 * increments == i2)
+    {
         std::cout << "Test passed" << std::endl;
-    } else {
+    }
+    else
+    {
         std::cout << "Test failed: i1=" << i1 << " i2=" << i2 << std::endl;
     }
 }
 
-int hpx_main(hpx::program_options::variables_map& vm) {
+int hpx_main(hpx::program_options::variables_map& vm)
+{
     if (vm.count("increments"))
         increments = vm["increments"].as<int>();
 
@@ -74,29 +82,33 @@ int hpx_main(hpx::program_options::variables_map& vm) {
     guards.add(l1);
     guards.add(l2);
 
-    for(int i=0;i<increments;i++) {
+    for (int i = 0; i < increments; i++)
+    {
         // spawn 3 asynchronous tasks
-        run_guarded(guards,both);
-        run_guarded(*l1,incr1);
-        run_guarded(*l2,incr2);
+        run_guarded(guards, both);
+        run_guarded(*l1, incr1);
+        run_guarded(*l2, incr2);
     }
 
-    run_guarded(guards,check_);
-    return hpx::finalize();
+    run_guarded(guards, check_);
+    return hpx::local::finalize();
 }
 
-int main(int argc, char* argv[]) {
-    hpx::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+int main(int argc, char* argv[])
+{
+    hpx::program_options::options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     desc_commandline.add_options()
         ("increments,n", hpx::program_options::value<int>()->default_value(3000),
             "the number of times to increment the counters")
         ;
+    // clang-format on
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }

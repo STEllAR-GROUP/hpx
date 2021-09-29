@@ -6,8 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/init.hpp>
 #include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/local/tuple.hpp>
 
 #include <iostream>
@@ -38,11 +38,11 @@ int hpx_main()
         hpx::when_all(a, b, c).then(cout_continuation());
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    return hpx::init(argc, argv);    // Initialize and run HPX.
+    return hpx::local::init(hpx_main, argc, argv);    // Initialize and run HPX.
 }

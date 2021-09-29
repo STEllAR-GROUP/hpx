@@ -7,7 +7,7 @@
 // The purpose of this demo is to show how it is possible to start HPX without
 // blocking the main thread.
 
-#include <hpx/hpx_start.hpp>
+#include <hpx/local/init.hpp>
 
 #include <iostream>
 
@@ -15,14 +15,14 @@
 // finalize.
 int hpx_main()
 {
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
-    hpx::start(argc, argv);
+    hpx::local::start(hpx_main, argc, argv);
 
     std::cout << "Hello from the main thread!" << std::endl;
 
-    return hpx::stop();
+    return hpx::local::stop();
 }

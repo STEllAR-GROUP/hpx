@@ -11,9 +11,9 @@
 // fibonacci_futures.cpp. This example is mainly intended to demonstrate async,
 // futures and get for the documentation.
 
-#include <hpx/init.hpp>
 #include <hpx/local/chrono.hpp>
 #include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/format.hpp>
 
 #include <cstdint>
@@ -55,7 +55,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 
-    return hpx::finalize();    // Handles HPX shutdown
+    return hpx::local::finalize();    // Handles HPX shutdown
 }
 //hpx_main]
 
@@ -72,9 +72,9 @@ int main(int argc, char* argv[])
         "n value for the Fibonacci function");
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }
 //main]

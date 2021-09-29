@@ -5,21 +5,21 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/init.hpp>
 #include <hpx/local/chrono.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/local/thread.hpp>
 
 #include <chrono>
 #include <iostream>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using std::chrono::seconds;
 
-using hpx::threads::get_self_id;
 using hpx::threads::get_self;
+using hpx::threads::get_self_id;
 using hpx::threads::set_thread_state;
 
 using hpx::chrono::high_resolution_timer;
@@ -43,7 +43,7 @@ int hpx_main()
         std::cout << "woke up after " << t.elapsed() << " seconds\n";
     }
 
-    hpx::finalize();
+    hpx::local::finalize();
     return 0;
 }
 
@@ -51,13 +51,12 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX.
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }
-

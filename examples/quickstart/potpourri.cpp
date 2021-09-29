@@ -4,30 +4,30 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/algorithm.hpp>
-#include <hpx/future.hpp>
-#include <hpx/iostream.hpp>
-#include <hpx/wrap_main.hpp>
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 
+#include <iostream>
 #include <random>
 #include <vector>
 
 void final_task(hpx::future<hpx::tuple<hpx::future<double>, hpx::future<void>>>)
 {
-    hpx::cout << "in final_task" << hpx::endl;
+    std::cout << "in final_task" << std::endl;
 }
 
-int main(int, char**)
+int hpx_main()
 {
     // A function can be launched asynchronously. The program will not block
     // here until the result is available.
     hpx::future<int> f = hpx::async([]() { return 42; });
-    hpx::cout << "Just launched a task!" << hpx::endl;
+    std::cout << "Just launched a task!" << std::endl;
 
     // Use get to retrieve the value from the future. This will block this task
     // until the future is ready, but the HPX runtime will schedule other tasks
     // if there are tasks available.
-    hpx::cout << "f contains " << f.get() << hpx::endl;
+    std::cout << "f contains " << f.get() << std::endl;
 
     // Let's launch another task.
     hpx::future<double> g = hpx::async([]() { return 3.14; });
@@ -41,7 +41,7 @@ int main(int, char**)
     });
 
     // You can check if a future is ready with the is_ready method.
-    hpx::cout << "Result is ready? " << result.is_ready() << hpx::endl;
+    std::cout << "Result is ready? " << result.is_ready() << std::endl;
 
     // You can launch other work in the meantime. Let's sort a vector.
     std::vector<int> v(1000000);
@@ -63,8 +63,13 @@ int main(int, char**)
     all.wait();
 
     // all must be ready at this point because we waited for it to be ready.
-    hpx::cout << (all.is_ready() ? "all is ready!" : "all is not ready...")
-              << hpx::endl;
+    std::cout << (all.is_ready() ? "all is ready!" : "all is not ready...")
+              << std::endl;
 
-    return hpx::finalize();
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

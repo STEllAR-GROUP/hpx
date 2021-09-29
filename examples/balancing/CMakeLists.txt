@@ -4,13 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(example_programs hpx_thread_phase)
-
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(example_programs ${example_programs} os_thread_num)
-endif()
-
-set(os_thread_num_FLAGS DEPENDENCIES iostreams_component)
+set(example_programs hpx_thread_phase os_thread_num)
 
 set(os_thread_num_PARAMETERS THREADS_PER_LOCALITY 4)
 set(hpx_thread_phase_PARAMETERS THREADS_PER_LOCALITY 4)

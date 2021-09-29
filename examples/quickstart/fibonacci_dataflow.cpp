@@ -10,9 +10,9 @@
 // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3564.pdf). The
 // necessary transformations are performed by hand.
 
-#include <hpx/init.hpp>
 #include <hpx/local/chrono.hpp>
 #include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/format.hpp>
 
 #include <cstdint>
@@ -62,7 +62,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             << "fibonacci_dataflow: wrong command line argument value for "
                "option 'n-runs', should not be zero"
             << std::endl;
-        return hpx::finalize();    // Handles HPX shutdown
+        return hpx::local::finalize();    // Handles HPX shutdown
     }
 
     threshold = vm["threshold"].as<unsigned int>();
@@ -73,7 +73,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                "option 'threshold', should be in between 2 and n-value"
                ", value specified: "
             << threshold << std::endl;
-        return hpx::finalize();    // Handles HPX shutdown
+        return hpx::local::finalize();    // Handles HPX shutdown
     }
 
     bool executed_one = false;
@@ -128,7 +128,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             << test << std::endl;
     }
 
-    return hpx::finalize();    // Handles HPX shutdown
+    return hpx::local::finalize();    // Handles HPX shutdown
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -152,8 +152,8 @@ int main(int argc, char* argv[])
     // clang-format on
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::local::init(hpx_main, argc, argv, init_args);
 }
