@@ -59,25 +59,25 @@ double mysecond()
 int checktick()
 {
     static const std::size_t M = 20;
-    int minDelta, Delta;
-    double t1, t2, timesfound[M];
+    double timesfound[M];
 
     // Collect a sequence of M unique time values from the system.
     for (std::size_t i = 0; i < M; i++)
     {
-        t1 = mysecond();
+        double const t1 = mysecond();
+        double t2;
         while (((t2 = mysecond()) - t1) < 1.0E-6)
             ;
-        timesfound[i] = t1 = t2;
+        timesfound[i] = t2;
     }
 
     // Determine the minimum difference between these M values.
     // This result will be our estimate (in microseconds) for the
     // clock granularity.
-    minDelta = 1000000;
+    int minDelta = 1000000;
     for (std::size_t i = 1; i < M; i++)
     {
-        Delta = (int) (1.0E6 * (timesfound[i] - timesfound[i - 1]));
+        int Delta = (int) (1.0E6 * (timesfound[i] - timesfound[i - 1]));
         minDelta = (std::min)(minDelta, (std::max)(Delta, 0));
     }
 
