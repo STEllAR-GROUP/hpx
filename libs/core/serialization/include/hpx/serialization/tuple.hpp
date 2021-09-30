@@ -59,10 +59,10 @@ namespace hpx { namespace util { namespace detail {
         static void call(Archive& ar, T& t, unsigned int)
         {
 #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS)
-            int const _sequencer[] = {((ar & std::get<Is>(t)), 0)...};
+            int const _sequencer[] = {((ar & hpx::get<Is>(t)), 0)...};
 #else
             int const _sequencer[] = {
-                ((ar & const_cast<std::remove_const_t<Ts>&>(std::get<Is>(t))),
+                ((ar & const_cast<std::remove_const_t<Ts>&>(hpx::get<Is>(t))),
                     0)...};
 #endif
             (void) _sequencer;
