@@ -258,6 +258,11 @@ namespace std {
                     this->base_type::set_value(std::forward<U>(value));
                 }
 
+                void unhandled_exception() noexcept
+                {
+                    this->base_type::set_exception(std::current_exception());
+                }
+
                 HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
                     std::size_t size)
                 {
@@ -299,10 +304,15 @@ namespace std {
                     this->base_type::set_value();
                 }
 
+                void unhandled_exception() noexcept
+                {
+                    this->base_type::set_exception(std::current_exception());
+                }
+
                 HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
                     std::size_t size)
                 {
-                    return base_type::allocate();
+                    return base_type::allocate(size);
                 }
 
                 HPX_FORCEINLINE static void operator delete(
@@ -341,6 +351,11 @@ namespace std {
                 void return_value(U&& value)
                 {
                     this->base_type::set_value(std::forward<U>(value));
+                }
+
+                void unhandled_exception() noexcept
+                {
+                    this->base_type::set_exception(std::current_exception());
                 }
 
                 HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
@@ -384,10 +399,15 @@ namespace std {
                     this->base_type::set_value();
                 }
 
+                void unhandled_exception() noexcept
+                {
+                    this->base_type::set_exception(std::current_exception());
+                }
+
                 HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
                     std::size_t size)
                 {
-                    return base_type::allocate();
+                    return base_type::allocate(size);
                 }
 
                 HPX_FORCEINLINE static void operator delete(
