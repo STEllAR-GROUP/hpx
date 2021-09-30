@@ -109,7 +109,7 @@ namespace hpx { namespace naming {
 
     std::string gid_type::to_string() const
     {
-        return hpx::util::format("{:016x}{:016x}", id_msb_, id_lsb_);
+        return hpx::util::format("{:016llx}{:016llx}", id_msb_, id_lsb_);
     }
 
     std::ostream& operator<<(std::ostream& os, gid_type const& id)
@@ -118,7 +118,7 @@ namespace hpx { namespace naming {
         if (id != naming::invalid_gid)
         {
             hpx::util::format_to(
-                os, "{{{:016x}, {:016x}}}", id.id_msb_, id.id_lsb_);
+                os, "{{{:016llx}, {:016llx}}}", id.id_msb_, id.id_lsb_);
         }
         else
         {
