@@ -19,12 +19,8 @@
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/parallel/algorithms/mismatch.hpp>
+#include <hpx/parallel/algorithms/partition.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -64,9 +60,70 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typename Pred, typename Proj>
             static typename util::detail::algorithm_result<ExPolicy, Iter>::type
             parallel(ExPolicy&& policy, RandomIt first, RandomIt nth, Sent last,
-                Pred&& pred, Proj&& proj2)
+                Pred&& pred, Proj&& proj)
             {
-                return first;
+                if (first == last)
+                {
+                    return first;
+                }
+
+                if (nth == last)
+                {
+                    return nth;
+                }
+
+                using value_type = std::iterator_traits<RandomIt>::value_type;
+
+                RandomIt partitionIter;
+                RandomIt last_iter = detail::advance_to_sentinel(first, last);
+                RandomIt return_last = last_iter;
+
+                while (first != last_iter)
+                {
+                    auto n = detail::distance(first, last_iter);
+
+                    // get random pivot index
+                    auto pivotIndex = std::rand() % n;
+                    // swap first and pivot element
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                    std::ranges::iter_swap(first, first + pivotIndex);
+#else
+                    std::iter_swap(first, first + pivotIndex);
+#endif
+
+                    partitionIter = hpx::partition(
+                        std::forward<ExPolicy>(policy), first + 1, last_iter,
+                        [val = HPX_INVOKE(proj, *first), &proj](
+                            value_type const& elem) {
+                            return HPX_INVOKE(proj, elem) <= val;
+                        });
+
+                    --partitionIter;
+                    // swap first element and partitionIter(ending element of first group)
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                    std::ranges::iter_swap(first, partitionIter);
+#else
+                    std::iter_swap(first, partitionIter);
+#endif
+
+                    // if nth element < partitioned index, it lies in [first, partitionIter)
+                    if (partitionIter < nth)
+                    {
+                        first = partitionIter + 1;
+                    }
+                    // else it lies in [partitionIter + 1, last)
+                    else if (partitionIter > nth)
+                    {
+                        last_iter = partitionIter;
+                    }
+                    // partitionIter == nth
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                return return_last;
             }
         };
         /// \endcond
