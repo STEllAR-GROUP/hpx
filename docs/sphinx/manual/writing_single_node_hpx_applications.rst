@@ -677,7 +677,7 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::parallel::v1::adjacent_difference`
+   * * :cpp:func:`hpx::adjacent_difference`
      * Calculates the difference between each element in an input range and the preceding element.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`adjacent_difference`

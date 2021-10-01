@@ -341,8 +341,6 @@ namespace hpx {
                 "Required at least forward iterator.");
              typedef typename std::iterator_traits<FwdIter1>::value_type value_type;
 
-            // typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>().call(
                 std::forward<ExPolicy>(policy), first, last,
                 dest, std::minus<value_type>());
