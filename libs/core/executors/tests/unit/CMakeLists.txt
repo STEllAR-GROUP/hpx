@@ -14,15 +14,13 @@ set(tests
     parallel_fork_executor
     parallel_policy_executor
     polymorphic_executor
+    scheduler_executor
     sequenced_executor
     service_executors
     shared_parallel_executor
     standalone_thread_pool_executor
+    thread_pool_scheduler
 )
-
-if(HPX_CXX_STANDARD GREATER_EQUAL 17)
-  list(APPEND tests thread_pool_scheduler scheduler_executor)
-endif()
 
 if(HPX_WITH_CXX17_STD_EXECUTION_POLICES)
   set(tests ${tests} std_execution_policies)

@@ -5,20 +5,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    bulk_async
-    executor_parameters
-    executor_parameters_dispatching
-    executor_parameters_timer_hooks
-    future_then_executor
-    minimal_async_executor
-    minimal_sync_executor
-    persistent_executor_parameters
-)
-
-if(HPX_CXX_STANDARD GREATER_EQUAL 17)
-  list(
-    APPEND
-    tests
     algorithm_bulk
     algorithm_detach
     algorithm_ensure_started
@@ -32,8 +18,15 @@ if(HPX_CXX_STANDARD GREATER_EQUAL 17)
     algorithm_sync_wait
     algorithm_transform
     algorithm_when_all
-  )
-endif()
+    bulk_async
+    executor_parameters
+    executor_parameters_dispatching
+    executor_parameters_timer_hooks
+    future_then_executor
+    minimal_async_executor
+    minimal_sync_executor
+    persistent_executor_parameters
+)
 
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 
