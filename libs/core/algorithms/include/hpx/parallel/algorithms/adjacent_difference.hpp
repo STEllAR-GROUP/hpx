@@ -11,8 +11,7 @@
 
 #if defined(DOXYGEN)
 
-namespace hpx
-{
+namespace hpx {
     ////////////////////////////////////////////////////////////////////////////
     /// Assigns each value in the range given by result its corresponding
     /// element in the range [first, last] and the one preceding it except
@@ -71,78 +70,79 @@ namespace hpx
     adjacent_difference(
         ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// Assigns each value in the range given by result its corresponding
-    /// element in the range [first, last] and the one preceding it except
-    /// *result, which is assigned *first
-    ///
-    /// \note   Complexity: Exactly (last - first) - 1 application of the
-    ///                     binary operator and (last - first) assignments.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used for the
-    ///                     input range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the source iterators used for the
-    ///                     output range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Op          The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a adjacent_difference requires \a Op
-    ///                     to meet the requirements of \a CopyConstructible.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     of the range the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements of
-    ///                     the range the algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the sequence of elements
-    ///                     the results will be assigned to.
-    /// \param op           The binary operator which returns the difference
-    ///                     of elements. The signature should be equivalent
-    ///                     to the following:
-    ///                     \code
-    ///                     bool op(const Type1 &a, const Type1 &b);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const &, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The types \a Type1  must be such
-    ///                     that objects of type \a FwdIter1 can be dereferenced
-    ///                     and then implicitly converted to the dereferenced
-    ///                     type of \a dest.
-    ///
-    /// The difference operations in the parallel \a adjacent_difference invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The difference operations in the parallel \a adjacent_difference invoked
-    /// with an execution policy object of type \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an
-    /// unordered fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a adjacent_difference algorithm returns a
-    ///           \a hpx::future<FwdIter2> if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a FwdIter2 otherwise.
-    ///           The \a adjacent_find algorithm returns an iterator to the
-    ///           last element in the output range.
-    ///
-    ///
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Op>
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
-    adjacent_difference(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, Op&& op)
-}
+        ///////////////////////////////////////////////////////////////////////////
+        /// Assigns each value in the range given by result its corresponding
+        /// element in the range [first, last] and the one preceding it except
+        /// *result, which is assigned *first
+        ///
+        /// \note   Complexity: Exactly (last - first) - 1 application of the
+        ///                     binary operator and (last - first) assignments.
+        ///
+        /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+        ///                     It describes the manner in which the execution
+        ///                     of the algorithm may be parallelized and the manner
+        ///                     in which it executes the assignments.
+        /// \tparam FwdIter1    The type of the source iterators used for the
+        ///                     input range (deduced).
+        ///                     This iterator type must meet the requirements of an
+        ///                     forward iterator.
+        /// \tparam FwdIter2    The type of the source iterators used for the
+        ///                     output range (deduced).
+        ///                     This iterator type must meet the requirements of an
+        ///                     forward iterator.
+        /// \tparam Op          The type of the function/function object to use
+        ///                     (deduced). Unlike its sequential form, the parallel
+        ///                     overload of \a adjacent_difference requires \a Op
+        ///                     to meet the requirements of \a CopyConstructible.
+        ///
+        /// \param policy       The execution policy to use for the scheduling of
+        ///                     the iterations.
+        /// \param first        Refers to the beginning of the sequence of elements
+        ///                     of the range the algorithm will be applied to.
+        /// \param last         Refers to the end of the sequence of elements of
+        ///                     the range the algorithm will be applied to.
+        /// \param dest         Refers to the beginning of the sequence of elements
+        ///                     the results will be assigned to.
+        /// \param op           The binary operator which returns the difference
+        ///                     of elements. The signature should be equivalent
+        ///                     to the following:
+        ///                     \code
+        ///                     bool op(const Type1 &a, const Type1 &b);
+        ///                     \endcode \n
+        ///                     The signature does not need to have const &, but
+        ///                     the function must not modify the objects passed to
+        ///                     it. The types \a Type1  must be such
+        ///                     that objects of type \a FwdIter1 can be dereferenced
+        ///                     and then implicitly converted to the dereferenced
+        ///                     type of \a dest.
+        ///
+        /// The difference operations in the parallel \a adjacent_difference invoked
+        /// with an execution policy object of type \a sequenced_policy
+        /// execute in sequential order in the calling thread.
+        ///
+        /// The difference operations in the parallel \a adjacent_difference invoked
+        /// with an execution policy object of type \a parallel_policy
+        /// or \a parallel_task_policy are permitted to execute in an
+        /// unordered fashion in unspecified threads, and indeterminately sequenced
+        /// within each thread.
+        ///
+        /// \returns  The \a adjacent_difference algorithm returns a
+        ///           \a hpx::future<FwdIter2> if the execution policy is of type
+        ///           \a sequenced_task_policy or
+        ///           \a parallel_task_policy and
+        ///           returns \a FwdIter2 otherwise.
+        ///           The \a adjacent_find algorithm returns an iterator to the
+        ///           last element in the output range.
+        ///
+        ///
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename Op>
+        inline
+        typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy,
+                FwdIter2>::type>::type adjacent_difference(ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op)
+}    // namespace hpx
 
 #else
 
@@ -182,8 +182,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 
-            template <typename ExPolicy, typename InIter, typename Sent, typename OutIter,
-                typename Op>
+            template <typename ExPolicy, typename InIter, typename Sent,
+                typename OutIter, typename Op>
             static OutIter sequential(
                 ExPolicy, InIter first, Sent last, OutIter dest, Op&& op)
             {
@@ -191,8 +191,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     first, last, dest, std::forward<Op>(op));
             }
 
-            template <typename ExPolicy, typename FwdIter1, typename Sent, typename FwdIter2,
-                typename Op>
+            template <typename ExPolicy, typename FwdIter1, typename Sent,
+                typename FwdIter2, typename Op>
             static typename util::detail::algorithm_result<ExPolicy,
                 FwdIter2>::type
             parallel(ExPolicy&& policy, FwdIter1 first, Sent last,
@@ -246,27 +246,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::move(f2));
             }
         };
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Op>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-        adjacent_difference_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, Op&& op, std::false_type)
-        {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-                "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-                "Requires at least forward iterator.");
 
-            return detail::adjacent_difference<FwdIter2>().call(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::forward<Op>(op));
-        }
-
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Op>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-        adjacent_difference_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, Op&& op, std::true_type);
         /// \endcond
     }    // namespace detail
 
@@ -276,28 +256,27 @@ namespace hpx { namespace parallel { inline namespace v1 {
         "hpx::adjacent_difference instead")
     inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
-    adjacent_difference(
-        ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+        adjacent_difference(
+            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
     {
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
         return detail::adjacent_difference_(std::forward<ExPolicy>(policy),
             first, last, dest, std::minus<>(), is_segmented());
     }
 
-   
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Op>
-    HPX_DEPRECATED_V(1, 7,
+    HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::adjacent_difference is deprecated, use "
         "hpx::adjacent_difference instead")
     inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
-    adjacent_difference(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, Op&& op)
+        adjacent_difference(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, Op&& op)
     {
-        typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
-        return detail::adjacent_difference_(std::forward<ExPolicy>(policy),
-            first, last, dest, std::forward<Op>(op), is_segmented());
+        return detail::adjacent_difference<FwdIter2>(
+            std::forward<ExPolicy>(policy), first, last, dest,
+            std::forward<Op>(op));
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -313,16 +292,17 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter1>::value
             )>
         // clang-format on
-        friend FwdIter2 tag_fallback_dispatch(
-            hpx::adjacent_difference_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+        friend FwdIter2 tag_fallback_dispatch(hpx::adjacent_difference_t,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
-            typedef typename std::iterator_traits<FwdIter1>::value_type value_type;
+            typedef
+                typename std::iterator_traits<FwdIter1>::value_type value_type;
 
-            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>().call(
-                hpx::execution::sequenced_policy{}, first,
-                last, dest, std::minus<value_type>());
+            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
+                .call(hpx::execution::sequenced_policy{}, first, last, dest,
+                    std::minus<value_type>());
         }
 
         // clang-format off
@@ -334,16 +314,17 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
-            FwdIter1 last, FwdIter2 dest)
+        tag_fallback_dispatch(hpx::adjacent_difference_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Required at least forward iterator.");
-             typedef typename std::iterator_traits<FwdIter1>::value_type value_type;
+            typedef
+                typename std::iterator_traits<FwdIter1>::value_type value_type;
 
-            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                dest, std::minus<value_type>());
+            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
+                .call(std::forward<ExPolicy>(policy), first, last, dest,
+                    std::minus<value_type>());
         }
 
         // clang-format off
@@ -352,18 +333,17 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter1>::value
             )>
         // clang-format on
-        friend FwdIter2 tag_fallback_dispatch(
-            hpx::adjacent_difference_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op)
+        friend FwdIter2 tag_fallback_dispatch(hpx::adjacent_difference_t,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
-            typedef typename std::iterator_traits<FwdIter1>::value_type value_type;
 
-            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>().call(
-                hpx::execution::sequenced_policy{}, first,
-                last, dest, op, std::minus<value_type>());
+            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
+                .call(hpx::execution::sequenced_policy{}, first, last, dest,
+                    std::forward<Op>(op));
         }
-        
+
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename Op,
             HPX_CONCEPT_REQUIRES_(
@@ -373,20 +353,17 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
-            FwdIter1 last, FwdIter2 dest, Op op)
+        tag_fallback_dispatch(hpx::adjacent_difference_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Required at least forward iterator.");
-             typedef typename std::iterator_traits<FwdIter1>::value_type value_type;
 
-            // typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-
-            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                dest, op, std::minus<value_type>());
+            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
+                .call(std::forward<ExPolicy>(policy), first, last, dest,
+                    std::forward<Op>(op));
         }
 
     } adjacent_difference{};
-}
+}    // namespace hpx
 #endif

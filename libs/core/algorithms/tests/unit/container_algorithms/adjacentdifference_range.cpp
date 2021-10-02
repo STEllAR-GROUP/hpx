@@ -1,13 +1,14 @@
 //  Copyright (c) 2015 Daniel Bourgeois
 //  Copyright (c) 2021 Karame M.Shokooh
+//
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/container_algorithms/adjacent_difference.hpp>
-#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <cstddef>
 #include <iostream>
 #include <iterator>
@@ -25,7 +26,7 @@ void test_sen(ExPolicy policy)
         "hpx::is_execution_policy<ExPolicy>::value");
 
     std::vector<std::size_t> c(10007);
-    std::iota(c.begin(), c.end(), 1); 
+    std::iota(c.begin(), c.end(), 1);
     std::vector<std::size_t> d(10007);
     std::vector<std::size_t> d_ans(10007);
 
@@ -33,10 +34,10 @@ void test_sen(ExPolicy policy)
         policy, std::begin(c), sentinel<std::size_t>{10007}, std::begin(d));
     std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
 
-    HPX_TEST(std::equal(std::begin(d), std::end(d)-1, std::begin(d_ans),
+    HPX_TEST(std::equal(std::begin(d), std::end(d) - 1, std::begin(d_ans),
         [](std::size_t lhs, std::size_t rhs) -> bool { return lhs == rhs; }));
 
-    HPX_TEST(std::end(d)-1 == it);
+    HPX_TEST(std::end(d) - 1 == it);
 }
 void test_sen()
 {
@@ -49,10 +50,10 @@ void test_sen()
         std::begin(c), sentinel<std::size_t>{10007}, std::begin(d));
     std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
 
-    HPX_TEST(std::equal(std::begin(d), std::end(d)-1, std::begin(d_ans),
+    HPX_TEST(std::equal(std::begin(d), std::end(d) - 1, std::begin(d_ans),
         [](std::size_t lhs, std::size_t rhs) -> bool { return lhs == rhs; }));
 
-    HPX_TEST(std::end(d)-1 == it);
+    HPX_TEST(std::end(d) - 1 == it);
 }
 
 template <typename ExPolicy>
@@ -65,8 +66,7 @@ void test_adjacent_difference(ExPolicy policy)
     std::vector<std::size_t> d(10007);
     std::vector<std::size_t> d_ans(10007);
 
-    auto it = hpx::ranges::adjacent_difference(
-        policy, c, std::begin(d));
+    auto it = hpx::ranges::adjacent_difference(policy, c, std::begin(d));
     std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
@@ -80,8 +80,7 @@ void test_adjacent_difference()
     std::vector<std::size_t> d(10007);
     std::vector<std::size_t> d_ans(10007);
 
-    auto it = hpx::ranges::adjacent_difference(
-        c, std::begin(d));
+    auto it = hpx::ranges::adjacent_difference(c, std::begin(d));
     std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
@@ -100,8 +99,7 @@ void test_adjacent_difference_async(ExPolicy p)
     std::vector<std::size_t> d(10007);
     std::vector<std::size_t> d_ans(10007);
 
-    auto f_it = hpx::ranges::adjacent_difference(
-        p, c, std::begin(d));
+    auto f_it = hpx::ranges::adjacent_difference(p, c, std::begin(d));
     std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
 
     f_it.wait();

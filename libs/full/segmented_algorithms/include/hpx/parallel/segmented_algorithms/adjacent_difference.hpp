@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Ajai V George
+//  Copyright (c) 2021 Karame M.Shokooh
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -232,38 +233,82 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 },
                 std::move(segments)));
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        // segmented implementation
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Op>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-        adjacent_difference_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, Op&& op, std::true_type)
-        {
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-            typedef util::detail::algorithm_result<ExPolicy, FwdIter2> result;
-
-            if (first == last)
-            {
-                return result::get(std::move(dest));
-            }
-
-            typedef hpx::traits::segmented_iterator_traits<FwdIter2>
-                iterator_traits;
-
-            return segmented_adjacent_difference(
-                adjacent_difference<typename iterator_traits::local_iterator>(),
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::forward<Op>(op), is_seq());
-        }
-
-        // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Op>
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-        adjacent_difference_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, Op&& op, std::false_type);
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
+
+// The segmented iterators we support all live in namespace hpx::segmented
+namespace hpx { namespace segmented {
+
+    // clang-format off
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename Op,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_segmented_iterator<FwdIter1>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::traits::is_segmented_iterator<FwdIter2>::value)>
+    // clang-format on
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    tag_dispatch(hpx::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
+        FwdIter1 last, FwdIter2 dest, Op&& op)
+    {
+        static_assert(hpx::traits::is_input_iterator<FwdIter1>::value,
+            "Requires at least forwrad iterator.");
+
+        static_assert(hpx::traits::is_input_iterator<FwdIter2>::value,
+            "Requires at least forward iterator.");
+
+        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+        typedef parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>
+            result;
+
+        if (first == last)
+        {
+            return result::get(std::move(dest));
+        }
+
+        typedef hpx::traits::segmented_iterator_traits<FwdIter2>
+            iterator_traits;
+
+        return hpx::parallel::v1::detail::segmented_adjacent_difference(
+            hpx::parallel::v1::detail::adjacent_difference<
+                typename iterator_traits::local_iterator>(),
+            std::forward<ExPolicy>(policy), first, last, dest,
+            std::forward<Op>(op), is_seq());
+    }
+
+    // clang-format off
+    template <typename InIter1, typename InIter2,
+            typename Op,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator<InIter1>::value &&
+            hpx::traits::is_segmented_iterator<InIter1>::value &&
+            hpx::traits::is_iterator<InIter2>::value &&
+            hpx::traits::is_segmented_iterator<InIter2>::value
+        )>
+    // clang-format on
+    InIter2 tag_dispatch(hpx::adjacent_difference_t, InIter1 first,
+        InIter1 last, InIter2 dest, Op&& op)
+    {
+        static_assert(hpx::traits::is_input_iterator<InIter1>::value,
+            "Requires at least input iterator.");
+
+        static_assert(hpx::traits::is_input_iterator<InIter2>::value,
+            "Requires at least input iterator.");
+
+        if (first == last)
+        {
+            return dest;
+        }
+
+        typedef hpx::traits::segmented_iterator_traits<InIter2> iterator_traits;
+
+        return hpx::parallel::v1::detail::segmented_adjacent_difference(
+            hpx::parallel::v1::detail::adjacent_difference<
+                typename iterator_traits::local_iterator>(),
+            hpx::execution::seq, first, last, dest, std::forward<Op>(op),
+            std::true_type{});
+    }
+}}    // namespace hpx::segmented

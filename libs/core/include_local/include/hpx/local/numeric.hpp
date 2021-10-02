@@ -10,5 +10,5 @@
 #include <hpx/parallel/numeric.hpp>
 
 namespace hpx {
-    
+
 }    // namespace hpx
