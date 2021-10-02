@@ -89,6 +89,7 @@ set(tests
     mismatch
     mismatch_binary
     move
+    nth_element
     none_of
     parallel_sort
     partial_sort

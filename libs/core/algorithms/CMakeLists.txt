@@ -111,6 +111,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/minmax.hpp
     hpx/parallel/container_algorithms/mismatch.hpp
     hpx/parallel/container_algorithms/move.hpp
+    hpx/parallel/container_algorithms/nth_element.hpp
     hpx/parallel/container_algorithms/partition.hpp
     hpx/parallel/container_algorithms/reduce.hpp
     hpx/parallel/container_algorithms/remove_copy.hpp

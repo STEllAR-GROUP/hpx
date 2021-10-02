@@ -43,7 +43,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename RandomIt, typename Sent,
                 typename Pred, typename Proj>
-            static Iter sequential(ExPolicy, RandomIt first, RandomIt nth,
+            static RandomIt sequential(ExPolicy, RandomIt first, RandomIt nth,
                 Sent last, Pred&& pred, Proj&& proj)
             {
                 util::invoke_projected<Pred, Proj> pred_projected{
@@ -58,72 +58,100 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename RandomIt, typename Sent,
                 typename Pred, typename Proj>
-            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
+            static typename util::detail::algorithm_result<ExPolicy,
+                RandomIt>::type
             parallel(ExPolicy&& policy, RandomIt first, RandomIt nth, Sent last,
                 Pred&& pred, Proj&& proj)
             {
+                using value_type = std::iterator_traits<RandomIt>::value_type;
+                using result_type =
+                    util::detail::algorithm_result<ExPolicy, RandomIt>;
+
+                RandomIt partitionIter, return_last;
+
                 if (first == last)
                 {
-                    return first;
+                    return result_type::get(std::move(first));
                 }
 
                 if (nth == last)
                 {
-                    return nth;
+                    return result_type::get(std::move(nth));
                 }
 
-                using value_type = std::iterator_traits<RandomIt>::value_type;
-
-                RandomIt partitionIter;
-                RandomIt last_iter = detail::advance_to_sentinel(first, last);
-                RandomIt return_last = last_iter;
-
-                while (first != last_iter)
+                try
                 {
-                    auto n = detail::distance(first, last_iter);
+                    RandomIt last_iter =
+                        detail::advance_to_sentinel(first, last);
+                    return_last = last_iter;
 
-                    // get random pivot index
-                    auto pivotIndex = std::rand() % n;
-                    // swap first and pivot element
+                    while (first != last_iter)
+                    {
+                        auto n = detail::distance(first, last_iter);
+
+                        // get random pivot index
+                        auto pivotIndex = std::rand() % n;
+                        // swap first and pivot element
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
-                    std::ranges::iter_swap(first, first + pivotIndex);
+                        std::ranges::iter_swap(first, first + pivotIndex);
 #else
-                    std::iter_swap(first, first + pivotIndex);
+                        std::iter_swap(first, first + pivotIndex);
 #endif
 
-                    partitionIter = hpx::partition(
-                        std::forward<ExPolicy>(policy), first + 1, last_iter,
-                        [val = HPX_INVOKE(proj, *first), &proj](
-                            value_type const& elem) {
-                            return HPX_INVOKE(proj, elem) <= val;
-                        });
+                        auto partitionResult =
+                            hpx::parallel::v1::detail::partition<RandomIt>()
+                                .call(
+                                    std::forward<ExPolicy>(policy), first + 1,
+                                    last_iter,
+                                    [val = HPX_INVOKE(proj, *first), &proj](
+                                        value_type const& elem) {
+                                        return elem <= val;
+                                    },
+                                    proj);
 
-                    --partitionIter;
-                    // swap first element and partitionIter(ending element of first group)
+                        if constexpr (std::is_same_v<decltype(partitionResult),
+                                          RandomIt>)
+                        {
+                            partitionIter = partitionResult;
+                        }
+                        else
+                        {
+                            partitionIter = partitionResult.get();
+                        }
+
+                        --partitionIter;
+                        // swap first element and partitionIter(ending element of first group)
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
-                    std::ranges::iter_swap(first, partitionIter);
+                        std::ranges::iter_swap(first, partitionIter);
 #else
-                    std::iter_swap(first, partitionIter);
+                        std::iter_swap(first, partitionIter);
 #endif
 
-                    // if nth element < partitioned index, it lies in [first, partitionIter)
-                    if (partitionIter < nth)
-                    {
-                        first = partitionIter + 1;
-                    }
-                    // else it lies in [partitionIter + 1, last)
-                    else if (partitionIter > nth)
-                    {
-                        last_iter = partitionIter;
-                    }
-                    // partitionIter == nth
-                    else
-                    {
-                        break;
+                        // if nth element < partitioned index, it lies in [first, partitionIter)
+                        if (partitionIter < nth)
+                        {
+                            first = partitionIter + 1;
+                        }
+                        // else it lies in [partitionIter + 1, last)
+                        else if (partitionIter > nth)
+                        {
+                            last_iter = partitionIter;
+                        }
+                        // partitionIter == nth
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
+                catch (...)
+                {
+                    return result_type::get(
+                        detail::handle_exception<ExPolicy, RandomIt>::call(
+                            std::current_exception()));
+                }
 
-                return return_last;
+                return result_type::get(std::move(return_last));
             }
         };
         /// \endcond
@@ -140,7 +168,11 @@ namespace hpx {
         template <typename RandomIt,
             typename Pred = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<RandomIt>::value
+                hpx::traits::is_iterator_v<RandomIt> &&
+                hpx::is_invocable_v<Pred,
+                    typename std::iterator_traits<RandomIt>::value_type,
+                    typename std::iterator_traits<RandomIt>::value_type
+                >
             )>
         // clang-format on
         friend void tag_fallback_dispatch(hpx::nth_element_t, RandomIt first,
@@ -159,10 +191,16 @@ namespace hpx {
         template <typename ExPolicy, typename RandomIt,
             typename Pred = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<RandomIt>::value
+                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator_v<RandomIt> &&
+                hpx::is_invocable_v<Pred,
+                    typename std::iterator_traits<RandomIt>::value_type,
+                    typename std::iterator_traits<RandomIt>::value_type
+                >
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(hpx::nth_element_t, ExPolicy&& policy,
+        friend parallel::util::detail::algorithm_result_t<ExPolicy>
+        tag_fallback_dispatch(hpx::nth_element_t, ExPolicy&& policy,
             RandomIt first, RandomIt nth, RandomIt last, Pred&& pred = Pred())
         {
             static_assert(

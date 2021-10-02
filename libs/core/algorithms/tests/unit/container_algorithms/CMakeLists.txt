@@ -64,6 +64,7 @@ set(tests
     mismatch_binary_range
     mismatch_range
     move_range
+    nth_element_range
     none_of_range
     partition_range
     partition_copy_range
