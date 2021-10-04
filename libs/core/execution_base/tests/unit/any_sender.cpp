@@ -70,19 +70,22 @@ struct non_copyable_sender
         std::decay_t<R> r;
         std::tuple<std::decay_t<Ts>...> ts;
 
-        void start() & noexcept
+        friend void tag_dispatch(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
             hpx::util::invoke_fused(
                 hpx::util::bind_front(
-                    hpx::execution::experimental::set_value, std::move(r)),
-                std::move(ts));
+                    hpx::execution::experimental::set_value, std::move(os.r)),
+                std::move(os.ts));
         };
     };
 
     template <typename R>
-    operation_state<R> connect(R&& r) && noexcept
+    friend operation_state<R> tag_dispatch(
+        hpx::execution::experimental::connect_t, non_copyable_sender&& s,
+        R&& r) noexcept
     {
-        return {std::forward<R>(r), std::move(ts)};
+        return {std::forward<R>(r), std::move(s.ts)};
     }
 };
 
@@ -123,25 +126,28 @@ struct sender
         std::decay_t<R> r;
         std::tuple<std::decay_t<Ts>...> ts;
 
-        void start() & noexcept
+        friend void tag_dispatch(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
             hpx::util::invoke_fused(
                 hpx::util::bind_front(
-                    hpx::execution::experimental::set_value, std::move(r)),
-                std::move(ts));
+                    hpx::execution::experimental::set_value, std::move(os.r)),
+                std::move(os.ts));
         };
     };
 
     template <typename R>
-    operation_state<R> connect(R&& r) && noexcept
+    friend operation_state<R> tag_dispatch(
+        hpx::execution::experimental::connect_t, sender&& s, R&& r)
     {
-        return {std::forward<R>(r), std::move(ts)};
+        return {std::forward<R>(r), std::move(s.ts)};
     }
 
     template <typename R>
-    operation_state<R> connect(R&& r) & noexcept
+    friend operation_state<R> tag_dispatch(
+        hpx::execution::experimental::connect_t, sender& s, R&& r)
     {
-        return {std::forward<R>(r), ts};
+        return {std::forward<R>(r), s.ts};
     }
 };
 
@@ -215,7 +221,8 @@ struct error_sender
     struct operation_state
     {
         std::decay_t<R> r;
-        void start() noexcept
+        friend void tag_dispatch(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
             try
             {
@@ -224,13 +231,14 @@ struct error_sender
             catch (...)
             {
                 hpx::execution::experimental::set_error(
-                    std::move(r), std::current_exception());
+                    std::move(os.r), std::current_exception());
             }
         }
     };
 
     template <typename R>
-    operation_state<R> connect(R&& r)
+    friend operation_state<R> tag_dispatch(
+        hpx::execution::experimental::connect_t, error_sender, R&& r)
     {
         return {std::forward<R>(r)};
     }
@@ -243,22 +251,24 @@ struct callback_receiver
     std::atomic<bool>& set_value_called;
 
     template <typename E>
-    void set_error(E&&) && noexcept
+    friend void tag_dispatch(hpx::execution::experimental::set_error_t,
+        callback_receiver&&, E&&) noexcept
     {
         HPX_TEST(false);
     }
 
-    void set_done() && noexcept
+    friend void tag_dispatch(
+        hpx::execution::experimental::set_done_t, callback_receiver&&) noexcept
     {
         HPX_TEST(false);
     };
 
     template <typename... Ts>
-    auto set_value(Ts&&... ts) && noexcept
-        -> decltype(HPX_INVOKE(f, std::forward<Ts>(ts)...), void())
+    friend auto tag_dispatch(hpx::execution::experimental::set_value_t,
+        callback_receiver&& r, Ts&&... ts) noexcept
     {
-        HPX_INVOKE(f, std::forward<Ts>(ts)...);
-        set_value_called = true;
+        HPX_INVOKE(std::move(r.f), std::forward<Ts>(ts)...);
+        r.set_value_called = true;
     }
 };
 
@@ -266,7 +276,8 @@ struct error_receiver
 {
     std::atomic<bool>& set_error_called;
 
-    void set_error(std::exception_ptr&& e) noexcept
+    friend void tag_dispatch(hpx::execution::experimental::set_error_t,
+        error_receiver&& r, std::exception_ptr&& e) noexcept
     {
         try
         {
@@ -280,16 +291,18 @@ struct error_receiver
         {
             HPX_TEST(false);
         }
-        set_error_called = true;
+        r.set_error_called = true;
     }
 
-    void set_done() noexcept
+    friend void tag_dispatch(
+        hpx::execution::experimental::set_done_t, error_receiver&&) noexcept
     {
         HPX_TEST(false);
     };
 
     template <typename... Ts>
-    void set_value(Ts&&...) noexcept
+    friend void tag_dispatch(hpx::execution::experimental::set_value_t,
+        error_receiver&&, Ts&&...) noexcept
     {
         HPX_TEST(false);
     }
