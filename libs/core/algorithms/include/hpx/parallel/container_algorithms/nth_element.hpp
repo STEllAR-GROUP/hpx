@@ -412,7 +412,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_random_access_iterator<RandomIt>::value,
                 "Requires at least random access iterator.");
 
-            return hpx::parallel::v1::detail::nth_element().call(
+            return hpx::parallel::v1::detail::nth_element<RandomIt>().call(
                 hpx::execution::seq, first, nth, last, std::forward<Pred>(pred),
                 std::forward<Proj>(proj));
         }
@@ -442,7 +442,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_random_access_iterator<RandomIt>::value,
                 "Requires at least random access iterator.");
 
-            return hpx::parallel::v1::detail::nth_element().call(
+            return hpx::parallel::v1::detail::nth_element<RandomIt>().call(
                 std::forward<ExPolicy>(policy), first, nth, last,
                 std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
@@ -472,7 +472,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_random_access_iterator<iterator_type>::value,
                 "Requires at least random access iterator.");
 
-            return hpx::parallel::v1::detail::nth_element().call(
+            return hpx::parallel::v1::detail::nth_element<iterator_type>().call(
                 hpx::execution::seq, std::begin(rng), nth, std::end(rng),
                 std::forward<Pred>(pred), std::forward<Proj>(proj));
         }
@@ -504,7 +504,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_random_access_iterator<iterator_type>::value,
                 "Requires at least random access iterator.");
 
-            return hpx::parallel::v1::detail::nth_element().call(
+            return hpx::parallel::v1::detail::nth_element<iterator_type>().call(
                 std::forward<ExPolicy>(policy), std::begin(rng), nth,
                 std::end(rng), std::forward<Pred>(pred),
                 std::forward<Proj>(proj));

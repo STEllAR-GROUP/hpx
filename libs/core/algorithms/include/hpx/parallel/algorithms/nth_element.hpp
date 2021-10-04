@@ -49,11 +49,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 util::invoke_projected<Pred, Proj> pred_projected{
                     std::forward<Pred>(pred), std::forward<Proj>(proj)};
 
-                std::nth_element(first, nth,
-                    detail::advance_to_sentinel(first, last),
-                    std::move(pred_projected));
+                auto last_iter = detail::advance_to_sentinel(first, last);
 
-                return first;
+                std::nth_element(
+                    first, nth, last_iter, std::move(pred_projected));
+
+                return last_iter;
             }
 
             template <typename ExPolicy, typename RandomIt, typename Sent,
