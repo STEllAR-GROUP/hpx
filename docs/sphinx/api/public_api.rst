@@ -75,6 +75,7 @@ Functions
 - :cpp:func:`hpx::parallel::v1::mismatch`
 - :cpp:func:`hpx::move`
 - :cpp:func:`hpx::none_of`
+- :cpp:func:`hpx::nth_element`
 - :cpp:func:`hpx::partial_sort`
 - :cpp:func:`hpx::partition`
 - :cpp:func:`hpx::partition_copy`
@@ -141,6 +142,7 @@ Functions
 - :cpp:func:`hpx::ranges::merge`
 - :cpp:func:`hpx::ranges::move`
 - :cpp:func:`hpx::ranges::none_of`
+- :cpp:func:`hpx::ranges::nth_element`
 - :cpp:func:`hpx::ranges::partition`
 - :cpp:func:`hpx::ranges::partition_copy`
 - :cpp:func:`hpx::ranges::set_difference`

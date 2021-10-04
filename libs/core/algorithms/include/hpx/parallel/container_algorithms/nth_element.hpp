@@ -45,7 +45,7 @@ namespace hpx { namespace ranges {
     ///                     returns true if the first argument is less than
     ///                     (i.e. is ordered before) the second.
     ///                     The signature of this
-    ///                     comparision function should be equivalent to:
+    ///                     comparison function should be equivalent to:
     ///                     \code
     ///                     bool cmp(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
@@ -108,7 +108,7 @@ namespace hpx { namespace ranges {
     ///                     returns true if the first argument is less than
     ///                     (i.e. is ordered before) the second.
     ///                     The signature of this
-    ///                     comparision function should be equivalent to:
+    ///                     comparison function should be equivalent to:
     ///                     \code
     ///                     bool cmp(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
@@ -122,7 +122,7 @@ namespace hpx { namespace ranges {
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
     ///
-    /// The comparision operations in the parallel \a nth_element invoked with
+    /// The comparison operations in the parallel \a nth_element invoked with
     /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
@@ -171,7 +171,7 @@ namespace hpx { namespace ranges {
     ///                     returns true if the first argument is less than
     ///                     (i.e. is ordered before) the second.
     ///                     The signature of this
-    ///                     comparision function should be equivalent to:
+    ///                     comparison function should be equivalent to:
     ///                     \code
     ///                     bool cmp(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
@@ -231,7 +231,7 @@ namespace hpx { namespace ranges {
     ///                     returns true if the first argument is less than
     ///                     (i.e. is ordered before) the second.
     ///                     The signature of this
-    ///                     comparision function should be equivalent to:
+    ///                     comparison function should be equivalent to:
     ///                     \code
     ///                     bool cmp(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
@@ -245,7 +245,7 @@ namespace hpx { namespace ranges {
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
     ///
-    /// The comparision operations in the parallel \a nth_element invoked with
+    /// The comparison operations in the parallel \a nth_element invoked with
     /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///

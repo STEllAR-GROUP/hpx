@@ -13,6 +13,7 @@
 #include <hpx/parallel/container_algorithms/nth_element.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iostream>
 #include <iterator>
 #include <random>

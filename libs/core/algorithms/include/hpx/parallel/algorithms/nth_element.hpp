@@ -42,7 +42,7 @@ namespace hpx {
     ///                     returns true if the first argument is less than
     ///                     (i.e. is ordered before) the second.
     ///                     The signature of this
-    ///                     comparision function should be equivalent to:
+    ///                     comparison function should be equivalent to:
     ///                     \code
     ///                     bool cmp(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
@@ -93,7 +93,7 @@ namespace hpx {
     ///                     returns true if the first argument is less than
     ///                     (i.e. is ordered before) the second.
     ///                     The signature of this
-    ///                     comparision function should be equivalent to:
+    ///                     comparison function should be equivalent to:
     ///                     \code
     ///                     bool cmp(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
@@ -103,7 +103,7 @@ namespace hpx {
     ///                     type \a randomIt can be dereferenced and then
     ///                     implicitly converted to Type.
     ///
-    /// The comparision operations in the parallel \a nth_element invoked with
+    /// The comparison operations in the parallel \a nth_element invoked with
     /// an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
@@ -124,6 +124,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
+#include <hpx/assert.hpp>
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -173,10 +174,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             // Check if the iterators are corrects
             auto nelem = end - first;
-            if (nelem == 0)
-                return;
-            auto n_nth = nth - first + 1;
-            HPX_ASSERT(nelem >= 0 and n_nth > 0 and n_nth <= nelem);
+            HPX_ASSERT(nelem >= 0 and (nth - first + 1) > 0 and
+                (nth - first + 1) <= nelem);
 
             // Check  the special conditions
             if (nth == first)
@@ -230,12 +229,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 auto end = detail::advance_to_sentinel(first, last);
 
-                // Check if the iterators are corrects
                 auto nelem = end - first;
                 if (nelem == 0)
-                    return end;
-                auto n_nth = nth - first + 1;
-                HPX_ASSERT(nelem > 0 and n_nth > 0 and n_nth <= nelem);
+                    return first;
 
                 uint32_t level = detail::nbits64(nelem) * 2;
                 detail::nth_element_seq(first, nth, end, level,
@@ -251,20 +247,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
             parallel(ExPolicy&& policy, RandomIt first, RandomIt nth, Sent last,
                 Pred&& pred, Proj&& proj)
             {
-                using value_type = std::iterator_traits<RandomIt>::value_type;
-                using result_type =
-                    util::detail::algorithm_result<ExPolicy, RandomIt>;
+                using value_type =
+                    typename std::iterator_traits<RandomIt>::value_type;
 
                 RandomIt partitionIter, return_last;
 
                 if (first == last)
                 {
-                    return result_type::get(std::move(first));
+                    return util::detail::algorithm_result<ExPolicy,
+                        RandomIt>::get(std::move(first));
                 }
 
                 if (nth == last)
                 {
-                    return result_type::get(std::move(nth));
+                    return util::detail::algorithm_result<ExPolicy,
+                        RandomIt>::get(std::move(nth));
                 }
 
                 try
@@ -291,9 +288,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 .call(
                                     std::forward<ExPolicy>(policy), first + 1,
                                     last_iter,
-                                    [val = HPX_INVOKE(proj, *first), &proj](
+                                    [val = HPX_INVOKE(proj, *first), &pred](
                                         value_type const& elem) {
-                                        return elem <= val;
+                                        return HPX_INVOKE(pred, elem, val);
                                     },
                                     proj);
 
@@ -308,14 +305,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         }
 
                         --partitionIter;
-                        // swap first element and partitionIter(ending element of first group)
+                        // swap first element and partitionIter
+                        // (ending element of first group)
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                         std::ranges::iter_swap(first, partitionIter);
 #else
                         std::iter_swap(first, partitionIter);
 #endif
 
-                        // if nth element < partitioned index, it lies in [first, partitionIter)
+                        // if nth element < partitioned index,
+                        // it lies in [first, partitionIter)
                         if (partitionIter < nth)
                         {
                             first = partitionIter + 1;
@@ -334,12 +333,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
                 catch (...)
                 {
-                    return result_type::get(
-                        detail::handle_exception<ExPolicy, RandomIt>::call(
-                            std::current_exception()));
+                    return util::detail::algorithm_result<ExPolicy,
+                        RandomIt>::get(detail::handle_exception<ExPolicy,
+                        RandomIt>::call(std::current_exception()));
                 }
 
-                return result_type::get(std::move(return_last));
+                return util::detail::algorithm_result<ExPolicy, RandomIt>::get(
+                    std::move(return_last));
             }
         };
         /// \endcond
