@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Grant Mercer
 //  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2020 Francisco Jose Tapia
 //  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,6 +20,8 @@
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/minmax.hpp>
+#include <hpx/parallel/algorithms/partial_sort.hpp>
 #include <hpx/parallel/algorithms/partition.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
@@ -33,6 +36,72 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // nth_element
     namespace detail {
+
+        ///////////////////////////////////////////////////////////////////////
+        ///
+        /// \brief : The element placed in the nth position is exactly the
+        ///          element that would occur in this position if the range
+        ///          was fully sorted. All of the elements before this new nth
+        ///          element are less than or equal to the elements after the
+        ///          new nth element.
+        ///
+        /// \param first : iterator to the first element
+        /// \param nth : iterator defining the sort partition point
+        /// \param end : iterator to the element after the last in the range
+        /// \param level : level of depth in the call from the root
+        /// \param comp : object for to Compare elements
+        /// \param proj : projection
+        ///
+        template <class RandomIt, typename Compare, typename Proj>
+        void nth_element_seq(RandomIt first, RandomIt nth, RandomIt end,
+            uint32_t level, Compare&& comp, Proj&& proj)
+        {
+            const uint32_t nmin_sort = 24;
+
+            // Check if the iterators are corrects
+            auto nelem = end - first;
+            if (nelem == 0)
+                return;
+            auto n_nth = nth - first + 1;
+            HPX_ASSERT(nelem >= 0 and n_nth > 0 and n_nth <= nelem);
+
+            // Check  the special conditions
+            if (nth == first)
+            {
+                RandomIt it = detail::min_element<RandomIt>().call(
+                    hpx::execution::seq, first, end, comp, proj);
+                if (it != first)
+                    std::swap(*it, *first);
+                return;
+            };
+
+            if (nelem < nmin_sort)
+            {
+                detail::sort<RandomIt>().call(
+                    hpx::execution::seq, first, end, comp, proj);
+                return;
+            }
+            if (level == 0)
+            {
+                std::make_heap(first, end, comp);
+                std::sort_heap(first, nth, comp);
+                return;
+            };
+
+            // Filter the range and check which part contains the nth element
+            RandomIt c_last = filter(first, end, comp);
+
+            if (c_last == nth)
+                return;
+
+            if (nth < c_last)
+                nth_element_seq(first, nth, c_last, level - 1, comp, proj);
+            else
+                nth_element_seq(c_last + 1, nth, end, level - 1, comp, proj);
+
+            return;
+        };
+
         template <typename Iter>
         struct nth_element : public detail::algorithm<nth_element<Iter>, Iter>
         {
@@ -46,15 +115,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static RandomIt sequential(ExPolicy, RandomIt first, RandomIt nth,
                 Sent last, Pred&& pred, Proj&& proj)
             {
-                util::invoke_projected<Pred, Proj> pred_projected{
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)};
+                auto end = detail::advance_to_sentinel(first, last);
 
-                auto last_iter = detail::advance_to_sentinel(first, last);
+                // Check if the iterators are corrects
+                auto nelem = end - first;
+                if (nelem == 0)
+                    return end;
+                auto n_nth = nth - first + 1;
+                HPX_ASSERT(nelem > 0 and n_nth > 0 and n_nth <= nelem);
 
-                std::nth_element(
-                    first, nth, last_iter, std::move(pred_projected));
+                uint32_t level = detail::nbits64(nelem) * 2;
+                detail::nth_element_seq(first, nth, end, level,
+                    std::forward<Pred>(pred), std::forward<Proj>(proj));
 
-                return last_iter;
+                return end;
             }
 
             template <typename ExPolicy, typename RandomIt, typename Sent,
