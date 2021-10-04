@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    async_rw_mutex
     barrier_cpp20
     binary_semaphore_cpp20
     channel_mpmc_fib
@@ -27,10 +28,6 @@ set(tests
     stop_token
     stop_token_cb2
 )
-
-if(HPX_CXX_STANDARD GREATER_EQUAL 17)
-  list(APPEND tests async_rw_mutex)
-endif()
 
 set(async_rw_mutex_PARAMETERS THREADS_PER_LOCALITY 4)
 set(barrier_cpp20_PARAMETERS THREADS_PER_LOCALITY 4)
