@@ -28,11 +28,27 @@ namespace hpx { namespace execution { namespace experimental {
         {
             hpx::util::member_pack_for<std::decay_t<Ts>...> ts;
 
-            template <typename... Ts_>
-            explicit constexpr just_sender(Ts_&&... ts)
-              : ts(std::piecewise_construct, std::forward<Ts_>(ts)...)
+            constexpr just_sender() = default;
+
+            template <typename T,
+                typename = std::enable_if_t<
+                    !std::is_same_v<std::decay_t<T>, just_sender>>>
+            explicit constexpr just_sender(T&& t)
+              : ts(std::piecewise_construct, std::forward<T>(t))
             {
             }
+
+            template <typename T0, typename T1, typename... Ts_>
+            explicit constexpr just_sender(T0&& t0, T1&& t1, Ts_&&... ts)
+              : ts(std::piecewise_construct, std::forward<T0>(t0),
+                    std::forward<T1>(t1), std::forward<Ts_>(ts)...)
+            {
+            }
+
+            just_sender(just_sender&&) = default;
+            just_sender(just_sender const&) = default;
+            just_sender& operator=(just_sender&&) = default;
+            just_sender& operator=(just_sender const&) = default;
 
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
