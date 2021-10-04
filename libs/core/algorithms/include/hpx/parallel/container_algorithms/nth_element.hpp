@@ -13,359 +13,265 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+    // clang-format off
 
-    /// Checks if the first range [first1, last1) is lexicographically less than
-    /// the second range [first2, last2). uses a provided predicate to compare
-    /// elements.
+    /// nth_element is a partial sorting algorithm that rearranges elements in
+    /// [first, last) such that the element pointed at by nth is changed to
+    /// whatever element would occur in that position if [first, last) were
+    /// sorted and all of the elements before this new nth element are less
+    /// than or equal to the elements after the new nth element.
     ///
-    /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where N1 = std::distance(first1, last)
-    ///         and N2 = std::distance(first2, last2).
+    /// \note   Complexity: Linear in std::distance(first, last) on average.
+    ///         O(N) applications of the predicate, and O(N log N) swaps,
+    ///         where N = last - first.
     ///
-    /// \tparam InIter1     The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam Sent1       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter1.
-    /// \tparam InIter2     The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam Sent2       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter2.
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a nth_element requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible. This defaults
-    ///                     to std::less<>
-    /// \tparam Proj1       The type of an optional projection function for FwdIter1. This
-    ///                     defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function for FwdIter2. This
+    /// \tparam RandomIt    The type of the source begin, nth, and end
+    ///                     iterators used (deduced). This iterator type must
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for RandomIt.
+    /// \tparam Pred        Comparison function object which returns true if
+    ///                     the first argument is less than the second.
+    /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
-    /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last1        Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the sequence of elements
-    ///                     of the second range the algorithm will be applied to.
-    /// \param last2        Refers to the end of the sequence of elements of
-    ///                     the second range the algorithm will be applied to.
-    /// \param pred         Refers to the comparison function that the first
-    ///                     and second ranges will be applied to
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the first range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the second range
-    ///                     as a projection operation before the actual predicate
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param nth          Refers to the iterator defining the sort partition
+    ///                     point
+    /// \param last         Refers to sentinel value denoting the end of the
+    ///                     sequence of elements the algorithm will be applied.
+    /// \param pred         Specifies the comparison function object which
+    ///                     returns true if the first argument is less than
+    ///                     (i.e. is ordered before) the second.
+    ///                     The signature of this
+    ///                     comparision function should be equivalent to:
+    ///                     \code
+    ///                     bool cmp(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type must be such that an object of
+    ///                     type \a randomIt can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
     ///                     \a is invoked.
     ///
     /// The comparison operations in the parallel \a nth_element
-    /// algorithm invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
+    /// algorithm invoked without an execution policy object execute in
+    /// sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a nth_element
-    /// algorithm invoked with an execution policy object of type
-    /// \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
+    /// \returns  The \a nth_element algorithm returns returns \a
+    ///           RandomIt.
+    ///           The \a nth_element algorithm returns an iterator equal
+    ///           to last.
     ///
-    /// \note     Lexicographical comparison is an operation with the
-    ///           following properties
-    ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range
-    ///               is lexicographically
-    ///               \a less or \a greater than the other
-    ///             - If one range is a prefix of another, the shorter range is
-    ///               lexicographically \a less than the other
-    ///             - If two ranges have equivalent elements and are of the same length,
-    ///               then the ranges are lexicographically \a equal
-    ///             - An empty range is lexicographically \a less than any non-empty
-    ///               range
-    ///             - Two empty ranges are lexicographically \a equal
-    ///
-    /// \returns  The \a lexicographically_compare algorithm returns a
-    ///           \a hpx::future<bool> if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a lexicographically_compare algorithm returns true
-    ///           if the first range is lexicographically less, otherwise
-    ///           it returns false.
-    ///           range [first2, last2), it returns false.
-    template <typename InIter1, typename Sent1, typename InIter2,
-        typename Sent2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
-    bool nth_element(InIter1 first1, Sent1 last1, InIter2 first2, Sent2 last2,
-        Pred&& pred = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+    template <typename RandomIt, typename Sent, typename Pred, typename Proj>
+    RandomIt nth_element(RandomIt first, RandomIt nth, Sent last, Pred&& pred,
+        Proj&& proj);
 
-    /// Checks if the first range [first1, last1) is lexicographically less than
-    /// the second range [first2, last2). uses a provided predicate to compare
-    /// elements.
+    /// nth_element is a partial sorting algorithm that rearranges elements in
+    /// [first, last) such that the element pointed at by nth is changed to
+    /// whatever element would occur in that position if [first, last) were
+    /// sorted and all of the elements before this new nth element are less
+    /// than or equal to the elements after the new nth element.
     ///
-    /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where N1 = std::distance(first1, last)
-    ///         and N2 = std::distance(first2, last2).
+    /// \note   Complexity: Linear in std::distance(first, last) on average.
+    ///         O(N) applications of the predicate, and O(N log N) swaps,
+    ///         where N = last - first.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Sent1       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter1.
-    /// \tparam FwdIter2    The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Sent2       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter2.
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a nth_element requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible. This defaults
-    ///                     to std::less<>
-    /// \tparam Proj1       The type of an optional projection function for FwdIter1. This
-    ///                     defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function for FwdIter2. This
+    /// \tparam RandomIt    The type of the source begin, nth, and end
+    ///                     iterators used (deduced). This iterator type must
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for RandomIt.
+    /// \tparam Pred        Comparison function object which returns true if
+    ///                     the first argument is less than the second.
+    /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param first1       Refers to the beginning of the sequence of elements
-    ///                     of the first range the algorithm will be applied to.
-    /// \param last1        Refers to the end of the sequence of elements of
-    ///                     the first range the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the sequence of elements
-    ///                     of the second range the algorithm will be applied to.
-    /// \param last2        Refers to the end of the sequence of elements of
-    ///                     the second range the algorithm will be applied to.
-    /// \param pred         Refers to the comparison function that the first
-    ///                     and second ranges will be applied to
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the first range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the second range
-    ///                     as a projection operation before the actual predicate
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param nth          Refers to the iterator defining the sort partition
+    ///                     point
+    /// \param last         Refers to sentinel value denoting the end of the
+    ///                     sequence of elements the algorithm will be applied.
+    /// \param pred         Specifies the comparison function object which
+    ///                     returns true if the first argument is less than
+    ///                     (i.e. is ordered before) the second.
+    ///                     The signature of this
+    ///                     comparision function should be equivalent to:
+    ///                     \code
+    ///                     bool cmp(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type must be such that an object of
+    ///                     type \a randomIt can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
     ///                     \a is invoked.
     ///
-    /// The comparison operations in the parallel \a nth_element
-    /// algorithm invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
+    /// The comparision operations in the parallel \a nth_element invoked with
+    /// an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a nth_element
-    /// algorithm invoked with an execution policy object of type
-    /// \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// The assignments in the parallel \a nth_element algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     Lexicographical comparison is an operation with the
-    ///           following properties
-    ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range
-    ///               is lexicographically
-    ///               \a less or \a greater than the other
-    ///             - If one range is a prefix of another, the shorter range is
-    ///               lexicographically \a less than the other
-    ///             - If two ranges have equivalent elements and are of the same length,
-    ///               then the ranges are lexicographically \a equal
-    ///             - An empty range is lexicographically \a less than any non-empty
-    ///               range
-    ///             - Two empty ranges are lexicographically \a equal
+    /// \returns  The \a partition algorithm returns a \a
+    ///           hpx::future<RandomIt>
+    ///           if the execution policy is of type \a parallel_task_policy
+    ///           and returns \a RandomIt otherwise.
+    ///           The \a nth_element algorithm returns an iterator equal
+    ///           to last.
     ///
-    /// \returns  The \a lexicographically_compare algorithm returns a
-    ///           \a hpx::future<bool> if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a lexicographically_compare algorithm returns true
-    ///           if the first range is lexicographically less, otherwise
-    ///           it returns false.
-    ///           range [first2, last2), it returns false.
+    template <typename ExPolicy, typename RandomIt, typename Sent,
+        typename Pred, typename Proj>
+    parallel::util::detail::algorithm_result_t<ExPolicy, RandomIt>
+    nth_element(ExPolicy&& policy, RandomIt first, RandomIt nth,
+        Sent last, Pred&& pred, Proj&& proj);
 
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter2, typename Sent2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
-    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    nth_element(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
-        FwdIter2 first2, Sent2 last2, Pred&& pred = Pred(),
-        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
-
-    /// Checks if the first range rng1 is lexicographically less than
-    /// the second range rng2. uses a provided predicate to compare
-    /// elements.
+    /// nth_element is a partial sorting algorithm that rearranges elements in
+    /// [first, last) such that the element pointed at by nth is changed to
+    /// whatever element would occur in that position if [first, last) were
+    /// sorted and all of the elements before this new nth element are less
+    /// than or equal to the elements after the new nth element.
     ///
-    /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where N1 = std::distance(std::begin(rng1), std::end(rng1))
-    ///         and N2 = std::distance(std::begin(rng2), std::end(rng2)).
+    /// \note   Complexity: Linear in std::distance(first, last) on average.
+    ///         O(N) applications of the predicate, and O(N log N) swaps,
+    ///         where N = last - first.
     ///
-    /// \tparam Rng1        The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Rng2        The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a nth_element requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible. This defaults
-    ///                     to std::less<>
-    /// \tparam Proj1       The type of an optional projection function for elements of the first range.
-    ///                     This defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function for elements of the second range.
-    ///                     This defaults to \a util::projection_identity
+    ///                     meet the requirements of an random access iterator.
+    /// \tparam Pred        Comparison function object which returns true if
+    ///                     the first argument is less than the second.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
     ///
-    /// \param rng1         Refers to the sequence of elements the algorithm
+    /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
-    /// \param rng2         Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param pred         Refers to the comparison function that the first
-    ///                     and second ranges will be applied to
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the first range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the second range
-    ///                     as a projection operation before the actual predicate
+    /// \param nth          Refers to the iterator defining the sort partition
+    ///                     point
+    /// \param pred         Specifies the comparison function object which
+    ///                     returns true if the first argument is less than
+    ///                     (i.e. is ordered before) the second.
+    ///                     The signature of this
+    ///                     comparision function should be equivalent to:
+    ///                     \code
+    ///                     bool cmp(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type must be such that an object of
+    ///                     type \a randomIt can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
     ///                     \a is invoked.
     ///
     /// The comparison operations in the parallel \a nth_element
-    /// algorithm invoked without an execution policy object  execute in sequential
-    /// order in the calling thread.
+    /// algorithm invoked without an execution policy object execute in
+    /// sequential order in the calling thread.
     ///
-    /// \note     Lexicographical comparison is an operation with the
-    ///           following properties
-    ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range
-    ///               is lexicographically
-    ///               \a less or \a greater than the other
-    ///             - If one range is a prefix of another, the shorter range is
-    ///               lexicographically \a less than the other
-    ///             - If two ranges have equivalent elements and are of the same length,
-    ///               then the ranges are lexicographically \a equal
-    ///             - An empty range is lexicographically \a less than any non-empty
-    ///               range
-    ///             - Two empty ranges are lexicographically \a equal
+    /// \returns  The \a nth_element algorithm returns returns \a
+    ///           hpx::traits::range_iterator_t<Rng>.
+    ///           The \a nth_element algorithm returns an iterator equal
+    ///           to last.
     ///
-    /// \returns  The \a lexicographically_compare algorithm returns \a bool.
-    ///           The \a lexicographically_compare algorithm returns true
-    ///           if the first range is lexicographically less, otherwise
-    ///           it returns false.
-    ///           range [first2, last2), it returns false.
-    template <typename Rng1, typename Rng2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
-    bool nth_element(Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(),
-        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+    template <typename Rng, typename Pred, typename Proj>
+    hpx::traits::range_iterator_t<Rng> nth_element(Rng&& rng,
+        hpx::traits::range_iterator_t<Rng> nth, Pred&& pred,
+        Proj&& proj);
 
-    /// Checks if the first range rng1 is lexicographically less than
-    /// the second range rng2. uses a provided predicate to compare
-    /// elements.
+    /// nth_element is a partial sorting algorithm that rearranges elements in
+    /// [first, last) such that the element pointed at by nth is changed to
+    /// whatever element would occur in that position if [first, last) were
+    /// sorted and all of the elements before this new nth element are less
+    /// than or equal to the elements after the new nth element.
     ///
-    /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where N1 = std::distance(std::begin(rng1), std::end(rng1))
-    ///         and N2 = std::distance(std::begin(rng2), std::end(rng2)).
+    /// \note   Complexity: Linear in std::distance(first, last) on average.
+    ///         O(N) applications of the predicate, and O(N log N) swaps,
+    ///         where N = last - first.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1        The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Rng2        The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a nth_element requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible. This defaults
-    ///                     to std::less<>
-    /// \tparam Proj1       The type of an optional projection function for elements of the first range.
-    ///                     This defaults to \a util::projection_identity
-    /// \tparam Proj2       The type of an optional projection function for elements of the second range.
-    ///                     This defaults to \a util::projection_identity
+    ///                     meet the requirements of an random access iterator.
+    /// \tparam Pred        Comparison function object which returns true if
+    ///                     the first argument is less than the second.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param rng1         Refers to the sequence of elements the algorithm
+    /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
-    /// \param rng2         Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param pred         Refers to the comparison function that the first
-    ///                     and second ranges will be applied to
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the first range
-    ///                     as a projection operation before the actual predicate
-    ///                     \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements of the second range
-    ///                     as a projection operation before the actual predicate
+    /// \param nth          Refers to the iterator defining the sort partition
+    ///                     point
+    /// \param pred         Specifies the comparison function object which
+    ///                     returns true if the first argument is less than
+    ///                     (i.e. is ordered before) the second.
+    ///                     The signature of this
+    ///                     comparision function should be equivalent to:
+    ///                     \code
+    ///                     bool cmp(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type must be such that an object of
+    ///                     type \a randomIt can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
     ///                     \a is invoked.
     ///
-    /// The comparison operations in the parallel \a nth_element
-    /// algorithm invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
+    /// The comparision operations in the parallel \a nth_element invoked with
+    /// an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a nth_element
-    /// algorithm invoked with an execution policy object of type
-    /// \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// The assignments in the parallel \a nth_element algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     Lexicographical comparison is an operation with the
-    ///           following properties
-    ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range
-    ///               is lexicographically
-    ///               \a less or \a greater than the other
-    ///             - If one range is a prefix of another, the shorter range is
-    ///               lexicographically \a less than the other
-    ///             - If two ranges have equivalent elements and are of the same length,
-    ///               then the ranges are lexicographically \a equal
-    ///             - An empty range is lexicographically \a less than any non-empty
-    ///               range
-    ///             - Two empty ranges are lexicographically \a equal
+    /// \returns  The \a partition algorithm returns a \a
+    ///           hpx::future<hpx::traits::range_iterator_t<Rng>>
+    ///           if the execution policy is of type \a parallel_task_policy
+    ///           and returns \a hpx::traits::range_iterator_t<Rng> otherwise.
+    ///           The \a nth_element algorithm returns an iterator equal
+    ///           to last.
     ///
-    /// \returns  The \a lexicographically_compare algorithm returns a
-    ///           \a hpx::future<bool> if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a lexicographically_compare algorithm returns true
-    ///           if the first range is lexicographically less, otherwise
-    ///           it returns false.
-    ///           range [first2, last2), it returns false.
+    template <typename ExPolicy, typename Rng, typename Pred, typename Proj>
+    parallel::util::detail::algorithm_result_t<ExPolicy,
+        hpx::traits::range_iterator_t<Rng>>
+    nth_element(ExPolicy&& policy, Rng&& rng,
+        hpx::traits::range_iterator_t<Rng> nth,
+        Pred&& pred, Proj&& proj);
 
-    template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
-    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    nth_element(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
-        Pred&& pred = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
-}}    // namespace hpx::ranges
-#else
+    // clang-format on
+}}       // namespace hpx::ranges
+#else    // DOXYGEN
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>

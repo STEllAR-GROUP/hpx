@@ -1,5 +1,6 @@
 //  Copyright (c) 2018 Christopher Ogle
 //  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020 Francisco Jose Tapia (fjtapia@gmail.com )
 //  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -50,6 +51,16 @@ void test_nth_element_sent(IteratorTag)
         std::begin(d), std::begin(d) + rand_index, std::end(d) - 1);
 
     HPX_TEST(*(std::begin(c) + rand_index) == *(std::begin(d) + rand_index));
+
+    for (int k = 0; k < rand_index; k++)
+    {
+        HPX_TEST(c[k] <= c[rand_index]);
+    }
+
+    for (int k = rand_index + 1; k < SIZE - 1; k++)
+    {
+        HPX_TEST(c[k] >= c[rand_index]);
+    }
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -78,6 +89,16 @@ void test_nth_element_sent(ExPolicy policy, IteratorTag)
         std::begin(d), std::begin(d) + rand_index, std::end(d) - 1);
 
     HPX_TEST(*(std::begin(c) + rand_index) == *(std::begin(d) + rand_index));
+
+    for (int k = 0; k < rand_index; k++)
+    {
+        HPX_TEST(c[k] <= c[rand_index]);
+    }
+
+    for (int k = rand_index + 1; k < SIZE - 1; k++)
+    {
+        HPX_TEST(c[k] >= c[rand_index]);
+    }
 }
 
 template <typename IteratorTag>
@@ -96,6 +117,16 @@ void test_nth_element(IteratorTag)
     std::nth_element(std::begin(d), std::begin(d) + rand_index, std::end(d));
 
     HPX_TEST(*(std::begin(c) + rand_index) == *(std::begin(d) + rand_index));
+
+    for (int k = 0; k < rand_index; k++)
+    {
+        HPX_TEST(c[k] <= c[rand_index]);
+    }
+
+    for (int k = rand_index + 1; k < SIZE; k++)
+    {
+        HPX_TEST(c[k] >= c[rand_index]);
+    }
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -118,6 +149,16 @@ void test_nth_element(ExPolicy policy, IteratorTag)
     std::nth_element(std::begin(d), std::begin(d) + rand_index, std::end(d));
 
     HPX_TEST(*(std::begin(c) + rand_index) == *(std::begin(d) + rand_index));
+
+    for (int k = 0; k < rand_index; k++)
+    {
+        HPX_TEST(c[k] <= c[rand_index]);
+    }
+
+    for (int k = rand_index + 1; k < SIZE; k++)
+    {
+        HPX_TEST(c[k] >= c[rand_index]);
+    }
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -142,6 +183,16 @@ void test_nth_element_async(ExPolicy policy, IteratorTag)
     std::nth_element(std::begin(d), std::begin(d) + rand_index, std::end(d));
 
     HPX_TEST(*(std::begin(c) + rand_index) == *(std::begin(d) + rand_index));
+
+    for (int k = 0; k < rand_index; k++)
+    {
+        HPX_TEST(c[k] <= c[rand_index]);
+    }
+
+    for (int k = rand_index + 1; k < SIZE; k++)
+    {
+        HPX_TEST(c[k] >= c[rand_index]);
+    }
 }
 
 template <typename IteratorTag>

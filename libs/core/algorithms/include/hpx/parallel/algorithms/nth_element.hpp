@@ -11,6 +11,119 @@
 
 #pragma once
 
+#if defined(DOXYGEN)
+
+namespace hpx {
+    // clang-format off
+
+    /// nth_element is a partial sorting algorithm that rearranges elements in
+    /// [first, last) such that the element pointed at by nth is changed to
+    /// whatever element would occur in that position if [first, last) were
+    /// sorted and all of the elements before this new nth element are less
+    /// than or equal to the elements after the new nth element.
+    ///
+    /// \note   Complexity: Linear in std::distance(first, last) on average.
+    ///         O(N) applications of the predicate, and O(N log N) swaps,
+    ///         where N = last - first.
+    ///
+    /// \tparam RandomIt    The type of the source begin, nth, and end
+    ///                     iterators used (deduced). This iterator type must
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Pred        Comparison function object which returns true if
+    ///                     the first argument is less than the second.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param nth          Refers to the iterator defining the sort partition
+    ///                     point
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param pred         Specifies the comparison function object which
+    ///                     returns true if the first argument is less than
+    ///                     (i.e. is ordered before) the second.
+    ///                     The signature of this
+    ///                     comparision function should be equivalent to:
+    ///                     \code
+    ///                     bool cmp(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type must be such that an object of
+    ///                     type \a randomIt can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// The comparison operations in the parallel \a nth_element
+    /// algorithm invoked without an execution policy object execute in
+    /// sequential order in the calling thread.
+    ///
+    /// \returns  The \a nth_element algorithms returns nothing.
+    ///
+    template <typename RandomIt, typename Pred>
+    void nth_element(RandomIt first, RandomIt nth, RandomIt last, Pred&& pred);
+
+    /// nth_element is a partial sorting algorithm that rearranges elements in
+    /// [first, last) such that the element pointed at by nth is changed to
+    /// whatever element would occur in that position if [first, last) were
+    /// sorted and all of the elements before this new nth element are less
+    /// than or equal to the elements after the new nth element.
+    ///
+    /// \note   Complexity: Linear in std::distance(first, last) on average.
+    ///         O(N) applications of the predicate, and O(N log N) swaps,
+    ///         where N = last - first.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam RandomIt    The type of the source begin, nth, and end
+    ///                     iterators used (deduced). This iterator type must
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Pred        Comparison function object which returns true if
+    ///                     the first argument is less than the second.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param nth          Refers to the iterator defining the sort partition
+    ///                     point
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param pred         Specifies the comparison function object which
+    ///                     returns true if the first argument is less than
+    ///                     (i.e. is ordered before) the second.
+    ///                     The signature of this
+    ///                     comparision function should be equivalent to:
+    ///                     \code
+    ///                     bool cmp(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type must be such that an object of
+    ///                     type \a randomIt can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// The comparision operations in the parallel \a nth_element invoked with
+    /// an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a nth_element algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a nth_element algorithms returns nothing.
+    ///
+    template <typename ExPolicy, typename RandomIt, typename Pred>
+    void nth_element(ExPolicy&& policy, RandomIt first, RandomIt nth,
+        RandomIt last, Pred&& pred);
+
+    // clang-format on
+}    // namespace hpx
+
+#else    // DOXYGEN
+
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -294,3 +407,5 @@ namespace hpx {
         }
     } nth_element{};
 }    // namespace hpx
+
+#endif
