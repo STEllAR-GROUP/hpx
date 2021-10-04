@@ -50,8 +50,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             using hpx::util::make_zip_iterator;
             util::loop_n<std::decay_t<ExPolicy>>(
                 make_zip_iterator(first, prev, dest), count, [op](auto&& it) {
-                    get<2>(*it) =
-                        hpx::util::invoke(op, get<0>(*it), get<1>(*it));
+                    get<2>(*it) = HPX_INVOKE(op, get<0>(*it), get<1>(*it));
                 });
             std::advance(dest, count);
             return dest;
