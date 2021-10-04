@@ -106,10 +106,12 @@ namespace hpx { namespace parallel { namespace execution {
         async_execute(F&& f, Ts&&... ts)
         {
             hpx::util::thread_description desc(f);
-            return hpx::detail::async_launch_policy_dispatch<decltype(
-                launch::async)>::call(launch::async, desc, pool_, priority_,
-                stacksize_,
-                threads::thread_schedule_hint(get_next_thread_num()),
+
+            auto policy = launch::async_policy(priority_, stacksize_,
+                threads::thread_schedule_hint(get_next_thread_num()));
+
+            return hpx::detail::async_launch_policy_dispatch<
+                launch::async_policy>::call(policy, desc, pool_,
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
@@ -137,14 +139,13 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename F, typename... Ts>
         void post(F&& f, Ts&&... ts)
         {
-            char const* annotation =
-                hpx::traits::get_function_annotation<F>::call(f);
-            hpx::util::thread_description desc(f, annotation);
+            hpx::util::thread_description desc(f);
 
-            detail::post_policy_dispatch<decltype(launch::async)>::call(
-                launch::async, desc, pool_, priority_, stacksize_,
-                threads::thread_schedule_hint(get_next_thread_num()),
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            auto policy = launch::async_policy(priority_, stacksize_,
+                threads::thread_schedule_hint(get_next_thread_num()));
+
+            detail::post_policy_dispatch<launch::async_policy>::call(policy,
+                desc, pool_, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename S, typename... Ts>
@@ -152,9 +153,11 @@ namespace hpx { namespace parallel { namespace execution {
             typename detail::bulk_function_result<F, S, Ts...>::type>>
         bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
         {
+            auto policy =
+                launch::async_policy(priority_, stacksize_, schedulehint_);
+
             return detail::hierarchical_bulk_async_execute_helper(pool_,
-                priority_, stacksize_, schedulehint_, first_thread_,
-                num_threads_, hierarchical_threshold_, launch::async,
+                first_thread_, num_threads_, hierarchical_threshold_, policy,
                 std::forward<F>(f), shape, std::forward<Ts>(ts)...);
         }
 

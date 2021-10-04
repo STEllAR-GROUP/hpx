@@ -9,16 +9,20 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_base/scheduling_properties.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
+#include <cstdint>
 #include <type_traits>
 #include <utility>
 
 namespace hpx {
     /// \cond NOINTERNAL
     namespace detail {
-        enum class launch_policy
+
+        enum class launch_policy : std::int8_t
         {
             async = 0x01,
             deferred = 0x02,
@@ -37,9 +41,14 @@ namespace hpx {
         {
             constexpr explicit policy_holder_base(launch_policy p,
                 threads::thread_priority priority =
-                    threads::thread_priority::default_) noexcept
+                    threads::thread_priority::default_,
+                threads::thread_stacksize stacksize =
+                    threads::thread_stacksize::default_,
+                threads::thread_schedule_hint hint = {}) noexcept
               : policy_(p)
               , priority_(priority)
+              , stacksize_(stacksize)
+              , hint_(hint)
             {
             }
 
@@ -58,13 +67,41 @@ namespace hpx {
                 return static_cast<int>(policy_) != 0;
             }
 
-            constexpr threads::thread_priority get_priority() const
+            constexpr threads::thread_priority get_priority() const noexcept
             {
                 return priority_;
             }
 
+            constexpr threads::thread_stacksize get_stacksize() const noexcept
+            {
+                return stacksize_;
+            }
+
+            constexpr threads::thread_schedule_hint get_hint() const noexcept
+            {
+                return hint_;
+            }
+
+            void set_priority(threads::thread_priority priority) noexcept
+            {
+                priority_ = priority;
+            }
+
+            void set_stacksize(threads::thread_stacksize stacksize) noexcept
+            {
+                stacksize_ = stacksize;
+            }
+
+            void set_hint(threads::thread_schedule_hint hint) noexcept
+            {
+                hint_ = hint;
+            }
+
+        protected:
             launch_policy policy_;
             threads::thread_priority priority_;
+            threads::thread_stacksize stacksize_;
+            threads::thread_schedule_hint hint_;
 
         private:
             friend class serialization::access;
@@ -83,8 +120,11 @@ namespace hpx {
         {
             constexpr explicit policy_holder(launch_policy p,
                 threads::thread_priority priority =
-                    threads::thread_priority::default_) noexcept
-              : policy_holder_base(p, priority)
+                    threads::thread_priority::default_,
+                threads::thread_stacksize stacksize =
+                    threads::thread_stacksize::default_,
+                threads::thread_schedule_hint hint = {}) noexcept
+              : policy_holder_base(p, priority, stacksize, hint)
             {
             }
 
@@ -103,13 +143,21 @@ namespace hpx {
                 return static_cast<Derived const*>(this)->is_valid();
             }
 
-            constexpr launch_policy policy() const
+            constexpr launch_policy policy() const noexcept
             {
                 return static_cast<Derived const*>(this)->get_policy();
             }
-            constexpr threads::thread_priority priority() const
+            constexpr threads::thread_priority priority() const noexcept
             {
                 return static_cast<Derived const*>(this)->get_priority();
+            }
+            constexpr threads::thread_stacksize stacksize() const noexcept
+            {
+                return static_cast<Derived const*>(this)->get_stacksize();
+            }
+            constexpr threads::thread_schedule_hint hint() const noexcept
+            {
+                return static_cast<Derived const*>(this)->get_hint();
             }
         };
 
@@ -118,8 +166,11 @@ namespace hpx {
         {
             constexpr explicit policy_holder(launch_policy p,
                 threads::thread_priority priority =
-                    threads::thread_priority::default_) noexcept
-              : policy_holder_base(p, priority)
+                    threads::thread_priority::default_,
+                threads::thread_stacksize stacksize =
+                    threads::thread_stacksize::default_,
+                threads::thread_schedule_hint hint = {}) noexcept
+              : policy_holder_base(p, priority, stacksize, hint)
             {
             }
 
@@ -138,13 +189,21 @@ namespace hpx {
                 return this->policy_holder_base::is_valid();
             }
 
-            constexpr launch_policy policy() const
+            constexpr launch_policy policy() const noexcept
             {
                 return this->policy_holder_base::get_policy();
             }
-            constexpr threads::thread_priority priority() const
+            constexpr threads::thread_priority priority() const noexcept
             {
                 return this->policy_holder_base::get_priority();
+            }
+            constexpr threads::thread_stacksize stacksize() const noexcept
+            {
+                return this->policy_holder_base::get_stacksize();
+            }
+            constexpr threads::thread_schedule_hint hint() const noexcept
+            {
+                return this->policy_holder_base::get_hint();
             }
         };
 
@@ -153,55 +212,312 @@ namespace hpx {
         {
             constexpr explicit async_policy(
                 threads::thread_priority priority =
-                    threads::thread_priority::default_) noexcept
-              : policy_holder<async_policy>(launch_policy::async, priority)
+                    threads::thread_priority::default_,
+                threads::thread_stacksize stacksize =
+                    threads::thread_stacksize::default_,
+                threads::thread_schedule_hint hint = {}) noexcept
+              : policy_holder<async_policy>(
+                    launch_policy::async, priority, stacksize, hint)
             {
             }
 
-            constexpr async_policy operator()(
-                threads::thread_priority priority) const noexcept
+            friend async_policy tag_dispatch(
+                hpx::execution::experimental::with_priority_t,
+                async_policy policy, threads::thread_priority priority) noexcept
             {
-                return async_policy(priority);
+                auto policy_with_priority = policy;
+                policy_with_priority.set_priority(priority);
+                return policy_with_priority;
+            }
+
+            friend constexpr hpx::threads::thread_priority tag_dispatch(
+                hpx::execution::experimental::get_priority_t,
+                async_policy policy) noexcept
+            {
+                return policy.priority();
+            }
+
+            friend async_policy tag_dispatch(
+                hpx::execution::experimental::with_stacksize_t,
+                async_policy policy,
+                threads::thread_stacksize stacksize) noexcept
+            {
+                auto policy_with_stacksize = policy;
+                policy_with_stacksize.set_stacksize(stacksize);
+                return policy_with_stacksize;
+            }
+
+            friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+                hpx::execution::experimental::get_stacksize_t,
+                async_policy policy) noexcept
+            {
+                return policy.stacksize();
+            }
+
+            friend async_policy tag_dispatch(
+                hpx::execution::experimental::with_hint_t, async_policy policy,
+                threads::thread_schedule_hint hint) noexcept
+            {
+                auto policy_with_hint = policy;
+                policy_with_hint.set_hint(hint);
+                return policy_with_hint;
+            }
+
+            friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+                hpx::execution::experimental::get_hint_t,
+                async_policy policy) noexcept
+            {
+                return policy.hint();
             }
         };
 
         struct fork_policy : policy_holder<fork_policy>
         {
-            constexpr explicit fork_policy(
-                threads::thread_priority priority =
-                    threads::thread_priority::boost) noexcept
-              : policy_holder<fork_policy>(launch_policy::fork, priority)
+            constexpr explicit fork_policy(threads::thread_priority priority =
+                                               threads::thread_priority::boost,
+                threads::thread_stacksize stacksize =
+                    threads::thread_stacksize::default_,
+                threads::thread_schedule_hint hint = {}) noexcept
+              : policy_holder<fork_policy>(
+                    launch_policy::fork, priority, stacksize, hint)
             {
             }
 
-            constexpr fork_policy operator()(
-                threads::thread_priority priority) const noexcept
+            friend fork_policy tag_dispatch(
+                hpx::execution::experimental::with_priority_t,
+                fork_policy policy, threads::thread_priority priority) noexcept
             {
-                return fork_policy(priority);
+                auto policy_with_priority = policy;
+                policy_with_priority.set_priority(priority);
+                return policy_with_priority;
+            }
+
+            friend constexpr hpx::threads::thread_priority tag_dispatch(
+                hpx::execution::experimental::get_priority_t,
+                fork_policy policy) noexcept
+            {
+                return policy.priority();
+            }
+
+            friend fork_policy tag_dispatch(
+                hpx::execution::experimental::with_stacksize_t,
+                fork_policy policy,
+                threads::thread_stacksize stacksize) noexcept
+            {
+                auto policy_with_stacksize = policy;
+                policy_with_stacksize.set_stacksize(stacksize);
+                return policy_with_stacksize;
+            }
+
+            friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+                hpx::execution::experimental::get_stacksize_t,
+                fork_policy policy) noexcept
+            {
+                return policy.stacksize();
+            }
+
+            friend fork_policy tag_dispatch(
+                hpx::execution::experimental::with_hint_t, fork_policy policy,
+                threads::thread_schedule_hint hint) noexcept
+            {
+                auto policy_with_hint = policy;
+                policy_with_hint.set_hint(hint);
+                return policy_with_hint;
+            }
+
+            friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+                hpx::execution::experimental::get_hint_t,
+                fork_policy policy) noexcept
+            {
+                return policy.hint();
             }
         };
 
         struct sync_policy : policy_holder<sync_policy>
         {
-            constexpr sync_policy() noexcept
-              : policy_holder<sync_policy>(launch_policy::sync)
+            constexpr sync_policy(threads::thread_priority priority =
+                                      threads::thread_priority::default_,
+                threads::thread_stacksize stacksize =
+                    threads::thread_stacksize::default_,
+                threads::thread_schedule_hint hint = {}) noexcept
+              : policy_holder<sync_policy>(
+                    launch_policy::sync, priority, stacksize, hint)
             {
+            }
+
+            friend sync_policy tag_dispatch(
+                hpx::execution::experimental::with_priority_t,
+                sync_policy policy, threads::thread_priority priority) noexcept
+            {
+                auto policy_with_priority = policy;
+                policy_with_priority.set_priority(priority);
+                return policy_with_priority;
+            }
+
+            friend constexpr hpx::threads::thread_priority tag_dispatch(
+                hpx::execution::experimental::get_priority_t,
+                sync_policy policy) noexcept
+            {
+                return policy.priority();
+            }
+
+            friend sync_policy tag_dispatch(
+                hpx::execution::experimental::with_stacksize_t,
+                sync_policy policy,
+                threads::thread_stacksize stacksize) noexcept
+            {
+                auto policy_with_stacksize = policy;
+                policy_with_stacksize.set_stacksize(stacksize);
+                return policy_with_stacksize;
+            }
+
+            friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+                hpx::execution::experimental::get_stacksize_t,
+                sync_policy policy) noexcept
+            {
+                return policy.stacksize();
+            }
+
+            friend sync_policy tag_dispatch(
+                hpx::execution::experimental::with_hint_t, sync_policy policy,
+                threads::thread_schedule_hint hint) noexcept
+            {
+                auto policy_with_hint = policy;
+                policy_with_hint.set_hint(hint);
+                return policy_with_hint;
+            }
+
+            friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+                hpx::execution::experimental::get_hint_t,
+                sync_policy policy) noexcept
+            {
+                return policy.hint();
             }
         };
 
         struct deferred_policy : policy_holder<deferred_policy>
         {
-            constexpr deferred_policy() noexcept
-              : policy_holder<deferred_policy>(launch_policy::deferred)
+            constexpr deferred_policy(threads::thread_priority priority =
+                                          threads::thread_priority::default_,
+                threads::thread_stacksize stacksize =
+                    threads::thread_stacksize::default_,
+                threads::thread_schedule_hint hint = {}) noexcept
+              : policy_holder<deferred_policy>(
+                    launch_policy::deferred, priority, stacksize, hint)
             {
+            }
+
+            friend deferred_policy tag_dispatch(
+                hpx::execution::experimental::with_priority_t,
+                deferred_policy policy,
+                threads::thread_priority priority) noexcept
+            {
+                auto policy_with_priority = policy;
+                policy_with_priority.set_priority(priority);
+                return policy_with_priority;
+            }
+
+            friend constexpr hpx::threads::thread_priority tag_dispatch(
+                hpx::execution::experimental::get_priority_t,
+                deferred_policy policy) noexcept
+            {
+                return policy.priority();
+            }
+
+            friend deferred_policy tag_dispatch(
+                hpx::execution::experimental::with_stacksize_t,
+                deferred_policy policy,
+                threads::thread_stacksize stacksize) noexcept
+            {
+                auto policy_with_stacksize = policy;
+                policy_with_stacksize.set_stacksize(stacksize);
+                return policy_with_stacksize;
+            }
+
+            friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+                hpx::execution::experimental::get_stacksize_t,
+                deferred_policy policy) noexcept
+            {
+                return policy.stacksize();
+            }
+
+            friend deferred_policy tag_dispatch(
+                hpx::execution::experimental::with_hint_t,
+                deferred_policy policy,
+                threads::thread_schedule_hint hint) noexcept
+            {
+                auto policy_with_hint = policy;
+                policy_with_hint.set_hint(hint);
+                return policy_with_hint;
+            }
+
+            friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+                hpx::execution::experimental::get_hint_t,
+                deferred_policy policy) noexcept
+            {
+                return policy.hint();
             }
         };
 
         struct apply_policy : policy_holder<apply_policy>
         {
-            constexpr apply_policy() noexcept
-              : policy_holder<apply_policy>(launch_policy::apply)
+            constexpr apply_policy(threads::thread_priority priority =
+                                       threads::thread_priority::default_,
+                threads::thread_stacksize stacksize =
+                    threads::thread_stacksize::default_,
+                threads::thread_schedule_hint hint = {}) noexcept
+              : policy_holder<apply_policy>(
+                    launch_policy::apply, priority, stacksize, hint)
             {
+            }
+
+            friend apply_policy tag_dispatch(
+                hpx::execution::experimental::with_priority_t,
+                apply_policy policy, threads::thread_priority priority) noexcept
+            {
+                auto policy_with_priority = policy;
+                policy_with_priority.set_priority(priority);
+                return policy_with_priority;
+            }
+
+            friend constexpr hpx::threads::thread_priority tag_dispatch(
+                hpx::execution::experimental::get_priority_t,
+                apply_policy policy) noexcept
+            {
+                return policy.priority();
+            }
+
+            friend apply_policy tag_dispatch(
+                hpx::execution::experimental::with_stacksize_t,
+                apply_policy policy,
+                threads::thread_stacksize stacksize) noexcept
+            {
+                auto policy_with_stacksize = policy;
+                policy_with_stacksize.set_stacksize(stacksize);
+                return policy_with_stacksize;
+            }
+
+            friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+                hpx::execution::experimental::get_stacksize_t,
+                apply_policy policy) noexcept
+            {
+                return policy.stacksize();
+            }
+
+            friend apply_policy tag_dispatch(
+                hpx::execution::experimental::with_hint_t, apply_policy policy,
+                threads::thread_schedule_hint hint) noexcept
+            {
+                auto policy_with_hint = policy;
+                policy_with_hint.set_hint(hint);
+                return policy_with_hint;
+            }
+
+            friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+                hpx::execution::experimental::get_hint_t,
+                apply_policy policy) noexcept
+            {
+                return policy.hint();
             }
         };
 
@@ -209,19 +525,22 @@ namespace hpx {
         struct select_policy : policy_holder<select_policy<Pred>>
         {
             template <typename F,
-                typename U =
-                    typename std::enable_if<!std::is_same<select_policy<Pred>,
-                        typename std::decay<F>::type>::value>::type>
+                typename U = std::enable_if_t<
+                    !std::is_same_v<select_policy<Pred>, std::decay_t<F>>>>
             explicit select_policy(F&& f,
                 threads::thread_priority priority =
-                    threads::thread_priority::default_)    // NOLINT
+                    threads::thread_priority::default_,
+                threads::thread_stacksize stacksize =
+                    threads::thread_stacksize::default_,
+                threads::thread_schedule_hint hint = {})    // NOLINT
               : policy_holder<select_policy<Pred>>(
-                    launch_policy::async, priority)
+                    launch_policy::async, priority, stacksize, hint)
               , pred_(std::forward<F>(f))
             {
             }
 
             constexpr launch_policy get_policy() const
+                noexcept(noexcept(std::declval<Pred>()()))
             {
                 return pred_();
             }
@@ -231,25 +550,81 @@ namespace hpx {
                 return true;
             }
 
+            friend select_policy tag_dispatch(
+                hpx::execution::experimental::with_priority_t,
+                select_policy const& policy,
+                threads::thread_priority priority) noexcept
+            {
+                auto policy_with_priority = policy;
+                policy_with_priority.set_priority(priority);
+                return policy_with_priority;
+            }
+
+            friend constexpr hpx::threads::thread_priority tag_dispatch(
+                hpx::execution::experimental::get_priority_t,
+                select_policy const& policy) noexcept
+            {
+                return policy.priority();
+            }
+
+            friend select_policy tag_dispatch(
+                hpx::execution::experimental::with_stacksize_t,
+                select_policy const& policy,
+                threads::thread_stacksize stacksize) noexcept
+            {
+                auto policy_with_stacksize = policy;
+                policy_with_stacksize.set_stacksize(stacksize);
+                return policy_with_stacksize;
+            }
+
+            friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+                hpx::execution::experimental::get_stacksize_t,
+                select_policy const& policy) noexcept
+            {
+                return policy.stacksize();
+            }
+
+            friend select_policy tag_dispatch(
+                hpx::execution::experimental::with_hint_t,
+                select_policy const& policy,
+                threads::thread_schedule_hint hint) noexcept
+            {
+                auto policy_with_hint = policy;
+                policy_with_hint.set_hint(hint);
+                return policy_with_hint;
+            }
+
+            friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+                hpx::execution::experimental::get_hint_t,
+                select_policy const& policy) noexcept
+            {
+                return policy.hint();
+            }
+
         private:
             Pred pred_;
         };
 
         struct select_policy_generator
         {
-            constexpr async_policy operator()(
-                threads::thread_priority priority) const noexcept
+            constexpr async_policy operator()(threads::thread_priority priority,
+                threads::thread_stacksize stacksize =
+                    threads::thread_stacksize::default_,
+                threads::thread_schedule_hint hint = {}) const noexcept
             {
-                return async_policy(priority);
+                return async_policy(priority, stacksize, hint);
             }
 
             template <typename F>
-            select_policy<typename std::decay<F>::type> operator()(F&& f,
+            select_policy<std::decay_t<F>> operator()(F&& f,
                 threads::thread_priority priority =
-                    threads::thread_priority::default_) const
+                    threads::thread_priority::default_,
+                threads::thread_stacksize stacksize =
+                    threads::thread_stacksize::default_,
+                threads::thread_schedule_hint hint = {}) const
             {
-                return select_policy<typename std::decay<F>::type>(
-                    std::forward<F>(f), priority);
+                return select_policy<std::decay_t<F>>(
+                    std::forward<F>(f), priority, stacksize, hint);
             }
         };
 
@@ -261,7 +636,8 @@ namespace hpx {
         {
             return policy_holder_base(
                 static_cast<launch_policy>(static_cast<int>(lhs.policy()) &
-                    static_cast<int>(rhs.policy())));
+                    static_cast<int>(rhs.policy())),
+                lhs.get_priority(), lhs.get_stacksize(), lhs.get_hint());
         }
 
         template <typename Left, typename Right>
@@ -271,7 +647,8 @@ namespace hpx {
         {
             return policy_holder_base(
                 static_cast<launch_policy>(static_cast<int>(lhs.policy()) |
-                    static_cast<int>(rhs.policy())));
+                    static_cast<int>(rhs.policy())),
+                lhs.get_priority(), lhs.get_stacksize(), lhs.get_hint());
         }
 
         template <typename Left, typename Right>
@@ -281,7 +658,8 @@ namespace hpx {
         {
             return policy_holder_base(
                 static_cast<launch_policy>(static_cast<int>(lhs.policy()) ^
-                    static_cast<int>(rhs.policy())));
+                    static_cast<int>(rhs.policy())),
+                lhs.get_priority(), lhs.get_stacksize(), lhs.get_hint());
         }
 
         template <typename Derived>
@@ -289,7 +667,8 @@ namespace hpx {
             policy_holder<Derived> const& p) noexcept
         {
             return policy_holder<Derived>(
-                static_cast<launch_policy>(~static_cast<int>(p.policy())));
+                static_cast<launch_policy>(~static_cast<int>(p.policy())),
+                p.get_priority(), p.get_stacksize(), p.get_hint());
         }
 
         template <typename Left, typename Right>
@@ -359,41 +738,105 @@ namespace hpx {
         /// \endcond
 
         /// Create a launch policy representing asynchronous execution
-        constexpr launch(detail::async_policy) noexcept
-          : detail::policy_holder<>{detail::launch_policy::async}
+        constexpr launch(detail::async_policy p) noexcept
+          : detail::policy_holder<>{detail::launch_policy::async, p.priority(),
+                p.stacksize(), p.hint()}
         {
         }
 
         /// Create a launch policy representing asynchronous execution. The
         /// new thread is executed in a preferred way
-        constexpr launch(detail::fork_policy) noexcept
-          : detail::policy_holder<>{detail::launch_policy::fork}
+        constexpr launch(detail::fork_policy p) noexcept
+          : detail::policy_holder<>{detail::launch_policy::fork, p.priority(),
+                p.stacksize(), p.hint()}
         {
         }
 
         /// Create a launch policy representing synchronous execution
-        constexpr launch(detail::sync_policy) noexcept
-          : detail::policy_holder<>{detail::launch_policy::sync}
+        constexpr launch(detail::sync_policy p) noexcept
+          : detail::policy_holder<>{detail::launch_policy::sync, p.priority(),
+                p.stacksize(), p.hint()}
         {
         }
 
         /// Create a launch policy representing deferred execution
-        constexpr launch(detail::deferred_policy) noexcept
-          : detail::policy_holder<>{detail::launch_policy::deferred}
+        constexpr launch(detail::deferred_policy p) noexcept
+          : detail::policy_holder<>{detail::launch_policy::deferred,
+                p.priority(), p.stacksize(), p.hint()}
         {
         }
 
         /// Create a launch policy representing fire and forget execution
-        constexpr launch(detail::apply_policy) noexcept
-          : detail::policy_holder<>{detail::launch_policy::apply}
+        constexpr launch(detail::apply_policy p) noexcept
+          : detail::policy_holder<>{detail::launch_policy::apply, p.priority(),
+                p.stacksize(), p.hint()}
         {
         }
 
         /// Create a launch policy representing fire and forget execution
         template <typename F>
         constexpr launch(detail::select_policy<F> const& p) noexcept
-          : detail::policy_holder<>{p.policy()}
+          : detail::policy_holder<>{
+                p.policy(), p.priority(), p.stacksize(), p.hint()}
         {
+        }
+
+        template <typename Launch,
+            typename Enable =
+                std::enable_if_t<hpx::traits::is_launch_policy_v<Launch>>>
+        constexpr launch(Launch l, threads::thread_priority priority,
+            threads::thread_stacksize stacksize,
+            threads::thread_schedule_hint hint) noexcept
+          : detail::policy_holder<>(l.policy(), priority, stacksize, hint)
+        {
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        friend launch tag_dispatch(
+            hpx::execution::experimental::with_priority_t, launch const& policy,
+            threads::thread_priority priority) noexcept
+        {
+            auto policy_with_priority = policy;
+            policy_with_priority.set_priority(priority);
+            return policy_with_priority;
+        }
+
+        friend constexpr hpx::threads::thread_priority tag_dispatch(
+            hpx::execution::experimental::get_priority_t,
+            launch const& policy) noexcept
+        {
+            return policy.priority();
+        }
+
+        friend launch tag_dispatch(
+            hpx::execution::experimental::with_stacksize_t,
+            launch const& policy, threads::thread_stacksize stacksize) noexcept
+        {
+            auto policy_with_stacksize = policy;
+            policy_with_stacksize.set_stacksize(stacksize);
+            return policy_with_stacksize;
+        }
+
+        friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+            hpx::execution::experimental::get_stacksize_t,
+            launch const& policy) noexcept
+        {
+            return policy.stacksize();
+        }
+
+        friend launch tag_dispatch(hpx::execution::experimental::with_hint_t,
+            launch const& policy, threads::thread_schedule_hint hint) noexcept
+        {
+            auto policy_with_hint = policy;
+            policy_with_hint.set_hint(hint);
+            return policy_with_hint;
+        }
+
+        friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+            hpx::execution::experimental::get_hint_t,
+            launch const& policy) noexcept
+        {
+            return policy.hint();
         }
 
         ///////////////////////////////////////////////////////////////////////

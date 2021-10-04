@@ -7,9 +7,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 
 #include <type_traits>
+
+namespace hpx { namespace detail {
+
+    // forward declaration only
+    struct policy_holder_base;
+}}    // namespace hpx::detail
 
 namespace hpx { namespace traits {
 

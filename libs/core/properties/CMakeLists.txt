@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,6 @@ add_hpx_module(
   core properties
   GLOBAL_HEADER_GEN ON
   HEADERS ${properties_headers}
-  DEPENDENCIES hpx_functional
+  DEPENDENCIES hpx_tag_dispatch
   CMAKE_SUBDIRS examples tests
 )

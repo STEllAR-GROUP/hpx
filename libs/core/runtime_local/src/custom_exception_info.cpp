@@ -190,10 +190,10 @@ namespace hpx { namespace util {
 
         error_code ec(lightweight);
         threads::thread_id_ref_type tid =
-            p.apply("hpx::util::trace_on_new_stack", launch::fork,
-                threads::thread_priority::default_,
-                threads::thread_stacksize::medium,
-                threads::thread_schedule_hint(), ec);
+            p.apply("hpx::util::trace_on_new_stack",
+                launch::fork_policy(threads::thread_priority::default_,
+                    threads::thread_stacksize::medium),
+                ec);
         if (ec)
             return "<couldn't retrieve stack backtrace>";
 
