@@ -42,7 +42,6 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     FOLDER ${folder_name}
-    FOLDER "Tests/Regressions/Modules/Full/Actions"
   )
 
   add_hpx_regression_test("modules.actions" ${test} ${${test}_PARAMETERS})
