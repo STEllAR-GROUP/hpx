@@ -33,8 +33,8 @@ void serialize(Archive& ar, A& a, unsigned)
     ar& a.a;
 }
 
-HPX_SERIALIZATION_REGISTER_CLASS(A);
-HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(A);
+HPX_SERIALIZATION_REGISTER_CLASS(A)
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(A)
 
 struct B
 {
@@ -60,7 +60,7 @@ void serialize(Archive& ar, B& b, unsigned)
     ar& b.b;
 }
 
-HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(B);
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(B)
 
 struct D : B
 {

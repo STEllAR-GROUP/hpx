@@ -238,7 +238,7 @@ namespace hpx { namespace serialization { namespace detail {
             };                                                                 \
         }                                                                      \
     }                                                                          \
-    HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class);                                \
+    HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class)                                 \
 /**/
 #define HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, Name)                     \
     namespace hpx { namespace serialization { namespace detail {               \
