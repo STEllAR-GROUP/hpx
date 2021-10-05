@@ -27,9 +27,10 @@ namespace hpx::execution::experimental::detail {
         return true;
     }
 
-    void any_operation_state::start() & noexcept
+    void tag_dispatch(
+        hpx::execution::experimental::start_t, any_operation_state& os) noexcept
     {
-        storage.get().start();
+        os.storage.get().start();
     }
 
     void throw_bad_any_call(char const* class_name, char const* function_name)

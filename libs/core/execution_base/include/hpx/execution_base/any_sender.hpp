@@ -334,7 +334,9 @@ namespace hpx::execution::experimental {
             any_operation_state& operator=(any_operation_state&&) = delete;
             any_operation_state& operator=(any_operation_state const&) = delete;
 
-            void start() & noexcept;
+            HPX_CORE_EXPORT friend void tag_dispatch(
+                hpx::execution::experimental::start_t,
+                any_operation_state& os) noexcept;
         };
 
         template <typename... Ts>
@@ -367,7 +369,7 @@ namespace hpx::execution::experimental {
                 return true;
             }
 
-            HPX_NORETURN void set_value(Ts...) && override
+            void set_value(Ts...) && override
             {
                 throw_bad_any_call("any_receiver", "set_value");
             }
@@ -456,33 +458,36 @@ namespace hpx::execution::experimental {
             any_receiver& operator=(any_receiver&&) = default;
             any_receiver& operator=(any_receiver const&) = delete;
 
-            void set_value(Ts... ts) &&
+            friend void tag_dispatch(hpx::execution::experimental::set_value_t,
+                any_receiver&& r, Ts... ts)
             {
                 // We first move the storage to a temporary variable so that
                 // this any_receiver is empty after this set_value. Doing
                 // std::move(storage.get()).set_value(...) would leave us with a
                 // non-empty any_receiver holding a moved-from receiver.
-                auto moved_storage = std::move(storage);
+                auto moved_storage = std::move(r.storage);
                 std::move(moved_storage.get()).set_value(std::move(ts)...);
             }
 
-            void set_error(std::exception_ptr ep) && noexcept
+            friend void tag_dispatch(hpx::execution::experimental::set_error_t,
+                any_receiver&& r, std::exception_ptr ep) noexcept
             {
                 // We first move the storage to a temporary variable so that
                 // this any_receiver is empty after this set_error. Doing
                 // std::move(storage.get()).set_error(...) would leave us with a
                 // non-empty any_receiver holding a moved-from receiver.
-                auto moved_storage = std::move(storage);
+                auto moved_storage = std::move(r.storage);
                 std::move(moved_storage.get()).set_error(std::move(ep));
             }
 
-            void set_done() && noexcept
+            friend void tag_dispatch(hpx::execution::experimental::set_done_t,
+                any_receiver&& r) noexcept
             {
                 // We first move the storage to a temporary variable so that
                 // this any_receiver is empty after this set_done. Doing
                 // std::move(storage.get()).set_done(...) would leave us with a
                 // non-empty any_receiver holding a moved-from receiver.
-                auto moved_storage = std::move(storage);
+                auto moved_storage = std::move(r.storage);
                 std::move(moved_storage.get()).set_done();
             }
         };
@@ -684,13 +689,15 @@ namespace hpx::execution::experimental {
         static constexpr bool sends_done = false;
 
         template <typename R>
-        detail::any_operation_state connect(R&& r) &&
+        friend detail::any_operation_state tag_dispatch(
+            hpx::execution::experimental::connect_t, unique_any_sender&& s,
+            R&& r)
         {
             // We first move the storage to a temporary variable so that this
             // any_sender is empty after this connect. Doing
             // std::move(storage.get()).connect(...) would leave us with a
             // non-empty any_sender holding a moved-from sender.
-            auto moved_storage = std::move(storage);
+            auto moved_storage = std::move(s.storage);
             return std::move(moved_storage.get())
                 .connect(detail::any_receiver<Ts...>{std::forward<R>(r)});
         }
@@ -755,20 +762,22 @@ namespace hpx::execution::experimental {
         static constexpr bool sends_done = false;
 
         template <typename R>
-        detail::any_operation_state connect(R&& r) &
+        friend detail::any_operation_state tag_dispatch(
+            hpx::execution::experimental::connect_t, any_sender& s, R&& r)
         {
-            return storage.get().connect(
+            return s.storage.get().connect(
                 detail::any_receiver<Ts...>{std::forward<R>(r)});
         }
 
         template <typename R>
-        detail::any_operation_state connect(R&& r) &&
+        friend detail::any_operation_state tag_dispatch(
+            hpx::execution::experimental::connect_t, any_sender&& s, R&& r)
         {
             // We first move the storage to a temporary variable so that this
             // any_sender is empty after this connect. Doing
             // std::move(storage.get()).connect(...) would leave us with a
             // non-empty any_sender holding a moved-from sender.
-            auto moved_storage = std::move(storage);
+            auto moved_storage = std::move(s.storage);
             return std::move(moved_storage.get())
                 .connect(detail::any_receiver<Ts...>{std::forward<R>(r)});
         }
