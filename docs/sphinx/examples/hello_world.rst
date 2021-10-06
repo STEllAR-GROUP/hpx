@@ -9,9 +9,9 @@
 
 .. _examples_hello_world:
 
-==========================================
-Remote execution with actions: Hello world
-==========================================
+=============================
+Remote execution with actions
+=============================
 
 This program will print out a hello world message on every OS-thread on every
 :term:`locality`. The output will look something like this:

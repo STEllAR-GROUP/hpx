@@ -9,9 +9,9 @@
 
 .. _examples_fibonacci:
 
-=================================================================
-Asynchronous execution with ``hpx::async`` and actions: Fibonacci
-=================================================================
+===================================
+Asynchronous execution with actions
+===================================
 
 This example extends the :ref:`previous example <examples_fibonacci_local>` by
 introducing :term:`actions<action>`: functions that can be run remotely. In this

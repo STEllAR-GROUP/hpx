@@ -9,9 +9,9 @@
 
 .. _examples_fibonacci_local:
 
-=====================================================
-Asynchronous execution with ``hpx::async``: Fibonacci
-=====================================================
+======================
+Asynchronous execution
+======================
 
 The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
 every subsequent number is the sum of the previous two numbers. In this example,
