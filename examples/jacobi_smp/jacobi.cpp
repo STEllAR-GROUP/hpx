@@ -66,6 +66,10 @@ int hpx_main(variables_map& vm)
 #endif
 }
 
+#if !defined(HPX_APPLICATION_STRING)
+#define HPX_APPLICATION_STRING "jacobi"
+#endif
+
 int main(int argc, char** argv)
 {
     options_description desc_cmd("usage: " HPX_APPLICATION_STRING " [options]");
