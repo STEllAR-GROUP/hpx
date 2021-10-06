@@ -30,7 +30,8 @@ namespace hpx {
     ///                     iterators used (deduced). This iterator type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam Pred        Comparison function object which returns true if
-    ///                     the first argument is less than the second.
+    ///                     the first argument is less than the second. This defaults
+    ///                     to std::less<>.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -50,7 +51,8 @@ namespace hpx {
     ///                     the function must not modify the objects passed to
     ///                     it. The type must be such that an object of
     ///                     type \a randomIt can be dereferenced and then
-    ///                     implicitly converted to Type.
+    ///                     implicitly converted to Type. This defaults
+    ///                     to std::less<>.
     ///
     /// The comparison operations in the parallel \a nth_element
     /// algorithm invoked without an execution policy object execute in
@@ -79,7 +81,8 @@ namespace hpx {
     ///                     iterators used (deduced). This iterator type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam Pred        Comparison function object which returns true if
-    ///                     the first argument is less than the second.
+    ///                     the first argument is less than the second. This
+    ///                     defaults to std::less<>.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -101,7 +104,8 @@ namespace hpx {
     ///                     the function must not modify the objects passed to
     ///                     it. The type must be such that an object of
     ///                     type \a randomIt can be dereferenced and then
-    ///                     implicitly converted to Type.
+    ///                     implicitly converted to Type. This defaults
+    ///                     to std::less<>.
     ///
     /// The comparison operations in the parallel \a nth_element invoked with
     /// an execution policy object of type \a sequenced_policy
@@ -167,30 +171,35 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \param proj : projection
         ///
         template <class RandomIt, typename Compare, typename Proj>
-        void nth_element_seq(RandomIt first, RandomIt nth, RandomIt end,
-            uint32_t level, Compare&& comp, Proj&& proj)
+        static constexpr void nth_element_seq(RandomIt first, RandomIt nth,
+            RandomIt end, std::uint32_t level, Compare&& comp, Proj&& proj)
         {
-            const uint32_t nmin_sort = 24;
-
-            // Check if the iterators are corrects
+            std::uint32_t const nmin_sort = 24;
             auto nelem = end - first;
-            HPX_ASSERT(nelem >= 0 and (nth - first + 1) > 0 and
-                (nth - first + 1) <= nelem);
 
             // Check  the special conditions
             if (nth == first)
             {
                 RandomIt it = detail::min_element<RandomIt>().call(
-                    hpx::execution::seq, first, end, comp, proj);
+                    hpx::execution::seq, first, end,
+                    std::forward<Compare>(comp), std::forward<Proj>(proj));
+
                 if (it != first)
-                    std::swap(*it, *first);
+                {
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                    std::ranges::iter_swap(it, first);
+#else
+                    std::iter_swap(it, first);
+#endif
+                }
+
                 return;
             };
 
             if (nelem < nmin_sort)
             {
-                detail::sort<RandomIt>().call(
-                    hpx::execution::seq, first, end, comp, proj);
+                detail::sort<RandomIt>().call(hpx::execution::seq, first, end,
+                    std::forward<Compare>(comp), std::forward<Proj>(proj));
                 return;
             }
             if (level == 0)
@@ -207,9 +216,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return;
 
             if (nth < c_last)
-                nth_element_seq(first, nth, c_last, level - 1, comp, proj);
+                nth_element_seq(first, nth, c_last, level - 1,
+                    std::forward<Compare>(comp), std::forward<Proj>(proj));
             else
-                nth_element_seq(c_last + 1, nth, end, level - 1, comp, proj);
+                nth_element_seq(c_last + 1, nth, end, level - 1,
+                    std::forward<Compare>(comp), std::forward<Proj>(proj));
 
             return;
         };
@@ -232,6 +243,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto nelem = end - first;
                 if (nelem == 0)
                     return first;
+                HPX_ASSERT(nelem >= 0 && (nth - first + 1) > 0 &&
+                    (nth - first + 1) <= nelem);
 
                 uint32_t level = detail::nbits64(nelem) * 2;
                 detail::nth_element_seq(first, nth, end, level,
@@ -283,26 +296,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         std::iter_swap(first, first + pivotIndex);
 #endif
 
-                        auto partitionResult =
+                        partitionIter =
                             hpx::parallel::v1::detail::partition<RandomIt>()
                                 .call(
-                                    std::forward<ExPolicy>(policy), first + 1,
-                                    last_iter,
+                                    hpx::detail::async_to_sync_policy<ExPolicy>(
+                                        policy),
+                                    first + 1, last_iter,
                                     [val = HPX_INVOKE(proj, *first), &pred](
                                         value_type const& elem) {
                                         return HPX_INVOKE(pred, elem, val);
                                     },
                                     proj);
-
-                        if constexpr (std::is_same_v<decltype(partitionResult),
-                                          RandomIt>)
-                        {
-                            partitionIter = partitionResult;
-                        }
-                        else
-                        {
-                            partitionIter = partitionResult.get();
-                        }
 
                         --partitionIter;
                         // swap first element and partitionIter

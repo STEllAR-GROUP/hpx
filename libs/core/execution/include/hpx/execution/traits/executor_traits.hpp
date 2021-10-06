@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/type_support/detected.hpp>
 
@@ -339,4 +340,5 @@ namespace hpx { namespace traits {
     template <typename Executor>
     using executor_parameters_type_t =
         typename executor_parameters_type<Executor>::type;
+
 }}    // namespace hpx::traits

@@ -53,11 +53,13 @@ namespace hpx { namespace ranges {
     ///                     the function must not modify the objects passed to
     ///                     it. The type must be such that an object of
     ///                     type \a randomIt can be dereferenced and then
-    ///                     implicitly converted to Type.
+    ///                     implicitly converted to Type. This defaults
+    ///                     to std::less<>.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
+    ///                     This defaults to projection_identity.
     ///
     /// The comparison operations in the parallel \a nth_element
     /// algorithm invoked without an execution policy object execute in
@@ -116,11 +118,13 @@ namespace hpx { namespace ranges {
     ///                     the function must not modify the objects passed to
     ///                     it. The type must be such that an object of
     ///                     type \a randomIt can be dereferenced and then
-    ///                     implicitly converted to Type.
+    ///                     implicitly converted to Type. This defaults
+    ///                     to std::less<>.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
+    ///                     This defaults to projection_identity.
     ///
     /// The comparison operations in the parallel \a nth_element invoked with
     /// an execution policy object of type \a sequenced_policy
@@ -179,11 +183,13 @@ namespace hpx { namespace ranges {
     ///                     the function must not modify the objects passed to
     ///                     it. The type must be such that an object of
     ///                     type \a randomIt can be dereferenced and then
-    ///                     implicitly converted to Type.
+    ///                     implicitly converted to Type. This defaults
+    ///                     to std::less<>.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
+    ///                     This defaults to projection_identity.
     ///
     /// The comparison operations in the parallel \a nth_element
     /// algorithm invoked without an execution policy object execute in
@@ -239,11 +245,13 @@ namespace hpx { namespace ranges {
     ///                     the function must not modify the objects passed to
     ///                     it. The type must be such that an object of
     ///                     type \a randomIt can be dereferenced and then
-    ///                     implicitly converted to Type.
+    ///                     implicitly converted to Type. This defaults
+    ///                     to std::less<>.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
+    ///                     This defaults to projection_identity.
     ///
     /// The comparison operations in the parallel \a nth_element invoked with
     /// an execution policy object of type \a sequenced_policy

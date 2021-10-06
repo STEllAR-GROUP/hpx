@@ -1622,5 +1622,19 @@ namespace hpx { namespace detail {
       : std::true_type
     {
     };
+
+    template <typename ExPolicy>
+    constexpr decltype(auto) async_to_sync_policy(ExPolicy&& policy)
+    {
+        if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
+        {
+            return hpx::execution::par.on(policy.executor())
+                .with(policy.parameters());
+        }
+        else
+        {
+            return std::forward<ExPolicy>(policy);
+        }
+    }
     /// \endcond
 }}    // namespace hpx::detail
