@@ -104,7 +104,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Enable =
                       std::enable_if_t<hpx::is_invocable_v<with_priority_t,
                           BaseScheduler, hpx::threads::thread_priority>>>
-        friend scheduler_executor tag_dispatch(
+        friend scheduler_executor tag_invoke(
             hpx::execution::experimental::with_priority_t,
             scheduler_executor const& exec,
             hpx::threads::thread_priority priority)
@@ -114,7 +114,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Enable = std::enable_if_t<
                       hpx::is_invocable_v<get_priority_t, BaseScheduler>>>
-        friend hpx::threads::thread_priority tag_dispatch(
+        friend hpx::threads::thread_priority tag_invoke(
             hpx::execution::experimental::get_priority_t,
             scheduler_executor const& exec)
         {
@@ -124,7 +124,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Enable =
                       std::enable_if_t<hpx::is_invocable_v<with_stacksize_t,
                           BaseScheduler, hpx::threads::thread_stacksize>>>
-        friend scheduler_executor tag_dispatch(
+        friend scheduler_executor tag_invoke(
             hpx::execution::experimental::with_stacksize_t,
             scheduler_executor const& exec,
             hpx::threads::thread_stacksize stacksize)
@@ -134,7 +134,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Enable = std::enable_if_t<
                       hpx::is_invocable_v<get_stacksize_t, BaseScheduler>>>
-        friend hpx::threads::thread_stacksize tag_dispatch(
+        friend hpx::threads::thread_stacksize tag_invoke(
             hpx::execution::experimental::get_stacksize_t,
             scheduler_executor const& exec)
         {
@@ -144,7 +144,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <
             typename Enable = std::enable_if_t<hpx::is_invocable_v<with_hint_t,
                 BaseScheduler, hpx::threads::thread_schedule_hint>>>
-        friend scheduler_executor tag_dispatch(
+        friend scheduler_executor tag_invoke(
             hpx::execution::experimental::with_hint_t,
             scheduler_executor const& exec,
             hpx::threads::thread_schedule_hint hint)
@@ -154,7 +154,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Enable = std::enable_if_t<
                       hpx::is_invocable_v<get_hint_t, BaseScheduler>>>
-        friend hpx::threads::thread_schedule_hint tag_dispatch(
+        friend hpx::threads::thread_schedule_hint tag_invoke(
             hpx::execution::experimental::get_hint_t,
             scheduler_executor const& exec)
         {
@@ -163,7 +163,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Enable = std::enable_if_t<hpx::is_invocable_v<
                       with_annotation_t, BaseScheduler, char const*>>>
-        friend scheduler_executor tag_dispatch(
+        friend scheduler_executor tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             scheduler_executor const& exec, char const* annotation)
         {
@@ -172,7 +172,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Enable = std::enable_if_t<hpx::is_invocable_v<
                       with_annotation_t, BaseScheduler, std::string>>>
-        friend scheduler_executor tag_dispatch(
+        friend scheduler_executor tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             scheduler_executor const& exec, std::string annotation)
         {
@@ -181,7 +181,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Enable = std::enable_if_t<
                       hpx::is_invocable_v<get_annotation_t, BaseScheduler>>>
-        friend char const* tag_dispatch(
+        friend char const* tag_invoke(
             hpx::execution::experimental::get_annotation_t,
             scheduler_executor const& exec)
         {

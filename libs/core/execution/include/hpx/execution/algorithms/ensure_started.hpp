@@ -12,13 +12,13 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/split.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 
 #include <utility>
 
 namespace hpx::execution::experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct ensure_started_t final
-      : hpx::functional::tag_fallback<ensure_started_t>
+      : hpx::functional::detail::tag_fallback<ensure_started_t>
     {
     private:
         // clang-format off
@@ -29,7 +29,7 @@ namespace hpx::execution::experimental {
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             ensure_started_t, Sender&& sender, Allocator const& allocator = {})
         {
             return detail::split_sender<Sender, Allocator,
@@ -38,7 +38,7 @@ namespace hpx::execution::experimental {
         }
 
         template <typename Sender, typename Allocator>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             ensure_started_t,
             detail::split_sender<Sender, Allocator,
                 detail::submission_type::eager>
@@ -54,7 +54,7 @@ namespace hpx::execution::experimental {
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             ensure_started_t, Allocator const& allocator = {})
         {
             return detail::partial_algorithm<ensure_started_t, Allocator>{

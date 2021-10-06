@@ -170,8 +170,8 @@ namespace hpx {
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
@@ -813,7 +813,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             RandIter3>::type
-        tag_fallback_dispatch(merge_t, ExPolicy&& policy, RandIter1 first1,
+        tag_fallback_invoke(merge_t, ExPolicy&& policy, RandIter1 first1,
             RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
             Comp&& comp = Comp())
         {
@@ -851,7 +851,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend RandIter3 tag_fallback_dispatch(merge_t, RandIter1 first1,
+        friend RandIter3 tag_fallback_invoke(merge_t, RandIter1 first1,
             RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
             Comp&& comp = Comp())
         {
@@ -897,9 +897,8 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_fallback_dispatch(inplace_merge_t, ExPolicy&& policy,
-            RandIter first, RandIter middle, RandIter last,
-            Comp&& comp = Comp())
+        tag_fallback_invoke(inplace_merge_t, ExPolicy&& policy, RandIter first,
+            RandIter middle, RandIter last, Comp&& comp = Comp())
         {
             static_assert(
                 (hpx::traits::is_random_access_iterator<RandIter>::value),
@@ -923,7 +922,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(inplace_merge_t, RandIter first,
+        friend void tag_fallback_invoke(inplace_merge_t, RandIter first,
             RandIter middle, RandIter last, Comp&& comp = Comp())
         {
             static_assert(

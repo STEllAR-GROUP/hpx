@@ -13,6 +13,6 @@ add_hpx_module(
   core properties
   GLOBAL_HEADER_GEN ON
   HEADERS ${properties_headers}
-  DEPENDENCIES hpx_tag_dispatch
+  DEPENDENCIES hpx_tag_invoke
   CMAKE_SUBDIRS examples tests
 )

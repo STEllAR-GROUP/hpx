@@ -21,15 +21,14 @@ namespace mylib {
 
     struct state_2
     {
-        friend void tag_dispatch(
-            hpx::execution::experimental::start_t, state_2&)
+        friend void tag_invoke(hpx::execution::experimental::start_t, state_2&)
         {
         }
     };
 
     struct state_3
     {
-        friend void tag_dispatch(
+        friend void tag_invoke(
             hpx::execution::experimental::start_t, state_3&) noexcept
         {
             start_called = true;
@@ -40,13 +39,13 @@ namespace mylib {
     {
     };
 
-    void tag_dispatch(hpx::execution::experimental::start_t, state_4&) {}
+    void tag_invoke(hpx::execution::experimental::start_t, state_4&) {}
 
     struct state_5
     {
     };
 
-    void tag_dispatch(hpx::execution::experimental::start_t, state_5&) noexcept
+    void tag_invoke(hpx::execution::experimental::start_t, state_5&) noexcept
     {
         start_called = true;
     }

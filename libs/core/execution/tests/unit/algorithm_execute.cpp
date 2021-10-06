@@ -11,8 +11,8 @@
 #include <exception>
 #include <type_traits>
 
-static std::size_t friend_tag_dispatch_schedule_calls = 0;
-static std::size_t tag_dispatch_execute_calls = 0;
+static std::size_t friend_tag_invoke_schedule_calls = 0;
+static std::size_t tag_invoke_execute_calls = 0;
 
 struct sender
 {
@@ -27,12 +27,12 @@ struct sender
 
     struct operation_state
     {
-        friend void tag_dispatch(hpx::execution::experimental::start_t,
+        friend void tag_invoke(hpx::execution::experimental::start_t,
             operation_state&) noexcept {};
     };
 
     template <typename R>
-    friend operation_state tag_dispatch(
+    friend operation_state tag_invoke(
         hpx::execution::experimental::connect_t, sender&&, R&&) noexcept
     {
         return {};
@@ -41,10 +41,10 @@ struct sender
 
 struct scheduler_1
 {
-    friend sender tag_dispatch(
+    friend sender tag_invoke(
         hpx::execution::experimental::schedule_t, scheduler_1)
     {
-        ++friend_tag_dispatch_schedule_calls;
+        ++friend_tag_invoke_schedule_calls;
         return {};
     }
 
@@ -73,9 +73,9 @@ struct scheduler_2
 };
 
 template <typename F>
-void tag_dispatch(hpx::execution::experimental::execute_t, scheduler_2, F&&)
+void tag_invoke(hpx::execution::experimental::execute_t, scheduler_2, F&&)
 {
-    ++tag_dispatch_execute_calls;
+    ++tag_invoke_execute_calls;
 }
 
 struct f_struct_1
@@ -104,8 +104,8 @@ int main()
         hpx::execution::experimental::execute(s1, f_struct_1{});
         hpx::execution::experimental::execute(s1, f_struct_3{});
         hpx::execution::experimental::execute(s1, &f_fun_1);
-        HPX_TEST_EQ(friend_tag_dispatch_schedule_calls, std::size_t(3));
-        HPX_TEST_EQ(tag_dispatch_execute_calls, std::size_t(0));
+        HPX_TEST_EQ(friend_tag_invoke_schedule_calls, std::size_t(3));
+        HPX_TEST_EQ(tag_invoke_execute_calls, std::size_t(0));
     }
 
     {
@@ -113,8 +113,8 @@ int main()
         hpx::execution::experimental::execute(s2, f_struct_1{});
         hpx::execution::experimental::execute(s2, f_struct_3{});
         hpx::execution::experimental::execute(s2, &f_fun_1);
-        HPX_TEST_EQ(friend_tag_dispatch_schedule_calls, std::size_t(3));
-        HPX_TEST_EQ(tag_dispatch_execute_calls, std::size_t(3));
+        HPX_TEST_EQ(friend_tag_invoke_schedule_calls, std::size_t(3));
+        HPX_TEST_EQ(tag_invoke_execute_calls, std::size_t(3));
     }
 
     return hpx::util::report_errors();

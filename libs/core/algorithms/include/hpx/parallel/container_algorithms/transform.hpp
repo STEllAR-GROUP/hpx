@@ -384,7 +384,7 @@ namespace hpx { namespace ranges {
         ranges::binary_transform_result<
             typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, FwdIter>>::type
-    tag_fallback_dispatch(hpx::ranges::transform_t, ExPolicy&& policy,
+    tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
         Rng1&& rng1, Rng2&& rng2, FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2())
 
@@ -567,7 +567,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             ranges::unary_transform_result<FwdIter1, FwdIter2>>::type
-        tag_fallback_dispatch(hpx::ranges::transform_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
             FwdIter1 first, Sent1 last, FwdIter2 dest, F&& f,
             Proj&& proj = Proj())
         {
@@ -592,7 +592,7 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             ranges::unary_transform_result<
                 typename hpx::traits::range_iterator<Rng>::type, FwdIter>>::type
-        tag_fallback_dispatch(hpx::ranges::transform_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
             Rng&& rng, FwdIter dest, F&& f, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -625,7 +625,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             ranges::binary_transform_result<FwdIter1, FwdIter2, FwdIter3>>::type
-        tag_fallback_dispatch(hpx::ranges::transform_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
             FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2,
             FwdIter3 dest, F&& f, Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -657,7 +657,7 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng1>::type,
                 typename hpx::traits::range_iterator<Rng2>::type,
                 FwdIter>>::type
-        tag_fallback_dispatch(hpx::ranges::transform_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
             Rng1&& rng1, Rng2&& rng2, FwdIter dest, F&& f,
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -691,7 +691,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend ranges::unary_transform_result<FwdIter1, FwdIter2>
-        tag_fallback_dispatch(hpx::ranges::transform_t, FwdIter1 first,
+        tag_fallback_invoke(hpx::ranges::transform_t, FwdIter1 first,
             Sent1 last, FwdIter2 dest, F&& f, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_input_iterator<FwdIter1>::value,
@@ -713,7 +713,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend ranges::unary_transform_result<
             typename hpx::traits::range_iterator<Rng>::type, FwdIter>
-        tag_fallback_dispatch(hpx::ranges::transform_t, Rng&& rng, FwdIter dest,
+        tag_fallback_invoke(hpx::ranges::transform_t, Rng&& rng, FwdIter dest,
             F&& f, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -743,7 +743,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend ranges::binary_transform_result<FwdIter1, FwdIter2, FwdIter3>
-        tag_fallback_dispatch(hpx::ranges::transform_t, FwdIter1 first1,
+        tag_fallback_invoke(hpx::ranges::transform_t, FwdIter1 first1,
             Sent1 last1, FwdIter2 first2, Sent2 last2, FwdIter3 dest, F&& f,
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -771,8 +771,8 @@ namespace hpx { namespace ranges {
         friend ranges::binary_transform_result<
             typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, FwdIter>
-        tag_fallback_dispatch(hpx::ranges::transform_t, Rng1&& rng1,
-            Rng2&& rng2, FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
+        tag_fallback_invoke(hpx::ranges::transform_t, Rng1&& rng1, Rng2&& rng2,
+            FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             using iterator_type1 =

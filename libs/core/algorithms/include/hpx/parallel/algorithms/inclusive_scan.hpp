@@ -422,8 +422,8 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
@@ -768,7 +768,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<OutIter>
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(
+        friend OutIter tag_fallback_invoke(
             hpx::inclusive_scan_t, InIter first, InIter last, OutIter dest)
         {
             static_assert((hpx::traits::is_input_iterator_v<InIter>),
@@ -796,7 +796,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::inclusive_scan_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::inclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
@@ -826,8 +826,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(hpx::inclusive_scan_t,
-            InIter first, InIter last, OutIter dest, Op&& op)
+        friend OutIter tag_fallback_invoke(hpx::inclusive_scan_t, InIter first,
+            InIter last, OutIter dest, Op&& op)
         {
             static_assert((hpx::traits::is_input_iterator_v<InIter>),
                 "Requires at least input iterator.");
@@ -857,7 +857,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::inclusive_scan_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::inclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
@@ -886,8 +886,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(hpx::inclusive_scan_t,
-            InIter first, InIter last, OutIter dest, Op&& op, T init)
+        friend OutIter tag_fallback_invoke(hpx::inclusive_scan_t, InIter first,
+            InIter last, OutIter dest, Op&& op, T init)
         {
             static_assert((hpx::traits::is_input_iterator_v<InIter>),
                 "Requires at least input iterator.");
@@ -917,7 +917,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::inclusive_scan_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::inclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op, T init)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,

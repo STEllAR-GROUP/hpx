@@ -215,10 +215,10 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/accumulate.hpp>
@@ -397,7 +397,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_fallback_dispatch(hpx::reduce_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(hpx::reduce_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, T init, F&& f)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -417,7 +417,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_fallback_dispatch(hpx::reduce_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(hpx::reduce_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, T init)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -437,7 +437,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<FwdIter>::value_type>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::reduce_t, ExPolicy&& policy, FwdIter first, FwdIter last)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -457,7 +457,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend T tag_fallback_dispatch(
+        friend T tag_fallback_invoke(
             hpx::reduce_t, FwdIter first, FwdIter last, T init, F&& f)
         {
             static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
@@ -474,7 +474,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend T tag_fallback_dispatch(
+        friend T tag_fallback_invoke(
             hpx::reduce_t, FwdIter first, FwdIter last, T init)
         {
             static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
@@ -492,7 +492,7 @@ namespace hpx {
             )>
         // clang-format on
         friend typename std::iterator_traits<FwdIter>::value_type
-        tag_fallback_dispatch(hpx::reduce_t, FwdIter first, FwdIter last)
+        tag_fallback_invoke(hpx::reduce_t, FwdIter first, FwdIter last)
         {
             static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
                 "Requires at least input iterator.");

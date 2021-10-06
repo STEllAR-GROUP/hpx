@@ -13,7 +13,7 @@
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <exception>
@@ -29,15 +29,14 @@ namespace hpx { namespace execution { namespace experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
             template <typename Error>
-            friend void tag_dispatch(
+            friend void tag_invoke(
                 set_error_t, transform_receiver&& r, Error&& error) noexcept
             {
                 hpx::execution::experimental::set_error(
                     std::move(r.receiver), std::forward<Error>(error));
             }
 
-            friend void tag_dispatch(
-                set_done_t, transform_receiver&& r) noexcept
+            friend void tag_invoke(set_done_t, transform_receiver&& r) noexcept
             {
                 hpx::execution::experimental::set_done(std::move(r.receiver));
             }
@@ -76,7 +75,7 @@ namespace hpx { namespace execution { namespace experimental {
         public:
             template <typename... Ts,
                 typename = std::enable_if_t<hpx::is_invocable_v<F, Ts...>>>
-            friend void tag_dispatch(
+            friend void tag_invoke(
                 set_value_t, transform_receiver&& r, Ts&&... ts) noexcept
             {
                 using is_void_result =
@@ -128,7 +127,7 @@ namespace hpx { namespace execution { namespace experimental {
                         CPO, std::decay_t<Sender>>)
                 // clang-format on
                 >
-            friend constexpr auto tag_dispatch(
+            friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
                 transform_sender const& sender)
             {
@@ -137,7 +136,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Receiver>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 connect_t, transform_sender&& s, Receiver&& receiver)
             {
                 return hpx::execution::experimental::connect(
@@ -147,7 +146,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Receiver>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 connect_t, transform_sender& r, Receiver&& receiver)
             {
                 return hpx::execution::experimental::connect(r.sender,
@@ -158,7 +157,7 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct transform_t final
-      : hpx::functional::tag_fallback<transform_t>
+      : hpx::functional::detail::tag_fallback<transform_t>
     {
     private:
         // clang-format off
@@ -167,7 +166,7 @@ namespace hpx { namespace execution { namespace experimental {
                 is_sender_v<Sender>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             transform_t, Sender&& sender, F&& f)
         {
             return detail::transform_sender<Sender, F>{
@@ -175,7 +174,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         template <typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             transform_t, F&& f)
         {
             return detail::partial_algorithm<transform_t, F>{

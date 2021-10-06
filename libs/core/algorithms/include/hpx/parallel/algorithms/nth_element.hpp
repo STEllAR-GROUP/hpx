@@ -128,8 +128,8 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#include <hpx/assert.hpp>
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -138,10 +138,10 @@ namespace hpx {
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/pivot.hpp>
 #include <hpx/parallel/algorithms/minmax.hpp>
 #include <hpx/parallel/algorithms/partial_sort.hpp>
 #include <hpx/parallel/algorithms/partition.hpp>
-#include <hpx/parallel/algorithms/detail/pivot.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <algorithm>
@@ -358,7 +358,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(hpx::nth_element_t, RandomIt first,
+        friend void tag_fallback_invoke(hpx::nth_element_t, RandomIt first,
             RandomIt nth, RandomIt last, Pred&& pred = Pred())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
@@ -382,7 +382,7 @@ namespace hpx {
             )>
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy>
-        tag_fallback_dispatch(hpx::nth_element_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::nth_element_t, ExPolicy&& policy,
             RandomIt first, RandomIt nth, RandomIt last, Pred&& pred = Pred())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,

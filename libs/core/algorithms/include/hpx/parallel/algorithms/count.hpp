@@ -452,7 +452,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<FwdIter>::difference_type>::type
-        tag_fallback_dispatch(count_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(count_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -473,8 +473,7 @@ namespace hpx {
             )>
         // clang-format on
         friend typename std::iterator_traits<InIter>::difference_type
-        tag_fallback_dispatch(
-            count_t, InIter first, InIter last, T const& value)
+        tag_fallback_invoke(count_t, InIter first, InIter last, T const& value)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
                 "Required at least input iterator.");
@@ -506,7 +505,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<FwdIter>::difference_type>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             count_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -530,7 +529,7 @@ namespace hpx {
             )>
         // clang-format on
         friend typename std::iterator_traits<InIter>::difference_type
-        tag_fallback_dispatch(count_if_t, InIter first, InIter last, F&& f)
+        tag_fallback_invoke(count_if_t, InIter first, InIter last, F&& f)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
                 "Required at least input iterator.");

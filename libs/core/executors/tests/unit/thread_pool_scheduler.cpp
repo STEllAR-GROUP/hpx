@@ -61,20 +61,19 @@ struct check_context_receiver
     bool& executed;
 
     template <typename E>
-    friend void tag_dispatch(
+    friend void tag_invoke(
         ex::set_error_t, check_context_receiver&&, E&&) noexcept
     {
         HPX_TEST(false);
     }
 
-    friend void tag_dispatch(ex::set_done_t, check_context_receiver&&) noexcept
+    friend void tag_invoke(ex::set_done_t, check_context_receiver&&) noexcept
     {
         HPX_TEST(false);
     }
 
     template <typename... Ts>
-    friend void tag_dispatch(
-        ex::set_value_t, check_context_receiver&& r, Ts&&...)
+    friend void tag_invoke(ex::set_value_t, check_context_receiver&& r, Ts&&...)
     {
         HPX_TEST_NEQ(r.parent_id, hpx::this_thread::get_id());
         HPX_TEST_NEQ(hpx::thread::id(hpx::threads::invalid_thread_id),
@@ -231,18 +230,18 @@ struct callback_receiver
     std::atomic<bool>& executed;
 
     template <typename E>
-    friend void tag_dispatch(ex::set_error_t, callback_receiver&&, E&&) noexcept
+    friend void tag_invoke(ex::set_error_t, callback_receiver&&, E&&) noexcept
     {
         HPX_TEST(false);
     }
 
-    friend void tag_dispatch(ex::set_done_t, callback_receiver&&) noexcept
+    friend void tag_invoke(ex::set_done_t, callback_receiver&&) noexcept
     {
         HPX_TEST(false);
     }
 
     template <typename... Ts>
-    friend void tag_dispatch(
+    friend void tag_invoke(
         ex::set_value_t, callback_receiver&& r, Ts&&...) noexcept
     {
         HPX_INVOKE(r.f, );
@@ -1706,7 +1705,7 @@ void test_completion_scheduler()
     {
         auto sender =
             ex::transform(ex::schedule(ex::thread_pool_scheduler{}), []() {});
-        using hpx::functional::tag_dispatch;
+        using hpx::functional::tag_invoke;
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(sender);
         static_assert(

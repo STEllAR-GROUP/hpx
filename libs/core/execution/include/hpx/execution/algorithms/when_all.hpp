@@ -14,8 +14,8 @@
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <atomic>
@@ -39,7 +39,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Error>
-            friend void tag_dispatch(
+            friend void tag_invoke(
                 set_error_t, when_all_receiver&& r, Error&& error) noexcept
             {
                 if (!r.op_state.set_done_error_called.exchange(true))
@@ -58,14 +58,14 @@ namespace hpx { namespace execution { namespace experimental {
                 r.op_state.finish();
             }
 
-            friend void tag_dispatch(set_done_t, when_all_receiver&& r) noexcept
+            friend void tag_invoke(set_done_t, when_all_receiver&& r) noexcept
             {
                 r.op_state.set_done_error_called = true;
                 r.op_state.finish();
             };
 
             template <typename T>
-            friend void tag_dispatch(
+            friend void tag_invoke(
                 set_value_t, when_all_receiver&& r, T&& t) noexcept
             {
                 if (!r.op_state.set_done_error_called)
@@ -248,7 +248,7 @@ namespace hpx { namespace execution { namespace experimental {
             };
 
             template <typename Receiver, typename SendersPack>
-            friend void tag_dispatch(start_t,
+            friend void tag_invoke(start_t,
                 operation_state<Receiver, SendersPack, num_predecessors - 1>&
                     os) noexcept
             {
@@ -256,7 +256,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Receiver>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 connect_t, when_all_sender&& s, Receiver&& receiver)
             {
                 return operation_state<Receiver, senders_type&&,
@@ -265,7 +265,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Receiver>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 connect_t, when_all_sender& s, Receiver&& receiver)
             {
                 return operation_state<Receiver, senders_type&,
@@ -275,7 +275,7 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct when_all_t final
-      : hpx::functional::tag_fallback<when_all_t>
+      : hpx::functional::detail::tag_fallback<when_all_t>
     {
     private:
         // clang-format off
@@ -284,7 +284,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::util::all_of_v<is_sender<Senders>...>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             when_all_t, Senders&&... senders)
         {
             return detail::when_all_sender<Senders...>{

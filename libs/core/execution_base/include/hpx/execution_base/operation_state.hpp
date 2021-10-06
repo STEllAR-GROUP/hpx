@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
 #include <type_traits>
@@ -25,7 +25,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///       `void start();`
     ///     * Otherwise, the expression is ill-formed.
     ///
-    /// The customization is implemented in terms of `hpx::functional::tag_dispatch`.
+    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
     template <typename O>
     void start(O&& o);
 #endif

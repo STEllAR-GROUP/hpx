@@ -8,35 +8,35 @@ include(HPX_Message)
 
 if(HPX_WITH_TESTS)
   if(HPX_WITH_TESTS_UNIT)
-    add_hpx_pseudo_target(tests.unit.modules.tag_dispatch)
+    add_hpx_pseudo_target(tests.unit.modules.tag_invoke)
     add_hpx_pseudo_dependencies(
-      tests.unit.modules tests.unit.modules.tag_dispatch
+      tests.unit.modules tests.unit.modules.tag_invoke
     )
     add_subdirectory(unit)
   endif()
 
   if(HPX_WITH_TESTS_REGRESSIONS)
-    add_hpx_pseudo_target(tests.regressions.modules.tag_dispatch)
+    add_hpx_pseudo_target(tests.regressions.modules.tag_invoke)
     add_hpx_pseudo_dependencies(
-      tests.regressions.modules tests.regressions.modules.tag_dispatch
+      tests.regressions.modules tests.regressions.modules.tag_invoke
     )
     add_subdirectory(regressions)
   endif()
 
   if(HPX_WITH_TESTS_BENCHMARKS)
-    add_hpx_pseudo_target(tests.performance.modules.tag_dispatch)
+    add_hpx_pseudo_target(tests.performance.modules.tag_invoke)
     add_hpx_pseudo_dependencies(
-      tests.performance.modules tests.performance.modules.tag_dispatch
+      tests.performance.modules tests.performance.modules.tag_invoke
     )
     add_subdirectory(performance)
   endif()
 
   if(HPX_WITH_TESTS_HEADERS)
     add_hpx_header_tests(
-      modules.tag_dispatch
-      HEADERS ${tag_dispatch_headers}
+      modules.tag_invoke
+      HEADERS ${tag_invoke_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-      DEPENDENCIES hpx_tag_dispatch
+      DEPENDENCIES hpx_tag_invoke
     )
   endif()
 endif()

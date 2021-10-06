@@ -14,8 +14,8 @@
 #include <type_traits>
 #include <utility>
 
-static std::size_t friend_tag_dispatch_connect_calls = 0;
-static std::size_t tag_dispatch_connect_calls = 0;
+static std::size_t friend_tag_invoke_connect_calls = 0;
+static std::size_t tag_invoke_connect_calls = 0;
 
 struct non_sender_1
 {
@@ -68,15 +68,15 @@ struct non_sender_7
 
 struct receiver
 {
-    friend void tag_dispatch(hpx::execution::experimental::set_error_t,
+    friend void tag_invoke(hpx::execution::experimental::set_error_t,
         receiver&&, std::exception_ptr) noexcept
     {
     }
-    friend void tag_dispatch(
+    friend void tag_invoke(
         hpx::execution::experimental::set_done_t, receiver&&) noexcept
     {
     }
-    friend void tag_dispatch(
+    friend void tag_invoke(
         hpx::execution::experimental::set_value_t, receiver&& r, int v)
     {
         r.i = v;
@@ -99,17 +99,17 @@ struct sender_1
     struct operation_state
     {
         receiver& r;
-        friend void tag_dispatch(
+        friend void tag_invoke(
             hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
             hpx::execution::experimental::set_value(std::move(os.r), 4711);
         };
     };
 
-    friend operation_state tag_dispatch(
+    friend operation_state tag_invoke(
         hpx::execution::experimental::connect_t, sender_1&&, receiver& r)
     {
-        ++friend_tag_dispatch_connect_calls;
+        ++friend_tag_invoke_connect_calls;
         return {r};
     }
 };
@@ -128,7 +128,7 @@ struct sender_2
     struct operation_state
     {
         receiver& r;
-        friend void tag_dispatch(
+        friend void tag_invoke(
             hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
             hpx::execution::experimental::set_value(std::move(os.r), 4711);
@@ -136,10 +136,10 @@ struct sender_2
     };
 };
 
-sender_2::operation_state tag_dispatch(
+sender_2::operation_state tag_invoke(
     hpx::execution::experimental::connect_t, sender_2, receiver& r)
 {
-    ++tag_dispatch_connect_calls;
+    ++tag_invoke_connect_calls;
     return {r};
 }
 
@@ -147,15 +147,15 @@ static std::size_t void_receiver_set_value_calls = 0;
 
 struct void_receiver
 {
-    friend void tag_dispatch(hpx::execution::experimental::set_error_t,
+    friend void tag_invoke(hpx::execution::experimental::set_error_t,
         void_receiver&&, std::exception_ptr) noexcept
     {
     }
-    friend void tag_dispatch(
+    friend void tag_invoke(
         hpx::execution::experimental::set_done_t, void_receiver&&) noexcept
     {
     }
-    friend void tag_dispatch(
+    friend void tag_invoke(
         hpx::execution::experimental::set_value_t, void_receiver&&)
     {
         ++void_receiver_set_value_calls;
@@ -248,8 +248,8 @@ int main()
         auto os = hpx::execution::experimental::connect(sender_1{}, r1);
         hpx::execution::experimental::start(os);
         HPX_TEST_EQ(r1.i, 4711);
-        HPX_TEST_EQ(friend_tag_dispatch_connect_calls, std::size_t(1));
-        HPX_TEST_EQ(tag_dispatch_connect_calls, std::size_t(0));
+        HPX_TEST_EQ(friend_tag_invoke_connect_calls, std::size_t(1));
+        HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(0));
     }
 
     {
@@ -257,8 +257,8 @@ int main()
         auto os = hpx::execution::experimental::connect(sender_2{}, r2);
         hpx::execution::experimental::start(os);
         HPX_TEST_EQ(r2.i, 4711);
-        HPX_TEST_EQ(friend_tag_dispatch_connect_calls, std::size_t(1));
-        HPX_TEST_EQ(tag_dispatch_connect_calls, std::size_t(1));
+        HPX_TEST_EQ(friend_tag_invoke_connect_calls, std::size_t(1));
+        HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(1));
     }
 
     return hpx::util::report_errors();

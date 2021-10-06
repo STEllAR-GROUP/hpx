@@ -14,9 +14,9 @@
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/type_support/detail/with_result_of.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -181,7 +181,7 @@ namespace hpx { namespace execution { namespace experimental {
                     };
 
                     template <typename Error>
-                    friend void tag_dispatch(set_error_t,
+                    friend void tag_invoke(set_error_t,
                         let_error_predecessor_receiver&& r,
                         Error&& error) noexcept
                     {
@@ -203,7 +203,7 @@ namespace hpx { namespace execution { namespace experimental {
                             });
                     }
 
-                    friend void tag_dispatch(
+                    friend void tag_invoke(
                         set_done_t, let_error_predecessor_receiver&& r) noexcept
                     {
                         hpx::execution::experimental::set_done(
@@ -214,7 +214,7 @@ namespace hpx { namespace execution { namespace experimental {
                         typename = std::enable_if_t<hpx::is_invocable_v<
                             hpx::execution::experimental::set_value_t,
                             Receiver&&, Ts...>>>
-                    friend void tag_dispatch(set_value_t,
+                    friend void tag_invoke(set_value_t,
                         let_error_predecessor_receiver&& r, Ts&&... ts) noexcept
                     {
                         hpx::execution::experimental::set_value(
@@ -278,7 +278,7 @@ namespace hpx { namespace execution { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                friend void tag_dispatch(start_t, operation_state& os) noexcept
+                friend void tag_invoke(start_t, operation_state& os) noexcept
                 {
                     hpx::execution::experimental::start(
                         os.predecessor_operation_state);
@@ -286,7 +286,7 @@ namespace hpx { namespace execution { namespace experimental {
             };
 
             template <typename Receiver>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 connect_t, let_error_sender&& s, Receiver&& receiver)
             {
                 return operation_state<Receiver>(
@@ -297,7 +297,7 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct let_error_t final
-      : hpx::functional::tag_fallback<let_error_t>
+      : hpx::functional::detail::tag_fallback<let_error_t>
     {
     private:
         // clang-format off
@@ -306,7 +306,7 @@ namespace hpx { namespace execution { namespace experimental {
                 is_sender_v<PredecessorSender>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             let_error_t, PredecessorSender&& predecessor_sender, F&& f)
         {
             return detail::let_error_sender<PredecessorSender, F>{
@@ -315,7 +315,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         template <typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             let_error_t, F&& f)
         {
             return detail::partial_algorithm<let_error_t, F>{

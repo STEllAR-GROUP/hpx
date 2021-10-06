@@ -29,7 +29,7 @@ namespace hpx { namespace execution { namespace experimental {
             hpx::is_execution_policy_v<ExPolicy>
         )>
     // clang-format on
-    constexpr decltype(auto) tag_dispatch(
+    constexpr decltype(auto) tag_invoke(
         hpx::execution::experimental::with_annotation_t, ExPolicy&& policy,
         char const* annotation)
     {
@@ -46,7 +46,7 @@ namespace hpx { namespace execution { namespace experimental {
             hpx::is_execution_policy_v<ExPolicy>
         )>
     // clang-format on
-    decltype(auto) tag_dispatch(hpx::execution::experimental::with_annotation_t,
+    decltype(auto) tag_invoke(hpx::execution::experimental::with_annotation_t,
         ExPolicy&& policy, std::string annotation)
     {
         auto exec = hpx::execution::experimental::with_annotation(
@@ -62,12 +62,12 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::functional::is_tag_dispatchable_v<
+            hpx::functional::is_tag_invocable_v<
                 hpx::execution::experimental::get_annotation_t,
                 typename std::decay_t<ExPolicy>::executor_type>
         )>
     // clang-format on
-    constexpr decltype(auto) tag_dispatch(
+    constexpr decltype(auto) tag_invoke(
         hpx::execution::experimental::get_annotation_t, ExPolicy&& policy)
     {
         return hpx::execution::experimental::get_annotation(policy.executor());

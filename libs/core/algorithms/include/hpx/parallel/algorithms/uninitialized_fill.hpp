@@ -171,7 +171,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
@@ -456,7 +456,7 @@ namespace hpx {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(hpx::uninitialized_fill_t,
+        friend void tag_fallback_invoke(hpx::uninitialized_fill_t,
             FwdIter first, FwdIter last, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -474,7 +474,7 @@ namespace hpx {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(hpx::uninitialized_fill_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::uninitialized_fill_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -504,7 +504,7 @@ namespace hpx {
                 std::is_integral<Size>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(hpx::uninitialized_fill_n_t,
+        friend FwdIter tag_fallback_invoke(hpx::uninitialized_fill_n_t,
             FwdIter first, Size count, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -530,7 +530,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::uninitialized_fill_n_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::uninitialized_fill_n_t, ExPolicy&& policy,
             FwdIter first, Size count, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,

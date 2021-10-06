@@ -457,7 +457,7 @@ namespace hpx { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                friend void tag_dispatch(hpx::execution::experimental::start_t,
+                friend void tag_invoke(hpx::execution::experimental::start_t,
                     operation_state& os) noexcept
                 {
                     HPX_ASSERT_MSG(os.state,
@@ -500,7 +500,7 @@ namespace hpx { namespace experimental {
             };
 
             template <typename R>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 hpx::execution::experimental::connect_t, sender&& s, R&& r)
             {
                 return operation_state<R>{std::forward<R>(r),
@@ -651,7 +651,7 @@ namespace hpx { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                friend void tag_dispatch(hpx::execution::experimental::start_t,
+                friend void tag_invoke(hpx::execution::experimental::start_t,
                     operation_state& os) noexcept
                 {
                     HPX_ASSERT_MSG(os.state,
@@ -693,7 +693,7 @@ namespace hpx { namespace experimental {
             };
 
             template <typename R>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 hpx::execution::experimental::connect_t, sender&& s, R&& r)
             {
                 return operation_state<R>{std::forward<R>(r),

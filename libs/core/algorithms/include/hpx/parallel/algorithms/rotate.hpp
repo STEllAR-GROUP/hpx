@@ -400,7 +400,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }
 }}}    // namespace hpx::parallel::v1
 
-// create new APIs, tag_fallback_dispatch overloads.
+// create new APIs, tag_fallback_invoke overloads.
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::rotate
@@ -413,7 +413,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             hpx::rotate_t, FwdIter first, FwdIter new_first, FwdIter last)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
@@ -433,7 +433,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::rotate_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(hpx::rotate_t, ExPolicy&& policy, FwdIter first,
             FwdIter new_first, FwdIter last)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
@@ -464,7 +464,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<OutIter>
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(hpx::rotate_copy_t, FwdIter first,
+        friend OutIter tag_fallback_invoke(hpx::rotate_copy_t, FwdIter first,
             FwdIter new_first, FwdIter last, OutIter dest_first)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
@@ -489,7 +489,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::rotate_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::rotate_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 new_first, FwdIter1 last,
             FwdIter2 dest_first)
         {

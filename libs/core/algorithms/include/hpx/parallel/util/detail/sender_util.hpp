@@ -81,7 +81,7 @@ namespace hpx { namespace detail {
 
     // Helper base class for implementing parallel algorithm DPOs. See
     // tag_fallback documentation for details. Compared to tag_fallback this
-    // adds two tag_fallback_dispatch overloads that are generic for all
+    // adds two tag_fallback_invoke overloads that are generic for all
     // parallel algorithms:
     //
     //   1. An overload taking a predecessor sender which sends all arguments
@@ -94,7 +94,7 @@ namespace hpx { namespace detail {
     //      predecessor can also be supplied  using the operator| overload:
     //      predecessor | partially_applied_parallel_algorithm.
     template <typename Tag>
-    struct tag_parallel_algorithm : hpx::functional::tag_fallback<Tag>
+    struct tag_parallel_algorithm : hpx::functional::detail::tag_fallback<Tag>
     {
         // clang-format off
         template <typename Predecessor, typename ExPolicy,
@@ -106,7 +106,7 @@ namespace hpx { namespace detail {
                         std::decay_t<Predecessor>>>
             )>
         // clang-format on
-        friend auto tag_fallback_dispatch(
+        friend auto tag_fallback_invoke(
             Tag, Predecessor&& predecessor, ExPolicy&& policy)
         {
             return detail::transform_with_bound_algorithm<Tag>(
@@ -116,7 +116,7 @@ namespace hpx { namespace detail {
 
         template <typename ExPolicy,
             HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value)>
-        friend auto tag_fallback_dispatch(Tag, ExPolicy&& policy)
+        friend auto tag_fallback_invoke(Tag, ExPolicy&& policy)
         {
             return hpx::execution::experimental::detail::partial_algorithm<Tag,
                 ExPolicy>{std::forward<ExPolicy>(policy)};

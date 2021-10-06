@@ -13,7 +13,7 @@
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
@@ -30,7 +30,7 @@ namespace hpx { namespace execution { namespace experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
             std::decay_t<Future> future;
 
-            friend void tag_dispatch(start_t, operation_state& os) noexcept
+            friend void tag_invoke(start_t, operation_state& os) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
@@ -99,7 +99,7 @@ namespace hpx { namespace execution { namespace experimental {
             keep_future_sender& operator=(keep_future_sender const&) = delete;
 
             template <typename Receiver>
-            friend operation_state<Receiver, future_type> tag_dispatch(
+            friend operation_state<Receiver, future_type> tag_invoke(
                 connect_t, keep_future_sender&& s, Receiver&& receiver)
             {
                 return {std::forward<Receiver>(receiver), std::move(s.future)};
@@ -128,14 +128,14 @@ namespace hpx { namespace execution { namespace experimental {
             keep_future_sender& operator=(keep_future_sender const&) = default;
 
             template <typename Receiver>
-            friend operation_state<Receiver, future_type> tag_dispatch(
+            friend operation_state<Receiver, future_type> tag_invoke(
                 connect_t, keep_future_sender&& s, Receiver&& receiver)
             {
                 return {std::forward<Receiver>(receiver), std::move(s.future)};
             }
 
             template <typename Receiver>
-            friend operation_state<Receiver, future_type> tag_dispatch(
+            friend operation_state<Receiver, future_type> tag_invoke(
                 connect_t, keep_future_sender& s, Receiver&& receiver)
             {
                 return {std::forward<Receiver>(receiver), s.future};

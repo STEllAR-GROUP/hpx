@@ -696,7 +696,7 @@ namespace hpx { namespace ranges {
                     parallel::traits::projected<Proj, FwdIter>>::value
             )>
         // clang-format on
-        friend subrange_t<FwdIter, Sent> tag_fallback_dispatch(
+        friend subrange_t<FwdIter, Sent> tag_fallback_invoke(
             hpx::ranges::unique_t, FwdIter first, Sent last,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
@@ -727,7 +727,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             subrange_t<FwdIter, Sent>>::type
-        tag_fallback_dispatch(hpx::ranges::unique_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::unique_t, ExPolicy&& policy,
             FwdIter first, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
@@ -756,7 +756,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend subrange_t<hpx::traits::range_iterator_t<Rng>,
             hpx::traits::range_iterator_t<Rng>>
-        tag_fallback_dispatch(hpx::ranges::unique_t, Rng&& rng,
+        tag_fallback_invoke(hpx::ranges::unique_t, Rng&& rng,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
@@ -792,8 +792,8 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             subrange_t<hpx::traits::range_iterator_t<Rng>,
                 hpx::traits::range_iterator_t<Rng>>>::type
-        tag_fallback_dispatch(hpx::ranges::unique_t, ExPolicy&& policy,
-            Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj())
+        tag_fallback_invoke(hpx::ranges::unique_t, ExPolicy&& policy, Rng&& rng,
+            Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
@@ -835,7 +835,7 @@ namespace hpx { namespace ranges {
                     parallel::traits::projected<Proj, InIter>>::value
             )>
         // clang-format on
-        friend unique_copy_result<InIter, O> tag_fallback_dispatch(
+        friend unique_copy_result<InIter, O> tag_fallback_invoke(
             hpx::ranges::unique_copy_t, InIter first, Sent last, O dest,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
@@ -867,7 +867,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             unique_copy_result<FwdIter, O>>::type
-        tag_fallback_dispatch(hpx::ranges::unique_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::unique_copy_t, ExPolicy&& policy,
             FwdIter first, Sent last, O dest, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
@@ -895,7 +895,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend unique_copy_result<hpx::traits::range_iterator_t<Rng>, O>
-        tag_fallback_dispatch(hpx::ranges::unique_copy_t, Rng&& rng, O dest,
+        tag_fallback_invoke(hpx::ranges::unique_copy_t, Rng&& rng, O dest,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
@@ -926,7 +926,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             unique_copy_result<hpx::traits::range_iterator_t<Rng>, O>>::type
-        tag_fallback_dispatch(hpx::ranges::unique_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::unique_copy_t, ExPolicy&& policy,
             Rng&& rng, O dest, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;

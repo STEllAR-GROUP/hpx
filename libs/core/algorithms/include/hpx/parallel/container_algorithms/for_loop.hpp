@@ -746,7 +746,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(hpx::ranges::for_loop_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::for_loop_t, ExPolicy&& policy,
             Iter first, Sent last, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
@@ -766,7 +766,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(
+        friend void tag_fallback_invoke(
             hpx::ranges::for_loop_t, Iter first, Sent last, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
@@ -786,7 +786,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::ranges::for_loop_t, ExPolicy&& policy, R&& rng, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
@@ -806,7 +806,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(
+        friend void tag_fallback_invoke(
             hpx::ranges::for_loop_t, Rng&& rng, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
@@ -835,8 +835,8 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(hpx::ranges::for_loop_strided_t,
-            ExPolicy&& policy, Iter first, Sent last, S stride, Args&&... args)
+        tag_fallback_invoke(hpx::ranges::for_loop_strided_t, ExPolicy&& policy,
+            Iter first, Sent last, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_strided must be called with at least a function "
@@ -857,7 +857,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(hpx::ranges::for_loop_strided_t,
+        friend void tag_fallback_invoke(hpx::ranges::for_loop_strided_t,
             Iter first, Sent last, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
@@ -880,8 +880,8 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(hpx::ranges::for_loop_strided_t,
-            ExPolicy&& policy, Rng&& rng, S stride, Args&&... args)
+        tag_fallback_invoke(hpx::ranges::for_loop_strided_t, ExPolicy&& policy,
+            Rng&& rng, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_strided must be called with at least a function "
@@ -902,7 +902,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(hpx::ranges::for_loop_strided_t,
+        friend void tag_fallback_invoke(hpx::ranges::for_loop_strided_t,
             Rng&& rng, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,

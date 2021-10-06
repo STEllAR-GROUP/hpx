@@ -503,9 +503,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend RandIter tag_fallback_dispatch(hpx::partial_sort_t,
-            RandIter first, RandIter middle, RandIter last,
-            Comp&& comp = Comp())
+        friend RandIter tag_fallback_invoke(hpx::partial_sort_t, RandIter first,
+            RandIter middle, RandIter last, Comp&& comp = Comp())
         {
             static_assert(
                 hpx::traits::is_random_access_iterator<RandIter>::value,
@@ -531,7 +530,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             RandIter>::type
-        tag_fallback_dispatch(hpx::partial_sort_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::partial_sort_t, ExPolicy&& policy,
             RandIter first, RandIter middle, RandIter last,
             Comp&& comp = Comp())
         {

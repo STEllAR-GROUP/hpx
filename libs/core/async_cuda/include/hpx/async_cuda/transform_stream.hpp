@@ -13,7 +13,7 @@
 #include <hpx/execution/algorithms/transform.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <exception>
@@ -144,14 +144,14 @@ namespace hpx { namespace cuda { namespace experimental {
             }
 
             template <typename E>
-            friend void tag_dispatch(hpx::execution::experimental::set_error_t,
+            friend void tag_invoke(hpx::execution::experimental::set_error_t,
                 transform_stream_receiver&& r, E&& e) noexcept
             {
                 hpx::execution::experimental::set_error(
                     std::move(r.r), std::forward<E>(e));
             }
 
-            friend void tag_dispatch(hpx::execution::experimental::set_done_t,
+            friend void tag_invoke(hpx::execution::experimental::set_done_t,
                 transform_stream_receiver&& r) noexcept
             {
                 hpx::execution::experimental::set_done(std::move(r.r));
@@ -290,7 +290,7 @@ namespace hpx { namespace cuda { namespace experimental {
             static constexpr bool sends_done = false;
 
             template <typename R>
-            friend auto tag_dispatch(hpx::execution::experimental::connect_t,
+            friend auto tag_invoke(hpx::execution::experimental::connect_t,
                 transform_stream_sender&& s, R&& r)
             {
                 return hpx::execution::experimental::connect(std::move(s.s),
@@ -304,7 +304,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // ("error: no instance of overloaded function std::forward matches the
         // argument list").
         template <typename R, typename F, typename... Ts>
-        void tag_dispatch(hpx::execution::experimental::set_value_t,
+        void tag_invoke(hpx::execution::experimental::set_value_t,
             transform_stream_receiver<R, F>&& r, Ts&&... ts)
         {
             r.set_value(std::forward<Ts>(ts)...);
@@ -317,13 +317,13 @@ namespace hpx { namespace cuda { namespace experimental {
     // - values from the predecessor sender are not forwarded, only passed by
     //   reference, to the call to f to keep them alive until the event is ready
     HPX_INLINE_CONSTEXPR_VARIABLE struct transform_stream_t final
-      : hpx::functional::tag_fallback<transform_stream_t>
+      : hpx::functional::detail::tag_fallback<transform_stream_t>
     {
     private:
         template <typename S, typename F,
             typename = std::enable_if_t<
                 !std::is_same<std::decay_t<F>, cudaStream_t>::value>>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             transform_stream_t, S&& s, F&& f, cudaStream_t stream = {})
         {
             return detail::transform_stream_sender<S, F>{
@@ -331,7 +331,7 @@ namespace hpx { namespace cuda { namespace experimental {
         }
 
         template <typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             transform_stream_t, F&& f, cudaStream_t stream = {})
         {
             return hpx::execution::experimental::detail::partial_algorithm<

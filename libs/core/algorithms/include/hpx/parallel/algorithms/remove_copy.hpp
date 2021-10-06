@@ -467,8 +467,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(hpx::remove_copy_if_t,
-            InIter first, InIter last, OutIter dest, Pred&& pred)
+        friend OutIter tag_fallback_invoke(hpx::remove_copy_if_t, InIter first,
+            InIter last, OutIter dest, Pred&& pred)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
                 "Required input iterator.");
@@ -498,7 +498,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::remove_copy_if_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::remove_copy_if_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred&& pred)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -530,7 +530,7 @@ namespace hpx {
                 hpx::traits::is_iterator<OutIter>::value
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(hpx::remove_copy_t, InIter first,
+        friend OutIter tag_fallback_invoke(hpx::remove_copy_t, InIter first,
             InIter last, OutIter dest, T const& value)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
@@ -555,7 +555,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::remove_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::remove_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
