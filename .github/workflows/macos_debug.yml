@@ -72,3 +72,6 @@ jobs:
           tests.unit.modules.segmented_algorithms.distributed.tcp.partitioned_vector|\
           tests.unit.threads.distributed.tcp.thread_stacksize|\
           tests.unit.topology.numa_allocator"
+    - name: setup_debugging_session_on_failure
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
