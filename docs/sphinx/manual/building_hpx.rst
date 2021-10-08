@@ -121,16 +121,16 @@ Getting |hpx|
 Download a tarball of the latest release from |stellar_hpx_download|_ and
 unpack it or clone the repository directly using ``git``:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-    git clone https://github.com/STEllAR-GROUP/hpx.git
+    $ git clone https://github.com/STEllAR-GROUP/hpx.git
 
 It is also recommended that you check out the latest stable tag:
 
-.. code-block:: sh
+.. code-block:: shell-session
     
-    cd hpx
-    git checkout 1.7.1 
+    $ cd hpx
+    $ git checkout 1.7.1
 
 .. _building_hpx:
 
@@ -231,17 +231,17 @@ known to |cmake|, the following gets you started:
 
 #. First, set up a separate build directory to configure the project:
 
-   .. code-block:: sh
+   .. code-block:: shell-session
 
-      mkdir build && cd build
+      $ mkdir build && cd build
 
 #. To configure the project you have the following options:
 
    * To build the core |hpx| libraries and examples, and install them to your chosen location (recommended):
 
-    .. code-block:: sh
+    .. code-block:: shell-session
 
-        cmake -DCMAKE_INSTALL_PREFIX=/install/path ..
+        $ cmake -DCMAKE_INSTALL_PREFIX=/install/path ..
 
     .. tip::
 
@@ -252,15 +252,15 @@ known to |cmake|, the following gets you started:
 
    * To install |hpx| to the default system folders, simply leave out the ``CMAKE_INSTALL_PREFIX`` option:
 
-    .. code-block:: sh
+    .. code-block:: shell-session
 
-        cmake ..
+        $ cmake ..
 
    * If your dependencies are in custom locations, you may need to tell |cmake| where to find them by passing one or more options to |cmake| as shown below:
 
-    .. code-block:: sh
+    .. code-block:: shell-session
 
-        cmake -DBOOST_ROOT=/path/to/boost
+        $ cmake -DBOOST_ROOT=/path/to/boost
               -DHWLOC_ROOT=/path/to/hwloc
               -DTCMALLOC_ROOT=/path/to/tcmalloc
               -DJEMALLOC_ROOT=/path/to/jemalloc
@@ -269,15 +269,15 @@ known to |cmake|, the following gets you started:
 
     For instance:
 
-    .. code-block:: bash
+    .. code-block:: shell-session
 
-        cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_1.5.1
+        $ cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_1.5.1
 
    * If you want to try |hpx| without using a custom allocator pass ``-DHPX_WITH_MALLOC=system`` to |cmake|:
 
-    .. code-block:: sh 
+    .. code-block:: shell-session
 
-        cmake -DCMAKE_INSTALL_PREFIX=/install/path -DHPX_WITH_MALLOC=system ..
+        $ cmake -DCMAKE_INSTALL_PREFIX=/install/path -DHPX_WITH_MALLOC=system ..
 
     .. note::
        Please pay special attention to the section about :option:`HPX_WITH_MALLOC:STRING` as this is crucial for getting decent performance.
@@ -295,9 +295,9 @@ known to |cmake|, the following gets you started:
 
 #. Once the configuration is complete, to build the project you run:
 
-  .. code-block:: sh
+  .. code-block:: shell-session
 
-      cmake --build . --target install
+      $ cmake --build . --target install
 
 .. _windows_installation:
 
@@ -429,47 +429,47 @@ Running tests
 
 To build the tests:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-    cmake --build . --target tests
+    $ cmake --build . --target tests
 
 To control which tests to run use ``ctest``:
 
 * To run single tests, for example a test for ``for_loop``:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-    ctest --output-on-failure -R tests.unit.modules.algorithms.for_loop
+    $ ctest --output-on-failure -R tests.unit.modules.algorithms.for_loop
 
 * To run a whole group of tests:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-    ctest --output-on-failure -R tests.unit
+    $ ctest --output-on-failure -R tests.unit
 
 Running examples
 ................
 
 * To build (and install) all examples invoke:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   cmake -DHPX_WITH_EXAMPLES=On .
-   make examples
-   make install
+   $ cmake -DHPX_WITH_EXAMPLES=On .
+   $ make examples
+   $ make install
 
 * To build the ``hello_world_1`` example run:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-   make hello_world_1
+   $ make hello_world_1
 
 |hpx| executables end up in the ``bin`` directory in your build directory. You
 can now run ``hello_world_1`` and should see the following output:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-   ./bin/hello_world_1
+   $ ./bin/hello_world_1
    Hello World!
 
 You've just run an example which prints ``Hello World!`` from the |hpx| runtime.

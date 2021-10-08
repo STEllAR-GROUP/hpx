@@ -84,15 +84,15 @@ stacktrace.
 To debug with core files, the operating system first has to be told to actually
 write them. On most Unix systems this can be done by calling:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ulimit -c unlimited
+   $ ulimit -c unlimited
 
 in the shell. Now the debugger can be started up with:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   gdb <application> <core file name>
+   $ gdb <application> <core file name>
 
 The debugger should now display the last state of the application. The default
 file name for core files is ``core``.

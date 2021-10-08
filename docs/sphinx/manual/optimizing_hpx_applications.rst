@@ -352,9 +352,9 @@ of the data exposed by this counter.
 Requesting the counter data for one or more performance counters can be achieved
 by invoking ``hello_world_distributed`` with a list of counter names:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
        --hpx:print-counter=/threads{locality#0/total}/count/cumulative \
        --hpx:print-counter=/agas{locality#0/total}/count/bind
 
@@ -391,9 +391,9 @@ counters returning an array of values, like for instance a histogram).
 Requesting to query the counter data once after a constant time interval with
 this command line:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
        --hpx:print-counter=/threads{locality#0/total}/count/cumulative \
        --hpx:print-counter=/agas{locality#0/total}/count/bind \
        --hpx:print-counter-interval=20
@@ -422,9 +422,9 @@ environment for the executed program. For instance, if your program is utilizing
 four worker threads for the execution of |hpx| threads (see command line option
 :option:`--hpx:threads`) the following command line
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
        --hpx:threads=4 \
        --hpx:print-counter=/threads{locality#0/worker-thread#*}/count/cumulative
 
@@ -447,9 +447,9 @@ The command ``--hpx:print-counter-format`` takes values ``csv`` and
 
 With format as csv:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
        --hpx:threads=2 \
        --hpx:print-counter-format csv \
        --hpx:print-counter /threads{locality#*/total}/count/cumulative \
@@ -467,9 +467,9 @@ countername as a header:
 
 With format csv-short:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
        --hpx:threads 2 \
        --hpx:print-counter-format csv-short \
        --hpx:print-counter cumulative,/threads{locality#*/total}/count/cumulative \
@@ -487,9 +487,9 @@ as a header:
 
 With format csv and csv-short when used with ``--hpx:print-counter-interval``:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
        --hpx:threads 2 \
        --hpx:print-counter-format csv-short \
        --hpx:print-counter cumulative,/threads{locality#*/total}/count/cumulative \
@@ -510,9 +510,9 @@ The command ``--hpx:no-csv-header`` can be used with
 ``--hpx:print-counter-format`` to print performance counter values in CSV format
 without any header:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
    --hpx:threads 2 \
    --hpx:print-counter-format csv-short \
    --hpx:print-counter cumulative,/threads{locality#*/total}/count/cumulative \
@@ -2615,9 +2615,9 @@ system and application performance.
    counters. For this reason those have to be specified as parameters (a comma
    separated list of counters appended after a ``'@'``). For instance:
 
-   .. code-block:: bash
+   .. code-block:: shell-session
 
-      ./bin/hello_world_distributed -t2 \
+      $ ./bin/hello_world_distributed -t2 \
           --hpx:print-counter=/threads{locality#0/worker-thread#*}/count/cumulative \
           --hpx:print-counter=/arithmetics/add@/threads{locality#0/worker-thread#*}/count/cumulative
       hello world from OS-thread 0 on locality 0
@@ -2629,9 +2629,9 @@ system and application performance.
    Since all wildcards in the parameters are expanded, this example is fully
    equivalent to specifying both counters separately to ``/arithmetics/add``:
 
-   .. code-block:: bash
+   .. code-block:: shell-session
 
-      ./bin/hello_world_distributed -t2 \
+      $ ./bin/hello_world_distributed -t2 \
           --hpx:print-counter=/threads{locality#0/worker-thread#*}/count/cumulative \
           --hpx:print-counter=/arithmetics/add@\
               /threads{locality#0/worker-thread#0}/count/cumulative,\

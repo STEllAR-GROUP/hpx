@@ -23,25 +23,25 @@ The easiest way to install |hpx| on your system is by choosing one of the steps 
 
    You can download and install |hpx| using the `vcpkg <https://github.com/Microsoft/vcpkg>`_ dependency manager:
 
-   .. code-block:: sh
+   .. code-block:: shell-session
 
-      vcpkg install hpx
+      $ vcpkg install hpx
 
 #. **Spack**
 
    Another way to install |hpx| is using `Spack <https://spack.readthedocs.io/en/latest/>`_:
 
-   .. code-block:: sh
+   .. code-block:: shell-session
 
-      spack install hpx
+      $ spack install hpx
 
 #. **Fedora**
 
    Installation can be done with `Fedora <https://fedoraproject.org/wiki/DNF>`_ as well:
 
-   .. code-block:: sh
+   .. code-block:: shell-session
 
-      dnf install hpx*
+      $ dnf install hpx*
 
 #. **Arch Linux**
 
@@ -90,12 +90,12 @@ Also create a ``main.cpp`` with the contents below.
 
 Then, in your project directory run the following:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-   mkdir build && cd build
-   cmake -DCMAKE_PREFIX_PATH=/path/to/hpx/installation ..
-   make all
-   ./my_hpx_program
+   $ mkdir build && cd build
+   $ cmake -DCMAKE_PREFIX_PATH=/path/to/hpx/installation ..
+   $ make all
+   $ ./my_hpx_program
 
 The program looks almost like a regular C++ hello world with the exception of
 the two includes and ``hpx::cout``. When you include ``hpx_main.hpp`` some
@@ -107,9 +107,9 @@ runtime with lightweight threads. ``hpx::cout`` is a replacement for
 read more about ``hpx::cout`` in :ref:`iostreams`. If you rebuild and run your
 program now, you should see the familiar ``Hello World!``:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-    ./my_hpx_program
+    $ ./my_hpx_program
     Hello World!
 
 .. note::
