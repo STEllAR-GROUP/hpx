@@ -34,6 +34,8 @@ namespace hpx { namespace execution {
     /// Default sequential execution policy object.
     HPX_INLINE_CONSTEXPR_VARIABLE task_policy_tag task{};
 
+    HPX_INLINE_CONSTEXPR_VARIABLE non_task_policy_tag non_task{};
+
     namespace detail {
         template <typename T, typename Enable = void>
         struct has_async_execution_policy : std::false_type
@@ -102,6 +104,13 @@ namespace hpx { namespace execution {
         {
             return *this;
         }
+
+        /// Create a corresponding non task policy for this task policy
+        ///
+        /// \returns The non task seqeuential policy
+        ///
+        inline constexpr decltype(auto) operator()(
+            non_task_policy_tag /*tag*/) const;
 
         /// Create a new sequenced_task_policy from the given
         /// executor
@@ -239,6 +248,13 @@ namespace hpx { namespace execution {
         {
             return *this;
         }
+
+        /// Create a corresponding non task policy for this task policy
+        ///
+        /// \returns The non task seqeuential shim policy
+        ///
+        inline constexpr decltype(auto) operator()(
+            non_task_policy_tag /*tag*/) const;
 
         /// Create a new sequenced_task_policy from the given
         /// executor
@@ -396,6 +412,15 @@ namespace hpx { namespace execution {
             return sequenced_task_policy();
         }
 
+        /// Create a new sequenced_policy from itself.
+        ///
+        /// \returns The new sequenced_policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
         /// Create a new sequenced_policy from the given
         /// executor
         ///
@@ -529,6 +554,15 @@ namespace hpx { namespace execution {
         {
             return sequenced_task_policy_shim<Executor, Parameters>(
                 exec_, params_);
+        }
+
+        /// Create a new sequenced_policy from itself.
+        ///
+        /// \returns The new sequenced_policy_shim
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
         }
 
         /// Create a new sequenced_policy from the given
@@ -690,6 +724,16 @@ namespace hpx { namespace execution {
             return *this;
         }
 
+        /// Create a new non task parallel policy from itself
+        ///
+        /// \param tag          [in] Specify that the corresponding
+        ///                     execution policy should be used
+        ///
+        /// \returns The new non task parallel_policy
+        ///
+        inline constexpr decltype(auto) operator()(
+            non_task_policy_tag /*tag*/) const;
+
         /// Create a new parallel_task_policy from given executor
         ///
         /// \tparam Executor    The type of the executor to associate with this
@@ -821,6 +865,16 @@ namespace hpx { namespace execution {
         {
             return *this;
         }
+
+        /// Create a new non task parallel policy from itself
+        ///
+        /// \param tag          [in] Specify that the corresponding
+        ///                     execution policy should be used
+        ///
+        /// \returns The new non task parallel_policy_shim
+        ///
+        inline constexpr decltype(auto) operator()(
+            non_task_policy_tag /*tag*/) const;
 
         /// Create a new parallel_task_policy from the given
         /// executor
@@ -978,6 +1032,18 @@ namespace hpx { namespace execution {
             return parallel_task_policy();
         }
 
+        /// Create a new parallel_policy from itself
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        ///
+        /// \returns The new parallel_policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
         /// Create a new parallel_policy referencing an executor and
         /// a chunk size.
         ///
@@ -1105,6 +1171,18 @@ namespace hpx { namespace execution {
         {
             return parallel_task_policy_shim<Executor, Parameters>(
                 exec_, params_);
+        }
+
+        /// Create a new parallel_policy from itself
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        ///
+        /// \returns The new parallel_policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
         }
 
         /// Create a new parallel_policy from the given
@@ -1240,6 +1318,15 @@ namespace hpx { namespace execution {
         constexpr parallel_unsequenced_policy() = default;
         /// \endcond
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task parallel unsequenced policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
     public:
         /// Return the associated executor object.
         executor_type& executor()
@@ -1303,6 +1390,15 @@ namespace hpx { namespace execution {
         constexpr unsequenced_policy() = default;
         /// \endcond
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task unsequenced policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
     public:
         /// Return the associated executor object.
         executor_type& executor()
@@ -1342,6 +1438,39 @@ namespace hpx { namespace execution {
 
     /// Default vector execution policy object.
     HPX_INLINE_CONSTEXPR_VARIABLE unsequenced_policy unseq{};
+
+    constexpr decltype(auto) sequenced_task_policy::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return seq.on(executor()).with(parameters());
+    }
+
+    constexpr decltype(auto) parallel_task_policy::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return par.on(executor()).with(parameters());
+    }
+
+    template <typename Executor, typename Parameters>
+    constexpr decltype(auto)
+        sequenced_task_policy_shim<Executor, Parameters>::operator()(
+            non_task_policy_tag /*tag*/) const
+    {
+        return sequenced_policy_shim<Executor, Parameters>{}
+            .on(executor())
+            .with(parameters());
+    }
+
+    template <typename Executor, typename Parameters>
+    constexpr decltype(auto)
+        parallel_task_policy_shim<Executor, Parameters>::operator()(
+            non_task_policy_tag /*tag*/) const
+    {
+        return parallel_policy_shim<Executor, Parameters>{}
+            .on(executor())
+            .with(parameters());
+    }
+
 }}    // namespace hpx::execution
 
 namespace hpx { namespace parallel { namespace execution {
@@ -1623,18 +1752,5 @@ namespace hpx { namespace detail {
     {
     };
 
-    template <typename ExPolicy>
-    constexpr decltype(auto) async_to_sync_policy(ExPolicy&& policy)
-    {
-        if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
-        {
-            return hpx::execution::par.on(policy.executor())
-                .with(policy.parameters());
-        }
-        else
-        {
-            return std::forward<ExPolicy>(policy);
-        }
-    }
     /// \endcond
 }}    // namespace hpx::detail

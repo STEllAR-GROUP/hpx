@@ -9,7 +9,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //-----------------------------------------------------------------------------
 #include <hpx/assert.hpp>
-#include <hpx/hpx.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
@@ -19,8 +18,10 @@
 #include <hpx/parallel/algorithms/nth_element.hpp>
 #include <algorithm>
 #include <iostream>
+#include <random>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 #include <time.h>
 #include <vector>
 

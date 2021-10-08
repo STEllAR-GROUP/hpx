@@ -145,6 +145,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -299,9 +300,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         partitionIter =
                             hpx::parallel::v1::detail::partition<RandomIt>()
                                 .call(
-                                    hpx::detail::async_to_sync_policy<ExPolicy>(
-                                        policy),
-                                    first + 1, last_iter,
+                                    policy(hpx::execution::non_task), first + 1,
+                                    last_iter,
                                     [val = HPX_INVOKE(proj, *first), &pred](
                                         value_type const& elem) {
                                         return HPX_INVOKE(pred, elem, val);

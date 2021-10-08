@@ -73,6 +73,12 @@ namespace hpx { namespace execution { inline namespace v1 {
             return *this;
         }
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task simd policy
+        ///
+        inline decltype(auto) operator()(non_task_policy_tag /*tag*/) const;
+
         /// Create a new simd_task_policy from the given
         /// executor
         ///
@@ -213,6 +219,12 @@ namespace hpx { namespace execution { inline namespace v1 {
         {
             return *this;
         }
+
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task simd_policy_shim
+        ///
+        inline decltype(auto) operator()(non_task_policy_tag /*tag*/) const;
 
         /// Create a new simd_task_policy_shim from the given
         /// executor
@@ -365,6 +377,15 @@ namespace hpx { namespace execution { inline namespace v1 {
             return simd_task_policy();
         }
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task simd policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
         /// Create a new simd_policy from the given
         /// executor
         ///
@@ -500,6 +521,15 @@ namespace hpx { namespace execution { inline namespace v1 {
             task_policy_tag) const
         {
             return simd_task_policy_shim<Executor, Parameters>(exec_, params_);
+        }
+
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task simd_policy_shim
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
         }
 
         /// Create a new simd_policy from the given
@@ -657,6 +687,12 @@ namespace hpx { namespace execution { inline namespace v1 {
             return *this;
         }
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task par_simd policy
+        ///
+        inline decltype(auto) operator()(non_task_policy_tag /*tag*/) const;
+
         /// Create a new par_simd_task_policy from given executor
         ///
         /// \tparam Executor    The type of the executor to associate with this
@@ -794,6 +830,15 @@ namespace hpx { namespace execution { inline namespace v1 {
             return par_simd_task_policy();
         }
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task par_simd policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
         /// Create a new par_simd_policy referencing an executor and
         /// a chunk size.
         ///
@@ -925,6 +970,15 @@ namespace hpx { namespace execution { inline namespace v1 {
         {
             return par_simd_task_policy_shim<Executor, Parameters>(
                 exec_, params_);
+        }
+
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task par_simd policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
         }
 
         /// Create a new par_simd_task_policy_shim from the given
@@ -1075,6 +1129,12 @@ namespace hpx { namespace execution { inline namespace v1 {
             return *this;
         }
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task par_simd policy
+        ///
+        inline decltype(auto) operator()(non_task_policy_tag /*tag*/) const;
+
         /// Create a new parallel_task_policy from the given
         /// executor
         ///
@@ -1182,6 +1242,36 @@ namespace hpx { namespace execution { inline namespace v1 {
         Parameters params_;
         /// \endcond
     };
+
+    decltype(auto) simd_task_policy::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return simd.on(executor()).with(parameters());
+    }
+
+    decltype(auto) par_simd_task_policy::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return par_simd.on(executor()).with(parameters());
+    }
+
+    template <typename Executor, typename Parameters>
+    decltype(auto) simd_task_policy_shim<Executor, Parameters>::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return simd_policy_shim<Executor, Parameters>{}
+            .on(executor())
+            .with(parameters());
+    }
+
+    template <typename Executor, typename Parameters>
+    decltype(auto) par_simd_task_policy_shim<Executor, Parameters>::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return par_simd_policy_shim<Executor, Parameters>{}
+            .on(executor())
+            .with(parameters());
+    }
 }}}    // namespace hpx::execution::v1
 
 namespace hpx { namespace detail {
