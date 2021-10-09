@@ -322,8 +322,7 @@ namespace hpx { namespace ranges {
             RandomIt first, RandomIt nth, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RandomIt>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires at least random access iterator.");
 
             return hpx::parallel::v1::detail::nth_element<RandomIt>().call(
@@ -352,8 +351,7 @@ namespace hpx { namespace ranges {
             RandomIt first, RandomIt nth, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RandomIt>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires at least random access iterator.");
 
             return hpx::parallel::v1::detail::nth_element<RandomIt>().call(
@@ -366,8 +364,8 @@ namespace hpx { namespace ranges {
             typename Pred = hpx::parallel::v1::detail::less,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
+                hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
@@ -383,7 +381,7 @@ namespace hpx { namespace ranges {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Requires at least random access iterator.");
 
             return hpx::parallel::v1::detail::nth_element<iterator_type>().call(
@@ -396,14 +394,14 @@ namespace hpx { namespace ranges {
             typename Pred = hpx::parallel::v1::detail::less,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_range<Rng>::value &&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_range_v<Rng> &&
+                hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
-                >::value
+                >
             )>
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -415,7 +413,7 @@ namespace hpx { namespace ranges {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Requires at least random access iterator.");
 
             return hpx::parallel::v1::detail::nth_element<iterator_type>().call(

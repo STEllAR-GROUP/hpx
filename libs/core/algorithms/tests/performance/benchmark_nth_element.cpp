@@ -106,7 +106,7 @@ void function02(void)
         ac1 += nanotime1.count();
         std::cout << "hpx::parallel::nth_element :"
                   << (nanotime1.count() / 1000000) << " msec";
-        assert(B[i] == i);
+        HPX_ASSERT(B[i] == i);
 
         B = A;
         start = std::chrono::high_resolution_clock::now();
@@ -116,7 +116,7 @@ void function02(void)
         ac2 += nanotime2.count();
         std::cout << "  \tstd::nth_element       :"
                   << (nanotime2.count() / 1000000) << " msec\n";
-        assert(B[i] == i);
+        HPX_ASSERT(B[i] == i);
     }
     std::cout << "\n\n";
     std::cout << "Accumulated (msec) hpx::parallel::nth_element "

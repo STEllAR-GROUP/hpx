@@ -141,6 +141,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/minmax.hpp>
 #include <hpx/parallel/algorithms/partial_sort.hpp>
 #include <hpx/parallel/algorithms/partition.hpp>
+#include <hpx/parallel/algorithms/detail/pivot.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <algorithm>
@@ -256,8 +257,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename RandomIt, typename Sent,
                 typename Pred, typename Proj>
-            static typename util::detail::algorithm_result<ExPolicy,
-                RandomIt>::type
+            static util::detail::algorithm_result_t<ExPolicy, RandomIt>
             parallel(ExPolicy&& policy, RandomIt first, RandomIt nth, Sent last,
                 Pred&& pred, Proj&& proj)
             {
@@ -286,16 +286,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     while (first != last_iter)
                     {
-                        auto n = detail::distance(first, last_iter);
-
-                        // get random pivot index
-                        auto pivotIndex = std::rand() % n;
-                        // swap first and pivot element
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
-                        std::ranges::iter_swap(first, first + pivotIndex);
-#else
-                        std::iter_swap(first, first + pivotIndex);
-#endif
+                        detail::pivot9(first, last_iter, pred);
 
                         partitionIter =
                             hpx::parallel::v1::detail::partition<RandomIt>()
@@ -370,8 +361,7 @@ namespace hpx {
         friend void tag_fallback_dispatch(hpx::nth_element_t, RandomIt first,
             RandomIt nth, RandomIt last, Pred&& pred = Pred())
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RandomIt>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires at least random iterator.");
 
             hpx::parallel::v1::detail::nth_element<RandomIt>().call(
@@ -383,7 +373,7 @@ namespace hpx {
         template <typename ExPolicy, typename RandomIt,
             typename Pred = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<RandomIt>::value_type,
@@ -395,13 +385,11 @@ namespace hpx {
         tag_fallback_dispatch(hpx::nth_element_t, ExPolicy&& policy,
             RandomIt first, RandomIt nth, RandomIt last, Pred&& pred = Pred())
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RandomIt>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires at least random iterator.");
 
             using result_type =
-                typename hpx::parallel::util::detail::algorithm_result<
-                    ExPolicy>::type;
+                hpx::parallel::util::detail::algorithm_result_t<ExPolicy>;
 
             return hpx::util::void_guard<result_type>(),
                    hpx::parallel::v1::detail::nth_element<RandomIt>().call(
