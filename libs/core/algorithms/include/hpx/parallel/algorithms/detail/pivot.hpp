@@ -14,6 +14,7 @@
 #include <hpx/functional/invoke.hpp>
 
 #include <algorithm>
+#include <cstddef>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     /// Return the iterator to the mid value of the three values
