@@ -31,6 +31,8 @@
 #include <hpx/parallel/container_algorithms/mismatch.hpp>
 #include <hpx/parallel/container_algorithms/move.hpp>
 #include <hpx/parallel/container_algorithms/nth_element.hpp>
+#include <hpx/parallel/container_algorithms/partial_sort.hpp>
+#include <hpx/parallel/container_algorithms/partial_sort_copy.hpp>
 #include <hpx/parallel/container_algorithms/partition.hpp>
 #include <hpx/parallel/container_algorithms/reduce.hpp>
 #include <hpx/parallel/container_algorithms/remove.hpp>

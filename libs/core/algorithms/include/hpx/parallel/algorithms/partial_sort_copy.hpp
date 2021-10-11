@@ -25,15 +25,16 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     ///////////////////////////////////////////////////////////////////////
     // partial_sort_copy
-    template <typename RandIter>
+    template <typename Iter>
     struct partial_sort_copy
-      : public detail::algorithm<partial_sort_copy<RandIter>, RandIter>
+      : public detail::algorithm<partial_sort_copy<Iter>, Iter>
     {
         partial_sort_copy()
           : partial_sort_copy::algorithm("partial_sort_copy")
@@ -60,10 +61,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         /// \return iterator after the last element sorted
         ///
         template <typename ExPolicy, typename InIter, typename Sent,
-            typename Compare, typename Proj1, typename Proj2>
-        static RandIter sequential(ExPolicy, InIter first, Sent last,
-            RandIter d_first, RandIter d_last, Compare&& comp, Proj1&& proj1,
-            Proj2&& proj2)
+            typename RandIter, typename Compare, typename Proj1, typename Proj2>
+        static util::in_out_result<InIter, RandIter> sequential(ExPolicy,
+            InIter first, Sent last, RandIter d_first, RandIter d_last,
+            Compare&& comp, Proj1&& proj1, Proj2&& proj2)
         {
             auto last_iter = detail::advance_to_sentinel(first, last);
 
@@ -76,7 +77,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 std::is_same_v<value1_t, value_t>, "Incompatible iterators\n");
 
             if ((last_iter == first) || (d_last == d_first))
-                return d_first;
+                return util::in_out_result<InIter, RandIter>{
+                    last_iter, d_first};
 
             std::vector<value_t> aux(first, last_iter);
             std::int64_t noutput = d_last - d_first;
@@ -101,7 +103,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
             detail::copy<util::in_out_result<vec_iter_t, RandIter>>().call(
                 hpx::execution::seq, aux.begin(), aux.begin() + nmin, d_first);
-            return d_first + nmin;
+            return util::in_out_result<InIter, RandIter>{
+                last_iter, d_first + nmin};
         }
 
         //////////////////////////////////////////////////////////////////////////
@@ -124,9 +127,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         /// \return iterator after the last element sorted
         ///
         template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename Compare, typename Proj1, typename Proj2>
-        static util::detail::algorithm_result_t<ExPolicy, RandIter> parallel(
-            ExPolicy&& policy, FwdIter first, Sent last, RandIter d_first,
+            typename RandIter, typename Compare, typename Proj1, typename Proj2>
+        static util::detail::algorithm_result_t<ExPolicy,
+            util::in_out_result<FwdIter, RandIter>>
+        parallel(ExPolicy&& policy, FwdIter first, Sent last, RandIter d_first,
             RandIter d_last, Compare&& comp, Proj1&& proj1, Proj2&& proj2)
         {
             using result_type =
@@ -169,7 +173,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                     std::forwrad<ExPolicy>(policy), aux.begin(),
                     aux.begin() + nmin, d_first);
 
-                return result_type::get(d_first + nmin);
+                return result_type::get(util::in_out_result<InIter, RandIter>{
+                    last_iter, d_first + nmin});
             }
             catch (...)
             {
@@ -192,8 +197,8 @@ namespace hpx {
         template <typename InIter, typename RandIter,
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<InIter>::value &&
-                hpx::traits::is_iterator<RandIter>::value &&
+                hpx::traits::is_iterator_v<InIter> &&
+                hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
@@ -210,10 +215,14 @@ namespace hpx {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires at least random access iterator.");
 
-            return parallel::v1::detail::partial_sort_copy<RandIter>().call(
-                hpx::execution::seq, first, last, d_first, d_last,
-                std::forward<Comp>(comp), parallel::util::projection_identity{},
-                parallel::util::projection_identity{});
+            using result_type = parallel::util::in_out_result<InIter, RandIter>;
+
+            return parallel::util::get_second_element(
+                parallel::v1::detail::partial_sort_copy<result_type>().call(
+                    hpx::execution::seq, first, last, d_first, d_last,
+                    std::forward<Comp>(comp),
+                    parallel::util::projection_identity{},
+                    parallel::util::projection_identity{}));
         }
 
         // clang-format off
@@ -221,9 +230,9 @@ namespace hpx {
             typename RandIter,
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter>::value &&
-                hpx::traits::is_iterator<RandIter>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter> &&
+                hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
@@ -241,10 +250,15 @@ namespace hpx {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires at least random access iterator.");
 
-            return parallel::v1::detail::partial_sort_copy<RandIter>().call(
-                std::forward<ExPolicy>(policy), first, last, d_first, d_last,
-                std::forward<Comp>(comp), parallel::util::projection_identity{},
-                parallel::util::projection_identity{});
+            using result_type =
+                parallel::util::in_out_result<FwdIter, RandIter>;
+
+            return parallel::util::get_second_element(
+                parallel::v1::detail::partial_sort_copy<result_type>().call(
+                    std::forward<ExPolicy>(policy), first, last, d_first,
+                    d_last, std::forward<Comp>(comp),
+                    parallel::util::projection_identity{},
+                    parallel::util::projection_identity{}));
         }
     } partial_sort_copy{};
 }    // namespace hpx

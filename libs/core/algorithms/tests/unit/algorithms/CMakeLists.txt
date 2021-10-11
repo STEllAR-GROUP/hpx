@@ -92,7 +92,9 @@ set(tests
     none_of
     parallel_sort
     partial_sort
+    partial_sort_copy
     partial_sort_parallel
+    partial_sort_copy_parallel
     partition
     partition_copy
     reduce_
