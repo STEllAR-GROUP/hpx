@@ -568,10 +568,12 @@ void tuple_std_test()
 
 void tuple_structured_binding_test()
 {
+#ifdef HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE
     auto [a1, a2] = hpx::make_tuple(1, '2');
 
     HPX_TEST_EQ(a1, 1);
     HPX_TEST_EQ(a2, '2');
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -35,7 +35,7 @@ struct custom_type_non_copyable
 template <typename... Ts>
 struct non_copyable_sender
 {
-    std::tuple<std::decay_t<Ts>...> ts;
+    hpx::tuple<std::decay_t<Ts>...> ts;
 
     template <template <class...> class Tuple,
         template <class...> class Variant>
@@ -68,7 +68,7 @@ struct non_copyable_sender
     struct operation_state
     {
         std::decay_t<R> r;
-        std::tuple<std::decay_t<Ts>...> ts;
+        hpx::tuple<std::decay_t<Ts>...> ts;
 
         friend void tag_dispatch(
             hpx::execution::experimental::start_t, operation_state& os) noexcept
@@ -92,7 +92,7 @@ struct non_copyable_sender
 template <typename... Ts>
 struct sender
 {
-    std::tuple<std::decay_t<Ts>...> ts;
+    hpx::tuple<std::decay_t<Ts>...> ts;
 
     template <template <class...> class Tuple,
         template <class...> class Variant>
@@ -124,7 +124,7 @@ struct sender
     struct operation_state
     {
         std::decay_t<R> r;
-        std::tuple<std::decay_t<Ts>...> ts;
+        hpx::tuple<std::decay_t<Ts>...> ts;
 
         friend void tag_dispatch(
             hpx::execution::experimental::start_t, operation_state& os) noexcept

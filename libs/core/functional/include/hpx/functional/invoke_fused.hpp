@@ -69,8 +69,8 @@ namespace hpx { namespace util {
     ///          the first argument in the sequenced type will be treated as
     ///          the callee (this object).
     ///
-    /// \param t A type which is content accessible through a call
-    ///          to hpx#util#get.
+    /// \param t A type whose contents are accessible through a call
+    ///          to hpx#get.
     ///
     /// \returns The result of the callable object when it's called with
     ///          the content of the given sequenced type.
