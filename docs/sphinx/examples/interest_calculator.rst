@@ -62,20 +62,15 @@ To compile this program, go to your |hpx| build directory (see
 :ref:`hpx_build_system` for information on configuring and building |hpx|) and
 enter:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   make examples.quickstart.interest_calculator
+   $ make examples.quickstart.interest_calculator
 
 To run the program type:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ./bin/interest_calculator --principal 100 --rate 5 --cp 6 --time 36
-
-This should print:
-
-.. code-block:: text
-
+   $ ./bin/interest_calculator --principal 100 --rate 5 --cp 6 --time 36
    Final amount: 134.01
    Amount made: 34.0096
 

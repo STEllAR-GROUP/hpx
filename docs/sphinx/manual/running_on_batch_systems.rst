@@ -60,9 +60,9 @@ program, explained in the section :ref:`examples_hello_world`.
    Alternatively, use the option :option:`--hpx:endnodes` to explicitly mark the
    end of the list of node names:
 
-   .. code-block:: bash
+   .. code-block:: shell-session
 
-      pbsdsh -u $APP_PATH --hpx:nodes`cat $PBS_NODEFILE` --hpx:endnodes $APP_OPTIONS
+      $ pbsdsh -u $APP_PATH --hpx:nodes`cat $PBS_NODEFILE` --hpx:endnodes $APP_OPTIONS
 
 The ``#PBS -l nodes=2:ppn=4`` directive will cause two compute nodes to be
 allocated for the application, as specified in the option ``nodes``. Each of the
@@ -139,22 +139,22 @@ All that remains now is submitting the job to the queuing system. Assuming that
 the contents of the PBS script were saved in the file ``pbs_hello_world.sh`` in the
 current directory, this is accomplished by typing:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   qsub ./pbs_hello_world_pbs.sh
+   $ qsub ./pbs_hello_world_pbs.sh
 
 If the job is accepted, |qsub| will print out the assigned job ID, which may
 look like:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
    $ 42.supercomputer.some.university.edu
 
 To check the status of your job, issue the following command:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   qstat 42.supercomputer.some.university.edu
+   $ qstat 42.supercomputer.some.university.edu
 
 and look for a single-letter job status symbol. The common cases include:
 
@@ -204,9 +204,9 @@ can be done.
 The easiest way to run an |hpx| application using SLURM is to utilize the
 command line tool |srun|, which interacts with the SLURM batch scheduling system:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   srun -p <partition> -N <number-of-nodes> hpx-application <application-arguments>
+   $ srun -p <partition> -N <number-of-nodes> hpx-application <application-arguments>
 
 Here, ``<partition>`` is one of the node partitions existing on the target
 machine (consult the machine's documentation to get a list of existing
@@ -241,9 +241,9 @@ Interactive shells
 To get an interactive development shell on one of the nodes, users can issue the
 following command:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   srun -p <node-type> -N <number-of-nodes> --pty /bin/bash -l
+   $ srun -p <node-type> -N <number-of-nodes> --pty /bin/bash -l
 
 After the shell has been opened, users can run their |hpx| application. By default,
 it uses all available cores. Note that if you requested one node, you don't need
