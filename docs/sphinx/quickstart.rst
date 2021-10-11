@@ -15,7 +15,7 @@ The following steps will help you get started with |hpx|.
 
 
 Installing |hpx|
-=============
+================
 
 The easiest way to install |hpx| on your system is by choosing one of the steps below:
 
