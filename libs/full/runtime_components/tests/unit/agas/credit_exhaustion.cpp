@@ -56,7 +56,7 @@ using hpx::flush;
 
 void split(id_type const& from, id_type const& target, std::int64_t old_credit);
 
-HPX_PLAIN_ACTION(split);
+HPX_PLAIN_ACTION(split)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions.

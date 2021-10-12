@@ -36,7 +36,7 @@ struct matrix_multiply_multiplier
 };
 
 HPX_REGISTER_COMPONENT(hpx::components::component<matrix_multiply_multiplier>,
-    matrix_multiply_multiplier);
+    matrix_multiply_multiplier)
 
 int hpx_main()
 {

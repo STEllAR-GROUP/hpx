@@ -122,7 +122,7 @@ HPX_REGISTER_ACTION_ID(
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_COMPONENT_NAME(
-    hpx::components::server::runtime_support, hpx_runtime_support);
+    hpx::components::server::runtime_support, hpx_runtime_support)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(hpx::components::server::runtime_support,
     hpx::components::component_runtime_support)
 

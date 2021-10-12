@@ -19,7 +19,7 @@ hpx::future<void> bcast_void(double)
     return hpx::make_ready_future();
 }
 
-HPX_PLAIN_ACTION(bcast_void);
+HPX_PLAIN_ACTION(bcast_void)
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(bcast_void_action)
 HPX_REGISTER_BROADCAST_ACTION(bcast_void_action)
@@ -29,7 +29,7 @@ hpx::future<double> bcast(double bcast)
     return hpx::make_ready_future(bcast);
 }
 
-HPX_PLAIN_ACTION(bcast);
+HPX_PLAIN_ACTION(bcast)
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(bcast_action)
 HPX_REGISTER_BROADCAST_ACTION(bcast_action)

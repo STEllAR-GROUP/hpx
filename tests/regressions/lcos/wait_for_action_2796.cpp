@@ -22,8 +22,8 @@ void f()
     called.store(true);
 }
 
-HPX_PLAIN_ACTION(f, f_action);
-HPX_PLAIN_DIRECT_ACTION(f, f_direct_action);
+HPX_PLAIN_ACTION(f, f_action)
+HPX_PLAIN_DIRECT_ACTION(f, f_direct_action)
 
 int main()
 {

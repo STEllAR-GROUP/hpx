@@ -142,7 +142,7 @@ namespace hpx { namespace parcelset
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_DEFINITION_4(                      \
         action_type, action_name, num, interval)                              \
-    HPX_REGISTER_COALESCING_COUNTERS(action_type, action_name);               \
+    HPX_REGISTER_COALESCING_COUNTERS(action_type, action_name)                \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -173,7 +173,7 @@ namespace hpx { namespace parcelset
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DEFINITION(                \
         action_type, action_name, num, interval)                              \
-    HPX_REGISTER_COALESCING_COUNTERS(action_type, action_name);               \
+    HPX_REGISTER_COALESCING_COUNTERS(action_type, action_name)                \
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW(...)                       \
     HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(__VA_ARGS__)       \

@@ -112,7 +112,7 @@ void serialize(Archive& ar, F& f, unsigned)
     ar& hpx::serialization::base_object<E>(f);
     ar& f.c;
 }
-HPX_SERIALIZATION_REGISTER_CLASS(F);
+HPX_SERIALIZATION_REGISTER_CLASS(F)
 
 void test_intrusive()
 {

@@ -67,11 +67,11 @@ buffer_allocator_type allocator_message(buffer_allocator_type const& receive_buf
     HPX_TEST_EQ(receive_buffer.size(), static_cast<std::size_t>(MEMORY_BLOCK_SIZE));
     return receive_buffer;
 }
-HPX_PLAIN_ACTION(allocator_message);
+HPX_PLAIN_ACTION(allocator_message)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(buffer_allocator_type,
-    serialization_buffer_char_allocator);
+    serialization_buffer_char_allocator)
 HPX_REGISTER_BASE_LCO_WITH_VALUE(buffer_allocator_type,
-    serialization_buffer_char_allocator);
+    serialization_buffer_char_allocator)
 
 //----------------------------------------------------------------------------
 void receive(hpx::naming::id_type dest, char* send_buffer,

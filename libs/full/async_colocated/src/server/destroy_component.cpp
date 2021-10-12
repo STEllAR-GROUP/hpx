@@ -17,7 +17,7 @@
 #include <cstdint>
 
 HPX_PLAIN_ACTION_ID(hpx::components::server::destroy_component,
-    hpx_destroy_component_action, hpx::actions::free_component_action_id);
+    hpx_destroy_component_action, hpx::actions::free_component_action_id)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server {

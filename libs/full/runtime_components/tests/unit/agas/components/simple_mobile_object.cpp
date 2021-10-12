@@ -12,7 +12,7 @@
 
 #include "server/simple_mobile_object.hpp"
 
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 
 using hpx::test::server::simple_mobile_object;
 
@@ -27,6 +27,6 @@ HPX_REGISTER_DISABLED_COMPONENT_FACTORY(
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION(
-    simple_mobile_object::get_lva_action, simple_mobile_object_get_lva_action);
+    simple_mobile_object::get_lva_action, simple_mobile_object_get_lva_action)
 
 #endif

@@ -30,7 +30,7 @@ void receive_result(std::int32_t i)
     if (i > final_result)
         final_result = i;
 }
-HPX_PLAIN_ACTION(receive_result);
+HPX_PLAIN_ACTION(receive_result)
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<std::int32_t> accumulator;
@@ -49,11 +49,11 @@ struct increment_server
 };
 
 typedef hpx::components::managed_component<increment_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, increment_server);
+HPX_REGISTER_COMPONENT(server_type, increment_server)
 
 typedef increment_server::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION_DECLARATION(call_action)
+HPX_REGISTER_ACTION(call_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()

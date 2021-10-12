@@ -14,12 +14,12 @@
 
 
 
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 
 
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY
-(hpx::components::component<vector_t_server>, vector_t_factory);
+(hpx::components::component<vector_t_server>, vector_t_factory)
 
 void vector_t_server::axpy(double alpha, const hpx::id_type& x)
 {
@@ -68,7 +68,7 @@ vector_t_client::gemv(bool trans, double alpha, const matrix_t_client& a,
 
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY
-(hpx::components::component<matrix_t_server>, matrix_t_factory);
+(hpx::components::component<matrix_t_server>, matrix_t_factory)
 
 void matrix_t_server::axpy(bool trans, double alpha, const hpx::id_type& a)
 {

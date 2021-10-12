@@ -46,7 +46,7 @@ non_default_ctor plain_non_default_ctor()
     return non_default_ctor(42);
 }
 
-HPX_PLAIN_ACTION(plain_non_default_ctor, plain_non_default_ctor_action);
+HPX_PLAIN_ACTION(plain_non_default_ctor, plain_non_default_ctor_action)
 
 void test_plain_call_non_default_ctor(hpx::id_type id)
 {

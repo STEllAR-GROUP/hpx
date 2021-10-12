@@ -21,7 +21,7 @@ std::uint32_t f1()
 {
     return hpx::get_locality_id();
 }
-HPX_PLAIN_ACTION(f1);
+HPX_PLAIN_ACTION(f1)
 
 typedef std::plus<std::uint32_t> std_plus_type;
 HPX_REGISTER_REDUCE_ACTION_DECLARATION(f1_action, std_plus_type)
@@ -31,7 +31,7 @@ std::uint32_t f3(std::uint32_t i)
 {
     return hpx::get_locality_id() + i;
 }
-HPX_PLAIN_ACTION(f3);
+HPX_PLAIN_ACTION(f3)
 
 HPX_REGISTER_REDUCE_ACTION_DECLARATION(f3_action, std_plus_type)
 HPX_REGISTER_REDUCE_ACTION(f3_action, std_plus_type)
@@ -40,7 +40,7 @@ std::uint32_t f1_idx(std::size_t idx)
 {
     return hpx::get_locality_id() + std::uint32_t(idx);
 }
-HPX_PLAIN_ACTION(f1_idx);
+HPX_PLAIN_ACTION(f1_idx)
 
 HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION(f1_idx_action, std_plus_type)
 HPX_REGISTER_REDUCE_WITH_INDEX_ACTION(f1_idx_action, std_plus_type)
@@ -49,7 +49,7 @@ std::uint32_t f3_idx(std::uint32_t i, std::size_t idx)
 {
     return hpx::get_locality_id() + i + std::uint32_t(idx);
 }
-HPX_PLAIN_ACTION(f3_idx);
+HPX_PLAIN_ACTION(f3_idx)
 
 HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_DECLARATION(f3_idx_action, std_plus_type)
 HPX_REGISTER_REDUCE_WITH_INDEX_ACTION(f3_idx_action, std_plus_type)

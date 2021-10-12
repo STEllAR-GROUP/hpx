@@ -14,9 +14,9 @@
 
 #include <vector>
 
-HPX_REGISTER_PARTITIONED_VECTOR(int);
+HPX_REGISTER_PARTITIONED_VECTOR(int)
 typedef long long long_long;
-HPX_REGISTER_PARTITIONED_VECTOR(long_long);
+HPX_REGISTER_PARTITIONED_VECTOR(long_long)
 
 // an out-of-line definition of a member of a class template cannot have default
 // arguments

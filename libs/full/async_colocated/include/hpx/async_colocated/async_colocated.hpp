@@ -52,7 +52,7 @@ namespace hpx { namespace detail {
         (hpx::util::functional::detail::async_continuation_impl<               \
             typename hpx::detail::async_colocated_bound_action<Action>::type,  \
             hpx::util::unused_type>),                                          \
-        Name);                                                                 \
+        Name)                                                                  \
     /**/
 
 #define HPX_REGISTER_ASYNC_COLOCATED(Action, Name)                             \
@@ -61,7 +61,7 @@ namespace hpx { namespace detail {
         (hpx::util::functional::detail::async_continuation_impl<               \
             typename hpx::detail::async_colocated_bound_action<Action>::type,  \
             hpx::util::unused_type>),                                          \
-        Name);                                                                 \
+        Name)                                                                  \
     /**/
 
 namespace hpx { namespace detail {

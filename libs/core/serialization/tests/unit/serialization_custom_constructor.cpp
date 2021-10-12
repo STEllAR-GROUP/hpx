@@ -44,8 +44,8 @@ A* a_factory(hpx::serialization::input_archive& ar)
     return a;
 }
 
-HPX_SERIALIZATION_REGISTER_CLASS(A);
-HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(A, a_factory);
+HPX_SERIALIZATION_REGISTER_CLASS(A)
+HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(A, a_factory)
 
 /**
  * In this example we leverage the custom factory to pull data from
@@ -84,8 +84,8 @@ B* b_factory(hpx::serialization::input_archive& ar)
     return new B(b, flag);
 }
 
-HPX_SERIALIZATION_REGISTER_CLASS(B);
-HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(B, b_factory);
+HPX_SERIALIZATION_REGISTER_CLASS(B)
+HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(B, b_factory)
 
 /**
  * Obviously we need to check templates, too.
@@ -116,7 +116,7 @@ C<T>* c_factory(hpx::serialization::input_archive& ar, C<T>* /*unused*/)
 }
 
 HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE(
-    (template <typename T>), (C<T>), c_factory);
+    (template <typename T>), (C<T>), c_factory)
 
 void test_delegate()
 {

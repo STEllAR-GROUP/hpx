@@ -24,20 +24,20 @@ std::int32_t increment(std::int32_t i)
 {
     return i + 1;
 }
-HPX_PLAIN_ACTION(increment);    // defines increment_action
+HPX_PLAIN_ACTION(increment)    // defines increment_action
 
 std::int32_t increment_with_future(hpx::shared_future<std::int32_t> fi)
 {
     return fi.get() + 1;
 }
-HPX_PLAIN_ACTION(increment_with_future);
+HPX_PLAIN_ACTION(increment_with_future)
 
 ///////////////////////////////////////////////////////////////////////////////
 std::int32_t mult2(std::int32_t i)
 {
     return i * 2;
 }
-HPX_PLAIN_ACTION(mult2);    // defines mult2_action
+HPX_PLAIN_ACTION(mult2)    // defines mult2_action
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<int> callback_called(0);

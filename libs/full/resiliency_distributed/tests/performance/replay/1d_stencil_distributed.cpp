@@ -139,8 +139,8 @@ using stencil = std::vector<partition_data>;
 // Setup HPX channel boilerplate
 using communication_type = partition_data;
 
-HPX_REGISTER_CHANNEL_DECLARATION(communication_type);
-HPX_REGISTER_CHANNEL(communication_type, stencil_communication);
+HPX_REGISTER_CHANNEL_DECLARATION(communication_type)
+HPX_REGISTER_CHANNEL(communication_type, stencil_communication)
 
 double stencil_operation(double left, double center, double right)
 {

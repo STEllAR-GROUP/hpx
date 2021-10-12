@@ -45,7 +45,7 @@ hpx::id_type test1(std::vector<double> const&)
 {
     return hpx::find_here();
 }
-HPX_PLAIN_ACTION(test1);
+HPX_PLAIN_ACTION(test1)
 
 void test_plain_argument(hpx::id_type const& id)
 {
@@ -85,7 +85,7 @@ hpx::id_type test2(hpx::future<double> const&)
 {
     return hpx::find_here();
 }
-HPX_PLAIN_ACTION(test2);
+HPX_PLAIN_ACTION(test2)
 
 void test_future_argument(hpx::id_type const& id)
 {

@@ -56,14 +56,14 @@ typedef hpx::components::component<
     > view_registration_listener_type;
 
 HPX_REGISTER_COMPONENT(
-    view_registration_listener_type, ViewRegistrationListener);
+    view_registration_listener_type, ViewRegistrationListener)
 
 HPX_REGISTER_ACTION_DECLARATION(
     tests::server::ViewRegistrationListener::register_view_action,
-    view_registration_listener_register_view_action);
+    view_registration_listener_register_view_action)
 HPX_REGISTER_ACTION(
     tests::server::ViewRegistrationListener::register_view_action,
-    view_registration_listener_register_view_action);
+    view_registration_listener_register_view_action)
 
 namespace tests { namespace client
 {

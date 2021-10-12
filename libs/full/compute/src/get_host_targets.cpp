@@ -57,7 +57,7 @@ namespace hpx { namespace compute { namespace host {
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 HPX_PLAIN_ACTION(
-    hpx::compute::host::get_local_targets, compute_host_get_targets_action);
+    hpx::compute::host::get_local_targets, compute_host_get_targets_action)
 
 namespace hpx { namespace compute { namespace host {
     hpx::future<std::vector<target>> get_targets(hpx::id_type const& locality)

@@ -36,10 +36,10 @@ struct dummy_server : hpx::components::component_base<dummy_server>
 };
 
 typedef hpx::components::component<dummy_server> dummy_server_type;
-HPX_REGISTER_COMPONENT(dummy_server_type, dummy_server);
+HPX_REGISTER_COMPONENT(dummy_server_type, dummy_server)
 
 typedef dummy_server::call_action dummy_action;
-HPX_REGISTER_ACTION(dummy_action);
+HPX_REGISTER_ACTION(dummy_action)
 
 struct dummy_client : hpx::components::client_base<dummy_client, dummy_server>
 {
@@ -188,31 +188,31 @@ private:
 };
 
 typedef hpx::components::component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 typedef test_server::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION_DECLARATION(call_action)
+HPX_REGISTER_ACTION(call_action)
 
 typedef test_server::busy_work_action busy_work_action;
-HPX_REGISTER_ACTION_DECLARATION(busy_work_action);
-HPX_REGISTER_ACTION(busy_work_action);
+HPX_REGISTER_ACTION_DECLARATION(busy_work_action)
+HPX_REGISTER_ACTION(busy_work_action)
 
 typedef test_server::lazy_busy_work_action lazy_busy_work_action;
-HPX_REGISTER_ACTION_DECLARATION(lazy_busy_work_action);
-HPX_REGISTER_ACTION(lazy_busy_work_action);
+HPX_REGISTER_ACTION_DECLARATION(lazy_busy_work_action)
+HPX_REGISTER_ACTION(lazy_busy_work_action)
 
 typedef test_server::get_data_action get_data_action;
-HPX_REGISTER_ACTION_DECLARATION(get_data_action);
-HPX_REGISTER_ACTION(get_data_action);
+HPX_REGISTER_ACTION_DECLARATION(get_data_action)
+HPX_REGISTER_ACTION(get_data_action)
 
 typedef test_server::lazy_get_data_action lazy_get_data_action;
-HPX_REGISTER_ACTION_DECLARATION(lazy_get_data_action);
-HPX_REGISTER_ACTION(lazy_get_data_action);
+HPX_REGISTER_ACTION_DECLARATION(lazy_get_data_action)
+HPX_REGISTER_ACTION(lazy_get_data_action)
 
 typedef test_server::lazy_get_client_action lazy_get_client_action;
-HPX_REGISTER_ACTION_DECLARATION(lazy_get_client_action);
-HPX_REGISTER_ACTION(lazy_get_client_action);
+HPX_REGISTER_ACTION_DECLARATION(lazy_get_client_action)
+HPX_REGISTER_ACTION(lazy_get_client_action)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {

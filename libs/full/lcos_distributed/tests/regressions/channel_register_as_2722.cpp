@@ -10,7 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
 
-HPX_REGISTER_CHANNEL(int);    // add to one source file
+HPX_REGISTER_CHANNEL(int)    // add to one source file
 
 void send_values(hpx::lcos::channel<int> buffer)
 {

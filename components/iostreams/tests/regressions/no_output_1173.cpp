@@ -25,7 +25,7 @@ void worker()
     locality_id = hpx::get_locality_id();
     hpx::consolestream << "hello!" << hpx::endl;
 }
-HPX_PLAIN_ACTION(worker, worker_action);
+HPX_PLAIN_ACTION(worker, worker_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void on_shutdown(std::string const& expected)

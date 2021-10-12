@@ -85,6 +85,6 @@ HPX_REGISTER_COMPONENT_HEAP(
     hpx::components::managed_component<hpx::lcos::base_lco>)
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_DEFINE_COMPONENT_NAME(hpx::lcos::base_lco, hpx_lcos_base_lco);
+HPX_DEFINE_COMPONENT_NAME(hpx::lcos::base_lco, hpx_lcos_base_lco)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco, hpx::components::component_base_lco)

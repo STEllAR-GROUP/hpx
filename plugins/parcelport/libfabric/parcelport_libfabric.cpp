@@ -437,4 +437,4 @@ namespace libfabric
     }
 }}}}
 
-HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::libfabric::parcelport, libfabric);
+HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::libfabric::parcelport, libfabric)

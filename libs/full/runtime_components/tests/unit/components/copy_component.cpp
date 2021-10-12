@@ -54,10 +54,10 @@ struct test_server : hpx::components::component_base<test_server>
 };
 
 using server_type = hpx::components::component<test_server>;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 using call_action = test_server::call_action;
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION(call_action)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {

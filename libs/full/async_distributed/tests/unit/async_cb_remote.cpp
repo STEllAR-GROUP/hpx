@@ -25,13 +25,13 @@ std::int32_t increment(std::int32_t i)
 {
     return i + 1;
 }
-HPX_PLAIN_ACTION(increment);
+HPX_PLAIN_ACTION(increment)
 
 std::int32_t increment_with_future(hpx::shared_future<std::int32_t> fi)
 {
     return fi.get() + 1;
 }
-HPX_PLAIN_ACTION(increment_with_future);
+HPX_PLAIN_ACTION(increment_with_future)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct decrement_server
@@ -46,11 +46,11 @@ struct decrement_server
 };
 
 typedef hpx::components::managed_component<decrement_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, decrement_server);
+HPX_REGISTER_COMPONENT(server_type, decrement_server)
 
 typedef decrement_server::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION_DECLARATION(call_action)
+HPX_REGISTER_ACTION(call_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<int> callback_called(0);

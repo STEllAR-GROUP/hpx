@@ -23,7 +23,7 @@ double message_double(double d)
 {
     return d;
 }
-HPX_PLAIN_ACTION(message_double);
+HPX_PLAIN_ACTION(message_double)
 
 // ----------------------------------------------------------------------------
 int main()

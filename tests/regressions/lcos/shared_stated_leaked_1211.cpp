@@ -40,10 +40,10 @@ struct test_server : hpx::components::component_base<test_server>
 bool test_server::destructor_called = false;
 
 typedef hpx::components::component<test_server> test_server_type;
-HPX_REGISTER_COMPONENT(test_server_type, test_server);
+HPX_REGISTER_COMPONENT(test_server_type, test_server)
 
 typedef test_server::test_action test_action;
-HPX_REGISTER_ACTION(test_action);
+HPX_REGISTER_ACTION(test_action)
 
 struct test : hpx::components::client_base<test, test_server>
 {

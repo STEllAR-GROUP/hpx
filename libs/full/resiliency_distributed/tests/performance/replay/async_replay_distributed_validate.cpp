@@ -74,7 +74,7 @@ int universal_ans(std::vector<hpx::id_type> const& f_locales, std::size_t err,
     return 42;
 }
 
-HPX_PLAIN_ACTION(universal_ans, universal_action);
+HPX_PLAIN_ACTION(universal_ans, universal_action)
 
 bool validate(int ans)
 {

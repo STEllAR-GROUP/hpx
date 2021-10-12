@@ -168,7 +168,7 @@ namespace {
     auto const nodelist_def = hostlist % ',';
 
     BOOST_SPIRIT_DEFINE(
-        prefix, range_str, range, ranges, nodename, hostlist, nodelist);
+        prefix, range_str, range, ranges, nodename, hostlist, nodelist)
 
 }    // namespace
 

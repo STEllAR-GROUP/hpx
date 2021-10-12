@@ -30,7 +30,7 @@ int universal_ans()
     return 84;
 }
 
-HPX_PLAIN_ACTION(universal_ans, universal_action);
+HPX_PLAIN_ACTION(universal_ans, universal_action)
 
 bool validate(int ans)
 {

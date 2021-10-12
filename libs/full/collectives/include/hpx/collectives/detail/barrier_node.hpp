@@ -105,6 +105,6 @@ namespace hpx { namespace lcos { namespace detail {
 }}}    // namespace hpx::lcos::detail
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::detail::barrier_node::gather_action, barrier_node_gather_action);
+    hpx::lcos::detail::barrier_node::gather_action, barrier_node_gather_action)
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -16,10 +16,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 void test(hpx::naming::id_type) {}
-HPX_PLAIN_ACTION(test, test_action);
+HPX_PLAIN_ACTION(test, test_action)
 
 hpx::naming::id_type test_return() { return hpx::find_here(); }
-HPX_PLAIN_ACTION(test_return, test_return_action);
+HPX_PLAIN_ACTION(test_return, test_return_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map&)

@@ -23,13 +23,13 @@ std::int32_t times2(std::int32_t i)
 {
     return i * 2;
 }
-HPX_PLAIN_ACTION(times2);           // defines times2_action
+HPX_PLAIN_ACTION(times2)           // defines times2_action
 
 std::string to_string(std::int32_t i)
 {
     return std::to_string(i);
 }
-HPX_PLAIN_ACTION(to_string);    // defines to_string_action
+HPX_PLAIN_ACTION(to_string)        // defines to_string_action
 
 int hpx_main()
 {

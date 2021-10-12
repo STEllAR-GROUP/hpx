@@ -30,11 +30,11 @@ struct test_server : hpx::components::component_base<test_server>
 };
 
 typedef hpx::components::component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 typedef test_server::check_ptr_action check_ptr_action;
-HPX_REGISTER_ACTION_DECLARATION(check_ptr_action);
-HPX_REGISTER_ACTION(check_ptr_action);
+HPX_REGISTER_ACTION_DECLARATION(check_ptr_action)
+HPX_REGISTER_ACTION(check_ptr_action)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {

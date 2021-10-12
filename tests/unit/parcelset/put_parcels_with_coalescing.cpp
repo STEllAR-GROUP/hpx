@@ -59,13 +59,13 @@ struct test_server : hpx::components::component_base<test_server>
 };
 
 typedef hpx::components::component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 typedef test_server::test1_action test1_action;
 
-HPX_REGISTER_ACTION_DECLARATION(test1_action);
-HPX_ACTION_USES_MESSAGE_COALESCING(test1_action);
-HPX_REGISTER_ACTION(test1_action);
+HPX_REGISTER_ACTION_DECLARATION(test1_action)
+HPX_ACTION_USES_MESSAGE_COALESCING(test1_action)
+HPX_REGISTER_ACTION(test1_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_plain_argument(hpx::id_type const& id)
@@ -110,9 +110,9 @@ hpx::id_type test2(hpx::future<double> const&)
 {
     return hpx::find_here();
 }
-HPX_DECLARE_PLAIN_ACTION(test2, test2_action);
-HPX_ACTION_USES_MESSAGE_COALESCING(test2_action);
-HPX_PLAIN_ACTION(test2, test2_action);
+HPX_DECLARE_PLAIN_ACTION(test2, test2_action)
+HPX_ACTION_USES_MESSAGE_COALESCING(test2_action)
+HPX_PLAIN_ACTION(test2, test2_action)
 
 void test_future_argument(hpx::id_type const& id)
 {

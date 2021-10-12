@@ -22,7 +22,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
-HPX_REGISTER_UNORDERED_MAP(std::string, double);
+HPX_REGISTER_UNORDERED_MAP(std::string, double)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Key, typename Value, typename Hash, typename KeyEqual>

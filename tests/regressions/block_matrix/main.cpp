@@ -42,8 +42,8 @@ void output_hpx_info()
 
 
 
-HPX_PLAIN_ACTION(test_dense);
-HPX_PLAIN_ACTION(test_blocked);
+HPX_PLAIN_ACTION(test_dense)
+HPX_PLAIN_ACTION(test_blocked)
 
 int hpx_main(hpx::program_options::variables_map&)
 {

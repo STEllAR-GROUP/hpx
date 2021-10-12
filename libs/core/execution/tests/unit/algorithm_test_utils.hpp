@@ -211,7 +211,7 @@ void check_exception_ptr(std::exception_ptr eptr)
     {
         HPX_TEST_EQ(std::string(e.what()), std::string("error"));
     }
-};
+}
 
 struct custom_sender_tag_invoke
 {
@@ -381,7 +381,7 @@ struct scheduler
         hpx::execution::experimental::execute_t, scheduler s, F&& f)
     {
         s.execute_called = true;
-        HPX_INVOKE(std::forward<F>(f));
+        HPX_INVOKE(std::forward<F>(f), );
     }
 
     struct sender

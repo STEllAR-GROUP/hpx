@@ -151,7 +151,7 @@ void test5()
     std::stable_sort(M.begin(), M.end(), comp);
     for (unsigned i = 0; i < KMax; i++)
         HPX_TEST(M[i] == K[i]);
-};
+}
 
 void test6()
 {

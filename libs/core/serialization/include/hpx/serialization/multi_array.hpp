@@ -38,7 +38,7 @@ namespace hpx { namespace serialization {
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
         (template <typename T, std::size_t N, typename Allocator>),
-        (boost::multi_array<T, N, Allocator>) );
+        (boost::multi_array<T, N, Allocator>) )
 }}    // namespace hpx::serialization
 
 #endif

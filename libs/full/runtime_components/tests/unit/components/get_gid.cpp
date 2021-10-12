@@ -36,11 +36,11 @@ struct test_server : managed_component_base<test_server>
 };
 
 using server_type = managed_component<test_server>;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 using check_gid_action = test_server::check_gid_action;
-HPX_REGISTER_ACTION_DECLARATION(check_gid_action);
-HPX_REGISTER_ACTION(check_gid_action);
+HPX_REGISTER_ACTION_DECLARATION(check_gid_action)
+HPX_REGISTER_ACTION(check_gid_action)
 
 struct test_client : client_base<test_client, stub_base<test_server>>
 {

@@ -52,7 +52,7 @@ std::size_t bulk_test(
 
     return local_count.load();
 }
-HPX_PLAIN_ACTION(bulk_test, bulk_test_action);
+HPX_PLAIN_ACTION(bulk_test, bulk_test_action)
 
 int main()
 {

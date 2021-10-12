@@ -1795,6 +1795,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall)
     hpx_add_compile_flag_if_available(-Wextra)
+    hpx_add_compile_flag_if_available(-Wpedantic)
     hpx_add_compile_flag_if_available(-Wno-strict-aliasing)
     hpx_add_compile_flag_if_available(-Wno-sign-promo)
     hpx_add_compile_flag_if_available(-Wno-attributes)

@@ -42,7 +42,7 @@ struct component_server : hpx::components::component_base<component_server>
 };
 
 HPX_REGISTER_COMPONENT(
-    hpx::components::component<component_server>, component_server_component);
+    hpx::components::component<component_server>, component_server_component)
 
 int hpx_main()
 {

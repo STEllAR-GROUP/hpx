@@ -73,13 +73,13 @@ private:
 typedef hpx::components::component<
         test_receive_buffer_server
     > server_type;
-HPX_REGISTER_COMPONENT(server_type, server_type);
+HPX_REGISTER_COMPONENT(server_type, server_type)
 
 typedef server_type::from_action from_action;
-HPX_REGISTER_ACTION(from_action);
+HPX_REGISTER_ACTION(from_action)
 
 typedef server_type::do_work_action do_work_action;
-HPX_REGISTER_ACTION(do_work_action);
+HPX_REGISTER_ACTION(do_work_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_receive_buffer

@@ -111,7 +111,7 @@ namespace hpx { namespace server {
 
 HPX_DISTRIBUTED_METADATA_DECLARATION(
     hpx::server::partitioned_vector_config_data,
-    hpx_server_partitioned_vector_config_data);
+    hpx_server_partitioned_vector_config_data)
 
 /// \endcond
 

@@ -78,7 +78,7 @@ void null_thread()
     ++void_counter;
 }
 
-HPX_PLAIN_ACTION(null_thread, null_action);
+HPX_PLAIN_ACTION(null_thread, null_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<std::size_t> result_counter;
@@ -89,7 +89,7 @@ bool null_result_thread()
     return true;
 }
 
-HPX_PLAIN_ACTION(null_result_thread, null_result_action);
+HPX_PLAIN_ACTION(null_result_thread, null_result_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()

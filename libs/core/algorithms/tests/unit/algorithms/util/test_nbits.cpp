@@ -21,4 +21,4 @@ int main(int, char*[])
     HPX_TEST(nbits64(65ULL) == 7);
 
     return hpx::util::report_errors();
-};
+}

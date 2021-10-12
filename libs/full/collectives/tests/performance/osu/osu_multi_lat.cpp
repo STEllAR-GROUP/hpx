@@ -63,7 +63,7 @@ hpx::serialization::serialize_buffer<char> isend(
 {
     return receive_buffer;
 }
-HPX_PLAIN_ACTION(isend);
+HPX_PLAIN_ACTION(isend)
 
 ///////////////////////////////////////////////////////////////////////////////
 double ireceive(
@@ -111,7 +111,7 @@ double ireceive(
     double elapsed = t.elapsed();
     return (elapsed * 1e6) / static_cast<double>(2 * loop * window_size);
 }
-HPX_PLAIN_ACTION(ireceive);
+HPX_PLAIN_ACTION(ireceive)
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_header()

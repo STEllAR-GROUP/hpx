@@ -120,7 +120,7 @@ void bulk_test( hpx::lcos::spmd_block block,
         }
     }
 }
-HPX_PLAIN_ACTION(bulk_test, bulk_test_action);
+HPX_PLAIN_ACTION(bulk_test, bulk_test_action)
 
 int main()
 {

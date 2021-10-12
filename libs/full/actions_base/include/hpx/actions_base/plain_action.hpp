@@ -326,8 +326,8 @@ namespace hpx { namespace traits {
 ///
 #define HPX_PLAIN_ACTION_ID(func, name, id)                                    \
     HPX_DEFINE_PLAIN_ACTION(func, name);                                       \
-    HPX_REGISTER_ACTION_DECLARATION(name, name);                               \
-    HPX_REGISTER_ACTION_ID(name, name, id);                                    \
+    HPX_REGISTER_ACTION_DECLARATION(name, name)                                \
+    HPX_REGISTER_ACTION_ID(name, name, id)                                     \
     /**/
 
 /// \cond NOINTERNAL
@@ -347,11 +347,11 @@ namespace hpx { namespace traits {
 /**/
 #define HPX_PLAIN_ACTION_2(func, name)                                         \
     HPX_DEFINE_PLAIN_ACTION(func, name);                                       \
-    HPX_REGISTER_ACTION_DECLARATION(name, name);                               \
-    HPX_REGISTER_ACTION(name, name);                                           \
+    HPX_REGISTER_ACTION_DECLARATION(name, name)                                \
+    HPX_REGISTER_ACTION(name, name)                                            \
 /**/
 #define HPX_PLAIN_ACTION_1(func)                                               \
-    HPX_PLAIN_ACTION_2(func, HPX_PP_CAT(func, _action));                       \
+    HPX_PLAIN_ACTION_2(func, HPX_PP_CAT(func, _action))                        \
 /**/
 
 // same for direct actions
@@ -361,16 +361,16 @@ namespace hpx { namespace traits {
 /**/
 #define HPX_PLAIN_DIRECT_ACTION_2(func, name)                                  \
     HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name);                                \
-    HPX_REGISTER_ACTION_DECLARATION(name, name);                               \
-    HPX_REGISTER_ACTION(name, name);                                           \
+    HPX_REGISTER_ACTION_DECLARATION(name, name)                                \
+    HPX_REGISTER_ACTION(name, name)                                            \
 /**/
 #define HPX_PLAIN_DIRECT_ACTION_1(func)                                        \
-    HPX_PLAIN_DIRECT_ACTION_2(func, HPX_PP_CAT(func, _action));                \
+    HPX_PLAIN_DIRECT_ACTION_2(func, HPX_PP_CAT(func, _action))                 \
 /**/
 #define HPX_PLAIN_DIRECT_ACTION_ID(func, name, id)                             \
     HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name);                                \
-    HPX_REGISTER_ACTION_DECLARATION(name, name);                               \
-    HPX_REGISTER_ACTION_ID(name, name, id);                                    \
+    HPX_REGISTER_ACTION_DECLARATION(name, name)                                \
+    HPX_REGISTER_ACTION_ID(name, name, id)                                     \
     /**/
 
 /// \endcond

@@ -52,7 +52,7 @@ unsigned long getpagesize()
 
 ///////////////////////////////////////////////////////////////////////////////
 void isend(hpx::serialization::serialize_buffer<char> const&) {}
-HPX_PLAIN_ACTION(isend);
+HPX_PLAIN_ACTION(isend)
 
 ///////////////////////////////////////////////////////////////////////////////
 double ireceive(hpx::naming::id_type dest, std::size_t loop, std::size_t size,

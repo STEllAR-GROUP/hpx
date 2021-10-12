@@ -296,6 +296,6 @@ namespace hpx { namespace traits
 
 HPX_REGISTER_PARCELPORT(
     hpx::parcelset::policies::mpi::parcelport,
-    mpi);
+    mpi)
 
 #endif

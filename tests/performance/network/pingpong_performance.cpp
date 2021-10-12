@@ -28,7 +28,7 @@ namespace pingpong
     }
 }
 
-HPX_PLAIN_ACTION(pingpong::server::get_element, pingpong_get_element_action);
+HPX_PLAIN_ACTION(pingpong::server::get_element, pingpong_get_element_action)
 //HPX_ACTION_USES_MESSAGE_COALESCING(pingpong_get_element_action);
 
 

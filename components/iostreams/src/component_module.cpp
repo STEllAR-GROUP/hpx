@@ -81,5 +81,5 @@ namespace hpx { namespace iostreams { namespace detail
 
 // Note that this macro can be used not more than once in one module.
 HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(
-    hpx::iostreams::detail::get_startup, hpx::iostreams::detail::get_shutdown);
+    hpx::iostreams::detail::get_startup, hpx::iostreams::detail::get_shutdown)
 

@@ -50,13 +50,13 @@ namespace hpx { namespace components { namespace server
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::component_storage::migrate_to_here_action,
-    component_storage_migrate_component_to_here_action);
+    component_storage_migrate_component_to_here_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::component_storage::migrate_from_here_action,
-    component_storage_migrate_component_from_here_action);
+    component_storage_migrate_component_from_here_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::component_storage::size_action,
-    component_storage_size_action);
+    component_storage_size_action)
 
 typedef std::vector<char> hpx_component_storage_data_type;
 HPX_REGISTER_UNORDERED_MAP_DECLARATION(

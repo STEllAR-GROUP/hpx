@@ -25,7 +25,7 @@ void vector_bcast(std::vector<double> bcast)
     buffer = bcast;
 }
 
-HPX_PLAIN_ACTION(vector_bcast);
+HPX_PLAIN_ACTION(vector_bcast)
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(vector_bcast_action)
 HPX_REGISTER_BROADCAST_ACTION(vector_bcast_action)
