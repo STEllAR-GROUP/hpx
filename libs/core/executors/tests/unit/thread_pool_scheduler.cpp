@@ -245,7 +245,7 @@ struct callback_receiver
     friend void tag_dispatch(
         ex::set_value_t, callback_receiver&& r, Ts&&...) noexcept
     {
-        HPX_INVOKE(r.f);
+        HPX_INVOKE(r.f, );
         r.executed = true;
         r.cond.notify_one();
     }

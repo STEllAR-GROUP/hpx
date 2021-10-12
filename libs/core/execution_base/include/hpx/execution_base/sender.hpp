@@ -206,9 +206,9 @@ namespace hpx { namespace execution { namespace experimental {
         {
             F f;
 
-            void set_value() noexcept(noexcept(HPX_INVOKE(f)))
+            void set_value() noexcept(noexcept(HPX_INVOKE(f, )))
             {
-                HPX_INVOKE(f);
+                HPX_INVOKE(f, );
             }
 
             template <typename E_>
