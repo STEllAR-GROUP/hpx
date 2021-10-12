@@ -18,8 +18,6 @@ endforeach()
 # add tests
 set(tests
     adjacentdifference
-    adjacentdifference_exception
-    adjacentdifference_bad_alloc
     adjacentfind
     adjacentfind_exception
     adjacentfind_bad_alloc

@@ -5,38 +5,34 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/include/datapar.hpp>
 #include <hpx/local/init.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "adjacentdifference_tests.hpp"
+#include "../algorithms/adjacentdifference_tests.hpp"
 
 void adjacent_difference_test()
 {
     using namespace hpx::execution;
-    test_adjacent_difference(seq);
-    test_adjacent_difference(par);
-    test_adjacent_difference(par_unseq);
+    test_adjacent_difference(simd);
+    test_adjacent_difference(par_simd);
 
-    test_adjacent_difference_async(seq(task));
-    test_adjacent_difference_async(par(task));
+    test_adjacent_difference_async(simd(task));
+    test_adjacent_difference_async(par_simd(task));
 }
 
 template <typename IteratorTag>
 void test_adjacent_difference_exception()
 {
     using namespace hpx::execution;
+    test_adjacent_difference_exception(simd, IteratorTag());
+    test_adjacent_difference_exception(par_simd, IteratorTag());
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_adjacent_difference_exception(seq, IteratorTag());
-    test_adjacent_difference_exception(par, IteratorTag());
-
-    test_adjacent_difference_exception_async(seq(task), IteratorTag());
-    test_adjacent_difference_exception_async(par(task), IteratorTag());
+    test_adjacent_difference_exception_async(simd(task), IteratorTag());
+    test_adjacent_difference_exception_async(par_simd(task), IteratorTag());
 }
 
 void adjacent_difference_exception_test()
@@ -49,15 +45,11 @@ template <typename IteratorTag>
 void test_adjacent_difference_bad_alloc()
 {
     using namespace hpx::execution;
+    test_adjacent_difference_bad_alloc(simd, IteratorTag());
+    test_adjacent_difference_bad_alloc(par_simd, IteratorTag());
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_adjacent_difference_bad_alloc(seq, IteratorTag());
-    test_adjacent_difference_bad_alloc(par, IteratorTag());
-
-    test_adjacent_difference_bad_alloc_async(seq(task), IteratorTag());
-    test_adjacent_difference_bad_alloc_async(par(task), IteratorTag());
+    test_adjacent_difference_bad_alloc_async(simd(task), IteratorTag());
+    test_adjacent_difference_bad_alloc_async(par_simd(task), IteratorTag());
 }
 
 void adjacent_difference_bad_alloc_test()
