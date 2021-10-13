@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 Francisco Jose Tapia (fjtapia@gmail.com )
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,26 +17,30 @@
 #include <string>
 #include <vector>
 
+#include "test_utils.hpp"
+
 ////////////////////////////////////////////////////////////////////////////
 unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
-void function01()
+#define SIZE 1007
+
+template <typename IteratorTag>
+void test_partial_sort(IteratorTag)
 {
-    typedef std::less<std::uint64_t> compare_t;
-    constexpr std::uint32_t NELEM = 1000;
+    using compare_t = std::less<std::uint64_t>;
 
     std::vector<std::uint64_t> A, B;
-    A.reserve(NELEM);
-    B.reserve(NELEM);
+    A.reserve(SIZE);
+    B.reserve(SIZE);
 
-    for (std::uint64_t i = 0; i < NELEM; ++i)
+    for (std::uint64_t i = 0; i < SIZE; ++i)
     {
         A.emplace_back(i);
     }
     std::shuffle(A.begin(), A.end(), gen);
 
-    for (std::uint64_t i = 1; i < NELEM; ++i)
+    for (std::uint64_t i = 1; i < SIZE; ++i)
     {
         B = A;
         hpx::partial_sort(B.begin(), B.begin() + i, B.end(), compare_t());
@@ -47,34 +52,80 @@ void function01()
     }
 }
 
-// partial_sort with different intervals of data to sort.
-// accumulate all the times and compare the two algorithms with 1 thread
-void function02()
+template <typename ExPolicy, typename IteratorTag>
+void test_partial_sort(ExPolicy policy, IteratorTag)
 {
-    typedef std::less<std::uint64_t> compare_t;
-    constexpr std::uint32_t NELEM = 100000;
+    using compare_t = std::less<std::uint64_t>;
 
     std::vector<std::uint64_t> A, B;
-    A.reserve(NELEM);
-    B.reserve(NELEM);
+    A.reserve(SIZE);
+    B.reserve(SIZE);
 
-    for (std::uint64_t i = 0; i < NELEM; ++i)
+    for (std::uint64_t i = 0; i < SIZE; ++i)
     {
         A.emplace_back(i);
     }
     std::shuffle(A.begin(), A.end(), gen);
 
-    constexpr std::uint32_t STEP = NELEM / 100;
-    for (std::uint64_t i = 0; i <= NELEM; i += STEP)
+    for (std::uint64_t i = 1; i < SIZE; ++i)
     {
         B = A;
-        hpx::partial_sort(hpx::execution::seq, B.begin(), B.begin() + i,
-            B.end(), compare_t());
-        for (std::uint64_t k = 0; k < i; ++k)
+        hpx::partial_sort(
+            policy, B.begin(), B.begin() + i, B.end(), compare_t());
+
+        for (std::uint64_t j = 0; j < i; ++j)
         {
-            HPX_TEST(B[k] == k);
+            HPX_TEST(B[j] == j);
         }
     }
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_partial_sort_async(ExPolicy p, IteratorTag)
+{
+    using compare_t = std::less<std::uint64_t>;
+
+    std::vector<std::uint64_t> A, B;
+    A.reserve(SIZE);
+    B.reserve(SIZE);
+
+    for (std::uint64_t i = 0; i < SIZE; ++i)
+    {
+        A.emplace_back(i);
+    }
+    std::shuffle(A.begin(), A.end(), gen);
+
+    for (std::uint64_t i = 1; i < SIZE; ++i)
+    {
+        B = A;
+        auto result = hpx::partial_sort(
+            p, B.begin(), B.begin() + i, B.end(), compare_t());
+        result.wait();
+
+        for (std::uint64_t j = 0; j < i; ++j)
+        {
+            HPX_TEST(B[j] == j);
+        }
+    }
+}
+
+template <typename IteratorTag>
+void test_partial_sort()
+{
+    using namespace hpx::execution;
+    test_partial_sort(IteratorTag());
+    test_partial_sort(seq, IteratorTag());
+    test_partial_sort(par, IteratorTag());
+    test_partial_sort(par_unseq, IteratorTag());
+
+    test_partial_sort_async(seq(task), IteratorTag());
+    test_partial_sort_async(par(task), IteratorTag());
+}
+
+void partial_sort_test()
+{
+    test_partial_sort<std::random_access_iterator_tag>();
+    test_partial_sort<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -85,8 +136,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     gen.seed(seed);
 
-    function01();
-    function02();
+    partial_sort_test();
 
     return hpx::local::finalize();
 }

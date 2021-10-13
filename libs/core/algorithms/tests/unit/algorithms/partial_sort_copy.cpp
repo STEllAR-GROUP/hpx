@@ -8,23 +8,234 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //-----------------------------------------------------------------------------
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
-#include <hpx/iostream.hpp>
-#include <hpx/execution.hpp>
-#include <ciso646>
-#include <hpx/assert.hpp>
-#include <chrono>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <vector>
-#include <algorithm>
+#include <hpx/local/execution.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/partial_sort_copy.hpp>
 
-namespace hpp = ::hpx::parallel;
+#include <algorithm>
+#include <cstdint>
+#include <iostream>
+#include <random>
+#include <string>
+#include <vector>
 
+#include "test_utils.hpp"
+
+////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
+template <typename IteratorTag>
+void test_partial_sort(IteratorTag)
+{
+    std::list<uint64_t> l = {9, 7, 6, 8, 5, 4, 1, 2, 3};
+    uint64_t v1[20], v2[20];
+
+    //------------------------------------------------------------------------
+    // Output size is smaller than input size
+    //------------------------------------------------------------------------
+    for (int i = 0; i < 20; ++i)
+        v1[i] = v2[i] = 999;
+
+    hpx::partial_sort_copy(l.begin(), l.end(), &v1[0], &v1[4]);
+    std::partial_sort_copy(l.begin(), l.end(), &v2[0], &v2[4]);
+
+    for (int i = 0; i < 4; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+    for (int i = 4; i < 20; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+
+    //------------------------------------------------------------------------
+    // Output size is equal than input size
+    //------------------------------------------------------------------------
+    for (int i = 0; i < 20; ++i)
+        v1[i] = v2[i] = 999;
+
+    hpx::partial_sort_copy(l.begin(), l.end(), &v1[0], &v1[9]);
+    std::partial_sort_copy(l.begin(), l.end(), &v2[0], &v2[9]);
+
+    for (int i = 0; i < 9; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+    for (int i = 9; i < 20; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+
+    //------------------------------------------------------------------------
+    // Output size is greater than input size
+    //------------------------------------------------------------------------
+    for (int i = 0; i < 20; ++i)
+        v1[i] = v2[i] = 999;
+
+    hpx::partial_sort_copy(l.begin(), l.end(), &v1[0], &v1[20]);
+    std::partial_sort_copy(l.begin(), l.end(), &v2[0], &v2[20]);
+
+    for (int i = 0; i < 9; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+    for (int i = 9; i < 20; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_partial_sort(ExPolicy policy, IteratorTag)
+{
+    std::list<uint64_t> l = {9, 7, 6, 8, 5, 4, 1, 2, 3};
+    uint64_t v1[20], v2[20];
+
+    //------------------------------------------------------------------------
+    // Output size is smaller than input size
+    //------------------------------------------------------------------------
+    for (int i = 0; i < 20; ++i)
+        v1[i] = v2[i] = 999;
+
+    hpx::partial_sort_copy(policy, l.begin(), l.end(), &v1[0], &v1[4]);
+    std::partial_sort_copy(l.begin(), l.end(), &v2[0], &v2[4]);
+
+    for (int i = 0; i < 4; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+    for (int i = 4; i < 20; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+
+    //------------------------------------------------------------------------
+    // Output size is equal than input size
+    //------------------------------------------------------------------------
+    for (int i = 0; i < 20; ++i)
+        v1[i] = v2[i] = 999;
+
+    hpx::partial_sort_copy(policy, l.begin(), l.end(), &v1[0], &v1[9]);
+    std::partial_sort_copy(l.begin(), l.end(), &v2[0], &v2[9]);
+
+    for (int i = 0; i < 9; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+    for (int i = 9; i < 20; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+
+    //------------------------------------------------------------------------
+    // Output size is greater than input size
+    //------------------------------------------------------------------------
+    for (int i = 0; i < 20; ++i)
+        v1[i] = v2[i] = 999;
+
+    hpx::partial_sort_copy(policy, l.begin(), l.end(), &v1[0], &v1[20]);
+    std::partial_sort_copy(l.begin(), l.end(), &v2[0], &v2[20]);
+
+    for (int i = 0; i < 9; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+    for (int i = 9; i < 20; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_partial_sort_async(ExPolicy p, IteratorTag)
+{
+    std::list<uint64_t> l = {9, 7, 6, 8, 5, 4, 1, 2, 3};
+    std::vector<uint64_t> v1(20);
+    std::vector<uint64_t> v2(20);
+
+    //------------------------------------------------------------------------
+    // Output size is smaller than input size
+    //------------------------------------------------------------------------
+    for (int i = 0; i < 20; ++i)
+        v1[i] = v2[i] = 999;
+
+    auto f = hpx::partial_sort_copy(
+        p, l.begin(), l.end(), v1.begin(), v1.begin() + 4);
+    f.wait();
+    std::partial_sort_copy(l.begin(), l.end(), v2.begin(), v2.begin() + 4);
+
+    for (int i = 0; i < 4; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+    for (int i = 4; i < 20; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+
+    //------------------------------------------------------------------------
+    // Output size is equal than input size
+    //------------------------------------------------------------------------
+    for (int i = 0; i < 20; ++i)
+        v1[i] = v2[i] = 999;
+
+    auto f1 = hpx::partial_sort_copy(
+        p, l.begin(), l.end(), v1.begin(), v1.begin() + 9);
+    f1.wait();
+    std::partial_sort_copy(l.begin(), l.end(), v2.begin(), v2.begin() + 9);
+
+    for (int i = 0; i < 9; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+    for (int i = 9; i < 20; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+
+    //------------------------------------------------------------------------
+    // Output size is greater than input size
+    //------------------------------------------------------------------------
+    for (int i = 0; i < 20; ++i)
+        v1[i] = v2[i] = 999;
+
+    auto f2 =
+        hpx::partial_sort_copy(p, l.begin(), l.end(), v1.begin(), v1.end());
+    f2.wait();
+    std::partial_sort_copy(l.begin(), l.end(), v2.begin(), v2.end());
+
+    for (int i = 0; i < 9; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+    for (int i = 9; i < 20; ++i)
+    {
+        HPX_TEST(v1[i] == v2[i]);
+    };
+}
+
+template <typename IteratorTag>
+void test_partial_sort()
+{
+    using namespace hpx::execution;
+    test_partial_sort(IteratorTag());
+    test_partial_sort(seq, IteratorTag());
+    test_partial_sort(par, IteratorTag());
+    test_partial_sort(par_unseq, IteratorTag());
+
+    test_partial_sort_async(seq(task), IteratorTag());
+    test_partial_sort_async(par(task), IteratorTag());
+}
+
+void partial_sort_test()
+{
+    test_partial_sort<std::random_access_iterator_tag>();
+    test_partial_sort<std::forward_iterator_tag>();
+}
+
+/*
 //---------------------------------------------------------------------------
 // Check with the three cases
 // a) Output size smaller than input size
@@ -33,60 +244,6 @@ namespace hpp = ::hpx::parallel;
 //---------------------------------------------------------------------------
 void function01(void)
 {
-	std::list<uint64_t> l = {9, 7, 6, 8, 5, 4, 1, 2, 3};
-	uint64_t v1[20], v2[20];
-
-	//------------------------------------------------------------------------
-	// Output size is smaller than input size
-	//------------------------------------------------------------------------
-	for ( int i = 0; i < 20; ++i) 	v1[i] = v2[i] = 999;
-
-	hpxp::partial_sort_copy (l.begin(), l.end(), &v1[0], & v1[4]);
-
-	std::partial_sort_copy (l.begin(), l.end(), &v2[0], & v2[4]);
-	//hpx::cout<<"Expected : 1, 2, 3, 4 \n";
-	for ( int i =0 ; i < 4; ++i)
-	{
-		assert (v1[i] == v2[i]);
-	};
-	for ( int i = 4 ; i < 20; ++i)
-	{
-		assert (v1[i] == v2[i]);
-	};
-
-	//------------------------------------------------------------------------
-	// Output size is equal than input size
-	//------------------------------------------------------------------------
-	for ( int i = 0; i < 20; ++i) 	v1[i] = v2[i] = 999;
-
-	hpxp::partial_sort_copy (l.begin(), l.end(), &v1[0], & v1[9]);
-	std::partial_sort_copy (l.begin(), l.end(), &v2[0], & v2[9]);
-	//hpx::cout<<"Expected : 1, 2, 3, 4, 5, 6, 7, 8, 9\n";
-	for ( int i =0 ; i < 9; ++i)
-	{
-		assert (v1[i] == v2[i]);
-	};
-	for ( int i = 9 ; i < 20; ++i)
-	{
-		assert (v1[i] == v2[i]);
-	};
-
-	//------------------------------------------------------------------------
-	// Output size is greater than input size
-	//------------------------------------------------------------------------
-	for ( int i = 0; i < 20; ++i) 	v1[i] = v2[i] = 999;
-
-	hpxp::partial_sort_copy (l.begin(), l.end(), &v1[0], & v1[20]);
-	std::partial_sort_copy (l.begin(), l.end(), &v2[0], & v2[20]);
-	//hpx::cout<<"Expected : 1, 2, 3, 4, 5, 6, 7, 8, 9\n";
-	for ( int i =0 ; i < 9; ++i)
-	{
-		assert (v1[i] == v2[i]);
-	};
-	for ( int i = 9 ; i < 20; ++i)
-	{
-		assert (v1[i] == v2[i]);
-	};
 
 };
 //---------------------------------------------------------------------------
@@ -164,29 +321,41 @@ void function03 ( void)
     		assert (A[j] == j);
 		};
     };
-};
+};*/
 
-int test_main (void)
+int hpx_main(hpx::program_options::variables_map& vm)
 {
-	hpx::cout<<"----------------- test_partial_sort_copy -------------------\n";
-	function01();
-    function02();
-    function03();
-    hpx::cout<<"------------------------ end -------------------------------\n";
-    return 0;
+    if (vm.count("seed"))
+        seed = vm["seed"].as<unsigned int>();
+
+    std::cout << "using seed: " << seed << std::endl;
+    gen.seed(seed);
+
+    partial_sort_test();
+
+    return hpx::local::finalize();
 }
+
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=all");
+    // add command line option which controls the random number generator seed
+    using namespace hpx::program_options;
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    // Initialize and run HPX.
-    return hpx::init(argc, argv, cfg);
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
+
+    // By default this test should run on all available cores
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
+
+    // Initialize and run HPX
+    hpx::local::init_params init_args;
+    init_args.desc_cmdline = desc_commandline;
+    init_args.cfg = cfg;
+
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv, init_args), 0,
+        "HPX main exited with non-zero status");
+
+    return hpx::util::report_errors();
 }
-int hpx_main(boost::program_options::variables_map&)
-{
-	{	test_main() ;
-    };
-    // Initiate shutdown of the runtime systems on all localities.
-    return hpx::finalize();
-};

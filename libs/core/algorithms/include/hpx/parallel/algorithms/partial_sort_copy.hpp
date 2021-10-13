@@ -133,8 +133,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         parallel(ExPolicy&& policy, FwdIter first, Sent last, RandIter d_first,
             RandIter d_last, Compare&& comp, Proj1&& proj1, Proj2&& proj2)
         {
-            using result_type =
-                util::detail::algorithm_result<ExPolicy, RandIter>;
+            using result_type = util::detail::algorithm_result<ExPolicy,
+                util::in_out_result<FwdIter, RandIter>>;
             using value_t = typename std::iterator_traits<FwdIter>::value_type;
             using value1_t =
                 typename std::iterator_traits<RandIter>::value_type;
@@ -147,8 +147,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             {
                 auto last_iter = detail::advance_to_sentinel(first, last);
 
-                if ((last_iter == first) or (d_last == d_first))
-                    return result_type::get(d_first);
+                if ((last_iter == first) || (d_last == d_first))
+                    return result_type::get(
+                        util::in_out_result<FwdIter, RandIter>{
+                            last_iter, d_first});
 
                 std::vector<value_t> aux(first, last);
                 std::int64_t ninput = aux.size();
@@ -158,29 +160,31 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 auto nmin = ninput < noutput ? ninput : noutput;
                 if (noutput >= ninput)
                 {
-                    detail::sort<vec_iter_t>().call(policy, aux.begin(),
-                        aux.end(), comp, std::forward<Proj2>(proj2));
+                    detail::sort<vec_iter_t>().call(hpx::execution::par,
+                        aux.begin(), aux.end(), comp,
+                        std::forward<Proj2>(proj2));
                 }
                 else
                 {
-                    hpx::parallel::v1::partial_sort<vec_iter_t>().call(policy,
-                        aux.begin(), aux.begin() + nmin, aux.end(),
-                        std::forward<Compare>(comp),
+                    //
+                    hpx::parallel::v1::partial_sort<vec_iter_t>().call(
+                        hpx::execution::par, aux.begin(), aux.begin() + nmin,
+                        aux.end(), std::forward<Compare>(comp),
                         std::forward<Proj2>(proj2));
                 };
 
                 detail::copy<util::in_out_result<vec_iter_t, RandIter>>().call(
-                    std::forwrad<ExPolicy>(policy), aux.begin(),
-                    aux.begin() + nmin, d_first);
+                    hpx::execution::par, aux.begin(), aux.begin() + nmin,
+                    d_first);
 
-                return result_type::get(util::in_out_result<InIter, RandIter>{
+                return result_type::get(util::in_out_result<FwdIter, RandIter>{
                     last_iter, d_first + nmin});
             }
             catch (...)
             {
-                return result_type::get(
-                    detail::handle_exception<ExPolicy, RandIter>::call(
-                        std::current_exception()));
+                return result_type::get(detail::handle_exception<ExPolicy,
+                    util::in_out_result<FwdIter,
+                        RandIter>>::call(std::current_exception()));
             }
         }
     };
