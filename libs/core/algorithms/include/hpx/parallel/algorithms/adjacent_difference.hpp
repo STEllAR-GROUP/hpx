@@ -84,9 +84,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     // VS2015RC bails out when op is captured by ref
                     using hpx::get;
                     util::loop_n<std::decay_t<ExPolicy>>(
-                        part_begin, part_size, [op](auto&& it) {
+                        part_begin, part_size, [op](auto&& it) mutable {
                             get<2>(*it) =
-                                hpx::util::invoke(op, get<0>(*it), get<1>(*it));
+                                HPX_INVOKE(op, get<0>(*it), get<1>(*it));
                         });
                 };
 
