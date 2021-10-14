@@ -764,6 +764,9 @@ system and application performance.
      * Description
      * Parameters
    * * ``/agas/count/<agas_service>``
+   
+       .. _agas-count-agas-service: 
+       :ref:`🔗<agas-count-agas-service>`
 
        where:
 
