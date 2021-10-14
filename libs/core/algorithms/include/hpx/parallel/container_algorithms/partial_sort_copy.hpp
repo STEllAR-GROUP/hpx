@@ -369,8 +369,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::partial_sort_copy<result_type>()
                 .call(std::forward<ExPolicy>(policy), first, last, r_first,
-                    r_last, std::forward<Comp>(comp), std::forward<Proj1>(proj),
-                    std::forward<Proj2>(proj2));
+                    r_last, std::forward<Comp>(comp),
+                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
 
         // clang-format off

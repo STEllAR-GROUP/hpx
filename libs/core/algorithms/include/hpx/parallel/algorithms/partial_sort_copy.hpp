@@ -138,7 +138,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             using value_t = typename std::iterator_traits<FwdIter>::value_type;
             using value1_t =
                 typename std::iterator_traits<RandIter>::value_type;
-            using vec_iter_t = std::vector<value_t>::iterator;
+            using vec_iter_t = typename std::vector<value_t>::iterator;
 
             static_assert(
                 std::is_same_v<value1_t, value_t>, "Incompatible iterators\n");

@@ -27,7 +27,7 @@ unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename IteratorTag>
-void test_partial_sort(IteratorTag)
+void test_partial_sort1(IteratorTag)
 {
     std::list<uint64_t> l = {9, 7, 6, 8, 5, 4, 1, 2, 3};
     uint64_t v1[20], v2[20];
@@ -88,7 +88,7 @@ void test_partial_sort(IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_partial_sort(ExPolicy policy, IteratorTag)
+void test_partial_sort1(ExPolicy policy, IteratorTag)
 {
     std::list<uint64_t> l = {9, 7, 6, 8, 5, 4, 1, 2, 3};
     uint64_t v1[20], v2[20];
@@ -149,7 +149,7 @@ void test_partial_sort(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_partial_sort_async(ExPolicy p, IteratorTag)
+void test_partial_sort1_async(ExPolicy p, IteratorTag)
 {
     std::list<uint64_t> l = {9, 7, 6, 8, 5, 4, 1, 2, 3};
     std::vector<uint64_t> v1(20);
@@ -217,111 +217,273 @@ void test_partial_sort_async(ExPolicy p, IteratorTag)
 }
 
 template <typename IteratorTag>
-void test_partial_sort()
+void test_partial_sort1()
 {
     using namespace hpx::execution;
-    test_partial_sort(IteratorTag());
-    test_partial_sort(seq, IteratorTag());
-    test_partial_sort(par, IteratorTag());
-    test_partial_sort(par_unseq, IteratorTag());
+    test_partial_sort1(IteratorTag());
+    test_partial_sort1(seq, IteratorTag());
+    test_partial_sort1(par, IteratorTag());
+    test_partial_sort1(par_unseq, IteratorTag());
 
-    test_partial_sort_async(seq(task), IteratorTag());
-    test_partial_sort_async(par(task), IteratorTag());
+    test_partial_sort1_async(seq(task), IteratorTag());
+    test_partial_sort1_async(par(task), IteratorTag());
 }
 
-void partial_sort_test()
+void partial_sort_test1()
 {
-    test_partial_sort<std::random_access_iterator_tag>();
-    test_partial_sort<std::forward_iterator_tag>();
+    test_partial_sort1<std::random_access_iterator_tag>();
+    test_partial_sort1<std::forward_iterator_tag>();
 }
 
-/*
-//---------------------------------------------------------------------------
-// Check with the three cases
-// a) Output size smaller than input size
-// b) Output size equal than input size
-// c) Output size greter than input size
-//---------------------------------------------------------------------------
-void function01(void)
+template <typename IteratorTag>
+void test_partial_sort2(IteratorTag)
 {
-
-};
-//---------------------------------------------------------------------------
-// This function check all the sizes in a list of 10000 elements, and checks
-// with the version of the standard library
-//---------------------------------------------------------------------------
-void function02 (void)
-{
-    typedef std::less<uint64_t>   compare_t;
-    std::list <uint64_t> lst;
-    std::mt19937 my_rand (0);
+    using compare_t = std::less<uint64_t>;
+    std::list<uint64_t> lst;
+    std::mt19937 my_rand(0);
     std::vector<uint64_t> A, B;
     const uint32_t NELEM = 10000;
     A.reserve(NELEM);
     B.reserve(NELEM);
-   
 
-    for ( uint64_t i = 0; i < NELEM; ++i)
+    for (uint64_t i = 0; i < NELEM; ++i)
     {
-    	A.emplace_back (i);
-    	B.emplace_back (0);
+        A.emplace_back(i);
+        B.emplace_back(0);
     }
 
-    std::shuffle( A.begin(), A.end(), my_rand);
-    lst.insert (lst.end(), A.begin(), A.end() );
+    std::shuffle(A.begin(), A.end(), my_rand);
+    lst.insert(lst.end(), A.begin(), A.end());
 
     for (uint64_t i = 0; i <= NELEM; ++i)
-    {	A = B;
+    {
+        A = B;
 
-    	hpxp::partial_sort_copy (::hpx::execution::seq,
-    			                 lst.begin(), lst.end(),
-    			                 A.begin(), A.begin() + i, compare_t());
+        hpx::partial_sort_copy(
+            lst.begin(), lst.end(), A.begin(), A.begin() + i, compare_t());
 
-    	for ( uint64_t j =0 ; j < i; ++j)
-		{
-    		assert (A[j] == j);
-		};
+        for (uint64_t j = 0; j < i; ++j)
+        {
+            HPX_ASSERT(A[j] == j);
+        };
     };
-};
-//-----------------------------------------------------------------------------
-// This function check the partial_sort_copy from a list to several output
-// sizes nd compare with the standard library implementation
-//-----------------------------------------------------------------------------
+}
 
-void function03 ( void)
+template <typename ExPolicy, typename IteratorTag>
+void test_partial_sort2(ExPolicy policy, IteratorTag)
 {
-    typedef std::less<uint64_t>   compare_t;
-    std::list <uint64_t> lst;
-    std::mt19937 my_rand (0);
+    using compare_t = std::less<uint64_t>;
+    std::list<uint64_t> lst;
+    std::mt19937 my_rand(0);
+    std::vector<uint64_t> A, B;
+    const uint32_t NELEM = 10000;
+    A.reserve(NELEM);
+    B.reserve(NELEM);
+
+    for (uint64_t i = 0; i < NELEM; ++i)
+    {
+        A.emplace_back(i);
+        B.emplace_back(0);
+    }
+
+    std::shuffle(A.begin(), A.end(), my_rand);
+    lst.insert(lst.end(), A.begin(), A.end());
+
+    for (uint64_t i = 0; i <= NELEM; ++i)
+    {
+        A = B;
+
+        hpx::partial_sort_copy(policy, lst.begin(), lst.end(), A.begin(),
+            A.begin() + i, compare_t());
+
+        for (uint64_t j = 0; j < i; ++j)
+        {
+            HPX_ASSERT(A[j] == j);
+        };
+    };
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_partial_sort2_async(ExPolicy p, IteratorTag)
+{
+    using compare_t = std::less<uint64_t>;
+    std::list<uint64_t> lst;
+    std::mt19937 my_rand(0);
+    std::vector<uint64_t> A, B;
+    const uint32_t NELEM = 10000;
+    A.reserve(NELEM);
+    B.reserve(NELEM);
+
+    for (uint64_t i = 0; i < NELEM; ++i)
+    {
+        A.emplace_back(i);
+        B.emplace_back(0);
+    }
+
+    std::shuffle(A.begin(), A.end(), my_rand);
+    lst.insert(lst.end(), A.begin(), A.end());
+
+    for (uint64_t i = 0; i <= NELEM; ++i)
+    {
+        A = B;
+
+        auto f = hpx::partial_sort_copy(
+            p, lst.begin(), lst.end(), A.begin(), A.begin() + i, compare_t());
+        f.wait();
+
+        for (uint64_t j = 0; j < i; ++j)
+        {
+            HPX_ASSERT(A[j] == j);
+        };
+    };
+}
+
+template <typename IteratorTag>
+void test_partial_sort2()
+{
+    using namespace hpx::execution;
+    test_partial_sort2(IteratorTag());
+    test_partial_sort2(seq, IteratorTag());
+    test_partial_sort2(par, IteratorTag());
+    test_partial_sort2(par_unseq, IteratorTag());
+
+    test_partial_sort2_async(seq(task), IteratorTag());
+    test_partial_sort2_async(par(task), IteratorTag());
+}
+
+void partial_sort_test2()
+{
+    test_partial_sort2<std::random_access_iterator_tag>();
+    test_partial_sort2<std::forward_iterator_tag>();
+}
+
+template <typename IteratorTag>
+void test_partial_sort3(IteratorTag)
+{
+    using compare_t = std::less<uint64_t>;
+    std::list<uint64_t> lst;
+    std::mt19937 my_rand(0);
     std::vector<uint64_t> A, B, C;
-    const uint32_t NELEM = 1000000;
+    const uint32_t NELEM = 1000;
     A.reserve(NELEM);
     B.reserve(NELEM);
     C.reserve(NELEM);
 
-    for ( uint64_t i = 0; i < NELEM; ++i)
+    for (uint64_t i = 0; i < NELEM; ++i)
     {
-    	A.emplace_back (i);
-    	B.emplace_back (0);
+        A.emplace_back(i);
+        B.emplace_back(0);
     }
 
-    std::shuffle( A.begin(), A.end(), my_rand);
-    lst.insert (lst.end(), A.begin(), A.end() );
+    std::shuffle(A.begin(), A.end(), my_rand);
+    lst.insert(lst.end(), A.begin(), A.end());
 
-	const uint32_t STEP = NELEM / 20 ;
+    const uint32_t STEP = NELEM / 20;
 
-	for (uint64_t i = 0; i <= NELEM; i += STEP)
-    {	A = B ;
-    	hpxp::partial_sort_copy (::hpx::execution::seq,
-    			                 lst.begin(), lst.end(),
-    			                 A.begin() , A.begin() + i, compare_t());
+    for (uint64_t i = 0; i <= NELEM; i += STEP)
+    {
+        A = B;
+        hpx::partial_sort_copy(
+            lst.begin(), lst.end(), A.begin(), A.begin() + i, compare_t());
 
-    	for ( uint64_t j =0 ; j < i; ++j)
-		{
-    		assert (A[j] == j);
-		};
+        for (uint64_t j = 0; j < i; ++j)
+        {
+            HPX_ASSERT(A[j] == j);
+        };
     };
-};*/
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_partial_sort3(ExPolicy policy, IteratorTag)
+{
+    using compare_t = std::less<uint64_t>;
+    std::list<uint64_t> lst;
+    std::mt19937 my_rand(0);
+    std::vector<uint64_t> A, B, C;
+    const uint32_t NELEM = 100000;
+    A.reserve(NELEM);
+    B.reserve(NELEM);
+    C.reserve(NELEM);
+
+    for (uint64_t i = 0; i < NELEM; ++i)
+    {
+        A.emplace_back(i);
+        B.emplace_back(0);
+    }
+
+    std::shuffle(A.begin(), A.end(), my_rand);
+    lst.insert(lst.end(), A.begin(), A.end());
+
+    const uint32_t STEP = NELEM / 20;
+
+    for (uint64_t i = 0; i <= NELEM; i += STEP)
+    {
+        A = B;
+        hpx::partial_sort_copy(policy, lst.begin(), lst.end(), A.begin(),
+            A.begin() + i, compare_t());
+
+        for (uint64_t j = 0; j < i; ++j)
+        {
+            HPX_ASSERT(A[j] == j);
+        };
+    };
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_partial_sort3_async(ExPolicy p, IteratorTag)
+{
+    using compare_t = std::less<uint64_t>;
+    std::list<uint64_t> lst;
+    std::mt19937 my_rand(0);
+    std::vector<uint64_t> A, B, C;
+    const uint32_t NELEM = 100000;
+    A.reserve(NELEM);
+    B.reserve(NELEM);
+    C.reserve(NELEM);
+
+    for (uint64_t i = 0; i < NELEM; ++i)
+    {
+        A.emplace_back(i);
+        B.emplace_back(0);
+    }
+
+    std::shuffle(A.begin(), A.end(), my_rand);
+    lst.insert(lst.end(), A.begin(), A.end());
+
+    const uint32_t STEP = NELEM / 20;
+
+    for (uint64_t i = 0; i <= NELEM; i += STEP)
+    {
+        A = B;
+        auto f = hpx::partial_sort_copy(
+            p, lst.begin(), lst.end(), A.begin(), A.begin() + i, compare_t());
+        f.wait();
+
+        for (uint64_t j = 0; j < i; ++j)
+        {
+            HPX_ASSERT(A[j] == j);
+        };
+    };
+}
+
+template <typename IteratorTag>
+void test_partial_sort3()
+{
+    using namespace hpx::execution;
+    test_partial_sort3(IteratorTag());
+    test_partial_sort3(seq, IteratorTag());
+    test_partial_sort3(par, IteratorTag());
+    test_partial_sort3(par_unseq, IteratorTag());
+
+    test_partial_sort3_async(seq(task), IteratorTag());
+    test_partial_sort3_async(par(task), IteratorTag());
+}
+
+void partial_sort_test3()
+{
+    test_partial_sort3<std::random_access_iterator_tag>();
+    test_partial_sort3<std::forward_iterator_tag>();
+}
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
@@ -331,7 +493,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     gen.seed(seed);
 
-    partial_sort_test();
+    partial_sort_test1();
+    partial_sort_test2();
+    partial_sort_test3();
 
     return hpx::local::finalize();
 }
