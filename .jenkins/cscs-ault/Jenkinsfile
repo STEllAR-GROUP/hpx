@@ -1,0 +1,72 @@
+#!groovy
+
+// Copyright (c) 2020 ETH Zurich
+//
+// SPDX-License-Identifier: BSL-1.0
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+pipeline {
+    agent {
+        node {
+            label 'ault'
+        }
+    }
+    options {
+        buildDiscarder(
+            logRotator(
+                daysToKeepStr: "7",
+                numToKeepStr: "25",
+                artifactDaysToKeepStr: "7",
+                artifactNumToKeepStr: "25"
+            )
+        )
+    }
+    environment {
+        SPACK_ROOT = '/apps/ault/SSL/HPX/spack'
+        GITHUB_TOKEN = credentials('STELLARBOT_GITHUB_TOKEN')
+    }
+    stages {
+        stage('checkout') {
+            steps {
+                dir('hpx') {
+                    checkout scm
+                    echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                }
+            }
+        }
+        stage('build') {
+            matrix {
+                axes {
+                    axis {
+                        name 'configuration_name'
+                        values 'hipcc'
+                    }
+                    axis {
+                         name 'build_type'
+                         values 'Release', 'Debug'
+                    }
+                }
+                stages {
+                    stage('build') {
+                        steps {
+                            dir('hpx') {
+                                sh '''
+                                #!/bin/bash -l
+                                .jenkins/cscs-ault/entry.sh
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'hpx/jenkins-hpx-*', fingerprint: true
+            archiveArtifacts artifacts: 'hpx/*-Testing/**', fingerprint: true
+        }
+    }
+}
