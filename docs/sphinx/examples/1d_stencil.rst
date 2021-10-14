@@ -7,9 +7,9 @@
 
 .. _examples_1d_stencil:
 
-===========================
-Local to remote: 1D stencil
-===========================
+===============
+Local to remote
+===============
 
 When developers write code they typically begin with a simple serial code and
 build upon it until all of the required functionality is present. The following

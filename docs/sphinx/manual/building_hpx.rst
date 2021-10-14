@@ -36,35 +36,35 @@ work, but we do not test |hpx| with other platforms, so please be warned.
    Mac OSX   Any OSX system     x86-64
    ========= ================== ====================
 
+Supported compilers
+-------------------
+The table below shows the supported compilers for |hpx|.
+
+.. table:: Supported Compilers for |hpx|
+
+   =================== ================== 
+   Name                Minimum Version    
+   =================== ================== 
+   |gcc|_              7.0              
+   |clang|_            7.0             
+   |visual_cxx|_ (x64) 2015     
+   =================== ================== 
+
 Software and libraries
 ----------------------
 
 The table below presents all the necessary prerequisites for building |hpx|.
 
-.. list-table:: Software prerequisites for |hpx|
+.. table:: Software prerequisites for |hpx|
 
-   * * Name
-     * Minimum version
-   * * **Compilers**
-     *
-   * * |gcc|_
-     * 7.0
-   * * |clang|_
-     * 7.0
-   * * |visual_cxx|_ (x64)
-     * 2015
-   * * **Build System**
-     *
-   * * |cmake|_
-     * 3.18
-   * * **Required Libraries**
-     *
-   * * |boost|_
-     * 1.71.0
-   * * |hwloc|_
-     * 1.5
-   * * |asio|_
-     * 1.12.0
+   ====================== =================== ================== 
+   \                      Name                Minimum Version    
+   ====================== =================== ================== 
+   **Build System**       |cmake|_            3.18
+   **Required Libraries** |boost|_            1.71.0
+   \                      |hwloc|_            1.5
+   \                      |asio|_             1.12.0
+   ====================== =================== ================== 
 
 The most important dependencies are |boost|_ and |hwloc|_. The installation of Boost 
 is described in detail in Boost's `Getting Started <https://www.boost.org/more/getting_started/index.html>`_

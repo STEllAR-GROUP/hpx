@@ -9,9 +9,9 @@
 
 .. _examples_accumulator:
 
-===================================
-Components and actions: Accumulator
-===================================
+======================
+Components and actions
+======================
 
 The accumulator example demonstrates the use of components. Components are C++
 classes that expose methods as a type of |hpx| action. These actions are called

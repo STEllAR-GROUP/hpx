@@ -9,9 +9,9 @@
 
 .. _examples_interest_calculator:
 
-=============================
-Dataflow: Interest calculator
-=============================
+========
+Dataflow
+========
 
 |hpx| provides its users with several different tools to simply express parallel
 concepts. One of these tools is a :term:`local control object` (:term:`LCO`)
