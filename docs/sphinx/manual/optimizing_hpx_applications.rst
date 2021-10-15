@@ -806,6 +806,9 @@ system and application performance.
        service since its creation.
    * * ``/agas/<agas_service_category>/count``
 
+       .. _agas-agas-service-category-count: 
+       :ref:`🔗<agas-agas-service-category-count>`
+
        where:
 
        ``<agas_service_category>`` is one of the following: ``primary``,
@@ -828,6 +831,9 @@ system and application performance.
        services provided by the given :term:`AGAS` service category since its
        creation.
    * * ``agas/time/<agas_service>``
+
+       .. _agas-time-agas-service: 
+       :ref:`🔗<agas-time-agas-service>`
 
        where:
 
@@ -869,6 +875,9 @@ system and application performance.
        since its creation (in nanoseconds).
    * * ``/agas/<agas_service_category>/time``
 
+       .. _agas-agas-service-category-time: 
+       :ref:`🔗<agas-agas-service-category-time>`
+
        where:
 
        ``<agas_service_category>`` is one of the following: ``primary``,
@@ -890,6 +899,10 @@ system and application performance.
        by the given :term:`AGAS` service category since its creation (in
        nanoseconds).
    * * ``/agas/count/entries``
+       
+       .. _agas-count-entries: 
+       :ref:`🔗<agas-count-entries>`
+     
      * ``locality#*/total``
 
        where:
@@ -901,6 +914,9 @@ system and application performance.
      * Returns the number of cache entries resident in the :term:`AGAS` cache of
        the specified :term:`locality` (see ``<cache_statistics>``).
    * * ``/agas/count/<cache_statistics>``
+
+       .. _agas-count-cache-statistics: 
+       :ref:`🔗<agas-count-cache-statistics>`
 
        where:
 
@@ -919,6 +935,9 @@ system and application performance.
        ``<cache_statistics>``).
    * * ``/agas/count/<full_cache_statistics>``
 
+       .. _agas-count-full-cache-statistics: 
+       :ref:`🔗<agas-count-full-cache-statistics>`
+
        where:
 
        ``<full_cache_statistics>`` is one of the following: ``cache/get_entry``,
@@ -934,6 +953,9 @@ system and application performance.
      * Returns the number of invocations of the specified cache API function of
        the :term:`AGAS` cache.
    * * ``/agas/time/<full_cache_statistics>``
+
+       .. _agas-time-full-cache-statistics:
+       :ref:`🔗<agas-time-full-cache-statistics>`
 
        where:
 
