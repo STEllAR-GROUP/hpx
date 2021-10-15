@@ -60,13 +60,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         ///
         /// \return iterator after the last element sorted
         ///
-        template <typename ExPolicy, typename InIter, typename Sent,
-            typename RandIter, typename Compare, typename Proj1, typename Proj2>
+        template <typename ExPolicy, typename InIter, typename Sent1,
+            typename RandIter, typename Sent2, typename Compare, typename Proj1,
+            typename Proj2>
         static util::in_out_result<InIter, RandIter> sequential(ExPolicy,
-            InIter first, Sent last, RandIter d_first, RandIter d_last,
+            InIter first, Sent1 last, RandIter d_first, Sent2 d_last,
             Compare&& comp, Proj1&& proj1, Proj2&& proj2)
         {
             auto last_iter = detail::advance_to_sentinel(first, last);
+            auto d_last_iter = detail::advance_to_sentinel(d_first, d_last);
 
             using value_t = typename std::iterator_traits<InIter>::value_type;
             using value1_t =
@@ -76,12 +78,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             static_assert(
                 std::is_same_v<value1_t, value_t>, "Incompatible iterators\n");
 
-            if ((last_iter == first) || (d_last == d_first))
+            if ((last_iter == first) || (d_last_iter == d_first))
                 return util::in_out_result<InIter, RandIter>{
                     last_iter, d_first};
 
             std::vector<value_t> aux(first, last_iter);
-            std::int64_t noutput = d_last - d_first;
+            std::int64_t noutput = d_last_iter - d_first;
             std::int64_t ninput = aux.size();
 
             HPX_ASSERT(ninput >= 0 || noutput >= 0);
@@ -126,12 +128,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         ///
         /// \return iterator after the last element sorted
         ///
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename RandIter, typename Compare, typename Proj1, typename Proj2>
+        template <typename ExPolicy, typename FwdIter, typename Sent1,
+            typename RandIter, typename Sent2, typename Compare, typename Proj1,
+            typename Proj2>
         static util::detail::algorithm_result_t<ExPolicy,
             util::in_out_result<FwdIter, RandIter>>
-        parallel(ExPolicy&& policy, FwdIter first, Sent last, RandIter d_first,
-            RandIter d_last, Compare&& comp, Proj1&& proj1, Proj2&& proj2)
+        parallel(ExPolicy&& policy, FwdIter first, Sent1 last, RandIter d_first,
+            Sent2 d_last, Compare&& comp, Proj1&& proj1, Proj2&& proj2)
         {
             using result_type = util::detail::algorithm_result<ExPolicy,
                 util::in_out_result<FwdIter, RandIter>>;
@@ -146,15 +149,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             try
             {
                 auto last_iter = detail::advance_to_sentinel(first, last);
+                auto d_last_iter = detail::advance_to_sentinel(d_first, d_last);
 
-                if ((last_iter == first) || (d_last == d_first))
+                if ((last_iter == first) || (d_last_iter == d_first))
                     return result_type::get(
                         util::in_out_result<FwdIter, RandIter>{
                             last_iter, d_first});
 
-                std::vector<value_t> aux(first, last);
+                std::vector<value_t> aux(first, last_iter);
                 std::int64_t ninput = aux.size();
-                std::int64_t noutput = d_last - d_first;
+                std::int64_t noutput = d_last_iter - d_first;
                 HPX_ASSERT(ninput >= 0 and noutput >= 0);
 
                 auto nmin = ninput < noutput ? ninput : noutput;

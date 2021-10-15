@@ -341,7 +341,7 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::partial_sort<RandomIt>().call(
-                std::forward<ExPolicy>(policy), first, last,
+                std::forward<ExPolicy>(policy), first, middle, last,
                 std::forward<Comp>(comp), std::forward<Proj>(proj));
         }
 
@@ -364,7 +364,7 @@ namespace hpx { namespace ranges {
             hpx::traits::range_iterator_t<Rng> middle,
             Compare&& comp = Compare(), Proj&& proj = Proj())
         {
-            using iterator_type = hpx::traits::range_traits_t<Rng>;
+            using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
             static_assert(
                 hpx::traits::is_random_access_iterator_v<iterator_type>,

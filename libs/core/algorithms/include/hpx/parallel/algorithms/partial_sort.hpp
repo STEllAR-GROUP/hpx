@@ -383,7 +383,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename Iter, typename Sent, typename Comp>
     Iter sequential_partial_sort(Iter first, Iter middle, Sent end, Comp&& comp)
     {
-        std::int64_t nelem = end - first;
+        std::int64_t nelem = detail::distance(first, end);
         HPX_ASSERT(nelem >= 0);
 
         std::int64_t nmid = middle - first;
@@ -418,7 +418,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     hpx::future<Iter> parallel_partial_sort(
         ExPolicy&& policy, Iter first, Iter middle, Sent end, Comp&& comp)
     {
-        std::int64_t nelem = end - first;
+        std::int64_t nelem = detail::distance(first, end);
         HPX_ASSERT(nelem >= 0);
 
         std::int64_t nmid = middle - first;
