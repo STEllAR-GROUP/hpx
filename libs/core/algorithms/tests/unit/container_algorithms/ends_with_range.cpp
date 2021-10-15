@@ -23,24 +23,29 @@
 template <typename IteratorTag>
 void test_ends_with_sent(IteratorTag)
 {
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+    using sentinel = test::sentinel_from_iterator<iterator>;
+
     auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % (end1 - 1) + 1;
+    auto end2 = std::rand() % end1;
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
 
-    // create vector containing last end2-end1 elements
-    auto some_more_ints = std::vector<int>(end1 - end2 + 1);
-    std::iota(some_more_ints.begin(), some_more_ints.end(), end2);
+    auto some_more_ints =
+        std::vector<int>(some_ints.begin() + end2, some_ints.end());
 
-    auto some_wrong_ints = std::vector<int>(end2);
-    std::iota(some_wrong_ints.begin(), some_wrong_ints.end(), 1);
+    auto some_wrong_ints = std::vector<int>(end1 - end2);
+    std::iota(some_wrong_ints.begin(), some_wrong_ints.end(), -2);
 
-    auto result1 = hpx::ranges::ends_with(std::begin(some_ints),
-        sentinel<int>{end1}, std::begin(some_more_ints), sentinel<int>{end1});
+    auto result1 = hpx::ranges::ends_with(iterator(std::begin(some_ints)),
+        sentinel(std::end(some_ints)), iterator(std::begin(some_more_ints)),
+        sentinel(std::end(some_more_ints)));
     HPX_TEST_EQ(result1, true);
 
-    auto result2 = hpx::ranges::ends_with(std::begin(some_ints),
-        sentinel<int>{end1}, std::begin(some_wrong_ints), sentinel<int>{end2});
+    auto result2 = hpx::ranges::ends_with(iterator(std::begin(some_ints)),
+        sentinel(std::end(some_ints)), iterator(std::begin(some_wrong_ints)),
+        sentinel(std::end(some_wrong_ints)));
     HPX_TEST_EQ(result2, false);
 }
 
@@ -50,22 +55,31 @@ void test_ends_with_sent(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+    using sentinel = test::sentinel_from_iterator<iterator>;
+
     auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % (end1 - 1) + 1;
+    auto end2 = std::rand() % end1;
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
-    auto some_more_ints = std::vector<int>(end1 - end2 + 1);
-    std::iota(some_more_ints.begin(), some_more_ints.end(), end2);
-    auto some_wrong_ints = std::vector<int>(end2);
-    std::iota(some_wrong_ints.begin(), some_wrong_ints.end(), 1);
 
-    auto result1 = hpx::ranges::ends_with(policy, std::begin(some_ints),
-        sentinel<int>{end1}, std::begin(some_more_ints), sentinel<int>{end1});
+    auto some_more_ints =
+        std::vector<int>(some_ints.begin() + end2, some_ints.end());
+
+    auto some_wrong_ints = std::vector<int>(end1 - end2);
+    std::iota(some_wrong_ints.begin(), some_wrong_ints.end(), -2);
+
+    auto result1 =
+        hpx::ranges::ends_with(policy, iterator(std::begin(some_ints)),
+            sentinel(std::end(some_ints)), iterator(std::begin(some_more_ints)),
+            sentinel(std::end(some_more_ints)));
     HPX_TEST_EQ(result1, true);
 
-    auto result2 = hpx::ranges::ends_with(policy, std::begin(some_ints),
-        sentinel<int>{end1}, std::begin(some_wrong_ints), sentinel<int>{end2});
-
+    auto result2 = hpx::ranges::ends_with(policy,
+        iterator(std::begin(some_ints)), sentinel(std::end(some_ints)),
+        iterator(std::begin(some_wrong_ints)),
+        sentinel(std::end(some_wrong_ints)));
     HPX_TEST_EQ(result2, false);
 }
 
@@ -73,13 +87,15 @@ template <typename IteratorTag>
 void test_ends_with(IteratorTag)
 {
     auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % (end1 - 1) + 1;
+    auto end2 = std::rand() % end1;
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
-    auto some_more_ints = std::vector<int>(end1 - end2 + 1);
-    std::iota(some_more_ints.begin(), some_more_ints.end(), end2);
-    auto some_wrong_ints = std::vector<int>(end2);
-    std::iota(some_wrong_ints.begin(), some_wrong_ints.end(), 1);
+
+    auto some_more_ints =
+        std::vector<int>(some_ints.begin() + end2, some_ints.end());
+
+    auto some_wrong_ints = std::vector<int>(end1 - end2);
+    std::iota(some_wrong_ints.begin(), some_wrong_ints.end(), -2);
 
     auto result1 = hpx::ranges::ends_with(some_ints, some_more_ints);
     HPX_TEST_EQ(result1, true);
@@ -95,13 +111,15 @@ void test_ends_with(ExPolicy policy, IteratorTag)
         "hpx::is_execution_policy<ExPolicy>::value");
 
     auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % (end1 - 1) + 1;
+    auto end2 = std::rand() % end1;
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
-    auto some_more_ints = std::vector<int>(end1 - end2 + 1);
-    std::iota(some_more_ints.begin(), some_more_ints.end(), end2);
-    auto some_wrong_ints = std::vector<int>(end2);
-    std::iota(some_wrong_ints.begin(), some_wrong_ints.end(), 1);
+
+    auto some_more_ints =
+        std::vector<int>(some_ints.begin() + end2, some_ints.end());
+
+    auto some_wrong_ints = std::vector<int>(end1 - end2);
+    std::iota(some_wrong_ints.begin(), some_wrong_ints.end(), -2);
 
     auto result1 = hpx::ranges::ends_with(policy, some_ints, some_more_ints);
     HPX_TEST_EQ(result1, true);
@@ -114,13 +132,15 @@ template <typename ExPolicy, typename IteratorTag>
 void test_ends_with_async(ExPolicy p, IteratorTag)
 {
     auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % (end1 - 1) + 1;
+    auto end2 = std::rand() % end1;
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
-    auto some_more_ints = std::vector<int>(end1 - end2 + 1);
-    std::iota(some_more_ints.begin(), some_more_ints.end(), end2);
-    auto some_wrong_ints = std::vector<int>(end2);
-    std::iota(some_wrong_ints.begin(), some_wrong_ints.end(), 1);
+
+    auto some_more_ints =
+        std::vector<int>(some_ints.begin() + end2, some_ints.end());
+
+    auto some_wrong_ints = std::vector<int>(end1 - end2);
+    std::iota(some_wrong_ints.begin(), some_wrong_ints.end(), -2);
 
     hpx::future<bool> result1 =
         hpx::ranges::ends_with(p, some_ints, some_more_ints);
@@ -138,6 +158,11 @@ void test_ends_with()
 {
     using namespace hpx::execution;
 
+    test_ends_with_sent(IteratorTag());
+    test_ends_with_sent(seq, IteratorTag());
+    test_ends_with_sent(par, IteratorTag());
+    test_ends_with_sent(par_unseq, IteratorTag());
+
     test_ends_with(IteratorTag());
     test_ends_with(seq, IteratorTag());
     test_ends_with(par, IteratorTag());
@@ -145,11 +170,6 @@ void test_ends_with()
 
     test_ends_with_async(seq(task), IteratorTag());
     test_ends_with_async(par(task), IteratorTag());
-
-    test_ends_with_sent(IteratorTag());
-    test_ends_with_sent(seq, IteratorTag());
-    test_ends_with_sent(par, IteratorTag());
-    test_ends_with_sent(par_unseq, IteratorTag());
 }
 
 void ends_with_test()
