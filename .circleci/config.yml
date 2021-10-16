@@ -407,6 +407,7 @@ jobs:
 
   tests.unit:
     <<: *defaults
+    parallelism: 4
     steps:
       - attach_workspace:
           at: /hpx
@@ -460,6 +461,7 @@ jobs:
 
   tests.regressions:
     <<: *defaults
+    parallelism: 4
     steps:
       - attach_workspace:
           at: /hpx
