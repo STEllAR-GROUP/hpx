@@ -387,7 +387,7 @@ jobs:
               # NOTE: transpose_block_numa is disabled because
               # hwloc_get_area_membind_nodeset (which is used by the
               # numa_allocator) fails with EPERM.
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure \
+              ctest -j4 --timeout 60 -T test --no-compress-output --output-on-failure \
                   -R tests.examples \
                   -E tests.examples.transpose.transpose_block_numa
       - run:
@@ -420,7 +420,7 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              ctest \
+              ctest -j4 \
                 --timeout 120 \
                 -T test \
                 --no-compress-output \
@@ -430,7 +430,7 @@ jobs:
               "tests.unit.modules.segmented_algorithms|\
               tests.unit.modules.compute.numa_allocator|\
               tests.unit.modules.resource_partitioner.scheduler_binding_check"
-              ctest \
+              ctest -j4 \
                 --timeout 120 \
                 -T test \
                 --no-compress-output \
@@ -471,7 +471,7 @@ jobs:
           name: Running Regressions Tests
           when: always
           command: |
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.regressions
+              ctest -j4 --timeout 60 -T test --no-compress-output --output-on-failure -R tests.regressions
       - run:
           <<: *convert_xml
       - run:
