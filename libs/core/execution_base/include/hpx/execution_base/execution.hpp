@@ -50,6 +50,12 @@ namespace hpx { namespace execution {
     {
         constexpr task_policy_tag() = default;
     };
+
+    /// \cond NOINTERNAL
+    struct non_task_policy_tag
+    {
+        constexpr non_task_policy_tag() = default;
+    };
 }}    // namespace hpx::execution
 
 namespace hpx { namespace parallel { namespace execution {
