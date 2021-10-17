@@ -2891,6 +2891,11 @@ system and application performance.
      * Description
      * Parameters
    * * ``/arithmetics/add``
+
+       .. _arithmetics-add:
+
+       :ref:`🔗<arithmetics-add>`
+   
      * None
      * Returns the sum calculated based on the values queried from the
        underlying counters (the ones specified as the parameters).
@@ -2898,6 +2903,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/subtract``
+
+       .. _arithmetics-subtract:
+
+       :ref:`🔗<arithmetics-subtract>`
+
      * None
      * Returns the difference calculated based on the values queried from the
        underlying counters (the ones specified as the parameters).
@@ -2905,6 +2915,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/multiply``
+
+       .. _arithmetics-multiply:
+
+       :ref:`🔗<arithmetics-multiply>`
+
      * None
      * Returns the product calculated based on the values queried from the
        underlying counters (the ones specified as the parameters).
@@ -2912,6 +2927,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/divide``
+
+          .. _arithmetics-divide:
+
+       :ref:`🔗<arithmetics-divide>`
+
      * None
      * Returns the result of division of the values queried from the
        underlying counters (the ones specified as the parameters).
@@ -2919,6 +2939,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/mean``
+
+       .. _arithmetics-mean:
+
+       :ref:`🔗<arithmetics-mean>`
+
      * None
      * Returns the average value of all values queried from the
        underlying counters (the ones specified as the parameters).
@@ -2926,6 +2951,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/variance``
+
+       .. _arithmetics-variance:
+
+       :ref:`🔗<arithmetics-variance>`
+
      * None
      * Returns the standard deviation of all values queried from the underlying
        counters (the ones specified as the parameters).
@@ -2933,6 +2963,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/median``
+
+       .. _arithmetics-median:
+
+       :ref:`🔗<arithmetics-median>`
+
      * None
      * Returns the median value of all values queried from the underlying
        counters (the ones specified as the parameters).
@@ -2940,6 +2975,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/min``
+
+       .. _arithmetics-min:
+
+       :ref:`🔗<arithmetics-min>`
+
      * None
      * Returns the minimum value of all values queried from the underlying
        counters (the ones specified as the parameters).
@@ -2947,6 +2987,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/max``
+
+       .. _arithmetics-max:
+
+       :ref:`🔗<arithmetics-max>`
+
      * None
      * Returns the maximum value of all values queried from the
        underlying counters (the ones specified as the parameters).
@@ -2954,6 +2999,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/count``
+
+       .. _arithmetics-count:
+
+       :ref:`🔗<arithmetics-count>`
+
      * None
      * Returns the count value of all values queried from the underlying
        counters (the ones specified as the parameters).
