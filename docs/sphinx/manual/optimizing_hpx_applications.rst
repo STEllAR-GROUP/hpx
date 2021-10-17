@@ -2664,6 +2664,10 @@ system and application performance.
      * Parameters
    * * ``/papi/<papi_event>``
 
+       .. _papi-papi-event:
+
+       :ref:`🔗<papi-papi-event>`
+
        where:
 
        ``<papi_event>`` is the name of the PAPI event to expose as a performance
@@ -2704,6 +2708,11 @@ system and application performance.
      * Description
      * Parameters
    * * ``/statistics/average``
+
+       .. _statistics-average:
+
+       :ref:`🔗<statistics-average>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current average (mean) value calculated based on the values
@@ -2718,6 +2727,11 @@ system and application performance.
        The default value is ``0``.
 
    * * ``/statistics/rolling_average``
+
+       .. _statistics-rolling-average:
+
+       :ref:`🔗<statistics-rolling-average>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current rolling average (mean) value calculated based on the
@@ -2734,6 +2748,11 @@ system and application performance.
        be reset during evaluation ``1`` or not ``0``. The default value is ``0``.
 
    * * ``/statistics/stddev``
+
+       .. _statistics-stddev:
+
+       :ref:`🔗<statistics-stddev>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current standard deviation (stddev) value calculated based on
@@ -2748,6 +2767,11 @@ system and application performance.
        The default value is ``0``.
 
    * * ``/statistics/rolling_stddev``
+
+       .. _statistics-rolling-stddev:
+
+       :ref:`🔗<statistics-rolling-stddev>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current rolling variance (stddev) value calculated based on
@@ -2764,6 +2788,11 @@ system and application performance.
        during evaluation ``1`` or not ``0``. The default value is ``0``.
 
    * * ``/statistics/median``
+
+       .. _statistics-median:
+
+       :ref:`🔗<statistics-median>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current (statistically estimated) median value calculated
@@ -2778,6 +2807,11 @@ system and application performance.
        The default value is ``0``.
 
    * * ``/statistics/max``
+
+       .. _statistics-max:
+
+       :ref:`🔗<statistics-max>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current maximum value calculated based on the values queried
@@ -2791,6 +2825,11 @@ system and application performance.
        The default value is ``0``.
 
    * * ``/statistics/rolling_max``
+
+       .. _statistics-rolling-max:
+
+       :ref:`🔗<statistics-rolling-max>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current rolling maximum value calculated based on the values
@@ -2807,6 +2846,11 @@ system and application performance.
        during evaluation ``1`` or not ``0``. The default value is ``0``.
 
    * * ``/statistics/min``
+
+       .. _statistics-min:
+
+       :ref:`🔗<statistics-min>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current minimum value calculated based on the values queried
@@ -2820,6 +2864,11 @@ system and application performance.
        The default value is ``0``.
 
    * * ``/statistics/rolling_min``
+
+       .. _statistics-rolling-min:
+
+       :ref:`🔗<statistics-rolling-min>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current rolling minimum value calculated based on the values
