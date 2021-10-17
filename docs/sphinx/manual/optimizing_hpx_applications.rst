@@ -2412,6 +2412,11 @@ system and application performance.
      * Description
      * Parameters
    * * ``/runtime/count/component``
+
+       .. _runtime-count-component: 
+
+       :ref:`🔗<runtime-count-component>`
+
      * ``locality#*/total``
 
        where:
@@ -2425,6 +2430,11 @@ system and application performance.
        registering the component with |hpx|, e.g. which has been passed as the
        second parameter to the macro :c:macro:`HPX_REGISTER_COMPONENT`.
    * * ``/runtime/count/action-invocation``
+
+       .. _runtime-count-action-invocation: 
+
+       :ref:`🔗<runtime-count-action-invocation>`
+
      * ``locality#*/total``
 
          where:
@@ -2439,6 +2449,11 @@ system and application performance.
        to the macro :c:macro:`HPX_REGISTER_ACTION` or
        :c:macro:`HPX_REGISTER_ACTION_ID`.
    * * ``/runtime/count/remote-action-invocation``
+
+       .. _runtime-count-remote-action-invocation:
+
+       :ref:`🔗<runtime-count-remote-action-invocation>`
+
      * ``locality#*/total``
 
        where:
@@ -2453,6 +2468,11 @@ system and application performance.
        to the macro :c:macro:`HPX_REGISTER_ACTION` or
        :c:macro:`HPX_REGISTER_ACTION_ID`.
    * * ``/runtime/uptime``
+
+       .. _runtime-uptime:
+
+       :ref:`🔗<runtime-uptime>`
+
      * ``locality#*/total``
 
        where:
@@ -2464,6 +2484,11 @@ system and application performance.
        :term:`locality` in nanoseconds.
      * None
    * * ``/runtime/memory/virtual``
+
+       .. _runtime-memory-virtual:
+
+       :ref:`🔗<runtime-memory-virtual>`
+
      * ``locality#*/total``
 
        where:
@@ -2475,6 +2500,11 @@ system and application performance.
        referenced :term:`locality` (in bytes).
      * None
    * * ``/runtime/memory/resident``
+
+       .. _runtime-memory-resident:
+
+       :ref:`🔗<runtime-memory-resident>`
+
      * ``locality#*/total``
 
        where:
@@ -2486,6 +2516,11 @@ system and application performance.
        referenced :term:`locality` (in bytes).
      * None
    * * ``/runtime/memory/total``
+
+       .. _runtime-memory-total`:
+
+       :ref:`🔗<runtime-memory-total>`
+
      * ``locality#*/total``
 
        where:
@@ -2499,6 +2534,11 @@ system and application performance.
         Windows systems only.
      * None
    * * ``/runtime/io/read_bytes_issued``
+
+       .. _runtime-io-read-bytes-issued:
+
+       :ref:`🔗<runtime-io-read-bytes-issued>`
+
      * ``locality#*/total``
 
        where:
@@ -2512,6 +2552,11 @@ system and application performance.
        through the /proc file system.
      * None
    * * ``/runtime/io/write_bytes_issued``
+
+       .. _runtime-io-write-bytes-issued:
+
+       :ref:`🔗<runtime-io-write-bytes-issued>`
+
      * ``locality#*/total``
 
        where:
@@ -2525,6 +2570,11 @@ system and application performance.
        through the /proc file system.
      * None
    * * ``/runtime/io/read_syscalls``
+
+       .. _runtime-io-read-syscalls:
+
+       :ref:`🔗<runtime-io-read-syscalls>`
+
      * ``locality#*/total``
 
        where:
@@ -2537,6 +2587,11 @@ system and application performance.
        related data through the /proc file system.
      * None
    * * ``/runtime/io/write_syscalls``
+
+       .. _runtime-io-write-syscalls:
+
+       :ref:`🔗<runtime-io-write-syscalls>`
+
      * ``locality#*/total``
 
        where:
@@ -2549,6 +2604,11 @@ system and application performance.
        related data through the /proc file system.
      * None
    * * ``/runtime/io/read_bytes_transferred``
+
+       .. _runtime-io-read-bytes-transferred:
+
+       :ref:`🔗<runtime-io-read-bytes-transferred>`
+
      * ``locality#*/total``
 
        where:
@@ -2561,6 +2621,11 @@ system and application performance.
        related data through the /proc file system.
      * None
    * * ``/runtime/io/write_bytes_transferred``
+
+       .. _runtime-io-write-bytes-transferred:
+
+       :ref:`🔗<runtime-io-write-bytes-transferred>`
+
      * ``locality#*/total``
 
        where:
@@ -2573,6 +2638,11 @@ system and application performance.
        related data through the /proc file system.
      * None
    * * ``/runtime/io/write_bytes_cancelled``
+
+       .. _runtime-io-write-bytes-cancelled:
+
+       :ref:`🔗<runtime-io-write-bytes-cancelled>`
+
      * ``locality#*/total``
 
        where:
