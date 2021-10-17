@@ -766,6 +766,7 @@ system and application performance.
    * * ``/agas/count/<agas_service>``
    
        .. _agas-count-agas-service: 
+
        :ref:`🔗<agas-count-agas-service>`
 
        where:
@@ -807,6 +808,7 @@ system and application performance.
    * * ``/agas/<agas_service_category>/count``
 
        .. _agas-agas-service-category-count: 
+
        :ref:`🔗<agas-agas-service-category-count>`
 
        where:
@@ -833,6 +835,7 @@ system and application performance.
    * * ``agas/time/<agas_service>``
 
        .. _agas-time-agas-service: 
+
        :ref:`🔗<agas-time-agas-service>`
 
        where:
@@ -876,6 +879,7 @@ system and application performance.
    * * ``/agas/<agas_service_category>/time``
 
        .. _agas-agas-service-category-time: 
+
        :ref:`🔗<agas-agas-service-category-time>`
 
        where:
@@ -901,6 +905,7 @@ system and application performance.
    * * ``/agas/count/entries``
        
        .. _agas-count-entries: 
+
        :ref:`🔗<agas-count-entries>`
      
      * ``locality#*/total``
@@ -916,6 +921,7 @@ system and application performance.
    * * ``/agas/count/<cache_statistics>``
 
        .. _agas-count-cache-statistics: 
+
        :ref:`🔗<agas-count-cache-statistics>`
 
        where:
@@ -936,6 +942,7 @@ system and application performance.
    * * ``/agas/count/<full_cache_statistics>``
 
        .. _agas-count-full-cache-statistics: 
+
        :ref:`🔗<agas-count-full-cache-statistics>`
 
        where:
@@ -955,6 +962,7 @@ system and application performance.
    * * ``/agas/time/<full_cache_statistics>``
 
        .. _agas-time-full-cache-statistics:
+
        :ref:`🔗<agas-time-full-cache-statistics>`
 
        where:
@@ -980,6 +988,10 @@ system and application performance.
      * Description
      * Parameters
    * * ``/data/count/<connection_type>/<operation>``
+
+       .. _data-count-connection-type-operation:
+
+       :ref:`🔗<data-count-connection-type-operation>`
 
        where:
 
@@ -1007,6 +1019,10 @@ system and application performance.
      * None
    * * ``/data/time/<connection_type>/<operation>``
 
+       .. _data-time-connection-type-operation:
+
+       :ref:`🔗<data-time-connection-type-operation>`
+
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
@@ -1033,6 +1049,10 @@ system and application performance.
        Please see :ref:`cmake_variables` for more details.
      * None
    * * ``/serialize/count/<connection_type>/<operation>``
+
+       .. _serialize-count-connection-type-operation:
+
+       :ref:`🔗<serialize-count-connection-type-operation>`
 
        where:
 
@@ -1063,6 +1083,10 @@ system and application performance.
        bytes transmitted for the given action only.
    * * ``/serialize/time/<connection_type>/<operation>``
 
+       .. _serialize-time-connection-type-operation:
+
+       :ref:`🔗<serialize-time-connection-type-operation>`
+
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
@@ -1091,6 +1115,11 @@ system and application performance.
        as its parameter. In this case the counter will report the serialization
        time for the given action only.
    * * ``/parcels/count/routed``
+
+       .. _parcels-count-routed:
+
+       :ref:`🔗<parcels-count-routed>`
+
      * ``locality#*/total``
 
        where:
@@ -1113,6 +1142,10 @@ system and application performance.
        as its parameter. In this case the counter will report the number of
        parcels for the given action only.
    * * ``/parcels/count/<connection_type>/<operation>``
+
+       .. _parcels-count-connection-type-operation:
+
+       :ref:`🔗<parcels-count-connection-type-operation>`
 
        where:
 
@@ -1140,6 +1173,10 @@ system and application performance.
      * None
    * * ``/messages/count/<connection_type>/<operation>``
 
+       .. _messages-count-connection-type-operation:
+
+       :ref:`🔗<messages-count-connection-type-operation>`
+
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
@@ -1165,6 +1202,10 @@ system and application performance.
        Please see :ref:`cmake_variables` for more details.
      * None
    * * ``/parcelport/count/<connection_type>/<cache_statistics>``
+
+       .. _parcelport-count-connection-type-cache-statistics:
+
+       :ref:`🔗<parcelport-count-connection-type-cache-statistics>`
 
        where:
 
@@ -1195,6 +1236,10 @@ system and application performance.
      * None
    * * ``/parcelqueue/length/<operation>``
 
+       .. _parcelqueue-length-operation:
+
+       :ref:`🔗<parcelqueue-length-operation>`
+
        where:
 
        ``<operation>`` is one of the following: ``send``, ``receive``
@@ -1216,6 +1261,11 @@ system and application performance.
      * Description
      * Parameters
    * * ``/threads/count/cumulative``
+
+       .. _threads-count-cumulative:
+
+       :ref:`🔗<threads-count-cumulative>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1250,6 +1300,11 @@ system and application performance.
        ``ON``).
      * None
    * * ``/threads/time/average``
+
+       .. _threads-time-average:
+
+       :ref:`🔗<threads-time-average>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1287,6 +1342,11 @@ system and application performance.
        of measure for this counter is nanosecond [ns].
      * None
    * * ``/threads/time/average-overhead``
+       
+       .. _threads-time-average-overhead:
+
+       :ref:`🔗<threads-time-average-overhead>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1323,6 +1383,11 @@ system and application performance.
        unit of measure for this counter is nanosecond [ns].
      * None
    * * ``/threads/count/cumulative-phases``
+
+       .. _threads-count-cumulative-phases:
+
+       :ref:`🔗<threads-count-cumulative-phases>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1358,6 +1423,11 @@ system and application performance.
        nanosecond [ns].
      * None
    * * ``/threads/time/average-phase``
+
+       .. _threads-time-average-phase:
+
+       :ref:`🔗<threads-time-average-phase>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1394,6 +1464,11 @@ system and application performance.
        unit of measure for this counter is nanosecond [ns].
      * None
    * * ``/threads/time/average-phase-overhead``
+
+       .. _threads-time-average-phase-overhead:
+
+       :ref:`🔗<threads-time-average-phase-overhead>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1431,6 +1506,11 @@ system and application performance.
        unit of measure for this counter is nanosecond [ns].
      * None
    * * ``/threads/time/overall``
+
+       .. _threads-time-overall:
+
+       :ref:`🔗<threads-time-overall>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1465,6 +1545,11 @@ system and application performance.
        nanosecond [ns].
      * None
    * * ``/threads/time/cumulative``
+
+       .. _threads-time-cumulative:
+
+       :ref:`🔗<threads-time-cumulative>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1499,6 +1584,11 @@ system and application performance.
        ``HPX_THREAD_MAINTAIN_IDLE_RATES`` are set to ``ON`` (default: ``OFF``).
      * None
    * * ``/threads/time/cumulative-overheads``
+
+       .. _threads-time-cumulative-overheads:
+
+       :ref:`🔗<threads-time-cumulative-overheads>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1535,6 +1625,10 @@ system and application performance.
        The unit of measure for this counter is nanosecond [ns].
      * None
    * * ``threads/count/instantaneous/<thread-state>``
+
+       .. _threads-count-instantaneous-thread-state:
+
+       :ref:`🔗<threads-count-instantaneous-thread-state>`
 
        where:
 
@@ -1574,6 +1668,10 @@ system and application performance.
        |hpx|-threads in the given state for all worker threads separately.
      * None
    * * ``threads/wait-time/<thread-state>``
+
+       .. _threads-wait-time-thread-state:
+
+       :ref:`🔗<threads-wait-time-thread-state>`
 
        where:
 
@@ -1621,6 +1719,11 @@ system and application performance.
        nanosecond [ns].
      * None
    * * ``/threads/idle-rate``
+
+       .. _threads-idle-rate:
+
+       :ref:`🔗<threads-idle-rate>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1651,6 +1754,11 @@ system and application performance.
        (default: ``OFF``).
      * None
    * * ``/threads/creation-idle-rate``
+
+       .. _threads-creation-idle-rate:
+
+       :ref:`🔗<threads-creation-idle-rate>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1682,6 +1790,11 @@ system and application performance.
        ``HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES`` are set to ``ON``.
      * None
    * * ``/threads/cleanup-idle-rate``
+
+       .. _threads-cleanup-idle-rate:
+
+       :ref:`🔗<threads-cleanup-idle-rate>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1715,6 +1828,11 @@ system and application performance.
        ``ON``.
      * None
    * * ``/threadqueue/length``
+
+       .. _threadqueue-length:
+
+       :ref:`🔗<threadqueue-length>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1742,6 +1860,11 @@ system and application performance.
        on the given :term:`locality`.
      * None
    * * ``/threads/count/stack-unbinds``
+
+       .. _threads-count-stack-unbinds:
+
+       :ref:`🔗<threads-count-stack-unbinds>`
+
      * ``locality#*/total``
 
        where:
@@ -1754,6 +1877,11 @@ system and application performance.
        not available on Windows based platforms.
      * None
    * * ``/threads/count/stack-recycles``
+
+       .. _threads-count-stack-recycles:
+
+       :ref:`🔗<threads-count-stack-recycles>`
+
      * ``locality#*/total``
 
        where:
@@ -1764,6 +1892,11 @@ system and application performance.
      * Returns the total number of |hpx|-thread recycling operations performed.
      * None
    * * ``/threads/count/stolen-from-pending``
+
+       .. _threads-count-stolen-from-pending:
+
+       :ref:`🔗<threads-count-stolen-from-pending>`
+
      * ``locality#*/total``
 
           where:
@@ -1778,6 +1911,11 @@ system and application performance.
        ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON`` (default: ``ON``).
      * None
    * * ``/threads/count/pending-misses``
+
+       .. _threads-count-pending-misses:
+
+       :ref:`🔗<threads-count-pending-misses>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1808,6 +1946,11 @@ system and application performance.
        (default: ``ON``).
      * None
    * * ``/threads/count/pending-accesses``
+ 
+       .. _threads-count-pending-accesses:
+
+       :ref:`🔗<threads-count-pending-accesses>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1838,6 +1981,11 @@ system and application performance.
        (default: ``ON``).
      * None
    * * ``/threads/count/stolen-from-staged``
+
+       .. _threads-count-stolen-from-staged:
+
+       :ref:`🔗<threads-count-stolen-from-staged>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1868,6 +2016,11 @@ system and application performance.
        ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON`` (default: ``ON``).
      * None
    * * ``/threads/count/stolen-to-pending``
+
+       .. _threads-count-stolen-to-pending:
+
+       :ref:`🔗<threads-count-stolen-to-pending>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1898,6 +2051,11 @@ system and application performance.
        ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON`` (default: ``ON``).
      * None
    * * ``/threads/count/stolen-to-staged``
+
+       .. _threads-count-stolen-to-staged:
+
+       :ref:`🔗<threads-count-stolen-to-staged>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1929,6 +2087,11 @@ system and application performance.
        ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON`` (default: ``ON``).
      * None
    * * ``/threads/count/objects``
+
+       .. _threads-count-objects:
+
+       :ref:`🔗<threads-count-objects>`
+
      * ``locality#*/total`` or
 
        ``locality#*/allocator#*``
@@ -1951,6 +2114,11 @@ system and application performance.
        does not reflect the number of actually executed (retired) |hpx|-threads.
      * None
    * * ``/scheduler/utilization/instantaneous``
+
+       .. _scheduler-utilization-instantaneous:
+
+       :ref:`🔗<scheduler-utilization-instantaneous>`
+
      * ``locality#*/total``
 
        where:
@@ -1963,6 +2131,11 @@ system and application performance.
         current percentage of scheduler threads executing |hpx| threads.
      * Percent
    * * ``/threads/idle-loop-count/instantaneous``
+
+       .. _threads-idle-loop-count-instantaneous:
+
+       :ref:`🔗<threads-idle-loop-count-instantaneous>`
+       
      * ``locality#*/worker-thread#*`` or
 
        ``locality#*/pool#*/worker-thread#*``
@@ -1988,6 +2161,11 @@ system and application performance.
        |hpx|- worker thread or the accumulated value for all worker threads.
      * None
    * * ``/threads/busy-loop-count/instantaneous``
+
+       .. _threads-busy-loop-count-instantaneous:
+
+       :ref:`🔗<threads-busy-loop-count-instantaneous>`
+       
      * ``locality#*/worker-thread#*`` or
 
        ``locality#*/pool#*/worker-thread#*``
@@ -2013,6 +2191,11 @@ system and application performance.
        worker thread or the accumulated value for all worker threads.
      * None
    * * ``/threads/time/background-work-duration``
+
+       .. _threads-time-background-work-duration:
+
+       :ref:`🔗<threads-time-background-work-duration>`
+       
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2043,6 +2226,11 @@ system and application performance.
 
      * None
    * * ``/threads/background-overhead``
+
+       .. _threads-background-overhead:
+
+       :ref:`🔗<threads-background-overhead>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2070,6 +2258,11 @@ system and application performance.
        unit of measure displayed for this counter is 0.1%.
      * None
    * * ``/threads/time/background-send-duration``
+
+       .. _threads-time-background-send-duration:
+
+       :ref:`🔗<threads-time-background-send-duration>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2104,6 +2297,11 @@ system and application performance.
 
      * None
    * * ``/threads/background-send-overhead``
+
+       .. _threads-background-send-overhead:
+
+       :ref:`🔗<threads-background-send-overhead>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2134,6 +2332,11 @@ system and application performance.
        parcelport only.
      * None
    * * ``/threads/time/background-receive-duration``
+
+       .. _threads-time-background-receive-duration:
+
+       :ref:`🔗<threads-time-background-receive-duration>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2167,6 +2370,11 @@ system and application performance.
        parcelport only.
      * None
    * * ``/threads/background-receive-overhead``
+
+       .. _threads-background-receive-overhead:
+       
+       :ref:`🔗<threads-background-receive-overhead>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
