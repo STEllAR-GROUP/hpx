@@ -2517,7 +2517,7 @@ system and application performance.
      * None
    * * ``/runtime/memory/total``
 
-       .. _runtime-memory-total`:
+       .. _runtime-memory-total:
 
        :ref:`🔗<runtime-memory-total>`
 
@@ -3047,6 +3047,11 @@ system and application performance.
      * Parameters
 
    * * ``/coalescing/count/parcels``
+
+       .. _coalescing-count-parcels:
+
+       :ref:`🔗<coalescing-count-parcels>`
+
      * ``locality#*/total``
 
        where:
@@ -3062,6 +3067,11 @@ system and application performance.
        :c:macro:`HPX_REGISTER_ACTION_ID`.
 
    * * ``/coalescing/count/messages``
+
+       .. _coalescing-count-messages:
+
+       :ref:`🔗<coalescing-count-messages>`
+
      * ``locality#*/total``
 
        where:
@@ -3077,6 +3087,11 @@ system and application performance.
        :c:macro:`HPX_REGISTER_ACTION_ID`.
 
    * * ``/coalescing/count/average-parcels-per-message``
+
+       .. _coalescing-count-average-parcels-per-message:
+
+       :ref:`🔗<coalescing-count-average-parcels-per-message>`
+
      * ``locality#*/total``
 
        where:
@@ -3093,6 +3108,11 @@ system and application performance.
        :c:macro:`HPX_REGISTER_ACTION_ID`
 
    * * ``/coalescing/time/average-parcel-arrival``
+
+       .. _coalescing-time-average-parcel-arrival:
+
+       :ref:`🔗<coalescing-time-average-parcel-arrival>`
+
      * ``locality#*/total``
 
        where:
@@ -3109,6 +3129,11 @@ system and application performance.
        :c:macro:`HPX_REGISTER_ACTION_ID`
 
    * * ``/coalescing/time/parcel-arrival-histogram``
+
+       .. _coalescing-time-parcel-arrival-histogram:
+
+       :ref:`🔗<coalescing-time-parcel-arrival-histogram>`
+
      * ``locality#*/total``
 
        where:
