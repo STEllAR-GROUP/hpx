@@ -25,7 +25,7 @@ namespace hpx { namespace util { namespace hardware {
         };
     };
 
-    void cpuid(std::uint32_t (&cpuinfo)[4], std::uint32_t eax)
+    inline void cpuid(std::uint32_t (&cpuinfo)[4], std::uint32_t eax)
     {
         __asm__ __volatile__("cpuid ;\n"
                              : "=a"(cpuinfo[cpuid_register::eax]),
@@ -36,7 +36,7 @@ namespace hpx { namespace util { namespace hardware {
                              :);
     }
 
-    void cpuidex(
+    inline void cpuidex(
         std::uint32_t (&cpuinfo)[4], std::uint32_t eax, std::uint32_t ecx)
     {
         __asm__ __volatile__("cpuid ;\n"

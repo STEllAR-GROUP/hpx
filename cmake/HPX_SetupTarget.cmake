@@ -164,6 +164,14 @@ function(hpx_setup_target target)
     target_link_libraries(
       ${target} ${__tll_public} ${target_COMPONENT_DEPENDENCIES}
     )
+
+    if(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL)
+      if("${_type}" STREQUAL "EXECUTABLE")
+        target_precompile_headers(
+          ${target} REUSE_FROM hpx_exe_precompiled_headers
+        )
+      endif()
+    endif()
   endif()
 
   target_link_libraries(${target} ${__tll_public} ${target_DEPENDENCIES})
@@ -174,10 +182,6 @@ function(hpx_setup_target target)
 
   if(target_UNITY_BUILD)
     set_target_properties(${target} PROPERTIES UNITY_BUILD ON)
-  endif()
-
-  if(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL)
-    target_precompile_headers(${target} REUSE_FROM hpx_precompiled_headers)
   endif()
 
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)

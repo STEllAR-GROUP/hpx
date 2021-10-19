@@ -368,18 +368,6 @@
 #  define HPX_PREFIX HPX_PREFIX_DEFAULT
 #endif
 
-#if defined(HPX_APPLICATION_NAME_DEFAULT) && !defined(HPX_APPLICATION_NAME)
-#  define HPX_APPLICATION_NAME HPX_APPLICATION_NAME_DEFAULT
-#endif
-
-#if !defined(HPX_APPLICATION_STRING)
-#  if defined(HPX_APPLICATION_NAME)
-#    define HPX_APPLICATION_STRING HPX_PP_STRINGIZE(HPX_APPLICATION_NAME)
-#  else
-#    define HPX_APPLICATION_STRING "unknown HPX application"
-#  endif
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 // Count number of empty (no HPX thread available) thread manager loop executions
 #if !defined(HPX_IDLE_LOOP_COUNT_MAX)
