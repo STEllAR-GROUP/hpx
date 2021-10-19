@@ -414,7 +414,6 @@ jobs:
           name: Building Unit Tests
           command: |
               ninja -j2 -k 0 tests.unit
-              ninja -j1 -k 0 tests.unit.modules.segmented_algorithms
       - run:
           name: Running Unit Tests
           when: always
