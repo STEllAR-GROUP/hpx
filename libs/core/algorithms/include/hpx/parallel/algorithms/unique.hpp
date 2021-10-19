@@ -830,7 +830,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using difference_type =
                     typename std::iterator_traits<FwdIter1>::difference_type;
 
-                difference_type count = detail::distance(first, last);
+                auto last_iter = first;
+                difference_type count =
+                    detail::advance_and_get_distance(last_iter, last);
 
                 if (count == 0)
                     return algorithm_result::get(
@@ -850,7 +852,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 boost::shared_array<bool> flags(new bool[count - 1]);
 #endif
                 std::size_t init = 0;
-                auto last_iter = detail::advance_to_sentinel(first, last);
 
                 using hpx::get;
                 using hpx::util::make_zip_iterator;
