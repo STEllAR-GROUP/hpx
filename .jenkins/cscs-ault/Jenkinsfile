@@ -23,7 +23,7 @@ pipeline {
         )
     }
     environment {
-        SPACK_ROOT = '/apps/ault/SSL/HPX/spack'
+        SPACK_ROOT = '/apps/ault/SSD/HPX/spack'
         GITHUB_TOKEN = credentials('STELLARBOT_GITHUB_TOKEN')
     }
     stages {

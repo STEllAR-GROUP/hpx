@@ -18,7 +18,7 @@ spack unload openssl
 
 export CMAKE_CXX_COMPILER_LAUNCHER=ccache
 export CMAKE_GENERATOR=Ninja
-export CCACHE_DIR=/apps/ault/SSL/HPX/ccache/ccache-jenkins-hpx
+export CCACHE_DIR=/scratch/aurianer/ccache/ccache-jenkins-hpx
 export CCACHE_MAXSIZE=100G
 export CCACHE_MAXFILES=50000
 
