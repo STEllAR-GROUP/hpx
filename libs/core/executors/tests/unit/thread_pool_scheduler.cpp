@@ -56,8 +56,8 @@ void test_execute()
 struct check_context_receiver
 {
     hpx::thread::id parent_id;
-    hpx::lcos::local::mutex& mtx;
-    hpx::lcos::local::condition_variable& cond;
+    hpx::mutex& mtx;
+    hpx::condition_variable& cond;
     bool& executed;
 
     template <typename E>
@@ -78,7 +78,7 @@ struct check_context_receiver
         HPX_TEST_NEQ(r.parent_id, hpx::this_thread::get_id());
         HPX_TEST_NEQ(hpx::thread::id(hpx::threads::invalid_thread_id),
             hpx::this_thread::get_id());
-        std::lock_guard<hpx::lcos::local::mutex> l{r.mtx};
+        std::lock_guard l{r.mtx};
         r.executed = true;
         r.cond.notify_one();
     }
@@ -87,8 +87,8 @@ struct check_context_receiver
 void test_sender_receiver_basic()
 {
     hpx::thread::id parent_id = hpx::this_thread::get_id();
-    hpx::lcos::local::mutex mtx;
-    hpx::lcos::local::condition_variable cond;
+    hpx::mutex mtx;
+    hpx::condition_variable cond;
     bool executed{false};
 
     ex::thread_pool_scheduler sched{};
@@ -99,7 +99,7 @@ void test_sender_receiver_basic()
     ex::start(os);
 
     {
-        std::unique_lock<hpx::lcos::local::mutex> l{mtx};
+        std::unique_lock l{mtx};
         cond.wait(l, [&]() { return executed; });
     }
 
@@ -112,8 +112,8 @@ void test_sender_receiver_transform()
 {
     ex::thread_pool_scheduler sched{};
     hpx::thread::id parent_id = hpx::this_thread::get_id();
-    hpx::lcos::local::mutex mtx;
-    hpx::lcos::local::condition_variable cond;
+    hpx::mutex mtx;
+    hpx::condition_variable cond;
     bool executed{false};
 
     auto begin = ex::schedule(sched);
@@ -130,7 +130,7 @@ void test_sender_receiver_transform()
     ex::start(os);
 
     {
-        std::unique_lock<hpx::lcos::local::mutex> l{mtx};
+        std::unique_lock l{mtx};
         cond.wait(l, [&]() { return executed; });
     }
 
@@ -142,7 +142,7 @@ void test_sender_receiver_transform_wait()
     ex::thread_pool_scheduler sched{};
     hpx::thread::id parent_id = hpx::this_thread::get_id();
     std::atomic<std::size_t> transform_count{0};
-    std::atomic<bool> executed{false};
+    bool executed{false};
 
     auto begin = ex::schedule(sched);
     auto work1 =
@@ -226,8 +226,9 @@ template <typename F>
 struct callback_receiver
 {
     std::decay_t<F> f;
-    hpx::lcos::local::condition_variable& cond;
-    std::atomic<bool>& executed;
+    hpx::mutex& mtx;
+    hpx::condition_variable& cond;
+    bool& executed;
 
     template <typename E>
     friend void tag_invoke(ex::set_error_t, callback_receiver&&, E&&) noexcept
@@ -245,6 +246,7 @@ struct callback_receiver
         ex::set_value_t, callback_receiver&& r, Ts&&...) noexcept
     {
         HPX_INVOKE(r.f, );
+        std::lock_guard l{r.mtx};
         r.executed = true;
         r.cond.notify_one();
     }
@@ -253,9 +255,9 @@ struct callback_receiver
 void test_properties()
 {
     ex::thread_pool_scheduler sched{};
-    hpx::lcos::local::mutex mtx;
-    hpx::lcos::local::condition_variable cond;
-    std::atomic<bool> executed{false};
+    hpx::mutex mtx;
+    hpx::condition_variable cond;
+    bool executed{false};
 
     constexpr std::array<hpx::threads::thread_priority, 3> priorities{
         {hpx::threads::thread_priority::low,
@@ -272,11 +274,11 @@ void test_properties()
         };
         executed = false;
         auto os = ex::connect(ex::schedule(exec_prop),
-            callback_receiver<decltype(check)>{check, cond, executed});
+            callback_receiver<decltype(check)>{check, mtx, cond, executed});
         ex::start(os);
         {
-            std::unique_lock<hpx::lcos::local::mutex> l{mtx};
-            cond.wait(l, [&]() { return executed.load(); });
+            std::unique_lock l{mtx};
+            cond.wait(l, [&]() { return executed; });
         }
 
         HPX_TEST(executed);
@@ -300,11 +302,11 @@ void test_properties()
         };
         executed = false;
         auto os = ex::connect(ex::schedule(exec_prop),
-            callback_receiver<decltype(check)>{check, cond, executed});
+            callback_receiver<decltype(check)>{check, mtx, cond, executed});
         ex::start(os);
         {
-            std::unique_lock<hpx::lcos::local::mutex> l{mtx};
-            cond.wait(l, [&]() { return executed.load(); });
+            std::unique_lock l{mtx};
+            cond.wait(l, [&]() { return executed; });
         }
 
         HPX_TEST(executed);
@@ -345,12 +347,12 @@ void test_properties()
         };
         executed = false;
         auto os = ex::connect(ex::schedule(exec_prop),
-            callback_receiver<decltype(check)>{check, cond, executed});
+            callback_receiver<decltype(check)>{check, mtx, cond, executed});
         ex::start(os);
 
         {
-            std::unique_lock<hpx::lcos::local::mutex> l{mtx};
-            cond.wait(l, [&]() { return executed.load(); });
+            std::unique_lock l{mtx};
+            cond.wait(l, [&]() { return executed; });
         }
 
         HPX_TEST(executed);
@@ -575,7 +577,7 @@ void test_when_all()
         auto when1 =
             ex::when_all(std::move(work1), std::move(work2), std::move(work3));
 
-        std::atomic<bool> executed{false};
+        bool executed{false};
         std::move(when1) |
             ex::transform(
                 [parent_id, &executed](int x, std::string y, double z) {
@@ -910,17 +912,18 @@ void test_ensure_started_when_all()
     {
         std::atomic<std::size_t> first_task_calls{0};
         std::atomic<std::size_t> successor_task_calls{0};
-        hpx::lcos::local::mutex mtx;
-        hpx::lcos::local::condition_variable cond;
-        std::atomic<bool> started{false};
+        hpx::mutex mtx;
+        hpx::condition_variable cond;
+        bool started{false};
         auto s = ex::schedule(sched) | ex::transform([&]() {
             ++first_task_calls;
+            std::lock_guard l{mtx};
             started = true;
             cond.notify_one();
         }) | ex::ensure_started();
         {
-            std::unique_lock<hpx::lcos::local::mutex> l{mtx};
-            cond.wait(l, [&]() { return started.load(); });
+            std::unique_lock l{mtx};
+            cond.wait(l, [&]() { return started; });
         }
         auto succ1 = s | ex::transform([&]() {
             ++successor_task_calls;
@@ -942,18 +945,19 @@ void test_ensure_started_when_all()
     {
         std::atomic<std::size_t> first_task_calls{0};
         std::atomic<std::size_t> successor_task_calls{0};
-        hpx::lcos::local::mutex mtx;
-        hpx::lcos::local::condition_variable cond;
-        std::atomic<bool> started{false};
+        hpx::mutex mtx;
+        hpx::condition_variable cond;
+        bool started{false};
         auto s = ex::schedule(sched) | ex::transform([&]() {
             ++first_task_calls;
+            std::lock_guard l{mtx};
             started = true;
             cond.notify_one();
             return 3;
         }) | ex::ensure_started();
         {
-            std::unique_lock<hpx::lcos::local::mutex> l{mtx};
-            cond.wait(l, [&]() { return started.load(); });
+            std::unique_lock l{mtx};
+            cond.wait(l, [&]() { return started; });
         }
         HPX_TEST_EQ(first_task_calls, std::size_t(1));
         auto succ1 = s | ex::transform([&](int const& x) {
@@ -976,18 +980,19 @@ void test_ensure_started_when_all()
     {
         std::atomic<std::size_t> first_task_calls{0};
         std::atomic<std::size_t> successor_task_calls{0};
-        hpx::lcos::local::mutex mtx;
-        hpx::lcos::local::condition_variable cond;
-        std::atomic<bool> started{false};
+        hpx::mutex mtx;
+        hpx::condition_variable cond;
+        bool started{false};
         auto s = ex::schedule(sched) | ex::transform([&]() {
             ++first_task_calls;
+            std::lock_guard l{mtx};
             started = true;
             cond.notify_one();
             return 3;
         }) | ex::ensure_started();
         {
-            std::unique_lock<hpx::lcos::local::mutex> l{mtx};
-            cond.wait(l, [&]() { return started.load(); });
+            std::unique_lock l{mtx};
+            cond.wait(l, [&]() { return started; });
         }
         auto succ1 = s | ex::on(sched) | ex::transform([&](int const& x) {
             ++successor_task_calls;
@@ -1331,17 +1336,17 @@ void test_detach()
 
     {
         bool called = false;
-        hpx::mutex m;
-        hpx::condition_variable cv;
+        hpx::mutex mtx;
+        hpx::condition_variable cond;
         ex::schedule(sched) | ex::transform([&]() {
-            std::unique_lock<hpx::mutex> l(m);
+            std::unique_lock l{mtx};
             called = true;
-            cv.notify_one();
+            cond.notify_one();
         }) | ex::detach();
 
         {
-            std::unique_lock<hpx::mutex> l(m);
-            HPX_TEST(cv.wait_for(
+            std::unique_lock l{mtx};
+            HPX_TEST(cond.wait_for(
                 l, std::chrono::seconds(1), [&]() { return called; }));
         }
         HPX_TEST(called);
@@ -1350,18 +1355,18 @@ void test_detach()
     // Values passed to set_value are ignored
     {
         bool called = false;
-        hpx::mutex m;
-        hpx::condition_variable cv;
+        hpx::mutex mtx;
+        hpx::condition_variable cond;
         ex::schedule(sched) | ex::transform([&]() {
-            std::unique_lock<hpx::mutex> l(m);
+            std::lock_guard l{mtx};
             called = true;
-            cv.notify_one();
+            cond.notify_one();
             return 42;
         }) | ex::detach();
 
         {
-            std::unique_lock<hpx::mutex> l(m);
-            HPX_TEST(cv.wait_for(
+            std::unique_lock l{mtx};
+            HPX_TEST(cond.wait_for(
                 l, std::chrono::seconds(1), [&]() { return called; }));
         }
         HPX_TEST(called);
