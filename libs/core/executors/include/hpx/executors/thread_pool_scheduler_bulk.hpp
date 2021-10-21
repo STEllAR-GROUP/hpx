@@ -18,7 +18,7 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/iterator_support/counting_iterator.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
@@ -70,7 +70,7 @@ namespace hpx { namespace execution { namespace experimental {
                                 std::decay_t<Sender>>))
                 // clang-format on
                 >
-            friend constexpr auto tag_dispatch(
+            friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
                 thread_pool_bulk_sender const& s)
             {
@@ -94,7 +94,7 @@ namespace hpx { namespace execution { namespace experimental {
                     operation_state* op_state;
 
                     template <typename E>
-                    friend void tag_dispatch(
+                    friend void tag_invoke(
                         set_error_t, bulk_receiver&& r, E&& e) noexcept
                     {
                         hpx::execution::experimental::set_error(
@@ -102,7 +102,7 @@ namespace hpx { namespace execution { namespace experimental {
                             std::forward<E>(e));
                     }
 
-                    friend void tag_dispatch(
+                    friend void tag_invoke(
                         set_done_t, bulk_receiver&& r) noexcept
                     {
                         hpx::execution::experimental::set_done(
@@ -161,7 +161,7 @@ namespace hpx { namespace execution { namespace experimental {
                         typename = std::enable_if_t<
                             hpx::is_invocable_v<F, range_value_type,
                                 std::add_lvalue_reference_t<Ts>...>>>
-                    friend void tag_dispatch(
+                    friend void tag_invoke(
                         set_value_t, bulk_receiver&& r, Ts&&... ts) noexcept
                     {
                         auto const n = hpx::util::size(r.op_state->shape);
@@ -266,14 +266,14 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                 }
 
-                friend void tag_dispatch(start_t, operation_state& os) noexcept
+                friend void tag_invoke(start_t, operation_state& os) noexcept
                 {
                     hpx::execution::experimental::start(os.op_state);
                 }
             };
 
             template <typename Receiver>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 connect_t, thread_pool_bulk_sender&& s, Receiver&& receiver)
             {
                 return operation_state<std::decay_t<Receiver>>{
@@ -283,7 +283,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Receiver>
-            auto tag_dispatch(
+            auto tag_invoke(
                 connect_t, thread_pool_bulk_sender& s, Receiver&& receiver)
             {
                 return operation_state<std::decay_t<Receiver>>{s.scheduler,
@@ -294,7 +294,7 @@ namespace hpx { namespace execution { namespace experimental {
 
     template <typename Sender, typename Shape, typename F,
         HPX_CONCEPT_REQUIRES_(std::is_integral_v<std::decay_t<Shape>>)>
-    constexpr auto tag_dispatch(bulk_t, thread_pool_scheduler scheduler,
+    constexpr auto tag_invoke(bulk_t, thread_pool_scheduler scheduler,
         Sender&& sender, Shape&& shape, F&& f)
     {
         return detail::thread_pool_bulk_sender<std::decay_t<Sender>,
@@ -305,7 +305,7 @@ namespace hpx { namespace execution { namespace experimental {
 
     template <typename Sender, typename Shape, typename F,
         HPX_CONCEPT_REQUIRES_(!std::is_integral_v<std::decay_t<Shape>>)>
-    constexpr auto tag_dispatch(bulk_t, thread_pool_scheduler scheduler,
+    constexpr auto tag_invoke(bulk_t, thread_pool_scheduler scheduler,
         Sender&& sender, Shape&& shape, F&& f)
     {
         return detail::thread_pool_bulk_sender<std::decay_t<Sender>,

@@ -276,8 +276,8 @@ namespace hpx { namespace ranges {
 
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/stable_sort.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -346,7 +346,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend RandomIt tag_fallback_dispatch(hpx::ranges::stable_sort_t,
+        friend RandomIt tag_fallback_invoke(hpx::ranges::stable_sort_t,
             RandomIt first, Sent last, Comp&& comp = Comp(),
             Proj&& proj = Proj())
         {
@@ -375,7 +375,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             RandomIt>::type
-        tag_fallback_dispatch(hpx::ranges::stable_sort_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::stable_sort_t, ExPolicy&& policy,
             RandomIt first, Sent last, Comp&& comp = Comp(),
             Proj&& proj = Proj())
         {
@@ -402,7 +402,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_dispatch(hpx::ranges::stable_sort_t, Rng&& rng,
+        tag_fallback_invoke(hpx::ranges::stable_sort_t, Rng&& rng,
             Compare&& comp = Compare(), Proj&& proj = Proj())
         {
             using iterator_type =
@@ -433,7 +433,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_dispatch(hpx::ranges::stable_sort_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::stable_sort_t, ExPolicy&& policy,
             Rng&& rng, Compare&& comp = Compare(), Proj&& proj = Proj())
         {
             using iterator_type =

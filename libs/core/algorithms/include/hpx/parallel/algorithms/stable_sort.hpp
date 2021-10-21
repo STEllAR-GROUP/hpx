@@ -245,8 +245,8 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/spin_sort.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -406,7 +406,7 @@ namespace hpx {
                 >::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(hpx::stable_sort_t, RandomIt first,
+        friend void tag_fallback_invoke(hpx::stable_sort_t, RandomIt first,
             RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
@@ -432,7 +432,7 @@ namespace hpx {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(hpx::stable_sort_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::stable_sort_t, ExPolicy&& policy,
             RandomIt first, RandomIt last, Comp&& comp = Comp(),
             Proj&& proj = Proj())
         {

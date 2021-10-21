@@ -9,17 +9,17 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/on.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 
 #include <utility>
 
 namespace hpx { namespace execution { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct just_on_t final
-      : hpx::functional::tag_fallback<just_on_t>
+      : hpx::functional::detail::tag_fallback<just_on_t>
     {
     private:
         template <typename Scheduler, typename... Ts>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             just_on_t, Scheduler&& scheduler, Ts&&... ts)
         {
             return on(just(std::forward<Ts>(ts)...),

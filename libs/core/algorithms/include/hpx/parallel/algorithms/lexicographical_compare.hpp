@@ -354,7 +354,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(hpx::lexicographical_compare_t,
+        friend bool tag_fallback_invoke(hpx::lexicographical_compare_t,
             InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
             Pred&& pred = Pred())
         {
@@ -385,7 +385,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(hpx::lexicographical_compare_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::lexicographical_compare_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             Pred&& pred = Pred())
         {

@@ -270,7 +270,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::shift_right
     HPX_INLINE_CONSTEXPR_VARIABLE struct shift_right_t final
-      : hpx::functional::tag_fallback<shift_right_t>
+      : hpx::functional::detail::tag_fallback<shift_right_t>
     {
     private:
         // clang-format off
@@ -278,7 +278,7 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value)>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             shift_right_t, FwdIter first, FwdIter last, Size n)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -296,7 +296,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(shift_right_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(shift_right_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Size n)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,

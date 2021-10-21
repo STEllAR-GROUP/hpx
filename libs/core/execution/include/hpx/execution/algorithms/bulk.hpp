@@ -17,8 +17,8 @@
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/functional/detail/tag_priority_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_priority_dispatch.hpp>
 #include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -61,7 +61,7 @@ namespace hpx { namespace execution { namespace experimental {
                         CPO, std::decay_t<Sender>>)
                 // clang-format on
                 >
-            friend constexpr auto tag_dispatch(
+            friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
                 bulk_sender const& sender)
             {
@@ -85,14 +85,14 @@ namespace hpx { namespace execution { namespace experimental {
                 }
 
                 template <typename Error>
-                friend void tag_dispatch(
+                friend void tag_invoke(
                     set_error_t, bulk_receiver&& r, Error&& error) noexcept
                 {
                     hpx::execution::experimental::set_error(
                         std::move(r.receiver), std::forward<Error>(error));
                 }
 
-                friend void tag_dispatch(set_done_t, bulk_receiver&& r) noexcept
+                friend void tag_invoke(set_done_t, bulk_receiver&& r) noexcept
                 {
                     hpx::execution::experimental::set_done(
                         std::move(r.receiver));
@@ -117,7 +117,7 @@ namespace hpx { namespace execution { namespace experimental {
                 }
 
                 template <typename... Ts>
-                friend auto tag_dispatch(
+                friend auto tag_invoke(
                     set_value_t, bulk_receiver&& r, Ts&&... ts) noexcept
                     -> decltype(hpx::execution::experimental::set_value(
                                     std::declval<std::decay_t<Receiver>&&>(),
@@ -133,7 +133,7 @@ namespace hpx { namespace execution { namespace experimental {
             };
 
             template <typename Receiver>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 connect_t, bulk_sender&& s, Receiver&& receiver)
             {
                 return hpx::execution::experimental::connect(
@@ -143,7 +143,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Receiver>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 connect_t, bulk_sender& s, Receiver&& receiver)
             {
                 return hpx::execution::experimental::connect(s.sender,
@@ -155,7 +155,7 @@ namespace hpx { namespace execution { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct bulk_t final
-      : hpx::functional::tag_priority<bulk_t>
+      : hpx::functional::detail::tag_priority<bulk_t>
     {
     private:
         // clang-format off
@@ -163,17 +163,17 @@ namespace hpx { namespace execution { namespace experimental {
             HPX_CONCEPT_REQUIRES_(
                 is_sender_v<Sender> &&
                 hpx::execution::experimental::detail::
-                    is_completion_scheduler_tag_dispatchable_v<
+                    is_completion_scheduler_tag_invocable_v<
                         hpx::execution::experimental::set_value_t, Sender,
                         bulk_t, Shape, F>)>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_override_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
             bulk_t, Sender&& sender, Shape const& shape, F&& f)
         {
             auto scheduler =
                 hpx::execution::experimental::get_completion_scheduler<
                     hpx::execution::experimental::set_value_t>(sender);
-            return hpx::functional::tag_dispatch(bulk_t{}, std::move(scheduler),
+            return hpx::functional::tag_invoke(bulk_t{}, std::move(scheduler),
                 std::forward<Sender>(sender), shape, std::forward<F>(f));
         }
 
@@ -184,7 +184,7 @@ namespace hpx { namespace execution { namespace experimental {
                 std::is_integral<Shape>::value
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             bulk_t, Sender&& sender, Shape const& shape, F&& f)
         {
             return detail::bulk_sender<Sender,
@@ -201,7 +201,7 @@ namespace hpx { namespace execution { namespace experimental {
                 !std::is_integral<std::decay_t<Shape>>::value
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             bulk_t, Sender&& sender, Shape&& shape, F&& f)
         {
             return detail::bulk_sender<Sender, Shape, F>{
@@ -210,7 +210,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         template <typename Shape, typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             bulk_t, Shape&& shape, F&& f)
         {
             return detail::partial_algorithm<bulk_t, Shape, F>{

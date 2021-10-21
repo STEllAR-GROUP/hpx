@@ -51,7 +51,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         // support with_priority property
-        friend thread_pool_scheduler tag_dispatch(
+        friend thread_pool_scheduler tag_invoke(
             hpx::execution::experimental::with_priority_t,
             thread_pool_scheduler const& scheduler,
             hpx::threads::thread_priority priority)
@@ -61,7 +61,7 @@ namespace hpx { namespace execution { namespace experimental {
             return sched_with_priority;
         }
 
-        friend hpx::threads::thread_priority tag_dispatch(
+        friend hpx::threads::thread_priority tag_invoke(
             hpx::execution::experimental::get_priority_t,
             thread_pool_scheduler const& scheduler)
         {
@@ -69,7 +69,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         // support with_stacksize property
-        friend thread_pool_scheduler tag_dispatch(
+        friend thread_pool_scheduler tag_invoke(
             hpx::execution::experimental::with_stacksize_t,
             thread_pool_scheduler const& scheduler,
             hpx::threads::thread_stacksize stacksize)
@@ -79,7 +79,7 @@ namespace hpx { namespace execution { namespace experimental {
             return sched_with_stacksize;
         }
 
-        friend hpx::threads::thread_stacksize tag_dispatch(
+        friend hpx::threads::thread_stacksize tag_invoke(
             hpx::execution::experimental::get_stacksize_t,
             thread_pool_scheduler const& scheduler)
         {
@@ -87,7 +87,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         // support with_hint property
-        friend thread_pool_scheduler tag_dispatch(
+        friend thread_pool_scheduler tag_invoke(
             hpx::execution::experimental::with_hint_t,
             thread_pool_scheduler const& scheduler,
             hpx::threads::thread_schedule_hint hint)
@@ -97,7 +97,7 @@ namespace hpx { namespace execution { namespace experimental {
             return sched_with_hint;
         }
 
-        friend hpx::threads::thread_schedule_hint tag_dispatch(
+        friend hpx::threads::thread_schedule_hint tag_invoke(
             hpx::execution::experimental::get_hint_t,
             thread_pool_scheduler const& scheduler)
         {
@@ -105,7 +105,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         // support with_annotation property
-        friend constexpr thread_pool_scheduler tag_dispatch(
+        friend constexpr thread_pool_scheduler tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             thread_pool_scheduler const& scheduler, char const* annotation)
         {
@@ -114,7 +114,7 @@ namespace hpx { namespace execution { namespace experimental {
             return sched_with_annotation;
         }
 
-        friend thread_pool_scheduler tag_dispatch(
+        friend thread_pool_scheduler tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             thread_pool_scheduler const& scheduler, std::string annotation)
         {
@@ -126,7 +126,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         // support get_annotation property
-        friend constexpr char const* tag_dispatch(
+        friend constexpr char const* tag_invoke(
             hpx::execution::experimental::get_annotation_t,
             thread_pool_scheduler const& scheduler) noexcept
         {
@@ -164,7 +164,7 @@ namespace hpx { namespace execution { namespace experimental {
             operation_state& operator=(operation_state&&) = delete;
             operation_state& operator=(operation_state const&) = delete;
 
-            friend void tag_dispatch(start_t, operation_state& os) noexcept
+            friend void tag_invoke(start_t, operation_state& os) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
@@ -196,7 +196,7 @@ namespace hpx { namespace execution { namespace experimental {
             static constexpr bool sends_done = false;
 
             template <typename Receiver>
-            friend operation_state<Scheduler, Receiver> tag_dispatch(
+            friend operation_state<Scheduler, Receiver> tag_invoke(
                 connect_t, sender&& s, Receiver&& receiver)
             {
                 return {
@@ -204,7 +204,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Receiver>
-            friend operation_state<Scheduler, Receiver> tag_dispatch(
+            friend operation_state<Scheduler, Receiver> tag_invoke(
                 connect_t, sender& s, Receiver&& receiver)
             {
                 return {s.scheduler, std::forward<Receiver>(receiver)};
@@ -213,7 +213,7 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename CPO,
                 HPX_CONCEPT_REQUIRES_(std::is_same_v<CPO,
                     hpx::execution::experimental::set_value_t>)>
-            friend constexpr auto tag_dispatch(
+            friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
                 sender const& s)
             {
@@ -221,13 +221,13 @@ namespace hpx { namespace execution { namespace experimental {
             }
         };
 
-        friend constexpr sender<thread_pool_scheduler> tag_dispatch(
+        friend constexpr sender<thread_pool_scheduler> tag_invoke(
             schedule_t, thread_pool_scheduler&& sched)
         {
             return {std::move(sched)};
         }
 
-        friend constexpr sender<thread_pool_scheduler> tag_dispatch(
+        friend constexpr sender<thread_pool_scheduler> tag_invoke(
             schedule_t, thread_pool_scheduler const& sched)
         {
             return {sched};

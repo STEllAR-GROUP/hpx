@@ -11,7 +11,7 @@
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_difference.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             hpx::is_vectorpack_execution_policy<ExPolicy>::value&&
                 hpx::parallel::util::detail::iterator_datapar_compatible<
                     InIter>::value)>
-    inline OutIter tag_dispatch(sequential_adjacent_difference_t<ExPolicy>,
+    inline OutIter tag_invoke(sequential_adjacent_difference_t<ExPolicy>,
         InIter first, InIter last, OutIter dest, Op&& op)
     {
         return datapar_adjacent_difference<ExPolicy>::call(

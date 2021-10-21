@@ -10,17 +10,17 @@
 #include <hpx/execution/algorithms/detach.hpp>
 #include <hpx/execution/algorithms/transform.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 
 #include <utility>
 
 namespace hpx { namespace execution { namespace experimental {
     HPX_INLINE_CONSTEXPR_VARIABLE struct execute_t final
-      : hpx::functional::tag_fallback<execute_t>
+      : hpx::functional::detail::tag_fallback<execute_t>
     {
     private:
         template <typename Scheduler, typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             execute_t, Scheduler&& scheduler, F&& f)
         {
             return detach(

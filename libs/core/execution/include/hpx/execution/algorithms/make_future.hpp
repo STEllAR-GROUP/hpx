@@ -34,21 +34,20 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::lcos::detail::future_data_allocator<T, Allocator>>
                 data;
 
-            friend void tag_dispatch(set_error_t, make_future_receiver&& r,
+            friend void tag_invoke(set_error_t, make_future_receiver&& r,
                 std::exception_ptr ep) noexcept
             {
                 r.data->set_exception(std::move(ep));
                 r.data.reset();
             }
 
-            friend void tag_dispatch(
-                set_done_t, make_future_receiver&&) noexcept
+            friend void tag_invoke(set_done_t, make_future_receiver&&) noexcept
             {
                 std::terminate();
             }
 
             template <typename U>
-            friend void tag_dispatch(
+            friend void tag_invoke(
                 set_value_t, make_future_receiver&& r, U&& u) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
@@ -67,20 +66,19 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::lcos::detail::future_data_allocator<void, Allocator>>
                 data;
 
-            friend void tag_dispatch(set_error_t, make_future_receiver&& r,
+            friend void tag_invoke(set_error_t, make_future_receiver&& r,
                 std::exception_ptr ep) noexcept
             {
                 r.data->set_exception(std::move(ep));
                 r.data.reset();
             }
 
-            friend void tag_dispatch(
-                set_done_t, make_future_receiver&&) noexcept
+            friend void tag_invoke(set_done_t, make_future_receiver&&) noexcept
             {
                 std::terminate();
             }
 
-            friend void tag_dispatch(
+            friend void tag_invoke(
                 set_value_t, make_future_receiver&& r) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
@@ -159,7 +157,7 @@ namespace hpx { namespace execution { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_INLINE_CONSTEXPR_VARIABLE struct make_future_t final
-      : hpx::functional::tag_fallback<make_future_t>
+      : hpx::functional::detail::tag_fallback<make_future_t>
     {
     private:
         // clang-format off
@@ -170,9 +168,8 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
-            make_future_t, Sender&& sender,
-            Allocator const& allocator = Allocator{})
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(make_future_t,
+            Sender&& sender, Allocator const& allocator = Allocator{})
         {
             return detail::make_future(std::forward<Sender>(sender), allocator);
         }
@@ -183,7 +180,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             make_future_t, Allocator const& allocator = Allocator{})
         {
             return detail::partial_algorithm<make_future_t, Allocator>{

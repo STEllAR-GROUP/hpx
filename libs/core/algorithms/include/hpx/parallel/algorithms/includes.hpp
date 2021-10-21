@@ -96,8 +96,8 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -105,9 +105,9 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/upper_lower_bound.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -362,7 +362,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(includes_t, ExPolicy&& policy, FwdIter1 first1,
+        tag_fallback_invoke(includes_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -389,7 +389,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(includes_t, FwdIter1 first1,
+        friend bool tag_fallback_invoke(includes_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),

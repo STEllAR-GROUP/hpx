@@ -264,7 +264,7 @@ namespace hpx {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(
+        friend bool tag_fallback_invoke(
             hpx::is_partitioned_t, FwdIter first, FwdIter last, Pred&& pred)
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, FwdIter>()
@@ -283,7 +283,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(hpx::is_partitioned_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::is_partitioned_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, Pred&& pred)
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, FwdIter>()

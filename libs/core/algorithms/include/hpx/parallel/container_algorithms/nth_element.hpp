@@ -318,7 +318,7 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend RandomIt tag_fallback_dispatch(hpx::ranges::nth_element_t,
+        friend RandomIt tag_fallback_invoke(hpx::ranges::nth_element_t,
             RandomIt first, RandomIt nth, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
@@ -347,7 +347,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, RandomIt>
-        tag_fallback_dispatch(hpx::ranges::nth_element_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::nth_element_t, ExPolicy&& policy,
             RandomIt first, RandomIt nth, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
@@ -373,7 +373,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend hpx::traits::range_iterator_t<Rng> tag_fallback_dispatch(
+        friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::nth_element_t, Rng&& rng,
             hpx::traits::range_iterator_t<Rng> nth, Pred&& pred = Pred(),
             Proj&& proj = Proj())
@@ -406,7 +406,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::traits::range_iterator_t<Rng>>
-        tag_fallback_dispatch(hpx::ranges::nth_element_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::nth_element_t, ExPolicy&& policy,
             Rng&& rng, hpx::traits::range_iterator_t<Rng> nth,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {

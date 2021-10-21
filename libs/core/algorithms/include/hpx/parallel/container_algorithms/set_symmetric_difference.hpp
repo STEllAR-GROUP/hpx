@@ -299,7 +299,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             set_symmetric_difference_result<Iter1, Iter2, Iter3>>::type
-        tag_fallback_dispatch(set_symmetric_difference_t, ExPolicy&& policy,
+        tag_fallback_invoke(set_symmetric_difference_t, ExPolicy&& policy,
             Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -350,7 +350,7 @@ namespace hpx { namespace ranges {
             set_symmetric_difference_result<
                 typename hpx::traits::range_iterator<Rng1>::type,
                 typename hpx::traits::range_iterator<Rng2>::type, Iter3>>::type
-        tag_fallback_dispatch(set_symmetric_difference_t, ExPolicy&& policy,
+        tag_fallback_invoke(set_symmetric_difference_t, ExPolicy&& policy,
             Rng1&& rng1, Rng2&& rng2, Iter3 dest, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -408,7 +408,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend set_symmetric_difference_result<Iter1, Iter2, Iter3>
-        tag_fallback_dispatch(set_symmetric_difference_t, Iter1 first1,
+        tag_fallback_invoke(set_symmetric_difference_t, Iter1 first1,
             Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -451,7 +451,7 @@ namespace hpx { namespace ranges {
         friend set_symmetric_difference_result<
             typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, Iter3>
-        tag_fallback_dispatch(set_symmetric_difference_t, Rng1&& rng1,
+        tag_fallback_invoke(set_symmetric_difference_t, Rng1&& rng1,
             Rng2&& rng2, Iter3 dest, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {

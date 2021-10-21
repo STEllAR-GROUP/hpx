@@ -5,7 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # Function tests
-set(function_tests tag_dispatch)
+set(function_tests tag_invoke)
 
 foreach(test ${function_tests})
   set(sources ${test}.cpp)
@@ -18,9 +18,9 @@ foreach(test ${function_tests})
     NOLIBS
     DEPENDENCIES hpx_core
     EXCLUDE_FROM_ALL
-    FOLDER "Tests/Unit/Modules/Core/TagDispatch"
+    FOLDER "Tests/Unit/Modules/Core/TagInvoke"
   )
 
-  add_hpx_unit_test("modules.tag_dispatch" ${test})
+  add_hpx_unit_test("modules.tag_invoke" ${test})
 
 endforeach()

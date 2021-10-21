@@ -507,7 +507,7 @@ namespace hpx { namespace lcos { namespace detail {
         operation_state(operation_state const&) = delete;
         operation_state& operator=(operation_state const&) = delete;
 
-        friend void tag_dispatch(
+        friend void tag_invoke(
             hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
             os.start_helper(std::is_void<result_type>{});
@@ -908,7 +908,7 @@ namespace hpx { namespace lcos {
         using base_type::value_types;
 
         template <typename Receiver>
-        friend detail::operation_state<Receiver, future> tag_dispatch(
+        friend detail::operation_state<Receiver, future> tag_invoke(
             hpx::execution::experimental::connect_t, future&& f,
             Receiver&& receiver)
         {
@@ -1239,7 +1239,7 @@ namespace hpx { namespace lcos {
         using base_type::value_types;
 
         template <typename Receiver>
-        friend detail::operation_state<Receiver, shared_future> tag_dispatch(
+        friend detail::operation_state<Receiver, shared_future> tag_invoke(
             hpx::execution::experimental::connect_t, shared_future&& f,
             Receiver&& receiver)
         {
@@ -1247,7 +1247,7 @@ namespace hpx { namespace lcos {
         }
 
         template <typename Receiver>
-        friend detail::operation_state<Receiver, shared_future> tag_dispatch(
+        friend detail::operation_state<Receiver, shared_future> tag_invoke(
             hpx::execution::experimental::connect_t, shared_future& f,
             Receiver&& receiver)
         {

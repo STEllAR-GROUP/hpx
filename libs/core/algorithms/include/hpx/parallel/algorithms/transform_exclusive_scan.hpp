@@ -215,9 +215,9 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -454,7 +454,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(hpx::transform_exclusive_scan_t,
+        friend OutIter tag_fallback_invoke(hpx::transform_exclusive_scan_t,
             InIter first, InIter last, OutIter dest, T init, BinOp&& binary_op,
             UnOp&& unary_op)
         {
@@ -492,9 +492,9 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::transform_exclusive_scan_t,
-            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
-            T init, BinOp&& binary_op, UnOp&& unary_op)
+        tag_fallback_invoke(hpx::transform_exclusive_scan_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init,
+            BinOp&& binary_op, UnOp&& unary_op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");

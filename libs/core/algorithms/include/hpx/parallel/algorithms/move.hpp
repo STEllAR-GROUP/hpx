@@ -216,7 +216,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(move_t, ExPolicy&& policy, FwdIter1 first,
+        tag_fallback_invoke(move_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest)
         {
             return hpx::parallel::util::get_second_element(
@@ -231,7 +231,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value)>
         // clang-format on
-        friend FwdIter2 tag_fallback_dispatch(
+        friend FwdIter2 tag_fallback_invoke(
             move_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
             return std::move(first, last, dest);

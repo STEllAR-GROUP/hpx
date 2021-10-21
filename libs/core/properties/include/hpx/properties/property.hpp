@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
 #include <type_traits>
@@ -16,11 +16,11 @@
 namespace hpx { namespace experimental {
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct prefer_t
-      : hpx::functional::tag_fallback<prefer_t>
+      : hpx::functional::detail::tag_fallback<prefer_t>
     {
         // clang-format off
         template <typename Tag, typename... Tn>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
                 prefer_t, Tag const& tag, Tn&&... tn)
             noexcept(noexcept(tag(std::forward<Tn>(tn)...)))
             -> decltype(tag(std::forward<Tn>(tn)...))
@@ -31,11 +31,11 @@ namespace hpx { namespace experimental {
 
         // clang-format off
         template <typename Tag, typename T0, typename... Tn>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
                 prefer_t, Tag, T0&& t0, Tn&&...)
             noexcept(noexcept(std::forward<T0>(t0)))
             -> std::enable_if_t<
-                    !hpx::functional::is_tag_dispatchable_v<
+                    !hpx::functional::is_tag_invocable_v<
                         prefer_t, Tag, T0, Tn...> &&
                     !hpx::is_invocable_v<Tag, T0, Tn...>,
                     decltype(std::forward<T0>(t0))>

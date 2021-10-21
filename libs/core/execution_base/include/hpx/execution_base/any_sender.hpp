@@ -334,7 +334,7 @@ namespace hpx::execution::experimental {
             any_operation_state& operator=(any_operation_state&&) = delete;
             any_operation_state& operator=(any_operation_state const&) = delete;
 
-            HPX_CORE_EXPORT friend void tag_dispatch(
+            HPX_CORE_EXPORT friend void tag_invoke(
                 hpx::execution::experimental::start_t,
                 any_operation_state& os) noexcept;
         };
@@ -458,7 +458,7 @@ namespace hpx::execution::experimental {
             any_receiver& operator=(any_receiver&&) = default;
             any_receiver& operator=(any_receiver const&) = delete;
 
-            friend void tag_dispatch(hpx::execution::experimental::set_value_t,
+            friend void tag_invoke(hpx::execution::experimental::set_value_t,
                 any_receiver&& r, Ts... ts)
             {
                 // We first move the storage to a temporary variable so that
@@ -469,7 +469,7 @@ namespace hpx::execution::experimental {
                 std::move(moved_storage.get()).set_value(std::move(ts)...);
             }
 
-            friend void tag_dispatch(hpx::execution::experimental::set_error_t,
+            friend void tag_invoke(hpx::execution::experimental::set_error_t,
                 any_receiver&& r, std::exception_ptr ep) noexcept
             {
                 // We first move the storage to a temporary variable so that
@@ -480,7 +480,7 @@ namespace hpx::execution::experimental {
                 std::move(moved_storage.get()).set_error(std::move(ep));
             }
 
-            friend void tag_dispatch(hpx::execution::experimental::set_done_t,
+            friend void tag_invoke(hpx::execution::experimental::set_done_t,
                 any_receiver&& r) noexcept
             {
                 // We first move the storage to a temporary variable so that
@@ -689,7 +689,7 @@ namespace hpx::execution::experimental {
         static constexpr bool sends_done = false;
 
         template <typename R>
-        friend detail::any_operation_state tag_dispatch(
+        friend detail::any_operation_state tag_invoke(
             hpx::execution::experimental::connect_t, unique_any_sender&& s,
             R&& r)
         {
@@ -762,7 +762,7 @@ namespace hpx::execution::experimental {
         static constexpr bool sends_done = false;
 
         template <typename R>
-        friend detail::any_operation_state tag_dispatch(
+        friend detail::any_operation_state tag_invoke(
             hpx::execution::experimental::connect_t, any_sender& s, R&& r)
         {
             return s.storage.get().connect(
@@ -770,7 +770,7 @@ namespace hpx::execution::experimental {
         }
 
         template <typename R>
-        friend detail::any_operation_state tag_dispatch(
+        friend detail::any_operation_state tag_invoke(
             hpx::execution::experimental::connect_t, any_sender&& s, R&& r)
         {
             // We first move the storage to a temporary variable so that this

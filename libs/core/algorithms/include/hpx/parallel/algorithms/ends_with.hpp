@@ -226,7 +226,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ends_with
     HPX_INLINE_CONSTEXPR_VARIABLE struct ends_with_t final
-      : hpx::functional::tag_fallback<ends_with_t>
+      : hpx::functional::detail::tag_fallback<ends_with_t>
     {
     private:
         // clang-format off
@@ -241,7 +241,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(hpx::ends_with_t, InIter1 first1,
+        friend bool tag_fallback_invoke(hpx::ends_with_t, InIter1 first1,
             InIter1 last1, InIter2 first2, InIter2 last2, Pred&& pred = Pred())
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter1>,
@@ -271,7 +271,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(hpx::ends_with_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ends_with_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             Pred&& pred = Pred())
         {

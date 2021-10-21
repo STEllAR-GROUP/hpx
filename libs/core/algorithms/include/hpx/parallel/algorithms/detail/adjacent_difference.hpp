@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
@@ -23,12 +23,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename ExPolicy>
     struct sequential_adjacent_difference_t
-      : hpx::functional::tag_fallback<
+      : hpx::functional::detail::tag_fallback<
             sequential_adjacent_difference_t<ExPolicy>>
     {
     private:
         template <typename InIter, typename OutIter, typename Op>
-        friend inline OutIter tag_fallback_dispatch(
+        friend inline OutIter tag_fallback_invoke(
             sequential_adjacent_difference_t<ExPolicy>, InIter first,
             InIter last, OutIter dest, Op&& op)
         {

@@ -671,7 +671,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     // Note: The implementation of the non-segmented algorithms here relies on
-    //       tag_fallback_dispatch. For this reason the tag_dispatch overloads for
+    //       tag_fallback_invoke. For this reason the tag_invoke overloads for
     //       the segmented algorithms (and other specializations) take
     //       precedence over the implementations here. This has the advantage
     //       that the non-segmented algorithms do not need to be explicitly
@@ -688,7 +688,7 @@ namespace hpx {
                 hpx::traits::is_iterator<InIter>::value
             )>
         // clang-format on
-        friend F tag_fallback_dispatch(
+        friend F tag_fallback_invoke(
             hpx::for_each_t, InIter first, InIter last, F&& f)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
@@ -713,7 +713,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_fallback_dispatch(hpx::for_each_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(hpx::for_each_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, F&& f)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -745,7 +745,7 @@ namespace hpx {
                 hpx::traits::is_input_iterator<InIter>::value
             )>
         // clang-format on
-        friend InIter tag_fallback_dispatch(
+        friend InIter tag_fallback_invoke(
             hpx::for_each_n_t, InIter first, Size count, F&& f)
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
@@ -771,8 +771,8 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::for_each_n_t, ExPolicy&& policy,
-            FwdIter first, Size count, F&& f)
+        tag_fallback_invoke(hpx::for_each_n_t, ExPolicy&& policy, FwdIter first,
+            Size count, F&& f)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");

@@ -11,8 +11,8 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/detail/invoke.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
@@ -29,13 +29,13 @@ namespace hpx { namespace parallel { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy>
     struct loop_step_t final
-      : hpx::functional::tag_fallback<loop_step_t<ExPolicy>>
+      : hpx::functional::detail::tag_fallback<loop_step_t<ExPolicy>>
     {
     private:
         template <typename VecOnly, typename F, typename... Iters>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE
             typename hpx::util::invoke_result<F, Iters...>::type
-            tag_fallback_dispatch(hpx::parallel::util::loop_step_t<ExPolicy>,
+            tag_fallback_invoke(hpx::parallel::util::loop_step_t<ExPolicy>,
                 VecOnly&&, F&& f, Iters&... its)
         {
             return HPX_INVOKE(std::forward<F>(f), (its++)...);
@@ -60,12 +60,12 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy>
     struct loop_optimization_t final
-      : hpx::functional::tag_fallback<loop_optimization_t<ExPolicy>>
+      : hpx::functional::detail::tag_fallback<loop_optimization_t<ExPolicy>>
     {
     private:
         template <typename Iter>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool
-            tag_fallback_dispatch(
+            tag_fallback_invoke(
                 hpx::parallel::util::loop_optimization_t<ExPolicy>, Iter, Iter)
         {
             return false;
@@ -121,12 +121,12 @@ namespace hpx { namespace parallel { namespace util {
         };
     }    // namespace detail
 
-    struct loop_t final : hpx::functional::tag_fallback<loop_t>
+    struct loop_t final : hpx::functional::detail::tag_fallback<loop_t>
     {
     private:
         template <typename ExPolicy, typename Begin, typename End, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
-        tag_fallback_dispatch(hpx::parallel::util::loop_t, ExPolicy&&,
+        tag_fallback_invoke(hpx::parallel::util::loop_t, ExPolicy&&,
             Begin begin, End end, F&& f)
         {
             return detail::loop<Begin>::call(begin, end, std::forward<F>(f));
@@ -135,7 +135,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename ExPolicy, typename Begin, typename End,
             typename CancelToken, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
-        tag_fallback_dispatch(hpx::parallel::util::loop_t, ExPolicy&&,
+        tag_fallback_invoke(hpx::parallel::util::loop_t, ExPolicy&&,
             Begin begin, End end, CancelToken& tok, F&& f)
         {
             return detail::loop<Begin>::call(
@@ -200,12 +200,12 @@ namespace hpx { namespace parallel { namespace util {
         };
     }    // namespace detail
 
-    struct loop_ind_t final : hpx::functional::tag_fallback<loop_ind_t>
+    struct loop_ind_t final : hpx::functional::detail::tag_fallback<loop_ind_t>
     {
     private:
         template <typename ExPolicy, typename Begin, typename End, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
-        tag_fallback_dispatch(hpx::parallel::util::loop_ind_t, ExPolicy&&,
+        tag_fallback_invoke(hpx::parallel::util::loop_ind_t, ExPolicy&&,
             Begin begin, End end, F&& f)
         {
             return detail::loop_ind<Begin>::call(
@@ -215,7 +215,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename ExPolicy, typename Begin, typename End,
             typename CancelToken, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
-        tag_fallback_dispatch(hpx::parallel::util::loop_ind_t, ExPolicy&&,
+        tag_fallback_invoke(hpx::parallel::util::loop_ind_t, ExPolicy&&,
             Begin begin, End end, CancelToken& tok, F&& f)
         {
             return detail::loop_ind<Begin>::call(
@@ -270,14 +270,15 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     template <typename ExPolicy>
-    struct loop2_t final : hpx::functional::tag_fallback<loop2_t<ExPolicy>>
+    struct loop2_t final
+      : hpx::functional::detail::tag_fallback<loop2_t<ExPolicy>>
     {
     private:
         template <typename VecOnly, typename Begin1, typename End1,
             typename Begin2, typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr std::pair<Begin1, Begin2>
-            tag_fallback_dispatch(hpx::parallel::util::loop2_t<ExPolicy>,
+            tag_fallback_invoke(hpx::parallel::util::loop2_t<ExPolicy>,
                 VecOnly&&, Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
         {
             return detail::loop2<Begin1, Begin2>::call(
@@ -437,12 +438,13 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////
     template <typename ExPolicy>
-    struct loop_n_t final : hpx::functional::tag_fallback<loop_n_t<ExPolicy>>
+    struct loop_n_t final
+      : hpx::functional::detail::tag_fallback<loop_n_t<ExPolicy>>
     {
     private:
         template <typename Iter, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
-        tag_fallback_dispatch(hpx::parallel::util::loop_n_t<ExPolicy>, Iter it,
+        tag_fallback_invoke(hpx::parallel::util::loop_n_t<ExPolicy>, Iter it,
             std::size_t count, F&& f)
         {
             using pred = std::integral_constant<bool,
@@ -455,7 +457,7 @@ namespace hpx { namespace parallel { namespace util {
 
         template <typename Iter, typename CancelToken, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
-        tag_fallback_dispatch(hpx::parallel::util::loop_n_t<ExPolicy>, Iter it,
+        tag_fallback_invoke(hpx::parallel::util::loop_n_t<ExPolicy>, Iter it,
             std::size_t count, CancelToken& tok, F&& f)
         {
             using pred = std::integral_constant<bool,
@@ -494,12 +496,12 @@ namespace hpx { namespace parallel { namespace util {
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy>
         struct extract_value_t
-          : hpx::functional::tag_fallback<extract_value_t<ExPolicy>>
+          : hpx::functional::detail::tag_fallback<extract_value_t<ExPolicy>>
         {
         private:
             template <typename T>
             friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T const&
-            tag_fallback_dispatch(
+            tag_fallback_invoke(
                 hpx::parallel::util::detail::extract_value_t<ExPolicy>,
                 T const& v)
             {
@@ -522,12 +524,12 @@ namespace hpx { namespace parallel { namespace util {
 
         template <typename ExPolicy>
         struct accumulate_values_t
-          : hpx::functional::tag_fallback<accumulate_values_t<ExPolicy>>
+          : hpx::functional::detail::tag_fallback<accumulate_values_t<ExPolicy>>
         {
         private:
             template <typename F, typename T>
             friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T const&
-            tag_fallback_dispatch(
+            tag_fallback_invoke(
                 hpx::parallel::util::detail::accumulate_values_t<ExPolicy>, F&&,
                 T const& v)
             {
@@ -536,7 +538,7 @@ namespace hpx { namespace parallel { namespace util {
 
             template <typename F, typename T, typename T1>
             friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T
-            tag_fallback_dispatch(
+            tag_fallback_invoke(
                 hpx::parallel::util::detail::accumulate_values_t<ExPolicy>,
                 F&& f, T&& v, T1&& init)
             {
@@ -705,12 +707,12 @@ namespace hpx { namespace parallel { namespace util {
     ///////////////////////////////////////////////////////////////////////
     template <typename ExPolicy>
     struct loop_n_ind_t final
-      : hpx::functional::tag_fallback<loop_n_ind_t<ExPolicy>>
+      : hpx::functional::detail::tag_fallback<loop_n_ind_t<ExPolicy>>
     {
     private:
         template <typename Iter, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
-        tag_fallback_dispatch(hpx::parallel::util::loop_n_ind_t<ExPolicy>,
+        tag_fallback_invoke(hpx::parallel::util::loop_n_ind_t<ExPolicy>,
             Iter it, std::size_t count, F&& f)
         {
             using pred = std::integral_constant<bool,
@@ -723,7 +725,7 @@ namespace hpx { namespace parallel { namespace util {
 
         template <typename Iter, typename CancelToken, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
-        tag_fallback_dispatch(hpx::parallel::util::loop_n_ind_t<ExPolicy>,
+        tag_fallback_invoke(hpx::parallel::util::loop_n_ind_t<ExPolicy>,
             Iter it, std::size_t count, CancelToken& tok, F&& f)
         {
             using pred = std::integral_constant<bool,

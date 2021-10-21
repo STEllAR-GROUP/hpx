@@ -259,7 +259,7 @@ namespace hpx {
                 hpx::traits::is_input_iterator<InIter>::value
             )>
         // clang-format on
-        friend InIter tag_fallback_dispatch(hpx::adjacent_find_t, InIter first,
+        friend InIter tag_fallback_invoke(hpx::adjacent_find_t, InIter first,
             InIter last, Pred&& pred = Pred())
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
@@ -280,7 +280,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::adjacent_find_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::adjacent_find_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, Pred&& pred = Pred())
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),

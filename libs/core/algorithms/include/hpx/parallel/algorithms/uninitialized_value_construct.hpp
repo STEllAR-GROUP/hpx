@@ -458,7 +458,7 @@ namespace hpx {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(
+        friend void tag_fallback_invoke(
             hpx::uninitialized_value_construct_t, FwdIter first, FwdIter last)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -476,7 +476,7 @@ namespace hpx {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(hpx::uninitialized_value_construct_t,
+        tag_fallback_invoke(hpx::uninitialized_value_construct_t,
             ExPolicy&& policy, FwdIter first, FwdIter last)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -505,7 +505,7 @@ namespace hpx {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             hpx::uninitialized_value_construct_n_t, FwdIter first, Size count)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -531,7 +531,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::uninitialized_value_construct_n_t,
+        tag_fallback_invoke(hpx::uninitialized_value_construct_n_t,
             ExPolicy&& policy, FwdIter first, Size count)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,

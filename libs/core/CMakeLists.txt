@@ -66,7 +66,7 @@ set(_hpx_core_modules
     static_reinit
     string_util
     synchronization
-    tag_dispatch
+    tag_invoke
     testing
     thread_pool_util
     thread_pools

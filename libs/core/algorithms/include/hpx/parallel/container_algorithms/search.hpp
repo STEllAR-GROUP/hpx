@@ -785,10 +785,9 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(hpx::ranges::search_t,
-            FwdIter first, Sent last, FwdIter2 s_first, Sent2 s_last,
-            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+        friend FwdIter tag_fallback_invoke(hpx::ranges::search_t, FwdIter first,
+            Sent last, FwdIter2 s_first, Sent2 s_last, Pred&& op = Pred(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             return hpx::parallel::v1::detail::search<FwdIter, Sent>().call(
                 hpx::execution::seq, first, last, s_first, s_last,
@@ -819,7 +818,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::ranges::search_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::search_t, ExPolicy&& policy,
             FwdIter first, Sent last, FwdIter2 s_first, Sent2 s_last,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -848,7 +847,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng1>::type
-        tag_fallback_dispatch(hpx::ranges::search_t, Rng1&& rng1, Rng2&& rng2,
+        tag_fallback_invoke(hpx::ranges::search_t, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -882,7 +881,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_fallback_dispatch(hpx::ranges::search_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::search_t, ExPolicy&& policy,
             Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -921,7 +920,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(hpx::ranges::search_n_t,
+        friend FwdIter tag_fallback_invoke(hpx::ranges::search_n_t,
             FwdIter first, std::size_t count, FwdIter2 s_first, Sent2 s_last,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -953,7 +952,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::ranges::search_n_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::search_n_t, ExPolicy&& policy,
             FwdIter first, std::size_t count, FwdIter2 s_first, Sent2 s_last,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -982,7 +981,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng1>::type
-        tag_fallback_dispatch(hpx::ranges::search_n_t, Rng1&& rng1,
+        tag_fallback_invoke(hpx::ranges::search_n_t, Rng1&& rng1,
             std::size_t count, Rng2&& rng2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -1017,7 +1016,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_fallback_dispatch(hpx::ranges::search_n_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::search_n_t, ExPolicy&& policy,
             Rng1&& rng1, std::size_t count, Rng2&& rng2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {

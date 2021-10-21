@@ -15,8 +15,8 @@
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -38,7 +38,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::intrusive_ptr<operation_state_holder> op_state;
 
                 template <typename Error>
-                HPX_NORETURN friend void tag_dispatch(
+                HPX_NORETURN friend void tag_invoke(
                     set_error_t, detach_receiver&&, Error&&) noexcept
                 {
                     HPX_ASSERT_MSG(false,
@@ -49,14 +49,13 @@ namespace hpx { namespace execution { namespace experimental {
                     std::terminate();
                 }
 
-                friend void tag_dispatch(
-                    set_done_t, detach_receiver&& r) noexcept
+                friend void tag_invoke(set_done_t, detach_receiver&& r) noexcept
                 {
                     r.op_state.reset();
                 };
 
                 template <typename... Ts>
-                friend void tag_dispatch(
+                friend void tag_invoke(
                     set_value_t, detach_receiver&& r, Ts&&...) noexcept
                 {
                     r.op_state.reset();
@@ -107,7 +106,7 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct detach_t final
-      : hpx::functional::tag_fallback<detach_t>
+      : hpx::functional::detail::tag_fallback<detach_t>
     {
     private:
         // clang-format off
@@ -118,7 +117,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE void tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE void tag_fallback_invoke(
             detach_t, Sender&& sender, Allocator const& allocator = Allocator{})
         {
             using allocator_type = Allocator;
@@ -145,7 +144,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             detach_t, Allocator const& allocator = Allocator{})
         {
             return detail::partial_algorithm<detach_t, Allocator>{allocator};
