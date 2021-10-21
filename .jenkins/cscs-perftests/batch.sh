@@ -97,7 +97,6 @@ set +e
 ctest \
     --verbose \
     -S ${src_dir}/.jenkins/cscs-perftests/ctest.cmake \
-    -DCTEST_CONFIGURE_EXTRA_OPTIONS="${configure_extra_options}" \
     -DCTEST_BUILD_CONFIGURATION_NAME="${configuration_name}" \
     -DCTEST_SOURCE_DIRECTORY="${src_dir}" \
     -DCTEST_BINARY_DIRECTORY="${build_dir}"
