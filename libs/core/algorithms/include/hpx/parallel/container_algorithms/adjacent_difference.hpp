@@ -270,7 +270,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx { namespace ranges {
     HPX_INLINE_CONSTEXPR_VARIABLE struct adjacent_difference_t final
-      : hpx::functional::tag_fallback<adjacent_difference_t>
+      : hpx::detail::tag_parallel_algorithm<adjacent_difference_t>
     {
     private:
         // clang-format off
@@ -281,7 +281,7 @@ namespace hpx { namespace ranges {
             )>
 
         // clang-format on
-        friend FwdIter2 tag_fallback_dispatch(
+        friend FwdIter2 tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, FwdIter1 first, Sent last,
             FwdIter2 dest)
         {
@@ -303,7 +303,7 @@ namespace hpx { namespace ranges {
             )>
 
         // clang-format on
-        friend FwdIter2 tag_fallback_dispatch(
+        friend FwdIter2 tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, Rng&& rng, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<
@@ -327,7 +327,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::ranges::adjacent_difference_t,
+        tag_fallback_invoke(hpx::ranges::adjacent_difference_t,
             ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
@@ -352,7 +352,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::ranges::adjacent_difference_t,
+        tag_fallback_invoke(hpx::ranges::adjacent_difference_t,
             ExPolicy&& policy, Rng&& rng, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<
@@ -373,7 +373,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, FwdIter1>::value
             )>
         // clang-format on
-        friend FwdIter2 tag_fallback_dispatch(
+        friend FwdIter2 tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, FwdIter1 first, Sent last,
             FwdIter2 dest, Op&& op)
         {
@@ -391,7 +391,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
         // clang-format on
-        friend FwdIter2 tag_fallback_dispatch(
+        friend FwdIter2 tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, Rng&& rng, FwdIter2 dest,
             Op&& op)
         {
@@ -416,7 +416,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::ranges::adjacent_difference_t,
+        tag_fallback_invoke(hpx::ranges::adjacent_difference_t,
             ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest,
             Op&& op)
         {
@@ -438,7 +438,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::ranges::adjacent_difference_t,
+        tag_fallback_invoke(hpx::ranges::adjacent_difference_t,
             ExPolicy&& policy, Rng&& rng, FwdIter2 dest, Op&& op)
         {
             static_assert((hpx::traits::is_forward_iterator<
