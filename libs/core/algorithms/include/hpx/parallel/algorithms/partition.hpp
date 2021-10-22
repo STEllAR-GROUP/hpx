@@ -1610,15 +1610,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         });
                 };
 
-                auto f4 =
-                    [last_iter, dest_true, dest_false, flags](
-                        std::vector<
-                            hpx::shared_future<output_iterator_offset>>&& items,
-                        std::vector<hpx::future<void>>&&) mutable
+                auto f4 = [last_iter, dest_true, dest_false, flags](
+                              std::vector<output_iterator_offset>&& items,
+                              std::vector<hpx::future<void>>&&) mutable
                     -> hpx::tuple<FwdIter1, FwdIter2, FwdIter3> {
                     HPX_UNUSED(flags);
 
-                    output_iterator_offset count_pair = items.back().get();
+                    output_iterator_offset count_pair = items.back();
                     std::size_t count_true = get<0>(count_pair);
                     std::size_t count_false = get<1>(count_pair);
                     std::advance(dest_true, count_true);

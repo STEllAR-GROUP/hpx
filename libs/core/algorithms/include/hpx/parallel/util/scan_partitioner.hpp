@@ -87,6 +87,7 @@ namespace hpx { namespace parallel { namespace util {
 
                 std::vector<hpx::shared_future<Result1>> workitems;
                 std::vector<hpx::future<Result2>> finalitems;
+                std::vector<Result1> f2results;
                 std::list<std::exception_ptr> errors;
                 try
                 {
@@ -150,7 +151,7 @@ namespace hpx { namespace parallel { namespace util {
                     hpx::wait_all(workitems);
 
                     // perform f2 sequentially in one go
-                    std::vector<Result1> f2results(workitems.size());
+                    f2results.resize(workitems.size());
                     auto result = workitems[0].get();
                     f2results[0] = result;
                     for (std::size_t i = 1; i < workitems.size(); i++)
@@ -176,7 +177,7 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(std::move(workitems), std::move(finalitems),
+                return reduce(std::move(f2results), std::move(finalitems),
                     std::move(errors), std::forward<F4>(f4));
 #endif
             }
@@ -347,6 +348,38 @@ namespace hpx { namespace parallel { namespace util {
                 // always rethrow if 'errors' is not empty or 'workitems' or
                 // 'finalitems' have an exceptional future
                 handle_local_exceptions::call(workitems, errors);
+                handle_local_exceptions::call(finalitems, errors);
+
+                try
+                {
+                    return f(std::move(workitems), std::move(finalitems));
+                }
+                catch (...)
+                {
+                    // rethrow either bad_alloc or exception_list
+                    handle_local_exceptions::call(std::current_exception());
+                }
+#endif
+            }
+
+            template <typename F>
+            static R reduce(std::vector<Result1>&& workitems,
+                std::vector<hpx::future<Result2>>&& finalitems,
+                std::list<std::exception_ptr>&& errors, F&& f)
+            {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_UNUSED(workitems);
+                HPX_UNUSED(finalitems);
+                HPX_UNUSED(errors);
+                HPX_UNUSED(f);
+                HPX_ASSERT(false);
+                return R();
+#else
+                // wait for all tasks to finish
+                hpx::wait_all(finalitems);
+
+                // always rethrow if 'errors' is not empty or
+                // 'finalitems' have an exceptional future
                 handle_local_exceptions::call(finalitems, errors);
 
                 try

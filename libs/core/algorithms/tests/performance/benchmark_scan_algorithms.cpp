@@ -4,11 +4,23 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/algorithm.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/modules/program_options.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/parallel/algorithms/exclusive_scan.hpp>
+#include <hpx/parallel/algorithms/inclusive_scan.hpp>
+#include <hpx/parallel/algorithms/transform_exclusive_scan.hpp>
+#include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
+#include <hpx/parallel/algorithms/unique.hpp>
 
+#include <array>
+#include <cstddef>
 #include <fstream>
 #include <functional>
+#include <iostream>
+#include <map>
+#include <string>
 #include <vector>
 
 //#define OUTPUT_TO_CSV
@@ -177,8 +189,25 @@ void measureScanAlgorithms()
     }
 }
 
-int hpx_main(int, char**)
+int hpx_main(hpx::program_options::variables_map&)
 {
-    measureScanAlgorithms();
-    return hpx::finalize();
+    {
+        measureScanAlgorithms();
+    };
+    // Initiate shutdown of the runtime systems on all localities.
+    return hpx::local::finalize();
+};
+
+int main(int argc, char* argv[])
+{
+    std::vector<std::string> cfg;
+    cfg.push_back("hpx.os_threads=all");
+    hpx::local::init_params init_args;
+    init_args.cfg = cfg;
+
+    // Initialize and run HPX.
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv, init_args), 0,
+        "HPX main exited with non-zero status");
+
+    return hpx::util::report_errors();
 }

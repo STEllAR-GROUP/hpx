@@ -869,10 +869,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::loop_n<std::decay_t<ExPolicy>>(++part_begin,
                         part_size,
                         [base, pred, proj, &curr](zip_iterator it) mutable {
-                            using hpx::util::invoke;
-
-                            bool f = invoke(pred, invoke(proj, *base),
-                                invoke(proj, get<0>(*it)));
+                            bool f = HPX_INVOKE(pred, HPX_INVOKE(proj, *base),
+                                HPX_INVOKE(proj, get<0>(*it)));
 
                             if (!(get<1>(*it) = f))
                             {
@@ -895,18 +893,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         });
                 };
 
-                auto f4 =
-                    [last_iter, dest, flags](
-                        std::vector<hpx::shared_future<std::size_t>>&& items,
-                        std::vector<hpx::future<void>>&& data) mutable
+                auto f4 = [last_iter, dest, flags](
+                              std::vector<std::size_t>&& items,
+                              std::vector<hpx::future<void>>&& data) mutable
                     -> unique_copy_result<FwdIter1, FwdIter2> {
                     HPX_UNUSED(flags);
 
-                    std::advance(dest, items.back().get());
+                    std::advance(dest, items.back());
 
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    items.clear();
                     data.clear();
 
                     return unique_copy_result<FwdIter1, FwdIter2>{

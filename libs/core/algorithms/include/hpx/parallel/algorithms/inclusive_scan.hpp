@@ -599,12 +599,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         // step 3 runs final accumulation on each partition
                         std::move(f3),
                         // step 4 use this return value
-                        [last_iter, final_dest](
-                            std::vector<hpx::shared_future<T>>&& items,
+                        [last_iter, final_dest](std::vector<T>&&,
                             std::vector<hpx::future<void>>&& data) {
                             // make sure iterators embedded in function object that is
                             // attached to futures are invalidated
-                            items.clear();
                             data.clear();
                             return util::in_out_result<FwdIter1, FwdIter2>{
                                 last_iter, final_dest};
