@@ -17,36 +17,37 @@
 
 #include <atomic>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-void blocker(hpx::barrier<>& exit_barrier, std::atomic<std::uint64_t>* entered,
-    std::atomic<std::uint64_t>* started,
-    std::unique_ptr<std::atomic<std::uint64_t>[]>* blocked_threads,
+void blocker(hpx::barrier<>& exit_barrier, std::atomic<std::uint64_t>& entered,
+    std::atomic<std::uint64_t>& started,
+    std::unique_ptr<std::atomic<std::uint64_t>[]>& blocked_threads,
     std::uint64_t worker)
 {
     // reschedule if we are not on the correct OS thread...
     if (worker != hpx::get_worker_thread_num())
     {
         hpx::threads::thread_init_data data(
-            hpx::threads::make_thread_function_nullary(
-                hpx::util::bind(&blocker, std::ref(exit_barrier), entered,
-                    started, blocked_threads, worker)),
+            hpx::threads::make_thread_function_nullary(hpx::util::bind(&blocker,
+                std::ref(exit_barrier), std::ref(entered), std::ref(started),
+                std::ref(blocked_threads), worker)),
             "blocker", hpx::threads::thread_priority::normal,
             hpx::threads::thread_schedule_hint(worker));
         hpx::threads::register_work(data);
         return;
     }
 
-    (*blocked_threads)[hpx::get_worker_thread_num()].fetch_add(1);
+    blocked_threads[hpx::get_worker_thread_num()].fetch_add(1);
 
-    entered->fetch_add(1);
+    entered.fetch_add(1);
 
     HPX_TEST_EQ(worker, hpx::get_worker_thread_num());
 
-    while (started->load() != 1)
+    while (started.load() != 1)
         continue;
 
     exit_barrier.arrive_and_drop();
@@ -80,9 +81,9 @@ int hpx_main()
                 continue;
 
             hpx::threads::thread_init_data data(
-                hpx::threads::make_thread_function_nullary(
-                    hpx::util::bind(&blocker, std::ref(exit_barrier), &entered,
-                        &started, &blocked_threads, i)),
+                hpx::threads::make_thread_function_nullary(hpx::util::bind(
+                    &blocker, std::ref(exit_barrier), std::ref(entered),
+                    std::ref(started), std::ref(blocked_threads), i)),
                 "blocker", hpx::threads::thread_priority::normal,
                 hpx::threads::thread_schedule_hint(i));
             hpx::threads::register_work(data);
