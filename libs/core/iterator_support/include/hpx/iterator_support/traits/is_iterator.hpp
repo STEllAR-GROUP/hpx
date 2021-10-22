@@ -389,10 +389,13 @@ namespace hpx { namespace traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Category>
-    struct has_category
-      : detail::has_category<typename std::decay<Iter>::type, Category>
+    struct has_category : detail::has_category<std::decay_t<Iter>, Category>
     {
     };
+
+    template <typename Iter, typename Category>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool has_category_v =
+        has_category<Iter, Category>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>

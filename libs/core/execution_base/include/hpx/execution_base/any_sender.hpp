@@ -268,6 +268,8 @@ namespace hpx::detail {
     };
 }    // namespace hpx::detail
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::execution::experimental {
     namespace detail {
         struct any_operation_state_base
@@ -783,6 +785,8 @@ namespace hpx::execution::experimental {
         }
     };
 }    // namespace hpx::execution::experimental
+
+#include <hpx/config/warnings_suffix.hpp>
 
 namespace hpx::detail {
     template <>
