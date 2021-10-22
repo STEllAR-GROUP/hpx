@@ -30,7 +30,7 @@ set(timed_task_spawn_SOURCES activate_counters.cpp)
 set(timed_task_spawn_HEADERS activate_counters.hpp)
 
 if(NOT HPX_WITH_CUDA_COMPUTE)
-  list(APPEND benchmarks stream)
+  list(APPEND benchmarks stream stream_report)
   set(stream_FLAGS CUDA)
 endif()
 

@@ -6,6 +6,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+set -eux
+
 # Computes the status of the job and store the artifacts
 status_computation_and_artifacts_storage() {
     ctest_exit_code=$?
@@ -37,7 +39,6 @@ cp -r ${src_dir}/tools/perftests_ci ${build_dir}/tools
 # Variables
 perftests_dir=${build_dir}/tools/perftests_ci
 mkdir -p ${build_dir}/reports
-result=${build_dir}/reports/local-priority-fifo.json
 logfile=${build_dir}/reports/jenkins-hpx-${configuration_name}.log
 
 # Load python packages
@@ -48,39 +49,54 @@ configure_build_errors=0
 test_errors=0
 plot_errors=0
 
+hpx_targets=("future_overhead_report_test" "stream_report_test")
+hpx_test_options=("--hpx:queuing=local-priority --hpx:threads=4 --test-all \
+    --repetitions=100 --futures=500000" \
+    "--vector_size=1048576 --hpx:threads=4 --iterations=5000 \
+    --warmup_iterations=500")
+
 # Build binaries for performance tests
-${perftests_dir}/driver.py -v -l $logfile build -b release \
-    -o build --source-dir ${src_dir} --build-dir ${build_dir} -e $envfile \
-    -t tests.performance.local.future_overhead_report \
+${perftests_dir}/driver.py -v -l $logfile build -b release -o build \
+    --source-dir ${src_dir} --build-dir ${build_dir} -e $envfile \
+    -t "${hpx_targets[@]}" \
     || { echo 'Build failed'; configure_build_errors=1; exit 1; }
 
+index=0
+result_files=""
 
-# TODO: make schedulers and other options vary
-#for domain in 128 256; do
+# Run and compare for each targets specified
+for executable in "${hpx_targets[@]}"
+do
+  test_opts=${hpx_test_options[$index]}
+  result=${build_dir}/reports/${executable}.json
+  reference=${perftests_dir}/perftest/references/daint_default/${executable}.json
+  result_files+=(${result})
+  references_files+=(${reference})
+  logfile_tmp=log_perftests_${executable}.tmp
+
+  run_command=("./bin/${executable} ${test_opts}")
+
+  # TODO: make schedulers and other options vary
 
   # Run performance tests
-  ${perftests_dir}/driver.py -v -l $logfile perftest run \
-      --local True --scheduling-policy local-priority --run_output $result \
-      --extra-opts ' --test-all --repetitions=100' \
+  ${perftests_dir}/driver.py -v -l $logfile_tmp perftest run --local True \
+      --run_output $result --targets-and-opts "${run_command[@]}" \
       || { echo 'Running failed'; test_errors=1; exit 1; }
-  # We add a space before --test-all because of the following issue
-  # https://bugs.python.org/issue9334
 
-  # Find references for same configuration (TODO: specify for scheduler etc.)
-  reference=${perftests_dir}/perftest/references/daint_default/local-priority-fifo.json
+  index=$((index+1))
+done
 
-  # Plot comparison of current result with references
-  ${perftests_dir}/driver.py -v -l $logfile perftest plot compare \
-      -i $reference $result -o ${build_dir}/reports/reports-comparison \
-      || { echo 'Plotting failed: performance drop or unknown'; plot_errors=1; exit 1; }
-#done
+# Plot comparison of current result with references
+${perftests_dir}/driver.py -v -l $logfile perftest plot compare --references \
+    ${references_files[@]} --results ${result_files[@]} \
+    -o ${build_dir}/reports/reports-comparison \
+    || { echo 'Plotting failed: performance drop or unknown'; plot_errors=1; exit 1; }
 
 # Dummy ctest to upload the html report of the perftest
 set +e
 ctest \
     --verbose \
     -S ${src_dir}/.jenkins/cscs-perftests/ctest.cmake \
-    -DCTEST_CONFIGURE_EXTRA_OPTIONS="${configure_extra_options}" \
     -DCTEST_BUILD_CONFIGURATION_NAME="${configuration_name}" \
     -DCTEST_SOURCE_DIRECTORY="${src_dir}" \
     -DCTEST_BINARY_DIRECTORY="${build_dir}"

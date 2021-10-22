@@ -78,8 +78,10 @@ namespace hpx { namespace util {
             double time);
     }    // namespace detail
 
-    HPX_CORE_EXPORT void perf_test_report(std::string const& name,
+    HPX_CORE_EXPORT void perftests_report(std::string const& name,
         std::string const& exec, const std::size_t steps,
         function_nonser<void(void)>&& test);
+
+    HPX_CORE_EXPORT void perftests_print_times();
 
 }}    // namespace hpx::util

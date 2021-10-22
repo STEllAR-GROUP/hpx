@@ -29,7 +29,7 @@ namespace hpx { namespace util {
 
     }    // namespace detail
 
-    void perf_test_report(std::string const& name, std::string const& exec,
+    void perftests_report(std::string const& name, std::string const& exec,
         const std::size_t steps, function_nonser<void(void)>&& test)
     {
         if (steps == 0)
@@ -50,6 +50,10 @@ namespace hpx { namespace util {
                     timer::now() - start);
             detail::add_time(name, exec, time.count());
         }
+    }
+
+    void perftests_print_times()
+    {
         std::cout << detail::times();
     }
 
