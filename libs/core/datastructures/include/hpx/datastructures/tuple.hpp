@@ -153,7 +153,7 @@ namespace hpx {
         struct are_tuples_compatible<tuple<Ts...>, UTuple>
           : are_tuples_compatible_impl<
                 typename util::make_index_pack<sizeof...(Ts)>::type,
-                tuple<Ts...>, UTuple>
+                hpx::tuple<Ts...>, UTuple>
         {
         };
 

@@ -54,9 +54,9 @@ void measureScanAlgorithms()
          alg <= (int) ALGORITHM::UNIQUE_COPY; alg++)
     {
         std::size_t start = 32;
-        std::size_t till = 1 << 30;
+        std::size_t till = 1 << 28;
 
-        const auto NUM_ITERATIONS = 50;
+        const auto NUM_ITERATIONS = 5;
 
         std::vector<std::array<double, 3>> data;
 
