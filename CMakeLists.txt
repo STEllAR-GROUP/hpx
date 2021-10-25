@@ -972,7 +972,7 @@ hpx_option(
   ADVANCED
 )
 hpx_option(
-  HPX_WITH_ASIO_TAG STRING "Asio repository tag or branch" "asio-1-18-2"
+  HPX_WITH_ASIO_TAG STRING "Asio repository tag or branch" "asio-1-20-0"
   CATEGORY "Build Targets"
   ADVANCED
 )
