@@ -238,6 +238,7 @@ namespace hpx {
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
@@ -306,8 +307,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         typename std::decay<Proj>::type>;
 
                 // number of elements to sort
-                std::size_t count = detail::distance(first, last);
-                auto last_iter = detail::advance_to_sentinel(first, last);
+                auto last_iter = first;
+                std::size_t count =
+                    detail::advance_and_get_distance(last_iter, last);
 
                 // figure out the chunk size to use
                 std::size_t cores = execution::processing_units_count(
