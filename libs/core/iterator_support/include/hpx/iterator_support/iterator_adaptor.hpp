@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2021 Hartmut Kaiser
+//  Copyright (c) 2016 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,6 @@
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
 
-#include <algorithm>
 #include <iterator>
 #include <memory>
 #include <type_traits>
@@ -122,21 +121,21 @@ namespace hpx { namespace util {
             Category, Reference, Difference, Pointer>::type
     {
     protected:
-        using base_adaptor_type =
-            typename hpx::util::detail::iterator_adaptor_base<Derived, Base,
-                Value, Category, Reference, Difference, Pointer>::type;
+        typedef typename hpx::util::detail::iterator_adaptor_base<Derived, Base,
+            Value, Category, Reference, Difference, Pointer>::type
+            base_adaptor_type;
 
         friend class hpx::util::iterator_core_access;
 
     public:
-        HPX_HOST_DEVICE iterator_adaptor() = default;
+        HPX_HOST_DEVICE iterator_adaptor() {}
 
         HPX_HOST_DEVICE explicit iterator_adaptor(Base const& iter)
           : iterator_(iter)
         {
         }
 
-        using base_type = Base;
+        typedef Base base_type;
 
         HPX_HOST_DEVICE HPX_FORCEINLINE Base const& base() const
         {
@@ -188,7 +187,7 @@ namespace hpx { namespace util {
         template <typename DifferenceType>
         HPX_HOST_DEVICE HPX_FORCEINLINE void advance(DifferenceType n)
         {
-            std::advance(iterator_, n);
+            iterator_ += n;
         }
 
         HPX_HOST_DEVICE HPX_FORCEINLINE void increment()
@@ -216,7 +215,7 @@ namespace hpx { namespace util {
             //  static_assert(
             //      (detail::same_category_and_difference<Derived,OtherDerived>::value)
             //  );
-            return std::distance(iterator_, y.base());
+            return y.base() - iterator_;
         }
 
     private:    // data members

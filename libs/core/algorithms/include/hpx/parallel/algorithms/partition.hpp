@@ -1547,9 +1547,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return result::get(
                         hpx::make_tuple(first, dest_true, dest_false));
 
-                auto last_iter = first;
-                difference_type count =
-                    detail::advance_and_get_distance(last_iter, last);
+                auto last_iter = detail::advance_to_sentinel(first, last);
+                difference_type count = std::distance(first, last_iter);
 
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);

@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 
 #include <iterator>
 #include <type_traits>

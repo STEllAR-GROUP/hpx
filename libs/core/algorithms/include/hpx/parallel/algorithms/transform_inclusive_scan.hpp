@@ -534,9 +534,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first == last)
                     return result::get(std::move(result_type{first, dest}));
 
-                FwdIter1 last_iter = first;
-                difference_type count =
-                    detail::advance_and_get_distance(last_iter, last);
+                difference_type count = detail::distance(first, last);
+                FwdIter1 last_iter = detail::advance_to_sentinel(first, last);
 
                 FwdIter2 final_dest = dest;
                 std::advance(final_dest, count);

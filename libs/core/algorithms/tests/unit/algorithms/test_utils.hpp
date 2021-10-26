@@ -27,13 +27,16 @@ namespace test {
             BaseIterator, void, IteratorTag>
     {
     private:
-        using base_type = hpx::util::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
             test_iterator<BaseIterator, IteratorTag>, BaseIterator, void,
-            IteratorTag>;
+            IteratorTag>
+            base_type;
 
     public:
-        test_iterator() = default;
-
+        test_iterator()
+          : base_type()
+        {
+        }
         explicit test_iterator(BaseIterator base)
           : base_type(base)
         {
@@ -48,12 +51,13 @@ namespace test {
             IteratorTag>
     {
     private:
-        using base_type = hpx::util::iterator_adaptor<
+        typedef hpx::util::iterator_adaptor<
             decorated_iterator<BaseIterator, IteratorTag>, BaseIterator, void,
-            IteratorTag>;
+            IteratorTag>
+            base_type;
 
     public:
-        HPX_HOST_DEVICE decorated_iterator() = default;
+        HPX_HOST_DEVICE decorated_iterator() {}
 
         HPX_HOST_DEVICE decorated_iterator(BaseIterator base)
           : base_type(base)

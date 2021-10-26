@@ -429,7 +429,7 @@ namespace hpx {
 #include <hpx/pack_traversal/unwrap.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -546,9 +546,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return result::get(
                         util::in_out_result<FwdIter1, FwdIter2>{first, dest});
 
-                FwdIter1 last_iter = first;
-                difference_type count =
-                    detail::advance_and_get_distance(last_iter, last);
+                difference_type count = detail::distance(first, last);
+                FwdIter1 last_iter = detail::advance_to_sentinel(first, last);
 
                 FwdIter2 final_dest = dest;
                 std::advance(final_dest, count);
