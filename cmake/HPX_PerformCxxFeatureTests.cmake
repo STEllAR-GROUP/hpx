@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2017 Hartmut Kaiser
+# Copyright (c) 2007-2021 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2013-2016 Agustin Berge
 # Copyright (c)      2017 Taeguk Kwon
@@ -56,6 +56,10 @@ function(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx17_std_scan(DEFINITIONS HPX_HAVE_CXX17_STD_SCAN_ALGORITHMS)
 
   hpx_check_for_cxx17_copy_elision(DEFINITIONS HPX_HAVE_CXX17_COPY_ELISION)
+
+  hpx_check_for_cxx17_memory_resource(
+    DEFINITIONS HPX_HAVE_CXX17_MEMORY_RESOURCE
+  )
 
   # C++20 feature tests
   hpx_check_for_cxx20_coroutines(DEFINITIONS HPX_HAVE_CXX20_COROUTINES)

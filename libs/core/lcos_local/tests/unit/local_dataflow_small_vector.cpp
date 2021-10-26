@@ -1,10 +1,11 @@
 //  Copyright (c) 2013 Thomas Heller
-//  Copyright (c) 2018 Hartmut Kaiser
+//  Copyright (c) 2018-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/local/thread.hpp>
@@ -21,33 +22,30 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-#include <boost/container/small_vector.hpp>
-
 namespace hpx { namespace traits {
-    // support unwrapping of boost::container::small_vector
-    // Note: small_vector's allocator support is not 100% conforming
+
+    // support unwrapping of hpx::detail::small_vector
     template <typename NewType, typename OldType, std::size_t Size,
         typename OldAllocator>
     struct pack_traversal_rebind_container<NewType,
-        boost::container::small_vector<OldType, Size, OldAllocator>>
+        hpx::detail::small_vector<OldType, Size, OldAllocator>>
     {
         using NewAllocator = typename std::allocator_traits<
             OldAllocator>::template rebind_alloc<NewType>;
 
-        static boost::container::small_vector<NewType, Size, NewAllocator> call(
-            boost::container::small_vector<OldType, Size, OldAllocator> const&)
+        static hpx::detail::small_vector<NewType, Size, NewAllocator> call(
+            hpx::detail::small_vector<OldType, Size, OldAllocator> const&)
         {
             // Create a new version of the container with a new allocator
             // instance
-            return boost::container::small_vector<NewType, Size,
-                NewAllocator>();
+            return hpx::detail::small_vector<NewType, Size, NewAllocator>();
         }
     };
 }}    // namespace hpx::traits
 
 template <typename T>
 using small_vector =
-    boost::container::small_vector<T, 3, boost::container::new_allocator<T>>;
+    hpx::detail::small_vector<T, 3, hpx::util::internal_allocator<T>>;
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<std::uint32_t> void_f_count;
