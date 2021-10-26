@@ -222,6 +222,13 @@ function(hpx_sanitize_usage_requirements property is_build)
       string(REPLACE "$<INSTALL_INTERFACE:" "$<0:" prop "${prop}")
     else()
       string(REPLACE "$<BUILD_INTERFACE:" "$<0:" prop "${prop}")
+      string(REPLACE "$<INSTALL_INTERFACE:-L$<TARGET_FILE_DIR:"
+                     "$<1:-L$<TARGET_FILE_DIR:" prop "${prop}"
+      )
+      string(REPLACE "$<INSTALL_INTERFACE:-L/" "$<1:-L/" prop "${prop}")
+      string(REPLACE "$<INSTALL_INTERFACE:-L" "$<1:-L${CMAKE_INSTALL_PREFIX}/"
+                     prop "${prop}"
+      )
       string(REPLACE "$<INSTALL_INTERFACE:" "$<1:${CMAKE_INSTALL_PREFIX}/" prop
                      "${prop}"
       )
