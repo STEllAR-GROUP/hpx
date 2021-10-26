@@ -19,7 +19,6 @@
 # serve to show the default.
 
 import os
-import subprocess
 import sys
 import re
 
