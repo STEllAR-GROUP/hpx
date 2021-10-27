@@ -136,26 +136,17 @@ namespace hpx { namespace lcos { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     // derive from future shared state as this will be combined with the
     // necessary stack frame for the resumable function
-    template <typename Allocator, typename T, typename Derived>
-    struct coroutine_promise_base
-      : hpx::lcos::detail::future_data_allocator<T, Allocator, Derived>
+    template <typename T, typename Derived>
+    struct coroutine_promise_base : hpx::lcos::detail::future_data<T>
     {
-        using base_type =
-            hpx::lcos::detail::future_data_allocator<T, Allocator, Derived>;
+        using base_type = hpx::lcos::detail::future_data<T>;
         using init_no_addref = typename base_type::init_no_addref;
 
-        typedef typename std::allocator_traits<
-            Allocator>::template rebind_alloc<Derived>
-            other_allocator;
+        using allocator_type = hpx::util::internal_allocator<char>;
 
         // the shared state is held alive by the coroutine
         coroutine_promise_base()
-          : base_type(init_no_addref{}, other_allocator{})
-        {
-        }
-
-        coroutine_promise_base(other_allocator const& alloc)
-          : base_type(init_no_addref{}, alloc)
+          : base_type(init_no_addref{})
         {
         }
 
@@ -191,35 +182,26 @@ namespace hpx { namespace lcos { namespace detail {
         HPX_NODISCARD static void* allocate(std::size_t size)
         {
             using char_allocator = typename std::allocator_traits<
-                Allocator>::template rebind_alloc<char>;
-
+                allocator_type>::template rebind_alloc<char>;
             using traits = std::allocator_traits<char_allocator>;
-            using unique_ptr =
-                std::unique_ptr<char, util::allocator_deleter<char_allocator>>;
+            using unique_ptr = std::unique_ptr<char,
+                hpx::util::allocator_deleter<char_allocator>>;
 
             char_allocator alloc{};
             unique_ptr p(traits::allocate(alloc, size),
-                util::allocator_deleter<char_allocator>{alloc});
-
-            using derived_allocator = typename std::allocator_traits<
-                Allocator>::template rebind_alloc<Derived>;
-
-            derived_allocator alloc_derived{};
-            traits::construct(
-                alloc, reinterpret_cast<Derived*>(p.get()), alloc_derived);
+                hpx::util::allocator_deleter<char_allocator>{alloc});
 
             return p.release();
         }
 
-        HPX_FORCEINLINE void call_base_destroy()
-        {
-            this->base_type::destroy();
-        }
-
         static void deallocate(void* p, std::size_t size) noexcept
         {
-            // the destroy() of the base takes care of the memory
-            static_cast<Derived*>(p)->call_base_destroy();
+            using char_allocator = typename std::allocator_traits<
+                allocator_type>::template rebind_alloc<char>;
+            using traits = std::allocator_traits<char_allocator>;
+
+            char_allocator alloc{};
+            traits::deallocate(alloc, static_cast<char*>(p), size);
         }
     };
 }}}    // namespace hpx::lcos::detail
@@ -237,20 +219,12 @@ namespace std {
                 hpx::util::internal_allocator<coroutine_traits>;
 
             struct promise_type
-              : hpx::lcos::detail::coroutine_promise_base<allocator_type, T,
-                    promise_type>
+              : hpx::lcos::detail::coroutine_promise_base<T, promise_type>
             {
                 using base_type =
-                    hpx::lcos::detail::coroutine_promise_base<allocator_type, T,
-                        promise_type>;
+                    hpx::lcos::detail::coroutine_promise_base<T, promise_type>;
 
                 promise_type() = default;
-
-                template <typename Allocator>
-                promise_type(Allocator const& alloc)
-                  : base_type(alloc)
-                {
-                }
 
                 template <typename U>
                 void return_value(U&& value)
@@ -284,20 +258,13 @@ namespace std {
                 hpx::util::internal_allocator<coroutine_traits>;
 
             struct promise_type
-              : hpx::lcos::detail::coroutine_promise_base<allocator_type, void,
-                    promise_type>
+              : hpx::lcos::detail::coroutine_promise_base<void, promise_type>
             {
                 using base_type =
-                    hpx::lcos::detail::coroutine_promise_base<allocator_type,
-                        void, promise_type>;
+                    hpx::lcos::detail::coroutine_promise_base<void,
+                        promise_type>;
 
                 promise_type() = default;
-
-                template <typename Allocator>
-                promise_type(Allocator const& alloc)
-                  : base_type(alloc)
-                {
-                }
 
                 void return_void()
                 {
@@ -332,20 +299,12 @@ namespace std {
                 hpx::util::internal_allocator<coroutine_traits>;
 
             struct promise_type
-              : hpx::lcos::detail::coroutine_promise_base<allocator_type, T,
-                    promise_type>
+              : hpx::lcos::detail::coroutine_promise_base<T, promise_type>
             {
                 using base_type =
-                    hpx::lcos::detail::coroutine_promise_base<allocator_type, T,
-                        promise_type>;
+                    hpx::lcos::detail::coroutine_promise_base<T, promise_type>;
 
                 promise_type() = default;
-
-                template <typename Allocator>
-                promise_type(Allocator const& alloc)
-                  : base_type(alloc)
-                {
-                }
 
                 template <typename U>
                 void return_value(U&& value)
@@ -379,20 +338,13 @@ namespace std {
                 hpx::util::internal_allocator<coroutine_traits>;
 
             struct promise_type
-              : hpx::lcos::detail::coroutine_promise_base<allocator_type, void,
-                    promise_type>
+              : hpx::lcos::detail::coroutine_promise_base<void, promise_type>
             {
                 using base_type =
-                    hpx::lcos::detail::coroutine_promise_base<allocator_type,
-                        void, promise_type>;
+                    hpx::lcos::detail::coroutine_promise_base<void,
+                        promise_type>;
 
                 promise_type() = default;
-
-                template <typename Allocator>
-                promise_type(Allocator const& alloc)
-                  : base_type(alloc)
-                {
-                }
 
                 void return_void()
                 {
