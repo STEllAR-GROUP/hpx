@@ -1,4 +1,3 @@
-//  Copyright (c) 2021 Srinivas Yadav
 //  Copyright (c) 2015 Daniel Bourgeois
 //  Copyright (c) 2021 Karame M.Shokooh
 //  Copyright (c) 2021 Srinivas Yadav
@@ -7,6 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/local/algorithm.hpp>
 #include <hpx/local/init.hpp>
 #include <iostream>
 #include <string>
@@ -14,6 +14,7 @@
 
 #include "adjacentdifference_tests.hpp"
 
+////////////////////////////////////////////////////////////////////////////
 void adjacent_difference_test()
 {
     using namespace hpx::execution;
@@ -23,63 +24,6 @@ void adjacent_difference_test()
 
     test_adjacent_difference_async(seq(task));
     test_adjacent_difference_async(par(task));
-}
-
-template <typename IteratorTag>
-void test_adjacent_difference_exception()
-{
-    using namespace hpx::execution;
-
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_adjacent_difference_exception(seq, IteratorTag());
-    test_adjacent_difference_exception(par, IteratorTag());
-
-    test_adjacent_difference_exception_async(seq(task), IteratorTag());
-    test_adjacent_difference_exception_async(par(task), IteratorTag());
-}
-void test_adjacent_difference()
-{
-    std::vector<std::size_t> c = test::random_iota(10007);
-    std::vector<std::size_t> d(10007);
-    std::vector<std::size_t> d_ans(10007);
-
-    auto it =
-        hpx::adjacent_difference(std::begin(c), std::end(c), std::begin(d));
-    std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
-
-    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
-        [](std::size_t lhs, std::size_t rhs) -> bool { return lhs == rhs; }));
-
-    HPX_TEST(std::end(d) == it);
-}
-
-void adjacent_difference_exception_test()
-{
-    test_adjacent_difference_exception<std::random_access_iterator_tag>();
-    test_adjacent_difference_exception<std::forward_iterator_tag>();
-}
-
-template <typename IteratorTag>
-void test_adjacent_difference_bad_alloc()
-{
-    using namespace hpx::execution;
-
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_adjacent_difference_bad_alloc(seq, IteratorTag());
-    test_adjacent_difference_bad_alloc(par, IteratorTag());
-
-    test_adjacent_difference_bad_alloc_async(seq(task), IteratorTag());
-    test_adjacent_difference_bad_alloc_async(par(task), IteratorTag());
-}
-
-void adjacent_difference_bad_alloc_test()
-{
-    test_adjacent_difference_bad_alloc<std::random_access_iterator_tag>();
-    test_adjacent_difference_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

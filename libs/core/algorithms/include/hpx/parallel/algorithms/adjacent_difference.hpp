@@ -264,7 +264,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>(
+        return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>().call(
             std::forward<ExPolicy>(policy), first, last, dest, std::minus<>());
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -281,7 +281,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         adjacent_difference(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest, Op&& op)
     {
-        return detail::adjacent_difference<FwdIter2>(
+        return detail::adjacent_difference<FwdIter2>().call(
             std::forward<ExPolicy>(policy), first, last, dest,
             std::forward<Op>(op));
     }

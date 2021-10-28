@@ -281,9 +281,8 @@ namespace hpx { namespace ranges {
             )>
 
         // clang-format on
-        friend FwdIter2 tag_fallback_invoke(
-            hpx::ranges::adjacent_difference_t, FwdIter1 first, Sent last,
-            FwdIter2 dest)
+        friend FwdIter2 tag_fallback_invoke(hpx::ranges::adjacent_difference_t,
+            FwdIter1 first, Sent last, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
@@ -373,9 +372,8 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, FwdIter1>::value
             )>
         // clang-format on
-        friend FwdIter2 tag_fallback_invoke(
-            hpx::ranges::adjacent_difference_t, FwdIter1 first, Sent last,
-            FwdIter2 dest, Op&& op)
+        friend FwdIter2 tag_fallback_invoke(hpx::ranges::adjacent_difference_t,
+            FwdIter1 first, Sent last, FwdIter2 dest, Op&& op)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
@@ -391,9 +389,8 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
         // clang-format on
-        friend FwdIter2 tag_fallback_invoke(
-            hpx::ranges::adjacent_difference_t, Rng&& rng, FwdIter2 dest,
-            Op&& op)
+        friend FwdIter2 tag_fallback_invoke(hpx::ranges::adjacent_difference_t,
+            Rng&& rng, FwdIter2 dest, Op&& op)
         {
             static_assert((hpx::traits::is_forward_iterator<
                               hpx::traits::range_iterator_t<Rng>>::value),
