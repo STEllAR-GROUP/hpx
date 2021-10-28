@@ -69,6 +69,10 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename BaseScheduler>
     struct scheduler_executor
     {
+        static_assert(hpx::execution::experimental::is_scheduler_v<
+                          std::decay_t<BaseScheduler>>,
+            "scheduler_executor requires a scheduler");
+
         constexpr scheduler_executor() = default;
 
         template <typename Scheduler,

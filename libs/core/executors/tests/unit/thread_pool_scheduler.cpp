@@ -1593,19 +1593,19 @@ void test_bulk()
 {
     std::vector<int> const ns = {0, 1, 10, 43};
 
-    for (int n : {0, 1, 10, 43})
+    for (int n : ns)
     {
-        std::vector<int> v(n, -1);
+        std::vector<int> v(n, 0);
         hpx::thread::id parent_id = hpx::this_thread::get_id();
 
         ex::schedule(ex::thread_pool_scheduler{}) | ex::bulk(n, [&](int i) {
-            v[i] = i;
+            ++v[i];
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
         }) | ex::sync_wait();
 
         for (int i = 0; i < n; ++i)
         {
-            HPX_TEST_EQ(v[i], i);
+            HPX_TEST_EQ(v[i], 1);
         }
     }
 
@@ -1681,13 +1681,13 @@ void test_bulk()
             HPX_TEST_EQ(std::string(e.what()), std::string("error"));
         }
 
-        for (int i = 0; i < n; ++i)
+        if (expect_exception)
         {
-            if (i == i_fail)
-            {
-                HPX_TEST_EQ(v[i], -1);
-            }
-            else
+            HPX_TEST_EQ(v[i_fail], -1);
+        }
+        else
+        {
+            for (int i = 0; i < n; ++i)
             {
                 HPX_TEST_EQ(v[i], i);
             }
