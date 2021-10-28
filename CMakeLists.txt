@@ -136,23 +136,7 @@ if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   unset(HPX_SOVERSION)
 endif()
 
-# Adjust a couple of build-system settings, if HPX is to be built using vcpkg
 if(MSVC)
-  set(_with_vcpkg_default OFF)
-  if(VCPKG_TOOLCHAIN)
-    set(_with_vcpkg_default ON)
-  endif()
-  hpx_option(
-    HPX_WITH_VCPKG
-    BOOL
-    "Build HPX in the context of the vcpkg build and configuration tool (default: OFF)."
-    ${_with_vcpkg_default}
-    ADVANCED
-  )
-  if(HPX_WITH_VCPKG)
-    hpx_add_config_define(HPX_HAVE_VCPKG)
-  endif()
-
   hpx_option(
     HPX_WITH_VS_STARTUP_PROJECT STRING
     "Define the startup project for the HPX solution (default: ALL_BUILD)."
@@ -1792,12 +1776,10 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag(-wd4800)
 
     # vcpkg enables the /utf-8 option which causes (benign) warnings in the
-    # Spirit headers
-    if(HPX_WITH_VCPKG)
-      # The file contains a character starting at offset ... that is illegal in
-      # the current source character set
-      hpx_add_compile_flag(-wd4828)
-    endif()
+    # Spirit headers:
+    # The file contains a character starting at offset ... that is illegal in
+    # the current source character set
+    hpx_add_compile_flag(-wd4828)
 
     if(HPX_WITH_DATAPAR_VC)
       # unary minus operator applied to unsigned type, result still unsigned
