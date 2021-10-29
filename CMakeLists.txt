@@ -1776,9 +1776,8 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag(-wd4800)
 
     # vcpkg enables the /utf-8 option which causes (benign) warnings in the
-    # Spirit headers:
-    # The file contains a character starting at offset ... that is illegal in
-    # the current source character set
+    # Spirit headers: The file contains a character starting at offset ... that
+    # is illegal in the current source character set
     hpx_add_compile_flag(-wd4828)
 
     if(HPX_WITH_DATAPAR_VC)
