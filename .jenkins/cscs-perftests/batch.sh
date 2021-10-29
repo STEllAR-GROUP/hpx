@@ -27,17 +27,15 @@ orig_src_dir="$(pwd)"
 src_dir="/dev/shm/hpx/src"
 build_dir="/dev/shm/hpx/build"
 
-# Copy source directory to /dev/shm for faster builds
-mkdir -p "${build_dir}"
-cp -r "${orig_src_dir}" "${src_dir}"
-# Args for the pyutils suite
-envfile=${src_dir}/.jenkins/cscs-perftests/env-${configuration_name}.sh
-# Copy the perftest utility in the build dir
 mkdir -p ${build_dir}/tools
-cp -r ${src_dir}/tools/perftests_ci ${build_dir}/tools
+# Copy source directory to /dev/shm for faster builds and copy the perftest
+# utility in the build dir
+cp -r "${orig_src_dir}" "${src_dir}" && \
+    cp -r ${src_dir}/tools/perftests_ci ${build_dir}/tools &
 
 # Variables
 perftests_dir=${build_dir}/tools/perftests_ci
+envfile=${src_dir}/.jenkins/cscs-perftests/env-${configuration_name}.sh
 mkdir -p ${build_dir}/reports
 logfile=${build_dir}/reports/jenkins-hpx-${configuration_name}.log
 
@@ -49,6 +47,10 @@ configure_build_errors=0
 test_errors=0
 plot_errors=0
 
+# Synchronize after the asynchronous copy from the source dir
+wait
+
+# Build and Run the perftests
 source ${src_dir}/.jenkins/cscs-perftests/launch_perftests.sh
 
 # Dummy ctest to upload the html report of the perftest
