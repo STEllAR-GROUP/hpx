@@ -42,7 +42,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             while (++first != last)
             {
                 value_t val = *first;
-                *++dest = op(val, std::move(acc));    // std::move since C++20
+                *++dest = op(val, std::move(acc));
                 acc = std::move(val);
             }
             return ++dest;

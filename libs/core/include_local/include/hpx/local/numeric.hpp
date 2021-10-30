@@ -8,7 +8,3 @@
 
 #include <hpx/parallel/container_numeric.hpp>
 #include <hpx/parallel/numeric.hpp>
-
-namespace hpx {
-
-}    // namespace hpx

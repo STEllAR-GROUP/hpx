@@ -305,12 +305,10 @@ namespace hpx {
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
-            typedef
-                typename std::iterator_traits<FwdIter1>::value_type value_type;
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
                 .call(hpx::execution::sequenced_policy{}, first, last, dest,
-                    std::minus<value_type>());
+                    std::minus<>());
         }
 
         // clang-format off
@@ -327,12 +325,10 @@ namespace hpx {
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Required at least forward iterator.");
-            typedef
-                typename std::iterator_traits<FwdIter1>::value_type value_type;
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
                 .call(std::forward<ExPolicy>(policy), first, last, dest,
-                    std::minus<value_type>());
+                    std::minus<>());
         }
 
         // clang-format off
