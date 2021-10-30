@@ -634,6 +634,10 @@ html_search_language = 'en'
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'HPXdoc'
 
+# Files mentioned in this list are used by sphinxcontrib.bibtex extension to generate
+# references/citations
+bibtex_bibfiles = ['references.bib']
+
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
@@ -689,6 +693,3 @@ epub_title = project
 epub_author = author
 epub_publisher = author
 epub_copyright = copyright
-
-# -- 
-bibtex_bibfiles = ['references.bib']
