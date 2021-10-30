@@ -3193,3 +3193,8 @@ optionally, ``TAU_ROOT=$PATH_TO_TAU`` to your |cmake| configuration. In
 addition, you can override the tag used for |apex| with the
 :option:`HPX_WITH_APEX_TAG` option. Please see the |apex_hpx_doc|_ for detailed
 instructions on using |apex| with |hpx|.
+
+See :cite:t:`1999:examplecitation` for an example citation number 1.
+See :cite:t:`1999:examplecitation` for an example citation number 2.
+
+.. bibliography::
