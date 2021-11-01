@@ -103,7 +103,10 @@ namespace hpx { namespace util {
 
     public:
         counting_iterator() = default;
+        counting_iterator(counting_iterator&& rhs) = default;
+        counting_iterator& operator=(counting_iterator&& rhs) = default;
         counting_iterator(counting_iterator const& rhs) = default;
+        counting_iterator& operator=(counting_iterator const& rhs) = default;
 
         HPX_HOST_DEVICE explicit counting_iterator(Incrementable x)
           : base_type(x)
@@ -132,7 +135,10 @@ namespace hpx { namespace util {
 
     public:
         counting_iterator() = default;
+        counting_iterator(counting_iterator&& rhs) = default;
+        counting_iterator& operator=(counting_iterator&& rhs) = default;
         counting_iterator(counting_iterator const& rhs) = default;
+        counting_iterator& operator=(counting_iterator const& rhs) = default;
 
         HPX_HOST_DEVICE explicit counting_iterator(Incrementable x)
           : base_type(x)

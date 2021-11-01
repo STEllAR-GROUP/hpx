@@ -19,12 +19,10 @@ namespace hpx { namespace components { namespace detail {
         std::size_t count, std::vector<std::uint64_t> const& values)
     {
         std::size_t maxcount = 0;
-        std::size_t existing = 0;
 
         for (std::uint64_t value : values)
         {
             maxcount = (std::max)(maxcount, std::size_t(value));
-            existing += std::size_t(value);
         }
 
         // distribute the number of components to create in a way, so that
