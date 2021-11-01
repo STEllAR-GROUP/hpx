@@ -25,7 +25,7 @@ set(async_mpi_headers
 )
 
 # Default location is $HPX_ROOT/libs/mpi/src
-set(mpi_sources mpi_future.cpp)
+set(mpi_sources mpi_exception.cpp mpi_future.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
