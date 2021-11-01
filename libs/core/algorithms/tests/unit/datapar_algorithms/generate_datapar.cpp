@@ -13,10 +13,8 @@
 #include <string>
 #include <vector>
 
-#include "../algorithms/generate_tests.hpp"
+#include "generate_tests.hpp"
 
-// FIXME: Intel 15 currently can not compile this code. This needs to be fixed. See #1408
-#if !(defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION == 1500)
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_generate()
@@ -98,12 +96,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     generate_bad_alloc_test();
     return hpx::local::finalize();
 }
-#else
-int hpx_main(hpx::program_options::variables_map& vm)
-{
-    return hpx::local::finalize();
-}
-#endif
 
 int main(int argc, char* argv[])
 {

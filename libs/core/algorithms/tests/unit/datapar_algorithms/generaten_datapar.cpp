@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "../algorithms/generaten_tests.hpp"
+#include "generaten_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
