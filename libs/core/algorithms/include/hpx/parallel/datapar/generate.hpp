@@ -10,6 +10,7 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/execution/traits/vector_pack_alignment_size.hpp>
 #include <hpx/functional/tag_dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/generate.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
@@ -21,26 +22,62 @@
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
+    template <typename Iterator>
+    struct datapar_generate_helper
+    {
+        typedef typename std::decay<Iterator>::type iterator_type;
+        typedef
+            typename std::iterator_traits<iterator_type>::value_type value_type;
+
+        template <typename Iter, typename F>
+        static void call(Iter first, std::size_t count, F&& f)
+        {
+            using V = std::decay_t<decltype(f())>;
+
+            static constexpr std::size_t size =
+                traits::vector_pack_size<V>::value;
+            std::size_t len = count;
+
+            for (std::int64_t len_v = std::int64_t(len - (size + 1)); len_v > 0;
+                 len_v -= size, len -= size)
+            {
+                auto tmp = f();
+
+                if (util::detail::is_data_aligned(first))
+                    traits::vector_pack_store<V, value_type>::aligned(
+                        tmp, first);
+                else
+                    traits::vector_pack_store<V, value_type>::unaligned(
+                        tmp, first);
+                std::advance(first, size);
+            }
+            auto tmp = f();
+            std::size_t i = 0;
+            for (/* */; len != 0; --len)
+            {
+                *first++ = tmp[i++];
+            }
+        }
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     struct datapar_generate
     {
         template <typename ExPolicy, typename Iter, typename Sent, typename F>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            util::detail::iterator_datapar_compatible<Iter>::value, Iter>::type
-        call(ExPolicy&& policy, Iter first, Sent last, F&& f)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
+            ExPolicy&&, Iter first, Sent last, F&& f)
         {
-            hpx::parallel::util::loop_ind(std::forward<ExPolicy>(policy), first,
-                last, [f = std::forward<F>(f)](auto& v) mutable { v = f(); });
+            using result_type = std::decay_t<decltype(f())>;
+            static_assert(traits::is_vector_pack<result_type>::value ||
+                    traits::is_scalar_vector_pack<result_type>::value,
+                "Function object must return a vector_pack");
+
+            std::size_t count = std::distance(first, last);
+            datapar_generate_helper<Iter>::call(
+                first, count, std::forward<F>(f));
             return first;
         }
 
-        template <typename ExPolicy, typename Iter, typename Sent, typename F>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            !util::detail::iterator_datapar_compatible<Iter>::value, Iter>::type
-        call(ExPolicy&&, Iter first, Sent last, F&& f)
-        {
-            return sequential_generate_helper(first, last, std::forward<F>(f));
-        }
     };
 
     template <typename ExPolicy, typename Iter, typename Sent, typename F>
@@ -57,23 +94,19 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct datapar_generate_n
     {
         template <typename ExPolicy, typename Iter, typename F>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            util::detail::iterator_datapar_compatible<Iter>::value, Iter>::type
-        call(ExPolicy&&, Iter first, std::size_t count, F&& f)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
+            ExPolicy&&, Iter first, std::size_t count, F&& f)
         {
-            hpx::parallel::util::loop_n_ind<std::decay_t<ExPolicy>>(first,
-                count, [f = std::forward<F>(f)](auto& v) mutable { v = f(); });
+            using result_type = std::decay_t<decltype(f())>;
+            static_assert(traits::is_vector_pack<result_type>::value ||
+                    traits::is_scalar_vector_pack<result_type>::value,
+                "Function object must return a vector_pack");
+
+            datapar_generate_helper<Iter>::call(
+                first, count, std::forward<F>(f));
             return first;
         }
 
-        template <typename ExPolicy, typename Iter, typename F>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            !util::detail::iterator_datapar_compatible<Iter>::value, Iter>::type
-        call(ExPolicy&&, Iter first, std::size_t count, F&& f)
-        {
-            return sequential_generate_n_helper(
-                first, count, std::forward<F>(f));
-        }
     };
 
     template <typename ExPolicy, typename Iter, typename F>

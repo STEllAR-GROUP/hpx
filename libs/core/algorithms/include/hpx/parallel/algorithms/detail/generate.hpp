@@ -7,7 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -19,11 +21,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename Iter, typename Sent, typename F>
     constexpr Iter sequential_generate_helper(Iter first, Sent last, F&& f)
     {
-        while (first != last)
-        {
-            *first++ = f();
-        }
-        return first;
+        return util::loop_ind(hpx::execution::seq, first, last,
+            [f = std::forward<F>(f)](auto& v) mutable { v = f(); });
     }
 
     struct sequential_generate_t
