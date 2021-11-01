@@ -138,7 +138,7 @@ namespace hpx { namespace lcos {
 
         void set_value_nonvirt(RemoteResult&& result)
         {
-            set_value(std::move(result));
+            set_value(HPX_MOVE(result));
         }
 
         /// The \a function get_result_nonvirt is called whenever a

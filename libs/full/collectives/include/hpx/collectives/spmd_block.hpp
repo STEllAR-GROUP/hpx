@@ -265,7 +265,7 @@ namespace hpx { namespace lcos {
                 F()
                 (hpx::launch::sync,
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    std::move(block), std::forward<Ts>(ts)...);
+                    HPX_MOVE(block), HPX_FORWARD(Ts, ts)...);
             }
         };
 
@@ -323,8 +323,8 @@ namespace hpx { namespace lcos {
         }
 
         return hpx::lcos::broadcast(act, localities,
-            std::forward<std::string>(name), images_per_locality, num_images,
-            std::forward<Args>(args)...);
+            HPX_FORWARD(std::string, name), images_per_locality, num_images,
+            HPX_FORWARD(Args, args)...);
     }
 }}    // namespace hpx::lcos
 #endif

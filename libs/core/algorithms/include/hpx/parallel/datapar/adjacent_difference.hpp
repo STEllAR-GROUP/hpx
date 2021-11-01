@@ -67,7 +67,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         InIter first, InIter last, OutIter dest, Op&& op)
     {
         return datapar_adjacent_difference<ExPolicy>::call(
-            first, last, dest, std::forward<Op>(op));
+            first, last, dest, HPX_FORWARD(Op, op));
     }
 }}}}    // namespace hpx::parallel::v1::detail
 #endif

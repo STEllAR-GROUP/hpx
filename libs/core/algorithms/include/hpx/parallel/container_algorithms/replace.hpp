@@ -1105,9 +1105,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         return hpx::parallel::v1::detail::replace<
             typename hpx::traits::range_traits<Rng>::iterator_type>()
-            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), old_value, new_value,
-                std::forward<Proj>(proj));
+                HPX_FORWARD(Proj, proj));
     }
 
     // clang-format off
@@ -1130,9 +1130,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         return hpx::parallel::v1::detail::replace_if<
             typename hpx::traits::range_traits<Rng>::iterator_type>()
-            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<F>(f), new_value,
-                std::forward<Proj>(proj));
+            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(F, f), new_value,
+                HPX_FORWARD(Proj, proj));
     }
 
     // clang-format off
@@ -1158,9 +1158,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         return hpx::parallel::v1::detail::replace_copy<util::in_out_result<
             typename hpx::traits::range_traits<Rng>::iterator_type, OutIter>>()
-            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), dest, old_value, new_value,
-                std::forward<Proj>(proj));
+                HPX_FORWARD(Proj, proj));
     }
 
     // clang-format off
@@ -1185,9 +1185,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         return hpx::parallel::v1::detail::replace_copy_if<util::in_out_result<
             typename hpx::traits::range_traits<Rng>::iterator_type, OutIter>>()
-            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), dest, std::forward<F>(f), new_value,
-                std::forward<Proj>(proj));
+            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), dest, HPX_FORWARD(F, f), new_value,
+                HPX_FORWARD(Proj, proj));
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -1228,8 +1228,8 @@ namespace hpx { namespace ranges {
                 "Required at least input iterator.");
 
             return hpx::parallel::v1::detail::replace_if<Iter>().call(
-                hpx::execution::seq, first, sent, std::forward<Pred>(pred),
-                new_value, std::forward<Proj>(proj));
+                hpx::execution::seq, first, sent, HPX_FORWARD(Pred, pred),
+                new_value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1257,8 +1257,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::replace_if<
                 typename hpx::traits::range_iterator<Rng>::type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), std::forward<Pred>(pred), new_value,
-                    std::forward<Proj>(proj));
+                    hpx::util::end(rng), HPX_FORWARD(Pred, pred), new_value,
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1283,8 +1283,8 @@ namespace hpx { namespace ranges {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::replace_if<Iter>().call(
-                std::forward<ExPolicy>(policy), first, sent,
-                std::forward<Pred>(pred), new_value, std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, sent,
+                HPX_FORWARD(Pred, pred), new_value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1310,9 +1310,9 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::replace_if<
                 typename hpx::traits::range_iterator<Rng>::type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), std::forward<Pred>(pred), new_value,
-                    std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), HPX_FORWARD(Pred, pred), new_value,
+                    HPX_FORWARD(Proj, proj));
         }
     } replace_if{};
 
@@ -1343,7 +1343,7 @@ namespace hpx { namespace ranges {
             return hpx::ranges::replace_if(
                 first, sent,
                 [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, std::forward<Proj>(proj));
+                new_value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1368,9 +1368,9 @@ namespace hpx { namespace ranges {
                 Type;
 
             return hpx::ranges::replace_if(
-                std::forward<Rng>(rng),
+                HPX_FORWARD(Rng, rng),
                 [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, std::forward<Proj>(proj));
+                new_value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1395,9 +1395,9 @@ namespace hpx { namespace ranges {
             typedef typename std::iterator_traits<Iter>::value_type Type;
 
             return hpx::ranges::replace_if(
-                std::forward<ExPolicy>(policy), first, sent,
+                HPX_FORWARD(ExPolicy, policy), first, sent,
                 [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, std::forward<Proj>(proj));
+                new_value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1425,9 +1425,9 @@ namespace hpx { namespace ranges {
                 Type;
 
             return hpx::ranges::replace_if(
-                std::forward<ExPolicy>(policy), std::forward<Rng>(rng),
+                HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Rng, rng),
                 [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, std::forward<Proj>(proj));
+                new_value, HPX_FORWARD(Proj, proj));
         }
     } replace{};
 
@@ -1463,8 +1463,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::replace_copy_if<
                 hpx::parallel::util::in_out_result<InIter, OutIter>>()
                 .call(hpx::execution::seq, first, sent, dest,
-                    std::forward<Pred>(pred), new_value,
-                    std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), new_value,
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1498,8 +1498,8 @@ namespace hpx { namespace ranges {
                 hpx::parallel::util::in_out_result<
                     typename hpx::traits::range_iterator<Rng>::type, OutIter>>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, std::forward<Pred>(pred),
-                    new_value, std::forward<Proj>(proj));
+                    hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
+                    new_value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1530,9 +1530,9 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::replace_copy_if<
                 hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first, sent, dest,
-                    std::forward<Pred>(pred), new_value,
-                    std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), first, sent, dest,
+                    HPX_FORWARD(Pred, pred), new_value,
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1565,9 +1565,9 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::replace_copy_if<
                 hpx::parallel::util::in_out_result<
                     typename hpx::traits::range_iterator<Rng>::type, FwdIter>>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, std::forward<Pred>(pred),
-                    new_value, std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
+                    new_value, HPX_FORWARD(Proj, proj));
         }
     } replace_copy_if{};
 
@@ -1602,7 +1602,7 @@ namespace hpx { namespace ranges {
             return hpx::ranges::replace_copy_if(
                 hpx::execution::seq, first, sent, dest,
                 [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, std::forward<Proj>(proj));
+                new_value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1636,7 +1636,7 @@ namespace hpx { namespace ranges {
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
                 dest,
                 [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, std::forward<Proj>(proj));
+                new_value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1666,9 +1666,9 @@ namespace hpx { namespace ranges {
             typedef typename std::iterator_traits<FwdIter1>::value_type Type;
 
             return hpx::ranges::replace_copy_if(
-                std::forward<ExPolicy>(policy), first, sent, dest,
+                HPX_FORWARD(ExPolicy, policy), first, sent, dest,
                 [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, std::forward<Proj>(proj));
+                new_value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1701,10 +1701,10 @@ namespace hpx { namespace ranges {
                 Type;
 
             return hpx::ranges::replace_copy_if(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), dest,
                 [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, std::forward<Proj>(proj));
+                new_value, HPX_FORWARD(Proj, proj));
         }
     } replace_copy{};
 }}    // namespace hpx::ranges

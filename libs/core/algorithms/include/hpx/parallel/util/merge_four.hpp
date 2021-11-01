@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <hpx/config/move.hpp>
 #include <hpx/parallel/util/low_level.hpp>
 #include <hpx/parallel/util/range.hpp>
 
@@ -145,7 +146,7 @@ namespace hpx { namespace parallel { namespace util {
         {
             auto& r = vrange_input[pos[0]];
 
-            *(it_dest++) = std::move(*(r.begin()));
+            *(it_dest++) = HPX_MOVE(*(r.begin()));
             r = util::range<Iter2, Sent2>(r.begin() + 1, r.end());
 
             if (r.size() == 0)
@@ -288,7 +289,7 @@ namespace hpx { namespace parallel { namespace util {
         {
             auto& r = vrange_input[pos[0]];
 
-            util::construct_object(&(*(it_dest++)), std::move(*(r.begin())));
+            util::construct_object(&(*(it_dest++)), HPX_MOVE(*(r.begin())));
             r = util::range<Iter, Sent>(r.begin() + 1, r.end());
 
             if (r.size() == 0)

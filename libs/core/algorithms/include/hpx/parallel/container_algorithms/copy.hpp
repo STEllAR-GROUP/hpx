@@ -400,7 +400,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::v1::detail::copy_iter<FwdIter1, FwdIter>;
 
             return hpx::parallel::v1::detail::transfer<copy_iter_t>(
-                std::forward<ExPolicy>(policy), iter, sent, dest);
+                HPX_FORWARD(ExPolicy, policy), iter, sent, dest);
         }
 
         // clang-format off
@@ -423,7 +423,7 @@ namespace hpx { namespace ranges {
                 FwdIter>;
 
             return hpx::parallel::v1::detail::transfer<copy_iter_t>(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), dest);
         }
 
@@ -497,12 +497,12 @@ namespace hpx { namespace ranges {
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     ranges::copy_n_result<FwdIter1, FwdIter2>>::
                     get(ranges::copy_n_result<FwdIter1, FwdIter2>{
-                        std::move(first), std::move(dest)});
+                        HPX_MOVE(first), HPX_MOVE(dest)});
             }
 
             return hpx::parallel::v1::detail::copy_n<
                 ranges::copy_n_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first, std::size_t(count),
+                .call(HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
                     dest);
         }
 
@@ -524,7 +524,7 @@ namespace hpx { namespace ranges {
             if (hpx::parallel::v1::detail::is_negative(count))
             {
                 return ranges::copy_n_result<FwdIter1, FwdIter2>{
-                    std::move(first), std::move(dest)};
+                    HPX_MOVE(first), HPX_MOVE(dest)};
             }
 
             return hpx::parallel::v1::detail::copy_n<
@@ -570,8 +570,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::copy_if<
                 hpx::parallel::util::in_out_result<FwdIter1, FwdIter>>()
-                .call(std::forward<ExPolicy>(policy), iter, sent, dest,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), iter, sent, dest,
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -604,9 +604,9 @@ namespace hpx { namespace ranges {
                 hpx::parallel::util::in_out_result<
                     typename hpx::traits::range_traits<Rng>::iterator_type,
                     FwdIter>>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, std::forward<Pred>(pred),
-                    std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -637,7 +637,7 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::copy_if<
                 hpx::parallel::util::in_out_result<FwdIter1, FwdIter>>()
                 .call(hpx::execution::seq, iter, sent, dest,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -666,8 +666,8 @@ namespace hpx { namespace ranges {
                     typename hpx::traits::range_traits<Rng>::iterator_type,
                     FwdIter>>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, std::forward<Pred>(pred),
-                    std::forward<Proj>(proj));
+                    hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
 
     } copy_if{};
@@ -698,7 +698,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::transfer<copy_iter_t>(
-            std::forward<ExPolicy>(policy), iter, sent, dest);
+            HPX_FORWARD(ExPolicy, policy), iter, sent, dest);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -726,7 +726,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::transfer<copy_iter_t>(std::forward<ExPolicy>(policy),
+        return detail::transfer<copy_iter_t>(HPX_FORWARD(ExPolicy, policy),
             hpx::util::begin(rng), hpx::util::end(rng), dest);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -755,9 +755,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 OutIter>>::type copy_if(ExPolicy&& policy, Rng&& rng,
             OutIter dest, F&& f, Proj&& proj = Proj())
     {
-        return copy_if(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), dest, std::forward<F>(f),
-            std::forward<Proj>(proj));
+        return copy_if(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), dest, HPX_FORWARD(F, f),
+            HPX_FORWARD(Proj, proj));
     }
 }}}    // namespace hpx::parallel::v1
 

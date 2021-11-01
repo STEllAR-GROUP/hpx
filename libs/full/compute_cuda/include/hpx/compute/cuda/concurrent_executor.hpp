@@ -51,7 +51,7 @@ namespace hpx { namespace cuda { namespace experimental {
                 hpx::cuda::experimental::target t(
                     cuda_target.native_handle().get_device());
                 t.native_handle().get_stream();
-                cuda_executors_.emplace_back(std::move(t));
+                cuda_executors_.emplace_back(HPX_MOVE(t));
             }
         }
 
@@ -63,8 +63,8 @@ namespace hpx { namespace cuda { namespace experimental {
         }
 
         concurrent_executor(concurrent_executor&& other)
-          : host_executor_(std::move(other.host_executor_))
-          , cuda_executors_(std::move(other.cuda_executors_))
+          : host_executor_(HPX_MOVE(other.host_executor_))
+          , cuda_executors_(HPX_MOVE(other.cuda_executors_))
           , current_(other.current_.load())
         {
         }
@@ -85,8 +85,8 @@ namespace hpx { namespace cuda { namespace experimental {
         {
             if (&other != this)
             {
-                host_executor_ = std::move(other.host_executor_);
-                cuda_executors_ = std::move(other.cuda_executors_);
+                host_executor_ = HPX_MOVE(other.host_executor_);
+                cuda_executors_ = HPX_MOVE(other.cuda_executors_);
                 current_ = other.current_.load();
             }
 
@@ -126,9 +126,9 @@ namespace hpx { namespace cuda { namespace experimental {
                 host_executor_,
                 [this, current](F&& f, Ts&&... ts) mutable {
                     parallel::execution::post(cuda_executors_[current],
-                        std::forward<F>(f), std::forward<Ts>(ts)...);
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
                 },
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
@@ -139,10 +139,10 @@ namespace hpx { namespace cuda { namespace experimental {
                 host_executor_,
                 [this, current](F&& f, Ts&&... ts) mutable {
                     return parallel::execution::async_execute(
-                        cuda_executors_[current], std::forward<F>(f),
-                        std::forward<Ts>(ts)...);
+                        cuda_executors_[current], HPX_FORWARD(F, f),
+                        HPX_FORWARD(Ts, ts)...);
                 },
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
@@ -153,9 +153,9 @@ namespace hpx { namespace cuda { namespace experimental {
                 host_executor_,
                 [this, current](F&& f, Ts&&... ts) mutable {
                     parallel::execution::sync_execute(cuda_executors_[current],
-                        std::forward<F>(f), std::forward<Ts>(ts)...);
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
                 },
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename Shape, typename... Ts>

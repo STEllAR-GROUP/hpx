@@ -104,7 +104,7 @@ namespace hpx { namespace util {
         inline std::string encode_and_enquote(std::string str)
         {
             encode(str, '\"', "\\\"", 2);
-            return detail::enquote(std::move(str));
+            return detail::enquote(HPX_MOVE(str));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -1511,7 +1511,7 @@ namespace hpx { namespace util {
     {
         if (options.empty())
         {
-            return std::move(args);
+            return HPX_MOVE(args);
         }
 
         using tokenizer = boost::tokenizer<boost::escaped_list_separator<char>>;
@@ -1554,8 +1554,7 @@ namespace hpx { namespace util {
         std::string prepend_command_line =
             rtcfg_.get_entry("hpx.commandline.prepend_options");
 
-        args =
-            prepend_options(std::move(args), std::move(prepend_command_line));
+        args = prepend_options(HPX_MOVE(args), HPX_MOVE(prepend_command_line));
 
         // Initial analysis of the command line options. This is
         // preliminary as it will not take into account any aliases as

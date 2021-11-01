@@ -54,8 +54,7 @@ namespace hpx { namespace resiliency { namespace experimental {
             return hpx::dataflow(
                 // do not schedule new thread for the lambda
                 hpx::launch::sync,
-                [pred = std::forward<Pred>(pred),
-                    vote = std::forward<Vote>(vote),
+                [pred = HPX_FORWARD(Pred, pred), vote = HPX_FORWARD(Vote, vote),
                     n](std::vector<hpx::future<result_type>>&& results) mutable
                 -> result_type {
                     // Store all valid results
@@ -64,7 +63,7 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                     std::exception_ptr ex;
 
-                    for (auto&& f : std::move(results))
+                    for (auto&& f : HPX_MOVE(results))
                     {
                         if (f.has_exception())
                         {
@@ -76,7 +75,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                             auto&& result = f.get();
                             if (HPX_INVOKE(pred, result))
                             {
-                                valid_results.emplace_back(std::move(result));
+                                valid_results.emplace_back(HPX_MOVE(result));
                             }
                         }
                     }
@@ -84,7 +83,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                     if (!valid_results.empty())
                     {
                         return HPX_INVOKE(
-                            std::forward<Vote>(vote), std::move(valid_results));
+                            HPX_FORWARD(Vote, vote), HPX_MOVE(valid_results));
                     }
 
                     if (bool(ex))
@@ -93,7 +92,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                     // throw aborting exception no correct results ere produced
                     throw abort_replicate_exception{};
                 },
-                std::move(results));
+                HPX_MOVE(results));
         }
     }    // namespace detail
 
@@ -108,9 +107,8 @@ namespace hpx { namespace resiliency { namespace experimental {
     tag_invoke(async_replicate_vote_validate_t, std::size_t n, Vote&& vote,
         Pred&& pred, F&& f, Ts&&... ts)
     {
-        return detail::async_replicate_vote_validate(n,
-            std::forward<Vote>(vote), std::forward<Pred>(pred),
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+        return detail::async_replicate_vote_validate(n, HPX_FORWARD(Vote, vote),
+            HPX_FORWARD(Pred, pred), HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -124,9 +122,9 @@ namespace hpx { namespace resiliency { namespace experimental {
     tag_invoke(
         async_replicate_vote_t, std::size_t n, Vote&& vote, F&& f, Ts&&... ts)
     {
-        return detail::async_replicate_vote_validate(n,
-            std::forward<Vote>(vote), detail::replicate_validator{},
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+        return detail::async_replicate_vote_validate(n, HPX_FORWARD(Vote, vote),
+            detail::replicate_validator{}, HPX_FORWARD(F, f),
+            HPX_FORWARD(Ts, ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -140,8 +138,8 @@ namespace hpx { namespace resiliency { namespace experimental {
         Ts&&... ts)
     {
         return detail::async_replicate_vote_validate(n,
-            detail::replicate_voter{}, std::forward<Pred>(pred),
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+            detail::replicate_voter{}, HPX_FORWARD(Pred, pred),
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -155,6 +153,6 @@ namespace hpx { namespace resiliency { namespace experimental {
     {
         return detail::async_replicate_vote_validate(n,
             detail::replicate_voter{}, detail::replicate_validator{},
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 }}}    // namespace hpx::resiliency::experimental

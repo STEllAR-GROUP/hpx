@@ -105,8 +105,7 @@ namespace hpx {
     {
         naming::address addr(
             nullptr, components::component_base_lco_with_value);
-        set_lco_value(
-            id, std::move(addr), std::forward<Result>(t), move_credits);
+        set_lco_value(id, HPX_MOVE(addr), HPX_FORWARD(Result, t), move_credits);
     }
 
     /// \brief Set the result value for the (unmanaged) LCO referenced by the given id
@@ -125,8 +124,7 @@ namespace hpx {
     {
         naming::address addr(
             nullptr, components::component_base_lco_with_value_unmanaged);
-        set_lco_value(
-            id, std::move(addr), std::forward<Result>(t), move_credits);
+        set_lco_value(id, HPX_MOVE(addr), HPX_FORWARD(Result, t), move_credits);
     }
 
     /// \brief Set the result value for the LCO referenced by the given id
@@ -162,7 +160,7 @@ namespace hpx {
         naming::address addr(
             nullptr, components::component_base_lco_with_value);
         set_lco_value(
-            id, std::move(addr), std::forward<Result>(t), cont, move_credits);
+            id, HPX_MOVE(addr), HPX_FORWARD(Result, t), cont, move_credits);
     }
 
     /// \brief Set the result value for the (unmanaged) LCO referenced by the given id
@@ -183,7 +181,7 @@ namespace hpx {
         naming::address addr(
             nullptr, components::component_base_lco_with_value_unmanaged);
         set_lco_value(
-            id, std::move(addr), std::forward<Result>(t), cont, move_credits);
+            id, HPX_MOVE(addr), HPX_FORWARD(Result, t), cont, move_credits);
     }
 
     /// \brief Set the error state for the LCO referenced by the given id
@@ -243,7 +241,7 @@ namespace hpx {
     inline void set_lco_error(naming::id_type const& id, std::exception_ptr&& e,
         bool move_credits = true)
     {
-        set_lco_error(id, naming::address(), std::move(e), move_credits);
+        set_lco_error(id, naming::address(), HPX_MOVE(e), move_credits);
     }
 
     /// \brief Set the error state for the LCO referenced by the given id
@@ -308,6 +306,6 @@ namespace hpx {
     inline void set_lco_error(naming::id_type const& id, std::exception_ptr&& e,
         naming::id_type const& cont, bool move_credits = true)
     {
-        set_lco_error(id, naming::address(), std::move(e), cont, move_credits);
+        set_lco_error(id, naming::address(), HPX_MOVE(e), cont, move_credits);
     }
 }    // namespace hpx

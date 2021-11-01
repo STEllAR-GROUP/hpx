@@ -47,7 +47,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         explicit replay_executor(BaseExecutor& exec, std::size_t n, F&& f)
           : exec_(exec)
           , replay_count_(n)
-          , validator_(std::forward<F>(f))
+          , validator_(HPX_FORWARD(F, f))
         {
         }
 
@@ -71,7 +71,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         decltype(auto) async_execute(F&& f, Ts&&... ts) const
         {
             return async_replay_validate(exec_, replay_count_, validator_,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkTwoWayExecutor interface
@@ -163,7 +163,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     {
         return replay_executor<BaseExecutor,
             typename std::decay<Validate>::type>(
-            exec, n, std::forward<Validate>(validate));
+            exec, n, HPX_FORWARD(Validate, validate));
     }
 
     template <typename BaseExecutor>

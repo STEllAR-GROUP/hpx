@@ -80,7 +80,7 @@ namespace hpx { namespace execution {
                 // use executor to launch given function for measurements
                 std::size_t test_chunk_size =
                     hpx::parallel::execution::sync_execute(
-                        std::forward<Executor>(exec), f, num_iters_for_timing_);
+                        HPX_FORWARD(Executor, exec), f, num_iters_for_timing_);
 
                 if (test_chunk_size != 0)
                 {

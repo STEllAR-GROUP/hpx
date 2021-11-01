@@ -233,8 +233,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
             {
                 return sequential_equal_binary(first1, last1, first2, last2,
-                    std::forward<F>(f), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
             }
 
             template <typename ExPolicy, typename Iter1, typename Sent1,
@@ -281,9 +281,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typedef typename zip_iterator::reference reference;
 
                 util::cancellation_token<> tok;
-                auto f1 = [tok, f = std::forward<F>(f),
-                              proj1 = std::forward<Proj1>(proj1),
-                              proj2 = std::forward<Proj2>(proj2)](
+                auto f1 = [tok, f = HPX_FORWARD(F, f),
+                              proj1 = HPX_FORWARD(Proj1, proj1),
+                              proj2 = HPX_FORWARD(Proj2, proj2)](
                               zip_iterator it,
                               std::size_t part_count) mutable -> bool {
                     util::loop_n<std::decay_t<ExPolicy>>(it, part_count, tok,
@@ -300,9 +300,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy),
+                    HPX_FORWARD(ExPolicy, policy),
                     hpx::util::make_zip_iterator(first1, first2), count1,
-                    std::move(f1),
+                    HPX_MOVE(f1),
                     [](std::vector<hpx::future<bool>>&& results) -> bool {
                         return std::all_of(hpx::util::begin(results),
                             hpx::util::end(results),
@@ -341,8 +341,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::equal_binary().call(std::forward<ExPolicy>(policy),
-            first1, last1, first2, last2, std::forward<Pred>(op),
+        return detail::equal_binary().call(HPX_FORWARD(ExPolicy, policy),
+            first1, last1, first2, last2, HPX_FORWARD(Pred, op),
             util::projection_identity{}, util::projection_identity{});
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -365,7 +365,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static bool sequential(
                 ExPolicy, InIter1 first1, InIter1 last1, InIter2 first2, F&& f)
             {
-                return std::equal(first1, last1, first2, std::forward<F>(f));
+                return std::equal(first1, last1, first2, HPX_FORWARD(F, f));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
@@ -404,10 +404,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy),
+                    HPX_FORWARD(ExPolicy, policy),
                     hpx::util::make_zip_iterator(first1, first2), count,
-                    std::move(f1),
-                    [](std::vector<hpx::future<bool>>&& results) {
+                    HPX_MOVE(f1), [](std::vector<hpx::future<bool>>&& results) {
                         return std::all_of(hpx::util::begin(results),
                             hpx::util::end(results),
                             [](hpx::future<bool>& val) { return val.get(); });
@@ -446,8 +445,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return hpx::parallel::v1::detail::equal().call(
-            std::forward<ExPolicy>(policy), first1, last1, first2,
-            std::forward<Pred>(op));
+            HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
+            HPX_FORWARD(Pred, op));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -486,8 +485,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::equal_binary().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                std::forward<Pred>(op),
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                HPX_FORWARD(Pred, op),
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }
@@ -511,7 +510,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::equal_binary().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
                 hpx::parallel::v1::detail::equal_to{},
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
@@ -541,8 +540,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::equal().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2,
-                std::forward<Pred>(op));
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
+                HPX_FORWARD(Pred, op));
         }
 
         // clang-format off
@@ -564,7 +563,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::equal().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2,
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
                 hpx::parallel::v1::detail::equal_to{});
         }
 
@@ -589,7 +588,7 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::equal_binary().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                std::forward<Pred>(op),
+                HPX_FORWARD(Pred, op),
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }
@@ -636,7 +635,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::equal().call(hpx::execution::seq,
-                first1, last1, first2, std::forward<Pred>(op));
+                first1, last1, first2, HPX_FORWARD(Pred, op));
         }
 
         // clang-format off

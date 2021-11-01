@@ -127,7 +127,7 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename F, typename... Ts>
         inline decltype(auto) post(F&& f, Ts&&... ts)
         {
-            return apply(std::forward<F>(f), std::forward<Ts>(ts)...);
+            return apply(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // -------------------------------------------------------------------------
@@ -135,7 +135,7 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename F, typename... Ts>
         inline decltype(auto) async_execute(F&& f, Ts&&... ts)
         {
-            return async(std::forward<F>(f), std::forward<Ts>(ts)...);
+            return async(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
     protected:
@@ -151,7 +151,7 @@ namespace hpx { namespace cuda { namespace experimental {
             check_cuda_error(cudaSetDevice(device_));
             // insert the stream handle in the arg list and call the cuda function
             detail::dispatch_helper<R, Params...> helper{};
-            helper(cuda_function, std::forward<Args>(args)..., stream_);
+            helper(cuda_function, HPX_FORWARD(Args, args)..., stream_);
         }
 
         // -------------------------------------------------------------------------
@@ -168,11 +168,11 @@ namespace hpx { namespace cuda { namespace experimental {
                     check_cuda_error(cudaSetDevice(device_));
                     // insert the stream handle in the arg list and call the cuda function
                     detail::dispatch_helper<R, Params...> helper{};
-                    helper(cuda_kernel, std::forward<Args>(args)..., stream_);
+                    helper(cuda_kernel, HPX_FORWARD(Args, args)..., stream_);
                     return get_future();
                 },
                 [&](std::exception_ptr&& ep) {
-                    return hpx::make_exceptional_future<void>(std::move(ep));
+                    return hpx::make_exceptional_future<void>(HPX_MOVE(ep));
                 });
         }
     };

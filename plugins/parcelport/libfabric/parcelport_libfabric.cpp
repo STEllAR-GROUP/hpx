@@ -11,11 +11,11 @@
 // config
 #include <hpx/config.hpp>
 // util
+#include <hpx/command_line_handling/command_line_handling.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
 #include <hpx/plugins/parcelport_factory.hpp>
@@ -39,51 +39,48 @@
 // --------------------------------------------------------------------
 // Controls whether we are allowed to suspend threads that are sending
 // when we have maxed out the number of sends we can handle
-#define HPX_PARCELPORT_LIBFABRIC_SUSPEND_WAKE  (HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS/2)
+#define HPX_PARCELPORT_LIBFABRIC_SUSPEND_WAKE                                  \
+    (HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS / 2)
 
 // --------------------------------------------------------------------
 // Enable the use of hpx small_vector for certain short lived storage
 // elements within the parcelport. This can reduce some memory allocations
-#define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR    true
+#define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR true
 
 // --------------------------------------------------------------------
-#include <plugins/parcelport/unordered_map.hpp>
 #include <plugins/parcelport/libfabric/header.hpp>
 #include <plugins/parcelport/libfabric/locality.hpp>
+#include <plugins/parcelport/unordered_map.hpp>
 
+#include <plugins/parcelport/libfabric/connection_handler.hpp>
+#include <plugins/parcelport/libfabric/libfabric_controller.hpp>
 #include <plugins/parcelport/libfabric/libfabric_region_provider.hpp>
+#include <plugins/parcelport/libfabric/rdma_locks.hpp>
+#include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/performance_counter.hpp>
 #include <plugins/parcelport/rma_memory_pool.hpp>
-#include <plugins/parcelport/libfabric/connection_handler.hpp>
-#include <plugins/parcelport/parcelport_logging.hpp>
-#include <plugins/parcelport/libfabric/rdma_locks.hpp>
-#include <plugins/parcelport/libfabric/libfabric_controller.hpp>
 
 //
 #if HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR
 #include <hpx/datastructures/detail/small_vector.hpp>
 #endif
 //
-#include <unordered_map>
-#include <memory>
-#include <mutex>
-#include <sstream>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <list>
+#include <memory>
+#include <mutex>
+#include <sstream>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
 using namespace hpx::parcelset::policies;
 
-namespace hpx {
-namespace parcelset {
-namespace policies {
-namespace libfabric
-{
+namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
     // --------------------------------------------------------------------
     // parcelport, the implementation of the parcelport itself
     // --------------------------------------------------------------------
@@ -101,34 +98,36 @@ namespace libfabric
         FUNC_START_DEBUG_MSG;
 
         // if we are not enabled, then skip allocating resources
-        parcelport_enabled_ = hpx::util::get_entry_as<bool>(ini,
-            "hpx.parcel.libfabric.enable", 0);
+        parcelport_enabled_ = hpx::util::get_entry_as<bool>(
+            ini, "hpx.parcel.libfabric.enable", 0);
         LOG_DEBUG_MSG("Got enabled " << parcelport_enabled_);
 
         bootstrap_enabled_ = ("libfabric" ==
-            hpx::util::get_entry_as<std::string>(ini, "hpx.parcel.bootstrap", ""));
+            hpx::util::get_entry_as<std::string>(
+                ini, "hpx.parcel.bootstrap", ""));
         LOG_DEBUG_MSG("Got bootstrap " << bootstrap_enabled_);
 
-        if (!parcelport_enabled_) return;
+        if (!parcelport_enabled_)
+            return;
 
         // Get parameters that determine our fabric selection
-        std::string provider = ini.get_entry("hpx.parcel.libfabric.provider",
-            HPX_PARCELPORT_LIBFABRIC_PROVIDER);
-        std::string domain = ini.get_entry("hpx.parcel.libfabric.domain",
-            HPX_PARCELPORT_LIBFABRIC_DOMAIN);
-        std::string endpoint = ini.get_entry("hpx.parcel.libfabric.endpoint",
-            HPX_PARCELPORT_LIBFABRIC_ENDPOINT);
+        std::string provider = ini.get_entry(
+            "hpx.parcel.libfabric.provider", HPX_PARCELPORT_LIBFABRIC_PROVIDER);
+        std::string domain = ini.get_entry(
+            "hpx.parcel.libfabric.domain", HPX_PARCELPORT_LIBFABRIC_DOMAIN);
+        std::string endpoint = ini.get_entry(
+            "hpx.parcel.libfabric.endpoint", HPX_PARCELPORT_LIBFABRIC_ENDPOINT);
 
         LOG_DEBUG_MSG("libfabric parcelport function using attributes "
             << provider << " " << domain << " " << endpoint);
 
         // create our main fabric control structure
-        libfabric_controller_ = std::make_shared<libfabric_controller>(
-            provider, domain, endpoint);
+        libfabric_controller_ =
+            std::make_shared<libfabric_controller>(provider, domain, endpoint);
 
         // get 'this' locality from the controller
         LOG_DEBUG_MSG("Getting local locality object");
-        const locality & local = libfabric_controller_->here();
+        const locality& local = libfabric_controller_->here();
         here_ = parcelset::locality(local);
         // and make a note of our ip address for convenience
         ip_addr_ = local.ip_address();
@@ -151,10 +150,11 @@ namespace libfabric
     // Start the handling of communication.
     bool parcelport::do_run()
     {
-        if (!parcelport_enabled_) return false;
+        if (!parcelport_enabled_)
+            return false;
 
 #ifndef HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
-        auto &as = naming::get_agas_client();
+        auto& as = naming::get_agas_client();
         libfabric_controller_->initialize_localities(as);
 #endif
 
@@ -164,20 +164,17 @@ namespace libfabric
         LOG_DEBUG_MSG("Fetching memory pool");
         chunk_pool_ = &libfabric_controller_->get_memory_pool();
 
-        for (std::size_t i = 0; i < HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS; ++i)
+        for (std::size_t i = 0; i < HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS;
+             ++i)
         {
-            sender *snd =
-               new sender(this,
-                    libfabric_controller_->ep_active_,
-                    libfabric_controller_->get_domain(),
-                    chunk_pool_);
-            snd->postprocess_handler_ = [this](sender* s)
-                {
-                    --senders_in_use_;
-                    senders_.push(s);
-                    trigger_pending_work();
-                };
-           senders_.push(snd);
+            sender* snd = new sender(this, libfabric_controller_->ep_active_,
+                libfabric_controller_->get_domain(), chunk_pool_);
+            snd->postprocess_handler_ = [this](sender* s) {
+                --senders_in_use_;
+                senders_.push(s);
+                trigger_pending_work();
+            };
+            senders_.push(snd);
         }
 
         if (bootstrap_enabled_)
@@ -185,30 +182,30 @@ namespace libfabric
             for (std::size_t i = 0; i != io_service_pool_.size(); ++i)
             {
                 io_service_pool_.get_io_service(int(i)).post(
-                    hpx::util::bind(
-                        &parcelport::io_service_work, this));
+                    hpx::util::bind(&parcelport::io_service_work, this));
             }
         }
         return true;
-   }
+    }
 
     // --------------------------------------------------------------------
     // return a sender object back to the parcelport_impl
     // this is used by the send_immediate version of parcelport_impl
     // --------------------------------------------------------------------
     sender* parcelport::get_connection(
-        parcelset::locality const& dest, fi_addr_t &fi_addr)
+        parcelset::locality const& dest, fi_addr_t& fi_addr)
     {
         sender* snd = nullptr;
         if (senders_.pop(snd))
         {
             FUNC_START_DEBUG_MSG;
-            const locality &fabric_locality = dest.get<locality>();
+            const locality& fabric_locality = dest.get<locality>();
             LOG_DEBUG_MSG("get_fabric_address           from "
                 << ipaddress(here_.get<locality>().ip_address()) << "to "
                 << ipaddress(fabric_locality.ip_address()));
             ++senders_in_use_;
-            fi_addr = libfabric_controller_->get_fabric_address(fabric_locality);
+            fi_addr =
+                libfabric_controller_->get_fabric_address(fabric_locality);
             FUNC_END_DEBUG_MSG;
             return snd;
         }
@@ -245,27 +242,29 @@ namespace libfabric
 
     // --------------------------------------------------------------------
     // cleanup
-    parcelport::~parcelport() {
+    parcelport::~parcelport()
+    {
         FUNC_START_DEBUG_MSG;
         scoped_lock lk(stop_mutex);
-        sender *snd = nullptr;
+        sender* snd = nullptr;
 
-        unsigned int sends_posted  = 0;
+        unsigned int sends_posted = 0;
         unsigned int sends_deleted = 0;
         unsigned int acks_received = 0;
         //
-        while (senders_.pop(snd)) {
+        while (senders_.pop(snd))
+        {
             LOG_DEBUG_MSG("Popped a sender for delete " << hexpointer(snd));
-            sends_posted  += snd->sends_posted_;
+            sends_posted += snd->sends_posted_;
             sends_deleted += snd->sends_deleted_;
             acks_received += snd->acks_received_;
             delete snd;
         }
-        LOG_DEBUG_MSG(
-               "sends_posted "  << decnumber(sends_posted)
-            << "sends_deleted " << decnumber(sends_deleted)
-            << "acks_received " << decnumber(acks_received)
-            << "non_rma-send "  << decnumber(sends_posted-acks_received));
+        LOG_DEBUG_MSG("sends_posted "
+            << decnumber(sends_posted) << "sends_deleted "
+            << decnumber(sends_deleted) << "acks_received "
+            << decnumber(acks_received) << "non_rma-send "
+            << decnumber(sends_posted - acks_received));
         //
         libfabric_controller_ = nullptr;
         FUNC_END_DEBUG_MSG;
@@ -273,7 +272,8 @@ namespace libfabric
 
     // --------------------------------------------------------------------
     /// Should not be used any more as parcelport_impl handles this?
-    bool parcelport::can_bootstrap() const {
+    bool parcelport::can_bootstrap() const
+    {
         FUNC_START_DEBUG_MSG;
         bool can_boot = HPX_PARCELPORT_LIBFABRIC_HAVE_BOOTSTRAPPING();
         LOG_TRACE_MSG("Returning " << can_boot << " from can_bootstrap")
@@ -291,26 +291,28 @@ namespace libfabric
         temp << asio::ip::host_name() << ":" << ipaddress(ip_addr_);
         std::string tstr = temp.str();
         FUNC_END_DEBUG_MSG;
-        return tstr.substr(0, tstr.size()-1);
+        return tstr.substr(0, tstr.size() - 1);
     }
 
     // --------------------------------------------------------------------
     // the root node has spacial handling, this returns its Id
-    parcelset::locality parcelport::
-    agas_locality(util::runtime_configuration const & ini) const
+    parcelset::locality parcelport::agas_locality(
+        util::runtime_configuration const& ini) const
     {
         FUNC_START_DEBUG_MSG;
         // load all components as described in the configuration information
         if (!bootstrap_enabled_)
         {
-            LOG_ERROR_MSG("Should only return agas locality when bootstrapping");
+            LOG_ERROR_MSG(
+                "Should only return agas locality when bootstrapping");
         }
         FUNC_END_DEBUG_MSG;
         return libfabric_controller_->agas_;
     }
 
     // --------------------------------------------------------------------
-    parcelset::locality parcelport::create_locality() const {
+    parcelset::locality parcelport::create_locality() const
+    {
         FUNC_START_DEBUG_MSG;
         FUNC_END_DEBUG_MSG;
         return parcelset::locality(locality());
@@ -318,11 +320,10 @@ namespace libfabric
 
     // --------------------------------------------------------------------
     /// for debugging
-    void parcelport::suspended_task_debug(const std::string &match)
+    void parcelport::suspended_task_debug(const std::string& match)
     {
         std::string temp = hpx::util::debug::suspended_task_backtraces();
-        if (match.size()==0 ||
-            temp.find(match)!=std::string::npos)
+        if (match.size() == 0 || temp.find(match) != std::string::npos)
         {
             LOG_DEBUG_MSG("Suspended threads " << temp);
         }
@@ -330,10 +331,12 @@ namespace libfabric
 
     // --------------------------------------------------------------------
     /// stop the parcelport, prior to shutdown
-    void parcelport::do_stop() {
+    void parcelport::do_stop()
+    {
         LOG_DEBUG_MSG("Entering libfabric stop ");
         FUNC_START_DEBUG_MSG;
-        if (!stopped_) {
+        if (!stopped_)
+        {
             // we don't want multiple threads trying to stop the clients
             scoped_lock lock(stop_mutex);
 
@@ -341,14 +344,13 @@ namespace libfabric
             libfabric_controller_->disconnect_all();
 
             // wait for all clients initiated elsewhere to be disconnected
-            while (libfabric_controller_->active() /*&& !hpx::is_stopped()*/) {
-                completions_handled_ += libfabric_controller_->poll_endpoints(true);
+            while (libfabric_controller_->active() /*&& !hpx::is_stopped()*/)
+            {
+                completions_handled_ +=
+                    libfabric_controller_->poll_endpoints(true);
                 LOG_TIMED_INIT(disconnect_poll);
                 LOG_TIMED_BLOCK(disconnect_poll, DEVEL, 5.0,
-                    {
-                        LOG_DEBUG_MSG("Polling before shutdown");
-                    }
-                )
+                    { LOG_DEBUG_MSG("Polling before shutdown"); })
             }
             LOG_DEBUG_MSG("stopped removing clients and terminating");
         }
@@ -370,15 +372,15 @@ namespace libfabric
 
     // --------------------------------------------------------------------
     template <typename Handler>
-    bool parcelport::async_write(Handler && handler,
-        sender *snd, fi_addr_t addr,
-        snd_buffer_type &buffer)
+    bool parcelport::async_write(
+        Handler&& handler, sender* snd, fi_addr_t addr, snd_buffer_type& buffer)
     {
-        LOG_DEBUG_MSG("parcelport::async_write using sender " << hexpointer(snd));
+        LOG_DEBUG_MSG(
+            "parcelport::async_write using sender " << hexpointer(snd));
         snd->dst_addr_ = addr;
-        snd->buffer_ = std::move(buffer);
+        snd->buffer_ = HPX_MOVE(buffer);
         HPX_ASSERT(!snd->handler_);
-        snd->handler_ = std::forward<Handler>(handler);
+        snd->handler_ = HPX_FORWARD(Handler, handler);
         snd->async_write_impl();
         // after a send poll to make progress on the network and
         // reduce latencies for receives coming in
@@ -402,13 +404,15 @@ namespace libfabric
     // NB: There is no difference any more between background polling work
     // on OS or HPX as all has been tested thoroughly
     // --------------------------------------------------------------------
-    inline bool parcelport::background_work_OS_thread() {
+    inline bool parcelport::background_work_OS_thread()
+    {
         LOG_TIMED_INIT(background);
         bool done = false;
-        do {
+        do
+        {
             LOG_TIMED_BLOCK(background, DEVEL, 5.0, {
-                LOG_DEBUG_MSG("number of senders in use "
-                    << decnumber(senders_in_use_));
+                LOG_DEBUG_MSG(
+                    "number of senders in use " << decnumber(senders_in_use_));
             });
             // if an event comes in, we may spend time processing/handling it
             // and another may arrive during this handling,
@@ -416,9 +420,9 @@ namespace libfabric
             // libfabric_controller_->refill_client_receives(false);
             int numc = libfabric_controller_->poll_endpoints();
             completions_handled_ += numc;
-            done = (numc==0);
+            done = (numc == 0);
         } while (!done);
-        return (done!=0);
+        return (done != 0);
     }
 
     // --------------------------------------------------------------------
@@ -430,11 +434,12 @@ namespace libfabric
     bool parcelport::background_work(
         std::size_t num_thread, parcelport_background_mode mode)
     {
-        if (stopped_ || hpx::is_stopped()) {
+        if (stopped_ || hpx::is_stopped())
+        {
             return false;
         }
         return background_work_OS_thread();
     }
-}}}}
+}}}}    // namespace hpx::parcelset::policies::libfabric
 
 HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::libfabric::parcelport, libfabric)

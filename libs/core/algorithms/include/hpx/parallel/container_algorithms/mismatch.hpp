@@ -267,9 +267,9 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::mismatch_binary<
                 mismatch_result<Iter1, Iter2>>()
-                .call(std::forward<ExPolicy>(policy), first1, last1, first2,
-                    last2, std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
+                    last2, HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -311,10 +311,10 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_traits<Rng2>::iterator_type>;
 
             return hpx::parallel::v1::detail::mismatch_binary<result_type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -345,8 +345,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::mismatch_binary<
                 mismatch_result<Iter1, Iter2>>()
                 .call(hpx::execution::seq, first1, last1, first2, last2,
-                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -388,8 +388,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::mismatch_binary<result_type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
     } mismatch{};

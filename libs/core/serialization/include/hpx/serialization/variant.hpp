@@ -57,7 +57,7 @@ namespace hpx { namespace serialization {
                 {
                     T value;
                     ar >> value;
-                    v.template emplace<T>(std::move(value));
+                    v.template emplace<T>(HPX_MOVE(value));
                     return;
                 }
                 std_variant_impl<Ts...>::load(ar, which - 1, v);

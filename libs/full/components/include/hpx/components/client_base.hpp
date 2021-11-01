@@ -90,7 +90,7 @@ namespace hpx { namespace traits {
             HPX_FORCEINLINE static Derived create(
                 hpx::intrusive_ptr<SharedState>&& shared_state)
             {
-                return Derived(future<id_type>(std::move(shared_state)));
+                return Derived(future<id_type>(HPX_MOVE(shared_state)));
             }
 
             template <typename SharedState>
@@ -136,7 +136,7 @@ namespace hpx { namespace traits {
             template <typename T_>
             HPX_FORCEINLINE Derived operator()(T_&& value) const
             {
-                return std::forward<T_>(value);
+                return HPX_FORWARD(T_, value);
             }
         };
 
@@ -188,7 +188,7 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename... T>
         future_data(init_no_addref no_addref, in_place in_place, T&&... ts)
           : future_data_base<id_type>(
-                no_addref, in_place, std::forward<T>(ts)...)
+                no_addref, in_place, HPX_FORWARD(T, ts)...)
         {
         }
 
@@ -197,7 +197,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
         }
         future_data(init_no_addref no_addref, std::exception_ptr&& e)
-          : future_data_base<id_type>(no_addref, std::move(e))
+          : future_data_base<id_type>(no_addref, HPX_MOVE(e))
         {
         }
 
@@ -205,7 +205,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             if (!registered_name_.empty())
             {
-                std::string name = std::move(registered_name_);
+                std::string name = HPX_MOVE(registered_name_);
                 error_code ec(lightweight);
                 agas::unregister_name(launch::sync, name, ec);
             }
@@ -217,12 +217,12 @@ namespace hpx { namespace lcos { namespace detail {
         }
         void set_registered_name(std::string name) override
         {
-            registered_name_ = std::move(name);
+            registered_name_ = HPX_MOVE(name);
         }
         bool register_as(std::string name, bool manage_lifetime) override
         {
             HPX_ASSERT(registered_name_.empty());    // call only once
-            registered_name_ = std::move(name);
+            registered_name_ = HPX_MOVE(name);
             hpx::id_type id = *this->get_result();
             if (!manage_lifetime)
             {
@@ -283,7 +283,7 @@ namespace hpx { namespace components {
         }
 
         client_base(hpx::intrusive_ptr<shared_state_type>&& state)
-          : shared_state_(std::move(state))
+          : shared_state_(HPX_MOVE(state))
         {
         }
 
@@ -304,7 +304,7 @@ namespace hpx { namespace components {
         explicit client_base(id_type&& id)
           : shared_state_(new lcos::detail::future_data<id_type>)
         {
-            shared_state_->set_value(std::move(id));
+            shared_state_->set_value(HPX_MOVE(id));
         }
 
         explicit client_base(shared_future<id_type> const& f) noexcept
@@ -315,13 +315,13 @@ namespace hpx { namespace components {
         explicit client_base(shared_future<id_type>&& f) noexcept
           : shared_state_(
                 hpx::traits::future_access<future_type>::get_shared_state(
-                    std::move(f)))
+                    HPX_MOVE(f)))
         {
         }
         explicit client_base(future<id_type>&& f) noexcept
           : shared_state_(
                 hpx::traits::future_access<future_type>::get_shared_state(
-                    std::move(f)))
+                    HPX_MOVE(f)))
         {
         }
 
@@ -330,7 +330,7 @@ namespace hpx { namespace components {
         {
         }
         client_base(client_base&& rhs) noexcept
-          : shared_state_(std::move(rhs.shared_state_))
+          : shared_state_(HPX_MOVE(rhs.shared_state_))
         {
             rhs.shared_state_ = nullptr;
         }
@@ -340,7 +340,7 @@ namespace hpx { namespace components {
         // the id of the referenced object.
         client_base(future<Derived>&& d)
           : shared_state_(
-                d.valid() ? lcos::detail::unwrap(std::move(d)) : nullptr)
+                d.valid() ? lcos::detail::unwrap(HPX_MOVE(d)) : nullptr)
         {
         }
 
@@ -356,7 +356,7 @@ namespace hpx { namespace components {
         client_base& operator=(id_type&& id)
         {
             shared_state_ = new shared_state_type;
-            shared_state_->set_value(std::move(id));
+            shared_state_->set_value(HPX_MOVE(id));
             return *this;
         }
 
@@ -370,14 +370,14 @@ namespace hpx { namespace components {
         {
             shared_state_ =
                 hpx::traits::future_access<future_type>::get_shared_state(
-                    std::move(f));
+                    HPX_MOVE(f));
             return *this;
         }
         client_base& operator=(future<id_type>&& f) noexcept
         {
             shared_state_ =
                 hpx::traits::future_access<future_type>::get_shared_state(
-                    std::move(f));
+                    HPX_MOVE(f));
             return *this;
         }
 
@@ -388,7 +388,7 @@ namespace hpx { namespace components {
         }
         client_base& operator=(client_base&& rhs) noexcept
         {
-            shared_state_ = std::move(rhs.shared_state_);
+            shared_state_ = HPX_MOVE(rhs.shared_state_);
             return *this;
         }
 
@@ -424,7 +424,7 @@ namespace hpx { namespace components {
         shared_future<id_type> detach()
         {
             return hpx::traits::future_access<future_type>::create(
-                std::move(shared_state_));
+                HPX_MOVE(shared_state_));
         }
 
         shared_future<id_type> share() const
@@ -440,12 +440,12 @@ namespace hpx { namespace components {
 
         void reset(id_type&& id)
         {
-            *this = std::move(id);
+            *this = HPX_MOVE(id);
         }
 
         void reset(shared_future<id_type>&& rhs)
         {
-            *this = std::move(rhs);
+            *this = HPX_MOVE(rhs);
         }
 
     public:
@@ -521,7 +521,7 @@ namespace hpx { namespace components {
         static typename hpx::traits::future_then_result<Derived, F>::cont_result
         on_ready(shared_future<id_type>&& fut, F f)
         {
-            return f(Derived(std::move(fut)));
+            return f(Derived(HPX_MOVE(fut)));
         }
 
     public:
@@ -546,15 +546,15 @@ namespace hpx { namespace components {
 
             shared_state_ptr p =
                 lcos::detail::make_continuation<continuation_result_type>(
-                    *static_cast<Derived const*>(this), l, std::forward<F>(f));
+                    *static_cast<Derived const*>(this), l, HPX_FORWARD(F, f));
             return hpx::traits::future_access<future<result_type>>::create(
-                std::move(p));
+                HPX_MOVE(p));
         }
 
         template <typename F>
         hpx::traits::future_then_result_t<Derived, F> then(F&& f)
         {
-            return then(launch::all, std::forward<F>(f));
+            return then(launch::all, HPX_FORWARD(F, f));
         }
 
     private:
@@ -563,7 +563,7 @@ namespace hpx { namespace components {
             std::string symbolic_name, bool manage_lifetime)
         {
             return f.shared_state_->register_as(
-                std::move(symbolic_name), manage_lifetime);
+                HPX_MOVE(symbolic_name), manage_lifetime);
         }
 
     public:
@@ -579,14 +579,14 @@ namespace hpx { namespace components {
 
             hpx::traits::detail::shared_state_ptr_t<bool> p =
                 lcos::detail::make_continuation<bool>(*this, launch::sync,
-                    [=, symbolic_name = std::move(symbolic_name)](
+                    [=, symbolic_name = HPX_MOVE(symbolic_name)](
                         client_base const& f) mutable -> bool {
                         return register_as_helper(
-                            f, std::move(symbolic_name), manage_lifetime);
+                            f, HPX_MOVE(symbolic_name), manage_lifetime);
                     });
 
             return hpx::traits::future_access<future<bool>>::create(
-                std::move(p));
+                HPX_MOVE(p));
         }
 
         // Retrieve the id associated with the given name and use it to

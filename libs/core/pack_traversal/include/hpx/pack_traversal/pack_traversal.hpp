@@ -54,10 +54,10 @@ namespace hpx { namespace util {
     template <typename Mapper, typename... T>
     auto map_pack(Mapper&& mapper, T&&... pack)
         -> decltype(detail::apply_pack_transform(detail::strategy_remap_tag{},
-            std::forward<Mapper>(mapper), std::forward<T>(pack)...))
+            HPX_FORWARD(Mapper, mapper), HPX_FORWARD(T, pack)...))
     {
         return detail::apply_pack_transform(detail::strategy_remap_tag{},
-            std::forward<Mapper>(mapper), std::forward<T>(pack)...);
+            HPX_FORWARD(Mapper, mapper), HPX_FORWARD(T, pack)...);
     }
 
     /// Indicate that the result shall be spread across the parent container
@@ -68,7 +68,7 @@ namespace hpx { namespace util {
     spread_this(T&&... args)
     {
         return detail::spreading::spread_box<typename std::decay<T>::type...>(
-            hpx::make_tuple(std::forward<T>(args)...));
+            hpx::make_tuple(HPX_FORWARD(T, args)...));
     }
 
     /// Traverses the pack with the given visitor.
@@ -81,7 +81,7 @@ namespace hpx { namespace util {
     void traverse_pack(Mapper&& mapper, T&&... pack)
     {
         detail::apply_pack_transform(detail::strategy_traverse_tag{},
-            std::forward<Mapper>(mapper), std::forward<T>(pack)...);
+            HPX_FORWARD(Mapper, mapper), HPX_FORWARD(T, pack)...);
     }
 }}    // namespace hpx::util
 

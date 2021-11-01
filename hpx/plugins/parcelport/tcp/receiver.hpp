@@ -47,12 +47,12 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parcelset { namespace policies { namespace tcp
-{
+namespace hpx { namespace parcelset { namespace policies { namespace tcp {
     class connection_handler;
 
     class receiver
-      : public parcelport_connection<receiver, std::vector<char>, std::vector<char> >
+      : public parcelport_connection<receiver, std::vector<char>,
+            std::vector<char>>
     {
         using mutex_type = hpx::lcos::local::spinlock;
 
@@ -66,7 +66,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
           , timer_()
           , mtx_()
           , operation_in_flight_(0)
-        {}
+        {
+        }
 
         ~receiver()
         {
@@ -74,7 +75,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
 
         /// Get the socket associated with the parcelport_connection.
-        asio::ip::tcp::socket& socket() { return socket_; }
+        asio::ip::tcp::socket& socket()
+        {
+            return socket_;
+        }
 
         /// Asynchronously read a data structure from the socket.
         template <typename Handler>
@@ -82,7 +86,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         {
             HPX_ASSERT(buffer_.data_.empty());
             // Store the time of the begin of the read operation
-            performance_counters::parcels::data_point& data = buffer_.data_point_;
+            performance_counters::parcels::data_point& data =
+                buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
             data.serialization_time_ = 0;
             data.bytes_ = 0;
@@ -91,17 +96,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // Issue a read operation to read the message size.
             using asio::buffer;
             std::vector<asio::mutable_buffer> buffers;
-            buffers.push_back(buffer(&buffer_.size_,
-                sizeof(buffer_.size_)));
-            buffers.push_back(buffer(&buffer_.data_size_,
-                sizeof(buffer_.data_size_)));
+            buffers.push_back(buffer(&buffer_.size_, sizeof(buffer_.size_)));
+            buffers.push_back(
+                buffer(&buffer_.data_size_, sizeof(buffer_.data_size_)));
 
-            buffers.push_back(buffer(&buffer_.num_chunks_,
-                sizeof(buffer_.num_chunks_)));
+            buffers.push_back(
+                buffer(&buffer_.num_chunks_, sizeof(buffer_.num_chunks_)));
 
             {
                 std::unique_lock<mutex_type> lk(mtx_);
-                if(!socket_.is_open())
+                if (!socket_.is_open())
                 {
                     lk.unlock();
                     // report this problem back to the handler
@@ -110,19 +114,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     return;
                 }
 #if defined(__linux) || defined(linux) || defined(__linux__)
-                asio::detail::socket_option::boolean<
-                    IPPROTO_TCP, TCP_QUICKACK> quickack(true);
+                asio::detail::socket_option::boolean<IPPROTO_TCP, TCP_QUICKACK>
+                    quickack(true);
                 socket_.set_option(quickack);
 #endif
 
-                void (receiver::*f)(std::error_code const&,
-                        std::size_t, Handler)
-                    = &receiver::handle_read_header<Handler>;
+                void (receiver::*f)(std::error_code const&, std::size_t,
+                    Handler) = &receiver::handle_read_header<Handler>;
 
                 asio::async_read(socket_, buffers,
                     util::bind(f, shared_from_this(),
-                        util::placeholders::_1, // error
-                        util::placeholders::_2, // bytes_transferred
+                        util::placeholders::_1,    // error
+                        util::placeholders::_2,    // bytes_transferred
                         util::protect(handler)));
             }
         }
@@ -132,9 +135,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             std::lock_guard<mutex_type> lk(mtx_);
             // gracefully and portably shutdown the socket
             std::error_code ec;
-            if (socket_.is_open()) {
+            if (socket_.is_open())
+            {
                 socket_.shutdown(asio::ip::tcp::socket::shutdown_both, ec);
-                socket_.close(ec);    // close the socket to give it back to the OS
+                socket_.close(
+                    ec);    // close the socket to give it back to the OS
             }
 
             hpx::util::yield_while(
@@ -150,13 +155,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             std::size_t /* bytes_transferred */, Handler handler)
         {
             HPX_ASSERT(operation_in_flight_ == 0);
-            if (e) {
+            if (e)
+            {
                 handler(e);
 
                 // Issue a read operation to read the next parcel.
-//                 async_read(handler);
+                //                 async_read(handler);
             }
-            else {
+            else
+            {
                 ++operation_in_flight_;
                 // Determine the length of the serialized data.
                 std::uint64_t inbound_size = buffer_.size_;
@@ -169,23 +176,22 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     return;
                 }
 
-                buffer_.data_point_.bytes_ = static_cast<std::size_t>(inbound_size);
+                buffer_.data_point_.bytes_ =
+                    static_cast<std::size_t>(inbound_size);
 
                 // receive buffers
                 std::vector<asio::mutable_buffer> buffers;
 
                 // determine the size of the chunk buffer
-                std::size_t num_zero_copy_chunks =
-                    static_cast<std::size_t>(
-                        static_cast<std::uint32_t>(buffer_.num_chunks_.first));
-                std::size_t num_non_zero_copy_chunks =
-                    static_cast<std::size_t>(
-                        static_cast<std::uint32_t>(buffer_.num_chunks_.second));
+                std::size_t num_zero_copy_chunks = static_cast<std::size_t>(
+                    static_cast<std::uint32_t>(buffer_.num_chunks_.first));
+                std::size_t num_non_zero_copy_chunks = static_cast<std::size_t>(
+                    static_cast<std::uint32_t>(buffer_.num_chunks_.second));
 
-                void (receiver::*f)(std::error_code const&,
-                        Handler) = nullptr;
+                void (receiver::*f)(std::error_code const&, Handler) = nullptr;
 
-                if (num_zero_copy_chunks != 0) {
+                if (num_zero_copy_chunks != 0)
+                {
                     typedef parcel_buffer_type::transmission_chunk_type
                         transmission_chunk_type;
 
@@ -195,20 +201,22 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     chunks.resize(static_cast<std::size_t>(
                         num_zero_copy_chunks + num_non_zero_copy_chunks));
 
-                    buffers.push_back(
-                        asio::buffer(chunks.data(), chunks.size() *
-                            sizeof(transmission_chunk_type)));
+                    buffers.push_back(asio::buffer(chunks.data(),
+                        chunks.size() * sizeof(transmission_chunk_type)));
 
                     // add main buffer holding data which was serialized normally
-                    buffer_.data_.resize(static_cast<std::size_t>(inbound_size));
+                    buffer_.data_.resize(
+                        static_cast<std::size_t>(inbound_size));
                     buffers.push_back(asio::buffer(buffer_.data_));
 
                     // Start an asynchronous call to receive the data.
                     f = &receiver::handle_read_chunk_data<Handler>;
                 }
-                else {
+                else
+                {
                     // add main buffer holding data which was serialized normally
-                    buffer_.data_.resize(static_cast<std::size_t>(inbound_size));
+                    buffer_.data_.resize(
+                        static_cast<std::size_t>(inbound_size));
                     buffers.push_back(asio::buffer(buffer_.data_));
 
                     // Start an asynchronous call to receive the data.
@@ -217,7 +225,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
                 {
                     std::unique_lock<mutex_type> lk(mtx_);
-                    if(!socket_.is_open())
+                    if (!socket_.is_open())
                     {
                         lk.unlock();
                         // report this problem back to the handler
@@ -226,13 +234,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         return;
                     }
 #if defined(__linux) || defined(linux) || defined(__linux__)
-                    asio::detail::socket_option::boolean<
-                        IPPROTO_TCP, TCP_QUICKACK> quickack(true);
+                    asio::detail::socket_option::boolean<IPPROTO_TCP,
+                        TCP_QUICKACK>
+                        quickack(true);
                     socket_.set_option(quickack);
 #endif
                     asio::async_read(socket_, buffers,
                         util::bind(f, shared_from_this(),
-                            util::placeholders::_1, // error,
+                            util::placeholders::_1,    // error,
                             util::protect(handler)));
                 }
             }
@@ -240,24 +249,24 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         /// Handle a completed read of message data.
         template <typename Handler>
-        void handle_read_chunk_data(std::error_code const& e,
-            Handler handler)
+        void handle_read_chunk_data(std::error_code const& e, Handler handler)
         {
-            if (e) {
+            if (e)
+            {
                 handler(e);
                 --operation_in_flight_;
 
                 // Issue a read operation to read the next parcel.
-//                 async_read(handler);
+                //                 async_read(handler);
             }
-            else {
+            else
+            {
                 // receive buffers
                 std::vector<asio::mutable_buffer> buffers;
 
                 // add appropriately sized chunk buffers for the zero-copy data
-                std::size_t num_zero_copy_chunks =
-                    static_cast<std::size_t>(
-                        static_cast<std::uint32_t>(buffer_.num_chunks_.first));
+                std::size_t num_zero_copy_chunks = static_cast<std::size_t>(
+                    static_cast<std::uint32_t>(buffer_.num_chunks_.first));
 
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
@@ -270,13 +279,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 }
 
                 // Start an asynchronous call to receive the data.
-                void (receiver::*f)(std::error_code const&,
-                        Handler)
-                    = &receiver::handle_read_data<Handler>;
+                void (receiver::*f)(std::error_code const&, Handler) =
+                    &receiver::handle_read_data<Handler>;
 
                 {
                     std::unique_lock<mutex_type> lk(mtx_);
-                    if(!socket_.is_open())
+                    if (!socket_.is_open())
                     {
                         lk.unlock();
                         // report this problem back to the handler
@@ -285,13 +293,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         return;
                     }
 #if defined(__linux) || defined(linux) || defined(__linux__)
-                    asio::detail::socket_option::boolean<
-                        IPPROTO_TCP, TCP_QUICKACK> quickack(true);
+                    asio::detail::socket_option::boolean<IPPROTO_TCP,
+                        TCP_QUICKACK>
+                        quickack(true);
                     socket_.set_option(quickack);
 #endif
                     asio::async_read(socket_, buffers,
                         util::bind(f, shared_from_this(),
-                            util::placeholders::_1, // error,
+                            util::placeholders::_1,    // error,
                             util::protect(handler)));
                 }
             }
@@ -299,35 +308,34 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         /// Handle a completed read of message data.
         template <typename Handler>
-        void handle_read_data(std::error_code const& e,
-            Handler handler)
+        void handle_read_data(std::error_code const& e, Handler handler)
         {
-            if (e) {
+            if (e)
+            {
                 handler(e);
                 --operation_in_flight_;
 
                 // Issue a read operation to read the next parcel.
-//                 async_read(handler);
+                //                 async_read(handler);
             }
-            else {
+            else
+            {
                 // complete data point and pass it along
-                buffer_.data_point_.time_ = timer_.elapsed_nanoseconds() -
-                    buffer_.data_point_.time_;
+                buffer_.data_point_.time_ =
+                    timer_.elapsed_nanoseconds() - buffer_.data_point_.time_;
 
                 // now send acknowledgment byte
-                void (receiver::*f)(std::error_code const&,
-                        Handler)
-                    = &receiver::handle_write_ack<Handler>;
+                void (receiver::*f)(std::error_code const&, Handler) =
+                    &receiver::handle_write_ack<Handler>;
 
                 // decode the received parcels.
-                decode_parcels(
-                    parcelport_, std::move(buffer_), std::size_t(-1));
+                decode_parcels(parcelport_, HPX_MOVE(buffer_), std::size_t(-1));
                 buffer_ = parcel_buffer_type();
 
                 ack_ = true;
                 {
                     std::unique_lock<mutex_type> lk(mtx_);
-                    if(!socket_.is_open())
+                    if (!socket_.is_open())
                     {
                         lk.unlock();
                         // report this problem back to the handler
@@ -338,15 +346,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     asio::async_write(socket_,
                         asio::buffer(&ack_, sizeof(ack_)),
                         util::bind(f, shared_from_this(),
-                            util::placeholders::_1, // error,
+                            util::placeholders::_1,    // error,
                             util::protect(handler)));
                 }
             }
         }
 
         template <typename Handler>
-        void handle_write_ack(std::error_code const& e,
-            Handler handler)
+        void handle_write_ack(std::error_code const& e, Handler handler)
         {
             HPX_ASSERT(operation_in_flight_ != 0);
             // Inform caller that data has been received ok.
@@ -359,7 +366,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 async_read(handler);
             }
         }
-
 
         /// Socket for the parcelport_connection.
         asio::ip::tcp::socket socket_;
@@ -377,7 +383,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         mutex_type mtx_;
         hpx::util::atomic_count operation_in_flight_;
     };
-}}}}
+}}}}    // namespace hpx::parcelset::policies::tcp
 
 #endif
-

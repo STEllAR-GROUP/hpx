@@ -76,7 +76,7 @@ namespace hpx { namespace util {
         function_ref(F&& f)
           : object(nullptr)
         {
-            assign(std::forward<F>(f));
+            assign(HPX_FORWARD(F, f));
         }
 
         function_ref(function_ref const& other) noexcept
@@ -91,7 +91,7 @@ namespace hpx { namespace util {
                 is_invocable_r_v<R, F&, Ts...>>::type>
         function_ref& operator=(F&& f)
         {
-            assign(std::forward<F>(f));
+            assign(HPX_FORWARD(F, f));
             return *this;
         }
 
@@ -150,9 +150,9 @@ namespace hpx { namespace util {
         HPX_FORCEINLINE R operator()(Ts... vs) const
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            return vptr->invoke(object, std::forward<Ts>(vs)...);
+            return vptr->invoke(object, HPX_FORWARD(Ts, vs)...);
 #else
-            return vptr(object, std::forward<Ts>(vs)...);
+            return vptr(object, HPX_FORWARD(Ts, vs)...);
 #endif
         }
 

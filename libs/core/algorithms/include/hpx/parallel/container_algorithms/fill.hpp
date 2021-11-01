@@ -141,9 +141,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
             "Requires at least forward iterator.");
 
-        return detail::fill<iterator_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), value);
+        return detail::fill<iterator_type>().call(HPX_FORWARD(ExPolicy, policy),
+            hpx::util::begin(rng), hpx::util::end(rng), value);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -173,8 +172,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         return detail::fill_n<iterator_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng), count,
-            value);
+            HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng), count, value);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -210,7 +208,7 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::fill<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), value);
         }
 
@@ -230,7 +228,7 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::fill<Iter>().call(
-                std::forward<ExPolicy>(policy), first, last, value);
+                HPX_FORWARD(ExPolicy, policy), first, last, value);
         }
 
         // clang-format off
@@ -301,11 +299,11 @@ namespace hpx { namespace ranges {
             {
                 auto first = hpx::util::begin(rng);
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                    iterator_type>::get(std::move(first));
+                    iterator_type>::get(HPX_MOVE(first));
             }
 
             return hpx::parallel::v1::detail::fill_n<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::size(rng), value);
         }
 
@@ -328,11 +326,11 @@ namespace hpx { namespace ranges {
             if (hpx::parallel::v1::detail::is_negative(count))
             {
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(std::move(first));
+                    FwdIter>::get(HPX_MOVE(first));
             }
 
             return hpx::parallel::v1::detail::fill_n<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, std::size_t(count),
+                HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
                 value);
         }
 

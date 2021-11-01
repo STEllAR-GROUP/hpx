@@ -268,12 +268,12 @@ namespace hpx { namespace lcos {
                             // re-evaluate it and continue to the next element
                             // in the sequence (if any).
                             next_future_data->set_on_completed(
-                                [this_ = std::move(this_),
-                                    next = std::forward<Iter>(next),
+                                [this_ = HPX_MOVE(this_),
+                                    next = HPX_FORWARD(Iter, next),
                                     end = std::forward<Iter>(
                                         end)]() mutable -> void {
                                     return this_->template await_range<I>(
-                                        std::move(next), std::move(end));
+                                        HPX_MOVE(next), HPX_MOVE(end));
                                 });
 
                             // explicitly destruct iterators as those might
@@ -328,7 +328,7 @@ namespace hpx { namespace lcos {
                         // re-evaluate it and continue to the next argument
                         // (if any).
                         next_future_data->set_on_completed(
-                            [this_ = std::move(this_)]() -> void {
+                            [this_ = HPX_MOVE(this_)]() -> void {
                                 return this_->template await_next<I>(
                                     std::true_type(), std::false_type());
                             });

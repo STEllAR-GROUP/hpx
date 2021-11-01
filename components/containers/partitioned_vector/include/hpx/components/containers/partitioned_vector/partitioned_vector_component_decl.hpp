@@ -487,7 +487,7 @@ namespace hpx {
         // {
         //     HPX_ASSERT(this->get_id());
         //     this->base_type::push_back_async(
-        //         this->get_id(), std::forward<T_>(val)).get();
+        //         this->get_id(), HPX_FORWARD(T_, val)).get();
         // }
 
         // void pop_back()

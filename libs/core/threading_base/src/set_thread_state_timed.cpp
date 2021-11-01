@@ -113,7 +113,7 @@ namespace hpx { namespace threads { namespace detail {
         deadline_timer t(*s, abs_time);
 
         // let the timer invoke the set_state on the new (suspended) thread
-        t.async_wait([wake_id = std::move(wake_id), priority, retry_on_active](
+        t.async_wait([wake_id = HPX_MOVE(wake_id), priority, retry_on_active](
                          std::error_code const& ec) {
             if (ec == std::make_error_code(std::errc::operation_canceled))
             {

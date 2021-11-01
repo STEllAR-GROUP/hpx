@@ -185,7 +185,7 @@ namespace hpx {
 
         // tuple(tuple&& u) = default;
         // For all i, initializes the ith element of *this with
-        // std::forward<Ti>(get<i>(u)).
+        // HPX_FORWARD(Ti, get<i>(u)).
         constexpr tuple(tuple&& /*other*/) = default;
 
         // 20.4.2.2, tuple assignment
@@ -198,7 +198,7 @@ namespace hpx {
         }
 
         // tuple& operator=(tuple&& u) noexcept(see below );
-        // For all i, assigns std::forward<Ti>(get<i>(u)) to get<i>(*this).
+        // For all i, assigns HPX_FORWARD(Ti, get<i>(u)) to get<i>(*this).
         HPX_HOST_DEVICE tuple& operator=(tuple&& /*other*/) noexcept
         {
             return *this;
@@ -249,7 +249,7 @@ namespace hpx {
         // template <class... UTypes>
         // explicit constexpr tuple(UTypes&&... u);
         // Initializes the elements in the tuple with the corresponding value
-        // in std::forward<UTypes>(u).
+        // in HPX_FORWARD(UTypes, u).
         // This constructor shall not participate in overload resolution
         // unless each type in UTypes is implicitly convertible to its
         // corresponding type in Types.
@@ -260,8 +260,8 @@ namespace hpx {
             typename EnableCompatible = typename std::enable_if<hpx::detail::
                     are_tuples_compatible<tuple, tuple<U, Us...>>::value>::type>
         explicit constexpr HPX_HOST_DEVICE tuple(U&& v, Us&&... vs)
-          : _members(std::piecewise_construct, std::forward<U>(v),
-                std::forward<Us>(vs)...)
+          : _members(std::piecewise_construct, HPX_FORWARD(U, v),
+                HPX_FORWARD(Us, vs)...)
         {
         }
 
@@ -273,7 +273,7 @@ namespace hpx {
 
         // tuple(tuple&& u) = default;
         // For all i, initializes the ith element of *this with
-        // std::forward<Ti>(get<i>(u)).
+        // HPX_FORWARD(Ti, get<i>(u)).
         tuple(tuple&&) = default;
 #else
         // tuple(const tuple& u) = default;
@@ -286,9 +286,9 @@ namespace hpx {
 
         // tuple(tuple&& u) = default;
         // For all i, initializes the ith element of *this with
-        // std::forward<Ti>(get<i>(u)).
+        // HPX_FORWARD(Ti, get<i>(u)).
         constexpr HPX_HOST_DEVICE tuple(tuple&& other)
-          : _members(std::move(other._members))
+          : _members(HPX_MOVE(other._members))
         {
         }
 #endif
@@ -297,7 +297,7 @@ namespace hpx {
         template <std::size_t... Is, typename UTuple>
         constexpr HPX_HOST_DEVICE tuple(util::index_pack<Is...>, UTuple&& other)
           : _members(std::piecewise_construct,
-                hpx::get<Is>(std::forward<UTuple>(other))...)
+                hpx::get<Is>(HPX_FORWARD(UTuple, other))...)
         {
         }
 
@@ -305,7 +305,7 @@ namespace hpx {
         // template <class... UTypes> constexpr tuple(const tuple<UTypes...>& u);
         // template <class... UTypes> constexpr tuple(tuple<UTypes...>&& u);
         // For all i, initializes the ith element of *this with
-        // get<i>(std::forward<U>(u)).
+        // get<i>(HPX_FORWARD(U, u)).
         // This constructor shall not participate in overload resolution
         // unless each type in UTypes is implicitly convertible to its
         // corresponding type in Types
@@ -315,7 +315,7 @@ namespace hpx {
             typename EnableCompatible = typename std::enable_if<
                 hpx::detail::are_tuples_compatible<tuple, UTuple>::value>::type>
         constexpr HPX_HOST_DEVICE tuple(UTuple&& other)
-          : tuple(index_pack{}, std::forward<UTuple>(other))
+          : tuple(index_pack{}, HPX_FORWARD(UTuple, other))
         {
         }
 
@@ -337,7 +337,7 @@ namespace hpx {
         {
             int const _sequencer[] = {
                 ((_members.template get<Is>() =
-                         std::move(other._members).template get<Is>()),
+                         HPX_MOVE(other._members).template get<Is>()),
                     0)...};
             (void) _sequencer;
         }
@@ -348,7 +348,7 @@ namespace hpx {
             int const _sequencer[] = {
                 ((_members.template get<Is>() =
                          // NOLINTNEXTLINE(bugprone-signed-char-misuse)
-                     hpx::get<Is>(std::forward<UTuple>(other))),
+                     hpx::get<Is>(HPX_FORWARD(UTuple, other))),
                     0)...};
             (void) _sequencer;
         }
@@ -363,20 +363,20 @@ namespace hpx {
         }
 
         // tuple& operator=(tuple&& u) noexcept(see below);
-        // For all i, assigns std::forward<Ti>(get<i>(u)) to get<i>(*this).
+        // For all i, assigns HPX_FORWARD(Ti, get<i>(u)) to get<i>(*this).
         HPX_HOST_DEVICE tuple& operator=(tuple&& other)
         {
-            assign_(index_pack{}, std::move(other));
+            assign_(index_pack{}, HPX_MOVE(other));
             return *this;
         }
 
         // template <class... UTypes> tuple& operator=(const tuple<UTypes...>& u);
         // template <class... UTypes> tuple& operator=(tuple<UTypes...>&& u);
-        // For all i, assigns get<i>(std::forward<U>(u)) to get<i>(*this).
+        // For all i, assigns get<i>(HPX_FORWARD(U, u)) to get<i>(*this).
         template <typename UTuple>
         HPX_HOST_DEVICE tuple& operator=(UTuple&& other)
         {
-            assign_(index_pack{}, std::forward<UTuple>(other));
+            assign_(index_pack{}, HPX_FORWARD(UTuple, other));
             return *this;
         }
 
@@ -419,7 +419,7 @@ namespace hpx {
         template <std::size_t... Is, typename UTuple>
         std::tuple<Ts...> make_tuple_(util::index_pack<Is...>, UTuple&& t)
         {
-            return std::make_tuple(hpx::get<Is>(std::forward<UTuple>(t))...);
+            return std::make_tuple(hpx::get<Is>(HPX_FORWARD(UTuple, t))...);
         }
 
     public:
@@ -438,13 +438,13 @@ namespace hpx {
         HPX_HOST_DEVICE
         operator std::tuple<Ts...>() &&
         {
-            return make_tuple_(index_pack{}, std::move(*this));
+            return make_tuple_(index_pack{}, HPX_MOVE(*this));
         }
 
         HPX_HOST_DEVICE
         operator std::tuple<Ts...>() const&&
         {
-            return make_tuple_(index_pack{}, std::move(*this));
+            return make_tuple_(index_pack{}, HPX_MOVE(*this));
         }
 #endif
 
@@ -629,13 +629,13 @@ namespace hpx {
         static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type&& get(
             std::tuple<Ts...>&& tuple) noexcept
         {
-            return std::get<I>(std::move(tuple));
+            return std::get<I>(HPX_MOVE(tuple));
         }
 
         static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type const&& get(
             std::tuple<Ts...> const&& tuple) noexcept
         {
-            return std::get<I>(std::move(tuple));
+            return std::get<I>(HPX_MOVE(tuple));
         }
     };
 #endif
@@ -738,7 +738,7 @@ namespace hpx {
         make_tuple(Ts&&... vs)
     {
         return tuple<typename util::decay_unwrap<Ts>::type...>(
-            std::forward<Ts>(vs)...);
+            HPX_FORWARD(Ts, vs)...);
     }
 
     // template<class... Types>
@@ -751,7 +751,7 @@ namespace hpx {
     HPX_HOST_DEVICE HPX_FORCEINLINE tuple<Ts&&...> forward_as_tuple(
         Ts&&... vs) noexcept
     {
-        return tuple<Ts&&...>(std::forward<Ts>(vs)...);
+        return tuple<Ts&&...>(HPX_FORWARD(Ts, vs)...);
     }
 
     // template<class... Types>
@@ -800,9 +800,9 @@ namespace hpx {
             template <typename THead, typename... TTail>
             static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
                 THead&& head, TTail&&... /*tail*/) noexcept
-                -> decltype(hpx::get<I>(std::forward<THead>(head)))
+                -> decltype(hpx::get<I>(HPX_FORWARD(THead, head)))
             {
-                return hpx::get<I>(std::forward<THead>(head));
+                return hpx::get<I>(HPX_FORWARD(THead, head));
             }
         };
 
@@ -817,9 +817,9 @@ namespace hpx {
             template <typename THead, typename... TTail>
             static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
                 THead&& /*head*/, TTail&&... tail) noexcept
-                -> decltype(_members::get(std::forward<TTail>(tail)...))
+                -> decltype(_members::get(HPX_FORWARD(TTail, tail)...))
             {
-                return _members::get(std::forward<TTail>(tail)...);
+                return _members::get(HPX_FORWARD(TTail, tail)...);
             }
         };
 
@@ -848,7 +848,7 @@ namespace hpx {
             return tuple_cat_result_of_t<decltype(is_pack),
                 decltype(tuple_pack)>{
                 tuple_cat_element<Is, util::pack<Tuples...>>::get(
-                    std::forward<Tuples_>(tuples)...)...};
+                    HPX_FORWARD(Tuples_, tuples)...)...};
         }
     }    // namespace detail
 
@@ -858,13 +858,13 @@ namespace hpx {
             typename util::make_index_pack<hpx::detail::tuple_cat_size<
                 typename std::decay<Tuples>::type...>::value>::type{},
             util::pack<typename std::decay<Tuples>::type...>{},
-            std::forward<Tuples>(tuples)...))
+            HPX_FORWARD(Tuples, tuples)...))
     {
         return hpx::detail::tuple_cat_impl(
             typename util::make_index_pack<hpx::detail::tuple_cat_size<
                 typename std::decay<Tuples>::type...>::value>::type{},
             util::pack<typename std::decay<Tuples>::type...>{},
-            std::forward<Tuples>(tuples)...);
+            HPX_FORWARD(Tuples, tuples)...);
     }
 
     // 20.4.2.7, relational operators
@@ -1046,7 +1046,7 @@ namespace hpx { namespace util {
         "hpx::util::make_tuple is deprecated. Use hpx::make_tuple instead.")
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto make_tuple(Ts&&... vs)
     {
-        return hpx::make_tuple(std::forward<Ts>(vs)...);
+        return hpx::make_tuple(HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename... Ts>
@@ -1054,7 +1054,7 @@ namespace hpx { namespace util {
         1, 6, "hpx::util::tie is deprecated. Use hpx::tie instead.")
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tie(Ts&&... vs)
     {
-        return hpx::tie(std::forward<Ts>(vs)...);
+        return hpx::tie(HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename... Ts>
@@ -1063,7 +1063,7 @@ namespace hpx { namespace util {
         "instead.")
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto forward_as_tuple(Ts&&... vs)
     {
-        return hpx::forward_as_tuple(std::forward<Ts>(vs)...);
+        return hpx::forward_as_tuple(HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename... Ts>
@@ -1072,7 +1072,7 @@ namespace hpx { namespace util {
         "instead.")
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(Ts&&... vs)
     {
-        return hpx::tuple_cat(std::forward<Ts>(vs)...);
+        return hpx::tuple_cat(HPX_FORWARD(Ts, vs)...);
     }
 
     template <std::size_t I, typename Tuple>
@@ -1081,7 +1081,7 @@ namespace hpx { namespace util {
         "instead.")
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto get(Tuple&& tuple)
     {
-        return hpx::get<I>(std::forward<Tuple>(tuple));
+        return hpx::get<I>(HPX_FORWARD(Tuple, tuple));
     }
 }}    // namespace hpx::util
 

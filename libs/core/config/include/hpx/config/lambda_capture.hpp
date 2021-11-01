@@ -12,16 +12,16 @@
 
 #include <utility>
 
-/// Evaluates to ``var = std::forward<decltype(var)>(var)`` if the compiler
+/// Evaluates to ``var = HPX_FORWARD(decltype(var), var)`` if the compiler
 /// supports C++14 Lambdas. Defaults to ``var``.
 ///
 /// This macro is deprecated. Prefer using ``var =
-/// std::forward<decltype((var))>(var)`` directly instead.
-#define HPX_CAPTURE_FORWARD(var) var = std::forward<decltype((var))>(var)
+/// HPX_FORWARD(decltype((var)), var)`` directly instead.
+#define HPX_CAPTURE_FORWARD(var) var = HPX_FORWARD(decltype((var)), var)
 
-///  Evaluates to ``var = std::move(var)`` if the compiler supports C++14
+///  Evaluates to ``var = HPX_MOVE(var)`` if the compiler supports C++14
 /// Lambdas. Defaults to `var`.
 ///
-/// This macro is deprecated. Prefer using ``var = std::move(var)`` directly
+/// This macro is deprecated. Prefer using ``var = HPX_MOVE(var)`` directly
 /// instead.
-#define HPX_CAPTURE_MOVE(var) var = std::move(var)
+#define HPX_CAPTURE_MOVE(var) var = HPX_MOVE(var)

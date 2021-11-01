@@ -135,7 +135,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor>(exec), parameters());
+                *this, HPX_FORWARD(Executor, exec), parameters());
         }
 
         /// Create a new sequenced_task_policy from the given
@@ -159,7 +159,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters>(params)...));
+                    HPX_FORWARD(Parameters, params)...));
         }
 
     public:
@@ -279,7 +279,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor_>(exec), parameters());
+                *this, HPX_FORWARD(Executor_, exec), parameters());
         }
 
         /// Create a new sequenced_task_policy_shim from the given
@@ -303,7 +303,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
         }
 
         /// Return the associated executor object.
@@ -343,8 +343,8 @@ namespace hpx { namespace execution {
         template <typename Executor_, typename Parameters_>
         constexpr sequenced_task_policy_shim(
             Executor_&& exec, Parameters_&& params)
-          : exec_(std::forward<Executor_>(exec))
-          , params_(std::forward<Parameters_>(params))
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
         {
         }
 
@@ -444,7 +444,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor>(exec), parameters());
+                *this, HPX_FORWARD(Executor, exec), parameters());
         }
 
         /// Create a new sequenced_policy from the given
@@ -468,7 +468,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters>(params)...));
+                    HPX_FORWARD(Parameters, params)...));
         }
 
     public:
@@ -588,7 +588,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor_>(exec), parameters());
+                *this, HPX_FORWARD(Executor_, exec), parameters());
         }
 
         /// Create a new sequenced_policy_shim from the given
@@ -612,7 +612,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
         }
 
     public:
@@ -652,8 +652,8 @@ namespace hpx { namespace execution {
 
         template <typename Executor_, typename Parameters_>
         constexpr sequenced_policy_shim(Executor_&& exec, Parameters_&& params)
-          : exec_(std::forward<Executor_>(exec))
-          , params_(std::forward<Parameters_>(params))
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
         {
         }
 
@@ -756,7 +756,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor>(exec), parameters());
+                *this, HPX_FORWARD(Executor, exec), parameters());
         }
 
         /// Create a new parallel_policy_shim from the given
@@ -780,7 +780,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters>(params)...));
+                    HPX_FORWARD(Parameters, params)...));
         }
 
     public:
@@ -899,7 +899,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor_>(exec), parameters());
+                *this, HPX_FORWARD(Executor_, exec), parameters());
         }
 
         /// Create a new parallel_policy_shim from the given
@@ -923,7 +923,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
         }
 
     public:
@@ -964,8 +964,8 @@ namespace hpx { namespace execution {
         template <typename Executor_, typename Parameters_>
         constexpr parallel_task_policy_shim(
             Executor_&& exec, Parameters_&& params)
-          : exec_(std::forward<Executor_>(exec))
-          , params_(std::forward<Parameters_>(params))
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
         {
         }
 
@@ -1062,7 +1062,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor>(exec), parameters());
+                *this, HPX_FORWARD(Executor, exec), parameters());
         }
 
         /// Create a new parallel_policy from the given
@@ -1085,7 +1085,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters>(params)...));
+                    HPX_FORWARD(Parameters, params)...));
         }
 
     public:
@@ -1208,7 +1208,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor_>(exec), parameters());
+                *this, HPX_FORWARD(Executor_, exec), parameters());
         }
 
         /// Create a new parallel_policy_shim from the given
@@ -1231,7 +1231,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
         }
 
     public:
@@ -1271,8 +1271,8 @@ namespace hpx { namespace execution {
 
         template <typename Executor_, typename Parameters_>
         constexpr parallel_policy_shim(Executor_&& exec, Parameters_&& params)
-          : exec_(std::forward<Executor_>(exec))
-          , params_(std::forward<Parameters_>(params))
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
         {
         }
 

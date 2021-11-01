@@ -139,11 +139,11 @@ namespace hpx { namespace util { namespace cache {
         local_cache(local_cache&& other)
           : max_size_(other.max_size_)
           , current_size_(other.current_size_)
-          , store_(std::move(other.store_))
-          , entry_heap_(std::move(other.entry_heap_))
-          , update_policy_(std::move(other.update_policy_.f_))
-          , insert_policy_(std::move(other.insert_policy_))
-          , statistics_(std::move(other.statistics_))
+          , store_(HPX_MOVE(other.store_))
+          , entry_heap_(HPX_MOVE(other.entry_heap_))
+          , update_policy_(HPX_MOVE(other.update_policy_.f_))
+          , insert_policy_(HPX_MOVE(other.insert_policy_))
+          , statistics_(HPX_MOVE(other.statistics_))
         {
         }
 

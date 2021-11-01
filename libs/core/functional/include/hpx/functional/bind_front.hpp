@@ -46,8 +46,8 @@ namespace hpx { namespace util {
                 typename = typename std::enable_if<
                     std::is_constructible<F, F_>::value>::type>
             constexpr explicit bound_front(F_&& f, Ts_&&... vs)
-              : _f(std::forward<F_>(f))
-              , _args(std::piecewise_construct, std::forward<Ts_>(vs)...)
+              : _f(HPX_FORWARD(F_, f))
+              , _args(std::piecewise_construct, HPX_FORWARD(Ts_, vs)...)
             {
             }
 
@@ -62,8 +62,8 @@ namespace hpx { namespace util {
             }
 
             constexpr HPX_HOST_DEVICE bound_front(bound_front&& other)
-              : _f(std::move(other._f))
-              , _args(std::move(other._args))
+              : _f(HPX_MOVE(other._f))
+              , _args(HPX_MOVE(other._args))
             {
             }
 #endif
@@ -76,7 +76,7 @@ namespace hpx { namespace util {
             operator()(Us&&... vs) &
             {
                 return HPX_INVOKE(
-                    _f, _args.template get<Is>()..., std::forward<Us>(vs)...);
+                    _f, _args.template get<Is>()..., HPX_FORWARD(Us, vs)...);
             }
 
             template <typename... Us>
@@ -86,7 +86,7 @@ namespace hpx { namespace util {
                 operator()(Us&&... vs) const&
             {
                 return HPX_INVOKE(
-                    _f, _args.template get<Is>()..., std::forward<Us>(vs)...);
+                    _f, _args.template get<Is>()..., HPX_FORWARD(Us, vs)...);
             }
 
             template <typename... Us>
@@ -94,9 +94,9 @@ namespace hpx { namespace util {
                 util::pack<Ts&&...>, Us&&...>::type
             operator()(Us&&... vs) &&
             {
-                return HPX_INVOKE(std::move(_f),
-                    std::move(_args).template get<Is>()...,
-                    std::forward<Us>(vs)...);
+                return HPX_INVOKE(HPX_MOVE(_f),
+                    HPX_MOVE(_args).template get<Is>()...,
+                    HPX_FORWARD(Us, vs)...);
             }
 
             template <typename... Us>
@@ -105,9 +105,9 @@ namespace hpx { namespace util {
                     util::pack<Ts const&&...>, Us&&...>::type
                 operator()(Us&&... vs) const&&
             {
-                return HPX_INVOKE(std::move(_f),
-                    std::move(_args).template get<Is>()...,
-                    std::forward<Us>(vs)...);
+                return HPX_INVOKE(HPX_MOVE(_f),
+                    HPX_MOVE(_args).template get<Is>()...,
+                    HPX_FORWARD(Us, vs)...);
             }
 
             template <typename Archive>
@@ -160,14 +160,14 @@ namespace hpx { namespace util {
             typename util::decay_unwrap<Ts>::type...>
             result_type;
 
-        return result_type(std::forward<F>(f), std::forward<Ts>(vs)...);
+        return result_type(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
     }
 
     // nullary functions do not need to be bound again
     template <typename F>
     constexpr typename std::decay<F>::type bind_front(F&& f)
     {
-        return std::forward<F>(f);
+        return HPX_FORWARD(F, f);
     }
 }}    // namespace hpx::util
 

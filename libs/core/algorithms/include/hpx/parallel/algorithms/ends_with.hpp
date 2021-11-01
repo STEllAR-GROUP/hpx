@@ -186,10 +186,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return false;
 
                 return hpx::parallel::v1::detail::equal_binary().call(
-                    hpx::execution::seq, std::next(std::move(first1), drop),
-                    std::move(last1), std::move(first2), std::move(last2),
-                    std::forward<Pred>(pred), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    hpx::execution::seq, std::next(HPX_MOVE(first1), drop),
+                    HPX_MOVE(last1), HPX_MOVE(first2), HPX_MOVE(last2),
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent1,
@@ -210,11 +210,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 return hpx::parallel::v1::detail::equal_binary().call(
-                    std::forward<ExPolicy>(policy),
-                    std::next(std::move(first1), drop), std::move(last1),
-                    std::move(first2), std::move(last2),
-                    std::forward<Pred>(pred), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(ExPolicy, policy),
+                    std::next(HPX_MOVE(first1), drop), HPX_MOVE(last1),
+                    HPX_MOVE(first2), HPX_MOVE(last2), HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
             }
         };
         /// \endcond
@@ -252,7 +251,7 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::ends_with().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                std::forward<Pred>(pred), parallel::util::projection_identity{},
+                HPX_FORWARD(Pred, pred), parallel::util::projection_identity{},
                 parallel::util::projection_identity{});
         }
 
@@ -282,8 +281,8 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::ends_with().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                std::forward<Pred>(pred), parallel::util::projection_identity{},
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                HPX_FORWARD(Pred, pred), parallel::util::projection_identity{},
                 parallel::util::projection_identity{});
         }
     } ends_with{};

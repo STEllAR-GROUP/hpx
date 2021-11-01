@@ -81,7 +81,7 @@ namespace hpx { namespace execution { namespace experimental {
             explicit operation_state_holder(
                 Sender_&& sender, allocator_type const& alloc)
               : alloc(alloc)
-              , op_state(connect(std::forward<Sender_>(sender),
+              , op_state(connect(HPX_FORWARD(Sender_, sender),
                     start_detached_receiver{this}))
             {
                 start(op_state);
@@ -137,7 +137,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
             new (p.get())
-                operation_state_type{std::forward<Sender>(sender), alloc};
+                operation_state_type{HPX_FORWARD(Sender, sender), alloc};
             HPX_UNUSED(p.release());
         }
 

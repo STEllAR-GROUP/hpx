@@ -37,7 +37,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         auto const& state =
-            traits::detail::get_shared_state(std::forward<T>(current));
+            traits::detail::get_shared_state(HPX_FORWARD(T, current));
 
         if (state.get() == nullptr)
         {
@@ -58,11 +58,11 @@ namespace hpx { namespace lcos { namespace detail {
     void async_detach_future(T&& current, N&& next)
     {
         auto const& state =
-            traits::detail::get_shared_state(std::forward<T>(current));
+            traits::detail::get_shared_state(HPX_FORWARD(T, current));
 
         // Attach a continuation to this future which will
         // re-evaluate it and continue to the next argument (if any).
-        state->set_on_completed(util::deferred_call(std::forward<N>(next)));
+        state->set_on_completed(util::deferred_call(HPX_FORWARD(N, next)));
     }
 
     // Acquire a future range from the given begin and end iterator

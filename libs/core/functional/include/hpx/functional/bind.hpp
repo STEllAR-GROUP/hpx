@@ -62,7 +62,7 @@ namespace hpx { namespace util {
                 T&& /*t*/, Us&&... vs)
             {
                 return util::member_pack_for<Us&&...>(
-                    std::piecewise_construct, std::forward<Us>(vs)...)
+                    std::piecewise_construct, HPX_FORWARD(Us, vs)...)
                     .template get<I>();
             }
         };
@@ -74,7 +74,7 @@ namespace hpx { namespace util {
             template <typename... Us>
             static constexpr HPX_HOST_DEVICE T&& call(T&& t, Us&&... /*vs*/)
             {
-                return std::forward<T>(t);
+                return HPX_FORWARD(T, t);
             }
         };
 
@@ -95,7 +95,7 @@ namespace hpx { namespace util {
             static constexpr HPX_HOST_DEVICE util::invoke_result_t<T, Us...>
             call(T&& t, Us&&... vs)
             {
-                return HPX_INVOKE(std::forward<T>(t), std::forward<Us>(vs)...);
+                return HPX_INVOKE(HPX_FORWARD(T, t), HPX_FORWARD(Us, vs)...);
             }
         };
 
@@ -129,8 +129,8 @@ namespace hpx { namespace util {
                 typename =
                     std::enable_if_t<std::is_constructible<F, F_>::value>>
             constexpr explicit bound(F_&& f, Ts_&&... vs)
-              : _f(std::forward<F_>(f))
-              , _args(std::piecewise_construct, std::forward<Ts_>(vs)...)
+              : _f(HPX_FORWARD(F_, f))
+              , _args(std::piecewise_construct, HPX_FORWARD(Ts_, vs)...)
             {
             }
 
@@ -145,8 +145,8 @@ namespace hpx { namespace util {
             }
 
             constexpr HPX_HOST_DEVICE bound(bound&& other)
-              : _f(std::move(other._f))
-              , _args(std::move(other._args))
+              : _f(HPX_MOVE(other._f))
+              , _args(HPX_MOVE(other._args))
             {
             }
 #endif
@@ -160,7 +160,7 @@ namespace hpx { namespace util {
             {
                 return HPX_INVOKE(_f,
                     detail::bind_eval<Ts&, sizeof...(Us)>::call(
-                        _args.template get<Is>(), std::forward<Us>(vs)...)...);
+                        _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
             template <typename... Us>
@@ -170,7 +170,7 @@ namespace hpx { namespace util {
             {
                 return HPX_INVOKE(_f,
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
-                        _args.template get<Is>(), std::forward<Us>(vs)...)...);
+                        _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
             template <typename... Us>
@@ -178,10 +178,10 @@ namespace hpx { namespace util {
                 invoke_bound_result_t<F&&, util::pack<Ts&&...>, Us&&...>
                 operator()(Us&&... vs) &&
             {
-                return HPX_INVOKE(std::move(_f),
+                return HPX_INVOKE(HPX_MOVE(_f),
                     detail::bind_eval<Ts, sizeof...(Us)>::call(
-                        std::move(_args).template get<Is>(),
-                        std::forward<Us>(vs)...)...);
+                        HPX_MOVE(_args).template get<Is>(),
+                        HPX_FORWARD(Us, vs)...)...);
             }
 
             template <typename... Us>
@@ -189,10 +189,10 @@ namespace hpx { namespace util {
                 util::pack<Ts const&&...>, Us&&...>
             operator()(Us&&... vs) const&&
             {
-                return HPX_INVOKE(std::move(_f),
+                return HPX_INVOKE(HPX_MOVE(_f),
                     detail::bind_eval<Ts const, sizeof...(Us)>::call(
-                        std::move(_args).template get<Is>(),
-                        std::forward<Us>(vs)...)...);
+                        HPX_MOVE(_args).template get<Is>(),
+                        HPX_FORWARD(Us, vs)...)...);
             }
 
             template <typename Archive>
@@ -248,7 +248,7 @@ namespace hpx { namespace util {
             util::make_index_pack_t<sizeof...(Ts)>,
             util::decay_unwrap_t<Ts>...>;
 
-        return result_type(std::forward<F>(f), std::forward<Ts>(vs)...);
+        return result_type(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
     }
 }}    // namespace hpx::util
 

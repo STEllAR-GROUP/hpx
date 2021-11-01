@@ -78,9 +78,9 @@ namespace hpx { namespace execution { namespace experimental {
 
                 template <typename Receiver_, typename Shape_, typename F_>
                 bulk_receiver(Receiver_&& receiver, Shape_&& shape, F_&& f)
-                  : receiver(std::forward<Receiver_>(receiver))
-                  , shape(std::forward<Shape_>(shape))
-                  , f(std::forward<F_>(f))
+                  : receiver(HPX_FORWARD(Receiver_, receiver))
+                  , shape(HPX_FORWARD(Shape_, shape))
+                  , f(HPX_FORWARD(F_, f))
                 {
                 }
 
@@ -89,13 +89,13 @@ namespace hpx { namespace execution { namespace experimental {
                     set_error_t, bulk_receiver&& r, Error&& error) noexcept
                 {
                     hpx::execution::experimental::set_error(
-                        std::move(r.receiver), std::forward<Error>(error));
+                        HPX_MOVE(r.receiver), HPX_FORWARD(Error, error));
                 }
 
                 friend void tag_invoke(set_done_t, bulk_receiver&& r) noexcept
                 {
                     hpx::execution::experimental::set_done(
-                        std::move(r.receiver));
+                        HPX_MOVE(r.receiver));
                 }
 
                 template <typename... Ts>
@@ -108,11 +108,11 @@ namespace hpx { namespace execution { namespace experimental {
                                 HPX_INVOKE(f, s, ts...);
                             }
                             hpx::execution::experimental::set_value(
-                                std::move(receiver), std::forward<Ts>(ts)...);
+                                HPX_MOVE(receiver), HPX_FORWARD(Ts, ts)...);
                         },
                         [&](std::exception_ptr ep) {
                             hpx::execution::experimental::set_error(
-                                std::move(receiver), std::move(ep));
+                                HPX_MOVE(receiver), HPX_MOVE(ep));
                         });
                 }
 
@@ -121,14 +121,14 @@ namespace hpx { namespace execution { namespace experimental {
                     set_value_t, bulk_receiver&& r, Ts&&... ts) noexcept
                     -> decltype(hpx::execution::experimental::set_value(
                                     std::declval<std::decay_t<Receiver>&&>(),
-                                    std::forward<Ts>(ts)...),
+                                    HPX_FORWARD(Ts, ts)...),
                         void())
                 {
                     // set_value is in a member function only because of a
                     // compiler bug in GCC 7. When the body of set_value is
                     // inlined here compilation fails with an internal compiler
                     // error.
-                    r.set_value(std::forward<Ts>(ts)...);
+                    r.set_value(HPX_FORWARD(Ts, ts)...);
                 }
             };
 
@@ -136,10 +136,9 @@ namespace hpx { namespace execution { namespace experimental {
             friend auto tag_invoke(
                 connect_t, bulk_sender&& s, Receiver&& receiver)
             {
-                return hpx::execution::experimental::connect(
-                    std::move(s.sender),
-                    bulk_receiver<Receiver>(std::forward<Receiver>(receiver),
-                        std::move(s.shape), std::move(s.f)));
+                return hpx::execution::experimental::connect(HPX_MOVE(s.sender),
+                    bulk_receiver<Receiver>(HPX_FORWARD(Receiver, receiver),
+                        HPX_MOVE(s.shape), HPX_MOVE(s.f)));
             }
 
             template <typename Receiver>
@@ -148,7 +147,7 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 return hpx::execution::experimental::connect(s.sender,
                     bulk_receiver<Receiver>(
-                        std::forward<Receiver>(receiver), s.shape, s.f));
+                        HPX_FORWARD(Receiver, receiver), s.shape, s.f));
             }
         };
     }    // namespace detail
@@ -173,8 +172,8 @@ namespace hpx { namespace execution { namespace experimental {
             auto scheduler =
                 hpx::execution::experimental::get_completion_scheduler<
                     hpx::execution::experimental::set_value_t>(sender);
-            return hpx::functional::tag_invoke(bulk_t{}, std::move(scheduler),
-                std::forward<Sender>(sender), shape, std::forward<F>(f));
+            return hpx::functional::tag_invoke(bulk_t{}, HPX_MOVE(scheduler),
+                HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f));
         }
 
         // clang-format off
@@ -189,9 +188,9 @@ namespace hpx { namespace execution { namespace experimental {
         {
             return detail::bulk_sender<Sender,
                 hpx::util::detail::counting_shape_type<Shape>, F>{
-                std::forward<Sender>(sender),
+                HPX_FORWARD(Sender, sender),
                 hpx::util::detail::make_counting_shape(shape),
-                std::forward<F>(f)};
+                HPX_FORWARD(F, f)};
         }
 
         // clang-format off
@@ -205,8 +204,8 @@ namespace hpx { namespace execution { namespace experimental {
             bulk_t, Sender&& sender, Shape&& shape, F&& f)
         {
             return detail::bulk_sender<Sender, Shape, F>{
-                std::forward<Sender>(sender), std::forward<Shape>(shape),
-                std::forward<F>(f)};
+                HPX_FORWARD(Sender, sender), HPX_FORWARD(Shape, shape),
+                HPX_FORWARD(F, f)};
         }
 
         template <typename Shape, typename F>
@@ -214,7 +213,7 @@ namespace hpx { namespace execution { namespace experimental {
             bulk_t, Shape&& shape, F&& f)
         {
             return detail::partial_algorithm<bulk_t, Shape, F>{
-                std::forward<Shape>(shape), std::forward<F>(f)};
+                HPX_FORWARD(Shape, shape), HPX_FORWARD(F, f)};
         }
     } bulk{};
 }}}    // namespace hpx::execution::experimental

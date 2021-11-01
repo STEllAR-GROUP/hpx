@@ -130,7 +130,7 @@ namespace hpx { namespace threads { namespace policies {
                 // pushing the new thread into the pending queue of the
                 // specified thread_queue
                 ++added;
-                schedule_work(std::move(tid), stealing);
+                schedule_work(HPX_MOVE(tid), stealing);
             }
 
             return added;
@@ -223,7 +223,7 @@ namespace hpx { namespace threads { namespace policies {
                     {
                         *id = tid;
                     }
-                    schedule_work(std::move(tid), false);
+                    schedule_work(HPX_MOVE(tid), false);
                 }
                 else
                 {
@@ -231,7 +231,7 @@ namespace hpx { namespace threads { namespace policies {
                     // returned to the caller as otherwise the thread would
                     // go out of scope right away.
                     HPX_ASSERT(id != nullptr);
-                    *id = std::move(tid);
+                    *id = HPX_MOVE(tid);
                 }
 
                 if (&ec != &throws)
@@ -253,7 +253,7 @@ namespace hpx { namespace threads { namespace policies {
             // later thread creation
             ++new_tasks_count_.data_;
 
-            new_task_items_.push(task_description(std::move(data)));
+            new_task_items_.push(task_description(HPX_MOVE(data)));
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -299,7 +299,7 @@ namespace hpx { namespace threads { namespace policies {
                 debug::dec<4>(work_items_count_.data_),
                 debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
             //
-            work_items_.push(std::move(thrd), other_end);
+            work_items_.push(HPX_MOVE(thrd), other_end);
 #ifdef DEBUG_QUEUE_EXTRA
             debug_queue(work_items_);
 #endif

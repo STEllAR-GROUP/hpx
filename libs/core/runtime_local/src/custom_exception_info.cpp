@@ -287,7 +287,7 @@ namespace hpx { namespace detail {
         // be thrown and annotate it with all the local information we have
         try
         {
-            throw_with_info(e, std::move(info));
+            throw_with_info(e, HPX_MOVE(info));
         }
         catch (...)
         {

@@ -63,10 +63,10 @@ namespace hpx { namespace lcos { namespace detail {
         ar >> value;
 
         hpx::intrusive_ptr<shared_state> p(
-            new shared_state(init_no_addref{}, in_place{}, std::move(value)),
+            new shared_state(init_no_addref{}, in_place{}, HPX_MOVE(value)),
             false);
 
-        f = hpx::traits::future_access<Future>::create(std::move(p));
+        f = hpx::traits::future_access<Future>::create(HPX_MOVE(p));
     }
 
     template <typename Archive, typename Future>
@@ -80,10 +80,10 @@ namespace hpx { namespace lcos { namespace detail {
             serialization::detail::constructor_selector<value_type>::create(ar);
 
         hpx::intrusive_ptr<shared_state> p(
-            new shared_state(init_no_addref{}, in_place{}, std::move(value)),
+            new shared_state(init_no_addref{}, in_place{}, HPX_MOVE(value)),
             false);
 
-        f = hpx::traits::future_access<Future>::create(std::move(p));
+        f = hpx::traits::future_access<Future>::create(HPX_MOVE(p));
     }
 
     template <typename Archive, typename Future>
@@ -110,10 +110,9 @@ namespace hpx { namespace lcos { namespace detail {
             ar >> exception;
 
             hpx::intrusive_ptr<shared_state> p(
-                new shared_state(init_no_addref{}, std::move(exception)),
-                false);
+                new shared_state(init_no_addref{}, HPX_MOVE(exception)), false);
 
-            f = hpx::traits::future_access<Future>::create(std::move(p));
+            f = hpx::traits::future_access<Future>::create(HPX_MOVE(p));
         }
         // NOLINTNEXTLINE(bugprone-branch-clone)
         else if (state == future_state::invalid)
@@ -144,7 +143,7 @@ namespace hpx { namespace lcos { namespace detail {
                     init_no_addref{}, in_place{}, hpx::util::unused),
                 false);
 
-            f = hpx::traits::future_access<Future>::create(std::move(p));
+            f = hpx::traits::future_access<Future>::create(HPX_MOVE(p));
         }
         else if (state == future_state::has_exception)
         {
@@ -152,10 +151,9 @@ namespace hpx { namespace lcos { namespace detail {
             ar >> exception;
 
             hpx::intrusive_ptr<shared_state> p(
-                new shared_state(init_no_addref{}, std::move(exception)),
-                false);
+                new shared_state(init_no_addref{}, HPX_MOVE(exception)), false);
 
-            f = hpx::traits::future_access<Future>::create(std::move(p));
+            f = hpx::traits::future_access<Future>::create(HPX_MOVE(p));
         }
         else if (state == future_state::invalid)
         {
@@ -325,7 +323,7 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename U>
         HPX_FORCEINLINE static U get(U&& u)
         {
-            return std::forward<U>(u);
+            return HPX_FORWARD(U, u);
         }
 
         static T get_default()
@@ -497,8 +495,8 @@ namespace hpx { namespace lcos { namespace detail {
     public:
         template <typename Receiver_>
         operation_state(Receiver_&& r, future_type f)
-          : receiver_(std::forward<Receiver_>(r))
-          , future_(std::move(f))
+          : receiver_(HPX_FORWARD(Receiver_, r))
+          , future_(HPX_MOVE(f))
         {
         }
 
@@ -534,19 +532,19 @@ namespace hpx { namespace lcos { namespace detail {
                         if (future_.has_value())
                         {
                             hpx::execution::experimental::set_value(
-                                std::move(receiver_));
+                                HPX_MOVE(receiver_));
                         }
                         else if (future_.has_exception())
                         {
                             hpx::execution::experimental::set_error(
-                                std::move(receiver_),
+                                HPX_MOVE(receiver_),
                                 future_.get_exception_ptr());
                         }
                     });
                 },
                 [&](std::exception_ptr ep) {
                     hpx::execution::experimental::set_error(
-                        std::move(receiver_), std::move(ep));
+                        HPX_MOVE(receiver_), HPX_MOVE(ep));
                 });
         }
 
@@ -569,19 +567,19 @@ namespace hpx { namespace lcos { namespace detail {
                         if (future_.has_value())
                         {
                             hpx::execution::experimental::set_value(
-                                std::move(receiver_), future_.get());
+                                HPX_MOVE(receiver_), future_.get());
                         }
                         else if (future_.has_exception())
                         {
                             hpx::execution::experimental::set_error(
-                                std::move(receiver_),
+                                HPX_MOVE(receiver_),
                                 future_.get_exception_ptr());
                         }
                     });
                 },
                 [&](std::exception_ptr ep) {
                     hpx::execution::experimental::set_error(
-                        std::move(receiver_), std::move(ep));
+                        HPX_MOVE(receiver_), HPX_MOVE(ep));
                 });
         }
 
@@ -627,7 +625,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         explicit future_base(hpx::intrusive_ptr<shared_state_type>&& p)
-          : shared_state_(std::move(p))
+          : shared_state_(HPX_MOVE(p))
         {
         }
 
@@ -637,7 +635,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         future_base(future_base&& other) noexcept
-          : shared_state_(std::move(other.shared_state_))
+          : shared_state_(HPX_MOVE(other.shared_state_))
         {
             other.shared_state_ = nullptr;
         }
@@ -660,7 +658,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             if (this != &other)
             {
-                shared_state_ = std::move(other.shared_state_);
+                shared_state_ = HPX_MOVE(other.shared_state_);
                 other.shared_state_ = nullptr;
             }
             return *this;
@@ -754,11 +752,11 @@ namespace hpx { namespace lcos { namespace detail {
         static auto then(Derived&& fut, F&& f, error_code& ec = throws)
             -> decltype(
                 future_then_dispatch<typename std::decay<F>::type>::call(
-                    std::move(fut), std::forward<F>(f)))
+                    HPX_MOVE(fut), HPX_FORWARD(F, f)))
         {
             using result_type = decltype(
                 future_then_dispatch<typename std::decay<F>::type>::call(
-                    std::move(fut), std::forward<F>(f)));
+                    HPX_MOVE(fut), HPX_FORWARD(F, f)));
 
             if (!fut.shared_state_)
             {
@@ -768,18 +766,18 @@ namespace hpx { namespace lcos { namespace detail {
             }
 
             return future_then_dispatch<typename std::decay<F>::type>::call(
-                std::move(fut), std::forward<F>(f));
+                HPX_MOVE(fut), HPX_FORWARD(F, f));
         }
 
         template <typename F, typename T0>
         static auto then(Derived&& fut, T0&& t0, F&& f, error_code& ec = throws)
             -> decltype(
                 future_then_dispatch<typename std::decay<T0>::type>::call(
-                    std::move(fut), std::forward<T0>(t0), std::forward<F>(f)))
+                    HPX_MOVE(fut), HPX_FORWARD(T0, t0), HPX_FORWARD(F, f)))
         {
             using result_type = decltype(
                 future_then_dispatch<typename std::decay<T0>::type>::call(
-                    std::move(fut), std::forward<T0>(t0), std::forward<F>(f)));
+                    HPX_MOVE(fut), HPX_FORWARD(T0, t0), HPX_FORWARD(F, f)));
 
             if (!fut.shared_state_)
             {
@@ -789,7 +787,7 @@ namespace hpx { namespace lcos { namespace detail {
             }
 
             return future_then_dispatch<typename std::decay<T0>::type>::call(
-                std::move(fut), std::forward<T0>(t0), std::forward<F>(f));
+                HPX_MOVE(fut), HPX_FORWARD(T0, t0), HPX_FORWARD(F, f));
         }
 
         template <typename Allocator, typename F>
@@ -797,11 +795,11 @@ namespace hpx { namespace lcos { namespace detail {
             error_code& ec = throws)
             -> decltype(
                 future_then_dispatch<typename std::decay<F>::type>::call_alloc(
-                    alloc, std::move(fut), std::forward<F>(f)))
+                    alloc, HPX_MOVE(fut), HPX_FORWARD(F, f)))
         {
             using result_type = decltype(
                 future_then_dispatch<typename std::decay<F>::type>::call_alloc(
-                    alloc, std::move(fut), std::forward<F>(f)));
+                    alloc, HPX_MOVE(fut), HPX_FORWARD(F, f)));
 
             if (!fut.shared_state_)
             {
@@ -811,8 +809,8 @@ namespace hpx { namespace lcos { namespace detail {
             }
 
             return future_then_dispatch<
-                typename std::decay<F>::type>::call_alloc(alloc, std::move(fut),
-                std::forward<F>(f));
+                typename std::decay<F>::type>::call_alloc(alloc, HPX_MOVE(fut),
+                HPX_FORWARD(F, f));
         }
 
         // Effects: blocks until the shared state is ready.
@@ -912,7 +910,7 @@ namespace hpx { namespace lcos {
             hpx::execution::experimental::connect_t, future&& f,
             Receiver&& receiver)
         {
-            return {std::forward<Receiver>(receiver), std::move(f)};
+            return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(f)};
         }
 
     private:
@@ -945,7 +943,7 @@ namespace hpx { namespace lcos {
         }
 
         explicit future(hpx::intrusive_ptr<shared_state_type>&& state)
-          : base_type(std::move(state))
+          : base_type(HPX_MOVE(state))
         {
         }
 
@@ -971,7 +969,7 @@ namespace hpx { namespace lcos {
         //     constructor invocation.
         //   - other.valid() == false.
         future(future&& other) noexcept
-          : base_type(std::move(other))
+          : base_type(HPX_MOVE(other))
         {
         }
 
@@ -982,8 +980,7 @@ namespace hpx { namespace lcos {
         //     constructor invocation.
         //   - other.valid() == false.
         future(future<future>&& other) noexcept
-          : base_type(
-                other.valid() ? detail::unwrap(std::move(other)) : nullptr)
+          : base_type(other.valid() ? detail::unwrap(HPX_MOVE(other)) : nullptr)
         {
         }
 
@@ -994,8 +991,7 @@ namespace hpx { namespace lcos {
         //     constructor invocation.
         //   - other.valid() == false.
         future(future<shared_future<R>>&& other) noexcept
-          : base_type(
-                other.valid() ? detail::unwrap(std::move(other)) : nullptr)
+          : base_type(other.valid() ? detail::unwrap(HPX_MOVE(other)) : nullptr)
         {
         }
 
@@ -1014,7 +1010,7 @@ namespace hpx { namespace lcos {
                                       nullptr)
         {
             traits::future_access<future<T>>::detach_shared_state(
-                std::move(other));
+                HPX_MOVE(other));
         }
 
         // Effects:
@@ -1031,22 +1027,22 @@ namespace hpx { namespace lcos {
         //   - other.valid() == false.
         future& operator=(future&& other) noexcept
         {
-            base_type::operator=(std::move(other));
+            base_type::operator=(HPX_MOVE(other));
             return *this;
         }
 
-        // Returns: shared_future<R>(std::move(*this)).
+        // Returns: shared_future<R>(HPX_MOVE(*this)).
         // Postcondition: valid() == false.
         shared_future<R> share()
         {
-            return shared_future<R>(std::move(*this));
+            return shared_future<R>(HPX_MOVE(*this));
         }
 
         // Effects: wait()s until the shared state is ready, then retrieves
         //          the value stored in the shared state.
         // Returns:
         //   - future::get() returns the value v stored in the object's
-        //     shared state as std::move(v).
+        //     shared state as HPX_MOVE(v).
         //   - future<R&>::get() returns the reference stored as value in the
         //     object's shared state.
         //   - future<void>::get() returns nothing.
@@ -1068,7 +1064,7 @@ namespace hpx { namespace lcos {
                 this->shared_state_);
 
             // no error has been reported, return the result
-            return detail::future_value<R>::get(std::move(*result));
+            return detail::future_value<R>::get(HPX_MOVE(*result));
         }
 
         typename hpx::traits::future_traits<future>::result_type get(
@@ -1090,7 +1086,7 @@ namespace hpx { namespace lcos {
                 return detail::future_value<R>::get_default();
 
             // no error has been reported, return the result
-            return detail::future_value<R>::get(std::move(*result));
+            return detail::future_value<R>::get(HPX_MOVE(*result));
         }
         using base_type::get_exception_ptr;
 
@@ -1110,11 +1106,11 @@ namespace hpx { namespace lcos {
             // specifying what entity it refers to.
             HPX_ASSERT(false);
             using future_type = decltype(
-                base_type::then(std::move(*this), std::forward<F>(f), ec));
+                base_type::then(HPX_MOVE(*this), HPX_FORWARD(F, f), ec));
             return future_type{};
 #else
             invalidate on_exit(*this);
-            return base_type::then(std::move(*this), std::forward<F>(f), ec);
+            return base_type::then(HPX_MOVE(*this), HPX_FORWARD(F, f), ec);
 #endif
         }
 
@@ -1123,30 +1119,34 @@ namespace hpx { namespace lcos {
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
-            using future_type = decltype(base_type::then(std::move(*this),
-                std::forward<T0>(t0), std::forward<F>(f), ec));
+            using future_type = decltype(base_type::then(
+                HPX_MOVE(*this), HPX_FORWARD(T0, t0), HPX_FORWARD(F, f), ec));
             return future_type{};
 #else
             invalidate on_exit(*this);
             return base_type::then(
-                std::move(*this), std::forward<T0>(t0), std::forward<F>(f), ec);
+                HPX_MOVE(*this), HPX_FORWARD(T0, t0), HPX_FORWARD(F, f), ec);
 #endif
         }
 
         template <typename Allocator, typename F>
         auto then_alloc(Allocator const& alloc, F&& f, error_code& ec = throws)
             -> decltype(base_type::then_alloc(
+#if defined(HPX_CUDA_VERSION) && (HPX_CUDA_VERSION < 1104)
                 alloc, std::move(*this), std::forward<F>(f), ec))
+#else
+                alloc, HPX_MOVE(*this), HPX_FORWARD(F, f), ec))
+#endif
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
             using future_type = decltype(base_type::then_alloc(
-                alloc, std::move(*this), std::forward<F>(f), ec));
+                alloc, HPX_MOVE(*this), HPX_FORWARD(F, f), ec));
             return future_type{};
 #else
             invalidate on_exit(*this);
             return base_type::then_alloc(
-                alloc, std::move(*this), std::forward<F>(f), ec);
+                alloc, HPX_MOVE(*this), HPX_FORWARD(F, f), ec);
 #endif
         }
 
@@ -1168,7 +1168,7 @@ namespace hpx { namespace lcos {
         if constexpr (std::is_convertible_v<hpx::lcos::future<U>,
                           hpx::lcos::future<R>>)
         {
-            return std::move(f);
+            return HPX_MOVE(f);
         }
         else
         {
@@ -1186,7 +1186,7 @@ namespace hpx { namespace lcos {
         if constexpr (std::is_convertible_v<hpx::lcos::future<U>,
                           hpx::lcos::future<R>>)
         {
-            return std::move(f);
+            return HPX_MOVE(f);
         }
         else
         {
@@ -1218,7 +1218,7 @@ namespace hpx { namespace lcos {
             hpx::execution::experimental::connect_t, shared_future&& f,
             Receiver&& receiver)
         {
-            return {std::forward<Receiver>(receiver), std::move(f)};
+            return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(f)};
         }
 
         template <typename Receiver>
@@ -1226,7 +1226,7 @@ namespace hpx { namespace lcos {
             hpx::execution::experimental::connect_t, shared_future& f,
             Receiver&& receiver)
         {
-            return {std::forward<Receiver>(receiver), f};
+            return {HPX_FORWARD(Receiver, receiver), f};
         }
 
     private:
@@ -1244,7 +1244,7 @@ namespace hpx { namespace lcos {
         }
 
         explicit shared_future(hpx::intrusive_ptr<shared_state_type>&& state)
-          : base_type(std::move(state))
+          : base_type(HPX_MOVE(state))
         {
         }
 
@@ -1278,7 +1278,7 @@ namespace hpx { namespace lcos {
         //     constructor invocation.
         //   - other.valid() == false.
         shared_future(shared_future&& other) noexcept
-          : base_type(std::move(other))
+          : base_type(HPX_MOVE(other))
         {
         }
 
@@ -1340,7 +1340,7 @@ namespace hpx { namespace lcos {
         //   - other.valid() == false.
         shared_future& operator=(shared_future&& other) noexcept
         {
-            base_type::operator=(std::move(other));
+            base_type::operator=(HPX_MOVE(other));
             return *this;
         }
 
@@ -1407,11 +1407,10 @@ namespace hpx { namespace lcos {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
             using future_type = decltype(
-                base_type::then(shared_future(*this), std::forward<F>(f), ec));
+                base_type::then(shared_future(*this), HPX_FORWARD(F, f), ec));
             return future_type{};
 #else
-            return base_type::then(
-                shared_future(*this), std::forward<F>(f), ec);
+            return base_type::then(shared_future(*this), HPX_FORWARD(F, f), ec);
 #endif
         }
 
@@ -1421,27 +1420,31 @@ namespace hpx { namespace lcos {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
             using future_type = decltype(base_type::then(shared_future(*this),
-                std::forward<T0>(t0), std::forward<F>(f), ec));
+                HPX_FORWARD(T0, t0), HPX_FORWARD(F, f), ec));
             return future_type{};
 #else
-            return base_type::then(shared_future(*this), std::forward<T0>(t0),
-                std::forward<F>(f), ec);
+            return base_type::then(shared_future(*this), HPX_FORWARD(T0, t0),
+                HPX_FORWARD(F, f), ec);
 #endif
         }
 
         template <typename Allocator, typename F>
         auto then_alloc(Allocator const& alloc, F&& f, error_code& ec = throws)
             -> decltype(base_type::then_alloc(
+#if defined(HPX_CUDA_VERSION) && (HPX_CUDA_VERSION < 1104)
                 alloc, std::move(*this), std::forward<F>(f), ec))
+#else
+                alloc, HPX_MOVE(*this), HPX_FORWARD(F, f), ec))
+#endif
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
             using future_type = decltype(base_type::then_alloc(
-                alloc, shared_future(*this), std::forward<F>(f), ec));
+                alloc, shared_future(*this), HPX_FORWARD(F, f), ec));
             return future_type{};
 #else
             return base_type::then_alloc(
-                alloc, shared_future(*this), std::forward<F>(f), ec);
+                alloc, shared_future(*this), HPX_FORWARD(F, f), ec);
 #endif
         }
 
@@ -1559,7 +1562,7 @@ namespace hpx { namespace lcos {
         unique_ptr p(traits::allocate(alloc, 1),
             util::allocator_deleter<other_allocator>{alloc});
         traits::construct(alloc, p.get(), init_no_addref{}, in_place{}, alloc,
-            std::forward<Ts>(ts)...);
+            HPX_FORWARD(Ts, ts)...);
 
         return hpx::traits::future_access<future<result_type>>::create(
             p.release(), false);
@@ -1574,7 +1577,7 @@ namespace hpx { namespace lcos {
         make_ready_future(Ts&&... ts)
     {
         return make_ready_future_alloc<T>(
-            hpx::util::internal_allocator<>{}, std::forward<Ts>(ts)...);
+            hpx::util::internal_allocator<>{}, HPX_FORWARD(Ts, ts)...);
     }
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object, with allocator
@@ -1583,7 +1586,7 @@ namespace hpx { namespace lcos {
         Allocator const& a, T&& init)
     {
         using result_type = typename hpx::util::decay_unwrap<T>::type;
-        return make_ready_future_alloc<result_type>(a, std::forward<T>(init));
+        return make_ready_future_alloc<result_type>(a, HPX_FORWARD(T, init));
     }
 
     // extension: create a pre-initialized future object
@@ -1593,7 +1596,7 @@ namespace hpx { namespace lcos {
     {
         using result_type = typename hpx::util::decay_unwrap<T>::type;
         return make_ready_future_alloc<result_type>(
-            hpx::util::internal_allocator<>{}, std::forward<T>(init));
+            hpx::util::internal_allocator<>{}, HPX_FORWARD(T, init));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1608,7 +1611,7 @@ namespace hpx { namespace lcos {
         hpx::intrusive_ptr<shared_state> p(
             new shared_state(init_no_addref{}, e), false);
 
-        return hpx::traits::future_access<future<T>>::create(std::move(p));
+        return hpx::traits::future_access<future<T>>::create(HPX_MOVE(p));
     }
 
     template <typename T, typename E>
@@ -1637,17 +1640,17 @@ namespace hpx { namespace lcos {
         typedef lcos::detail::timed_future_data<result_type> shared_state;
 
         hpx::intrusive_ptr<shared_state> p(
-            new shared_state(abs_time.value(), std::forward<T>(init)));
+            new shared_state(abs_time.value(), HPX_FORWARD(T, init)));
 
         return hpx::traits::future_access<future<result_type>>::create(
-            std::move(p));
+            HPX_MOVE(p));
     }
 
     template <int DeductionGuard = 0, typename T>
     future<typename hpx::util::decay_unwrap<T>::type> make_ready_future_after(
         hpx::chrono::steady_duration const& rel_time, T&& init)
     {
-        return make_ready_future_at(rel_time.from_now(), std::forward<T>(init));
+        return make_ready_future_at(rel_time.from_now(), HPX_FORWARD(T, init));
     }
 
     ///////////////////////////////////////////////////////////////////////////

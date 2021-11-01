@@ -208,8 +208,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                auto f1 = [tok, first, comp = std::forward<Comp>(comp),
-                              proj = std::forward<Proj>(proj)](Iter it,
+                auto f1 = [tok, first, comp = HPX_FORWARD(Comp, comp),
+                              proj = HPX_FORWARD(Proj, proj)](Iter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
@@ -238,8 +238,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 return util::partitioner<ExPolicy, bool, void>::call_with_index(
-                    std::forward<ExPolicy>(policy), second, count, 1,
-                    std::move(f1), std::move(f2));
+                    HPX_FORWARD(ExPolicy, policy), second, count, 1,
+                    HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
 
@@ -256,8 +256,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static bool sequential(
                 ExPolicy&&, Iter first, Sent last, Comp&& comp, Proj&& proj)
             {
-                return sequential_is_heap(first, last, std::forward<Comp>(comp),
-                    std::forward<Proj>(proj));
+                return sequential_is_heap(first, last, HPX_FORWARD(Comp, comp),
+                    HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -266,8 +266,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             parallel(ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
                 Proj&& proj)
             {
-                return is_heap_helper()(std::forward<ExPolicy>(policy), first,
-                    last, std::forward<Comp>(comp), std::forward<Proj>(proj));
+                return is_heap_helper()(HPX_FORWARD(ExPolicy, policy), first,
+                    last, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
             }
         };
     }    // namespace detail
@@ -298,8 +298,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::is_heap<RandIter>().call(std::forward<ExPolicy>(policy),
-            first, last, std::forward<Comp>(comp), std::forward<Proj>(proj));
+        return detail::is_heap<RandIter>().call(HPX_FORWARD(ExPolicy, policy),
+            first, last, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -345,7 +345,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 difference_type count = detail::distance(first, last);
                 if (count <= 1)
                 {
-                    return result::get(std::move(last));
+                    return result::get(HPX_MOVE(last));
                 }
 
                 Iter second = first + 1;
@@ -353,8 +353,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                auto f1 = [tok, first, comp = std::forward<Comp>(comp),
-                              proj = std::forward<Proj>(proj)](Iter it,
+                auto f1 = [tok, first, comp = HPX_FORWARD(Comp, comp),
+                              proj = HPX_FORWARD(Proj, proj)](Iter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable {
                     util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
@@ -381,12 +381,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     std::advance(second, find_res);
 
-                    return std::move(second);
+                    return HPX_MOVE(second);
                 };
 
                 return util::partitioner<ExPolicy, Iter, void>::call_with_index(
-                    std::forward<ExPolicy>(policy), second, count, 1,
-                    std::move(f1), std::move(f2));
+                    HPX_FORWARD(ExPolicy, policy), second, count, 1,
+                    HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
 
@@ -405,7 +405,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy&&, Iter first, Sent last, Comp&& comp, Proj&& proj)
             {
                 return sequential_is_heap_until(first, last,
-                    std::forward<Comp>(comp), std::forward<Proj>(proj));
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -414,9 +414,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             parallel(ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
                 Proj&& proj)
             {
-                return is_heap_until_helper()(std::forward<ExPolicy>(policy),
-                    first, last, std::forward<Comp>(comp),
-                    std::forward<Proj>(proj));
+                return is_heap_until_helper()(HPX_FORWARD(ExPolicy, policy),
+                    first, last, HPX_FORWARD(Comp, comp),
+                    HPX_FORWARD(Proj, proj));
             }
         };
     }    // namespace detail
@@ -449,8 +449,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::is_heap_until<RandIter>().call(
-            std::forward<ExPolicy>(policy), first, last,
-            std::forward<Comp>(comp), std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(Comp, comp),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -487,8 +487,8 @@ namespace hpx {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::is_heap<RandIter>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Comp>(comp),
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Comp, comp),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -511,7 +511,7 @@ namespace hpx {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::is_heap<RandIter>().call(
-                hpx::execution::seq, first, last, std::forward<Comp>(comp),
+                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
                 hpx::parallel::util::projection_identity{});
         }
     } is_heap{};
@@ -544,8 +544,8 @@ namespace hpx {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::is_heap_until<RandIter>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Comp>(comp),
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Comp, comp),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -568,7 +568,7 @@ namespace hpx {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::is_heap_until<RandIter>().call(
-                hpx::execution::seq, first, last, std::forward<Comp>(comp),
+                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
                 hpx::parallel::util::projection_identity{});
         }
     } is_heap_until{};

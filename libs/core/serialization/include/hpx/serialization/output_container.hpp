@@ -93,7 +93,7 @@ namespace hpx { namespace serialization {
 
             void push_back(serialization_chunk&& chunk)
             {
-                chunks_->push_back(std::move(chunk));
+                chunks_->push_back(HPX_MOVE(chunk));
             }
 
             void reset()
@@ -140,7 +140,7 @@ namespace hpx { namespace serialization {
 
             void push_back(serialization_chunk&& chunk)
             {
-                chunk_ = std::move(chunk);
+                chunk_ = HPX_MOVE(chunk);
                 ++num_chunks_;
             }
 

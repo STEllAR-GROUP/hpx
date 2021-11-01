@@ -33,7 +33,7 @@ namespace hpx { namespace resiliency { namespace experimental {
             template <typename T>
             constexpr T operator()(std::vector<T>&& vect) const
             {
-                return std::move(vect.at(0));
+                return HPX_MOVE(vect.at(0));
             }
         };
 

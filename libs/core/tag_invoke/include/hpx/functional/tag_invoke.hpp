@@ -17,7 +17,7 @@ namespace hpx { namespace functional {
         ///
         /// The evaluation of the expression `hpx::tag_invoke(tag, args...)` is
         /// equivalent to evaluating the unqualified call to
-        /// `tag_invoke(decay-copy(tag), std::forward<Args>(args)...)`.
+        /// `tag_invoke(decay-copy(tag), HPX_FORWARD(Args, args)...)`.
         ///
         /// `hpx::functional::tag_invoke` is implemented against P1895.
         ///
@@ -121,11 +121,11 @@ namespace hpx { namespace functional {
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Tag tag, Ts&&... ts) const
                 noexcept(noexcept(
-                    tag_invoke(std::declval<Tag>(), std::forward<Ts>(ts)...)))
-                    -> decltype(tag_invoke(
-                        std::declval<Tag>(), std::forward<Ts>(ts)...))
+                    tag_invoke(std::declval<Tag>(), HPX_FORWARD(Ts, ts)...)))
+                    -> decltype(
+                        tag_invoke(std::declval<Tag>(), HPX_FORWARD(Ts, ts)...))
             {
-                return tag_invoke(tag, std::forward<Ts>(ts)...);
+                return tag_invoke(tag, HPX_FORWARD(Ts, ts)...);
             }
 
             friend constexpr bool operator==(tag_invoke_t, tag_invoke_t)
@@ -226,8 +226,8 @@ namespace hpx { namespace functional {
                 noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
                     -> tag_invoke_result_t<Tag, Args...>
             {
-                return tag_invoke(static_cast<Tag const&>(*this),
-                    std::forward<Args>(args)...);
+                return tag_invoke(
+                    static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
         };
 
@@ -241,8 +241,8 @@ namespace hpx { namespace functional {
                 Args&&... args) const noexcept
                 -> tag_invoke_result_t<Tag, decltype(args)...>
             {
-                return tag_invoke(static_cast<Tag const&>(*this),
-                    std::forward<Args>(args)...);
+                return tag_invoke(
+                    static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
         };
     }    // namespace tag_base_ns

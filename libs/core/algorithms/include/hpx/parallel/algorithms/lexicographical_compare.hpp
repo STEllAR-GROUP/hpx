@@ -287,9 +287,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, bool, void>::call_with_index(
-                    std::forward<ExPolicy>(policy),
-                    make_zip_iterator(first1, first2), count, 1, std::move(f1),
-                    std::move(f2));
+                    HPX_FORWARD(ExPolicy, policy),
+                    make_zip_iterator(first1, first2), count, 1, HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -326,9 +326,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::lexicographical_compare().call(
-            std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-            std::forward<Pred>(pred),
-            hpx::parallel::util::projection_identity{},
+            HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+            HPX_FORWARD(Pred, pred), hpx::parallel::util::projection_identity{},
             hpx::parallel::util::projection_identity{});
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -366,7 +365,7 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::lexicographical_compare().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                std::forward<Pred>(pred),
+                HPX_FORWARD(Pred, pred),
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }
@@ -396,8 +395,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::lexicographical_compare().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                std::forward<Pred>(pred),
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                HPX_FORWARD(Pred, pred),
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }

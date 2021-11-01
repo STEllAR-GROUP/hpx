@@ -32,13 +32,13 @@ namespace hpx {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
 
-            detail::apply_impl<set_action>(target, std::move(addr),
-                actions::action_priority<set_action>());
+            detail::apply_impl<set_action>(
+                target, HPX_MOVE(addr), actions::action_priority<set_action>());
         }
         else
         {
             detail::apply_impl<set_action>(
-                id, std::move(addr), actions::action_priority<set_action>());
+                id, HPX_MOVE(addr), actions::action_priority<set_action>());
         }
 #else
         HPX_ASSERT(false);
@@ -66,15 +66,14 @@ namespace hpx {
             detail::apply_impl<set_action>(
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(cont),
-                target, std::move(addr),
-                actions::action_priority<set_action>());
+                target, HPX_MOVE(addr), actions::action_priority<set_action>());
         }
         else
         {
             detail::apply_impl<set_action>(
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(cont),
-                id, std::move(addr), actions::action_priority<set_action>());
+                id, HPX_MOVE(addr), actions::action_priority<set_action>());
         }
 #else
         HPX_ASSERT(false);
@@ -96,13 +95,13 @@ namespace hpx {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
 
-            detail::apply_impl<set_action>(target, std::move(addr),
+            detail::apply_impl<set_action>(target, HPX_MOVE(addr),
                 actions::action_priority<set_action>(), e);
         }
         else
         {
             detail::apply_impl<set_action>(
-                id, std::move(addr), actions::action_priority<set_action>(), e);
+                id, HPX_MOVE(addr), actions::action_priority<set_action>(), e);
         }
 #else
         HPX_ASSERT(false);
@@ -125,13 +124,13 @@ namespace hpx {
             naming::id_type target(id.get_gid(), id_type::managed_move_credit);
             id.make_unmanaged();
 
-            detail::apply_impl<set_action>(target, std::move(addr),
-                actions::action_priority<set_action>(), std::move(e));
+            detail::apply_impl<set_action>(target, HPX_MOVE(addr),
+                actions::action_priority<set_action>(), HPX_MOVE(e));
         }
         else
         {
-            detail::apply_impl<set_action>(id, std::move(addr),
-                actions::action_priority<set_action>(), std::move(e));
+            detail::apply_impl<set_action>(id, HPX_MOVE(addr),
+                actions::action_priority<set_action>(), HPX_MOVE(e));
         }
 #else
         HPX_ASSERT(false);
@@ -161,7 +160,7 @@ namespace hpx {
             detail::apply_impl<set_action>(
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(cont),
-                target, std::move(addr), actions::action_priority<set_action>(),
+                target, HPX_MOVE(addr), actions::action_priority<set_action>(),
                 e);
         }
         else
@@ -169,7 +168,7 @@ namespace hpx {
             detail::apply_impl<set_action>(
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(cont),
-                id, std::move(addr), actions::action_priority<set_action>(), e);
+                id, HPX_MOVE(addr), actions::action_priority<set_action>(), e);
         }
 #else
         HPX_ASSERT(false);
@@ -200,16 +199,16 @@ namespace hpx {
             detail::apply_impl<set_action>(
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(cont),
-                target, std::move(addr), actions::action_priority<set_action>(),
-                std::move(e));
+                target, HPX_MOVE(addr), actions::action_priority<set_action>(),
+                HPX_MOVE(e));
         }
         else
         {
             detail::apply_impl<set_action>(
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(cont),
-                id, std::move(addr), actions::action_priority<set_action>(),
-                std::move(e));
+                id, HPX_MOVE(addr), actions::action_priority<set_action>(),
+                HPX_MOVE(e));
         }
 #else
         HPX_ASSERT(false);

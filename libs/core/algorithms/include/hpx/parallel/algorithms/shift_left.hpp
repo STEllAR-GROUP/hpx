@@ -169,12 +169,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             if constexpr (hpx::traits::is_random_access_iterator_v<FwdIter>)
             {
                 return parallel::util::get_second_element(
-                    util::move_n(mid, dist - n, std::move(first)));
+                    util::move_n(mid, dist - n, HPX_MOVE(first)));
             }
             else
             {
-                return parallel::util::get_second_element(util::move(
-                    std::move(mid), std::move(last), std::move(first)));
+                return parallel::util::get_second_element(
+                    util::move(HPX_MOVE(mid), HPX_MOVE(last), HPX_MOVE(first)));
             }
         }
 
@@ -212,7 +212,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (n <= 0 || static_cast<std::size_t>(n) >= dist)
                 {
                     return parallel::util::detail::algorithm_result<ExPolicy,
-                        FwdIter2>::get(std::move(first));
+                        FwdIter2>::get(HPX_MOVE(first));
                 }
 
                 return util::detail::algorithm_result<ExPolicy, FwdIter2>::get(
@@ -262,7 +262,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, last, n);
+                HPX_FORWARD(ExPolicy, policy), first, last, n);
         }
     } shift_left{};
 }    // namespace hpx

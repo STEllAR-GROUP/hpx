@@ -58,7 +58,7 @@ namespace hpx { namespace util {
         invoke_fused_impl(index_pack<Is...>, F&& f, Tuple&& t)
         {
             return HPX_INVOKE(
-                std::forward<F>(f), hpx::get<Is>(std::forward<Tuple>(t))...);
+                HPX_FORWARD(F, f), hpx::get<Is>(HPX_FORWARD(Tuple, t))...);
         }
     }    // namespace detail
 
@@ -86,7 +86,7 @@ namespace hpx { namespace util {
     {
         using index_pack = typename detail::fused_index_pack<Tuple>::type;
         return detail::invoke_fused_impl(
-            index_pack{}, std::forward<F>(f), std::forward<Tuple>(t));
+            index_pack{}, HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t));
     }
 
     /// \copydoc invoke_fused
@@ -99,7 +99,7 @@ namespace hpx { namespace util {
         using index_pack = typename detail::fused_index_pack<Tuple>::type;
         return util::void_guard<R>(),
                detail::invoke_fused_impl(
-                   index_pack{}, std::forward<F>(f), std::forward<Tuple>(t));
+                   index_pack{}, HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ namespace hpx { namespace util {
                 using index_pack =
                     typename util::detail::fused_index_pack<Tuple>::type;
                 return util::detail::invoke_fused_impl(
-                    index_pack{}, std::forward<F>(f), std::forward<Tuple>(t));
+                    index_pack{}, HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t));
             }
         };
 
@@ -129,7 +129,7 @@ namespace hpx { namespace util {
                     typename util::detail::fused_index_pack<Tuple>::type;
                 return util::void_guard<R>(),
                        util::detail::invoke_fused_impl(index_pack{},
-                           std::forward<F>(f), std::forward<Tuple>(t));
+                           HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t));
             }
         };
     }    // namespace functional

@@ -261,8 +261,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy&& policy, FwdIter first, FwdIter new_first, Sent last)
             {
                 return util::detail::algorithm_result<ExPolicy, IterPair>::get(
-                    rotate_helper(std::forward<ExPolicy>(policy), first,
-                        new_first, last));
+                    rotate_helper(
+                        HPX_FORWARD(ExPolicy, policy), first, new_first, last));
             }
         };
         /// \endcond
@@ -290,7 +290,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 !hpx::traits::is_bidirectional_iterator_v<FwdIter>>;
 
         return detail::rotate<util::in_out_result<FwdIter, FwdIter>>().call2(
-            std::forward<ExPolicy>(policy), is_seq(), first, new_first, last);
+            HPX_FORWARD(ExPolicy, policy), is_seq(), first, new_first, last);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -306,9 +306,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             util::in_out_result<InIter, OutIter> p1 =
                 util::copy(new_first, last, dest_first);
             util::in_out_result<InIter, OutIter> p2 =
-                util::copy(first, new_first, std::move(p1.out));
+                util::copy(first, new_first, HPX_MOVE(p1.out));
             return util::in_out_result<InIter, OutIter>{
-                std::move(p1.in), std::move(p2.out)};
+                HPX_MOVE(p1.in), HPX_MOVE(p2.out)};
         }
 
         template <typename ExPolicy, typename FwdIter1, typename Sent,
@@ -363,7 +363,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Sent last, FwdIter2 dest_first)
             {
                 return util::detail::algorithm_result<ExPolicy, IterPair>::get(
-                    rotate_copy_helper(std::forward<ExPolicy>(policy), first,
+                    rotate_copy_helper(HPX_FORWARD(ExPolicy, policy), first,
                         new_first, last, dest_first));
             }
         };
@@ -395,7 +395,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 !hpx::traits::is_bidirectional_iterator_v<FwdIter1>>;
 
         return detail::rotate_copy<util::in_out_result<FwdIter1, FwdIter2>>()
-            .call2(std::forward<ExPolicy>(policy), is_seq(), first, new_first,
+            .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first, new_first,
                 last, dest_first);
     }
 }}}    // namespace hpx::parallel::v1
@@ -446,7 +446,7 @@ namespace hpx {
             return parallel::util::get_second_element(
                 hpx::parallel::v1::detail::rotate<
                     hpx::parallel::util::in_out_result<FwdIter, FwdIter>>()
-                    .call2(std::forward<ExPolicy>(policy), is_seq(), first,
+                    .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first,
                         new_first, last));
         }
 
@@ -505,7 +505,7 @@ namespace hpx {
             return parallel::util::get_second_element(
                 hpx::parallel::v1::detail::rotate_copy<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call2(std::forward<ExPolicy>(policy), is_seq(), first,
+                    .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first,
                         new_first, last, dest_first));
         }
     } rotate_copy{};

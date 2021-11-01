@@ -158,7 +158,7 @@ namespace hpx { namespace mpi { namespace experimental {
 
             // return a future bound to the shared state
             using traits::future_access;
-            return future_access<hpx::future<void>>::create(std::move(data));
+            return future_access<hpx::future<void>>::create(HPX_MOVE(data));
         }
         return hpx::make_ready_future<void>();
     }
@@ -211,7 +211,7 @@ namespace hpx { namespace mpi { namespace experimental {
         while (detail::get_request_queue().try_dequeue(val))
         {
             --(detail::get_mpi_info().request_queue_size_);
-            add_to_request_vector(std::move(val));
+            add_to_request_vector(HPX_MOVE(val));
         }
 
         bool keep_trying = !detail::get_active_requests().empty();

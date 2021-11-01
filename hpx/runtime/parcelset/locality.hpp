@@ -11,11 +11,11 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assert.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/serialization/map.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <map>
 #include <memory>
@@ -26,8 +26,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset
-{
+namespace hpx { namespace parcelset {
     ////////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT locality
     {
@@ -39,25 +38,25 @@ namespace hpx { namespace parcelset
         public:
             virtual ~impl_base() = default;
 
-            virtual bool equal(impl_base const & rhs) const = 0;
-            virtual bool less_than(impl_base const & rhs) const = 0;
+            virtual bool equal(impl_base const& rhs) const = 0;
+            virtual bool less_than(impl_base const& rhs) const = 0;
             virtual bool valid() const = 0;
-            virtual const char *type() const = 0;
-            virtual std::ostream & print(std::ostream & os) const = 0;
-            virtual void save(serialization::output_archive & ar) const = 0;
-            virtual void load(serialization::input_archive & ar) = 0;
-            virtual impl_base * clone() const = 0;
-            virtual impl_base * move() = 0;
+            virtual const char* type() const = 0;
+            virtual std::ostream& print(std::ostream& os) const = 0;
+            virtual void save(serialization::output_archive& ar) const = 0;
+            virtual void load(serialization::input_archive& ar) = 0;
+            virtual impl_base* clone() const = 0;
+            virtual impl_base* move() = 0;
 
             template <typename Impl>
-            Impl & get()
+            Impl& get()
             {
                 HPX_ASSERT(Impl::type() == type());
                 return static_cast<impl<Impl>*>(this)->impl_;
             }
 
             template <typename Impl>
-            Impl const & get() const
+            Impl const& get() const
             {
                 HPX_ASSERT(Impl::type() == type());
                 return static_cast<const impl<Impl>*>(this)->impl_;
@@ -73,11 +72,12 @@ namespace hpx { namespace parcelset
             typename Enable2 = typename std::enable_if<
                 !traits::is_iterator<Impl>::value>::type>
         explicit locality(Impl&& i)
-          : impl_(new impl<typename std::decay<Impl>::type>(
-                std::forward<Impl>(i)))
-        {}
+          : impl_(
+                new impl<typename std::decay<Impl>::type>(HPX_FORWARD(Impl, i)))
+        {
+        }
 
-        locality(locality const & other)
+        locality(locality const& other)
           : impl_(other.impl_ ? other.impl_->clone() : nullptr)
         {
         }
@@ -87,11 +87,11 @@ namespace hpx { namespace parcelset
         {
         }
 
-        locality & operator=(locality const & other)
+        locality& operator=(locality const& other)
         {
-            if(this != &other)
+            if (this != &other)
             {
-                if(other.impl_)
+                if (other.impl_)
                 {
                     impl_.reset(other.impl_->clone());
                 }
@@ -105,9 +105,9 @@ namespace hpx { namespace parcelset
 
         locality& operator=(locality&& other) noexcept
         {
-            if(this != &other)
+            if (this != &other)
             {
-                if(other.impl_)
+                if (other.impl_)
                 {
                     impl_.reset(other.impl_->move());
                 }
@@ -122,23 +122,23 @@ namespace hpx { namespace parcelset
         ///////////////////////////////////////////////////////////////////////
         explicit operator bool() const noexcept
         {
-            return impl_ ? impl_->valid(): false;
+            return impl_ ? impl_->valid() : false;
         }
 
-        const char *type() const
+        const char* type() const
         {
             return impl_ ? impl_->type() : "";
         }
 
         template <typename Impl>
-        Impl & get()
+        Impl& get()
         {
             HPX_ASSERT(impl_);
             return impl_->get<Impl>();
         }
 
         template <typename Impl>
-        Impl const & get() const
+        Impl const& get() const
         {
             HPX_ASSERT(impl_);
             return impl_->get<Impl>();
@@ -147,8 +147,10 @@ namespace hpx { namespace parcelset
     private:
         friend bool operator==(locality const& lhs, locality const& rhs)
         {
-            if(lhs.impl_ == rhs.impl_) return true;
-            if(!lhs.impl_ || !rhs.impl_) return false;
+            if (lhs.impl_ == rhs.impl_)
+                return true;
+            if (!lhs.impl_ || !rhs.impl_)
+                return false;
             return lhs.impl_->equal(*rhs.impl_);
         }
 
@@ -157,30 +159,36 @@ namespace hpx { namespace parcelset
             return !(lhs == rhs);
         }
 
-        friend bool operator< (locality const& lhs, locality const& rhs)
+        friend bool operator<(locality const& lhs, locality const& rhs)
         {
-            if(lhs.impl_ == rhs.impl_) return false;
-            if(!lhs.impl_ || ! rhs.impl_) return false;
+            if (lhs.impl_ == rhs.impl_)
+                return false;
+            if (!lhs.impl_ || !rhs.impl_)
+                return false;
             return lhs.impl_->less_than(*rhs.impl_);
         }
 
-        friend bool operator> (locality const& lhs, locality const& rhs)
+        friend bool operator>(locality const& lhs, locality const& rhs)
         {
-            if(lhs.impl_ == rhs.impl_) return false;
-            if(!lhs.impl_ || ! rhs.impl_) return false;
+            if (lhs.impl_ == rhs.impl_)
+                return false;
+            if (!lhs.impl_ || !rhs.impl_)
+                return false;
             return !(lhs < rhs) && !(lhs == rhs);
         }
 
-        friend std::ostream& operator<< (std::ostream& os, locality const& l)
+        friend std::ostream& operator<<(std::ostream& os, locality const& l)
         {
-            if(!l.impl_) return os;
+            if (!l.impl_)
+                return os;
             return l.impl_->print(os);
         }
 
         // serialization support
         friend class hpx::serialization::access;
 
-        void save(serialization::output_archive& ar, const unsigned int version) const;
+        void save(serialization::output_archive& ar,
+            const unsigned int version) const;
 
         void load(serialization::input_archive& ar, const unsigned int version);
 
@@ -192,16 +200,23 @@ namespace hpx { namespace parcelset
         class impl : public impl_base
         {
         public:
-            explicit impl(Impl && i) : impl_(std::move(i)) {}
-            explicit impl(Impl const & i) : impl_(i) {}
-
-            bool equal(impl_base const & rhs) const override
+            explicit impl(Impl&& i)
+              : impl_(HPX_MOVE(i))
             {
-                if(type() != rhs.type()) return false;
+            }
+            explicit impl(Impl const& i)
+              : impl_(i)
+            {
+            }
+
+            bool equal(impl_base const& rhs) const override
+            {
+                if (type() != rhs.type())
+                    return false;
                 return impl_ == rhs.get<Impl>();
             }
 
-            bool less_than(impl_base const & rhs) const override
+            bool less_than(impl_base const& rhs) const override
             {
                 return type() < rhs.type() ||
                     (type() == rhs.type() && impl_ < rhs.get<Impl>());
@@ -212,35 +227,35 @@ namespace hpx { namespace parcelset
                 return !!impl_;
             }
 
-            const char *type() const override
+            const char* type() const override
             {
                 return Impl::type();
             }
 
-            std::ostream & print(std::ostream & os) const override
+            std::ostream& print(std::ostream& os) const override
             {
                 os << impl_;
                 return os;
             }
 
-            void save(serialization::output_archive & ar) const override
+            void save(serialization::output_archive& ar) const override
             {
                 impl_.save(ar);
             }
 
-            void load(serialization::input_archive & ar) override
+            void load(serialization::input_archive& ar) override
             {
                 impl_.load(ar);
             }
 
-            impl_base * clone() const override
+            impl_base* clone() const override
             {
                 return new impl<Impl>(impl_);
             }
 
-            impl_base * move() override
+            impl_base* move() override
             {
-                return new impl<Impl>(std::move(impl_));
+                return new impl<Impl>(HPX_MOVE(impl_));
             }
 
             Impl impl_;
@@ -249,8 +264,7 @@ namespace hpx { namespace parcelset
 
     using endpoints_type = std::map<std::string, locality>;
 
-    std::ostream& operator<< (std::ostream& os, endpoints_type const& endpoints);
-}}
+    std::ostream& operator<<(std::ostream& os, endpoints_type const& endpoints);
+}}    // namespace hpx::parcelset
 
 #include <hpx/config/warnings_suffix.hpp>
-

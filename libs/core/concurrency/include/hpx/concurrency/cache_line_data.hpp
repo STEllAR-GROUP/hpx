@@ -79,7 +79,7 @@ namespace hpx {
             }
 
             cache_aligned_data(Data&& data)
-              : data_{std::move(data)}
+              : data_{HPX_MOVE(data)}
             {
             }
 
@@ -103,7 +103,7 @@ namespace hpx {
             cache_aligned_data() = default;
 
             cache_aligned_data(Data&& data)
-              : data_{std::move(data)}
+              : data_{HPX_MOVE(data)}
             {
             }
 
@@ -130,7 +130,7 @@ namespace hpx {
             }
 
             cache_aligned_data_derived(Data&& data)
-              : Data{std::move(data)}
+              : Data{HPX_MOVE(data)}
             {
             }
 
@@ -151,7 +151,7 @@ namespace hpx {
             cache_aligned_data_derived() = default;
 
             cache_aligned_data_derived(Data&& data)
-              : Data{std::move(data)}
+              : Data{HPX_MOVE(data)}
             {
             }
 

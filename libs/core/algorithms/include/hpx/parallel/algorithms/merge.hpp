@@ -255,7 +255,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Iter first, Sent last, T const& value, Comp&& comp, Proj&& proj)
             {
                 return detail::upper_bound(first, last, value,
-                    std::forward<Comp>(comp), std::forward<Proj>(proj));
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
             }
 
             using another_type = lower_bound_helper;
@@ -270,7 +270,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Iter first, Sent last, T const& value, Comp&& comp, Proj&& proj)
             {
                 return detail::lower_bound(first, last, value,
-                    std::forward<Comp>(comp), std::forward<Proj>(proj));
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
             }
 
             using another_type = upper_bound_helper;
@@ -295,14 +295,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (range_reversal)
                 {
                     sequential_merge(first2, last2, first1, last1, dest,
-                        std::forward<Comp>(comp), std::forward<Proj2>(proj2),
-                        std::forward<Proj1>(proj1));
+                        HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj2, proj2),
+                        HPX_FORWARD(Proj1, proj1));
                 }
                 else
                 {
                     sequential_merge(first1, last1, first2, last2, dest,
-                        std::forward<Comp>(comp), std::forward<Proj1>(proj1),
-                        std::forward<Proj2>(proj2));
+                        HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
+                        HPX_FORWARD(Proj2, proj2));
                 }
                 return;
             }
@@ -313,8 +313,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // For stability of algorithm, must switch binary search methods
                 // when swapping size1 and size2.
                 parallel_merge_helper(policy, first2, last2, first1, last1,
-                    dest, std::forward<Comp>(comp), std::forward<Proj2>(proj2),
-                    std::forward<Proj1>(proj1), !range_reversal,
+                    dest, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj2, proj2),
+                    HPX_FORWARD(Proj1, proj1), !range_reversal,
                     typename BinarySearchHelper::another_type());
                 return;
             }
@@ -341,8 +341,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 // Process right side ranges.
                 parallel_merge_helper(policy, mid1 + 1, last1, boundary2, last2,
-                    target + 1, std::forward<Comp>(comp),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2),
+                    target + 1, HPX_FORWARD(Comp, comp),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2),
                     range_reversal, BinarySearchHelper());
             }
             catch (...)
@@ -351,7 +351,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 std::vector<hpx::future<void>> futures;
                 futures.reserve(2);
-                futures.emplace_back(std::move(fut));
+                futures.emplace_back(HPX_MOVE(fut));
                 futures.emplace_back(hpx::make_exceptional_future<void>(
                     std::current_exception()));
 
@@ -377,15 +377,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
             using result_type = util::in_in_out_result<Iter1, Iter2, Iter3>;
 
             auto f1 = [first1, last1, first2, last2, dest,
-                          policy = std::forward<ExPolicy>(policy),
-                          comp = std::forward<Comp>(comp),
-                          proj1 = std::forward<Proj1>(proj1),
-                          proj2 = std::forward<Proj2>(proj2)]() -> result_type {
+                          policy = HPX_FORWARD(ExPolicy, policy),
+                          comp = HPX_FORWARD(Comp, comp),
+                          proj1 = HPX_FORWARD(Proj1, proj1),
+                          proj2 = HPX_FORWARD(
+                              Proj2, proj2)]() mutable -> result_type {
                 try
                 {
-                    parallel_merge_helper(std::move(policy), first1, last1,
-                        first2, last2, dest, std::move(comp), std::move(proj1),
-                        std::move(proj2), false, lower_bound_helper());
+                    parallel_merge_helper(HPX_MOVE(policy), first1, last1,
+                        first2, last2, dest, HPX_MOVE(comp), HPX_MOVE(proj1),
+                        HPX_MOVE(proj2), false, lower_bound_helper());
 
                     auto len1 = detail::distance(first1, last1);
                     auto len2 = detail::distance(first2, last2);
@@ -408,7 +409,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 HPX_ASSERT(false);
             };
 
-            return execution::async_execute(policy.executor(), std::move(f1));
+            return execution::async_execute(policy.executor(), HPX_MOVE(f1));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -428,8 +429,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Iter3 dest, Comp&& comp, Proj1&& proj1, Proj2&& proj2)
             {
                 return sequential_merge(first1, last1, first2, last2, dest,
-                    std::forward<Comp>(comp), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
             }
 
             template <typename ExPolicy, typename Iter1, typename Sent1,
@@ -448,10 +449,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 try
                 {
                     return algorithm_result::get(parallel_merge(
-                        std::forward<ExPolicy>(policy), first1, last1, first2,
-                        last2, dest, std::forward<Comp>(comp),
-                        std::forward<Proj1>(proj1),
-                        std::forward<Proj2>(proj2)));
+                        HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
+                        last2, dest, HPX_FORWARD(Comp, comp),
+                        HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2)));
                 }
                 catch (...)
                 {
@@ -511,9 +511,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::merge<result_type>().call(std::forward<ExPolicy>(policy),
-            first1, last1, first2, last2, dest, std::forward<Comp>(comp),
-            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        return detail::merge<result_type>().call(HPX_FORWARD(ExPolicy, policy),
+            first1, last1, first2, last2, dest, HPX_FORWARD(Comp, comp),
+            HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -532,7 +532,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 detail::advance_to_sentinel(middle, last),
                 util::compare_projected<typename std::decay<Comp>::type,
                     typename std::decay<Proj>::type>(
-                    std::forward<Comp>(comp), std::forward<Proj>(proj)));
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj)));
             return last;
         }
 
@@ -552,7 +552,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             if (left_size + right_size <= threshold)
             {
                 sequential_inplace_merge(first, middle, last,
-                    std::forward<Comp>(comp), std::forward<Proj>(proj));
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
                 return;
             }
 
@@ -595,7 +595,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     std::vector<hpx::future<void>> futures;
                     futures.reserve(2);
-                    futures.emplace_back(std::move(fut));
+                    futures.emplace_back(HPX_MOVE(fut));
                     futures.emplace_back(hpx::make_exceptional_future<void>(
                         std::current_exception()));
 
@@ -651,7 +651,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     std::vector<hpx::future<void>> futures;
                     futures.reserve(2);
-                    futures.emplace_back(std::move(fut));
+                    futures.emplace_back(HPX_MOVE(fut));
                     futures.emplace_back(hpx::make_exceptional_future<void>(
                         std::current_exception()));
 
@@ -676,12 +676,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             Iter first, Iter middle, Sent last, Comp&& comp, Proj&& proj)
         {
             return execution::async_execute(policy.executor(),
-                [policy, first, middle, last, comp = std::forward<Comp>(comp),
-                    proj = std::forward<Proj>(proj)]() mutable -> Iter {
+                [policy, first, middle, last, comp = HPX_FORWARD(Comp, comp),
+                    proj = HPX_FORWARD(Proj, proj)]() mutable -> Iter {
                     try
                     {
                         parallel_inplace_merge_helper(policy, first, middle,
-                            last, std::move(comp), std::move(proj));
+                            last, HPX_MOVE(comp), HPX_MOVE(proj));
                         return last;
                     }
                     catch (...)
@@ -711,7 +711,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Comp&& comp, Proj&& proj)
             {
                 return sequential_inplace_merge(first, middle, last,
-                    std::forward<Comp>(comp), std::forward<Proj>(proj));
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -725,8 +725,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 try
                 {
                     return result::get(parallel_inplace_merge(
-                        std::forward<ExPolicy>(policy), first, middle, last,
-                        std::forward<Comp>(comp), std::forward<Proj>(proj)));
+                        HPX_FORWARD(ExPolicy, policy), first, middle, last,
+                        HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj)));
                 }
                 catch (...)
                 {
@@ -746,7 +746,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Iter>
         inline hpx::future<void> get_void_result(hpx::future<Iter>&& f)
         {
-            return hpx::future<void>(std::move(f));
+            return hpx::future<void>(HPX_MOVE(f));
         }
     }    // namespace detail
 
@@ -781,8 +781,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::inplace_merge<RandIter>().call(
-            std::forward<ExPolicy>(policy), first, middle, last,
-            std::forward<Comp>(comp), std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), first, middle, last,
+            HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -832,8 +832,8 @@ namespace hpx {
 
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::v1::detail::merge<result_type>().call(
-                    std::forward<ExPolicy>(policy), first1, last1, first2,
-                    last2, dest, std::forward<Comp>(comp),
+                    HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                    dest, HPX_FORWARD(Comp, comp),
                     hpx::parallel::util::projection_identity(),
                     hpx::parallel::util::projection_identity()));
         }
@@ -871,7 +871,7 @@ namespace hpx {
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::v1::detail::merge<result_type>().call(
                     hpx::execution::seq, first1, last1, first2, last2, dest,
-                    std::forward<Comp>(comp),
+                    HPX_FORWARD(Comp, comp),
                     hpx::parallel::util::projection_identity(),
                     hpx::parallel::util::projection_identity()));
         }
@@ -906,8 +906,8 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::get_void_result(
                 hpx::parallel::v1::detail::inplace_merge<RandIter>().call(
-                    std::forward<ExPolicy>(policy), first, middle, last,
-                    std::forward<Comp>(comp),
+                    HPX_FORWARD(ExPolicy, policy), first, middle, last,
+                    HPX_FORWARD(Comp, comp),
                     hpx::parallel::util::projection_identity()));
         }
 
@@ -932,7 +932,7 @@ namespace hpx {
             return hpx::parallel::v1::detail::get_void_result(
                 hpx::parallel::v1::detail::inplace_merge<RandIter>().call(
                     hpx::execution::seq, first, middle, last,
-                    std::forward<Comp>(comp),
+                    HPX_FORWARD(Comp, comp),
                     hpx::parallel::util::projection_identity()));
         }
     } inplace_merge{};

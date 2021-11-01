@@ -41,9 +41,9 @@ namespace hpx { namespace lcos { namespace local {
 
         base_trigger(base_trigger&& rhs) noexcept
           : mtx_()
-          , promise_(std::move(rhs.promise_))
+          , promise_(HPX_MOVE(rhs.promise_))
           , generation_(rhs.generation_)
-          , conditions_(std::move(rhs.conditions_))
+          , conditions_(HPX_MOVE(rhs.conditions_))
         {
             rhs.generation_ = std::size_t(-1);
         }
@@ -54,10 +54,10 @@ namespace hpx { namespace lcos { namespace local {
             {
                 std::lock_guard<mutex_type> l(rhs.mtx_);
                 mtx_ = mutex_type();
-                promise_ = std::move(rhs.promise_);
+                promise_ = HPX_MOVE(rhs.promise_);
                 generation_ = rhs.generation_;
                 rhs.generation_ = std::size_t(-1);
-                conditions_ = std::move(rhs.conditions_);
+                conditions_ = HPX_MOVE(rhs.conditions_);
             }
             return *this;
         }
@@ -138,7 +138,7 @@ namespace hpx { namespace lcos { namespace local {
             future<void> get_future(
                 Condition&& func, error_code& ec = hpx::throws)
             {
-                return (*it_)->get_future(std::forward<Condition>(func), ec);
+                return (*it_)->get_future(HPX_FORWARD(Condition, func), ec);
             }
 
             base_trigger& this_;
@@ -228,14 +228,14 @@ namespace hpx { namespace lcos { namespace local {
         trigger() {}
 
         trigger(trigger&& rhs) noexcept
-          : base_type(std::move(static_cast<base_type&>(rhs)))
+          : base_type(HPX_MOVE(static_cast<base_type&>(rhs)))
         {
         }
 
         trigger& operator=(trigger&& rhs) noexcept
         {
             if (this != &rhs)
-                static_cast<base_type&>(*this) = std::move(rhs);
+                static_cast<base_type&>(*this) = HPX_MOVE(rhs);
             return *this;
         }
 

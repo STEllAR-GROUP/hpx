@@ -67,7 +67,7 @@ namespace hpx { namespace naming {
         {
         }
         id_type(id_type&& o) noexcept
-          : gid_(std::move(o.gid_))
+          : gid_(HPX_MOVE(o.gid_))
         {
         }
 
@@ -78,7 +78,7 @@ namespace hpx { namespace naming {
         }
         id_type& operator=(id_type&& o) noexcept
         {
-            gid_ = std::move(o.gid_);
+            gid_ = HPX_MOVE(o.gid_);
             return *this;
         }
 

@@ -476,8 +476,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::transform_exclusive_scan<
                 result_type>()
                 .call(hpx::execution::seq, first, last, dest,
-                    std::forward<UnOp>(unary_op), std::move(init),
-                    std::forward<BinOp>(binary_op));
+                    HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
+                    HPX_FORWARD(BinOp, binary_op));
         }
 
         // clang-format off
@@ -514,9 +514,9 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::transform_exclusive_scan<
                 result_type>()
-                .call(std::forward<ExPolicy>(policy), first, last, dest,
-                    std::forward<UnOp>(unary_op), std::move(init),
-                    std::forward<BinOp>(binary_op));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                    HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
+                    HPX_FORWARD(BinOp, binary_op));
         }
 
         // clang-format off
@@ -550,8 +550,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::transform_exclusive_scan<
                 result_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng), dest,
-                    std::forward<UnOp>(unary_op), std::move(init),
-                    std::forward<BinOp>(binary_op));
+                    HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
+                    HPX_FORWARD(BinOp, binary_op));
         }
 
         // clang-format off
@@ -587,9 +587,9 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::transform_exclusive_scan<
                 result_type>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng),
-                    std::end(rng), dest, std::forward<UnOp>(unary_op),
-                    std::move(init), std::forward<BinOp>(binary_op));
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
+                    std::end(rng), dest, HPX_FORWARD(UnOp, unary_op),
+                    HPX_MOVE(init), HPX_FORWARD(BinOp, binary_op));
         }
     } transform_exclusive_scan{};
 }}    // namespace hpx::ranges

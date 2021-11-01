@@ -161,14 +161,14 @@ namespace hpx { namespace lcos {
             inline static void call(
                 F&& f, IndexType index, FutureType&& future, std::true_type)
             {
-                f(index, std::forward<FutureType>(future));
+                f(index, HPX_FORWARD(FutureType, future));
             }
 
             template <typename F, typename IndexType, typename FutureType>
             inline static void call(
                 F&& f, IndexType, FutureType&& future, std::false_type)
             {
-                f(std::forward<FutureType>(future));
+                f(HPX_FORWARD(FutureType, future));
             }
         };
 
@@ -192,8 +192,8 @@ namespace hpx { namespace lcos {
         public:
             template <typename Tuple_, typename F_>
             when_each_frame(Tuple_&& t, F_&& f, std::size_t needed_count)
-              : t_(std::forward<Tuple_>(t))
-              , f_(std::forward<F_>(f))
+              : t_(HPX_FORWARD(Tuple_, t))
+              , f_(HPX_FORWARD(F_, f))
               , count_(0)
               , needed_count_(needed_count)
             {
@@ -234,18 +234,17 @@ namespace hpx { namespace lcos {
                             // (if any).
                             hpx::intrusive_ptr<when_each_frame> this_(this);
                             next_future_data->set_on_completed(
-                                [this_ = std::move(this_),
-                                    next = std::move(next),
-                                    end = std::move(end)]() mutable -> void {
+                                [this_ = HPX_MOVE(this_), next = HPX_MOVE(next),
+                                    end = HPX_MOVE(end)]() mutable -> void {
                                     return this_->template await_range<I>(
-                                        std::move(next), std::move(end));
+                                        HPX_MOVE(next), HPX_MOVE(end));
                                 });
                             return;
                         }
                     }
 
-                    dispatch::call(std::forward<F>(f_), count_++,
-                        std::move(*next),
+                    dispatch::call(HPX_FORWARD(F, f_), count_++,
+                        HPX_MOVE(*next),
                         typename is_invocable<F, std::size_t,
                             future_type>::type());
 
@@ -296,7 +295,7 @@ namespace hpx { namespace lcos {
                         // (if any).
                         hpx::intrusive_ptr<when_each_frame> this_(this);
                         next_future_data->set_on_completed(
-                            [this_ = std::move(this_)]() -> void {
+                            [this_ = HPX_MOVE(this_)]() -> void {
                                 return this_->template await_next<I>(
                                     std::true_type(), std::false_type());
                             });
@@ -304,7 +303,7 @@ namespace hpx { namespace lcos {
                     }
                 }
 
-                dispatch::call(std::forward<F>(f_), count_++, std::move(fut),
+                dispatch::call(HPX_FORWARD(F, f_), count_++, HPX_MOVE(fut),
                     typename is_invocable<F, std::size_t, future_type>::type());
 
                 if (count_ == needed_count_)
@@ -367,20 +366,20 @@ namespace hpx { namespace lcos {
 
         std::size_t lazy_values_size = lazy_values_.size();
         hpx::intrusive_ptr<frame_type> p(
-            new frame_type(hpx::forward_as_tuple(std::move(lazy_values_)),
-                std::forward<F>(func), lazy_values_size));
+            new frame_type(hpx::forward_as_tuple(HPX_MOVE(lazy_values_)),
+                HPX_FORWARD(F, func), lazy_values_size));
 
         p->do_await();
 
         using traits::future_access;
-        return future_access<typename frame_type::type>::create(std::move(p));
+        return future_access<typename frame_type::type>::create(HPX_MOVE(p));
     }
 
     template <typename F, typename Future>
     lcos::future<void>    //-V659
     when_each(F&& f, std::vector<Future>&& lazy_values)
     {
-        return lcos::when_each(std::forward<F>(f), lazy_values);
+        return lcos::when_each(HPX_FORWARD(F, f), lazy_values);
     }
 
     template <typename F, typename Iterator>
@@ -395,9 +394,9 @@ namespace hpx { namespace lcos {
         std::transform(begin, end, std::back_inserter(lazy_values_),
             traits::acquire_future_disp());
 
-        return lcos::when_each(std::forward<F>(f), lazy_values_)
+        return lcos::when_each(HPX_FORWARD(F, f), lazy_values_)
             .then(hpx::launch::sync,
-                [end = std::move(end)](lcos::future<void> fut) -> Iterator {
+                [end = HPX_MOVE(end)](lcos::future<void> fut) -> Iterator {
                     fut.get();    // rethrow exceptions, if any
                     return end;
                 });
@@ -416,9 +415,9 @@ namespace hpx { namespace lcos {
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
 
-        return lcos::when_each(std::forward<F>(f), lazy_values_)
+        return lcos::when_each(HPX_FORWARD(F, f), lazy_values_)
             .then(hpx::launch::sync,
-                [begin = std::move(begin)](lcos::future<void> fut) -> Iterator {
+                [begin = HPX_MOVE(begin)](lcos::future<void> fut) -> Iterator {
                     fut.get();    // rethrow exceptions, if any
                     return begin;
                 });
@@ -445,15 +444,15 @@ namespace hpx { namespace lcos {
         typedef detail::when_each_frame<argument_type, func_type> frame_type;
 
         traits::acquire_future_disp func;
-        argument_type lazy_values(func(std::forward<Ts>(ts))...);
+        argument_type lazy_values(func(HPX_FORWARD(Ts, ts))...);
 
         hpx::intrusive_ptr<frame_type> p(new frame_type(
-            std::move(lazy_values), std::forward<F>(f), sizeof...(Ts)));
+            HPX_MOVE(lazy_values), HPX_FORWARD(F, f), sizeof...(Ts)));
 
         p->do_await();
 
         using traits::future_access;
-        return future_access<typename frame_type::type>::create(std::move(p));
+        return future_access<typename frame_type::type>::create(HPX_MOVE(p));
     }
 }}    // namespace hpx::lcos
 

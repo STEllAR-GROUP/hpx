@@ -42,8 +42,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             while (++first != last)
             {
                 value_t val = *first;
-                *++dest = op(val, std::move(acc));
-                acc = std::move(val);
+                *++dest = op(val, HPX_MOVE(acc));
+                acc = HPX_MOVE(val);
             }
             return ++dest;
         }
@@ -61,7 +61,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         InIter first, Sent last, OutIter dest, Op&& op)
     {
         return sequential_adjacent_difference_t<ExPolicy>{}(
-            first, last, dest, std::forward<Op>(op));
+            first, last, dest, HPX_FORWARD(Op, op));
     }
 #endif
 

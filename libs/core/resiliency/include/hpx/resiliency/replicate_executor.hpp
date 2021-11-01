@@ -48,8 +48,8 @@ namespace hpx { namespace resiliency { namespace experimental {
             BaseExecutor& exec, std::size_t n, V&& v, F&& f)
           : exec_(exec)
           , replicate_count_(n)
-          , voter_(std::forward<V>(v))
-          , validator_(std::forward<F>(f))
+          , voter_(HPX_FORWARD(V, v))
+          , validator_(HPX_FORWARD(F, f))
         {
         }
 
@@ -73,8 +73,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         decltype(auto) async_execute(F&& f, Ts&&... ts) const
         {
             return async_replicate_vote_validate(exec_, replicate_count_,
-                voter_, validator_, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                voter_, validator_, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkTwoWayExecutor interface
@@ -170,7 +169,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         return replicate_executor<BaseExecutor,
             typename std::decay<Voter>::type,
             typename std::decay<Validate>::type>(exec, n,
-            std::forward<Voter>(voter), std::forward<Validate>(validate));
+            HPX_FORWARD(Voter, voter), HPX_FORWARD(Validate, validate));
     }
 
     template <typename BaseExecutor, typename Validate>
@@ -181,7 +180,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     {
         return replicate_executor<BaseExecutor, detail::replicate_voter,
             typename std::decay<Validate>::type>(exec, n,
-            detail::replicate_voter(), std::forward<Validate>(validate));
+            detail::replicate_voter(), HPX_FORWARD(Validate, validate));
     }
 
     template <typename BaseExecutor>

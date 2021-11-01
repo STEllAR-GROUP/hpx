@@ -504,8 +504,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         return hpx::parallel::v1::detail::remove_if<
             typename hpx::traits::range_iterator<Rng>::type>()
-            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), value, std::forward<Proj>(proj));
+            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), value, HPX_FORWARD(Proj, proj));
     }
 
     // clang-format off
@@ -528,9 +528,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         return hpx::parallel::v1::detail::remove_if<
             typename hpx::traits::range_iterator<Rng>::type>()
-            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -562,8 +562,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::util::make_subrange<Iter, Sent>(
                 hpx::parallel::v1::detail::remove_if<Iter>().call(
-                    hpx::execution::seq, first, sent, std::forward<Pred>(pred),
-                    std::forward<Proj>(proj)),
+                    hpx::execution::seq, first, sent, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj)),
                 sent);
         }
 
@@ -595,8 +595,8 @@ namespace hpx { namespace ranges {
                 hpx::parallel::v1::detail::remove_if<
                     typename hpx::traits::range_iterator<Rng>::type>()
                     .call(hpx::execution::seq, hpx::util::begin(rng),
-                        hpx::util::end(rng), std::forward<Pred>(pred),
-                        std::forward<Proj>(proj)),
+                        hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                        HPX_FORWARD(Proj, proj)),
                 hpx::util::end(rng));
         }
 
@@ -622,8 +622,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::util::make_subrange<FwdIter, Sent>(
                 hpx::parallel::v1::detail::remove_if<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), first, sent,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)),
+                    HPX_FORWARD(ExPolicy, policy), first, sent,
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)),
                 sent);
         }
 
@@ -653,9 +653,9 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::v1::detail::remove_if<
                     typename hpx::traits::range_iterator<Rng>::type>()
-                    .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                        hpx::util::end(rng), std::forward<Pred>(pred),
-                        std::forward<Proj>(proj)),
+                    .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                        hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                        HPX_FORWARD(Proj, proj)),
                 hpx::util::end(rng));
         }
     } remove_if{};
@@ -686,7 +686,7 @@ namespace hpx { namespace ranges {
             return hpx::ranges::remove_if(
                 first, last,
                 [value](Type const& a) -> bool { return value == a; },
-                std::forward<Proj>(proj));
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -711,9 +711,9 @@ namespace hpx { namespace ranges {
                 Type;
 
             return hpx::ranges::remove_if(
-                std::forward<Rng>(rng),
+                HPX_FORWARD(Rng, rng),
                 [value](Type const& a) -> bool { return value == a; },
-                std::forward<Proj>(proj));
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -737,9 +737,9 @@ namespace hpx { namespace ranges {
             typedef typename std::iterator_traits<FwdIter>::value_type Type;
 
             return hpx::ranges::remove_if(
-                std::forward<ExPolicy>(policy), first, last,
+                HPX_FORWARD(ExPolicy, policy), first, last,
                 [value](Type const& a) -> bool { return value == a; },
-                std::forward<Proj>(proj));
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -766,9 +766,9 @@ namespace hpx { namespace ranges {
                 Type;
 
             return hpx::ranges::remove_if(
-                std::forward<ExPolicy>(policy), std::forward<Rng>(rng),
+                HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Rng, rng),
                 [value](Type const& a) -> bool { return value == a; },
-                std::forward<Proj>(proj));
+                HPX_FORWARD(Proj, proj));
         }
 
     } remove{};

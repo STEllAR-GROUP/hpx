@@ -9,8 +9,8 @@
 #pragma once
 
 #include <hpx/synchronization/mutex.hpp>
-#include <plugins/parcelport/readers_writers_mutex.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
+#include <plugins/parcelport/readers_writers_mutex.hpp>
 //
 #include <unordered_map>
 #include <utility>
@@ -22,30 +22,25 @@
 //   map_type::map_read_lock_type read_lock(map.read_write_mutex());
 // in order to safely iterate over contents and block any writers from gaining access
 //
-namespace hpx {
-namespace concurrent {
+namespace hpx { namespace concurrent {
 
-    template<
-        class Key,
-        class Value,
-        class Hash = std::hash<Key>,
+    template <class Key, class Value, class Hash = std::hash<Key>,
         class KeyEqual = std::equal_to<Key>,
-        class Allocator = std::allocator<std::pair<const Key, Value>>
-    >
+        class Allocator = std::allocator<std::pair<const Key, Value>>>
     class unordered_map
     {
     public:
-
-        typedef hpx::lcos::local::readers_writer_mutex  rw_mutex_type;
-        typedef std::unique_lock<rw_mutex_type>         write_lock;
-        typedef std::shared_lock<rw_mutex_type>         read_lock;
-        typedef std::defer_lock_t                       defer_lock;
+        typedef hpx::lcos::local::readers_writer_mutex rw_mutex_type;
+        typedef std::unique_lock<rw_mutex_type> write_lock;
+        typedef std::shared_lock<rw_mutex_type> read_lock;
+        typedef std::defer_lock_t defer_lock;
 
     private:
-        typedef std::unordered_map<Key, Value, Hash, KeyEqual, Allocator> base_map;
-        base_map              map_;
+        typedef std::unordered_map<Key, Value, Hash, KeyEqual, Allocator>
+            base_map;
+        base_map map_;
         mutable rw_mutex_type mutex_;
-        mutable read_lock     iterator_lock_;
+        mutable read_lock iterator_lock_;
 
     public:
         typedef typename base_map::key_type key_type;
@@ -65,20 +60,20 @@ namespace concurrent {
         typedef typename base_map::local_iterator local_iterator;
         typedef typename base_map::const_local_iterator const_local_iterator;
         //
-        typedef read_lock  map_read_lock_type;
+        typedef read_lock map_read_lock_type;
         typedef write_lock map_write_lock_type;
 
     public:
         //
         // construct/destroy/copy
         //
-        explicit unordered_map(size_type n = 64,
-            const hasher& hf = hasher(),
+        explicit unordered_map(size_type n = 64, const hasher& hf = hasher(),
             const key_equal& eql = key_equal(),
             const allocator_type& a = allocator_type())
-        : map_(n, hf, eql, a)
-        , iterator_lock_(mutex_, defer_lock())
-        {}
+          : map_(n, hf, eql, a)
+          , iterator_lock_(mutex_, defer_lock())
+        {
+        }
 
         template <typename InputIterator>
         unordered_map(InputIterator first, InputIterator last, size_type n = 64,
@@ -86,42 +81,49 @@ namespace concurrent {
             const allocator_type& a = allocator_type())
           : map_(first, last, n, hf, eql, a)
           , iterator_lock_(mutex_, defer_lock())
-        {}
+        {
+        }
 
         unordered_map(const unordered_map& other)
           : map_(other)
           , mutex_()
           , iterator_lock_(mutex_, defer_lock())
-        {}
+        {
+        }
 
         explicit unordered_map(const allocator_type& a)
           : map_(a)
           , iterator_lock_(mutex_, defer_lock())
-        {}
+        {
+        }
 
         unordered_map(const unordered_map& other, const allocator_type& a)
           : map_(other, a)
           , iterator_lock_(mutex_, defer_lock())
-        {}
+        {
+        }
 
         // C++11 specific
         unordered_map(unordered_map&& other) noexcept
-          : map_(std::forward<unordered_map>(other))
+          : map_(HPX_FORWARD(unordered_map, other))
           , mutex_()
           , iterator_lock_(mutex_, defer_lock())
-        {}
+        {
+        }
 
         unordered_map(unordered_map&& other, const allocator_type& a)
-          : map_(std::forward<unordered_map>(other), a)
+          : map_(HPX_FORWARD(unordered_map, other), a)
           , iterator_lock_(mutex_, defer_lock())
-        {}
+        {
+        }
 
         unordered_map(std::initializer_list<value_type> il, size_type n = 64,
             const hasher& hf = hasher(), const key_equal& eql = key_equal(),
             const allocator_type& a = allocator_type())
           : map_(il, n, hf, eql, a)
           , iterator_lock_(mutex_, defer_lock())
-        {}
+        {
+        }
 
         ~unordered_map()
         {
@@ -141,7 +143,7 @@ namespace concurrent {
         {
             write_lock lock(other.mutex_);
             mutex_ = rw_mutex_type();
-            map_ = std::move(other);
+            map_ = HPX_MOVE(other);
             return *this;
         }
 
@@ -173,7 +175,7 @@ namespace concurrent {
             return map_.insert(hint, x);
         }
 
-        template<class InputIterator>
+        template <class InputIterator>
         void insert(InputIterator first, InputIterator last)
         {
             write_lock lock(mutex_);
@@ -182,15 +184,15 @@ namespace concurrent {
 
         // C++11 specific
         std::pair<iterator, bool> insert(value_type&& x)
-         {
+        {
             write_lock lock(mutex_);
-            return map_.insert(std::forward<value_type>(x));
-         }
+            return map_.insert(HPX_FORWARD(value_type, x));
+        }
 
         iterator insert(const_iterator hint, value_type&& x)
         {
             write_lock lock(mutex_);
-            return map_.insert(hint, std::forward<value_type>(x));
+            return map_.insert(hint, HPX_FORWARD(value_type, x));
         }
 
         void insert(std::initializer_list<value_type> il)
@@ -200,18 +202,18 @@ namespace concurrent {
         }
 
         // C++11 specific
-        template<typename... Args>
+        template <typename... Args>
         std::pair<iterator, bool> emplace(Args&&... args)
         {
             write_lock lock(mutex_);
-            map_.emplace(std::forward<Args>(args)...);
+            map_.emplace(HPX_FORWARD(Args, args)...);
         }
 
-        template<typename... Args>
+        template <typename... Args>
         iterator emplace_hint(const_iterator hint, Args&&... args)
         {
             write_lock lock(mutex_);
-            return map_.emplace_hint(hint, std::forward<Args>(args)...);
+            return map_.emplace_hint(hint, HPX_FORWARD(Args, args)...);
         }
 
         // modifiers
@@ -262,12 +264,30 @@ namespace concurrent {
         // iterators - not thread safe to access these
         // obtain a read_lock before iterating, and release when done
         //
-        iterator begin() { return map_.begin(); }
-        const_iterator begin() const  { return map_.begin(); };
-        iterator end()  { return map_.end(); };
-        const_iterator end() const  { return map_.end(); };
-        const_iterator cbegin() const  { return map_.cbegin(); };
-        const_iterator cend() const  { return map_.cbegin(); };
+        iterator begin()
+        {
+            return map_.begin();
+        }
+        const_iterator begin() const
+        {
+            return map_.begin();
+        };
+        iterator end()
+        {
+            return map_.end();
+        };
+        const_iterator end() const
+        {
+            return map_.end();
+        };
+        const_iterator cbegin() const
+        {
+            return map_.cbegin();
+        };
+        const_iterator cend() const
+        {
+            return map_.cbegin();
+        };
 
         //
         // Before iterating over the map one must obtain a read lock,
@@ -275,15 +295,22 @@ namespace concurrent {
         //
         // map_type::map_read_lock_type read_lock(map.read_write_mutex());
         //
-        rw_mutex_type& read_write_mutex() {
+        rw_mutex_type& read_write_mutex()
+        {
             return mutex_;
         }
 
         //
         // observers
         //
-        hasher hash_function() const { return map_.hash_function(); }
-        key_equal key_eq() const { return map_.key_eq(); }
+        hasher hash_function() const
+        {
+            return map_.hash_function();
+        }
+        key_equal key_eq() const
+        {
+            return map_.key_eq();
+        }
 
         //
         // lookup
@@ -305,7 +332,8 @@ namespace concurrent {
             read_lock lock(mutex_);
             const_iterator it = map_.find(k);
             bool result = (it != map_.end());
-            return std::make_pair(it, result);;
+            return std::make_pair(it, result);
+            ;
         }
 
         size_type count(const key_type& k) const
@@ -320,7 +348,8 @@ namespace concurrent {
             return map_.equal_range(k);
         }
 
-        std::pair<const_iterator, const_iterator> equal_range(const key_type& k) const
+        std::pair<const_iterator, const_iterator> equal_range(
+            const key_type& k) const
         {
             read_lock lock(mutex_);
             return map_.equal_range(k);
@@ -340,7 +369,7 @@ namespace concurrent {
             return map_.at(k);
         };
 
-        mapped_type& at( const key_type& k )
+        mapped_type& at(const key_type& k)
         {
             read_lock lock(mutex_);
             return map_.at(k);
@@ -351,7 +380,6 @@ namespace concurrent {
             read_lock lock(mutex_);
             return map_.at(k);
         };
-
     };
 
-}}
+}}    // namespace hpx::concurrent

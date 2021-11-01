@@ -123,7 +123,7 @@ namespace hpx { namespace threads {
 
         ~on_exit_reset_held_lock_data()
         {
-            hpx::util::set_held_locks_data(std::move(data_));
+            hpx::util::set_held_locks_data(HPX_MOVE(data_));
         }
 
         std::unique_ptr<hpx::util::held_locks_data> data_;

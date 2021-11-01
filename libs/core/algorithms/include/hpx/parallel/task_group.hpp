@@ -95,15 +95,15 @@ namespace hpx { namespace execution { namespace experimental {
             // make sure exceptions don't leave the latch in the wrong state
             on_exit l(latch_);
 
-            hpx::parallel::execution::post(std::forward<Executor>(exec),
-                [this, l = std::move(l), f = std::forward<F>(f),
-                    t = hpx::make_tuple(std::forward<Ts>(ts)...)]() mutable {
+            hpx::parallel::execution::post(HPX_FORWARD(Executor, exec),
+                [this, l = HPX_MOVE(l), f = HPX_FORWARD(F, f),
+                    t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)]() mutable {
                     // latch needs to be released before the lambda exits
-                    on_exit _(std::move(l));
+                    on_exit _(HPX_MOVE(l));
                     std::exception_ptr p;
                     try
                     {
-                        hpx::util::invoke_fused(std::move(f), std::move(t));
+                        hpx::util::invoke_fused(HPX_MOVE(f), HPX_MOVE(t));
                         return;
                     }
                     catch (...)
@@ -115,7 +115,7 @@ namespace hpx { namespace execution { namespace experimental {
                     // set_exception may yield. Ending the catch block on a
                     // different worker thread than where it was started may
                     // lead to segfaults.
-                    add_exception(std::move(p));
+                    add_exception(HPX_MOVE(p));
                 });
         }
 
@@ -127,8 +127,8 @@ namespace hpx { namespace execution { namespace experimental {
         // clang-format on
         void run(F&& f, Ts&&... ts)
         {
-            run(execution::parallel_executor{}, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+            run(execution::parallel_executor{}, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         /// Waits for all tasks in the group to complete.
@@ -147,7 +147,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         void add_exception(std::exception_ptr p)
         {
-            errors_.add(std::move(p));
+            errors_.add(HPX_MOVE(p));
         }
 
     private:

@@ -56,7 +56,7 @@ namespace hpx {
             auto thrd_data = threads::get_self_id_data();
             HPX_ASSERT(thrd_data);
             start_thread(thrd_data->get_scheduler_base()->get_parent_pool(),
-                util::deferred_call(std::forward<F>(f)));
+                util::deferred_call(HPX_FORWARD(F, f)));
         }
 
         template <typename F, typename... Ts>
@@ -65,22 +65,20 @@ namespace hpx {
             auto thrd_data = threads::get_self_id_data();
             HPX_ASSERT(thrd_data);
             start_thread(thrd_data->get_scheduler_base()->get_parent_pool(),
-                util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(vs)...));
+                util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...));
         }
 
         template <typename F>
         thread(threads::thread_pool_base* pool, F&& f)
         {
-            start_thread(pool, util::deferred_call(std::forward<F>(f)));
+            start_thread(pool, util::deferred_call(HPX_FORWARD(F, f)));
         }
 
         template <typename F, typename... Ts>
         thread(threads::thread_pool_base* pool, F&& f, Ts&&... vs)
         {
             start_thread(pool,
-                util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(vs)...));
+                util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...));
         }
 
         ~thread();
@@ -189,7 +187,7 @@ namespace hpx {
         {
         }
         explicit id(threads::thread_id_type&& i) noexcept
-          : id_(std::move(i))
+          : id_(HPX_MOVE(i))
         {
         }
 
@@ -198,7 +196,7 @@ namespace hpx {
         {
         }
         explicit id(threads::thread_id_ref_type&& i) noexcept
-          : id_(std::move(i).get().get())
+          : id_(HPX_MOVE(i).get().get())
         {
         }
 

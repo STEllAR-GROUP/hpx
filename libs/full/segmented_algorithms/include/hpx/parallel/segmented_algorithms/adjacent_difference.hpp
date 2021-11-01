@@ -133,7 +133,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
                 dest = traits2::compose(sdest, out);
             }
-            return result::get(std::move(dest));
+            return result::get(HPX_MOVE(dest));
         }
 
         // parallel remote implementation
@@ -241,7 +241,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     }
                     return odest;
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
         /// \endcond
     }    // namespace detail
@@ -275,7 +275,7 @@ namespace hpx { namespace segmented {
             using result =
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     FwdIter2>;
-            return result::get(std::move(dest));
+            return result::get(HPX_MOVE(dest));
         }
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
@@ -284,8 +284,8 @@ namespace hpx { namespace segmented {
         return hpx::parallel::v1::detail::segmented_adjacent_difference(
             hpx::parallel::v1::detail::adjacent_difference<
                 typename traits::local_iterator>(),
-            std::forward<ExPolicy>(policy), first, last, dest,
-            std::forward<Op>(op), is_seq());
+            HPX_FORWARD(ExPolicy, policy), first, last, dest,
+            HPX_FORWARD(Op, op), is_seq());
     }
 
     // clang-format off
@@ -315,7 +315,7 @@ namespace hpx { namespace segmented {
         return hpx::parallel::v1::detail::segmented_adjacent_difference(
             hpx::parallel::v1::detail::adjacent_difference<
                 typename traits::local_iterator>(),
-            hpx::execution::seq, first, last, dest, std::forward<Op>(op),
+            hpx::execution::seq, first, last, dest, HPX_FORWARD(Op, op),
             std::true_type{});
     }
 }}    // namespace hpx::segmented

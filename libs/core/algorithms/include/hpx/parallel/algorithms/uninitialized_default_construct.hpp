@@ -246,7 +246,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             if (count == 0)
             {
                 return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                    std::move(first));
+                    HPX_MOVE(first));
             }
 
             typedef std::pair<FwdIter, FwdIter> partition_result_type;
@@ -257,7 +257,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return util::partitioner_with_cleanup<ExPolicy, FwdIter,
                 partition_result_type>::
                 call(
-                    std::forward<ExPolicy>(policy), first, count,
+                    HPX_FORWARD(ExPolicy, policy), first, count,
                     [tok](FwdIter it, std::size_t part_size) mutable
                     -> partition_result_type {
                         return std::make_pair(it,
@@ -309,7 +309,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 parallel(ExPolicy&& policy, FwdIter first, Sent last)
             {
                 return parallel_sequential_uninitialized_default_construct_n(
-                    std::forward<ExPolicy>(policy), first,
+                    HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last));
             }
         };
@@ -341,7 +341,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         return hpx::util::void_guard<result_type>(),
                hpx::parallel::v1::detail::uninitialized_default_construct<
                    FwdIter>()
-                   .call(std::forward<ExPolicy>(policy), first, last);
+                   .call(HPX_FORWARD(ExPolicy, policy), first, last);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -404,7 +404,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 parallel(ExPolicy&& policy, FwdIter first, std::size_t count)
             {
                 return parallel_sequential_uninitialized_default_construct_n(
-                    std::forward<ExPolicy>(policy), first, count);
+                    HPX_FORWARD(ExPolicy, policy), first, count);
             }
         };
         /// \endcond
@@ -428,7 +428,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         if (detail::is_negative(count))
         {
             return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                std::move(first));
+                HPX_MOVE(first));
         }
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -436,7 +436,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::uninitialized_default_construct_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, std::size_t(count));
+            HPX_FORWARD(ExPolicy, policy), first, std::size_t(count));
     }
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -487,7 +487,7 @@ namespace hpx {
             return hpx::util::void_guard<result_type>(),
                    hpx::parallel::v1::detail::uninitialized_default_construct<
                        FwdIter>()
-                       .call(std::forward<ExPolicy>(policy), first, last);
+                       .call(HPX_FORWARD(ExPolicy, policy), first, last);
         }
 
     } uninitialized_default_construct{};
@@ -540,13 +540,12 @@ namespace hpx {
             if (hpx::parallel::v1::detail::is_negative(count))
             {
                 return parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(std::move(first));
+                    FwdIter>::get(HPX_MOVE(first));
             }
 
             return hpx::parallel::v1::detail::uninitialized_default_construct_n<
                 FwdIter>()
-                .call(
-                    std::forward<ExPolicy>(policy), first, std::size_t(count));
+                .call(HPX_FORWARD(ExPolicy, policy), first, std::size_t(count));
         }
 
     } uninitialized_default_construct_n{};

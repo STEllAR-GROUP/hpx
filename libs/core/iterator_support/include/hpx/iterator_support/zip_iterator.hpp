@@ -280,7 +280,7 @@ namespace hpx { namespace util {
             }
             HPX_HOST_DEVICE
             zip_iterator_base(IteratorTuple&& iterators)
-              : iterators_(std::move(iterators))
+              : iterators_(HPX_MOVE(iterators))
             {
             }
 
@@ -340,7 +340,7 @@ namespace hpx { namespace util {
             template <typename F>
             HPX_HOST_DEVICE void apply(F&& f)
             {
-                return apply(std::forward<F>(f),
+                return apply(HPX_FORWARD(F, f),
                     util::make_index_pack<
                         hpx::tuple_size<IteratorTuple>::value>());
             }
@@ -382,7 +382,7 @@ namespace hpx { namespace util {
         }
 
         HPX_HOST_DEVICE explicit zip_iterator(hpx::tuple<Ts...>&& t)
-          : base_type(std::move(t))
+          : base_type(HPX_MOVE(t))
         {
         }
 
@@ -392,7 +392,7 @@ namespace hpx { namespace util {
         }
 
         HPX_HOST_DEVICE zip_iterator(zip_iterator&& other)
-          : base_type(std::move(other))
+          : base_type(HPX_MOVE(other))
         {
         }
 
@@ -403,7 +403,7 @@ namespace hpx { namespace util {
         }
         HPX_HOST_DEVICE zip_iterator& operator=(zip_iterator&& other)
         {
-            base_type::operator=(std::move(other));
+            base_type::operator=(HPX_MOVE(other));
             return *this;
         }
 
@@ -425,7 +425,7 @@ namespace hpx { namespace util {
         operator=(zip_iterator<Ts_...>&& other)
         {
             base_type::operator=(
-                base_type(std::move(other.get_iterator_tuple())));
+                base_type(HPX_MOVE(other.get_iterator_tuple())));
             return *this;
         }
     };
@@ -453,7 +453,7 @@ namespace hpx { namespace util {
         }
 
         HPX_HOST_DEVICE explicit zip_iterator(hpx::tuple<Ts...>&& t)
-          : base_type(std::move(t))
+          : base_type(HPX_MOVE(t))
         {
         }
 
@@ -463,7 +463,7 @@ namespace hpx { namespace util {
         }
 
         HPX_HOST_DEVICE zip_iterator(zip_iterator&& other)
-          : base_type(std::move(other))
+          : base_type(HPX_MOVE(other))
         {
         }
 
@@ -474,7 +474,7 @@ namespace hpx { namespace util {
         }
         HPX_HOST_DEVICE zip_iterator& operator=(zip_iterator&& other)
         {
-            base_type::operator=(std::move(other));
+            base_type::operator=(HPX_MOVE(other));
             return *this;
         }
 
@@ -496,7 +496,7 @@ namespace hpx { namespace util {
         operator=(zip_iterator<Ts_...>&& other)
         {
             base_type::operator=(
-                base_type(std::move(other.get_iterator_tuple())));
+                base_type(HPX_MOVE(other.get_iterator_tuple())));
             return *this;
         }
     };
@@ -508,7 +508,7 @@ namespace hpx { namespace util {
     {
         typedef zip_iterator<typename std::decay<Ts>::type...> result_type;
 
-        return result_type(std::forward<Ts>(vs)...);
+        return result_type(HPX_FORWARD(Ts, vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -38,7 +38,7 @@ namespace hpx { namespace actions { namespace detail {
         auto it = map_.find(name);
         if (it == map_.end())
         {
-            map_.emplace(std::move(name));
+            map_.emplace(HPX_MOVE(name));
         }
     }
 

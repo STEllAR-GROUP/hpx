@@ -225,7 +225,7 @@ namespace hpx { namespace lcos {
             hpx::id_type const& id, std::size_t, Ts const&... vs)
         {
             futures.push_back(
-                hpx::async(act, id, vs...).then(std::forward<Cont>(cont)));
+                hpx::async(act, id, vs...).then(HPX_FORWARD(Cont, cont)));
         }
 
         template <typename Action, typename Futures, typename Cont,
@@ -235,7 +235,7 @@ namespace hpx { namespace lcos {
             Ts const&... vs)
         {
             futures.push_back(hpx::async(Action(), id, vs..., global_idx)
-                                  .then(std::forward<Cont>(cont)));
+                                  .then(HPX_FORWARD(Cont, cont)));
         }
 
         template <typename Action, typename... Ts>
@@ -362,11 +362,11 @@ namespace hpx { namespace lcos {
         {
             std::vector<Result> res;
             std::vector<hpx::future<std::vector<Result>>> fres =
-                std::move(r.get());
+                HPX_MOVE(r.get());
 
             for (hpx::future<std::vector<Result>>& f : fres)
             {
-                std::vector<Result> t = std::move(f.get());
+                std::vector<Result> t = HPX_MOVE(f.get());
                 res.reserve(res.capacity() + t.size());
                 std::move(t.begin(), t.end(), std::back_inserter(res));
             }
@@ -417,7 +417,7 @@ namespace hpx { namespace lcos {
                     hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::detail::async_colocated<broadcast_impl_action>(id,
-                            act, std::move(ids_next), global_idx + applied,
+                            act, HPX_MOVE(ids_next), global_idx + applied,
                             std::true_type(), vs...));
 
                     applied += next_fan;
@@ -477,7 +477,7 @@ namespace hpx { namespace lcos {
                     hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
                         hpx::detail::async_colocated<broadcast_impl_action>(id,
-                            act, std::move(ids_next), global_idx + applied,
+                            act, HPX_MOVE(ids_next), global_idx + applied,
                             std::false_type(), vs...));
 
                     applied += next_fan;
@@ -529,7 +529,7 @@ namespace hpx { namespace lcos {
 
                     hpx::id_type id(ids_next[0]);
                     hpx::detail::apply_colocated<broadcast_impl_action>(id, act,
-                        std::move(ids_next), global_idx + applied, vs...);
+                        HPX_MOVE(ids_next), global_idx + applied, vs...);
 
                     applied += next_fan;
                     it += next_fan;

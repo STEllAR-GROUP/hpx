@@ -258,7 +258,7 @@ namespace hpx { namespace components { namespace server {
                         throw;
                     }
                 }
-                return std::move(f);
+                return HPX_MOVE(f);
             });
     }
 
@@ -302,7 +302,7 @@ namespace hpx { namespace components { namespace server {
                     // mark object in AGAS as being migrated first
                     return agas::begin_migration(to_migrate)
                         .then(launch::sync,
-                            [ptr = std::move(ptr), to_migrate, policy](
+                            [ptr = HPX_MOVE(ptr), to_migrate, policy](
                                 hpx::future<bm_result>&& bmf) mutable
                             -> future<id_type> {
                                 auto r = bmf.get();    // propagate exceptions

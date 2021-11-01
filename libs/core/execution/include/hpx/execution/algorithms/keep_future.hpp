@@ -49,12 +49,12 @@ namespace hpx { namespace execution { namespace experimental {
                         // receiver and future into the on_completed callback.
                         state->set_on_completed([&os]() mutable {
                             hpx::execution::experimental::set_value(
-                                std::move(os.receiver), std::move(os.future));
+                                HPX_MOVE(os.receiver), HPX_MOVE(os.future));
                         });
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
-                            std::move(os.receiver), std::move(ep));
+                            HPX_MOVE(os.receiver), HPX_MOVE(ep));
                     });
             }
         };
@@ -89,7 +89,7 @@ namespace hpx { namespace execution { namespace experimental {
                 typename = std::enable_if_t<!std::is_same<std::decay_t<Future>,
                     keep_future_sender>::value>>
             explicit keep_future_sender(Future&& future)
-              : base_type{std::forward<Future>(future)}
+              : base_type{HPX_FORWARD(Future, future)}
             {
             }
 
@@ -102,7 +102,7 @@ namespace hpx { namespace execution { namespace experimental {
             friend operation_state<Receiver, future_type> tag_invoke(
                 connect_t, keep_future_sender&& s, Receiver&& receiver)
             {
-                return {std::forward<Receiver>(receiver), std::move(s.future)};
+                return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.future)};
             }
         };
 
@@ -118,7 +118,7 @@ namespace hpx { namespace execution { namespace experimental {
                 typename = std::enable_if_t<!std::is_same<std::decay_t<Future>,
                     keep_future_sender>::value>>
             explicit keep_future_sender(Future&& future)
-              : base_type{std::forward<Future>(future)}
+              : base_type{HPX_FORWARD(Future, future)}
             {
             }
 
@@ -131,14 +131,14 @@ namespace hpx { namespace execution { namespace experimental {
             friend operation_state<Receiver, future_type> tag_invoke(
                 connect_t, keep_future_sender&& s, Receiver&& receiver)
             {
-                return {std::forward<Receiver>(receiver), std::move(s.future)};
+                return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.future)};
             }
 
             template <typename Receiver>
             friend operation_state<Receiver, future_type> tag_invoke(
                 connect_t, keep_future_sender& s, Receiver&& receiver)
             {
-                return {std::forward<Receiver>(receiver), s.future};
+                return {HPX_FORWARD(Receiver, receiver), s.future};
             }
         };
     }    // namespace detail
@@ -154,7 +154,7 @@ namespace hpx { namespace execution { namespace experimental {
         constexpr HPX_FORCEINLINE auto operator()(Future&& future) const
         {
             return detail::keep_future_sender<std::decay_t<Future>>(
-                std::forward<Future>(future));
+                HPX_FORWARD(Future, future));
         }
 
         constexpr HPX_FORCEINLINE auto operator()() const

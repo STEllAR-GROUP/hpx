@@ -230,7 +230,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         return result_type{output_traits::compose(sdest, p.in),
                             output_traits::compose(sdest, p.out)};
                     },
-                    std::move(segments)));
+                    HPX_MOVE(segments)));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -251,7 +251,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-            return segmented_transfer(Algo(), std::forward<ExPolicy>(policy),
+            return segmented_transfer(Algo(), HPX_FORWARD(ExPolicy, policy),
                 is_seq(), first, last, dest);
         }
 

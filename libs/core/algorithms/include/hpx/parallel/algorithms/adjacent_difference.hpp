@@ -190,7 +190,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, InIter first, Sent last, OutIter dest, Op&& op)
             {
                 return sequential_adjacent_difference<ExPolicy>(
-                    first, last, dest, std::forward<Op>(op));
+                    first, last, dest, HPX_FORWARD(Op, op));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
@@ -209,7 +209,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 if (first == last)
                 {
-                    return result::get(std::move(dest));
+                    return result::get(HPX_MOVE(dest));
                 }
 
                 difference_type count = detail::distance(first, last) - 1;
@@ -218,14 +218,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::traits::proxy_value_t<
                     typename std::iterator_traits<FwdIter1>::value_type>
                     tmp = *first++;
-                *dest++ = std::move(tmp);
+                *dest++ = HPX_MOVE(tmp);
 
                 if (count == 0)
                 {
-                    return result::get(std::move(dest));
+                    return result::get(HPX_MOVE(dest));
                 }
 
-                auto f1 = [op = std::forward<Op>(op)](zip_iterator part_begin,
+                auto f1 = [op = HPX_FORWARD(Op, op)](zip_iterator part_begin,
                               std::size_t part_size) mutable {
                     // VS2015RC bails out when op is captured by ref
                     using hpx::get;
@@ -248,9 +248,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, FwdIter2, void>::call(
-                    std::forward<ExPolicy>(policy),
-                    make_zip_iterator(first, prev, dest), count, std::move(f1),
-                    std::move(f2));
+                    HPX_FORWARD(ExPolicy, policy),
+                    make_zip_iterator(first, prev, dest), count, HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
 
@@ -271,7 +271,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>().call(
-            std::forward<ExPolicy>(policy), first, last, dest, std::minus<>());
+            HPX_FORWARD(ExPolicy, policy), first, last, dest, std::minus<>());
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -288,8 +288,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         FwdIter1 last, FwdIter2 dest, Op&& op)
     {
         return detail::adjacent_difference<FwdIter2>().call(
-            std::forward<ExPolicy>(policy), first, last, dest,
-            std::forward<Op>(op));
+            HPX_FORWARD(ExPolicy, policy), first, last, dest,
+            HPX_FORWARD(Op, op));
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -339,7 +339,7 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
-                .call(std::forward<ExPolicy>(policy), first, last, dest,
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
                     std::minus<>());
         }
 
@@ -360,7 +360,7 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
                 .call(hpx::execution::sequenced_policy{}, first, last, dest,
-                    std::forward<Op>(op));
+                    HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -382,8 +382,8 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
-                .call(std::forward<ExPolicy>(policy), first, last, dest,
-                    std::forward<Op>(op));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                    HPX_FORWARD(Op, op));
         }
 
     } adjacent_difference{};

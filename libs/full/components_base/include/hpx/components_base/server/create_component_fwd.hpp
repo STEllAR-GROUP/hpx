@@ -34,6 +34,6 @@ namespace hpx { namespace components { namespace server {
     template <typename Component, typename... Ts>
     inline naming::gid_type construct(Ts&&... ts)
     {
-        return create<Component>(std::forward<Ts>(ts)...);
+        return create<Component>(HPX_FORWARD(Ts, ts)...);
     }
 }}}    // namespace hpx::components::server

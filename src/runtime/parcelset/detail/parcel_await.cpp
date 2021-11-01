@@ -34,9 +34,9 @@ namespace hpx { namespace parcelset { namespace detail {
 
         parcel_await_base(Parcel&& parcel, Handler&& handler,
             std::uint32_t archive_flags, put_parcel_type pp)
-          : put_parcel_(std::move(pp))
-          , parcel_(std::move(parcel))
-          , handler_(std::move(handler))
+          : put_parcel_(HPX_MOVE(pp))
+          , parcel_(HPX_MOVE(parcel))
+          , handler_(HPX_MOVE(handler))
           , archive_(data_, archive_flags)
           , overhead_(archive_.bytes_written())
         {
@@ -44,7 +44,7 @@ namespace hpx { namespace parcelset { namespace detail {
 
         void done()
         {
-            put_parcel_(std::move(parcel_), std::move(handler_));
+            put_parcel_(HPX_MOVE(parcel_), HPX_MOVE(handler_));
         }
 
         bool apply_single(parcel& p)
@@ -123,7 +123,7 @@ namespace hpx { namespace parcelset { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     parcel_await::parcel_await(parcel&& p, write_handler_type&& f,
         std::uint32_t archive_flags, parcel_await::put_parcel_type pp)
-      : base_type(std::move(p), std::move(f), archive_flags, std::move(pp))
+      : base_type(HPX_MOVE(p), HPX_MOVE(f), archive_flags, HPX_MOVE(pp))
     {
     }
 
@@ -138,7 +138,7 @@ namespace hpx { namespace parcelset { namespace detail {
     parcels_await::parcels_await(std::vector<parcel>&& p,
         std::vector<write_handler_type>&& f, std::uint32_t archive_flags,
         parcels_await::put_parcel_type pp)
-      : base_type(std::move(p), std::move(f), archive_flags, std::move(pp))
+      : base_type(HPX_MOVE(p), HPX_MOVE(f), archive_flags, HPX_MOVE(pp))
       , idx_(0)
     {
     }
@@ -158,7 +158,7 @@ namespace hpx { namespace parcelset { namespace detail {
         std::uint32_t archive_flags, put_parcel_type pp)
     {
         auto ptr = std::make_shared<parcel_await>(
-            std::move(p), std::move(f), archive_flags, std::move(pp));
+            HPX_MOVE(p), HPX_MOVE(f), archive_flags, HPX_MOVE(pp));
         ptr->apply();
     }
 
@@ -167,7 +167,7 @@ namespace hpx { namespace parcelset { namespace detail {
         put_parcels_type pp)
     {
         auto ptr = std::make_shared<parcels_await>(
-            std::move(p), std::move(f), archive_flags, std::move(pp));
+            HPX_MOVE(p), HPX_MOVE(f), archive_flags, HPX_MOVE(pp));
         ptr->apply();
     }
 }}}    // namespace hpx::parcelset::detail

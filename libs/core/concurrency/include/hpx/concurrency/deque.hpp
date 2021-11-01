@@ -79,7 +79,7 @@ namespace boost { namespace lockfree {
             tag_t rtag = 0)
           : left(pointer(lptr, ltag))
           , right(pointer(rptr, rtag))
-          , data(std::move(v))
+          , data(HPX_MOVE(v))
         {
         }
     };
@@ -266,7 +266,7 @@ namespace boost { namespace lockfree {
             {
                 throw std::bad_alloc();
             }
-            new (chunk) node(lptr, rptr, std::move(v), ltag, rtag);
+            new (chunk) node(lptr, rptr, HPX_MOVE(v), ltag, rtag);
             return chunk;
         }
 
@@ -401,7 +401,7 @@ namespace boost { namespace lockfree {
         bool push_left(T data)
         {
             // Allocate the new node which we will be inserting.
-            node* n = alloc_node(nullptr, nullptr, std::move(data));
+            node* n = alloc_node(nullptr, nullptr, HPX_MOVE(data));
 
             if (n == nullptr)
                 return false;
@@ -459,7 +459,7 @@ namespace boost { namespace lockfree {
         bool push_right(T data)
         {
             // Allocate the new node which we will be inserting.
-            node* n = alloc_node(nullptr, nullptr, std::move(data));
+            node* n = alloc_node(nullptr, nullptr, HPX_MOVE(data));
 
             if (n == nullptr)
                 return false;
@@ -534,7 +534,7 @@ namespace boost { namespace lockfree {
                                 lrs.get_right_tag() + 1)))
                     {
                         // Set the result, deallocate the popped node, and return.
-                        r = std::move(lrs.get_left_ptr()->data);
+                        r = HPX_MOVE(lrs.get_left_ptr()->data);
                         dealloc_node(lrs.get_left_ptr());
                         return true;
                     }
@@ -558,7 +558,7 @@ namespace boost { namespace lockfree {
                                 lrs.get_left_tag(), lrs.get_right_tag() + 1)))
                     {
                         // Set the result, deallocate the popped node, and return.
-                        r = std::move(lrs.get_left_ptr()->data);
+                        r = HPX_MOVE(lrs.get_left_ptr()->data);
                         dealloc_node(lrs.get_left_ptr());
                         return true;
                     }
@@ -600,7 +600,7 @@ namespace boost { namespace lockfree {
                                 lrs.get_right_tag() + 1)))
                     {
                         // Set the result, deallocate the popped node, and return.
-                        r = std::move(lrs.get_right_ptr()->data);
+                        r = HPX_MOVE(lrs.get_right_ptr()->data);
                         dealloc_node(lrs.get_right_ptr());
                         return true;
                     }
@@ -624,7 +624,7 @@ namespace boost { namespace lockfree {
                                 lrs.get_left_tag(), lrs.get_right_tag() + 1)))
                     {
                         // Set the result, deallocate the popped node, and return.
-                        r = std::move(lrs.get_right_ptr()->data);
+                        r = HPX_MOVE(lrs.get_right_ptr()->data);
                         dealloc_node(lrs.get_right_ptr());
                         return true;
                     }

@@ -184,8 +184,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Iter3 dest, F&& f, Proj1&& proj1, Proj2&& proj2)
             {
                 return sequential_set_difference(first1, last1, first2, last2,
-                    dest, std::forward<F>(f), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    dest, HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
             }
 
             template <typename ExPolicy, typename Iter1, typename Sent1,
@@ -208,13 +208,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first1 == last1)
                 {
                     return result::get(
-                        result_type{std::move(first1), std::move(dest)});
+                        result_type{HPX_MOVE(first1), HPX_MOVE(dest)});
                 }
 
                 if (first2 == last2)
                 {
                     return detail::copy<result_type>().call(
-                        std::forward<ExPolicy>(policy), first1, last1, dest);
+                        HPX_FORWARD(ExPolicy, policy), first1, last1, dest);
                 }
 
                 using buffer_type = typename set_operations_buffer<Iter3>::type;
@@ -238,13 +238,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         result.in, part_first2, result.out};
                 };
 
-                auto last = set_operation(std::forward<ExPolicy>(policy),
-                    first1, last1, first2, last2, dest, std::forward<F>(f),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2),
-                    std::move(f1), std::move(f2));
+                auto last = set_operation(HPX_FORWARD(ExPolicy, policy), first1,
+                    last1, first2, last2, dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2),
+                    HPX_MOVE(f1), HPX_MOVE(f2));
 
                 // construct return value
-                return util::detail::convert_to_result(std::move(last),
+                return util::detail::convert_to_result(HPX_MOVE(last),
                     [](util::in_in_out_result<Iter1, Iter2, Iter3> const& p)
                         -> result_type {
                         return {p.in1, p.out};
@@ -293,8 +293,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
         return hpx::parallel::util::get_second_element(
             detail::set_difference<util::in_out_result<FwdIter1, FwdIter3>>()
-                .call2(std::forward<ExPolicy>(policy), is_seq(), first1, last1,
-                    first2, last2, dest, std::forward<Pred>(op),
+                .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first1, last1,
+                    first2, last2, dest, HPX_FORWARD(Pred, op),
                     util::projection_identity(), util::projection_identity()));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -349,8 +349,8 @@ namespace hpx {
 
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::set_difference<result_type>().call2(
-                    std::forward<ExPolicy>(policy), is_seq(), first1, last1,
-                    first2, last2, dest, std::forward<Pred>(op),
+                    HPX_FORWARD(ExPolicy, policy), is_seq(), first1, last1,
+                    first2, last2, dest, HPX_FORWARD(Pred, op),
                     hpx::parallel::util::projection_identity(),
                     hpx::parallel::util::projection_identity()));
         }
@@ -385,7 +385,7 @@ namespace hpx {
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::set_difference<result_type>().call(
                     hpx::execution::seq, first1, last1, first2, last2, dest,
-                    std::forward<Pred>(op),
+                    HPX_FORWARD(Pred, op),
                     hpx::parallel::util::projection_identity(),
                     hpx::parallel::util::projection_identity()));
         }

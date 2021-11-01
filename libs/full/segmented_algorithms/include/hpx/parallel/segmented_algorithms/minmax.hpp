@@ -109,8 +109,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             return result::get(Algo::sequential_minmax_element_ind(policy,
-                positions.begin(), positions.size(), std::forward<F>(f),
-                std::forward<Proj>(proj)));
+                positions.begin(), positions.size(), HPX_FORWARD(F, f),
+                HPX_FORWARD(Proj, proj)));
         }
 
         // parallel remote implementation
@@ -201,11 +201,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     parallel::util::detail::handle_remote_exceptions<
                         ExPolicy>::call(r, errors);
 
-                    std::vector<SegIter> res = hpx::unwrap(std::move(r));
+                    std::vector<SegIter> res = hpx::unwrap(HPX_MOVE(r));
                     return Algo::sequential_minmax_element_ind(
                         policy, res.begin(), res.size(), f, proj);
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
         /// \endcond
     }    // namespace detail
@@ -300,8 +300,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             return result::get(Algo::sequential_minmax_element_ind(policy,
-                positions.begin(), positions.size(), std::forward<F>(f),
-                std::forward<Proj>(proj)));
+                positions.begin(), positions.size(), HPX_FORWARD(F, f),
+                HPX_FORWARD(Proj, proj)));
         }
 
         // parallel remote implementation
@@ -406,11 +406,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     parallel::util::detail::handle_remote_exceptions<
                         ExPolicy>::call(r, errors);
 
-                    std::vector<result_type> res = hpx::unwrap(std::move(r));
+                    std::vector<result_type> res = hpx::unwrap(HPX_MOVE(r));
                     return Algo::sequential_minmax_element_ind(
                         policy, res.begin(), res.size(), f, proj);
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
         /// \endcond
     }    // namespace detail
@@ -445,7 +445,7 @@ namespace hpx { namespace segmented {
         return hpx::parallel::v1::detail::segmented_minormax(
             hpx::parallel::v1::detail::min_element<
                 typename iterator_traits::local_iterator>(),
-            hpx::execution::seq, first, last, std::forward<F>(f),
+            hpx::execution::seq, first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity{}, std::true_type{});
     }
 
@@ -470,7 +470,7 @@ namespace hpx { namespace segmented {
         if (first == last || std::next(first) == last)
         {
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                SegIter>::get(std::move(first));
+                SegIter>::get(HPX_MOVE(first));
         }
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
@@ -478,7 +478,7 @@ namespace hpx { namespace segmented {
         return hpx::parallel::v1::detail::segmented_minormax(
             hpx::parallel::v1::detail::min_element<
                 typename iterator_traits::local_iterator>(),
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity{}, is_seq());
     }
 
@@ -505,7 +505,7 @@ namespace hpx { namespace segmented {
         return hpx::parallel::v1::detail::segmented_minormax(
             hpx::parallel::v1::detail::max_element<
                 typename iterator_traits::local_iterator>(),
-            hpx::execution::seq, first, last, std::forward<F>(f),
+            hpx::execution::seq, first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity{}, std::true_type{});
     }
 
@@ -530,7 +530,7 @@ namespace hpx { namespace segmented {
         if (first == last || std::next(first) == last)
         {
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                SegIter>::get(std::move(first));
+                SegIter>::get(HPX_MOVE(first));
         }
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
@@ -538,7 +538,7 @@ namespace hpx { namespace segmented {
         return hpx::parallel::v1::detail::segmented_minormax(
             hpx::parallel::v1::detail::max_element<
                 typename iterator_traits::local_iterator>(),
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity{}, is_seq());
     }
 
@@ -566,7 +566,7 @@ namespace hpx { namespace segmented {
         return hpx::parallel::v1::detail::segmented_minmax(
             hpx::parallel::v1::detail::minmax_element<
                 typename iterator_traits::local_iterator>(),
-            hpx::execution::seq, first, last, std::forward<F>(f),
+            hpx::execution::seq, first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity{}, std::true_type{});
     }
 
@@ -594,7 +594,7 @@ namespace hpx { namespace segmented {
         {
             result_type result = {first, first};
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                result_type>::get(std::move(result));
+                result_type>::get(HPX_MOVE(result));
         }
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
@@ -602,7 +602,7 @@ namespace hpx { namespace segmented {
         return hpx::parallel::v1::detail::segmented_minmax(
             hpx::parallel::v1::detail::minmax_element<
                 typename iterator_traits::local_iterator>(),
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity{}, is_seq());
     }
 }}    // namespace hpx::segmented

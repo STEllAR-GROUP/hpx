@@ -72,7 +72,7 @@ namespace hpx { namespace lcos { namespace server {
         // Push a value to the channel.
         void set_value(RemoteType&& result)
         {
-            channel_.set(std::move(result));
+            channel_.set(HPX_MOVE(result));
         }
 
         // Close the channel
@@ -100,7 +100,7 @@ namespace hpx { namespace lcos { namespace server {
 
         void set_generation(RemoteType&& value, std::size_t generation)
         {
-            channel_.set(std::move(value), generation);
+            channel_.set(HPX_MOVE(value), generation);
         }
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(channel, set_generation);
 

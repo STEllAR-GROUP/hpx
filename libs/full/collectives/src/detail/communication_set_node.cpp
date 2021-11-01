@@ -148,7 +148,7 @@ namespace hpx { namespace lcos { namespace detail {
         if (connect_to_ != site_)
         {
             connected_node_ =
-                hpx::find_from_basename(std::move(name), connect_to_);
+                hpx::find_from_basename(HPX_MOVE(name), connect_to_);
         }
     }
 
@@ -162,7 +162,7 @@ namespace hpx { namespace lcos { namespace detail {
             hpx::register_with_basename(basename, target, site);
 
         return result.then(hpx::launch::sync,
-            [target = std::move(target), basename = std::move(basename)](
+            [target = HPX_MOVE(target), basename = HPX_MOVE(basename)](
                 hpx::future<bool>&& f) -> hpx::id_type {
                 bool result = f.get();
                 if (!result)
@@ -195,7 +195,7 @@ namespace hpx { namespace lcos { namespace detail {
         // register the communicator's id using the given basename
         return id.then(hpx::launch::sync,
             util::bind_back(&detail::register_communication_set_name,
-                std::move(name), this_site));
+                HPX_MOVE(name), this_site));
     }
 }}}    // namespace hpx::lcos::detail
 

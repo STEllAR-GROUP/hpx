@@ -114,7 +114,7 @@ namespace hpx { namespace execution { namespace experimental {
                         }
                         else
                         {
-                            return std::move(hpx::get<value_type>(value));
+                            return HPX_MOVE(hpx::get<value_type>(value));
                         }
                     }
                     else if (hpx::holds_alternative<error_type>(value))
@@ -146,7 +146,7 @@ namespace hpx { namespace execution { namespace experimental {
                 set_error_t, sync_wait_receiver&& r, Error&& error) noexcept
             {
                 r.state.value.template emplace<error_type>(
-                    std::forward<Error>(error));
+                    HPX_FORWARD(Error, error));
                 r.signal_set_called();
             }
 
@@ -163,7 +163,7 @@ namespace hpx { namespace execution { namespace experimental {
                 set_value_t, sync_wait_receiver&& r, Us&&... us) noexcept
             {
                 r.state.value.template emplace<value_type>(
-                    std::forward<Us>(us)...);
+                    HPX_FORWARD(Us, us)...);
                 r.signal_set_called();
             }
         };
@@ -187,7 +187,7 @@ namespace hpx { namespace execution { namespace experimental {
 
             state_type state{};
             auto op_state = hpx::execution::experimental::connect(
-                std::forward<Sender>(sender), receiver_type{state});
+                HPX_FORWARD(Sender, sender), receiver_type{state});
             hpx::execution::experimental::start(op_state);
 
             state.wait();

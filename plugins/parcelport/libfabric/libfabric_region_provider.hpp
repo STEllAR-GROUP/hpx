@@ -20,30 +20,29 @@
 
 #include <plugins/parcelport/libfabric/rma_memory_region_traits.hpp>
 
-namespace hpx {
-namespace parcelset {
-namespace policies {
-namespace libfabric
-{
+namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
     struct libfabric_region_provider
     {
         // The internal memory region handle
-        typedef struct fid_mr     provider_region;
+        typedef struct fid_mr provider_region;
         typedef struct fid_domain provider_domain;
 
         template <typename... Args>
-        static int register_memory(Args &&... args) {
-            return fi_mr_reg(std::forward<Args>(args)...);
+        static int register_memory(Args&&... args)
+        {
+            return fi_mr_reg(HPX_FORWARD(Args, args)...);
         }
 
-        static int unregister_memory(provider_region *region) {
+        static int unregister_memory(provider_region* region)
+        {
             return fi_close(&region->fid);
         }
 
-        static int flags() { return
-            FI_READ | FI_WRITE | FI_RECV | FI_SEND | FI_REMOTE_READ | FI_REMOTE_WRITE;
+        static int flags()
+        {
+            return FI_READ | FI_WRITE | FI_RECV | FI_SEND | FI_REMOTE_READ |
+                FI_REMOTE_WRITE;
         }
     };
 
-}}}}
-
+}}}}    // namespace hpx::parcelset::policies::libfabric

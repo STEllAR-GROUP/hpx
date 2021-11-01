@@ -74,8 +74,8 @@ namespace hpx { namespace cuda { namespace experimental {
                             hpx::util::invoke_r<void>(f, *(p + idx), ts...);
                         }
                     },
-                    std::forward<F>(f), shape_container.data(), count,
-                    std::forward<Ts>(ts)...);
+                    HPX_FORWARD(F, f), shape_container.data(), count,
+                    HPX_FORWARD(Ts, ts)...);
 #else
                 HPX_UNUSED(target);
                 HPX_UNUSED(f);
@@ -131,7 +131,7 @@ namespace hpx { namespace cuda { namespace experimental {
                                     f, value_type(begin + idx, 1, idx), ts...);
                             }
                         },
-                        std::forward<F>(f), std::forward<Ts>(ts)...);
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
                 }
 #else
                 HPX_UNUSED(target);
@@ -185,20 +185,20 @@ namespace hpx { namespace cuda { namespace experimental {
         void post(F&& f, Ts&&... ts) const
         {
             detail::launch(
-                target_, 1, 1, std::forward<F>(f), std::forward<Ts>(ts)...);
+                target_, 1, 1, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
         hpx::future<void> async_execute(F&& f, Ts&&... ts) const
         {
-            post(std::forward<F>(f), std::forward<Ts>(ts)...);
+            post(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             return target_.get_future_with_callback();
         }
 
         template <typename F, typename... Ts>
         void sync_execute(F&& f, Ts&&... ts) const
         {
-            post(std::forward<F>(f), std::forward<Ts>(ts)...);
+            post(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             target_.synchronize();
         }
 
@@ -206,14 +206,14 @@ namespace hpx { namespace cuda { namespace experimental {
         void bulk_launch(F&& f, Shape const& shape, Ts&&... ts) const
         {
             detail::bulk_launch_helper<Shape>::call(
-                target_, std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+                target_, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename Shape, typename... Ts>
         std::vector<hpx::future<void>> bulk_async_execute(
             F&& f, Shape const& shape, Ts&&... ts) const
         {
-            bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+            bulk_launch(HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
 
             std::vector<hpx::future<void>> result;
             result.push_back(target_.get_future_with_callback());
@@ -223,7 +223,7 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename F, typename Shape, typename... Ts>
         void bulk_sync_execute(F&& f, Shape const& shape, Ts&&... ts) const
         {
-            bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+            bulk_launch(HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
             target_.synchronize();
         }
 

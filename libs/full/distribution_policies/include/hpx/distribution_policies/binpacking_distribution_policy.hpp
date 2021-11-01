@@ -71,10 +71,10 @@ namespace hpx { namespace components {
                 Ts&&... vs) const
             {
                 hpx::id_type const& best_locality =
-                    get_best_locality(std::move(values), localities_);
+                    get_best_locality(HPX_MOVE(values), localities_);
 
                 return create_async<Component>(
-                    best_locality, std::forward<Ts>(vs)...);
+                    best_locality, HPX_FORWARD(Ts, vs)...);
             }
 
             std::vector<hpx::id_type> const& localities_;
@@ -123,11 +123,11 @@ namespace hpx { namespace components {
                         for (std::size_t i = 0; i != v.size(); ++i)
                         {
                             result.emplace_back(
-                                std::move(localities_[i]), v[i].get());
+                                HPX_MOVE(localities_[i]), v[i].get());
                         }
                         return result;
                     },
-                    std::move(objs));
+                    HPX_MOVE(objs));
             }
 
             std::vector<hpx::id_type> const& localities_;
@@ -198,7 +198,7 @@ namespace hpx { namespace components {
             }
 #endif
             return binpacking_distribution_policy(
-                std::move(locs), perf_counter_name);
+                HPX_MOVE(locs), perf_counter_name);
         }
 
         /// Create a new \a default_distribution policy representing the given
@@ -237,12 +237,12 @@ namespace hpx { namespace components {
             {
                 return create_async<Component>(
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    std::forward<Ts>(vs)...);
+                    HPX_FORWARD(Ts, vs)...);
             }
             else if (localities_.size() == 1)
             {
                 return create_async<Component>(
-                    localities_.front(), std::forward<Ts>(vs)...);
+                    localities_.front(), HPX_FORWARD(Ts, vs)...);
             }
 
             // schedule creation of all objects across given localities
@@ -252,7 +252,7 @@ namespace hpx { namespace components {
 
             return values.then(hpx::util::bind_back(
                 detail::create_helper<Component>(localities_),
-                std::forward<Ts>(vs)...));
+                HPX_FORWARD(Ts, vs)...));
         }
 
         /// \cond NOINTERNAL
@@ -283,7 +283,7 @@ namespace hpx { namespace components {
 
                 return values.then(hpx::util::bind_back(
                     detail::create_bulk_helper<Component>(localities_), count,
-                    std::forward<Ts>(vs)...));
+                    HPX_FORWARD(Ts, vs)...));
             }
 
             // handle special cases
@@ -292,11 +292,10 @@ namespace hpx { namespace components {
                 localities_.front();
 
             hpx::future<std::vector<hpx::id_type>> f =
-                bulk_create_async<Component>(
-                    id, count, std::forward<Ts>(vs)...);
+                bulk_create_async<Component>(id, count, HPX_FORWARD(Ts, vs)...);
 
             return f.then(hpx::launch::sync,
-                [id = std::move(id)](hpx::future<std::vector<hpx::id_type>>&& f)
+                [id = HPX_MOVE(id)](hpx::future<std::vector<hpx::id_type>>&& f)
                     -> std::vector<bulk_locality_result> {
                     std::vector<bulk_locality_result> result;
                     result.emplace_back(id, f.get());
@@ -333,7 +332,7 @@ namespace hpx { namespace components {
 
         binpacking_distribution_policy(
             std::vector<id_type>&& localities, char const* perf_counter_name)
-          : localities_(std::move(localities))
+          : localities_(HPX_MOVE(localities))
           , counter_name_(perf_counter_name)
         {
         }

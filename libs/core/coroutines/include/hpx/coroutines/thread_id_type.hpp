@@ -225,7 +225,7 @@ namespace hpx { namespace threads {
         {
         }
         explicit thread_id_ref(thread_id_repr&& thrd) noexcept
-          : thrd_(std::move(thrd))
+          : thrd_(HPX_MOVE(thrd))
         {
         }
 
@@ -236,7 +236,7 @@ namespace hpx { namespace threads {
         }
         thread_id_ref& operator=(thread_id_repr&& rhs) noexcept
         {
-            thrd_ = std::move(rhs);
+            thrd_ = HPX_MOVE(rhs);
             return *this;
         }
 
@@ -294,7 +294,7 @@ namespace hpx { namespace threads {
         }
         thread_id_repr&& get() && noexcept
         {
-            return std::move(thrd_);
+            return HPX_MOVE(thrd_);
         }
 
         thread_id_repr const& get() const& noexcept

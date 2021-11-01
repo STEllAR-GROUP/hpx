@@ -306,7 +306,7 @@ namespace hpx { namespace naming {
         gid_type move_gid(gid_type& gid)
         {
             std::unique_lock<gid_type::mutex_type> l(gid.get_mutex());
-            return move_gid_locked(std::move(l), gid);
+            return move_gid_locked(HPX_MOVE(l), gid);
         }
 
         gid_type move_gid_locked(

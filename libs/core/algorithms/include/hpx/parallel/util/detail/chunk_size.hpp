@@ -33,14 +33,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         std::vector<Future>& workitems, F&& f, FwdIter first, std::size_t count)
     {
         workitems.push_back(
-            hpx::make_ready_future(std::forward<F>(f)(first, count)));
+            hpx::make_ready_future(HPX_FORWARD(F, f)(first, count)));
     }
 
     template <typename F, typename FwdIter>
     void add_ready_future(std::vector<hpx::future<void>>& workitems, F&& f,
         FwdIter first, std::size_t count)
     {
-        std::forward<F>(f)(first, count);
+        HPX_FORWARD(F, f)(first, count);
         workitems.push_back(hpx::make_ready_future());
     }
 
@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     void add_ready_future(std::vector<hpx::shared_future<void>>& workitems,
         F&& f, FwdIter first, std::size_t count)
     {
-        std::forward<F>(f)(first, count);
+        HPX_FORWARD(F, f)(first, count);
         workitems.push_back(hpx::make_ready_future());
     }
 
@@ -243,14 +243,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         FwdIter first, std::size_t base_idx, std::size_t count)
     {
         workitems.push_back(
-            hpx::make_ready_future(std::forward<F>(f)(first, count, base_idx)));
+            hpx::make_ready_future(HPX_FORWARD(F, f)(first, count, base_idx)));
     }
 
     template <typename F, typename FwdIter>
     void add_ready_future_idx(std::vector<hpx::future<void>>& workitems, F&& f,
         FwdIter first, std::size_t base_idx, std::size_t count)
     {
-        std::forward<F>(f)(first, count, base_idx);
+        HPX_FORWARD(F, f)(first, count, base_idx);
         workitems.push_back(hpx::make_ready_future());
     }
 
@@ -258,7 +258,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     void add_ready_future_idx(std::vector<hpx::shared_future<void>>& workitems,
         F&& f, std::size_t base_idx, FwdIter first, std::size_t count)
     {
-        std::forward<F>(f)(first, count, base_idx);
+        HPX_FORWARD(F, f)(first, count, base_idx);
         workitems.push_back(hpx::make_ready_future());
     }
 

@@ -54,7 +54,7 @@ namespace hpx { namespace detail {
             traits::detail::get_shared_state(f)->set_on_completed(
                 hpx::detail::keep_id_alive(id));
         }
-        return std::move(f);
+        return HPX_MOVE(f);
     }
 
     struct keep_id_and_ptr_alive
@@ -62,7 +62,7 @@ namespace hpx { namespace detail {
         explicit keep_id_and_ptr_alive(
             naming::id_type const& id, components::pinned_ptr&& p)
           : id_(id)
-          , p_(std::move(p))
+          , p_(HPX_MOVE(p))
         {
         }
 
@@ -79,9 +79,9 @@ namespace hpx { namespace detail {
         if (id.get_management_type() == naming::id_type::managed)
         {
             traits::detail::get_shared_state(f)->set_on_completed(
-                hpx::detail::keep_id_and_ptr_alive(id, std::move(p)));
+                hpx::detail::keep_id_and_ptr_alive(id, HPX_MOVE(p)));
         }
-        return std::move(f);
+        return HPX_MOVE(f);
     }
 
     template <typename Result>
@@ -152,7 +152,7 @@ namespace hpx { namespace detail {
 
                 return make_ready_future(
                     get_remote_result_type::call(Action::execute_function(
-                        addr.address_, addr.type_, std::forward<Ts>(vs)...)));
+                        addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...)));
             }
             catch (...)
             {
@@ -183,7 +183,7 @@ namespace hpx { namespace detail {
             try
             {
                 Action::execute_function(
-                    addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                    addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
 
                 return make_ready_future();
             }
@@ -208,8 +208,8 @@ namespace hpx { namespace detail {
                 lcos::packaged_action<Action, Result> p;
 
                 f = p.get_future();
-                p.apply_cb(std::move(addr), hmt.get_id(),
-                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                p.apply_cb(HPX_MOVE(addr), hmt.get_id(),
+                    HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
                 f.wait();
             }
             return f;
@@ -231,7 +231,7 @@ namespace hpx { namespace detail {
             handle_managed_target<result_type> hmt(id, f);
             lcos::packaged_action<action_type, result_type> p;
             f = p.get_future();
-            p.apply(std::move(addr), hmt.get_id(), std::forward<Ts>(vs)...);
+            p.apply(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Ts, vs)...);
             f.wait();
         }
         return f;
@@ -251,7 +251,7 @@ namespace hpx { namespace detail {
             handle_managed_target<result_type> hmt(id, f);
             lcos::packaged_action<action_type, result_type> p;
             f = p.get_future();
-            p.apply(std::move(addr), hmt.get_id(), std::forward<Ts>(vs)...);
+            p.apply(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Ts, vs)...);
         }
         return f;
     }
@@ -271,7 +271,7 @@ namespace hpx { namespace detail {
             lcos::packaged_action<action_type, result_type> p;
             f = p.get_future();
             p.apply_deferred(
-                std::move(addr), hmt.get_id(), std::forward<Ts>(vs)...);
+                HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Ts, vs)...);
         }
         return f;
     }
@@ -286,17 +286,17 @@ namespace hpx { namespace detail {
         if (policy == launch::sync)
         {
             return async_remote_impl<Action>(
-                launch::sync, id, std::move(addr), std::forward<Ts>(vs)...);
+                launch::sync, id, HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...);
         }
         if (hpx::detail::has_async_policy(policy))
         {
             return async_remote_impl<Action>(
-                launch::async, id, std::move(addr), std::forward<Ts>(vs)...);
+                launch::async, id, HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...);
         }
         if (policy == launch::deferred)
         {
             return async_remote_impl<Action>(
-                launch::deferred, id, std::move(addr), std::forward<Ts>(vs)...);
+                launch::deferred, id, HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...);
         }
 
         HPX_THROW_EXCEPTION(
@@ -319,7 +319,7 @@ namespace hpx { namespace detail {
             naming::address::component_type comptype, Ts&&... vs) const
         {
             return get_remote_result_type::call(
-                Action::invoker(lva, comptype, std::forward<Ts>(vs)...));
+                Action::invoker(lva, comptype, HPX_FORWARD(Ts, vs)...));
         }
     };
 }}    // namespace hpx::detail
@@ -378,23 +378,22 @@ namespace hpx { namespace detail {
         if (policy == launch::sync || action_type::direct_execution::value)
         {
             return hpx::detail::sync_local_invoke<action_type,
-                result_type>::call(id, std::move(addr),
-                std::forward<Ts>(vs)...);
+                result_type>::call(id, HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...);
         }
         if (hpx::detail::has_async_policy(policy))
         {
             return keep_alive(
                 hpx::async(action_invoker<action_type>(), addr.address_,
-                    addr.type_, std::forward<Ts>(vs)...),
-                id, std::move(r.second));
+                    addr.type_, HPX_FORWARD(Ts, vs)...),
+                id, HPX_MOVE(r.second));
         }
 
         HPX_ASSERT(policy == launch::deferred);
 
         return keep_alive(
             hpx::async(launch::deferred, action_invoker<action_type>(),
-                addr.address_, addr.type_, std::forward<Ts>(vs)...),
-            id, std::move(r.second));
+                addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...),
+            id, HPX_MOVE(r.second));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -419,7 +418,7 @@ namespace hpx { namespace detail {
             if (!r.first)
             {
                 f = async_local_impl<Action>(
-                    policy, id, addr, r, std::forward<Ts>(vs)...);
+                    policy, id, addr, r, HPX_FORWARD(Ts, vs)...);
                 return true;
             }
 
@@ -428,7 +427,7 @@ namespace hpx { namespace detail {
         }
 
         f = async_local_impl<Action>(
-            policy, id, addr, r, std::forward<Ts>(vs)...);
+            policy, id, addr, r, HPX_FORWARD(Ts, vs)...);
 
         return true;
     }
@@ -450,14 +449,14 @@ namespace hpx { namespace detail {
         {
             hpx::future<result_type> f;
             if (async_local_impl_all<Action>(
-                    policy, id, addr, r, f, std::forward<Ts>(vs)...))
+                    policy, id, addr, r, f, HPX_FORWARD(Ts, vs)...))
             {
                 return f;
             }
         }
 
-        return async_remote_impl<Action>(std::forward<Launch>(policy), id,
-            std::move(addr), std::forward<Ts>(vs)...);
+        return async_remote_impl<Action>(HPX_FORWARD(Launch, policy), id,
+            HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -493,9 +492,8 @@ namespace hpx { namespace detail {
                         action_type::direct_execution::value)
                     {
                         return hpx::detail::sync_local_invoke_cb<action_type,
-                            result_type>::call(id, std::move(addr),
-                            std::forward<Callback>(cb),
-                            std::forward<Ts>(vs)...);
+                            result_type>::call(id, HPX_MOVE(addr),
+                            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
                     }
                 }
             }
@@ -503,8 +501,8 @@ namespace hpx { namespace detail {
                 action_type::direct_execution::value)
             {
                 return hpx::detail::sync_local_invoke_cb<action_type,
-                    result_type>::call(id, std::move(addr),
-                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                    result_type>::call(id, HPX_MOVE(addr),
+                    HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
             }
         }
 
@@ -517,8 +515,8 @@ namespace hpx { namespace detail {
                 lcos::packaged_action<action_type, result_type> p;
 
                 f = p.get_future();
-                p.apply_cb(std::move(addr), hmt.get_id(),
-                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                p.apply_cb(HPX_MOVE(addr), hmt.get_id(),
+                    HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
                 if (policy == launch::sync)
                     f.wait();
             }
@@ -527,8 +525,8 @@ namespace hpx { namespace detail {
                 lcos::packaged_action<action_type, result_type> p;
 
                 f = p.get_future();
-                p.apply_deferred_cb(std::move(addr), hmt.get_id(),
-                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                p.apply_deferred_cb(HPX_MOVE(addr), hmt.get_id(),
+                    HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
             }
             else
             {
@@ -562,15 +560,15 @@ namespace hpx { namespace detail {
                 if (!r.first)
                 {
                     return hpx::detail::sync_local_invoke_cb<action_type,
-                        result_type>::call(id, std::move(addr),
-                        std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                        result_type>::call(id, HPX_MOVE(addr),
+                        HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
                 }
             }
             else
             {
                 return hpx::detail::sync_local_invoke_cb<action_type,
-                    result_type>::call(id, std::move(addr),
-                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                    result_type>::call(id, HPX_MOVE(addr),
+                    HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
             }
         }
 
@@ -580,8 +578,8 @@ namespace hpx { namespace detail {
             lcos::packaged_action<action_type, result_type> p;
 
             f = p.get_future();
-            p.apply_cb(std::move(addr), hmt.get_id(),
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            p.apply_cb(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Callback, cb),
+                HPX_FORWARD(Ts, vs)...);
             f.wait();
         }
         return f;
@@ -617,9 +615,8 @@ namespace hpx { namespace detail {
                         action_type::direct_execution::value)
                     {
                         return hpx::detail::sync_local_invoke_cb<action_type,
-                            result_type>::call(id, std::move(addr),
-                            std::forward<Callback>(cb),
-                            std::forward<Ts>(vs)...);
+                            result_type>::call(id, HPX_MOVE(addr),
+                            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
                     }
                 }
             }
@@ -627,8 +624,8 @@ namespace hpx { namespace detail {
                 action_type::direct_execution::value)
             {
                 return hpx::detail::sync_local_invoke_cb<action_type,
-                    result_type>::call(id, std::move(addr),
-                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                    result_type>::call(id, HPX_MOVE(addr),
+                    HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
             }
         }
 
@@ -638,8 +635,8 @@ namespace hpx { namespace detail {
             lcos::packaged_action<action_type, result_type> p;
 
             f = p.get_future();
-            p.apply_cb(std::move(addr), hmt.get_id(),
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            p.apply_cb(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Callback, cb),
+                HPX_FORWARD(Ts, vs)...);
         }
         return f;
     }
@@ -662,8 +659,8 @@ namespace hpx { namespace detail {
             lcos::packaged_action<action_type, result_type> p;
 
             f = p.get_future();
-            p.apply_deferred_cb(std::move(addr), hmt.get_id(),
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            p.apply_deferred_cb(HPX_MOVE(addr), hmt.get_id(),
+                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
         return f;
     }

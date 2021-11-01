@@ -37,7 +37,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         {
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(hpx::util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...)),
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)),
                 desc, policy.priority(),
                 threads::thread_schedule_hint(
                     static_cast<std::int16_t>(get_worker_thread_num())),
@@ -65,7 +65,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
         {
             call(policy, desc, threads::detail::get_self_or_default_pool(),
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -77,7 +77,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             hpx::util::thread_description const& /* desc */,
             threads::thread_pool_base* /* pool */, F&& f, Ts&&... ts)
         {
-            hpx::detail::call_sync(std::forward<F>(f), std::forward<Ts>(ts)...);
+            hpx::detail::call_sync(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
@@ -85,7 +85,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             hpx::util::thread_description const& /* desc */, F&& f,
             Ts&&... ts) noexcept
         {
-            hpx::detail::call_sync(std::forward<F>(f), std::forward<Ts>(ts)...);
+            hpx::detail::call_sync(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -100,7 +100,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             if (policy == launch::sync)
             {
                 hpx::detail::call_sync(
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
                 return;
             }
             else if (policy == launch::fork)
@@ -109,13 +109,13 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                     policy.priority(), policy.stacksize(), policy.hint());
 
                 post_policy_dispatch<launch::fork_policy>::call(fork_policy,
-                    desc, pool, std::forward<F>(f), std::forward<Ts>(ts)...);
+                    desc, pool, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
                 return;
             }
 
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(hpx::util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...)),
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)),
                 desc, policy.priority(), policy.hint(), policy.stacksize(),
                 threads::thread_schedule_state::pending);
 
@@ -129,7 +129,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             if (policy == launch::sync)
             {
                 hpx::detail::call_sync(
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
                 return;
             }
             else if (policy == launch::fork)
@@ -138,13 +138,13 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                     policy.priority(), policy.stacksize(), policy.hint());
 
                 post_policy_dispatch<launch::fork_policy>::call(fork_policy,
-                    desc, std::forward<F>(f), std::forward<Ts>(ts)...);
+                    desc, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
                 return;
             }
 
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(hpx::util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...)),
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)),
                 desc, policy.priority(), policy.hint(), policy.stacksize(),
                 threads::thread_schedule_state::pending);
 

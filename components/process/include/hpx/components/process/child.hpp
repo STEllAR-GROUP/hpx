@@ -18,18 +18,18 @@
 
 #include <utility>
 
-namespace hpx { namespace components { namespace process
-{
+namespace hpx { namespace components { namespace process {
     ///////////////////////////////////////////////////////////////////////////
     class child : public client_base<child, process::server::child>
     {
         typedef client_base<child, process::server::child> base_type;
 
     public:
-        template <typename ... Ts>
-        child(Ts &&... ts)
-          : base_type(std::forward<Ts>(ts)...)
-        {}
+        template <typename... Ts>
+        child(Ts&&... ts)
+          : base_type(HPX_FORWARD(Ts, ts)...)
+        {
+        }
 
         hpx::future<void> terminate()
         {
@@ -63,5 +63,4 @@ namespace hpx { namespace components { namespace process
             return wait_for_exit().get();
         }
     };
-}}}
-
+}}}    // namespace hpx::components::process

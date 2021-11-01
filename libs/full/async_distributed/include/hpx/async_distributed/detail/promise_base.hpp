@@ -46,7 +46,7 @@ namespace hpx {
 
             void set_task(util::unique_function_nonser<void()>&& f)
             {
-                f_ = std::move(f);
+                f_ = HPX_MOVE(f);
             }
 
             void mark_as_started()
@@ -67,7 +67,7 @@ namespace hpx {
                         return;
                     },
                     [&](std::exception_ptr ep) {
-                        this->set_exception(std::move(ep));
+                        this->set_exception(HPX_MOVE(ep));
                     });
             }
 
@@ -191,10 +191,10 @@ namespace hpx {
             }
 
             promise_base(promise_base&& other) noexcept
-              : base_type(std::move(static_cast<base_type&&>(other)))
+              : base_type(HPX_MOVE(static_cast<base_type&&>(other)))
               , id_retrieved_(other.id_retrieved_)
-              , id_(std::move(other.id_))
-              , addr_(std::move(other.addr_))
+              , id_(HPX_MOVE(other.id_))
+              , addr_(HPX_MOVE(other.addr_))
             {
                 other.id_retrieved_ = false;
                 other.id_ = naming::invalid_id;
@@ -210,11 +210,10 @@ namespace hpx {
 
             promise_base& operator=(promise_base&& other) noexcept
             {
-                base_type::operator=(
-                    std::move(static_cast<base_type&&>(other)));
+                base_type::operator=(HPX_MOVE(static_cast<base_type&&>(other)));
                 id_retrieved_ = other.id_retrieved_;
-                id_ = std::move(other.id_);
-                addr_ = std::move(other.addr_);
+                id_ = HPX_MOVE(other.id_);
+                addr_ = HPX_MOVE(other.addr_);
 
                 other.id_retrieved_ = false;
                 other.id_ = naming::invalid_id;

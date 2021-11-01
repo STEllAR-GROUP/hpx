@@ -628,9 +628,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return unique(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), std::forward<Pred>(pred),
-            std::forward<Proj>(proj));
+        return unique(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -661,9 +661,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return unique_copy(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), dest,
-            std::forward<Pred>(pred), std::forward<Proj>(proj));
+        return unique_copy(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -705,8 +705,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::util::make_subrange<FwdIter, Sent>(
                 hpx::parallel::v1::detail::unique<FwdIter>().call(
-                    hpx::execution::seq, first, last, std::forward<Pred>(pred),
-                    std::forward<Proj>(proj)),
+                    hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj)),
                 last);
         }
 
@@ -736,8 +736,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::util::make_subrange<FwdIter, Sent>(
                 hpx::parallel::v1::detail::unique<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)),
+                    HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)),
                 last);
         }
 
@@ -770,8 +770,8 @@ namespace hpx { namespace ranges {
                 hpx::parallel::v1::detail::unique<
                     hpx::traits::range_iterator_t<Rng>>()
                     .call(hpx::execution::seq, hpx::util::begin(rng),
-                        hpx::util::end(rng), std::forward<Pred>(pred),
-                        std::forward<Proj>(proj)),
+                        hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                        HPX_FORWARD(Proj, proj)),
                 hpx::util::end(rng));
         }
 
@@ -805,9 +805,9 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::v1::detail::unique<
                     hpx::traits::range_iterator_t<Rng>>()
-                    .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                        hpx::util::end(rng), std::forward<Pred>(pred),
-                        std::forward<Proj>(proj)),
+                    .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                        hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                        HPX_FORWARD(Proj, proj)),
                 hpx::util::end(rng));
         }
     } unique{};
@@ -845,8 +845,8 @@ namespace hpx { namespace ranges {
             using result_type = unique_copy_result<InIter, O>;
 
             return hpx::parallel::v1::detail::unique_copy<result_type>().call(
-                hpx::execution::seq, first, last, dest,
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, dest, HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -877,8 +877,8 @@ namespace hpx { namespace ranges {
             using result_type = unique_copy_result<FwdIter, O>;
 
             return hpx::parallel::v1::detail::unique_copy<result_type>().call(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -907,7 +907,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::unique_copy<result_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                dest, std::forward<Pred>(pred), std::forward<Proj>(proj));
+                dest, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -937,9 +937,9 @@ namespace hpx { namespace ranges {
             using result_type = unique_copy_result<iterator_type, O>;
 
             return hpx::parallel::v1::detail::unique_copy<result_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), dest, std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
     } unique_copy{};
 }}    // namespace hpx::ranges

@@ -779,7 +779,7 @@ namespace hpx {
                 hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>, F&& f,
                 B part_begin)
             {
-                HPX_INVOKE(std::forward<F>(f), part_begin,
+                HPX_INVOKE(HPX_FORWARD(F, f), part_begin,
                     hpx::get<Is>(args).iteration_value()...);
             }
 
@@ -817,9 +817,9 @@ namespace hpx {
 
                 template <typename F_, typename S_, typename Args>
                 part_iterations(F_&& f, S_&& stride, Args&& args)
-                  : f_(std::forward<F_>(f))
-                  , stride_(std::forward<S_>(stride))
-                  , args_(std::forward<Args>(args))
+                  : f_(HPX_FORWARD(F_, f))
+                  , stride_(HPX_FORWARD(S_, stride))
+                  , args_(HPX_FORWARD(Args, args))
                 {
                 }
 
@@ -903,8 +903,8 @@ namespace hpx {
 
                 template <typename F_, typename S_, typename Args>
                 part_iterations(F_&& f, S_&& stride, Args&&)
-                  : f_(std::forward<F_>(f))
-                  , stride_(std::forward<S_>(stride))
+                  : f_(HPX_FORWARD(F_, f))
+                  , stride_(HPX_FORWARD(S_, stride))
                 {
                 }
 
@@ -977,7 +977,7 @@ namespace hpx {
                     if (stride == 1)
                     {
                         parallel::util::loop_n<std::decay_t<ExPolicy>>(
-                            first, count, std::forward<F>(f));
+                            first, count, HPX_FORWARD(F, f));
                     }
                     else if (stride > 0)
                     {
@@ -1085,12 +1085,12 @@ namespace hpx {
                     using args_type = hpx::tuple<std::decay_t<Ts>...>;
 
                     args_type args =
-                        hpx::forward_as_tuple(std::forward<Ts>(ts)...);
+                        hpx::forward_as_tuple(HPX_FORWARD(Ts, ts)...);
 
                     return util::partitioner<ExPolicy>::call_with_index(policy,
                         first, size, stride,
                         part_iterations<ExPolicy, F, S, args_type>{
-                            std::forward<F>(f), stride, args},
+                            HPX_FORWARD(F, f), stride, args},
                         [=](std::vector<hpx::future<void>>&&) mutable -> void {
                             auto pack =
                                 typename hpx::util::make_index_pack<sizeof...(
@@ -1129,9 +1129,9 @@ namespace hpx {
                     "boundaries.");
 
                 std::size_t size = parallel::v1::detail::distance(first, last);
-                auto&& t = hpx::forward_as_tuple(std::forward<Args>(args)...);
+                auto&& t = hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
 
-                return for_loop_algo().call(std::forward<ExPolicy>(policy),
+                return for_loop_algo().call(HPX_FORWARD(ExPolicy, policy),
                     first, size, stride, hpx::get<sizeof...(Args) - 1>(t),
                     hpx::get<Is>(t)...);
             }
@@ -1159,9 +1159,9 @@ namespace hpx {
                     "Requires at least forward iterator or integral loop "
                     "boundaries.");
 
-                auto&& t = hpx::forward_as_tuple(std::forward<Args>(args)...);
+                auto&& t = hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
 
-                return for_loop_algo().call(std::forward<ExPolicy>(policy),
+                return for_loop_algo().call(HPX_FORWARD(ExPolicy, policy),
                     first, size, stride, hpx::get<sizeof...(Args) - 1>(t),
                     hpx::get<Is>(t)...);
             }
@@ -1181,9 +1181,9 @@ namespace hpx {
                 "for_loop must be called with at least a function object");
 
             using hpx::util::make_index_pack;
-            return detail::for_loop(std::forward<ExPolicy>(policy), first, last,
+            return detail::for_loop(HPX_FORWARD(ExPolicy, policy), first, last,
                 1, typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         template <typename I, typename... Args,
@@ -1197,7 +1197,7 @@ namespace hpx {
                 "for_loop must be called with at least a function object");
 
             return for_loop(
-                hpx::execution::seq, first, last, std::forward<Args>(args)...);
+                hpx::execution::seq, first, last, HPX_FORWARD(Args, args)...);
         }
 
         template <typename ExPolicy, typename I, typename S, typename... Args,
@@ -1216,9 +1216,9 @@ namespace hpx {
                 "object");
 
             using hpx::util::make_index_pack;
-            return detail::for_loop(std::forward<ExPolicy>(policy), first, last,
+            return detail::for_loop(HPX_FORWARD(ExPolicy, policy), first, last,
                 stride, typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         template <typename I, typename S, typename... Args,
@@ -1235,7 +1235,7 @@ namespace hpx {
                 "object");
 
             return for_loop_strided(hpx::execution::seq, first, last, stride,
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         template <typename ExPolicy, typename I, typename Size,
@@ -1253,9 +1253,9 @@ namespace hpx {
                 "for_loop_n must be called with at least a function object");
 
             using hpx::util::make_index_pack;
-            return detail::for_loop_n(std::forward<ExPolicy>(policy), first,
+            return detail::for_loop_n(HPX_FORWARD(ExPolicy, policy), first,
                 size, 1, typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         template <typename I, typename Size, typename... Args,
@@ -1270,7 +1270,7 @@ namespace hpx {
                 "for_loop_n must be called with at least a function object");
 
             return for_loop_n(
-                hpx::execution::seq, first, size, std::forward<Args>(args)...);
+                hpx::execution::seq, first, size, HPX_FORWARD(Args, args)...);
         }
 
         template <typename ExPolicy, typename I, typename Size, typename S,
@@ -1291,10 +1291,10 @@ namespace hpx {
                 "object");
 
             using hpx::util::make_index_pack;
-            return detail::for_loop_n(std::forward<ExPolicy>(policy), first,
+            return detail::for_loop_n(HPX_FORWARD(ExPolicy, policy), first,
                 size, stride,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         template <typename I, typename Size, typename S, typename... Args,
@@ -1310,7 +1310,7 @@ namespace hpx {
                 "for_loop_n_strided must be called with at least a function "
                 "object");
             return for_loop_strided_n(hpx::execution::seq, first, size, stride,
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
     }}    // namespace parallel::v2
 
@@ -1336,10 +1336,10 @@ namespace hpx {
                 "for_loop must be called with at least a function object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(
-                std::forward<ExPolicy>(policy), first, last, 1,
+            return parallel::v2::detail::for_loop(HPX_FORWARD(ExPolicy, policy),
+                first, last, 1,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -1359,7 +1359,7 @@ namespace hpx {
             using hpx::util::make_index_pack;
             return parallel::v2::detail::for_loop(hpx::execution::seq, first,
                 last, 1, typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
     } for_loop{};
 
@@ -1387,10 +1387,10 @@ namespace hpx {
                 "object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(
-                std::forward<ExPolicy>(policy), first, last, stride,
+            return parallel::v2::detail::for_loop(HPX_FORWARD(ExPolicy, policy),
+                first, last, stride,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -1413,7 +1413,7 @@ namespace hpx {
             return parallel::v2::detail::for_loop(hpx::execution::seq, first,
                 last, stride,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
     } for_loop_strided{};
 
@@ -1441,9 +1441,9 @@ namespace hpx {
 
             using hpx::util::make_index_pack;
             return parallel::v2::detail::for_loop_n(
-                std::forward<ExPolicy>(policy), first, size, 1,
+                HPX_FORWARD(ExPolicy, policy), first, size, 1,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -1463,7 +1463,7 @@ namespace hpx {
             using hpx::util::make_index_pack;
             return parallel::v2::detail::for_loop_n(hpx::execution::seq, first,
                 size, 1, typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
     } for_loop_n{};
 
@@ -1493,9 +1493,9 @@ namespace hpx {
 
             using hpx::util::make_index_pack;
             return parallel::v2::detail::for_loop_n(
-                std::forward<ExPolicy>(policy), first, size, stride,
+                HPX_FORWARD(ExPolicy, policy), first, size, stride,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -1518,7 +1518,7 @@ namespace hpx {
             return parallel::v2::detail::for_loop_n(hpx::execution::seq, first,
                 size, stride,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
     } for_loop_n_strided{};
 }    // namespace hpx

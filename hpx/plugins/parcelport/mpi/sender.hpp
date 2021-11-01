@@ -25,8 +25,7 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace parcelset { namespace policies { namespace mpi
-{
+namespace hpx { namespace parcelset { namespace policies { namespace mpi {
     struct sender
     {
         using connection_type = sender_connection;
@@ -51,7 +50,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return std::make_shared<connection_type>(this, dest, pp);
         }
 
-        void add(connection_ptr const & ptr)
+        void add(connection_ptr const& ptr)
         {
             std::unique_lock<mutex_type> l(connections_mtx_);
             connections_.push_back(ptr);
@@ -62,29 +61,23 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return tag_provider_.acquire();
         }
 
-        void send_messages(
-            connection_ptr connection
-        )
+        void send_messages(connection_ptr connection)
         {
             // Check if sending has been completed....
             if (connection->send())
             {
                 error_code ec;
-                util::unique_function_nonser<
-                    void(
-                        error_code const&
-                      , parcelset::locality const&
-                      , connection_ptr
-                    )
-                > postprocess_handler;
-                std::swap(postprocess_handler, connection->postprocess_handler_);
-                postprocess_handler(
-                    ec, connection->destination(), connection);
+                util::unique_function_nonser<void(error_code const&,
+                    parcelset::locality const&, connection_ptr)>
+                    postprocess_handler;
+                std::swap(
+                    postprocess_handler, connection->postprocess_handler_);
+                postprocess_handler(ec, connection->destination(), connection);
             }
             else
             {
                 std::unique_lock<mutex_type> l(connections_mtx_);
-                connections_.push_back(std::move(connection));
+                connections_.push_back(HPX_MOVE(connection));
             }
         }
 
@@ -92,17 +85,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             connection_ptr connection;
             {
-                std::unique_lock<mutex_type> l(connections_mtx_, std::try_to_lock);
-                if(l && !connections_.empty())
+                std::unique_lock<mutex_type> l(
+                    connections_mtx_, std::try_to_lock);
+                if (l && !connections_.empty())
                 {
-                    connection = std::move(connections_.front());
+                    connection = HPX_MOVE(connections_.front());
                     connections_.pop_front();
                 }
             }
             bool has_work = false;
-            if(connection)
+            if (connection)
             {
-                send_messages(std::move(connection));
+                send_messages(HPX_MOVE(connection));
                 has_work = true;
             }
             next_free_tag();
@@ -116,12 +110,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             int next_free = -1;
             {
-                std::unique_lock<mutex_type> l(next_free_tag_mtx_, std::try_to_lock);
-                if(l)
+                std::unique_lock<mutex_type> l(
+                    next_free_tag_mtx_, std::try_to_lock);
+                if (l)
                     next_free = next_free_tag_locked();
             }
 
-            if(next_free != -1)
+            if (next_free != -1)
             {
                 HPX_ASSERT(next_free > 1);
                 tag_provider_.release(next_free);
@@ -132,14 +127,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             util::mpi_environment::scoped_try_lock l;
 
-            if(l.locked)
+            if (l.locked)
             {
                 MPI_Status status;
                 int completed = 0;
                 int ret = 0;
                 ret = MPI_Test(&next_free_tag_request_, &completed, &status);
                 HPX_ASSERT(ret == MPI_SUCCESS);
-                if(completed)// && status->MPI_ERROR != MPI_ERR_PENDING)
+                if (completed)    // && status->MPI_ERROR != MPI_ERR_PENDING)
                 {
                     return get_next_free_tag();
                 }
@@ -150,15 +145,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         int get_next_free_tag()
         {
             int next_free = next_free_tag_;
-            MPI_Irecv(
-                &next_free_tag_
-              , 1
-              , MPI_INT
-              , MPI_ANY_SOURCE
-              , 1
-              , util::mpi_environment::communicator()
-              , &next_free_tag_request_
-            );
+            MPI_Irecv(&next_free_tag_, 1, MPI_INT, MPI_ANY_SOURCE, 1,
+                util::mpi_environment::communicator(), &next_free_tag_request_);
             return next_free;
         }
 
@@ -170,8 +158,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         int next_free_tag_;
     };
 
-
-}}}}
+}}}}    // namespace hpx::parcelset::policies::mpi
 
 #endif
-

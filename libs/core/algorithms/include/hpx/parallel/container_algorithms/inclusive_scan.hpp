@@ -909,7 +909,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::inclusive_scan<result_type>()
                 .call(hpx::execution::seq, first, last, dest,
-                    std::forward<Op>(op));
+                    HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -940,8 +940,8 @@ namespace hpx { namespace ranges {
             using result_type = inclusive_scan_result<FwdIter1, FwdIter2>;
 
             return hpx::parallel::v1::detail::inclusive_scan<result_type>()
-                .call(std::forward<ExPolicy>(policy), first, last, dest,
-                    std::forward<Op>(op));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                    HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -970,7 +970,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::inclusive_scan<result_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng), dest,
-                    std::forward<Op>(op));
+                    HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -1000,8 +1000,8 @@ namespace hpx { namespace ranges {
                 inclusive_scan_result<traits::range_iterator_t<Rng>, O>;
 
             return hpx::parallel::v1::detail::inclusive_scan<result_type>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng),
-                    std::end(rng), dest, std::forward<Op>(op));
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
+                    std::end(rng), dest, HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -1029,8 +1029,8 @@ namespace hpx { namespace ranges {
             using result_type = inclusive_scan_result<InIter, OutIter>;
 
             return hpx::parallel::v1::detail::inclusive_scan<result_type>()
-                .call(hpx::execution::seq, first, last, dest, std::move(init),
-                    std::forward<Op>(op));
+                .call(hpx::execution::seq, first, last, dest, HPX_MOVE(init),
+                    HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -1060,8 +1060,8 @@ namespace hpx { namespace ranges {
             using result_type = inclusive_scan_result<FwdIter1, FwdIter2>;
 
             return hpx::parallel::v1::detail::inclusive_scan<result_type>()
-                .call(std::forward<ExPolicy>(policy), first, last, dest,
-                    std::move(init), std::forward<Op>(op));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                    HPX_MOVE(init), HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -1090,7 +1090,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::inclusive_scan<result_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng), dest,
-                    std::move(init), std::forward<Op>(op));
+                    HPX_MOVE(init), HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -1120,8 +1120,8 @@ namespace hpx { namespace ranges {
                 inclusive_scan_result<traits::range_iterator_t<Rng>, O>;
 
             return hpx::parallel::v1::detail::inclusive_scan<result_type>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng),
-                    std::end(rng), dest, std::move(init), std::forward<Op>(op));
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
+                    std::end(rng), dest, HPX_MOVE(init), HPX_FORWARD(Op, op));
         }
     } inclusive_scan{};
 }}    // namespace hpx::ranges

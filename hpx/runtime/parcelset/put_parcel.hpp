@@ -35,38 +35,30 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parcelset
-{
-    namespace detail
-    {
+namespace hpx { namespace parcelset {
+    namespace detail {
         template <typename Action, typename Continuation, typename... Args>
         std::unique_ptr<actions::base_action> make_parcel_action_impl(
-            std::true_type /* Continuation */,
-            Continuation&& cont,
-            Action, Args&&... args)
+            std::true_type /* Continuation */, Continuation&& cont, Action,
+            Args&&... args)
         {
             static_assert(traits::is_action<Action>::value,
                 "We need an action to construct a parcel");
             return std::unique_ptr<actions::base_action>(
-                    new actions::transfer_continuation_action<Action>(
-                        std::forward<Continuation>(cont),
-                        std::forward<Args>(args)...
-                    )
-                );
+                new actions::transfer_continuation_action<Action>(
+                    HPX_FORWARD(Continuation, cont),
+                    HPX_FORWARD(Args, args)...));
         }
 
         template <typename Action, typename... Args>
         std::unique_ptr<actions::base_action> make_parcel_action_impl(
-            std::false_type /* Continuation */,
-            Action, Args&&... args)
+            std::false_type /* Continuation */, Action, Args&&... args)
         {
             static_assert(traits::is_action<Action>::value,
                 "We need an action to construct a parcel");
             return std::unique_ptr<actions::base_action>(
-                    new actions::transfer_action<Action>(
-                        std::forward<Args>(args)...
-                    )
-                );
+                new actions::transfer_action<Action>(
+                    HPX_FORWARD(Args, args)...));
         }
 
         template <typename Arg0, typename... Args>
@@ -75,28 +67,23 @@ namespace hpx { namespace parcelset
         {
             // Is the first argument a continuation?
             using is_continuation = traits::is_continuation<Arg0>;
-            return make_parcel_action_impl(
-                is_continuation{},
-                std::forward<Arg0>(arg0), std::forward<Args>(args)...);
+            return make_parcel_action_impl(is_continuation{},
+                HPX_FORWARD(Arg0, arg0), HPX_FORWARD(Args, args)...);
         }
 
         template <typename... Args>
         parcel create_parcel::call(
-            naming::gid_type&& dest, naming::address&& addr,
-            Args&&... args)
+            naming::gid_type&& dest, naming::address&& addr, Args&&... args)
         {
-            return parcel(
-                std::move(dest), std::move(addr),
-                detail::make_parcel_action(std::forward<Args>(args)...));
+            return parcel(HPX_MOVE(dest), HPX_MOVE(addr),
+                detail::make_parcel_action(HPX_FORWARD(Args, args)...));
         }
 
-        parcel create_parcel::call_with_action(
-            naming::gid_type&& dest, naming::address&& addr,
+        parcel create_parcel::call_with_action(naming::gid_type&& dest,
+            naming::address&& addr,
             std::unique_ptr<actions::base_action>&& action)
         {
-            return parcel(
-                std::move(dest), std::move(addr),
-                std::move(action));
+            return parcel(HPX_MOVE(dest), HPX_MOVE(addr), HPX_MOVE(action));
         }
 
         template <typename PutParcel>
@@ -104,14 +91,12 @@ namespace hpx { namespace parcelset
             hpx::future<naming::gid_type> f)
         {
             pp(detail::create_parcel::call_with_action(
-                f.get(), std::move(addr),
-                std::move(action)
-            ));
+                f.get(), HPX_MOVE(addr), HPX_MOVE(action)));
         }
 
         template <typename PutParcel>
-        void put_parcel_impl(PutParcel&& pp,
-            naming::id_type dest, naming::address&& addr,
+        void put_parcel_impl(PutParcel&& pp, naming::id_type dest,
+            naming::address&& addr,
             std::unique_ptr<actions::base_action>&& action)
         {
             if (dest.get_management_type() == naming::id_type::unmanaged)
@@ -122,20 +107,17 @@ namespace hpx { namespace parcelset
                 HPX_ASSERT(gid);
 
                 pp(detail::create_parcel::call_with_action(
-                    std::move(gid), std::move(addr),
-                    std::move(action)
-                ));
+                    HPX_MOVE(gid), HPX_MOVE(addr), HPX_MOVE(action)));
             }
-            else if (dest.get_management_type() == naming::id_type::managed_move_credit)
+            else if (dest.get_management_type() ==
+                naming::id_type::managed_move_credit)
             {
                 naming::gid_type gid = naming::detail::move_gid(dest.get_gid());
                 // NOLINTNEXTLINE(bugprone-use-after-move)
                 HPX_ASSERT(gid);
 
                 pp(detail::create_parcel::call_with_action(
-                    std::move(gid), std::move(addr),
-                    std::move(action)
-                ));
+                    HPX_MOVE(gid), HPX_MOVE(addr), HPX_MOVE(action)));
             }
             else
             {
@@ -144,19 +126,13 @@ namespace hpx { namespace parcelset
                 if (split_gid.is_ready())
                 {
                     pp(detail::create_parcel::call_with_action(
-                        split_gid.get(), std::move(addr),
-                        std::move(action)
-                    ));
+                        split_gid.get(), HPX_MOVE(addr), HPX_MOVE(action)));
                 }
                 else
                 {
-                    split_gid.then(
-                        hpx::launch::sync,
-                        put_parcel_cont<PutParcel>{
-                            std::forward<PutParcel>(pp),
-                            std::move(dest), std::move(addr),
-                            std::move(action)
-                        });
+                    split_gid.then(hpx::launch::sync,
+                        put_parcel_cont<PutParcel>{HPX_FORWARD(PutParcel, pp),
+                            HPX_MOVE(dest), HPX_MOVE(addr), HPX_MOVE(action)});
                 }
             }
         }
@@ -173,30 +149,29 @@ namespace hpx { namespace parcelset
 
             void operator()(parcel&& p)
             {
-                hpx::parcelset::put_parcel(std::move(p), std::move(cb_));
+                hpx::parcelset::put_parcel(HPX_MOVE(p), HPX_MOVE(cb_));
             }
         };
-    }
+    }    // namespace detail
 
     template <typename... Args>
     void put_parcel(
         naming::id_type const& dest, naming::address&& addr, Args&&... args)
     {
-        detail::put_parcel_impl(
-            detail::put_parcel_handler(),
-            dest, std::move(addr),
-            detail::make_parcel_action(std::forward<Args>(args)...));
+        detail::put_parcel_impl(detail::put_parcel_handler(), dest,
+            HPX_MOVE(addr),
+            detail::make_parcel_action(HPX_FORWARD(Args, args)...));
     }
 
     template <typename Callback, typename... Args>
-    void put_parcel_cb(Callback&& cb,
-        naming::id_type const& dest, naming::address&& addr, Args&&... args)
+    void put_parcel_cb(Callback&& cb, naming::id_type const& dest,
+        naming::address&& addr, Args&&... args)
     {
         detail::put_parcel_impl(
-            detail::put_parcel_handler_cb<Callback>{std::forward<Callback>(cb)},
-            dest, std::move(addr),
-            detail::make_parcel_action(std::forward<Args>(args)...));
+            detail::put_parcel_handler_cb<Callback>{HPX_FORWARD(Callback, cb)},
+            dest, HPX_MOVE(addr),
+            detail::make_parcel_action(HPX_FORWARD(Args, args)...));
     }
-}}
+}}    // namespace hpx::parcelset
 
 #endif

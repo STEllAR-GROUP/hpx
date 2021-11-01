@@ -91,8 +91,8 @@ namespace hpx { namespace parallel { namespace execution {
         static void sync_execute(F&& f, Ts&&... ts)
         {
             return hpx::detail::sync_launch_policy_dispatch<
-                launch::sync_policy>::call(launch::sync, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                launch::sync_policy>::call(launch::sync, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // TwoWayExecutor interface
@@ -100,7 +100,7 @@ namespace hpx { namespace parallel { namespace execution {
         static hpx::future<void> async_execute(F&& f, Ts&&... ts)
         {
             return hpx::detail::async_launch_policy_dispatch<Policy>::call(
-                Policy{}, std::forward<F>(f), std::forward<Ts>(ts)...);
+                Policy{}, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
@@ -111,7 +111,7 @@ namespace hpx { namespace parallel { namespace execution {
                 f, "parallel_executor_aggregated::post");
 
             detail::post_policy_dispatch<Policy>::call(
-                Policy{}, desc, std::forward<F>(f), std::forward<Ts>(ts)...);
+                Policy{}, desc, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
     private:
@@ -155,7 +155,7 @@ namespace hpx { namespace parallel { namespace execution {
                 // concurrently
                 if (e)
                 {
-                    std::rethrow_exception(std::move(e));
+                    std::rethrow_exception(HPX_MOVE(e));
                 }
             }
 
@@ -229,7 +229,7 @@ namespace hpx { namespace parallel { namespace execution {
             // change the executor and algorithm infrastructure
             std::vector<hpx::future<void>> result;
             result.push_back(async_execute(sync_exec{num_spread_, num_tasks_},
-                std::forward<F>(f), shape, std::forward<Ts>(ts)...));
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
             return result;
         }
 
@@ -305,8 +305,8 @@ namespace hpx { namespace parallel { namespace execution {
         static void sync_execute(F&& f, Ts&&... ts)
         {
             return hpx::detail::sync_launch_policy_dispatch<
-                launch::sync_policy>::call(launch::sync, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                launch::sync_policy>::call(launch::sync, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // TwoWayExecutor interface
@@ -314,7 +314,7 @@ namespace hpx { namespace parallel { namespace execution {
         hpx::future<void> async_execute(F&& f, Ts&&... ts) const
         {
             return hpx::detail::async_launch_policy_dispatch<hpx::launch>::call(
-                policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
+                policy_, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
@@ -325,7 +325,7 @@ namespace hpx { namespace parallel { namespace execution {
                 f, "parallel_executor_aggregated::post");
 
             detail::post_policy_dispatch<hpx::launch>::call(
-                policy_, desc, std::forward<F>(f), std::forward<Ts>(ts)...);
+                policy_, desc, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
     private:
@@ -369,7 +369,7 @@ namespace hpx { namespace parallel { namespace execution {
                 // concurrently
                 if (e)
                 {
-                    std::rethrow_exception(std::move(e));
+                    std::rethrow_exception(HPX_MOVE(e));
                 }
             }
 
@@ -453,7 +453,7 @@ namespace hpx { namespace parallel { namespace execution {
             std::vector<hpx::future<void>> result;
             result.push_back(
                 async_execute(sync_exec{policy_, num_spread_, num_tasks_},
-                    std::forward<F>(f), shape, std::forward<Ts>(ts)...));
+                    HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
             return result;
         }
 

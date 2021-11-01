@@ -45,7 +45,7 @@ namespace hpx { namespace components {
         naming::id_type create_component(Ts&&... vs)
         {
             return this->base_type::template create_component<Component>(
-                gid_, std::forward<Ts>(vs)...);
+                gid_, HPX_FORWARD(Ts, vs)...);
         }
 
         /// Asynchronously create a new component using the runtime_support
@@ -53,7 +53,7 @@ namespace hpx { namespace components {
         lcos::future<naming::id_type> create_component_async(Ts&&... vs)
         {
             return this->base_type::template create_component_async<Component>(
-                gid_, std::forward<Ts>(vs)...);
+                gid_, HPX_FORWARD(Ts, vs)...);
         }
 
         /// Asynchronously create N new default constructed components using
@@ -63,7 +63,7 @@ namespace hpx { namespace components {
             std::size_t /* count */, Ts&&... vs)
         {
             return this->base_type::template bulk_create_component<Component>(
-                gid_, std::forward<Ts>(vs)...);
+                gid_, HPX_FORWARD(Ts, vs)...);
         }
 
         /// Asynchronously create a new component using the runtime_support
@@ -72,7 +72,7 @@ namespace hpx { namespace components {
             std::size_t /* count */, Ts&&... vs)
         {
             return this->base_type::template bulk_create_component<Component>(
-                gid_, std::forward<Ts>(vs)...);
+                gid_, HPX_FORWARD(Ts, vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////

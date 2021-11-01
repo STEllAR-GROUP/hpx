@@ -57,7 +57,7 @@ namespace hpx { namespace actions {
                 // yes, this looks like this code was dereferencing a nullptr...
                 int* dummy = nullptr;
                 return reinterpret_cast<F const&>(*dummy)(    // -V522
-                    std::forward<Ts>(vs)...);
+                    HPX_FORWARD(Ts, vs)...);
             }
         };
 

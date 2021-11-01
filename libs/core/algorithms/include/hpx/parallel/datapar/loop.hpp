@@ -293,7 +293,7 @@ namespace hpx { namespace parallel { namespace util {
                 if (!detail::is_data_aligned(it1) ||
                     !detail::is_data_aligned(it2))
                 {
-                    return std::make_pair(std::move(it1), std::move(it2));
+                    return std::make_pair(HPX_MOVE(it1), HPX_MOVE(it2));
                 }
 
                 static std::size_t constexpr size =
@@ -305,7 +305,7 @@ namespace hpx { namespace parallel { namespace util {
                     datapar_loop_step2<InIter1, InIter2>::callv(f, it1, it2);
                 }
 
-                return std::make_pair(std::move(it1), std::move(it2));
+                return std::make_pair(HPX_MOVE(it1), HPX_MOVE(it2));
             }
 
             template <typename InIter1, typename InIter2, typename F>
@@ -316,7 +316,7 @@ namespace hpx { namespace parallel { namespace util {
                 std::pair<InIter1, InIter2>>::type
             call(InIter1 it1, InIter1 /* last1 */, InIter2 it2, F&& /* f */)
             {
-                return std::make_pair(std::move(it1), std::move(it2));
+                return std::make_pair(HPX_MOVE(it1), HPX_MOVE(it2));
             }
         };
 
@@ -331,7 +331,7 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter1 it1, InIter1 last1, InIter2 it2, F&& f)
             {
                 return util::detail::loop2<InIter1, InIter2>::call(
-                    it1, last1, it2, std::forward<F>(f));
+                    it1, last1, it2, HPX_FORWARD(F, f));
             }
         };
 
@@ -587,10 +587,10 @@ namespace hpx { namespace parallel { namespace util {
         hpx::parallel::util::loop_step_t<ExPolicy>, std::false_type, F&& f,
         Iter1& it1, Iter2& it2)
         -> decltype(detail::datapar_loop_step2<Iter1, Iter2>::call1(
-            std::forward<F>(f), it1, it2))
+            HPX_FORWARD(F, f), it1, it2))
     {
         return detail::datapar_loop_step2<Iter1, Iter2>::call1(
-            std::forward<F>(f), it1, it2);
+            HPX_FORWARD(F, f), it1, it2);
     }
 
     template <typename ExPolicy, typename F, typename Iter1, typename Iter2,
@@ -600,10 +600,10 @@ namespace hpx { namespace parallel { namespace util {
         hpx::parallel::util::loop_step_t<ExPolicy>, std::true_type, F&& f,
         Iter1& it1, Iter2& it2)
         -> decltype(detail::datapar_loop_step2<Iter1, Iter2>::callv(
-            std::forward<F>(f), it1, it2))
+            HPX_FORWARD(F, f), it1, it2))
     {
         return detail::datapar_loop_step2<Iter1, Iter2>::callv(
-            std::forward<F>(f), it1, it2);
+            HPX_FORWARD(F, f), it1, it2);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -622,8 +622,7 @@ namespace hpx { namespace parallel { namespace util {
         hpx::parallel::util::loop_t, hpx::execution::simd_policy, Begin begin,
         End end, F&& f)
     {
-        return detail::datapar_loop<Begin>::call(
-            begin, end, std::forward<F>(f));
+        return detail::datapar_loop<Begin>::call(begin, end, HPX_FORWARD(F, f));
     }
 
     template <typename Begin, typename End, typename F>
@@ -631,8 +630,7 @@ namespace hpx { namespace parallel { namespace util {
         hpx::parallel::util::loop_t, hpx::execution::simd_task_policy,
         Begin begin, End end, F&& f)
     {
-        return detail::datapar_loop<Begin>::call(
-            begin, end, std::forward<F>(f));
+        return detail::datapar_loop<Begin>::call(begin, end, HPX_FORWARD(F, f));
     }
 
     template <typename Begin, typename End, typename CancelToken, typename F>
@@ -660,7 +658,7 @@ namespace hpx { namespace parallel { namespace util {
         Begin begin, End end, F&& f)
     {
         return detail::datapar_loop_ind<Begin>::call(
-            begin, end, std::forward<F>(f));
+            begin, end, HPX_FORWARD(F, f));
     }
 
     template <typename Begin, typename End, typename F>
@@ -669,7 +667,7 @@ namespace hpx { namespace parallel { namespace util {
         Begin begin, End end, F&& f)
     {
         return detail::datapar_loop_ind<Begin>::call(
-            begin, end, std::forward<F>(f));
+            begin, end, HPX_FORWARD(F, f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -682,7 +680,7 @@ namespace hpx { namespace parallel { namespace util {
         Iter1 last1, Iter2 first2, F&& f)
     {
         return detail::datapar_loop2<VecOnly, Iter1, Iter2>::call(
-            first1, last1, first2, std::forward<F>(f));
+            first1, last1, first2, HPX_FORWARD(F, f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -693,7 +691,7 @@ namespace hpx { namespace parallel { namespace util {
         std::size_t count, F&& f)
     {
         return hpx::parallel::util::detail::datapar_loop_n<Iter>::call(
-            it, count, std::forward<F>(f));
+            it, count, HPX_FORWARD(F, f));
     }
 
     template <typename ExPolicy, typename Iter, typename CancelToken,
@@ -715,7 +713,7 @@ namespace hpx { namespace parallel { namespace util {
         std::size_t count, F&& f)
     {
         return hpx::parallel::util::detail::datapar_loop_n_ind<Iter>::call(
-            it, count, std::forward<F>(f));
+            it, count, HPX_FORWARD(F, f));
     }
 
     ///////////////////////////////////////////////////////////////////////////

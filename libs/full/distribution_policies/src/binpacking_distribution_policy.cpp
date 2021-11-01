@@ -77,7 +77,7 @@ namespace hpx { namespace components { namespace detail {
             hpx::launch::sync,
             [](std::vector<hpx::future<std::uint64_t>>&& values)
                 -> std::vector<std::uint64_t> { return hpx::unwrap(values); },
-            std::move(values));
+            HPX_MOVE(values));
     }
 
     hpx::future<std::vector<std::uint64_t>> get_counter_values(
@@ -103,7 +103,7 @@ namespace hpx { namespace components { namespace detail {
                 counters.emplace_back(counter_name, id);
         }
 
-        return hpx::dataflow(&retrieve_counter_values, std::move(counters));
+        return hpx::dataflow(&retrieve_counter_values, HPX_MOVE(counters));
     }
 
     hpx::id_type const& get_best_locality(

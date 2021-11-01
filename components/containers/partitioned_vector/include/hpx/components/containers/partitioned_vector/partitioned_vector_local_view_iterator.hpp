@@ -20,27 +20,20 @@ namespace hpx {
     class partitioned_vector_local_view_iterator
       : public hpx::util::iterator_adaptor<
             partitioned_vector_local_view_iterator<DataType, BaseIter>,
-            BaseIter,
-            DataType,
-            std::forward_iterator_tag,
-            DataType &>
+            BaseIter, DataType, std::forward_iterator_tag, DataType&>
     {
     private:
-        using base_type
-            = hpx::util::iterator_adaptor<
-                partitioned_vector_local_view_iterator<DataType, BaseIter>,
-                BaseIter,
-                DataType,
-                std::forward_iterator_tag,
-                DataType &>;
+        using base_type = hpx::util::iterator_adaptor<
+            partitioned_vector_local_view_iterator<DataType, BaseIter>,
+            BaseIter, DataType, std::forward_iterator_tag, DataType&>;
 
     public:
         partitioned_vector_local_view_iterator() = default;
 
         explicit partitioned_vector_local_view_iterator(
-            BaseIter && it, BaseIter && end)
-        : base_type( std::forward<BaseIter>(it) ),
-          end_( std::forward<BaseIter>(end) )
+            BaseIter&& it, BaseIter&& end)
+          : base_type(HPX_FORWARD(BaseIter, it))
+          , end_(HPX_FORWARD(BaseIter, end))
         {
             satisfy_predicate();
         }
@@ -56,7 +49,7 @@ namespace hpx {
         template <typename, typename>
         friend class const_partitioned_vector_local_view_iterator;
 
-        DataType & dereference() const
+        DataType& dereference() const
         {
             HPX_ASSERT(!is_at_end());
             return this->base_reference()->data();
@@ -70,10 +63,10 @@ namespace hpx {
 
         void satisfy_predicate()
         {
-            while(this->base_reference() != end_ &&
-                !this->base_reference()-> is_owned_by_current_thread())
+            while (this->base_reference() != end_ &&
+                !this->base_reference()->is_owned_by_current_thread())
             {
-                ++( this->base_reference() );
+                ++(this->base_reference());
             }
         }
 
@@ -85,19 +78,12 @@ namespace hpx {
     class const_partitioned_vector_local_view_iterator
       : public hpx::util::iterator_adaptor<
             const_partitioned_vector_local_view_iterator<DataType, BaseIter>,
-            BaseIter,
-            DataType,
-            std::forward_iterator_tag,
-            DataType const &>
+            BaseIter, DataType, std::forward_iterator_tag, DataType const&>
     {
     private:
-        using base_type
-            = hpx::util::iterator_adaptor<
-                const_partitioned_vector_local_view_iterator<DataType, BaseIter>,
-                BaseIter,
-                DataType,
-                std::forward_iterator_tag,
-                DataType const &>;
+        using base_type = hpx::util::iterator_adaptor<
+            const_partitioned_vector_local_view_iterator<DataType, BaseIter>,
+            BaseIter, DataType, std::forward_iterator_tag, DataType const&>;
 
     public:
         const_partitioned_vector_local_view_iterator() = default;
@@ -108,12 +94,13 @@ namespace hpx {
                 RightBaseIter> const& other)
           : base_type(other.base())
           , end_(other.end_)
-        {}
+        {
+        }
 
         explicit const_partitioned_vector_local_view_iterator(
-            BaseIter && it, BaseIter && end)
-            : base_type( std::forward<BaseIter>(it) ),
-                end_( std::forward<BaseIter>(end) )
+            BaseIter&& it, BaseIter&& end)
+          : base_type(HPX_FORWARD(BaseIter, it))
+          , end_(HPX_FORWARD(BaseIter, end))
         {
             satisfy_predicate();
         }
@@ -126,7 +113,7 @@ namespace hpx {
     private:
         friend class hpx::util::iterator_core_access;
 
-        DataType const & dereference() const
+        DataType const& dereference() const
         {
             HPX_ASSERT(!is_at_end());
             return this->base_reference()->data();
@@ -140,15 +127,14 @@ namespace hpx {
 
         void satisfy_predicate()
         {
-            while(this->base_reference() != end_ &&
-                !this->base_reference()-> is_owned_by_current_thread())
+            while (this->base_reference() != end_ &&
+                !this->base_reference()->is_owned_by_current_thread())
             {
-                ++( this->base_reference() );
+                ++(this->base_reference());
             }
         }
 
     private:
         BaseIter end_;
     };
-}
-
+}    // namespace hpx

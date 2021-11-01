@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         ExPolicy&& policy, Iter first, Sent last, T const& value)
     {
         return sequential_fill_t{}(
-            std::forward<ExPolicy>(policy), first, last, value);
+            HPX_FORWARD(ExPolicy, policy), first, last, value);
     }
 #endif
 
@@ -81,7 +81,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         ExPolicy&& policy, Iter first, std::size_t count, T const& value)
     {
         return sequential_fill_n_t{}(
-            std::forward<ExPolicy>(policy), first, count, value);
+            HPX_FORWARD(ExPolicy, policy), first, count, value);
     }
 #endif
 

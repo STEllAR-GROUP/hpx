@@ -57,7 +57,7 @@ namespace hpx { namespace lcos { namespace local {
             event_.store(true, std::memory_order_release);
 
             std::unique_lock<mutex_type> l(mtx_);
-            set_locked(std::move(l));
+            set_locked(HPX_MOVE(l));
         }
 
         /// \brief Reset the event
@@ -82,7 +82,7 @@ namespace hpx { namespace lcos { namespace local {
             HPX_ASSERT(l.owns_lock());
 
             // release the threads
-            cond_.notify_all(std::move(l));
+            cond_.notify_all(HPX_MOVE(l));
         }
 
         mutex_type mtx_;    ///< This mutex protects the queue.

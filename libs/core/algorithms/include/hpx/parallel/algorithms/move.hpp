@@ -138,7 +138,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::detail::get_in_out_result(
                     util::foreach_partitioner<ExPolicy>::call(
-                        std::forward<ExPolicy>(policy),
+                        HPX_FORWARD(ExPolicy, policy),
                         hpx::util::make_zip_iterator(first, dest),
                         detail::distance(first, last),
                         [](zip_iterator part_begin, std::size_t part_size,
@@ -150,7 +150,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 get<0>(iters), part_size, get<1>(iters));
                         },
                         [](zip_iterator&& last) -> zip_iterator {
-                            return std::move(last);
+                            return HPX_MOVE(last);
                         }));
             }
         };
@@ -195,7 +195,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         move(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
     {
         return detail::transfer<detail::move<FwdIter1, FwdIter2>>(
-            std::forward<ExPolicy>(policy), first, last, dest);
+            HPX_FORWARD(ExPolicy, policy), first, last, dest);
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -222,7 +222,7 @@ namespace hpx {
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::transfer<
                     hpx::parallel::v1::detail::move<FwdIter1, FwdIter2>>(
-                    std::forward<ExPolicy>(policy), first, last, dest));
+                    HPX_FORWARD(ExPolicy, policy), first, last, dest));
         }
 
         // clang-format off

@@ -52,7 +52,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             task_object(F&& f)
-              : f_(std::move(f))
+              : f_(HPX_MOVE(f))
             {
             }
 
@@ -64,7 +64,7 @@ namespace hpx { namespace lcos { namespace local {
 
             task_object(init_no_addref no_addref, F&& f)
               : base_type(no_addref)
-              , f_(std::move(f))
+              , f_(HPX_MOVE(f))
             {
             }
 
@@ -80,7 +80,7 @@ namespace hpx { namespace lcos { namespace local {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() { this->set_value(f_()); },
                     [&](std::exception_ptr ep) {
-                        this->set_exception(std::move(ep));
+                        this->set_exception(HPX_MOVE(ep));
                     });
             }
 
@@ -93,7 +93,7 @@ namespace hpx { namespace lcos { namespace local {
                         this->set_value(result_type());
                     },
                     [&](std::exception_ptr ep) {
-                        this->set_exception(std::move(ep));
+                        this->set_exception(HPX_MOVE(ep));
                     });
             }
 
@@ -110,7 +110,7 @@ namespace hpx { namespace lcos { namespace local {
                     threads::thread_init_data data(
                         threads::make_thread_function_nullary(
                             util::deferred_call(
-                                &base_type::run_impl, std::move(this_))),
+                                &base_type::run_impl, HPX_MOVE(this_))),
                         util::thread_description(f_, annotation),
                         policy.priority(),
                         threads::thread_schedule_hint(
@@ -124,7 +124,7 @@ namespace hpx { namespace lcos { namespace local {
 
                 threads::thread_init_data data(
                     threads::make_thread_function_nullary(util::deferred_call(
-                        &base_type::run_impl, std::move(this_))),
+                        &base_type::run_impl, HPX_MOVE(this_))),
                     util::thread_description(f_, annotation), policy.priority(),
                     policy.hint(), policy.stacksize(),
                     threads::thread_schedule_state::pending);
@@ -152,7 +152,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             task_object_allocator(other_allocator const& alloc, F&& f)
-              : base_type(std::move(f))
+              : base_type(HPX_MOVE(f))
               , alloc_(alloc)
             {
             }
@@ -166,7 +166,7 @@ namespace hpx { namespace lcos { namespace local {
 
             task_object_allocator(
                 init_no_addref no_addref, other_allocator const& alloc, F&& f)
-              : base_type(no_addref, std::move(f))
+              : base_type(no_addref, HPX_MOVE(f))
               , alloc_(alloc)
             {
             }
@@ -200,7 +200,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             task_object(F&& f)
-              : base_type(std::move(f))
+              : base_type(HPX_MOVE(f))
               , exec_(nullptr)
             {
             }
@@ -212,7 +212,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             task_object(Executor& exec, F&& f)
-              : base_type(std::move(f))
+              : base_type(HPX_MOVE(f))
               , exec_(&exec)
             {
             }
@@ -224,7 +224,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             task_object(init_no_addref no_addref, F&& f)
-              : base_type(no_addref, std::move(f))
+              : base_type(no_addref, HPX_MOVE(f))
               , exec_(nullptr)
             {
             }
@@ -236,7 +236,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             task_object(Executor& exec, init_no_addref no_addref, F&& f)
-              : base_type(no_addref, std::move(f))
+              : base_type(no_addref, HPX_MOVE(f))
               , exec_(&exec)
             {
             }
@@ -253,7 +253,7 @@ namespace hpx { namespace lcos { namespace local {
                     hpx::intrusive_ptr<base_type> this_(this);
                     parallel::execution::post(*exec_,
                         util::deferred_call(
-                            &base_type::run_impl, std::move(this_)),
+                            &base_type::run_impl, HPX_MOVE(this_)),
                         exec_->get_schedulehint(), annotation);
                     return threads::invalid_thread_id;
                 }
@@ -283,7 +283,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             cancelable_task_object(F&& f)
-              : base_type(std::move(f))
+              : base_type(HPX_MOVE(f))
             {
             }
 
@@ -293,7 +293,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             cancelable_task_object(init_no_addref no_addref, F&& f)
-              : base_type(no_addref, std::move(f))
+              : base_type(no_addref, HPX_MOVE(f))
             {
             }
         };
@@ -319,7 +319,7 @@ namespace hpx { namespace lcos { namespace local {
 
             cancelable_task_object_allocator(
                 other_allocator const& alloc, F&& f)
-              : base_type(std::move(f))
+              : base_type(HPX_MOVE(f))
               , alloc_(alloc)
             {
             }
@@ -333,7 +333,7 @@ namespace hpx { namespace lcos { namespace local {
 
             cancelable_task_object_allocator(
                 init_no_addref no_addref, other_allocator const& alloc, F&& f)
-              : base_type(no_addref, std::move(f))
+              : base_type(no_addref, HPX_MOVE(f))
               , alloc_(alloc)
             {
             }
@@ -368,7 +368,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             cancelable_task_object(F&& f)
-              : base_type(std::move(f))
+              : base_type(HPX_MOVE(f))
             {
             }
 
@@ -378,7 +378,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             cancelable_task_object(Executor& exec, F&& f)
-              : base_type(exec, std::move(f))
+              : base_type(exec, HPX_MOVE(f))
             {
             }
 
@@ -388,7 +388,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             cancelable_task_object(init_no_addref no_addref, F&& f)
-              : base_type(no_addref, std::move(f))
+              : base_type(no_addref, HPX_MOVE(f))
             {
             }
 
@@ -400,7 +400,7 @@ namespace hpx { namespace lcos { namespace local {
 
             cancelable_task_object(
                 Executor& exec, init_no_addref no_addref, F&& f)
-              : base_type(exec, no_addref, std::move(f))
+              : base_type(exec, no_addref, HPX_MOVE(f))
             {
             }
         };
@@ -456,7 +456,7 @@ namespace hpx { namespace lcos { namespace local {
             static return_type call(F&& f)
             {
                 return return_type(new task_object<Result, F, void>(
-                                       init_no_addref{}, std::forward<F>(f)),
+                                       init_no_addref{}, HPX_FORWARD(F, f)),
                     false);
             }
 
@@ -488,8 +488,8 @@ namespace hpx { namespace lcos { namespace local {
                 other_allocator alloc(a);
                 unique_ptr p(traits::allocate(alloc, 1),
                     util::allocator_deleter<other_allocator>{alloc});
-                traits::construct(alloc, p.get(), init_no_addref{}, alloc,
-                    std::forward<F>(f));
+                traits::construct(
+                    alloc, p.get(), init_no_addref{}, alloc, HPX_FORWARD(F, f));
 
                 return return_type(p.release(), false);
             }
@@ -535,7 +535,7 @@ namespace hpx { namespace lcos { namespace local {
             static return_type call(Executor& exec, F&& f)
             {
                 return return_type(new task_object<Result, F, Executor>(exec,
-                                       init_no_addref{}, std::forward<F>(f)),
+                                       init_no_addref{}, HPX_FORWARD(F, f)),
                     false);
             }
 
@@ -563,7 +563,7 @@ namespace hpx { namespace lcos { namespace local {
             static return_type call(F&& f)
             {
                 return return_type(new cancelable_task_object<Result, F, void>(
-                                       init_no_addref{}, std::forward<F>(f)),
+                                       init_no_addref{}, HPX_FORWARD(F, f)),
                     false);
             }
 
@@ -597,8 +597,8 @@ namespace hpx { namespace lcos { namespace local {
                 other_allocator alloc(a);
                 unique_ptr p(traits::allocate(alloc, 1),
                     util::allocator_deleter<other_allocator>{alloc});
-                traits::construct(alloc, p.get(), init_no_addref{}, alloc,
-                    std::forward<F>(f));
+                traits::construct(
+                    alloc, p.get(), init_no_addref{}, alloc, HPX_FORWARD(F, f));
 
                 return return_type(p.release(), false);
             }
@@ -645,7 +645,7 @@ namespace hpx { namespace lcos { namespace local {
             {
                 return return_type(
                     new cancelable_task_object<Result, F, Executor>(
-                        exec, init_no_addref{}, std::forward<F>(f)),
+                        exec, init_no_addref{}, HPX_FORWARD(F, f)),
                     false);
             }
 
@@ -677,7 +677,7 @@ namespace hpx { namespace lcos { namespace local {
         explicit futures_factory(Executor& exec, F&& f)
           : task_(
                 detail::create_task_object<Result, Cancelable, Executor>::call(
-                    exec, std::forward<F>(f)))
+                    exec, HPX_FORWARD(F, f)))
           , future_obtained_(false)
         {
         }
@@ -696,7 +696,7 @@ namespace hpx { namespace lcos { namespace local {
                 typename std::decay<F>::type, futures_factory>::value>::type>
         explicit futures_factory(F&& f)
           : task_(detail::create_task_object<Result, Cancelable>::call(
-                hpx::util::internal_allocator<>{}, std::forward<F>(f)))
+                hpx::util::internal_allocator<>{}, HPX_FORWARD(F, f)))
           , future_obtained_(false)
         {
         }
@@ -714,7 +714,7 @@ namespace hpx { namespace lcos { namespace local {
         futures_factory& operator=(futures_factory const& rhs) = delete;
 
         futures_factory(futures_factory&& rhs)
-          : task_(std::move(rhs.task_))
+          : task_(HPX_MOVE(rhs.task_))
           , future_obtained_(rhs.future_obtained_)
         {
             rhs.task_.reset();
@@ -725,7 +725,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             if (this != &rhs)
             {
-                task_ = std::move(rhs.task_);
+                task_ = HPX_MOVE(rhs.task_);
                 future_obtained_ = rhs.future_obtained_;
 
                 rhs.task_.reset();
@@ -792,7 +792,7 @@ namespace hpx { namespace lcos { namespace local {
             future_obtained_ = true;
 
             using traits::future_access;
-            return future_access<future<Result>>::create(std::move(task_));
+            return future_access<future<Result>>::create(HPX_MOVE(task_));
         }
 
         bool valid() const noexcept

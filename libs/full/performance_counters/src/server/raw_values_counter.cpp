@@ -34,7 +34,7 @@ namespace hpx { namespace performance_counters { namespace server {
     raw_values_counter::raw_values_counter(counter_info const& info,
         hpx::util::function_nonser<std::vector<std::int64_t>(bool)> f)
       : base_type_holder(info)
-      , f_(std::move(f))
+      , f_(HPX_MOVE(f))
       , reset_(false)
     {
         if (info.type_ != counter_histogram && info.type_ != counter_raw_values)

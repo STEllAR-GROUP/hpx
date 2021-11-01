@@ -112,7 +112,7 @@ namespace hpx { namespace lcos { namespace local {
             util::ignore_while_checking il(&l);
             HPX_UNUSED(il);
 
-            cond_.notify_one(std::move(l), threads::thread_priority::boost, ec);
+            cond_.notify_one(HPX_MOVE(l), threads::thread_priority::boost, ec);
         }
     }
 

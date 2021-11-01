@@ -40,11 +40,11 @@ namespace hpx { namespace detail {
             if (policy == launch::sync)
             {
                 return call(
-                    launch::sync, std::forward<F>(f), std::forward<Ts>(ts)...);
+                    launch::sync, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
-            lcos::local::futures_factory<result_type()> p(util::deferred_call(
-                std::forward<F>(f), std::forward<Ts>(ts)...));
+            lcos::local::futures_factory<result_type()> p(
+                util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
             if (hpx::detail::has_async_policy(policy))
             {
@@ -71,7 +71,7 @@ namespace hpx { namespace detail {
         {
             try
             {
-                return HPX_INVOKE(std::forward<F>(f), std::forward<Ts>(ts)...);
+                return HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
             catch (std::bad_alloc const& ba)
             {

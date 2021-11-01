@@ -58,7 +58,7 @@ namespace hpx { namespace performance_counters {
                     return false;
 
                 performance_counters::counter_info cinfo = info;
-                cinfo.fullname_ = std::move(fullname);
+                cinfo.fullname_ = HPX_MOVE(fullname);
                 return f(cinfo, ec) && !ec;
             }
 
@@ -90,7 +90,7 @@ namespace hpx { namespace performance_counters {
                     return false;
 
                 performance_counters::counter_info cinfo = info;
-                cinfo.fullname_ = std::move(fullname);
+                cinfo.fullname_ = HPX_MOVE(fullname);
 
                 if (!f(cinfo, ec) || ec)
                     return false;
@@ -147,7 +147,7 @@ namespace hpx { namespace performance_counters {
             return false;
 
         performance_counters::counter_info cinfo = info;
-        cinfo.fullname_ = std::move(fullname);
+        cinfo.fullname_ = HPX_MOVE(fullname);
 
         if (!f(cinfo, ec) || ec)
             return false;

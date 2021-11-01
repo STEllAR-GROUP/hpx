@@ -22,8 +22,8 @@ namespace hpx { namespace execution { namespace experimental {
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             just_on_t, Scheduler&& scheduler, Ts&&... ts)
         {
-            return on(just(std::forward<Ts>(ts)...),
-                std::forward<Scheduler>(scheduler));
+            return on(just(HPX_FORWARD(Ts, ts)...),
+                HPX_FORWARD(Scheduler, scheduler));
         }
     } just_on{};
 }}}    // namespace hpx::execution::experimental

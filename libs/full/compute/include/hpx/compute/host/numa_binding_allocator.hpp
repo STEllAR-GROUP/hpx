@@ -221,7 +221,7 @@ namespace hpx { namespace compute { namespace host {
 
         // Move constructor
         numa_binding_allocator(numa_binding_allocator&& rhs)
-          : binding_helper_(std::move(rhs.binding_helper_))
+          : binding_helper_(HPX_MOVE(rhs.binding_helper_))
           , policy_(rhs.policy_)
           , flags_(rhs.flags_)
           , init_mutex()
@@ -354,7 +354,7 @@ namespace hpx { namespace compute { namespace host {
         template <class U, class... A>
         void construct(U* const p, A&&... args)
         {
-            new (p) U(std::forward<A>(args)...);
+            new (p) U(HPX_FORWARD(A, args)...);
         }
 
         template <class U>
@@ -465,7 +465,7 @@ namespace hpx { namespace compute { namespace host {
                 nba_deb.debug(debug::str<>("First-Touch"),
                     "add task future to vector for domain ",
                     debug::dec<2>(domain), " ", nodesets[i]);
-                tasks.push_back(std::move(f1));
+                tasks.push_back(HPX_MOVE(f1));
             }
             wait_all(tasks);
             nba_deb.debug(debug::str<>("First-Touch"), "Done tasks");

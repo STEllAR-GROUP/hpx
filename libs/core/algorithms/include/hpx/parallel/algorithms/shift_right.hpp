@@ -182,7 +182,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 auto mid = std::next(first, dist - n);
                 return std::move_backward(
-                    std::move(first), std::move(mid), std::move(last));
+                    HPX_MOVE(first), HPX_MOVE(mid), HPX_MOVE(last));
             }
             else
             {
@@ -194,7 +194,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     if (lead == last)
                     {
-                        std::move(std::move(first), std::move(trail), result);
+                        std::move(HPX_MOVE(first), HPX_MOVE(trail), result);
                         return result;
                     }
                 }
@@ -206,9 +206,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     {
                         if (lead == last)
                         {
-                            trail = std::move(mid, result, std::move(trail));
-                            std::move(std::move(first), std::move(mid),
-                                std::move(trail));
+                            trail = std::move(mid, result, HPX_MOVE(trail));
+                            std::move(HPX_MOVE(first), HPX_MOVE(mid),
+                                HPX_MOVE(trail));
                             return result;
                         }
                         std::iter_swap(mid, trail);
@@ -253,7 +253,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (n <= 0 || static_cast<std::size_t>(n) >= dist)
                 {
                     return parallel::util::detail::algorithm_result<ExPolicy,
-                        FwdIter2>::get(std::move(first));
+                        FwdIter2>::get(HPX_MOVE(first));
                 }
 
                 auto new_first = std::next(first, dist - n);
@@ -303,7 +303,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::shift_right<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, last, n);
+                HPX_FORWARD(ExPolicy, policy), first, last, n);
         }
     } shift_right{};
 }    // namespace hpx

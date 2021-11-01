@@ -300,8 +300,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 T&& init, Op&& op)
             {
                 return sequential_transform_exclusive_scan(first, last, dest,
-                    std::forward<Conv>(conv), std::forward<T>(init),
-                    std::forward<Op>(op));
+                    HPX_FORWARD(Conv, conv), HPX_FORWARD(T, init),
+                    HPX_FORWARD(Op, op));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
@@ -349,7 +349,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 return util::scan_partitioner<ExPolicy, result_type, T>::call(
-                    std::forward<ExPolicy>(policy),
+                    HPX_FORWARD(ExPolicy, policy),
                     make_zip_iterator(first, dest), count, init,
                     // step 1 performs first part of scan algorithm
                     [op, conv](
@@ -366,7 +366,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     // to right
                     op,
                     // step 3 runs final accumulation on each partition
-                    std::move(f3),
+                    HPX_MOVE(f3),
                     // use this return value
                     [last_iter, final_dest](std::vector<T>&&,
                         std::vector<hpx::future<void>>&& data) -> result_type {
@@ -418,9 +418,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
         return parallel::util::get_second_element(
             detail::transform_exclusive_scan<result_type>().call(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::forward<Conv>(conv), std::move(init),
-                std::forward<Op>(op)));
+                HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                HPX_FORWARD(Conv, conv), HPX_MOVE(init), HPX_FORWARD(Op, op)));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -464,8 +463,8 @@ namespace hpx {
                 hpx::parallel::v1::detail::transform_exclusive_scan<
                     result_type>()
                     .call(hpx::execution::seq, first, last, dest,
-                        std::forward<UnOp>(unary_op), std::move(init),
-                        std::forward<BinOp>(binary_op)));
+                        HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
+                        HPX_FORWARD(BinOp, binary_op)));
         }
 
         // clang-format off
@@ -502,9 +501,9 @@ namespace hpx {
             return parallel::util::get_second_element(
                 hpx::parallel::v1::detail::transform_exclusive_scan<
                     result_type>()
-                    .call(std::forward<ExPolicy>(policy), first, last, dest,
-                        std::forward<UnOp>(unary_op), std::move(init),
-                        std::forward<BinOp>(binary_op)));
+                    .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                        HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
+                        HPX_FORWARD(BinOp, binary_op)));
         }
     } transform_exclusive_scan{};
 }    // namespace hpx

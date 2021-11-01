@@ -68,7 +68,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             promise_base(promise_base&& other) noexcept
-              : shared_state_(std::move(other.shared_state_))
+              : shared_state_(HPX_MOVE(other.shared_state_))
               , future_retrieved_(other.future_retrieved_)
               , shared_future_retrieved_(other.shared_future_retrieved_)
             {
@@ -90,7 +90,7 @@ namespace hpx { namespace lcos { namespace local {
                     this->check_abandon_shared_state(
                         "local::detail::promise_base<R>::operator=");
 
-                    shared_state_ = std::move(other.shared_state_);
+                    shared_state_ = HPX_MOVE(other.shared_state_);
                     future_retrieved_ = other.future_retrieved_;
                     shared_future_retrieved_ = other.shared_future_retrieved_;
 
@@ -181,7 +181,7 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
 
-                shared_state_->set_value(std::forward<Ts>(ts)...);
+                shared_state_->set_value(HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename T>
@@ -203,7 +203,7 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
 
-                shared_state_->set_exception(std::forward<T>(value));
+                shared_state_->set_exception(HPX_FORWARD(T, value));
             }
 
         protected:
@@ -253,7 +253,7 @@ namespace hpx { namespace lcos { namespace local {
         ~promise() = default;
 
         // Effects: Abandons any shared state (30.6.4) and then as if
-        //          promise(std::move(other)).swap(*this).
+        //          promise(HPX_MOVE(other)).swap(*this).
         // Returns: *this.
         promise& operator=(promise&& other) noexcept = default;
 
@@ -319,7 +319,7 @@ namespace hpx { namespace lcos { namespace local {
         //   - no_state if *this has no shared state.
         void set_value(R&& r)
         {
-            base_type::set_value(std::move(r));
+            base_type::set_value(HPX_MOVE(r));
         }
 
         // Extension (see wg21.link/P0319)
@@ -342,7 +342,7 @@ namespace hpx { namespace lcos { namespace local {
         template <typename... Ts>
         void set_value(Ts&&... ts)
         {
-            base_type::set_value(std::forward<Ts>(ts)...);
+            base_type::set_value(HPX_FORWARD(Ts, ts)...);
         }
 
         // Effects: atomically stores the exception pointer p in the shared
@@ -384,7 +384,7 @@ namespace hpx { namespace lcos { namespace local {
         ~promise() = default;
 
         // Effects: Abandons any shared state (30.6.4) and then as if
-        //          promise(std::move(other)).swap(*this).
+        //          promise(HPX_MOVE(other)).swap(*this).
         // Returns: *this.
         promise& operator=(promise&& other) noexcept = default;
 
@@ -474,7 +474,7 @@ namespace hpx { namespace lcos { namespace local {
         ~promise() = default;
 
         // Effects: Abandons any shared state (30.6.4) and then as if
-        //          promise(std::move(other)).swap(*this).
+        //          promise(HPX_MOVE(other)).swap(*this).
         // Returns: *this.
         promise& operator=(promise&& other) noexcept = default;
 

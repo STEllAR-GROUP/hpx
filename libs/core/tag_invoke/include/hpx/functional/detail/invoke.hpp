@@ -22,7 +22,7 @@ namespace hpx { namespace util { namespace detail {
             typename std::remove_reference<T>::type>::value>::type>
     static constexpr T&& mem_ptr_target(T&& v) noexcept
     {
-        return std::forward<T>(v);
+        return HPX_FORWARD(T, v);
     }
 
     // when `pm` is a pointer to member of a class `C` and
@@ -37,9 +37,17 @@ namespace hpx { namespace util { namespace detail {
     // satisfy the previous two items;
     template <typename C, typename T>
     static constexpr auto mem_ptr_target(T&& v) noexcept(
+#if defined(HPX_CUDA_VERSION)
         noexcept(*std::forward<T>(v))) -> decltype(*std::forward<T>(v))
+#else
+        noexcept(*HPX_FORWARD(T, v))) -> decltype(*HPX_FORWARD(T, v))
+#endif
     {
+#if defined(HPX_CUDA_VERSION)
         return *std::forward<T>(v);
+#else
+        return *HPX_FORWARD(T, v);
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -56,8 +64,8 @@ namespace hpx { namespace util { namespace detail {
 
         template <typename T1>
         constexpr auto operator()(T1&& t1) const noexcept(
-            noexcept(detail::mem_ptr_target<C>(std::forward<T1>(t1)).*pm))
-            -> decltype(detail::mem_ptr_target<C>(std::forward<T1>(t1)).*pm)
+            noexcept(detail::mem_ptr_target<C>(HPX_FORWARD(T1, t1)).*pm))
+            -> decltype(detail::mem_ptr_target<C>(HPX_FORWARD(T1, t1)).*pm)
         {
             // This seems to trigger a bogus warning in GCC 11 with
             // optimizations enabled (possibly the same as this:
@@ -67,7 +75,7 @@ namespace hpx { namespace util { namespace detail {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
-            return detail::mem_ptr_target<C>(std::forward<T1>(t1)).*pm;
+            return detail::mem_ptr_target<C>(HPX_FORWARD(T1, t1)).*pm;
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
 #pragma GCC diagnostic pop
 #endif
@@ -87,10 +95,10 @@ namespace hpx { namespace util { namespace detail {
 
         template <typename T1, typename... Tn>
         constexpr auto operator()(T1&& t1, Tn&&... tn) const
-            noexcept(noexcept((detail::mem_ptr_target<C>(std::forward<T1>(t1)).*
-                pm)(std::forward<Tn>(tn)...)))
-                -> decltype((detail::mem_ptr_target<C>(std::forward<T1>(t1)).*
-                    pm)(std::forward<Tn>(tn)...))
+            noexcept(noexcept((detail::mem_ptr_target<C>(HPX_FORWARD(T1, t1)).*
+                pm)(HPX_FORWARD(Tn, tn)...)))
+                -> decltype((detail::mem_ptr_target<C>(HPX_FORWARD(T1, t1)).*
+                    pm)(HPX_FORWARD(Tn, tn)...))
         {
             // This seems to trigger a bogus warning in GCC 11 with
             // optimizations enabled (possibly the same as this:
@@ -100,8 +108,8 @@ namespace hpx { namespace util { namespace detail {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
-            return (detail::mem_ptr_target<C>(std::forward<T1>(t1)).*pm)(
-                std::forward<Tn>(tn)...);
+            return (detail::mem_ptr_target<C>(HPX_FORWARD(T1, t1)).*pm)(
+                HPX_FORWARD(Tn, tn)...);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
 #pragma GCC diagnostic pop
 #endif

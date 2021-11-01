@@ -20,7 +20,7 @@ namespace hpx { namespace applier {
     template <typename Arg0>
     inline void trigger(naming::id_type const& k, Arg0&& arg0)
     {
-        set_lco_value(k, std::forward<Arg0>(arg0));
+        set_lco_value(k, HPX_FORWARD(Arg0, arg0));
     }
 
     inline void trigger(naming::id_type const& k)

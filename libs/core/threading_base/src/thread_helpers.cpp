@@ -471,14 +471,14 @@ namespace hpx { namespace this_thread {
                 auto* scheduler =
                     get_thread_id_data(nextid)->get_scheduler_base();
                 scheduler->schedule_thread(
-                    std::move(nextid), threads::thread_schedule_hint());
+                    HPX_MOVE(nextid), threads::thread_schedule_hint());
                 statex = self.yield(threads::thread_result_type(
                     state, threads::invalid_thread_id));
             }
             else
             {
                 statex = self.yield(
-                    threads::thread_result_type(state, std::move(nextid)));
+                    threads::thread_result_type(state, HPX_MOVE(nextid)));
             }
         }
 
@@ -553,7 +553,7 @@ namespace hpx { namespace this_thread {
                 auto* scheduler =
                     get_thread_id_data(nextid)->get_scheduler_base();
                 scheduler->schedule_thread(
-                    std::move(nextid), threads::thread_schedule_hint());
+                    HPX_MOVE(nextid), threads::thread_schedule_hint());
                 statex = self.yield(threads::thread_result_type(
                     threads::thread_schedule_state::suspended,
                     threads::invalid_thread_id));
@@ -562,7 +562,7 @@ namespace hpx { namespace this_thread {
             {
                 statex = self.yield(threads::thread_result_type(
                     threads::thread_schedule_state::suspended,
-                    std::move(nextid)));
+                    HPX_MOVE(nextid)));
             }
 
             if (statex != threads::thread_restart_state::timeout)

@@ -93,7 +93,7 @@ namespace hpx { namespace parallel { namespace util {
                 {
                     // pre-initialize first intermediate result
                     workitems.push_back(
-                        make_ready_future(std::forward<T>(init)));
+                        make_ready_future(HPX_FORWARD(T, init)));
 
                     HPX_ASSERT(count > 0);
                     FwdIter first_ = first;
@@ -177,8 +177,8 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(std::move(f2results), std::move(finalitems),
-                    std::move(errors), std::forward<F4>(f4));
+                return reduce(HPX_MOVE(f2results), HPX_MOVE(finalitems),
+                    HPX_MOVE(errors), HPX_FORWARD(F4, f4));
 #endif
             }
 
@@ -211,7 +211,7 @@ namespace hpx { namespace parallel { namespace util {
                 {
                     // pre-initialize first intermediate result
                     workitems.push_back(
-                        make_ready_future(std::forward<T>(init)));
+                        make_ready_future(HPX_FORWARD(T, init)));
 
                     HPX_ASSERT(count > 0);
                     FwdIter first_ = first;
@@ -311,8 +311,8 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(std::move(workitems), std::move(finalitems),
-                    std::move(errors), std::forward<F4>(f4));
+                return reduce(HPX_MOVE(workitems), HPX_MOVE(finalitems),
+                    HPX_MOVE(errors), HPX_FORWARD(F4, f4));
 #endif
             }
 
@@ -321,10 +321,10 @@ namespace hpx { namespace parallel { namespace util {
             static R call(ExPolicy_&& policy, FwdIter first, std::size_t count,
                 T&& init, F1&& f1, F2&& f2, F3&& f3, F4&& f4)
             {
-                return call(ScanPartTag{}, std::forward<ExPolicy_>(policy),
-                    first, count, std::forward<T>(init), std::forward<F1>(f1),
-                    std::forward<F2>(f2), std::forward<F3>(f3),
-                    std::forward<F4>(f4));
+                return call(ScanPartTag{}, HPX_FORWARD(ExPolicy_, policy),
+                    first, count, HPX_FORWARD(T, init), HPX_FORWARD(F1, f1),
+                    HPX_FORWARD(F2, f2), HPX_FORWARD(F3, f3),
+                    HPX_FORWARD(F4, f4));
             }
 
         private:
@@ -352,7 +352,7 @@ namespace hpx { namespace parallel { namespace util {
 
                 try
                 {
-                    return f(std::move(workitems), std::move(finalitems));
+                    return f(HPX_MOVE(workitems), HPX_MOVE(finalitems));
                 }
                 catch (...)
                 {
@@ -406,16 +406,16 @@ namespace hpx { namespace parallel { namespace util {
                 std::size_t count, T&& init, F1&& f1, F2&& f2, F3&& f3, F4&& f4)
             {
                 return execution::async_execute(policy.executor(),
-                    [first, count, policy = std::forward<ExPolicy_>(policy),
-                        init = std::forward<T>(init), f1 = std::forward<F1>(f1),
-                        f2 = std::forward<F2>(f2), f3 = std::forward<F3>(f3),
-                        f4 = std::forward<F4>(f4)]() mutable -> R {
+                    [first, count, policy = HPX_FORWARD(ExPolicy_, policy),
+                        init = HPX_FORWARD(T, init), f1 = HPX_FORWARD(F1, f1),
+                        f2 = HPX_FORWARD(F2, f2), f3 = HPX_FORWARD(F3, f3),
+                        f4 = HPX_FORWARD(F4, f4)]() mutable -> R {
                         using partitioner_type =
                             scan_static_partitioner<ExPolicy, ScanPartTag, R,
                                 Result1, Result2>;
                         return partitioner_type::call(ScanPartTag{},
-                            std::forward<ExPolicy_>(policy), first, count,
-                            std::move(init), f1, f2, f3, f4);
+                            HPX_FORWARD(ExPolicy_, policy), first, count,
+                            HPX_MOVE(init), f1, f2, f3, f4);
                     });
             }
         };

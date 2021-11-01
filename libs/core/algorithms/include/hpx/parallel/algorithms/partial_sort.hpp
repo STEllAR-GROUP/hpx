@@ -204,7 +204,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             auto N2 = (last - first) >> 1;
             Iter it_val =
-                mid3(first + 1, first + N2, last - 1, std::forward<Comp>(comp));
+                mid3(first + 1, first + N2, last - 1, HPX_FORWARD(Comp, comp));
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
             std::ranges::iter_swap(first, it_val);
 #else
@@ -332,13 +332,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (middle != c_last)
                 {
                     recursive_partial_sort(c_last + 1, middle, end, level - 1,
-                        std::forward<Comp>(comp));
+                        HPX_FORWARD(Comp, comp));
                 }
                 return;
             }
 
             recursive_partial_sort(
-                first, middle, c_last, level - 1, std::forward<Comp>(comp));
+                first, middle, c_last, level - 1, HPX_FORWARD(Comp, comp));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -430,15 +430,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             if (right.has_exception())
                                 errors.push_back(right.get_exception_ptr());
 
-                            throw exception_list(std::move(errors));
+                            throw exception_list(HPX_MOVE(errors));
                         }
                         return last;
                     },
-                    std::move(left), std::move(right));
+                    HPX_MOVE(left), HPX_MOVE(right));
             }
 
-            return parallel_partial_sort(std::forward<ExPolicy>(policy), first,
-                middle, c_last, level - 1, std::forward<Comp>(comp));
+            return parallel_partial_sort(HPX_FORWARD(ExPolicy, policy), first,
+                middle, c_last, level - 1, HPX_FORWARD(Comp, comp));
         }
         /// \endcond NOINTERNAL
     }    // end namespace detail
@@ -473,7 +473,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         std::uint32_t level = detail::nbits64(nelem) * 2;
         detail::recursive_partial_sort(
-            first, middle, first + nelem, level, std::forward<Comp>(comp));
+            first, middle, first + nelem, level, HPX_FORWARD(Comp, comp));
         return first + nelem;
     }
 
@@ -507,8 +507,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
 
         std::uint32_t level = parallel::v1::detail::nbits64(nelem) * 2;
-        return detail::parallel_partial_sort(std::forward<ExPolicy>(policy),
-            first, middle, first + nelem, level, std::forward<Comp>(comp));
+        return detail::parallel_partial_sort(HPX_FORWARD(ExPolicy, policy),
+            first, middle, first + nelem, level, HPX_FORWARD(Comp, comp));
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -529,7 +529,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             return sequential_partial_sort(first, middle, last,
                 util::compare_projected<Comp, Proj>(
-                    std::forward<Comp>(comp), std::forward<Proj>(proj)));
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj)));
         }
 
         template <typename ExPolicy, typename Iter, typename Sent,
@@ -546,9 +546,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // call the sort routine and return the right type,
                 // depending on execution policy
                 return algorithm_result::get(parallel_partial_sort(
-                    std::forward<ExPolicy>(policy), first, middle, last,
+                    HPX_FORWARD(ExPolicy, policy), first, middle, last,
                     util::compare_projected<Comp, Proj>(
-                        std::forward<Comp>(comp), std::forward<Proj>(proj))));
+                        HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj))));
             }
             catch (...)
             {
@@ -586,8 +586,7 @@ namespace hpx {
 
             return parallel::v1::partial_sort<RandIter>().call(
                 hpx::execution::seq, first, middle, last,
-                std::forward<Comp>(comp),
-                parallel::util::projection_identity());
+                HPX_FORWARD(Comp, comp), parallel::util::projection_identity());
         }
 
         // clang-format off
@@ -617,8 +616,8 @@ namespace hpx {
 
             return algorithm_result::get(
                 parallel::v1::partial_sort<RandIter>().call(
-                    std::forward<ExPolicy>(policy), first, middle, last,
-                    std::forward<Comp>(comp),
+                    HPX_FORWARD(ExPolicy, policy), first, middle, last,
+                    HPX_FORWARD(Comp, comp),
                     parallel::util::projection_identity()));
         }
     } partial_sort{};

@@ -144,8 +144,8 @@ namespace hpx { namespace parallel { namespace execution {
             sync_execute_t, Executor&& exec, F&& f, Ts&&... ts)
         {
             return detail::sync_execute_fn_helper<std::decay_t<Executor>>::call(
-                std::forward<Executor>(exec), std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
     } sync_execute{};
 
@@ -191,8 +191,8 @@ namespace hpx { namespace parallel { namespace execution {
             async_execute_t, Executor&& exec, F&& f, Ts&&... ts)
         {
             return detail::async_execute_fn_helper<
-                std::decay_t<Executor>>::call(std::forward<Executor>(exec),
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     } async_execute{};
 
@@ -231,8 +231,8 @@ namespace hpx { namespace parallel { namespace execution {
             Ts&&... ts)
         {
             return detail::then_execute_fn_helper<std::decay_t<Executor>>::call(
-                std::forward<Executor>(exec), std::forward<F>(f),
-                std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
+                HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+                HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
     } then_execute{};
 
@@ -271,8 +271,8 @@ namespace hpx { namespace parallel { namespace execution {
             post_t, Executor&& exec, F&& f, Ts&&... ts)
         {
             return detail::post_fn_helper<std::decay_t<Executor>>::call(
-                std::forward<Executor>(exec), std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
     } post{};
 
@@ -331,8 +331,8 @@ namespace hpx { namespace parallel { namespace execution {
             Ts&&... ts)
         {
             return detail::bulk_sync_execute_fn_helper<
-                std::decay_t<Executor>>::call(std::forward<Executor>(exec),
-                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
         // clang-format off
@@ -347,10 +347,10 @@ namespace hpx { namespace parallel { namespace execution {
             Ts&&... ts)
         {
             return detail::bulk_sync_execute_fn_helper<
-                std::decay_t<Executor>>::call(std::forward<Executor>(exec),
-                std::forward<F>(f),
+                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f),
                 hpx::util::detail::make_counting_shape(shape),
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Ts, ts)...);
         }
     } bulk_sync_execute{};
 
@@ -403,8 +403,8 @@ namespace hpx { namespace parallel { namespace execution {
             Ts&&... ts)
         {
             return detail::bulk_async_execute_fn_helper<
-                std::decay_t<Executor>>::call(std::forward<Executor>(exec),
-                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
         // clang-format off
@@ -419,10 +419,10 @@ namespace hpx { namespace parallel { namespace execution {
             Ts&&... ts)
         {
             return detail::bulk_async_execute_fn_helper<
-                std::decay_t<Executor>>::call(std::forward<Executor>(exec),
-                std::forward<F>(f),
+                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f),
                 hpx::util::detail::make_counting_shape(shape),
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Ts, ts)...);
         }
     } bulk_async_execute{};
 
@@ -480,9 +480,9 @@ namespace hpx { namespace parallel { namespace execution {
             Future&& predecessor, Ts&&... ts)
         {
             return detail::bulk_then_execute_fn_helper<
-                std::decay_t<Executor>>::call(std::forward<Executor>(exec),
-                std::forward<F>(f), shape, std::forward<Future>(predecessor),
-                std::forward<Ts>(ts)...);
+                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Future, predecessor),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // clang-format off
@@ -498,10 +498,10 @@ namespace hpx { namespace parallel { namespace execution {
             Future&& predecessor, Ts&&... ts)
         {
             return detail::bulk_then_execute_fn_helper<
-                std::decay_t<Executor>>::call(std::forward<Executor>(exec),
-                std::forward<F>(f),
+                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f),
                 hpx::util::detail::make_counting_shape(shape),
-                std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
+                HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
     } bulk_then_execute{};
 }}}    // namespace hpx::parallel::execution

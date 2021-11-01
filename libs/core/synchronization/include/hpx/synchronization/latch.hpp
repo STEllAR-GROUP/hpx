@@ -103,7 +103,7 @@ namespace hpx { namespace lcos { namespace local {
                 // which avoids suspension of this thread when it tries to
                 // re-lock the mutex while exiting from condition_variable::wait
                 while (cond_.data_.notify_one(
-                    std::move(l), threads::thread_priority::boost))
+                    HPX_MOVE(l), threads::thread_priority::boost))
                 {
                     l = std::unique_lock<mutex_type>(mtx_.data_);
                 }
@@ -166,7 +166,7 @@ namespace hpx { namespace lcos { namespace local {
                 // which avoids suspension of this thread when it tries to
                 // re-lock the mutex while exiting from condition_variable::wait
                 while (cond_.data_.notify_one(
-                    std::move(l), threads::thread_priority::boost))
+                    HPX_MOVE(l), threads::thread_priority::boost))
                 {
                     l = std::unique_lock<mutex_type>(mtx_.data_);
                 }
@@ -250,7 +250,7 @@ namespace hpx { namespace lcos { namespace local {
         void abort_all()
         {
             std::unique_lock<mutex_type> l(mtx_.data_);
-            cond_.data_.abort_all(std::move(l));
+            cond_.data_.abort_all(HPX_MOVE(l));
         }
 
         /// Increments counter_ by n. Does not block.

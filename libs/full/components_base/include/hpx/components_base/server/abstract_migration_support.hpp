@@ -64,7 +64,7 @@ namespace hpx { namespace components {
                 &abstract_base_migration_support::thread_function,
                 get_lva<this_component_type>::call(lva),
                 traits::component_decorate_function<base_type>::call(
-                    lva, std::forward<F>(f)),
+                    lva, HPX_FORWARD(F, f)),
                 components::pinned_ptr::create<this_component_type>(lva)));
         }
 
@@ -98,7 +98,7 @@ namespace hpx { namespace components {
 
         template <typename... Ts>
         abstract_migration_support(Ts&&... ts)
-          : abstract_base_type(std::forward<Ts>(ts)...)
+          : abstract_base_type(HPX_FORWARD(Ts, ts)...)
         {
         }
 

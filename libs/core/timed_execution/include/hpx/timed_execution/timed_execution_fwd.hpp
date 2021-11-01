@@ -78,10 +78,10 @@ namespace hpx { namespace parallel { namespace execution {
             Executor&& exec, hpx::chrono::steady_time_point const& abs_time,
             F&& f, Ts&&... ts)
         {
-            return detail::
-                timed_post_fn_helper<typename std::decay<Executor>::type>::call(
-                    std::forward<Executor>(exec), abs_time, std::forward<F>(f),
-                    std::forward<Ts>(ts)...);
+            return detail::timed_post_fn_helper<
+                typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
+                                                               exec),
+                abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     } post_at{};
 
@@ -119,10 +119,10 @@ namespace hpx { namespace parallel { namespace execution {
             Executor&& exec, hpx::chrono::steady_duration const& rel_time,
             F&& f, Ts&&... ts)
         {
-            return detail::
-                timed_post_fn_helper<typename std::decay<Executor>::type>::call(
-                    std::forward<Executor>(exec), rel_time, std::forward<F>(f),
-                    std::forward<Ts>(ts)...);
+            return detail::timed_post_fn_helper<
+                typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
+                                                               exec),
+                rel_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     } post_after{};
 
@@ -166,9 +166,10 @@ namespace hpx { namespace parallel { namespace execution {
             async_execute_at_t, Executor&& exec,
             hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
         {
-            return detail::timed_async_execute_fn_helper<typename std::decay<
-                Executor>::type>::call(std::forward<Executor>(exec), abs_time,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return detail::timed_async_execute_fn_helper<
+                typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
+                                                               exec),
+                abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     } async_execute_at{};
 
@@ -207,9 +208,10 @@ namespace hpx { namespace parallel { namespace execution {
             async_execute_after_t, Executor&& exec,
             hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
         {
-            return detail::timed_async_execute_fn_helper<typename std::decay<
-                Executor>::type>::call(std::forward<Executor>(exec), rel_time,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return detail::timed_async_execute_fn_helper<
+                typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
+                                                               exec),
+                rel_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     } async_execute_after{};
 
@@ -248,9 +250,10 @@ namespace hpx { namespace parallel { namespace execution {
             sync_execute_at_t, Executor&& exec,
             hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
         {
-            return detail::timed_sync_execute_fn_helper<typename std::decay<
-                Executor>::type>::call(std::forward<Executor>(exec), abs_time,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return detail::timed_sync_execute_fn_helper<
+                typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
+                                                               exec),
+                abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     } sync_execute_at{};
 
@@ -289,9 +292,10 @@ namespace hpx { namespace parallel { namespace execution {
             sync_execute_after_t, Executor&& exec,
             hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
         {
-            return detail::timed_sync_execute_fn_helper<typename std::decay<
-                Executor>::type>::call(std::forward<Executor>(exec), rel_time,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return detail::timed_sync_execute_fn_helper<
+                typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
+                                                               exec),
+                rel_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     } sync_execute_after{};
 }}}    // namespace hpx::parallel::execution

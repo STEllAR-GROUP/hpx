@@ -186,7 +186,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef util::in_out_result<iKey, iVal> result_type;
 
             return lcos::make_future<result_type>(
-                std::move(ziter), [=](ZIter zipiter) {
+                HPX_MOVE(ziter), [=](ZIter zipiter) {
                     auto t = zipiter.second.get_iterator_tuple();
                     iKey key_end = hpx::get<0>(t);
                     return result_type{key_end,
@@ -378,10 +378,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 RanIter2 values_first, FwdIter1 keys_output,
                 FwdIter2 values_output, Compare&& comp, Func&& func)
             {
-                return reduce_by_key_impl(std::forward<ExPolicy>(policy),
+                return reduce_by_key_impl(HPX_FORWARD(ExPolicy, policy),
                     key_first, key_last, values_first, keys_output,
-                    values_output, std::forward<Compare>(comp),
-                    std::forward<Func>(func));
+                    values_output, HPX_FORWARD(Compare, comp),
+                    HPX_FORWARD(Func, func));
             }
 
             template <typename ExPolicy, typename RanIter, typename RanIter2,
@@ -401,8 +401,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 FwdIter2, Compare&&, Func&&>,
                             policy, key_first, key_last, values_first,
                             keys_output, values_output,
-                            std::forward<Compare>(comp),
-                            std::forward<Func>(func))));
+                            HPX_FORWARD(Compare, comp),
+                            HPX_FORWARD(Func, func))));
             }
         };
         /// \endcond
@@ -547,8 +547,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
 
         return detail::reduce_by_key<FwdIter1, FwdIter2>().call(
-            std::forward<ExPolicy>(policy), key_first, key_last, values_first,
-            keys_output, values_output, std::forward<Compare>(comp),
-            std::forward<Func>(func));
+            HPX_FORWARD(ExPolicy, policy), key_first, key_last, values_first,
+            keys_output, values_output, HPX_FORWARD(Compare, comp),
+            HPX_FORWARD(Func, func));
     }
 }}}    // namespace hpx::parallel::v1

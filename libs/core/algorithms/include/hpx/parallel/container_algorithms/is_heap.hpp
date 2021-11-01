@@ -334,9 +334,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires a random access iterator.");
 
         return hpx::parallel::v1::detail::is_heap<iterator_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), std::forward<Comp>(comp),
-            std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), HPX_FORWARD(Comp, comp),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -373,9 +373,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires a random access iterator.");
 
         return hpx::parallel::v1::detail::is_heap_until<iterator_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), std::forward<Comp>(comp),
-            std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), HPX_FORWARD(Comp, comp),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -417,9 +417,9 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::is_heap<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<Comp>(comp),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(Comp, comp),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -444,8 +444,8 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::is_heap<Iter>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Comp>(comp), std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -474,7 +474,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::is_heap<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<Comp>(comp), std::forward<Proj>(proj));
+                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -497,8 +497,8 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::is_heap<Iter>().call(
-                hpx::execution::seq, first, last, std::forward<Comp>(comp),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
+                HPX_FORWARD(Proj, proj));
         }
     } is_heap{};
 
@@ -535,9 +535,9 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::is_heap_until<iterator_type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), std::forward<Comp>(comp),
-                    std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), HPX_FORWARD(Comp, comp),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -562,8 +562,8 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::is_heap_until<Iter>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Comp>(comp), std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -593,8 +593,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::is_heap_until<iterator_type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), std::forward<Comp>(comp),
-                    std::forward<Proj>(proj));
+                    hpx::util::end(rng), HPX_FORWARD(Comp, comp),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -617,8 +617,8 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::is_heap_until<Iter>().call(
-                hpx::execution::seq, first, last, std::forward<Comp>(comp),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
+                HPX_FORWARD(Proj, proj));
         }
     } is_heap_until{};
 

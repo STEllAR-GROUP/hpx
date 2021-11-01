@@ -152,7 +152,7 @@ namespace hpx { namespace ranges {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::destroy<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng));
         }
 
@@ -171,7 +171,7 @@ namespace hpx { namespace ranges {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::destroy<Iter>().call(
-                std::forward<ExPolicy>(policy), first, last);
+                HPX_FORWARD(ExPolicy, policy), first, last);
         }
 
         // clang-format off
@@ -236,11 +236,11 @@ namespace hpx { namespace ranges {
             if (hpx::parallel::v1::detail::is_negative(count))
             {
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(std::move(first));
+                    FwdIter>::get(HPX_MOVE(first));
             }
 
             return hpx::parallel::v1::detail::destroy_n<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, std::size_t(count));
+                HPX_FORWARD(ExPolicy, policy), first, std::size_t(count));
         }
 
         // clang-format off

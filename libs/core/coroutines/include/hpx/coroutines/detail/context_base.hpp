@@ -357,7 +357,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         {
             HPX_ASSERT(status != ctx_not_exited);
             HPX_ASSERT(m_state == ctx_running);
-            m_type_info = std::move(info);
+            m_type_info = HPX_MOVE(info);
             m_state = ctx_exited;
             m_exit_status = status;
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)

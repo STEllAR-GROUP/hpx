@@ -38,7 +38,7 @@ namespace hpx { namespace serialization {
 
         T value;
         ar >> value;
-        o.emplace(std::move(value));
+        o.emplace(HPX_MOVE(value));
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(

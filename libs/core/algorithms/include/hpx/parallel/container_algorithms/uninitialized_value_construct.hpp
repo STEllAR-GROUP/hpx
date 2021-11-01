@@ -315,7 +315,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::uninitialized_value_construct<
                 FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, last);
+                .call(HPX_FORWARD(ExPolicy, policy), first, last);
         }
 
         // clang-format off
@@ -361,7 +361,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::uninitialized_value_construct<
                 iterator_type>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng),
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
                     std::end(rng));
         }
     } uninitialized_value_construct{};
@@ -405,7 +405,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::uninitialized_value_construct_n<
                 FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, count);
+                .call(HPX_FORWARD(ExPolicy, policy), first, count);
         }
     } uninitialized_value_construct_n{};
 }}    // namespace hpx::ranges

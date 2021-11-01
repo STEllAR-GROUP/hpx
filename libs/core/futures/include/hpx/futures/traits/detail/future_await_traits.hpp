@@ -164,7 +164,7 @@ namespace hpx { namespace lcos { namespace detail {
             hpx::intrusive_ptr<Derived> shared_state(
                 static_cast<Derived*>(this));
             return hpx::traits::future_access<hpx::lcos::future<T>>::create(
-                std::move(shared_state));
+                HPX_MOVE(shared_state));
         }
 
         constexpr suspend_never initial_suspend() const noexcept
@@ -255,7 +255,7 @@ namespace std {
                 template <typename U>
                 void return_value(U&& value)
                 {
-                    this->base_type::set_value(std::forward<U>(value));
+                    this->base_type::set_value(HPX_FORWARD(U, value));
                 }
 
                 void unhandled_exception() noexcept
@@ -350,7 +350,7 @@ namespace std {
                 template <typename U>
                 void return_value(U&& value)
                 {
-                    this->base_type::set_value(std::forward<U>(value));
+                    this->base_type::set_value(HPX_FORWARD(U, value));
                 }
 
                 void unhandled_exception() noexcept

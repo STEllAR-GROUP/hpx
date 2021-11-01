@@ -28,7 +28,7 @@ namespace hpx { namespace util {
             }
 
             explicit protected_bind(F&& f)
-              : F(std::move(f))
+              : F(HPX_MOVE(f))
             {
             }
 
@@ -42,7 +42,7 @@ namespace hpx { namespace util {
             }
 
             HPX_HOST_DEVICE protected_bind(protected_bind&& other)
-              : F(std::move(other))
+              : F(HPX_MOVE(other))
             {
             }
 #endif
@@ -59,7 +59,7 @@ namespace hpx { namespace util {
     protect(T&& f)
     {
         return detail::protected_bind<typename std::decay<T>::type>(
-            std::forward<T>(f));
+            HPX_FORWARD(T, f));
     }
 
     // leave everything that is not a bind expression as is
@@ -69,6 +69,6 @@ namespace hpx { namespace util {
         T>::type
     protect(T&& v)    //-V659
     {
-        return std::forward<T>(v);
+        return HPX_FORWARD(T, v);
     }
 }}    // namespace hpx::util

@@ -439,9 +439,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
             "Requires at least forward iterator.");
 
-        return transform(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), std::move(dest), std::forward<F>(f),
-            std::forward<Proj>(proj));
+        return transform(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), HPX_MOVE(dest), HPX_FORWARD(F, f),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -483,10 +483,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::traits::is_forward_iterator<InIter2>::value,
             "Requires at least forward iterator.");
 
-        return transform(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), std::move(first2), std::move(dest),
-            std::forward<F>(f), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
+        return transform(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), HPX_MOVE(first2), HPX_MOVE(dest),
+            HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+            HPX_FORWARD(Proj2, proj2));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -530,10 +530,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::traits::is_forward_iterator<iterator_type2>::value,
             "Requires at least forward iterator.");
 
-        return transform(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+        return transform(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
             hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
-            std::move(dest), std::forward<F>(f), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
+            HPX_MOVE(dest), HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+            HPX_FORWARD(Proj2, proj2));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -576,8 +576,8 @@ namespace hpx { namespace ranges {
 
             return parallel::v1::detail::transform<
                 unary_transform_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first, last, dest,
-                    std::forward<F>(f), std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -604,9 +604,9 @@ namespace hpx { namespace ranges {
 
             return parallel::v1::detail::transform<
                 unary_transform_result<iterator_type, FwdIter>>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, std::forward<F>(f),
-                    std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -636,9 +636,9 @@ namespace hpx { namespace ranges {
 
             return parallel::v1::detail::transform_binary2<
                 binary_transform_result<FwdIter1, FwdIter2, FwdIter3>>()
-                .call(std::forward<ExPolicy>(policy), first1, last1, first2,
-                    last2, dest, std::forward<F>(f), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
+                    last2, dest, HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -674,10 +674,10 @@ namespace hpx { namespace ranges {
             return parallel::v1::detail::transform_binary2<
                 binary_transform_result<iterator_type1, iterator_type2,
                     FwdIter>>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), dest, std::forward<F>(f),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -699,8 +699,8 @@ namespace hpx { namespace ranges {
 
             return parallel::v1::detail::transform<
                 unary_transform_result<FwdIter1, FwdIter2>>()
-                .call(hpx::execution::seq, first, last, dest,
-                    std::forward<F>(f), std::forward<Proj>(proj));
+                .call(hpx::execution::seq, first, last, dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -725,8 +725,8 @@ namespace hpx { namespace ranges {
             return parallel::v1::detail::transform<
                 unary_transform_result<iterator_type, FwdIter>>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, std::forward<F>(f),
-                    std::forward<Proj>(proj));
+                    hpx::util::end(rng), dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -754,8 +754,8 @@ namespace hpx { namespace ranges {
             return parallel::v1::detail::transform_binary2<
                 binary_transform_result<FwdIter1, FwdIter2, FwdIter3>>()
                 .call(hpx::execution::seq, first1, last1, first2, last2, dest,
-                    std::forward<F>(f), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -790,8 +790,8 @@ namespace hpx { namespace ranges {
                     FwdIter>>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), dest, std::forward<F>(f),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
     } transform{};

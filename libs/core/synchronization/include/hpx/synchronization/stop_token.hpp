@@ -429,15 +429,15 @@ namespace hpx {
         //
         // Preconditions: Callback and CB model constructible_from<Callback, CB>.
         //
-        // Effects: Initializes callback with std::forward<CB>(cb). If
-        //      st.stop_requested() is true, then std::forward<CB>(cb)() is
+        // Effects: Initializes callback with HPX_FORWARD(CB, cb). If
+        //      st.stop_requested() is true, then HPX_FORWARD(CB, cb)() is
         //      evaluated in the current thread before the constructor returns.
         //      Otherwise, if st has ownership of a stop state, acquires shared
         //      ownership of that stop state and registers the callback with
-        //      that stop state such that std::forward<CB>(cb)() is evaluated by
+        //      that stop state such that HPX_FORWARD(CB, cb)() is evaluated by
         //      the first call to request_stop() on an associated stop_source.
         //
-        // Remarks: If evaluating std::forward<CB>(cb)() exits via
+        // Remarks: If evaluating HPX_FORWARD(CB, cb)() exits via
         //      an exception, then std::terminate is called (14.6.1).
         //
         // Throws: Any exception thrown by the initialization of callback.
@@ -446,7 +446,7 @@ namespace hpx {
                 std::is_constructible<Callback, CB>::value>::type>
         explicit stop_callback(stop_token const& st, CB&& cb) noexcept(
             std::is_nothrow_constructible<Callback, CB>::value)
-          : callback_(std::forward<CB>(cb))
+          : callback_(HPX_FORWARD(CB, cb))
           , state_(st.state_)
         {
             if (state_)
@@ -458,8 +458,8 @@ namespace hpx {
                 std::is_constructible<Callback, CB>::value>::type>
         explicit stop_callback(stop_token&& st, CB&& cb) noexcept(
             std::is_nothrow_constructible<Callback, CB>::value)
-          : callback_(std::forward<CB>(cb))
-          , state_(std::move(st.state_))
+          : callback_(HPX_FORWARD(CB, cb))
+          , state_(HPX_MOVE(st.state_))
         {
             if (state_)
                 state_->add_callback(this);
@@ -511,7 +511,7 @@ namespace hpx {
         stop_token const& st, Callback&& cb)
     {
         return stop_callback<typename std::decay<Callback>::type>(
-            st, std::forward<Callback>(cb));
+            st, HPX_FORWARD(Callback, cb));
     }
 
     template <typename Callback>
@@ -519,7 +519,7 @@ namespace hpx {
         stop_token&& st, Callback&& cb)
     {
         return stop_callback<typename std::decay<Callback>::type>(
-            std::move(st), std::forward<Callback>(cb));
+            HPX_MOVE(st), HPX_FORWARD(Callback, cb));
     }
 
     // clang-format produces inconsistent result between different versions

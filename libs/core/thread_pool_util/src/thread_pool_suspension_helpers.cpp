@@ -54,18 +54,18 @@ namespace hpx { namespace threads {
         }
 
         auto resume_direct_wrapper = [&pool, virt_core,
-                                         callback = std::move(callback)]() {
+                                         callback = HPX_MOVE(callback)]() {
             pool.resume_processing_unit_direct(virt_core, throws);
             callback();
         };
 
         if (threads::get_self_ptr())
         {
-            hpx::apply(std::move(resume_direct_wrapper));
+            hpx::apply(HPX_MOVE(resume_direct_wrapper));
         }
         else
         {
-            std::thread(std::move(resume_direct_wrapper)).detach();
+            std::thread(HPX_MOVE(resume_direct_wrapper)).detach();
         }
     }
 
@@ -115,7 +115,7 @@ namespace hpx { namespace threads {
         }
 
         auto suspend_direct_wrapper = [&pool, virt_core,
-                                          callback = std::move(callback)]() {
+                                          callback = HPX_MOVE(callback)]() {
             pool.suspend_processing_unit_direct(virt_core, throws);
             callback();
         };
@@ -133,11 +133,11 @@ namespace hpx { namespace threads {
                     "processing units from itself (no thread stealing)");
             }
 
-            hpx::apply(std::move(suspend_direct_wrapper));
+            hpx::apply(HPX_MOVE(suspend_direct_wrapper));
         }
         else
         {
-            std::thread(std::move(suspend_direct_wrapper)).detach();
+            std::thread(HPX_MOVE(suspend_direct_wrapper)).detach();
         }
     }
 
@@ -159,18 +159,18 @@ namespace hpx { namespace threads {
         util::function_nonser<void(void)> callback, error_code& /* ec */)
     {
         auto resume_direct_wrapper =
-            [&pool, callback = std::move(callback)]() -> void {
+            [&pool, callback = HPX_MOVE(callback)]() -> void {
             pool.resume_direct(throws);
             callback();
         };
 
         if (threads::get_self_ptr())
         {
-            hpx::apply(std::move(resume_direct_wrapper));
+            hpx::apply(HPX_MOVE(resume_direct_wrapper));
         }
         else
         {
-            std::thread(std::move(resume_direct_wrapper)).detach();
+            std::thread(HPX_MOVE(resume_direct_wrapper)).detach();
         }
     }
 
@@ -205,19 +205,18 @@ namespace hpx { namespace threads {
             return;
         }
 
-        auto suspend_direct_wrapper = [&pool,
-                                          callback = std::move(callback)]() {
+        auto suspend_direct_wrapper = [&pool, callback = HPX_MOVE(callback)]() {
             pool.suspend_direct(throws);
             callback();
         };
 
         if (threads::get_self_ptr())
         {
-            hpx::apply(std::move(suspend_direct_wrapper));
+            hpx::apply(HPX_MOVE(suspend_direct_wrapper));
         }
         else
         {
-            std::thread(std::move(suspend_direct_wrapper)).detach();
+            std::thread(HPX_MOVE(suspend_direct_wrapper)).detach();
         }
     }
 

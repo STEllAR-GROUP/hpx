@@ -192,8 +192,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         using difference_type =
             typename std::iterator_traits<iterator_type>::difference_type;
         return hpx::parallel::v1::detail::count<difference_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), value, std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), value, HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -232,8 +232,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         using difference_type =
             typename std::iterator_traits<iterator_type>::difference_type;
         return hpx::parallel::v1::detail::count_if<difference_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), std::forward<F>(f), std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -274,8 +274,8 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<iterator_type>::difference_type;
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), value, std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -298,8 +298,8 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<Iter>::difference_type;
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
-                std::forward<ExPolicy>(policy), first, last, value,
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last, value,
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -327,7 +327,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                value, std::forward<Proj>(proj));
+                value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -349,7 +349,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
                 hpx::execution::seq, first, last, value,
-                std::forward<Proj>(proj));
+                HPX_FORWARD(Proj, proj));
         }
     } count{};
 
@@ -388,9 +388,9 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<iterator_type>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<F>(f),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(F, f),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -417,8 +417,8 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<Iter>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -449,7 +449,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<F>(f), std::forward<Proj>(proj));
+                HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -475,8 +475,8 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<Iter>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                hpx::execution::seq, first, last, std::forward<F>(f),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(Proj, proj));
         }
     } count_if{};
 

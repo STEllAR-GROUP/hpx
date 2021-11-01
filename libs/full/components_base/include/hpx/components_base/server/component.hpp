@@ -68,7 +68,7 @@ namespace hpx { namespace components {
         // Construct a component instance holding a new wrapped instance
         template <typename... Ts>
         component(Ts&&... vs)
-          : Component(std::forward<Ts>(vs)...)
+          : Component(HPX_FORWARD(Ts, vs)...)
         {
         }
     };

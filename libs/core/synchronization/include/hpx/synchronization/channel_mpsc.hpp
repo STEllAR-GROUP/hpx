@@ -71,7 +71,7 @@ namespace hpx { namespace lcos { namespace local {
 
         base_channel_mpsc(base_channel_mpsc&& rhs) noexcept
           : size_(rhs.size_)
-          , buffer_(std::move(rhs.buffer_))
+          , buffer_(HPX_MOVE(rhs.buffer_))
         {
             head_.data_.store(rhs.head_.data_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
@@ -93,7 +93,7 @@ namespace hpx { namespace lcos { namespace local {
                 std::memory_order_relaxed);
 
             size_ = rhs.size_;
-            buffer_ = std::move(rhs.buffer_);
+            buffer_ = HPX_MOVE(rhs.buffer_);
 
             closed_.store(rhs.closed_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
@@ -135,7 +135,7 @@ namespace hpx { namespace lcos { namespace local {
                 return true;
             }
 
-            *val = std::move(buffer_[head]);
+            *val = HPX_MOVE(buffer_[head]);
             if (++head >= size_)
             {
                 head = 0;
@@ -162,7 +162,7 @@ namespace hpx { namespace lcos { namespace local {
                 return false;
             }
 
-            buffer_[tail] = std::move(t);
+            buffer_[tail] = HPX_MOVE(t);
             if (++tail >= size_)
             {
                 tail = 0;

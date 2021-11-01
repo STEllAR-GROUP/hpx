@@ -35,7 +35,7 @@ namespace hpx { namespace components {
     public:
         template <typename... Arg>
         executor_component(executor_type const& exec, Arg&&... arg)
-          : base_type(std::forward<Arg>(arg)...)
+          : base_type(HPX_FORWARD(Arg, arg)...)
           , exec_(exec)
         {
         }
@@ -65,7 +65,7 @@ namespace hpx { namespace components {
                 hpx::util::deferred_call(
                     hpx::util::annotated_function(
                         &executor_component::execute, desc.get_description()),
-                    std::move(data.func)));
+                    HPX_MOVE(data.func)));
         }
 
     protected:

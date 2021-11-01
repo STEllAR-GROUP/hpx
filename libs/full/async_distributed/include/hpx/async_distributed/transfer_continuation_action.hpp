@@ -129,8 +129,8 @@ namespace hpx { namespace actions {
     template <typename... Ts>
     transfer_continuation_action<Action>::transfer_continuation_action(
         continuation_type&& cont, Ts&&... vs)
-      : base_type(std::forward<Ts>(vs)...)
-      , cont_(std::move(cont))
+      : base_type(HPX_FORWARD(Ts, vs)...)
+      , cont_(HPX_MOVE(cont))
     {
     }
 
@@ -138,8 +138,8 @@ namespace hpx { namespace actions {
     template <typename... Ts>
     transfer_continuation_action<Action>::transfer_continuation_action(
         threads::thread_priority priority, continuation_type&& cont, Ts&&... vs)
-      : base_type(priority, std::forward<Ts>(vs)...)
-      , cont_(std::move(cont))
+      : base_type(priority, HPX_FORWARD(Ts, vs)...)
+      , cont_(HPX_MOVE(cont))
     {
     }
 
@@ -158,8 +158,8 @@ namespace hpx { namespace actions {
         naming::address::component_type comptype)
     {
         return base_type::derived_type::construct_thread_function(
-            std::move(target), std::move(cont_), lva, comptype,
-            hpx::get<Is>(std::move(this->arguments_))...);
+            HPX_MOVE(target), HPX_MOVE(cont_), lva, comptype,
+            hpx::get<Is>(HPX_MOVE(this->arguments_))...);
     }
 
     template <typename Action>
@@ -170,7 +170,7 @@ namespace hpx { namespace actions {
     {
         return get_thread_function(
             typename util::make_index_pack<Action::arity>::type(),
-            std::move(target), lva, comptype);
+            HPX_MOVE(target), lva, comptype);
     }
 
     template <typename Action>
@@ -199,8 +199,8 @@ namespace hpx { namespace actions {
             data.description, data.parent_locality_id, data.parent_id);
 #endif
         applier::detail::apply_helper<typename base_type::derived_type>::call(
-            std::move(data), std::move(cont_), target, lva, comptype,
-            this->priority_, std::move(hpx::get<Is>(this->arguments_))...);
+            HPX_MOVE(data), HPX_MOVE(cont_), target, lva, comptype,
+            this->priority_, HPX_MOVE(hpx::get<Is>(this->arguments_))...);
     }
 
     template <typename Action>
@@ -256,7 +256,7 @@ namespace hpx { namespace actions {
             }
         }
 
-        schedule_thread(std::move(target), lva, comptype, num_thread);
+        schedule_thread(HPX_MOVE(target), lva, comptype, num_thread);
     }
 
     template <typename Action>

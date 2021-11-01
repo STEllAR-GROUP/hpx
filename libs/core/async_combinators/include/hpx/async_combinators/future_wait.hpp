@@ -32,7 +32,7 @@ namespace hpx { namespace lcos {
             HPX_FORCEINLINE hpx::future<R> operator()(
                 hpx::future<R>& future) const
             {
-                return std::move(future);
+                return HPX_MOVE(future);
             }
 
             template <typename R>
@@ -105,7 +105,7 @@ namespace hpx { namespace lcos {
                 std::atomic<std::size_t>* success_counter)
               : lazy_values_(lazy_values)
               , ready_count_(0)
-              , f_(std::forward<F>(f))
+              , f_(HPX_FORWARD(F, f))
               , success_counter_(success_counter)
               , goal_reached_on_calling_thread_(false)
             {
@@ -114,18 +114,18 @@ namespace hpx { namespace lcos {
             template <typename F_>
             wait_each(argument_type&& lazy_values, F_&& f,
                 std::atomic<std::size_t>* success_counter)
-              : lazy_values_(std::move(lazy_values))
+              : lazy_values_(HPX_MOVE(lazy_values))
               , ready_count_(0)
-              , f_(std::forward<F>(f))
+              , f_(HPX_FORWARD(F, f))
               , success_counter_(success_counter)
               , goal_reached_on_calling_thread_(false)
             {
             }
 
             wait_each(wait_each&& rhs)
-              : lazy_values_(std::move(rhs.lazy_values_))
+              : lazy_values_(HPX_MOVE(rhs.lazy_values_))
               , ready_count_(rhs.ready_count_.load())
-              , f_(std::move(rhs.f_))
+              , f_(HPX_MOVE(rhs.f_))
               , success_counter_(rhs.success_counter_)
               , goal_reached_on_calling_thread_(
                     rhs.goal_reached_on_calling_thread_)
@@ -138,10 +138,10 @@ namespace hpx { namespace lcos {
             {
                 if (this != &rhs)
                 {
-                    lazy_values_ = std::move(rhs.lazy_values_);
+                    lazy_values_ = HPX_MOVE(rhs.lazy_values_);
                     ready_count_.store(rhs.ready_count_.load());
                     rhs.ready_count_ = 0;
-                    f_ = std::move(rhs.f_);
+                    f_ = HPX_MOVE(rhs.f_);
                     success_counter_ = rhs.success_counter_;
                     rhs.success_counter_ = nullptr;
                     goal_reached_on_calling_thread_ =
@@ -188,7 +188,7 @@ namespace hpx { namespace lcos {
                 // all futures should be ready
                 HPX_ASSERT(ready_count_ == size);
 
-                return std::move(lazy_values_);
+                return HPX_MOVE(lazy_values_);
             }
 
             std::vector<Future> lazy_values_;
@@ -247,7 +247,7 @@ namespace hpx { namespace lcos {
         std::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p(
             detail::wait_each<Future, F>(
-                std::move(lazy_values_), std::forward<F>(f), &success_counter));
+                HPX_MOVE(lazy_values_), HPX_FORWARD(F, f), &success_counter));
 
         p.apply();
         p.get_future().get();
@@ -259,7 +259,7 @@ namespace hpx { namespace lcos {
     inline std::size_t wait(
         std::vector<Future>&& lazy_values, F&& f, std::int32_t suspend_for = 10)
     {
-        return wait(lazy_values, std::forward<F>(f), suspend_for);
+        return wait(lazy_values, HPX_FORWARD(F, f), suspend_for);
     }
 
     template <typename Future, typename F>
@@ -280,7 +280,7 @@ namespace hpx { namespace lcos {
         std::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p(
             detail::wait_each<Future, F>(
-                std::move(lazy_values_), std::forward<F>(f), &success_counter));
+                HPX_MOVE(lazy_values_), HPX_FORWARD(F, f), &success_counter));
 
         p.apply();
         p.get_future().get();

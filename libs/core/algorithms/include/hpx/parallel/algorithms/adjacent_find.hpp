@@ -161,7 +161,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 return std::adjacent_find(first, last,
                     util::invoke_projected<Pred, Proj>(
-                        std::forward<Pred>(pred), std::forward<Proj>(proj)));
+                        HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
             }
 
             template <typename ExPolicy, typename FwdIter, typename Sent_,
@@ -179,7 +179,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first == last)
                 {
                     return util::detail::algorithm_result<ExPolicy,
-                        FwdIter>::get(std::move(last));
+                        FwdIter>::get(HPX_MOVE(last));
                 }
 
                 FwdIter next = first;
@@ -188,9 +188,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 util::cancellation_token<difference_type> tok(count);
 
                 util::invoke_projected<Pred, Proj> pred_projected{
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)};
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
 
-                auto f1 = [pred_projected = std::move(pred_projected), tok](
+                auto f1 = [pred_projected = HPX_MOVE(pred_projected), tok](
                               zip_iterator it, std::size_t part_size,
                               std::size_t base_idx) mutable {
                     util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
@@ -214,13 +214,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     else
                         first = last;
 
-                    return std::move(first);
+                    return HPX_MOVE(first);
                 };
 
                 return util::partitioner<ExPolicy, FwdIter,
-                    void>::call_with_index(std::forward<ExPolicy>(policy),
+                    void>::call_with_index(HPX_FORWARD(ExPolicy, policy),
                     hpx::util::make_zip_iterator(first, next), count - 1, 1,
-                    std::move(f1), std::move(f2));
+                    HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -239,8 +239,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::adjacent_find<FwdIter, FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, last,
-            std::forward<Pred>(pred),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(Pred, pred),
             hpx::parallel::util::projection_identity{});
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -267,7 +266,7 @@ namespace hpx {
                 "Requires at least input iterator.");
 
             return parallel::v1::detail::adjacent_find<InIter, InIter>().call(
-                hpx::execution::seq, first, last, std::forward<Pred>(pred),
+                hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -288,8 +287,8 @@ namespace hpx {
                 "Requires at least a forward iterator");
 
             return parallel::v1::detail::adjacent_find<FwdIter, FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Pred>(pred),
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Pred, pred),
                 hpx::parallel::util::projection_identity{});
         }
     } adjacent_find{};

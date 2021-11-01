@@ -311,7 +311,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Proj&& proj)
             {
                 return sequential_remove_copy(
-                    first, last, dest, val, std::forward<Proj>(proj));
+                    first, last, dest, val, HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
@@ -322,9 +322,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 FwdIter2 dest, T const& val, Proj&& proj)
             {
                 return copy_if<IterPair>().call(
-                    std::forward<ExPolicy>(policy), first, last, dest,
+                    HPX_FORWARD(ExPolicy, policy), first, last, dest,
                     [val](T const& a) -> bool { return !(a == val); },
-                    std::forward<Proj>(proj));
+                    HPX_FORWARD(Proj, proj));
             }
         };
         /// \endcond
@@ -356,8 +356,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         return detail::remove_copy<util::in_out_result<FwdIter1, FwdIter2>>()
-            .call(std::forward<ExPolicy>(policy), first, last, dest, val,
-                std::forward<Proj>(proj));
+            .call(HPX_FORWARD(ExPolicy, policy), first, last, dest, val,
+                HPX_FORWARD(Proj, proj));
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -397,7 +397,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 InIter first, Sent last, OutIter dest, F&& f, Proj&& proj)
             {
                 return sequential_remove_copy_if(first, last, dest,
-                    std::forward<F>(f), std::forward<Proj>(proj));
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
@@ -411,11 +411,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     value_type;
 
                 return copy_if<IterPair>().call(
-                    std::forward<ExPolicy>(policy), first, last, dest,
-                    [f = std::forward<F>(f)](value_type const& a) -> bool {
+                    HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                    [f = HPX_FORWARD(F, f)](value_type const& a) -> bool {
                         return !hpx::util::invoke(f, a);
                     },
-                    std::forward<Proj>(proj));
+                    HPX_FORWARD(Proj, proj));
             }
         };
         /// \endcond
@@ -446,8 +446,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         return detail::remove_copy_if<util::in_out_result<FwdIter1, FwdIter2>>()
-            .call(std::forward<ExPolicy>(policy), first, last, dest,
-                std::forward<F>(f), std::forward<Proj>(proj));
+            .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -479,10 +479,10 @@ namespace hpx {
             auto&& res = hpx::parallel::v1::detail::remove_copy_if<
                 hpx::parallel::util::in_out_result<InIter, OutIter>>()
                              .call(hpx::execution::sequenced_policy{}, first,
-                                 last, dest, std::forward<Pred>(pred),
+                                 last, dest, HPX_FORWARD(Pred, pred),
                                  hpx::parallel::util::projection_identity());
 
-            return hpx::parallel::util::get_second_element(std::move(res));
+            return hpx::parallel::util::get_second_element(HPX_MOVE(res));
         }
 
         // clang-format off
@@ -509,11 +509,11 @@ namespace hpx {
 
             auto&& res = hpx::parallel::v1::detail::remove_copy_if<
                 hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                             .call(std::forward<ExPolicy>(policy), first, last,
-                                 dest, std::forward<Pred>(pred),
+                             .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                                 dest, HPX_FORWARD(Pred, pred),
                                  hpx::parallel::util::projection_identity());
 
-            return hpx::parallel::util::get_second_element(std::move(res));
+            return hpx::parallel::util::get_second_element(HPX_MOVE(res));
         }
     } remove_copy_if{};
 
@@ -566,7 +566,7 @@ namespace hpx {
 
             typedef typename std::iterator_traits<FwdIter1>::value_type Type;
 
-            return hpx::remove_copy_if(std::forward<ExPolicy>(policy), first,
+            return hpx::remove_copy_if(HPX_FORWARD(ExPolicy, policy), first,
                 last, dest,
                 [value](Type const& a) -> bool { return value == a; });
         }

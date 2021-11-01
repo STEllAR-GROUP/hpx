@@ -40,7 +40,7 @@ namespace hpx { namespace lcos { namespace local {
                 std::enable_if_t<!std::is_same_v<FD, packaged_task> &&
                     is_invocable_r_v<R, FD&, Ts...>>>
         explicit packaged_task(F&& f)
-          : function_(std::forward<F>(f))
+          : function_(HPX_FORWARD(F, f))
           , promise_()
         {
         }
@@ -50,7 +50,7 @@ namespace hpx { namespace lcos { namespace local {
                 std::enable_if_t<!std::is_same_v<FD, packaged_task> &&
                     is_invocable_r_v<R, FD&, Ts...>>>
         explicit packaged_task(std::allocator_arg_t, Allocator const& a, F&& f)
-          : function_(std::forward<F>(f))
+          : function_(HPX_FORWARD(F, f))
           , promise_(std::allocator_arg, a)
         {
         }
@@ -83,16 +83,16 @@ namespace hpx { namespace lcos { namespace local {
                     hpx::util::annotate_function annotate(function_);
                     if constexpr (std::is_void_v<R>)
                     {
-                        function_(std::forward<Ts>(ts)...);
+                        function_(HPX_FORWARD(Ts, ts)...);
                         promise_.set_value();
                     }
                     else
                     {
-                        promise_.set_value(function_(std::forward<Ts>(ts)...));
+                        promise_.set_value(function_(HPX_FORWARD(Ts, ts)...));
                     }
                 },
                 [&](std::exception_ptr ep) {
-                    promise_.set_exception(std::move(ep));
+                    promise_.set_exception(HPX_MOVE(ep));
                 });
         }
 

@@ -753,10 +753,10 @@ namespace hpx { namespace ranges {
                 "for_loop must be called with at least a function object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(
-                std::forward<ExPolicy>(policy), first, last, 1,
+            return parallel::v2::detail::for_loop(HPX_FORWARD(ExPolicy, policy),
+                first, last, 1,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -775,7 +775,7 @@ namespace hpx { namespace ranges {
             using hpx::util::make_index_pack;
             return parallel::v2::detail::for_loop(hpx::execution::seq, first,
                 last, 1, typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -793,11 +793,10 @@ namespace hpx { namespace ranges {
                 "for_loop must be called with at least a function object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), 1,
+            return parallel::v2::detail::for_loop(HPX_FORWARD(ExPolicy, policy),
+                hpx::util::begin(rng), hpx::util::end(rng), 1,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -816,7 +815,7 @@ namespace hpx { namespace ranges {
             return parallel::v2::detail::for_loop(hpx::execution::seq,
                 hpx::util::begin(rng), hpx::util::end(rng), 1,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
     } for_loop{};
 
@@ -843,10 +842,10 @@ namespace hpx { namespace ranges {
                 "object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(
-                std::forward<ExPolicy>(policy), first, last, stride,
+            return parallel::v2::detail::for_loop(HPX_FORWARD(ExPolicy, policy),
+                first, last, stride,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -868,7 +867,7 @@ namespace hpx { namespace ranges {
             return parallel::v2::detail::for_loop(hpx::execution::seq, first,
                 last, stride,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -888,11 +887,10 @@ namespace hpx { namespace ranges {
                 "object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), stride,
+            return parallel::v2::detail::for_loop(HPX_FORWARD(ExPolicy, policy),
+                hpx::util::begin(rng), hpx::util::end(rng), stride,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -913,7 +911,7 @@ namespace hpx { namespace ranges {
             return parallel::v2::detail::for_loop(hpx::execution::seq,
                 hpx::util::begin(rng), hpx::util::end(rng), stride,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
     } for_loop_strided{};
 }}    // namespace hpx::ranges

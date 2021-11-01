@@ -34,8 +34,8 @@ namespace hpx { namespace util {
             Tags...>::type result_type;
 
         return lcos::make_future<result_type>(
-            std::move(f), [](hpx::tuple<Ts...>&& t) -> result_type {
-                return make_tagged_tuple<Tags...>(std::move(t));
+            HPX_MOVE(f), [](hpx::tuple<Ts...>&& t) -> result_type {
+                return make_tagged_tuple<Tags...>(HPX_MOVE(t));
             });
     }
 }}    // namespace hpx::util

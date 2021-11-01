@@ -241,7 +241,7 @@ namespace hpx { namespace agas {
             naming::get_gid_from_locality_id(target_locality_id));
         parcelset::parcel p(parcelset::detail::create_parcel::call(
             naming::get_gid_from_locality_id(target_locality_id),
-            std::move(addr), act, std::forward<Args>(args)...));
+            HPX_MOVE(addr), act, HPX_FORWARD(Args, args)...));
 #if defined(HPX_HAVE_PARCEL_PROFILING)
         if (!p.parcel_id())
         {
@@ -252,11 +252,11 @@ namespace hpx { namespace agas {
         HPX_UNUSED(source_locality_id);
 #endif
 
-        parcelset::detail::parcel_await_apply(std::move(p),
+        parcelset::detail::parcel_await_apply(HPX_MOVE(p),
             parcelset::write_handler_type(), 0,
             [this, dest](
                 parcelset::parcel&& p, parcelset::write_handler_type&&) {
-                pp->send_early_parcel(dest, std::move(p));
+                pp->send_early_parcel(dest, HPX_MOVE(p));
             });
     }    // }}}
 
@@ -273,7 +273,7 @@ namespace hpx { namespace agas {
         parcelset::put_parcel(naming::id_type(naming::get_gid_from_locality_id(
                                                   target_locality_id),
                                   naming::id_type::unmanaged),
-            std::move(addr), act, std::forward<Args>(args)...);
+            HPX_MOVE(addr), act, HPX_FORWARD(Args, args)...);
     }    // }}}
 
     //typedef components::detail::heap_factory<
@@ -525,7 +525,7 @@ namespace hpx { namespace agas {
             // of startup synchronization.
             get_big_boot_barrier().apply_late(0,
                 naming::get_locality_id_from_gid(prefix), dest,
-                notify_worker_action(), std::move(hdr));
+                notify_worker_action(), HPX_MOVE(hdr));
         }
 
         else
@@ -539,7 +539,7 @@ namespace hpx { namespace agas {
                     util::bind_front(&big_boot_barrier::apply_notification,
                         &get_big_boot_barrier(), 0,
                         naming::get_locality_id_from_gid(prefix), dest,
-                        std::move(hdr))));
+                        HPX_MOVE(hdr))));
             get_big_boot_barrier().add_thunk(thunk);
         }
     }
@@ -612,7 +612,7 @@ namespace hpx { namespace agas {
     {
         hdr.endpoints = localities;
         apply(source_locality_id, target_locality_id, dest,
-            notify_worker_action(), std::move(hdr));
+            notify_worker_action(), HPX_MOVE(hdr));
     }
 
     void big_boot_barrier::add_locality_endpoints(std::uint32_t locality_id,
@@ -744,7 +744,7 @@ namespace hpx { namespace agas {
 
         // random first parcel id
         apply(static_cast<std::uint32_t>(std::random_device{}()), 0,
-            bootstrap_agas, register_worker_action(), std::move(hdr));
+            bootstrap_agas, register_worker_action(), HPX_MOVE(hdr));
 
         // wait for registration to be complete
         spin();

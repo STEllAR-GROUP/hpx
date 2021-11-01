@@ -91,7 +91,7 @@ namespace hpx { namespace detail {
         return detail::async_continue_r<action_type, remote_result_type>(
             util::functional::async_continuation(util::bind<Action>(
                 util::bind(util::functional::extract_locality(), _2, gid),
-                std::forward<Ts>(vs)...)),
+                HPX_FORWARD(Ts, vs)...)),
             service_target, gid.get_gid());
 #else
         HPX_ASSERT(false);
@@ -109,7 +109,7 @@ namespace hpx { namespace detail {
         ,
         naming::id_type const& gid, Ts&&... vs)
     {
-        return async_colocated<Derived>(gid, std::forward<Ts>(vs)...);
+        return async_colocated<Derived>(gid, HPX_FORWARD(Ts, vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -145,8 +145,8 @@ namespace hpx { namespace detail {
             util::functional::async_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid),
-                    std::forward<Ts>(vs)...),
-                std::forward<Continuation>(cont)),
+                    HPX_FORWARD(Ts, vs)...),
+                HPX_FORWARD(Continuation, cont)),
             service_target, gid.get_gid());
 #endif
     }
@@ -163,6 +163,6 @@ namespace hpx { namespace detail {
             naming::id_type const& gid, Ts&&... vs)
     {
         return async_colocated<Derived>(
-            std::forward<Continuation>(cont), gid, std::forward<Ts>(vs)...);
+            HPX_FORWARD(Continuation, cont), gid, HPX_FORWARD(Ts, vs)...);
     }
 }}    // namespace hpx::detail

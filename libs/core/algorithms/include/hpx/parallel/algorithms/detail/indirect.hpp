@@ -32,7 +32,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Comp comp;
 
         inline less_ptr_no_null(Comp C1 = Comp())
-          : comp(std::move(C1))
+          : comp(HPX_MOVE(C1))
         {
         }
 
@@ -89,19 +89,19 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
             pos_dest = pos_src = pos_in_vector;
             Iter it_dest = std::next(first, pos_dest);
-            value_type Aux = std::move(*it_dest);
+            value_type Aux = HPX_MOVE(*it_dest);
 
             while ((pos_src = std::size_t(detail::distance(
                         first, v_iter[pos_dest]))) != pos_in_vector)
             {
                 v_iter[pos_dest] = it_dest;
                 Iter it_src = std::next(first, pos_src);
-                *it_dest = std::move(*it_src);
+                *it_dest = HPX_MOVE(*it_src);
                 it_dest = it_src;
                 pos_dest = pos_src;
             }
 
-            *it_dest = std::move(Aux);
+            *it_dest = HPX_MOVE(Aux);
             v_iter[pos_dest] = it_dest;
             ++pos_in_vector;
         }

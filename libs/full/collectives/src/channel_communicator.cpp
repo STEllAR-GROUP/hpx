@@ -33,7 +33,7 @@ namespace hpx { namespace collectives {
         num_sites_arg num_sites, this_site_arg this_site,
         components::client<detail::channel_communicator_server>&& here)
       : comm_(std::make_shared<detail::channel_communicator>(basename,
-            num_sites.num_sites_, this_site.this_site_, std::move(here)))
+            num_sites.num_sites_, this_site.this_site_, HPX_MOVE(here)))
     {
     }
 
@@ -70,7 +70,7 @@ namespace hpx { namespace collectives {
             hpx::detail::name_from_basename(basename, this_site.this_site_));
 
         return f.then(hpx::launch::sync,
-            [=, target = std::move(c)](hpx::future<bool>&& f) mutable {
+            [=, target = HPX_MOVE(c)](hpx::future<bool>&& f) mutable {
                 bool result = f.get();
                 if (!result)
                 {
@@ -82,7 +82,7 @@ namespace hpx { namespace collectives {
                             target.registered_name()));
                 }
                 return channel_communicator(
-                    basename, num_sites, this_site, std::move(target));
+                    basename, num_sites, this_site, HPX_MOVE(target));
             });
     }
 

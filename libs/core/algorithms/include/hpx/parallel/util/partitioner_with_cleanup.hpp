@@ -70,8 +70,8 @@ namespace hpx { namespace parallel { namespace util {
                 try
                 {
                     workitems = detail::partition<Result>(
-                        std::forward<ExPolicy_>(policy), first, count,
-                        std::forward<F1>(f1));
+                        HPX_FORWARD(ExPolicy_, policy), first, count,
+                        HPX_FORWARD(F1, f1));
 
                     scoped_params.mark_end_of_scheduling();
                 }
@@ -80,8 +80,8 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(std::move(workitems), std::move(errors),
-                    std::forward<F2>(f2), std::forward<Cleanup>(cleanup));
+                return reduce(HPX_MOVE(workitems), HPX_MOVE(errors),
+                    HPX_FORWARD(F2, f2), HPX_FORWARD(Cleanup, cleanup));
             }
 
         private:
@@ -96,18 +96,18 @@ namespace hpx { namespace parallel { namespace util {
                 // always rethrow if 'errors' is not empty or workitems has
                 // exceptional future
                 handle_local_exceptions::call_with_cleanup(
-                    workitems, errors, std::forward<Cleanup>(cleanup));
+                    workitems, errors, HPX_FORWARD(Cleanup, cleanup));
 
                 try
                 {
-                    return f(std::move(workitems));
+                    return f(HPX_MOVE(workitems));
                 }
                 catch (...)
                 {
                     // rethrow either bad_alloc or exception_list
                     handle_local_exceptions::call(std::current_exception());
                     HPX_ASSERT(false);
-                    return f(std::move(workitems));
+                    return f(HPX_MOVE(workitems));
                 }
             }
         };
@@ -141,8 +141,8 @@ namespace hpx { namespace parallel { namespace util {
                 try
                 {
                     workitems = detail::partition<Result>(
-                        std::forward<ExPolicy_>(policy), first, count,
-                        std::forward<F1>(f1));
+                        HPX_FORWARD(ExPolicy_, policy), first, count,
+                        HPX_FORWARD(F1, f1));
 
                     scoped_params->mark_end_of_scheduling();
                 }
@@ -156,9 +156,9 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(std::move(scoped_params), std::move(workitems),
-                    std::move(errors), std::forward<F2>(f2),
-                    std::forward<Cleanup>(cleanup));
+                return reduce(HPX_MOVE(scoped_params), HPX_MOVE(workitems),
+                    HPX_MOVE(errors), HPX_FORWARD(F2, f2),
+                    HPX_FORWARD(Cleanup, cleanup));
             }
 
         private:
@@ -180,18 +180,18 @@ namespace hpx { namespace parallel { namespace util {
                 return hpx::future<R>{};
 #else
                 return hpx::dataflow(
-                    [errors = std::move(errors),
-                        scoped_params = std::move(scoped_params),
-                        f = std::forward<F>(f),
-                        cleanup = std::forward<Cleanup>(cleanup)](
+                    [errors = HPX_MOVE(errors),
+                        scoped_params = HPX_MOVE(scoped_params),
+                        f = HPX_FORWARD(F, f),
+                        cleanup = HPX_FORWARD(Cleanup, cleanup)](
                         std::vector<hpx::future<Result>>&& r) mutable -> R {
                         HPX_UNUSED(scoped_params);
 
                         handle_local_exceptions::call_with_cleanup(
-                            r, errors, std::forward<Cleanup>(cleanup));
-                        return f(std::move(r));
+                            r, errors, HPX_FORWARD(Cleanup, cleanup));
+                        return f(HPX_MOVE(r));
                     },
-                    std::move(workitems));
+                    HPX_MOVE(workitems));
 #endif
             }
         };

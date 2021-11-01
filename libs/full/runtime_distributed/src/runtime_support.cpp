@@ -24,7 +24,7 @@ namespace hpx { namespace components { namespace server {
         if (!f.empty())
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            pre_startup_functions_.push_back(std::move(f));
+            pre_startup_functions_.push_back(HPX_MOVE(f));
         }
     }
 
@@ -33,7 +33,7 @@ namespace hpx { namespace components { namespace server {
         if (!f.empty())
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            startup_functions_.push_back(std::move(f));
+            startup_functions_.push_back(HPX_MOVE(f));
         }
     }
 
@@ -42,7 +42,7 @@ namespace hpx { namespace components { namespace server {
         if (!f.empty())
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            pre_shutdown_functions_.push_back(std::move(f));
+            pre_shutdown_functions_.push_back(HPX_MOVE(f));
         }
     }
 
@@ -51,7 +51,7 @@ namespace hpx { namespace components { namespace server {
         if (!f.empty())
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            shutdown_functions_.push_back(std::move(f));
+            shutdown_functions_.push_back(HPX_MOVE(f));
         }
     }
 }}}    // namespace hpx::components::server

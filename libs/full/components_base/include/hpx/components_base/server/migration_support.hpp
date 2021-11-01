@@ -38,7 +38,7 @@ namespace hpx { namespace components {
     public:
         template <typename... Arg>
         migration_support(Arg&&... arg)
-          : base_type(std::forward<Arg>(arg)...)
+          : base_type(HPX_FORWARD(Arg, arg)...)
           , pin_count_(0)
           , was_marked_for_migration_(false)
         {
@@ -209,7 +209,7 @@ namespace hpx { namespace components {
                     hpx::future<void> f = trigger_migration_.get_future();
 
                     l.unlock();
-                    return std::make_pair(true, std::move(f));
+                    return std::make_pair(true, HPX_MOVE(f));
                 },
                 false);
         }
@@ -234,7 +234,7 @@ namespace hpx { namespace components {
                 util::bind_front(&migration_support::thread_function,
                     get_lva<this_component_type>::call(lva),
                     traits::component_decorate_function<base_type>::call(
-                        lva, std::forward<F>(f)),
+                        lva, HPX_FORWARD(F, f)),
                     components::pinned_ptr::create<this_component_type>(lva)));
         }
 

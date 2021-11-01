@@ -202,7 +202,7 @@ namespace hpx { namespace threads {
                 auto pool_func = rp.get_pool_creator(i);
                 std::unique_ptr<thread_pool_base> pool(
                     pool_func(thread_pool_init, thread_queue_init));
-                pools_.push_back(std::move(pool));
+                pools_.push_back(HPX_MOVE(pool));
                 break;
             }
             case resource::unspecified:
@@ -234,8 +234,8 @@ namespace hpx { namespace threads {
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(std::move(sched), thread_pool_init));
-                pools_.push_back(std::move(pool));
+                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                pools_.push_back(HPX_MOVE(pool));
                 break;
             }
 
@@ -272,8 +272,8 @@ namespace hpx { namespace threads {
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(std::move(sched), thread_pool_init));
-                pools_.push_back(std::move(pool));
+                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                pools_.push_back(HPX_MOVE(pool));
 
                 break;
             }
@@ -312,8 +312,8 @@ namespace hpx { namespace threads {
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(std::move(sched), thread_pool_init));
-                pools_.push_back(std::move(pool));
+                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                pools_.push_back(HPX_MOVE(pool));
 #else
                 throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=local-priority-lifo "
@@ -346,8 +346,8 @@ namespace hpx { namespace threads {
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(std::move(sched), thread_pool_init));
-                pools_.push_back(std::move(pool));
+                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                pools_.push_back(HPX_MOVE(pool));
                 break;
             }
 
@@ -383,8 +383,8 @@ namespace hpx { namespace threads {
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(std::move(sched), thread_pool_init));
-                pools_.push_back(std::move(pool));
+                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                pools_.push_back(HPX_MOVE(pool));
                 break;
             }
 
@@ -423,8 +423,8 @@ namespace hpx { namespace threads {
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(std::move(sched), thread_pool_init));
-                pools_.push_back(std::move(pool));
+                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                pools_.push_back(HPX_MOVE(pool));
 #else
                 throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=abp-priority-fifo "
@@ -469,8 +469,8 @@ namespace hpx { namespace threads {
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(std::move(sched), thread_pool_init));
-                pools_.push_back(std::move(pool));
+                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                pools_.push_back(HPX_MOVE(pool));
 #else
                 throw hpx::detail::command_line_error(
                     "Command line option --hpx:queuing=abp-priority-lifo "
@@ -503,8 +503,8 @@ namespace hpx { namespace threads {
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
                     new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(std::move(sched), thread_pool_init));
-                pools_.push_back(std::move(pool));
+                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                pools_.push_back(HPX_MOVE(pool));
                 break;
             }
             }

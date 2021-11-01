@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/synchronization/recursive_mutex.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/synchronization/recursive_mutex.hpp>
 
 #include <hpx/components/iostreams/export_definitions.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>
@@ -19,8 +19,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace iostreams { namespace detail
-{
+namespace hpx { namespace iostreams { namespace detail {
     struct buffer
     {
     protected:
@@ -28,19 +27,22 @@ namespace hpx { namespace iostreams { namespace detail
 
     public:
         buffer()
-          : data_(new std::vector<char>),
-            mtx_(new mutex_type)
-        {}
+          : data_(new std::vector<char>)
+          , mtx_(new mutex_type)
+        {
+        }
 
         buffer(buffer const& rhs)
           : data_(rhs.data_)
           , mtx_(rhs.mtx_)
-        {}
+        {
+        }
 
-        buffer(buffer && rhs)
-          : data_(std::move(rhs.data_))
-          , mtx_(std::move(rhs.mtx_))
-        {}
+        buffer(buffer&& rhs)
+          : data_(HPX_MOVE(rhs.data_))
+          , mtx_(HPX_MOVE(rhs.mtx_))
+        {
+        }
 
         buffer& operator=(buffer const& rhs)
         {
@@ -52,12 +54,12 @@ namespace hpx { namespace iostreams { namespace detail
             return *this;
         }
 
-        buffer& operator=(buffer && rhs)
+        buffer& operator=(buffer&& rhs)
         {
             if (this != &rhs)
             {
-                data_ = std::move(rhs.data_);
-                mtx_ = std::move(rhs.mtx_);
+                data_ = HPX_MOVE(rhs.data_);
+                mtx_ = HPX_MOVE(rhs.mtx_);
             }
             return *this;
         }
@@ -101,7 +103,7 @@ namespace hpx { namespace iostreams { namespace detail
             if (data_.get())
             {
                 // execute even for empty buffers as this will flush the output
-                std::shared_ptr<std::vector<char> > data(data_);
+                std::shared_ptr<std::vector<char>> data(data_);
                 data_.reset();
                 l.unlock();
 
@@ -111,7 +113,7 @@ namespace hpx { namespace iostreams { namespace detail
         }
 
     private:
-        std::shared_ptr<std::vector<char> > data_;
+        std::shared_ptr<std::vector<char>> data_;
 
     protected:
         std::shared_ptr<mutex_type> mtx_;
@@ -126,5 +128,4 @@ namespace hpx { namespace iostreams { namespace detail
 
         HPX_SERIALIZATION_SPLIT_MEMBER();
     };
-}}}
-
+}}}    // namespace hpx::iostreams::detail

@@ -312,7 +312,7 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::uninitialized_fill<FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, last, value);
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, value);
         }
 
         // clang-format off
@@ -359,7 +359,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::uninitialized_fill<
                 iterator_type>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng),
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
                     std::end(rng), value);
         }
     } uninitialized_fill{};
@@ -403,7 +403,7 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::uninitialized_fill_n<FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, count, value);
+                .call(HPX_FORWARD(ExPolicy, policy), first, count, value);
         }
     } uninitialized_fill_n{};
 }}    // namespace hpx::ranges

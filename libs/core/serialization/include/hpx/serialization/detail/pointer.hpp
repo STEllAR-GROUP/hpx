@@ -78,7 +78,7 @@ namespace hpx { namespace serialization {
             using referred_type = typename Pointer::element_type;
 
             erase_ptr_helper(Pointer&& t, Pointer& ptr)
-              : t_(std::move(t))
+              : t_(HPX_MOVE(t))
             {
                 ptr = t_;
             }
@@ -272,7 +272,7 @@ namespace hpx { namespace serialization {
                             ar);
                     register_pointer(ar, pos,
                         ptr_helper_ptr(new detail::erase_ptr_helper<Pointer>(
-                            std::move(temp), ptr)));
+                            HPX_MOVE(temp), ptr)));
                 }
                 else
                 {

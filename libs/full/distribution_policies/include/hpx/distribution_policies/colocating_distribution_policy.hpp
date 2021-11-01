@@ -87,10 +87,10 @@ namespace hpx { namespace components {
             {
                 return create_async<Component>(
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    std::forward<Ts>(vs)...);
+                    HPX_FORWARD(Ts, vs)...);
             }
             return create_colocated_async<Component>(
-                id_, std::forward<Ts>(vs)...);
+                id_, HPX_FORWARD(Ts, vs)...);
         }
 
         /// \cond NOINTERNAL
@@ -121,17 +121,17 @@ namespace hpx { namespace components {
             {
                 id = naming::get_id_from_locality_id(agas::get_locality_id());
                 f = bulk_create_async<Component>(
-                    id, count, std::forward<Ts>(vs)...);
+                    id, count, HPX_FORWARD(Ts, vs)...);
             }
             else
             {
                 id = id_;
                 f = bulk_create_colocated_async<Component>(
-                    id, count, std::forward<Ts>(vs)...);
+                    id, count, HPX_FORWARD(Ts, vs)...);
             }
 
             return f.then(hpx::launch::sync,
-                [id = std::move(id)](hpx::future<std::vector<hpx::id_type>>&& f)
+                [id = HPX_MOVE(id)](hpx::future<std::vector<hpx::id_type>>&& f)
                     -> std::vector<bulk_locality_result> {
                     std::vector<bulk_locality_result> result;
                     result.emplace_back(id, f.get());
@@ -158,10 +158,10 @@ namespace hpx { namespace components {
             {
                 return hpx::detail::async_impl<Action>(policy,
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    std::forward<Ts>(vs)...);
+                    HPX_FORWARD(Ts, vs)...);
             }
             return hpx::detail::async_colocated<Action>(
-                id_, std::forward<Ts>(vs)...);
+                id_, HPX_FORWARD(Ts, vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
@@ -175,10 +175,10 @@ namespace hpx { namespace components {
             {
                 return hpx::detail::async_cb_impl<Action>(policy,
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                    HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
             }
             return hpx::detail::async_colocated_cb<Action>(
-                id_, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                id_, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
@@ -191,12 +191,12 @@ namespace hpx { namespace components {
             if (!id_)
             {
                 return hpx::detail::apply_impl<Action>(
-                    std::forward<Continuation>(c),
+                    HPX_FORWARD(Continuation, c),
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    priority, std::forward<Ts>(vs)...);
+                    priority, HPX_FORWARD(Ts, vs)...);
             }
             return hpx::detail::apply_colocated<Action>(
-                std::forward<Continuation>(c), id_, std::forward<Ts>(vs)...);
+                HPX_FORWARD(Continuation, c), id_, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action, typename... Ts>
@@ -206,10 +206,10 @@ namespace hpx { namespace components {
             {
                 return hpx::detail::apply_impl<Action>(
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    priority, std::forward<Ts>(vs)...);
+                    priority, HPX_FORWARD(Ts, vs)...);
             }
             return hpx::detail::apply_colocated<Action>(
-                id_, std::forward<Ts>(vs)...);
+                id_, HPX_FORWARD(Ts, vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
@@ -223,14 +223,14 @@ namespace hpx { namespace components {
             if (!id_)
             {
                 return hpx::detail::apply_cb_impl<Action>(
-                    std::forward<Continuation>(c),
+                    HPX_FORWARD(Continuation, c),
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    priority, std::forward<Callback>(cb),
-                    std::forward<Ts>(vs)...);
+                    priority, HPX_FORWARD(Callback, cb),
+                    HPX_FORWARD(Ts, vs)...);
             }
             return hpx::detail::apply_colocated_cb<Action>(
-                std::forward<Continuation>(c), id_, std::forward<Callback>(cb),
-                std::forward<Ts>(vs)...);
+                HPX_FORWARD(Continuation, c), id_, HPX_FORWARD(Callback, cb),
+                HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action, typename Callback, typename... Ts>
@@ -241,11 +241,11 @@ namespace hpx { namespace components {
             {
                 return hpx::detail::apply_cb_impl<Action>(
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    priority, std::forward<Callback>(cb),
-                    std::forward<Ts>(vs)...);
+                    priority, HPX_FORWARD(Callback, cb),
+                    HPX_FORWARD(Ts, vs)...);
             }
             return hpx::detail::apply_colocated_cb<Action>(
-                id_, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                id_, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         /// Returns the number of associated localities for this distribution

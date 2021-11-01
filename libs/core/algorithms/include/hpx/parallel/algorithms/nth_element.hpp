@@ -183,8 +183,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             if (nth == first)
             {
                 RandomIt it = detail::min_element<RandomIt>().call(
-                    hpx::execution::seq, first, end,
-                    std::forward<Compare>(comp), std::forward<Proj>(proj));
+                    hpx::execution::seq, first, end, HPX_FORWARD(Compare, comp),
+                    HPX_FORWARD(Proj, proj));
 
                 if (it != first)
                 {
@@ -201,7 +201,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             if (nelem < nmin_sort)
             {
                 detail::sort<RandomIt>().call(hpx::execution::seq, first, end,
-                    std::forward<Compare>(comp), std::forward<Proj>(proj));
+                    HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj, proj));
                 return;
             }
             if (level == 0)
@@ -219,10 +219,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             if (nth < c_last)
                 nth_element_seq(first, nth, c_last, level - 1,
-                    std::forward<Compare>(comp), std::forward<Proj>(proj));
+                    HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj, proj));
             else
                 nth_element_seq(c_last + 1, nth, end, level - 1,
-                    std::forward<Compare>(comp), std::forward<Proj>(proj));
+                    HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj, proj));
 
             return;
         }
@@ -250,7 +250,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 uint32_t level = detail::nbits64(nelem) * 2;
                 detail::nth_element_seq(first, nth, end, level,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
 
                 return end;
             }
@@ -269,13 +269,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first == last)
                 {
                     return util::detail::algorithm_result<ExPolicy,
-                        RandomIt>::get(std::move(first));
+                        RandomIt>::get(HPX_MOVE(first));
                 }
 
                 if (nth == last)
                 {
                     return util::detail::algorithm_result<ExPolicy,
-                        RandomIt>::get(std::move(nth));
+                        RandomIt>::get(HPX_MOVE(nth));
                 }
 
                 try
@@ -334,7 +334,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 return util::detail::algorithm_result<ExPolicy, RandomIt>::get(
-                    std::move(return_last));
+                    HPX_MOVE(return_last));
             }
         };
         /// \endcond
@@ -365,7 +365,7 @@ namespace hpx {
                 "Requires at least random iterator.");
 
             hpx::parallel::v1::detail::nth_element<RandomIt>().call(
-                hpx::execution::seq, first, nth, last, std::forward<Pred>(pred),
+                hpx::execution::seq, first, nth, last, HPX_FORWARD(Pred, pred),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -393,8 +393,8 @@ namespace hpx {
 
             return hpx::util::void_guard<result_type>(),
                    hpx::parallel::v1::detail::nth_element<RandomIt>().call(
-                       std::forward<ExPolicy>(policy), first, nth, last,
-                       std::forward<Pred>(pred),
+                       HPX_FORWARD(ExPolicy, policy), first, nth, last,
+                       HPX_FORWARD(Pred, pred),
                        hpx::parallel::util::projection_identity{});
         }
     } nth_element{};

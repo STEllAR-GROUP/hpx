@@ -21,33 +21,27 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parcelset { namespace policies { namespace mpi
-{
+namespace hpx { namespace parcelset { namespace policies { namespace mpi {
     template <typename Parcelport>
     struct receiver_connection
     {
     private:
         enum connection_state
         {
-            initialized
-          , rcvd_transmission_chunks
-          , rcvd_data
-          , rcvd_chunks
-          , sent_release_tag
+            initialized,
+            rcvd_transmission_chunks,
+            rcvd_data,
+            rcvd_chunks,
+            sent_release_tag
         };
 
         typedef hpx::lcos::local::spinlock mutex_type;
 
-        typedef std::vector<char>
-            data_type;
+        typedef std::vector<char> data_type;
         typedef parcel_buffer<data_type, data_type> buffer_type;
 
     public:
-        receiver_connection(
-            int src
-          , header h
-          , Parcelport & pp
-        )
+        receiver_connection(int src, header h, Parcelport& pp)
           : state_(initialized)
           , src_(src)
           , tag_(h.tag())
@@ -59,7 +53,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             header_.assert_valid();
 
-            performance_counters::parcels::data_point& data = buffer_.data_point_;
+            performance_counters::parcels::data_point& data =
+                buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
             data.bytes_ = static_cast<std::size_t>(header_.numbytes());
 
@@ -71,18 +66,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             switch (state_)
             {
-                case initialized:
-                    return receive_transmission_chunks(num_thread);
-                case rcvd_transmission_chunks:
-                    return receive_data(num_thread);
-                case rcvd_data:
-                    return receive_chunks(num_thread);
-                case rcvd_chunks:
-                    return send_release_tag(num_thread);
-                case sent_release_tag:
-                    return done();
-                default:
-                    HPX_ASSERT(false);
+            case initialized:
+                return receive_transmission_chunks(num_thread);
+            case rcvd_transmission_chunks:
+                return receive_data(num_thread);
+            case rcvd_data:
+                return receive_chunks(num_thread);
+            case rcvd_chunks:
+                return send_release_tag(num_thread);
+            case sent_release_tag:
+                return done();
+            default:
+                HPX_ASSERT(false);
             }
             return false;
         }
@@ -90,32 +85,22 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool receive_transmission_chunks(std::size_t num_thread = -1)
         {
             // determine the size of the chunk buffer
-            std::size_t num_zero_copy_chunks =
-                static_cast<std::size_t>(
-                    static_cast<std::uint32_t>(buffer_.num_chunks_.first));
-            std::size_t num_non_zero_copy_chunks =
-                static_cast<std::size_t>(
-                    static_cast<std::uint32_t>(buffer_.num_chunks_.second));
+            std::size_t num_zero_copy_chunks = static_cast<std::size_t>(
+                static_cast<std::uint32_t>(buffer_.num_chunks_.first));
+            std::size_t num_non_zero_copy_chunks = static_cast<std::size_t>(
+                static_cast<std::uint32_t>(buffer_.num_chunks_.second));
             buffer_.transmission_chunks_.resize(
-                num_zero_copy_chunks + num_non_zero_copy_chunks
-            );
-            if(num_zero_copy_chunks != 0)
+                num_zero_copy_chunks + num_non_zero_copy_chunks);
+            if (num_zero_copy_chunks != 0)
             {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 {
                     util::mpi_environment::scoped_lock l;
-                    MPI_Irecv(
-                        buffer_.transmission_chunks_.data()
-                      , static_cast<int>(
-                            buffer_.transmission_chunks_.size()
-                          * sizeof(buffer_type::transmission_chunk_type)
-                        )
-                      , MPI_BYTE
-                      , src_
-                      , tag_
-                      , util::mpi_environment::communicator()
-                      , &request_
-                    );
+                    MPI_Irecv(buffer_.transmission_chunks_.data(),
+                        static_cast<int>(buffer_.transmission_chunks_.size() *
+                            sizeof(buffer_type::transmission_chunk_type)),
+                        MPI_BYTE, src_, tag_,
+                        util::mpi_environment::communicator(), &request_);
                     request_ptr_ = &request_;
                 }
             }
@@ -127,25 +112,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         bool receive_data(std::size_t num_thread = -1)
         {
-            if(!request_done()) return false;
+            if (!request_done())
+                return false;
 
-            char *piggy_back = header_.piggy_back();
-            if(piggy_back)
+            char* piggy_back = header_.piggy_back();
+            if (piggy_back)
             {
-                std::memcpy(&buffer_.data_[0], piggy_back, buffer_.data_.size());
+                std::memcpy(
+                    &buffer_.data_[0], piggy_back, buffer_.data_.size());
             }
             else
             {
                 util::mpi_environment::scoped_lock l;
-                MPI_Irecv(
-                    buffer_.data_.data()
-                  , static_cast<int>(buffer_.data_.size())
-                  , MPI_BYTE
-                  , src_
-                  , tag_
-                  , util::mpi_environment::communicator()
-                  , &request_
-                );
+                MPI_Irecv(buffer_.data_.data(),
+                    static_cast<int>(buffer_.data_.size()), MPI_BYTE, src_,
+                    tag_, util::mpi_environment::communicator(), &request_);
                 request_ptr_ = &request_;
             }
 
@@ -156,26 +137,22 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         bool receive_chunks(std::size_t num_thread = -1)
         {
-            while(chunks_idx_ < buffer_.chunks_.size())
+            while (chunks_idx_ < buffer_.chunks_.size())
             {
-                if(!request_done()) return false;
+                if (!request_done())
+                    return false;
 
                 std::size_t idx = chunks_idx_++;
-                std::size_t chunk_size = buffer_.transmission_chunks_[idx].second;
+                std::size_t chunk_size =
+                    buffer_.transmission_chunks_[idx].second;
 
-                data_type & c = buffer_.chunks_[idx];
+                data_type& c = buffer_.chunks_[idx];
                 c.resize(chunk_size);
                 {
                     util::mpi_environment::scoped_lock l;
-                    MPI_Irecv(
-                        c.data()
-                      , static_cast<int>(c.size())
-                      , MPI_BYTE
-                      , src_
-                      , tag_
-                      , util::mpi_environment::communicator()
-                      , &request_
-                    );
+                    MPI_Irecv(c.data(), static_cast<int>(c.size()), MPI_BYTE,
+                        src_, tag_, util::mpi_environment::communicator(),
+                        &request_);
                     request_ptr_ = &request_;
                 }
             }
@@ -187,26 +164,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         bool send_release_tag(std::size_t num_thread = -1)
         {
-            if(!request_done()) return false;
+            if (!request_done())
+                return false;
 
-            performance_counters::parcels::data_point& data = buffer_.data_point_;
+            performance_counters::parcels::data_point& data =
+                buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds() - data.time_;
 
             {
                 util::mpi_environment::scoped_lock l;
-                MPI_Isend(
-                    &tag_
-                  , 1
-                  , MPI_INT
-                  , src_
-                  , 1
-                  , util::mpi_environment::communicator()
-                  , &request_
-                );
+                MPI_Isend(&tag_, 1, MPI_INT, src_, 1,
+                    util::mpi_environment::communicator(), &request_);
                 request_ptr_ = &request_;
             }
 
-            decode_parcels(pp_, std::move(buffer_), num_thread);
+            decode_parcels(pp_, HPX_MOVE(buffer_), num_thread);
 
             state_ = sent_release_tag;
 
@@ -220,17 +192,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         bool request_done()
         {
-            if(request_ptr_ == nullptr) return true;
+            if (request_ptr_ == nullptr)
+                return true;
 
             util::mpi_environment::scoped_try_lock l;
 
-            if(!l.locked) return false;
+            if (!l.locked)
+                return false;
 
             int completed = 0;
             int ret = 0;
             ret = MPI_Test(request_ptr_, &completed, MPI_STATUS_IGNORE);
             HPX_ASSERT(ret == MPI_SUCCESS);
-            if(completed)
+            if (completed)
             {
                 request_ptr_ = nullptr;
                 return true;
@@ -248,12 +222,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         buffer_type buffer_;
 
         MPI_Request request_;
-        MPI_Request *request_ptr_;
+        MPI_Request* request_ptr_;
         std::size_t chunks_idx_;
 
-        Parcelport & pp_;
+        Parcelport& pp_;
     };
-}}}}
+}}}}    // namespace hpx::parcelset::policies::mpi
 
 #endif
-

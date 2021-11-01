@@ -64,7 +64,7 @@ namespace hpx { namespace util {
         for (std::size_t i = 0; i < pool_size_; ++i)
         {
             std::unique_ptr<asio::io_context> p(new asio::io_context);
-            io_services_.emplace_back(std::move(p));
+            io_services_.emplace_back(HPX_MOVE(p));
             work_.emplace_back(initialize_work(*io_services_[i]));
         }
     }
@@ -181,7 +181,7 @@ namespace hpx { namespace util {
             for (std::size_t i = 0; i < num_threads; ++i)
             {
                 std::unique_ptr<asio::io_context> p(new asio::io_context);
-                io_services_.emplace_back(std::move(p));
+                io_services_.emplace_back(HPX_MOVE(p));
                 work_.emplace_back(initialize_work(*io_services_[i]));
             }
         }
@@ -189,7 +189,7 @@ namespace hpx { namespace util {
         for (std::size_t i = 0; i < num_threads; ++i)
         {
             std::thread t(&io_service_pool::thread_run, this, i, startup);
-            threads_.emplace_back(std::move(t));
+            threads_.emplace_back(HPX_MOVE(t));
         }
 
         next_io_service_ = 0;

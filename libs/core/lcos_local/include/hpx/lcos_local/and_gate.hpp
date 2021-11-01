@@ -46,10 +46,10 @@ namespace hpx { namespace lcos { namespace local {
 
         base_and_gate(base_and_gate&& rhs) noexcept
           : mtx_()
-          , received_segments_(std::move(rhs.received_segments_))
-          , promise_(std::move(rhs.promise_))
+          , received_segments_(HPX_MOVE(rhs.received_segments_))
+          , promise_(HPX_MOVE(rhs.promise_))
           , generation_(rhs.generation_)
-          , conditions_(std::move(rhs.conditions_))
+          , conditions_(HPX_MOVE(rhs.conditions_))
         {
             rhs.generation_ = std::size_t(-1);
         }
@@ -60,11 +60,11 @@ namespace hpx { namespace lcos { namespace local {
             {
                 std::lock_guard<mutex_type> l(rhs.mtx_);
                 mtx_ = mutex_type();
-                received_segments_ = std::move(rhs.received_segments_);
-                promise_ = std::move(rhs.promise_);
+                received_segments_ = HPX_MOVE(rhs.received_segments_);
+                promise_ = HPX_MOVE(rhs.promise_);
                 generation_ = rhs.generation_;
                 rhs.generation_ = std::size_t(-1);
-                conditions_ = std::move(rhs.conditions_);
+                conditions_ = HPX_MOVE(rhs.conditions_);
             }
             return *this;
         }
@@ -240,7 +240,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             no_mutex mtx;
             std::unique_lock<no_mutex> lk(mtx);
-            return set(which, std::move(lk), ec);
+            return set(which, HPX_MOVE(lk), ec);
         }
 
     protected:
@@ -268,7 +268,7 @@ namespace hpx { namespace lcos { namespace local {
             future<void> get_future(
                 Condition&& func, error_code& ec = hpx::throws)
             {
-                return (*it_)->get_future(std::forward<Condition>(func), ec);
+                return (*it_)->get_future(HPX_FORWARD(Condition, func), ec);
             }
 
             base_and_gate& this_;
@@ -386,14 +386,14 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         and_gate(and_gate&& rhs) noexcept
-          : base_type(std::move(static_cast<base_type&>(rhs)))
+          : base_type(HPX_MOVE(static_cast<base_type&>(rhs)))
         {
         }
 
         and_gate& operator=(and_gate&& rhs) noexcept
         {
             if (this != &rhs)
-                static_cast<base_type&>(*this) = std::move(rhs);
+                static_cast<base_type&>(*this) = HPX_MOVE(rhs);
             return *this;
         }
 
@@ -418,7 +418,7 @@ namespace hpx { namespace lcos { namespace local {
         template <typename Lock>
         bool set(std::size_t which, Lock l, error_code& ec = throws)
         {
-            return this->base_type::set(which, std::move(l), ec);
+            return this->base_type::set(which, HPX_MOVE(l), ec);
         }
 
         template <typename Lock>

@@ -721,10 +721,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         search(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
-        return search(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+        return search(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
             hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
-            std::forward<Pred>(op), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
+            HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+            HPX_FORWARD(Proj2, proj2));
     }
 
     // clang-format off
@@ -751,10 +751,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
     {
-        return search_n(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+        return search_n(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
             count, hpx::util::begin(rng2), hpx::util::end(rng2),
-            std::forward<Pred>(op), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
+            HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+            HPX_FORWARD(Proj2, proj2));
     }
 
 }}}    // namespace hpx::parallel::v1
@@ -791,8 +791,8 @@ namespace hpx { namespace ranges {
         {
             return hpx::parallel::v1::detail::search<FwdIter, Sent>().call(
                 hpx::execution::seq, first, last, s_first, s_last,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -824,9 +824,9 @@ namespace hpx { namespace ranges {
             Proj2&& proj2 = Proj2())
         {
             return hpx::parallel::v1::detail::search<FwdIter, Sent>().call(
-                std::forward<ExPolicy>(policy), first, last, s_first, s_last,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), first, last, s_first, s_last,
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -858,8 +858,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::search<fwditer_type, sent_type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -890,10 +890,10 @@ namespace hpx { namespace ranges {
             using sent_type = typename hpx::traits::range_sentinel<Rng1>::type;
 
             return hpx::parallel::v1::detail::search<fwditer_type, sent_type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
     } search{};
@@ -927,8 +927,8 @@ namespace hpx { namespace ranges {
         {
             return hpx::parallel::v1::detail::search_n<FwdIter, FwdIter>().call(
                 hpx::execution::seq, first, count, s_first, s_last,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -958,9 +958,9 @@ namespace hpx { namespace ranges {
             Proj2&& proj2 = Proj2())
         {
             return hpx::parallel::v1::detail::search_n<FwdIter, FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, count, s_first, s_last,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), first, count, s_first, s_last,
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -993,8 +993,8 @@ namespace hpx { namespace ranges {
                 sent_type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1), count,
                     hpx::util::begin(rng2), hpx::util::end(rng2),
-                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1026,10 +1026,10 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::search_n<fwditer_type,
                 sent_type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                     count, hpx::util::begin(rng2), hpx::util::end(rng2),
-                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
     } search_n{};

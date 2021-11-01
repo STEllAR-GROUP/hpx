@@ -99,7 +99,7 @@ namespace hpx { namespace util {
         {
         }
         checkpoint(std::vector<char>&& vec) noexcept
-          : data_(std::move(vec))
+          : data_(HPX_MOVE(vec))
         {
         }
 
@@ -220,7 +220,7 @@ namespace hpx { namespace util {
                 typename std::decay<T>::type>::value>::type>
         T&& prepare_client(T&& t) noexcept
         {
-            return std::forward<T>(t);
+            return HPX_FORWARD(T, t);
         }
 
         // Properly handle Clients to components
@@ -241,8 +241,8 @@ namespace hpx { namespace util {
             checkpoint operator()(checkpoint&& c, Ts&&... ts) const
             {
                 hpx::util::save_checkpoint_data(
-                    c.data_, std::forward<Ts>(ts)...);
-                return std::move(c);
+                    c.data_, HPX_FORWARD(Ts, ts)...);
+                return HPX_MOVE(c);
             }
         };
     }    // namespace detail
@@ -289,8 +289,8 @@ namespace hpx { namespace util {
     hpx::future<checkpoint> save_checkpoint(T&& t, Ts&&... ts)
     {
         return hpx::dataflow(detail::save_funct_obj{}, checkpoint{},
-            detail::prepare_client(std::forward<T>(t)),
-            detail::prepare_client(std::forward<Ts>(ts))...);
+            detail::prepare_client(HPX_FORWARD(T, t)),
+            detail::prepare_client(HPX_FORWARD(Ts, ts))...);
     }
 
     /// \cond NOINTERNAL
@@ -338,16 +338,16 @@ namespace hpx { namespace util {
     template <typename T, typename... Ts>
     hpx::future<checkpoint> save_checkpoint(checkpoint&& c, T&& t, Ts&&... ts)
     {
-        return hpx::dataflow(detail::save_funct_obj{}, std::move(c),
-            detail::prepare_client(std::forward<T>(t)),
-            detail::prepare_client(std::forward<Ts>(ts))...);
+        return hpx::dataflow(detail::save_funct_obj{}, HPX_MOVE(c),
+            detail::prepare_client(HPX_FORWARD(T, t)),
+            detail::prepare_client(HPX_FORWARD(Ts, ts))...);
     }
 
     /// \cond NOINTERNAL
     // Same as above, just nullary
     inline hpx::future<checkpoint> save_checkpoint(checkpoint&& c)
     {
-        return hpx::make_ready_future(std::move(c));
+        return hpx::make_ready_future(HPX_MOVE(c));
     }
     /// \endcond
 
@@ -392,8 +392,8 @@ namespace hpx { namespace util {
     hpx::future<checkpoint> save_checkpoint(hpx::launch p, T&& t, Ts&&... ts)
     {
         return hpx::dataflow(p, detail::save_funct_obj{}, checkpoint{},
-            detail::prepare_client(std::forward<T>(t)),
-            detail::prepare_client(std::forward<Ts>(ts))...);
+            detail::prepare_client(HPX_FORWARD(T, t)),
+            detail::prepare_client(HPX_FORWARD(Ts, ts))...);
     }
 
     /// \cond NOINTERNAL
@@ -446,16 +446,16 @@ namespace hpx { namespace util {
     hpx::future<checkpoint> save_checkpoint(
         hpx::launch p, checkpoint&& c, T&& t, Ts&&... ts)
     {
-        return hpx::dataflow(p, detail::save_funct_obj{}, std::move(c),
-            detail::prepare_client(std::forward<T>(t)),
-            detail::prepare_client(std::forward<Ts>(ts))...);
+        return hpx::dataflow(p, detail::save_funct_obj{}, HPX_MOVE(c),
+            detail::prepare_client(HPX_FORWARD(T, t)),
+            detail::prepare_client(HPX_FORWARD(Ts, ts))...);
     }
 
     /// \cond NOINTERNAL
     // Same as above, just nullary
     inline hpx::future<checkpoint> save_checkpoint(hpx::launch, checkpoint&& c)
     {
-        return hpx::make_ready_future(std::move(c));
+        return hpx::make_ready_future(HPX_MOVE(c));
     }
     /// \endcond
 
@@ -503,8 +503,8 @@ namespace hpx { namespace util {
     {
         hpx::future<checkpoint> f_chk =
             hpx::dataflow(sync_p, detail::save_funct_obj{}, checkpoint{},
-                detail::prepare_client(std::forward<T>(t)),
-                detail::prepare_client(std::forward<Ts>(ts))...);
+                detail::prepare_client(HPX_FORWARD(T, t)),
+                detail::prepare_client(HPX_FORWARD(Ts, ts))...);
         return f_chk.get();
     }
 
@@ -556,9 +556,9 @@ namespace hpx { namespace util {
         hpx::launch::sync_policy sync_p, checkpoint&& c, T&& t, Ts&&... ts)
     {
         hpx::future<checkpoint> f_chk =
-            hpx::dataflow(sync_p, detail::save_funct_obj{}, std::move(c),
-                detail::prepare_client(std::forward<T>(t)),
-                detail::prepare_client(std::forward<Ts>(ts))...);
+            hpx::dataflow(sync_p, detail::save_funct_obj{}, HPX_MOVE(c),
+                detail::prepare_client(HPX_FORWARD(T, t)),
+                detail::prepare_client(HPX_FORWARD(Ts, ts))...);
         return f_chk.get();
     }
 
@@ -566,7 +566,7 @@ namespace hpx { namespace util {
     // Same as above, just nullary
     inline checkpoint save_checkpoint(hpx::launch::sync_policy, checkpoint&& c)
     {
-        return std::move(c);
+        return HPX_MOVE(c);
     }
     /// \endcond
 
@@ -580,7 +580,7 @@ namespace hpx { namespace util {
             {
                 std::size_t size = hpx::util::prepare_checkpoint_data(ts...);
                 c.data_.resize(size);
-                return std::move(c);
+                return HPX_MOVE(c);
             }
         };
     }    // namespace detail
@@ -650,7 +650,7 @@ namespace hpx { namespace util {
     hpx::future<checkpoint> prepare_checkpoint(
         checkpoint&& c, T const& t, Ts const&... ts)
     {
-        return hpx::dataflow(detail::prepare_checkpoint{}, std::move(c),
+        return hpx::dataflow(detail::prepare_checkpoint{}, HPX_MOVE(c),
             detail::prepare_client(t), detail::prepare_client(ts)...);
     }
 
@@ -658,7 +658,7 @@ namespace hpx { namespace util {
     // Same as above, just nullary
     inline hpx::future<checkpoint> prepare_checkpoint(checkpoint&& c)
     {
-        return hpx::make_ready_future(std::move(c));
+        return hpx::make_ready_future(HPX_MOVE(c));
     }
     /// \endcond
 
@@ -750,7 +750,7 @@ namespace hpx { namespace util {
     hpx::future<checkpoint> prepare_checkpoint(
         hpx::launch p, checkpoint&& c, T const& t, Ts const&... ts)
     {
-        return hpx::dataflow(p, detail::prepare_checkpoint{}, std::move(c),
+        return hpx::dataflow(p, detail::prepare_checkpoint{}, HPX_MOVE(c),
             detail::prepare_client(t), detail::prepare_client(ts)...);
     }
 
@@ -759,7 +759,7 @@ namespace hpx { namespace util {
     checkpoint prepare_checkpoint(hpx::launch::sync_policy sync_p,
         checkpoint&& c, T const& t, Ts const&... ts)
     {
-        return hpx::dataflow(sync_p, detail::prepare_checkpoint{}, std::move(c),
+        return hpx::dataflow(sync_p, detail::prepare_checkpoint{}, HPX_MOVE(c),
             detail::prepare_client(t), detail::prepare_client(ts)...)
             .get();
     }
@@ -768,13 +768,13 @@ namespace hpx { namespace util {
     inline hpx::future<checkpoint> prepare_checkpoint(
         hpx::launch, checkpoint&& c)
     {
-        return hpx::make_ready_future(std::move(c));
+        return hpx::make_ready_future(HPX_MOVE(c));
     }
 
     inline checkpoint prepare_checkpoint(
         hpx::launch::sync_policy, checkpoint&& c)
     {
-        return std::move(c);
+        return HPX_MOVE(c);
     }
     /// \endcond
 
@@ -807,7 +807,7 @@ namespace hpx { namespace util {
                 ar >> f_server_ptr;
                 c = hpx::new_<Client>(
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    std::move(*(f_server_ptr.get())));
+                    HPX_MOVE(*(f_server_ptr.get())));
             }
         };
     }    // namespace detail

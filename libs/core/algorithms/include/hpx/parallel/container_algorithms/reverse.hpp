@@ -397,7 +397,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         return detail::reverse<
             typename hpx::traits::range_iterator<Rng>::type>()
-            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng));
     }
 
@@ -416,7 +416,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         return detail::reverse_copy<util::in_out_result<
             typename hpx::traits::range_iterator<Rng>::type, OutIter>>()
-            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), dest_first);
     }
 }}}    // namespace hpx::parallel::v1
@@ -487,7 +487,7 @@ namespace hpx { namespace ranges {
                 "Required at least biderectional iterator.");
 
             return parallel::v1::detail::reverse<Iter>().call(
-                std::forward<ExPolicy>(policy), first, sent);
+                HPX_FORWARD(ExPolicy, policy), first, sent);
         }
 
         // clang-format off
@@ -509,7 +509,7 @@ namespace hpx { namespace ranges {
 
             return parallel::v1::detail::reverse<
                 typename hpx::traits::range_iterator<Rng>::type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng));
         }
     } reverse{};
@@ -591,7 +591,7 @@ namespace hpx { namespace ranges {
 
             return parallel::v1::detail::reverse_copy<
                 hpx::parallel::util::in_out_result<Iter, FwdIter>>()
-                .call(std::forward<ExPolicy>(policy), first, last, result);
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, result);
         }
 
         // clang-format off
@@ -619,7 +619,7 @@ namespace hpx { namespace ranges {
             return parallel::v1::detail::reverse_copy<
                 hpx::parallel::util::in_out_result<
                     typename hpx::traits::range_iterator<Rng>::type, OutIter>>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng), result);
         }
     } reverse_copy{};

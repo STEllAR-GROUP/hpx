@@ -94,7 +94,7 @@ namespace hpx { namespace parallel { namespace util {
             std::advance(first, count);
             std::advance(dest, count);
             return in_out_result<InIter, OutIter>{
-                std::move(first), std::move(dest)};
+                HPX_MOVE(first), HPX_MOVE(dest)};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -110,7 +110,7 @@ namespace hpx { namespace parallel { namespace util {
                 while (first != last)
                     *dest++ = *first++;
                 return in_out_result<InIter, OutIter>{
-                    std::move(first), std::move(dest)};
+                    HPX_MOVE(first), HPX_MOVE(dest)};
             }
         };
 
@@ -163,7 +163,7 @@ namespace hpx { namespace parallel { namespace util {
                     *dest = *first;
                 }
                 return in_out_result<InIter, OutIter>{
-                    std::move(first), std::move(dest)};
+                    HPX_MOVE(first), HPX_MOVE(dest)};
             }
         };
 
@@ -247,9 +247,13 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter first, Sent last, OutIter dest)
             {
                 while (first != last)
-                    *dest++ = std::move(*first++);
+                {
+                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                    *dest++ = HPX_MOVE(*first++);
+                }
+
                 return in_out_result<InIter, OutIter>{
-                    std::move(first), std::move(dest)};
+                    HPX_MOVE(first), HPX_MOVE(dest)};
             }
         };
 
@@ -290,17 +294,20 @@ namespace hpx { namespace parallel { namespace util {
                 for (std::size_t i = 0; i < count;
                      (void) ++first, ++dest, i += 4)
                 {
-                    *dest = std::move(*first);
-                    *++dest = std::move(*++first);
-                    *++dest = std::move(*++first);
-                    *++dest = std::move(*++first);
+                    *dest = HPX_MOVE(*first);
+                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                    *++dest = HPX_MOVE(*++first);
+                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                    *++dest = HPX_MOVE(*++first);
+                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                    *++dest = HPX_MOVE(*++first);
                 }
                 for (/**/; count < num; (void) ++first, ++dest, ++count)
                 {
-                    *dest = std::move(*first);
+                    *dest = HPX_MOVE(*first);
                 }
                 return in_out_result<InIter, OutIter>{
-                    std::move(first), std::move(dest)};
+                    HPX_MOVE(first), HPX_MOVE(dest)};
             }
         };
 

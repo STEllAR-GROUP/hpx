@@ -53,13 +53,13 @@ namespace hpx { namespace parallel { namespace util {
 
             std::vector<hpx::future<Result>> inititems;
             auto shape = detail::get_bulk_iteration_shape(
-                has_variable_chunk_size{}, std::forward<ExPolicy>(policy),
+                has_variable_chunk_size{}, HPX_FORWARD(ExPolicy, policy),
                 inititems, f, first, count, 1);
 
             std::vector<hpx::future<Result>> workitems =
                 execution::bulk_async_execute(policy.executor(),
-                    partitioner_iteration<Result, F>{std::forward<F>(f)},
-                    std::move(shape));
+                    partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                    HPX_MOVE(shape));
 
             if (inititems.empty())
                 return workitems;
@@ -85,13 +85,13 @@ namespace hpx { namespace parallel { namespace util {
 
             std::vector<hpx::future<Result>> inititems;
             auto shape = detail::get_bulk_iteration_shape_idx(
-                has_variable_chunk_size{}, std::forward<ExPolicy>(policy),
+                has_variable_chunk_size{}, HPX_FORWARD(ExPolicy, policy),
                 inititems, f, first, count, stride);
 
             std::vector<hpx::future<Result>> workitems =
                 execution::bulk_async_execute(policy.executor(),
-                    partitioner_iteration<Result, F>{std::forward<F>(f)},
-                    std::move(shape));
+                    partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                    HPX_MOVE(shape));
 
             if (inititems.empty())
                 return workitems;
@@ -142,8 +142,8 @@ namespace hpx { namespace parallel { namespace util {
             HPX_ASSERT(chunk_size_it == chunk_sizes.end());
 
             return execution::bulk_async_execute(policy.executor(),
-                partitioner_iteration<Result, F>{std::forward<F>(f)},
-                std::move(shape));
+                partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                HPX_MOVE(shape));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -176,8 +176,8 @@ namespace hpx { namespace parallel { namespace util {
                 try
                 {
                     workitems = detail::partition<Result>(
-                        std::forward<ExPolicy_>(policy), first, count,
-                        std::forward<F1>(f1));
+                        HPX_FORWARD(ExPolicy_, policy), first, count,
+                        HPX_FORWARD(F1, f1));
 
                     scoped_params.mark_end_of_scheduling();
                 }
@@ -186,8 +186,8 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(std::move(workitems), std::move(errors),
-                    std::forward<F2>(f2));
+                return reduce(
+                    HPX_MOVE(workitems), HPX_MOVE(errors), HPX_FORWARD(F2, f2));
             }
 
             template <typename ExPolicy_, typename FwdIter, typename Stride,
@@ -204,8 +204,8 @@ namespace hpx { namespace parallel { namespace util {
                 try
                 {
                     workitems = detail::partition_with_index<Result>(
-                        std::forward<ExPolicy_>(policy), first, count, stride,
-                        std::forward<F1>(f1));
+                        HPX_FORWARD(ExPolicy_, policy), first, count, stride,
+                        HPX_FORWARD(F1, f1));
 
                     scoped_params.mark_end_of_scheduling();
                 }
@@ -214,8 +214,8 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(std::move(workitems), std::move(errors),
-                    std::forward<F2>(f2));
+                return reduce(
+                    HPX_MOVE(workitems), HPX_MOVE(errors), HPX_FORWARD(F2, f2));
             }
 
             template <typename ExPolicy_, typename FwdIter, typename F1,
@@ -234,9 +234,9 @@ namespace hpx { namespace parallel { namespace util {
                 try
                 {
                     workitems = detail::partition_with_data<Result>(
-                        std::forward<ExPolicy_>(policy), first, count,
-                        chunk_sizes, std::forward<Data>(data),
-                        std::forward<F1>(f1));
+                        HPX_FORWARD(ExPolicy_, policy), first, count,
+                        chunk_sizes, HPX_FORWARD(Data, data),
+                        HPX_FORWARD(F1, f1));
 
                     scoped_params.mark_end_of_scheduling();
                 }
@@ -245,8 +245,8 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(std::move(workitems), std::move(errors),
-                    std::forward<F2>(f2));
+                return reduce(
+                    HPX_MOVE(workitems), HPX_MOVE(errors), HPX_FORWARD(F2, f2));
             }
 
         private:
@@ -263,14 +263,14 @@ namespace hpx { namespace parallel { namespace util {
 
                 try
                 {
-                    return f(std::move(workitems));
+                    return f(HPX_MOVE(workitems));
                 }
                 catch (...)
                 {
                     // rethrow either bad_alloc or exception_list
                     handle_local_exceptions::call(std::current_exception());
                     HPX_ASSERT(false);
-                    return f(std::move(workitems));
+                    return f(HPX_MOVE(workitems));
                 }
             }
         };
@@ -304,8 +304,8 @@ namespace hpx { namespace parallel { namespace util {
                 try
                 {
                     workitems = detail::partition<Result>(
-                        std::forward<ExPolicy_>(policy), first, count,
-                        std::forward<F1>(f1));
+                        HPX_FORWARD(ExPolicy_, policy), first, count,
+                        HPX_FORWARD(F1, f1));
 
                     scoped_params->mark_end_of_scheduling();
                 }
@@ -319,8 +319,8 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(std::move(scoped_params), std::move(workitems),
-                    std::move(errors), std::forward<F2>(f2));
+                return reduce(HPX_MOVE(scoped_params), HPX_MOVE(workitems),
+                    HPX_MOVE(errors), HPX_FORWARD(F2, f2));
             }
 
             template <typename ExPolicy_, typename FwdIter, typename Stride,
@@ -339,8 +339,8 @@ namespace hpx { namespace parallel { namespace util {
                 try
                 {
                     workitems = detail::partition_with_index<Result>(
-                        std::forward<ExPolicy_>(policy), first, count, stride,
-                        std::forward<F1>(f1));
+                        HPX_FORWARD(ExPolicy_, policy), first, count, stride,
+                        HPX_FORWARD(F1, f1));
 
                     scoped_params->mark_end_of_scheduling();
                 }
@@ -354,8 +354,8 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(std::move(scoped_params), std::move(workitems),
-                    std::move(errors), std::forward<F2>(f2));
+                return reduce(HPX_MOVE(scoped_params), HPX_MOVE(workitems),
+                    HPX_MOVE(errors), HPX_FORWARD(F2, f2));
             }
 
             template <typename ExPolicy_, typename FwdIter, typename F1,
@@ -375,9 +375,9 @@ namespace hpx { namespace parallel { namespace util {
                 try
                 {
                     workitems = detail::partition_with_data<Result>(
-                        std::forward<ExPolicy_>(policy), first, count,
-                        chunk_sizes, std::forward<Data>(data),
-                        std::forward<F1>(f1));
+                        HPX_FORWARD(ExPolicy_, policy), first, count,
+                        chunk_sizes, HPX_FORWARD(Data, data),
+                        HPX_FORWARD(F1, f1));
 
                     scoped_params->mark_end_of_scheduling();
                 }
@@ -391,8 +391,8 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(std::move(scoped_params), std::move(workitems),
-                    std::move(errors), std::forward<F2>(f2));
+                return reduce(HPX_MOVE(scoped_params), HPX_MOVE(workitems),
+                    HPX_MOVE(errors), HPX_FORWARD(F2, f2));
             }
 
         private:
@@ -412,16 +412,16 @@ namespace hpx { namespace parallel { namespace util {
 #else
                 // wait for all tasks to finish
                 return hpx::dataflow(
-                    [errors = std::move(errors),
-                        scoped_params = std::move(scoped_params),
-                        f = std::forward<F>(f)](
+                    [errors = HPX_MOVE(errors),
+                        scoped_params = HPX_MOVE(scoped_params),
+                        f = HPX_FORWARD(F, f)](
                         std::vector<hpx::future<Result>>&& r) mutable -> R {
                         HPX_UNUSED(scoped_params);
 
                         handle_local_exceptions::call(r, errors);
-                        return f(std::move(r));
+                        return f(HPX_MOVE(r));
                     },
-                    std::move(workitems));
+                    HPX_MOVE(workitems));
 #endif
             }
         };

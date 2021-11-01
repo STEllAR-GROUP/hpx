@@ -226,7 +226,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     void spin_sort(Iter first, Sent last, Compare&& comp)
     {
         spin_sort_helper<Iter, Sent, typename std::decay<Compare>::type> sorter(
-            first, last, std::forward<Compare>(comp));
+            first, last, HPX_FORWARD(Compare, comp));
     }
 
     template <typename Iter, typename Sent, typename Compare>
@@ -234,7 +234,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         util::range<typename std::iterator_traits<Iter>::value_type*> range_aux)
     {
         spin_sort_helper<Iter, Sent, typename std::decay<Compare>::type> sorter(
-            first, last, std::forward<Compare>(comp), range_aux);
+            first, last, HPX_FORWARD(Compare, comp), range_aux);
     }
 
     template <typename Iter, typename Sent, typename Compare>
@@ -242,7 +242,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         typename std::iterator_traits<Iter>::value_type* paux, std::size_t naux)
     {
         spin_sort_helper<Iter, Sent, typename std::decay<Compare>::type> sorter(
-            first, last, std::forward<Compare>(comp), paux, naux);
+            first, last, HPX_FORWARD(Compare, comp), paux, naux);
     }
 
 }}}}    // namespace hpx::parallel::v1::detail

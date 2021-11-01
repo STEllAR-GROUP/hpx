@@ -347,7 +347,7 @@ namespace hpx { namespace performance_counters {
             std::int64_t scaling = 1, bool scale_inverse = false)
           : time_()
           , count_(0)
-          , values_(std::move(values))
+          , values_(HPX_MOVE(values))
           , scaling_(scaling)
           , status_(status_new_data)
           , scale_inverse_(scale_inverse)

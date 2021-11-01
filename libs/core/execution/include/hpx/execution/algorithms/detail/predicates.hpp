@@ -301,7 +301,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct compare_to
     {
         HPX_HOST_DEVICE HPX_FORCEINLINE compare_to(Value&& val)
-          : value_(std::move(val))
+          : value_(HPX_MOVE(val))
         {
         }
         HPX_HOST_DEVICE HPX_FORCEINLINE compare_to(Value const& val)
@@ -326,7 +326,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
-            return std::forward<T1>(t1) < std::forward<T2>(t2);
+            return HPX_FORWARD(T1, t1) < HPX_FORWARD(T2, t2);
         }
     };
 
@@ -336,7 +336,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
-            return std::forward<T1>(t1) > std::forward<T2>(t2);
+            return HPX_FORWARD(T1, t1) > HPX_FORWARD(T2, t2);
         }
     };
 
@@ -346,7 +346,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
-            return std::forward<T1>(t1) >= std::forward<T2>(t2);
+            return HPX_FORWARD(T1, t1) >= HPX_FORWARD(T2, t2);
         }
     };
 
@@ -356,7 +356,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
-            return std::forward<T1>(t1) <= std::forward<T2>(t2);
+            return HPX_FORWARD(T1, t1) <= HPX_FORWARD(T2, t2);
         }
     };
 

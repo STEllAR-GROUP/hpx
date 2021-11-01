@@ -34,7 +34,7 @@ namespace hpx { namespace collectives { namespace detail {
       , clients_(find_all_from_basename<client_type>(basename, num_sites))
     {
         // replace reference to our own client (manages base-name registration)
-        clients_[this_site] = std::move(here);
+        clients_[this_site] = HPX_MOVE(here);
     }
 }}}    // namespace hpx::collectives::detail
 
