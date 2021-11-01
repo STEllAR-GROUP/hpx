@@ -219,7 +219,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, BidirIter first, Sent last)
             {
                 auto last2{hpx::ranges::next(first, last)};
-                for (auto tail{last2}; !(first == tail or first == --tail);
+                for (auto tail{last2}; !(first == tail || first == --tail);
                      ++first)
                 {
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
