@@ -15,7 +15,7 @@
 //
 #include <hpx/thread_support/atomic_count.hpp>
 //
-#include <boost/container/small_vector.hpp>
+#include <hpx/datastructures/detail/small_vector.hpp>
 //
 #include <vector>
 
@@ -36,7 +36,7 @@ namespace libfabric
         typedef libfabric_region_provider                      region_provider;
         typedef rma_memory_region<region_provider>             region_type;
         typedef rma_memory_pool<region_provider>               memory_pool_type;
-        typedef boost::container::small_vector<region_type*,8> zero_copy_vector;
+        typedef hpx::detail::small_vector<region_type*, 8>     zero_copy_vector;
 
         typedef header<HPX_PARCELPORT_LIBFABRIC_MESSAGE_HEADER_SIZE> header_type;
         static constexpr unsigned int header_size = header_type::header_block_size;

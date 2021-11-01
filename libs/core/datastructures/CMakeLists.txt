@@ -21,6 +21,7 @@ endif()
 
 set(datastructures_headers
     hpx/datastructures/any.hpp
+    hpx/datastructures/detail/small_vector.hpp
     hpx/datastructures/detail/variant.hpp
     hpx/datastructures/member_pack.hpp
     hpx/datastructures/optional.hpp

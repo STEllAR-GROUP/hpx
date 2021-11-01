@@ -2315,7 +2315,6 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
       <asio/io_context.hpp>
       <asio/ip/tcp.hpp>
       <boost/config.hpp>
-      <boost/container/small_vector.hpp>
       <boost/fusion/include/vector.hpp>
       <boost/intrusive/slist.hpp>
       <boost/lockfree/queue.hpp>

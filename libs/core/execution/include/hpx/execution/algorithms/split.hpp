@@ -12,6 +12,7 @@
 #include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
@@ -27,8 +28,6 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/type_support/pack.hpp>
-
-#include <boost/container/small_vector.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -134,8 +133,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                 using continuation_type =
                     hpx::util::unique_function_nonser<void()>;
-                boost::container::small_vector<continuation_type, 1>
-                    continuations;
+                hpx::detail::small_vector<continuation_type, 1> continuations;
 
                 struct split_receiver
                 {

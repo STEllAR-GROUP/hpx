@@ -7,7 +7,7 @@
 set(tests
     channel_local
     local_dataflow
-    local_dataflow_boost_small_vector
+    local_dataflow_small_vector
     local_dataflow_executor
     local_dataflow_external_future
     local_dataflow_executor_additional_arguments

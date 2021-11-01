@@ -10,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
+#include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/future_fwd.hpp>
@@ -24,8 +25,6 @@
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/type_support/unused.hpp>
-
-#include <boost/container/small_vector.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -72,7 +71,7 @@ namespace hpx { namespace lcos { namespace detail {
     {
     public:
         typedef util::unique_function_nonser<void()> completed_callback_type;
-        typedef boost::container::small_vector<completed_callback_type, 1>
+        typedef hpx::detail::small_vector<completed_callback_type, 1>
             completed_callback_vector_type;
 
         typedef void has_future_data_refcnt_base;
