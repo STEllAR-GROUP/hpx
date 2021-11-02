@@ -17,6 +17,7 @@
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <type_traits>
 #include <utility>
 
@@ -77,7 +78,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 first, count, std::forward<F>(f));
             return first;
         }
-
     };
 
     template <typename ExPolicy, typename Iter, typename Sent, typename F>
@@ -106,7 +106,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 first, count, std::forward<F>(f));
             return first;
         }
-
     };
 
     template <typename ExPolicy, typename Iter, typename F>

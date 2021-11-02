@@ -53,7 +53,7 @@ void test_generate(ExPolicy&& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    using V = hpx::parallel::traits::vector_pack_type<int>::type;
+    using V = hpx::parallel::traits::vector_pack_type<std::size_t>::type;
     std::vector<std::size_t> c(10007);
 
     auto gen = []() { return V(10); };
@@ -75,7 +75,7 @@ void test_generate_async(ExPolicy&& p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    using V = hpx::parallel::traits::vector_pack_type<int>::type;
+    using V = hpx::parallel::traits::vector_pack_type<std::size_t>::type;
     std::vector<std::size_t> c(10007);
 
     auto gen = []() { return V(10); };
@@ -135,7 +135,7 @@ void test_generate_exception(ExPolicy&& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
-    using V = hpx::parallel::traits::vector_pack_type<int>::type;
+    using V = hpx::parallel::traits::vector_pack_type<std::size_t>::type;
     std::vector<std::size_t> c(10007);
 
     auto gen = []() { return V(10); };
@@ -170,7 +170,7 @@ void test_generate_exception_async(ExPolicy&& p, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    using V = hpx::parallel::traits::vector_pack_type<int>::type;
+    using V = hpx::parallel::traits::vector_pack_type<std::size_t>::type;
     std::vector<std::size_t> c(10007);
 
     auto gen = []() { return V(10); };
@@ -213,7 +213,7 @@ void test_generate_bad_alloc(ExPolicy&& policy, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    using V = hpx::parallel::traits::vector_pack_type<int>::type;
+    using V = hpx::parallel::traits::vector_pack_type<std::size_t>::type;
     std::vector<std::size_t> c(10007);
 
     auto gen = []() { return V(10); };
@@ -245,7 +245,7 @@ void test_generate_bad_alloc_async(ExPolicy&& p, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    using V = hpx::parallel::traits::vector_pack_type<int>::type;
+    using V = hpx::parallel::traits::vector_pack_type<std::size_t>::type;
     std::vector<std::size_t> c(10007);
 
     auto gen = []() { return V(10); };

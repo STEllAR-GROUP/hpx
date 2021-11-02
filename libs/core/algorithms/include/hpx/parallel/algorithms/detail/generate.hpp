@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter sequential_generate(
         ExPolicy&& policy, Iter first, Sent last, F&& f)
     {
-        return hpx::parallel::util::sequential_generate_t{}(
+        return sequential_generate_t{}(
             std::forward<ExPolicy>(policy), first, last, std::forward<F>(f));
     }
 #endif
@@ -79,7 +79,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter sequential_generate_n(
         ExPolicy&& policy, Iter first, std::size_t count, F&& f)
     {
-        return hpx::parallel::util::sequential_generate_n_t{}(
+        return sequential_generate_n_t{}(
             std::forward<ExPolicy>(policy), first, count, std::forward<F>(f));
     }
 #endif
