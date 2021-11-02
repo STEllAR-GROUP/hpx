@@ -46,6 +46,7 @@
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
 
@@ -860,8 +861,9 @@ namespace hpx { namespace parcelset {
                 // Just ignore the handlers_mtx_ while checking. We need to hold
                 // the lock here to avoid multiple registrations that happens
                 // right now in the parcel coalescing plugin
-                hpx::util::ignore_while_checking<std::unique_lock<mutex_type>>
-                    il(&l);
+                hpx::util::ignore_while_checking il(&l);
+                HPX_UNUSED(il);
+
                 p.reset(hpx::create_message_handler(message_handler_type,
                     action, find_parcelport(loc.type()), num_messages, interval,
                     ec));

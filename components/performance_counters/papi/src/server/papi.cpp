@@ -18,6 +18,7 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/runtime_components/derived_component_factory.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <boost/version.hpp>
 
@@ -204,6 +205,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         if (it == thread_state_.end())
         {
             hpx::util::ignore_all_while_checking i;
+            HPX_UNUSED(i);
+
             return thread_state_[tix] = new thread_counters(tix);
         }
         else
@@ -227,6 +230,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
             // suspending thread" errors. At this point, it is safe to ignore
             // the lock.
             hpx::util::ignore_all_while_checking il;
+            HPX_UNUSED(il);
 
             papi_call(PAPI_event_name_to_code(
                 const_cast<char *>(cpe.countername_.c_str()),

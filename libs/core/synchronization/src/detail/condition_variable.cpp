@@ -16,6 +16,7 @@
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -131,8 +132,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
                     return;
                 }
 
-                util::ignore_while_checking<std::unique_lock<mutex_type>> il(
-                    &lock);
+                util::ignore_while_checking il(&lock);
+                HPX_UNUSED(il);
+
                 ctx.resume();
 
             } while (!queue.empty());

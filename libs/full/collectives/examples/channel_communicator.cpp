@@ -45,12 +45,14 @@ int hpx_main()
     int msg = msg_vec[this_locality];
 
     // send values to another locality
-    set(comm, that_site_arg(next_locality), msg).get();
+    set(comm, that_site_arg(next_locality), msg, tag_arg(cnt)).get();
 
-    auto got_msg = get<int>(comm, that_site_arg(next_locality));
+    auto got_msg = get<int>(comm, that_site_arg(next_locality), tag_arg(cnt));
 
     while (cnt < times)
     {
+        cnt += 1;
+
         auto done_msg = got_msg.then([&](auto&& f) {
             int rec_msg = f.get();
             std::cout << "Time: " << cnt << ", Locality " << this_locality
@@ -60,12 +62,13 @@ int hpx_main()
             rec_msg += 10;
 
             // start next round
-            set(comm, that_site_arg(next_locality), rec_msg).get();
-            got_msg = get<int>(comm, that_site_arg(next_locality));
+            set(comm, that_site_arg(next_locality), rec_msg, tag_arg(cnt))
+                .get();
+            got_msg =
+                get<int>(comm, that_site_arg(next_locality), tag_arg(cnt));
         });
 
         done_msg.get();
-        cnt += 1;
     }
 
     return hpx::finalize();

@@ -320,7 +320,8 @@ namespace hpx { namespace lcos { namespace local {
                 if (pop_active_)
                 {
                     // avoid lock-being-held errors
-                    util::ignore_while_checking<Lock> il(&l);
+                    util::ignore_while_checking il(&l);
+                    HPX_UNUSED(il);
 
                     pop_();    // trigger waiting pop
                 }
@@ -365,7 +366,8 @@ namespace hpx { namespace lcos { namespace local {
                 if (push_active_)
                 {
                     // avoid lock-being-held errors
-                    util::ignore_while_checking<Lock> il(&l);
+                    util::ignore_while_checking il(&l);
+                    HPX_UNUSED(il);
 
                     push_();    // trigger waiting push
                 }

@@ -19,6 +19,7 @@
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <mutex>
 #include <utility>
@@ -84,6 +85,8 @@ namespace hpx { namespace lcos { namespace local {
             auto data = data_;    // keep data alive
 
             util::ignore_all_while_checking ignore_lock;
+            HPX_UNUSED(ignore_lock);
+
             std::unique_lock<mutex_type> l(data->mtx_);
             util::unlock_guard<std::unique_lock<Mutex>> unlock(lock);
 
@@ -117,6 +120,8 @@ namespace hpx { namespace lcos { namespace local {
             auto data = data_;    // keep data alive
 
             util::ignore_all_while_checking ignore_lock;
+            HPX_UNUSED(ignore_lock);
+
             std::unique_lock<mutex_type> l(data->mtx_);
             util::unlock_guard<std::unique_lock<Mutex>> unlock(lock);
 
@@ -226,6 +231,8 @@ namespace hpx { namespace lcos { namespace local {
             auto data = data_;    // keep data alive
 
             util::ignore_all_while_checking ignore_lock;
+            HPX_UNUSED(ignore_lock);
+
             std::unique_lock<mutex_type> l(data->mtx_);
             util::unlock_guard<Lock> unlock(lock);
 
@@ -258,6 +265,8 @@ namespace hpx { namespace lcos { namespace local {
             auto data = data_;    // keep data alive
 
             util::ignore_all_while_checking ignore_lock;
+            HPX_UNUSED(ignore_lock);
+
             std::unique_lock<mutex_type> l(data->mtx_);
             util::unlock_guard<Lock> unlock(lock);
 
@@ -330,6 +339,8 @@ namespace hpx { namespace lcos { namespace local {
             while (!pred())
             {
                 util::ignore_all_while_checking ignore_lock;
+                HPX_UNUSED(ignore_lock);
+
                 std::unique_lock<mutex_type> l(data->mtx_);
                 if (stoken.stop_requested())
                 {
@@ -374,6 +385,8 @@ namespace hpx { namespace lcos { namespace local {
                 bool should_stop;
                 {
                     util::ignore_all_while_checking ignore_lock;
+                    HPX_UNUSED(ignore_lock);
+
                     std::unique_lock<mutex_type> l(data->mtx_);
                     if (stoken.stop_requested())
                     {
