@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 Francisco Jose Tapia
+//  Copyright (c) 2020 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +11,44 @@
 
 #if defined(DOXYGEN)
 namespace hpx {
+    // clang-format off
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// Places the first middle - first elements from the range [first, last)
+    /// as sorted with respect to comp into the range [first, middle). The rest
+    /// of the elements in the range [middle, last) are placed in an unspecified
+    /// order.
+    ///
+    /// \note   Complexity: Approximately (last - first) * log(middle - first)
+    ///         comparisons.
+    ///
+    /// \tparam RandIter    The type of the source begin, middle, and end
+    ///                     iterators used (deduced). This iterator type must
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced). Comp defaults to detail::less.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param middle       Refers to the middle of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param comp         comp is a callable object. The return value of the
+    ///                     INVOKE operation applied to an object of type Comp,
+    ///                     when contextually converted to bool, yields true if
+    ///                     the first argument of the call is less than the
+    ///                     second, and false otherwise. It is assumed that
+    ///                     comp will not apply any non-constant function
+    ///                     through the dereferenced iterator. It defaults to
+    ///                     detail::less.
+    ///
+    /// \returns  The \a partial_sort algorithm returns nothing.
+    ///
+    template <typename RandIter, typename Comp>
+    void partial_sort(RandIter first, RandIter middle, RandIter last, Comp&& comp = Comp());
+
+    ///////////////////////////////////////////////////////////////////////////
     /// Places the first middle - first elements from the range [first, last)
     /// as sorted with respect to comp into the range [first, middle). The rest
     /// of the elements in the range [middle, last) are placed in an unspecified
@@ -26,6 +64,8 @@ namespace hpx {
     /// \tparam RandIter    The type of the source begin, middle, and end
     ///                     iterators used (deduced). This iterator type must
     ///                     meet the requirements of a random access iterator.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced). Comp defaults to detail::less.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -35,16 +75,25 @@ namespace hpx {
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
+    /// \param comp         comp is a callable object. The return value of the
+    ///                     INVOKE operation applied to an object of type Comp,
+    ///                     when contextually converted to bool, yields true if
+    ///                     the first argument of the call is less than the
+    ///                     second, and false otherwise. It is assumed that
+    ///                     comp will not apply any non-constant function
+    ///                     through the dereferenced iterator. It defaults to
+    ///                     detail::less.
     ///
     /// \returns  The \a partial_sort algorithm returns a
     ///           \a hpx::future<void> if the execution policy is of
     ///           type \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns void otherwise.
     ///
-    template <typename RandIter>
-    typename util::detail::algorithm_result<ExPolicy>::type partial_sort(
-        ExPolicy&& policy, RandIter first, RandIter middle, RandIter last);
+    template <typename ExPolicy, typename RandIter, typename Comp>
+    util::detail::algorithm_result_t<ExPolicy> partial_sort(
+        ExPolicy&& policy, RandIter first, RandIter middle, RandIter last, Comp&& comp = Comp());
 
+    // clang-format on
 }    // namespace hpx
 
 #else

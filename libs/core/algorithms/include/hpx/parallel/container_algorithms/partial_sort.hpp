@@ -15,19 +15,13 @@ namespace hpx { namespace ranges {
     // clang-format off
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Sorts the elements in the range [first, last) in ascending order. The
-    /// relative order of equal elements is preserved. The function
-    /// uses the given comparison function object comp (defaults to using
-    /// operator<()).
+    /// Places the first middle - first elements from the range [first, last)
+    /// as sorted with respect to comp into the range [first, middle). The rest
+    /// of the elements in the range [middle, last) are placed in an unspecified
+    /// order.
     ///
-    /// \note   Complexity: O(Nlog(N)), where N = std::distance(first, last)
-    ///                     comparisons.
-    ///
-    /// A sequence is sorted with respect to a comparator \a comp and a
-    /// projection \a proj if for every iterator i pointing to the sequence and
-    /// every non-negative integer n such that i + n is a valid iterator
-    /// pointing to an element of the sequence, and
-    /// INVOKE(comp, INVOKE(proj, *(i + n)), INVOKE(proj, *i)) == false.
+    /// \note   Complexity: Approximately (last - first) * log(middle - first)
+    ///         comparisons.
     ///
     /// \tparam RandomIt    The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -35,11 +29,13 @@ namespace hpx { namespace ranges {
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for RandomIt.
     /// \tparam Comp        The type of the function/function object to use
-    ///                     (deduced).
+    ///                     (deduced). Comp defaults to detail::less.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
     /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param middle       Refers to the middle of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied.
@@ -47,15 +43,14 @@ namespace hpx { namespace ranges {
     ///                     INVOKE operation applied to an object of type Comp,
     ///                     when contextually converted to bool, yields true if
     ///                     the first argument of the call is less than the
-    ///                     second, and false otherwise. It is assumed that comp
-    ///                     will not apply any non-constant function through the
-    ///                     dereferenced iterator.
+    ///                     second, and false otherwise. It is assumed that
+    ///                     comp will not apply any non-constant function
+    ///                     through the dereferenced iterator. Comp defaults
+    ///                     to detail::less.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each pair of elements as a
     ///                     projection operation before the actual predicate
     ///                     \a comp is invoked.
-    ///
-    /// \a comp has to induce a strict weak ordering on the values.
     ///
     /// The assignments in the parallel \a partial_sort algorithm invoked without
     /// an execution policy object execute in sequential order in the
@@ -66,22 +61,17 @@ namespace hpx { namespace ranges {
     ///           element after the last element in the input sequence.
     ///
     template <typename RandomIt, typename Sent, typename Comp, typename Proj>
-    RandomIt partial_sort(RandomIt first, Sent last, Comp&& comp, Proj&& proj);
+    RandomIt partial_sort(RandomIt first, Sent last, Comp&& comp = Comp(),
+        Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Sorts the elements in the range [first, last) in ascending order. The
-    /// relative order of equal elements is preserved. The function
-    /// uses the given comparison function object comp (defaults to using
-    /// operator<()).
+    /// Places the first middle - first elements from the range [first, last)
+    /// as sorted with respect to comp into the range [first, middle). The rest
+    /// of the elements in the range [middle, last) are placed in an unspecified
+    /// order.
     ///
-    /// \note   Complexity: O(Nlog(N)), where N = std::distance(first, last)
-    ///                     comparisons.
-    ///
-    /// A sequence is sorted with respect to a comparator \a comp and a
-    /// projection \a proj if for every iterator i pointing to the sequence and
-    /// every non-negative integer n such that i + n is a valid iterator
-    /// pointing to an element of the sequence, and
-    /// INVOKE(comp, INVOKE(proj, *(i + n)), INVOKE(proj, *i)) == false.
+    /// \note   Complexity: Approximately (last - first) * log(middle - first)
+    ///         comparisons.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -93,7 +83,7 @@ namespace hpx { namespace ranges {
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for RandomIt.
     /// \tparam Comp        The type of the function/function object to use
-    ///                     (deduced).
+    ///                     (deduced). Comp defaults to detail::less.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
@@ -101,21 +91,22 @@ namespace hpx { namespace ranges {
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
+    /// \param middle       Refers to the middle of the sequence of elements
+    ///                     the algorithm will be applied to.
     /// \param last         Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied.
     /// \param comp         comp is a callable object. The return value of the
     ///                     INVOKE operation applied to an object of type Comp,
     ///                     when contextually converted to bool, yields true if
     ///                     the first argument of the call is less than the
-    ///                     second, and false otherwise. It is assumed that comp
-    ///                     will not apply any non-constant function through the
-    ///                     dereferenced iterator.
+    ///                     second, and false otherwise. It is assumed that
+    ///                     comp will not apply any non-constant function
+    ///                     through the dereferenced iterator. Comp defaults
+    ///                     to detail::less.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each pair of elements as a
     ///                     projection operation before the actual predicate
     ///                     \a comp is invoked.
-    ///
-    /// \a comp has to induce a strict weak ordering on the values.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
@@ -139,49 +130,44 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename RandomIt, typename Sent,
         typename Comp, typename Proj>
-    typename parallel::util::detail::algorithm_result<ExPolicy,
-        RandomIt>::type
-    partial_sort(ExPolicy&& policy, RandomIt first, Sent last, Comp&& comp,
-        Proj&& proj);
+    parallel::util::detail::algorithm_result_t<ExPolicy,
+        RandomIt>
+    partial_sort(ExPolicy&& policy, RandomIt first, RandomIt middle,
+        Sent last, Comp&& comp = Comp(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Sorts the elements in the range [first, last) in ascending order. The
-    /// relative order of equal elements is preserved. The function
-    /// uses the given comparison function object comp (defaults to using
-    /// operator<()).
+    /// Places the first middle - first elements from the range [first, last)
+    /// as sorted with respect to comp into the range [first, middle). The rest
+    /// of the elements in the range [middle, last) are placed in an unspecified
+    /// order.
     ///
-    /// \note   Complexity: O(Nlog(N)), where N = std::distance(first, last)
-    ///                     comparisons.
-    ///
-    /// A sequence is sorted with respect to a comparator \a comp and a
-    /// projection \a proj if for every iterator i pointing to the sequence and
-    /// every non-negative integer n such that i + n is a valid iterator
-    /// pointing to an element of the sequence, and
-    /// INVOKE(comp, INVOKE(proj, *(i + n)), INVOKE(proj, *i)) == false.
+    /// \note   Complexity: Approximately (last - first) * log(middle - first)
+    ///         comparisons.
     ///
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
     /// \tparam Comp        The type of the function/function object to use
-    ///                     (deduced).
+    ///                     (deduced). Comp defaults to detail::less.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
+    /// \param middle       Refers to the middle of the sequence of elements
+    ///                     the algorithm will be applied to.
     /// \param comp         comp is a callable object. The return value of the
     ///                     INVOKE operation applied to an object of type Comp,
     ///                     when contextually converted to bool, yields true if
     ///                     the first argument of the call is less than the
-    ///                     second, and false otherwise. It is assumed that comp
-    ///                     will not apply any non-constant function through the
-    ///                     dereferenced iterator.
+    ///                     second, and false otherwise. It is assumed that
+    ///                     comp will not apply any non-constant function
+    ///                     through the dereferenced iterator. Comp defaults
+    ///                     to detail::less.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each pair of elements as a
     ///                     projection operation before the actual predicate
     ///                     \a comp is invoked.
-    ///
-    /// \a comp has to induce a strict weak ordering on the values.
     ///
     /// The assignments in the parallel \a partial_sort algorithm invoked without
     /// an execution policy object execute in sequential order in the
@@ -191,8 +177,9 @@ namespace hpx { namespace ranges {
     ///           typename hpx::traits::range_iterator<Rng>::type.
     ///           It returns \a last.
     template <typename Rng, typename Comp, typename Proj>
-    typename hpx::traits::range_iterator<Rng>::type
-    partial_sort(Rng&& rng, Compare&& comp, Proj&& proj);
+    hpx::traits::range_iterator<Rng>_t
+    partial_sort(Rng&& rng,, hpx::traits::range_iterator<Rng>_t middle,
+        Comp&& comp = Comp(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Sorts the elements in the range [first, last) in ascending order. The
@@ -217,7 +204,7 @@ namespace hpx { namespace ranges {
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
     /// \tparam Comp        The type of the function/function object to use
-    ///                     (deduced).
+    ///                     (deduced). Comp defaults to detail::less;
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
@@ -225,19 +212,20 @@ namespace hpx { namespace ranges {
     ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
+    /// \param middle       Refers to the middle of the sequence of elements
+    ///                     the algorithm will be applied to.
     /// \param comp         comp is a callable object. The return value of the
     ///                     INVOKE operation applied to an object of type Comp,
     ///                     when contextually converted to bool, yields true if
     ///                     the first argument of the call is less than the
-    ///                     second, and false otherwise. It is assumed that comp
-    ///                     will not apply any non-constant function through the
-    ///                     dereferenced iterator.
+    ///                     second, and false otherwise. It is assumed that
+    ///                     comp will not apply any non-constant function
+    ///                     through the dereferenced iterator. Comp defaults
+    ///                     to detail::less.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each pair of elements as a
     ///                     projection operation before the actual predicate
     ///                     \a comp is invoked.
-    ///
-    /// \a comp has to induce a strict weak ordering on the values.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
@@ -259,10 +247,12 @@ namespace hpx { namespace ranges {
     ///           otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename Rng, typename Pred, typename Proj>
-    typename util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_iterator<Rng>::type>::type
-    partial_sort(ExPolicy&& policy, Rng&& rng, Comp&& comp, Proj&&);
+    template <typename ExPolicy, typename Rng, typename Comp, typename Proj>
+    util::detail::algorithm_result_t<ExPolicy,
+        hpx::traits::range_iterator<Rng>_t>
+    partial_sort(ExPolicy&& policy, Rng&& rng,
+        hpx::traits::range_iterator<Rng>_t middle,
+        Comp&& comp = Comp(), Proj&& proj = Proj());
 
     // clang-format on
 }}    // namespace hpx::ranges

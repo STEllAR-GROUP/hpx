@@ -7,6 +7,142 @@
 
 #pragma once
 
+#if defined(DOXYGEN)
+
+namespace hpx {
+    // clang-format off
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Sorts some of the elements in the range [first, last) in ascending
+    /// order, storing the result in the range [d_first, d_last). At most
+    /// d_last - d_first of the elements are placed sorted to the range
+    /// [d_first, d_first + n) where n is the number of elements to sort
+    /// (n = min(last - first, d_last - d_first)).
+    ///
+    /// \note   Complexity: O(Nlog(min(D,N))), where N =
+    ///         std::distance(first, last) and D = std::distance(d_first,
+    ///         d_last) comparisons.
+    ///
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam RandIter    The type of the destination iterators used(deduced)
+    ///                     This iterator type must meet the requirements of an
+    ///                     random iterator.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced). Comp defaults to detail::less.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param d_first      Refers to the beginning of the destination range.
+    /// \param d_last       Refers to the end of the destination range.
+    /// \param comp         comp is a callable object. The return value of the
+    ///                     INVOKE operation applied to an object of type Comp,
+    ///                     when contextually converted to bool, yields true if
+    ///                     the first argument of the call is less than the
+    ///                     second, and false otherwise. It is assumed that
+    ///                     comp will not apply any non-constant function
+    ///                     through the dereferenced iterator. This defaults to
+    ///                     detail::less.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequenced_policy execute in sequential order in the
+    /// calling thread.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_policy or \a parallel_task_policy are
+    /// permitted to execute in an unordered fashion in unspecified
+    /// threads, and indeterminately sequenced within each thread.
+    ///
+    /// \returns  The \a partial_sort_copy algorithm returns a
+    ///           returns \a RandomIt.
+    ///           The algorithm returns an iterator to the element defining
+    ///           the upper boundary of the sorted range i.e.
+    ///           d_first + min(last - first, d_last - d_first)
+    ///
+    template <typename InIter, typename RandIter,
+        typename Comp>
+    RandIter partial_sort_copy(InIter first, InIter last, RandIter d_first,
+        RandIter d_last, Comp&& comp = Comp());
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Sorts some of the elements in the range [first, last) in ascending
+    /// order, storing the result in the range [d_first, d_last). At most
+    /// d_last - d_first of the elements are placed sorted to the range
+    /// [d_first, d_first + n) where n is the number of elements to sort
+    /// (n = min(last - first, d_last - d_first)).
+    ///
+    /// \note   Complexity: O(Nlog(min(D,N))), where N =
+    ///         std::distance(first, last) and D = std::distance(d_first,
+    ///         d_last) comparisons.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam RandIter    The type of the destination iterators used(deduced)
+    ///                     This iterator type must meet the requirements of an
+    ///                     random iterator.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced). Comp defaults to detail::less.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param d_first      Refers to the beginning of the destination range.
+    /// \param d_last       Refers to the end of the destination range.
+    /// \param comp         comp is a callable object. The return value of the
+    ///                     INVOKE operation applied to an object of type Comp,
+    ///                     when contextually converted to bool, yields true if
+    ///                     the first argument of the call is less than the
+    ///                     second, and false otherwise. It is assumed that
+    ///                     comp will not apply any non-constant function
+    ///                     through the dereferenced iterator. This defaults to
+    ///                     detail::less.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequenced_policy execute in sequential order in the
+    /// calling thread.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_policy or \a parallel_task_policy are
+    /// permitted to execute in an unordered fashion in unspecified
+    /// threads, and indeterminately sequenced within each thread.
+    ///
+    /// \returns  The \a partial_sort_copy algorithm returns a
+    ///           \a hpx::future<RandomIt> if the execution policy is of
+    ///           type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a RandomIt
+    ///           otherwise.
+    ///           The algorithm returns an iterator to the element defining
+    ///           the upper boundary of the sorted range i.e.
+    ///           d_first + min(last - first, d_last - d_first)
+    ///
+    template <typename ExPolicy, typename FwdIter, typename RandIter,
+        typename Comp>
+    parallel::util::detail::algorithm_result_t<ExPolicy, RandIter>
+    partial_sort_copy(
+        ExPolicy&& policy, FwdIter first, FwdIter last, RandIter d_first,
+        RandIter d_last, Comp&& comp = Comp());
+
+    // clang-format on
+}    // namespace hpx
+
+#else    // DOXYGEN
+
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -270,3 +406,5 @@ namespace hpx {
         }
     } partial_sort_copy{};
 }    // namespace hpx
+
+#endif    // DOXYGEN
