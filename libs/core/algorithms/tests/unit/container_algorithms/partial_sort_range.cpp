@@ -45,7 +45,7 @@ void test_partial_sort_range_sent(IteratorTag)
     {
         B = A;
         hpx::ranges::partial_sort(B.begin(), B.begin() + i,
-            sentinel<std::int64_t>{SIZE}, compare_t());
+            sentinel<std::uint64_t>{SIZE}, compare_t());
 
         for (std::uint64_t j = 0; j < i; ++j)
         {
@@ -73,7 +73,7 @@ void test_partial_sort_range_sent(ExPolicy policy, IteratorTag)
     {
         B = A;
         hpx::ranges::partial_sort(policy, B.begin(), B.begin() + i,
-            sentinel<std::int64_t>{SIZE}, compare_t());
+            sentinel<std::uint64_t>{SIZE}, compare_t());
 
         for (std::uint64_t j = 0; j < i; ++j)
         {
@@ -101,7 +101,7 @@ void test_partial_sort_range_async_sent(ExPolicy p, IteratorTag)
     {
         B = A;
         auto result = hpx::ranges::partial_sort(p, B.begin(), B.begin() + i,
-            sentinel<std::int64_t>{SIZE}, compare_t());
+            sentinel<std::uint64_t>{SIZE}, compare_t());
         result.wait();
 
         for (std::uint64_t j = 0; j < i; ++j)

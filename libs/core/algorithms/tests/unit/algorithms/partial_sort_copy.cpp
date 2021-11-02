@@ -8,6 +8,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //-----------------------------------------------------------------------------
+#include <hpx/assert.hpp>
 #include <hpx/local/execution.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
@@ -16,6 +17,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <iostream>
+#include <list>
 #include <random>
 #include <string>
 #include <vector>
@@ -241,7 +243,7 @@ void test_partial_sort_copy2(IteratorTag)
     using compare_t = std::less<std::uint64_t>;
     std::list<std::uint64_t> lst;
     std::vector<std::uint64_t> A, B;
-    const uint32_t NELEM = 10000;
+    const uint32_t NELEM = 1000;
     A.reserve(NELEM);
     B.reserve(NELEM);
 
@@ -274,7 +276,7 @@ void test_partial_sort_copy2(ExPolicy policy, IteratorTag)
     using compare_t = std::less<std::uint64_t>;
     std::list<std::uint64_t> lst;
     std::vector<std::uint64_t> A, B;
-    const uint32_t NELEM = 10000;
+    const uint32_t NELEM = 1000;
     A.reserve(NELEM);
     B.reserve(NELEM);
 
@@ -307,7 +309,7 @@ void test_partial_sort_copy2_async(ExPolicy p, IteratorTag)
     using compare_t = std::less<std::uint64_t>;
     std::list<std::uint64_t> lst;
     std::vector<std::uint64_t> A, B;
-    const uint32_t NELEM = 10000;
+    const uint32_t NELEM = 1000;
     A.reserve(NELEM);
     B.reserve(NELEM);
 
@@ -397,7 +399,7 @@ void test_partial_sort_copy3(ExPolicy policy, IteratorTag)
     std::list<std::uint64_t> lst;
     std::mt19937 my_rand(0);
     std::vector<std::uint64_t> A, B, C;
-    const uint32_t NELEM = 10000;
+    const uint32_t NELEM = 1000;
     A.reserve(NELEM);
     B.reserve(NELEM);
     C.reserve(NELEM);
@@ -433,7 +435,7 @@ void test_partial_sort_copy3_async(ExPolicy p, IteratorTag)
     std::list<std::uint64_t> lst;
     std::mt19937 my_rand(0);
     std::vector<std::uint64_t> A, B, C;
-    const uint32_t NELEM = 10000;
+    const uint32_t NELEM = 1000;
     A.reserve(NELEM);
     B.reserve(NELEM);
     C.reserve(NELEM);

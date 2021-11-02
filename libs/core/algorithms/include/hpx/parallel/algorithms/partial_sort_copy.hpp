@@ -5,6 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file parallel/algorithms/partial_sort_copy.hpp
+
 #pragma once
 
 #if defined(DOXYGEN)
@@ -158,12 +160,16 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/algorithms/partial_sort.hpp>
+#include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
+#include <cstdint>
+#include <utility>
+#include <vector>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     ///////////////////////////////////////////////////////////////////////
@@ -209,7 +215,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             using value_t = typename std::iterator_traits<InIter>::value_type;
             using value1_t =
                 typename std::iterator_traits<RandIter>::value_type;
-            using vec_iter_t = std::vector<value_t>::iterator;
+            using vec_iter_t = typename std::vector<value_t>::iterator;
 
             static_assert(
                 std::is_same_v<value1_t, value_t>, "Incompatible iterators\n");
@@ -224,19 +230,23 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
             HPX_ASSERT(ninput >= 0 || noutput >= 0);
 
+            util::compare_projected<Compare, Proj1, Proj2> proj_comp{
+                std::forward<Compare>(comp), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2)};
+
             auto nmin = ninput < noutput ? ninput : noutput;
             if (noutput >= ninput)
             {
                 detail::sort<vec_iter_t>().call(hpx::execution::seq,
-                    aux.begin(), aux.end(), std::forward<Compare>(comp),
-                    std::forward<Proj2>(proj2));
+                    aux.begin(), aux.end(), std::move(proj_comp),
+                    util::projection_identity{});
             }
             else
             {
                 parallel::v1::partial_sort<vec_iter_t>().call(
                     hpx::execution::seq, aux.begin(), aux.begin() + nmin,
-                    aux.end(), std::forward<Compare>(comp),
-                    std::forward<Proj2>(proj2));
+                    aux.end(), std::move(proj_comp),
+                    util::projection_identity{});
             }
 
             detail::copy<util::in_out_result<vec_iter_t, RandIter>>().call(
@@ -297,25 +307,30 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 std::int64_t noutput = d_last_iter - d_first;
                 HPX_ASSERT(ninput >= 0 and noutput >= 0);
 
+                util::compare_projected<Compare, Proj1, Proj2> proj_comp{
+                    std::forward<Compare>(comp), std::forward<Proj1>(proj1),
+                    std::forward<Proj2>(proj2)};
+
                 auto nmin = ninput < noutput ? ninput : noutput;
                 if (noutput >= ninput)
                 {
-                    detail::sort<vec_iter_t>().call(hpx::execution::par,
-                        aux.begin(), aux.end(), comp,
-                        std::forward<Proj2>(proj2));
+                    detail::sort<vec_iter_t>().call(
+                        policy(hpx::execution::non_task), aux.begin(),
+                        aux.end(), std::move(proj_comp),
+                        util::projection_identity{});
                 }
                 else
                 {
                     //
                     hpx::parallel::v1::partial_sort<vec_iter_t>().call(
-                        hpx::execution::par, aux.begin(), aux.begin() + nmin,
-                        aux.end(), std::forward<Compare>(comp),
-                        std::forward<Proj2>(proj2));
+                        policy(hpx::execution::non_task), aux.begin(),
+                        aux.begin() + nmin, aux.end(), std::move(proj_comp),
+                        util::projection_identity{});
                 };
 
                 detail::copy<util::in_out_result<vec_iter_t, RandIter>>().call(
-                    hpx::execution::par, aux.begin(), aux.begin() + nmin,
-                    d_first);
+                    policy(hpx::execution::non_task), aux.begin(),
+                    aux.begin() + nmin, d_first);
 
                 return result_type::get(util::in_out_result<FwdIter, RandIter>{
                     last_iter, d_first + nmin});
@@ -344,12 +359,12 @@ namespace hpx {
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
-                    typename std::iterator_traits<RandIter>::value_type,
-                    typename std::iterator_traits<RandIter>::value_type
+                    typename std::iterator_traits<InIter>::value_type,
+                    typename std::iterator_traits<InIter>::value_type
                 >
             )>
         // clang-format on
-        friend RandIter tag_fallback_dispatch(hpx::partial_sort_copy_t,
+        friend RandIter tag_fallback_invoke(hpx::partial_sort_copy_t,
             InIter first, InIter last, RandIter d_first, RandIter d_last,
             Comp&& comp = Comp())
         {
@@ -378,13 +393,13 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
-                    typename std::iterator_traits<RandIter>::value_type,
-                    typename std::iterator_traits<RandIter>::value_type
+                    typename std::iterator_traits<FwdIter>::value_type,
+                    typename std::iterator_traits<FwdIter>::value_type
                 >
             )>
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, RandIter>
-        tag_fallback_dispatch(hpx::partial_sort_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::partial_sort_copy_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, RandIter d_first, RandIter d_last,
             Comp&& comp = Comp())
         {

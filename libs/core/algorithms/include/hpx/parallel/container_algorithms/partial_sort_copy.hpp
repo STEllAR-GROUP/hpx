@@ -360,12 +360,12 @@ namespace hpx { namespace ranges {
                 parallel::traits::is_projected_v<Proj2, RandIter> &&
                 parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Comp,
-                    parallel::traits::projected<Proj2, RandIter>,
-                    parallel::traits::projected<Proj2, RandIter>
+                    parallel::traits::projected<Proj1, InIter>,
+                    parallel::traits::projected<Proj1, InIter>
                 >
             )>
         // clang-format on
-        friend partial_sort_copy_result<InIter, RandIter> tag_fallback_dispatch(
+        friend partial_sort_copy_result<InIter, RandIter> tag_fallback_invoke(
             hpx::ranges::partial_sort_copy_t, InIter first, Sent1 last,
             RandIter r_first, Sent2 r_last, Comp&& comp = Comp(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
@@ -400,16 +400,16 @@ namespace hpx { namespace ranges {
                 parallel::traits::is_projected_v<Proj2, RandIter> &&
                 parallel::traits::is_indirect_callable_v<
                     ExPolicy, Comp,
-                    parallel::traits::projected<Proj2, RandIter>,
-                    parallel::traits::projected<Proj2, RandIter>
+                    parallel::traits::projected<Proj1, FwdIter>,
+                    parallel::traits::projected<Proj1, FwdIter>
                 >
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result_t<ExPolicy,
             partial_sort_copy_result<FwdIter, RandIter>>
-        tag_fallback_dispatch(hpx::ranges::partial_sort_copy_t,
-            ExPolicy&& policy, FwdIter first, Sent1 last, RandIter r_first,
-            Sent2 r_last, Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
+        tag_fallback_invoke(hpx::ranges::partial_sort_copy_t, ExPolicy&& policy,
+            FwdIter first, Sent1 last, RandIter r_first, Sent2 r_last,
+            Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
@@ -439,13 +439,13 @@ namespace hpx { namespace ranges {
                 parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Compare,
                     parallel::traits::projected_range<Proj1, Rng1>,
-                    parallel::traits::projected_range<Proj2, Rng2>
+                    parallel::traits::projected_range<Proj1, Rng1>
                 >
             )>
         // clang-format on
         friend partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,
             hpx::traits::range_iterator_t<Rng2>>
-        tag_fallback_dispatch(hpx::ranges::partial_sort_copy_t, Rng1&& rng1,
+        tag_fallback_invoke(hpx::ranges::partial_sort_copy_t, Rng1&& rng1,
             Rng2&& rng2, Compare&& comp = Compare(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -482,17 +482,16 @@ namespace hpx { namespace ranges {
                 parallel::traits::is_indirect_callable_v<
                     ExPolicy, Compare,
                     parallel::traits::projected_range<Proj1, Rng1>,
-                    parallel::traits::projected_range<Proj2, Rng2>
+                    parallel::traits::projected_range<Proj1, Rng1>
                 >
             )>
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,
                 hpx::traits::range_iterator_t<Rng2>>>
-        tag_fallback_dispatch(hpx::ranges::partial_sort_copy_t,
-            ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
-            Compare&& comp = Compare(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+        tag_fallback_invoke(hpx::ranges::partial_sort_copy_t, ExPolicy&& policy,
+            Rng1&& rng1, Rng2&& rng2, Compare&& comp = Compare(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
             using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;

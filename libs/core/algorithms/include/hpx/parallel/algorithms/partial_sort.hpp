@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 Francisco Jose Tapia
-//  Copyright (c) 2020 Akhil J Nair
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -46,7 +46,8 @@ namespace hpx {
     /// \returns  The \a partial_sort algorithm returns nothing.
     ///
     template <typename RandIter, typename Comp>
-    void partial_sort(RandIter first, RandIter middle, RandIter last, Comp&& comp = Comp());
+    void partial_sort(RandIter first, RandIter middle, RandIter last,
+        Comp&& comp = Comp());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Places the first middle - first elements from the range [first, last)
@@ -91,7 +92,8 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename RandIter, typename Comp>
     util::detail::algorithm_result_t<ExPolicy> partial_sort(
-        ExPolicy&& policy, RandIter first, RandIter middle, RandIter last, Comp&& comp = Comp());
+        ExPolicy&& policy, RandIter first, RandIter middle, RandIter last,
+        Comp&& comp = Comp());
 
     // clang-format on
 }    // namespace hpx
@@ -115,6 +117,7 @@ namespace hpx {
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
@@ -432,7 +435,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename Iter, typename Sent, typename Comp>
     Iter sequential_partial_sort(Iter first, Iter middle, Sent end, Comp&& comp)
     {
-        std::int64_t nelem = detail::distance(first, end);
+        std::int64_t nelem = parallel::v1::detail::distance(first, end);
         HPX_ASSERT(nelem >= 0);
 
         std::int64_t nmid = middle - first;
@@ -467,7 +470,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     hpx::future<Iter> parallel_partial_sort(
         ExPolicy&& policy, Iter first, Iter middle, Sent end, Comp&& comp)
     {
-        std::int64_t nelem = detail::distance(first, end);
+        std::int64_t nelem = parallel::v1::detail::distance(first, end);
         HPX_ASSERT(nelem >= 0);
 
         std::int64_t nmid = middle - first;

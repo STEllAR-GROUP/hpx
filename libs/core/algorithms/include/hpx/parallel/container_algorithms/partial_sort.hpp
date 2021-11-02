@@ -294,7 +294,7 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend RandomIt tag_fallback_dispatch(hpx::ranges::partial_sort_t,
+        friend RandomIt tag_fallback_invoke(hpx::ranges::partial_sort_t,
             RandomIt first, RandomIt middle, Sent last, Comp&& comp = Comp(),
             Proj&& proj = Proj())
         {
@@ -323,7 +323,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             RandomIt>::type
-        tag_fallback_dispatch(hpx::ranges::partial_sort_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::partial_sort_t, ExPolicy&& policy,
             RandomIt first, RandomIt middle, Sent last, Comp&& comp = Comp(),
             Proj&& proj = Proj())
         {
@@ -349,7 +349,7 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend hpx::traits::range_iterator_t<Rng> tag_fallback_dispatch(
+        friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::partial_sort_t, Rng&& rng,
             hpx::traits::range_iterator_t<Rng> middle,
             Compare&& comp = Compare(), Proj&& proj = Proj())
@@ -382,7 +382,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::traits::range_iterator_t<Rng>>
-        tag_fallback_dispatch(hpx::ranges::partial_sort_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::partial_sort_t, ExPolicy&& policy,
             Rng&& rng, hpx::traits::range_iterator_t<Rng> middle,
             Compare&& comp = Compare(), Proj&& proj = Proj())
         {
