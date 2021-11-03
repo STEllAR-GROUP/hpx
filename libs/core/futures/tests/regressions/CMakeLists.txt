@@ -5,9 +5,20 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests future_2667 future_790 future_unwrap_878 future_unwrap_1182
-          shared_future_continuation_order shared_future_then_2166
+set(tests
+    exception_from_continuation_1613
+    future_2667
+    future_790
+    future_unwrap_878
+    future_unwrap_1182
+    set_hpx_limit_798
+    shared_future_continuation_order
+    shared_future_then_2166
+    wait_for_1751
 )
+
+set(exception_from_continuation_1613_PARAMETERS THREADS_PER_LOCALITY 2)
+set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

@@ -19,8 +19,8 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/create_component.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/futures/packaged_task.hpp>
 #include <hpx/ini/ini.hpp>
-#include <hpx/lcos_local/packaged_task.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/errors.hpp>

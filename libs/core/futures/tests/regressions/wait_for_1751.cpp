@@ -7,8 +7,8 @@
 // This test case demonstrates the issue described in #1751:
 // hpx::future::wait_for fails a simple test
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <chrono>
@@ -49,11 +49,11 @@ int hpx_main()
         HPX_TEST_LT(dif.count(), 1.1);
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    hpx::init(argc, argv);
+    hpx::local::init(hpx_main, argc, argv);
     return hpx::util::report_errors();
 }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,31 +7,26 @@
 // This test case demonstrates the issue described in #1613: Dataflow causes
 // stack overflow
 
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <vector>
 
-#define NUM_FUTURES std::size_t(2*HPX_CONTINUATION_MAX_RECURSION_DEPTH)
+#define NUM_FUTURES std::size_t(2 * HPX_CONTINUATION_MAX_RECURSION_DEPTH)
 
 void test_exception_from_continuation1()
 {
     hpx::lcos::local::promise<void> p;
     hpx::future<void> f1 = p.get_future();
 
-    hpx::future<void> f2 =
-        f1.then(
-            [](hpx::future<void> && f1)
-            {
-                HPX_TEST(f1.has_value());
-                HPX_THROW_EXCEPTION(
-                    hpx::invalid_status, "lambda", "testing exceptions"
-                );
-            });
+    hpx::future<void> f2 = f1.then([](hpx::future<void>&& f1) {
+        HPX_TEST(f1.has_value());
+        HPX_THROW_EXCEPTION(
+            hpx::invalid_status, "lambda", "testing exceptions");
+    });
 
     p.set_value();
     f2.wait();
@@ -43,8 +38,8 @@ void test_exception_from_continuation2()
 {
     hpx::lcos::local::promise<void> p;
 
-    std::vector<hpx::shared_future<void> > results;
-    results.reserve(NUM_FUTURES+1);
+    std::vector<hpx::shared_future<void>> results;
+    results.reserve(NUM_FUTURES + 1);
 
     std::atomic<std::size_t> recursion_level(0);
     std::atomic<std::size_t> exceptions_thrown(0);
@@ -53,19 +48,15 @@ void test_exception_from_continuation2()
     for (std::size_t i = 0; i != NUM_FUTURES; ++i)
     {
         results.push_back(
-            results.back().then(
-                [&](hpx::shared_future<void> && f)
-                {
-                    ++recursion_level;
+            results.back().then([&](hpx::shared_future<void>&& f) {
+                ++recursion_level;
 
-                    f.get();        // rethrow, if has exception
+                f.get();    // rethrow, if has exception
 
-                    ++exceptions_thrown;
-                    HPX_THROW_EXCEPTION(
-                        hpx::invalid_status, "lambda", "testing exceptions"
-                    );
-                })
-        );
+                ++exceptions_thrown;
+                HPX_THROW_EXCEPTION(
+                    hpx::invalid_status, "lambda", "testing exceptions");
+            }));
     }
 
     // make futures ready in backwards sequence
@@ -84,10 +75,16 @@ void test_exception_from_continuation2()
     }
 }
 
-int main()
+int hpx_main()
 {
     test_exception_from_continuation1();
     test_exception_from_continuation2();
 
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    hpx::local::init(hpx_main, argc, argv);
     return hpx::util::report_errors();
 }

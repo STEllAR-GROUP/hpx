@@ -84,7 +84,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/lcos_local/packaged_task.hpp>
+#include <hpx/futures/packaged_task.hpp>
 
 #include <atomic>
 #include <cstddef>

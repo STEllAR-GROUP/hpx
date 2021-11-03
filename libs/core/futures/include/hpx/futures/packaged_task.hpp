@@ -11,6 +11,7 @@
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
+#include <hpx/futures/promise.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
@@ -36,7 +37,7 @@ namespace hpx { namespace lcos { namespace local {
 
         template <typename F, typename FD = std::decay_t<F>,
             typename Enable =
-                std::enable_if_t<!std::is_same<FD, packaged_task>::value &&
+                std::enable_if_t<!std::is_same_v<FD, packaged_task> &&
                     is_invocable_r_v<R, FD&, Ts...>>>
         explicit packaged_task(F&& f)
           : function_(std::forward<F>(f))
@@ -46,7 +47,7 @@ namespace hpx { namespace lcos { namespace local {
 
         template <typename Allocator, typename F, typename FD = std::decay_t<F>,
             typename Enable =
-                std::enable_if_t<!std::is_same<FD, packaged_task>::value &&
+                std::enable_if_t<!std::is_same_v<FD, packaged_task> &&
                     is_invocable_r_v<R, FD&, Ts...>>>
         explicit packaged_task(std::allocator_arg_t, Allocator const& a, F&& f)
           : function_(std::forward<F>(f))
@@ -54,21 +55,11 @@ namespace hpx { namespace lcos { namespace local {
         {
         }
 
-        packaged_task(packaged_task&& rhs) noexcept
-          : function_(std::move(rhs.function_))
-          , promise_(std::move(rhs.promise_))
-        {
-        }
+        packaged_task(packaged_task const& rhs) noexcept = delete;
+        packaged_task(packaged_task&& rhs) noexcept = default;
 
-        packaged_task& operator=(packaged_task&& rhs) noexcept
-        {
-            if (this != &rhs)
-            {
-                function_ = std::move(rhs.function_);
-                promise_ = std::move(rhs.promise_);
-            }
-            return *this;
-        }
+        packaged_task& operator=(packaged_task const& rhs) noexcept = delete;
+        packaged_task& operator=(packaged_task&& rhs) noexcept = default;
 
         void swap(packaged_task& rhs) noexcept
         {
@@ -76,18 +67,33 @@ namespace hpx { namespace lcos { namespace local {
             promise_.swap(rhs.promise_);
         }
 
-        void operator()(Ts... vs)
+        void operator()(Ts... ts)
         {
             if (function_.empty())
             {
                 HPX_THROW_EXCEPTION(no_state,
-                    "packaged_task_base<Signature>::get_future",
+                    "packaged_task<Signature>::operator()",
                     "this packaged_task has no valid shared state");
                 return;
             }
 
-            hpx::util::annotate_function annotate(function_);
-            invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
+            // synchronous execution of the embedded function (object)
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    hpx::util::annotate_function annotate(function_);
+                    if constexpr (std::is_void_v<R>)
+                    {
+                        function_(std::forward<Ts>(ts)...);
+                        promise_.set_value();
+                    }
+                    else
+                    {
+                        promise_.set_value(function_(std::forward<Ts>(ts)...));
+                    }
+                },
+                [&](std::exception_ptr ep) {
+                    promise_.set_exception(std::move(ep));
+                });
         }
 
         // result retrieval
@@ -96,7 +102,7 @@ namespace hpx { namespace lcos { namespace local {
             if (function_.empty())
             {
                 HPX_THROWS_IF(ec, no_state,
-                    "packaged_task_base<Signature>::get_future",
+                    "packaged_task<Signature>::get_future",
                     "this packaged_task has no valid shared state");
                 return lcos::future<R>();
             }
@@ -112,8 +118,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             if (function_.empty())
             {
-                HPX_THROWS_IF(ec, no_state,
-                    "packaged_task_base<Signature>::get_future",
+                HPX_THROWS_IF(ec, no_state, "packaged_task<Signature>::reset",
                     "this packaged_task has no valid shared state");
                 return;
             }
@@ -124,33 +129,6 @@ namespace hpx { namespace lcos { namespace local {
         void set_exception(std::exception_ptr const& e)
         {
             promise_.set_exception(e);
-        }
-
-    private:
-        // synchronous execution
-        template <typename... Vs>
-        void invoke_impl(/*is_void=*/std::false_type, Vs&&... vs)
-        {
-            hpx::detail::try_catch_exception_ptr(
-                [&]() {
-                    promise_.set_value(function_(std::forward<Vs>(vs)...));
-                },
-                [&](std::exception_ptr ep) {
-                    promise_.set_exception(std::move(ep));
-                });
-        }
-
-        template <typename... Vs>
-        void invoke_impl(/*is_void=*/std::true_type, Vs&&... vs)
-        {
-            hpx::detail::try_catch_exception_ptr(
-                [&]() {
-                    function_(std::forward<Ts>(vs)...);
-                    promise_.set_value();
-                },
-                [&](std::exception_ptr ep) {
-                    promise_.set_exception(std::move(ep));
-                });
         }
 
     private:
@@ -166,4 +144,11 @@ namespace std {
       : std::true_type
     {
     };
+
+    template <typename Sig>
+    void swap(hpx::lcos::local::packaged_task<Sig>& lhs,
+        hpx::lcos::local::packaged_task<Sig>& rhs)
+    {
+        lhs.swap(rhs);
+    }
 }    // namespace std

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (C) 2011 Vicente J. Botet Escriba
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -32,4 +32,6 @@ int main()
                       test_allocator<int>>::value,
         "std::uses_allocator<local::packaged_task<int()>, "
         "test_allocator<int> >::value");
+
+    return 0;
 }
