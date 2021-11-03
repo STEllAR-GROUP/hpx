@@ -16,7 +16,7 @@ set(tests
     shared_future
 )
 
-if(HPX_WITH_AWAIT OR HPX_WITH_CXX20_COROUTINES)
+if(HPX_WITH_CXX20_COROUTINES)
   set(tests ${tests} await)
   set(await_PARAMETERS THREADS_PER_LOCALITY 4)
 endif()

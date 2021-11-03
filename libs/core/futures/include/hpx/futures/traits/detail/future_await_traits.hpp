@@ -8,21 +8,14 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_AWAIT) || defined(HPX_HAVE_CXX20_COROUTINES)
+#if defined(HPX_HAVE_CXX20_COROUTINES)
 
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/memory.hpp>
 
-#if defined(HPX_HAVE_CXX20_COROUTINES)
 #include <coroutine>
-#elif defined(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
-#include <hpx/util/await_traits.hpp>
-#else
-#include <experimental/coroutine>
-#endif
-
 #include <cstddef>
 #include <exception>
 #include <memory>
@@ -32,15 +25,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail {
 
-#if defined(HPX_HAVE_CXX20_COROUTINES)
     template <typename Promise = void>
     using coroutine_handle = std::coroutine_handle<Promise>;
     using suspend_never = std::suspend_never;
-#else
-    template <typename Promise = void>
-    using coroutine_handle = std::experimental::coroutine_handle<Promise>;
-    using suspend_never = std::experimental::suspend_never;
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // this was removed from the TS, so we define our own
@@ -208,170 +195,158 @@ namespace hpx { namespace lcos { namespace detail {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace std {
-#if !defined(HPX_HAVE_CXX20_COROUTINES)
-    namespace experimental {
-#endif
-        // Allow for functions which use co_await to return an hpx::future<T>
-        template <typename T, typename... Ts>
-        struct coroutine_traits<hpx::lcos::future<T>, Ts...>
+    // Allow for functions which use co_await to return an hpx::future<T>
+    template <typename T, typename... Ts>
+    struct coroutine_traits<hpx::lcos::future<T>, Ts...>
+    {
+        using allocator_type = hpx::util::internal_allocator<coroutine_traits>;
+
+        struct promise_type
+          : hpx::lcos::detail::coroutine_promise_base<T, promise_type>
         {
-            using allocator_type =
-                hpx::util::internal_allocator<coroutine_traits>;
+            using base_type =
+                hpx::lcos::detail::coroutine_promise_base<T, promise_type>;
 
-            struct promise_type
-              : hpx::lcos::detail::coroutine_promise_base<T, promise_type>
+            promise_type() = default;
+
+            template <typename U>
+            void return_value(U&& value)
             {
-                using base_type =
-                    hpx::lcos::detail::coroutine_promise_base<T, promise_type>;
+                this->base_type::set_value(HPX_FORWARD(U, value));
+            }
 
-                promise_type() = default;
+            void unhandled_exception() noexcept
+            {
+                this->base_type::set_exception(std::current_exception());
+            }
 
-                template <typename U>
-                void return_value(U&& value)
-                {
-                    this->base_type::set_value(HPX_FORWARD(U, value));
-                }
+            HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
+                std::size_t size)
+            {
+                return base_type::allocate(size);
+            }
 
-                void unhandled_exception() noexcept
-                {
-                    this->base_type::set_exception(std::current_exception());
-                }
-
-                HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
-                    std::size_t size)
-                {
-                    return base_type::allocate(size);
-                }
-
-                HPX_FORCEINLINE static void operator delete(
-                    void* p, std::size_t size) noexcept
-                {
-                    base_type::deallocate(p, size);
-                }
-            };
+            HPX_FORCEINLINE static void operator delete(
+                void* p, std::size_t size) noexcept
+            {
+                base_type::deallocate(p, size);
+            }
         };
+    };
 
-        template <typename... Ts>
-        struct coroutine_traits<hpx::lcos::future<void>, Ts...>
+    template <typename... Ts>
+    struct coroutine_traits<hpx::lcos::future<void>, Ts...>
+    {
+        using allocator_type = hpx::util::internal_allocator<coroutine_traits>;
+
+        struct promise_type
+          : hpx::lcos::detail::coroutine_promise_base<void, promise_type>
         {
-            using allocator_type =
-                hpx::util::internal_allocator<coroutine_traits>;
+            using base_type =
+                hpx::lcos::detail::coroutine_promise_base<void, promise_type>;
 
-            struct promise_type
-              : hpx::lcos::detail::coroutine_promise_base<void, promise_type>
+            promise_type() = default;
+
+            void return_void()
             {
-                using base_type =
-                    hpx::lcos::detail::coroutine_promise_base<void,
-                        promise_type>;
+                this->base_type::set_value();
+            }
 
-                promise_type() = default;
+            void unhandled_exception() noexcept
+            {
+                this->base_type::set_exception(std::current_exception());
+            }
 
-                void return_void()
-                {
-                    this->base_type::set_value();
-                }
+            HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
+                std::size_t size)
+            {
+                return base_type::allocate(size);
+            }
 
-                void unhandled_exception() noexcept
-                {
-                    this->base_type::set_exception(std::current_exception());
-                }
-
-                HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
-                    std::size_t size)
-                {
-                    return base_type::allocate(size);
-                }
-
-                HPX_FORCEINLINE static void operator delete(
-                    void* p, std::size_t size) noexcept
-                {
-                    base_type::deallocate(p, size);
-                }
-            };
+            HPX_FORCEINLINE static void operator delete(
+                void* p, std::size_t size) noexcept
+            {
+                base_type::deallocate(p, size);
+            }
         };
+    };
 
-        // Allow for functions which use co_await to return an
-        // hpx::shared_future<T>
-        template <typename T, typename... Ts>
-        struct coroutine_traits<hpx::lcos::shared_future<T>, Ts...>
+    // Allow for functions which use co_await to return an
+    // hpx::shared_future<T>
+    template <typename T, typename... Ts>
+    struct coroutine_traits<hpx::lcos::shared_future<T>, Ts...>
+    {
+        using allocator_type = hpx::util::internal_allocator<coroutine_traits>;
+
+        struct promise_type
+          : hpx::lcos::detail::coroutine_promise_base<T, promise_type>
         {
-            using allocator_type =
-                hpx::util::internal_allocator<coroutine_traits>;
+            using base_type =
+                hpx::lcos::detail::coroutine_promise_base<T, promise_type>;
 
-            struct promise_type
-              : hpx::lcos::detail::coroutine_promise_base<T, promise_type>
+            promise_type() = default;
+
+            template <typename U>
+            void return_value(U&& value)
             {
-                using base_type =
-                    hpx::lcos::detail::coroutine_promise_base<T, promise_type>;
+                this->base_type::set_value(HPX_FORWARD(U, value));
+            }
 
-                promise_type() = default;
+            void unhandled_exception() noexcept
+            {
+                this->base_type::set_exception(std::current_exception());
+            }
 
-                template <typename U>
-                void return_value(U&& value)
-                {
-                    this->base_type::set_value(HPX_FORWARD(U, value));
-                }
+            HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
+                std::size_t size)
+            {
+                return base_type::allocate(size);
+            }
 
-                void unhandled_exception() noexcept
-                {
-                    this->base_type::set_exception(std::current_exception());
-                }
-
-                HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
-                    std::size_t size)
-                {
-                    return base_type::allocate(size);
-                }
-
-                HPX_FORCEINLINE static void operator delete(
-                    void* p, std::size_t size) noexcept
-                {
-                    base_type::deallocate(p, size);
-                }
-            };
+            HPX_FORCEINLINE static void operator delete(
+                void* p, std::size_t size) noexcept
+            {
+                base_type::deallocate(p, size);
+            }
         };
+    };
 
-        template <typename... Ts>
-        struct coroutine_traits<hpx::lcos::shared_future<void>, Ts...>
+    template <typename... Ts>
+    struct coroutine_traits<hpx::lcos::shared_future<void>, Ts...>
+    {
+        using allocator_type = hpx::util::internal_allocator<coroutine_traits>;
+
+        struct promise_type
+          : hpx::lcos::detail::coroutine_promise_base<void, promise_type>
         {
-            using allocator_type =
-                hpx::util::internal_allocator<coroutine_traits>;
+            using base_type =
+                hpx::lcos::detail::coroutine_promise_base<void, promise_type>;
 
-            struct promise_type
-              : hpx::lcos::detail::coroutine_promise_base<void, promise_type>
+            promise_type() = default;
+
+            void return_void()
             {
-                using base_type =
-                    hpx::lcos::detail::coroutine_promise_base<void,
-                        promise_type>;
+                this->base_type::set_value();
+            }
 
-                promise_type() = default;
+            void unhandled_exception() noexcept
+            {
+                this->base_type::set_exception(std::current_exception());
+            }
 
-                void return_void()
-                {
-                    this->base_type::set_value();
-                }
+            HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
+                std::size_t size)
+            {
+                return base_type::allocate(size);
+            }
 
-                void unhandled_exception() noexcept
-                {
-                    this->base_type::set_exception(std::current_exception());
-                }
-
-                HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
-                    std::size_t size)
-                {
-                    return base_type::allocate(size);
-                }
-
-                HPX_FORCEINLINE static void operator delete(
-                    void* p, std::size_t size) noexcept
-                {
-                    base_type::deallocate(p, size);
-                }
-            };
+            HPX_FORCEINLINE static void operator delete(
+                void* p, std::size_t size) noexcept
+            {
+                base_type::deallocate(p, size);
+            }
         };
-#if !defined(HPX_HAVE_CXX20_COROUTINES)
-    }    // namespace experimental
-#endif
+    };
 }    // namespace std
 
-#endif    // HPX_HAVE_AWAIT || HPX_HAVE_CXX20_COROUTINES
+#endif    // HPX_HAVE_CXX20_COROUTINES

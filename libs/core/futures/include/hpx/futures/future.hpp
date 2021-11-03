@@ -865,7 +865,7 @@ namespace hpx { namespace lcos { namespace detail {
             return wait_until(rel_time.from_now(), ec);
         }
 
-#if defined(HPX_HAVE_AWAIT) || defined(HPX_HAVE_CXX20_COROUTINES)
+#if defined(HPX_HAVE_CXX20_COROUTINES)
         bool await_ready() const noexcept
         {
             return detail::await_ready(*static_cast<Derived const*>(this));

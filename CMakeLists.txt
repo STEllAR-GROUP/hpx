@@ -1511,41 +1511,6 @@ elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_info("Compiling for BlueGene/Q")
 endif()
 
-if((NOT HPX_WITH_CXX20_COROUTINES)
-   AND ((MSVC_VERSION GREATER_EQUAL 1900) AND CMAKE_CL_64)
-   OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-)
-
-  # If C++20 coroutines are not supported by the compiler there is still a
-  # chance to enable them through command line options.
-
-  hpx_option(
-    HPX_WITH_AWAIT BOOL "Enable the use of experimental co_await functionality"
-    OFF ADVANCED CATEGORY "LCOs"
-  )
-  if(HPX_WITH_AWAIT)
-    hpx_add_config_define(HPX_HAVE_AWAIT)
-
-    if((MSVC_VERSION GREATER_EQUAL 1900) AND CMAKE_CL_64)
-      hpx_add_target_compile_option(-await PUBLIC)
-    endif()
-
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-      hpx_add_target_compile_option(-Xclang -fcoroutines-ts PUBLIC)
-
-      # older Clang versions don't have <experimental/coroutine> yet
-      hpx_option(
-        HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY BOOL
-        "Use hpx/util/await_traits.hpp instead of <experimental/coroutine>" OFF
-        ADVANCED CATEGORY "LCOs"
-      )
-      if(HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY)
-        hpx_add_config_define(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
-      endif()
-    endif()
-  endif()
-endif()
-
 # ##############################################################################
 # Some special handling of the compilation is need on build infrastructure for
 # generating packages for target architecture, see issue #3575
@@ -1651,10 +1616,10 @@ if(WIN32)
     hpx_add_target_compile_option(-Ob1 PUBLIC CONFIGURATIONS Release)
 
     # /RTC1 is incompatible with /await
-    if((NOT HPX_WITH_AWAIT) AND (NOT HPX_WITH_CXX20_COROUTINES))
-      hpx_add_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
-    else()
+    if(HPX_WITH_CXX20_COROUTINES)
       hpx_remove_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
+    else()
+      hpx_add_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
     endif()
 
     # VS2012 and above has a special flag for improving the debug experience by

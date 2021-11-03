@@ -16,13 +16,11 @@ set(util_headers
     hpx/util/min.hpp
     hpx/util/regex_from_pattern.hpp
     hpx/util/sed_transform.hpp
-    hpx/util/traits/await_traits.hpp
 )
 
 # cmake-format: off
 set(util_compat_headers
     hpx/util.hpp => hpx/include/util.hpp
-    hpx/util/await_traits.hpp => hpx/include/util.hpp
 )
 # cmake-format: on
 
