@@ -476,7 +476,6 @@ namespace hpx { namespace parallel { namespace execution {
 
 int hpx_main()
 {
-    bool ok = true;
     try
     {
         test_async_executor exec;
@@ -485,7 +484,6 @@ int hpx_main()
     catch (std::exception& e)
     {
         std::cout << "Exception " << e.what() << std::endl;
-        ok = false;
     }
 
     typedef hpx::parallel::execution::pool_numa_hint<dummy_tag> dummy_hint;
@@ -498,7 +496,6 @@ int hpx_main()
     catch (std::exception& e)
     {
         std::cout << "Exception " << e.what() << std::endl;
-        ok = false;
     }
 
     try
@@ -510,7 +507,6 @@ int hpx_main()
     catch (std::exception& e)
     {
         std::cout << "Exception " << e.what() << std::endl;
-        ok = false;
     }
 
     std::cout << "Tests done \n";
