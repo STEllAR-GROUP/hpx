@@ -67,6 +67,10 @@ elseif(NOT TARGET Asio::asio AND NOT HPX_FIND_PACKAGE)
 endif()
 
 if(NOT HPX_FIND_PACKAGE)
+  # Asio should use std::aligned_new only if available
+  if(NOT HPX_WITH_CXX17_ALIGNED_NEW)
+    hpx_add_config_cond_define(ASIO_DISABLE_STD_ALIGNED_ALLOC)
+  endif()
   # Asio should not use Boost exceptions
   hpx_add_config_cond_define(ASIO_HAS_BOOST_THROW_EXCEPTION 0)
   # Disable concepts support in Asio as a workaround to
