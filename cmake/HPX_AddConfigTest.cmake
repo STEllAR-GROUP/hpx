@@ -447,31 +447,6 @@ function(hpx_check_for_cxx20_coroutines)
     SOURCE cmake/tests/cxx20_coroutines.cpp
     FILE ${ARGN}
   )
-
-  if(NOT HPX_WITH_CXX20_COROUTINES)
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
-       AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 10
-       AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11
-    )
-      set(HPX_CXX20_COROUTINES_FLAGS
-          "-fcoroutines"
-          CACHE STRING "coroutines need an explicit flag" FORCE
-      )
-    endif()
-    if(HPX_CXX20_COROUTINES_FLAGS)
-      unset(HPX_WITH_CXX20_COROUTINES CACHE)
-      add_hpx_config_test(
-        HPX_WITH_CXX20_COROUTINES
-        SOURCE cmake/tests/cxx20_coroutines.cpp CXXFLAGS
-                                                "${HPX_CXX20_COROUTINES_FLAGS}"
-        FILE ${ARGN}
-      )
-      if(NOT HPX_WITH_CXX20_COROUTINES)
-        unset(HPX_CXX20_COROUTINES_FLAGS CACHE)
-        unset(HPX_WITH_CXX20_COROUTINES CACHE)
-      endif()
-    endif()
-  endif()
 endfunction()
 
 # ##############################################################################
