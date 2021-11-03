@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <new>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace components { namespace detail {
@@ -65,10 +66,14 @@ namespace hpx { namespace components {
         using derived_type = component_type;
         using heap_type = typename traits::component_heap_type<Component>::type;
 
+        constexpr component() = default;
+
         // Construct a component instance holding a new wrapped instance
-        template <typename... Ts>
-        component(Ts&&... vs)
-          : Component(HPX_FORWARD(Ts, vs)...)
+        template <typename T, typename... Ts,
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<std::decay_t<T>, component>>>
+        explicit component(T&& t, Ts&&... ts)
+          : Component(HPX_FORWARD(T, t), HPX_FORWARD(Ts, ts)...)
         {
         }
     };

@@ -76,7 +76,7 @@ namespace hpx { namespace components { namespace detail {
             }
         }
 
-        std::unique_lock<naming::gid_type::mutex_type> l(gid_.get_mutex());
+        std::unique_lock l(gid_.get_mutex());
 
         naming::gid_type gid = gid_;
         if (!naming::detail::has_credits(gid_))
@@ -121,7 +121,7 @@ namespace hpx { namespace components { namespace detail {
             // can be directly resolved to the address it contains.
         }
 
-        std::unique_lock<naming::gid_type::mutex_type> l(gid_.get_mutex());
+        std::unique_lock l(gid_.get_mutex());
 
         naming::gid_type gid = gid_;
         if (!naming::detail::has_credits(gid_))

@@ -131,6 +131,14 @@ struct test_server_base
         // clang-format on
     }
 
+    hpx::naming::address get_current_address() const override
+    {
+        return hpx::naming::address(
+            hpx::naming::get_gid_from_locality_id(hpx::get_locality_id()),
+            hpx::components::get_component_type<test_server_base>(),
+            const_cast<test_server_base*>(this));
+    }
+
 private:
     int base_data_;
 };
@@ -224,6 +232,14 @@ struct test_server
         ar & hpx::serialization::base_object<test_server_base>(*this);
         ar & data_;
         // clang-format on
+    }
+
+    hpx::naming::address get_current_address() const override
+    {
+        return hpx::naming::address(
+            hpx::naming::get_gid_from_locality_id(hpx::get_locality_id()),
+            hpx::components::get_component_type<test_server>(),
+            const_cast<test_server*>(this));
     }
 
 private:

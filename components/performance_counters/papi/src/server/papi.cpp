@@ -318,6 +318,14 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         base_type::finalize();
     }
 
+    naming::address papi_counter::get_current_address() const
+    {
+        return naming::address(
+            naming::get_gid_from_locality_id(hpx::get_locality_id()),
+            components::get_component_type<papi_counter>(),
+            const_cast<papi_counter*>(this));
+    }
+
 }}}}
 
 #undef HPX_PAPI_NS_STR

@@ -30,6 +30,9 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server {
+
+    elapsed_time_counter::elapsed_time_counter() = default;
+
     elapsed_time_counter::elapsed_time_counter(counter_info const& info)
       : base_type_holder(info)
     {
@@ -68,6 +71,29 @@ namespace hpx { namespace performance_counters { namespace server {
         HPX_THROW_EXCEPTION(bad_parameter,
             "elapsed_time_counter::reset_counter_value",
             "counter /runtime/uptime does no support reset");
+    }
+
+    bool elapsed_time_counter::start()
+    {
+        return false;
+    }
+    bool elapsed_time_counter::stop()
+    {
+        return false;
+    }
+
+    void elapsed_time_counter::finalize()
+    {
+        base_performance_counter::finalize();
+        base_type::finalize();
+    }
+
+    naming::address elapsed_time_counter::get_current_address() const
+    {
+        return naming::address(
+            naming::get_gid_from_locality_id(agas::get_locality_id()),
+            components::get_component_type<elapsed_time_counter>(),
+            const_cast<elapsed_time_counter*>(this));
     }
 }}}    // namespace hpx::performance_counters::server
 

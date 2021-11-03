@@ -74,8 +74,8 @@ namespace hpx { namespace lcos {
       , public ComponentTag
     {
     protected:
-        typedef typename std::conditional<std::is_void<Result>::value,
-            util::unused_type, Result>::type result_type;
+        using result_type = std::conditional_t<std::is_void_v<Result>,
+            util::unused_type, Result>;
 
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
@@ -91,8 +91,10 @@ namespace hpx { namespace lcos {
             // this shouldn't ever be called
             HPX_THROW_EXCEPTION(invalid_status,
                 "base_lco_with_value::set_event_nonvirt",
-                "attempt to use a non-default-constructible return type with "
-                "an action in a context where default-construction would be "
+                "attempt to use a non-default-constructible return type "
+                "with "
+                "an action in a context where default-construction would "
+                "be "
                 "required");
         }
 

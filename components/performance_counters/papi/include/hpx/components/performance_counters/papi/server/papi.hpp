@@ -210,6 +210,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         // currently cached value
         long long get_value() const {return value_;}
 
+        naming::address get_current_address() const;
+
     private:
         //// methods below operate on shared state and require locking in the caller
 

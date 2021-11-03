@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace server
 
         // rebind the object to this storage locality
         naming::address addr(current_lva);
-        addr.address_ = 0;       // invalidate lva
+        addr.address_ = nullptr;       // invalidate lva
         if (!agas::bind(launch::sync, gid, addr, this->gid_))
         {
             HPX_THROW_EXCEPTION(duplicate_component_address,

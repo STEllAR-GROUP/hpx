@@ -71,7 +71,7 @@ namespace hpx { namespace components {
         public:
             static component_entry& get_entry(component_type type)
             {
-                std::lock_guard<mutex_type> l(mtx());
+                std::lock_guard l(mtx());
                 auto& d = data();
 
                 auto it = d.find(type);
@@ -89,7 +89,7 @@ namespace hpx { namespace components {
                 std::vector<component_type> types;
 
                 {
-                    std::lock_guard<mutex_type> l(mtx());
+                    std::lock_guard l(mtx());
                     types.reserve(data().size());
 
                     for (auto const& e : data())
@@ -158,17 +158,27 @@ namespace hpx { namespace components {
         std::string result;
 
         if (type == component_invalid)
+        {
             result = "component_invalid";
+        }
         else if ((type < component_last) && (get_derived_type(type) == 0))
+        {
             result = components::detail::names[type];
+        }
         else if (get_derived_type(type) < component_last &&
             (get_derived_type(type) != 0))
+        {
             result = components::detail::names[get_derived_type(type)];
+        }
         else
+        {
             result = "component";
+        }
 
         if (type == get_base_type(type) || component_invalid == type)
+        {
             result += "[" + std::to_string(type) + "]";
+        }
         else
         {
             result += "[" +

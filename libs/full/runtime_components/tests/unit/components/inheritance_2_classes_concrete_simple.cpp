@@ -41,6 +41,13 @@ struct A : hpx::components::component_base<A>
         return test0();
     }
     HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action);
+
+    hpx::naming::address get_current_address() const
+    {
+        return hpx::naming::address(
+            hpx::naming::get_gid_from_locality_id(hpx::get_locality_id()),
+            hpx::components::get_component_type<A>(), const_cast<A*>(this));
+    }
 };
 
 typedef hpx::components::component<A> serverA_type;
@@ -61,7 +68,13 @@ struct B
 
     using hpx::components::component_base<B>::finalize;
     using hpx::components::component_base<B>::get_base_gid;
-    using hpx::components::component_base<B>::get_current_address;
+
+    hpx::naming::address get_current_address() const
+    {
+        return hpx::naming::address(
+            hpx::naming::get_gid_from_locality_id(hpx::get_locality_id()),
+            hpx::components::get_component_type<B>(), const_cast<B*>(this));
+    }
 
     typedef B type_holder;
     typedef A base_type_holder;

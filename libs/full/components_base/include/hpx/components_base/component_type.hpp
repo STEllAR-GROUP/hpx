@@ -127,18 +127,24 @@ namespace hpx { namespace components {
     {
         // don't compare types if one of them is unknown
         if (component_invalid == rhs || component_invalid == lhs)
+        {
             return true;    // no way of telling, so we assume the best :-P
+        }
 
         // don't compare types if one of them is component_runtime_support
         if (component_runtime_support == rhs ||
             component_runtime_support == lhs)
+        {
             return true;
+        }
 
         component_type lhs_base = get_base_type(lhs);
         component_type rhs_base = get_base_type(rhs);
 
         if (lhs_base == rhs_base)
+        {
             return true;
+        }
 
         // special case for lco's
         if (lhs_base == component_base_lco &&

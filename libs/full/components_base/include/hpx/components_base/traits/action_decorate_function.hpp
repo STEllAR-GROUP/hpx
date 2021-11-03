@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -43,10 +43,14 @@ namespace hpx { namespace traits {
     {
     };
 
+    template <typename Action>
+    inline constexpr bool has_decorates_action_v =
+        has_decorates_action<Action>::value;
+
     template <typename Action, typename Enable = void>
     struct action_decorate_function
     {
-        static constexpr bool value = has_decorates_action<Action>::value;
+        static constexpr bool value = has_decorates_action_v<Action>;
 
         template <typename F>
         static threads::thread_function_type call(
@@ -58,10 +62,14 @@ namespace hpx { namespace traits {
         }
     };
 
-    template <typename Action, typename Enable = void>
-    struct component_decorates_action : detail::has_decorates_action<Action>
+    template <typename Component, typename Enable = void>
+    struct component_decorates_action : detail::has_decorates_action<Component>
     {
     };
+
+    template <typename Component>
+    inline constexpr bool component_decorates_action_v =
+        component_decorates_action<Component>::value;
 
     template <typename Component, typename Enable = void>
     struct component_decorate_function

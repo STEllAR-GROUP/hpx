@@ -68,6 +68,7 @@ set(performance_counters_sources
     server/action_invocation_counter.cpp
     server/arithmetics_counter.cpp
     server/arithmetics_counter_extended.cpp
+    server/base_performance_counter.cpp
     server/component_instance_counter.cpp
     server/elapsed_time_counter.cpp
     server/per_action_data_counters.cpp

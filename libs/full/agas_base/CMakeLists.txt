@@ -47,6 +47,7 @@ set(agas_base_sources
     detail/bootstrap_locality_namespace.cpp
     detail/hosted_component_namespace.cpp
     detail/hosted_locality_namespace.cpp
+    gva.cpp
     locality_namespace.cpp
     primary_namespace.cpp
     server/component_namespace_server.cpp

@@ -796,7 +796,8 @@ namespace hpx { namespace agas {
                 HPX_ASSERT(rts_lva_);
 
                 addr.type_ = components::component_runtime_support;
-                addr.address_ = rts_lva_;
+                addr.address_ =
+                    reinterpret_cast<naming::address::address_type>(rts_lva_);
                 return true;
             }
 
@@ -804,7 +805,8 @@ namespace hpx { namespace agas {
             {
                 // handle (non-migratable) components located on this locality first
                 addr.type_ = naming::detail::get_component_type_from_gid(msb);
-                addr.address_ = lsb;
+                addr.address_ =
+                    reinterpret_cast<naming::address::address_type>(lsb);
                 return true;
             }
         }

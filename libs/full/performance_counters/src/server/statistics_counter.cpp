@@ -377,6 +377,15 @@ namespace hpx { namespace performance_counters { namespace server {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Statistic>
+    statistics_counter<Statistic>::statistics_counter()
+      : has_prev_value_(false)
+      , parameter1_(0)
+      , parameter2_(0)
+      , reset_base_counter_(false)
+    {
+    }
+
+    template <typename Statistic>
     statistics_counter<Statistic>::statistics_counter(counter_info const& info,
         std::string const& base_counter_name, std::size_t parameter1,
         std::size_t parameter2, bool reset_base_counter)
@@ -595,6 +604,27 @@ namespace hpx { namespace performance_counters { namespace server {
 
         // start off with last base value
         value_->add_value(static_cast<double>(prev_value_.value_));
+    }
+
+    template <typename Statistic>
+    void statistics_counter<Statistic>::on_terminate()
+    {
+    }
+
+    template <typename Statistic>
+    void statistics_counter<Statistic>::finalize()
+    {
+        base_performance_counter::finalize();
+        base_type::finalize();
+    }
+
+    template <typename Statistic>
+    naming::address statistics_counter<Statistic>::get_current_address() const
+    {
+        return naming::address(
+            naming::get_gid_from_locality_id(agas::get_locality_id()),
+            components::get_component_type<statistics_counter>(),
+            const_cast<statistics_counter*>(this));
     }
 }}}    // namespace hpx::performance_counters::server
 

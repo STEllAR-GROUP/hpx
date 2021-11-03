@@ -1049,7 +1049,7 @@ namespace hpx {
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
         components::server::runtime_support* p =
-            reinterpret_cast<components::server::runtime_support*>(
+            static_cast<components::server::runtime_support*>(
                 get_runtime_distributed().get_runtime_support_lva());
 
         if (nullptr == p)
@@ -1078,7 +1078,7 @@ namespace hpx {
         }
 
         components::server::runtime_support* p =
-            reinterpret_cast<components::server::runtime_support*>(
+            static_cast<components::server::runtime_support*>(
                 get_runtime_distributed().get_runtime_support_lva());
 
         if (nullptr == p)

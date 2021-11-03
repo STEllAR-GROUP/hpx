@@ -67,6 +67,14 @@ namespace hpx { namespace lcos { namespace server {
             components::set_component_type<channel>(type);
         }
 
+        naming::address get_current_address() const
+        {
+            return naming::address(
+                naming::get_gid_from_locality_id(agas::get_locality_id()),
+                components::get_component_type<channel>(),
+                const_cast<channel*>(this));
+        }
+
         // standard LCO action implementations
 
         // Push a value to the channel.

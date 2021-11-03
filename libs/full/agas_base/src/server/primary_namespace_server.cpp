@@ -631,7 +631,7 @@ namespace hpx { namespace agas { namespace server {
             }
 
             // Otherwise, correct
-            lower = naming::gid_type(upper.get_msb(), 0);
+            lower = naming::gid_type(upper.get_msb(), nullptr);
             upper = lower + real_count;
         }
 

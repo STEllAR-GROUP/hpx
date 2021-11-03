@@ -263,7 +263,7 @@ namespace hpx {
         /// \brief Returns a string of the locality endpoints (usable in debug output)
         std::string here() const override;
 
-        std::uint64_t get_runtime_support_lva() const;
+        naming::address_type get_runtime_support_lva() const;
 
         naming::gid_type get_next_id(std::size_t count = 1);
 

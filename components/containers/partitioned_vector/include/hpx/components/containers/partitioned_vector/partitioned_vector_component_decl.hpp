@@ -84,8 +84,11 @@ namespace hpx { namespace server {
             allocator_type const& alloc);
 
         // support components::copy
-        partitioned_vector(partitioned_vector const& rhs);
-        partitioned_vector(partitioned_vector&& rhs);
+        partitioned_vector(partitioned_vector const& rhs) = default;
+        partitioned_vector(partitioned_vector&& rhs) = default;
+
+        partitioned_vector& operator=(partitioned_vector const& rhs) = default;
+        partitioned_vector& operator=(partitioned_vector&& rhs) = default;
 
         ///////////////////////////////////////////////////////////////////////
         data_type& get_data();

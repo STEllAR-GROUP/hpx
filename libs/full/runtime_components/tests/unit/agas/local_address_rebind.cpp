@@ -50,15 +50,16 @@ int hpx_main()
         address addr = hpx::agas::resolve(a_id).get();
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_TEST_EQ(addr.address_, a.get_lva());
-        HPX_SANITY_EQ(hpx::agas::resolve(a_id).get().address_, a.get_lva());
+        HPX_TEST_EQ(addr.address_, reinterpret_cast<void*>(a.get_lva()));
+        HPX_SANITY_EQ(hpx::agas::resolve(a_id).get().address_,
+            reinterpret_cast<void*>(a.get_lva()));
 
         ///////////////////////////////////////////////////////////////////////
         // Change a's GID to point to b.
 
         // Rebind the GID.
-        std::uint64_t a_lva = addr.address_;
-        addr.address_ = b_lva;
+        void* a_lva = addr.address_;
+        addr.address_ = reinterpret_cast<void*>(b_lva);
         HPX_TEST(hpx::agas::bind_gid_local(a_gid, addr));
 
         // Update our AGAS cache.
@@ -66,7 +67,8 @@ int hpx_main()
 
         ///////////////////////////////////////////////////////////////////////
         HPX_TEST_EQ(b_lva, a.get_lva());
-        HPX_SANITY_EQ(hpx::agas::resolve(a_id).get().address_, a.get_lva());
+        HPX_SANITY_EQ(hpx::agas::resolve(a_id).get().address_,
+            reinterpret_cast<void*>(a.get_lva()));
 
         ///////////////////////////////////////////////////////////////////////
         // Now we restore the original bindings to prevent a double free.
@@ -80,7 +82,8 @@ int hpx_main()
 
         ///////////////////////////////////////////////////////////////////////
         HPX_TEST_EQ(hpx::agas::resolve(a_id).get().address_, a_lva);
-        HPX_SANITY_EQ(hpx::agas::resolve(a_id).get().address_, a.get_lva());
+        HPX_SANITY_EQ(hpx::agas::resolve(a_id).get().address_,
+            reinterpret_cast<void*>(a.get_lva()));
     }
 
     finalize();

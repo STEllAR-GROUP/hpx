@@ -32,7 +32,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server {
+
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Statistic>
+    arithmetics_counter_extended<Statistic>::arithmetics_counter_extended() =
+        default;
+
     template <typename Statistic>
     arithmetics_counter_extended<Statistic>::arithmetics_counter_extended(
         counter_info const& info,
@@ -168,6 +173,23 @@ namespace hpx { namespace performance_counters { namespace server {
     void arithmetics_counter_extended<Statistic>::reset_counter_value()
     {
         counters_.reset(hpx::launch::sync);
+    }
+
+    template <typename Statistic>
+    void arithmetics_counter_extended<Statistic>::finalize()
+    {
+        base_performance_counter::finalize();
+        base_type::finalize();
+    }
+
+    template <typename Statistic>
+    naming::address
+    arithmetics_counter_extended<Statistic>::get_current_address() const
+    {
+        return naming::address(
+            naming::get_gid_from_locality_id(agas::get_locality_id()),
+            components::get_component_type<arithmetics_counter_extended>(),
+            const_cast<arithmetics_counter_extended*>(this));
     }
 }}}    // namespace hpx::performance_counters::server
 

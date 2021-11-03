@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -20,7 +20,7 @@ namespace hpx {
         }    // namespace detail
 
         using component_type = std::int32_t;
-        using address_type = std::uint64_t;
+        using address_type = void*;
 
         inline constexpr std::uint32_t invalid_locality_id =
             ~static_cast<std::uint32_t>(0);
