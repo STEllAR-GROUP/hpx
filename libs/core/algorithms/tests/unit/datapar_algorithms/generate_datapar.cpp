@@ -21,8 +21,6 @@ void test_generate()
 {
     using namespace hpx::execution;
 
-    test_generate(IteratorTag());
-
     test_generate(simd, IteratorTag());
     test_generate(par_simd, IteratorTag());
 
@@ -41,8 +39,6 @@ template <typename IteratorTag>
 void test_generate_exception()
 {
     using namespace hpx::execution;
-
-    test_generate_exception(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
