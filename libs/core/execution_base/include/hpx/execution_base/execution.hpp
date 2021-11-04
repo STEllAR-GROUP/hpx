@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/counting_shape.hpp>
 
 #include <type_traits>
@@ -49,6 +49,12 @@ namespace hpx { namespace execution {
     struct task_policy_tag
     {
         constexpr task_policy_tag() = default;
+    };
+
+    /// \cond NOINTERNAL
+    struct non_task_policy_tag
+    {
+        constexpr non_task_policy_tag() = default;
     };
 }}    // namespace hpx::execution
 
@@ -125,7 +131,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       exec.sync_execute(f, ts...) if it exists.
     ///
     HPX_INLINE_CONSTEXPR_VARIABLE struct sync_execute_t final
-      : hpx::functional::tag_fallback<sync_execute_t>
+      : hpx::functional::detail::tag_fallback<sync_execute_t>
     {
     private:
         // clang-format off
@@ -134,7 +140,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             sync_execute_t, Executor&& exec, F&& f, Ts&&... ts)
         {
             return detail::sync_execute_fn_helper<std::decay_t<Executor>>::call(
@@ -172,7 +178,7 @@ namespace hpx { namespace parallel { namespace execution {
     /// \returns f(ts...)'s result through a future
     ///
     HPX_INLINE_CONSTEXPR_VARIABLE struct async_execute_t final
-      : hpx::functional::tag_fallback<async_execute_t>
+      : hpx::functional::detail::tag_fallback<async_execute_t>
     {
     private:
         // clang-format off
@@ -181,7 +187,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             async_execute_t, Executor&& exec, F&& f, Ts&&... ts)
         {
             return detail::async_execute_fn_helper<
@@ -211,7 +217,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       for one way executors (calls predecessor.then(bind(f, ts...))).
     ///
     HPX_INLINE_CONSTEXPR_VARIABLE struct then_execute_t final
-      : hpx::functional::tag_fallback<then_execute_t>
+      : hpx::functional::detail::tag_fallback<then_execute_t>
     {
     private:
         // clang-format off
@@ -220,7 +226,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             then_execute_t, Executor&& exec, F&& f, Future&& predecessor,
             Ts&&... ts)
         {
@@ -252,7 +258,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       (calls exec.post(f, ts...) if it exists).
     ///
     HPX_INLINE_CONSTEXPR_VARIABLE struct post_t final
-      : hpx::functional::tag_fallback<post_t>
+      : hpx::functional::detail::tag_fallback<post_t>
     {
     private:
         // clang-format off
@@ -261,7 +267,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             post_t, Executor&& exec, F&& f, Ts&&... ts)
         {
             return detail::post_fn_helper<std::decay_t<Executor>>::call(
@@ -310,7 +316,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       as often as needed.
     ///
     HPX_INLINE_CONSTEXPR_VARIABLE struct bulk_sync_execute_t final
-      : hpx::functional::tag_fallback<bulk_sync_execute_t>
+      : hpx::functional::detail::tag_fallback<bulk_sync_execute_t>
     {
     private:
         // clang-format off
@@ -320,7 +326,7 @@ namespace hpx { namespace parallel { namespace execution {
                 !std::is_integral<Shape>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_sync_execute_t, Executor&& exec, F&& f, Shape const& shape,
             Ts&&... ts)
         {
@@ -336,7 +342,7 @@ namespace hpx { namespace parallel { namespace execution {
                 std::is_integral<Shape>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_sync_execute_t, Executor&& exec, F&& f, Shape const& shape,
             Ts&&... ts)
         {
@@ -382,7 +388,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       as often as needed.
     ///
     HPX_INLINE_CONSTEXPR_VARIABLE struct bulk_async_execute_t final
-      : hpx::functional::tag_fallback<bulk_async_execute_t>
+      : hpx::functional::detail::tag_fallback<bulk_async_execute_t>
     {
     private:
         // clang-format off
@@ -392,7 +398,7 @@ namespace hpx { namespace parallel { namespace execution {
                 !std::is_integral<Shape>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_async_execute_t, Executor&& exec, F&& f, Shape const& shape,
             Ts&&... ts)
         {
@@ -408,7 +414,7 @@ namespace hpx { namespace parallel { namespace execution {
                 std::is_integral<Shape>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_async_execute_t, Executor&& exec, F&& f, Shape const& shape,
             Ts&&... ts)
         {
@@ -458,7 +464,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       is also a TwoWayExecutor) - as often as needed.
     ///
     HPX_INLINE_CONSTEXPR_VARIABLE struct bulk_then_execute_t final
-      : hpx::functional::tag_fallback<bulk_then_execute_t>
+      : hpx::functional::detail::tag_fallback<bulk_then_execute_t>
     {
     private:
         // clang-format off
@@ -469,7 +475,7 @@ namespace hpx { namespace parallel { namespace execution {
                 !std::is_integral<Shape>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_then_execute_t, Executor&& exec, F&& f, Shape const& shape,
             Future&& predecessor, Ts&&... ts)
         {
@@ -487,7 +493,7 @@ namespace hpx { namespace parallel { namespace execution {
                 std::is_integral<Shape>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_then_execute_t, Executor&& exec, F&& f, Shape const& shape,
             Future&& predecessor, Ts&&... ts)
         {

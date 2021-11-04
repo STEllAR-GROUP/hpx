@@ -18,3 +18,4 @@ packages
 .ccls-cache
 .clangd
 /out
+.vs

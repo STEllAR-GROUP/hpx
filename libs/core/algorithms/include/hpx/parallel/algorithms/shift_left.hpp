@@ -107,7 +107,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
@@ -229,7 +229,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::shift_left
     HPX_INLINE_CONSTEXPR_VARIABLE struct shift_left_t final
-      : hpx::functional::tag_fallback<shift_left_t>
+      : hpx::functional::detail::tag_fallback<shift_left_t>
     {
     private:
         // clang-format off
@@ -237,7 +237,7 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value)>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             shift_left_t, FwdIter first, FwdIter last, Size n)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -255,7 +255,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(shift_left_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(shift_left_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Size n)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,

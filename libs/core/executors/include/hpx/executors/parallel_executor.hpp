@@ -156,7 +156,7 @@ namespace hpx { namespace execution {
         }
 
         // property implementations
-        friend constexpr parallel_policy_executor tag_dispatch(
+        friend constexpr parallel_policy_executor tag_invoke(
             hpx::execution::experimental::with_hint_t,
             parallel_policy_executor const& exec,
             hpx::threads::thread_schedule_hint hint)
@@ -166,14 +166,14 @@ namespace hpx { namespace execution {
             return exec_with_hint;
         }
 
-        friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+        friend constexpr hpx::threads::thread_schedule_hint tag_invoke(
             hpx::execution::experimental::get_hint_t,
             parallel_policy_executor const& exec) noexcept
         {
             return exec.policy_.hint();
         }
 
-        friend constexpr parallel_policy_executor tag_dispatch(
+        friend constexpr parallel_policy_executor tag_invoke(
             hpx::execution::experimental::with_priority_t,
             parallel_policy_executor const& exec,
             hpx::threads::thread_priority priority)
@@ -183,14 +183,14 @@ namespace hpx { namespace execution {
             return exec_with_priority;
         }
 
-        friend constexpr hpx::threads::thread_priority tag_dispatch(
+        friend constexpr hpx::threads::thread_priority tag_invoke(
             hpx::execution::experimental::get_priority_t,
             parallel_policy_executor const& exec) noexcept
         {
             return exec.policy_.priority();
         }
 
-        friend constexpr parallel_policy_executor tag_dispatch(
+        friend constexpr parallel_policy_executor tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             parallel_policy_executor const& exec, char const* annotation)
         {
@@ -199,7 +199,7 @@ namespace hpx { namespace execution {
             return exec_with_annotation;
         }
 
-        friend parallel_policy_executor tag_dispatch(
+        friend parallel_policy_executor tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             parallel_policy_executor const& exec, std::string annotation)
         {
@@ -209,7 +209,7 @@ namespace hpx { namespace execution {
             return exec_with_annotation;
         }
 
-        friend constexpr char const* tag_dispatch(
+        friend constexpr char const* tag_invoke(
             hpx::execution::experimental::get_annotation_t,
             parallel_policy_executor const& exec) noexcept
         {

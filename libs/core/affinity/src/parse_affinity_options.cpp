@@ -952,6 +952,7 @@ namespace hpx { namespace threads { namespace detail {
         std::size_t max_cores, std::vector<std::size_t>& num_pus,
         bool use_process_mask, error_code& ec)
     {
+        HPX_UNUSED(max_cores);
         std::size_t num_threads = affinities.size();
 
         check_num_threads(use_process_mask, t, num_threads, ec);
@@ -959,7 +960,6 @@ namespace hpx { namespace threads { namespace detail {
         if (use_process_mask)
         {
             used_cores = 0;
-            max_cores = t.get_number_of_cores();
         }
 
         num_pus.resize(num_threads);
@@ -970,11 +970,9 @@ namespace hpx { namespace threads { namespace detail {
         std::vector<std::size_t> num_cores_numa(num_numas, 0);
         std::vector<std::size_t> num_pus_numa(num_numas, 0);
         std::vector<std::size_t> num_threads_numa(num_numas, 0);
-        std::size_t cores_t = 0;
         for (std::size_t n = 0; n < num_numas; ++n)
         {
             num_cores_numa[n] = t.get_number_of_numa_node_cores(n);
-            cores_t += num_cores_numa[n];
         }
 
         std::size_t core_offset = 0;

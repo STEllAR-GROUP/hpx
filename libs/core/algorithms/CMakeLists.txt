@@ -17,6 +17,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/copy.hpp
     hpx/parallel/algorithms/count.hpp
     hpx/parallel/algorithms/destroy.hpp
+    hpx/parallel/algorithms/detail/adjacent_difference.hpp
     hpx/parallel/algorithms/detail/accumulate.hpp
     hpx/parallel/algorithms/detail/advance_and_get_distance.hpp
     hpx/parallel/algorithms/detail/advance_to_sentinel.hpp
@@ -29,6 +30,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/insertion_sort.hpp
     hpx/parallel/algorithms/detail/is_sorted.hpp
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
+    hpx/parallel/algorithms/detail/pivot.hpp
     hpx/parallel/algorithms/detail/rotate.hpp
     hpx/parallel/algorithms/detail/sample_sort.hpp
     hpx/parallel/algorithms/detail/search.hpp
@@ -36,6 +38,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/spin_sort.hpp
     hpx/parallel/algorithms/detail/transfer.hpp
     hpx/parallel/algorithms/detail/upper_lower_bound.hpp
+    hpx/parallel/algorithms/ends_with.hpp
     hpx/parallel/algorithms/equal.hpp
     hpx/parallel/algorithms/exclusive_scan.hpp
     hpx/parallel/algorithms/fill.hpp
@@ -56,6 +59,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/minmax.hpp
     hpx/parallel/algorithms/mismatch.hpp
     hpx/parallel/algorithms/move.hpp
+    hpx/parallel/algorithms/nth_element.hpp
     hpx/parallel/algorithms/partial_sort.hpp
     hpx/parallel/algorithms/partition.hpp
     hpx/parallel/algorithms/reduce_by_key.hpp
@@ -73,6 +77,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/shift_left.hpp
     hpx/parallel/algorithms/shift_right.hpp
     hpx/parallel/algorithms/stable_sort.hpp
+    hpx/parallel/algorithms/starts_with.hpp
     hpx/parallel/algorithms/sort_by_key.hpp
     hpx/parallel/algorithms/sort.hpp
     hpx/parallel/algorithms/swap_ranges.hpp
@@ -92,6 +97,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/copy.hpp
     hpx/parallel/container_algorithms/count.hpp
     hpx/parallel/container_algorithms/destroy.hpp
+    hpx/parallel/container_algorithms/ends_with.hpp
     hpx/parallel/container_algorithms/equal.hpp
     hpx/parallel/container_algorithms/exclusive_scan.hpp
     hpx/parallel/container_algorithms/fill.hpp
@@ -111,6 +117,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/minmax.hpp
     hpx/parallel/container_algorithms/mismatch.hpp
     hpx/parallel/container_algorithms/move.hpp
+    hpx/parallel/container_algorithms/nth_element.hpp
     hpx/parallel/container_algorithms/partition.hpp
     hpx/parallel/container_algorithms/reduce.hpp
     hpx/parallel/container_algorithms/remove_copy.hpp
@@ -127,6 +134,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/shift_right.hpp
     hpx/parallel/container_algorithms/sort.hpp
     hpx/parallel/container_algorithms/stable_sort.hpp
+    hpx/parallel/container_algorithms/starts_with.hpp
     hpx/parallel/container_algorithms/swap_ranges.hpp
     hpx/parallel/container_algorithms/transform.hpp
     hpx/parallel/container_algorithms/transform_exclusive_scan.hpp
@@ -143,6 +151,7 @@ set(algorithms_headers
     hpx/parallel/datapar.hpp
     hpx/parallel/datapar/fill.hpp
     hpx/parallel/datapar/generate.hpp
+    hpx/parallel/datapar/adjacent_difference.hpp
     hpx/parallel/datapar/iterator_helpers.hpp
     hpx/parallel/datapar/loop.hpp
     hpx/parallel/datapar/transfer.hpp

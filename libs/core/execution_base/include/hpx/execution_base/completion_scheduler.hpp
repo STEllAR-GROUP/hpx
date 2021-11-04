@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 
 #include <type_traits>
 
@@ -24,7 +24,7 @@ namespace hpx::execution::experimental {
         get_completion_scheduler{};
 
     namespace detail {
-        template <bool TagDispatchable, typename CPO, typename Sender>
+        template <bool TagInvocable, typename CPO, typename Sender>
         struct has_completion_scheduler_impl : std::false_type
         {
         };
@@ -32,17 +32,16 @@ namespace hpx::execution::experimental {
         template <typename CPO, typename Sender>
         struct has_completion_scheduler_impl<true, CPO, Sender>
           : hpx::execution::experimental::is_scheduler<hpx::functional::
-                    tag_dispatch_result_t<get_completion_scheduler_t<CPO>,
+                    tag_invoke_result_t<get_completion_scheduler_t<CPO>,
                         std::decay_t<Sender> const&>>
         {
         };
 
         template <typename CPO, typename Sender>
         struct has_completion_scheduler
-          : has_completion_scheduler_impl<
-                hpx::functional::is_tag_dispatchable_v<
-                    get_completion_scheduler_t<CPO>,
-                    std::decay_t<Sender> const&>,
+          : has_completion_scheduler_impl<hpx::functional::is_tag_invocable_v<
+                                              get_completion_scheduler_t<CPO>,
+                                              std::decay_t<Sender> const&>,
                 CPO, Sender>
         {
         };
@@ -53,17 +52,17 @@ namespace hpx::execution::experimental {
 
         template <bool HasCompletionScheduler, typename ReceiverCPO,
             typename Sender, typename AlgorithmCPO, typename... Ts>
-        struct is_completion_scheduler_tag_dispatchable_impl : std::false_type
+        struct is_completion_scheduler_tag_invocable_impl : std::false_type
         {
         };
 
         template <typename ReceiverCPO, typename Sender, typename AlgorithmCPO,
             typename... Ts>
-        struct is_completion_scheduler_tag_dispatchable_impl<true, ReceiverCPO,
+        struct is_completion_scheduler_tag_invocable_impl<true, ReceiverCPO,
             Sender, AlgorithmCPO, Ts...>
           : std::integral_constant<bool,
-                hpx::functional::is_tag_dispatchable_v<AlgorithmCPO,
-                    hpx::functional::tag_dispatch_result_t<
+                hpx::functional::is_tag_invocable_v<AlgorithmCPO,
+                    hpx::functional::tag_invoke_result_t<
                         hpx::execution::experimental::
                             get_completion_scheduler_t<ReceiverCPO>,
                         Sender>,
@@ -73,8 +72,8 @@ namespace hpx::execution::experimental {
 
         template <typename ReceiverCPO, typename Sender, typename AlgorithmCPO,
             typename... Ts>
-        struct is_completion_scheduler_tag_dispatchable
-          : is_completion_scheduler_tag_dispatchable_impl<
+        struct is_completion_scheduler_tag_invocable
+          : is_completion_scheduler_tag_invocable_impl<
                 hpx::execution::experimental::detail::
                     has_completion_scheduler_v<ReceiverCPO, Sender>,
                 ReceiverCPO, Sender, AlgorithmCPO, Ts...>
@@ -84,8 +83,8 @@ namespace hpx::execution::experimental {
         template <typename ReceiverCPO, typename Sender, typename AlgorithmCPO,
             typename... Ts>
         HPX_INLINE_CONSTEXPR_VARIABLE bool
-            is_completion_scheduler_tag_dispatchable_v =
-                is_completion_scheduler_tag_dispatchable<ReceiverCPO, Sender,
+            is_completion_scheduler_tag_invocable_v =
+                is_completion_scheduler_tag_invocable<ReceiverCPO, Sender,
                     AlgorithmCPO, Ts...>::value;
 
     }    // namespace detail

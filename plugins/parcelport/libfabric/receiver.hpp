@@ -15,7 +15,7 @@
 //
 #include <hpx/thread_support/atomic_count.hpp>
 //
-#include <boost/container/small_vector.hpp>
+#include <hpx/datastructures/detail/small_vector.hpp>
 //
 #include <cstdint>
 
@@ -37,7 +37,7 @@ namespace libfabric
     {
         typedef libfabric_region_provider                      region_provider;
         typedef rma_memory_region<region_provider>             region_type;
-        typedef boost::container::small_vector<region_type*,8> zero_copy_vector;
+        typedef hpx::detail::small_vector<region_type*, 8>     zero_copy_vector;
 
         // --------------------------------------------------------------------
         // construct receive object

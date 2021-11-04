@@ -1762,9 +1762,9 @@ ignore the option. For instance, the following PBS script passes the option
    Alternatively, use the option :option:`--hpx:endnodes` to explicitly
    mark the end of the list of node names:
 
-   .. code-block:: bash
+   .. code-block:: shell-session
 
-      pbsdsh -u $APP_PATH --hpx:1:pu-offset=4 --hpx:nodes=`cat $PBS_NODEFILE` --hpx:endnodes $APP_OPTIONS
+      $ pbsdsh -u $APP_PATH --hpx:1:pu-offset=4 --hpx:nodes=`cat $PBS_NODEFILE` --hpx:endnodes $APP_OPTIONS
 
 .. _details:
 
@@ -1852,9 +1852,9 @@ has more than 1 processing unit (hardware threads). Running
 each of those threads is bound to the first processing unit of each of the
 cores, can be achieved by invoking:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed -t4 --hpx:bind=thread:0-3=core:0-3.pu:0
+   $ hello_world_distributed -t4 --hpx:bind=thread:0-3=core:0-3.pu:0
 
 Here ``thread:0-3`` specifies the OS threads for which to define affinity
 bindings, and ``core:0-3.pu:`` defines that for each of the cores (``core:0-3``)
@@ -1867,9 +1867,9 @@ only their first processing unit ``pu:0`` should be used.
    :option:`--hpx:bind`. For instance, on a system with hyperthreading enabled
    (i.e. 2 processing units per core), the command line:
 
-   .. code-block:: bash
+   .. code-block:: shell-session
 
-      hello_world_distributed -t4 --hpx:bind=thread:0-3=core:0-3.pu:0 --hpx:print-bind
+      $ hello_world_distributed -t4 --hpx:bind=thread:0-3=core:0-3.pu:0 --hpx:print-bind
 
    will cause this output to be printed:
 

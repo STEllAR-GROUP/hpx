@@ -20,7 +20,7 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 
-#include <boost/container/small_vector.hpp>
+#include <hpx/datastructures/detail/small_vector.hpp>
 #include <memory>
 
 // include for iovec
@@ -47,7 +47,7 @@ namespace libfabric
         typedef parcel_buffer<snd_data_type, serialization::serialization_chunk>
             snd_buffer_type;
 
-        typedef boost::container::small_vector<region_type*,8> zero_copy_vector;
+        typedef hpx::detail::small_vector<region_type*, 8> zero_copy_vector;
 
         // --------------------------------------------------------------------
         sender(parcelport* pp, fid_ep* endpoint, fid_domain* domain,

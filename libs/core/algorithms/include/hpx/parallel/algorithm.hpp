@@ -33,6 +33,7 @@
 #include <hpx/parallel/algorithms/minmax.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/algorithms/move.hpp>
+#include <hpx/parallel/algorithms/nth_element.hpp>
 #include <hpx/parallel/algorithms/partial_sort.hpp>
 #include <hpx/parallel/algorithms/partition.hpp>
 #include <hpx/parallel/algorithms/remove.hpp>
@@ -51,6 +52,8 @@
 #include <hpx/parallel/algorithms/unique.hpp>
 
 // Parallelism TS V2
+#include <hpx/parallel/algorithms/ends_with.hpp>
 #include <hpx/parallel/algorithms/for_loop.hpp>
 #include <hpx/parallel/algorithms/shift_left.hpp>
 #include <hpx/parallel/algorithms/shift_right.hpp>
+#include <hpx/parallel/algorithms/starts_with.hpp>

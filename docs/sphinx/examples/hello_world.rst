@@ -9,9 +9,9 @@
 
 .. _examples_hello_world:
 
-==========================================
-Remote execution with actions: Hello world
-==========================================
+=============================
+Remote execution with actions
+=============================
 
 This program will print out a hello world message on every OS-thread on every
 :term:`locality`. The output will look something like this:
@@ -34,15 +34,15 @@ To compile this program, go to your |hpx| build directory (see
 :ref:`hpx_build_system` for information on configuring and building |hpx|) and
 enter:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   make examples.quickstart.hello_world_distributed
+   $ make examples.quickstart.hello_world_distributed
 
 To run the program type:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ./bin/hello_world_distributed
+   $ ./bin/hello_world_distributed
 
 This should print:
 
@@ -53,9 +53,9 @@ This should print:
 To use more OS-threads use the command line option :option:`--hpx:threads` and
 type the number of threads that you wish to use. For example, typing:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ./bin/hello_world_distributed --hpx:threads 2
+   $ ./bin/hello_world_distributed --hpx:threads 2
 
 will yield:
 

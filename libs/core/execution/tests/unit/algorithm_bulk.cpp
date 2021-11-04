@@ -21,7 +21,7 @@ namespace ex = hpx::execution::experimental;
 
 struct custom_bulk_operation
 {
-    std::atomic<bool>& tag_dispatch_overload_called;
+    std::atomic<bool>& tag_invoke_overload_called;
     std::atomic<bool>& call_operator_called;
     std::atomic<int>& call_operator_count;
     bool throws;
@@ -40,9 +40,9 @@ struct custom_bulk_operation
 };
 
 template <typename S>
-auto tag_dispatch(ex::bulk_t, S&& s, int num, custom_bulk_operation t)
+auto tag_invoke(ex::bulk_t, S&& s, int num, custom_bulk_operation t)
 {
-    t.tag_dispatch_overload_called = true;
+    t.tag_invoke_overload_called = true;
     return ex::bulk(
         std::forward<S>(s), num, [t = std::move(t)](int n) { t(n); });
 }
@@ -147,14 +147,14 @@ int main()
         HPX_TEST_EQ(set_value_count, 40);
     }
 
-    // tag_dispatch overload
+    // tag_invoke overload
     {
         std::atomic<bool> receiver_set_value_called{false};
-        std::atomic<bool> tag_dispatch_overload_called{false};
+        std::atomic<bool> tag_invoke_overload_called{false};
         std::atomic<bool> custom_bulk_call_operator_called{false};
         std::atomic<int> custom_bulk_call_count{0};
         auto s = ex::bulk(ex::just(), 10,
-            custom_bulk_operation{tag_dispatch_overload_called,
+            custom_bulk_operation{tag_invoke_overload_called,
                 custom_bulk_call_operator_called, custom_bulk_call_count,
                 false});
         auto f = [] {};
@@ -162,7 +162,7 @@ int main()
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(receiver_set_value_called);
-        HPX_TEST(tag_dispatch_overload_called);
+        HPX_TEST(tag_invoke_overload_called);
         HPX_TEST(custom_bulk_call_operator_called);
         HPX_TEST_EQ(custom_bulk_call_count, 10);
     }
@@ -213,11 +213,11 @@ int main()
 
     {
         std::atomic<bool> receiver_set_error_called{false};
-        std::atomic<bool> tag_dispatch_overload_called{false};
+        std::atomic<bool> tag_invoke_overload_called{false};
         std::atomic<bool> custom_bulk_call_operator_called{false};
         std::atomic<int> custom_bulk_call_count{0};
         auto s = ex::bulk(ex::just(), 10,
-            custom_bulk_operation{tag_dispatch_overload_called,
+            custom_bulk_operation{tag_invoke_overload_called,
                 custom_bulk_call_operator_called, custom_bulk_call_count,
                 true});
         auto r = error_callback_receiver<decltype(check_exception_ptr)>{
@@ -225,7 +225,7 @@ int main()
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(receiver_set_error_called);
-        HPX_TEST(tag_dispatch_overload_called);
+        HPX_TEST(tag_invoke_overload_called);
         HPX_TEST(custom_bulk_call_operator_called);
         HPX_TEST_EQ(custom_bulk_call_count, 3);
     }

@@ -92,7 +92,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
     auto const num_threads = hpx::get_num_worker_threads();
     hpx::error_code ec;
 
-    hpx::util::perf_test_report(
+    hpx::util::perftests_report(
         "future overhead - create_thread_hierarchical - latch", "no-executor",
         repetitions, [&]() -> void {
             hpx::lcos::local::latch l(count);
@@ -136,6 +136,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
             }
             l.wait();
         });
+    hpx::util::perftests_print_times();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

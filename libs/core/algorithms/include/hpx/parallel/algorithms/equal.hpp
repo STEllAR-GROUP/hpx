@@ -203,10 +203,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \cond NOINTERNAL
 
         // Our own version of the C++14 equal (_binary).
-        template <typename InIter1, typename InIter2, typename F,
-            typename Proj1, typename Proj2>
-        bool sequential_equal_binary(InIter1 first1, InIter1 last1,
-            InIter2 first2, InIter2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
+        template <typename InIter1, typename Sent1, typename InIter2,
+            typename Sent2, typename F, typename Proj1, typename Proj2>
+        bool sequential_equal_binary(InIter1 first1, Sent1 last1,
+            InIter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
         {
             for (/* */; first1 != last1 && first2 != last2;
                  (void) ++first1, ++first2)
@@ -477,7 +477,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(equal_t, ExPolicy&& policy, FwdIter1 first1,
+        tag_fallback_invoke(equal_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -502,7 +502,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(equal_t, ExPolicy&& policy, FwdIter1 first1,
+        tag_fallback_invoke(equal_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -532,7 +532,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(equal_t, ExPolicy&& policy, FwdIter1 first1,
+        tag_fallback_invoke(equal_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, Pred&& op)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -555,7 +555,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(equal_t, ExPolicy&& policy, FwdIter1 first1,
+        tag_fallback_invoke(equal_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -579,7 +579,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(equal_t, FwdIter1 first1,
+        friend bool tag_fallback_invoke(equal_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -601,7 +601,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(equal_t, FwdIter1 first1,
+        friend bool tag_fallback_invoke(equal_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -627,7 +627,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(equal_t, FwdIter1 first1,
+        friend bool tag_fallback_invoke(equal_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, Pred&& op)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -646,7 +646,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(
+        friend bool tag_fallback_invoke(
             equal_t, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),

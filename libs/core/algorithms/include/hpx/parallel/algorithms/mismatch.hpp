@@ -523,7 +523,7 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             std::pair<FwdIter1, FwdIter2>>
-        tag_fallback_dispatch(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
+        tag_fallback_invoke(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
@@ -550,7 +550,7 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             std::pair<FwdIter1, FwdIter2>>
-        tag_fallback_dispatch(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
+        tag_fallback_invoke(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
@@ -582,7 +582,7 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             std::pair<FwdIter1, FwdIter2>>
-        tag_fallback_dispatch(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
+        tag_fallback_invoke(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, Pred&& op)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
@@ -606,7 +606,7 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             std::pair<FwdIter1, FwdIter2>>
-        tag_fallback_dispatch(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
+        tag_fallback_invoke(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
@@ -632,7 +632,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend std::pair<FwdIter1, FwdIter2> tag_fallback_dispatch(mismatch_t,
+        friend std::pair<FwdIter1, FwdIter2> tag_fallback_invoke(mismatch_t,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             Pred&& op)
         {
@@ -657,7 +657,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend std::pair<FwdIter1, FwdIter2> tag_fallback_dispatch(mismatch_t,
+        friend std::pair<FwdIter1, FwdIter2> tag_fallback_invoke(mismatch_t,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
@@ -686,7 +686,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend std::pair<FwdIter1, FwdIter2> tag_fallback_dispatch(mismatch_t,
+        friend std::pair<FwdIter1, FwdIter2> tag_fallback_invoke(mismatch_t,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, Pred&& op)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
@@ -707,7 +707,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend std::pair<FwdIter1, FwdIter2> tag_fallback_dispatch(
+        friend std::pair<FwdIter1, FwdIter2> tag_fallback_invoke(
             mismatch_t, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),

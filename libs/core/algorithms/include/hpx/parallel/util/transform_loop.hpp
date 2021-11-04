@@ -46,14 +46,14 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     struct transform_loop_t final
-      : hpx::functional::tag_fallback<transform_loop_t>
+      : hpx::functional::detail::tag_fallback<transform_loop_t>
     {
     private:
         template <typename ExPolicy, typename IterB, typename IterE,
             typename OutIter, typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
-            tag_fallback_dispatch(hpx::parallel::util::transform_loop_t,
+            tag_fallback_invoke(hpx::parallel::util::transform_loop_t,
                 ExPolicy&&, IterB it, IterE end, OutIter dest, F&& f)
         {
             return detail::transform_loop<IterB>::call(
@@ -102,14 +102,14 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     struct transform_loop_ind_t final
-      : hpx::functional::tag_fallback<transform_loop_ind_t>
+      : hpx::functional::detail::tag_fallback<transform_loop_ind_t>
     {
     private:
         template <typename ExPolicy, typename IterB, typename IterE,
             typename OutIter, typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
-            tag_fallback_dispatch(hpx::parallel::util::transform_loop_ind_t,
+            tag_fallback_invoke(hpx::parallel::util::transform_loop_ind_t,
                 ExPolicy&&, IterB it, IterE end, OutIter dest, F&& f)
         {
             return detail::transform_loop_ind<IterB>::call(
@@ -176,14 +176,14 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy>
     struct transform_binary_loop_t final
-      : hpx::functional::tag_fallback<transform_binary_loop_t<ExPolicy>>
+      : hpx::functional::detail::tag_fallback<transform_binary_loop_t<ExPolicy>>
     {
     private:
         template <typename InIter1B, typename InIter1E, typename InIter2,
             typename OutIter, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<
             InIter1B, InIter2, OutIter>
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::parallel::util::transform_binary_loop_t<ExPolicy>,
             InIter1B first1, InIter1E last1, InIter2 first2, OutIter dest,
             F&& f)
@@ -196,7 +196,7 @@ namespace hpx { namespace parallel { namespace util {
             typename InIter2E, typename OutIter, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<
             InIter1B, InIter2B, OutIter>
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::parallel::util::transform_binary_loop_t<ExPolicy>,
             InIter1B first1, InIter1E last1, InIter2B first2, InIter2E last2,
             OutIter dest, F&& f)
@@ -277,14 +277,15 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy>
     struct transform_binary_loop_ind_t final
-      : hpx::functional::tag_fallback<transform_binary_loop_ind_t<ExPolicy>>
+      : hpx::functional::detail::tag_fallback<
+            transform_binary_loop_ind_t<ExPolicy>>
     {
     private:
         template <typename InIter1B, typename InIter1E, typename InIter2,
             typename OutIter, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<
             InIter1B, InIter2, OutIter>
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::parallel::util::transform_binary_loop_ind_t<ExPolicy>,
             InIter1B first1, InIter1E last1, InIter2 first2, OutIter dest,
             F&& f)
@@ -297,7 +298,7 @@ namespace hpx { namespace parallel { namespace util {
             typename InIter2E, typename OutIter, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<
             InIter1B, InIter2B, OutIter>
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::parallel::util::transform_binary_loop_ind_t<ExPolicy>,
             InIter1B first1, InIter1E last1, InIter2B first2, InIter2E last2,
             OutIter dest, F&& f)
@@ -408,13 +409,13 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy>
     struct transform_loop_n_t final
-      : hpx::functional::tag_fallback<transform_loop_n_t<ExPolicy>>
+      : hpx::functional::detail::tag_fallback<transform_loop_n_t<ExPolicy>>
     {
     private:
         template <typename Iter, typename OutIter, typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
-            tag_fallback_dispatch(
+            tag_fallback_invoke(
                 hpx::parallel::util::transform_loop_n_t<ExPolicy>, Iter it,
                 std::size_t count, OutIter dest, F&& f)
         {
@@ -512,13 +513,13 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy>
     struct transform_loop_n_ind_t final
-      : hpx::functional::tag_fallback<transform_loop_n_ind_t<ExPolicy>>
+      : hpx::functional::detail::tag_fallback<transform_loop_n_ind_t<ExPolicy>>
     {
     private:
         template <typename Iter, typename OutIter, typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
-            tag_fallback_dispatch(
+            tag_fallback_invoke(
                 hpx::parallel::util::transform_loop_n_ind_t<ExPolicy>, Iter it,
                 std::size_t count, OutIter dest, F&& f)
         {
@@ -579,14 +580,15 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy>
     struct transform_binary_loop_n_t final
-      : hpx::functional::tag_fallback<transform_binary_loop_n_t<ExPolicy>>
+      : hpx::functional::detail::tag_fallback<
+            transform_binary_loop_n_t<ExPolicy>>
     {
     private:
         template <typename InIter1, typename InIter2, typename OutIter,
             typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr hpx::tuple<InIter1, InIter2, OutIter>
-            tag_fallback_dispatch(
+            tag_fallback_invoke(
                 hpx::parallel::util::transform_binary_loop_n_t<ExPolicy>,
                 InIter1 first1, std::size_t count, InIter2 first2, OutIter dest,
                 F&& f)
@@ -649,14 +651,15 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy>
     struct transform_binary_loop_ind_n_t final
-      : hpx::functional::tag_fallback<transform_binary_loop_ind_n_t<ExPolicy>>
+      : hpx::functional::detail::tag_fallback<
+            transform_binary_loop_ind_n_t<ExPolicy>>
     {
     private:
         template <typename InIter1, typename InIter2, typename OutIter,
             typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr hpx::tuple<InIter1, InIter2, OutIter>
-            tag_fallback_dispatch(
+            tag_fallback_invoke(
                 hpx::parallel::util::transform_binary_loop_ind_n_t<ExPolicy>,
                 InIter1 first1, std::size_t count, InIter2 first2, OutIter dest,
                 F&& f)

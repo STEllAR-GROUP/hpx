@@ -13,6 +13,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
 
 #include <climits>
 #include <cstddef>
@@ -125,6 +126,28 @@ namespace hpx { namespace lcos { namespace local {
             HPX_ASSERT(expected >= 0 && expected <= (max)());
         }
 
+    private:
+        HPX_NODISCARD
+        arrival_token arrive_locked(
+            std::unique_lock<mutex_type>& l, std::ptrdiff_t update = 1)
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+            HPX_ASSERT(arrived_ >= update);
+
+            bool const old_phase = phase_;
+            std::ptrdiff_t const result = (arrived_ -= update);
+            std::ptrdiff_t const new_expected = expected_;
+            if (result == 0)
+            {
+                completion_();
+                arrived_ = new_expected;
+                phase_ = !old_phase;
+                cond_.notify_all(std::move(l));
+            }
+            return old_phase;
+        }
+
+    public:
         // Preconditions:  update > 0 is true, and update is less than or equal
         //                 to the expected count for the current barrier phase.
         // Effects:        Constructs an object of type arrival_token that is
@@ -145,20 +168,7 @@ namespace hpx { namespace lcos { namespace local {
         arrival_token arrive(std::ptrdiff_t update = 1)
         {
             std::unique_lock<mutex_type> l(mtx_);
-
-            HPX_ASSERT(arrived_ >= update);
-
-            bool const old_phase = phase_;
-            std::ptrdiff_t const result = (arrived_ -= update);
-            std::ptrdiff_t const new_expected = expected_;
-            if (result == 0)
-            {
-                completion_();
-                arrived_ = new_expected;
-                phase_ = !old_phase;
-                cond_.notify_all(std::move(l));
-            }
-            return old_phase;
+            return arrive_locked(l, update);
         }
 
         // Preconditions:  arrival is associated with the phase synchronization
@@ -209,7 +219,7 @@ namespace hpx { namespace lcos { namespace local {
             std::unique_lock<mutex_type> l(mtx_);
             HPX_ASSERT(expected_ > 0);
             --expected_;
-            (void) arrive(1);
+            HPX_UNUSED(arrive_locked(l, 1));
         }
 
     private:

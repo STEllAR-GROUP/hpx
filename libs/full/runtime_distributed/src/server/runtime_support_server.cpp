@@ -1132,10 +1132,6 @@ namespace hpx { namespace components { namespace server {
         {
             // initialize the factory instance using the preferences from the
             // ini files
-            util::section const* glob_ini = nullptr;
-            if (ini.has_section("settings"))
-                glob_ini = ini.get_section("settings");
-
             util::section const* component_ini = nullptr;
             std::string component_section("hpx.components." + instance);
             if (ini.has_section(component_section))
@@ -1645,10 +1641,6 @@ namespace hpx { namespace components { namespace server {
         {
             // initialize the factory instance using the preferences from the
             // ini files
-            util::section const* glob_ini = nullptr;
-            if (ini.has_section("settings"))
-                glob_ini = ini.get_section("settings");
-
             util::section const* component_ini = nullptr;
             std::string component_section("hpx.components." + instance);
             if (ini.has_section(component_section))

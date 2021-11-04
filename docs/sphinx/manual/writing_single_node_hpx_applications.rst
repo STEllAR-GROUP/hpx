@@ -618,6 +618,10 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
+   * * :cpp:func:`hpx::nth_element`
+       * Partially sorts the given range making sure that it is partitioned by the given element
+       * ``<hpx/algorithm.hpp>``
+       * :cppreference-algorithm:`nth_element`
    * * :cpp:func:`hpx::is_partitioned`
      * Returns ``true`` if each true element for a predicate precedes the false elements in a range.
      * ``<hpx/algorithm.hpp>``

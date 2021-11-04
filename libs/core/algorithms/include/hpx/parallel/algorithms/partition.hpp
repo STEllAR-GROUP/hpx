@@ -471,8 +471,8 @@ namespace hpx {
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/tagspec.hpp>
@@ -1547,8 +1547,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return result::get(
                         hpx::make_tuple(first, dest_true, dest_false));
 
-                auto last_iter = detail::advance_to_sentinel(first, last);
-                difference_type count = std::distance(first, last_iter);
+                auto last_iter = first;
+                difference_type count =
+                    detail::advance_and_get_distance(last_iter, last);
 
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);
@@ -1712,7 +1713,7 @@ namespace hpx {
                     parallel::traits::projected<Proj, BidirIter>>
         )>
         // clang-format on
-        friend BidirIter tag_fallback_dispatch(hpx::stable_partition_t,
+        friend BidirIter tag_fallback_invoke(hpx::stable_partition_t,
             BidirIter first, BidirIter last, F&& f, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
@@ -1736,7 +1737,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result_t<ExPolicy,
             BidirIter>
-        tag_fallback_dispatch(hpx::stable_partition_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::stable_partition_t, ExPolicy&& policy,
             BidirIter first, BidirIter last, F&& f, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
@@ -1768,7 +1769,7 @@ namespace hpx {
                     Pred, parallel::traits::projected<Proj, FwdIter>>
         )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(hpx::partition_t, FwdIter first,
+        friend FwdIter tag_fallback_invoke(hpx::partition_t, FwdIter first,
             FwdIter last, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
@@ -1792,8 +1793,8 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result_t<ExPolicy,
             FwdIter>
-        tag_fallback_dispatch(hpx::partition_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, Pred&& pred, Proj&& proj = Proj())
+        tag_fallback_invoke(hpx::partition_t, ExPolicy&& policy, FwdIter first,
+            FwdIter last, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
@@ -1826,7 +1827,7 @@ namespace hpx {
         friend hpx::util::tagged_tuple<parallel::v1::tag::in(FwdIter1),
             parallel::v1::tag::out1(FwdIter2),
             parallel::v1::tag::out2(FwdIter3)>
-        tag_fallback_dispatch(hpx::partition_copy_t, FwdIter1 first,
+        tag_fallback_invoke(hpx::partition_copy_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
             Proj&& proj = Proj())
         {
@@ -1864,7 +1865,7 @@ namespace hpx {
             hpx::util::tagged_tuple<parallel::v1::tag::in(FwdIter1),
                 parallel::v1::tag::out1(FwdIter2),
                 parallel::v1::tag::out2(FwdIter3)>>
-        tag_fallback_dispatch(hpx::partition_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::partition_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest_true,
             FwdIter3 dest_false, Pred&& pred, Proj&& proj = Proj())
         {

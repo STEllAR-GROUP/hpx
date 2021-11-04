@@ -8,14 +8,13 @@
 
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/synchronization/mutex.hpp>
-
-#include <boost/container/small_vector.hpp>
 
 #include <exception>
 #include <memory>
@@ -39,7 +38,7 @@ namespace hpx { namespace experimental {
             hpx::util::optional<T> value;
             shared_state_ptr_type next_state;
             hpx::lcos::local::mutex mtx;
-            boost::container::small_vector<
+            hpx::detail::small_vector<
                 hpx::util::unique_function_nonser<void(shared_state_ptr_type)>,
                 1>
                 continuations;
@@ -108,7 +107,7 @@ namespace hpx { namespace experimental {
                 std::shared_ptr<async_rw_mutex_shared_state>;
             shared_state_ptr_type next_state;
             hpx::lcos::local::mutex mtx;
-            boost::container::small_vector<
+            hpx::detail::small_vector<
                 hpx::util::unique_function_nonser<void(shared_state_ptr_type)>,
                 1>
                 continuations;
@@ -457,7 +456,7 @@ namespace hpx { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                friend void tag_dispatch(hpx::execution::experimental::start_t,
+                friend void tag_invoke(hpx::execution::experimental::start_t,
                     operation_state& os) noexcept
                 {
                     HPX_ASSERT_MSG(os.state,
@@ -500,7 +499,7 @@ namespace hpx { namespace experimental {
             };
 
             template <typename R>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 hpx::execution::experimental::connect_t, sender&& s, R&& r)
             {
                 return operation_state<R>{std::forward<R>(r),
@@ -651,7 +650,7 @@ namespace hpx { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                friend void tag_dispatch(hpx::execution::experimental::start_t,
+                friend void tag_invoke(hpx::execution::experimental::start_t,
                     operation_state& os) noexcept
                 {
                     HPX_ASSERT_MSG(os.state,
@@ -693,7 +692,7 @@ namespace hpx { namespace experimental {
             };
 
             template <typename R>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 hpx::execution::experimental::connect_t, sender&& s, R&& r)
             {
                 return operation_state<R>{std::forward<R>(r),

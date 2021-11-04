@@ -806,7 +806,7 @@ namespace hpx { namespace ranges {
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -847,7 +847,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend transform_inclusive_scan_result<InIter, OutIter>
-        tag_fallback_dispatch(hpx::ranges::transform_inclusive_scan_t,
+        tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
             InIter first, Sent last, OutIter dest, BinOp&& binary_op,
             UnOp&& unary_op)
         {
@@ -886,7 +886,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             transform_inclusive_scan_result<FwdIter1, FwdIter2>>::type
-        tag_fallback_dispatch(hpx::ranges::transform_inclusive_scan_t,
+        tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
             ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest,
             BinOp&& binary_op, UnOp&& unary_op)
         {
@@ -922,8 +922,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend transform_inclusive_scan_result<
             hpx::traits::range_iterator_t<Rng>, O>
-        tag_fallback_dispatch(hpx::ranges::transform_inclusive_scan_t,
-            Rng&& rng, O dest, BinOp&& binary_op, UnOp&& unary_op)
+        tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t, Rng&& rng,
+            O dest, BinOp&& binary_op, UnOp&& unary_op)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -960,7 +960,7 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             transform_inclusive_scan_result<hpx::traits::range_iterator_t<Rng>,
                 O>>::type
-        tag_fallback_dispatch(hpx::ranges::transform_inclusive_scan_t,
+        tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
             ExPolicy&& policy, Rng&& rng, O dest, BinOp&& binary_op,
             UnOp&& unary_op)
         {
@@ -998,7 +998,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend transform_inclusive_scan_result<InIter, OutIter>
-        tag_fallback_dispatch(hpx::ranges::transform_inclusive_scan_t,
+        tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
             InIter first, Sent last, OutIter dest, BinOp&& binary_op,
             UnOp&& unary_op, T init)
         {
@@ -1037,7 +1037,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             transform_inclusive_scan_result<FwdIter1, FwdIter2>>::type
-        tag_fallback_dispatch(hpx::ranges::transform_inclusive_scan_t,
+        tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
             ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest,
             BinOp&& binary_op, UnOp&& unary_op, T init)
         {
@@ -1073,8 +1073,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend transform_inclusive_scan_result<
             hpx::traits::range_iterator_t<Rng>, O>
-        tag_fallback_dispatch(hpx::ranges::transform_inclusive_scan_t,
-            Rng&& rng, O dest, BinOp&& binary_op, UnOp&& unary_op, T init)
+        tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t, Rng&& rng,
+            O dest, BinOp&& binary_op, UnOp&& unary_op, T init)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -1111,7 +1111,7 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             transform_inclusive_scan_result<hpx::traits::range_iterator_t<Rng>,
                 O>>::type
-        tag_fallback_dispatch(hpx::ranges::transform_inclusive_scan_t,
+        tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
             ExPolicy&& policy, Rng&& rng, O dest, BinOp&& binary_op,
             UnOp&& unary_op, T init)
         {

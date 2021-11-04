@@ -11,6 +11,7 @@ if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
       ${tests}
       copy_datapar
       copyn_datapar
+      adjacentdifference_datapar
       count_datapar
       countif_datapar
       fill_datapar

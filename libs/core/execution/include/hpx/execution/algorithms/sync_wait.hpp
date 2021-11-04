@@ -13,7 +13,7 @@
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -139,7 +139,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Error>
-            friend void tag_dispatch(
+            friend void tag_invoke(
                 set_error_t, sync_wait_receiver&& r, Error&& error) noexcept
             {
                 r.state.value.template emplace<error_type>(
@@ -147,8 +147,7 @@ namespace hpx { namespace execution { namespace experimental {
                 r.signal_set_called();
             }
 
-            friend void tag_dispatch(
-                set_done_t, sync_wait_receiver&& r) noexcept
+            friend void tag_invoke(set_done_t, sync_wait_receiver&& r) noexcept
             {
                 r.signal_set_called();
             }
@@ -157,7 +156,7 @@ namespace hpx { namespace execution { namespace experimental {
                 typename =
                     std::enable_if_t<(is_void_result && sizeof...(Us) == 0) ||
                         (!is_void_result && sizeof...(Us) == 1)>>
-            friend void tag_dispatch(
+            friend void tag_invoke(
                 set_value_t, sync_wait_receiver&& r, Us&&... us) noexcept
             {
                 r.state.value.template emplace<value_type>(
@@ -168,7 +167,7 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct sync_wait_t final
-      : hpx::functional::tag_fallback<sync_wait_t>
+      : hpx::functional::detail::tag_fallback<sync_wait_t>
     {
     private:
         // clang-format off
@@ -177,7 +176,7 @@ namespace hpx { namespace execution { namespace experimental {
                 is_sender_v<Sender>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             sync_wait_t, Sender&& sender)
         {
             using receiver_type = detail::sync_wait_receiver<Sender>;
@@ -192,7 +191,7 @@ namespace hpx { namespace execution { namespace experimental {
             return state.get_value();
         }
 
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(sync_wait_t)
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(sync_wait_t)
         {
             return detail::partial_algorithm<sync_wait_t>{};
         }

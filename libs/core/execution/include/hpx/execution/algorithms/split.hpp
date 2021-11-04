@@ -12,6 +12,7 @@
 #include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
@@ -20,15 +21,13 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/type_support/pack.hpp>
-
-#include <boost/container/small_vector.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -134,15 +133,14 @@ namespace hpx { namespace execution { namespace experimental {
 
                 using continuation_type =
                     hpx::util::unique_function_nonser<void()>;
-                boost::container::small_vector<continuation_type, 1>
-                    continuations;
+                hpx::detail::small_vector<continuation_type, 1> continuations;
 
                 struct split_receiver
                 {
                     hpx::intrusive_ptr<shared_state> state;
 
                     template <typename Error>
-                    friend void tag_dispatch(
+                    friend void tag_invoke(
                         set_error_t, split_receiver&& r, Error&& error) noexcept
                     {
                         r.state->v.template emplace<error_type>(
@@ -151,7 +149,7 @@ namespace hpx { namespace execution { namespace experimental {
                         r.state.reset();
                     }
 
-                    friend void tag_dispatch(
+                    friend void tag_invoke(
                         set_done_t, split_receiver&& r) noexcept
                     {
                         r.state->set_predecessor_done();
@@ -167,7 +165,7 @@ namespace hpx { namespace execution { namespace experimental {
                             hpx::variant>;
 
                     template <typename... Ts>
-                    friend auto tag_dispatch(
+                    friend auto tag_invoke(
                         set_value_t, split_receiver&& r, Ts&&... ts) noexcept
                         -> decltype(
                             std::declval<
@@ -426,7 +424,7 @@ namespace hpx { namespace execution { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                friend void tag_dispatch(start_t, operation_state& os) noexcept
+                friend void tag_invoke(start_t, operation_state& os) noexcept
                 {
                     // Lazy submission means that we wait to start the
                     // predecessor operation state when a downstream operation
@@ -441,14 +439,14 @@ namespace hpx { namespace execution { namespace experimental {
             };
 
             template <typename Receiver>
-            friend operation_state<Receiver> tag_dispatch(
+            friend operation_state<Receiver> tag_invoke(
                 connect_t, split_sender&& s, Receiver&& receiver)
             {
                 return {std::forward<Receiver>(receiver), std::move(s.state)};
             }
 
             template <typename Receiver>
-            friend operation_state<Receiver> tag_dispatch(
+            friend operation_state<Receiver> tag_invoke(
                 connect_t, split_sender& s, Receiver&& receiver)
             {
                 return {std::forward<Receiver>(receiver), s.state};
@@ -457,7 +455,7 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct split_t final
-      : hpx::functional::tag_fallback<split_t>
+      : hpx::functional::detail::tag_fallback<split_t>
     {
     private:
         // clang-format off
@@ -468,7 +466,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             split_t, Sender&& sender, Allocator const& allocator = {})
         {
             return detail::split_sender<Sender, Allocator,
@@ -477,7 +475,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         template <typename Sender, typename Allocator>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(split_t,
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(split_t,
             detail::split_sender<Sender, Allocator,
                 detail::submission_type::lazy>
                 sender,
@@ -492,7 +490,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             split_t, Allocator const& allocator = {})
         {
             return detail::partial_algorithm<split_t, Allocator>{allocator};

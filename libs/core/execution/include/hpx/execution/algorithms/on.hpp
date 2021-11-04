@@ -16,8 +16,8 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/type_support/detail/with_result_of.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -73,7 +73,7 @@ namespace hpx { namespace execution { namespace experimental {
                                 std::decay_t<Sender>>))
                 // clang-format on
                 >
-            friend constexpr auto tag_dispatch(
+            friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
                 on_sender const& sender)
             {
@@ -138,14 +138,14 @@ namespace hpx { namespace execution { namespace experimental {
                     operation_state& op_state;
 
                     template <typename Error>
-                    friend void tag_dispatch(set_error_t,
+                    friend void tag_invoke(set_error_t,
                         predecessor_sender_receiver&& r, Error&& error) noexcept
                     {
                         r.op_state.set_error_predecessor_sender(
                             std::forward<Error>(error));
                     }
 
-                    friend void tag_dispatch(
+                    friend void tag_invoke(
                         set_done_t, predecessor_sender_receiver&& r) noexcept
                     {
                         r.op_state.set_done_predecessor_sender();
@@ -161,7 +161,7 @@ namespace hpx { namespace execution { namespace experimental {
                         hpx::monostate>;
 
                     template <typename... Ts>
-                    friend auto tag_dispatch(set_value_t,
+                    friend auto tag_invoke(set_value_t,
                         predecessor_sender_receiver&& r, Ts&&... ts) noexcept
                         -> decltype(std::declval<value_type>()
                                         .template emplace<hpx::tuple<Ts...>>(
@@ -220,20 +220,20 @@ namespace hpx { namespace execution { namespace experimental {
                     operation_state& op_state;
 
                     template <typename Error>
-                    friend void tag_dispatch(set_error_t,
+                    friend void tag_invoke(set_error_t,
                         scheduler_sender_receiver&& r, Error&& error) noexcept
                     {
                         r.op_state.set_error_scheduler_sender(
                             std::forward<Error>(error));
                     }
 
-                    friend void tag_dispatch(
+                    friend void tag_invoke(
                         set_done_t, scheduler_sender_receiver&& r) noexcept
                     {
                         r.op_state.set_done_scheduler_sender();
                     }
 
-                    friend void tag_dispatch(
+                    friend void tag_invoke(
                         set_value_t, scheduler_sender_receiver&& r) noexcept
                     {
                         r.op_state.set_value_scheduler_sender();
@@ -284,14 +284,14 @@ namespace hpx { namespace execution { namespace experimental {
                         std::move(ts));
                 }
 
-                friend void tag_dispatch(start_t, operation_state& os) noexcept
+                friend void tag_invoke(start_t, operation_state& os) noexcept
                 {
                     hpx::execution::experimental::start(os.sender_os);
                 }
             };
 
             template <typename Receiver>
-            friend operation_state<Receiver> tag_dispatch(
+            friend operation_state<Receiver> tag_invoke(
                 connect_t, on_sender&& s, Receiver&& receiver)
             {
                 return {std::move(s.predecessor_sender), std::move(s.scheduler),
@@ -299,7 +299,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Receiver>
-            friend operation_state<Receiver> tag_dispatch(
+            friend operation_state<Receiver> tag_invoke(
                 connect_t, on_sender& s, Receiver&& receiver)
             {
                 return {s.predecessor_sender, s.scheduler,
@@ -309,7 +309,7 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct on_t final
-      : hpx::functional::tag_fallback<on_t>
+      : hpx::functional::detail::tag_fallback<on_t>
     {
     private:
         // clang-format off
@@ -318,7 +318,7 @@ namespace hpx { namespace execution { namespace experimental {
                 is_sender_v<Sender>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             on_t, Sender&& predecessor_sender, Scheduler&& scheduler)
         {
             return detail::on_sender<Sender, Scheduler>{
@@ -327,7 +327,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         template <typename Scheduler>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_dispatch(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             on_t, Scheduler&& scheduler)
         {
             return detail::partial_algorithm<on_t, Scheduler>{

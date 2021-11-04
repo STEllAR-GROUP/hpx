@@ -915,7 +915,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend FwdIter2 tag_fallback_dispatch(hpx::transform_t, FwdIter1 first,
+        friend FwdIter2 tag_fallback_invoke(hpx::transform_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, F&& f)
         {
             static_assert(hpx::traits::is_input_iterator<FwdIter1>::value,
@@ -940,8 +940,8 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::transform_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest, F&& f)
+        tag_fallback_invoke(hpx::transform_t, ExPolicy&& policy, FwdIter1 first,
+            FwdIter1 last, FwdIter2 dest, F&& f)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
                 "Requires at least forward iterator.");
@@ -963,7 +963,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter3>
             )>
         // clang-format on
-        friend FwdIter3 tag_fallback_dispatch(hpx::transform_t, FwdIter1 first1,
+        friend FwdIter3 tag_fallback_invoke(hpx::transform_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter3 dest, F&& f)
         {
             static_assert(hpx::traits::is_input_iterator<FwdIter1>::value &&
@@ -993,7 +993,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter3>::type
-        tag_fallback_dispatch(hpx::transform_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::transform_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter3 dest,
             F&& f)
         {

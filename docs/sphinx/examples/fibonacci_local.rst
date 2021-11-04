@@ -9,9 +9,9 @@
 
 .. _examples_fibonacci_local:
 
-=====================================================
-Asynchronous execution with ``hpx::async``: Fibonacci
-=====================================================
+======================
+Asynchronous execution
+======================
 
 The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
 every subsequent number is the sum of the previous two numbers. In this example,
@@ -55,15 +55,15 @@ To compile this program, go to your |hpx| build directory (see
 :ref:`hpx_build_system` for information on configuring and building |hpx|) and
 enter:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   make examples.quickstart.fibonacci_local
+   $ make examples.quickstart.fibonacci_local
 
 To run the program type:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ./bin/fibonacci_local
+   $ ./bin/fibonacci_local
 
 This should print (time should be approximate):
 
@@ -78,9 +78,9 @@ the ``--n-value`` option. Additionally you can use the :option:`--hpx:threads`
 option to declare how many OS-threads you wish to use when running the program.
 For instance, running:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ./bin/fibonacci --n-value 20 --hpx:threads 4
+   $ ./bin/fibonacci --n-value 20 --hpx:threads 4
 
 Will yield:
 

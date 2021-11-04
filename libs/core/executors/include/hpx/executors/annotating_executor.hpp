@@ -139,7 +139,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         // support with_annotation property
-        friend constexpr annotating_executor tag_dispatch(
+        friend constexpr annotating_executor tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             annotating_executor const& exec, char const* annotation)
         {
@@ -148,7 +148,7 @@ namespace hpx { namespace execution { namespace experimental {
             return exec_with_annotation;
         }
 
-        friend annotating_executor tag_dispatch(
+        friend annotating_executor tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             annotating_executor const& exec, std::string annotation)
         {
@@ -160,7 +160,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         // support get_annotation property
-        friend constexpr char const* tag_dispatch(
+        friend constexpr char const* tag_invoke(
             hpx::execution::experimental::get_annotation_t,
             annotating_executor const& exec) noexcept
         {
@@ -197,7 +197,7 @@ namespace hpx { namespace execution { namespace experimental {
             hpx::traits::is_executor_any_v<Executor>
         )>
     // clang-format on
-    constexpr auto tag_fallback_dispatch(
+    constexpr auto tag_fallback_invoke(
         with_annotation_t, Executor&& exec, char const* annotation)
     {
         return annotating_executor<std::decay_t<Executor>>(
@@ -210,7 +210,7 @@ namespace hpx { namespace execution { namespace experimental {
             hpx::traits::is_executor_any_v<Executor>
          )>
     // clang-format on
-    auto tag_fallback_dispatch(
+    auto tag_fallback_invoke(
         with_annotation_t, Executor&& exec, std::string annotation)
     {
         return annotating_executor<std::decay_t<Executor>>(

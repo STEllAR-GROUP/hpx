@@ -47,6 +47,7 @@ std::ptrdiff_t structure_t::find(std::ptrdiff_t i) const
   HPX_ASSERT(loopinv());
   (void)loopinv;
   std::ptrdiff_t old_loopvar = loopvar();
+  HPX_UNUSED(old_loopvar);
   while (b0 < b1 && i>=begin[b0] && i<end[b1]) {
     std::ptrdiff_t b = (b0 + b1)/2;
     if (i < end[b]) {

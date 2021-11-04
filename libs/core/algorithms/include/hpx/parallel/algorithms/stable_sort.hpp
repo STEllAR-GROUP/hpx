@@ -238,6 +238,7 @@ namespace hpx {
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
@@ -245,8 +246,8 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/spin_sort.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -306,8 +307,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         typename std::decay<Proj>::type>;
 
                 // number of elements to sort
-                std::size_t count = detail::distance(first, last);
-                auto last_iter = detail::advance_to_sentinel(first, last);
+                auto last_iter = first;
+                std::size_t count =
+                    detail::advance_and_get_distance(last_iter, last);
 
                 // figure out the chunk size to use
                 std::size_t cores = execution::processing_units_count(
@@ -406,7 +408,7 @@ namespace hpx {
                 >::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(hpx::stable_sort_t, RandomIt first,
+        friend void tag_fallback_invoke(hpx::stable_sort_t, RandomIt first,
             RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
@@ -432,7 +434,7 @@ namespace hpx {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(hpx::stable_sort_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::stable_sort_t, ExPolicy&& policy,
             RandomIt first, RandomIt last, Comp&& comp = Comp(),
             Proj&& proj = Proj())
         {

@@ -14,7 +14,7 @@
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/modules/topology.hpp>
 
 #include <cstddef>
@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       will always return \a false
     ///
     HPX_INLINE_CONSTEXPR_VARIABLE struct has_pending_closures_t final
-      : hpx::functional::tag_fallback<has_pending_closures_t>
+      : hpx::functional::detail::tag_fallback<has_pending_closures_t>
     {
     private:
         // clang-format off
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             has_pending_closures_t, Executor&& /*exec*/)
         {
             return false;    // assume stateless scheduling
@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { namespace execution {
                 has_has_pending_closures<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_invoke(
             has_pending_closures_t, Executor&& exec)
         {
             return exec.has_pending_closures();
@@ -86,7 +86,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       will always invoke hpx::threads::get_pu_mask()
     ///
     HPX_INLINE_CONSTEXPR_VARIABLE struct get_pu_mask_t final
-      : hpx::functional::tag_fallback<get_pu_mask_t>
+      : hpx::functional::detail::tag_fallback<get_pu_mask_t>
     {
     private:
         // clang-format off
@@ -95,8 +95,8 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
-            get_pu_mask_t, Executor&& /*exec*/, threads::topology& topo,
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(get_pu_mask_t,
+            Executor&& /*exec*/, threads::topology& topo,
             std::size_t thread_num)
         {
             return detail::get_pu_mask(topo, thread_num);
@@ -109,7 +109,7 @@ namespace hpx { namespace parallel { namespace execution {
                 has_get_pu_mask<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_dispatch(get_pu_mask_t,
+        friend HPX_FORCEINLINE decltype(auto) tag_invoke(get_pu_mask_t,
             Executor&& exec, threads::topology& topo, std::size_t thread_num)
         {
             return exec.get_pu_mask(topo, thread_num);
@@ -126,7 +126,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       otherwise it does nothing.
     ///
     HPX_INLINE_CONSTEXPR_VARIABLE struct set_scheduler_mode_t final
-      : hpx::functional::tag_fallback<set_scheduler_mode_t>
+      : hpx::functional::detail::tag_fallback<set_scheduler_mode_t>
     {
     private:
         // clang-format off
@@ -135,7 +135,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE void tag_fallback_dispatch(
+        friend HPX_FORCEINLINE void tag_fallback_invoke(
             set_scheduler_mode_t, Executor&& /*exec*/, Mode const& /*mode*/)
         {
         }
@@ -147,7 +147,7 @@ namespace hpx { namespace parallel { namespace execution {
                 has_set_scheduler_mode<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE void tag_dispatch(
+        friend HPX_FORCEINLINE void tag_invoke(
             set_scheduler_mode_t, Executor&& exec, Mode const& mode)
         {
             exec.set_scheduler_mode(mode);

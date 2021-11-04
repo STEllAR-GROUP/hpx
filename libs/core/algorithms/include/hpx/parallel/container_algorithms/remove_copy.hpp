@@ -678,7 +678,7 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend remove_copy_if_result<I, O> tag_fallback_dispatch(
+        friend remove_copy_if_result<I, O> tag_fallback_invoke(
             hpx::ranges::remove_copy_if_t, I first, Sent last, O dest,
             Pred&& pred, Proj&& proj = Proj())
         {
@@ -709,7 +709,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend remove_copy_if_result<
             typename hpx::traits::range_iterator<Rng>::type, O>
-        tag_fallback_dispatch(hpx::ranges::remove_copy_if_t, Rng&& rng, O dest,
+        tag_fallback_invoke(hpx::ranges::remove_copy_if_t, Rng&& rng, O dest,
             Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(
@@ -741,7 +741,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             remove_copy_if_result<I, O>>::type
-        tag_fallback_dispatch(hpx::ranges::remove_copy_if_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::remove_copy_if_t, ExPolicy&& policy,
             I first, Sent last, O dest, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_forward_iterator<I>::value),
@@ -773,7 +773,7 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             remove_copy_if_result<
                 typename hpx::traits::range_iterator<Rng>::type, O>>::type
-        tag_fallback_dispatch(hpx::ranges::remove_copy_if_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::remove_copy_if_t, ExPolicy&& policy,
             Rng&& rng, O dest, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(
@@ -806,7 +806,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_projected<Proj, I>::value
             )>
         // clang-format on
-        friend remove_copy_result<I, O> tag_fallback_dispatch(
+        friend remove_copy_result<I, O> tag_fallback_invoke(
             hpx::ranges::remove_copy_t, I first, Sent last, O dest,
             T const& value, Proj&& proj = Proj())
         {
@@ -831,7 +831,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend remove_copy_result<
             typename hpx::traits::range_iterator<Rng>::type, O>
-        tag_fallback_dispatch(hpx::ranges::remove_copy_t, Rng&& rng, O dest,
+        tag_fallback_invoke(hpx::ranges::remove_copy_t, Rng&& rng, O dest,
             T const& value, Proj&& proj = Proj())
         {
             static_assert(
@@ -862,7 +862,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             remove_copy_result<I, O>>::type
-        tag_fallback_dispatch(hpx::ranges::remove_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::remove_copy_t, ExPolicy&& policy,
             I first, Sent last, O dest, T const& value, Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_forward_iterator<I>::value),
@@ -888,7 +888,7 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             remove_copy_result<typename hpx::traits::range_iterator<Rng>::type,
                 O>>::type
-        tag_fallback_dispatch(hpx::ranges::remove_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::remove_copy_t, ExPolicy&& policy,
             Rng&& rng, O dest, T const& value, Proj&& proj = Proj())
         {
             static_assert(

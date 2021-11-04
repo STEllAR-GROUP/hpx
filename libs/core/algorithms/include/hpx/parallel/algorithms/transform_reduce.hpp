@@ -256,11 +256,11 @@ namespace hpx {
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -794,7 +794,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_fallback_dispatch(transform_reduce_t, ExPolicy&& policy,
+        tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T init, Reduce&& red_op,
             Convert&& conv_op)
         {
@@ -824,7 +824,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend T tag_fallback_dispatch(transform_reduce_t, InIter first,
+        friend T tag_fallback_invoke(transform_reduce_t, InIter first,
             InIter last, T init, Reduce&& red_op, Convert&& conv_op)
         {
             static_assert(hpx::traits::is_input_iterator<InIter>::value,
@@ -846,7 +846,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_fallback_dispatch(transform_reduce_t, ExPolicy&& policy,
+        tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, T init)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
@@ -867,7 +867,7 @@ namespace hpx {
                 hpx::traits::is_iterator<InIter2>::value
             )>
         // clang-format on
-        friend T tag_fallback_dispatch(transform_reduce_t, InIter1 first1,
+        friend T tag_fallback_invoke(transform_reduce_t, InIter1 first1,
             InIter1 last1, InIter2 first2, T init)
         {
             static_assert(hpx::traits::is_input_iterator<InIter1>::value,
@@ -906,7 +906,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_fallback_dispatch(transform_reduce_t, ExPolicy&& policy,
+        tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, T init,
             Reduce&& red_op, Convert&& conv_op)
         {
@@ -943,7 +943,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend T tag_fallback_dispatch(transform_reduce_t, InIter1 first1,
+        friend T tag_fallback_invoke(transform_reduce_t, InIter1 first1,
             InIter1 last1, InIter2 first2, T init, Reduce&& red_op,
             Convert&& conv_op)
         {

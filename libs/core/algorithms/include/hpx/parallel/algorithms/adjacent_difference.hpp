@@ -14,6 +14,7 @@
 #include <hpx/iterator_support/zip_iterator.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/adjacent_difference.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -47,7 +48,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static OutIter sequential(
                 ExPolicy, InIter first, InIter last, OutIter dest, Op&& op)
             {
-                return std::adjacent_difference(
+                return sequential_adjacent_difference<ExPolicy>(
                     first, last, dest, std::forward<Op>(op));
             }
 
@@ -83,9 +84,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     // VS2015RC bails out when op is captured by ref
                     using hpx::get;
                     util::loop_n<std::decay_t<ExPolicy>>(
-                        part_begin, part_size, [op](zip_iterator it) {
+                        part_begin, part_size, [op](auto&& it) mutable {
                             get<2>(*it) =
-                                hpx::util::invoke(op, get<0>(*it), get<1>(*it));
+                                HPX_INVOKE(op, get<0>(*it), get<1>(*it));
                         });
                 };
 
@@ -188,10 +189,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
     adjacent_difference(
         ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
     {
-        typedef typename std::iterator_traits<FwdIter1>::value_type value_type;
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
         return detail::adjacent_difference_(std::forward<ExPolicy>(policy),
-            first, last, dest, std::minus<value_type>(), is_segmented());
+            first, last, dest, std::minus<>(), is_segmented());
     }
 
     ////////////////////////////////////////////////////////////////////////////

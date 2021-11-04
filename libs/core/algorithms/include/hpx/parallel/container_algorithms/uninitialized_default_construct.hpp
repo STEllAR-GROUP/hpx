@@ -285,7 +285,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             hpx::ranges::uninitialized_default_construct_t, FwdIter first,
             Sent last)
         {
@@ -307,7 +307,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::ranges::uninitialized_default_construct_t,
+        tag_fallback_invoke(hpx::ranges::uninitialized_default_construct_t,
             ExPolicy&& policy, FwdIter first, Sent last)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -325,7 +325,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::ranges::uninitialized_default_construct_t, Rng&& rng)
         {
             using iterator_type =
@@ -349,7 +349,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>::type
-        tag_fallback_dispatch(hpx::ranges::uninitialized_default_construct_t,
+        tag_fallback_invoke(hpx::ranges::uninitialized_default_construct_t,
             ExPolicy&& policy, Rng&& rng)
         {
             using iterator_type =
@@ -377,7 +377,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             hpx::ranges::uninitialized_default_construct_n_t, FwdIter first,
             Size count)
         {
@@ -398,7 +398,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::ranges::uninitialized_default_construct_n_t,
+        tag_fallback_invoke(hpx::ranges::uninitialized_default_construct_n_t,
             ExPolicy&& policy, FwdIter first, Size count)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,

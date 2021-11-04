@@ -10,7 +10,7 @@
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/type_support/equality.hpp>
 
@@ -39,7 +39,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///     * Otherwise, the expression is ill-formed.
     ///
     /// The customization is implemented in terms of
-    /// `hpx::functional::tag_dispatch`.
+    /// `hpx::functional::tag_invoke`.
     template <typename S, typename R>
     void connect(S&& s, R&& r);
 
@@ -60,7 +60,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///      * Otherwise, schedule(s) is ill-formed.
     ///
     /// The customization is implemented in terms of
-    /// `hpx::functional::tag_dispatch`.
+    /// `hpx::functional::tag_invoke`.
 
 #endif
 
@@ -206,9 +206,9 @@ namespace hpx { namespace execution { namespace experimental {
         {
             F f;
 
-            void set_value() noexcept(noexcept(HPX_INVOKE(f)))
+            void set_value() noexcept(noexcept(HPX_INVOKE(f, )))
             {
-                HPX_INVOKE(f);
+                HPX_INVOKE(f, );
             }
 
             template <typename E_>

@@ -136,23 +136,7 @@ if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   unset(HPX_SOVERSION)
 endif()
 
-# Adjust a couple of build-system settings, if HPX is to be built using vcpkg
 if(MSVC)
-  set(_with_vcpkg_default OFF)
-  if(VCPKG_TOOLCHAIN)
-    set(_with_vcpkg_default ON)
-  endif()
-  hpx_option(
-    HPX_WITH_VCPKG
-    BOOL
-    "Build HPX in the context of the vcpkg build and configuration tool (default: OFF)."
-    ${_with_vcpkg_default}
-    ADVANCED
-  )
-  if(HPX_WITH_VCPKG)
-    hpx_add_config_define(HPX_HAVE_VCPKG)
-  endif()
-
   hpx_option(
     HPX_WITH_VS_STARTUP_PROJECT STRING
     "Define the startup project for the HPX solution (default: ALL_BUILD)."
@@ -321,98 +305,13 @@ hpx_option(
 )
 if(HPX_WITH_PRECOMPILED_HEADERS)
   set(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL ON)
-
-  set(system_precompiled_headers
-      <algorithm>
-      <array>
-      <atomic>
-      <bitset>
-      <cassert>
-      <cctype>
-      <cerrno>
-      <chrono>
-      <climits>
-      <cmath>
-      <complex>
-      <condition_variable>
-      <cstddef>
-      <cstdint>
-      <cstdio>
-      <cstdlib>
-      <cstring>
-      <ctime>
-      <deque>
-      <exception>
-      <execution>
-      <forward_list>
-      <fstream>
-      <functional>
-      <iomanip>
-      <ios>
-      <iosfwd>
-      <iostream>
-      <iterator>
-      <limits>
-      <list>
-      <locale>
-      <map>
-      <memory>
-      <mutex>
-      <new>
-      <numeric>
-      <ostream>
-      <random>
-      <regex>
-      <set>
-      <shared_mutex>
-      <sstream>
-      <stack>
-      <stdexcept>
-      <string>
-      <system_error>
-      <thread>
-      <tuple>
-      <type_traits>
-      <typeinfo>
-      <unordered_map>
-      <unordered_set>
-      <utility>
-      <variant>
-      <vector>
-      <hwloc.h>
-      <asio/basic_waitable_timer.hpp>
-      <asio/io_context.hpp>
-      <asio/ip/tcp.hpp>
-      <boost/config.hpp>
-      <boost/container/small_vector.hpp>
-      <boost/fusion/include/vector.hpp>
-      <boost/intrusive/slist.hpp>
-      <boost/lockfree/queue.hpp>
-      <boost/optional.hpp>
-      <boost/spirit/home/x3.hpp>
-      <boost/tokenizer.hpp>
-      <boost/utility/string_ref.hpp>
-  )
-
-  if(HPX_WITH_CXX17_FILESYSTEM)
-    list(APPEND system_precompiled_headers <filesystem>)
-  endif()
-
-  set(system_precompiled_headers_dependencies
-      hpx_dependencies_boost hpx_private_flags hpx_public_flags Asio::asio
-  )
-
+  # Only create the targets here. They will be set up later once all modules are
+  # known.
   add_library(hpx_precompiled_headers OBJECT libs/src/dummy.cpp)
-  target_link_libraries(
-    hpx_precompiled_headers
-    PRIVATE hpx_public_flags hpx_private_flags hpx_base_libraries
-            ${system_precompiled_headers_dependencies}
-  )
-  target_precompile_headers(
-    hpx_precompiled_headers PRIVATE ${system_precompiled_headers}
-  )
+  add_executable(hpx_exe_precompiled_headers libs/src/dummy.cpp)
 
   set_target_properties(hpx_precompiled_headers PROPERTIES FOLDER "Core")
+  set_target_properties(hpx_exe_precompiled_headers PROPERTIES FOLDER "Core")
 endif()
 
 # ##############################################################################
@@ -1057,7 +956,7 @@ hpx_option(
   ADVANCED
 )
 hpx_option(
-  HPX_WITH_ASIO_TAG STRING "Asio repository tag or branch" "asio-1-18-2"
+  HPX_WITH_ASIO_TAG STRING "Asio repository tag or branch" "asio-1-20-0"
   CATEGORY "Build Targets"
   ADVANCED
 )
@@ -1804,6 +1703,9 @@ if(WIN32)
       # Silence C++17 deprecation warnings
       hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
 
+      # Silence C++20 deprecation warnings
+      hpx_add_config_cond_define(_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS)
+
       # ASan is available in Visual Studion starting V16.8
       if((MSVC_VERSION GREATER_EQUAL 1928) AND HPX_WITH_SANITIZERS)
         hpx_add_target_compile_option(
@@ -1874,12 +1776,9 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag(-wd4800)
 
     # vcpkg enables the /utf-8 option which causes (benign) warnings in the
-    # Spirit headers
-    if(HPX_WITH_VCPKG)
-      # The file contains a character starting at offset ... that is illegal in
-      # the current source character set
-      hpx_add_compile_flag(-wd4828)
-    endif()
+    # Spirit headers: The file contains a character starting at offset ... that
+    # is illegal in the current source character set
+    hpx_add_compile_flag(-wd4828)
 
     if(HPX_WITH_DATAPAR_VC)
       # unary minus operator applied to unsigned type, result still unsigned
@@ -2351,6 +2250,124 @@ configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
   "${PROJECT_BINARY_DIR}/bin/hpxrun.py" @ONLY
 )
+
+# Set up precompiled headers
+if(HPX_WITH_PRECOMPILED_HEADERS)
+  set(system_precompiled_headers
+      <algorithm>
+      <array>
+      <atomic>
+      <bitset>
+      <cassert>
+      <cctype>
+      <cerrno>
+      <chrono>
+      <climits>
+      <cmath>
+      <complex>
+      <condition_variable>
+      <cstddef>
+      <cstdint>
+      <cstdio>
+      <cstdlib>
+      <cstring>
+      <ctime>
+      <deque>
+      <exception>
+      <execution>
+      <forward_list>
+      <fstream>
+      <functional>
+      <iomanip>
+      <ios>
+      <iosfwd>
+      <iostream>
+      <iterator>
+      <limits>
+      <list>
+      <locale>
+      <map>
+      <memory>
+      <mutex>
+      <new>
+      <numeric>
+      <ostream>
+      <random>
+      <regex>
+      <set>
+      <shared_mutex>
+      <sstream>
+      <stack>
+      <stdexcept>
+      <string>
+      <system_error>
+      <thread>
+      <tuple>
+      <type_traits>
+      <typeinfo>
+      <unordered_map>
+      <unordered_set>
+      <utility>
+      <variant>
+      <vector>
+      <hwloc.h>
+      <asio/basic_waitable_timer.hpp>
+      <asio/io_context.hpp>
+      <asio/ip/tcp.hpp>
+      <boost/config.hpp>
+      <boost/fusion/include/vector.hpp>
+      <boost/intrusive/slist.hpp>
+      <boost/lockfree/queue.hpp>
+      <boost/optional.hpp>
+      <boost/spirit/home/x3.hpp>
+      <boost/tokenizer.hpp>
+      <boost/utility/string_ref.hpp>
+  )
+
+  if(HPX_WITH_CXX17_FILESYSTEM)
+    list(APPEND system_precompiled_headers <filesystem>)
+  endif()
+
+  set(system_precompiled_headers_dependencies
+      hpx_dependencies_boost hpx_private_flags hpx_public_flags Asio::asio
+  )
+
+  target_link_libraries(
+    hpx_precompiled_headers
+    PRIVATE hpx_public_flags hpx_private_flags hpx_base_libraries
+            ${system_precompiled_headers_dependencies}
+  )
+  target_precompile_headers(
+    hpx_precompiled_headers PRIVATE ${system_precompiled_headers}
+  )
+
+  # Headers that should be precompiled for things depending on HPX (executables,
+  # libraries).
+  set(hpx_precompiled_headers_modules ${HPX_ENABLED_MODULES})
+  # The init_runtime modules cannot be precompiled because they use macros that
+  # can depend on the application (HPX_PREFIX and HPX_APPLICATION_NAME_DEFAULT).
+  list(REMOVE_ITEM hpx_precompiled_headers_modules init_runtime
+       init_runtime_local
+  )
+  # config, version, and the include modules don't have hpx/module headers.
+  list(REMOVE_ITEM hpx_precompiled_headers_modules config include include_local
+       version
+  )
+  list(TRANSFORM hpx_precompiled_headers_modules PREPEND "<hpx/modules/")
+  list(TRANSFORM hpx_precompiled_headers_modules APPEND ".hpp>")
+
+  # We do not link to HPX::hpx as it will set HPX_APPLICATION_NAME_DEFAULT and
+  # HPX_PREFIX to values that don't match those used in tests. We instead set
+  # them manually here.
+  target_link_libraries(hpx_exe_precompiled_headers PRIVATE hpx_full)
+  target_compile_definitions(
+    hpx_exe_precompiled_headers PRIVATE "HPX_PREFIX=\"${HPX_BUILD_PREFIX}\""
+                                        "HPX_APPLICATION_EXPORTS"
+  )
+  target_precompile_headers(
+    hpx_exe_precompiled_headers PRIVATE ${hpx_precompiled_headers_modules}
+  )
+endif()
 
 # ##############################################################################
 # installation instructions

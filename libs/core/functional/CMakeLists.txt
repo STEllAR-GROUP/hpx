@@ -88,7 +88,7 @@ add_hpx_module(
     hpx_errors
     hpx_itt_notify
     hpx_serialization
-    hpx_tag_dispatch
+    hpx_tag_invoke
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

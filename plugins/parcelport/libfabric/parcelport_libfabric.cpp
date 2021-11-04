@@ -42,7 +42,7 @@
 #define HPX_PARCELPORT_LIBFABRIC_SUSPEND_WAKE  (HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS/2)
 
 // --------------------------------------------------------------------
-// Enable the use of boost small_vector for certain short lived storage
+// Enable the use of hpx small_vector for certain short lived storage
 // elements within the parcelport. This can reduce some memory allocations
 #define HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR    true
 
@@ -61,7 +61,7 @@
 
 //
 #if HPX_PARCELPORT_LIBFABRIC_USE_SMALL_VECTOR
-# include <boost/container/small_vector.hpp>
+#include <hpx/datastructures/detail/small_vector.hpp>
 #endif
 //
 #include <unordered_map>

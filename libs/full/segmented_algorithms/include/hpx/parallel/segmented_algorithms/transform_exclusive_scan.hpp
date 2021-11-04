@@ -38,7 +38,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<OutIter>::value
         )>
     // clang-format on
-    OutIter tag_dispatch(hpx::transform_exclusive_scan_t, InIter first,
+    OutIter tag_invoke(hpx::transform_exclusive_scan_t, InIter first,
         InIter last, OutIter dest, T init, Op&& op, Conv&& conv)
     {
         static_assert(hpx::traits::is_input_iterator<InIter>::value,
@@ -67,7 +67,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    tag_dispatch(hpx::transform_exclusive_scan_t, ExPolicy&& policy,
+    tag_invoke(hpx::transform_exclusive_scan_t, ExPolicy&& policy,
         FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init, Op&& op,
         Conv&& conv)
     {

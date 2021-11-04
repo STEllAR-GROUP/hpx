@@ -250,8 +250,8 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/set_union.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
@@ -291,7 +291,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             set_union_result<Iter1, Iter2, Iter3>>::type
-        tag_fallback_dispatch(set_union_t, ExPolicy&& policy, Iter1 first1,
+        tag_fallback_invoke(set_union_t, ExPolicy&& policy, Iter1 first1,
             Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -339,7 +339,7 @@ namespace hpx { namespace ranges {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             set_union_result<typename hpx::traits::range_iterator<Rng1>::type,
                 typename hpx::traits::range_iterator<Rng2>::type, Iter3>>::type
-        tag_fallback_dispatch(set_union_t, ExPolicy&& policy, Rng1&& rng1,
+        tag_fallback_invoke(set_union_t, ExPolicy&& policy, Rng1&& rng1,
             Rng2&& rng2, Iter3 dest, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -395,7 +395,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend set_union_result<Iter1, Iter2, Iter3> tag_fallback_dispatch(
+        friend set_union_result<Iter1, Iter2, Iter3> tag_fallback_invoke(
             set_union_t, Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
             Iter3 dest, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -436,7 +436,7 @@ namespace hpx { namespace ranges {
         friend set_union_result<
             typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, Iter3>
-        tag_fallback_dispatch(set_union_t, Rng1&& rng1, Rng2&& rng2, Iter3 dest,
+        tag_fallback_invoke(set_union_t, Rng1&& rng1, Rng2&& rng2, Iter3 dest,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {

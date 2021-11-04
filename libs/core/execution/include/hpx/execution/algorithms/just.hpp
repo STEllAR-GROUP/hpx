@@ -78,7 +78,7 @@ namespace hpx { namespace execution { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                friend void tag_dispatch(start_t, operation_state& os) noexcept
+                friend void tag_invoke(start_t, operation_state& os) noexcept
                 {
                     hpx::detail::try_catch_exception_ptr(
                         [&]() {
@@ -94,7 +94,7 @@ namespace hpx { namespace execution { namespace experimental {
             };
 
             template <typename Receiver>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 connect_t, just_sender&& s, Receiver&& receiver)
             {
                 return operation_state<Receiver>{
@@ -102,7 +102,7 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename Receiver>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 connect_t, just_sender& s, Receiver&& receiver)
             {
                 return operation_state<Receiver>{

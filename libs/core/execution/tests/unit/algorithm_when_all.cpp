@@ -22,9 +22,9 @@ namespace ex = hpx::execution::experimental;
 // This overload is only used to check dispatching. It is not a useful
 // implementation.
 template <typename... Ss>
-auto tag_dispatch(ex::when_all_t, custom_sender_tag_dispatch s, Ss&&... ss)
+auto tag_invoke(ex::when_all_t, custom_sender_tag_invoke s, Ss&&... ss)
 {
-    s.tag_dispatch_overload_called = true;
+    s.tag_invoke_overload_called = true;
     return ex::when_all(std::forward<Ss>(ss)...);
 }
 
@@ -37,7 +37,7 @@ int main()
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
-        tag_dispatch(ex::start, os);
+        tag_invoke(ex::start, os);
         HPX_TEST(set_value_called);
     }
 
@@ -80,16 +80,15 @@ int main()
 
     {
         std::atomic<bool> receiver_set_value_called{false};
-        std::atomic<bool> tag_dispatch_overload_called{false};
+        std::atomic<bool> tag_invoke_overload_called{false};
         auto s = ex::when_all(
-            custom_sender_tag_dispatch{tag_dispatch_overload_called},
-            ex::just(42));
+            custom_sender_tag_invoke{tag_invoke_overload_called}, ex::just(42));
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<decltype(f)>{f, receiver_set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(receiver_set_value_called);
-        HPX_TEST(tag_dispatch_overload_called);
+        HPX_TEST(tag_invoke_overload_called);
     }
 
     // Failure path

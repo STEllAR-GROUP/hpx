@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/pointer_category.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
@@ -180,13 +180,14 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     template <typename ExPolicy>
-    struct copy_n_t final : hpx::functional::tag_fallback<copy_n_t<ExPolicy>>
+    struct copy_n_t final
+      : hpx::functional::detail::tag_fallback<copy_n_t<ExPolicy>>
     {
     private:
         template <typename InIter, typename OutIter>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter>
-            tag_fallback_dispatch(hpx::parallel::util::copy_n_t<ExPolicy>,
+            tag_fallback_invoke(hpx::parallel::util::copy_n_t<ExPolicy>,
                 InIter first, std::size_t count, OutIter dest)
         {
             using category = hpx::traits::pointer_copy_category_t<

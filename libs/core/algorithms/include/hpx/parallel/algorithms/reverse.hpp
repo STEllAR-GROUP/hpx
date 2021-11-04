@@ -219,7 +219,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, BidirIter first, Sent last)
             {
                 auto last2{hpx::ranges::next(first, last)};
-                for (auto tail{last2}; !(first == tail or first == --tail);
+                for (auto tail{last2}; !(first == tail || first == --tail);
                      ++first)
                 {
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
@@ -379,7 +379,7 @@ namespace hpx {
                 hpx::traits::is_iterator<BidirIter>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(
+        friend void tag_fallback_invoke(
             hpx::reverse_t, BidirIter first, BidirIter last)
         {
             static_assert(
@@ -399,7 +399,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             void>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::reverse_t, ExPolicy&& policy, BidirIter first, BidirIter last)
         {
             static_assert(
@@ -425,7 +425,7 @@ namespace hpx {
                 hpx::traits::is_iterator<OutIter>::value
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(
+        friend OutIter tag_fallback_invoke(
             hpx::reverse_copy_t, BidirIter first, BidirIter last, OutIter dest)
         {
             static_assert(
@@ -452,7 +452,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::reverse_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::reverse_copy_t, ExPolicy&& policy,
             BidirIter first, BidirIter last, FwdIter dest)
         {
             static_assert(

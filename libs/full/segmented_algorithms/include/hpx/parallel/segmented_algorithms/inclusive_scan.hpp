@@ -268,7 +268,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<OutIter>
         )>
     // clang-format on
-    OutIter tag_dispatch(hpx::inclusive_scan_t, InIter first, InIter last,
+    OutIter tag_invoke(hpx::inclusive_scan_t, InIter first, InIter last,
         OutIter dest, Op&& op = Op())
     {
         static_assert(hpx::traits::is_input_iterator_v<InIter>,
@@ -300,7 +300,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    tag_dispatch(hpx::inclusive_scan_t, ExPolicy&& policy, FwdIter1 first,
+    tag_invoke(hpx::inclusive_scan_t, ExPolicy&& policy, FwdIter1 first,
         FwdIter1 last, FwdIter2 dest, Op&& op = Op())
     {
         static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
@@ -332,7 +332,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<OutIter>
         )>
     // clang-format on
-    OutIter tag_dispatch(hpx::inclusive_scan_t, InIter first, InIter last,
+    OutIter tag_invoke(hpx::inclusive_scan_t, InIter first, InIter last,
         OutIter dest, Op&& op, T&& init)
     {
         static_assert(hpx::traits::is_input_iterator_v<InIter>,
@@ -362,7 +362,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    tag_dispatch(hpx::inclusive_scan_t, ExPolicy&& policy, FwdIter1 first,
+    tag_invoke(hpx::inclusive_scan_t, ExPolicy&& policy, FwdIter1 first,
         FwdIter1 last, FwdIter2 dest, Op&& op, T&& init)
     {
         static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,

@@ -674,7 +674,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::copy_t, ExPolicy&& policy, FwdIter1 first,
+        tag_fallback_invoke(hpx::copy_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest)
         {
             return parallel::util::get_second_element(
@@ -690,7 +690,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend FwdIter2 tag_fallback_dispatch(
+        friend FwdIter2 tag_fallback_invoke(
             hpx::copy_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
             return parallel::util::get_second_element(
@@ -717,7 +717,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::copy_n_t, ExPolicy&& policy, FwdIter1 first,
+        tag_fallback_invoke(hpx::copy_n_t, ExPolicy&& policy, FwdIter1 first,
             Size count, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
@@ -748,7 +748,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend FwdIter2 tag_fallback_dispatch(
+        friend FwdIter2 tag_fallback_invoke(
             hpx::copy_n_t, FwdIter1 first, Size count, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
@@ -792,7 +792,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::copy_if_t, ExPolicy&& policy, FwdIter1 first,
+        tag_fallback_invoke(hpx::copy_if_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, Pred&& pred)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
@@ -820,7 +820,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend FwdIter2 tag_fallback_dispatch(hpx::copy_if_t, FwdIter1 first,
+        friend FwdIter2 tag_fallback_invoke(hpx::copy_if_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, Pred&& pred)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),

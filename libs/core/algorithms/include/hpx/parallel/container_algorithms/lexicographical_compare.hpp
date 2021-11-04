@@ -408,10 +408,10 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(
-            hpx::ranges::lexicographical_compare_t, InIter1 first1, Sent1 last1,
-            InIter2 first2, Sent2 last2, Pred&& pred = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        friend bool tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
+            InIter1 first1, Sent1 last1, InIter2 first2, Sent2 last2,
+            Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
         {
             static_assert(hpx::traits::is_input_iterator<InIter1>::value,
                 "Requires at least input iterator.");
@@ -447,7 +447,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(hpx::ranges::lexicographical_compare_t,
+        tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
             ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
             Sent2 last2, Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -480,10 +480,9 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(
-            hpx::ranges::lexicographical_compare_t, Rng1&& rng1, Rng2&& rng2,
-            Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+        friend bool tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
+            Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             using iterator_type1 =
                 typename hpx::traits::range_traits<Rng1>::iterator_type;
@@ -522,7 +521,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(hpx::ranges::lexicographical_compare_t,
+        tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
             ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {

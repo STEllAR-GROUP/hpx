@@ -468,7 +468,7 @@ namespace hpx {
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
+#include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
@@ -830,7 +830,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using difference_type =
                     typename std::iterator_traits<FwdIter1>::difference_type;
 
-                difference_type count = detail::distance(first, last);
+                auto last_iter = first;
+                difference_type count =
+                    detail::advance_and_get_distance(last_iter, last);
 
                 if (count == 0)
                     return algorithm_result::get(
@@ -850,7 +852,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 boost::shared_array<bool> flags(new bool[count - 1]);
 #endif
                 std::size_t init = 0;
-                auto last_iter = detail::advance_to_sentinel(first, last);
 
                 using hpx::get;
                 using hpx::util::make_zip_iterator;
@@ -996,7 +997,7 @@ namespace hpx {
                     parallel::traits::projected<Proj, FwdIter>>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(hpx::unique_t, FwdIter first,
+        friend FwdIter tag_fallback_invoke(hpx::unique_t, FwdIter first,
             FwdIter last, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
@@ -1022,7 +1023,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::unique_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(hpx::unique_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
@@ -1052,7 +1053,7 @@ namespace hpx {
                     parallel::traits::projected<Proj, InIter>>::value
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(hpx::unique_copy_t, InIter first,
+        friend OutIter tag_fallback_invoke(hpx::unique_copy_t, InIter first,
             InIter last, OutIter dest, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
@@ -1082,7 +1083,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::unique_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::unique_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {

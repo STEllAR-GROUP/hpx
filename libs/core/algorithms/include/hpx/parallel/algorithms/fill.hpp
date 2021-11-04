@@ -107,10 +107,10 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
@@ -306,7 +306,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_fallback_dispatch(fill_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(fill_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -327,7 +327,7 @@ namespace hpx {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(
+        friend void tag_fallback_invoke(
             fill_t, FwdIter first, FwdIter last, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -353,7 +353,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(fill_n_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(fill_n_t, ExPolicy&& policy, FwdIter first,
             Size count, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -377,7 +377,7 @@ namespace hpx {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             fill_n_t, FwdIter first, Size count, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),

@@ -18,8 +18,6 @@ endforeach()
 # add tests
 set(tests
     adjacentdifference
-    adjacentdifference_exception
-    adjacentdifference_bad_alloc
     adjacentfind
     adjacentfind_exception
     adjacentfind_bad_alloc
@@ -38,6 +36,7 @@ set(tests
     countif
     destroy
     destroyn
+    ends_with
     equal
     equal_binary
     exclusive_scan
@@ -89,6 +88,7 @@ set(tests
     mismatch
     mismatch_binary
     move
+    nth_element
     none_of
     parallel_sort
     partial_sort
@@ -126,6 +126,7 @@ set(tests
     stable_partition
     stable_sort
     stable_sort_exceptions
+    starts_with
     swapranges
     transform
     transform_binary

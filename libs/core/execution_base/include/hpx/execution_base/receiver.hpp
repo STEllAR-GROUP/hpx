@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
 #include <exception>
@@ -28,7 +28,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///       `void set_value();`
     ///     * Otherwise, the expression is ill-formed.
     ///
-    /// The customization is implemented in terms of `hpx::functional::tag_dispatch`.
+    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
     template <typename R, typename... As>
     void set_value(R&& r, As&&... as);
 
@@ -42,7 +42,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///       `void set_done();`
     ///     * Otherwise, the expression is ill-formed.
     ///
-    /// The customization is implemented in terms of `hpx::functional::tag_dispatch`.
+    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
     template <typename R>
     void set_done(R&& r);
 
@@ -56,7 +56,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///       `void set_error();`
     ///     * Otherwise, the expression is ill-formed.
     ///
-    /// The customization is implemented in terms of `hpx::functional::tag_dispatch`.
+    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
     template <typename R, typename E>
     void set_error(R&& r, E&& e);
 #endif

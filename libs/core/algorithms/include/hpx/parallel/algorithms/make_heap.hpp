@@ -105,10 +105,10 @@ namespace hpx {
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
@@ -430,7 +430,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_fallback_dispatch(make_heap_t, ExPolicy&& policy, RndIter first,
+        tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RndIter first,
             RndIter last, Comp&& comp)
         {
             static_assert(
@@ -453,7 +453,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             make_heap_t, ExPolicy&& policy, RndIter first, RndIter last)
         {
             static_assert(
@@ -480,7 +480,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(
+        friend void tag_fallback_invoke(
             make_heap_t, RndIter first, RndIter last, Comp&& comp)
         {
             static_assert(
@@ -498,7 +498,7 @@ namespace hpx {
                 hpx::traits::is_iterator<RndIter>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(
+        friend void tag_fallback_invoke(
             make_heap_t, RndIter first, RndIter last)
         {
             static_assert(
