@@ -866,9 +866,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::size_t curr = 0;
 
                     // MSVC complains if pred or proj is captured by ref below
-                    util::loop_n<std::decay_t<ExPolicy>>(++part_begin,
-                        part_size,
-                        [base, pred, proj, &curr](zip_iterator it) mutable {
+                    util::loop_n<std::decay_t<ExPolicy>>(
+                        ++part_begin, part_size, [&](zip_iterator it) mutable {
                             bool f = HPX_INVOKE(pred, HPX_INVOKE(proj, *base),
                                 HPX_INVOKE(proj, get<0>(*it)));
 
