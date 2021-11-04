@@ -54,7 +54,7 @@ void measureScanAlgorithms()
          alg <= (int) ALGORITHM::UNIQUE_COPY; alg++)
     {
         std::size_t start = 32;
-        std::size_t till = 1 << 28;
+        std::size_t till = 1 << 10;
 
         const auto NUM_ITERATIONS = 5;
 

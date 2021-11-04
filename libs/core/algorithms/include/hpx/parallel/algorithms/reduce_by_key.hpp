@@ -399,12 +399,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::vector<reduce_key_series_states>::iterator>::reference
                     zip2_ref;
 
+                std::vector<value_type> temp(number_of_keys);
+                hpx::copy(sync_policy, values_output,
+                    values_output + number_of_keys, temp.begin());
+
                 return make_pair_result(
                     hpx::ranges::copy_if(sync_policy,
-                        make_zip_iterator(key_first, values_output,
+                        make_zip_iterator(key_first, temp.begin(),
                             hpx::util::begin(key_state)),
                         make_zip_iterator(key_last,
-                            values_output + number_of_keys,
+                            temp.begin() + number_of_keys,
                             hpx::util::end(key_state)),
                         make_zip_iterator(keys_output, values_output,
                             hpx::util::begin(key_state)),
