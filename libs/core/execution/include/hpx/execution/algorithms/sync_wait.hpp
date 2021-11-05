@@ -105,7 +105,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                 auto get_value()
                 {
-                    if (std::holds_alternative<value_type>(value))
+                    if (hpx::holds_alternative<value_type>(value))
                     {
                         if constexpr (is_void_result)
                         {
@@ -116,7 +116,7 @@ namespace hpx { namespace execution { namespace experimental {
                             return std::move(hpx::get<value_type>(value));
                         }
                     }
-                    else if (std::holds_alternative<error_type>(value))
+                    else if (hpx::holds_alternative<error_type>(value))
                     {
                         hpx::visit(sync_wait_error_visitor{},
                             hpx::get<error_type>(value));
