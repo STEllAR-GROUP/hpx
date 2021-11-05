@@ -12,7 +12,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution/traits/vector_pack_alignment_size.hpp>
 #include <hpx/execution/traits/vector_pack_type.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/generate.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
@@ -95,7 +95,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename ExPolicy, typename Iter, typename Sent, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
-    tag_dispatch(
+    tag_invoke(
         sequential_generate_t, ExPolicy&& policy, Iter first, Sent last, F&& f)
     {
         return datapar_generate::call(
@@ -117,7 +117,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
-    tag_dispatch(sequential_generate_n_t, ExPolicy&& policy, Iter first,
+    tag_invoke(sequential_generate_n_t, ExPolicy&& policy, Iter first,
         std::size_t count, F&& f)
     {
         return datapar_generate_n::call(

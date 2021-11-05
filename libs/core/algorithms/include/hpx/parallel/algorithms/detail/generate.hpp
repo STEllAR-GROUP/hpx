@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
@@ -26,11 +26,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 
     struct sequential_generate_t
-      : hpx::functional::tag_fallback<sequential_generate_t>
+      : hpx::functional::detail::tag_fallback<sequential_generate_t>
     {
     private:
         template <typename ExPolicy, typename Iter, typename Sent, typename F>
-        friend constexpr Iter tag_fallback_dispatch(
+        friend constexpr Iter tag_fallback_invoke(
             sequential_generate_t, ExPolicy&&, Iter first, Sent last, F&& f)
         {
             return sequential_generate_helper(first, last, std::forward<F>(f));
@@ -59,11 +59,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 
     struct sequential_generate_n_t
-      : hpx::functional::tag_fallback<sequential_generate_n_t>
+      : hpx::functional::detail::tag_fallback<sequential_generate_n_t>
     {
     private:
         template <typename ExPolicy, typename Iter, typename F>
-        friend constexpr Iter tag_fallback_dispatch(sequential_generate_n_t,
+        friend constexpr Iter tag_fallback_invoke(sequential_generate_n_t,
             ExPolicy&&, Iter first, std::size_t count, F&& f)
         {
             return sequential_generate_n_helper(
