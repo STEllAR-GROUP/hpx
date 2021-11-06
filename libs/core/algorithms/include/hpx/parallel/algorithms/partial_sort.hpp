@@ -404,15 +404,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     policy.parameters(), policy.executor(), 0, cores, nelem);
 
                 hpx::future<Iter> left = execution::async_execute(
-                    policy.executor(), sort_thread_helper(),
-                    policy, first, c_last, comp, chunk_size);
+                    policy.executor(), sort_thread_helper(), policy, first,
+                    c_last, comp, chunk_size);
 
                 hpx::future<Iter> right;
                 if (middle != c_last)
                 {
                     right = execution::async_execute(policy.executor(),
-                        parallel_partial_sort_helper(), policy,
-                        c_last + 1, middle, last, level - 1, comp);
+                        parallel_partial_sort_helper(), policy, c_last + 1,
+                        middle, last, level - 1, comp);
                 }
                 else
                 {
