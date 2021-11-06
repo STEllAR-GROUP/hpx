@@ -351,9 +351,31 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \param level : level of depth from the top level call
         /// \param comp : object for to Comp elements
         ///
+        struct sort_thread_helper
+        {
+            template <typename... Ts>
+            decltype(auto) operator()(Ts&&... ts) const
+            {
+                return sort_thread(std::forward<Ts>(ts)...);
+            }
+        };
+
         template <typename ExPolicy, typename Iter, typename Comp>
         hpx::future<Iter> parallel_partial_sort(ExPolicy&& policy, Iter first,
-            Iter middle, Iter last, std::uint32_t level, Comp&& comp = Comp())
+            Iter middle, Iter last, std::uint32_t level, Comp&& comp = Comp());
+
+        struct parallel_partial_sort_helper
+        {
+            template <typename... Ts>
+            decltype(auto) operator()(Ts&&... ts) const
+            {
+                return parallel_partial_sort(std::forward<Ts>(ts)...);
+            }
+        };
+
+        template <typename ExPolicy, typename Iter, typename Comp>
+        hpx::future<Iter> parallel_partial_sort(ExPolicy&& policy, Iter first,
+            Iter middle, Iter last, std::uint32_t level, Comp&& comp)
         {
             std::int64_t nelem = last - first;
             std::int64_t nmid = middle - first;
@@ -382,14 +404,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     policy.parameters(), policy.executor(), 0, cores, nelem);
 
                 hpx::future<Iter> left = execution::async_execute(
-                    policy.executor(), &sort_thread<ExPolicy, Iter, Comp>,
+                    policy.executor(), sort_thread_helper(),
                     policy, first, c_last, comp, chunk_size);
 
                 hpx::future<Iter> right;
                 if (middle != c_last)
                 {
                     right = execution::async_execute(policy.executor(),
-                        &parallel_partial_sort<ExPolicy, Iter, Comp>, policy,
+                        parallel_partial_sort_helper(), policy,
                         c_last + 1, middle, last, level - 1, comp);
                 }
                 else
