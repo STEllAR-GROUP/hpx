@@ -18,6 +18,7 @@ set(benchmarks
     benchmark_partition_copy
     benchmark_remove
     benchmark_remove_if
+    benchmark_scan_algorithms
     benchmark_unique
     benchmark_unique_copy
     foreach_scaling

@@ -568,14 +568,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return curr;
                 };
                 auto f3 = [dest, flags](zip_iterator part_begin,
-                              std::size_t part_size,
-                              hpx::shared_future<std::size_t> curr,
-                              hpx::shared_future<std::size_t> next) mutable {
+                              std::size_t part_size, std::size_t val) mutable {
                     HPX_UNUSED(flags);
-
-                    next.get();    // rethrow exceptions
-
-                    std::advance(dest, curr.get());
+                    std::advance(dest, val);
                     util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_size,
                         [&dest](zip_iterator it) mutable {
                             if (get<1>(*it))
@@ -583,20 +578,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         });
                 };
 
-                auto f4 =
-                    [first, dest, flags](
-                        std::vector<hpx::shared_future<std::size_t>>&& items,
-                        std::vector<hpx::future<void>>&& data) mutable
+                auto f4 = [first, dest, flags](std::vector<std::size_t>&& items,
+                              std::vector<hpx::future<void>>&& data) mutable
                     -> util::in_out_result<FwdIter1, FwdIter3> {
                     HPX_UNUSED(flags);
 
-                    auto dist = items.back().get();
+                    auto dist = items.back();
                     std::advance(first, dist);
                     std::advance(dest, dist);
 
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    items.clear();
                     data.clear();
 
                     return util::in_out_result<FwdIter1, FwdIter3>{
@@ -610,7 +602,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::move(f1),
                     // step 2 propagates the partition results from left
                     // to right
-                    hpx::unwrapping(std::plus<std::size_t>()),
+                    std::plus<std::size_t>(),
                     // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // step 4 use this return value
