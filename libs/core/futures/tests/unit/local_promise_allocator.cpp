@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (C) 2011 Vicente J. Botet Escriba
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -6,13 +6,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <memory>
 
 #include "test_allocator.hpp"
 
-int main()
+int hpx_main()
 {
     HPX_TEST_EQ(test_alloc_base::count, 0);
     {
@@ -43,5 +44,11 @@ int main()
     }
     HPX_TEST_EQ(test_alloc_base::count, 0);
 
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    hpx::local::init(hpx_main, argc, argv);
     return hpx::util::report_errors();
 }

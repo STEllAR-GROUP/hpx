@@ -1,20 +1,18 @@
-// Copyright (C) 2015-2017 Hartmut Kaiser
+// Copyright (C) 2015-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
+#include <hpx/config.hpp>
 
 #if !defined(HPX_HAVE_AWAIT) && !defined(HPX_HAVE_CXX20_COROUTINES)
 #error "This test requires compiler support for C++20 coroutines"
 #endif
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/include/async.hpp>
-#include <hpx/include/lcos_local.hpp>
-#include <hpx/include/threads.hpp>
-
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
+#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <chrono>
@@ -43,7 +41,7 @@ hpx::future<int> test2()
 
 hpx::future<int> test3()
 {
-    int local_variable[128] = {42};      // large local variable
+    int local_variable[128] = {42};    // large local variable
     auto result = co_await hpx::make_ready_future(local_variable[0]);
     (void) result;
     co_return result;
@@ -63,7 +61,7 @@ hpx::future<int> async_test2()
 
 hpx::future<int> async_test3()
 {
-    int local_variable[128] = {42};      // large local variable
+    int local_variable[128] = {42};    // large local variable
     auto result = co_await hpx::async(just_wait, local_variable[0]);
     (void) result;
     co_return result;
@@ -118,7 +116,7 @@ hpx::shared_future<int> shared_test2()
 
 hpx::shared_future<int> shared_test3()
 {
-    int local_variable[128] = {42};      // large local variable
+    int local_variable[128] = {42};    // large local variable
     auto result = co_await hpx::make_ready_future(local_variable[0]);
     (void) result;
     co_return result;
@@ -138,7 +136,7 @@ hpx::shared_future<int> async_shared_test2()
 
 hpx::shared_future<int> async_shared_test3()
 {
-    int local_variable[128] = {42};      // large local variable
+    int local_variable[128] = {42};    // large local variable
     auto result = co_await hpx::async(just_wait, local_variable[0]);
     (void) result;
     co_return result;
@@ -187,8 +185,7 @@ int hpx_main()
     simple_await_shared_tests();
     simple_recursive_await_shared_tests();
 
-    HPX_TEST_EQ(hpx::finalize(), 0);
-    return hpx::util::report_errors();
+    return hpx::local::finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -198,8 +195,9 @@ int main(int argc, char* argv[])
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    hpx::init_params init_args;
+    hpx::local::init_params init_args;
     init_args.cfg = cfg;
 
-    return hpx::init(argc, argv, init_args);
+    hpx::local::init(hpx_main, argc, argv, init_args);
+    return hpx::util::report_errors();
 }

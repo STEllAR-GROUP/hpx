@@ -5,7 +5,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests local_promise_allocator local_use_allocator)
+set(tests)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests
@@ -18,11 +18,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       promise_emplace
       use_allocator
   )
-endif()
-
-if(HPX_WITH_AWAIT OR HPX_WITH_CXX20_COROUTINES)
-  set(tests ${tests} await)
-  set(await_PARAMETERS THREADS_PER_LOCALITY 4)
 endif()
 
 set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)

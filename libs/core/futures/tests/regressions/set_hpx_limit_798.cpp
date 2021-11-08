@@ -9,16 +9,10 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
-#include <hpx/include/actions.hpp>
+#include <hpx/local/future.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/async_local/dataflow.hpp>
-
-using hpx::unwrapping;
-using hpx::lcos::make_ready_future;
-using hpx::lcos::shared_future;
 
 // define large action
 double func(double x1, double, double, double, double, double, double)
@@ -26,13 +20,17 @@ double func(double x1, double, double, double, double, double, double)
     return x1;
 }
 
-int main()
+int hpx_main()
 {
-    shared_future< double > f = make_ready_future( 1.0 );
+    hpx::shared_future<double> f = hpx::make_ready_future(1.0);
     f = hpx::dataflow(
-            hpx::launch::sync,
-            unwrapping(&func),
-            f, f, f, f, f, f, f);
+        hpx::launch::sync, hpx::unwrapping(&func), f, f, f, f, f, f, f);
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    hpx::local::init(hpx_main, argc, argv);
     return hpx::util::report_errors();
 }
 #endif
