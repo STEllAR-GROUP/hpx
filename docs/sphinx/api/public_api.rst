@@ -625,7 +625,7 @@ algorithms.
 Functions
 ---------
 
-- :cpp:func:`hpx::parallel::v1::adjacent_difference`
+- :cpp:func:`hpx::adjacent_difference`
 - :cpp:func:`hpx::exclusive_scan`
 - :cpp:func:`hpx::inclusive_scan`
 - :cpp:func:`hpx::reduce`

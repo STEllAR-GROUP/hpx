@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/local/algorithm.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/adjacent_difference.hpp>
@@ -14,84 +15,9 @@
 #include <string>
 #include <vector>
 
-#include "test_utils.hpp"
+#include "adjacentdifference_tests.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_difference_bad_alloc(ExPolicy policy, IteratorTag)
-{
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
-
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator<base_iterator, IteratorTag>
-        decorated_iterator;
-
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(10007);
-
-    bool caught_bad_alloc = false;
-    try
-    {
-        hpx::parallel::adjacent_difference(policy,
-            decorated_iterator(std::begin(c)), decorated_iterator(std::end(c)),
-            std::begin(d), [](std::size_t lhs, std::size_t rhs) -> std::size_t {
-                throw std::bad_alloc();
-                return lhs - rhs;
-            });
-    }
-    catch (std::bad_alloc const&)
-    {
-        caught_bad_alloc = true;
-    }
-    catch (...)
-    {
-        HPX_TEST(false);
-    }
-
-    HPX_TEST(caught_bad_alloc);
-}
-
-template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_difference_bad_alloc_async(ExPolicy p, IteratorTag)
-{
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator<base_iterator, IteratorTag>
-        decorated_iterator;
-
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(10007);
-
-    bool caught_bad_alloc = false;
-    bool returned_from_algorithm = false;
-
-    try
-    {
-        hpx::future<base_iterator> f = hpx::parallel::adjacent_difference(p,
-            decorated_iterator(std::begin(c)), decorated_iterator(std::end(c)),
-            std::begin(d), [](std::size_t lhs, std::size_t rhs) -> std::size_t {
-                throw std::bad_alloc();
-                return lhs - rhs;
-            });
-        returned_from_algorithm = true;
-
-        f.get();
-
-        HPX_TEST(false);
-    }
-    catch (std::bad_alloc const&)
-    {
-        caught_bad_alloc = true;
-    }
-    catch (...)
-    {
-        HPX_TEST(false);
-    }
-
-    HPX_TEST(caught_bad_alloc);
-    HPX_TEST(returned_from_algorithm);
-}
-
 template <typename IteratorTag>
 void test_adjacent_difference_bad_alloc()
 {
