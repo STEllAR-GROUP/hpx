@@ -16,6 +16,7 @@
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
 #include <mutex>
@@ -123,7 +124,8 @@ namespace hpx { namespace components {
                     lock_type l(this->mtx_);
 
                     // avoid locking errors while handling asserts below
-                    util::ignore_while_checking<lock_type> il(&l);
+                    util::ignore_while_checking il(&l);
+                    HPX_UNUSED(il);
 
                     was_migrated = this->pin_count_ == ~0x0u;
                     HPX_ASSERT(this->pin_count_ != 0);
@@ -169,6 +171,8 @@ namespace hpx { namespace components {
 
             // avoid locking errors while handling asserts below
             util::ignore_while_checking<lock_type> il(&l);
+            HPX_UNUSED(il);
+
             HPX_ASSERT(1 == pin_count_);
 
             pin_count_ = ~0x0u;

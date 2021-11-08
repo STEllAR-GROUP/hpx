@@ -29,6 +29,7 @@
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
 
@@ -618,9 +619,8 @@ namespace hpx { namespace parcelset
             // We ignore the lock here. It might happen that while enqueuing,
             // we need to acquire a lock. This should not cause any problems
             // (famous last words)
-            util::ignore_while_checking<
-                std::unique_lock<lcos::local::spinlock>
-            > il(&l);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
 
             mapped_type& e = pending_parcels_[locality_id];
             hpx::get<0>(e).push_back(std::move(p));
@@ -640,9 +640,8 @@ namespace hpx { namespace parcelset
             // We ignore the lock here. It might happen that while enqueuing,
             // we need to acquire a lock. This should not cause any problems
             // (famous last words)
-            util::ignore_while_checking<
-                std::unique_lock<lcos::local::spinlock>
-            > il(&l);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
 
             HPX_ASSERT(parcels.size() == handlers.size());
 

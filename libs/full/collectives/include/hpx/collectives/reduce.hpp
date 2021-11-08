@@ -174,7 +174,8 @@ namespace hpx { namespace traits {
                 auto& communicator = this_->communicator_;
 
                 lock_type l(communicator.mtx_);
-                util::ignore_while_checking<lock_type> il(&l);
+                util::ignore_while_checking il(&l);
+                HPX_UNUSED(il);
 
                 auto& data = communicator.template access_data<arg_type>(l);
 
@@ -183,7 +184,8 @@ namespace hpx { namespace traits {
             };
 
             lock_type l(communicator_.mtx_);
-            util::ignore_while_checking<lock_type> il(&l);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
 
             hpx::future<arg_type> f =
                 communicator_.gate_.get_shared_future(l).then(
@@ -218,7 +220,8 @@ namespace hpx { namespace traits {
             };
 
             lock_type l(communicator_.mtx_);
-            util::ignore_while_checking<lock_type> il(&l);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
 
             hpx::future<void> f = communicator_.gate_.get_shared_future(l).then(
                 hpx::launch::sync, std::move(on_ready));

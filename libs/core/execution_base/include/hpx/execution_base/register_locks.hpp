@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <map>
@@ -29,9 +30,6 @@ namespace hpx { namespace util {
 
     // Always provide function exports, which guarantees ABI compatibility of
     // Debug and Release builds.
-
-    template <typename Lock, typename Enable = void>
-    struct ignore_while_checking;
 
 #if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_CORE_EXPORTS)
 
@@ -121,11 +119,11 @@ namespace hpx { namespace util {
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(mutex)
     }
 
-    template <typename Lock>
-    struct ignore_while_checking<Lock,
-        typename std::enable_if<detail::has_mutex<Lock>::value>::type>
+    template <typename Lock,
+        typename Enable = std::enable_if_t<detail::has_mutex_v<Lock>>>
+    struct ignore_while_checking
     {
-        ignore_while_checking(Lock const* lock)
+        explicit ignore_while_checking(Lock const* lock)
           : mtx_(lock->mutex())
         {
             ignore_lock(mtx_);
@@ -153,36 +151,41 @@ namespace hpx { namespace util {
 
 #else
 
-    template <typename Lock, typename Enable>
+    template <typename Lock, typename Enable = void>
     struct ignore_while_checking
     {
-        ignore_while_checking(void const* /*lock*/) {}
+        explicit constexpr ignore_while_checking(Lock const* /*lock*/) noexcept
+        {
+        }
     };
 
     struct ignore_all_while_checking
     {
-        ignore_all_while_checking() {}
+        constexpr ignore_all_while_checking() noexcept {}
     };
 
     constexpr inline bool register_lock(
-        void const*, util::register_lock_data* = nullptr)
+        void const*, util::register_lock_data* = nullptr) noexcept
     {
         return true;
     }
-    constexpr inline bool unregister_lock(void const*)
+    constexpr inline bool unregister_lock(void const*) noexcept
     {
         return true;
     }
-    constexpr inline void verify_no_locks() {}
-    constexpr inline void force_error_on_lock() {}
-    constexpr inline void enable_lock_detection() {}
-    constexpr inline void disable_lock_detection() {}
-    constexpr inline void trace_depth_lock_detection(std::size_t /*value*/) {}
-    constexpr inline void ignore_lock(void const* /*lock*/) {}
-    constexpr inline void reset_ignored(void const* /*lock*/) {}
+    constexpr inline void verify_no_locks() noexcept {}
+    constexpr inline void force_error_on_lock() noexcept {}
+    constexpr inline void enable_lock_detection() noexcept {}
+    constexpr inline void disable_lock_detection() noexcept {}
+    constexpr inline void trace_depth_lock_detection(
+        std::size_t /*value*/) noexcept
+    {
+    }
+    constexpr inline void ignore_lock(void const* /*lock*/) noexcept {}
+    constexpr inline void reset_ignored(void const* /*lock*/) noexcept {}
 
-    constexpr inline void ignore_all_locks() {}
-    constexpr inline void reset_ignored_all() {}
+    constexpr inline void ignore_all_locks() noexcept {}
+    constexpr inline void reset_ignored_all() noexcept {}
 
     struct held_locks_data
     {
@@ -194,7 +197,7 @@ namespace hpx { namespace util {
     }
 
     constexpr inline void set_held_locks_data(
-        std::unique_ptr<held_locks_data>&& /*data*/)
+        std::unique_ptr<held_locks_data>&& /*data*/) noexcept
     {
     }
 

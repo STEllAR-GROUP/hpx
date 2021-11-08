@@ -17,6 +17,7 @@
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/pack.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <exception>
@@ -134,7 +135,9 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 std::unique_lock<mutex_type> l(state.mtx);
                 state.set_called = true;
-                hpx::util::ignore_while_checking<decltype(l)> il(&l);
+                hpx::util::ignore_while_checking il(&l);
+                HPX_UNUSED(il);
+
                 state.cond_var.notify_one();
             }
 

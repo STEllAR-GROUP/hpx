@@ -16,6 +16,7 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <mutex>
 #include <utility>
@@ -108,7 +109,9 @@ namespace hpx { namespace lcos { namespace local {
         owner_id_ = threads::invalid_thread_id;
 
         {
-            util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
+
             cond_.notify_one(std::move(l), threads::thread_priority::boost, ec);
         }
     }

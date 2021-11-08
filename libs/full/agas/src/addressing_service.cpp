@@ -2156,7 +2156,8 @@ namespace hpx { namespace agas {
         using lock_type = std::unique_lock<mutex_type>;
 
         lock_type lock(migrated_objects_mtx_);
-        util::ignore_while_checking<lock_type> ignore(&lock);
+        util::ignore_while_checking ignore(&lock);
+        HPX_UNUSED(ignore);
 
         // call the user code for the component instance to be migrated, the
         // returned future becomes ready whenever the component instance can be
@@ -2302,7 +2303,9 @@ namespace hpx { namespace agas {
         if (was_object_migrated_locked(gid))
             return std::make_pair(true, components::pinned_ptr());
 
-        util::ignore_while_checking<lock_type> ignore(&lock);
+        util::ignore_while_checking ignore(&lock);
+        HPX_UNUSED(ignore);
+
         return std::make_pair(false, f());
     }
 

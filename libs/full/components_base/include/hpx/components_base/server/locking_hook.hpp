@@ -15,6 +15,7 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_data.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <mutex>
 #include <type_traits>
@@ -118,7 +119,8 @@ namespace hpx { namespace components {
             //
             // If this lock is not ignored it will cause false positives as the
             // check for held locks is performed before this lock is unlocked.
-            util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
 
             {
                 // register our yield decorator
