@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 Francisco Jose Tapia
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +11,45 @@
 
 #if defined(DOXYGEN)
 namespace hpx {
+    // clang-format off
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// Places the first middle - first elements from the range [first, last)
+    /// as sorted with respect to comp into the range [first, middle). The rest
+    /// of the elements in the range [middle, last) are placed in an unspecified
+    /// order.
+    ///
+    /// \note   Complexity: Approximately (last - first) * log(middle - first)
+    ///         comparisons.
+    ///
+    /// \tparam RandIter    The type of the source begin, middle, and end
+    ///                     iterators used (deduced). This iterator type must
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced). Comp defaults to detail::less.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param middle       Refers to the middle of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param comp         comp is a callable object. The return value of the
+    ///                     INVOKE operation applied to an object of type Comp,
+    ///                     when contextually converted to bool, yields true if
+    ///                     the first argument of the call is less than the
+    ///                     second, and false otherwise. It is assumed that
+    ///                     comp will not apply any non-constant function
+    ///                     through the dereferenced iterator. It defaults to
+    ///                     detail::less.
+    ///
+    /// \returns  The \a partial_sort algorithm returns nothing.
+    ///
+    template <typename RandIter, typename Comp>
+    void partial_sort(RandIter first, RandIter middle, RandIter last,
+        Comp&& comp = Comp());
+
+    ///////////////////////////////////////////////////////////////////////////
     /// Places the first middle - first elements from the range [first, last)
     /// as sorted with respect to comp into the range [first, middle). The rest
     /// of the elements in the range [middle, last) are placed in an unspecified
@@ -26,6 +65,8 @@ namespace hpx {
     /// \tparam RandIter    The type of the source begin, middle, and end
     ///                     iterators used (deduced). This iterator type must
     ///                     meet the requirements of a random access iterator.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced). Comp defaults to detail::less.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -35,16 +76,26 @@ namespace hpx {
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
+    /// \param comp         comp is a callable object. The return value of the
+    ///                     INVOKE operation applied to an object of type Comp,
+    ///                     when contextually converted to bool, yields true if
+    ///                     the first argument of the call is less than the
+    ///                     second, and false otherwise. It is assumed that
+    ///                     comp will not apply any non-constant function
+    ///                     through the dereferenced iterator. It defaults to
+    ///                     detail::less.
     ///
     /// \returns  The \a partial_sort algorithm returns a
     ///           \a hpx::future<void> if the execution policy is of
     ///           type \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns void otherwise.
     ///
-    template <typename RandIter>
-    typename util::detail::algorithm_result<ExPolicy>::type partial_sort(
-        ExPolicy&& policy, RandIter first, RandIter middle, RandIter last);
+    template <typename ExPolicy, typename RandIter, typename Comp>
+    util::detail::algorithm_result_t<ExPolicy> partial_sort(
+        ExPolicy&& policy, RandIter first, RandIter middle, RandIter last,
+        Comp&& comp = Comp());
 
+    // clang-format on
 }    // namespace hpx
 
 #else
@@ -66,6 +117,7 @@ namespace hpx {
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
@@ -299,9 +351,31 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \param level : level of depth from the top level call
         /// \param comp : object for to Comp elements
         ///
+        struct sort_thread_helper
+        {
+            template <typename... Ts>
+            decltype(auto) operator()(Ts&&... ts) const
+            {
+                return sort_thread(std::forward<Ts>(ts)...);
+            }
+        };
+
         template <typename ExPolicy, typename Iter, typename Comp>
         hpx::future<Iter> parallel_partial_sort(ExPolicy&& policy, Iter first,
-            Iter middle, Iter last, std::uint32_t level, Comp&& comp = Comp())
+            Iter middle, Iter last, std::uint32_t level, Comp&& comp = Comp());
+
+        struct parallel_partial_sort_helper
+        {
+            template <typename... Ts>
+            decltype(auto) operator()(Ts&&... ts) const
+            {
+                return parallel_partial_sort(std::forward<Ts>(ts)...);
+            }
+        };
+
+        template <typename ExPolicy, typename Iter, typename Comp>
+        hpx::future<Iter> parallel_partial_sort(ExPolicy&& policy, Iter first,
+            Iter middle, Iter last, std::uint32_t level, Comp&& comp)
         {
             std::int64_t nelem = last - first;
             std::int64_t nmid = middle - first;
@@ -330,15 +404,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     policy.parameters(), policy.executor(), 0, cores, nelem);
 
                 hpx::future<Iter> left = execution::async_execute(
-                    policy.executor(), &sort_thread<ExPolicy, Iter, Comp>,
-                    policy, first, c_last, comp, chunk_size);
+                    policy.executor(), sort_thread_helper(), policy, first,
+                    c_last, comp, chunk_size);
 
                 hpx::future<Iter> right;
                 if (middle != c_last)
                 {
                     right = execution::async_execute(policy.executor(),
-                        &parallel_partial_sort<ExPolicy, Iter, Comp>, policy,
-                        c_last + 1, middle, last, level - 1, comp);
+                        parallel_partial_sort_helper(), policy, c_last + 1,
+                        middle, last, level - 1, comp);
                 }
                 else
                 {
@@ -383,7 +457,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename Iter, typename Sent, typename Comp>
     Iter sequential_partial_sort(Iter first, Iter middle, Sent end, Comp&& comp)
     {
-        std::int64_t nelem = end - first;
+        std::int64_t nelem = parallel::v1::detail::distance(first, end);
         HPX_ASSERT(nelem >= 0);
 
         std::int64_t nmid = middle - first;
@@ -418,7 +492,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     hpx::future<Iter> parallel_partial_sort(
         ExPolicy&& policy, Iter first, Iter middle, Sent end, Comp&& comp)
     {
-        std::int64_t nelem = end - first;
+        std::int64_t nelem = parallel::v1::detail::distance(first, end);
         HPX_ASSERT(nelem >= 0);
 
         std::int64_t nmid = middle - first;

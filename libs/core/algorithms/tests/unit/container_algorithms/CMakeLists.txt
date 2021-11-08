@@ -67,6 +67,8 @@ set(tests
     move_range
     nth_element_range
     none_of_range
+    partial_sort_range
+    partial_sort_copy_range
     partition_range
     partition_copy_range
     reduce_range

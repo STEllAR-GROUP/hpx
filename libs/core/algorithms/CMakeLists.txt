@@ -60,6 +60,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/move.hpp
     hpx/parallel/algorithms/nth_element.hpp
     hpx/parallel/algorithms/partial_sort.hpp
+    hpx/parallel/algorithms/partial_sort_copy.hpp
     hpx/parallel/algorithms/partition.hpp
     hpx/parallel/algorithms/reduce_by_key.hpp
     hpx/parallel/algorithms/reduce.hpp
@@ -117,6 +118,8 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/mismatch.hpp
     hpx/parallel/container_algorithms/move.hpp
     hpx/parallel/container_algorithms/nth_element.hpp
+    hpx/parallel/container_algorithms/partial_sort.hpp
+    hpx/parallel/container_algorithms/partial_sort_copy.hpp
     hpx/parallel/container_algorithms/partition.hpp
     hpx/parallel/container_algorithms/reduce.hpp
     hpx/parallel/container_algorithms/remove_copy.hpp
