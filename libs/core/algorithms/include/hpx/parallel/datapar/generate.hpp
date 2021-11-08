@@ -29,8 +29,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct datapar_generate_helper
     {
         using iterator_type = std::decay_t<Iterator>;
-        using value_type = std::iterator_traits<iterator_type>::value_type;
-        using V = hpx::parallel::traits::vector_pack_type<value_type>::type;
+        using value_type =
+            typename std::iterator_traits<iterator_type>::value_type;
+        using V =
+            typename hpx::parallel::traits::vector_pack_type<value_type>::type;
 
         static constexpr std::size_t size = traits::vector_pack_size<V>::value;
 
