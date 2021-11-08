@@ -6,6 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/include/datapar.hpp>
 #include <hpx/local/init.hpp>
 
 #include <iostream>
@@ -14,22 +15,17 @@
 
 #include "generate_tests.hpp"
 
-// FIXME: Intel 15 currently can not compile this code. This needs to be fixed. See #1408
-#if !(defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION == 1500)
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_generate()
 {
     using namespace hpx::execution;
 
-    test_generate(IteratorTag());
+    test_generate(simd, IteratorTag());
+    test_generate(par_simd, IteratorTag());
 
-    test_generate(seq, IteratorTag());
-    test_generate(par, IteratorTag());
-    test_generate(par_unseq, IteratorTag());
-
-    test_generate_async(seq(task), IteratorTag());
-    test_generate_async(par(task), IteratorTag());
+    test_generate_async(simd(task), IteratorTag());
+    test_generate_async(par_simd(task), IteratorTag());
 }
 
 void generate_test()
@@ -44,16 +40,14 @@ void test_generate_exception()
 {
     using namespace hpx::execution;
 
-    test_generate_exception(IteratorTag());
-
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_generate_exception(seq, IteratorTag());
-    test_generate_exception(par, IteratorTag());
+    test_generate_exception(simd, IteratorTag());
+    test_generate_exception(par_simd, IteratorTag());
 
-    test_generate_exception_async(seq(task), IteratorTag());
-    test_generate_exception_async(par(task), IteratorTag());
+    test_generate_exception_async(simd(task), IteratorTag());
+    test_generate_exception_async(par_simd(task), IteratorTag());
 }
 
 void generate_exception_test()
@@ -71,11 +65,11 @@ void test_generate_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_generate_bad_alloc(seq, IteratorTag());
-    test_generate_bad_alloc(par, IteratorTag());
+    test_generate_bad_alloc(simd, IteratorTag());
+    test_generate_bad_alloc(par_simd, IteratorTag());
 
-    test_generate_bad_alloc_async(seq(task), IteratorTag());
-    test_generate_bad_alloc_async(par(task), IteratorTag());
+    test_generate_bad_alloc_async(simd(task), IteratorTag());
+    test_generate_bad_alloc_async(par_simd(task), IteratorTag());
 }
 
 void generate_bad_alloc_test()
@@ -98,12 +92,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     generate_bad_alloc_test();
     return hpx::local::finalize();
 }
-#else
-int hpx_main(hpx::program_options::variables_map& vm)
-{
-    return hpx::local::finalize();
-}
-#endif
 
 int main(int argc, char* argv[])
 {

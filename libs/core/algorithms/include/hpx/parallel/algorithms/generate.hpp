@@ -135,10 +135,13 @@ namespace hpx {
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/generate.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -146,22 +149,13 @@ namespace hpx {
 #include <iterator>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace hpx { namespace parallel { inline namespace v1 {
 
     ///////////////////////////////////////////////////////////////////////////
     // generate
     namespace detail {
-
-        template <typename Iter, typename Sent, typename F>
-        constexpr Iter sequential_generate(Iter first, Sent last, F&& f)
-        {
-            while (first != last)
-            {
-                *first++ = f();
-            }
-            return first;
-        }
 
         template <typename FwdIter>
         struct generate : public detail::algorithm<generate<FwdIter>, FwdIter>
@@ -174,9 +168,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename F>
             static constexpr Iter sequential(
-                ExPolicy, Iter first, Sent last, F&& f)
+                ExPolicy&& policy, Iter first, Sent last, F&& f)
             {
-                return sequential_generate(first, last, std::forward<F>(f));
+                return sequential_generate(std::forward<ExPolicy>(policy),
+                    first, last, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -184,13 +179,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static typename util::detail::algorithm_result<ExPolicy, Iter>::type
             parallel(ExPolicy&& policy, Iter first, Sent last, F&& f)
             {
-                using type = typename std::iterator_traits<Iter>::value_type;
-
-                return for_each_n<Iter>().call(
+                auto f1 = [policy = std::forward<ExPolicy>(policy),
+                              f = std::forward<F>(f)](
+                              Iter part_begin, std::size_t part_size) mutable {
+                    auto part_end = part_begin;
+                    std::advance(part_end, part_size);
+                    return sequential_generate(std::forward<ExPolicy>(policy),
+                        part_begin, part_end, std::forward<F>(f));
+                };
+                return util::partitioner<ExPolicy, Iter>::call(
                     std::forward<ExPolicy>(policy), first,
-                    detail::distance(first, last),
-                    [f = std::forward<F>(f)](type& v) mutable { v = f(); },
-                    util::projection_identity());
+                    detail::distance(first, last), std::move(f1),
+                    [first, last](std::vector<hpx::future<Iter>>&&) {
+                        return detail::advance_to_sentinel(first, last);
+                    });
             }
         };
     }    // namespace detail
@@ -236,9 +238,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter, typename F>
             static FwdIter sequential(
-                ExPolicy, InIter first, std::size_t count, F&& f)
+                ExPolicy&& policy, InIter first, std::size_t count, F&& f)
             {
-                return std::generate_n(first, count, f);
+                return sequential_generate_n(
+                    std::forward<ExPolicy>(policy), first, count, f);
             }
 
             template <typename ExPolicy, typename F>
@@ -247,12 +250,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 parallel(
                     ExPolicy&& policy, FwdIter first, std::size_t count, F&& f)
             {
-                typedef typename std::iterator_traits<FwdIter>::value_type type;
-
-                return for_each_n<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), first, count,
-                    [f = std::forward<F>(f)](type& v) mutable { v = f(); },
-                    util::projection_identity());
+                auto f1 = [policy = std::forward<ExPolicy>(policy),
+                              f = std::forward<F>(f)](FwdIter part_begin,
+                              std::size_t part_size) mutable {
+                    return sequential_generate_n(std::forward<ExPolicy>(policy),
+                        part_begin, part_size, std::forward<F>(f));
+                };
+                return util::partitioner<ExPolicy, FwdIter>::call(
+                    std::forward<ExPolicy>(policy), first, count, std::move(f1),
+                    [first, count](
+                        std::vector<hpx::future<FwdIter>>&&) mutable {
+                        std::advance(first, count);
+                        return first;
+                    });
             }
         };
     }    // namespace detail

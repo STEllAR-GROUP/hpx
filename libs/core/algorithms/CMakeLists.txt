@@ -25,6 +25,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/distance.hpp
     hpx/parallel/algorithms/detail/fill.hpp
     hpx/parallel/algorithms/detail/find.hpp
+    hpx/parallel/algorithms/detail/generate.hpp
     hpx/parallel/algorithms/detail/indirect.hpp
     hpx/parallel/algorithms/detail/insertion_sort.hpp
     hpx/parallel/algorithms/detail/is_sorted.hpp
@@ -153,6 +154,7 @@ set(algorithms_headers
     hpx/parallel/container_numeric.hpp
     hpx/parallel/datapar.hpp
     hpx/parallel/datapar/fill.hpp
+    hpx/parallel/datapar/generate.hpp
     hpx/parallel/datapar/adjacent_difference.hpp
     hpx/parallel/datapar/iterator_helpers.hpp
     hpx/parallel/datapar/loop.hpp

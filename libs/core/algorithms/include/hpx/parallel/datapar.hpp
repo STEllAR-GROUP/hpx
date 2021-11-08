@@ -14,6 +14,7 @@
 #include <hpx/executors/datapar/execution_policy.hpp>
 #include <hpx/parallel/datapar/adjacent_difference.hpp>
 #include <hpx/parallel/datapar/fill.hpp>
+#include <hpx/parallel/datapar/generate.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
 #include <hpx/parallel/datapar/transfer.hpp>
