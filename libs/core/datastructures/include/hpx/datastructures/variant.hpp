@@ -14,6 +14,7 @@
 namespace hpx {
 
     using std::get;
+    using std::holds_alternative;
     using std::monostate;
     using std::variant;
     using std::visit;
@@ -26,6 +27,7 @@ namespace hpx {
 namespace hpx {
 
     using hpx::variant_ns::get;
+    using hpx::variant_ns::holds_alternative;
     using hpx::variant_ns::monostate;
     using hpx::variant_ns::variant;
     using hpx::variant_ns::visit;
