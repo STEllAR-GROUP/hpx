@@ -14,7 +14,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality.
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::component<
@@ -22,15 +22,15 @@ typedef hpx::components::component<
 > cancelable_action_component_type;
 
 HPX_REGISTER_COMPONENT(
-    cancelable_action_component_type, cancelable_action);
+    cancelable_action_component_type, cancelable_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for simple_accumulator actions.
 HPX_REGISTER_ACTION(
     examples::server::cancelable_action::do_it_action,
-    cancelable_action_do_it_action);
+    cancelable_action_do_it_action)
 HPX_REGISTER_ACTION(
     examples::server::cancelable_action::cancel_it_action,
-    cancelable_action_cancel_it_action);
+    cancelable_action_cancel_it_action)
 
 #endif

@@ -34,7 +34,7 @@ namespace sheneos
     };
 }
 
-HPX_DISTRIBUTED_METADATA_DECLARATION(sheneos::config_data, sheneos_config_data);
+HPX_DISTRIBUTED_METADATA_DECLARATION(sheneos::config_data, sheneos_config_data)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Non-intrusive serialization.

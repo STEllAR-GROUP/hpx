@@ -199,12 +199,12 @@ private:
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
 typedef hpx::components::component<partition_server> partition_server_type;
-HPX_REGISTER_COMPONENT(partition_server_type, partition_server);
+HPX_REGISTER_COMPONENT(partition_server_type, partition_server)
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.
 typedef partition_server::get_data_action get_data_action;
-HPX_REGISTER_ACTION(get_data_action);
+HPX_REGISTER_ACTION(get_data_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // This is a client side helper class allowing to hide some of the tedious
@@ -325,7 +325,7 @@ struct stepper
 // those remotely. The macro HPX_PLAIN_ACTION() defines a new action type
 // 'heat_part_action' which wraps the global function heat_part(). It can be
 // used to call that function on a given locality.
-HPX_PLAIN_ACTION(stepper::heat_part, heat_part_action);
+HPX_PLAIN_ACTION(stepper::heat_part, heat_part_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // do all the work on 'np' partitions, 'nx' data points each, for 'nt'

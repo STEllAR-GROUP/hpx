@@ -124,7 +124,7 @@ void hello_world_foreman()
 //[hello_world_action_wrapper
 // Define the boilerplate code necessary for the function 'hello_world_foreman'
 // to be invoked as an HPX action.
-HPX_PLAIN_ACTION(hello_world_foreman, hello_world_foreman_action);
+HPX_PLAIN_ACTION(hello_world_foreman, hello_world_foreman_action)
 //]
 
 ///////////////////////////////////////////////////////////////////////////////

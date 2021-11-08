@@ -26,7 +26,7 @@ std::uint64_t fibonacci(std::uint64_t n);
 
 // This is to generate the required boilerplate we need for the remote
 // invocation to work.
-HPX_PLAIN_ACTION(fibonacci, fibonacci_action);
+HPX_PLAIN_ACTION(fibonacci, fibonacci_action)
 //]
 
 ///////////////////////////////////////////////////////////////////////////////

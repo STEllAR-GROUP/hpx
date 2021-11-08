@@ -107,7 +107,7 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
 
 HPX_DECLARE_ACTION(test_sheneos, test_action);
 HPX_ACTION_USES_MEDIUM_STACK(test_action);
-HPX_PLAIN_ACTION(test_sheneos, test_action);
+HPX_PLAIN_ACTION(test_sheneos, test_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the test function. It will be invoked on all localities that the
@@ -201,7 +201,7 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
 
 HPX_DECLARE_ACTION(test_sheneos_one_bulk, test_one_bulk_action);
 HPX_ACTION_USES_MEDIUM_STACK(test_one_bulk_action);
-HPX_PLAIN_ACTION(test_sheneos_one_bulk, test_one_bulk_action);
+HPX_PLAIN_ACTION(test_sheneos_one_bulk, test_one_bulk_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the test function for interpolate_bulk. It will be invoked on all
@@ -294,7 +294,7 @@ void test_sheneos_bulk(std::size_t num_ye_points,
 
 HPX_DECLARE_ACTION(test_sheneos_bulk, test_bulk_action);
 HPX_ACTION_USES_MEDIUM_STACK(test_bulk_action);
-HPX_PLAIN_ACTION(test_sheneos_bulk, test_bulk_action);
+HPX_PLAIN_ACTION(test_sheneos_bulk, test_bulk_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void wait_for_task(std::size_t i, hpx::chrono::high_resolution_timer& t)

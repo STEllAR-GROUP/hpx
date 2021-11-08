@@ -23,7 +23,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // The vector types to be used are defined in partitioned_vector module.
-// HPX_REGISTER_PARTITIONED_VECTOR(double);
+// HPX_REGISTER_PARTITIONED_VECTOR(double)
 
 void bulk_test(hpx::lcos::spmd_block block,
     std::size_t N,

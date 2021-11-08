@@ -298,12 +298,12 @@ private:
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
 typedef hpx::components::component<partition_server> partition_server_type;
-HPX_REGISTER_COMPONENT(partition_server_type, partition_server);
+HPX_REGISTER_COMPONENT(partition_server_type, partition_server)
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.
 typedef partition_server::get_data_action get_data_action;
-HPX_REGISTER_ACTION(get_data_action);
+HPX_REGISTER_ACTION(get_data_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // This is a client side helper class allowing to hide some of the tedious
@@ -442,21 +442,21 @@ private:
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
 typedef hpx::components::component<stepper_server> stepper_server_type;
-HPX_REGISTER_COMPONENT(stepper_server_type, stepper_server);
+HPX_REGISTER_COMPONENT(stepper_server_type, stepper_server)
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.
 typedef stepper_server::from_right_action from_right_action;
-HPX_REGISTER_ACTION(from_right_action);
+HPX_REGISTER_ACTION(from_right_action)
 
 typedef stepper_server::from_left_action from_left_action;
-HPX_REGISTER_ACTION(from_left_action);
+HPX_REGISTER_ACTION(from_left_action)
 
 typedef stepper_server::do_work_action do_work_action;
-HPX_REGISTER_ACTION(do_work_action);
+HPX_REGISTER_ACTION(do_work_action)
 
 typedef stepper_server::release_dependencies_action release_dependencies_action;
-HPX_REGISTER_ACTION(release_dependencies_action);
+HPX_REGISTER_ACTION(release_dependencies_action)
 
 void stepper_server::send_left(std::size_t t, partition p) const
 {

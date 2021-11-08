@@ -27,7 +27,7 @@ apex_policy_handle * periodic_policy_handle;
 
 double do_work(std::uint64_t n);
 
-HPX_PLAIN_ACTION(do_work, do_work_action);
+HPX_PLAIN_ACTION(do_work, do_work_action)
 
 double do_work(std::uint64_t n) {
     double result = 1;

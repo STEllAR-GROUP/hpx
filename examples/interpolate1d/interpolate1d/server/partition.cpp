@@ -72,11 +72,11 @@ typedef interpolate1d::server::partition partition_type;
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
 HPX_REGISTER_ACTION(partition_type::init_action,
-    partition_init_action);
+    partition_init_action)
 HPX_REGISTER_ACTION(partition_type::interpolate_action,
-    partition_interpolate_action);
+    partition_interpolate_action)
 
 HPX_REGISTER_COMPONENT(
     hpx::components::component<partition_type>,
-    interpolate1d_partition_type);
+    interpolate1d_partition_type)
 #endif

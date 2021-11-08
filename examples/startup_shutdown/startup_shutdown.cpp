@@ -36,7 +36,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
-HPX_REGISTER_COMPONENT_MODULE();    // create entry point for component factory
+HPX_REGISTER_COMPONENT_MODULE()     // create entry point for component factory
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace startup_shutdown
@@ -87,6 +87,6 @@ namespace startup_shutdown
 // of the 2 parameters for the macro below can be zero (0), which means no
 // function will be called. We leave the shutdown function out as we don't need
 // it for the purpose of this example.
-HPX_REGISTER_STARTUP_MODULE(::startup_shutdown::get_startup);
+HPX_REGISTER_STARTUP_MODULE(::startup_shutdown::get_startup)
 
 #endif

@@ -31,7 +31,7 @@ std::size_t get_serial_execution_count()
 {
     return serial_execution_count.load();
 }
-HPX_PLAIN_ACTION(get_serial_execution_count);
+HPX_PLAIN_ACTION(get_serial_execution_count)
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<std::size_t> next_locality(0);
@@ -75,7 +75,7 @@ hpx::id_type const& get_next_locality(std::uint64_t next)
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::future<std::uint64_t> fibonacci_future(std::uint64_t n);
-HPX_PLAIN_ACTION(fibonacci_future);
+HPX_PLAIN_ACTION(fibonacci_future)
 
 hpx::future<std::uint64_t> fibonacci_future(std::uint64_t n)
 {

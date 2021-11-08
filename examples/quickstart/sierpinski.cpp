@@ -74,7 +74,7 @@ sierpinski get_sierpinski(std::uint64_t n, double len);
 
 // This is to generate the required boilerplate we need for the remote
 // invocation to work.
-HPX_PLAIN_ACTION(get_sierpinski, get_sierpinski_action);
+HPX_PLAIN_ACTION(get_sierpinski, get_sierpinski_action)
 
 
 ///////////////////////////////////////////////////////////////////////////////

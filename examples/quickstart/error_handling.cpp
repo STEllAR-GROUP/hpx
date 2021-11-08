@@ -18,7 +18,7 @@ void raise_exception()
 {
     HPX_THROW_EXCEPTION(hpx::no_success, "raise_exception", "simulated error");
 }
-HPX_PLAIN_ACTION(raise_exception, raise_exception_action);
+HPX_PLAIN_ACTION(raise_exception, raise_exception_action)
 //]
 
 ///////////////////////////////////////////////////////////////////////////////

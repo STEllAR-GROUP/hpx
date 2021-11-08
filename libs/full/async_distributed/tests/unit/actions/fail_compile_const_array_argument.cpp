@@ -14,7 +14,7 @@
 #include <hpx/include/runtime.hpp>
 
 void test(int const (&ptr)[20]) {}
-HPX_PLAIN_ACTION(test);
+HPX_PLAIN_ACTION(test)
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()

@@ -28,7 +28,7 @@ namespace examples { namespace server
 }}
 
 HPX_REGISTER_ACTION_DECLARATION(
-    examples::server::hello_world::invoke_action, hello_world_invoke_action);
+    examples::server::hello_world::invoke_action, hello_world_invoke_action)
 
 namespace examples
 {

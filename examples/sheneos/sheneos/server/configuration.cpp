@@ -27,4 +27,4 @@ namespace hpx { namespace serialization
     }
 }}
 
-HPX_DISTRIBUTED_METADATA(sheneos::config_data, sheneos_config_data);
+HPX_DISTRIBUTED_METADATA(sheneos::config_data, sheneos_config_data)

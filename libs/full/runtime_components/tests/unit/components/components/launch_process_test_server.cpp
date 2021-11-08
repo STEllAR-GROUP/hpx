@@ -15,10 +15,10 @@
 // Test-component which is instantiated by the launching process and registered
 // with AGAS such that the launched process can use it.
 
-HPX_REGISTER_ACTION(launch_process_get_message_action);
-HPX_REGISTER_ACTION(launch_process_set_message_action);
+HPX_REGISTER_ACTION(launch_process_get_message_action)
+HPX_REGISTER_ACTION(launch_process_set_message_action)
 
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 
 ///////////////////////////////////////////////////////////////////////////////
 // We use a special component registry for this component as it has to be

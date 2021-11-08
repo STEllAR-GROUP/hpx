@@ -46,6 +46,6 @@ typedef launch_process::test_server::get_message_action
 typedef launch_process::test_server::set_message_action
     launch_process_set_message_action;
 
-HPX_REGISTER_ACTION_DECLARATION(launch_process_get_message_action);
-HPX_REGISTER_ACTION_DECLARATION(launch_process_set_message_action);
+HPX_REGISTER_ACTION_DECLARATION(launch_process_get_message_action)
+HPX_REGISTER_ACTION_DECLARATION(launch_process_set_message_action)
 #endif

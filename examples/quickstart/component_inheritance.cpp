@@ -32,11 +32,11 @@ struct A : hpx::components::abstract_component_base<A>
     HPX_DEFINE_COMPONENT_ACTION(A, print_nonvirt, print_action);
 };
 
-HPX_DEFINE_GET_COMPONENT_TYPE(A);
+HPX_DEFINE_GET_COMPONENT_TYPE(A)
 
 typedef A::print_action print_action;
-HPX_REGISTER_ACTION_DECLARATION(print_action);
-HPX_REGISTER_ACTION(print_action);
+HPX_REGISTER_ACTION_DECLARATION(print_action)
+HPX_REGISTER_ACTION(print_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define a component which implements the required interface by deriving from
@@ -74,7 +74,7 @@ struct B : A, hpx::components::component_base<B>
 };
 
 typedef hpx::components::component<B> server_type;
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(server_type, B, "A");
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(server_type, B, "A")
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define a client side representation for a remote component instance 'A',

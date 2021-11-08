@@ -111,7 +111,7 @@ typedef hpx::components::component<
     jacobi::server::stencil_iterator
 > stencil_iterator_type;
 
-HPX_REGISTER_COMPONENT(stencil_iterator_type, stencil_iterator);
+HPX_REGISTER_COMPONENT(stencil_iterator_type, stencil_iterator)
 
 
 HPX_REGISTER_ACTION(

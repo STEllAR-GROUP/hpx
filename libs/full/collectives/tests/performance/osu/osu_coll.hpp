@@ -75,7 +75,7 @@ inline std::pair<std::size_t, std::vector<hpx::util::remote_locality_result>>
 distribute_component(
     std::vector<hpx::id_type> localities, hpx::components::component_type type);
 
-HPX_PLAIN_ACTION(distribute_component);
+HPX_PLAIN_ACTION(distribute_component)
 
 inline std::pair<std::size_t, std::vector<hpx::util::remote_locality_result>>
 distribute_component(

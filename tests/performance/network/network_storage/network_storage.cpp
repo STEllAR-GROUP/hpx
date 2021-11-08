@@ -419,7 +419,7 @@ HPX_DEFINE_PLAIN_ACTION(Storage::CopyToStorage, CopyToStorage_action);
 HPX_REGISTER_ACTION_DECLARATION(CopyToStorage_action)
 
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyFromStorage, CopyFromStorage_action);
-//HPX_REGISTER_ACTION_DECLARATION(CopyFromStorage_action);
+//HPX_REGISTER_ACTION_DECLARATION(CopyFromStorage_action)
 
 // and these in a cpp
 HPX_REGISTER_ACTION(CopyToStorage_action)

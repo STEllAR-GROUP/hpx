@@ -61,7 +61,7 @@ int async_io(std::string const& string_to_write)
 }
 
 // this defines the type async_io_action
-HPX_PLAIN_ACTION(async_io, async_io_action);
+HPX_PLAIN_ACTION(async_io, async_io_action)
 
 int hpx_main()
 {

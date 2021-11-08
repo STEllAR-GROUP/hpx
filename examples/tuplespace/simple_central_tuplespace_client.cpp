@@ -97,7 +97,7 @@ void simple_central_tuplespace_test(
 }
 
 HPX_PLAIN_ACTION(
-    simple_central_tuplespace_test, simple_central_tuplespace_test_action);
+    simple_central_tuplespace_test, simple_central_tuplespace_test_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()

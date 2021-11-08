@@ -33,8 +33,8 @@
 
 using communication_type = double;
 
-HPX_REGISTER_CHANNEL_DECLARATION(communication_type);
-HPX_REGISTER_CHANNEL(communication_type, stencil_communication);
+HPX_REGISTER_CHANNEL_DECLARATION(communication_type)
+HPX_REGISTER_CHANNEL(communication_type, stencil_communication)
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {

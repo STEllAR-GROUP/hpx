@@ -102,15 +102,15 @@ namespace examples { namespace server
 //[accumulator_registration_declarations
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::accumulator::reset_action,
-    accumulator_reset_action);
+    accumulator_reset_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::accumulator::add_action,
-    accumulator_add_action);
+    accumulator_add_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::accumulator::query_action,
-    accumulator_query_action);
+    accumulator_query_action)
 //]
 
 

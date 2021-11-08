@@ -14,7 +14,7 @@ typedef hpx::components::component<
     jacobi::server::solver
 > solver_type;
 
-HPX_REGISTER_COMPONENT(solver_type, solver);
+HPX_REGISTER_COMPONENT(solver_type, solver)
 
 HPX_REGISTER_ACTION(
     jacobi::server::solver::run_action

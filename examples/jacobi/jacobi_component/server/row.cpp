@@ -27,7 +27,7 @@ typedef hpx::components::component<
     jacobi::server::row
 > row_type;
 
-HPX_REGISTER_COMPONENT(row_type, row);
+HPX_REGISTER_COMPONENT(row_type, row)
 
 HPX_REGISTER_ACTION(
     jacobi::server::row::init_action

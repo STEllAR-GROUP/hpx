@@ -386,11 +386,11 @@ namespace hpx { namespace traits
 
 // the component macros must come after the component_heap_type specialization
 using server_type = hpx::components::component<hello_world_server>;
-HPX_REGISTER_COMPONENT(server_type, hello_world_server);
+HPX_REGISTER_COMPONENT(server_type, hello_world_server)
 
 using print_action = hello_world_server::print_action;
-HPX_REGISTER_ACTION_DECLARATION(print_action);
-HPX_REGISTER_ACTION(print_action);
+HPX_REGISTER_ACTION_DECLARATION(print_action)
+HPX_REGISTER_ACTION(print_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()

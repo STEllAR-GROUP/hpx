@@ -19,8 +19,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-REGISTER_TEMPLATE_ACCUMULATOR(double);
-REGISTER_TEMPLATE_ACCUMULATOR(int);
+REGISTER_TEMPLATE_ACCUMULATOR(double)
+REGISTER_TEMPLATE_ACCUMULATOR(int)
 
 ///////////////////////////////////////////////////////////////////////////////
 char const* const help = "commands: reset, add [amount], query, help, quit";

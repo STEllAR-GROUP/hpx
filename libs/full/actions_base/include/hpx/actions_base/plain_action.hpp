@@ -255,7 +255,7 @@ namespace hpx { namespace traits {
 ///
 ///     // This will define the action type 'some_global_action' which represents
 ///     // the function 'app::some_global_function'.
-///     HPX_PLAIN_ACTION(app::some_global_function, some_global_action);
+///     HPX_PLAIN_ACTION(app::some_global_function, some_global_action)
 /// \endcode
 ///
 /// \note The macro \a HPX_PLAIN_ACTION has to be used at global namespace even

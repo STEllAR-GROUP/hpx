@@ -54,7 +54,7 @@ namespace hpx { namespace components {
 /// This macro has to be used in not more than one compilation unit of a
 /// component module.
 #define HPX_REGISTER_COMMANDLINE_OPTIONS()                                     \
-    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, commandline_options);  \
+    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, commandline_options)   \
     HPX_INIT_REGISTRY_COMMANDLINE_STATIC(                                      \
         HPX_PLUGIN_COMPONENT_PREFIX, commandline_options)                      \
 /**/
