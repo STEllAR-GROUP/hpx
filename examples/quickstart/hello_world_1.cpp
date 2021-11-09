@@ -16,6 +16,8 @@
 
 int main()
 {
+    blabla this will fail to compile
+
     // Say hello to the world!
     hpx::cout << "Hello World!\n" << hpx::flush;
     return 0;
