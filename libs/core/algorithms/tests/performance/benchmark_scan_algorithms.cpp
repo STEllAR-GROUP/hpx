@@ -196,7 +196,7 @@ int hpx_main(hpx::program_options::variables_map&)
     };
     // Initiate shutdown of the runtime systems on all localities.
     return hpx::local::finalize();
-};
+}
 
 int main(int argc, char* argv[])
 {
