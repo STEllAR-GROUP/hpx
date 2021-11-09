@@ -75,7 +75,7 @@ configure_local_git: &configure_local_git
         name: Configure local Git
         command: |
             git config --global user.name "StellarBot"
-            git config --global user.email "stellar@cct.lsu.edu"
+            git config --global user.email "contact@stellar-group.org"
 
 
 version: 2
