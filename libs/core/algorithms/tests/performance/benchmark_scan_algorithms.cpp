@@ -191,10 +191,8 @@ void measureScanAlgorithms()
 
 int hpx_main(hpx::program_options::variables_map&)
 {
-    {
-        measureScanAlgorithms();
-    };
-    // Initiate shutdown of the runtime systems on all localities.
+    measureScanAlgorithms();
+
     return hpx::local::finalize();
 }
 

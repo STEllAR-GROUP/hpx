@@ -146,10 +146,8 @@ int test_main(void)
 
 int hpx_main(hpx::program_options::variables_map&)
 {
-    {
-        test_main();
-    };
-    // Initiate shutdown of the runtime systems on all localities.
+    test_main();
+
     return hpx::local::finalize();
 }
 
