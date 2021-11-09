@@ -43,7 +43,10 @@ move_debug_log: &move_debug_log
 gh_pages_filter: &gh_pages_filter
     filters:
       branches:
-        ignore: gh-pages
+        ignore:
+          - gh-pages
+          - trying
+          - staging
       tags:
         ignore: stable
 
