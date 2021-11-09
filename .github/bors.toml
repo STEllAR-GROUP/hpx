@@ -1,0 +1,2 @@
+status = [ "build_bors" ]
+use_squash_merge = false
