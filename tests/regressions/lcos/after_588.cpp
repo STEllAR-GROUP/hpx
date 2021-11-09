@@ -54,10 +54,10 @@ struct test
 };
 
 typedef hpx::components::managed_component<test> test_component;
-HPX_REGISTER_COMPONENT(test_component);
+HPX_REGISTER_COMPONENT(test_component)
 
-HPX_REGISTER_ACTION(test::pong_action, test_pong_action);
-HPX_REGISTER_ACTION(test::ping_action, test_ping_action);
+HPX_REGISTER_ACTION(test::pong_action, test_pong_action)
+HPX_REGISTER_ACTION(test::ping_action, test_ping_action)
 
 int hpx_main(hpx::program_options::variables_map & vm)
 {

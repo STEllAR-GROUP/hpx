@@ -114,18 +114,18 @@ private:
 //
 // HPX_REGISTER_COMPONENT() exposes the component creation through hpx::new_<>().
 typedef hpx::components::component<partition_server> partition_server_type;
-HPX_REGISTER_COMPONENT(partition_server_type, partition_server);
+HPX_REGISTER_COMPONENT(partition_server_type, partition_server)
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.
 typedef partition_server::from_right_action from_right_action;
-HPX_REGISTER_ACTION(from_right_action);
+HPX_REGISTER_ACTION(from_right_action)
 
 typedef partition_server::do_work_action do_work_action;
-HPX_REGISTER_ACTION(do_work_action);
+HPX_REGISTER_ACTION(do_work_action)
 
 typedef partition_server::release_dependencies_action release_dependencies_action;
-HPX_REGISTER_ACTION(release_dependencies_action);
+HPX_REGISTER_ACTION(release_dependencies_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct partition : hpx::components::client_base<partition, partition_server>

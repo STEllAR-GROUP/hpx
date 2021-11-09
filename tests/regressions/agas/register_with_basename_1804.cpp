@@ -40,10 +40,10 @@ struct test_server
 };
 
 typedef hpx::components::component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 typedef test_server::call_action call_action;
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION(call_action)
 
 std::string gen_name(int source, int target)
 {

@@ -140,12 +140,12 @@ namespace throttle { namespace server
 typedef throttle::server::throttle throttle_type;
 
 HPX_REGISTER_COMPONENT(
-    hpx::components::component<throttle_type>, throttle_throttle_type);
+    hpx::components::component<throttle_type>, throttle_throttle_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION(throttle_type::suspend_action, throttle_suspend_action);
-HPX_REGISTER_ACTION(throttle_type::resume_action, throttle_resume_action);
-HPX_REGISTER_ACTION(throttle_type::is_suspended_action, throttle_is_suspended_action);
+HPX_REGISTER_ACTION(throttle_type::suspend_action, throttle_suspend_action)
+HPX_REGISTER_ACTION(throttle_type::resume_action, throttle_resume_action)
+HPX_REGISTER_ACTION(throttle_type::is_suspended_action, throttle_is_suspended_action)
 
 #endif

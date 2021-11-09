@@ -285,21 +285,21 @@ namespace hpx { namespace server {
 
 #define HPX_REGISTER_VECTOR_DECLARATION_IMPL(type, name)                       \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
-        type::get_value_action, HPX_PP_CAT(__vector_get_value_action_, name)); \
+        type::get_value_action, HPX_PP_CAT(__vector_get_value_action_, name))  \
     HPX_REGISTER_ACTION_DECLARATION(type::get_values_action,                   \
-        HPX_PP_CAT(__vector_get_values_action_, name));                        \
+        HPX_PP_CAT(__vector_get_values_action_, name))                         \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
-        type::set_value_action, HPX_PP_CAT(__vector_set_value_action_, name)); \
+        type::set_value_action, HPX_PP_CAT(__vector_set_value_action_, name))  \
     HPX_REGISTER_ACTION_DECLARATION(type::set_values_action,                   \
-        HPX_PP_CAT(__vector_set_values_action_, name));                        \
+        HPX_PP_CAT(__vector_set_values_action_, name))                         \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
-        type::size_action, HPX_PP_CAT(__vector_size_action_, name));           \
+        type::size_action, HPX_PP_CAT(__vector_size_action_, name))            \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
-        type::resize_action, HPX_PP_CAT(__vector_resize_action_, name));       \
+        type::resize_action, HPX_PP_CAT(__vector_resize_action_, name))        \
     HPX_REGISTER_ACTION_DECLARATION(type::get_copied_data_action,              \
-        HPX_PP_CAT(__vector_get_copied_data_action_, name));                   \
+        HPX_PP_CAT(__vector_get_copied_data_action_, name))                    \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
-        type::set_data_action, HPX_PP_CAT(__vector_set_data_action_, name));   \
+        type::set_data_action, HPX_PP_CAT(__vector_set_data_action_, name))    \
     /**/
 
 #define HPX_REGISTER_VECTOR_DECLARATION_1(type)                                \

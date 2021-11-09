@@ -23,7 +23,7 @@ typedef hpx::components::component<
 > sine_counter_type;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC(
-    sine_counter_type, sine_counter, "base_performance_counter");
+    sine_counter_type, sine_counter, "base_performance_counter")
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace performance_counters { namespace sine { namespace server

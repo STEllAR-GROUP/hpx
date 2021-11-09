@@ -423,8 +423,8 @@ namespace hpx { namespace agas {
 using hpx::agas::notify_worker_action;
 using hpx::agas::register_worker_action;
 
-HPX_ACTION_HAS_CRITICAL_PRIORITY(register_worker_action);
-HPX_ACTION_HAS_CRITICAL_PRIORITY(notify_worker_action);
+HPX_ACTION_HAS_CRITICAL_PRIORITY(register_worker_action)
+HPX_ACTION_HAS_CRITICAL_PRIORITY(notify_worker_action)
 
 HPX_REGISTER_ACTION_ID(register_worker_action, register_worker_action,
     hpx::actions::register_worker_action_id)

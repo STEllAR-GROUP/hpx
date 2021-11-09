@@ -102,7 +102,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         ///////////////////////////////////////////////////////////////////////
         // define member traits
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_chunk_size);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_chunk_size)
 
         ///////////////////////////////////////////////////////////////////////
         // default property implementation allowing to handle get_chunk_size

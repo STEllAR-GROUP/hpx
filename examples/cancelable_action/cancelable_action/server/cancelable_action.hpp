@@ -111,9 +111,9 @@ namespace examples { namespace server {
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::cancelable_action::do_it_action,
-    cancelable_action_do_it_action);
+    cancelable_action_do_it_action)
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::cancelable_action::cancel_it_action,
-    cancelable_action_cancel_it_action);
+    cancelable_action_cancel_it_action)
 
 #endif

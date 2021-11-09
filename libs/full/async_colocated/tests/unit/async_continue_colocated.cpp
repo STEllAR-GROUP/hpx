@@ -25,20 +25,20 @@ std::int32_t increment(std::int32_t i)
 {
     return i + 1;
 }
-HPX_PLAIN_ACTION(increment);    // defines increment_action
+HPX_PLAIN_ACTION(increment)    // defines increment_action
 
 std::int32_t increment_with_future(hpx::shared_future<std::int32_t> fi)
 {
     return fi.get() + 1;
 }
-HPX_PLAIN_ACTION(increment_with_future);
+HPX_PLAIN_ACTION(increment_with_future)
 
 ///////////////////////////////////////////////////////////////////////////////
 std::int32_t mult2(std::int32_t i)
 {
     return i * 2;
 }
-HPX_PLAIN_ACTION(mult2);    // defines mult2_action
+HPX_PLAIN_ACTION(mult2)    // defines mult2_action
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server : hpx::components::component_base<test_server>
@@ -46,7 +46,7 @@ struct test_server : hpx::components::component_base<test_server>
 };
 
 typedef hpx::components::component<test_server> test_server_type;
-HPX_REGISTER_COMPONENT(test_server_type, test_server);
+HPX_REGISTER_COMPONENT(test_server_type, test_server)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {

@@ -773,7 +773,7 @@ namespace hpx { namespace actions {
 ///      }
 ///
 ///      // Declare boilerplate code required for each of the component actions.
-///      HPX_REGISTER_ACTION_DECLARATION(app::server::print_greeting_action);
+///      HPX_REGISTER_ACTION_DECLARATION(app::server::print_greeting_action)
 /// \endcode
 ///
 /// \note This macro has to be used once for each of the component actions

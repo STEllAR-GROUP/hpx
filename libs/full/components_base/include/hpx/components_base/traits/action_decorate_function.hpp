@@ -34,7 +34,7 @@ namespace hpx { namespace traits {
             return Component::decorate_action(lva, std::forward<F>(f));
         }
 
-        HPX_HAS_XXX_TRAIT_DEF(decorates_action);
+        HPX_HAS_XXX_TRAIT_DEF(decorates_action)
     }    // namespace detail
 
     template <typename Action, typename Enable = void>

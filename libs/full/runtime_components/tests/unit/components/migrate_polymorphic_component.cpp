@@ -135,35 +135,35 @@ private:
     int base_data_;
 };
 
-HPX_DEFINE_GET_COMPONENT_TYPE(test_server_base);
+HPX_DEFINE_GET_COMPONENT_TYPE(test_server_base)
 
 typedef test_server_base::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION_DECLARATION(call_action)
+HPX_REGISTER_ACTION(call_action)
 
 typedef test_server_base::busy_work_action busy_work_action;
-HPX_REGISTER_ACTION_DECLARATION(busy_work_action);
-HPX_REGISTER_ACTION(busy_work_action);
+HPX_REGISTER_ACTION_DECLARATION(busy_work_action)
+HPX_REGISTER_ACTION(busy_work_action)
 
 typedef test_server_base::lazy_busy_work_action lazy_busy_work_action;
-HPX_REGISTER_ACTION_DECLARATION(lazy_busy_work_action);
-HPX_REGISTER_ACTION(lazy_busy_work_action);
+HPX_REGISTER_ACTION_DECLARATION(lazy_busy_work_action)
+HPX_REGISTER_ACTION(lazy_busy_work_action)
 
 typedef test_server_base::get_base_data_action get_base_data_action;
-HPX_REGISTER_ACTION_DECLARATION(get_base_data_action);
-HPX_REGISTER_ACTION(get_base_data_action);
+HPX_REGISTER_ACTION_DECLARATION(get_base_data_action)
+HPX_REGISTER_ACTION(get_base_data_action)
 
 typedef test_server_base::lazy_get_base_data_action lazy_get_base_data_action;
-HPX_REGISTER_ACTION_DECLARATION(lazy_get_base_data_action);
-HPX_REGISTER_ACTION(lazy_get_base_data_action);
+HPX_REGISTER_ACTION_DECLARATION(lazy_get_base_data_action)
+HPX_REGISTER_ACTION(lazy_get_base_data_action)
 
 typedef test_server_base::get_data_action get_data_action;
-HPX_REGISTER_ACTION_DECLARATION(get_data_action);
-HPX_REGISTER_ACTION(get_data_action);
+HPX_REGISTER_ACTION_DECLARATION(get_data_action)
+HPX_REGISTER_ACTION(get_data_action)
 
 typedef test_server_base::lazy_get_data_action lazy_get_data_action;
-HPX_REGISTER_ACTION_DECLARATION(lazy_get_data_action);
-HPX_REGISTER_ACTION(lazy_get_data_action);
+HPX_REGISTER_ACTION_DECLARATION(lazy_get_data_action)
+HPX_REGISTER_ACTION(lazy_get_data_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
@@ -232,7 +232,7 @@ private:
 
 typedef hpx::components::component<test_server> server_type;
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
-    server_type, test_server, "test_server_base");
+    server_type, test_server, "test_server_base")
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_client : hpx::components::client_base<test_client, test_server_base>

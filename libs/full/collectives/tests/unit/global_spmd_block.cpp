@@ -89,7 +89,7 @@ void bulk_test_function(hpx::lcos::spmd_block block, std::size_t arg)
         HPX_TEST_EQ(c[3], (std::size_t) 6);
     }
 }
-HPX_PLAIN_ACTION(bulk_test_function, bulk_test_action);
+HPX_PLAIN_ACTION(bulk_test_function, bulk_test_action)
 
 int main()
 {

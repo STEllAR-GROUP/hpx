@@ -56,10 +56,10 @@ namespace hpx { namespace traits {
 }}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_PLUGIN_MODULE_DYNAMIC();
+HPX_REGISTER_PLUGIN_MODULE_DYNAMIC()
 HPX_REGISTER_MESSAGE_HANDLER_FACTORY(
     hpx::plugins::parcel::coalescing_message_handler,
-    coalescing_message_handler);
+    coalescing_message_handler)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace parcel {

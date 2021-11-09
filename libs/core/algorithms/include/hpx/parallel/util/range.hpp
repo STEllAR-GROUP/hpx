@@ -131,7 +131,7 @@ namespace hpx { namespace parallel { namespace util {
             std::is_same<type1, type2>::value, "Incompatible iterators\n");
 
         return comp(*(src2.front()), *(src1.back()));
-    };
+    }
 
     /// \brief Merge two contiguous ranges src1 and src2 , and put the result in
     ///        the range dest, returning the range merged

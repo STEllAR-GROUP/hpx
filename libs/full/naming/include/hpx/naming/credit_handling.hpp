@@ -73,7 +73,7 @@ namespace hpx { namespace naming {
         HPX_EXPORT void load(
             serialization::input_archive& ar, id_type_impl&, unsigned);
 
-        HPX_SERIALIZATION_SPLIT_FREE(id_type_impl);
+        HPX_SERIALIZATION_SPLIT_FREE(id_type_impl)
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -82,5 +82,5 @@ namespace hpx { namespace naming {
     HPX_EXPORT void load(
         serialization::input_archive& ar, id_type&, unsigned int);
 
-    HPX_SERIALIZATION_SPLIT_FREE(id_type);
+    HPX_SERIALIZATION_SPLIT_FREE(id_type)
 }}    // namespace hpx::naming

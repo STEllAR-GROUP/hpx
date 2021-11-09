@@ -21,7 +21,7 @@ int test0()
 {
     return 42;
 }
-HPX_PLAIN_ACTION(test0, test0_action);
+HPX_PLAIN_ACTION(test0, test0_action)
 
 void bind_test0(hpx::naming::id_type id)
 {
@@ -92,7 +92,7 @@ int test1(int i)
 {
     return i;
 }
-HPX_PLAIN_ACTION(test1, test1_action);
+HPX_PLAIN_ACTION(test1, test1_action)
 
 void bind_test2(hpx::naming::id_type id)
 {
@@ -215,7 +215,7 @@ int test2(hpx::util::function<int(hpx::naming::id_type)> f)
 {
     return f(hpx::find_here());
 }
-HPX_PLAIN_ACTION(test2, test2_action);
+HPX_PLAIN_ACTION(test2, test2_action)
 
 void function_bind_test3(hpx::naming::id_type id)
 {
@@ -250,7 +250,7 @@ int test3(hpx::util::function<int()> f)
 {
     return f();
 }
-HPX_PLAIN_ACTION(test3, test3_action);
+HPX_PLAIN_ACTION(test3, test3_action)
 
 void function_bind_test5(hpx::naming::id_type id)
 {

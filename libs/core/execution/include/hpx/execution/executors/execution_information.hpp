@@ -25,9 +25,9 @@ namespace hpx { namespace parallel { namespace execution {
 
     ///////////////////////////////////////////////////////////////////////////
     // define member traits
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(has_pending_closures);
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_pu_mask);
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(set_scheduler_mode);
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(has_pending_closures)
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_pu_mask)
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(set_scheduler_mode)
 
     ///////////////////////////////////////////////////////////////////////////
     // define customization points

@@ -9,5 +9,5 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/include/components.hpp>
 
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 #endif

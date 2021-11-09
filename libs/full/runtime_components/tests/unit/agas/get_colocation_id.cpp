@@ -21,7 +21,7 @@ hpx::id_type test_colocation()
 {
     return hpx::find_here();
 }
-HPX_PLAIN_ACTION(test_colocation);
+HPX_PLAIN_ACTION(test_colocation)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server : hpx::components::managed_component_base<test_server>
@@ -34,10 +34,10 @@ struct test_server : hpx::components::managed_component_base<test_server>
 };
 
 typedef hpx::components::managed_component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 typedef test_server::call_action call_action;
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION(call_action)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {

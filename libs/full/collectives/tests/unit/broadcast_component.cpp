@@ -28,7 +28,7 @@ struct test_component1 : hpx::components::component_base<test_component1>
 };
 
 using test_component1_type = hpx::components::component<test_component1>;
-HPX_REGISTER_COMPONENT(test_component1_type, test_component1_type);
+HPX_REGISTER_COMPONENT(test_component1_type, test_component1_type)
 
 using f1_action = test_component1_type::f1_action;
 

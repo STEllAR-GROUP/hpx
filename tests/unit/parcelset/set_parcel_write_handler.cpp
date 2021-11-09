@@ -22,7 +22,7 @@ void test(hpx::id_type const& id)
 {
     hpx::trigger_lco_event(id);
 }
-HPX_PLAIN_ACTION(test);    // defines test_action
+HPX_PLAIN_ACTION(test)    // defines test_action
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<std::size_t> write_handler_called(0);

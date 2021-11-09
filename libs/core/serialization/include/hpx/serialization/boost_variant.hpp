@@ -99,7 +99,7 @@ namespace hpx { namespace serialization {
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (template <typename... T>), (boost::variant<T...>) );
+        (template <typename... T>), (boost::variant<T...>) )
 }}    // namespace hpx::serialization
 
 #endif    // HPX_SERIALIZATION_HAVE_BOOST_TYPES

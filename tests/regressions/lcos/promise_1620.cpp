@@ -34,7 +34,7 @@ struct test
 std::atomic<int> test::count(0);
 
 test call() { return test(); }
-HPX_PLAIN_ACTION(call);
+HPX_PLAIN_ACTION(call)
 
 void test_leak()
 {

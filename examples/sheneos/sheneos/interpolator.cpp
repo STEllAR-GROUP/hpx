@@ -31,7 +31,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality.
-HPX_REGISTER_COMPONENT_MODULE(); // Create entry point for component factory.
+HPX_REGISTER_COMPONENT_MODULE()  // Create entry point for component factory.
 
 ///////////////////////////////////////////////////////////////////////////////
 // Register a shutdown function which will be called as a px-thread during

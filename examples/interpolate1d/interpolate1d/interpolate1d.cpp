@@ -17,11 +17,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
-HPX_REGISTER_COMPONENT_MODULE();    // create entry point for component factory
+HPX_REGISTER_COMPONENT_MODULE()     // create entry point for component factory
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef interpolate1d::partition partition_client_type;
-HPX_DEFINE_GET_COMPONENT_TYPE(partition_client_type);
+HPX_DEFINE_GET_COMPONENT_TYPE(partition_client_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Interpolation client

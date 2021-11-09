@@ -93,9 +93,9 @@ struct f_struct_3
     void operator()(int = 42){};
 };
 
-void f_fun_1(){};
+void f_fun_1() {}
 
-void f_fun_2(int){};
+void f_fun_2(int) {}
 
 int main()
 {

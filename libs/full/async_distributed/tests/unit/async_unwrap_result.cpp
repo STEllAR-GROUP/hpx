@@ -33,11 +33,11 @@ struct decrement_server
 };
 
 typedef hpx::components::managed_component<decrement_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, decrement_server);
+HPX_REGISTER_COMPONENT(server_type, decrement_server)
 
 typedef decrement_server::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION_DECLARATION(call_action)
+HPX_REGISTER_ACTION(call_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server : hpx::components::component_base<test_server>
@@ -57,15 +57,15 @@ struct test_server : hpx::components::component_base<test_server>
 };
 
 typedef hpx::components::component<test_server> test_server_type;
-HPX_REGISTER_COMPONENT(test_server_type, test_server);
+HPX_REGISTER_COMPONENT(test_server_type, test_server)
 
 typedef test_server::increment_action increment_action;
-HPX_REGISTER_ACTION_DECLARATION(increment_action);
-HPX_REGISTER_ACTION(increment_action);
+HPX_REGISTER_ACTION_DECLARATION(increment_action)
+HPX_REGISTER_ACTION(increment_action)
 
 typedef test_server::increment_with_future_action increment_with_future_action;
-HPX_REGISTER_ACTION_DECLARATION(increment_with_future_action);
-HPX_REGISTER_ACTION(increment_with_future_action);
+HPX_REGISTER_ACTION_DECLARATION(increment_with_future_action)
+HPX_REGISTER_ACTION(increment_with_future_action)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {

@@ -41,11 +41,11 @@ struct message_server : component_base<message_server>
 };
 
 typedef component<message_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, message_server);
+HPX_REGISTER_COMPONENT(server_type, message_server)
 
 typedef message_server::print_action print_action;
-HPX_REGISTER_ACTION_DECLARATION(print_action);
-HPX_REGISTER_ACTION(print_action);
+HPX_REGISTER_ACTION_DECLARATION(print_action)
+HPX_REGISTER_ACTION(print_action)
 
 struct message : client_base<message, message_server>
 {

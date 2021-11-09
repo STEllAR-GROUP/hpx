@@ -137,9 +137,9 @@ namespace hpx { namespace iostreams
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_PLAIN_ACTION(hpx::iostreams::create_cout, create_cout_action);
-HPX_PLAIN_ACTION(hpx::iostreams::create_cerr, create_cerr_action);
-HPX_PLAIN_ACTION(hpx::iostreams::create_consolestream, create_consolestream_action);
+HPX_PLAIN_ACTION(hpx::iostreams::create_cout, create_cout_action)
+HPX_PLAIN_ACTION(hpx::iostreams::create_cerr, create_cerr_action)
+HPX_PLAIN_ACTION(hpx::iostreams::create_consolestream, create_consolestream_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx

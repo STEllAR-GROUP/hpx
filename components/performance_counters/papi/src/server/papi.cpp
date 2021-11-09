@@ -42,7 +42,7 @@ typedef hpx::components::component<
 > papi_counter_type;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC(
-    papi_counter_type, papi_counter, "base_performance_counter");
+    papi_counter_type, papi_counter, "base_performance_counter")
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace papi { namespace server

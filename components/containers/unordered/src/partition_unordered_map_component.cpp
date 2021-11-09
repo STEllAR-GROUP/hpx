@@ -16,7 +16,7 @@
 #include <hpx/components/containers/unordered/unordered_map.hpp>
 
 HPX_DISTRIBUTED_METADATA(hpx::server::unordered_map_config_data,
-    hpx_server_unordered_map_config_data);
+    hpx_server_unordered_map_config_data)
 
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 

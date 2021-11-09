@@ -60,11 +60,11 @@ struct test_server : hpx::components::component_base<test_server>
 };
 
 typedef hpx::components::component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 typedef test_server::test1_action test1_action;
 
-HPX_REGISTER_ACTION_DECLARATION(test1_action);
+HPX_REGISTER_ACTION_DECLARATION(test1_action)
 
 #if defined(HPX_HAVE_COMPRESSION_BZIP2)
 HPX_ACTION_USES_BZIP2_COMPRESSION(test1_action)
@@ -74,7 +74,7 @@ HPX_ACTION_USES_ZLIB_COMPRESSION(test1_action)
 HPX_ACTION_USES_SNAPPY_COMPRESSION(test1_action)
 #endif
 
-HPX_REGISTER_ACTION(test1_action);
+HPX_REGISTER_ACTION(test1_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_plain_argument(hpx::id_type const& id)
@@ -130,7 +130,7 @@ HPX_ACTION_USES_ZLIB_COMPRESSION(test2_action)
 HPX_ACTION_USES_SNAPPY_COMPRESSION(test2_action)
 #endif
 
-HPX_PLAIN_ACTION(test2, test2_action);
+HPX_PLAIN_ACTION(test2, test2_action)
 
 void test_future_argument(hpx::id_type const& id)
 {

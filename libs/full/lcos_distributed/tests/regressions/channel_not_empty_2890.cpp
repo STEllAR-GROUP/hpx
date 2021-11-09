@@ -14,7 +14,7 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/lcos_distributed/channel.hpp>
 
-HPX_REGISTER_CHANNEL(int);
+HPX_REGISTER_CHANNEL(int)
 #endif
 
 int main()

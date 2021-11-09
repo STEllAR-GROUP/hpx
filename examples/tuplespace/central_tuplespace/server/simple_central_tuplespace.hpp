@@ -184,15 +184,15 @@ namespace examples { namespace server {
 //[simple_central_tuplespace_registration_declarations
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::simple_central_tuplespace::write_action,
-    simple_central_tuplespace_write_action);
+    simple_central_tuplespace_write_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::simple_central_tuplespace::read_action,
-    simple_central_tuplespace_read_action);
+    simple_central_tuplespace_read_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::simple_central_tuplespace::take_action,
-    simple_central_tuplespace_take_action);
+    simple_central_tuplespace_take_action)
 //]
 
 #undef TS_DEBUG

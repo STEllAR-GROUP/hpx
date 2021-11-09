@@ -29,7 +29,7 @@ const std::size_t numiter_default = 5;
 ///////////////////////////////////////////////////////////////////////////////
 void on_recv(hpx::naming::id_type to, std::vector<double> const & in,
     std::size_t counter);
-HPX_PLAIN_ACTION(on_recv, on_recv_action);
+HPX_PLAIN_ACTION(on_recv, on_recv_action)
 
 void on_recv(hpx::naming::id_type to, std::vector<double> const & in,
     std::size_t counter)
@@ -48,7 +48,7 @@ void on_recv(hpx::naming::id_type to, std::vector<double> const & in,
 ///////////////////////////////////////////////////////////////////////////////
 void on_recv_ind(hpx::naming::id_type to,
     std::shared_ptr<std::vector<double> > const& in, std::size_t counter);
-HPX_PLAIN_ACTION(on_recv_ind, on_recv_ind_action);
+HPX_PLAIN_ACTION(on_recv_ind, on_recv_ind_action)
 
 void on_recv_ind(hpx::naming::id_type to,
     std::shared_ptr<std::vector<double> > const& in, std::size_t counter)

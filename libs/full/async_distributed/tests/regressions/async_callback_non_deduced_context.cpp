@@ -20,7 +20,7 @@ int test()
 {
     return 42;
 }
-HPX_PLAIN_ACTION(test, test_action);
+HPX_PLAIN_ACTION(test, test_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 int future_callback(hpx::lcos::future<int> p)

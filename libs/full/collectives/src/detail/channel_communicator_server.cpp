@@ -22,7 +22,7 @@
 using channel_communicator_component = hpx::components::component<
     hpx::collectives::detail::channel_communicator_server>;
 
-HPX_REGISTER_COMPONENT(channel_communicator_component);
+HPX_REGISTER_COMPONENT(channel_communicator_component)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace collectives { namespace detail {

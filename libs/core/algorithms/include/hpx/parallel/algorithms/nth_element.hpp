@@ -225,7 +225,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::forward<Compare>(comp), std::forward<Proj>(proj));
 
             return;
-        };
+        }
 
         template <typename Iter>
         struct nth_element : public detail::algorithm<nth_element<Iter>, Iter>

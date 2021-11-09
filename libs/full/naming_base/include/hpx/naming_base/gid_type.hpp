@@ -340,7 +340,7 @@ namespace hpx { namespace naming {
     HPX_EXPORT void load(
         serialization::input_archive& ar, gid_type&, unsigned int version);
 
-    HPX_SERIALIZATION_SPLIT_FREE(gid_type);
+    HPX_SERIALIZATION_SPLIT_FREE(gid_type)
 }}    // namespace hpx::naming
 
 ///////////////////////////////////////////////////////////////////////////////

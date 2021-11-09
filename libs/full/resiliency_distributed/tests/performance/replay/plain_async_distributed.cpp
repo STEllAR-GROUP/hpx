@@ -51,7 +51,7 @@ int universal_ans(std::vector<hpx::id_type> const&, std::size_t size)
     return 42;
 }
 
-HPX_PLAIN_ACTION(universal_ans, universal_action);
+HPX_PLAIN_ACTION(universal_ans, universal_action)
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {

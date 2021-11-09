@@ -17,11 +17,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION(
     hpx::components::process::server::child::terminate_action,
-    hpx_components_process_server_child_terminate_action);
+    hpx_components_process_server_child_terminate_action)
 
 HPX_REGISTER_ACTION(
     hpx::components::process::server::child::wait_for_exit_action,
-    hpx_components_process_server_child_wait_for_exit);
+    hpx_components_process_server_child_wait_for_exit)
 
 namespace hpx { namespace components { namespace process { namespace server
 {

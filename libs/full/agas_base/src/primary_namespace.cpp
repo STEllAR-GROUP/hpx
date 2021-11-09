@@ -28,7 +28,7 @@ using hpx::components::component_agas_primary_namespace;
 
 using hpx::agas::server::primary_namespace;
 
-HPX_DEFINE_COMPONENT_NAME(primary_namespace, hpx_primary_namespace);
+HPX_DEFINE_COMPONENT_NAME(primary_namespace, hpx_primary_namespace)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     primary_namespace, component_agas_primary_namespace)
 

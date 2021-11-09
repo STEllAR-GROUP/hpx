@@ -24,13 +24,13 @@ void void_f(hpx::future<int>&&)
 {
     ++void_f_count;
 }
-HPX_PLAIN_ACTION(void_f);
+HPX_PLAIN_ACTION(void_f)
 
 hpx::id_type id_f()
 {
     return hpx::find_here();
 }
-HPX_PLAIN_ACTION(id_f);
+HPX_PLAIN_ACTION(id_f)
 
 void plain_actions(hpx::id_type const& there)
 {

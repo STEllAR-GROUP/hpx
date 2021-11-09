@@ -29,7 +29,7 @@
 using collectives_component =
     hpx::components::component<hpx::collectives::detail::communicator_server>;
 
-HPX_REGISTER_COMPONENT(collectives_component);
+HPX_REGISTER_COMPONENT(collectives_component)
 
 namespace hpx { namespace collectives {
 

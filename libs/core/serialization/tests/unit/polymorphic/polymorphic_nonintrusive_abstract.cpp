@@ -92,7 +92,7 @@ struct Derived2 : Derived1<double>
     std::string message_;
 };
 
-HPX_SERIALIZATION_REGISTER_CLASS(Derived2);
+HPX_SERIALIZATION_REGISTER_CLASS(Derived2)
 
 template <typename Archive>
 void serialize(Archive& ar, Derived2& d2, unsigned)

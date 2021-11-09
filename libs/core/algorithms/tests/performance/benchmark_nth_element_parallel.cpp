@@ -69,7 +69,7 @@ void function01(void)
     std::chrono::duration<long unsigned, std::nano> nanotime2 = end - start;
     std::cout << "std::nth_element           :" << (nanotime2.count() / 1000000)
               << " msec\n";
-};
+}
 
 //----------------------------------------------------------------------------
 /// nth_element in a vector with 10000000 elements, with different number
@@ -125,7 +125,7 @@ void function02(void)
               << ac1 / 1000000 << " msec\n";
     std::cout << "Accumulated (msec) std::nth_element           "
               << ac2 / 1000000 << " msec\n";
-};
+}
 
 int test_main(void)
 {
@@ -151,7 +151,7 @@ int hpx_main(hpx::program_options::variables_map&)
     };
     // Initiate shutdown of the runtime systems on all localities.
     return hpx::local::finalize();
-};
+}
 
 int main(int argc, char* argv[])
 {

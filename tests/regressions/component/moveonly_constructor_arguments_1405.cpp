@@ -55,7 +55,7 @@ struct test_server
 };
 
 typedef hpx::components::managed_component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()

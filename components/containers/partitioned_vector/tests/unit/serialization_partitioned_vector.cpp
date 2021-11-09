@@ -23,9 +23,9 @@
 
 typedef unsigned long ulong;
 
-HPX_REGISTER_PARTITIONED_VECTOR(ulong);
-HPX_REGISTER_PARTITIONED_VECTOR(long);
-HPX_REGISTER_PARTITIONED_VECTOR(unsigned);
+HPX_REGISTER_PARTITIONED_VECTOR(ulong)
+HPX_REGISTER_PARTITIONED_VECTOR(long)
+HPX_REGISTER_PARTITIONED_VECTOR(unsigned)
 
 template <typename T>
 void test(T minval, T maxval)

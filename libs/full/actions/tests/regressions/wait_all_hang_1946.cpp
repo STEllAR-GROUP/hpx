@@ -27,7 +27,7 @@ void out(std::vector<unsigned int> const&)
 {
     hpx::cout << "out called " << hpx::find_here() << std::endl;
 }
-HPX_PLAIN_ACTION(out, out_action);
+HPX_PLAIN_ACTION(out, out_action)
 
 int main(int argc, char* argv[])
 {

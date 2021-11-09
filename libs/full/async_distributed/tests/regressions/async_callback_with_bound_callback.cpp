@@ -23,7 +23,7 @@ void async_callback(uint64_t) {}
 #endif
 
 void func() {}
-HPX_PLAIN_ACTION(func);
+HPX_PLAIN_ACTION(func)
 
 int main()
 {

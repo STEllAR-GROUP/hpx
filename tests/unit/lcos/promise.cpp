@@ -22,7 +22,7 @@ int test()
 {
     return 42;
 }
-HPX_PLAIN_ACTION(test, test_action);
+HPX_PLAIN_ACTION(test, test_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 int test_error()
@@ -31,7 +31,7 @@ int test_error()
         "throwing test exception");
     return 42;
 }
-HPX_PLAIN_ACTION(test_error, test_error_action);
+HPX_PLAIN_ACTION(test_error, test_error_action)
 
 char const* const error_msg = "throwing test exception: HPX(not_implemented)";
 

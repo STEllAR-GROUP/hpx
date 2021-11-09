@@ -26,7 +26,7 @@
 #include <benchmarks/network/osu_coll.hpp>
 
 HPX_PLAIN_ACTION(
-    hpx::lcos::detail::broadcast_impl_action, broadcast_impl_action);
+    hpx::lcos::detail::broadcast_impl_action, broadcast_impl_action)
 
 struct broadcast_component
   : hpx::components::component_base<broadcast_component>
@@ -78,7 +78,7 @@ struct broadcast_component
 };
 
 HPX_REGISTER_COMPONENT(
-    hpx::components::component<broadcast_component>, osu_broadcast_component);
+    hpx::components::component<broadcast_component>, osu_broadcast_component)
 
 void run_benchmark(params const& p)
 {

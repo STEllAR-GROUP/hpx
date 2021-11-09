@@ -53,6 +53,6 @@ namespace hpx { namespace test { namespace server {
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::test::server::simple_refcnt_checker::take_reference_action,
-    simple_refcnt_checker_take_reference_action);
+    simple_refcnt_checker_take_reference_action)
 
 #endif

@@ -439,7 +439,7 @@ void test6()
     HPX_TEST(Rz.size() == 20);
     for (std::uint32_t i = 0; i < 20; ++i)
         HPX_TEST(B[i] == i);
-};
+}
 
 // TEST OF STABILITY
 void test7()
@@ -752,4 +752,4 @@ int main(int, char*[])
     test10();
 
     return hpx::util::report_errors();
-};
+}

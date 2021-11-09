@@ -184,31 +184,31 @@ namespace gc {
 }    // namespace gc
 
 HPX_REGISTER_ACTION_DECLARATION(gc::server::collectable::phantomize_ref_action,
-    gc_collectable_phantomize_ref_action);
+    gc_collectable_phantomize_ref_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    gc::server::collectable::add_ref_action, gc_collectable_add_ref_action);
+    gc::server::collectable::add_ref_action, gc_collectable_add_ref_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    gc::server::collectable::set_ref_action, gc_collectable_set_ref_action);
+    gc::server::collectable::set_ref_action, gc_collectable_set_ref_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    gc::server::collectable::outgoing_action, gc_collectable_outgoing_action);
+    gc::server::collectable::outgoing_action, gc_collectable_outgoing_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    gc::server::collectable::incref_action, gc_collectable_incref_action);
+    gc::server::collectable::incref_action, gc_collectable_incref_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    gc::server::collectable::decref_action, gc_collectable_decref_action);
+    gc::server::collectable::decref_action, gc_collectable_decref_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    gc::server::collectable::done_action, gc_collectable_done_action);
+    gc::server::collectable::done_action, gc_collectable_done_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    gc::server::collectable::recover_action, gc_collectable_recover_action);
+    gc::server::collectable::recover_action, gc_collectable_recover_action)
 
 HPX_REGISTER_ACTION_DECLARATION(gc::server::collectable::recover_done_action,
-    gc_collectable_recover_done_action);
+    gc_collectable_recover_done_action)
 
 namespace gc {
     struct collectable
@@ -482,34 +482,34 @@ namespace gc { namespace server {
 
 typedef hpx::components::component<gc::server::collectable> collectable_type;
 
-HPX_REGISTER_COMPONENT(collectable_type, collectable);
+HPX_REGISTER_COMPONENT(collectable_type, collectable)
 
 HPX_REGISTER_ACTION(gc::server::collectable::phantomize_ref_action,
-    gc_collectable_phantomize_ref_action);
+    gc_collectable_phantomize_ref_action)
 
 HPX_REGISTER_ACTION(
-    gc::server::collectable::add_ref_action, gc_collectable_add_ref_action);
+    gc::server::collectable::add_ref_action, gc_collectable_add_ref_action)
 
 HPX_REGISTER_ACTION(
-    gc::server::collectable::set_ref_action, gc_collectable_set_ref_action);
+    gc::server::collectable::set_ref_action, gc_collectable_set_ref_action)
 
 HPX_REGISTER_ACTION(
-    gc::server::collectable::outgoing_action, gc_collectable_outgoing_action);
+    gc::server::collectable::outgoing_action, gc_collectable_outgoing_action)
 
 HPX_REGISTER_ACTION(
-    gc::server::collectable::incref_action, gc_collectable_incref_action);
+    gc::server::collectable::incref_action, gc_collectable_incref_action)
 
 HPX_REGISTER_ACTION(
-    gc::server::collectable::decref_action, gc_collectable_decref_action);
+    gc::server::collectable::decref_action, gc_collectable_decref_action)
 
 HPX_REGISTER_ACTION(
-    gc::server::collectable::done_action, gc_collectable_done_action);
+    gc::server::collectable::done_action, gc_collectable_done_action)
 
 HPX_REGISTER_ACTION(
-    gc::server::collectable::recover_action, gc_collectable_recover_action);
+    gc::server::collectable::recover_action, gc_collectable_recover_action)
 
 HPX_REGISTER_ACTION(gc::server::collectable::recover_done_action,
-    gc_collectable_recover_done_action);
+    gc_collectable_recover_done_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()

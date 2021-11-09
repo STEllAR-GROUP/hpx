@@ -182,8 +182,8 @@ using stencil = std::vector<partition_data>;
 // Setup HPX channel boilerplate
 using communication_type = partition_data;
 
-HPX_REGISTER_CHANNEL_DECLARATION(communication_type);
-HPX_REGISTER_CHANNEL(communication_type, stencil_communication);
+HPX_REGISTER_CHANNEL_DECLARATION(communication_type)
+HPX_REGISTER_CHANNEL(communication_type, stencil_communication)
 
 double left_flux(double left, double center)
 {
@@ -262,7 +262,7 @@ partition_data stencil_update_distributed(std::size_t sti,
         100, stencil_update, sti, center, left, right, error, is_faulty_node)
         .get();
 }
-HPX_PLAIN_ACTION(stencil_update_distributed, stencil_action);
+HPX_PLAIN_ACTION(stencil_update_distributed, stencil_action)
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {

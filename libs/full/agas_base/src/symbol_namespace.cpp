@@ -29,7 +29,7 @@ using hpx::components::component_agas_symbol_namespace;
 
 using hpx::agas::server::symbol_namespace;
 
-HPX_DEFINE_COMPONENT_NAME(symbol_namespace, hpx_symbol_namespace);
+HPX_DEFINE_COMPONENT_NAME(symbol_namespace, hpx_symbol_namespace)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     symbol_namespace, component_agas_symbol_namespace)
 
@@ -245,8 +245,8 @@ namespace hpx { namespace agas {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 using iterate_action = symbol_namespace::iterate_action;
 #endif
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(iterate_action);
-HPX_REGISTER_BROADCAST_ACTION(iterate_action);
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(iterate_action)
+HPX_REGISTER_BROADCAST_ACTION(iterate_action)
 
 namespace hpx { namespace agas {
 

@@ -72,10 +72,10 @@ struct data_server : hpx::components::component_base<data_server>
 };
 
 using data_server_type = hpx::components::component<data_server>;
-HPX_REGISTER_COMPONENT(data_server_type, data_server);
+HPX_REGISTER_COMPONENT(data_server_type, data_server)
 
-HPX_REGISTER_ACTION(data_server::get_data_action);
-HPX_REGISTER_ACTION(data_server::print_action);
+HPX_REGISTER_ACTION(data_server::get_data_action)
+HPX_REGISTER_ACTION(data_server::print_action)
 
 struct data_client : hpx::components::client_base<data_client, data_server>
 {

@@ -49,11 +49,11 @@ struct A : hpx::components::component_base<A>
 };
 
 typedef hpx::components::component<A> serverA_type;
-HPX_REGISTER_COMPONENT(serverA_type, A);
+HPX_REGISTER_COMPONENT(serverA_type, A)
 
 typedef A::test0_action test0_action;
-HPX_REGISTER_ACTION_DECLARATION(test0_action);
-HPX_REGISTER_ACTION(test0_action);
+HPX_REGISTER_ACTION_DECLARATION(test0_action)
+HPX_REGISTER_ACTION(test0_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Concrete
@@ -80,11 +80,11 @@ struct B : hpx::components::component_base<B>
 };
 
 typedef hpx::components::component<B> serverB_type;
-HPX_REGISTER_COMPONENT(serverB_type, B);
+HPX_REGISTER_COMPONENT(serverB_type, B)
 
 typedef B::test1_action test1_action;
-HPX_REGISTER_ACTION_DECLARATION(test1_action);
-HPX_REGISTER_ACTION(test1_action);
+HPX_REGISTER_ACTION_DECLARATION(test1_action)
+HPX_REGISTER_ACTION(test1_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Concrete
@@ -130,11 +130,11 @@ struct C
 };
 
 typedef hpx::components::component<C> serverC_type;
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(serverC_type, C, "B");
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(serverC_type, C, "B")
 
 typedef C::test2_action test2_action;
-HPX_REGISTER_ACTION_DECLARATION(test2_action);
-HPX_REGISTER_ACTION(test2_action);
+HPX_REGISTER_ACTION_DECLARATION(test2_action)
+HPX_REGISTER_ACTION(test2_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct clientA : hpx::components::client_base<clientA, A>

@@ -27,7 +27,7 @@ void worker1(tuple_type t)
     HPX_TEST_EQ(hpx::get<1>(t), 3.14);
     HPX_TEST_EQ(hpx::get<2>(t), "test");
 }
-HPX_PLAIN_ACTION(worker1);
+HPX_PLAIN_ACTION(worker1)
 
 void worker2(tuple_base_type t)
 {
@@ -35,7 +35,7 @@ void worker2(tuple_base_type t)
     HPX_TEST_EQ(hpx::get<1>(t), 3.14);
     HPX_TEST_EQ(hpx::get<2>(t), "test");
 }
-HPX_PLAIN_ACTION(worker2);
+HPX_PLAIN_ACTION(worker2)
 
 void worker1_ref(tuple_type const& t)
 {
@@ -43,7 +43,7 @@ void worker1_ref(tuple_type const& t)
     HPX_TEST_EQ(hpx::get<1>(t), 3.14);
     HPX_TEST_EQ(hpx::get<2>(t), "test");
 }
-HPX_PLAIN_ACTION(worker1_ref);
+HPX_PLAIN_ACTION(worker1_ref)
 
 void worker2_ref(tuple_base_type const& t)
 {
@@ -51,7 +51,7 @@ void worker2_ref(tuple_base_type const& t)
     HPX_TEST_EQ(hpx::get<1>(t), 3.14);
     HPX_TEST_EQ(hpx::get<2>(t), "test");
 }
-HPX_PLAIN_ACTION(worker2_ref);
+HPX_PLAIN_ACTION(worker2_ref)
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()

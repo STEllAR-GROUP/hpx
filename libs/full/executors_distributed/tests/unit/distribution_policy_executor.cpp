@@ -21,7 +21,7 @@ hpx::id_type call()
     return hpx::find_here();
 }
 
-HPX_PLAIN_ACTION(call, call_action);
+HPX_PLAIN_ACTION(call, call_action)
 
 struct call_pfo
 {

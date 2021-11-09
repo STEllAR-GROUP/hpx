@@ -49,8 +49,6 @@ struct counter
     }
 
 private:
-    ;
-
     counter& operator=(counter const&);
     counter& operator=(counter&&);
 };

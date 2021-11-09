@@ -105,7 +105,7 @@ namespace hpx { namespace server
 }}
 
 HPX_DISTRIBUTED_METADATA_DECLARATION(hpx::server::unordered_map_config_data,
-    hpx_server_unordered_map_config_data);
+    hpx_server_unordered_map_config_data)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx

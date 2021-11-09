@@ -154,15 +154,15 @@ private:
 };
 
 typedef hpx::components::component<zerocopy_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, zerocopy_server);
+HPX_REGISTER_COMPONENT(server_type, zerocopy_server)
 
 typedef zerocopy_server::get_here_action zerocopy_get_here_action;
-HPX_REGISTER_ACTION_DECLARATION(zerocopy_get_here_action);
-HPX_REGISTER_ACTION(zerocopy_get_here_action);
+HPX_REGISTER_ACTION_DECLARATION(zerocopy_get_here_action)
+HPX_REGISTER_ACTION(zerocopy_get_here_action)
 
 typedef zerocopy_server::get_action zerocopy_get_action;
-HPX_REGISTER_ACTION_DECLARATION(zerocopy_get_action);
-HPX_REGISTER_ACTION(zerocopy_get_action);
+HPX_REGISTER_ACTION_DECLARATION(zerocopy_get_action)
+HPX_REGISTER_ACTION(zerocopy_get_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct zerocopy : hpx::components::client_base<zerocopy, zerocopy_server>

@@ -35,21 +35,21 @@ hpx::future<int> g()
     return f(1);
 }
 
-HPX_PLAIN_ACTION(g);
+HPX_PLAIN_ACTION(g)
 
 hpx::future<int> h()
 {
     return hpx::async(f, 1);
 }
 
-HPX_PLAIN_ACTION(h);
+HPX_PLAIN_ACTION(h)
 
 hpx::future<int> i()
 {
     return hpx::async(ff);
 }
 
-HPX_PLAIN_ACTION(i);
+HPX_PLAIN_ACTION(i)
 
 int main()
 {

@@ -27,13 +27,13 @@ typedef hpx::components::managed_component<hpx::lcos::detail::barrier_node>
 
 HPX_REGISTER_COMPONENT_HEAP(barrier_type)
 HPX_DEFINE_COMPONENT_NAME(
-    hpx::lcos::detail::barrier_node, hpx_lcos_barrier_node);
+    hpx::lcos::detail::barrier_node, hpx_lcos_barrier_node)
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::detail::barrier_node, hpx::components::component_barrier)
 
 HPX_REGISTER_ACTION(
-    hpx::lcos::detail::barrier_node::gather_action, barrier_node_gather_action);
+    hpx::lcos::detail::barrier_node::gather_action, barrier_node_gather_action)
 
 namespace hpx { namespace lcos { namespace detail {
     barrier_node::barrier_node()

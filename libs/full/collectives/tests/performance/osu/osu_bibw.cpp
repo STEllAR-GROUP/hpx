@@ -45,7 +45,7 @@ char send_buffer[SEND_BUFSIZE];
 
 ///////////////////////////////////////////////////////////////////////////////
 void isend(hpx::serialization::serialize_buffer<char> const&) {}
-HPX_PLAIN_DIRECT_ACTION(isend);
+HPX_PLAIN_DIRECT_ACTION(isend)
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::future<void> send_async(
@@ -71,7 +71,7 @@ hpx::serialization::serialize_buffer<char> irecv(std::size_t size)
     using buffer_type = hpx::serialization::serialize_buffer<char>;
     return buffer_type(send_buffer, size, buffer_type::reference);
 }
-HPX_PLAIN_DIRECT_ACTION(irecv);
+HPX_PLAIN_DIRECT_ACTION(irecv)
 
 ///////////////////////////////////////////////////////////////////////////////
 void recv_async(hpx::id_type dest, std::size_t size, std::size_t window_size)

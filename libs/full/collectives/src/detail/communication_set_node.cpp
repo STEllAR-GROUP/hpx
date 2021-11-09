@@ -34,7 +34,7 @@
 using communication_set_node_component =
     hpx::components::component<hpx::lcos::detail::communication_set_node>;
 
-HPX_REGISTER_COMPONENT(communication_set_node_component);
+HPX_REGISTER_COMPONENT(communication_set_node_component)
 
 namespace hpx { namespace lcos { namespace detail {
 

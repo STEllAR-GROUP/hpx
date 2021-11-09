@@ -23,7 +23,7 @@
 
 void scatter(std::vector<hpx::id_type> const& localities,
     hpx::serialization::serialize_buffer<char> buffer, std::size_t chunk_size);
-HPX_PLAIN_ACTION(scatter);
+HPX_PLAIN_ACTION(scatter)
 
 void scatter(std::vector<hpx::id_type> const& localities,
     hpx::serialization::serialize_buffer<char> buffer, std::size_t chunk_size)

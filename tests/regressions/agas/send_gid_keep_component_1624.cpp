@@ -39,9 +39,9 @@ namespace server
 }
 
 HPX_REGISTER_ACTION_DECLARATION(server::view_registry::register_view_action,
-    view_registration_listener_register_view_action);
+    view_registration_listener_register_view_action)
 HPX_REGISTER_ACTION_DECLARATION(server::view_registry::update_action,
-    view_registration_listener_update_action);
+    view_registration_listener_update_action)
 
 
 namespace client
@@ -68,17 +68,17 @@ namespace client
     };
 }
 
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 
 typedef hpx::components::managed_component<server::view_registry>
     view_registration_listener_type;
 HPX_REGISTER_COMPONENT(
-    view_registration_listener_type, view_registry);
+    view_registration_listener_type, view_registry)
 
 HPX_REGISTER_ACTION(server::view_registry::register_view_action,
-    view_registration_listener_register_view_action);
+    view_registration_listener_register_view_action)
 HPX_REGISTER_ACTION(server::view_registry::update_action,
-    view_registration_listener_update_action);
+    view_registration_listener_update_action)
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,9 +119,9 @@ namespace server
 }
 
 HPX_REGISTER_ACTION_DECLARATION(server::viewer::register_region_action,
-    viewer_register_region_action);
+    viewer_register_region_action)
 HPX_REGISTER_ACTION_DECLARATION(server::viewer::update_action,
-    viewer_update_action);
+    viewer_update_action)
 
 namespace client
 {
@@ -148,11 +148,11 @@ namespace client
 }
 
 typedef hpx::components::managed_component<server::viewer> viewer_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(viewer_type, viewer);
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(viewer_type, viewer)
 
-HPX_REGISTER_ACTION(server::viewer::update_action, viewer_update_action);
+HPX_REGISTER_ACTION(server::viewer::update_action, viewer_update_action)
 HPX_REGISTER_ACTION(server::viewer::register_region_action,
-    viewer_register_region_action);
+    viewer_register_region_action)
 
 
 ///////////////////////////////////////////////////////////////////////////////

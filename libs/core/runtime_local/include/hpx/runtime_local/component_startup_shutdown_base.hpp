@@ -66,7 +66,7 @@ namespace hpx { namespace components {
 /// startup/shutdown registry. This macro has to be used in not more than one
 /// compilation unit of a component module.
 #define HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                              \
-    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, startup_shutdown);     \
+    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, startup_shutdown)      \
     HPX_INIT_REGISTRY_STARTUP_SHUTDOWN_STATIC(                                 \
         HPX_PLUGIN_COMPONENT_PREFIX, startup_shutdown)                         \
 /**/

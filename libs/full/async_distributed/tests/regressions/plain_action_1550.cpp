@@ -32,7 +32,7 @@ namespace mynamespace {
 
 using mynamespace_test_action = mynamespace::test_action;
 
-HPX_REGISTER_ACTION(mynamespace_test_action);
+HPX_REGISTER_ACTION(mynamespace_test_action)
 
 int hpx_main()
 {

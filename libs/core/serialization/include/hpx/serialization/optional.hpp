@@ -42,5 +42,5 @@ namespace hpx { namespace serialization {
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (template <typename T>), (hpx::util::optional<T>) );
+        (template <typename T>), (hpx::util::optional<T>) )
 }}    // namespace hpx::serialization

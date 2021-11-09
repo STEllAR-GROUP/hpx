@@ -45,6 +45,6 @@ namespace hpx { namespace test { namespace server {
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::test::server::simple_mobile_object::get_lva_action,
-    simple_mobile_object_get_lva_action);
+    simple_mobile_object_get_lva_action)
 
 #endif

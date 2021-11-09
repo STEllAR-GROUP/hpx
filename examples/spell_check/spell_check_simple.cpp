@@ -23,7 +23,7 @@ std::vector<std::string> words;
 
 std::string search(int start, int end, std::string const &word);
 
-HPX_PLAIN_ACTION(search, search_action);
+HPX_PLAIN_ACTION(search, search_action)
 
 std::string search(int start, int end, std::string const &word)
 {

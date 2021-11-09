@@ -39,11 +39,11 @@ struct hello_world_server
 };
 
 typedef hpx::components::component<hello_world_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, hello_world_server);
+HPX_REGISTER_COMPONENT(server_type, hello_world_server)
 
 typedef hello_world_server::print_action print_action;
-HPX_REGISTER_ACTION_DECLARATION(print_action);
-HPX_REGISTER_ACTION(print_action);
+HPX_REGISTER_ACTION_DECLARATION(print_action)
+HPX_REGISTER_ACTION(print_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct hello_world
