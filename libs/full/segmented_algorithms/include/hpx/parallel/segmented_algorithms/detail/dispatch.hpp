@@ -103,6 +103,23 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
     };
 
+    template <typename Iterator>
+    struct algorithm_result_helper<util::min_max_result<Iterator>,
+        typename std::enable_if<
+            hpx::traits::is_segmented_local_iterator<Iterator>::value>::type>
+    {
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits1;
+
+        static HPX_FORCEINLINE
+            util::min_max_result<typename traits1::local_iterator>
+            call(util::min_max_result<typename traits1::local_raw_iterator>&& p)
+        {
+            return util::min_max_result<typename traits1::local_iterator>{
+                traits1::remote(std::move(p.min)),
+                traits1::remote(std::move(p.max))};
+        }
+    };
+
     template <typename Iterator1, typename Iterator2, typename Iterator3>
     struct algorithm_result_helper<hpx::tuple<Iterator1, Iterator2, Iterator3>,
         typename std::enable_if<
@@ -229,6 +246,34 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                     return util::in_out_result<typename traits1::local_iterator,
                         typename traits2::local_iterator>{traits1::remote(p.in),
                             traits2::remote(p.out)};
+                });
+            // clang-format on
+        }
+    };
+
+    template <typename Iterator>
+    struct algorithm_result_helper<future<util::min_max_result<Iterator>>,
+        typename std::enable_if<
+            hpx::traits::is_segmented_local_iterator<Iterator>::value>::type>
+    {
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits1;
+
+        typedef util::min_max_result<typename traits1::local_raw_iterator>
+            arg_type;
+
+        static HPX_FORCEINLINE
+            future<util::min_max_result<typename traits1::local_iterator>>
+            call(future<arg_type>&& f)
+        {
+            // different versions of clang-format produce different results
+            // clang-format off
+            return f.then(hpx::launch::sync,
+                [](future<arg_type>&& f)
+                    -> util::min_max_result<typename traits1::local_iterator> {
+                    auto&& p = f.get();
+                    return util::min_max_result<typename traits1::local_iterator>{
+                        traits1::remote(p.min),
+                        traits1::remote(p.max)};
                 });
             // clang-format on
         }

@@ -10,8 +10,3 @@
 #include <hpx/parallel/algorithm.hpp>
 #include <hpx/parallel/container_algorithms.hpp>
 
-namespace hpx {
-    using hpx::parallel::max_element;
-    using hpx::parallel::min_element;
-    using hpx::parallel::minmax_element;
-}    // namespace hpx

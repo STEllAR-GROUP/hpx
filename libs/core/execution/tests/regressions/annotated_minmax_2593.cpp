@@ -19,7 +19,7 @@ double compute_minmax(const std::vector<double> v)
 
     auto minmaxX_ = hpx::minmax_element(policy, v.begin(), v.end());
     auto minmaxX = minmaxX_.get();
-    return *minmaxX.second - *minmaxX.first;
+    return *minmaxX.max - *minmaxX.min;
 }
 
 int hpx_main()

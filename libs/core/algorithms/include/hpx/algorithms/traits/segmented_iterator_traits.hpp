@@ -13,6 +13,7 @@
 #include <utility>
 
 namespace hpx { namespace traits {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator, typename Enable = void>
     struct segmented_iterator_traits
