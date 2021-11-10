@@ -278,7 +278,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename T1, typename T2,
             typename Enable = typename std::enable_if<
                 hpx::traits::is_equality_comparable_with<T1, T2>::value>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool operator()(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
             return t1 == t2;
@@ -290,7 +290,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename T1, typename T2,
             typename Enable = typename std::enable_if<
                 hpx::traits::is_equality_comparable_with<T1, T2>::value>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool operator()(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
             return t1 != t2;
@@ -323,7 +323,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct less
     {
         template <typename T1, typename T2>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool operator()(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
             return std::forward<T1>(t1) < std::forward<T2>(t2);
@@ -333,7 +333,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct greater
     {
         template <typename T1, typename T2>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool operator()(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
             return std::forward<T1>(t1) > std::forward<T2>(t2);
@@ -343,7 +343,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct greater_equal
     {
         template <typename T1, typename T2>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool operator()(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
             return std::forward<T1>(t1) >= std::forward<T2>(t2);
@@ -353,7 +353,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct less_equal
     {
         template <typename T1, typename T2>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool operator()(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
             return std::forward<T1>(t1) <= std::forward<T2>(t2);

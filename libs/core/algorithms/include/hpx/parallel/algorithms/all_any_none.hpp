@@ -270,7 +270,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static bool sequential(
                 ExPolicy, Iter first, Sent last, F&& f, Proj&& proj)
             {
-                return detail::sequential_find_if(first, last,
+                return detail::sequential_find_if<ExPolicy>(first, last,
                            util::invoke_projected<F, Proj>(std::forward<F>(f),
                                std::forward<Proj>(proj))) == last;
             }
@@ -292,14 +292,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj = std::forward<Proj>(proj)](
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
-                    util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count,
-                        tok, [&op, &tok, &proj](FwdIter const& curr) {
-                            if (hpx::util::invoke(
-                                    op, hpx::util::invoke(proj, *curr)))
-                            {
-                                tok.cancel();
-                            }
-                        });
+                    detail::sequential_find_if<std::decay_t<ExPolicy>>(
+                        part_begin, part_count, tok, std::forward<F>(op),
+                        std::forward<Proj>(proj));
 
                     return !tok.was_cancelled();
                 };
@@ -308,7 +303,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::forward<ExPolicy>(policy), first,
                     detail::distance(first, last), std::move(f1),
                     [](std::vector<hpx::future<bool>>&& results) {
-                        return detail::sequential_find_if_not(
+                        return detail::sequential_find_if_not<
+                                   hpx::execution::sequenced_policy>(
                                    hpx::util::begin(results),
                                    hpx::util::end(results),
                                    [](hpx::future<bool>& val) {
@@ -369,7 +365,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static bool sequential(
                 ExPolicy, Iter first, Sent last, F&& f, Proj&& proj)
             {
-                return detail::sequential_find_if(first, last,
+                return detail::sequential_find_if<ExPolicy>(first, last,
                            util::invoke_projected<F, Proj>(std::forward<F>(f),
                                std::forward<Proj>(proj))) != last;
             }
@@ -391,14 +387,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj = std::forward<Proj>(proj)](
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
-                    util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count,
-                        tok, [&op, &tok, &proj](FwdIter const& curr) {
-                            if (hpx::util::invoke(
-                                    op, hpx::util::invoke(proj, *curr)))
-                            {
-                                tok.cancel();
-                            }
-                        });
+                    detail::sequential_find_if<std::decay_t<ExPolicy>>(
+                        part_begin, part_count, tok, std::forward<F>(op),
+                        std::forward<Proj>(proj));
 
                     return tok.was_cancelled();
                 };
@@ -407,7 +398,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::forward<ExPolicy>(policy), first,
                     detail::distance(first, last), std::move(f1),
                     [](std::vector<hpx::future<bool>>&& results) {
-                        return detail::sequential_find_if(
+                        return detail::sequential_find_if<
+                                   hpx::execution::sequenced_policy>(
                                    hpx::util::begin(results),
                                    hpx::util::end(results),
                                    [](hpx::future<bool>& val) {
@@ -468,7 +460,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static bool sequential(
                 ExPolicy, Iter first, Sent last, F&& f, Proj&& proj)
             {
-                return detail::sequential_find_if_not(first, last,
+                return detail::sequential_find_if_not<ExPolicy>(first, last,
                            std::forward<F>(f),
                            std::forward<Proj>(proj)) == last;
             }
@@ -490,14 +482,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj = std::forward<Proj>(proj)](
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
-                    util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count,
-                        tok, [&op, &tok, &proj](FwdIter const& curr) {
-                            if (!hpx::util::invoke(
-                                    op, hpx::util::invoke(proj, *curr)))
-                            {
-                                tok.cancel();
-                            }
-                        });
+                    detail::sequential_find_if_not<std::decay_t<ExPolicy>>(
+                        part_begin, part_count, tok, std::forward<F>(op),
+                        std::forward<Proj>(proj));
 
                     return !tok.was_cancelled();
                 };
@@ -506,7 +493,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::forward<ExPolicy>(policy), first,
                     detail::distance(first, last), std::move(f1),
                     [](std::vector<hpx::future<bool>>&& results) {
-                        return detail::sequential_find_if_not(
+                        return detail::sequential_find_if_not<
+                                   hpx::execution::sequenced_policy>(
                                    hpx::util::begin(results),
                                    hpx::util::end(results),
                                    [](hpx::future<bool>& val) {

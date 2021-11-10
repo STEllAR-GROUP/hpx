@@ -65,7 +65,7 @@ namespace hpx { namespace parallel { namespace util {
         }
 
         template <typename T>
-        bool operator()(T&& t, T&& u)
+        auto operator()(T&& t, T&& u)
         {
             return HPX_INVOKE(pred_, std::forward<T>(t), std::forward<T>(u));
         }
