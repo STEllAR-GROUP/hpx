@@ -134,6 +134,12 @@ namespace hpx { namespace traits {
       : std::true_type
     {
     };
+
+    template <typename T>
+    struct proxy_value<hpx::cuda::experimental::value_proxy<T>>
+    {
+        using type = T;
+    };
 }}    // namespace hpx::traits
 
 #endif

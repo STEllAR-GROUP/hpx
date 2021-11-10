@@ -60,6 +60,12 @@ namespace hpx { namespace traits {
     struct is_value_proxy<test_value_proxy<T>> : std::true_type
     {
     };
+
+    template <typename T>
+    struct proxy_value<test_value_proxy<T>>
+    {
+        using type = T;
+    };
 }}    // namespace hpx::traits
 
 template <typename T>
