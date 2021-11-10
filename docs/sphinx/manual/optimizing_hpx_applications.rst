@@ -715,8 +715,7 @@ a component for you. The remainder of this section will explain the process of c
 performance counter based on the Sine example, which you can find in the
 directory ``examples/performance_counters/sine/``.
 
-The base class is defined in the header file [hpx_link
-hpx/performance_counters/base_performance_counter.hpp..hpx/performance_counters/base_performance_counter.hpp]
+The base class is defined in the header file :download:`base_performance_counter.cpp <../../libs/full/performance_counters/include/hpx/performance_counters/base_performance_counter.hpp>`
 as:
 
 .. literalinclude:: ../../libs/full/performance_counters/include/hpx/performance_counters/base_performance_counter.hpp
