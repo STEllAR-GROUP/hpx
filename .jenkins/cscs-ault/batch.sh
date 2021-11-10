@@ -9,13 +9,15 @@
 set -eux
 
 orig_src_dir="$(pwd)"
-src_dir="/dev/shm/hpx/src"
-build_dir="/dev/shm/hpx/build"
-install_dir="/dev/shm/hpx/install"
+hpx_dir="/dev/shm/hpx"
+src_dir="${hpx_dir}/src"
+build_dir="${hpx_dir}/build"
+install_dir="${hpx_dir}/install"
 
+rm -rf ${hpx_dir}
 # Copy source directory to /dev/shm for faster builds
-mkdir -p "${build_dir}"
-cp -r --remove-destination "${orig_src_dir}" "${src_dir}"
+mkdir -p "${build_dir}" "${src_dir}"
+cp -r "${orig_src_dir}" "${src_dir}"
 
 source ${src_dir}/.jenkins/cscs-ault/env-common.sh
 source ${src_dir}/.jenkins/cscs-ault/env-${configuration_name}.sh
