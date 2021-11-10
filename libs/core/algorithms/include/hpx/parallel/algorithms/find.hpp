@@ -419,7 +419,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static constexpr Iter sequential(ExPolicy, Iter first, Sent last,
                 T const& val, Proj&& proj = Proj())
             {
-                return sequential_find(
+                return sequential_find<ExPolicy>(
                     first, last, val, std::forward<Proj>(proj));
             }
 
@@ -443,7 +443,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f1 = [val, proj = std::forward<Proj>(proj), tok](Iter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n(base_idx, it, part_size, tok,
+                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
+                        part_size, tok,
                         [&val, &proj, &tok](type& v, std::size_t i) -> void {
                             if (hpx::util::invoke(proj, v) == val)
                             {
@@ -520,7 +521,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static constexpr Iter sequential(
                 ExPolicy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
             {
-                return sequential_find_if(
+                return sequential_find_if<ExPolicy>(
                     first, last, std::forward<F>(f), std::forward<Proj>(proj));
             }
 
@@ -545,7 +546,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj = std::forward<Proj>(proj),
                               tok](Iter it, std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n(base_idx, it, part_size, tok,
+                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
+                        part_size, tok,
                         [&f, &proj, &tok](type& v, std::size_t i) -> void {
                             if (hpx::util::invoke(
                                     f, hpx::util::invoke(proj, v)))
@@ -629,7 +631,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static constexpr Iter sequential(
                 ExPolicy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
             {
-                return sequential_find_if_not(
+                return sequential_find_if_not<ExPolicy>(
                     first, last, std::forward<F>(f), std::forward<Proj>(proj));
             }
 
@@ -654,7 +656,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj = std::forward<Proj>(proj),
                               tok](Iter it, std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n(base_idx, it, part_size, tok,
+                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
+                        part_size, tok,
                         [&f, &proj, &tok](type& v, std::size_t i) -> void {
                             if (!hpx::util::invoke(
                                     f, hpx::util::invoke(proj, v)))
@@ -839,7 +842,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj2 = std::forward<Proj2>(proj2)](Iter1 it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n(base_idx, it, part_size, tok,
+                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
+                        part_size, tok,
                         [=, &tok, &op, &proj1, &proj2](
                             auto t, std::size_t i) -> void {
                             if (hpx::util::invoke(op,
@@ -1003,7 +1007,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj2 = std::forward<Proj2>(proj2)](FwdIter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n(base_idx, it, part_size, tok,
+                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
+                        part_size, tok,
                         [&tok, &s_first, &s_last, &op, &proj1, &proj2](
                             reference v, std::size_t i) -> void {
                             for (FwdIter2 iter = s_first; iter != s_last;
