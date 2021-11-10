@@ -178,10 +178,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static future<Iterator> call(
             future<typename traits::local_raw_iterator>&& f)
         {
-            using argtype = future<typename traits::local_raw_iterator>;
-            return hpx::make_future<Iterator>(
-                std::move(f), [](argtype&& f) -> Iterator {
-                    return traits::remote(f.get());
+            return hpx::make_future<Iterator>(std::move(f),
+                [](typename traits::local_raw_iterator&& val) -> Iterator {
+                    return traits::remote(std::move(val));
                 });
         }
     };
@@ -203,8 +202,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static future<result_type> call(future<arg_type>&& f)
         {
             return hpx::make_future<result_type>(
-                std::move(f), [](future<arg_type>&& f) -> result_type {
-                    auto&& p = f.get();
+                std::move(f), [](arg_type&& p) -> result_type {
                     return std::make_pair(
                         traits1::remote(p.first), traits2::remote(p.second));
                 });
@@ -231,8 +229,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static future<result_type> call(future<arg_type>&& f)
         {
             return hpx::make_future<result_type>(
-                std::move(f), [](future<arg_type>&& f) -> result_type {
-                    auto&& p = f.get();
+                std::move(f), [](arg_type&& p) -> result_type {
                     return {traits1::remote(p.in), traits2::remote(p.out)};
                 });
         }
@@ -252,8 +249,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static future<result_type> call(future<arg_type>&& f)
         {
             return hpx::make_future<result_type>(
-                std::move(f), [](future<arg_type>&& f) -> result_type {
-                    auto&& p = f.get();
+                std::move(f), [](arg_type&& p) -> result_type {
                     return {traits::remote(p.min), traits::remote(p.max)};
                 });
         }
@@ -280,8 +276,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static future<result_type> call(future<arg_type>&& f)
         {
             return hpx::make_future<result_type>(
-                std::move(f), [](future<arg_type>&& f) -> result_type {
-                    auto&& p = f.get();
+                std::move(f), [](arg_type&& p) -> result_type {
                     return hpx::make_tuple(
                         traits1::remote(std::move(hpx::get<0>(p))),
                         traits2::remote(std::move(hpx::get<1>(p))),
@@ -314,8 +309,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static future<result_type> call(future<arg_type>&& f)
         {
             return hpx::make_future<result_type>(
-                std::move(f), [](future<arg_type>&& f) -> result_type {
-                    auto&& p = f.get();
+                std::move(f), [](arg_type&& p) -> result_type {
                     return {traits1::remote(std::move(p.in1)),
                         traits2::remote(std::move(p.in2)),
                         traits3::remote(std::move(p.out))};

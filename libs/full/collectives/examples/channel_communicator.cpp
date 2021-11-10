@@ -45,9 +45,10 @@ int hpx_main()
     int msg = msg_vec[this_locality];
 
     // send values to another locality
-    set(comm, that_site_arg(next_locality), msg, tag_arg(cnt)).get();
-
+    auto setf = set(comm, that_site_arg(next_locality), msg, tag_arg(cnt));
     auto got_msg = get<int>(comm, that_site_arg(next_locality), tag_arg(cnt));
+
+    setf.get();
 
     while (cnt < times)
     {
@@ -62,10 +63,11 @@ int hpx_main()
             rec_msg += 10;
 
             // start next round
-            set(comm, that_site_arg(next_locality), rec_msg, tag_arg(cnt))
-                .get();
+            setf =
+                set(comm, that_site_arg(next_locality), rec_msg, tag_arg(cnt));
             got_msg =
                 get<int>(comm, that_site_arg(next_locality), tag_arg(cnt));
+            setf.get();
         });
 
         done_msg.get();

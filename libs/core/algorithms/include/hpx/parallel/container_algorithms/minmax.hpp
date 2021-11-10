@@ -819,7 +819,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 7,
         "hpx::parallel::min_element is deprecated, use "
         "hpx::ranges::min_element instead")
-        util::detail::algorithm_result_t<ExPolicy,
+        hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>
     min_element(ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj())
     // clang-format on
@@ -848,7 +848,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 7,
         "hpx::parallel::max_element is deprecated, use "
         "hpx::ranges::max_element instead")
-        util::detail::algorithm_result_t<ExPolicy,
+        hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>
     max_element(ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj())
     // clang-format on
@@ -883,7 +883,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 7,
         "hpx::parallel::minmax_element is deprecated, use "
         "hpx::ranges::minmax_element instead")
-        util::detail::algorithm_result_t<ExPolicy,
+        hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             minmax_element_result<hpx::traits::range_iterator_t<Rng>>>
     minmax_element(
         ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj())
