@@ -18,7 +18,6 @@
 #include <hpx/parallel/datapar/loop.hpp>
 #include <hpx/parallel/datapar/zip_iterator.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <experimental/simd>
 
 #include <cstddef>
 #include <type_traits>

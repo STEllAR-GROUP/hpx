@@ -8,6 +8,7 @@
 #include <hpx/include/datapar.hpp>
 #include <hpx/local/init.hpp>
 
+#include <cstddef>
 #include <iostream>
 #include <string>
 #include <vector>

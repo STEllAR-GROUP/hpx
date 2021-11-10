@@ -17,8 +17,10 @@
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
+#include <cstddef>
 #include <iostream>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
