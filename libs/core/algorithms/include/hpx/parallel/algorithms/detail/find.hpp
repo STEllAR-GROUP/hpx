@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -172,7 +172,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     // provide implementation of std::find_if_not supporting iterators/sentinels
     template <typename ExPolicy>
     struct sequential_find_if_not_t
-      : hpx::functional::detail::tag_fallback<sequential_find_if_not_t<ExPolicy>>
+      : hpx::functional::detail::tag_fallback<
+            sequential_find_if_not_t<ExPolicy>>
     {
     private:
         template <typename Iterator, typename Sentinel, typename Pred,
