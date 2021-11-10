@@ -30,18 +30,17 @@ namespace hpx { namespace parallel { namespace util {
         HPX_NO_UNIQUE_ADDRESS I2 in2;
 
         template <typename II1, typename II2,
-            typename Enable = typename std::enable_if<
-                std::is_convertible<I1 const&, II1>::value &&
-                std::is_convertible<I2 const&, II2>::value>::type>
+            typename Enable =
+                std::enable_if_t<std::is_convertible_v<I1 const&, II1> &&
+                    std::is_convertible_v<I2 const&, II2>>>
         constexpr operator in_in_result<II1, II2>() const&
         {
             return {in1, in2};
         }
 
         template <typename II1, typename II2,
-            typename Enable =
-                typename std::enable_if<std::is_convertible<I1, II1>::value &&
-                    std::is_convertible<I2, II2>::value>::type>
+            typename Enable = std::enable_if_t<std::is_convertible_v<I1, II1> &&
+                std::is_convertible_v<I2, II2>>>
         constexpr operator in_in_result<II1, II2>() &&
         {
             return {std::move(in1), std::move(in2)};
@@ -77,18 +76,17 @@ namespace hpx { namespace parallel { namespace util {
         HPX_NO_UNIQUE_ADDRESS O out;
 
         template <typename I2, typename O2,
-            typename Enable = typename std::enable_if<
-                std::is_convertible<I const&, I2>::value &&
-                std::is_convertible<O const&, O2>::value>::type>
+            typename Enable =
+                std::enable_if_t<std::is_convertible_v<I const&, I2> &&
+                    std::is_convertible_v<O const&, O2>>>
         constexpr operator in_out_result<I2, O2>() const&
         {
             return {in, out};
         }
 
         template <typename I2, typename O2,
-            typename Enable =
-                typename std::enable_if<std::is_convertible<I, I2>::value &&
-                    std::is_convertible<O, O2>::value>::type>
+            typename Enable = std::enable_if_t<std::is_convertible_v<I, I2> &&
+                std::is_convertible_v<O, O2>>>
         constexpr operator in_out_result<I2, O2>() &&
         {
             return {std::move(in), std::move(out)};
@@ -159,16 +157,15 @@ namespace hpx { namespace parallel { namespace util {
         HPX_NO_UNIQUE_ADDRESS T max;
 
         template <typename T2,
-            typename Enable = typename std::enable_if<
-                std::is_convertible<T const&, T>::value>::type>
+            typename Enable =
+                std::enable_if_t<std::is_convertible_v<T const&, T>>>
         constexpr operator min_max_result<T2>() const&
         {
             return {min, max};
         }
 
         template <typename T2,
-            typename Enable = typename std::enable_if<
-                std::is_convertible<T, T2>::value>::type>
+            typename Enable = std::enable_if_t<std::is_convertible_v<T, T2>>>
         constexpr operator min_max_result<T2>() &&
         {
             return {std::move(min), std::move(max)};
@@ -306,18 +303,17 @@ namespace hpx { namespace parallel { namespace util {
         HPX_NO_UNIQUE_ADDRESS F fun;
 
         template <typename I2, typename F2,
-            typename Enable = typename std::enable_if<
-                std::is_convertible<I const&, I2>::value &&
-                std::is_convertible<F const&, F2>::value>::type>
+            typename Enable =
+                std::enable_if_t<std::is_convertible_v<I const&, I2> &&
+                    std::is_convertible_v<F const&, F2>>>
         constexpr operator in_fun_result<I2, F2>() const&
         {
             return {in, fun};
         }
 
         template <typename I2, typename F2,
-            typename Enable =
-                typename std::enable_if<std::is_convertible<I, I2>::value &&
-                    std::is_convertible<F, F2>::value>::type>
+            typename Enable = std::enable_if_t<std::is_convertible_v<I, I2> &&
+                std::is_convertible_v<F, F2>>>
         constexpr operator in_fun_result<I2, F2>() &&
         {
             return {std::move(in), std::move(fun)};

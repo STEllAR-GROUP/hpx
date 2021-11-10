@@ -435,7 +435,7 @@ namespace hpx { namespace segmented {
         static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
             "Requires at least forward iterator.");
 
-        if (first == last || (first + 1) == last)
+        if (first == last || std::next(first) == last)
         {
             return first;
         }
@@ -467,7 +467,7 @@ namespace hpx { namespace segmented {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-        if (first == last || (first + 1) == last)
+        if (first == last || std::next(first) == last)
         {
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
                 SegIter>::get(std::move(first));
@@ -495,7 +495,7 @@ namespace hpx { namespace segmented {
         static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
             "Requires at least forward iterator.");
 
-        if (first == last || (first + 1) == last)
+        if (first == last || std::next(first) == last)
         {
             return first;
         }
@@ -527,7 +527,7 @@ namespace hpx { namespace segmented {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-        if (first == last || (first + 1) == last)
+        if (first == last || std::next(first) == last)
         {
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
                 SegIter>::get(std::move(first));
@@ -556,7 +556,7 @@ namespace hpx { namespace segmented {
         static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
             "Requires at least forward iterator.");
 
-        if (first == last || (first + 1) == last)
+        if (first == last || std::next(first) == last)
         {
             return {first, first};
         }
@@ -579,7 +579,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<SegIter>
         )>
     // clang-format on
-    hpx::parallel::util::detail::algorithm_result_v<ExPolicy,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         minmax_element_result<SegIter>>
     tag_dispatch(hpx::minmax_element_t, ExPolicy&& policy, SegIter first,
         SegIter last, F&& f)
@@ -590,7 +590,7 @@ namespace hpx { namespace segmented {
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
         using result_type = minmax_element_result<SegIter>;
 
-        if (first == last || (first + 1) == last)
+        if (first == last || std::next(first) == last)
         {
             result_type result = {first, first};
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
