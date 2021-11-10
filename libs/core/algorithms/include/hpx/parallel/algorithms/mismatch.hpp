@@ -282,11 +282,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj2 = std::forward<Proj2>(proj2)](
                               zip_iterator it, std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n(base_idx, it, part_count, tok,
-                        [&](reference t, std::size_t i) {
-                            if (!HPX_INVOKE(f,
-                                    HPX_INVOKE(proj1, hpx::get<0>(t)),
-                                    HPX_INVOKE(proj2, hpx::get<1>(t))))
+                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
+                        part_count, tok,
+                        [&f, &proj1, &proj2, &tok](reference t, std::size_t i) {
+                            if (!hpx::util::invoke(f,
+                                    hpx::util::invoke(proj1, hpx::get<0>(t)),
+                                    hpx::util::invoke(proj2, hpx::get<1>(t))))
                             {
                                 tok.cancel(i);
                             }
@@ -426,9 +427,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f1 = [tok, f = std::forward<F>(f)](zip_iterator it,
                               std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n(base_idx, it, part_count, tok,
-                        [&](reference t, std::size_t i) {
-                            if (!HPX_INVOKE(f, hpx::get<0>(t), hpx::get<1>(t)))
+                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
+                        part_count, tok,
+                        [&f, &tok](reference t, std::size_t i) {
+                            if (!hpx::util::invoke(
+                                    f, hpx::get<0>(t), hpx::get<1>(t)))
                             {
                                 tok.cancel(i);
                             }

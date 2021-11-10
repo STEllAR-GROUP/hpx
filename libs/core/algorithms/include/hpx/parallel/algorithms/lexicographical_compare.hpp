@@ -249,7 +249,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f1 = [tok, pred, proj1, proj2](zip_iterator it,
                               std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n(base_idx, it, part_count, tok,
+                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
+                        part_count, tok,
                         [&pred, &tok, &proj1, &proj2](
                             reference t, std::size_t i) -> void {
                             using hpx::get;
