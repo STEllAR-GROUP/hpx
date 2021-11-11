@@ -12,6 +12,7 @@
 
 #if !defined(__CUDACC__)
 #include <hpx/execution/traits/detail/simd/vector_pack_all_any_none.hpp>
+#include <hpx/execution/traits/detail/vc/vector_pack_all_any_none.hpp>
 #endif
 
 #endif
