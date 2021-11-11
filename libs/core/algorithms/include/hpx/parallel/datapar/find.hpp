@@ -30,7 +30,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         template <typename Iterator, typename Sentinel, typename T,
             typename Proj>
-        static inline constexpr Iterator call(
+        static inline Iterator call(
             Iterator first, Sentinel last, T const& val, Proj proj)
         {
             int offset = 0;
@@ -94,7 +94,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         template <typename Iterator, typename Sentinel, typename Pred,
             typename Proj>
-        static inline constexpr Iterator call(
+        static inline Iterator call(
             Iterator first, Sentinel last, Pred pred, Proj proj)
         {
             int offset = 0;
@@ -184,7 +184,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         template <typename Iterator, typename Sentinel, typename Pred,
             typename Proj>
-        static inline constexpr Iterator call(
+        static inline Iterator call(
             Iterator first, Sentinel last, Pred pred, Proj proj)
         {
             int offset = 0;
