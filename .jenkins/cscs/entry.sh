@@ -39,6 +39,7 @@ sbatch \
     --time="03:00:00" \
     --output="jenkins-hpx-${configuration_name_with_build_type}.out" \
     --error="jenkins-hpx-${configuration_name_with_build_type}.err" \
+    --exclusive \
     --wait .jenkins/cscs/batch.sh
 
 # Print slurm logs
