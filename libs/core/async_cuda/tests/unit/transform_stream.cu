@@ -147,7 +147,7 @@ int hpx_main()
         auto s1 = ex::just();
         auto s2 = cu::transform_stream(std::move(s1), dummy{});
         auto s3 = ex::on(std::move(s2), ex::thread_pool_scheduler{});
-        auto s4 = ex::transform(std::move(s3), dummy{});
+        auto s4 = ex::then(std::move(s3), dummy{});
         auto s5 = cu::transform_stream(std::move(s4), dummy{});
         ex::sync_wait(ex::on(std::move(s5), ex::thread_pool_scheduler{}));
         HPX_TEST_EQ(dummy::host_void_calls.load(), std::size_t(1));
@@ -161,10 +161,10 @@ int hpx_main()
     {
         dummy::reset_counts();
         auto s1 = ex::schedule(ex::thread_pool_scheduler{});
-        auto s2 = ex::transform(std::move(s1), dummy{});
+        auto s2 = ex::then(std::move(s1), dummy{});
         auto s3 = cu::transform_stream(std::move(s2), dummy{});
         auto s4 = ex::on(std::move(s3), ex::thread_pool_scheduler{});
-        auto s5 = ex::transform(std::move(s4), dummy{});
+        auto s5 = ex::then(std::move(s4), dummy{});
         ex::sync_wait(std::move(s5));
         HPX_TEST_EQ(dummy::host_void_calls.load(), std::size_t(2));
         HPX_TEST_EQ(dummy::stream_void_calls.load(), std::size_t(1));
@@ -213,7 +213,7 @@ int hpx_main()
         auto s1 = ex::just(1);
         auto s2 = cu::transform_stream(std::move(s1), dummy{});
         auto s3 = ex::on(std::move(s2), ex::thread_pool_scheduler{});
-        auto s4 = ex::transform(std::move(s3), dummy{});
+        auto s4 = ex::then(std::move(s3), dummy{});
         auto s5 = cu::transform_stream(std::move(s4), dummy{});
         HPX_TEST_EQ(
             ex::sync_wait(ex::on(std::move(s5), ex::thread_pool_scheduler{})),
@@ -230,10 +230,10 @@ int hpx_main()
         dummy::reset_counts();
         auto s1 = ex::just(1);
         auto s2 = ex::on(std::move(s1), ex::thread_pool_scheduler{});
-        auto s3 = ex::transform(std::move(s2), dummy{});
+        auto s3 = ex::then(std::move(s2), dummy{});
         auto s4 = cu::transform_stream(std::move(s3), dummy{});
         auto s5 = ex::on(std::move(s4), ex::thread_pool_scheduler{});
-        auto s6 = ex::transform(std::move(s5), dummy{});
+        auto s6 = ex::then(std::move(s5), dummy{});
         HPX_TEST_EQ(ex::sync_wait(std::move(s6)), 4.0);
         HPX_TEST_EQ(dummy::host_void_calls.load(), std::size_t(0));
         HPX_TEST_EQ(dummy::stream_void_calls.load(), std::size_t(0));
@@ -246,11 +246,11 @@ int hpx_main()
     {
         dummy::reset_counts();
         auto s1 = ex::just_on(ex::thread_pool_scheduler{}, 1);
-        auto s2 = ex::transform(std::move(s1), dummy{});
+        auto s2 = ex::then(std::move(s1), dummy{});
         auto s3 = cu::transform_stream(std::move(s2), dummy{});
         auto s4 = cu::transform_stream(std::move(s3), dummy{});
         auto s5 = ex::on(std::move(s4), ex::thread_pool_scheduler{});
-        auto s6 = ex::transform(std::move(s5), dummy{});
+        auto s6 = ex::then(std::move(s5), dummy{});
         HPX_TEST_EQ(ex::sync_wait(std::move(s6)), 5.0);
         HPX_TEST_EQ(dummy::host_void_calls.load(), std::size_t(0));
         HPX_TEST_EQ(dummy::stream_void_calls.load(), std::size_t(0));
@@ -270,16 +270,16 @@ int hpx_main()
 
         auto s = ex::just(p, &p_h, sizeof(type), cudaMemcpyHostToDevice) |
             cu::transform_stream(cuda_memcpy_async{}) |
-            ex::transform(&cu::check_cuda_error) |
-            ex::transform([p] { return p; }) |
+            ex::then(&cu::check_cuda_error) |
+            ex::then([p] { return p; }) |
             cu::transform_stream(increment{}) |
             cu::transform_stream(increment{}) |
             cu::transform_stream(increment{});
         ex::when_all(ex::just(&p_h), std::move(s), ex::just(sizeof(type)),
             ex::just(cudaMemcpyDeviceToHost)) |
             cu::transform_stream(cuda_memcpy_async{}) |
-            ex::transform(&cu::check_cuda_error) |
-            ex::transform([&p_h] { HPX_TEST_EQ(p_h, 3); }) |
+            ex::then(&cu::check_cuda_error) |
+            ex::then([&p_h] { HPX_TEST_EQ(p_h, 3); }) |
             ex::on(ex::thread_pool_scheduler{}) | ex::sync_wait();
 
         cu::check_cuda_error(cudaFree(p));

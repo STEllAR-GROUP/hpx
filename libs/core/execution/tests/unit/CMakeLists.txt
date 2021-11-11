@@ -6,7 +6,6 @@
 
 set(tests
     algorithm_bulk
-    algorithm_detach
     algorithm_ensure_started
     algorithm_execute
     algorithm_just
@@ -15,8 +14,9 @@ set(tests
     algorithm_let_error
     algorithm_on
     algorithm_split
+    algorithm_start_detached
     algorithm_sync_wait
-    algorithm_transform
+    algorithm_then
     algorithm_when_all
     bulk_async
     executor_parameters

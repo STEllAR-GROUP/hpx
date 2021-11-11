@@ -8,7 +8,7 @@
 
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/let_value.hpp>
-#include <hpx/execution/algorithms/transform.hpp>
+#include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -19,8 +19,8 @@
 namespace hpx { namespace detail {
     // This is a lighter-weight alternative to bind for use in parallel
     // algorithm overloads, where one needs to bind an execution policy to an
-    // algorithm for use in execution::transform. Typically used together with
-    // transform_with_bound_algorithm.
+    // algorithm for use in execution::then. Typically used together with
+    // then_with_bound_algorithm.
     template <typename Tag, typename ExPolicy>
     struct bound_algorithm
     {
@@ -48,11 +48,10 @@ namespace hpx { namespace detail {
 
     // Helper function for use in creating overloads of parallel algorithms that
     // take senders. Takes an execution policy, a predecessor sender, and an
-    // "algorithm" (i.e. a tag) and applies transform with the predecessor
+    // "algorithm" (i.e. a tag) and applies then with the predecessor
     // sender and the execution policy bound to the algorithm.
     template <typename Tag, typename ExPolicy, typename Predecessor>
-    auto transform_with_bound_algorithm(
-        Predecessor&& predecessor, ExPolicy&& policy)
+    auto then_with_bound_algorithm(Predecessor&& predecessor, ExPolicy&& policy)
     {
         // If the given execution policy can has a task policy, i.e. the
         // algorithm can return a future, we use the task policy since we can
@@ -69,11 +68,11 @@ namespace hpx { namespace detail {
                     std::move(task_policy)});
         }
         // If the policy does not have a task policy, the algorithm can only be
-        // called synchronously. In this case we only use transform to chain the
+        // called synchronously. In this case we only use then to chain the
         // algorithm after the predecessor sender.
         else
         {
-            return hpx::execution::experimental::transform(
+            return hpx::execution::experimental::then(
                 std::forward<Predecessor>(predecessor),
                 bound_algorithm<Tag, ExPolicy>{std::forward<ExPolicy>(policy)});
         }
@@ -109,7 +108,7 @@ namespace hpx { namespace detail {
         friend auto tag_fallback_invoke(
             Tag, Predecessor&& predecessor, ExPolicy&& policy)
         {
-            return detail::transform_with_bound_algorithm<Tag>(
+            return detail::then_with_bound_algorithm<Tag>(
                 std::forward<Predecessor>(predecessor),
                 std::forward<ExPolicy>(policy));
         }

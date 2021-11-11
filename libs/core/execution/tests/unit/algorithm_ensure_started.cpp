@@ -34,7 +34,7 @@ int main()
     {
         std::atomic<bool> set_value_called{false};
         std::atomic<bool> started{false};
-        auto s1 = ex::transform(void_sender{}, [&]() { started = true; });
+        auto s1 = ex::then(void_sender{}, [&]() { started = true; });
         auto s2 = ex::ensure_started(std::move(s1));
         HPX_TEST(started);
         auto f = [] {};
@@ -47,7 +47,7 @@ int main()
     {
         std::atomic<bool> set_value_called{false};
         std::atomic<bool> started{false};
-        auto s1 = ex::transform(ex::just(0), [&](int x) {
+        auto s1 = ex::then(ex::just(0), [&](int x) {
             started = true;
             return x;
         });
@@ -63,12 +63,11 @@ int main()
     {
         std::atomic<bool> set_value_called{false};
         std::atomic<bool> started{false};
-        auto s1 =
-            ex::transform(ex::just(custom_type_non_default_constructible{42}),
-                [&](custom_type_non_default_constructible x) {
-                    started = true;
-                    return x;
-                });
+        auto s1 = ex::then(ex::just(custom_type_non_default_constructible{42}),
+            [&](custom_type_non_default_constructible x) {
+                started = true;
+                return x;
+            });
         auto s2 = ex::ensure_started(std::move(s1));
         HPX_TEST(started);
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
@@ -81,7 +80,7 @@ int main()
     {
         std::atomic<bool> set_value_called{false};
         std::atomic<bool> started{false};
-        auto s1 = ex::transform(
+        auto s1 = ex::then(
             ex::just(custom_type_non_default_constructible_non_copyable{42}),
             [&](custom_type_non_default_constructible_non_copyable&& x) {
                 started = true;

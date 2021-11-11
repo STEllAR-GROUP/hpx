@@ -35,10 +35,10 @@ struct custom_transformer
 };
 
 template <typename S>
-auto tag_invoke(ex::transform_t, S&& s, custom_transformer t)
+auto tag_invoke(ex::then_t, S&& s, custom_transformer t)
 {
     t.tag_invoke_overload_called = true;
-    return ex::transform(std::forward<S>(s), [t = std::move(t)]() { t(); });
+    return ex::then(std::forward<S>(s), [t = std::move(t)]() { t(); });
 }
 
 int main()
@@ -46,7 +46,7 @@ int main()
     // Success path
     {
         std::atomic<bool> set_value_called{false};
-        auto s = ex::transform(ex::just(), [] {});
+        auto s = ex::then(ex::just(), [] {});
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
@@ -56,7 +56,7 @@ int main()
 
     {
         std::atomic<bool> set_value_called{false};
-        auto s = ex::transform(ex::just(0), [](int x) { return ++x; });
+        auto s = ex::then(ex::just(0), [](int x) { return ++x; });
         auto f = [](int x) { HPX_TEST_EQ(x, 1); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
@@ -66,12 +66,11 @@ int main()
 
     {
         std::atomic<bool> set_value_called{false};
-        auto s =
-            ex::transform(ex::just(custom_type_non_default_constructible{0}),
-                [](custom_type_non_default_constructible x) {
-                    ++(x.x);
-                    return x;
-                });
+        auto s = ex::then(ex::just(custom_type_non_default_constructible{0}),
+            [](custom_type_non_default_constructible x) {
+                ++(x.x);
+                return x;
+            });
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 1); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
@@ -81,7 +80,7 @@ int main()
 
     {
         std::atomic<bool> set_value_called{false};
-        auto s = ex::transform(
+        auto s = ex::then(
             ex::just(custom_type_non_default_constructible_non_copyable{0}),
             [](custom_type_non_default_constructible_non_copyable&& x) {
                 ++(x.x);
@@ -96,10 +95,10 @@ int main()
 
     {
         std::atomic<bool> set_value_called{false};
-        auto s1 = ex::transform(ex::just(0), [](int x) { return ++x; });
-        auto s2 = ex::transform(std::move(s1), [](int x) { return ++x; });
-        auto s3 = ex::transform(std::move(s2), [](int x) { return ++x; });
-        auto s4 = ex::transform(std::move(s3), [](int x) { return ++x; });
+        auto s1 = ex::then(ex::just(0), [](int x) { return ++x; });
+        auto s2 = ex::then(std::move(s1), [](int x) { return ++x; });
+        auto s3 = ex::then(std::move(s2), [](int x) { return ++x; });
+        auto s4 = ex::then(std::move(s3), [](int x) { return ++x; });
         auto f = [](int x) { HPX_TEST_EQ(x, 4); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s4), std::move(r));
@@ -109,11 +108,11 @@ int main()
 
     {
         std::atomic<bool> set_value_called{false};
-        auto s1 = ex::transform(ex::just(), []() { return 3; });
-        auto s2 = ex::transform(std::move(s1), [](int x) { return x / 1.5; });
-        auto s3 = ex::transform(std::move(s2), [](double x) { return x / 2; });
-        auto s4 = ex::transform(
-            std::move(s3), [](int x) { return std::to_string(x); });
+        auto s1 = ex::then(ex::just(), []() { return 3; });
+        auto s2 = ex::then(std::move(s1), [](int x) { return x / 1.5; });
+        auto s3 = ex::then(std::move(s2), [](double x) { return x / 2; });
+        auto s4 =
+            ex::then(std::move(s3), [](int x) { return std::to_string(x); });
         auto f = [](std::string x) { HPX_TEST_EQ(x, std::string("1")); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s4), std::move(r));
@@ -124,10 +123,10 @@ int main()
     // operator| overload
     {
         std::atomic<bool> set_value_called{false};
-        auto s = ex::just() | ex::transform([]() { return 3; }) |
-            ex::transform([](int x) { return x / 1.5; }) |
-            ex::transform([](double x) { return x / 2; }) |
-            ex::transform([](int x) { return std::to_string(x); });
+        auto s = ex::just() | ex::then([]() { return 3; }) |
+            ex::then([](int x) { return x / 1.5; }) |
+            ex::then([](double x) { return x / 2; }) |
+            ex::then([](int x) { return std::to_string(x); });
         auto f = [](std::string x) { HPX_TEST_EQ(x, std::string("1")); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), r);
@@ -140,7 +139,7 @@ int main()
         std::atomic<bool> receiver_set_value_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         std::atomic<bool> custom_transformer_call_operator_called{false};
-        auto s = ex::transform(ex::just(),
+        auto s = ex::then(ex::just(),
             custom_transformer{tag_invoke_overload_called,
                 custom_transformer_call_operator_called, false});
         auto f = [] {};
@@ -155,8 +154,8 @@ int main()
     // Failure path
     {
         std::atomic<bool> set_error_called{false};
-        auto s = ex::transform(
-            ex::just(), [] { throw std::runtime_error("error"); });
+        auto s =
+            ex::then(ex::just(), [] { throw std::runtime_error("error"); });
         auto r = error_callback_receiver<decltype(check_exception_ptr)>{
             check_exception_ptr, set_error_called};
         auto os = ex::connect(std::move(s), std::move(r));
@@ -166,16 +165,16 @@ int main()
 
     {
         std::atomic<bool> set_error_called{false};
-        auto s1 = ex::transform(ex::just(0), [](int x) { return ++x; });
-        auto s2 = ex::transform(std::move(s1), [](int x) {
+        auto s1 = ex::then(ex::just(0), [](int x) { return ++x; });
+        auto s2 = ex::then(std::move(s1), [](int x) {
             throw std::runtime_error("error");
             return ++x;
         });
-        auto s3 = ex::transform(std::move(s2), [](int x) {
+        auto s3 = ex::then(std::move(s2), [](int x) {
             HPX_TEST(false);
             return ++x;
         });
-        auto s4 = ex::transform(std::move(s3), [](int x) {
+        auto s4 = ex::then(std::move(s3), [](int x) {
             HPX_TEST(false);
             return ++x;
         });
@@ -190,7 +189,7 @@ int main()
         std::atomic<bool> receiver_set_error_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         std::atomic<bool> custom_transformer_call_operator_called{false};
-        auto s = ex::transform(ex::just(),
+        auto s = ex::then(ex::just(),
             custom_transformer{tag_invoke_overload_called,
                 custom_transformer_call_operator_called, true});
         auto r = error_callback_receiver<decltype(check_exception_ptr)>{

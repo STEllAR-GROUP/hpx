@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/algorithms/detach.hpp>
-#include <hpx/execution/algorithms/transform.hpp>
+#include <hpx/execution/algorithms/start_detached.hpp>
+#include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 
@@ -23,8 +23,8 @@ namespace hpx { namespace execution { namespace experimental {
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             execute_t, Scheduler&& scheduler, F&& f)
         {
-            return detach(
-                transform(schedule(std::forward<Scheduler>(scheduler)),
+            return start_detached(
+                then(schedule(std::forward<Scheduler>(scheduler)),
                     std::forward<F>(f)));
         }
     } execute{};

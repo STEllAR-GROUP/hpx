@@ -33,30 +33,32 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Sender, typename Allocator>
         struct operation_state_holder
         {
-            struct detach_receiver
+            struct start_detached_receiver
             {
                 hpx::intrusive_ptr<operation_state_holder> op_state;
 
                 template <typename Error>
                 HPX_NORETURN friend void tag_invoke(
-                    set_error_t, detach_receiver&&, Error&&) noexcept
+                    set_error_t, start_detached_receiver&&, Error&&) noexcept
                 {
                     HPX_ASSERT_MSG(false,
-                        "set_error was called on the receiver of detach, "
+                        "set_error was called on the receiver of "
+                        "start_detached, "
                         "terminating. If you want to allow errors from the "
                         "predecessor sender, handle them first with e.g. "
                         "let_error.");
                     std::terminate();
                 }
 
-                friend void tag_invoke(set_done_t, detach_receiver&& r) noexcept
+                friend void tag_invoke(
+                    set_done_t, start_detached_receiver&& r) noexcept
                 {
                     r.op_state.reset();
                 };
 
                 template <typename... Ts>
                 friend void tag_invoke(
-                    set_value_t, detach_receiver&& r, Ts&&...) noexcept
+                    set_value_t, start_detached_receiver&& r, Ts&&...) noexcept
                 {
                     r.op_state.reset();
                 }
@@ -69,7 +71,7 @@ namespace hpx { namespace execution { namespace experimental {
             hpx::util::atomic_count count{0};
 
             using operation_state_type =
-                connect_result_t<Sender, detach_receiver>;
+                connect_result_t<Sender, start_detached_receiver>;
             std::decay_t<operation_state_type> op_state;
 
         public:
@@ -79,8 +81,8 @@ namespace hpx { namespace execution { namespace experimental {
             explicit operation_state_holder(
                 Sender_&& sender, allocator_type const& alloc)
               : alloc(alloc)
-              , op_state(connect(
-                    std::forward<Sender_>(sender), detach_receiver{this}))
+              , op_state(connect(std::forward<Sender_>(sender),
+                    start_detached_receiver{this}))
             {
                 start(op_state);
             }
@@ -105,8 +107,8 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct detach_t final
-      : hpx::functional::detail::tag_fallback<detach_t>
+    HPX_INLINE_CONSTEXPR_VARIABLE struct start_detached_t final
+      : hpx::functional::detail::tag_fallback<start_detached_t>
     {
     private:
         // clang-format off
@@ -118,7 +120,8 @@ namespace hpx { namespace execution { namespace experimental {
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE void tag_fallback_invoke(
-            detach_t, Sender&& sender, Allocator const& allocator = Allocator{})
+            start_detached_t, Sender&& sender,
+            Allocator const& allocator = Allocator{})
         {
             using allocator_type = Allocator;
             using operation_state_type =
@@ -145,9 +148,10 @@ namespace hpx { namespace execution { namespace experimental {
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            detach_t, Allocator const& allocator = Allocator{})
+            start_detached_t, Allocator const& allocator = Allocator{})
         {
-            return detail::partial_algorithm<detach_t, Allocator>{allocator};
+            return detail::partial_algorithm<start_detached_t, Allocator>{
+                allocator};
         }
-    } detach{};
+    } start_detached{};
 }}}    // namespace hpx::execution::experimental

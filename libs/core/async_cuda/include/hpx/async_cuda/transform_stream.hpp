@@ -10,7 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
-#include <hpx/execution/algorithms/transform.hpp>
+#include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
@@ -312,7 +312,7 @@ namespace hpx { namespace cuda { namespace experimental {
     }    // namespace detail
 
     // NOTE: This is not a customization of
-    // hpx::execution::experimental::transform. It has different semantics:
+    // hpx::execution::experimental::then. It has different semantics:
     // - a cudaStream_t is inserted as an additional argument into the call to f
     // - values from the predecessor sender are not forwarded, only passed by
     //   reference, to the call to f to keep them alive until the event is ready

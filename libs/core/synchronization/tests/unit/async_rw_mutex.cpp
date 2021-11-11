@@ -21,8 +21,8 @@
 using hpx::execution::experimental::execute;
 using hpx::execution::experimental::on;
 using hpx::execution::experimental::sync_wait;
+using hpx::execution::experimental::then;
 using hpx::execution::experimental::thread_pool_scheduler;
-using hpx::execution::experimental::transform;
 using hpx::experimental::async_rw_mutex;
 
 unsigned int seed = std::random_device{}();
@@ -169,7 +169,7 @@ template <typename ReadWriteT, typename ReadT = ReadWriteT>
 void test_single_read_access(async_rw_mutex<ReadWriteT, ReadT> rwm)
 {
     std::atomic<bool> called{false};
-    rwm.read() | transform([&](auto) { called = true; }) | sync_wait();
+    rwm.read() | then([&](auto) { called = true; }) | sync_wait();
     HPX_TEST(called);
 }
 
@@ -177,7 +177,7 @@ template <typename ReadWriteT, typename ReadT = ReadWriteT>
 void test_single_readwrite_access(async_rw_mutex<ReadWriteT, ReadT> rwm)
 {
     std::atomic<bool> called{false};
-    rwm.readwrite() | transform([&](auto) { called = true; }) | sync_wait();
+    rwm.readwrite() | then([&](auto) { called = true; }) | sync_wait();
     HPX_TEST(called);
 }
 
@@ -188,7 +188,7 @@ void test_moved(async_rw_mutex<ReadWriteT, ReadT> rwm)
     // values alive
     auto rwm2 = std::move(rwm);
     std::atomic<bool> called{false};
-    rwm2.read() | transform([&](auto) { called = true; }) | sync_wait();
+    rwm2.read() | then([&](auto) { called = true; }) | sync_wait();
     HPX_TEST(called);
 }
 
@@ -202,9 +202,9 @@ void test_multiple_accesses(
 
     // Read-only and read-write access return senders of different types
     using r_sender_type = std::decay_t<decltype(
-        rwm.read() | on(exec) | transform(checker{true, 0, count, 0}))>;
+        rwm.read() | on(exec) | then(checker{true, 0, count, 0}))>;
     using rw_sender_type = std::decay_t<decltype(
-        rwm.readwrite() | on(exec) | transform(checker{false, 0, count, 0}))>;
+        rwm.readwrite() | on(exec) | then(checker{false, 0, count, 0}))>;
     std::vector<r_sender_type> r_senders;
     std::vector<rw_sender_type> rw_senders;
 
@@ -224,14 +224,14 @@ void test_multiple_accesses(
             if (readonly)
             {
                 r_senders.push_back(rwm.read() | on(exec) |
-                    transform(checker{readonly, expected_predecessor_count,
-                        count, min_expected_count, max_expected_count}));
+                    then(checker{readonly, expected_predecessor_count, count,
+                        min_expected_count, max_expected_count}));
             }
             else
             {
                 rw_senders.push_back(rwm.readwrite() | on(exec) |
-                    transform(checker{readonly, expected_predecessor_count,
-                        count, min_expected_count, max_expected_count}));
+                    then(checker{readonly, expected_predecessor_count, count,
+                        min_expected_count, max_expected_count}));
                 // Only read-write access is allowed to change the value
                 ++expected_predecessor_count;
             }
