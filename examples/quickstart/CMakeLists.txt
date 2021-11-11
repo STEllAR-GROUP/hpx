@@ -20,6 +20,7 @@ set(example_programs
     latch_local
     local_channel_docs
     local_channel
+    matrix_multiplication
     pipeline1
     safe_object
     shared_mutex
