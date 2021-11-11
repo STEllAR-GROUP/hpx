@@ -14,6 +14,9 @@ src_dir="${hpx_dir}/src"
 build_dir="${hpx_dir}/build"
 install_dir="${hpx_dir}/install"
 
+# Tmp: debug
+hostname
+
 rm -rf ${hpx_dir}
 # Copy source directory to /dev/shm for faster builds
 mkdir -p "${build_dir}" "${src_dir}"
