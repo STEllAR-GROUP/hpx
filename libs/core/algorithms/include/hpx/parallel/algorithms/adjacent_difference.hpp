@@ -151,6 +151,7 @@ namespace hpx {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
 
+#include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_difference.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -199,20 +200,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
             parallel(ExPolicy&& policy, FwdIter1 first, Sent last,
                 FwdIter2 dest, Op&& op)
             {
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter1, FwdIter2>
-                    zip_iterator;
-                typedef util::detail::algorithm_result<ExPolicy, FwdIter2>
-                    result;
-                typedef typename std::iterator_traits<FwdIter1>::difference_type
-                    difference_type;
+                using zip_iterator =
+                    hpx::util::zip_iterator<FwdIter1, FwdIter1, FwdIter2>;
+                using result =
+                    util::detail::algorithm_result<ExPolicy, FwdIter2>;
+                using difference_type =
+                    typename std::iterator_traits<FwdIter1>::difference_type;
 
                 if (first == last)
+                {
                     return result::get(std::move(dest));
+                }
 
                 difference_type count = detail::distance(first, last) - 1;
 
                 FwdIter1 prev = first;
-                *dest++ = *first++;
+                hpx::traits::proxy_value_t<
+                    typename std::iterator_traits<FwdIter1>::value_type>
+                    tmp = *first++;
+                *dest++ = std::move(tmp);
 
                 if (count == 0)
                 {
@@ -255,10 +261,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::adjacent_difference is deprecated, use "
         "hpx::adjacent_difference instead")
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
-        adjacent_difference(
-            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+    inline std::enable_if_t<hpx::is_execution_policy_v<ExPolicy>,
+        util::detail::algorithm_result_t<ExPolicy,
+            FwdIter2>> adjacent_difference(ExPolicy&& policy, FwdIter1 first,
+        FwdIter1 last, FwdIter2 dest)
     {
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
@@ -276,10 +282,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::adjacent_difference is deprecated, use "
         "hpx::adjacent_difference instead")
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
-        adjacent_difference(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, Op&& op)
+    inline std::enable_if_t<hpx::is_execution_policy_v<ExPolicy>,
+        util::detail::algorithm_result_t<ExPolicy,
+            FwdIter2>> adjacent_difference(ExPolicy&& policy, FwdIter1 first,
+        FwdIter1 last, FwdIter2 dest, Op&& op)
     {
         return detail::adjacent_difference<FwdIter2>().call(
             std::forward<ExPolicy>(policy), first, last, dest,
@@ -297,13 +303,16 @@ namespace hpx {
         private:
         template <typename FwdIter1, typename FwdIter2,
              HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(hpx::adjacent_difference_t,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+                "Required at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
@@ -314,16 +323,19 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            FwdIter2>
         tag_fallback_invoke(hpx::adjacent_difference_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+                "Required at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
@@ -334,13 +346,16 @@ namespace hpx {
         // clang-format off
         template <typename FwdIter1, typename FwdIter2, typename Op,
              HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(hpx::adjacent_difference_t,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+                "Required at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
@@ -351,16 +366,19 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename Op,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            FwdIter2>
         tag_fallback_invoke(hpx::adjacent_difference_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+                "Required at least forward iterator.");
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()

@@ -29,6 +29,7 @@
 #include <vector>
 
 namespace hpx { namespace parallel { inline namespace v1 {
+
     ///////////////////////////////////////////////////////////////////////////
     // segmented_adjacent_difference
     namespace detail {
@@ -38,21 +39,22 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename FwdIter2, typename Op>
-        static typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
         segmented_adjacent_difference(Algo&& algo, ExPolicy const& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op,
             std::true_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<FwdIter1> traits1;
-            typedef hpx::traits::segmented_iterator_traits<FwdIter2> traits2;
-            typedef typename traits1::segment_iterator segment_iterator1;
-            typedef typename traits1::local_iterator local_iterator_type1;
-            typedef typename traits2::segment_iterator segment_iterator2;
-            typedef typename traits2::local_iterator local_iterator_type2;
+            using traits1 = hpx::traits::segmented_iterator_traits<FwdIter1>;
+            using traits2 = hpx::traits::segmented_iterator_traits<FwdIter2>;
+            using segment_iterator1 = typename traits1::segment_iterator;
+            using local_iterator_type1 = typename traits1::local_iterator;
+            using segment_iterator2 = typename traits2::segment_iterator;
+            using local_iterator_type2 = typename traits2::local_iterator;
 
-            typedef util::detail::algorithm_result<ExPolicy, FwdIter2> result;
+            using result =
+                hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                    FwdIter2>;
 
-            FwdIter1 ending, beginning;
             FwdIter2 end_dest = dest, curr;
             std::advance(end_dest, std::distance(first, last));
 
@@ -97,12 +99,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         out = dispatch(traits2::get_id(sdest), algo, policy,
                             std::true_type(), beg, end, ldest, op);
 
-                        beginning = traits1::compose(sit, beg);
+                        FwdIter1 beginning = traits1::compose(sit, beg);
                         if (beginning != last)
                         {
                             if (curr != end_dest)
-                                *curr = hpx::util::invoke(
+                            {
+                                *curr = HPX_INVOKE(
                                     op, *beginning, *std::prev(beginning));
+                            }
                         }
                     }
                 }
@@ -116,12 +120,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     out = dispatch(traits2::get_id(sdest), algo, policy,
                         std::true_type(), beg, end, ldest, op);
-                    beginning = traits1::compose(sit, beg);
+
+                    FwdIter1 beginning = traits1::compose(sit, beg);
                     if (beginning != last)
                     {
                         if (curr != end_dest)
-                            *curr = hpx::util::invoke(
+                        {
+                            *curr = HPX_INVOKE(
                                 op, *beginning, *std::prev(beginning));
+                        }
                     }
                 }
                 dest = traits2::compose(sdest, out);
@@ -132,34 +139,37 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename FwdIter2, typename Op>
-        static typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
         segmented_adjacent_difference(Algo&& algo, ExPolicy const& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op,
             std::false_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<FwdIter1> traits1;
-            typedef hpx::traits::segmented_iterator_traits<FwdIter2> traits2;
-            typedef typename traits1::segment_iterator segment_iterator1;
-            typedef typename traits1::local_iterator local_iterator_type1;
-            typedef typename traits2::segment_iterator segment_iterator2;
-            typedef typename traits2::local_iterator local_iterator_type2;
+            using traits1 = hpx::traits::segmented_iterator_traits<FwdIter1>;
+            using traits2 = hpx::traits::segmented_iterator_traits<FwdIter2>;
+            using segment_iterator1 = typename traits1::segment_iterator;
+            using local_iterator_type1 = typename traits1::local_iterator;
+            using segment_iterator2 = typename traits2::segment_iterator;
+            using local_iterator_type2 = typename traits2::local_iterator;
 
-            typedef util::detail::algorithm_result<ExPolicy, FwdIter2> result;
+            using result =
+                hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                    FwdIter2>;
 
-            typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<FwdIter1>::value>
-                forced_seq;
+            using forced_seq = std::integral_constant<bool,
+                !hpx::traits::is_forward_iterator_v<FwdIter1>>;
 
             segment_iterator1 sit = traits1::segment(first);
             segment_iterator1 send = traits1::segment(last);
             segment_iterator2 sdest = traits2::segment(dest);
 
-            typedef std::vector<future<local_iterator_type2>> segment_type;
+            using segment_type = std::vector<future<local_iterator_type2>>;
             segment_type segments;
-            segments.reserve(std::distance(sit, send));
+
+            auto size = std::distance(sit, send);
+            segments.reserve(size);
 
             std::vector<FwdIter1> between_segments;
-            between_segments.reserve(std::distance(sit, send));
+            between_segments.reserve(size);
 
             if (sit == send)
             {
@@ -218,6 +228,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::list<std::exception_ptr> errors;
                     parallel::util::detail::handle_remote_exceptions<
                         ExPolicy>::call(r, errors);
+
                     auto ft = r.back().get();
                     auto odest = traits2::compose(sdest, ft);
                     auto start = between_segments.begin();
@@ -225,8 +236,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     {
                         FwdIter2 curr = dest;
                         std::advance(curr, std::distance(first, *start));
-                        *curr = hpx::util::invoke(
-                            op, *(*start), *std::prev(*start));
+                        *curr = HPX_INVOKE(op, *(*start), *std::prev(*start));
                         start = std::next(start);
                     }
                     return odest;
@@ -244,58 +254,55 @@ namespace hpx { namespace segmented {
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Op,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_segmented_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
-            hpx::traits::is_segmented_iterator<FwdIter2>::value)>
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_segmented_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
+            hpx::traits::is_segmented_iterator_v<FwdIter2>
+        )>
     // clang-format on
-    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
     tag_invoke(hpx::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
         FwdIter1 last, FwdIter2 dest, Op&& op)
     {
-        static_assert(hpx::traits::is_input_iterator<FwdIter1>::value,
-            "Requires at least forwrad iterator.");
-
-        static_assert(hpx::traits::is_input_iterator<FwdIter2>::value,
+        static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
             "Requires at least forward iterator.");
-
-        typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
-        typedef parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>
-            result;
+        static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            "Requires at least forward iterator.");
 
         if (first == last)
         {
+            using result =
+                hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                    FwdIter2>;
             return result::get(std::move(dest));
         }
 
-        typedef hpx::traits::segmented_iterator_traits<FwdIter2>
-            iterator_traits;
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+        using traits = hpx::traits::segmented_iterator_traits<FwdIter2>;
 
         return hpx::parallel::v1::detail::segmented_adjacent_difference(
             hpx::parallel::v1::detail::adjacent_difference<
-                typename iterator_traits::local_iterator>(),
+                typename traits::local_iterator>(),
             std::forward<ExPolicy>(policy), first, last, dest,
             std::forward<Op>(op), is_seq());
     }
 
     // clang-format off
-    template <typename InIter1, typename InIter2,
-            typename Op,
+    template <typename InIter1, typename InIter2, typename Op,
         HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator<InIter1>::value &&
-            hpx::traits::is_segmented_iterator<InIter1>::value &&
-            hpx::traits::is_iterator<InIter2>::value &&
-            hpx::traits::is_segmented_iterator<InIter2>::value
+            hpx::traits::is_iterator_v<InIter1> &&
+            hpx::traits::is_segmented_iterator_v<InIter1> &&
+            hpx::traits::is_iterator_v<InIter2> &&
+            hpx::traits::is_segmented_iterator_v<InIter2>
         )>
     // clang-format on
     InIter2 tag_invoke(hpx::adjacent_difference_t, InIter1 first, InIter1 last,
         InIter2 dest, Op&& op)
     {
-        static_assert(hpx::traits::is_input_iterator<InIter1>::value,
+        static_assert(hpx::traits::is_input_iterator_v<InIter1>,
             "Requires at least input iterator.");
-
-        static_assert(hpx::traits::is_input_iterator<InIter2>::value,
+        static_assert(hpx::traits::is_input_iterator_v<InIter2>,
             "Requires at least input iterator.");
 
         if (first == last)
@@ -303,11 +310,11 @@ namespace hpx { namespace segmented {
             return dest;
         }
 
-        typedef hpx::traits::segmented_iterator_traits<InIter2> iterator_traits;
+        using traits = hpx::traits::segmented_iterator_traits<InIter2>;
 
         return hpx::parallel::v1::detail::segmented_adjacent_difference(
             hpx::parallel::v1::detail::adjacent_difference<
-                typename iterator_traits::local_iterator>(),
+                typename traits::local_iterator>(),
             hpx::execution::seq, first, last, dest, std::forward<Op>(op),
             std::true_type{});
     }

@@ -157,7 +157,9 @@ namespace hpx { namespace segmented {
                 return *(it_.get_data()->begin() + it_.get_local_index());
             }
 
-            template <typename T_>
+            template <typename T_,
+                typename Enable = std::enable_if_t<!std::is_same_v<
+                    std::decay_t<T_>, local_vector_value_proxy>>>
             local_vector_value_proxy& operator=(T_&& value)
             {
                 if (!it_.get_data())
@@ -214,7 +216,9 @@ namespace hpx { namespace segmented {
                 return v_.get_value(launch::sync, index_);
             }
 
-            template <typename T_>
+            template <typename T_,
+                typename Enable = std::enable_if_t<
+                    !std::is_same_v<std::decay_t<T_>, vector_value_proxy>>>
             vector_value_proxy& operator=(T_&& value)
             {
                 v_.set_value(launch::sync, index_, std::forward<T_>(value));
@@ -1230,8 +1234,21 @@ namespace hpx { namespace traits {
     };
 
     template <typename T, typename Data>
+    struct proxy_value<
+        hpx::segmented::detail::local_vector_value_proxy<T, Data>>
+    {
+        using type = T;
+    };
+
+    template <typename T, typename Data>
     struct is_value_proxy<hpx::segmented::detail::vector_value_proxy<T, Data>>
       : std::true_type
     {
+    };
+
+    template <typename T, typename Data>
+    struct proxy_value<hpx::segmented::detail::vector_value_proxy<T, Data>>
+    {
+        using type = T;
     };
 }}    // namespace hpx::traits
