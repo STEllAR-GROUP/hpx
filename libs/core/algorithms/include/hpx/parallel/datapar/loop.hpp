@@ -161,6 +161,60 @@ namespace hpx { namespace parallel { namespace util {
                 }
                 return it;
             }
+
+            template <typename Begin, typename End, typename CancelToken,
+                typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
+                iterator_datapar_compatible<Begin>::value, Begin>::type
+            call(Begin first, End last, CancelToken& tok, F&& f)
+            {
+                while (!is_data_aligned(first) && first != last)
+                {
+                    datapar_loop_step_tok<Begin>::call1(f, first);
+                    if (tok.was_cancelled())
+                        return first;
+                    ++first;
+                }
+
+                static std::size_t constexpr size =
+                    traits::vector_pack_size<V>::value;
+
+                End const lastV = last - (size + 1);
+                while (first < lastV)
+                {
+                    std::size_t incr =
+                        datapar_loop_step_tok<Begin>::callv(f, first);
+                    if (tok.was_cancelled())
+                        return first;
+                    std::advance(first, incr);
+                }
+
+                while (first != last)
+                {
+                    datapar_loop_step_tok<Begin>::call1(f, first);
+                    if (tok.was_cancelled())
+                        return first;
+                    ++first;
+                }
+
+                return first;
+            }
+
+            template <typename Begin, typename End, typename CancelToken,
+                typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
+                !iterator_datapar_compatible<Begin>::value, Begin>::type
+            call(Begin it, End end, CancelToken& tok, F&& f)
+            {
+                while (it != end)
+                {
+                    datapar_loop_step_tok<Begin>::call1(f, it);
+                    if (tok.was_cancelled())
+                        return it;
+                    ++it;
+                }
+                return it;
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -331,6 +385,60 @@ namespace hpx { namespace parallel { namespace util {
                 }
                 return first;
             }
+
+            template <typename InIter, typename CancelToken, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
+                iterator_datapar_compatible<InIter>::value, InIter>::type
+            call(InIter first, std::size_t count, CancelToken& tok, F&& f)
+            {
+                std::size_t len = count;
+
+                for (/* */; !detail::is_data_aligned(first) && len != 0; --len)
+                {
+                    datapar_loop_step_tok<InIter>::call1(f, first);
+                    if (tok.was_cancelled())
+                        return first;
+                    ++first;
+                }
+
+                static std::size_t constexpr size =
+                    traits::vector_pack_size<V>::value;
+
+                for (std::int64_t len_v = std::int64_t(len - (size + 1));
+                     len_v > 0; len_v -= size, len -= size)
+                {
+                    std::size_t incr =
+                        datapar_loop_step_tok<InIter>::callv(f, first);
+                    if (tok.was_cancelled())
+                        return first;
+                    std::advance(first, incr);
+                }
+
+                for (/* */; len != 0; --len)
+                {
+                    datapar_loop_step_tok<InIter>::call1(f, first);
+                    if (tok.was_cancelled())
+                        return first;
+                    ++first;
+                }
+
+                return first;
+            }
+
+            template <typename InIter, typename CancelToken, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
+                !iterator_datapar_compatible<InIter>::value, InIter>::type
+            call(InIter first, std::size_t count, CancelToken& tok, F&& f)
+            {
+                for (/* */; count != 0; --count)
+                {
+                    datapar_loop_step_tok<InIter>::call1(f, first);
+                    if (tok.was_cancelled())
+                        return first;
+                    ++first;
+                }
+                return first;
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -382,6 +490,91 @@ namespace hpx { namespace parallel { namespace util {
                     datapar_loop_step_ind<InIter>::call1(f, first);
                 }
                 return first;
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Iterator>
+        struct datapar_loop_idx_n
+        {
+            typedef typename std::decay<Iterator>::type iterator_type;
+            typedef typename std::iterator_traits<iterator_type>::value_type
+                value_type;
+
+            typedef typename traits::vector_pack_type<value_type>::type V;
+
+            template <typename Iter, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
+                std::size_t base_idx, Iter it, std::size_t count, F&& f)
+            {
+                std::size_t len = count;
+
+                for (/* */; !detail::is_data_aligned(it) && len != 0; --len)
+                {
+                    datapar_loop_idx_step<Iter>::call1(f, it, base_idx);
+                    ++it;
+                    ++base_idx;
+                }
+
+                static std::size_t constexpr size =
+                    traits::vector_pack_size<V>::value;
+
+                for (std::int64_t len_v = std::int64_t(len - (size + 1));
+                     len_v > 0; len_v -= size, len -= size)
+                {
+                    std::size_t incr =
+                        datapar_loop_idx_step<Iter>::callv(f, it, base_idx);
+                    std::advance(it, incr);
+                    base_idx += incr;
+                }
+
+                for (/* */; len != 0; --len)
+                {
+                    datapar_loop_idx_step<Iter>::call1(f, it, base_idx);
+                    ++it;
+                    ++base_idx;
+                }
+                return it;
+            }
+
+            template <typename Iter, typename CancelToken, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
+                std::size_t base_idx, Iter it, std::size_t count,
+                CancelToken& tok, F&& f)
+            {
+                std::size_t len = count;
+
+                for (/* */; !detail::is_data_aligned(it) && len != 0; --len)
+                {
+                    datapar_loop_idx_step<Iter>::call1(f, it, base_idx);
+                    if (tok.was_cancelled(base_idx))
+                        return it;
+                    ++it;
+                    ++base_idx;
+                }
+
+                static std::size_t constexpr size =
+                    traits::vector_pack_size<V>::value;
+
+                for (std::int64_t len_v = std::int64_t(len - (size + 1));
+                     len_v > 0; len_v -= size, len -= size)
+                {
+                    datapar_loop_idx_step<Iter>::callv(f, it, base_idx);
+                    if (tok.was_cancelled(base_idx))
+                        return it;
+                    std::advance(it, size);
+                    base_idx += size;
+                }
+
+                for (/* */; len != 0; --len)
+                {
+                    datapar_loop_idx_step<Iter>::call1(f, it, base_idx);
+                    if (tok.was_cancelled(base_idx))
+                        return it;
+                    ++it;
+                    ++base_idx;
+                }
+                return it;
             }
         };
     }    // namespace detail
@@ -442,6 +635,24 @@ namespace hpx { namespace parallel { namespace util {
             begin, end, std::forward<F>(f));
     }
 
+    template <typename Begin, typename End, typename CancelToken, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::loop_t, hpx::execution::simd_policy, Begin begin,
+        End end, CancelToken& tok, F&& f)
+    {
+        return detail::datapar_loop<Begin>::call(
+            begin, end, tok, std::forward<F>(f));
+    }
+
+    template <typename Begin, typename End, typename CancelToken, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::loop_t, hpx::execution::simd_task_policy,
+        Begin begin, End end, CancelToken& tok, F&& f)
+    {
+        return detail::datapar_loop<Begin>::call(
+            begin, end, tok, std::forward<F>(f));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
@@ -485,6 +696,18 @@ namespace hpx { namespace parallel { namespace util {
             it, count, std::forward<F>(f));
     }
 
+    template <typename ExPolicy, typename Iter, typename CancelToken,
+        typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
+        hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
+    tag_invoke(hpx::parallel::util::loop_n_t<ExPolicy>, Iter it,
+        std::size_t count, CancelToken& tok, F&& f)
+    {
+        return hpx::parallel::util::detail::datapar_loop_n<Iter>::call(
+            it, count, tok, std::forward<F>(f));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
@@ -493,6 +716,29 @@ namespace hpx { namespace parallel { namespace util {
     {
         return hpx::parallel::util::detail::datapar_loop_n_ind<Iter>::call(
             it, count, std::forward<F>(f));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ExPolicy, typename Iter, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
+        hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
+    tag_invoke(hpx::parallel::util::loop_idx_n_t<ExPolicy>,
+        std::size_t base_idx, Iter it, std::size_t count, F&& f)
+    {
+        return hpx::parallel::util::detail::datapar_loop_idx_n<Iter>::call(
+            base_idx, it, count, std::forward<F>(f));
+    }
+
+    template <typename ExPolicy, typename Iter, typename CancelToken,
+        typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
+        hpx::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
+    tag_invoke(hpx::parallel::util::loop_idx_n_t<ExPolicy>,
+        std::size_t base_idx, Iter it, std::size_t count, CancelToken& tok,
+        F&& f)
+    {
+        return hpx::parallel::util::detail::datapar_loop_idx_n<Iter>::call(
+            base_idx, it, count, tok, std::forward<F>(f));
     }
 }}}    // namespace hpx::parallel::util
 

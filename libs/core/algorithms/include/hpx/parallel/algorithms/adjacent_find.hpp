@@ -193,7 +193,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f1 = [pred_projected = std::move(pred_projected), tok](
                               zip_iterator it, std::size_t part_size,
                               std::size_t base_idx) mutable {
-                    util::loop_idx_n(base_idx, it, part_size, tok,
+                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
+                        part_size, tok,
                         [&pred_projected, &tok](reference t, std::size_t i) {
                             using hpx::get;
                             if (pred_projected(get<0>(t), get<1>(t)))

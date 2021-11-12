@@ -255,8 +255,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Iter, typename Sent, typename Pred, typename Proj>
         Iter sequential_remove_if(Iter first, Sent last, Pred pred, Proj proj)
         {
-            first = hpx::parallel::v1::detail::sequential_find_if(
-                first, last, pred, proj);
+            first = hpx::parallel::v1::detail::sequential_find_if<
+                hpx::execution::sequenced_policy>(first, last, pred, proj);
 
             if (first != last)
                 for (Iter i = first; ++i != last;)

@@ -260,6 +260,29 @@ namespace test {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline std::vector<T> fill_all_any_none(T size, T num_filled)
+    {
+        if (num_filled == 0)
+            return std::vector<T>(size, 0);
+
+        if (num_filled == size)
+            return std::vector<T>(size, 1);
+
+        std::vector<T> c(size, 0);
+        for (T i = 0; i < num_filled; /**/)
+        {
+            T pos = std::rand() % c.size();    //-V104
+            if (c[pos])
+                continue;
+
+            c[pos] = 1;
+            ++i;
+        }
+        return c;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename InputIter1, typename InputIter2>
     bool equal(InputIter1 first1, InputIter1 last1, InputIter2 first2,
         InputIter2 last2)

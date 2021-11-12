@@ -1,9 +1,11 @@
+//  Copyright (c) 2021 Srinivas Yadav
 //  Copyright (c) 2014-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/include/datapar.hpp>
 #include <hpx/local/init.hpp>
 
 #include <cstddef>
@@ -11,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "any_of_tests.hpp"
+#include "../algorithms/any_of_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -28,47 +30,12 @@ void test_any_of()
     };
     using namespace hpx::execution;
 
-    test_any_of(IteratorTag());
-    test_any_of_ranges_seq(IteratorTag(), proj());
+    test_any_of(simd, IteratorTag());
+    test_any_of(par_simd, IteratorTag());
 
-    test_any_of(seq, IteratorTag());
-    test_any_of(par, IteratorTag());
-    test_any_of(par_unseq, IteratorTag());
-
-    test_any_of_ranges(seq, IteratorTag(), proj());
-    test_any_of_ranges(par, IteratorTag(), proj());
-    test_any_of_ranges(par_unseq, IteratorTag(), proj());
-
-    test_any_of_async(seq(task), IteratorTag());
-    test_any_of_async(par(task), IteratorTag());
-
-    test_any_of_ranges_async(seq(task), IteratorTag(), proj());
-    test_any_of_ranges_async(par(task), IteratorTag(), proj());
+    test_any_of_async(simd(task), IteratorTag());
+    test_any_of_async(par_simd(task), IteratorTag());
 }
-
-// template <typename IteratorTag>
-// void test_any_of_exec()
-// {
-//     using namespace hpx::execution;
-//
-//     {
-//         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_any_of(par(exec), IteratorTag());
-//     }
-//     {
-//         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_any_of(task(exec), IteratorTag());
-//     }
-//
-//     {
-//         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_any_of(execution_policy(par(exec)), IteratorTag());
-//     }
-//     {
-//         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_any_of(execution_policy(task(exec)), IteratorTag());
-//     }
-// }
 
 ////////////////////////////////////////////////////////////////////////////
 void any_of_test()
@@ -87,11 +54,11 @@ void test_any_of_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_any_of_exception(seq, IteratorTag());
-    test_any_of_exception(par, IteratorTag());
+    test_any_of_exception(simd, IteratorTag());
+    test_any_of_exception(par_simd, IteratorTag());
 
-    test_any_of_exception_async(seq(task), IteratorTag());
-    test_any_of_exception_async(par(task), IteratorTag());
+    test_any_of_exception_async(simd(task), IteratorTag());
+    test_any_of_exception_async(par_simd(task), IteratorTag());
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -109,11 +76,11 @@ void test_any_of_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_any_of_bad_alloc(seq, IteratorTag());
-    test_any_of_bad_alloc(par, IteratorTag());
+    test_any_of_bad_alloc(simd, IteratorTag());
+    test_any_of_bad_alloc(par_simd, IteratorTag());
 
-    test_any_of_bad_alloc_async(seq(task), IteratorTag());
-    test_any_of_bad_alloc_async(par(task), IteratorTag());
+    test_any_of_bad_alloc_async(simd(task), IteratorTag());
+    test_any_of_bad_alloc_async(par_simd(task), IteratorTag());
 }
 
 void any_of_bad_alloc_test()

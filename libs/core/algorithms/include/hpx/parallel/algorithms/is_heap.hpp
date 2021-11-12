@@ -212,7 +212,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj = std::forward<Proj>(proj)](Iter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n(base_idx, it, part_size, tok,
+                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
+                        part_size, tok,
                         [&tok, first, &comp, &proj](
                             type const& v, std::size_t i) -> void {
                             if (hpx::util::invoke(comp,
@@ -356,7 +357,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj = std::forward<Proj>(proj)](Iter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable {
-                    util::loop_idx_n(base_idx, it, part_size, tok,
+                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
+                        part_size, tok,
                         [&tok, first, &comp, &proj](
                             type const& v, std::size_t i) -> void {
                             if (hpx::util::invoke(comp,

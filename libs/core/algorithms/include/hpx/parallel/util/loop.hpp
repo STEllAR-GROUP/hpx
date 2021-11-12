@@ -1166,24 +1166,57 @@ namespace hpx { namespace parallel { namespace util {
         };
     }    // namespace detail
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename F>
-    HPX_FORCEINLINE constexpr Iter loop_idx_n(
+    ///////////////////////////////////////////////////////////////////////
+    template <typename ExPolicy>
+    struct loop_idx_n_t final
+      : hpx::functional::detail::tag_fallback<loop_idx_n_t<ExPolicy>>
+    {
+    private:
+        template <typename Iter, typename F>
+        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
+        tag_fallback_invoke(hpx::parallel::util::loop_idx_n_t<ExPolicy>,
+            std::size_t base_idx, Iter it, std::size_t count, F&& f)
+        {
+            using cat = typename std::iterator_traits<Iter>::iterator_category;
+            return detail::loop_idx_n<cat>::call(
+                base_idx, it, count, std::forward<F>(f));
+        }
+
+        template <typename Iter, typename CancelToken, typename F>
+        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter
+        tag_fallback_invoke(hpx::parallel::util::loop_idx_n_t<ExPolicy>,
+            std::size_t base_idx, Iter it, std::size_t count, CancelToken& tok,
+            F&& f)
+        {
+            using cat = typename std::iterator_traits<Iter>::iterator_category;
+            return detail::loop_idx_n<cat>::call(
+                base_idx, it, count, tok, std::forward<F>(f));
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    HPX_INLINE_CONSTEXPR_VARIABLE loop_idx_n_t<ExPolicy> loop_idx_n =
+        loop_idx_n_t<ExPolicy>{};
+#else
+    template <typename ExPolicy, typename Iter, typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter loop_idx_n(
         std::size_t base_idx, Iter it, std::size_t count, F&& f)
     {
-        using cat = typename std::iterator_traits<Iter>::iterator_category;
-        return detail::loop_idx_n<cat>::call(
+        return hpx::parallel::util::loop_idx_n_t<ExPolicy>{}(
             base_idx, it, count, std::forward<F>(f));
     }
 
-    template <typename Iter, typename CancelToken, typename F>
-    HPX_FORCEINLINE constexpr Iter loop_idx_n(std::size_t base_idx, Iter it,
-        std::size_t count, CancelToken& tok, F&& f)
+    template <typename ExPolicy, typename Iter, typename CancelToken,
+        typename F>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter loop_idx_n(
+        std::size_t base_idx, Iter it, std::size_t count, CancelToken& tok,
+        F&& f)
     {
-        using cat = typename std::iterator_traits<Iter>::iterator_category;
-        return detail::loop_idx_n<cat>::call(
+        return hpx::parallel::util::loop_idx_n_t<ExPolicy>{}(
             base_idx, it, count, tok, std::forward<F>(f));
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {

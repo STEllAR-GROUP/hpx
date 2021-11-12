@@ -9,9 +9,11 @@ set(tests)
 if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
   set(tests
       ${tests}
+      adjacentdifference_datapar
+      all_of_datapar
+      any_of_datapar
       copy_datapar
       copyn_datapar
-      adjacentdifference_datapar
       count_datapar
       countif_datapar
       fill_datapar
@@ -21,6 +23,7 @@ if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
       foreachn_datapar
       generate_datapar
       generaten_datapar
+      none_of_datapar
       transform_binary_datapar
       transform_binary2_datapar
       transform_reduce_binary_datapar
