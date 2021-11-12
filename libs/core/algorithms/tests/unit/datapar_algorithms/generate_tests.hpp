@@ -38,10 +38,10 @@ void test_generate(ExPolicy&& policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
 
     foo gen;
 
@@ -49,8 +49,8 @@ void test_generate(ExPolicy&& policy, IteratorTag)
 
     // verify values
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(10));
+    std::for_each(std::begin(c), std::end(c), [&count](int v) -> void {
+        HPX_TEST_EQ(v, int(10));
         ++count;
     });
     HPX_TEST_EQ(count, c.size());
@@ -59,10 +59,10 @@ void test_generate(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_generate_async(ExPolicy&& p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
 
     foo gen;
 
@@ -71,8 +71,8 @@ void test_generate_async(ExPolicy&& p, IteratorTag)
     f.wait();
 
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(10));
+    std::for_each(std::begin(c), std::end(c), [&count](int v) -> void {
+        HPX_TEST_EQ(v, int(10));
         ++count;
     });
     HPX_TEST_EQ(count, c.size());
@@ -85,10 +85,10 @@ void test_generate_exception(ExPolicy&& policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
 
     foo gen;
 
@@ -117,11 +117,11 @@ void test_generate_exception(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_generate_exception_async(ExPolicy&& p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
 
     foo gen;
 
@@ -159,11 +159,11 @@ void test_generate_bad_alloc(ExPolicy&& policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
 
     foo gen;
 
@@ -190,11 +190,11 @@ void test_generate_bad_alloc(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_generate_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
 
     foo gen;
 
