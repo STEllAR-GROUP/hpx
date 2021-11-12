@@ -8,19 +8,28 @@
 
 set -eux
 
+#TODO: Setup a script to clean the old PRs directories
+if [[ -z "${ghprbPullId:-}" ]]; then
+    # Set name of branch if not building a pull request
+    export git_local_branch=$(echo ${GIT_BRANCH} | cut -f2 -d'/')
+    job_name="jenkins-hpx-${git_local_branch}-${configuration_name_with_build_type}"
+else
+    job_name="jenkins-hpx-${ghprbPullId}-${configuration_name_with_build_type}"
+fi
+
 orig_src_dir="$(pwd)"
 hpx_dir="/dev/shm/hpx"
-src_dir="${hpx_dir}/src"
-build_dir="${hpx_dir}/build"
-install_dir="${hpx_dir}/install"
+src_dir="${hpx_dir}/src_${job_name}"
+build_dir="${hpx_dir}/build_${job_name}"
+install_dir="${hpx_dir}/install_${job_name}"
 
 # Tmp: debug
 hostname
 
-rm -rf ${hpx_dir}
+rm -rf ${src_dir} ${build_dir}
 # Copy source directory to /dev/shm for faster builds
 mkdir -p "${build_dir}" "${src_dir}"
-cp -r "${orig_src_dir}" "${src_dir}"
+cp -r "${orig_src_dir}"/. "${src_dir}"
 
 source ${src_dir}/.jenkins/cscs-ault/env-common.sh
 source ${src_dir}/.jenkins/cscs-ault/env-${configuration_name}.sh
