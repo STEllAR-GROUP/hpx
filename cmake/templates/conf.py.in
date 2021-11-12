@@ -77,9 +77,9 @@ for lib_dir in os.listdir(hpx_libs_dir):
         # If we are in the root of the library dir, we add all
         # subdirectories as a new breathe project
         if len(subdir) == 0:
-            for dir in dirs:
-                breathe_projects_source[dir] = (subdir_full + '/' + dir, [])
-                hpx_libs[lib_dir].append(dir)
+            for Dir in dirs:
+                breathe_projects_source[Dir] = (subdir_full + '/' + Dir, [])
+                hpx_libs[lib_dir].append(Dir)
         # We are inside a module and need to add the files
         # to the breathe project
         else:
