@@ -517,7 +517,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'HPX'
-copyright = u'2008-2020, The STE||AR Group'
+Copyright = u'2008-2020, The STE||AR Group'
 author = u'The STE||AR Group'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -691,4 +691,4 @@ texinfo_documents = [
 epub_title = project
 epub_author = author
 epub_publisher = author
-epub_copyright = copyright
+epub_copyright = Copyright
