@@ -8,7 +8,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(execution_headers
     hpx/execution/algorithms/bulk.hpp
-    hpx/execution/algorithms/detach.hpp
     hpx/execution/algorithms/detail/is_negative.hpp
     hpx/execution/algorithms/detail/partial_algorithm.hpp
     hpx/execution/algorithms/detail/predicates.hpp
@@ -23,8 +22,9 @@ set(execution_headers
     hpx/execution/algorithms/make_future.hpp
     hpx/execution/algorithms/on.hpp
     hpx/execution/algorithms/split.hpp
+    hpx/execution/algorithms/start_detached.hpp
     hpx/execution/algorithms/sync_wait.hpp
-    hpx/execution/algorithms/transform.hpp
+    hpx/execution/algorithms/then.hpp
     hpx/execution/algorithms/when_all.hpp
     hpx/execution/detail/async_launch_policy_dispatch.hpp
     hpx/execution/detail/execution_parameter_callbacks.hpp

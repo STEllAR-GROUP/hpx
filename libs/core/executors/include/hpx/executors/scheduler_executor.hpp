@@ -11,12 +11,12 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/bulk.hpp>
-#include <hpx/execution/algorithms/detach.hpp>
 #include <hpx/execution/algorithms/keep_future.hpp>
 #include <hpx/execution/algorithms/make_future.hpp>
 #include <hpx/execution/algorithms/on.hpp>
+#include <hpx/execution/algorithms/start_detached.hpp>
 #include <hpx/execution/algorithms/sync_wait.hpp>
-#include <hpx/execution/algorithms/transform.hpp>
+#include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
@@ -207,7 +207,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename F, typename... Ts>
         void post(F&& f, Ts&&... ts)
         {
-            detach(transform(schedule(sched_),
+            start_detached(then(schedule(sched_),
                 hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...)));
         }
@@ -216,7 +216,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename F, typename... Ts>
         decltype(auto) sync_execute(F&& f, Ts&&... ts)
         {
-            return sync_wait(transform(schedule(sched_),
+            return sync_wait(then(schedule(sched_),
                 hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...)));
         }
@@ -225,7 +225,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename F, typename... Ts>
         decltype(auto) async_execute(F&& f, Ts&&... ts)
         {
-            return make_future(transform(schedule(sched_),
+            return make_future(then(schedule(sched_),
                 hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...)));
         }
@@ -236,7 +236,7 @@ namespace hpx { namespace execution { namespace experimental {
             auto&& predecessor_on_sched =
                 on(keep_future(std::forward<Future>(predecessor)), sched_);
 
-            return make_future(transform(std::move(predecessor_on_sched),
+            return make_future(then(std::move(predecessor_on_sched),
                 hpx::util::bind_back(
                     std::forward<F>(f), std::forward<Ts>(ts)...)));
         }
@@ -292,7 +292,7 @@ namespace hpx { namespace execution { namespace experimental {
                         });
                 };
 
-                detach(bulk(
+                start_detached(bulk(
                     just_on(sched_, std::move(promises), std::forward<F>(f),
                         shape, std::forward<Ts>(ts)...),
                     n, std::move(f_helper)));
@@ -340,7 +340,7 @@ namespace hpx { namespace execution { namespace experimental {
                     detail::captured_args_then(
                         std::forward<F>(f), std::forward<Ts>(ts)...));
 
-                return make_future(transform(
+                return make_future(then(
                     std::move(loop), [](auto&&, std::vector<result_type>&& v) {
                         return std::move(v);
                     }));

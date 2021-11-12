@@ -332,19 +332,19 @@ int hpx_main(hpx::program_options::variables_map& vm)
             // We have to manually unroll this loop, because the type of the
             // sender changes for each additional transform_stream call. The
             // number of unrolled calls must match batch_size above. Here we
-            // intentionally insert dummy transform([]{}) calls between the
+            // intentionally insert dummy then([]{}) calls between the
             // transform_stream calls to force synchronization between the
             // kernel launches.
             cu::transform_stream(ex::just(), f, cuda_stream) |
-                ex::transform([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::transform([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::transform([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::transform([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::transform([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::transform([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::transform([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::transform([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::transform([] {}) | cu::transform_stream(f, cuda_stream) |
+                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
+                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
+                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
+                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
+                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
+                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
+                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
+                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
+                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
                 ex::sync_wait();
         }
         // Do the remainder one-by-one

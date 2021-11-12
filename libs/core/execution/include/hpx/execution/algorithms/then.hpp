@@ -23,20 +23,20 @@
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
         template <typename Receiver, typename F>
-        struct transform_receiver
+        struct then_receiver
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
             template <typename Error>
             friend void tag_invoke(
-                set_error_t, transform_receiver&& r, Error&& error) noexcept
+                set_error_t, then_receiver&& r, Error&& error) noexcept
             {
                 hpx::execution::experimental::set_error(
                     std::move(r.receiver), std::forward<Error>(error));
             }
 
-            friend void tag_invoke(set_done_t, transform_receiver&& r) noexcept
+            friend void tag_invoke(set_done_t, then_receiver&& r) noexcept
             {
                 hpx::execution::experimental::set_done(std::move(r.receiver));
             }
@@ -76,7 +76,7 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename... Ts,
                 typename = std::enable_if_t<hpx::is_invocable_v<F, Ts...>>>
             friend void tag_invoke(
-                set_value_t, transform_receiver&& r, Ts&&... ts) noexcept
+                set_value_t, then_receiver&& r, Ts&&... ts) noexcept
             {
                 using is_void_result =
                     std::is_void<hpx::util::invoke_result_t<F, Ts...>>;
@@ -85,7 +85,7 @@ namespace hpx { namespace execution { namespace experimental {
         };
 
         template <typename Sender, typename F>
-        struct transform_sender
+        struct then_sender
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
@@ -129,7 +129,7 @@ namespace hpx { namespace execution { namespace experimental {
                 >
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
-                transform_sender const& sender)
+                then_sender const& sender)
             {
                 return hpx::execution::experimental::get_completion_scheduler<
                     CPO>(sender.sender);
@@ -137,27 +137,27 @@ namespace hpx { namespace execution { namespace experimental {
 
             template <typename Receiver>
             friend auto tag_invoke(
-                connect_t, transform_sender&& s, Receiver&& receiver)
+                connect_t, then_sender&& s, Receiver&& receiver)
             {
                 return hpx::execution::experimental::connect(
                     std::move(s.sender),
-                    transform_receiver<Receiver, F>{
+                    then_receiver<Receiver, F>{
                         std::forward<Receiver>(receiver), std::move(s.f)});
             }
 
             template <typename Receiver>
             friend auto tag_invoke(
-                connect_t, transform_sender& r, Receiver&& receiver)
+                connect_t, then_sender& r, Receiver&& receiver)
             {
                 return hpx::execution::experimental::connect(r.sender,
-                    transform_receiver<Receiver, F>{
+                    then_receiver<Receiver, F>{
                         std::forward<Receiver>(receiver), r.f});
             }
         };
     }    // namespace detail
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct transform_t final
-      : hpx::functional::detail::tag_fallback<transform_t>
+    HPX_INLINE_CONSTEXPR_VARIABLE struct then_t final
+      : hpx::functional::detail::tag_fallback<then_t>
     {
     private:
         // clang-format off
@@ -167,18 +167,16 @@ namespace hpx { namespace execution { namespace experimental {
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            transform_t, Sender&& sender, F&& f)
+            then_t, Sender&& sender, F&& f)
         {
-            return detail::transform_sender<Sender, F>{
+            return detail::then_sender<Sender, F>{
                 std::forward<Sender>(sender), std::forward<F>(f)};
         }
 
         template <typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            transform_t, F&& f)
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(then_t, F&& f)
         {
-            return detail::partial_algorithm<transform_t, F>{
-                std::forward<F>(f)};
+            return detail::partial_algorithm<then_t, F>{std::forward<F>(f)};
         }
-    } transform{};
+    } then{};
 }}}    // namespace hpx::execution::experimental

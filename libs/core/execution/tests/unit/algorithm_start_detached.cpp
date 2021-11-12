@@ -20,7 +20,7 @@ namespace ex = hpx::execution::experimental;
 
 // This overload is only used to check dispatching. It is not a useful
 // implementation.
-void tag_invoke(ex::detach_t, custom_sender2 s)
+void tag_invoke(ex::start_detached_t, custom_sender2 s)
 {
     s.tag_invoke_overload_called = true;
 }
@@ -31,7 +31,7 @@ int main()
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
-        ex::detach(custom_sender{
+        ex::start_detached(custom_sender{
             start_called, connect_called, tag_invoke_overload_called});
         HPX_TEST(start_called);
         HPX_TEST(connect_called);
@@ -42,7 +42,7 @@ int main()
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
-        ex::detach(custom_typed_sender<int>{
+        ex::start_detached(custom_typed_sender<int>{
             0, start_called, connect_called, tag_invoke_overload_called});
         HPX_TEST(start_called);
         HPX_TEST(connect_called);
@@ -53,9 +53,10 @@ int main()
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
-        ex::detach(custom_typed_sender<custom_type_non_default_constructible>{
-            custom_type_non_default_constructible{0}, start_called,
-            connect_called, tag_invoke_overload_called});
+        ex::start_detached(
+            custom_typed_sender<custom_type_non_default_constructible>{
+                custom_type_non_default_constructible{0}, start_called,
+                connect_called, tag_invoke_overload_called});
         HPX_TEST(start_called);
         HPX_TEST(connect_called);
         HPX_TEST(!tag_invoke_overload_called);
@@ -65,7 +66,7 @@ int main()
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
-        ex::detach(custom_typed_sender<
+        ex::start_detached(custom_typed_sender<
             custom_type_non_default_constructible_non_copyable>{
             custom_type_non_default_constructible_non_copyable{0}, start_called,
             connect_called, tag_invoke_overload_called});
@@ -81,7 +82,7 @@ int main()
         std::atomic<bool> tag_invoke_overload_called{false};
         custom_sender{
             start_called, connect_called, tag_invoke_overload_called} |
-            ex::detach();
+            ex::start_detached();
         HPX_TEST(start_called);
         HPX_TEST(connect_called);
         HPX_TEST(!tag_invoke_overload_called);
@@ -92,7 +93,7 @@ int main()
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
-        ex::detach(custom_sender2{custom_sender{
+        ex::start_detached(custom_sender2{custom_sender{
             start_called, connect_called, tag_invoke_overload_called}});
         HPX_TEST(!start_called);
         HPX_TEST(!connect_called);
