@@ -1,3 +1,4 @@
+//  Copyright (c) 2021 Srinivas Yadav
 //  copyright (c) 2014 Grant Mercer
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -5,88 +6,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/local/init.hpp>
-#include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/find.hpp>
 
-#include <cstddef>
 #include <iostream>
-#include <iterator>
-#include <random>
 #include <string>
 #include <vector>
 
-#include "test_utils.hpp"
+#include "findifnot_tests.hpp"
 
-////////////////////////////////////////////////////////////////////////////
-unsigned int seed = std::random_device{}();
-std::mt19937 gen(seed);
-std::uniform_int_distribution<> dis(2, 101);
-
-template <typename IteratorTag>
-void test_find_if_not(IteratorTag)
-{
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    //fill vector with random values about 1
-    std::fill(std::begin(c), std::end(c), dis(gen));
-    c.at(c.size() / 2) = 1;
-
-    iterator index =
-        hpx::find_if_not(iterator(std::begin(c)), iterator(std::end(c)),
-            [](std::size_t v) { return v != std::size_t(1); });
-
-    base_iterator test_index = std::begin(c) + c.size() / 2;
-
-    HPX_TEST(index == iterator(test_index));
-}
-
-template <typename ExPolicy, typename IteratorTag>
-void test_find_if_not(ExPolicy&& policy, IteratorTag)
-{
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
-
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    //fill vector with random values about 1
-    std::fill(std::begin(c), std::end(c), dis(gen));
-    c.at(c.size() / 2) = 1;
-
-    iterator index =
-        hpx::find_if_not(policy, iterator(std::begin(c)), iterator(std::end(c)),
-            [](std::size_t v) { return v != std::size_t(1); });
-
-    base_iterator test_index = std::begin(c) + c.size() / 2;
-
-    HPX_TEST(index == iterator(test_index));
-}
-
-template <typename ExPolicy, typename IteratorTag>
-void test_find_if_not_async(ExPolicy&& p, IteratorTag)
-{
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    //fill vector with random values above 1
-    std::fill(std::begin(c), std::end(c), dis(gen));
-    c.at(c.size() / 2) = 1;
-
-    hpx::future<iterator> f =
-        hpx::find_if_not(p, iterator(std::begin(c)), iterator(std::end(c)),
-            [](std::size_t v) { return v != std::size_t(1); });
-    f.wait();
-
-    //create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() / 2;
-
-    HPX_TEST(f.get() == iterator(test_index));
-}
-
+//////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_find_if_not()
 {
@@ -108,6 +35,52 @@ void find_if_not_test()
     test_find_if_not<std::forward_iterator_tag>();
 }
 
+//////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_find_if_not_exception()
+{
+    using namespace hpx::execution;
+
+    test_find_if_not_exception(IteratorTag());
+
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
+    test_find_if_not_exception(seq, IteratorTag());
+    test_find_if_not_exception(par, IteratorTag());
+
+    test_find_if_not_exception_async(seq(task), IteratorTag());
+    test_find_if_not_exception_async(par(task), IteratorTag());
+}
+
+void find_if_not_exception_test()
+{
+    test_find_if_not_exception<std::random_access_iterator_tag>();
+    test_find_if_not_exception<std::forward_iterator_tag>();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_find_if_not_bad_alloc()
+{
+    using namespace hpx::execution;
+
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
+    test_find_if_not_bad_alloc(seq, IteratorTag());
+    test_find_if_not_bad_alloc(par, IteratorTag());
+
+    test_find_if_not_bad_alloc_async(seq(task), IteratorTag());
+    test_find_if_not_bad_alloc_async(par(task), IteratorTag());
+}
+
+void find_if_not_bad_alloc_test()
+{
+    test_find_if_not_bad_alloc<std::random_access_iterator_tag>();
+    test_find_if_not_bad_alloc<std::forward_iterator_tag>();
+}
+
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (vm.count("seed"))
@@ -117,6 +90,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     gen.seed(seed);
 
     find_if_not_test();
+    find_if_not_exception_test();
+    find_if_not_bad_alloc_test();
     return hpx::local::finalize();
 }
 
