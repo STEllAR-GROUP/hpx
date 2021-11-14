@@ -255,4 +255,221 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             part_count, tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
     }
 #endif
+
+    // provide implementation of std::find_end supporting iterators/sentinels
+    template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
+        typename Pred, typename Proj1, typename Proj2>
+    constexpr Iter1 sequential_search(Iter1 first1, Sent1 last1, Iter2 first2,
+        Sent2 last2, Pred&& op, Proj1&& proj1, Proj2&& proj2)
+    {
+        for (/**/; /**/; ++first1)
+        {
+            Iter1 it1 = first1;
+            for (Iter2 it2 = first2; /**/; (void) ++it1, ++it2)
+            {
+                if (it2 == last2)
+                {
+                    return first1;
+                }
+                if (it1 == last1)
+                {
+                    return last1;
+                }
+                if (!hpx::util::invoke(op, hpx::util::invoke(proj1, *it1),
+                        hpx::util::invoke(proj2, *it2)))
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+    template <typename ExPolicy>
+    struct sequential_find_end_t
+      : hpx::functional::detail::tag_fallback<sequential_find_end_t<ExPolicy>>
+    {
+    private:
+        template <typename Iter1, typename Sent1, typename Iter2,
+            typename Sent2, typename Pred, typename Proj1, typename Proj2>
+        friend inline constexpr Iter1 tag_fallback_invoke(
+            sequential_find_end_t<ExPolicy>, Iter1 first1, Sent1 last1,
+            Iter2 first2, Sent2 last2, Pred&& op, Proj1&& proj1, Proj2&& proj2)
+        {
+            if (first2 == last2)
+            {
+                return detail::advance_to_sentinel(first1, last1);
+            }
+
+            Iter1 result = last1;
+            while (true)
+            {
+                Iter1 new_result = sequential_search(
+                    first1, last1, first2, last2, op, proj1, proj2);
+
+                if (new_result == last1)
+                {
+                    break;
+                }
+                else
+                {
+                    result = new_result;
+                    first1 = result;
+                    ++first1;
+                }
+            }
+            return result;
+        }
+
+        template <typename Iter1, typename Iter2, typename Token, typename Pred,
+            typename Proj1, typename Proj2>
+        friend inline constexpr void tag_fallback_invoke(
+            sequential_find_end_t<ExPolicy>, Iter1 it, Iter2 first2,
+            std::size_t base_idx, std::size_t part_size, std::size_t diff,
+            Token& tok, Pred&& op, Proj1&& proj1, Proj2&& proj2)
+        {
+            util::loop_idx_n<ExPolicy>(base_idx, it, part_size, tok,
+                [=, &tok, &op, &proj1, &proj2](auto t, std::size_t i) -> void {
+                    if (hpx::util::invoke(op, hpx::util::invoke(proj1, t),
+                            hpx::util::invoke(proj2, *first2)))
+                    {
+                        std::size_t local_count = 1;
+                        auto mid = t;
+                        auto mid2 = first2;
+                        ++mid;
+                        ++mid2;
+
+                        for (; local_count != diff;
+                             ++local_count, ++mid, ++mid2)
+                        {
+                            if (!hpx::util::invoke(op,
+                                    hpx::util::invoke(proj1, mid),
+                                    hpx::util::invoke(proj2, *mid2)))
+                            {
+                                break;
+                            }
+                        }
+
+                        if (local_count == diff)
+                        {
+                            tok.cancel(i);
+                        }
+                    }
+                });
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    HPX_INLINE_CONSTEXPR_VARIABLE sequential_find_end_t<ExPolicy>
+        sequential_find_end = sequential_find_end_t<ExPolicy>{};
+#else
+    template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
+        typename Sent2, typename Pred, typename Proj1, typename Proj2>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Iter1 sequential_find_end(Iter1 first1,
+        Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op, Proj1&& proj1,
+        Proj2&& proj2)
+    {
+        return sequential_find_end_t<ExPolicy>{}(first1, last1, first2, last2,
+            std::forward<Pred>(op), std::forward<Proj1>(proj1),
+            std::forward<Proj2>(proj2));
+    }
+
+    template <typename ExPolicy, typename Iter1, typename Iter2, typename Token,
+        typename Pred, typename Proj1, typename Proj2>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Iter1 sequential_find_end(Iter1 it,
+        Iter2 first2, std::size_t base_idx, std::size_t part_size,
+        std::size_t diff, Token& tok, Pred&& op, Proj1&& proj1, Proj2&& proj2)
+    {
+        return sequential_find_end_t<ExPolicy>{}(it, first2, base_idx,
+            part_size, diff, tok, std::forward<Pred>(op),
+            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+    }
+#endif
+
+    template <typename ExPolicy>
+    struct sequential_find_first_of_t
+      : hpx::functional::detail::tag_fallback<
+            sequential_find_first_of_t<ExPolicy>>
+    {
+        template <typename InIter1, typename InIter2, typename Pred,
+            typename Proj1, typename Proj2>
+        friend inline constexpr InIter1 tag_fallback_invoke(
+            sequential_find_first_of_t<ExPolicy>, InIter1 first, InIter1 last,
+            InIter2 s_first, InIter2 s_last, Pred&& op, Proj1&& proj1,
+            Proj2&& proj2)
+        {
+            if (first == last)
+                return last;
+
+            for (/* */; first != last; ++first)
+            {
+                for (InIter2 iter = s_first; iter != s_last; ++iter)
+                {
+                    if (hpx::util::invoke(
+                            util::compare_projected<Pred, Proj1, Proj2>(
+                                std::forward<Pred>(op),
+                                std::forward<Proj1>(proj1),
+                                std::forward<Proj2>(proj2)),
+                            *first, *iter))
+                    {
+                        return first;
+                    }
+                }
+            }
+            return last;
+        }
+
+        template <typename FwdIter, typename FwdIter2, typename Token,
+            typename Pred, typename Proj1, typename Proj2>
+        friend inline constexpr void tag_fallback_invoke(
+            sequential_find_first_of_t<ExPolicy>, FwdIter it, FwdIter2 s_first,
+            FwdIter2 s_last, std::size_t base_idx, std::size_t part_size,
+            Token& tok, Pred&& op, Proj1&& proj1, Proj2&& proj2)
+        {
+            util::loop_idx_n<ExPolicy>(base_idx, it, part_size, tok,
+                [&tok, &s_first, &s_last, &op, &proj1, &proj2](
+                    auto v, std::size_t i) -> void {
+                    for (FwdIter2 iter = s_first; iter != s_last; ++iter)
+                    {
+                        if (hpx::util::invoke(
+                                util::compare_projected<Pred, Proj1, Proj2>(
+                                    std::forward<Pred>(op),
+                                    std::forward<Proj1>(proj1),
+                                    std::forward<Proj2>(proj2)),
+                                v, *iter))
+                        {
+                            tok.cancel(i);
+                        }
+                    }
+                });
+        }
+    };
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    HPX_INLINE_CONSTEXPR_VARIABLE sequential_find_first_of_t<ExPolicy>
+        sequential_find_first_of = sequential_find_first_of_t<ExPolicy>{};
+#else
+    template <typename ExPolicy, typename InIter1, typename InIter2,
+        typename Pred, typename Proj1, typename Proj2>
+    HPX_HOST_DEVICE HPX_FORCEINLINE InIter1 sequential_find_first_of(
+        InIter1 first, InIter1 last, InIter2 s_first, InIter2 s_last, Pred&& op,
+        Proj1&& proj1, Proj2&& proj2)
+    {
+        return sequential_find_first_of_t<ExPolicy>{}(first, last, s_first,
+            s_last, std::forward<Pred>(op), std::forward<Proj1>(proj1),
+            std::forward<Proj2>(proj2));
+    }
+
+    template <typename ExPolicy, typename FwdIter, typename FwdIter2,
+        typename Token, typename Pred, typename Proj1, typename Proj2>
+    HPX_HOST_DEVICE HPX_FORCEINLINE InIter1 sequential_find_first_of(FwdIter it,
+        FwdIter2 s_first, FwdIter2 s_last, std::size_t base_idx,
+        std::size_t part_size, Token& tok, Pred&& op, Proj1&& proj1,
+        Proj2&& proj2)
+    {
+        return sequential_find_first_of_t<ExPolicy>{}(it, s_first, s_last,
+            base_idx, part_size, tok, std::forward<Pred>(op),
+            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+    }
+#endif
 }}}}    // namespace hpx::parallel::v1::detail
