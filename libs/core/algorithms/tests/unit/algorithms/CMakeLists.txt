@@ -52,8 +52,6 @@ set(tests
     findfirstof_binary
     findif
     findifnot
-    findifnot_exception
-    findifnot_bad_alloc
     foreach
     foreach_executors
     foreach_prefetching
