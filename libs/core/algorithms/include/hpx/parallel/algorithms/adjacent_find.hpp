@@ -124,6 +124,7 @@ namespace hpx {
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
+#include <hpx/parallel/algorithms/detail/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -159,7 +160,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static InIter sequential(
                 ExPolicy, InIter first, Sent_ last, Pred&& pred, Proj&& proj)
             {
-                return std::adjacent_find(first, last,
+                return sequential_adjacent_find<ExPolicy>(first, last,
                     util::invoke_projected<Pred, Proj>(
                         HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
             }
@@ -172,7 +173,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     Pred&& pred, Proj&& proj)
             {
                 using zip_iterator = hpx::util::zip_iterator<FwdIter, FwdIter>;
-                using reference = typename zip_iterator::reference;
                 using difference_type =
                     typename std::iterator_traits<FwdIter>::difference_type;
 
@@ -193,13 +193,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f1 = [pred_projected = HPX_MOVE(pred_projected), tok](
                               zip_iterator it, std::size_t part_size,
                               std::size_t base_idx) mutable {
-                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
-                        part_size, tok,
-                        [&pred_projected, &tok](reference t, std::size_t i) {
-                            using hpx::get;
-                            if (pred_projected(get<0>(t), get<1>(t)))
-                                tok.cancel(i);
-                        });
+                    sequential_adjacent_find<std::decay_t<ExPolicy>>(base_idx,
+                        it, part_size, tok,
+                        std::forward<decltype(pred_projected)>(pred_projected));
                 };
 
                 auto f2 = [tok, count, first, last](
