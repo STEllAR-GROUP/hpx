@@ -9,6 +9,7 @@ set(tests)
 if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
   set(tests
       ${tests}
+      adjacentfind_datapar
       adjacentdifference_datapar
       all_of_datapar
       any_of_datapar
