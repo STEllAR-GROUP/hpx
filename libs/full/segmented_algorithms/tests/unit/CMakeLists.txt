@@ -18,6 +18,12 @@ set(tests
     partitioned_vector_generate
     partitioned_vector_handle_values
     partitioned_vector_iter
+    partitioned_vector_max_element1
+    partitioned_vector_max_element2
+    partitioned_vector_min_element1
+    partitioned_vector_min_element2
+    partitioned_vector_minmax_element1
+    partitioned_vector_minmax_element2
     partitioned_vector_move
     partitioned_vector_target
     partitioned_vector_transform1

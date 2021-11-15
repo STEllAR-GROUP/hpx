@@ -15,9 +15,99 @@
 #include <string>
 #include <vector>
 
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+void test_max_element_sent()
+{
+    using hpx::get;
+
+    auto c = test::random_iota(100);
+    auto ref = std::max_element(std::begin(c), std::begin(c) + 50);
+    auto r = hpx::ranges::max_element(
+        std::begin(c), sentinel<size_t>{*(std::begin(c) + 50)});
+
+    HPX_TEST(*r == *ref);
+
+    auto c1 = std::vector<size_t>{5, 7, 8};
+    ref = std::max_element(
+        std::begin(c1), std::begin(c1) + 2, std::greater<std::size_t>());
+    r = hpx::ranges::max_element(
+        std::begin(c1), sentinel<size_t>{8}, std::greater<std::size_t>());
+
+    HPX_TEST(*r == *ref);
+
+    auto c2 = std::vector<size_t>{2, 2, 2};
+    r = hpx::ranges::max_element(std::begin(c2), sentinel<size_t>{2});
+    HPX_TEST(r == std::begin(c2));
+
+    auto c3 = std::vector<size_t>{2, 3, 3, 4};
+    r = hpx::ranges::max_element(std::begin(c3), sentinel<size_t>{3});
+    HPX_TEST(*r == 2);
+}
+
+template <typename ExPolicy>
+void test_max_element_sent(ExPolicy policy)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    using hpx::get;
+
+    auto c = test::random_iota(100);
+    auto ref = std::max_element(std::begin(c), std::begin(c) + 50);
+    auto r = hpx::ranges::max_element(
+        policy, std::begin(c), sentinel<size_t>{*(std::begin(c) + 50)});
+
+    HPX_TEST(*r == *ref);
+
+    auto c1 = std::vector<size_t>{5, 7, 8};
+    ref = std::max_element(
+        std::begin(c1), std::begin(c1) + 2, std::greater<std::size_t>());
+    r = hpx::ranges::max_element(policy, std::begin(c1), sentinel<size_t>{8},
+        std::greater<std::size_t>());
+
+    HPX_TEST(*r == *ref);
+
+    auto c2 = std::vector<size_t>{2, 2, 2};
+    r = hpx::ranges::max_element(policy, std::begin(c2), sentinel<size_t>{2});
+    HPX_TEST(r == std::begin(c2));
+
+    auto c3 = std::vector<size_t>{2, 3, 3, 4};
+    r = hpx::ranges::max_element(policy, std::begin(c3), sentinel<size_t>{3});
+    HPX_TEST(*r == 2);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_max_element(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
+
+    test_vector c = test::random_iota(10007);
+
+    base_iterator ref_end = std::end(c.base());
+
+    auto r = hpx::ranges::max_element(c, std::less<std::size_t>());
+    HPX_TEST(r != std::end(c));
+
+    base_iterator ref = std::max_element(
+        std::begin(c.base()), std::end(c.base()), std::less<std::size_t>());
+
+    HPX_TEST(ref != ref_end);
+    HPX_TEST_EQ(*ref, *r);
+
+    r = hpx::ranges::max_element(c);
+    HPX_TEST(r != std::end(c));
+
+    ref = std::max_element(std::begin(c.base()), std::end(c.base()));
+    HPX_TEST(ref != ref_end);
+    HPX_TEST_EQ(*ref, *r);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_max_element(ExPolicy policy, IteratorTag)
 {
@@ -32,7 +122,7 @@ void test_max_element(ExPolicy policy, IteratorTag)
 
     base_iterator ref_end = std::end(c.base());
 
-    auto r = hpx::parallel::max_element(policy, c, std::less<std::size_t>());
+    auto r = hpx::ranges::max_element(policy, c, std::less<std::size_t>());
     HPX_TEST(r != std::end(c));
 
     base_iterator ref = std::max_element(
@@ -41,7 +131,7 @@ void test_max_element(ExPolicy policy, IteratorTag)
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *r);
 
-    r = hpx::parallel::max_element(policy, c);
+    r = hpx::ranges::max_element(policy, c);
     HPX_TEST(r != std::end(c));
 
     ref = std::max_element(std::begin(c.base()), std::end(c.base()));
@@ -62,7 +152,7 @@ void test_max_element_async(ExPolicy p, IteratorTag)
 
     base_iterator ref_end(std::end(c.base()));
 
-    auto r = hpx::parallel::max_element(p, c, std::less<std::size_t>());
+    auto r = hpx::ranges::max_element(p, c, std::less<std::size_t>());
     iterator rit = r.get();
     HPX_TEST(rit != std::end(c));
 
@@ -71,7 +161,7 @@ void test_max_element_async(ExPolicy p, IteratorTag)
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *rit);
 
-    r = hpx::parallel::max_element(p, c);
+    r = hpx::ranges::max_element(p, c);
     rit = r.get();
     HPX_TEST(rit != std::end(c));
 
@@ -85,12 +175,18 @@ void test_max_element()
 {
     using namespace hpx::execution;
 
+    test_max_element(IteratorTag());
     test_max_element(seq, IteratorTag());
     test_max_element(par, IteratorTag());
     test_max_element(par_unseq, IteratorTag());
 
     test_max_element_async(seq(task), IteratorTag());
     test_max_element_async(par(task), IteratorTag());
+
+    test_max_element_sent();
+    test_max_element_sent(seq);
+    test_max_element_sent(par);
+    test_max_element_sent(par_unseq);
 }
 
 void max_element_test()
@@ -100,6 +196,66 @@ void max_element_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_max_element_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c = test::random_iota(10007);
+
+    {
+        bool caught_exception = false;
+        try
+        {
+            hpx::ranges::max_element(
+                hpx::util::make_iterator_range(
+                    decorated_iterator(std::begin(c),
+                        []() { throw std::runtime_error("test"); }),
+                    decorated_iterator(std::end(c))),
+                std::less<std::size_t>());
+
+            HPX_TEST(false);
+        }
+        catch (hpx::exception_list const& e)
+        {
+            caught_exception = true;
+            test::test_num_exceptions<hpx::execution::sequenced_policy,
+                IteratorTag>::call(hpx::execution::seq, e);
+        }
+        catch (...)
+        {
+            HPX_TEST(false);
+        }
+        HPX_TEST(caught_exception);
+    }
+
+    {
+        bool caught_exception = false;
+        try
+        {
+            hpx::ranges::max_element(
+                decorated_iterator(
+                    std::begin(c), []() { throw std::runtime_error("test"); }),
+                decorated_iterator(std::end(c)));
+
+            HPX_TEST(false);
+        }
+        catch (hpx::exception_list const& e)
+        {
+            caught_exception = true;
+            test::test_num_exceptions<hpx::execution::sequenced_policy,
+                IteratorTag>::call(hpx::execution::seq, e);
+        }
+        catch (...)
+        {
+            HPX_TEST(false);
+        }
+        HPX_TEST(caught_exception);
+    }
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_max_element_exception(ExPolicy policy, IteratorTag)
 {
@@ -116,7 +272,7 @@ void test_max_element_exception(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::parallel::max_element(policy,
+            hpx::ranges::max_element(policy,
                 hpx::util::make_iterator_range(
                     decorated_iterator(std::begin(c),
                         []() { throw std::runtime_error("test"); }),
@@ -141,7 +297,7 @@ void test_max_element_exception(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::parallel::max_element(policy,
+            hpx::ranges::max_element(policy,
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c)));
@@ -176,7 +332,7 @@ void test_max_element_exception_async(ExPolicy p, IteratorTag)
 
         try
         {
-            hpx::future<decorated_iterator> f = hpx::parallel::max_element(p,
+            hpx::future<decorated_iterator> f = hpx::ranges::max_element(p,
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c)), std::less<std::size_t>());
@@ -207,7 +363,7 @@ void test_max_element_exception_async(ExPolicy p, IteratorTag)
 
         try
         {
-            hpx::future<decorated_iterator> f = hpx::parallel::max_element(p,
+            hpx::future<decorated_iterator> f = hpx::ranges::max_element(p,
                 hpx::util::make_iterator_range(
                     decorated_iterator(std::begin(c),
                         []() { throw std::runtime_error("test"); }),
@@ -242,6 +398,7 @@ void test_max_element_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_max_element_exception(IteratorTag());
     test_max_element_exception(seq, IteratorTag());
     test_max_element_exception(par, IteratorTag());
 
@@ -256,6 +413,61 @@ void max_element_exception_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_max_element_bad_alloc(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c = test::random_iota(10007);
+
+    {
+        bool caught_exception = false;
+        try
+        {
+            hpx::ranges::max_element(hpx::util::make_iterator_range(
+                                         decorated_iterator(std::begin(c),
+                                             []() { throw std::bad_alloc(); }),
+                                         decorated_iterator(std::end(c))),
+                std::less<std::size_t>());
+
+            HPX_TEST(false);
+        }
+        catch (std::bad_alloc const&)
+        {
+            caught_exception = true;
+        }
+        catch (...)
+        {
+            HPX_TEST(false);
+        }
+        HPX_TEST(caught_exception);
+    }
+
+    {
+        bool caught_exception = false;
+        try
+        {
+            hpx::ranges::max_element(hpx::util::make_iterator_range(
+                decorated_iterator(
+                    std::begin(c), []() { throw std::bad_alloc(); }),
+                decorated_iterator(std::end(c))));
+
+            HPX_TEST(false);
+        }
+        catch (std::bad_alloc const&)
+        {
+            caught_exception = true;
+        }
+        catch (...)
+        {
+            HPX_TEST(false);
+        }
+        HPX_TEST(caught_exception);
+    }
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_max_element_bad_alloc(ExPolicy policy, IteratorTag)
 {
@@ -272,7 +484,7 @@ void test_max_element_bad_alloc(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::parallel::max_element(policy,
+            hpx::ranges::max_element(policy,
                 hpx::util::make_iterator_range(
                     decorated_iterator(
                         std::begin(c), []() { throw std::bad_alloc(); }),
@@ -296,7 +508,7 @@ void test_max_element_bad_alloc(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::parallel::max_element(policy,
+            hpx::ranges::max_element(policy,
                 hpx::util::make_iterator_range(
                     decorated_iterator(
                         std::begin(c), []() { throw std::bad_alloc(); }),
@@ -331,7 +543,7 @@ void test_max_element_bad_alloc_async(ExPolicy p, IteratorTag)
 
         try
         {
-            hpx::future<decorated_iterator> f = hpx::parallel::max_element(p,
+            hpx::future<decorated_iterator> f = hpx::ranges::max_element(p,
                 hpx::util::make_iterator_range(
                     decorated_iterator(
                         std::begin(c), []() { throw std::bad_alloc(); }),
@@ -363,7 +575,7 @@ void test_max_element_bad_alloc_async(ExPolicy p, IteratorTag)
 
         try
         {
-            hpx::future<decorated_iterator> f = hpx::parallel::max_element(p,
+            hpx::future<decorated_iterator> f = hpx::ranges::max_element(p,
                 hpx::util::make_iterator_range(
                     decorated_iterator(
                         std::begin(c), []() { throw std::bad_alloc(); }),
@@ -397,6 +609,7 @@ void test_max_element_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_max_element_bad_alloc(IteratorTag());
     test_max_element_bad_alloc(seq, IteratorTag());
     test_max_element_bad_alloc(par, IteratorTag());
 

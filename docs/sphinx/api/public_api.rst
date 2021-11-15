@@ -69,10 +69,10 @@ Functions
 - :cpp:func:`hpx::is_sorted_until`
 - :cpp:func:`hpx::lexicographical_compare`
 - :cpp:func:`hpx::make_heap`
-- :cpp:func:`hpx::parallel::v1::max_element`
+- :cpp:func:`hpx::max_element`
 - :cpp:func:`hpx::merge`
-- :cpp:func:`hpx::parallel::v1::min_element`
-- :cpp:func:`hpx::parallel::v1::minmax_element`
+- :cpp:func:`hpx::min_element`
+- :cpp:func:`hpx::minmax_element`
 - :cpp:func:`hpx::parallel::v1::mismatch`
 - :cpp:func:`hpx::move`
 - :cpp:func:`hpx::none_of`
