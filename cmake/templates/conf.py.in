@@ -77,9 +77,9 @@ for lib_dir in os.listdir(hpx_libs_dir):
         # If we are in the root of the library dir, we add all
         # subdirectories as a new breathe project
         if len(subdir) == 0:
-            for Dir in dirs:
-                breathe_projects_source[Dir] = (subdir_full + '/' + Dir, [])
-                hpx_libs[lib_dir].append(Dir)
+            for directory in dirs:
+                breathe_projects_source[directory] = (subdir_full + '/' + directory, [])
+                hpx_libs[lib_dir].append(directory)
         # We are inside a module and need to add the files
         # to the breathe project
         else:
@@ -517,7 +517,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'HPX'
-Copyright = u'2008-2021, The STE||AR Group'
+project_copyright = u'2008-2021, The STE||AR Group'
 author = u'The STE||AR Group'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -691,4 +691,4 @@ texinfo_documents = [
 epub_title = project
 epub_author = author
 epub_publisher = author
-epub_copyright = Copyright
+epub_copyright = project_copyright
