@@ -39,7 +39,7 @@ namespace hpx { namespace traits {
         template <typename T>
         HPX_FORCEINLINE typename acquire_future<T>::type operator()(T&& t) const
         {
-            return acquire_future<T>()(std::forward<T>(t));
+            return acquire_future<T>()(HPX_FORWARD(T, t));
         }
     };
 
@@ -55,7 +55,7 @@ namespace hpx { namespace traits {
             template <typename T_>
             HPX_FORCEINLINE T operator()(T_&& value) const
             {
-                return std::forward<T_>(value);
+                return HPX_FORWARD(T_, value);
             }
         };
 
@@ -68,13 +68,13 @@ namespace hpx { namespace traits {
             HPX_FORCEINLINE hpx::lcos::future<R> operator()(
                 hpx::lcos::future<R>& future) const
             {
-                return std::move(future);
+                return HPX_MOVE(future);
             }
 
             HPX_FORCEINLINE hpx::lcos::future<R> operator()(
                 hpx::lcos::future<R>&& future) const
             {
-                return std::move(future);
+                return HPX_MOVE(future);
             }
         };
 
@@ -92,7 +92,7 @@ namespace hpx { namespace traits {
             HPX_FORCEINLINE hpx::lcos::shared_future<R> operator()(
                 hpx::lcos::shared_future<R>&& future) const
             {
-                return std::move(future);
+                return HPX_MOVE(future);
             }
         };
 
@@ -134,7 +134,7 @@ namespace hpx { namespace traits {
             HPX_FORCEINLINE Range operator()(Range_&& futures) const
             {
                 Range values;
-                transform_future_disp(std::forward<Range_>(futures), values);
+                transform_future_disp(HPX_FORWARD(Range_, futures), values);
                 return values;
             }
         };

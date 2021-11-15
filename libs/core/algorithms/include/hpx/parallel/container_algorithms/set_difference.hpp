@@ -312,9 +312,9 @@ namespace hpx { namespace ranges {
             using result_type = set_difference_result<Iter1, Iter3>;
 
             return hpx::parallel::v1::detail::set_difference<result_type>()
-                .call2(std::forward<ExPolicy>(policy), is_seq(), first1, last1,
-                    first2, last2, dest, std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first1, last1,
+                    first2, last2, dest, HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -368,11 +368,11 @@ namespace hpx { namespace ranges {
             using result_type = set_difference_result<iterator_type1, Iter3>;
 
             return hpx::parallel::v1::detail::set_difference<result_type>()
-                .call2(std::forward<ExPolicy>(policy), is_seq(),
+                .call2(HPX_FORWARD(ExPolicy, policy), is_seq(),
                     hpx::util::begin(rng1), hpx::util::end(rng1),
                     hpx::util::begin(rng2), hpx::util::end(rng2), dest,
-                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -409,8 +409,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::set_difference<result_type>()
                 .call(hpx::execution::seq, first1, last1, first2, last2, dest,
-                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -456,8 +456,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::set_difference<result_type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), dest, std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), dest, HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
     } set_difference{};
 

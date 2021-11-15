@@ -939,9 +939,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return partition(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), std::forward<Pred>(pred),
-            std::forward<Proj>(proj));
+        return partition(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -973,9 +973,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return partition_copy(std::forward<ExPolicy>(policy),
+        return partition_copy(HPX_FORWARD(ExPolicy, policy),
             hpx::util::begin(rng), hpx::util::end(rng), dest_true, dest_false,
-            std::forward<Pred>(pred), std::forward<Proj>(proj));
+            HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -1016,8 +1016,8 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::v1::detail::partition<iterator>().call(
                     hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), std::forward<Pred>(pred),
-                    std::forward<Proj>(proj)),
+                    hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj)),
                 hpx::util::end(rng));
         }
 
@@ -1046,9 +1046,9 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::v1::detail::partition<iterator>().call(
-                    std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), std::forward<Pred>(pred),
-                    std::forward<Proj>(proj)),
+                    HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj)),
                 hpx::util::end(rng));
         }
 
@@ -1071,8 +1071,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::util::make_subrange<FwdIter, FwdIter>(
                 hpx::parallel::v1::detail::partition<FwdIter>().call(
-                    hpx::execution::seq, first, last, std::forward<Pred>(pred),
-                    std::forward<Proj>(proj)),
+                    hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj)),
                 parallel::v1::detail::advance_to_sentinel(first, last));
         }
 
@@ -1098,8 +1098,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::util::make_subrange<FwdIter, FwdIter>(
                 hpx::parallel::v1::detail::partition<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)),
+                    HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)),
                 parallel::v1::detail::advance_to_sentinel(first, last));
         }
     } partition{};
@@ -1134,7 +1134,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::v1::detail::stable_partition<iterator>().call2(
                     hpx::execution::seq, std::true_type{},
                     hpx::util::begin(rng), hpx::util::end(rng),
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)),
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)),
                 hpx::util::end(rng));
         }
 
@@ -1167,9 +1167,9 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::v1::detail::stable_partition<iterator>().call2(
-                    std::forward<ExPolicy>(policy), is_seq(),
+                    HPX_FORWARD(ExPolicy, policy), is_seq(),
                     hpx::util::begin(rng), hpx::util::end(rng),
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)),
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)),
                 hpx::util::end(rng));
         }
 
@@ -1194,7 +1194,7 @@ namespace hpx { namespace ranges {
             return hpx::parallel::util::make_subrange<BidirIter, BidirIter>(
                 hpx::parallel::v1::detail::stable_partition<BidirIter>().call2(
                     hpx::execution::seq, std::true_type{}, first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)),
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)),
                 parallel::v1::detail::advance_to_sentinel(first, last));
         }
 
@@ -1223,8 +1223,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::util::make_subrange<BidirIter, BidirIter>(
                 hpx::parallel::v1::detail::stable_partition<BidirIter>().call2(
-                    std::forward<ExPolicy>(policy), is_seq(), first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)),
+                    HPX_FORWARD(ExPolicy, policy), is_seq(), first, last,
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)),
                 parallel::v1::detail::advance_to_sentinel(first, last));
         }
     } stable_partition{};
@@ -1263,7 +1263,7 @@ namespace hpx { namespace ranges {
                 parallel::v1::detail::partition_copy<result_type>().call(
                     hpx::execution::seq, hpx::util::begin(rng),
                     hpx::util::end(rng), dest_true, dest_false,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
         }
 
         // clang-format off
@@ -1295,9 +1295,9 @@ namespace hpx { namespace ranges {
 
             return parallel::util::make_in_out_out_result(
                 parallel::v1::detail::partition_copy<result_type>().call(
-                    std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                    HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng), dest_true, dest_false,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
         }
 
         // clang-format off
@@ -1328,7 +1328,7 @@ namespace hpx { namespace ranges {
             return parallel::util::make_in_out_out_result(
                 parallel::v1::detail::partition_copy<result_type>().call(
                     hpx::execution::seq, first, last, dest_true, dest_false,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
         }
 
         // clang-format off
@@ -1360,9 +1360,9 @@ namespace hpx { namespace ranges {
 
             return parallel::util::make_in_out_out_result(
                 parallel::v1::detail::partition_copy<result_type>().call(
-                    std::forward<ExPolicy>(policy), first, last, dest_true,
-                    dest_false, std::forward<Pred>(pred),
-                    std::forward<Proj>(proj)));
+                    HPX_FORWARD(ExPolicy, policy), first, last, dest_true,
+                    dest_false, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj)));
         }
     } partition_copy{};
 }}    // namespace hpx::ranges

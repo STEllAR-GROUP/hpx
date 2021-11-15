@@ -524,7 +524,7 @@ namespace hpx { namespace program_options { namespace detail {
                 name = tok.substr(2);
             }
             option opt;
-            opt.string_key = std::move(name);
+            opt.string_key = HPX_MOVE(name);
             if (!adjacent.empty())
                 opt.value.push_back(adjacent);
             opt.original_tokens.push_back(tok);
@@ -610,7 +610,7 @@ namespace hpx { namespace program_options { namespace detail {
             string adjacent = tok.substr(2);
 
             option opt;
-            opt.string_key = std::move(name);
+            opt.string_key = HPX_MOVE(name);
             if (!adjacent.empty())
                 opt.value.push_back(adjacent);
             opt.original_tokens.push_back(tok);

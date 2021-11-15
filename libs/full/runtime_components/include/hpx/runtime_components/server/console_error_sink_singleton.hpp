@@ -37,8 +37,8 @@ namespace hpx { namespace components { namespace server {
         sink_type set_error_sink(F&& sink)
         {
             std::lock_guard<mutex_type> l(mtx_);
-            sink_type old_sink = std::move(sink_);
-            sink_ = std::forward<F>(sink);
+            sink_type old_sink = HPX_MOVE(sink_);
+            sink_ = HPX_FORWARD(F, sink);
             return old_sink;
         }
 

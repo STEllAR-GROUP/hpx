@@ -76,7 +76,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             return std::make_shared<traits::communication_operation<
                 communication_set_node, Operation>>(*this)
-                ->template get<Result>(which, std::move(args)...);
+                ->template get<Result>(which, HPX_MOVE(args)...);
         }
 
         template <typename Operation, typename Result, typename... Args>
@@ -94,7 +94,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             return std::make_shared<traits::communication_operation<
                 communication_set_node, Operation>>(*this)
-                ->template set<Result>(which, std::move(args)...);
+                ->template set<Result>(which, HPX_MOVE(args)...);
         }
 
         template <typename Operation, typename Result, typename... Args>

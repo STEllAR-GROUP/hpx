@@ -12,7 +12,6 @@
 
 #include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
 
-
 #include <cstdint>
 #include <mutex>
 #include <regex>
@@ -21,8 +20,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace plugins { namespace parcel
-{
+namespace hpx { namespace plugins { namespace parcel {
     coalescing_counter_registry& coalescing_counter_registry::instance()
     {
         hpx::util::static_<coalescing_counter_registry, tag> registry;
@@ -30,8 +28,7 @@ namespace hpx { namespace plugins { namespace parcel
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void coalescing_counter_registry::register_action(
-        std::string const& name,
+    void coalescing_counter_registry::register_action(std::string const& name,
         get_counter_type num_parcels, get_counter_type num_messages,
         get_counter_type num_parcels_per_message,
         get_counter_type average_time_between_parcels,
@@ -49,15 +46,11 @@ namespace hpx { namespace plugins { namespace parcel
         auto it = map_.find(name);
         if (it == map_.end())
         {
-            counter_functions data =
-            {
-                num_parcels, num_messages,
+            counter_functions data = {num_parcels, num_messages,
                 num_parcels_per_message, average_time_between_parcels,
-                time_between_parcels_histogram_creator,
-                0, 0, 1
-            };
+                time_between_parcels_histogram_creator, 0, 0, 1};
 
-            map_.emplace(name, std::move(data));
+            map_.emplace(name, HPX_MOVE(data));
         }
         else
         {
@@ -108,8 +101,8 @@ namespace hpx { namespace plugins { namespace parcel
 
     ///////////////////////////////////////////////////////////////////////////
     coalescing_counter_registry::get_counter_type
-        coalescing_counter_registry::get_parcels_counter(
-            std::string const& name) const
+    coalescing_counter_registry::get_parcels_counter(
+        std::string const& name) const
     {
         std::unique_lock<mutex_type> l(mtx_);
 
@@ -126,8 +119,8 @@ namespace hpx { namespace plugins { namespace parcel
     }
 
     coalescing_counter_registry::get_counter_type
-        coalescing_counter_registry::get_messages_counter(
-            std::string const& name) const
+    coalescing_counter_registry::get_messages_counter(
+        std::string const& name) const
     {
         std::unique_lock<mutex_type> l(mtx_);
 
@@ -144,8 +137,8 @@ namespace hpx { namespace plugins { namespace parcel
     }
 
     coalescing_counter_registry::get_counter_type
-        coalescing_counter_registry::get_parcels_per_message_counter(
-            std::string const& name) const
+    coalescing_counter_registry::get_parcels_per_message_counter(
+        std::string const& name) const
     {
         std::unique_lock<mutex_type> l(mtx_);
 
@@ -162,8 +155,8 @@ namespace hpx { namespace plugins { namespace parcel
     }
 
     coalescing_counter_registry::get_counter_type
-        coalescing_counter_registry::get_average_time_between_parcels_counter(
-            std::string const& name) const
+    coalescing_counter_registry::get_average_time_between_parcels_counter(
+        std::string const& name) const
     {
         std::unique_lock<mutex_type> l(mtx_);
 
@@ -173,7 +166,7 @@ namespace hpx { namespace plugins { namespace parcel
             l.unlock();
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_counter_registry::"
-                    "get_average_time_between_parcels_counter",
+                "get_average_time_between_parcels_counter",
                 "unknown action type");
             return get_counter_type();
         }
@@ -181,9 +174,9 @@ namespace hpx { namespace plugins { namespace parcel
     }
 
     coalescing_counter_registry::get_counter_values_type
-        coalescing_counter_registry::get_time_between_parcels_histogram_counter(
-            std::string const& name, std::int64_t min_boundary,
-            std::int64_t max_boundary, std::int64_t num_buckets)
+    coalescing_counter_registry::get_time_between_parcels_histogram_counter(
+        std::string const& name, std::int64_t min_boundary,
+        std::int64_t max_boundary, std::int64_t num_buckets)
     {
         std::unique_lock<mutex_type> l(mtx_);
 
@@ -193,7 +186,7 @@ namespace hpx { namespace plugins { namespace parcel
             l.unlock();
             HPX_THROW_EXCEPTION(bad_parameter,
                 "coalescing_counter_registry::"
-                    "get_time_between_parcels_histogram_counter",
+                "get_time_between_parcels_histogram_counter",
                 "unknown action type");
             return &coalescing_counter_registry::empty_histogram;
         }
@@ -242,7 +235,8 @@ namespace hpx { namespace plugins { namespace parcel
             {
                 std::string fullname;
                 performance_counters::get_counter_name(p, fullname, ec);
-                if (ec) return false;
+                if (ec)
+                    return false;
 
                 performance_counters::counter_info cinfo = info;
                 cinfo.fullname_ = fullname;
@@ -265,7 +259,8 @@ namespace hpx { namespace plugins { namespace parcel
         if (parameters.find_first_of("*?[]") != std::string::npos)
         {
             std::string str_rx(util::regex_from_pattern(parameters, ec));
-            if (ec) return false;
+            if (ec)
+                return false;
 
             std::regex rx(str_rx);
 
@@ -275,7 +270,8 @@ namespace hpx { namespace plugins { namespace parcel
                 std::unique_lock<mutex_type> l(mtx_);
 
                 map_type::const_iterator end = map_.end();
-                for (map_type::const_iterator it = map_.begin(); it != end; ++it)
+                for (map_type::const_iterator it = map_.begin(); it != end;
+                     ++it)
                 {
                     if (!std::regex_match((*it).first, rx))
                         continue;
@@ -285,7 +281,7 @@ namespace hpx { namespace plugins { namespace parcel
                     if (!additional_parameters.empty())
                         cp.parameters_ += additional_parameters;
 
-                    counters.push_back(std::move(cp));
+                    counters.push_back(HPX_MOVE(cp));
                 }
             }
 
@@ -312,13 +308,14 @@ namespace hpx { namespace plugins { namespace parcel
                 return false;
             }
 
-            for (auto && cp : counters)
+            for (auto&& cp : counters)
             {
                 // propagate parameters
                 std::string fullname;
 
                 performance_counters::get_counter_name(cp, fullname, ec);
-                if (ec) return false;
+                if (ec)
+                    return false;
 
                 performance_counters::counter_info cinfo = info;
                 cinfo.fullname_ = fullname;
@@ -343,7 +340,8 @@ namespace hpx { namespace plugins { namespace parcel
                 // compose a list of known action types
                 std::string types;
                 map_type::const_iterator end = map_.end();
-                for (map_type::const_iterator it = map_.begin(); it != end; ++it)
+                for (map_type::const_iterator it = map_.begin(); it != end;
+                     ++it)
                 {
                     types += "  " + (*it).first + "\n";
                 }
@@ -361,7 +359,8 @@ namespace hpx { namespace plugins { namespace parcel
         // propagate parameters
         std::string fullname;
         performance_counters::get_counter_name(p, fullname, ec);
-        if (ec) return false;
+        if (ec)
+            return false;
 
         performance_counters::counter_info cinfo = info;
         cinfo.fullname_ = fullname;
@@ -369,13 +368,14 @@ namespace hpx { namespace plugins { namespace parcel
         if (!f(cinfo, ec))
             return false;
 
-        if (ec) return false;
+        if (ec)
+            return false;
 
         if (&ec != &throws)
             ec = make_success_code();
 
         return true;
     }
-}}}
+}}}    // namespace hpx::plugins::parcel
 
 #endif

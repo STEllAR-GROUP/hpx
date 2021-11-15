@@ -209,7 +209,7 @@ namespace hpx { namespace lcos {
             Result operator()(
                 hpx::future<std::vector<hpx::future<Result>>> r) const
             {
-                std::vector<hpx::future<Result>> fres = std::move(r.get());
+                std::vector<hpx::future<Result>> fres = HPX_MOVE(r.get());
 
                 HPX_ASSERT(!fres.empty());
 
@@ -271,7 +271,7 @@ namespace hpx { namespace lcos {
                     hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
                         hpx::detail::async_colocated<reduce_impl_action>(id,
-                            act, std::move(ids_next), reduce_op,
+                            act, HPX_MOVE(ids_next), reduce_op,
                             global_idx + applied, vs...));
 
                     applied += next_fan;
@@ -304,7 +304,7 @@ namespace hpx { namespace lcos {
         }
 
         return hpx::detail::async_colocated<reduce_impl_action>(
-            ids[0], Action(), ids, std::forward<ReduceOp>(reduce_op), 0, vs...);
+            ids[0], Action(), ids, HPX_FORWARD(ReduceOp, reduce_op), 0, vs...);
     }
 
     template <typename Component, typename Signature, typename Derived,
@@ -315,7 +315,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const& ids, ReduceOp&& reduce_op,
         Ts const&... vs)
     {
-        return reduce<Derived>(ids, std::forward<ReduceOp>(reduce_op), vs...);
+        return reduce<Derived>(ids, HPX_FORWARD(ReduceOp, reduce_op), vs...);
     }
 
     template <typename Action, typename ReduceOp, typename... Ts>
@@ -324,7 +324,7 @@ namespace hpx { namespace lcos {
         Ts const&... vs)
     {
         return reduce<detail::reduce_with_index<Action>>(
-            ids, std::forward<ReduceOp>(reduce_op), vs...);
+            ids, HPX_FORWARD(ReduceOp, reduce_op), vs...);
     }
 
     template <typename Component, typename Signature, typename Derived,
@@ -337,7 +337,7 @@ namespace hpx { namespace lcos {
         Ts const&... vs)
     {
         return reduce<detail::reduce_with_index<Derived>>(
-            ids, std::forward<ReduceOp>(reduce_op), vs...);
+            ids, HPX_FORWARD(ReduceOp, reduce_op), vs...);
     }
 }}    // namespace hpx::lcos
 

@@ -19,7 +19,7 @@ namespace hpx::functional::detail {
         /// The evaluation of the expression
         /// `hpx::functional::detail::tag_fallback_invoke(tag, args...)` is
         /// equivalent to evaluating the unqualified call to
-        /// `tag_fallback_invoke(decay-copy(tag), std::forward<Args>(args)...)`.
+        /// `tag_fallback_invoke(decay-copy(tag), HPX_FORWARD(Args, args)...)`.
         ///
         /// `hpx::functional::detail::tag_fallback_invoke` is implemented against P1895.
         ///
@@ -125,11 +125,11 @@ namespace hpx::functional::detail {
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Tag tag, Ts&&... ts) const
                 noexcept(noexcept(tag_fallback_invoke(
-                    std::declval<Tag>(), std::forward<Ts>(ts)...)))
+                    std::declval<Tag>(), HPX_FORWARD(Ts, ts)...)))
                     -> decltype(tag_fallback_invoke(
-                        std::declval<Tag>(), std::forward<Ts>(ts)...))
+                        std::declval<Tag>(), HPX_FORWARD(Ts, ts)...))
             {
-                return tag_fallback_invoke(tag, std::forward<Ts>(ts)...);
+                return tag_fallback_invoke(tag, HPX_FORWARD(Ts, ts)...);
             }
 
             friend constexpr bool operator==(
@@ -268,8 +268,8 @@ namespace hpx::functional::detail {
                 noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
                     -> tag_invoke_result_t<Tag, Args&&...>
             {
-                return tag_invoke(static_cast<Tag const&>(*this),
-                    std::forward<Args>(args)...);
+                return tag_invoke(
+                    static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
 
             // is not tag-dispatchable
@@ -281,8 +281,8 @@ namespace hpx::functional::detail {
                 noexcept(is_nothrow_tag_fallback_invocable_v<Tag, Args...>)
                     -> tag_fallback_invoke_result_t<Tag, Args&&...>
             {
-                return tag_fallback_invoke(static_cast<Tag const&>(*this),
-                    std::forward<Args>(args)...);
+                return tag_fallback_invoke(
+                    static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
         };
 
@@ -308,8 +308,8 @@ namespace hpx::functional::detail {
                 std::true_type, Args&&... args) const noexcept
                 -> tag_fallback_invoke_result_t<Tag, Args&&...>
             {
-                return tag_fallback_invoke(static_cast<Tag const&>(*this),
-                    std::forward<Args>(args)...);
+                return tag_fallback_invoke(
+                    static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
 
         public:
@@ -321,8 +321,8 @@ namespace hpx::functional::detail {
                 Args&&... args) const noexcept
                 -> tag_invoke_result_t<Tag, Args&&...>
             {
-                return tag_invoke(static_cast<Tag const&>(*this),
-                    std::forward<Args>(args)...);
+                return tag_invoke(
+                    static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
 
             // is not nothrow tag-dispatchable
@@ -334,10 +334,10 @@ namespace hpx::functional::detail {
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> decltype(tag_fallback_invoke_impl(
-                    IsFallbackDispatchable{}, std::forward<Args>(args)...))
+                    IsFallbackDispatchable{}, HPX_FORWARD(Args, args)...))
             {
                 return tag_fallback_invoke_impl(
-                    IsFallbackDispatchable{}, std::forward<Args>(args)...);
+                    IsFallbackDispatchable{}, HPX_FORWARD(Args, args)...);
             }
         };
     }    // namespace tag_base_ns

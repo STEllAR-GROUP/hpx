@@ -37,7 +37,7 @@ namespace hpx { namespace components {
     public:
         template <typename... Arg>
         locking_hook(Arg&&... arg)
-          : base_type(std::forward<Arg>(arg)...)
+          : base_type(HPX_FORWARD(Arg, arg)...)
         {
         }
 
@@ -47,7 +47,7 @@ namespace hpx { namespace components {
         {
         }
         locking_hook(locking_hook&& rhs)
-          : base_type(std::move(rhs))
+          : base_type(HPX_MOVE(rhs))
           , mtx_()
         {
         }
@@ -61,7 +61,7 @@ namespace hpx { namespace components {
         }
         locking_hook& operator=(locking_hook&& rhs)
         {
-            this->base_type::operator=(std::move(rhs));
+            this->base_type::operator=(HPX_MOVE(rhs));
             return *this;
         }
 
@@ -76,7 +76,7 @@ namespace hpx { namespace components {
                 util::bind_front(&locking_hook::thread_function,
                     get_lva<this_component_type>::call(lva),
                     traits::component_decorate_function<base_type>::call(
-                        lva, std::forward<F>(f))));
+                        lva, HPX_FORWARD(F, f))));
         }
 
     protected:
@@ -93,7 +93,7 @@ namespace hpx { namespace components {
             // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
             decorate_wrapper(F&& f)
             {
-                threads::get_self().decorate_yield(std::forward<F>(f));
+                threads::get_self().decorate_yield(HPX_FORWARD(F, f));
             }
 
             ~decorate_wrapper()
@@ -144,7 +144,7 @@ namespace hpx { namespace components {
 
             ~undecorate_wrapper()
             {
-                threads::get_self().decorate_yield(std::move(yield_decorator_));
+                threads::get_self().decorate_yield(HPX_MOVE(yield_decorator_));
             }
 
             yield_decorator_type yield_decorator_;

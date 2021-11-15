@@ -103,7 +103,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
             }
 
-            return result::get(std::move(overall_result));
+            return result::get(HPX_MOVE(overall_result));
         }
 
         // parallel remote implementation
@@ -187,7 +187,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             return red_op(val, curr.get());
                         });
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
 
         // sequential remote implementation
@@ -272,7 +272,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
             }
 
-            return result::get(std::move(overall_result));
+            return result::get(HPX_MOVE(overall_result));
         }
 
         // parallel remote implementation
@@ -370,7 +370,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             return red_op(val, curr.get());
                         });
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
         /// \endcond
     }    // namespace detail
@@ -398,13 +398,13 @@ namespace hpx { namespace segmented {
 
         if (first == last)
         {
-            return std::forward<T>(init);
+            return HPX_FORWARD(T, init);
         }
 
         return hpx::parallel::v1::detail::segmented_transform_reduce(
             hpx::parallel::v1::detail::seg_transform_reduce<init_type>(),
-            hpx::execution::seq, first, last, std::forward<T>(init),
-            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
+            hpx::execution::seq, first, last, HPX_FORWARD(T, init),
+            HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op),
             std::true_type{});
     }
 
@@ -432,13 +432,13 @@ namespace hpx { namespace segmented {
         if (first == last)
         {
             return parallel::util::detail::algorithm_result<ExPolicy,
-                init_type>::get(std::forward<T>(init));
+                init_type>::get(HPX_FORWARD(T, init));
         }
 
         return hpx::parallel::v1::detail::segmented_transform_reduce(
             hpx::parallel::v1::detail::seg_transform_reduce<init_type>(),
-            std::forward<ExPolicy>(policy), first, last, std::forward<T>(init),
-            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(T, init),
+            HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op),
             is_seq());
     }
 
@@ -462,13 +462,13 @@ namespace hpx { namespace segmented {
 
         if (first1 == last1)
         {
-            return std::move(init);
+            return HPX_MOVE(init);
         }
 
         return hpx::parallel::v1::detail::segmented_transform_reduce(
             hpx::parallel::v1::detail::seg_transform_reduce_binary<T>(),
-            hpx::execution::seq, first1, last1, first2, std::forward<T>(init),
-            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
+            hpx::execution::seq, first1, last1, first2, HPX_FORWARD(T, init),
+            HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op),
             std::true_type{});
     }
 
@@ -497,13 +497,13 @@ namespace hpx { namespace segmented {
         if (first1 == last1)
         {
             return parallel::util::detail::algorithm_result<ExPolicy, T>::get(
-                std::forward<T>(init));
+                HPX_FORWARD(T, init));
         }
 
         return hpx::parallel::v1::detail::segmented_transform_reduce(
             hpx::parallel::v1::detail::seg_transform_reduce_binary<T>(),
-            std::forward<ExPolicy>(policy), first1, last1, first2,
-            std::forward<T>(init), std::forward<Reduce>(red_op),
-            std::forward<Convert>(conv_op), is_seq());
+            HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
+            HPX_FORWARD(T, init), HPX_FORWARD(Reduce, red_op),
+            HPX_FORWARD(Convert, conv_op), is_seq());
     }
 }}    // namespace hpx::segmented

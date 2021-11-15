@@ -37,8 +37,8 @@ namespace hpx { namespace util {
         return hpx::future<result_type>();
 #else
         return lcos::make_future<result_type>(
-            std::move(f), [](std::pair<T1, T2>&& p) -> result_type {
-                return make_tagged_pair<Tag1, Tag2>(std::move(p));
+            HPX_MOVE(f), [](std::pair<T1, T2>&& p) -> result_type {
+                return make_tagged_pair<Tag1, Tag2>(HPX_MOVE(p));
             });
 #endif
     }
@@ -63,8 +63,8 @@ namespace hpx { namespace util {
         return hpx::future<result_type>();
 #else
         return lcos::make_future<result_type>(
-            std::move(f), [](hpx::tuple<Ts...>&& p) -> result_type {
-                return make_tagged_pair<Tag1, Tag2>(std::move(p));
+            HPX_MOVE(f), [](hpx::tuple<Ts...>&& p) -> result_type {
+                return make_tagged_pair<Tag1, Tag2>(HPX_MOVE(p));
             });
 #endif
     }

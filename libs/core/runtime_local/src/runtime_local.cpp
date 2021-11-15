@@ -354,15 +354,15 @@ namespace hpx {
         threads::detail::network_background_callback_type
             network_background_callback)
     {
-        notifier_ = std::move(notifier);
+        notifier_ = HPX_MOVE(notifier);
 
         main_pool_.init(1);
 #ifdef HPX_HAVE_IO_POOL
-        io_pool_notifier_ = std::move(io_pool_notifier);
+        io_pool_notifier_ = HPX_MOVE(io_pool_notifier);
         io_pool_.init(rtcfg_.get_thread_pool_size("io_pool"));
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
-        timer_pool_notifier_ = std::move(timer_pool_notifier);
+        timer_pool_notifier_ = HPX_MOVE(timer_pool_notifier);
         timer_pool_.init(rtcfg_.get_thread_pool_size("timer_pool"));
 #endif
 
@@ -389,26 +389,26 @@ namespace hpx {
             for (startup_function_type& f :
                 detail::global_pre_startup_functions)
             {
-                add_pre_startup_function(std::move(f));
+                add_pre_startup_function(HPX_MOVE(f));
             }
             detail::global_pre_startup_functions.clear();
 
             for (startup_function_type& f : detail::global_startup_functions)
             {
-                add_startup_function(std::move(f));
+                add_startup_function(HPX_MOVE(f));
             }
             detail::global_startup_functions.clear();
 
             for (shutdown_function_type& f :
                 detail::global_pre_shutdown_functions)
             {
-                add_pre_shutdown_function(std::move(f));
+                add_pre_shutdown_function(HPX_MOVE(f));
             }
             detail::global_pre_shutdown_functions.clear();
 
             for (shutdown_function_type& f : detail::global_shutdown_functions)
             {
-                add_shutdown_function(std::move(f));
+                add_shutdown_function(HPX_MOVE(f));
             }
             detail::global_shutdown_functions.clear();
         }
@@ -566,7 +566,7 @@ namespace hpx {
         threads::policies::callback_notifier::on_startstop_type&& f)
     {
         threads::policies::callback_notifier::on_startstop_type newf =
-            std::move(f);
+            HPX_MOVE(f);
         std::swap(on_start_func_, newf);
         return newf;
     }
@@ -576,7 +576,7 @@ namespace hpx {
         threads::policies::callback_notifier::on_startstop_type&& f)
     {
         threads::policies::callback_notifier::on_startstop_type newf =
-            std::move(f);
+            HPX_MOVE(f);
         std::swap(on_stop_func_, newf);
         return newf;
     }
@@ -584,7 +584,7 @@ namespace hpx {
     threads::policies::callback_notifier::on_error_type runtime::on_error_func(
         threads::policies::callback_notifier::on_error_type&& f)
     {
-        threads::policies::callback_notifier::on_error_type newf = std::move(f);
+        threads::policies::callback_notifier::on_error_type newf = HPX_MOVE(f);
         std::swap(on_error_func_, newf);
         return newf;
     }
@@ -671,11 +671,11 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
         {
-            return rt->on_start_func(std::move(f));
+            return rt->on_start_func(HPX_MOVE(f));
         }
 
         threads::policies::callback_notifier::on_startstop_type newf =
-            std::move(f);
+            HPX_MOVE(f);
         std::swap(global_on_start_func, newf);
         return newf;
     }
@@ -687,11 +687,11 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
         {
-            return rt->on_stop_func(std::move(f));
+            return rt->on_stop_func(HPX_MOVE(f));
         }
 
         threads::policies::callback_notifier::on_startstop_type newf =
-            std::move(f);
+            HPX_MOVE(f);
         std::swap(global_on_stop_func, newf);
         return newf;
     }
@@ -703,10 +703,10 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
         {
-            return rt->on_error_func(std::move(f));
+            return rt->on_error_func(HPX_MOVE(f));
         }
 
-        threads::policies::callback_notifier::on_error_type newf = std::move(f);
+        threads::policies::callback_notifier::on_error_type newf = HPX_MOVE(f);
         std::swap(global_on_error_func, newf);
         return newf;
     }
@@ -1120,11 +1120,11 @@ namespace hpx {
                     "Too late to register a new pre-startup function.");
                 return;
             }
-            rt->add_pre_startup_function(std::move(f));
+            rt->add_pre_startup_function(HPX_MOVE(f));
         }
         else
         {
-            detail::global_pre_startup_functions.push_back(std::move(f));
+            detail::global_pre_startup_functions.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1139,11 +1139,11 @@ namespace hpx {
                     "Too late to register a new startup function.");
                 return;
             }
-            rt->add_startup_function(std::move(f));
+            rt->add_startup_function(HPX_MOVE(f));
         }
         else
         {
-            detail::global_startup_functions.push_back(std::move(f));
+            detail::global_startup_functions.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1159,11 +1159,11 @@ namespace hpx {
                     "Too late to register a new pre-shutdown function.");
                 return;
             }
-            rt->add_pre_shutdown_function(std::move(f));
+            rt->add_pre_shutdown_function(HPX_MOVE(f));
         }
         else
         {
-            detail::global_pre_shutdown_functions.push_back(std::move(f));
+            detail::global_pre_shutdown_functions.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1179,11 +1179,11 @@ namespace hpx {
                     "Too late to register a new shutdown function.");
                 return;
             }
-            rt->add_shutdown_function(std::move(f));
+            rt->add_shutdown_function(HPX_MOVE(f));
         }
         else
         {
-            detail::global_shutdown_functions.push_back(std::move(f));
+            detail::global_shutdown_functions.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1795,7 +1795,7 @@ namespace hpx {
         if (postfix && *postfix)
             fullname += postfix;
         fullname += "#" + std::to_string(global_thread_num);
-        detail::thread_name() = std::move(fullname);
+        detail::thread_name() = HPX_MOVE(fullname);
 
         char const* name = detail::thread_name().c_str();
 
@@ -1874,7 +1874,7 @@ namespace hpx {
         if (!f.empty())
         {
             std::lock_guard<std::mutex> l(mtx_);
-            pre_startup_functions_.push_back(std::move(f));
+            pre_startup_functions_.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1883,7 +1883,7 @@ namespace hpx {
         if (!f.empty())
         {
             std::lock_guard<std::mutex> l(mtx_);
-            startup_functions_.push_back(std::move(f));
+            startup_functions_.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1892,7 +1892,7 @@ namespace hpx {
         if (!f.empty())
         {
             std::lock_guard<std::mutex> l(mtx_);
-            pre_shutdown_functions_.push_back(std::move(f));
+            pre_shutdown_functions_.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1901,7 +1901,7 @@ namespace hpx {
         if (!f.empty())
         {
             std::lock_guard<std::mutex> l(mtx_);
-            shutdown_functions_.push_back(std::move(f));
+            shutdown_functions_.push_back(HPX_MOVE(f));
         }
     }
 

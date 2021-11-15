@@ -25,7 +25,7 @@ namespace hpx { namespace resiliency { namespace experimental {
             typename hpx::functional::tag_invoke_result<BaseTag,
                 Args&&...>::type
         {
-            return hpx::dataflow(BaseTag{}, std::forward<Args>(args)...);
+            return hpx::dataflow(BaseTag{}, HPX_FORWARD(Args, args)...);
         }
     };
 

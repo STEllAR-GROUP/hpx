@@ -244,7 +244,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::detail::convert_to_result(
                     for_each_n<zip_iterator>().call(
-                        std::forward<ExPolicy>(policy),
+                        HPX_FORWARD(ExPolicy, policy),
                         hpx::util::make_zip_iterator(
                             first, destination_iterator(last2)),
                         detail::distance(first, last2) / 2,
@@ -278,7 +278,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least bidirectional iterator.");
 
         return detail::reverse<BidirIter>().call(
-            std::forward<ExPolicy>(policy), first, last);
+            HPX_FORWARD(ExPolicy, policy), first, last);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -328,7 +328,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::detail::convert_to_result(
                     detail::copy<util::in_out_result<iterator, FwdIter>>().call(
-                        std::forward<ExPolicy>(policy), iterator(last2),
+                        HPX_FORWARD(ExPolicy, policy), iterator(last2),
                         iterator(first), dest_first),
                     [](util::in_out_result<iterator, FwdIter> const& p)
                         -> util::in_out_result<BidirIter, FwdIter> {
@@ -362,7 +362,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         return detail::reverse_copy<util::in_out_result<BidirIter, FwdIter>>()
-            .call(std::forward<ExPolicy>(policy), first, last, dest_first);
+            .call(HPX_FORWARD(ExPolicy, policy), first, last, dest_first);
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -408,7 +408,7 @@ namespace hpx {
 
             return parallel::util::detail::algorithm_result<ExPolicy>::get(
                 hpx::parallel::v1::detail::reverse<BidirIter>().call(
-                    std::forward<ExPolicy>(policy), first, last));
+                    HPX_FORWARD(ExPolicy, policy), first, last));
         }
     } reverse{};
 
@@ -465,7 +465,7 @@ namespace hpx {
             return parallel::util::get_second_element(
                 parallel::v1::detail::reverse_copy<
                     hpx::parallel::util::in_out_result<BidirIter, FwdIter>>()
-                    .call(std::forward<ExPolicy>(policy), first, last, dest));
+                    .call(HPX_FORWARD(ExPolicy, policy), first, last, dest));
         }
     } reverse_copy{};
 }    // namespace hpx

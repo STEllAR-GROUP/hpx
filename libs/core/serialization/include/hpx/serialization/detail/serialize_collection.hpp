@@ -98,7 +98,7 @@ namespace hpx { namespace serialization { namespace detail {
                 {
                     value_type elem;
                     ar >> elem;
-                    collection.emplace_back(std::move(elem));
+                    collection.emplace_back(HPX_MOVE(elem));
                 }
             }
         };
@@ -147,7 +147,7 @@ namespace hpx { namespace serialization { namespace detail {
                 {
                     std::unique_ptr<value_type> data(
                         constructor_selector_ptr<value_type>::create(ar));
-                    collection.emplace_back(std::move(*data));
+                    collection.emplace_back(HPX_MOVE(*data));
                 }
             }
         };

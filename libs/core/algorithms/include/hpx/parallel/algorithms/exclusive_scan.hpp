@@ -371,7 +371,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Op&& op)
             {
                 return sequential_exclusive_scan(
-                    first, last, dest, init, std::forward<Op>(op));
+                    first, last, dest, init, HPX_FORWARD(Op, op));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
@@ -422,7 +422,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::scan_partitioner<ExPolicy,
                     util::in_out_result<FwdIter1, FwdIter2>, T>::
                     call(
-                        std::forward<ExPolicy>(policy),
+                        HPX_FORWARD(ExPolicy, policy),
                         make_zip_iterator(first, dest), count, init,
                         // step 1 performs first part of scan algorithm
                         [op, last](zip_iterator part_begin,
@@ -442,7 +442,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         // to right
                         op,
                         // step 3 runs final accumulation on each partition
-                        std::move(f3),
+                        HPX_MOVE(f3),
                         // step 4 use this return value
                         [last_iter, final_dest](std::vector<T>&&,
                             std::vector<hpx::future<void>>&& data) {
@@ -490,8 +490,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
         return parallel::util::get_second_element(
             detail::exclusive_scan<result_type>().call(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::move(init), std::forward<Op>(op)));
+                HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                HPX_MOVE(init), HPX_FORWARD(Op, op)));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -526,8 +526,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
         return parallel::util::get_second_element(
             detail::exclusive_scan<result_type>().call(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::move(init), std::plus<T>()));
+                HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                HPX_MOVE(init), std::plus<T>()));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -559,7 +559,7 @@ namespace hpx {
 
             return parallel::util::get_second_element(
                 hpx::parallel::v1::detail::exclusive_scan<result_type>().call(
-                    hpx::execution::seq, first, last, dest, std::move(init),
+                    hpx::execution::seq, first, last, dest, HPX_MOVE(init),
                     std::plus<T>()));
         }
 
@@ -587,8 +587,8 @@ namespace hpx {
 
             return parallel::util::get_second_element(
                 hpx::parallel::v1::detail::exclusive_scan<result_type>().call(
-                    std::forward<ExPolicy>(policy), first, last, dest,
-                    std::move(init), std::plus<T>()));
+                    HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                    HPX_MOVE(init), std::plus<T>()));
         }
 
         // clang-format off
@@ -615,8 +615,8 @@ namespace hpx {
 
             return parallel::util::get_second_element(
                 hpx::parallel::v1::detail::exclusive_scan<result_type>().call(
-                    hpx::execution::seq, first, last, dest, std::move(init),
-                    std::forward<Op>(op)));
+                    hpx::execution::seq, first, last, dest, HPX_MOVE(init),
+                    HPX_FORWARD(Op, op)));
         }
 
         // clang-format off
@@ -647,8 +647,8 @@ namespace hpx {
 
             return parallel::util::get_second_element(
                 hpx::parallel::v1::detail::exclusive_scan<result_type>().call(
-                    std::forward<ExPolicy>(policy), first, last, dest,
-                    std::move(init), std::forward<Op>(op)));
+                    HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                    HPX_MOVE(init), HPX_FORWARD(Op, op)));
         }
 
     } exclusive_scan{};

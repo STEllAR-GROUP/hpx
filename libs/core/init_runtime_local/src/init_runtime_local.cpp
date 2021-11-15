@@ -279,10 +279,10 @@ namespace hpx {
                 }
 
                 if (!!startup)
-                    rt.add_startup_function(std::move(startup));
+                    rt.add_startup_function(HPX_MOVE(startup));
 
                 if (!!shutdown)
-                    rt.add_shutdown_function(std::move(shutdown));
+                    rt.add_shutdown_function(HPX_MOVE(shutdown));
 
                 if (vm.count("hpx:dump-config-initial"))
                 {
@@ -306,7 +306,7 @@ namespace hpx {
                 LPROGRESS_;
 
                 add_startup_functions(
-                    rt, vm, std::move(startup), std::move(shutdown));
+                    rt, vm, HPX_MOVE(startup), HPX_MOVE(shutdown));
 
                 // Run this runtime instance using the given function f.
                 if (!f.empty())
@@ -325,7 +325,7 @@ namespace hpx {
                 LPROGRESS_;
 
                 add_startup_functions(
-                    rt, vm, std::move(startup), std::move(shutdown));
+                    rt, vm, HPX_MOVE(startup), HPX_MOVE(shutdown));
 
                 if (!f.empty())
                 {
@@ -343,13 +343,13 @@ namespace hpx {
             {
                 if (blocking)
                 {
-                    return run(*rt, cfg.hpx_main_f_, cfg.vm_,
-                        std::move(startup), std::move(shutdown));
+                    return run(*rt, cfg.hpx_main_f_, cfg.vm_, HPX_MOVE(startup),
+                        HPX_MOVE(shutdown));
                 }
 
                 // non-blocking version
-                start(*rt, cfg.hpx_main_f_, cfg.vm_, std::move(startup),
-                    std::move(shutdown));
+                start(*rt, cfg.hpx_main_f_, cfg.vm_, HPX_MOVE(startup),
+                    HPX_MOVE(shutdown));
 
                 // pointer to runtime is stored in TLS
                 hpx::runtime* p = rt.release();
@@ -517,8 +517,8 @@ namespace hpx {
                     LPROGRESS_ << "creating local runtime";
                     rt.reset(new hpx::runtime(cmdline.rtcfg_, true));
 
-                    result = run_or_start(blocking, std::move(rt), cmdline,
-                        std::move(params.startup), std::move(params.shutdown));
+                    result = run_or_start(blocking, HPX_MOVE(rt), cmdline,
+                        HPX_MOVE(params.startup), HPX_MOVE(params.shutdown));
                 }
                 catch (hpx::detail::command_line_error const& e)
                 {

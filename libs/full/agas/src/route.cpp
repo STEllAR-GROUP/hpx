@@ -103,7 +103,7 @@ namespace hpx { namespace agas { namespace server {
         else
         {
             // destination is remote
-            hpx::parcelset::put_parcel(std::move(p));
+            hpx::parcelset::put_parcel(HPX_MOVE(p));
         }
 
         runtime& rt = get_runtime();

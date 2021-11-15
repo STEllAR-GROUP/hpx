@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { namespace util {
                         first, count, dest, [](auto& v) { return v; });
 
                 return util::in_out_result<InIter, OutIter>{
-                    std::move(ret.first), std::move(ret.second)};
+                    HPX_MOVE(ret.first), HPX_MOVE(ret.second)};
             }
 
             template <typename InIter, typename OutIter>

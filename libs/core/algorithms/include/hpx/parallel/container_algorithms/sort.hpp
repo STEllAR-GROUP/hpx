@@ -308,9 +308,9 @@ namespace hpx { namespace parallel { inline namespace rangev1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return v1::sort(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), std::forward<Compare>(comp),
-            std::forward<Proj>(proj));
+        return v1::sort(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), HPX_FORWARD(Compare, comp),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -347,8 +347,8 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::sort<RandomIt>().call(
-                hpx::execution::seq, first, last, std::forward<Comp>(comp),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -377,8 +377,8 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::sort<RandomIt>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Comp>(comp), std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -408,7 +408,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::sort<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<Compare>(comp), std::forward<Proj>(proj));
+                HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -438,9 +438,9 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::sort<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<Compare>(comp),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(Compare, comp),
+                HPX_FORWARD(Proj, proj));
         }
     } sort{};
 }}    // namespace hpx::ranges

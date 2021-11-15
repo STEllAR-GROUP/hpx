@@ -69,7 +69,7 @@ namespace hpx { namespace compute { namespace host {
             if (num_partitions == std::size_t(-1))
                 num_partitions = targets.size();
             return target_distribution_policy(
-                std::move(targets), num_partitions);
+                HPX_MOVE(targets), num_partitions);
         }
 
         /// Create a new \a target_distribution_policy representing the given
@@ -83,7 +83,7 @@ namespace hpx { namespace compute { namespace host {
             std::vector<target_type> targets;
             targets.push_back(target);
             return target_distribution_policy(
-                std::move(targets), num_partitions);
+                HPX_MOVE(targets), num_partitions);
         }
 
         /// Create a new \a target_distribution_policy representing the given
@@ -95,9 +95,9 @@ namespace hpx { namespace compute { namespace host {
             target_type&& target, std::size_t num_partitions = 1) const
         {
             std::vector<target_type> targets;
-            targets.push_back(std::move(target));
+            targets.push_back(HPX_MOVE(target));
             return target_distribution_policy(
-                std::move(targets), num_partitions);
+                HPX_MOVE(targets), num_partitions);
         }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -119,7 +119,7 @@ namespace hpx { namespace compute { namespace host {
             target_type t = this->get_next_target();
             hpx::id_type target_locality = t.get_locality();
             return components::create_async<Component>(
-                target_locality, std::forward<Ts>(ts)..., std::move(t));
+                target_locality, HPX_FORWARD(Ts, ts)..., HPX_MOVE(t));
         }
 #endif
 
@@ -171,7 +171,7 @@ namespace hpx { namespace compute { namespace host {
             auto end = m.end();
             for (auto it = m.begin(); it != end; ++it)
             {
-                localities.push_back(std::move(it->first));
+                localities.push_back(HPX_MOVE(it->first));
 
                 std::size_t num_partitions = 0;
                 for (target_type const& t : it->second)
@@ -181,7 +181,7 @@ namespace hpx { namespace compute { namespace host {
 
                 objs.push_back(
                     components::bulk_create_async<Component>(localities.back(),
-                        num_partitions, ts..., std::move(it->second)));
+                        num_partitions, ts..., HPX_MOVE(it->second)));
             }
 
             return hpx::dataflow(
@@ -195,12 +195,12 @@ namespace hpx { namespace compute { namespace host {
                     for (std::size_t i = 0; i != v.size(); ++i)
                     {
                         result.emplace_back(
-                            std::move(localities[i]), v[i].get());
+                            HPX_MOVE(localities[i]), v[i].get());
                     }
 
                     return result;
                 },
-                std::move(objs));
+                HPX_MOVE(objs));
 #endif
         }
 
@@ -214,7 +214,7 @@ namespace hpx { namespace compute { namespace host {
 
         target_distribution_policy(
             std::vector<target_type>&& targets, std::size_t num_partitions)
-          : base_type(std::move(targets), num_partitions)
+          : base_type(HPX_MOVE(targets), num_partitions)
         {
         }
 

@@ -56,7 +56,7 @@ namespace hpx { namespace threads {
 
         thread_init_data& operator=(thread_init_data&& rhs) noexcept
         {
-            func = std::move(rhs.func);
+            func = HPX_MOVE(rhs.func);
             priority = rhs.priority;
             schedulehint = rhs.schedulehint;
             stacksize = rhs.stacksize;
@@ -64,7 +64,7 @@ namespace hpx { namespace threads {
             run_now = rhs.run_now;
             scheduler_base = rhs.scheduler_base;
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            description = std::move(rhs.description);
+            description = HPX_MOVE(rhs.description);
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_id = rhs.parent_locality_id;
@@ -80,9 +80,9 @@ namespace hpx { namespace threads {
         }
 
         thread_init_data(thread_init_data&& rhs) noexcept
-          : func(std::move(rhs.func))
+          : func(HPX_MOVE(rhs.func))
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-          , description(std::move(rhs.description))
+          , description(HPX_MOVE(rhs.description))
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
           , parent_locality_id(rhs.parent_locality_id)
@@ -113,7 +113,7 @@ namespace hpx { namespace threads {
                 thread_schedule_state::pending,
             bool run_now_ = false,
             policies::scheduler_base* scheduler_base_ = nullptr)
-          : func(std::forward<F>(f))
+          : func(HPX_FORWARD(F, f))
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
           , description(desc)
 #endif

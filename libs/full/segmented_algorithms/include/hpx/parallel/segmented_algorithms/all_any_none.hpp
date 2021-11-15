@@ -92,7 +92,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
             }
 
-            return result::get(std::move(output));
+            return result::get(HPX_MOVE(output));
         }
 
         // parallel remote implementation
@@ -167,7 +167,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::list<std::exception_ptr> errors;
                     parallel::util::detail::handle_remote_exceptions<
                         ExPolicy>::call(r, errors);
-                    std::vector<bool> res = hpx::unwrap(std::move(r));
+                    std::vector<bool> res = hpx::unwrap(HPX_MOVE(r));
                     auto it = res.begin();
                     while (it != res.end())
                     {
@@ -177,7 +177,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     }
                     return true;
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -242,7 +242,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
             }
 
-            return result::get(std::move(output));
+            return result::get(HPX_MOVE(output));
         }
 
         // parallel remote implementation
@@ -317,7 +317,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::list<std::exception_ptr> errors;
                     parallel::util::detail::handle_remote_exceptions<
                         ExPolicy>::call(r, errors);
-                    std::vector<bool> res = hpx::unwrap(std::move(r));
+                    std::vector<bool> res = hpx::unwrap(HPX_MOVE(r));
                     auto it = res.begin();
                     while (it != res.end())
                     {
@@ -327,7 +327,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     }
                     return false;
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -392,7 +392,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
             }
 
-            return result::get(std::move(output));
+            return result::get(HPX_MOVE(output));
         }
 
         // parallel remote implementation
@@ -467,7 +467,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::list<std::exception_ptr> errors;
                     parallel::util::detail::handle_remote_exceptions<
                         ExPolicy>::call(r, errors);
-                    std::vector<bool> res = hpx::unwrap(std::move(r));
+                    std::vector<bool> res = hpx::unwrap(HPX_MOVE(r));
                     auto it = res.begin();
                     while (it != res.end())
                     {
@@ -477,7 +477,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     }
                     return true;
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
         /// \endcond
     }    // namespace detail
@@ -501,8 +501,8 @@ namespace hpx { namespace segmented {
 
         return hpx::parallel::v1::detail::segmented_none_of(
             hpx::parallel::v1::detail::none_of(), hpx::execution::seq, first,
-            last, std::forward<F>(f),
-            hpx::parallel::util::projection_identity{}, std::true_type());
+            last, HPX_FORWARD(F, f), hpx::parallel::util::projection_identity{},
+            std::true_type());
     }
 
     // clang-format off
@@ -524,8 +524,8 @@ namespace hpx { namespace segmented {
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
         return hpx::parallel::v1::detail::segmented_none_of(
-            hpx::parallel::v1::detail::none_of(),
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+            hpx::parallel::v1::detail::none_of(), HPX_FORWARD(ExPolicy, policy),
+            first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity{}, is_seq());
     }
 
@@ -544,8 +544,8 @@ namespace hpx { namespace segmented {
 
         return hpx::parallel::v1::detail::segmented_any_of(
             hpx::parallel::v1::detail::any_of(), hpx::execution::seq, first,
-            last, std::forward<F>(f),
-            hpx::parallel::util::projection_identity{}, std::true_type());
+            last, HPX_FORWARD(F, f), hpx::parallel::util::projection_identity{},
+            std::true_type());
     }
 
     // clang-format off
@@ -567,8 +567,8 @@ namespace hpx { namespace segmented {
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
         return hpx::parallel::v1::detail::segmented_any_of(
-            hpx::parallel::v1::detail::any_of(), std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f),
+            hpx::parallel::v1::detail::any_of(), HPX_FORWARD(ExPolicy, policy),
+            first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity{}, is_seq());
     }
 
@@ -587,8 +587,8 @@ namespace hpx { namespace segmented {
 
         return hpx::parallel::v1::detail::segmented_all_of(
             hpx::parallel::v1::detail::all_of(), hpx::execution::seq, first,
-            last, std::forward<F>(f),
-            hpx::parallel::util::projection_identity{}, std::true_type());
+            last, HPX_FORWARD(F, f), hpx::parallel::util::projection_identity{},
+            std::true_type());
     }
 
     // clang-format off
@@ -610,8 +610,8 @@ namespace hpx { namespace segmented {
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
         return hpx::parallel::v1::detail::segmented_all_of(
-            hpx::parallel::v1::detail::all_of(), std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f),
+            hpx::parallel::v1::detail::all_of(), HPX_FORWARD(ExPolicy, policy),
+            first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity{}, is_seq());
     }
 }}    // namespace hpx::segmented

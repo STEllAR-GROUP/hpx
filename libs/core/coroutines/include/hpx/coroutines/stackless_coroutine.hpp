@@ -59,7 +59,7 @@ namespace hpx { namespace threads { namespace coroutines {
 
         stackless_coroutine(functor_type&& f, thread_id_type id,
             std::ptrdiff_t /*stack_size*/ = default_stack_size)
-          : f_(std::move(f))
+          : f_(HPX_MOVE(f))
           , state_(ctx_ready)
           , id_(id)
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
@@ -169,7 +169,7 @@ namespace hpx { namespace threads { namespace coroutines {
         {
             HPX_ASSERT(exited());
 
-            f_ = std::move(f);
+            f_ = HPX_MOVE(f);
             id_ = id;
 
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)

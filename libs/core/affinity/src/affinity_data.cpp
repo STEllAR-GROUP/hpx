@@ -73,7 +73,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
             pu_step_ = pu_step % num_system_pus;
         }
 
-        affinity_domain_ = std::move(affinity_domain);
+        affinity_domain_ = HPX_MOVE(affinity_domain);
         pu_nums_.clear();
 
         init_cached_pu_nums(num_system_pus);

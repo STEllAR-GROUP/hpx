@@ -43,8 +43,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         args_type args_;
 
         HPX_HOST_DEVICE closure(fun_type&& f, args_type&& args)
-          : f_(std::move(f))
-          , args_(std::move(args))
+          : f_(HPX_MOVE(f))
+          , args_(HPX_MOVE(args))
         {
         }
 
@@ -55,8 +55,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         }
 
         HPX_HOST_DEVICE closure(closure&& rhs)
-          : f_(std::move(rhs.f_))
-          , args_(std::move(rhs.args_))
+          : f_(HPX_MOVE(rhs.f_))
+          , args_(HPX_MOVE(rhs.args_))
         {
         }
 
@@ -89,7 +89,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
             // This is needed for the device code to make sure the kernel
             // is instantiated correctly.
             auto launcher = get_launch_function();
-            Closure c{std::move(f), std::move(args)};
+            Closure c{HPX_MOVE(f), HPX_MOVE(args)};
 
             static_assert(sizeof(Closure) < 256,
                 "We currently require the closure to be less than 256 bytes");
@@ -98,7 +98,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
             detail::scoped_active_target active(tgt);
 
             launch_function<<<grid_dim, block_dim, 0, active.stream()>>>(
-                std::move(c));
+                HPX_MOVE(c));
 
             cudaError_t error = cudaGetLastError();
             if (error != cudaSuccess)
@@ -135,7 +135,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     {
         typedef closure<F, Ts...> closure_type;
         launch_helper<closure_type>::call(t, grid_dim, block_dim,
-            std::forward<F>(f), hpx::forward_as_tuple(std::forward<Ts>(vs)...));
+            HPX_FORWARD(F, f), hpx::forward_as_tuple(HPX_FORWARD(Ts, vs)...));
     }
 }}}}    // namespace hpx::cuda::experimental::detail
 

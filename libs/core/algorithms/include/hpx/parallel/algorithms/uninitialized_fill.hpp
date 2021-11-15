@@ -250,7 +250,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             if (count == 0)
                 return util::detail::algorithm_result<ExPolicy, Iter>::get(
-                    std::move(first));
+                    HPX_MOVE(first));
 
             typedef std::pair<Iter, Iter> partition_result_type;
             typedef typename std::iterator_traits<Iter>::value_type value_type;
@@ -259,7 +259,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return util::partitioner_with_cleanup<ExPolicy, Iter,
                 partition_result_type>::
                 call(
-                    std::forward<ExPolicy>(policy), first, count,
+                    HPX_FORWARD(ExPolicy, policy), first, count,
                     [value, tok](Iter it, std::size_t part_size) mutable
                     -> partition_result_type {
                         return std::make_pair(it,
@@ -311,10 +311,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 if (first == last)
                     return util::detail::algorithm_result<ExPolicy, Iter>::get(
-                        std::move(first));
+                        HPX_MOVE(first));
 
                 return parallel_sequential_uninitialized_fill_n(
-                    std::forward<ExPolicy>(policy), first,
+                    HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), value);
             }
         };
@@ -344,7 +344,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         return hpx::util::void_guard<result_type>(),
                hpx::parallel::v1::detail::uninitialized_fill<FwdIter>().call(
-                   std::forward<ExPolicy>(policy), first, last, value);
+                   HPX_FORWARD(ExPolicy, policy), first, last, value);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -406,7 +406,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 T const& value)
             {
                 return parallel_sequential_uninitialized_fill_n(
-                    std::forward<ExPolicy>(policy), first, count, value);
+                    HPX_FORWARD(ExPolicy, policy), first, count, value);
             }
         };
         /// \endcond
@@ -429,7 +429,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         if (detail::is_negative(count))
         {
             return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                std::move(first));
+                HPX_MOVE(first));
         }
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -437,7 +437,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::uninitialized_fill_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, std::size_t(count), value);
+            HPX_FORWARD(ExPolicy, policy), first, std::size_t(count), value);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -486,8 +486,7 @@ namespace hpx {
 
             return hpx::util::void_guard<result_type>(),
                    hpx::parallel::v1::detail::uninitialized_fill<FwdIter>()
-                       .call(
-                           std::forward<ExPolicy>(policy), first, last, value);
+                       .call(HPX_FORWARD(ExPolicy, policy), first, last, value);
         }
 
     } uninitialized_fill{};
@@ -540,11 +539,11 @@ namespace hpx {
             if (hpx::parallel::v1::detail::is_negative(count))
             {
                 return parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(std::move(first));
+                    FwdIter>::get(HPX_MOVE(first));
             }
 
             return hpx::parallel::v1::detail::uninitialized_fill_n<FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, std::size_t(count),
+                .call(HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
                     value);
         }
 

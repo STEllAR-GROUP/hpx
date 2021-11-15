@@ -48,7 +48,7 @@ namespace hpx { namespace util {
 
             template <typename Derived, typename... Ts_>
             explicit bound_action(Derived /*action*/, Ts_&&... vs)
-              : _args(std::piecewise_construct, std::forward<Ts_>(vs)...)
+              : _args(std::piecewise_construct, HPX_FORWARD(Ts_, vs)...)
             {
             }
 
@@ -62,7 +62,7 @@ namespace hpx { namespace util {
             }
 
             HPX_HOST_DEVICE bound_action(bound_action&& other)
-              : _args(std::move(other._args))
+              : _args(HPX_MOVE(other._args))
             {
             }
 #endif
@@ -74,7 +74,7 @@ namespace hpx { namespace util {
             {
                 return hpx::apply<Action>(
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
-                        _args.template get<Is>(), std::forward<Us>(vs)...)...);
+                        _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
             template <typename... Us>
@@ -83,7 +83,7 @@ namespace hpx { namespace util {
             {
                 return hpx::apply_c<Action>(cont,
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
-                        _args.template get<Is>(), std::forward<Us>(vs)...)...);
+                        _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
             template <typename Continuation, typename... Us>
@@ -91,9 +91,9 @@ namespace hpx { namespace util {
                 traits::is_continuation<Continuation>::value, bool>::type
             apply_c(Continuation&& cont, Us&&... vs) const
             {
-                return hpx::apply<Action>(std::forward<Continuation>(cont),
+                return hpx::apply<Action>(HPX_FORWARD(Continuation, cont),
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
-                        _args.template get<Is>(), std::forward<Us>(vs)...)...);
+                        _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
             template <typename... Us>
@@ -102,13 +102,13 @@ namespace hpx { namespace util {
             {
                 return hpx::async<Action>(
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
-                        _args.template get<Is>(), std::forward<Us>(vs)...)...);
+                        _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
             template <typename... Us>
             HPX_FORCEINLINE result_type operator()(Us&&... vs) const
             {
-                return async(std::forward<Us>(vs)...).get();
+                return async(HPX_FORWARD(Us, vs)...).get();
             }
 
             template <typename Archive>
@@ -138,7 +138,7 @@ namespace hpx { namespace util {
                 typename util::make_index_pack<sizeof...(Ts)>::type,
                 typename std::decay<Ts>::type...>;
 
-        return result_type(Action(), std::forward<Ts>(vs)...);
+        return result_type(Action(), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Component, typename Signature, typename Derived,
@@ -154,7 +154,7 @@ namespace hpx { namespace util {
             typename std::decay<Ts>::type...>;
 
         return result_type(
-            static_cast<Derived const&>(action), std::forward<Ts>(vs)...);
+            static_cast<Derived const&>(action), HPX_FORWARD(Ts, vs)...);
     }
 }}    // namespace hpx::util
 

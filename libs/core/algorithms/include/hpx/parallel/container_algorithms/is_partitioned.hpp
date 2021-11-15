@@ -273,8 +273,8 @@ namespace hpx { namespace ranges {
             FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, Sent>()
-                .call(hpx::execution::seq, first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -296,8 +296,8 @@ namespace hpx { namespace ranges {
             FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, Sent>()
-                .call(std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -321,7 +321,7 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::is_partitioned<iterator_type,
                 iterator_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng),
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -347,9 +347,9 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::is_partitioned<iterator_type,
                 iterator_type>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng),
-                    std::end(rng), std::forward<Pred>(pred),
-                    std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
+                    std::end(rng), HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
     } is_partitioned{};
 }}    // namespace hpx::ranges

@@ -34,11 +34,11 @@ namespace hpx { namespace cuda { namespace experimental {
             if (status == cudaSuccess)
             {
                 hpx::execution::experimental::set_value(
-                    std::forward<R>(r), std::forward<Ts>(ts)...);
+                    HPX_FORWARD(R, r), HPX_FORWARD(Ts, ts)...);
             }
             else
             {
-                hpx::execution::experimental::set_error(std::forward<R>(r),
+                hpx::execution::experimental::set_error(HPX_FORWARD(R, r),
                     std::make_exception_ptr(
                         cuda_exception(std::string("Getting event after "
                                                    "CUDA stream transform "
@@ -54,7 +54,7 @@ namespace hpx { namespace cuda { namespace experimental {
             if constexpr (sizeof...(Ts) > 0)
             {
                 detail::add_event_callback(
-                    [keep_alive = hpx::make_tuple(std::forward<Ts>(ts)...)](
+                    [keep_alive = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
                         cudaError_t status) {
                         HPX_ASSERT(status != cudaErrorNotReady);
                         HPX_UNUSED(status);
@@ -66,12 +66,12 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename R, typename... Ts>
         void set_value_immediate_void(cudaStream_t stream, R&& r, Ts&&... ts)
         {
-            hpx::execution::experimental::set_value(std::forward<R>(r));
+            hpx::execution::experimental::set_value(HPX_FORWARD(R, r));
 
             // Even though we call set_value immediately, we still extend the
             // life time of the arguments by capturing them in a callback that
             // is triggered when the event is ready.
-            extend_argument_lifetimes(stream, std::forward<Ts>(ts)...);
+            extend_argument_lifetimes(stream, HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename R, typename... Ts>
@@ -79,10 +79,10 @@ namespace hpx { namespace cuda { namespace experimental {
             cudaStream_t stream, R&& r, Ts&&... ts)
         {
             detail::add_event_callback(
-                [r = std::forward<R>(r),
-                    keep_alive = hpx::make_tuple(std::forward<Ts>(ts)...)](
+                [r = HPX_FORWARD(R, r),
+                    keep_alive = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
                     cudaError_t status) mutable {
-                    set_value_event_callback_helper(status, std::move(r));
+                    set_value_event_callback_helper(status, HPX_MOVE(r));
                 },
                 stream);
         }
@@ -92,12 +92,12 @@ namespace hpx { namespace cuda { namespace experimental {
             cudaStream_t stream, R&& r, T&& t, Ts&&... ts)
         {
             hpx::execution::experimental::set_value(
-                std::forward<R>(r), std::forward<T>(t));
+                HPX_FORWARD(R, r), HPX_FORWARD(T, t));
 
             // Even though we call set_value immediately, we still extend the
             // life time of the arguments by capturing them in a callback that
             // is triggered when the event is ready.
-            extend_argument_lifetimes(stream, std::forward<Ts>(ts)...);
+            extend_argument_lifetimes(stream, HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename R, typename T, typename... Ts>
@@ -105,11 +105,11 @@ namespace hpx { namespace cuda { namespace experimental {
             cudaStream_t stream, R&& r, T&& t, Ts&&... ts)
         {
             detail::add_event_callback(
-                [t = std::forward<T>(t), r = std::forward<R>(r),
-                    keep_alive = hpx::make_tuple(std::forward<Ts>(ts)...)](
+                [t = HPX_FORWARD(T, t), r = HPX_FORWARD(R, r),
+                    keep_alive = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
                     cudaError_t status) mutable {
                     set_value_event_callback_helper(
-                        status, std::move(r), std::move(t));
+                        status, HPX_MOVE(r), HPX_MOVE(t));
                 },
                 stream);
         }
@@ -137,8 +137,8 @@ namespace hpx { namespace cuda { namespace experimental {
 
             template <typename R_, typename F_>
             transform_stream_receiver(R_&& r, F_&& f, cudaStream_t stream)
-              : r(std::forward<R_>(r))
-              , f(std::forward<F_>(f))
+              : r(HPX_FORWARD(R_, r))
+              , f(HPX_FORWARD(F_, f))
               , stream(stream)
             {
             }
@@ -148,13 +148,13 @@ namespace hpx { namespace cuda { namespace experimental {
                 transform_stream_receiver&& r, E&& e) noexcept
             {
                 hpx::execution::experimental::set_error(
-                    std::move(r.r), std::forward<E>(e));
+                    HPX_MOVE(r.r), HPX_FORWARD(E, e));
             }
 
             friend void tag_invoke(hpx::execution::experimental::set_done_t,
                 transform_stream_receiver&& r) noexcept
             {
-                hpx::execution::experimental::set_done(std::move(r.r));
+                hpx::execution::experimental::set_done(HPX_MOVE(r.r));
             }
 
             template <typename... Ts>
@@ -182,7 +182,7 @@ namespace hpx { namespace cuda { namespace experimental {
                                     // when a non-transform_stream receiver is
                                     // connected.
                                     set_value_immediate_void(stream,
-                                        std::move(r), std::forward<Ts>(ts)...);
+                                        HPX_MOVE(r), HPX_FORWARD(Ts, ts)...);
                                 }
                                 else
                                 {
@@ -190,7 +190,7 @@ namespace hpx { namespace cuda { namespace experimental {
                                     // callback which will call set_value on the
                                     // receiver.
                                     set_value_event_callback_void(stream,
-                                        std::move(r), std::forward<Ts>(ts)...);
+                                        HPX_MOVE(r), HPX_FORWARD(Ts, ts)...);
                                 }
                             }
                             else
@@ -199,7 +199,7 @@ namespace hpx { namespace cuda { namespace experimental {
                                 // transform_stream_receiver, we add a callback
                                 // which will call set_value on the receiver.
                                 set_value_event_callback_void(stream,
-                                    std::move(r), std::forward<Ts>(ts)...);
+                                    HPX_MOVE(r), HPX_FORWARD(Ts, ts)...);
                             }
                         }
                         else
@@ -207,7 +207,7 @@ namespace hpx { namespace cuda { namespace experimental {
                             // When the return type is non-void, we have to forward
                             // the value to the receiver
                             auto t =
-                                HPX_INVOKE(f, std::forward<Ts>(ts)..., stream);
+                                HPX_INVOKE(f, HPX_FORWARD(Ts, ts)..., stream);
 
                             if constexpr (is_transform_stream_receiver<
                                               std::decay_t<R>>::value)
@@ -221,8 +221,8 @@ namespace hpx { namespace cuda { namespace experimental {
                                     // when a non-transform_stream receiver is
                                     // connected.
                                     set_value_immediate_non_void(stream,
-                                        std::move(r), std::move(t),
-                                        std::forward<Ts>(ts)...);
+                                        HPX_MOVE(r), HPX_MOVE(t),
+                                        HPX_FORWARD(Ts, ts)...);
                                 }
                                 else
                                 {
@@ -230,8 +230,8 @@ namespace hpx { namespace cuda { namespace experimental {
                                     // callback which will call set_value on the
                                     // receiver.
                                     set_value_event_callback_non_void(stream,
-                                        std::move(r), std::move(t),
-                                        std::forward<Ts>(ts)...);
+                                        HPX_MOVE(r), HPX_MOVE(t),
+                                        HPX_FORWARD(Ts, ts)...);
                                 }
                             }
                             else
@@ -240,14 +240,14 @@ namespace hpx { namespace cuda { namespace experimental {
                                 // transform_stream_receiver, we add a callback
                                 // which will call set_value on the receiver.
                                 set_value_event_callback_non_void(stream,
-                                    std::move(r), std::move(t),
-                                    std::forward<Ts>(ts)...);
+                                    HPX_MOVE(r), HPX_MOVE(t),
+                                    HPX_FORWARD(Ts, ts)...);
                             }
                         }
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
-                            std::move(r), std::move(ep));
+                            HPX_MOVE(r), HPX_MOVE(ep));
                     });
             }
         };
@@ -293,9 +293,9 @@ namespace hpx { namespace cuda { namespace experimental {
             friend auto tag_invoke(hpx::execution::experimental::connect_t,
                 transform_stream_sender&& s, R&& r)
             {
-                return hpx::execution::experimental::connect(std::move(s.s),
+                return hpx::execution::experimental::connect(HPX_MOVE(s.s),
                     transform_stream_receiver<R, F>{
-                        std::forward<R>(r), std::move(s.f), s.stream});
+                        HPX_FORWARD(R, r), HPX_MOVE(s.f), s.stream});
             }
         };
 
@@ -307,7 +307,7 @@ namespace hpx { namespace cuda { namespace experimental {
         void tag_invoke(hpx::execution::experimental::set_value_t,
             transform_stream_receiver<R, F>&& r, Ts&&... ts)
         {
-            r.set_value(std::forward<Ts>(ts)...);
+            r.set_value(HPX_FORWARD(Ts, ts)...);
         }
     }    // namespace detail
 
@@ -327,7 +327,7 @@ namespace hpx { namespace cuda { namespace experimental {
             transform_stream_t, S&& s, F&& f, cudaStream_t stream = {})
         {
             return detail::transform_stream_sender<S, F>{
-                std::forward<S>(s), std::forward<F>(f), stream};
+                HPX_FORWARD(S, s), HPX_FORWARD(F, f), stream};
         }
 
         template <typename F>
@@ -335,8 +335,7 @@ namespace hpx { namespace cuda { namespace experimental {
             transform_stream_t, F&& f, cudaStream_t stream = {})
         {
             return hpx::execution::experimental::detail::partial_algorithm<
-                transform_stream_t, F, cudaStream_t>{
-                std::forward<F>(f), stream};
+                transform_stream_t, F, cudaStream_t>{HPX_FORWARD(F, f), stream};
         }
     } transform_stream{};
 }}}    // namespace hpx::cuda::experimental

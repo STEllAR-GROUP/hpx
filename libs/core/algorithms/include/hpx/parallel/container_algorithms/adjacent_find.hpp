@@ -294,8 +294,8 @@ namespace hpx { namespace ranges {
             Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::adjacent_find<FwdIter, FwdIter>()
-                .call(hpx::execution::seq, first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -321,8 +321,8 @@ namespace hpx { namespace ranges {
             Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::adjacent_find<FwdIter, FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -353,7 +353,7 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::adjacent_find<iterator_type,
                 iterator_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng),
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -385,9 +385,9 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::adjacent_find<iterator_type,
                 iterator_type>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng),
-                    std::end(rng), std::forward<Pred>(pred),
-                    std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
+                    std::end(rng), HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
     } adjacent_find{};
 }}    // namespace hpx::ranges

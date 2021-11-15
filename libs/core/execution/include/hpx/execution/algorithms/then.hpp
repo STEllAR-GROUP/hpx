@@ -33,54 +33,62 @@ namespace hpx { namespace execution { namespace experimental {
                 set_error_t, then_receiver&& r, Error&& error) noexcept
             {
                 hpx::execution::experimental::set_error(
-                    std::move(r.receiver), std::forward<Error>(error));
+                    HPX_MOVE(r.receiver), HPX_FORWARD(Error, error));
             }
 
             friend void tag_invoke(set_done_t, then_receiver&& r) noexcept
             {
-                hpx::execution::experimental::set_done(std::move(r.receiver));
+                hpx::execution::experimental::set_done(HPX_MOVE(r.receiver));
             }
 
         private:
             template <typename... Ts>
-            void set_value_helper(std::true_type, Ts&&... ts) noexcept
+            void set_value_helper(Ts&&... ts) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        HPX_INVOKE(f, std::forward<Ts>(ts)...);
-                        hpx::execution::experimental::set_value(
-                            std::move(receiver));
+                        if constexpr (std::is_void_v<
+                                          hpx::util::invoke_result_t<F, Ts...>>)
+                        {
+                        // Certain versions of GCC with optimizations fail on
+                        // the move with an internal compiler error.
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION < 100000)
+                            HPX_INVOKE(std::move(f), HPX_FORWARD(Ts, ts)...);
+#else
+                            HPX_INVOKE(HPX_MOVE(f), HPX_FORWARD(Ts, ts)...);
+#endif
+                            hpx::execution::experimental::set_value(
+                                HPX_MOVE(receiver));
+                        }
+                        else
+                        {
+                        // Certain versions of GCC with optimizations fail on
+                        // the move with an internal compiler error.
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION < 100000)
+                            auto&& result = HPX_INVOKE(
+                                std::move(f), HPX_FORWARD(Ts, ts)...);
+#else
+                            auto&& result =
+                                HPX_INVOKE(HPX_MOVE(f), HPX_FORWARD(Ts, ts)...);
+#endif
+                            hpx::execution::experimental::set_value(
+                                HPX_MOVE(receiver), HPX_MOVE(result));
+                        }
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
-                            std::move(receiver), std::move(ep));
+                            HPX_MOVE(receiver), HPX_MOVE(ep));
                     });
             }
 
-            template <typename... Ts>
-            void set_value_helper(std::false_type, Ts&&... ts) noexcept
-            {
-                hpx::detail::try_catch_exception_ptr(
-                    [&]() {
-                        auto&& result = HPX_INVOKE(f, std::forward<Ts>(ts)...);
-                        hpx::execution::experimental::set_value(
-                            std::move(receiver), std::move(result));
-                    },
-                    [&](std::exception_ptr ep) {
-                        hpx::execution::experimental::set_error(
-                            std::move(receiver), std::move(ep));
-                    });
-            }
-
-        public:
             template <typename... Ts,
                 typename = std::enable_if_t<hpx::is_invocable_v<F, Ts...>>>
             friend void tag_invoke(
                 set_value_t, then_receiver&& r, Ts&&... ts) noexcept
             {
-                using is_void_result =
-                    std::is_void<hpx::util::invoke_result_t<F, Ts...>>;
-                r.set_value_helper(is_void_result{}, std::forward<Ts>(ts)...);
+                // GCC 7 fails with an internal compiler error unless the actual
+                // body is in a helper function.
+                r.set_value_helper(HPX_FORWARD(Ts, ts)...);
             }
         };
 
@@ -139,10 +147,9 @@ namespace hpx { namespace execution { namespace experimental {
             friend auto tag_invoke(
                 connect_t, then_sender&& s, Receiver&& receiver)
             {
-                return hpx::execution::experimental::connect(
-                    std::move(s.sender),
+                return hpx::execution::experimental::connect(HPX_MOVE(s.sender),
                     then_receiver<Receiver, F>{
-                        std::forward<Receiver>(receiver), std::move(s.f)});
+                        HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.f)});
             }
 
             template <typename Receiver>
@@ -151,7 +158,7 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 return hpx::execution::experimental::connect(r.sender,
                     then_receiver<Receiver, F>{
-                        std::forward<Receiver>(receiver), r.f});
+                        HPX_FORWARD(Receiver, receiver), r.f});
             }
         };
     }    // namespace detail
@@ -170,13 +177,13 @@ namespace hpx { namespace execution { namespace experimental {
             then_t, Sender&& sender, F&& f)
         {
             return detail::then_sender<Sender, F>{
-                std::forward<Sender>(sender), std::forward<F>(f)};
+                HPX_FORWARD(Sender, sender), HPX_FORWARD(F, f)};
         }
 
         template <typename F>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(then_t, F&& f)
         {
-            return detail::partial_algorithm<then_t, F>{std::forward<F>(f)};
+            return detail::partial_algorithm<then_t, F>{HPX_FORWARD(F, f)};
         }
     } then{};
 }}}    // namespace hpx::execution::experimental

@@ -169,7 +169,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy&& policy, InIter first, Sent last, T const& val)
             {
                 return detail::sequential_fill(
-                    std::forward<ExPolicy>(policy), first, last, val);
+                    HPX_FORWARD(ExPolicy, policy), first, last, val);
             }
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
@@ -182,13 +182,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first == last)
                 {
                     return util::detail::algorithm_result<ExPolicy,
-                        FwdIter>::get(std::move(first));
+                        FwdIter>::get(HPX_MOVE(first));
                 }
 
-                return for_each_n<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), first,
-                    detail::distance(first, last), fill_iteration<T>{val},
-                    util::projection_identity());
+                return for_each_n<FwdIter>().call(HPX_FORWARD(ExPolicy, policy),
+                    first, detail::distance(first, last),
+                    fill_iteration<T>{val}, util::projection_identity());
             }
         };
         /// \endcond
@@ -214,7 +213,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::fill<FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, last, value);
+            HPX_FORWARD(ExPolicy, policy), first, last, value);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -237,7 +236,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::size_t count, T const& val)
             {
                 return detail::sequential_fill_n(
-                    std::forward<ExPolicy>(policy), first, count, val);
+                    HPX_FORWARD(ExPolicy, policy), first, count, val);
             }
 
             template <typename ExPolicy, typename T>
@@ -247,7 +246,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     T const& val)
             {
                 return for_each_n<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), first, count,
+                    HPX_FORWARD(ExPolicy, policy), first, count,
                     [val](auto& v) -> void { v = val; },
                     util::projection_identity());
             }
@@ -274,7 +273,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         if (detail::is_negative(count))
         {
             return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                std::move(first));
+                HPX_MOVE(first));
         }
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -282,7 +281,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::fill_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, std::size_t(count), value);
+            HPX_FORWARD(ExPolicy, policy), first, std::size_t(count), value);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -318,7 +317,7 @@ namespace hpx {
 
             return hpx::util::void_guard<result_type>(),
                    hpx::parallel::v1::detail::fill<FwdIter>().call(
-                       std::forward<ExPolicy>(policy), first, last, value);
+                       HPX_FORWARD(ExPolicy, policy), first, last, value);
         }
 
         // clang-format off
@@ -363,11 +362,11 @@ namespace hpx {
             if (hpx::parallel::v1::detail::is_negative(count))
             {
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(std::move(first));
+                    FwdIter>::get(HPX_MOVE(first));
             }
 
             return hpx::parallel::v1::detail::fill_n<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, std::size_t(count),
+                HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
                 value);
         }
 

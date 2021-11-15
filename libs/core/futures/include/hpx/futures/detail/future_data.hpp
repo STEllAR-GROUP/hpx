@@ -133,7 +133,7 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename U>
         HPX_FORCEINLINE static U&& set(U&& u)
         {
-            return std::forward<U>(u);
+            return HPX_FORWARD(U, u);
         }
     };
 
@@ -329,8 +329,8 @@ namespace hpx { namespace lcos { namespace detail {
         static void construct(void* p, T&& t, Ts&&... ts)
         {
             ::new (p)
-                result_type(future_data_result<Result>::set(std::forward<T>(t)),
-                    std::forward<Ts>(ts)...);
+                result_type(future_data_result<Result>::set(HPX_FORWARD(T, t)),
+                    HPX_FORWARD(Ts, ts)...);
         }
 
     public:
@@ -355,7 +355,7 @@ namespace hpx { namespace lcos { namespace detail {
           : base_type(no_addref)
         {
             result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
-            construct(value_ptr, std::forward<Ts>(ts)...);
+            construct(value_ptr, HPX_FORWARD(Ts, ts)...);
             state_.store(value, std::memory_order_relaxed);
         }
 
@@ -372,7 +372,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*) exception_ptr) std::exception_ptr(std::move(e));
+            ::new ((void*) exception_ptr) std::exception_ptr(HPX_MOVE(e));
             state_.store(exception, std::memory_order_relaxed);
         }
 
@@ -421,14 +421,14 @@ namespace hpx { namespace lcos { namespace detail {
 
             // set the data
             result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
-            construct(value_ptr, std::forward<Ts>(ts)...);
+            construct(value_ptr, HPX_FORWARD(Ts, ts)...);
 
             // At this point the lock needs to be acquired to safely access the
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
 
             // handle all threads waiting for the future to become ready
-            auto on_completed = std::move(on_completed_);
+            auto on_completed = HPX_MOVE(on_completed_);
             on_completed_.clear();
 
             // The value has been set, changing the state to 'value' at this
@@ -454,7 +454,7 @@ namespace hpx { namespace lcos { namespace detail {
             //       which avoids suspension of this thread when it tries to
             //       re-lock the mutex while exiting from condition_variable::wait
             while (
-                cond_.notify_one(std::move(l), threads::thread_priority::boost))
+                cond_.notify_one(HPX_MOVE(l), threads::thread_priority::boost))
             {
                 l = std::unique_lock<mutex_type>(mtx_);
             }
@@ -465,7 +465,7 @@ namespace hpx { namespace lcos { namespace detail {
             // invoke the callback (continuation) function
             if (!on_completed.empty())
             {
-                handle_on_completed(std::move(on_completed));
+                handle_on_completed(HPX_MOVE(on_completed));
             }
         }
 
@@ -480,14 +480,14 @@ namespace hpx { namespace lcos { namespace detail {
             // set the data
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*) exception_ptr) std::exception_ptr(std::move(data));
+            ::new ((void*) exception_ptr) std::exception_ptr(HPX_MOVE(data));
 
             // At this point the lock needs to be acquired to safely access the
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
 
             // handle all threads waiting for the future to become ready
-            auto on_completed = std::move(on_completed_);
+            auto on_completed = HPX_MOVE(on_completed_);
             on_completed_.clear();
 
             // The value has been set, changing the state to 'exception' at this
@@ -513,7 +513,7 @@ namespace hpx { namespace lcos { namespace detail {
             //       which avoids suspension of this thread when it tries to
             //       re-lock the mutex while exiting from condition_variable::wait
             while (
-                cond_.notify_one(std::move(l), threads::thread_priority::boost))
+                cond_.notify_one(HPX_MOVE(l), threads::thread_priority::boost))
             {
                 l = std::unique_lock<mutex_type>(mtx_);
             }
@@ -524,7 +524,7 @@ namespace hpx { namespace lcos { namespace detail {
             // invoke the callback (continuation) function
             if (!on_completed.empty())
             {
-                handle_on_completed(std::move(on_completed));
+                handle_on_completed(HPX_MOVE(on_completed));
             }
         }
 
@@ -534,8 +534,8 @@ namespace hpx { namespace lcos { namespace detail {
         void set_data(T&& result)
         {
             hpx::detail::try_catch_exception_ptr(
-                [&]() { set_value(std::forward<T>(result)); },
-                [&](std::exception_ptr ep) { set_exception(std::move(ep)); });
+                [&]() { set_value(HPX_FORWARD(T, result)); },
+                [&](std::exception_ptr ep) { set_exception(HPX_MOVE(ep)); });
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -552,9 +552,9 @@ namespace hpx { namespace lcos { namespace detail {
 
                     // store the value
                     set_value(std::move(
-                        get_remote_result_type::call(std::forward<T>(result))));
+                        get_remote_result_type::call(HPX_FORWARD(T, result))));
                 },
-                [&](std::exception_ptr ep) { set_exception(std::move(ep)); });
+                [&](std::exception_ptr ep) { set_exception(HPX_MOVE(ep)); });
         }
 
         // trigger the future with the given error condition
@@ -562,7 +562,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             hpx::detail::try_catch_exception_ptr(
                 [&]() { HPX_THROW_EXCEPTION(e, f, msg); },
-                [&](std::exception_ptr ep) { set_exception(std::move(ep)); });
+                [&](std::exception_ptr ep) { set_exception(HPX_MOVE(ep)); });
         }
 
         /// Reset the promise to allow to restart an asynchronous
@@ -633,7 +633,7 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename... Ts>
         future_data(init_no_addref no_addref, in_place in_place, Ts&&... ts)
           : future_data_base<Result>(
-                no_addref, in_place, std::forward<Ts>(ts)...)
+                no_addref, in_place, HPX_FORWARD(Ts, ts)...)
         {
         }
 
@@ -642,7 +642,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
         }
         future_data(init_no_addref no_addref, std::exception_ptr&& e)
-          : future_data_base<Result>(no_addref, std::move(e))
+          : future_data_base<Result>(no_addref, HPX_MOVE(e))
         {
         }
 
@@ -678,7 +678,7 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename... T>
         future_data_allocator(init_no_addref no_addref, in_place in_place,
             other_allocator const& alloc, T&&... ts)
-          : future_data<Result>(no_addref, in_place, std::forward<T>(ts)...)
+          : future_data<Result>(no_addref, in_place, HPX_FORWARD(T, ts)...)
           , alloc_(alloc)
         {
         }
@@ -692,7 +692,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         future_data_allocator(init_no_addref no_addref, std::exception_ptr&& e,
             other_allocator const& alloc)
-          : future_data<Result>(no_addref, std::move(e))
+          : future_data<Result>(no_addref, HPX_MOVE(e))
           , alloc_(alloc)
         {
         }
@@ -732,8 +732,8 @@ namespace hpx { namespace lcos { namespace detail {
             error_code ec;
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(
-                    [this_ = std::move(this_),
-                        init = std::forward<Result_>(init)]() {
+                    [this_ = HPX_MOVE(this_),
+                        init = HPX_FORWARD(Result_, init)]() {
                         this_->set_value(init);
                     }),
                 "timed_future_data<Result>::timed_future_data",
@@ -884,12 +884,12 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename T>
         void set_data(T&& result)
         {
-            this->future_data<Result>::set_data(std::forward<T>(result));
+            this->future_data<Result>::set_data(HPX_FORWARD(T, result));
         }
 
         void set_exception(std::exception_ptr e)
         {
-            this->future_data<Result>::set_exception(std::move(e));
+            this->future_data<Result>::set_exception(HPX_MOVE(e));
         }
 
         virtual void do_run()
@@ -998,7 +998,7 @@ namespace hpx { namespace lcos { namespace detail {
                 [&](std::exception_ptr ep) {
                     this->started_ = true;
                     this->set_exception(ep);
-                    std::rethrow_exception(std::move(ep));
+                    std::rethrow_exception(HPX_MOVE(ep));
                 });
         }
 

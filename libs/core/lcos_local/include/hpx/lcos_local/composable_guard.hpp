@@ -190,7 +190,7 @@ namespace hpx { namespace lcos { namespace local {
     {
         return run_guarded(guard,
             detail::guard_function(util::deferred_call(
-                std::forward<F>(f), std::forward<Args>(args)...)));
+                HPX_FORWARD(F, f), HPX_FORWARD(Args, args)...)));
     }
 
     /// Conceptually, a guard_set acts like a set of mutexes on an asynchronous task.
@@ -203,6 +203,6 @@ namespace hpx { namespace lcos { namespace local {
     {
         return run_guarded(guards,
             detail::guard_function(util::deferred_call(
-                std::forward<F>(f), std::forward<Args>(args)...)));
+                HPX_FORWARD(F, f), HPX_FORWARD(Args, args)...)));
     }
 }}}    // namespace hpx::lcos::local

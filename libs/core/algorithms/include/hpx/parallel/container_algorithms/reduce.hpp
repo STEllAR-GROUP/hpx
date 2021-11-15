@@ -449,8 +449,8 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                std::forward<ExPolicy>(policy), first, last, std::move(init),
-                std::forward<F>(f));
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
+                HPX_FORWARD(F, f));
         }
 
         // clang-format off
@@ -471,8 +471,8 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::move(init), std::forward<F>(f));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_MOVE(init), HPX_FORWARD(F, f));
         }
 
         // clang-format off
@@ -492,7 +492,7 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                std::forward<ExPolicy>(policy), first, last, std::move(init),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
                 std::plus<T>{});
         }
 
@@ -514,8 +514,8 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::move(init), std::plus<T>{});
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_MOVE(init), std::plus<T>{});
         }
 
         // clang-format off
@@ -537,7 +537,7 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<FwdIter>::value_type;
 
             return hpx::parallel::v1::detail::reduce<value_type>().call(
-                std::forward<ExPolicy>(policy), first, last, value_type{},
+                HPX_FORWARD(ExPolicy, policy), first, last, value_type{},
                 std::plus<value_type>{});
         }
 
@@ -563,7 +563,7 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::reduce<value_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), value_type{}, std::plus<value_type>{});
         }
 
@@ -581,8 +581,8 @@ namespace hpx { namespace ranges {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                hpx::execution::seq, first, last, std::move(init),
-                std::forward<F>(f));
+                hpx::execution::seq, first, last, HPX_MOVE(init),
+                HPX_FORWARD(F, f));
         }
 
         // clang-format off
@@ -600,7 +600,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::reduce<T>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                std::move(init), std::forward<F>(f));
+                HPX_MOVE(init), HPX_FORWARD(F, f));
         }
 
         // clang-format off
@@ -617,7 +617,7 @@ namespace hpx { namespace ranges {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                hpx::execution::seq, first, last, std::move(init),
+                hpx::execution::seq, first, last, HPX_MOVE(init),
                 std::plus<T>{});
         }
 
@@ -635,7 +635,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::reduce<T>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                std::move(init), std::plus<T>{});
+                HPX_MOVE(init), std::plus<T>{});
         }
 
         // clang-format off

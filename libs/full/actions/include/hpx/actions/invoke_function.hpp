@@ -27,7 +27,7 @@ namespace hpx { namespace components { namespace server {
             static typename util::invoke_result<F, Ts...>::type call(
                 F f, Ts... ts)
             {
-                return f(std::move(ts)...);
+                return f(HPX_MOVE(ts)...);
             }
         };
 
@@ -40,7 +40,7 @@ namespace hpx { namespace components { namespace server {
         {
             static R call(std::size_t f, Ts... ts)
             {
-                return reinterpret_cast<R (*)(Ts...)>(f)(std::move(ts)...);
+                return reinterpret_cast<R (*)(Ts...)>(f)(HPX_MOVE(ts)...);
             }
         };
     }    // namespace detail

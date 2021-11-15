@@ -98,7 +98,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
             }
 
-            return result::get(std::move(overall_result));
+            return result::get(HPX_MOVE(overall_result));
         }
 
         // parallel remote implementation
@@ -214,8 +214,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     overall_result = dispatch(traits::get_id(sit), algo, policy,
-                        std::true_type(), beg, end, std::forward<F>(f),
-                        std::forward<Proj>(proj));
+                        std::true_type(), beg, end, HPX_FORWARD(F, f),
+                        HPX_FORWARD(Proj, proj));
                 }
             }
             else
@@ -226,8 +226,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     overall_result += dispatch(traits::get_id(sit), algo,
-                        policy, std::true_type(), beg, end, std::forward<F>(f),
-                        std::forward<Proj>(proj));
+                        policy, std::true_type(), beg, end, HPX_FORWARD(F, f),
+                        HPX_FORWARD(Proj, proj));
                 }
 
                 // handle all of the full partitions
@@ -239,7 +239,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     {
                         overall_result += dispatch(traits::get_id(sit), algo,
                             policy, std::true_type(), beg, end,
-                            std::forward<F>(f), std::forward<Proj>(proj));
+                            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
                     }
                 }
 
@@ -249,12 +249,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     overall_result += dispatch(traits::get_id(sit), algo,
-                        policy, std::true_type(), beg, end, std::forward<F>(f),
-                        std::forward<Proj>(proj));
+                        policy, std::true_type(), beg, end, HPX_FORWARD(F, f),
+                        HPX_FORWARD(Proj, proj));
                 }
             }
 
-            return result::get(std::move(overall_result));
+            return result::get(HPX_MOVE(overall_result));
         }
 
         // parallel remote implementation
@@ -291,8 +291,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit), algo,
-                        policy, forced_seq(), beg, end, std::forward<F>(f),
-                        std::forward<Proj>(proj)));
+                        policy, forced_seq(), beg, end, HPX_FORWARD(F, f),
+                        HPX_FORWARD(Proj, proj)));
                 }
             }
             else
@@ -303,8 +303,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit), algo,
-                        policy, forced_seq(), beg, end, std::forward<F>(f),
-                        std::forward<Proj>(proj)));
+                        policy, forced_seq(), beg, end, HPX_FORWARD(F, f),
+                        HPX_FORWARD(Proj, proj)));
                 }
 
                 // handle all of the full partitions
@@ -316,7 +316,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     {
                         segments.push_back(dispatch_async(traits::get_id(sit),
                             algo, policy, forced_seq(), beg, end,
-                            std::forward<F>(f), std::forward<Proj>(proj)));
+                            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj)));
                     }
                 }
 
@@ -326,8 +326,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit), algo,
-                        policy, forced_seq(), beg, end, std::forward<F>(f),
-                        std::forward<Proj>(proj)));
+                        policy, forced_seq(), beg, end, HPX_FORWARD(F, f),
+                        HPX_FORWARD(Proj, proj)));
                 }
             }
 
@@ -344,7 +344,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             return val + curr.get();
                         });
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
         /// \endcond
     }    // namespace detail
@@ -411,7 +411,7 @@ namespace hpx { namespace segmented {
 
         return hpx::parallel::v1::detail::segmented_count(
             hpx::parallel::v1::detail::count<difference_type>(),
-            std::forward<ExPolicy>(policy), first, last, value,
+            HPX_FORWARD(ExPolicy, policy), first, last, value,
             hpx::parallel::util::projection_identity(), is_seq());
     }
 
@@ -439,7 +439,7 @@ namespace hpx { namespace segmented {
 
         return hpx::parallel::v1::detail::segmented_count_if(
             hpx::parallel::v1::detail::count_if<difference_type>(),
-            hpx::execution::seq, first, last, std::forward<F>(f),
+            hpx::execution::seq, first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity(), std::true_type());
     }
 
@@ -473,7 +473,7 @@ namespace hpx { namespace segmented {
 
         return hpx::parallel::v1::detail::segmented_count_if(
             hpx::parallel::v1::detail::count_if<difference_type>(),
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity(), is_seq());
     }
 }}    // namespace hpx::segmented

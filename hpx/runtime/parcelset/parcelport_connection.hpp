@@ -27,58 +27,52 @@ namespace hpx { namespace parcelset {
 
     template <typename Connection, typename BufferType,
         typename ChunkType = serialization::serialization_chunk>
-    struct parcelport_connection
-      : std::enable_shared_from_this<Connection>
+    struct parcelport_connection : std::enable_shared_from_this<Connection>
     {
-          ////////////////////////////////////////////////////////////////////////
-          typedef BufferType buffer_type;
-          typedef parcel_buffer<buffer_type, ChunkType> parcel_buffer_type;
+        ////////////////////////////////////////////////////////////////////////
+        typedef BufferType buffer_type;
+        typedef parcel_buffer<buffer_type, ChunkType> parcel_buffer_type;
 
     public:
         HPX_NON_COPYABLE(parcelport_connection);
 
     public:
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-        enum state
-        {
-            state_initialized,
-            state_reinitialized,
-            state_set_parcel,
-            state_async_write,
-            state_handle_write,
-            state_handle_read_ack,
-            state_scheduled_thread,
-            state_send_pending,
-            state_reclaimed,
-            state_deleting
-        };
+        enum state{state_initialized, state_reinitialized, state_set_parcel,
+            state_async_write, state_handle_write, state_handle_read_ack,
+            state_scheduled_thread, state_send_pending, state_reclaimed,
+            state_deleting};
 #endif
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
         parcelport_connection()
           : state_(state_initialized)
-        {}
+        {
+        }
 
-        parcelport_connection(typename BufferType::allocator_type const & alloc)
+        parcelport_connection(typename BufferType::allocator_type const& alloc)
           : state_(state_initialized)
           , buffer_(alloc)
-        {}
+        {
+        }
         state state_;
 #else
-        parcelport_connection()
-        {}
+        parcelport_connection() {}
 
-        parcelport_connection(typename BufferType::allocator_type const & alloc)
+        parcelport_connection(typename BufferType::allocator_type const& alloc)
           : buffer_(alloc)
-        {}
+        {
+        }
 
-        parcelport_connection(typename BufferType::allocator_type * alloc)
-          : buffer_(std::move(buffer_type(alloc)),alloc)
-        {}
+        parcelport_connection(typename BufferType::allocator_type* alloc)
+          : buffer_(HPX_MOVE(buffer_type(alloc)), alloc)
+        {
+        }
 
-        parcelport_connection(parcel_buffer_type && buffer)
-          : buffer_(std::move(buffer))
-        {}
+        parcelport_connection(parcel_buffer_type&& buffer)
+          : buffer_(HPX_MOVE(buffer))
+        {
+        }
 
 #endif
 
@@ -100,6 +94,6 @@ namespace hpx { namespace parcelset {
         /// buffer for data
         parcel_buffer_type buffer_;
     };
-}}
+}}    // namespace hpx::parcelset
 
 #endif

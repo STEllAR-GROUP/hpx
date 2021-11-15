@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <hpx/config/forward.hpp>
+#include <hpx/config/move.hpp>
+
 #include <algorithm>
 #include <functional>
 #include <iterator>
@@ -25,7 +28,7 @@ namespace hpx { namespace parallel { namespace util {
     template <typename Value, typename... Args>
     inline void construct_object(Value* ptr, Args&&... args)
     {
-        (::new (static_cast<void*>(ptr)) Value(std::forward<Args>(args)...));
+        (::new (static_cast<void*>(ptr)) Value(HPX_FORWARD(Args, args)...));
     }
 
     /// \brief destroy an object in the memory specified by ptr
@@ -51,15 +54,16 @@ namespace hpx { namespace parallel { namespace util {
             return;
         }
 
-        construct_object(&(*first), std::move(val));
+        construct_object(&(*first), HPX_MOVE(val));
 
         Iter it1 = first, it2 = first + 1;
         while (it2 != last)
         {
-            construct_object(&(*(it2++)), std::move(*(it1++)));
+            // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+            construct_object(&(*(it2++)), HPX_MOVE(*(it1++)));
         }
 
-        val = std::move(*(last - 1));
+        val = HPX_MOVE(*(last - 1));
     }
 
     /// \brief create an object in the memory specified by ptr
@@ -70,7 +74,7 @@ namespace hpx { namespace parallel { namespace util {
     template <typename Value, typename... Args>
     inline void construct(Value* ptr, Args&&... args)
     {
-        (::new (static_cast<void*>(ptr)) Value(std::forward<Args>(args)...));
+        (::new (static_cast<void*>(ptr)) Value(HPX_FORWARD(Args, args)...));
     }
 
     /// \brief Move objects
@@ -83,7 +87,8 @@ namespace hpx { namespace parallel { namespace util {
     {
         while (first != last)
         {
-            *(it_dest++) = std::move(*(first++));
+            // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+            *(it_dest++) = HPX_MOVE(*(first++));
         }
         return it_dest;
     }
@@ -104,7 +109,8 @@ namespace hpx { namespace parallel { namespace util {
 
         while (first != last)
         {
-            ::new (static_cast<void*>(ptr++)) Value(std::move(*(first++)));
+            // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+            ::new (static_cast<void*>(ptr++)) Value(HPX_MOVE(*(first++)));
         }
 
         return ptr;
@@ -145,8 +151,11 @@ namespace hpx { namespace parallel { namespace util {
 
         while ((buf1 != end_buf1) && (buf2 != end_buf2))
         {
-            *(buf_out++) = (!comp(*buf2, *buf1)) ? std::move(*(buf1++)) :
-                                                   std::move(*(buf2++));
+            *(buf_out++) = (!comp(*buf2, *buf1)) ?
+                // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                HPX_MOVE(*(buf1++)) :
+                // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                HPX_MOVE(*(buf2++));
         }
         return (buf1 == end_buf1) ? init_move(buf_out, buf2, end_buf2) :
                                     init_move(buf_out, buf1, end_buf1);
@@ -172,8 +181,11 @@ namespace hpx { namespace parallel { namespace util {
         while (first1 != last1 && first2 != last2)
         {
             construct((it_out++),
-                (!comp(*first2, *first1)) ? std::move(*(first1++)) :
-                                            std::move(*(first2++)));
+                (!comp(*first2, *first1)) ?
+                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                    HPX_MOVE(*(first1++)) :
+                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                    HPX_MOVE(*(first2++)));
         };
         return (first1 == last1) ? uninit_move(it_out, first2, last2) :
                                    uninit_move(it_out, first1, last1);
@@ -204,8 +216,11 @@ namespace hpx { namespace parallel { namespace util {
 
         while ((buf1 != end_buf1) && (buf2 != end_buf2))
         {
-            *(buf_out++) = (!comp(*buf2, *buf1)) ? std::move(*(buf1++)) :
-                                                   std::move(*(buf2++));
+            *(buf_out++) = (!comp(*buf2, *buf1)) ?
+                // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                HPX_MOVE(*(buf1++)) :
+                // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                HPX_MOVE(*(buf2++));
         }
         return (buf2 == end_buf2) ? init_move(buf_out, buf1, end_buf1) :
                                     end_buf2;
@@ -261,7 +276,8 @@ namespace hpx { namespace parallel { namespace util {
         {
             while (src1 != end_src1)
             {
-                *(src1++) = std::move(*(aux++));
+                // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                *(src1++) = HPX_MOVE(*(aux++));
             }
             init_move(src2_first, aux, end_aux);
         }

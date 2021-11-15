@@ -241,7 +241,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                      (void) ++first, ++current)
                 {
                     ::new (std::addressof(*current))
-                        value_type(std::move(*first));
+                        value_type(HPX_MOVE(*first));
                 }
                 return util::in_out_result<InIter1, FwdIter2>{first, current};
             }
@@ -269,8 +269,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 util::loop_with_cleanup_n_with_token(
                     first, count, dest, tok,
                     [](InIter1 it, InIter2 dest) -> void {
-                        ::new (std::addressof(*dest))
-                            value_type(std::move(*it));
+                        ::new (std::addressof(*dest)) value_type(HPX_MOVE(*it));
                     },
                     [](InIter2 dest) -> void { (*dest).~value_type(); })};
         }
@@ -298,7 +297,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return util::partitioner_with_cleanup<ExPolicy,
                 util::in_out_result<Iter, FwdIter2>, partition_result_type>::
                 call(
-                    std::forward<ExPolicy>(policy),
+                    HPX_FORWARD(ExPolicy, policy),
                     hpx::util::make_zip_iterator(first, dest), count,
                     [tok](zip_iterator t, std::size_t part_size) mutable
                     -> partition_result_type {
@@ -362,7 +361,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             parallel(ExPolicy&& policy, Iter first, Sent last, FwdIter2 dest)
             {
                 return parallel_sequential_uninitialized_move_n(
-                    std::forward<ExPolicy>(policy), first,
+                    HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), dest);
             }
         };
@@ -439,7 +438,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         return parallel::util::get_second_element(
             detail::uninitialized_move<
                 parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first, last, dest));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -482,7 +481,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::size_t dist = dist1 <= dist2 ? dist1 : dist2;
 
                 return parallel_sequential_uninitialized_move_n(
-                    std::forward<ExPolicy>(policy), first, dist, dest);
+                    HPX_FORWARD(ExPolicy, policy), first, dist, dest);
             }
         };
         /// \endcond
@@ -508,7 +507,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 for (/* */; count != 0; ++first, (void) ++current, --count)
                 {
                     ::new (std::addressof(*current))
-                        value_type(std::move(*first));
+                        value_type(HPX_MOVE(*first));
                 }
                 return util::in_out_result<InIter1, InIter2>{first, current};
             }
@@ -545,7 +544,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
             {
                 return parallel_sequential_uninitialized_move_n(
-                    std::forward<ExPolicy>(policy), first, count, dest);
+                    HPX_FORWARD(ExPolicy, policy), first, count, dest);
             }
         };
         /// \endcond
@@ -585,7 +584,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         return parallel::util::get_pair(
             parallel::v1::detail::uninitialized_move_n<
                 parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first, std::size_t(count),
+                .call(HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
                     dest));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -641,7 +640,7 @@ namespace hpx {
             return parallel::util::get_second_element(
                 hpx::parallel::v1::detail::uninitialized_move<
                     parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(std::forward<ExPolicy>(policy), first, last, dest));
+                    .call(HPX_FORWARD(ExPolicy, policy), first, last, dest));
         }
 
     } uninitialized_move{};
@@ -709,7 +708,7 @@ namespace hpx {
             return parallel::util::get_pair(
                 hpx::parallel::v1::detail::uninitialized_move_n<
                     parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(std::forward<ExPolicy>(policy), first,
+                    .call(HPX_FORWARD(ExPolicy, policy), first,
                         std::size_t(count), dest));
         }
 

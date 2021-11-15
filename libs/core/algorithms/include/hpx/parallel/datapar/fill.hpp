@@ -29,7 +29,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             util::detail::iterator_datapar_compatible<Iter>::value, Iter>::type
         call(ExPolicy&& policy, Iter first, Sent last, T const& val)
         {
-            hpx::parallel::util::loop_ind(std::forward<ExPolicy>(policy), first,
+            hpx::parallel::util::loop_ind(HPX_FORWARD(ExPolicy, policy), first,
                 last, [&val](auto& v) { v = val; });
             return first;
         }
@@ -44,7 +44,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         ExPolicy&& policy, Iter first, Sent last, T const& value)
     {
         return datapar_fill::call(
-            std::forward<ExPolicy>(policy), first, last, value);
+            HPX_FORWARD(ExPolicy, policy), first, last, value);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         ExPolicy&& policy, Iter first, std::size_t count, T const& value)
     {
         return datapar_fill_n::call(
-            std::forward<ExPolicy>(policy), first, count, value);
+            HPX_FORWARD(ExPolicy, policy), first, count, value);
     }
 }}}}    // namespace hpx::parallel::v1::detail
 #endif

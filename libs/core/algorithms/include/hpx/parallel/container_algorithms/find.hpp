@@ -577,9 +577,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         return hpx::parallel::v1::detail::find_end<iterator_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+            HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
             hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
-            std::forward<Pred>(op), proj, proj);
+            HPX_FORWARD(Pred, op), proj, proj);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -626,10 +626,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Subsequence requires at least forward iterator.");
 
         return hpx::parallel::v1::detail::find_first_of<iterator_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+            HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
             hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
-            std::forward<Pred>(op), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
+            HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+            HPX_FORWARD(Proj2, proj2));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -663,8 +663,8 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find<Iter>().call(
-                std::forward<ExPolicy>(policy), first, last, val,
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last, val,
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -689,8 +689,8 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), val, std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), val, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -708,8 +708,7 @@ namespace hpx { namespace ranges {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::find<Iter>().call(
-                hpx::execution::seq, first, last, val,
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, val, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -732,7 +731,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::find<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                val, std::forward<Proj>(proj));
+                val, HPX_FORWARD(Proj, proj));
         }
     } find{};
 
@@ -763,8 +762,8 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_if<Iter>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -794,9 +793,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_if<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -817,8 +816,8 @@ namespace hpx { namespace ranges {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::find_if<Iter>().call(
-                hpx::execution::seq, first, last, std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -846,7 +845,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::find_if<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
     } find_if{};
 
@@ -877,8 +876,8 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_if_not<Iter>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -908,9 +907,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_if_not<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -931,8 +930,8 @@ namespace hpx { namespace ranges {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::find_if_not<Iter>().call(
-                hpx::execution::seq, first, last, std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -960,7 +959,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::find_if_not<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
     } find_if_not{};
 
@@ -1003,10 +1002,10 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_end<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), std::forward<Pred>(op),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1036,9 +1035,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_end<Iter1>().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1074,8 +1073,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::find_end<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), std::forward<Pred>(op),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1104,8 +1103,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::find_end<Iter1>().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
     } find_end{};
 
@@ -1148,10 +1147,10 @@ namespace hpx { namespace ranges {
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_first_of<iterator_type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1181,9 +1180,9 @@ namespace hpx { namespace ranges {
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_first_of<Iter1>().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1219,8 +1218,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::find_first_of<iterator_type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1249,8 +1248,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::find_first_of<Iter1>().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
     } find_first_of{};

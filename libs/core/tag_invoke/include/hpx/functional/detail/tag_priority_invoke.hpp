@@ -20,7 +20,7 @@ namespace hpx::functional::detail {
         /// The evaluation of the expression
         /// `hpx::functional::detail::tag_override_invoke(tag, args...)` is
         /// equivalent to evaluating the unqualified call to
-        /// `tag_override_invoke(decay-copy(tag), std::forward<Args>(args)...)`.
+        /// `tag_override_invoke(decay-copy(tag), HPX_FORWARD(Args, args)...)`.
         ///
         /// `hpx::functional::detail::tag_override_invoke` is implemented against P1895.
         ///
@@ -127,11 +127,11 @@ namespace hpx::functional::detail {
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Tag tag, Ts&&... ts) const
                 noexcept(noexcept(tag_override_invoke(
-                    std::declval<Tag>(), std::forward<Ts>(ts)...)))
+                    std::declval<Tag>(), HPX_FORWARD(Ts, ts)...)))
                     -> decltype(tag_override_invoke(
-                        std::declval<Tag>(), std::forward<Ts>(ts)...))
+                        std::declval<Tag>(), HPX_FORWARD(Ts, ts)...))
             {
-                return tag_override_invoke(tag, std::forward<Ts>(ts)...);
+                return tag_override_invoke(tag, HPX_FORWARD(Ts, ts)...);
             }
 
             friend constexpr bool operator==(
@@ -250,8 +250,8 @@ namespace hpx::functional::detail {
                 noexcept(is_nothrow_tag_override_invocable_v<Tag, Args...>)
                     -> tag_override_invoke_result_t<Tag, Args&&...>
             {
-                return tag_override_invoke(static_cast<Tag const&>(*this),
-                    std::forward<Args>(args)...);
+                return tag_override_invoke(
+                    static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
 
             // Is not tag-override-dispatchable, but tag-dispatchable
@@ -264,8 +264,8 @@ namespace hpx::functional::detail {
                 noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
                     -> tag_invoke_result_t<Tag, Args&&...>
             {
-                return tag_invoke(static_cast<Tag const&>(*this),
-                    std::forward<Args>(args)...);
+                return tag_invoke(
+                    static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
 
             // Is not tag-override-dispatchable, not tag-dispatchable, but
@@ -280,8 +280,8 @@ namespace hpx::functional::detail {
                 noexcept(is_nothrow_tag_fallback_invocable_v<Tag, Args...>)
                     -> tag_fallback_invoke_result_t<Tag, Args&&...>
             {
-                return tag_fallback_invoke(static_cast<Tag const&>(*this),
-                    std::forward<Args>(args)...);
+                return tag_fallback_invoke(
+                    static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
         };
 
@@ -301,8 +301,8 @@ namespace hpx::functional::detail {
                 Args&&... args) const noexcept
                 -> tag_override_invoke_result_t<Tag, Args&&...>
             {
-                return tag_override_invoke(static_cast<Tag const&>(*this),
-                    std::forward<Args>(args)...);
+                return tag_override_invoke(
+                    static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
 
             // Is not nothrow tag-override-dispatchable, but nothrow
@@ -315,8 +315,8 @@ namespace hpx::functional::detail {
                 Args&&... args) const noexcept
                 -> tag_invoke_result_t<Tag, Args&&...>
             {
-                return tag_invoke(static_cast<Tag const&>(*this),
-                    std::forward<Args>(args)...);
+                return tag_invoke(
+                    static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
 
             // Is not nothrow tag-override-dispatchable, not nothrow
@@ -330,8 +330,8 @@ namespace hpx::functional::detail {
                 Args&&... args) const noexcept
                 -> tag_fallback_invoke_result_t<Tag, Args&&...>
             {
-                return tag_fallback_invoke(static_cast<Tag const&>(*this),
-                    std::forward<Args>(args)...);
+                return tag_fallback_invoke(
+                    static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
         };
     }    // namespace tag_base_ns

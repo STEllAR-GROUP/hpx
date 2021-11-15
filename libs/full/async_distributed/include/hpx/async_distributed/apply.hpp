@@ -26,7 +26,7 @@ namespace hpx { namespace detail {
             hpx::util::detail::bound_action<Action, Is, Ts...> const& bound,
             Us&&... vs)
         {
-            return bound.apply(std::forward<Us>(vs)...);
+            return bound.apply(HPX_FORWARD(Us, vs)...);
         }
     };
 }}    // namespace hpx::detail

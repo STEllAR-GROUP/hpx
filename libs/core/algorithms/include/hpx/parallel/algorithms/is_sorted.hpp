@@ -264,7 +264,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, FwdIter first, Sent last, Pred&& pred, Proj&& proj)
             {
                 return is_sorted_sequential(first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename Pred, typename Proj>
@@ -282,11 +282,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return result::get(true);
 
                 util::invoke_projected<Pred, Proj> pred_projected{
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)};
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
 
                 util::cancellation_token<> tok;
                 auto f1 = [tok, last,
-                              pred_projected = std::move(pred_projected)](
+                              pred_projected = HPX_MOVE(pred_projected)](
                               FwdIter part_begin,
                               std::size_t part_size) mutable -> bool {
                     FwdIter trail = part_begin++;
@@ -320,8 +320,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy), first, count, std::move(f1),
-                    std::move(f2));
+                    HPX_FORWARD(ExPolicy, policy), first, count, HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -339,8 +339,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         return detail::is_sorted<FwdIter, FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, last,
-            std::forward<Pred>(pred), util::projection_identity());
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(Pred, pred),
+            util::projection_identity());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -361,7 +361,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, FwdIter first, Sent last, Pred&& pred, Proj&& proj)
             {
                 return is_sorted_until_sequential(first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename Pred, typename Proj>
@@ -380,14 +380,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 difference_type count = std::distance(first, last);
                 if (count <= 1)
-                    return result::get(std::move(last));
+                    return result::get(HPX_MOVE(last));
 
                 util::invoke_projected<Pred, Proj> pred_projected{
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)};
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
 
                 util::cancellation_token<difference_type> tok(count);
                 auto f1 = [tok, last,
-                              pred_projected = std::move(pred_projected)](
+                              pred_projected = HPX_MOVE(pred_projected)](
                               FwdIter part_begin, std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
                     FwdIter trail = part_begin++;
@@ -423,11 +423,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     difference_type loc = tok.get_data();
                     std::advance(first, loc);
-                    return std::move(first);
+                    return HPX_MOVE(first);
                 };
                 return util::partitioner<ExPolicy, FwdIter,
-                    void>::call_with_index(std::forward<ExPolicy>(policy),
-                    first, count, 1, std::move(f1), std::move(f2));
+                    void>::call_with_index(HPX_FORWARD(ExPolicy, policy), first,
+                    count, 1, HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -446,8 +446,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         return detail::is_sorted_until<FwdIter, FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, last,
-            std::forward<Pred>(pred), util::projection_identity());
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(Pred, pred),
+            util::projection_identity());
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -472,8 +472,7 @@ namespace hpx {
             hpx::is_sorted_t, FwdIter first, FwdIter last, Pred&& pred = Pred())
         {
             return hpx::parallel::v1::detail::is_sorted<FwdIter, FwdIter>()
-                .call(hpx::execution::seq, first, last,
-                    std::forward<Pred>(pred),
+                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
                     hpx::parallel::util::projection_identity());
         }
 
@@ -496,8 +495,8 @@ namespace hpx {
             FwdIter last, Pred&& pred = Pred())
         {
             return hpx::parallel::v1::detail::is_sorted<FwdIter, FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Pred>(pred),
+                .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(Pred, pred),
                     hpx::parallel::util::projection_identity());
         }
     } is_sorted{};
@@ -523,8 +522,7 @@ namespace hpx {
         {
             return hpx::parallel::v1::detail::is_sorted_until<FwdIter,
                 FwdIter>()
-                .call(hpx::execution::seq, first, last,
-                    std::forward<Pred>(pred),
+                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
                     hpx::parallel::util::projection_identity());
         }
 
@@ -548,8 +546,8 @@ namespace hpx {
         {
             return hpx::parallel::v1::detail::is_sorted_until<FwdIter,
                 FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Pred>(pred),
+                .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(Pred, pred),
                     hpx::parallel::util::projection_identity());
         }
     } is_sorted_until{};

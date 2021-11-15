@@ -410,7 +410,7 @@ namespace hpx { namespace components { namespace server {
         // should be moved to allow for move-only constructor argument
         // types.
         naming::gid_type id =
-            create<wrapping_type>(std::move(v), std::move(vs)...);
+            create<wrapping_type>(HPX_MOVE(v), HPX_MOVE(vs)...);
 
         LRT_(info).format("successfully created component {} of type: {}", id,
             components::get_component_type_name(type));
@@ -475,7 +475,7 @@ namespace hpx { namespace components { namespace server {
 
         if (!local_op)
         {
-            id = create<wrapping_type>(std::move(*p));
+            id = create<wrapping_type>(HPX_MOVE(*p));
         }
         else
         {
@@ -503,8 +503,8 @@ namespace hpx { namespace components { namespace server {
         typedef typename Component::wrapping_type wrapping_type;
         typename wrapping_type::derived_type* new_instance = nullptr;
 
-        naming::gid_type id = create_migrated<wrapping_type>(migrated_id,
-            reinterpret_cast<void**>(&new_instance), std::move(*p));
+        naming::gid_type id = create_migrated<wrapping_type>(
+            migrated_id, reinterpret_cast<void**>(&new_instance), HPX_MOVE(*p));
 
         // sanity checks
         if (!id || new_instance == nullptr)

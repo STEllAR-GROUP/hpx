@@ -116,7 +116,7 @@ namespace hpx { namespace lcos { namespace detail {
 
             // keep everything alive until future has become ready
             traits::detail::get_shared_state(result)->set_on_completed(
-                [this_ = std::move(this_)] {});
+                [this_ = HPX_MOVE(this_)] {});
 
             return result;
         }
@@ -150,10 +150,10 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         // keep everything alive until future has become ready
-        result = do_wait(this_, std::move(result));
+        result = do_wait(this_, HPX_MOVE(result));
 
         traits::detail::get_shared_state(result)->set_on_completed(
-            [this_ = std::move(this_)] {});
+            [this_ = HPX_MOVE(this_)] {});
 
         return result;
     }
@@ -166,7 +166,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
             return future.then(hpx::launch::sync,
-                [this_ = std::move(this_)](hpx::future<void>&& f) {
+                [this_ = HPX_MOVE(this_)](hpx::future<void>&& f) {
                     // Trigger possible errors...
                     f.get();
 
@@ -191,7 +191,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         return future.then(hpx::launch::sync,
-            [this_ = std::move(this_)](hpx::future<void>&& f) {
+            [this_ = HPX_MOVE(this_)](hpx::future<void>&& f) {
                 // Trigger possible errors...
                 f.get();
 
@@ -234,7 +234,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         // keep everything alive until future has become ready
         traits::detail::get_shared_state(result)->set_on_completed(
-            [this_ = std::move(this_)] {});
+            [this_ = HPX_MOVE(this_)] {});
 
         return result;
 #else
@@ -266,7 +266,7 @@ namespace hpx { namespace lcos { namespace detail {
         // Once we notified our children, we mark ourself ready.
         hpx::intrusive_ptr<barrier_node> this_(this);
         hpx::when_all(futures).then(
-            hpx::launch::sync, [this_ = std::move(this_)](future<void> f) {
+            hpx::launch::sync, [this_ = HPX_MOVE(this_)](future<void> f) {
                 // Trigger possible errors...
                 f.get();
                 this_->broadcast_promise_.set_value();

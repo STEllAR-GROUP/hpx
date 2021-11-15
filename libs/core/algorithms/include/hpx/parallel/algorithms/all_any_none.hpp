@@ -271,8 +271,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, Iter first, Sent last, F&& f, Proj&& proj)
             {
                 return detail::sequential_find_if<ExPolicy>(first, last,
-                           util::invoke_projected<F, Proj>(std::forward<F>(f),
-                               std::forward<Proj>(proj))) == last;
+                           util::invoke_projected<F, Proj>(HPX_FORWARD(F, f),
+                               HPX_FORWARD(Proj, proj))) == last;
             }
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
@@ -288,8 +288,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 util::cancellation_token<> tok;
-                auto f1 = [op = std::forward<F>(op), tok,
-                              proj = std::forward<Proj>(proj)](
+                auto f1 = [op = HPX_FORWARD(F, op), tok,
+                              proj = HPX_FORWARD(Proj, proj)](
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
                     detail::sequential_find_if<std::decay_t<ExPolicy>>(
@@ -300,8 +300,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy), first,
-                    detail::distance(first, last), std::move(f1),
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1),
                     [](std::vector<hpx::future<bool>>&& results) {
                         return detail::sequential_find_if_not<
                                    hpx::execution::sequenced_policy>(
@@ -342,8 +342,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return hpx::parallel::v1::detail::none_of().call(
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-            std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -366,8 +366,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, Iter first, Sent last, F&& f, Proj&& proj)
             {
                 return detail::sequential_find_if<ExPolicy>(first, last,
-                           util::invoke_projected<F, Proj>(std::forward<F>(f),
-                               std::forward<Proj>(proj))) != last;
+                           util::invoke_projected<F, Proj>(HPX_FORWARD(F, f),
+                               HPX_FORWARD(Proj, proj))) != last;
             }
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
@@ -383,8 +383,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 util::cancellation_token<> tok;
-                auto f1 = [op = std::forward<F>(op), tok,
-                              proj = std::forward<Proj>(proj)](
+                auto f1 = [op = HPX_FORWARD(F, op), tok,
+                              proj = HPX_FORWARD(Proj, proj)](
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
                     detail::sequential_find_if<std::decay_t<ExPolicy>>(
@@ -395,8 +395,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy), first,
-                    detail::distance(first, last), std::move(f1),
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1),
                     [](std::vector<hpx::future<bool>>&& results) {
                         return detail::sequential_find_if<
                                    hpx::execution::sequenced_policy>(
@@ -437,8 +437,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return hpx::parallel::v1::detail::any_of().call(
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-            std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -461,8 +461,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, Iter first, Sent last, F&& f, Proj&& proj)
             {
                 return detail::sequential_find_if_not<ExPolicy>(first, last,
-                           std::forward<F>(f),
-                           std::forward<Proj>(proj)) == last;
+                           HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj)) == last;
             }
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
@@ -478,8 +477,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 util::cancellation_token<> tok;
-                auto f1 = [op = std::forward<F>(op), tok,
-                              proj = std::forward<Proj>(proj)](
+                auto f1 = [op = HPX_FORWARD(F, op), tok,
+                              proj = HPX_FORWARD(Proj, proj)](
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
                     detail::sequential_find_if_not<std::decay_t<ExPolicy>>(
@@ -490,8 +489,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy), first,
-                    detail::distance(first, last), std::move(f1),
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1),
                     [](std::vector<hpx::future<bool>>&& results) {
                         return detail::sequential_find_if_not<
                                    hpx::execution::sequenced_policy>(
@@ -532,8 +531,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return hpx::parallel::v1::detail::all_of().call(
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-            std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -564,7 +563,7 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::none_of().call(
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -581,7 +580,7 @@ namespace hpx {
                 "Required at least input iterator.");
 
             return hpx::parallel::v1::detail::none_of().call(
-                hpx::execution::seq, first, last, std::forward<F>(f),
+                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
                 hpx::parallel::util::projection_identity{});
         }
     } none_of{};
@@ -608,7 +607,7 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::any_of().call(
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -625,7 +624,7 @@ namespace hpx {
                 "Required at least input iterator.");
 
             return hpx::parallel::v1::detail::any_of().call(hpx::execution::seq,
-                first, last, std::forward<F>(f),
+                first, last, HPX_FORWARD(F, f),
                 hpx::parallel::util::projection_identity{});
         }
     } any_of{};
@@ -652,7 +651,7 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::all_of().call(
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
                 hpx::parallel::util::projection_identity());
         }
 
@@ -669,7 +668,7 @@ namespace hpx {
                 "Required at least input iterator.");
 
             return hpx::parallel::v1::detail::all_of().call(hpx::execution::seq,
-                first, last, std::forward<F>(f),
+                first, last, HPX_FORWARD(F, f),
                 hpx::parallel::util::projection_identity{});
         }
     } all_of{};

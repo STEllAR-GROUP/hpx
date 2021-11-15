@@ -182,7 +182,7 @@ namespace hpx { namespace agas { namespace server {
             get<0>(it->second) = false;
             if (get<1>(it->second) != 0)
             {
-                get<2>(it->second).notify_all(std::move(l), hpx::throws);
+                get<2>(it->second).notify_all(HPX_MOVE(l), hpx::throws);
             }
             else
             {
@@ -1010,7 +1010,7 @@ namespace hpx { namespace agas { namespace server {
                             std::to_string(e.gva_.type));
                     return;
                 }
-                deleter(e.gid_, std::move(addr));
+                deleter(e.gid_, HPX_MOVE(addr));
             }
             else
             {

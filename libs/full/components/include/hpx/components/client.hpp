@@ -29,7 +29,7 @@ namespace hpx { namespace components {
         {
         }
         explicit client(naming::id_type&& id)
-          : base_type(std::move(id))
+          : base_type(HPX_MOVE(id))
         {
         }
 
@@ -38,15 +38,15 @@ namespace hpx { namespace components {
         {
         }
         explicit client(future_type&& f) noexcept
-          : base_type(std::move(f))
+          : base_type(HPX_MOVE(f))
         {
         }
         client(future<naming::id_type>&& f) noexcept
-          : base_type(std::move(f))
+          : base_type(HPX_MOVE(f))
         {
         }
         client(future<client>&& c)
-          : base_type(std::move(c))
+          : base_type(HPX_MOVE(c))
         {
         }
 
@@ -55,7 +55,7 @@ namespace hpx { namespace components {
         {
         }
         client(client&& rhs) noexcept
-          : base_type(std::move(rhs.shared_state_))
+          : base_type(HPX_MOVE(rhs.shared_state_))
         {
         }
 
@@ -67,7 +67,7 @@ namespace hpx { namespace components {
         }
         client& operator=(naming::id_type&& id)
         {
-            base_type::operator=(std::move(id));
+            base_type::operator=(HPX_MOVE(id));
             return *this;
         }
 
@@ -78,12 +78,12 @@ namespace hpx { namespace components {
         }
         client& operator=(future_type&& f) noexcept
         {
-            base_type::operator=(std::move(f));
+            base_type::operator=(HPX_MOVE(f));
             return *this;
         }
         client& operator=(future<naming::id_type>&& f) noexcept
         {
-            base_type::operator=(std::move(f));
+            base_type::operator=(HPX_MOVE(f));
             return *this;
         }
 
@@ -94,7 +94,7 @@ namespace hpx { namespace components {
         }
         client& operator=(client&& rhs) noexcept
         {
-            base_type::operator=(std::move(rhs));
+            base_type::operator=(HPX_MOVE(rhs));
             return *this;
         }
     };

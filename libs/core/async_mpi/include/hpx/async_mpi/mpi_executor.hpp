@@ -55,7 +55,7 @@ namespace hpx { namespace mpi { namespace experimental {
         decltype(auto) async_execute(F&& f, Ts&&... ts) const
         {
             return hpx::mpi::experimental::detail::async(
-                std::forward<F>(f), std::forward<Ts>(ts)..., communicator_);
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)..., communicator_);
         }
 
         std::size_t in_flight_estimate() const

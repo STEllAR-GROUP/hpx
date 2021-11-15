@@ -179,12 +179,12 @@ namespace hpx { namespace plugins { namespace parcel {
             l.unlock();
 
             // this instance should not buffer parcels anymore
-            pp_->put_parcel(dest, std::move(p), std::move(f));
+            pp_->put_parcel(dest, HPX_MOVE(p), HPX_MOVE(f));
             return;
         }
 
         detail::message_buffer::message_buffer_append_state s =
-            buffer_.append(dest, std::move(p), std::move(f));
+            buffer_.append(dest, HPX_MOVE(p), HPX_MOVE(f));
 
         switch (s)
         {

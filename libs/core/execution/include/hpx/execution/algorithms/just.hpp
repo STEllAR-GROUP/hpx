@@ -34,14 +34,14 @@ namespace hpx { namespace execution { namespace experimental {
                 typename = std::enable_if_t<
                     !std::is_same_v<std::decay_t<T>, just_sender>>>
             explicit constexpr just_sender(T&& t)
-              : ts(std::piecewise_construct, std::forward<T>(t))
+              : ts(std::piecewise_construct, HPX_FORWARD(T, t))
             {
             }
 
             template <typename T0, typename T1, typename... Ts_>
             explicit constexpr just_sender(T0&& t0, T1&& t1, Ts_&&... ts)
-              : ts(std::piecewise_construct, std::forward<T0>(t0),
-                    std::forward<T1>(t1), std::forward<Ts_>(ts)...)
+              : ts(std::piecewise_construct, HPX_FORWARD(T0, t0),
+                    HPX_FORWARD(T1, t1), HPX_FORWARD(Ts_, ts)...)
             {
             }
 
@@ -68,8 +68,8 @@ namespace hpx { namespace execution { namespace experimental {
                 template <typename Receiver_>
                 operation_state(Receiver_&& receiver,
                     hpx::util::member_pack_for<std::decay_t<Ts>...> ts)
-                  : receiver(std::forward<Receiver_>(receiver))
-                  , ts(std::move(ts))
+                  : receiver(HPX_FORWARD(Receiver_, receiver))
+                  , ts(HPX_MOVE(ts))
                 {
                 }
 
@@ -83,12 +83,12 @@ namespace hpx { namespace execution { namespace experimental {
                     hpx::detail::try_catch_exception_ptr(
                         [&]() {
                             hpx::execution::experimental::set_value(
-                                std::move(os.receiver),
-                                std::move(os.ts).template get<Is>()...);
+                                HPX_MOVE(os.receiver),
+                                HPX_MOVE(os.ts).template get<Is>()...);
                         },
                         [&](std::exception_ptr ep) {
                             hpx::execution::experimental::set_error(
-                                std::move(os.receiver), std::move(ep));
+                                HPX_MOVE(os.receiver), HPX_MOVE(ep));
                         });
                 }
             };
@@ -98,7 +98,7 @@ namespace hpx { namespace execution { namespace experimental {
                 connect_t, just_sender&& s, Receiver&& receiver)
             {
                 return operation_state<Receiver>{
-                    std::forward<Receiver>(receiver), std::move(s.ts)};
+                    HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.ts)};
             }
 
             template <typename Receiver>
@@ -106,7 +106,7 @@ namespace hpx { namespace execution { namespace experimental {
                 connect_t, just_sender& s, Receiver&& receiver)
             {
                 return operation_state<Receiver>{
-                    std::forward<Receiver>(receiver), s.ts};
+                    HPX_FORWARD(Receiver, receiver), s.ts};
             }
         };
     }    // namespace detail
@@ -118,7 +118,7 @@ namespace hpx { namespace execution { namespace experimental {
         {
             return detail::just_sender<
                 typename hpx::util::make_index_pack<sizeof...(Ts)>::type,
-                Ts...>{std::forward<Ts>(ts)...};
+                Ts...>{HPX_FORWARD(Ts, ts)...};
         }
     } just{};
 }}}    // namespace hpx::execution::experimental

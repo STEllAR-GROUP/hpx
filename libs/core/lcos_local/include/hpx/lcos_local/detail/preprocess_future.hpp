@@ -40,7 +40,7 @@ namespace hpx { namespace serialization { namespace detail {
           , done_(rhs.done_)
           , num_futures_(rhs.num_futures_)
           , triggered_futures_(rhs.triggered_futures_)
-          , promise_(std::move(rhs.promise_))
+          , promise_(HPX_MOVE(rhs.promise_))
         {
             rhs.done_ = true;
             rhs.num_futures_ = 0;
@@ -59,7 +59,7 @@ namespace hpx { namespace serialization { namespace detail {
             done_ = rhs.done_;
             num_futures_ = rhs.num_futures_;
             triggered_futures_ = rhs.triggered_futures_;
-            promise_ = std::move(rhs.promise_);
+            promise_ = HPX_MOVE(rhs.promise_);
 
             rhs.done_ = true;
             rhs.num_futures_ = 0;
@@ -169,7 +169,7 @@ namespace hpx { namespace serialization { namespace detail {
             auto& shared_state_ =
                 hpx::traits::future_access<hpx::future<void>>::get_shared_state(
                     fut);
-            shared_state_->set_on_completed([this, f = std::move(f)]() {
+            shared_state_->set_on_completed([this, f = HPX_MOVE(f)]() {
                 reset();
                 f();    // this invokes the next round of the fixed-point
                         // iteration

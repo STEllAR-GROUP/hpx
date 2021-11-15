@@ -73,7 +73,7 @@ namespace hpx { namespace segmented {
 
         if (first == last)
         {
-            return std::move(first);
+            return HPX_MOVE(first);
         }
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
@@ -110,7 +110,7 @@ namespace hpx { namespace segmented {
             using result =
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     SegIter>;
-            return result::get(std::move(first));
+            return result::get(HPX_MOVE(first));
         }
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
@@ -119,7 +119,7 @@ namespace hpx { namespace segmented {
         return segmented_for_each(
             hpx::parallel::v1::detail::for_each<
                 typename iterator_traits::local_iterator>(),
-            std::forward<ExPolicy>(policy), first, last,
+            HPX_FORWARD(ExPolicy, policy), first, last,
             hpx::parallel::v1::detail::fill_function<value_type>(value),
             hpx::parallel::util::projection_identity{}, is_seq());
     }

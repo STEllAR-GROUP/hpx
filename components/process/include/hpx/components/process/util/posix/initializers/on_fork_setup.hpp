@@ -20,44 +20,43 @@
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-namespace initializers {
+    namespace initializers {
 
-template <class Handler>
-class on_fork_setup_ : public initializer_base
-{
-public:
-    on_fork_setup_() {}
+        template <class Handler>
+        class on_fork_setup_ : public initializer_base
+        {
+        public:
+            on_fork_setup_() {}
 
-    explicit on_fork_setup_(Handler handler)
-      : handler_(std::move(handler))
-    {}
+            explicit on_fork_setup_(Handler handler)
+              : handler_(HPX_MOVE(handler))
+            {
+            }
 
-    template <class PosixExecutor>
-    void on_fork_setup(PosixExecutor &e) const
-    {
-        handler_(e);
-    }
+            template <class PosixExecutor>
+            void on_fork_setup(PosixExecutor& e) const
+            {
+                handler_(e);
+            }
 
-private:
-    friend class hpx::serialization::access;
+        private:
+            friend class hpx::serialization::access;
 
-    template <typename Archive>
-    void serialize(Archive& ar, unsigned const)
-    {
-        ar & handler_;
-    }
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned const)
+            {
+                ar& handler_;
+            }
 
-    Handler handler_;
-};
+            Handler handler_;
+        };
 
-template <class Handler>
-on_fork_setup_<Handler> on_fork_setup(Handler && handler)
-{
-    return on_fork_setup_<Handler>(std::forward<Handler>(handler));
-}
+        template <class Handler>
+        on_fork_setup_<Handler> on_fork_setup(Handler&& handler)
+        {
+            return on_fork_setup_<Handler>(HPX_FORWARD(Handler, handler));
+        }
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::posix::initializers
 
 #endif

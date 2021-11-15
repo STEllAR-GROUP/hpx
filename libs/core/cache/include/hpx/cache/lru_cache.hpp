@@ -68,9 +68,9 @@ namespace hpx { namespace util { namespace cache {
         lru_cache(lru_cache&& other)
           : max_size_(other.max_size_)
           , current_size_(0)
-          , storage_(std::move(other.storage_))
-          , map_(std::move(other.map_))
-          , statistics_(std::move(other.statistics_))
+          , storage_(HPX_MOVE(other.storage_))
+          , map_(HPX_MOVE(other.map_))
+          , statistics_(HPX_MOVE(other.statistics_))
         {
         }
 

@@ -83,15 +83,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         arg_type yield(result_type arg = result_type())
         {
-            return !yield_decorator_.empty() ?
-                yield_decorator_(std::move(arg)) :
-                yield_impl(std::move(arg));
+            return !yield_decorator_.empty() ? yield_decorator_(HPX_MOVE(arg)) :
+                                               yield_impl(HPX_MOVE(arg));
         }
 
         template <typename F>
         yield_decorator_type decorate_yield(F&& f)
         {
-            yield_decorator_type tmp(std::forward<F>(f));
+            yield_decorator_type tmp(HPX_FORWARD(F, f));
             std::swap(tmp, yield_decorator_);
             return tmp;
         }
@@ -106,7 +105,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         yield_decorator_type decorate_yield(yield_decorator_type&& f)
         {
             std::swap(f, yield_decorator_);
-            return std::move(f);
+            return HPX_MOVE(f);
         }
 
         yield_decorator_type undecorate_yield()

@@ -276,7 +276,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 !hpx::traits::is_value_proxy<T>::value>::type
             call(T&& t)
             {
-                HPX_INVOKE(f_, HPX_INVOKE(proj_, std::forward<T>(t)));
+                HPX_INVOKE(f_, HPX_INVOKE(proj_, HPX_FORWARD(T, t)));
             }
 
             template <typename T>
@@ -284,7 +284,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::traits::is_value_proxy<T>::value>::type
             call(T&& t)
             {
-                auto tmp = HPX_INVOKE(proj_, std::forward<T>(t));
+                auto tmp = HPX_INVOKE(proj_, HPX_FORWARD(T, t));
                 HPX_INVOKE(f_, tmp);
             }
 
@@ -316,7 +316,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 !hpx::traits::is_value_proxy<T>::value>::type
             call(T&& t)
             {
-                HPX_INVOKE(f_, std::forward<T>(t));
+                HPX_INVOKE(f_, HPX_FORWARD(T, t));
             }
 
             template <typename T>
@@ -324,7 +324,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::traits::is_value_proxy<T>::value>::type
             call(T&& t)
             {
-                auto tmp = std::forward<T>(t);
+                auto tmp = HPX_FORWARD(T, t);
                 HPX_INVOKE(f_, tmp);
             }
 
@@ -356,8 +356,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename F_, typename Proj_>
             HPX_HOST_DEVICE for_each_iteration(F_&& f, Proj_&& proj)
-              : f_(std::forward<F_>(f))
-              , proj_(std::forward<Proj_>(proj))
+              : f_(HPX_FORWARD(F_, f))
+              , proj_(HPX_FORWARD(Proj_, proj))
             {
             }
 
@@ -372,8 +372,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             HPX_HOST_DEVICE for_each_iteration(for_each_iteration&& rhs)
-              : f_(std::move(rhs.f_))
-              , proj_(std::move(rhs.proj_))
+              : f_(HPX_MOVE(rhs.f_))
+              , proj_(HPX_MOVE(rhs.proj_))
             {
             }
 #endif
@@ -415,7 +415,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename F_, typename Proj_>
             HPX_HOST_DEVICE for_each_iteration(F_&& f, Proj_&&)
-              : f_(std::forward<F_>(f))
+              : f_(HPX_FORWARD(F_, f))
             {
             }
 
@@ -429,7 +429,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             HPX_HOST_DEVICE for_each_iteration(for_each_iteration&& rhs)
-              : f_(std::move(rhs.f_))
+              : f_(HPX_MOVE(rhs.f_))
             {
             }
 #endif
@@ -473,7 +473,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 util::projection_identity)
             {
                 return util::loop_n_ind<std::decay_t<ExPolicy>>(
-                    first, count, std::forward<F>(f));
+                    first, count, HPX_FORWARD(F, f));
             }
 
             template <typename ExPolicy, typename FwdIter, typename F,
@@ -487,15 +487,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     auto f1 =
                         for_each_iteration<ExPolicy, F, std::decay_t<Proj>>(
-                            std::forward<F>(f), std::forward<Proj>(proj));
+                            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
 
                     return util::foreach_partitioner<ExPolicy>::call(
-                        std::forward<ExPolicy>(policy), first, count,
-                        std::move(f1), util::projection_identity());
+                        HPX_FORWARD(ExPolicy, policy), first, count,
+                        HPX_MOVE(f1), util::projection_identity());
                 }
 
                 return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                    std::move(first));
+                    HPX_MOVE(first));
             }
         };
         /// \endcond
@@ -534,7 +534,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             sequential(ExPolicy&& policy, InIterB first, InIterE last, F&& f,
                 Proj&& proj)
             {
-                return util::loop(std::forward<ExPolicy>(policy), first, last,
+                return util::loop(HPX_FORWARD(ExPolicy, policy), first, last,
                     invoke_projected<F, std::decay_t<Proj>>{f, proj});
             }
 
@@ -548,7 +548,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 return util::loop_n_ind<std::decay_t<ExPolicy>>(first,
                     static_cast<std::size_t>(detail::distance(first, last)),
-                    std::forward<F>(f));
+                    HPX_FORWARD(F, f));
             }
 
             template <typename ExPolicy, typename InIterB, typename InIterE,
@@ -559,8 +559,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             sequential(ExPolicy&& policy, InIterB first, InIterE last, F&& f,
                 util::projection_identity)
             {
-                return util::loop_ind(std::forward<ExPolicy>(policy), first,
-                    last, std::forward<F>(f));
+                return util::loop_ind(HPX_FORWARD(ExPolicy, policy), first,
+                    last, HPX_FORWARD(F, f));
             }
 
             template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
@@ -574,16 +574,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     auto f1 =
                         for_each_iteration<ExPolicy, F, std::decay_t<Proj>>(
-                            std::forward<F>(f), std::forward<Proj>(proj));
+                            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
 
                     return util::foreach_partitioner<ExPolicy>::call(
-                        std::forward<ExPolicy>(policy), first,
-                        detail::distance(first, last), std::move(f1),
+                        HPX_FORWARD(ExPolicy, policy), first,
+                        detail::distance(first, last), HPX_MOVE(f1),
                         util::projection_identity());
                 }
 
                 return util::detail::algorithm_result<ExPolicy, FwdIterB>::get(
-                    std::move(first));
+                    HPX_MOVE(first));
             }
         };
         /// \endcond
@@ -615,7 +615,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         if (detail::is_negative(count) || count == 0)
         {
             using result = util::detail::algorithm_result<ExPolicy, FwdIter>;
-            return result::get(std::move(first));
+            return result::get(HPX_MOVE(first));
         }
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -623,8 +623,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return parallel::v1::detail::for_each_n<FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, std::size_t(count),
-            std::forward<F>(f), std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
+            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -659,12 +659,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             using result =
                 parallel::util::detail::algorithm_result<ExPolicy, FwdIterB>;
-            return result::get(std::move(first));
+            return result::get(HPX_MOVE(first));
         }
 
         return parallel::v1::detail::for_each<FwdIterB>().call(
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-            std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+            HPX_FORWARD(Proj, proj));
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -700,7 +700,7 @@ namespace hpx {
                     hpx::execution::seq, first, last, f,
                     hpx::parallel::util::projection_identity());
             }
-            return std::forward<F>(f);
+            return HPX_FORWARD(F, f);
         }
 
         // clang-format off
@@ -728,8 +728,8 @@ namespace hpx {
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
                 hpx::parallel::v1::detail::for_each<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), first, last,
-                    std::forward<F>(f),
+                    HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(F, f),
                     hpx::parallel::util::projection_identity()));
         }
     } for_each{};
@@ -759,7 +759,7 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::for_each_n<InIter>().call(
                 hpx::execution::seq, first, std::size_t(count),
-                std::forward<F>(f), parallel::util::projection_identity());
+                HPX_FORWARD(F, f), parallel::util::projection_identity());
         }
 
         // clang-format off
@@ -782,12 +782,12 @@ namespace hpx {
             {
                 using result =
                     parallel::util::detail::algorithm_result<ExPolicy, FwdIter>;
-                return result::get(std::move(first));
+                return result::get(HPX_MOVE(first));
             }
 
             return hpx::parallel::v1::detail::for_each_n<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, std::size_t(count),
-                std::forward<F>(f), parallel::util::projection_identity());
+                HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
+                HPX_FORWARD(F, f), parallel::util::projection_identity());
         }
     } for_each_n{};
 }    // namespace hpx

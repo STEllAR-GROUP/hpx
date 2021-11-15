@@ -51,7 +51,7 @@ namespace hpx { namespace lcos { namespace local {
         if (total_ == number_of_threads_)
         {
             total_ += barrier_flag - 1;
-            cond_.notify_all(std::move(l));
+            cond_.notify_all(HPX_MOVE(l));
         }
         else
         {
@@ -65,7 +65,7 @@ namespace hpx { namespace lcos { namespace local {
             // get entering threads to wake up
             if (total_ == barrier_flag)
             {
-                cond_.notify_all(std::move(l));
+                cond_.notify_all(HPX_MOVE(l));
             }
         }
     }

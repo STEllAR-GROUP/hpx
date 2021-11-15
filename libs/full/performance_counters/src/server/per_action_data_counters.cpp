@@ -96,7 +96,7 @@ namespace hpx { namespace performance_counters {
             hpx::util::function_nonser<std::int64_t(bool)> f =
                 registry.get_counter(paths.parameters_, counter_func);
 
-            return detail::create_raw_counter(info, std::move(f), ec);
+            return detail::create_raw_counter(info, HPX_MOVE(f), ec);
         }
         break;
 

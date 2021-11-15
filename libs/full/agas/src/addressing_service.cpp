@@ -1229,9 +1229,8 @@ namespace hpx { namespace agas {
                 threads::thread_priority) = &addressing_service::route;
 
             threads::thread_init_data data(
-                threads::make_thread_function_nullary(
-                    util::deferred_call(route_ptr, this, std::move(p),
-                        std::move(f), local_priority)),
+                threads::make_thread_function_nullary(util::deferred_call(
+                    route_ptr, this, HPX_MOVE(p), HPX_MOVE(f), local_priority)),
                 "addressing_service::route", threads::thread_priority::normal,
                 threads::thread_schedule_hint(),
                 threads::thread_stacksize::default_,
@@ -1240,7 +1239,7 @@ namespace hpx { namespace agas {
             return;
         }
 
-        primary_ns_.route(std::move(p), std::move(f));
+        primary_ns_.route(HPX_MOVE(p), HPX_MOVE(f));
     }
 #endif
 
@@ -1572,7 +1571,7 @@ namespace hpx { namespace agas {
 
         return f.then(hpx::launch::sync,
             util::one_shot(util::bind_back(
-                &detail::on_register_event, std::move(result_f))));
+                &detail::on_register_event, HPX_MOVE(result_f))));
     }
 
     // Return all matching entries in the symbol namespace
@@ -2028,7 +2027,7 @@ namespace hpx { namespace agas {
             for (requests_type::iterator it = requests.begin(); it != end; ++it)
             {
                 server::primary_namespace::decrement_credit_action action;
-                hpx::apply(action, std::move(it->first), std::move(it->second));
+                hpx::apply(action, HPX_MOVE(it->first), HPX_MOVE(it->second));
             }
 
             if (&ec != &throws)
@@ -2097,13 +2096,12 @@ namespace hpx { namespace agas {
         }
 
         // send requests to all locality
-        requests_type::const_iterator end = requests.end();
-        for (requests_type::const_iterator it = requests.begin(); it != end;
-             ++it)
+        requests_type::iterator end = requests.end();
+        for (requests_type::iterator it = requests.begin(); it != end; ++it)
         {
             server::primary_namespace::decrement_credit_action action;
-            lazy_results.push_back(hpx::async(
-                action, std::move(it->first), std::move(it->second)));
+            lazy_results.push_back(
+                hpx::async(action, HPX_MOVE(it->first), HPX_MOVE(it->second)));
         }
 
         return lazy_results;
@@ -2192,7 +2190,7 @@ namespace hpx { namespace agas {
             remove_cache_entry(gid_);
         }
 
-        return std::move(result.second);
+        return HPX_MOVE(result.second);
     }
 
     void addressing_service::unmark_as_migrated(naming::gid_type const& gid_)

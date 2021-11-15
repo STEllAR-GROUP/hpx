@@ -146,9 +146,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
                 return hpx::parallel::util::detail::
                     algorithm_result<ExPolicy, local_result_type>::get(
-                        Derived::sequential(std::forward<ExPolicy>(policy),
-                            std::forward<Args>(args)...));
-
+                        Derived::sequential(HPX_FORWARD(ExPolicy, policy),
+                            HPX_FORWARD(Args, args)...));
 #if !defined(__CUDA_ARCH__)
             }
             catch (...)
@@ -182,21 +181,20 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
                 // run the launched task on the requested executor
                 return result_handler::get(execution::async_execute(
-                    std::move(exec), derived(), std::forward<ExPolicy>(policy),
-                    std::forward<Args>(args)...));
+                    HPX_MOVE(exec), derived(), HPX_FORWARD(ExPolicy, policy),
+                    HPX_FORWARD(Args, args)...));
             }
             else if constexpr (std::is_void_v<local_result_type>)
             {
-                execution::sync_execute(std::move(exec), derived(),
-                    std::forward<ExPolicy>(policy),
-                    std::forward<Args>(args)...);
+                execution::sync_execute(HPX_MOVE(exec), derived(),
+                    HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Args, args)...);
                 return result_handler::get();
             }
             else
             {
                 return result_handler::get(execution::sync_execute(
-                    std::move(exec), derived(), std::forward<ExPolicy>(policy),
-                    std::forward<Args>(args)...));
+                    HPX_MOVE(exec), derived(), HPX_FORWARD(ExPolicy, policy),
+                    HPX_FORWARD(Args, args)...));
             }
         }
 
@@ -207,7 +205,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             call2(ExPolicy&& policy, std::false_type, Args&&... args)
         {
             return Derived::parallel(
-                std::forward<ExPolicy>(policy), std::forward<Args>(args)...);
+                HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Args, args)...);
         }
 
         template <typename ExPolicy, typename... Args>
@@ -216,8 +214,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             call(ExPolicy&& policy, Args&&... args) const
         {
             using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-            return call2(std::forward<ExPolicy>(policy), is_seq(),
-                std::forward<Args>(args)...);
+            return call2(HPX_FORWARD(ExPolicy, policy), is_seq(),
+                HPX_FORWARD(Args, args)...);
         }
 
 #if defined(HPX_HAVE_CXX17_STD_EXECUTION_POLICES)
@@ -229,7 +227,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             call(std::execution::sequenced_policy, Args&&... args) const
         {
             return call2(hpx::execution::seq, std::true_type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         template <typename... Args>
@@ -239,7 +237,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             call(std::execution::parallel_policy, Args&&... args) const
         {
             return call2(hpx::execution::par, std::false_type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         template <typename... Args>
@@ -250,7 +248,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 Args&&... args) const
         {
             return call2(hpx::execution::par_unseq, std::false_type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
 #if defined(HPX_HAVE_CXX20_STD_EXECUTION_POLICES)
@@ -261,7 +259,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             call(std::execution::unsequenced_policy, Args&&... args) const
         {
             return call2(hpx::execution::unseq, std::false_type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 #endif
 #endif

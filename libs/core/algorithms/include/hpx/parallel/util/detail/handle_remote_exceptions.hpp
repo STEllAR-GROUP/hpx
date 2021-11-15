@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             }
 
             if (!errors.empty())
-                throw exception_list(std::move(errors));
+                throw exception_list(HPX_MOVE(errors));
         }
 
         template <typename T>
@@ -72,7 +72,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             }
 
             if (!errors.empty())
-                throw exception_list(std::move(errors));
+                throw exception_list(HPX_MOVE(errors));
         }
     };
 

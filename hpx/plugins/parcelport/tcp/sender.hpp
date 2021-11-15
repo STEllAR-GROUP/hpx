@@ -48,19 +48,17 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parcelset { namespace policies { namespace tcp
-{
+namespace hpx { namespace parcelset { namespace policies { namespace tcp {
     class sender
-      : public parcelset::parcelport_connection<sender, std::vector<char> >
+      : public parcelset::parcelport_connection<sender, std::vector<char>>
     {
-        using postprocess_handler_type = util::unique_function_nonser<void(
-            std::error_code const&)>;
+        using postprocess_handler_type =
+            util::unique_function_nonser<void(std::error_code const&)>;
 
     public:
         /// Construct a sending parcelport_connection with the given io_context.
         sender(asio::io_context& io_service,
-                parcelset::locality const& locality_id,
-                parcelset::parcelport* pp)
+            parcelset::locality const& locality_id, parcelset::parcelport* pp)
           : socket_(io_service)
           , ack_(0)
           , there_(locality_id)
@@ -72,38 +70,43 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         ~sender()
         {
             // gracefully and portably shutdown the socket
-            if (socket_.is_open()) {
+            if (socket_.is_open())
+            {
                 std::error_code ec;
                 socket_.shutdown(asio::ip::tcp::socket::shutdown_both, ec);
-                socket_.close(ec);    // close the socket to give it back to the OS
+                socket_.close(
+                    ec);    // close the socket to give it back to the OS
             }
         }
 
         /// Get the socket associated with the parcelport_connection.
-        asio::ip::tcp::socket& socket() { return socket_; }
+        asio::ip::tcp::socket& socket()
+        {
+            return socket_;
+        }
 
         parcelset::locality const& destination() const
         {
             return there_;
         }
 
-        void verify_(parcelset::locality const & parcel_locality_id) const
+        void verify_(parcelset::locality const& parcel_locality_id) const
         {
 #if defined(HPX_DEBUG)
             std::error_code ec;
-            asio::ip::tcp::socket::endpoint_type endpoint
-                = socket_.remote_endpoint(ec);
+            asio::ip::tcp::socket::endpoint_type endpoint =
+                socket_.remote_endpoint(ec);
 
-            locality const & impl = parcel_locality_id.get<locality>();
+            locality const& impl = parcel_locality_id.get<locality>();
             // We just ignore failures here. Those are the reason for
             // remote endpoint not connected errors which occur
             // when the runtime is in state_shutdown
-            if(!ec)
+            if (!ec)
             {
-                HPX_ASSERT(hpx::util::cleanup_ip_address(impl.address())
-                  == hpx::util::cleanup_ip_address(endpoint.address().to_string()));
-                HPX_ASSERT(impl.port() ==
-                    endpoint.port());
+                HPX_ASSERT(hpx::util::cleanup_ip_address(impl.address()) ==
+                    hpx::util::cleanup_ip_address(
+                        endpoint.address().to_string()));
+                HPX_ASSERT(impl.port() == endpoint.port());
             }
 #else
             HPX_UNUSED(parcel_locality_id);
@@ -111,8 +114,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
 
         template <typename Handler, typename ParcelPostprocess>
-        void async_write(Handler && handler,
-            ParcelPostprocess && parcel_postprocess)
+        void async_write(
+            Handler&& handler, ParcelPostprocess&& parcel_postprocess)
         {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             HPX_ASSERT(state_ == state_send_pending);
@@ -121,8 +124,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             HPX_ASSERT(!handler_);
             HPX_ASSERT(!postprocess_handler_);
 
-            handler_ = std::forward<Handler>(handler);
-            postprocess_handler_ = std::forward<ParcelPostprocess>(parcel_postprocess);
+            handler_ = HPX_FORWARD(Handler, handler);
+            postprocess_handler_ =
+                HPX_FORWARD(ParcelPostprocess, parcel_postprocess);
             HPX_ASSERT(handler_);
             HPX_ASSERT(postprocess_handler_);
 
@@ -135,20 +139,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
             std::vector<asio::const_buffer> buffers;
-            buffers.push_back(asio::buffer(&buffer_.size_,
-                sizeof(buffer_.size_)));
-            buffers.push_back(asio::buffer(&buffer_.data_size_,
-                sizeof(buffer_.data_size_)));
+            buffers.push_back(
+                asio::buffer(&buffer_.size_, sizeof(buffer_.size_)));
+            buffers.push_back(
+                asio::buffer(&buffer_.data_size_, sizeof(buffer_.data_size_)));
 
             // add chunk description
-            buffers.push_back(asio::buffer(&buffer_.num_chunks_,
-                sizeof(buffer_.num_chunks_)));
+            buffers.push_back(asio::buffer(
+                &buffer_.num_chunks_, sizeof(buffer_.num_chunks_)));
 
             std::vector<parcel_buffer_type::transmission_chunk_type>& chunks =
                 buffer_.transmission_chunks_;
-            if (!chunks.empty()) {
-                buffers.push_back(
-                    asio::buffer(chunks.data(), chunks.size() *
+            if (!chunks.empty())
+            {
+                buffers.push_back(asio::buffer(chunks.data(),
+                    chunks.size() *
                         sizeof(parcel_buffer_type::transmission_chunk_type)));
 
                 // add main buffer holding data which was serialized normally
@@ -161,7 +166,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         buffers.push_back(asio::buffer(c.data_.cpos_, c.size_));
                 }
             }
-            else {
+            else
+            {
                 // add main buffer holding data which was serialized normally
                 buffers.push_back(asio::buffer(buffer_.data_));
             }
@@ -169,13 +175,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // this additional wrapping of the handler into a bind object is
             // needed to keep  this parcelport_connection object alive for the whole
             // write operation
-            void (sender::*f)(std::error_code const&, std::size_t)
-                = &sender::handle_write;
+            void (sender::*f)(std::error_code const&, std::size_t) =
+                &sender::handle_write;
 
             using util::placeholders::_1;
             using util::placeholders::_2;
-            asio::async_write(socket_, buffers,
-                util::bind(f, shared_from_this(), _1, _2));
+            asio::async_write(
+                socket_, buffers, util::bind(f, shared_from_this(), _1, _2));
         }
 
     private:
@@ -202,25 +208,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 // the parcel, which in turn might invoke HPX functions)
                 threads::thread_init_data data(
                     threads::make_thread_function_nullary(util::deferred_call(
-                        &sender::reset_handler, std::move(handler))),
+                        &sender::reset_handler, HPX_MOVE(handler))),
                     "sender::reset_handler");
                 threads::register_thread(data);
             }
             else
             {
-                reset_handler(std::move(handler));
+                reset_handler(HPX_MOVE(handler));
             }
 
             if (e)
             {
                 // inform post-processing handler of error as well
-                util::unique_function_nonser<
-                    void(
-                        std::error_code const&
-                      , parcelset::locality const&
-                      , std::shared_ptr<sender>
-                    )
-                > postprocess_handler;
+                util::unique_function_nonser<void(std::error_code const&,
+                    parcelset::locality const&, std::shared_ptr<sender>)>
+                    postprocess_handler;
                 std::swap(postprocess_handler, postprocess_handler_);
                 postprocess_handler(e, there_, shared_from_this());
                 return;
@@ -233,17 +235,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
             // now handle the acknowledgment byte which is sent by the receiver
 #if defined(__linux) || defined(linux) || defined(__linux__)
-            asio::detail::socket_option::boolean<
-                IPPROTO_TCP, TCP_QUICKACK> quickack(true);
+            asio::detail::socket_option::boolean<IPPROTO_TCP, TCP_QUICKACK>
+                quickack(true);
             socket_.set_option(quickack);
 #endif
 
-            void (sender::*f)(std::error_code const&)
-                = &sender::handle_read_ack;
+            void (sender::*f)(std::error_code const&) =
+                &sender::handle_read_ack;
 
             using util::placeholders::_1;
-            asio::async_read(socket_,
-                asio::buffer(&ack_, sizeof(ack_)),
+            asio::async_read(socket_, asio::buffer(&ack_, sizeof(ack_)),
                 util::bind(f, shared_from_this(), _1));
         }
 
@@ -256,13 +257,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // Call post-processing handler, which will send remaining pending
             // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
-            util::unique_function_nonser<
-                void(
-                    std::error_code const&
-                  , parcelset::locality const&
-                  , std::shared_ptr<sender>
-                )
-            > postprocess_handler;
+            util::unique_function_nonser<void(std::error_code const&,
+                parcelset::locality const&, std::shared_ptr<sender>)>
+                postprocess_handler;
             std::swap(postprocess_handler, postprocess_handler_);
             postprocess_handler(e, there_, shared_from_this());
         }
@@ -280,15 +277,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         parcelset::parcelport* pp_;
 
         postprocess_handler_type handler_;
-        util::unique_function_nonser<
-            void(
-                std::error_code const&
-                , parcelset::locality const&
-                , std::shared_ptr<sender>
-                )
-        > postprocess_handler_;
+        util::unique_function_nonser<void(std::error_code const&,
+            parcelset::locality const&, std::shared_ptr<sender>)>
+            postprocess_handler_;
     };
-}}}}
+}}}}    // namespace hpx::parcelset::policies::tcp
 
 #endif
-

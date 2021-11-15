@@ -67,10 +67,10 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename Sender_, typename Shape_, typename F_>
             thread_pool_bulk_sender(thread_pool_scheduler&& scheduler,
                 Sender_&& sender, Shape_&& shape, F_&& f)
-              : scheduler(std::move(scheduler))
-              , sender(std::forward<Sender_>(sender))
-              , shape(std::forward<Shape_>(shape))
-              , f(std::forward<F_>(f))
+              : scheduler(HPX_MOVE(scheduler))
+              , sender(HPX_FORWARD(Sender_, sender))
+              , shape(HPX_FORWARD(Shape_, shape))
+              , f(HPX_FORWARD(F_, f))
             {
             }
             thread_pool_bulk_sender(thread_pool_bulk_sender&&) = default;
@@ -137,15 +137,14 @@ namespace hpx { namespace execution { namespace experimental {
                         set_error_t, bulk_receiver&& r, E&& e) noexcept
                     {
                         hpx::execution::experimental::set_error(
-                            std::move(r.op_state->receiver),
-                            std::forward<E>(e));
+                            HPX_MOVE(r.op_state->receiver), HPX_FORWARD(E, e));
                     }
 
                     friend void tag_invoke(
                         set_done_t, bulk_receiver&& r) noexcept
                     {
                         hpx::execution::experimental::set_done(
-                            std::move(r.op_state->receiver));
+                            HPX_MOVE(r.op_state->receiver));
                     };
 
                     struct task_function;
@@ -244,8 +243,8 @@ namespace hpx { namespace execution { namespace experimental {
                             hpx::util::invoke_fused(
                                 hpx::util::bind_front(
                                     hpx::execution::experimental::set_value,
-                                    std::move(op_state->receiver)),
-                                std::forward<Ts>(ts));
+                                    HPX_MOVE(op_state->receiver)),
+                                HPX_FORWARD(Ts, ts));
                         }
                     };
 
@@ -290,14 +289,14 @@ namespace hpx { namespace execution { namespace experimental {
                                 {
                                     HPX_ASSERT(op_state->exception.has_value());
                                     hpx::execution::experimental::set_error(
-                                        std::move(op_state->receiver),
-                                        std::move(op_state->exception.value()));
+                                        HPX_MOVE(op_state->receiver),
+                                        HPX_MOVE(op_state->exception.value()));
                                 }
                                 else
                                 {
                                     hpx::visit(
                                         set_value_end_loop_visitor{op_state},
-                                        std::move(op_state->ts));
+                                        HPX_MOVE(op_state->ts));
                                 }
                             }
                         }
@@ -388,7 +387,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                         threads::thread_init_data data(
                             threads::make_thread_function_nullary(
-                                std::move(task_f)),
+                                HPX_MOVE(task_f)),
                             annotation, get_priority(op_state->scheduler), hint,
                             get_stacksize(op_state->scheduler));
                         threads::register_work(
@@ -426,8 +425,8 @@ namespace hpx { namespace execution { namespace experimental {
                         if (n == 0)
                         {
                             hpx::execution::experimental::set_value(
-                                std::move(r.op_state->receiver),
-                                std::forward<Ts>(ts)...);
+                                HPX_MOVE(r.op_state->receiver),
+                                HPX_FORWARD(Ts, ts)...);
                             return;
                         }
 
@@ -439,7 +438,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                         // Store sent values in the operation state
                         r.op_state->ts.template emplace<hpx::tuple<Ts...>>(
-                            std::forward<Ts>(ts)...);
+                            HPX_FORWARD(Ts, ts)...);
 
                         // Initialize the queues for all worker threads so that
                         // worker threads can start stealing immediately when
@@ -500,12 +499,12 @@ namespace hpx { namespace execution { namespace experimental {
                 operation_state(thread_pool_scheduler&& scheduler,
                     Sender_&& sender, Shape_&& shape, F_&& f,
                     Receiver_&& receiver)
-                  : scheduler(std::move(scheduler))
+                  : scheduler(HPX_MOVE(scheduler))
                   , op_state(hpx::execution::experimental::connect(
-                        std::forward<Sender_>(sender), bulk_receiver{this}))
-                  , shape(std::forward<Shape_>(shape))
-                  , f(std::forward<F_>(f))
-                  , receiver(std::forward<Receiver_>(receiver))
+                        HPX_FORWARD(Sender_, sender), bulk_receiver{this}))
+                  , shape(HPX_FORWARD(Shape_, shape))
+                  , f(HPX_FORWARD(F_, f))
+                  , receiver(HPX_FORWARD(Receiver_, receiver))
                 {
                 }
 
@@ -521,9 +520,9 @@ namespace hpx { namespace execution { namespace experimental {
                 connect_t, thread_pool_bulk_sender&& s, Receiver&& receiver)
             {
                 return operation_state<std::decay_t<Receiver>>{
-                    std::move(s.scheduler), std::move(s.sender),
-                    std::move(s.shape), std::move(s.f),
-                    std::forward<Receiver>(receiver)};
+                    HPX_MOVE(s.scheduler), HPX_MOVE(s.sender),
+                    HPX_MOVE(s.shape), HPX_MOVE(s.f),
+                    HPX_FORWARD(Receiver, receiver)};
             }
 
             template <typename Receiver>
@@ -531,7 +530,7 @@ namespace hpx { namespace execution { namespace experimental {
                 connect_t, thread_pool_bulk_sender& s, Receiver&& receiver)
             {
                 return operation_state<std::decay_t<Receiver>>{s.scheduler,
-                    s.sender, s.shape, s.f, std::forward<Receiver>(receiver)};
+                    s.sender, s.shape, s.f, HPX_FORWARD(Receiver, receiver)};
             }
         };
     }    // namespace detail
@@ -543,8 +542,8 @@ namespace hpx { namespace execution { namespace experimental {
     {
         return detail::thread_pool_bulk_sender<std::decay_t<Sender>,
             hpx::util::detail::counting_shape_type<std::decay_t<Shape>>,
-            std::decay_t<F>>{std::move(scheduler), std::forward<Sender>(sender),
-            hpx::util::detail::make_counting_shape(shape), std::forward<F>(f)};
+            std::decay_t<F>>{HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender),
+            hpx::util::detail::make_counting_shape(shape), HPX_FORWARD(F, f)};
     }
 
     template <typename Sender, typename Shape, typename F,
@@ -553,8 +552,8 @@ namespace hpx { namespace execution { namespace experimental {
         Sender&& sender, Shape&& shape, F&& f)
     {
         return detail::thread_pool_bulk_sender<std::decay_t<Sender>,
-            std::decay_t<Shape>, std::decay_t<F>>{std::move(scheduler),
-            std::forward<Sender>(sender), std::forward<Shape>(shape),
-            std::forward<F>(f)};
+            std::decay_t<Shape>, std::decay_t<F>>{HPX_MOVE(scheduler),
+            HPX_FORWARD(Sender, sender), HPX_FORWARD(Shape, shape),
+            HPX_FORWARD(F, f)};
     }
 }}}    // namespace hpx::execution::experimental

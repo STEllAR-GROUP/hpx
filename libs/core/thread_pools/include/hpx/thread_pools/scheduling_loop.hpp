@@ -97,7 +97,7 @@ namespace hpx { namespace threads { namespace detail {
         {
             prev_state_ = thread_state(
                 new_state.first, prev_state_.state_ex(), prev_state_.tag() + 1);
-            next_thread_id_ = std::move(new_state.second);
+            next_thread_id_ = HPX_MOVE(new_state.second);
             return prev_state_;
         }
 
@@ -139,7 +139,7 @@ namespace hpx { namespace threads { namespace detail {
 
         thread_id_ref_type move_next_thread()
         {
-            return std::move(next_thread_id_);
+            return HPX_MOVE(next_thread_id_);
         }
 
     private:
@@ -183,7 +183,7 @@ namespace hpx { namespace threads { namespace detail {
         {
             prev_state_ = thread_state(
                 new_state.first, prev_state_.state_ex(), prev_state_.tag() + 1);
-            next_thread_id_ = std::move(new_state.second);
+            next_thread_id_ = HPX_MOVE(new_state.second);
             return prev_state_;
         }
 
@@ -225,7 +225,7 @@ namespace hpx { namespace threads { namespace detail {
 
         thread_id_ref_type move_next_thread()
         {
-            return std::move(next_thread_id_);
+            return HPX_MOVE(next_thread_id_);
         }
 
     private:
@@ -408,9 +408,9 @@ namespace hpx { namespace threads { namespace detail {
                 (std::numeric_limits<std::size_t>::max)(),
             std::size_t max_idle_loop_count = HPX_IDLE_LOOP_COUNT_MAX,
             std::size_t max_busy_loop_count = HPX_BUSY_LOOP_COUNT_MAX)
-          : outer_(std::move(outer))
-          , inner_(std::move(inner))
-          , background_(std::move(background))
+          : outer_(HPX_MOVE(outer))
+          , inner_(HPX_MOVE(inner))
+          , background_(HPX_MOVE(background))
           , max_background_threads_(max_background_threads)
           , max_idle_loop_count_(max_idle_loop_count)
           , max_busy_loop_count_(max_busy_loop_count)
@@ -528,13 +528,13 @@ namespace hpx { namespace threads { namespace detail {
                         {
                             if (next_thrd == nullptr)
                             {
-                                next_thrd = std::move(next);
+                                next_thrd = HPX_MOVE(next);
                             }
                             else
                             {
                                 auto* scheduler = get_thread_id_data(next)
                                                       ->get_scheduler_base();
-                                scheduler->schedule_thread(std::move(next),
+                                scheduler->schedule_thread(HPX_MOVE(next),
                                     threads::thread_schedule_hint(
                                         static_cast<std::int16_t>(num_thread)),
                                     true);
@@ -623,7 +623,7 @@ namespace hpx { namespace threads { namespace detail {
         thread_id_ref_type next_thrd;
         while (true)
         {
-            thread_id_ref_type thrd = std::move(next_thrd);
+            thread_id_ref_type thrd = HPX_MOVE(next_thrd);
             next_thrd = thread_id_ref_type();
 
             // Get the next HPX thread from the queue
@@ -791,7 +791,7 @@ namespace hpx { namespace threads { namespace detail {
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
                         scheduler.SchedulingPolicy::schedule_thread_last(
-                            std::move(thrd),
+                            HPX_MOVE(thrd),
                             threads::thread_schedule_hint(
                                 static_cast<std::int16_t>(num_thread)),
                             true);
@@ -810,7 +810,7 @@ namespace hpx { namespace threads { namespace detail {
                             if (HPX_UNLIKELY(busy_loop_count >
                                     params.max_busy_loop_count_))
                             {
-                                next_thrd = std::move(thrd);
+                                next_thrd = HPX_MOVE(thrd);
                             }
                             else
                             {
@@ -822,7 +822,7 @@ namespace hpx { namespace threads { namespace detail {
                                 // schedule this thread again immediately with
                                 // boosted priority
                                 scheduler.SchedulingPolicy::schedule_thread(
-                                    std::move(thrd),
+                                    HPX_MOVE(thrd),
                                     threads::thread_schedule_hint(
                                         static_cast<std::int16_t>(num_thread)),
                                     true, thread_priority::boost);
@@ -835,7 +835,7 @@ namespace hpx { namespace threads { namespace detail {
                             // schedule this thread again immediately with
                             // boosted priority
                             scheduler.SchedulingPolicy::schedule_thread(
-                                std::move(thrd),
+                                HPX_MOVE(thrd),
                                 threads::thread_schedule_hint(
                                     static_cast<std::int16_t>(num_thread)),
                                 true, thread_priority::boost);
@@ -859,7 +859,7 @@ namespace hpx { namespace threads { namespace detail {
                     // scheduler queue already but the state has not been reset
                     // yet
                     auto priority = thrdptr->get_priority();
-                    scheduler.SchedulingPolicy::schedule_thread(std::move(thrd),
+                    scheduler.SchedulingPolicy::schedule_thread(HPX_MOVE(thrd),
                         threads::thread_schedule_hint(
                             static_cast<std::int16_t>(num_thread)),
                         true, priority);
@@ -926,7 +926,7 @@ namespace hpx { namespace threads { namespace detail {
                                     scheduler.SchedulingPolicy::
                                         decrement_background_thread_count();
                                     scheduler.SchedulingPolicy::schedule_thread(
-                                        std::move(background_thread),
+                                        HPX_MOVE(background_thread),
                                         threads::thread_schedule_hint(
                                             static_cast<std::int16_t>(
                                                 num_thread)),
@@ -1071,7 +1071,7 @@ namespace hpx { namespace threads { namespace detail {
                         scheduler.SchedulingPolicy::
                             decrement_background_thread_count();
                         scheduler.SchedulingPolicy::schedule_thread(
-                            std::move(background_thread),
+                            HPX_MOVE(background_thread),
                             threads::thread_schedule_hint(
                                 static_cast<std::int16_t>(num_thread)),
                             true, priority);

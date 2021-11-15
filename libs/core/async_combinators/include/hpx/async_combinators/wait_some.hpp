@@ -312,7 +312,7 @@ namespace hpx { namespace lcos {
             typedef Sequence argument_type;
 
             wait_some(argument_type&& lazy_values, std::size_t n)
-              : lazy_values_(std::move(lazy_values))
+              : lazy_values_(HPX_MOVE(lazy_values))
               , count_(0)
               , needed_count_(n)
               , goal_reached_on_calling_thread_(false)
@@ -377,7 +377,7 @@ namespace hpx { namespace lcos {
 
         std::shared_ptr<detail::wait_some<result_type>> f =
             std::make_shared<detail::wait_some<result_type>>(
-                std::move(lazy_values_), n);
+                HPX_MOVE(lazy_values_), n);
 
         return (*f.get())();
     }
@@ -429,7 +429,7 @@ namespace hpx { namespace lcos {
 
         std::shared_ptr<detail::wait_some<result_type>> f =
             std::make_shared<detail::wait_some<result_type>>(
-                std::move(lazy_values_), n);
+                HPX_MOVE(lazy_values_), n);
 
         return (*f.get())();
     }
@@ -468,7 +468,7 @@ namespace hpx { namespace lcos {
 
         std::shared_ptr<detail::wait_some<result_type>> f =
             std::make_shared<detail::wait_some<result_type>>(
-                std::move(lazy_values_), n);
+                HPX_MOVE(lazy_values_), n);
 
         return (*f.get())();
     }
@@ -491,7 +491,7 @@ namespace hpx { namespace lcos {
 
         std::shared_ptr<detail::wait_some<result_type>> f =
             std::make_shared<detail::wait_some<result_type>>(
-                std::move(lazy_values_), n);
+                HPX_MOVE(lazy_values_), n);
 
         (*f.get())();
 
@@ -562,7 +562,7 @@ namespace hpx { namespace lcos {
 
         std::shared_ptr<detail::wait_some<result_type>> f =
             std::make_shared<detail::wait_some<result_type>>(
-                std::move(lazy_values_), n);
+                HPX_MOVE(lazy_values_), n);
 
         return (*f.get())();
     }
@@ -591,7 +591,7 @@ namespace hpx { namespace lcos {
 
         std::shared_ptr<detail::wait_some<result_type>> f =
             std::make_shared<detail::wait_some<result_type>>(
-                std::move(lazy_values_), n);
+                HPX_MOVE(lazy_values_), n);
 
         return (*f.get())();
     }

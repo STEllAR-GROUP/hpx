@@ -67,8 +67,8 @@ namespace hpx { namespace lcos { namespace detail {
             naming::id_type const& id, Ts&&... ts)
         {
             return detail::create_dataflow_alloc(alloc,
-                std::forward<Policy_>(policy), Derived{}, id,
-                traits::acquire_future_disp()(std::forward<Ts>(ts))...);
+                HPX_FORWARD(Policy_, policy), Derived{}, id,
+                traits::acquire_future_disp()(HPX_FORWARD(Ts, ts))...);
         }
     };
 
@@ -86,7 +86,7 @@ namespace hpx { namespace lcos { namespace detail {
             naming::id_type const& id, Ts&&... ts)
         {
             return dataflow_dispatch_impl<true, launch>::call(
-                alloc, launch::async, act, id, std::forward<Ts>(ts)...);
+                alloc, launch::async, act, id, HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -101,7 +101,7 @@ namespace hpx { namespace lcos { namespace detail {
         call(Allocator const& alloc, naming::id_type const& id, Ts&&... ts)
         {
             return dataflow_dispatch_impl<true, Action>::call(
-                alloc, Action(), id, std::forward<Ts>(ts)...);
+                alloc, Action(), id, HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -119,8 +119,8 @@ namespace hpx { namespace lcos { namespace detail {
         {
             return dataflow_dispatch_impl<true,
                 typename std::decay<Policy>::type>::call(alloc,
-                std::forward<Policy>(policy), Action(), id,
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Policy, policy), Action(), id,
+                HPX_FORWARD(Ts, ts)...);
         }
     };
 }}}    // namespace hpx::lcos::detail
@@ -132,12 +132,12 @@ namespace hpx {
             typename std::enable_if<traits::is_action<Action>::value>::type>
     HPX_FORCEINLINE auto dataflow(T0&& t0, Ts&&... ts)
         -> decltype(lcos::detail::dataflow_action_dispatch<Action, T0>::call(
-            hpx::util::internal_allocator<>{}, std::forward<T0>(t0),
-            std::forward<Ts>(ts)...))
+            hpx::util::internal_allocator<>{}, HPX_FORWARD(T0, t0),
+            HPX_FORWARD(Ts, ts)...))
     {
         return lcos::detail::dataflow_action_dispatch<Action, T0>::call(
-            hpx::util::internal_allocator<>{}, std::forward<T0>(t0),
-            std::forward<Ts>(ts)...);
+            hpx::util::internal_allocator<>{}, HPX_FORWARD(T0, t0),
+            HPX_FORWARD(Ts, ts)...);
     }
 
     template <typename Action, typename Allocator, typename T0, typename... Ts,
@@ -146,10 +146,10 @@ namespace hpx {
     HPX_FORCEINLINE auto dataflow_alloc(
         Allocator const& alloc, T0&& t0, Ts&&... ts)
         -> decltype(lcos::detail::dataflow_action_dispatch<Action, T0>::call(
-            alloc, std::forward<T0>(t0), std::forward<Ts>(ts)...))
+            alloc, HPX_FORWARD(T0, t0), HPX_FORWARD(Ts, ts)...))
     {
         return lcos::detail::dataflow_action_dispatch<Action, T0>::call(
-            alloc, std::forward<T0>(t0), std::forward<Ts>(ts)...);
+            alloc, HPX_FORWARD(T0, t0), HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx
 

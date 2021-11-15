@@ -83,7 +83,7 @@ namespace hpx { namespace performance_counters { namespace detail {
             using detail::create_raw_counter;
             util::function_nonser<std::int64_t(bool)> f =
                 util::bind_front(total_func, tm);
-            return create_raw_counter(info, std::move(f), ec);
+            return create_raw_counter(info, HPX_MOVE(f), ec);
         }
         else if (paths.instancename_ == "pool")
         {
@@ -99,7 +99,7 @@ namespace hpx { namespace performance_counters { namespace detail {
                 util::function_nonser<std::int64_t(bool)> f =
                     util::bind_front(pool_func, &pool_instance,
                         static_cast<std::size_t>(paths.subinstanceindex_));
-                return create_raw_counter(info, std::move(f), ec);
+                return create_raw_counter(info, HPX_MOVE(f), ec);
             }
         }
         else if (paths.instancename_ == "worker-thread" &&
@@ -111,7 +111,7 @@ namespace hpx { namespace performance_counters { namespace detail {
             util::function_nonser<std::int64_t(bool)> f =
                 util::bind_front(pool_func, &pool,
                     static_cast<std::size_t>(paths.instanceindex_));
-            return create_raw_counter(info, std::move(f), ec);
+            return create_raw_counter(info, HPX_MOVE(f), ec);
         }
 
         HPX_THROWS_IF(ec, bad_parameter, "locality_pool_thread_counter_creator",
@@ -148,7 +148,7 @@ namespace hpx { namespace performance_counters { namespace detail {
             // counter for default pool
             util::function_nonser<std::int64_t()> f = util::bind_back(
                 &threads::thread_pool_base::get_scheduler_utilization, &pool);
-            return create_raw_counter(info, std::move(f), ec);
+            return create_raw_counter(info, HPX_MOVE(f), ec);
         }
         else if (paths.instancename_ == "pool")
         {
@@ -158,7 +158,7 @@ namespace hpx { namespace performance_counters { namespace detail {
                 util::function_nonser<std::int64_t()> f = util::bind_back(
                     &threads::thread_pool_base::get_scheduler_utilization,
                     &pool);
-                return create_raw_counter(info, std::move(f), ec);
+                return create_raw_counter(info, HPX_MOVE(f), ec);
             }
             else if (std::size_t(paths.instanceindex_) <
                 hpx::resource::get_num_thread_pools())
@@ -170,7 +170,7 @@ namespace hpx { namespace performance_counters { namespace detail {
                 util::function_nonser<std::int64_t()> f = util::bind_back(
                     &threads::thread_pool_base::get_scheduler_utilization,
                     &pool_instance);
-                return create_raw_counter(info, std::move(f), ec);
+                return create_raw_counter(info, HPX_MOVE(f), ec);
             }
         }
 
@@ -226,7 +226,7 @@ namespace hpx { namespace performance_counters { namespace detail {
                 util::function_nonser<std::int64_t(bool)> f =
                     util::bind_front(pool_func, &pool_instance,
                         static_cast<std::size_t>(paths.subinstanceindex_));
-                return create_raw_counter(info, std::move(f), ec);
+                return create_raw_counter(info, HPX_MOVE(f), ec);
             }
         }
         else if (paths.instancename_ == "worker-thread" &&
@@ -238,7 +238,7 @@ namespace hpx { namespace performance_counters { namespace detail {
             util::function_nonser<std::int64_t(bool)> f =
                 util::bind_front(pool_func, &pool,
                     static_cast<std::size_t>(paths.instanceindex_));
-            return create_raw_counter(info, std::move(f), ec);
+            return create_raw_counter(info, HPX_MOVE(f), ec);
         }
 
         HPX_THROWS_IF(ec, bad_parameter,

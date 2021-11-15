@@ -25,24 +25,22 @@
 #include <set>
 #include <utility>
 
-namespace hpx { namespace parcelset { namespace policies { namespace mpi
-{
+namespace hpx { namespace parcelset { namespace policies { namespace mpi {
     template <typename Parcelport>
     struct receiver
     {
         typedef hpx::lcos::local::spinlock mutex_type;
-        typedef std::list<std::pair<int, header> > header_list;
-        typedef std::set<std::pair<int, int> > handles_header_type;
-        typedef
-            receiver_connection<Parcelport>
-            connection_type;
+        typedef std::list<std::pair<int, header>> header_list;
+        typedef std::set<std::pair<int, int>> handles_header_type;
+        typedef receiver_connection<Parcelport> connection_type;
         typedef std::shared_ptr<connection_type> connection_ptr;
         typedef std::deque<connection_ptr> connection_list;
 
         receiver(Parcelport& pp)
           : pp_(pp)
           , hdr_request_(0)
-        {}
+        {
+        }
 
         void run()
         {
@@ -59,17 +57,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             // already accepted ones.
             if (!connection)
             {
-                std::unique_lock<mutex_type> l(connections_mtx_, std::try_to_lock);
-                if(l && !connections_.empty())
+                std::unique_lock<mutex_type> l(
+                    connections_mtx_, std::try_to_lock);
+                if (l && !connections_.empty())
                 {
-                    connection = std::move(connections_.front());
+                    connection = HPX_MOVE(connections_.front());
                     connections_.pop_front();
                 }
             }
 
-            if(connection)
+            if (connection)
             {
-                receive_messages(std::move(connection));
+                receive_messages(HPX_MOVE(connection));
                 return true;
             }
 
@@ -81,38 +80,32 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if (!connection->receive())
             {
                 std::unique_lock<mutex_type> l(connections_mtx_);
-                connections_.push_back(std::move(connection));
+                connections_.push_back(HPX_MOVE(connection));
             }
         }
 
         connection_ptr accept()
         {
             std::unique_lock<mutex_type> l(headers_mtx_, std::try_to_lock);
-            if(l)
+            if (l)
                 return accept_locked(l);
             return connection_ptr();
         }
 
-        connection_ptr accept_locked(std::unique_lock<mutex_type> & header_lock)
+        connection_ptr accept_locked(std::unique_lock<mutex_type>& header_lock)
         {
             connection_ptr res;
             util::mpi_environment::scoped_try_lock l;
 
-            if(l.locked)
+            if (l.locked)
             {
                 MPI_Status status;
-                if(request_done_locked(hdr_request_, &status))
+                if (request_done_locked(hdr_request_, &status))
                 {
                     header h = new_header();
                     l.unlock();
                     header_lock.unlock();
-                    res.reset(
-                        new connection_type(
-                            status.MPI_SOURCE
-                          , h
-                          , pp_
-                        )
-                    );
+                    res.reset(new connection_type(status.MPI_SOURCE, h, pp_));
                     return res;
                 }
             }
@@ -123,19 +116,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             header h = rcv_header_;
             rcv_header_.reset();
-            MPI_Irecv(
-                rcv_header_.data()
-              , rcv_header_.data_size_
-              , MPI_BYTE
-              , MPI_ANY_SOURCE
-              , 0
-              , util::mpi_environment::communicator()
-              , &hdr_request_
-            );
+            MPI_Irecv(rcv_header_.data(), rcv_header_.data_size_, MPI_BYTE,
+                MPI_ANY_SOURCE, 0, util::mpi_environment::communicator(),
+                &hdr_request_);
             return h;
         }
 
-        Parcelport & pp_;
+        Parcelport& pp_;
 
         mutex_type headers_mtx_;
         MPI_Request hdr_request_;
@@ -147,13 +134,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         mutex_type connections_mtx_;
         connection_list connections_;
 
-        bool request_done_locked(MPI_Request & r, MPI_Status *status)
+        bool request_done_locked(MPI_Request& r, MPI_Status* status)
         {
             int completed = 0;
             int ret = 0;
             ret = MPI_Test(&r, &completed, status);
             HPX_ASSERT(ret == MPI_SUCCESS);
-            if(completed)
+            if (completed)
             {
                 return true;
             }
@@ -161,7 +148,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
     };
 
-}}}}
+}}}}    // namespace hpx::parcelset::policies::mpi
 
 #endif
-

@@ -590,7 +590,7 @@ namespace hpx { namespace performance_counters {
         discover_counter_func func(hpx::util::bind_front(
             &detail::discover_counters, std::ref(counters)));
 
-        return discover_counter_types(std::move(func), mode, ec);
+        return discover_counter_types(HPX_MOVE(func), mode, ec);
     }
 
     counter_status discover_counter_type(std::string const& name,
@@ -600,7 +600,7 @@ namespace hpx { namespace performance_counters {
         discover_counter_func func(hpx::util::bind_front(
             &detail::discover_counters, std::ref(counters)));
 
-        return discover_counter_type(name, std::move(func), mode, ec);
+        return discover_counter_type(name, HPX_MOVE(func), mode, ec);
     }
 
     counter_status discover_counter_type(counter_info const& info,
@@ -610,7 +610,7 @@ namespace hpx { namespace performance_counters {
         discover_counter_func func(hpx::util::bind_front(
             &detail::discover_counters, std::ref(counters)));
 
-        return discover_counter_type(info, std::move(func), mode, ec);
+        return discover_counter_type(info, HPX_MOVE(func), mode, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////

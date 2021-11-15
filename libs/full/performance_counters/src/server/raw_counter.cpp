@@ -31,7 +31,7 @@ namespace hpx { namespace performance_counters { namespace server {
     raw_counter::raw_counter(counter_info const& info,
         hpx::util::function_nonser<std::int64_t(bool)> f)
       : base_type_holder(info)
-      , f_(std::move(f))
+      , f_(HPX_MOVE(f))
       , reset_(false)
     {
         if (info.type_ != counter_raw && info.type_ != counter_elapsed_time &&

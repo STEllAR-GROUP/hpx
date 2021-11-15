@@ -48,7 +48,7 @@ namespace hpx { namespace serialization {
         auto& tracker = ar.get_extra_data<detail::input_pointer_tracker>();
         HPX_ASSERT(tracker.find(pos) == tracker.end());
 
-        tracker.insert(std::make_pair(pos, std::move(helper)));
+        tracker.insert(std::make_pair(pos, HPX_MOVE(helper)));
     }
 
     detail::ptr_helper& tracked_pointer(input_archive& ar, std::uint64_t pos)

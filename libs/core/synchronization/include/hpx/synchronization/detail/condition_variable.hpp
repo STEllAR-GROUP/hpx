@@ -102,14 +102,14 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             std::unique_lock<mutex_type> lock, error_code& ec = throws)
         {
             return notify_one(
-                std::move(lock), threads::thread_priority::default_, ec);
+                HPX_MOVE(lock), threads::thread_priority::default_, ec);
         }
 
         void notify_all(
             std::unique_lock<mutex_type> lock, error_code& ec = throws)
         {
             return notify_all(
-                std::move(lock), threads::thread_priority::default_, ec);
+                HPX_MOVE(lock), threads::thread_priority::default_, ec);
         }
 
         HPX_CORE_EXPORT void abort_all(std::unique_lock<mutex_type> lock);

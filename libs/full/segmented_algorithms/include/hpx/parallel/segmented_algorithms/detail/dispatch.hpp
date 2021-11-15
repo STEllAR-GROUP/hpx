@@ -36,7 +36,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename T_>
         HPX_FORCEINLINE static constexpr T_ call(T_&& val)
         {
-            return std::forward<T_>(val);
+            return HPX_FORWARD(T_, val);
         }
     };
 
@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         HPX_FORCEINLINE static future<void> call(future<void>&& f)
         {
-            return std::move(f);
+            return HPX_MOVE(f);
         }
     };
 
@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static Iterator call(
             typename traits::local_raw_iterator&& it)
         {
-            return traits::remote(std::move(it));
+            return traits::remote(HPX_MOVE(it));
         }
     };
 
@@ -76,8 +76,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         call(std::pair<typename traits1::local_raw_iterator,
             typename traits2::local_raw_iterator>&& p)
         {
-            return std::make_pair(traits1::remote(std::move(p.first)),
-                traits2::remote(std::move(p.second)));
+            return std::make_pair(traits1::remote(HPX_MOVE(p.first)),
+                traits2::remote(HPX_MOVE(p.second)));
         }
     };
 
@@ -97,8 +97,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             return util::in_out_result<typename traits1::local_iterator,
                 typename traits2::local_iterator>{
-                traits1::remote(std::move(p.in)),
-                traits2::remote(std::move(p.out))};
+                traits1::remote(HPX_MOVE(p.in)),
+                traits2::remote(HPX_MOVE(p.out))};
         }
     };
 
@@ -113,8 +113,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             call(util::min_max_result<typename traits1::local_raw_iterator>&& p)
         {
             return util::min_max_result<typename traits1::local_iterator>{
-                traits1::remote(std::move(p.min)),
-                traits1::remote(std::move(p.max))};
+                traits1::remote(HPX_MOVE(p.min)),
+                traits1::remote(HPX_MOVE(p.max))};
         }
     };
 
@@ -135,9 +135,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             typename traits2::local_raw_iterator,
             typename traits3::local_raw_iterator>&& p)
         {
-            return hpx::make_tuple(traits1::remote(std::move(hpx::get<0>(p))),
-                traits2::remote(std::move(hpx::get<1>(p))),
-                traits3::remote(std::move(hpx::get<2>(p))));
+            return hpx::make_tuple(traits1::remote(HPX_MOVE(hpx::get<0>(p))),
+                traits2::remote(HPX_MOVE(hpx::get<1>(p))),
+                traits3::remote(HPX_MOVE(hpx::get<2>(p))));
         }
     };
 
@@ -163,9 +163,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             return util::in_in_out_result<typename traits1::local_iterator,
                 typename traits2::local_iterator,
                 typename traits3::local_iterator>{
-                traits1::remote(std::move(p.in1)),
-                traits2::remote(std::move(p.in2)),
-                traits3::remote(std::move(p.out))};
+                traits1::remote(HPX_MOVE(p.in1)),
+                traits2::remote(HPX_MOVE(p.in2)),
+                traits3::remote(HPX_MOVE(p.out))};
         }
     };
 
@@ -178,9 +178,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static future<Iterator> call(
             future<typename traits::local_raw_iterator>&& f)
         {
-            return hpx::make_future<Iterator>(std::move(f),
+            return hpx::make_future<Iterator>(HPX_MOVE(f),
                 [](typename traits::local_raw_iterator&& val) -> Iterator {
-                    return traits::remote(std::move(val));
+                    return traits::remote(HPX_MOVE(val));
                 });
         }
     };
@@ -202,7 +202,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static future<result_type> call(future<arg_type>&& f)
         {
             return hpx::make_future<result_type>(
-                std::move(f), [](arg_type&& p) -> result_type {
+                HPX_MOVE(f), [](arg_type&& p) -> result_type {
                     return std::make_pair(
                         traits1::remote(p.first), traits2::remote(p.second));
                 });
@@ -229,7 +229,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static future<result_type> call(future<arg_type>&& f)
         {
             return hpx::make_future<result_type>(
-                std::move(f), [](arg_type&& p) -> result_type {
+                HPX_MOVE(f), [](arg_type&& p) -> result_type {
                     return {traits1::remote(p.in), traits2::remote(p.out)};
                 });
         }
@@ -249,7 +249,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static future<result_type> call(future<arg_type>&& f)
         {
             return hpx::make_future<result_type>(
-                std::move(f), [](arg_type&& p) -> result_type {
+                HPX_MOVE(f), [](arg_type&& p) -> result_type {
                     return {traits::remote(p.min), traits::remote(p.max)};
                 });
         }
@@ -276,11 +276,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static future<result_type> call(future<arg_type>&& f)
         {
             return hpx::make_future<result_type>(
-                std::move(f), [](arg_type&& p) -> result_type {
+                HPX_MOVE(f), [](arg_type&& p) -> result_type {
                     return hpx::make_tuple(
-                        traits1::remote(std::move(hpx::get<0>(p))),
-                        traits2::remote(std::move(hpx::get<1>(p))),
-                        traits3::remote(std::move(hpx::get<2>(p))));
+                        traits1::remote(HPX_MOVE(hpx::get<0>(p))),
+                        traits2::remote(HPX_MOVE(hpx::get<1>(p))),
+                        traits3::remote(HPX_MOVE(hpx::get<2>(p))));
                 });
         }
     };
@@ -309,10 +309,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static future<result_type> call(future<arg_type>&& f)
         {
             return hpx::make_future<result_type>(
-                std::move(f), [](arg_type&& p) -> result_type {
-                    return {traits1::remote(std::move(p.in1)),
-                        traits2::remote(std::move(p.in2)),
-                        traits3::remote(std::move(p.out))};
+                HPX_MOVE(f), [](arg_type&& p) -> result_type {
+                    return {traits1::remote(HPX_MOVE(p.in1)),
+                        traits2::remote(HPX_MOVE(p.in2)),
+                        traits3::remote(HPX_MOVE(p.out))};
                 });
         }
     };
@@ -330,17 +330,18 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             using hpx::traits::segmented_local_iterator_traits;
             if constexpr (std::is_void_v<result_type>)
             {
-                return algo.call2(std::forward<ExPolicy>(policy),
+                return algo.call2(HPX_FORWARD(ExPolicy, policy),
                     std::true_type(),
                     segmented_local_iterator_traits<std::decay_t<Args>>::local(
-                        std::forward<Args>(args))...);
+                        HPX_FORWARD(Args, args))...);
             }
             else
             {
-                return detail::algorithm_result_helper<result_type>::call(
-                    algo.call2(std::forward<ExPolicy>(policy), std::true_type(),
-                        segmented_local_iterator_traits<std::decay_t<Args>>::
-                            local(std::forward<Args>(args))...));
+                return detail::algorithm_result_helper<
+                    result_type>::call(algo.call2(HPX_FORWARD(ExPolicy, policy),
+                    std::true_type(),
+                    segmented_local_iterator_traits<std::decay_t<Args>>::local(
+                        HPX_FORWARD(Args, args))...));
             }
         }
 
@@ -350,18 +351,18 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             using hpx::traits::segmented_local_iterator_traits;
             if constexpr (std::is_void_v<result_type>)
             {
-                return algo.call2(std::forward<ExPolicy>(policy),
+                return algo.call2(HPX_FORWARD(ExPolicy, policy),
                     std::false_type(),
                     segmented_local_iterator_traits<std::decay_t<Args>>::local(
-                        std::forward<Args>(args))...);
+                        HPX_FORWARD(Args, args))...);
             }
             else
             {
-                return detail::algorithm_result_helper<result_type>::call(
-                    algo.call2(std::forward<ExPolicy>(policy),
-                        std::false_type(),
-                        segmented_local_iterator_traits<std::decay_t<Args>>::
-                            local(std::forward<Args>(args))...));
+                return detail::algorithm_result_helper<
+                    result_type>::call(algo.call2(HPX_FORWARD(ExPolicy, policy),
+                    std::false_type(),
+                    segmented_local_iterator_traits<std::decay_t<Args>>::local(
+                        HPX_FORWARD(Args, args))...));
             }
         }
     };
@@ -406,8 +407,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             result_type(std::decay_t<Args>...)>
             act;
 
-        return hpx::async(act, hpx::colocated(id), std::forward<Algo>(algo),
-            std::move(policy), std::forward<Args>(args)...);
+        return hpx::async(act, hpx::colocated(id), HPX_FORWARD(Algo, algo),
+            HPX_MOVE(policy), HPX_FORWARD(Args, args)...);
     }
 
     template <typename Algo, typename ExPolicy, typename IsSeq,
@@ -418,8 +419,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         // synchronously invoke remote operation
         future<typename std::decay_t<Algo>::result_type> f =
-            dispatch_async(id, std::forward<Algo>(algo), std::move(policy),
-                is_seq, std::forward<Args>(args)...);
+            dispatch_async(id, HPX_FORWARD(Algo, algo), HPX_MOVE(policy),
+                is_seq, HPX_FORWARD(Args, args)...);
         f.wait();
 
         // handle any remote exceptions
@@ -432,7 +433,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
             // NOLINTNEXTLINE(bugprone-use-after-move)
             HPX_ASSERT(errors.empty());
-            throw exception_list(std::move(errors));
+            throw exception_list(HPX_MOVE(errors));
         }
         return f.get();
     }

@@ -28,8 +28,8 @@ namespace hpx { namespace util {
         }
 
         iterator_range(Iterator iterator, Sentinel sentinel)
-          : _iterator(std::move(iterator))
-          , _sentinel(std::move(sentinel))
+          : _iterator(HPX_MOVE(iterator))
+          , _sentinel(HPX_MOVE(sentinel))
         {
         }
 

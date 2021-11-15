@@ -37,7 +37,7 @@ namespace hpx { namespace execution { namespace experimental {
             friend void tag_invoke(set_error_t, make_future_receiver&& r,
                 std::exception_ptr ep) noexcept
             {
-                r.data->set_exception(std::move(ep));
+                r.data->set_exception(HPX_MOVE(ep));
                 r.data.reset();
             }
 
@@ -51,9 +51,9 @@ namespace hpx { namespace execution { namespace experimental {
                 set_value_t, make_future_receiver&& r, U&& u) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
-                    [&]() { r.data->set_value(std::forward<U>(u)); },
+                    [&]() { r.data->set_value(HPX_FORWARD(U, u)); },
                     [&](std::exception_ptr ep) {
-                        r.data->set_exception(std::move(ep));
+                        r.data->set_exception(HPX_MOVE(ep));
                     });
                 r.data.reset();
             }
@@ -69,7 +69,7 @@ namespace hpx { namespace execution { namespace experimental {
             friend void tag_invoke(set_error_t, make_future_receiver&& r,
                 std::exception_ptr ep) noexcept
             {
-                r.data->set_exception(std::move(ep));
+                r.data->set_exception(HPX_MOVE(ep));
                 r.data.reset();
             }
 
@@ -84,7 +84,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() { r.data->set_value(hpx::util::unused); },
                     [&](std::exception_ptr ep) {
-                        r.data->set_exception(std::move(ep));
+                        r.data->set_exception(HPX_MOVE(ep));
                     });
                 r.data.reset();
             }
@@ -111,7 +111,7 @@ namespace hpx { namespace execution { namespace experimental {
               : hpx::lcos::detail::future_data_allocator<T, Allocator>(
                     no_addref, alloc)
               , op_state(hpx::execution::experimental::connect(
-                    std::forward<Sender>(sender),
+                    HPX_FORWARD(Sender, sender),
                     detail::make_future_receiver<T, Allocator>{this}))
             {
                 hpx::execution::experimental::start(op_state);
@@ -148,7 +148,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
             allocator_traits::construct(alloc, p.get(), init_no_addref{}, alloc,
-                std::forward<Sender>(sender));
+                HPX_FORWARD(Sender, sender));
 
             return hpx::traits::future_access<future<result_type>>::create(
                 p.release(), false);
@@ -171,7 +171,7 @@ namespace hpx { namespace execution { namespace experimental {
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(make_future_t,
             Sender&& sender, Allocator const& allocator = Allocator{})
         {
-            return detail::make_future(std::forward<Sender>(sender), allocator);
+            return detail::make_future(HPX_FORWARD(Sender, sender), allocator);
         }
 
         // clang-format off

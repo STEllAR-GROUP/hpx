@@ -17,8 +17,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parcelset
-{
+namespace hpx { namespace parcelset {
     template <typename BufferType,
         typename ChunkType = serialization::serialization_chunk>
     struct parcel_buffer
@@ -30,37 +29,47 @@ namespace hpx { namespace parcelset
         explicit parcel_buffer(allocator_type allocator = allocator_type())
           : data_(allocator)
           , num_chunks_(count_chunks_type(0, 0))
-          , size_(0), data_size_(0), header_size_(0)
-        {}
-
-        explicit parcel_buffer(BufferType const & data,
-                allocator_type allocator = allocator_type())
-          : data_(data, allocator)
-          , num_chunks_(count_chunks_type(0, 0))
-          , size_(0), data_size_(0), header_size_(0)
-        {}
-
-        explicit parcel_buffer(BufferType && data,
-            allocator_type allocator = allocator_type())
-          : data_(std::move(data), allocator)
-          , num_chunks_(count_chunks_type(0, 0))
-          , size_(0), data_size_(0), header_size_(0)
-        {}
+          , size_(0)
+          , data_size_(0)
+          , header_size_(0)
+        {
+        }
 
         explicit parcel_buffer(
-            BufferType&& data, allocator_type* /* allocator */)
-          : data_(std::move(data))
+            BufferType const& data, allocator_type allocator = allocator_type())
+          : data_(data, allocator)
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0)
           , data_size_(0)
           , header_size_(0)
-        {}
+        {
+        }
 
-        parcel_buffer(parcel_buffer && other)
-          : data_(std::move(other.data_))
-          , chunks_(std::move(other.chunks_))
-          , transmission_chunks_(std::move(other.transmission_chunks_))
-          , num_chunks_(std::move(other.num_chunks_))
+        explicit parcel_buffer(
+            BufferType&& data, allocator_type allocator = allocator_type())
+          : data_(HPX_MOVE(data), allocator)
+          , num_chunks_(count_chunks_type(0, 0))
+          , size_(0)
+          , data_size_(0)
+          , header_size_(0)
+        {
+        }
+
+        explicit parcel_buffer(
+            BufferType&& data, allocator_type* /* allocator */)
+          : data_(HPX_MOVE(data))
+          , num_chunks_(count_chunks_type(0, 0))
+          , size_(0)
+          , data_size_(0)
+          , header_size_(0)
+        {
+        }
+
+        parcel_buffer(parcel_buffer&& other)
+          : data_(HPX_MOVE(other.data_))
+          , chunks_(HPX_MOVE(other.chunks_))
+          , transmission_chunks_(HPX_MOVE(other.transmission_chunks_))
+          , num_chunks_(HPX_MOVE(other.num_chunks_))
           , size_(other.size_)
           , data_size_(other.data_size_)
           , header_size_(other.header_size_)
@@ -68,11 +77,11 @@ namespace hpx { namespace parcelset
         {
         }
 
-        parcel_buffer &operator=(parcel_buffer && other)
+        parcel_buffer& operator=(parcel_buffer&& other)
         {
-            data_ = std::move(other.data_);
-            chunks_ = std::move(other.chunks_);
-            transmission_chunks_ = std::move(other.transmission_chunks_);
+            data_ = HPX_MOVE(other.data_);
+            chunks_ = HPX_MOVE(other.chunks_);
+            transmission_chunks_ = HPX_MOVE(other.transmission_chunks_);
             num_chunks_ = other.num_chunks_;
             size_ = other.size_;
             data_size_ = other.data_size_;
@@ -110,6 +119,6 @@ namespace hpx { namespace parcelset
         /// Counters and their data containers.
         performance_counters::parcels::data_point data_point_;
     };
-}}
+}}    // namespace hpx::parcelset
 
 #endif

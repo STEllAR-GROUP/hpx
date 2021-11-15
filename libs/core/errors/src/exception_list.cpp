@@ -69,7 +69,7 @@ namespace hpx {
 
     exception_list::exception_list(exception_list_type&& l)
       : hpx::exception(!l.empty() ? hpx::get_error(l.front()) : success)
-      , exceptions_(std::move(l))
+      , exceptions_(HPX_MOVE(l))
       , mtx_()
     {
     }
@@ -82,8 +82,8 @@ namespace hpx {
     }
 
     exception_list::exception_list(exception_list&& l)
-      : hpx::exception(std::move(static_cast<hpx::exception&>(l)))
-      , exceptions_(std::move(l.exceptions_))
+      : hpx::exception(HPX_MOVE(static_cast<hpx::exception&>(l)))
+      , exceptions_(HPX_MOVE(l.exceptions_))
       , mtx_()
     {
     }
@@ -104,8 +104,8 @@ namespace hpx {
         if (this != &l)
         {
             static_cast<hpx::exception&>(*this) =
-                std::move(static_cast<hpx::exception&>(l));
-            exceptions_ = std::move(l.exceptions_);
+                HPX_MOVE(static_cast<hpx::exception&>(l));
+            exceptions_ = HPX_MOVE(l.exceptions_);
         }
         return *this;
     }

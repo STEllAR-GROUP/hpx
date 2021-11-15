@@ -46,8 +46,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::future<util::in_in_result<FwdIter1, FwdIter2>>&& f,
             Sent2 last2)
         {
-            return hpx::make_future<bool>(std::move(f),
-                [last2 = std::move(last2)](
+            return hpx::make_future<bool>(HPX_MOVE(f),
+                [last2 = HPX_MOVE(last2)](
                     util::in_in_result<FwdIter1, FwdIter2>&& p) -> bool {
                     return p.in2 == last2;
                 });
@@ -79,11 +79,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return detail::get_starts_with_result<Iter1, Iter2, Sent2>(
                     hpx::parallel::v1::detail::mismatch_binary<
                         util::in_in_result<Iter1, Iter2>>()
-                        .call(hpx::execution::seq, std::move(first1),
-                            std::move(end_first), std::move(first2), last2,
-                            std::forward<Pred>(pred),
-                            std::forward<Proj1>(proj1),
-                            std::forward<Proj2>(proj2)),
+                        .call(hpx::execution::seq, HPX_MOVE(first1),
+                            HPX_MOVE(end_first), HPX_MOVE(first2), last2,
+                            HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj1, proj1),
+                            HPX_FORWARD(Proj2, proj2)),
                     last2);
             }
 
@@ -109,10 +108,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     Sent2>(
                     detail::mismatch_binary<
                         util::in_in_result<FwdIter1, FwdIter2>>()
-                        .call(std::forward<ExPolicy>(policy), first1, end_first,
-                            first2, last2, std::forward<Pred>(pred),
-                            std::forward<Proj1>(proj1),
-                            std::forward<Proj2>(proj2)),
+                        .call(HPX_FORWARD(ExPolicy, policy), first1, end_first,
+                            first2, last2, HPX_FORWARD(Pred, pred),
+                            HPX_FORWARD(Proj1, proj1),
+                            HPX_FORWARD(Proj2, proj2)),
                     last2);
             }
         };
@@ -155,8 +154,8 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::starts_with().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                std::forward<Pred>(pred), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -189,9 +188,9 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::starts_with().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                std::forward<Pred>(pred), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
     } starts_with{};
 

@@ -35,7 +35,7 @@ namespace hpx { namespace util {
 
         template <typename... Ts>
         tagged_pair(Ts&&... ts)
-          : base_type(std::forward<Ts>(ts)...)
+          : base_type(HPX_FORWARD(Ts, ts)...)
         {
         }
     };
@@ -50,7 +50,7 @@ namespace hpx { namespace util {
             Tag2(typename std::decay<T2>::type)>
             result_type;
 
-        return result_type(std::move(p));
+        return result_type(HPX_MOVE(p));
     }
 
     template <typename Tag1, typename Tag2, typename T1, typename T2>
@@ -79,7 +79,7 @@ namespace hpx { namespace util {
             Tag2(typename hpx::tuple_element<1, hpx::tuple<Ts...>>::type)>
             result_type;
 
-        return result_type(std::move(get<0>(p)), std::move(get<1>(p)));
+        return result_type(HPX_MOVE(get<0>(p)), HPX_MOVE(get<1>(p)));
     }
 
     template <typename Tag1, typename Tag2, typename... Ts>
@@ -109,7 +109,7 @@ namespace hpx { namespace util {
             Tag2(typename std::decay<T2>::type)>
             result_type;
 
-        return result_type(std::forward<T1>(t1), std::forward<T2>(t2));
+        return result_type(HPX_FORWARD(T1, t1), HPX_FORWARD(T2, t2));
     }
 }}    // namespace hpx::util
 

@@ -250,11 +250,11 @@ namespace hpx { namespace performance_counters {
         {
             using hpx::util::placeholders::_1;
             discover_counter_ = hpx::util::bind(&expand_counter_info, _1,
-                std::move(discover_counter), std::ref(ec));
+                HPX_MOVE(discover_counter), std::ref(ec));
         }
         else
         {
-            discover_counter_ = std::move(discover_counter);
+            discover_counter_ = HPX_MOVE(discover_counter);
         }
 
         for (counter_type_map_type::value_type const& d : countertypes_)

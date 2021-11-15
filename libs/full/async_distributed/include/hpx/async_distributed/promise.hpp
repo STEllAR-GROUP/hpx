@@ -88,7 +88,7 @@ namespace hpx { namespace lcos {
         ~promise() = default;
 
         /// \brief   Abandons any shared state (30.6.4) and then as if
-        ///          promise(std::move(other)).swap(*this).
+        ///          promise(HPX_MOVE(other)).swap(*this).
         /// \returns *this.
         promise& operator=(promise&& other) noexcept = default;
 
@@ -175,7 +175,7 @@ namespace hpx { namespace lcos {
         ~promise() = default;
 
         /// \brief   Abandons any shared state (30.6.4) and then as if
-        ///          promise(std::move(other)).swap(*this).
+        ///          promise(HPX_MOVE(other)).swap(*this).
         /// \returns *this.
         promise& operator=(promise&& other) noexcept = default;
 

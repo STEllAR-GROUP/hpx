@@ -535,7 +535,7 @@ namespace hpx {
                 threads::thread_schedule_hint hint = {})    // NOLINT
               : policy_holder<select_policy<Pred>>(
                     launch_policy::async, priority, stacksize, hint)
-              , pred_(std::forward<F>(f))
+              , pred_(HPX_FORWARD(F, f))
             {
             }
 
@@ -624,7 +624,7 @@ namespace hpx {
                 threads::thread_schedule_hint hint = {}) const
             {
                 return select_policy<std::decay_t<F>>(
-                    std::forward<F>(f), priority, stacksize, hint);
+                    HPX_FORWARD(F, f), priority, stacksize, hint);
             }
         };
 

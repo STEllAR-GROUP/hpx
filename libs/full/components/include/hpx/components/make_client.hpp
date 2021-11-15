@@ -33,7 +33,7 @@ namespace hpx { namespace components {
         typename std::enable_if<traits::is_client<Client>::value, Client>::type
         make_client(hpx::id_type&& id)
     {
-        return Client(std::move(id));
+        return Client(HPX_MOVE(id));
     }
 
     template <typename Client>
@@ -49,7 +49,7 @@ namespace hpx { namespace components {
         typename std::enable_if<traits::is_client<Client>::value, Client>::type
         make_client(hpx::future<hpx::id_type>&& id)
     {
-        return Client(std::move(id));
+        return Client(HPX_MOVE(id));
     }
 
     template <typename Client>
@@ -65,7 +65,7 @@ namespace hpx { namespace components {
         typename std::enable_if<traits::is_client<Client>::value, Client>::type
         make_client(hpx::shared_future<hpx::id_type>&& id)
     {
-        return Client(std::move(id));
+        return Client(HPX_MOVE(id));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -92,7 +92,7 @@ namespace hpx { namespace components {
         result.reserve(ids.size());
         for (hpx::id_type& id : ids)
         {
-            result.push_back(Client(std::move(id)));
+            result.push_back(Client(HPX_MOVE(id)));
         }
         return result;
     }
@@ -120,7 +120,7 @@ namespace hpx { namespace components {
         result.reserve(ids.size());
         for (hpx::future<hpx::id_type>& id : ids)
         {
-            result.push_back(Client(std::move(id)));
+            result.push_back(Client(HPX_MOVE(id)));
         }
         return result;
     }
@@ -148,7 +148,7 @@ namespace hpx { namespace components {
         result.reserve(ids.size());
         for (hpx::shared_future<hpx::id_type>& id : ids)
         {
-            result.push_back(Client(std::move(id)));
+            result.push_back(Client(HPX_MOVE(id)));
         }
         return result;
     }

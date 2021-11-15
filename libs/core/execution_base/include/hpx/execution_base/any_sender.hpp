@@ -148,7 +148,7 @@ namespace hpx::detail {
           : heap_storage(nullptr)
           , object(get_empty_vtable<base_type>::call())
         {
-            move_assign(std::move(other));
+            move_assign(HPX_MOVE(other));
         }
 
         movable_sbo_storage& operator=(movable_sbo_storage&& other)
@@ -160,7 +160,7 @@ namespace hpx::detail {
                     release();
                 }
 
-                move_assign(std::move(other));
+                move_assign(HPX_MOVE(other));
             }
             return *this;
         }
@@ -189,12 +189,12 @@ namespace hpx::detail {
             if constexpr (can_use_embedded_storage<Impl>())
             {
                 Impl* p = reinterpret_cast<Impl*>(&embedded_storage);
-                new (p) Impl(std::forward<Ts>(ts)...);
+                new (p) Impl(HPX_FORWARD(Ts, ts)...);
                 object = p;
             }
             else
             {
-                heap_storage = new Impl(std::forward<Ts>(ts)...);
+                heap_storage = new Impl(HPX_FORWARD(Ts, ts)...);
                 object = heap_storage;
             }
         }
@@ -299,8 +299,8 @@ namespace hpx::execution::experimental {
             template <typename Sender_, typename Receiver_>
             any_operation_state_impl(Sender_&& sender, Receiver_&& receiver)
               : operation_state(hpx::execution::experimental::connect(
-                    std::forward<Sender_>(sender),
-                    std::forward<Receiver_>(receiver)))
+                    HPX_FORWARD(Sender_, sender),
+                    HPX_FORWARD(Receiver_, receiver)))
             {
             }
 
@@ -326,8 +326,8 @@ namespace hpx::execution::experimental {
             any_operation_state(Sender&& sender, Receiver&& receiver)
             {
                 storage.template store<impl_type<Sender, Receiver>>(
-                    std::forward<Sender>(sender),
-                    std::forward<Receiver>(receiver));
+                    HPX_FORWARD(Sender, sender),
+                    HPX_FORWARD(Receiver, receiver));
             }
 
             ~any_operation_state() = default;
@@ -396,30 +396,30 @@ namespace hpx::execution::experimental {
                 typename = std::enable_if_t<!std::is_same_v<
                     std::decay_t<Receiver_>, any_receiver_impl>>>
             explicit any_receiver_impl(Receiver_&& receiver)
-              : receiver(std::forward<Receiver_>(receiver))
+              : receiver(HPX_FORWARD(Receiver_, receiver))
             {
             }
 
             void move_into(void* p) override
             {
-                new (p) any_receiver_impl(std::move(receiver));
+                new (p) any_receiver_impl(HPX_MOVE(receiver));
             }
 
             void set_value(Ts... ts) && override
             {
                 hpx::execution::experimental::set_value(
-                    std::move(receiver), std::move(ts)...);
+                    HPX_MOVE(receiver), HPX_MOVE(ts)...);
             }
 
             void set_error(std::exception_ptr ep) && noexcept override
             {
                 hpx::execution::experimental::set_error(
-                    std::move(receiver), std::move(ep));
+                    HPX_MOVE(receiver), HPX_MOVE(ep));
             }
 
             void set_done() && noexcept override
             {
-                hpx::execution::experimental::set_done(std::move(receiver));
+                hpx::execution::experimental::set_done(HPX_MOVE(receiver));
             }
         };
 
@@ -441,7 +441,7 @@ namespace hpx::execution::experimental {
             explicit any_receiver(Receiver&& receiver)
             {
                 storage.template store<impl_type<Receiver>>(
-                    std::forward<Receiver>(receiver));
+                    HPX_FORWARD(Receiver, receiver));
             }
 
             template <typename Receiver,
@@ -450,7 +450,7 @@ namespace hpx::execution::experimental {
             any_receiver& operator=(Receiver&& receiver)
             {
                 storage.template store<impl_type<Receiver>>(
-                    std::forward<Receiver>(receiver));
+                    HPX_FORWARD(Receiver, receiver));
                 return *this;
             }
 
@@ -465,10 +465,10 @@ namespace hpx::execution::experimental {
             {
                 // We first move the storage to a temporary variable so that
                 // this any_receiver is empty after this set_value. Doing
-                // std::move(storage.get()).set_value(...) would leave us with a
+                // HPX_MOVE(storage.get()).set_value(...) would leave us with a
                 // non-empty any_receiver holding a moved-from receiver.
-                auto moved_storage = std::move(r.storage);
-                std::move(moved_storage.get()).set_value(std::move(ts)...);
+                auto moved_storage = HPX_MOVE(r.storage);
+                HPX_MOVE(moved_storage.get()).set_value(HPX_MOVE(ts)...);
             }
 
             friend void tag_invoke(hpx::execution::experimental::set_error_t,
@@ -476,10 +476,10 @@ namespace hpx::execution::experimental {
             {
                 // We first move the storage to a temporary variable so that
                 // this any_receiver is empty after this set_error. Doing
-                // std::move(storage.get()).set_error(...) would leave us with a
+                // HPX_MOVE(storage.get()).set_error(...) would leave us with a
                 // non-empty any_receiver holding a moved-from receiver.
-                auto moved_storage = std::move(r.storage);
-                std::move(moved_storage.get()).set_error(std::move(ep));
+                auto moved_storage = HPX_MOVE(r.storage);
+                HPX_MOVE(moved_storage.get()).set_error(HPX_MOVE(ep));
             }
 
             friend void tag_invoke(hpx::execution::experimental::set_done_t,
@@ -487,10 +487,10 @@ namespace hpx::execution::experimental {
             {
                 // We first move the storage to a temporary variable so that
                 // this any_receiver is empty after this set_done. Doing
-                // std::move(storage.get()).set_done(...) would leave us with a
+                // HPX_MOVE(storage.get()).set_done(...) would leave us with a
                 // non-empty any_receiver holding a moved-from receiver.
-                auto moved_storage = std::move(r.storage);
-                std::move(moved_storage.get()).set_done();
+                auto moved_storage = HPX_MOVE(r.storage);
+                HPX_MOVE(moved_storage.get()).set_done();
             }
         };
 
@@ -582,20 +582,20 @@ namespace hpx::execution::experimental {
                 typename = std::enable_if_t<!std::is_same_v<
                     std::decay_t<Sender_>, unique_any_sender_impl>>>
             explicit unique_any_sender_impl(Sender_&& sender)
-              : sender(std::forward<Sender_>(sender))
+              : sender(HPX_FORWARD(Sender_, sender))
             {
             }
 
             void move_into(void* p) override
             {
-                new (p) unique_any_sender_impl(std::move(sender));
+                new (p) unique_any_sender_impl(HPX_MOVE(sender));
             }
 
             any_operation_state connect(any_receiver<Ts...>&& receiver) &&
                 override
             {
                 return any_operation_state{
-                    std::move(sender), std::move(receiver)};
+                    HPX_MOVE(sender), HPX_MOVE(receiver)};
             }
         };
 
@@ -608,13 +608,13 @@ namespace hpx::execution::experimental {
                 typename = std::enable_if_t<
                     !std::is_same_v<std::decay_t<Sender_>, any_sender_impl>>>
             explicit any_sender_impl(Sender_&& sender)
-              : sender(std::forward<Sender_>(sender))
+              : sender(HPX_FORWARD(Sender_, sender))
             {
             }
 
             void move_into(void* p) override
             {
-                new (p) any_sender_impl(std::move(sender));
+                new (p) any_sender_impl(HPX_MOVE(sender));
             }
 
             any_sender_base<Ts...>* clone() const override
@@ -630,14 +630,14 @@ namespace hpx::execution::experimental {
             any_operation_state connect(any_receiver<Ts...>&& receiver) &
                 override
             {
-                return any_operation_state{sender, std::move(receiver)};
+                return any_operation_state{sender, HPX_MOVE(receiver)};
             }
 
             any_operation_state connect(any_receiver<Ts...>&& receiver) &&
                 override
             {
                 return any_operation_state{
-                    std::move(sender), std::move(receiver)};
+                    HPX_MOVE(sender), HPX_MOVE(receiver)};
             }
         };
     }    // namespace detail
@@ -662,7 +662,7 @@ namespace hpx::execution::experimental {
         explicit unique_any_sender(Sender&& sender)
         {
             storage.template store<impl_type<Sender>>(
-                std::forward<Sender>(sender));
+                HPX_FORWARD(Sender, sender));
         }
 
         template <typename Sender,
@@ -671,7 +671,7 @@ namespace hpx::execution::experimental {
         unique_any_sender& operator=(Sender&& sender)
         {
             storage.template store<impl_type<Sender>>(
-                std::forward<Sender>(sender));
+                HPX_FORWARD(Sender, sender));
             return *this;
         }
 
@@ -697,11 +697,11 @@ namespace hpx::execution::experimental {
         {
             // We first move the storage to a temporary variable so that this
             // any_sender is empty after this connect. Doing
-            // std::move(storage.get()).connect(...) would leave us with a
+            // HPX_MOVE(storage.get()).connect(...) would leave us with a
             // non-empty any_sender holding a moved-from sender.
-            auto moved_storage = std::move(s.storage);
-            return std::move(moved_storage.get())
-                .connect(detail::any_receiver<Ts...>{std::forward<R>(r)});
+            auto moved_storage = HPX_MOVE(s.storage);
+            return HPX_MOVE(moved_storage.get())
+                .connect(detail::any_receiver<Ts...>{HPX_FORWARD(R, r)});
         }
     };
 
@@ -730,7 +730,7 @@ namespace hpx::execution::experimental {
                 "constructible or use unique_any_sender if you do not require "
                 "copyability.");
             storage.template store<impl_type<Sender>>(
-                std::forward<Sender>(sender));
+                HPX_FORWARD(Sender, sender));
         }
 
         template <typename Sender,
@@ -744,7 +744,7 @@ namespace hpx::execution::experimental {
                 "constructible or use unique_any_sender if you do not require "
                 "copyability.");
             storage.template store<impl_type<Sender>>(
-                std::forward<Sender>(sender));
+                HPX_FORWARD(Sender, sender));
             return *this;
         }
 
@@ -768,7 +768,7 @@ namespace hpx::execution::experimental {
             hpx::execution::experimental::connect_t, any_sender& s, R&& r)
         {
             return s.storage.get().connect(
-                detail::any_receiver<Ts...>{std::forward<R>(r)});
+                detail::any_receiver<Ts...>{HPX_FORWARD(R, r)});
         }
 
         template <typename R>
@@ -777,11 +777,11 @@ namespace hpx::execution::experimental {
         {
             // We first move the storage to a temporary variable so that this
             // any_sender is empty after this connect. Doing
-            // std::move(storage.get()).connect(...) would leave us with a
+            // HPX_MOVE(storage.get()).connect(...) would leave us with a
             // non-empty any_sender holding a moved-from sender.
-            auto moved_storage = std::move(s.storage);
-            return std::move(moved_storage.get())
-                .connect(detail::any_receiver<Ts...>{std::forward<R>(r)});
+            auto moved_storage = HPX_MOVE(s.storage);
+            return HPX_MOVE(moved_storage.get())
+                .connect(detail::any_receiver<Ts...>{HPX_FORWARD(R, r)});
         }
     };
 }    // namespace hpx::execution::experimental

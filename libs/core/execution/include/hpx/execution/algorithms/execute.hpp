@@ -24,8 +24,8 @@ namespace hpx { namespace execution { namespace experimental {
             execute_t, Scheduler&& scheduler, F&& f)
         {
             return start_detached(
-                then(schedule(std::forward<Scheduler>(scheduler)),
-                    std::forward<F>(f)));
+                then(schedule(HPX_FORWARD(Scheduler, scheduler)),
+                    HPX_FORWARD(F, f)));
         }
     } execute{};
 }}}    // namespace hpx::execution::experimental

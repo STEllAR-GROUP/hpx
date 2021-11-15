@@ -21,7 +21,7 @@ namespace hpx { namespace traits {
 
         static Result call(RemoteResult&& rhs)    //-V659
         {
-            return Result(std::move(rhs));
+            return Result(HPX_MOVE(rhs));
         }
     };
 
@@ -35,7 +35,7 @@ namespace hpx { namespace traits {
 
         static Result&& call(Result&& rhs)
         {
-            return std::move(rhs);
+            return HPX_MOVE(rhs);
         }
     };
 }}    // namespace hpx::traits

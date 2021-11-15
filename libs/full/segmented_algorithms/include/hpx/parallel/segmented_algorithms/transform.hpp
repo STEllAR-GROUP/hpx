@@ -115,7 +115,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 dest = traits2::compose(sdest, out.out);
             }
             return result::get(util::in_out_result<SegIter, OutIter>{
-                std::move(last), std::move(dest)});
+                HPX_MOVE(last), HPX_MOVE(dest)});
         }
 
         // parallel remote implementation
@@ -211,7 +211,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     auto odest = traits2::compose(sdest, ft.out);
                     return util::in_out_result<SegIter, OutIter>{olast, odest};
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
 
         // Binary transform
@@ -317,7 +317,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
             return result::get(
                 util::in_in_out_result<InIter1, InIter2, OutIter>{
-                    std::move(last1), std::move(last2), std::move(dest)});
+                    HPX_MOVE(last1), HPX_MOVE(last2), HPX_MOVE(dest)});
         }
 
         // parallel remote implementation
@@ -436,7 +436,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return util::in_in_out_result<InIter1, InIter2, OutIter>{
                         olast1, olast2, odest};
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
 
         // Binary transform1
@@ -544,7 +544,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
             return result::get(
                 util::in_in_out_result<InIter1, InIter2, OutIter>{
-                    std::move(last1), std::move(last2), std::move(dest)});
+                    HPX_MOVE(last1), HPX_MOVE(last2), HPX_MOVE(dest)});
         }
 
         // parallel remote implementation
@@ -664,7 +664,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return util::in_in_out_result<InIter1, InIter2, OutIter>{
                         olast1, olast2, odest};
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
         /// \endcond
     }    // namespace detail
@@ -691,7 +691,7 @@ namespace hpx { namespace segmented {
         if (first == last)
         {
             return hpx::parallel::util::in_out_result<SegIter, OutIter>{
-                std::move(first), std::move(dest)};
+                HPX_MOVE(first), HPX_MOVE(dest)};
         }
 
         using iterator_traits1 =
@@ -703,7 +703,7 @@ namespace hpx { namespace segmented {
             hpx::parallel::v1::detail::transform<hpx::parallel::util::
                     in_out_result<typename iterator_traits1::local_iterator,
                         typename iterator_traits2::local_iterator>>(),
-            hpx::execution::seq, first, last, dest, std::forward<F>(f),
+            hpx::execution::seq, first, last, dest, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity{}, std::true_type{});
     }
 
@@ -734,7 +734,7 @@ namespace hpx { namespace segmented {
         {
             return result::get(
                 hpx::parallel::util::in_out_result<SegIter, OutIter>{
-                    std::move(first), std::move(dest)});
+                    HPX_MOVE(first), HPX_MOVE(dest)});
         }
 
         using iterator_traits1 =
@@ -746,9 +746,8 @@ namespace hpx { namespace segmented {
             hpx::parallel::v1::detail::transform<hpx::parallel::util::
                     in_out_result<typename iterator_traits1::local_iterator,
                         typename iterator_traits2::local_iterator>>(),
-            std::forward<ExPolicy>(policy), first, last, dest,
-            std::forward<F>(f), hpx::parallel::util::projection_identity{},
-            is_seq());
+            HPX_FORWARD(ExPolicy, policy), first, last, dest, HPX_FORWARD(F, f),
+            hpx::parallel::util::projection_identity{}, is_seq());
     }
 
     // clang-format off
@@ -777,7 +776,7 @@ namespace hpx { namespace segmented {
         if (first1 == last1)
         {
             return hpx::parallel::util::in_in_out_result<InIter1, InIter2,
-                OutIter>{std::move(first1), std::move(first2), std::move(dest)};
+                OutIter>{HPX_MOVE(first1), HPX_MOVE(first2), HPX_MOVE(dest)};
         }
 
         using iterator1_traits =
@@ -794,8 +793,8 @@ namespace hpx { namespace segmented {
                     in_in_out_result<typename iterator1_traits::local_iterator,
                         typename iterator2_traits::local_iterator,
                         typename iterator3_traits::local_iterator>>(),
-            hpx::execution::seq, first1, last1, first2, dest,
-            std::forward<F>(f), proj_id{}, proj_id{}, std::true_type{});
+            hpx::execution::seq, first1, last1, first2, dest, HPX_FORWARD(F, f),
+            proj_id{}, proj_id{}, std::true_type{});
     }
 
     // clang-format off
@@ -831,7 +830,7 @@ namespace hpx { namespace segmented {
         {
             return result::get(hpx::parallel::util::in_in_out_result<InIter1,
                 InIter2, OutIter>{
-                std::move(first1), std::move(first2), std::move(dest)});
+                HPX_MOVE(first1), HPX_MOVE(first2), HPX_MOVE(dest)});
         }
 
         using iterator1_traits =
@@ -848,8 +847,8 @@ namespace hpx { namespace segmented {
                     in_in_out_result<typename iterator1_traits::local_iterator,
                         typename iterator2_traits::local_iterator,
                         typename iterator3_traits::local_iterator>>(),
-            std::forward<ExPolicy>(policy), first1, last1, first2, dest,
-            std::forward<F>(f), proj_id{}, proj_id{}, is_seq());
+            HPX_FORWARD(ExPolicy, policy), first1, last1, first2, dest,
+            HPX_FORWARD(F, f), proj_id{}, proj_id{}, is_seq());
     }
 
     // clang-format off
@@ -875,7 +874,7 @@ namespace hpx { namespace segmented {
         if (first1 == last1)
         {
             return hpx::parallel::util::in_in_out_result<InIter1, InIter2,
-                OutIter>{std::move(first1), std::move(first2), std::move(dest)};
+                OutIter>{HPX_MOVE(first1), HPX_MOVE(first2), HPX_MOVE(dest)};
         }
 
         using iterator1_traits =
@@ -893,7 +892,7 @@ namespace hpx { namespace segmented {
                         typename iterator2_traits::local_iterator,
                         typename iterator3_traits::local_iterator>>(),
             hpx::execution::seq, first1, last1, first2, last2, dest,
-            std::forward<F>(f), proj_id{}, proj_id{}, std::true_type{});
+            HPX_FORWARD(F, f), proj_id{}, proj_id{}, std::true_type{});
     }
 
     // clang-format off
@@ -926,7 +925,7 @@ namespace hpx { namespace segmented {
         {
             return result::get(hpx::parallel::util::in_in_out_result<InIter1,
                 InIter2, OutIter>{
-                std::move(first1), std::move(first2), std::move(dest)});
+                HPX_MOVE(first1), HPX_MOVE(first2), HPX_MOVE(dest)});
         }
 
         using iterator1_traits =
@@ -943,7 +942,7 @@ namespace hpx { namespace segmented {
                     in_in_out_result<typename iterator1_traits::local_iterator,
                         typename iterator2_traits::local_iterator,
                         typename iterator3_traits::local_iterator>>(),
-            std::forward<ExPolicy>(policy), first1, last1, first2, last2, dest,
-            std::forward<F>(f), proj_id{}, proj_id{}, is_seq());
+            HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2, dest,
+            HPX_FORWARD(F, f), proj_id{}, proj_id{}, is_seq());
     }
 }}    // namespace hpx::segmented

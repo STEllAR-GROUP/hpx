@@ -48,7 +48,7 @@ namespace hpx { namespace components {
         using action_type = server::create_component_action<Component,
             typename std::decay<Ts>::type...>;
 
-        return hpx::async<action_type>(gid, std::forward<Ts>(vs)...);
+        return hpx::async<action_type>(gid, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Component, typename... Ts>
@@ -67,20 +67,20 @@ namespace hpx { namespace components {
         using action_type = server::bulk_create_component_action<Component,
             typename std::decay<Ts>::type...>;
 
-        return hpx::async<action_type>(gid, count, std::forward<Ts>(vs)...);
+        return hpx::async<action_type>(gid, count, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Component, typename... Ts>
     naming::id_type create(naming::id_type const& gid, Ts&&... vs)
     {
-        return create_async<Component>(gid, std::forward<Ts>(vs)...).get();
+        return create_async<Component>(gid, HPX_FORWARD(Ts, vs)...).get();
     }
 
     template <typename Component, typename... Ts>
     std::vector<naming::id_type> bulk_create(
         naming::id_type const& gid, std::size_t count, Ts&&... vs)
     {
-        return bulk_create_async<Component>(gid, count, std::forward<Ts>(vs)...)
+        return bulk_create_async<Component>(gid, count, HPX_FORWARD(Ts, vs)...)
             .get();
     }
 
@@ -92,14 +92,14 @@ namespace hpx { namespace components {
             typename std::decay<Ts>::type...>;
 
         return hpx::detail::async_colocated<action_type>(
-            gid, std::forward<Ts>(vs)...);
+            gid, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Component, typename... Ts>
     static naming::id_type create_colocated(
         naming::id_type const& gid, Ts&&... vs)
     {
-        return create_colocated_async(gid, std::forward<Ts>(vs)...).get();
+        return create_colocated_async(gid, HPX_FORWARD(Ts, vs)...).get();
     }
 
     template <typename Component, typename... Ts>
@@ -110,7 +110,7 @@ namespace hpx { namespace components {
             typename std::decay<Ts>::type...>;
 
         return hpx::detail::async_colocated<action_type>(
-            gid, count, std::forward<Ts>(vs)...);
+            gid, count, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Component, typename... Ts>
@@ -118,7 +118,7 @@ namespace hpx { namespace components {
         naming::id_type const& id, std::size_t count, Ts&&... vs)
     {
         return bulk_create_colocated_async<Component>(
-            id, count, std::forward<Ts>(vs)...)
+            id, count, HPX_FORWARD(Ts, vs)...)
             .get();
     }
 }}    // namespace hpx::components

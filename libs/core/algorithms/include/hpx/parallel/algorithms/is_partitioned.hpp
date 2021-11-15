@@ -169,7 +169,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 return std::is_partitioned(first, last,
                     util::invoke_projected<Pred, Proj>(
-                        std::forward<Pred>(pred), std::forward<Proj>(proj)));
+                        HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
             }
 
             template <typename ExPolicy, typename Pred, typename Proj>
@@ -187,11 +187,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return result::get(true);
 
                 util::invoke_projected<Pred, Proj> pred_projected(
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
 
                 util::cancellation_token<> tok;
-                auto f1 = [tok, pred_projected = std::move(pred_projected),
-                              proj = std::forward<Proj>(proj)](Iter part_begin,
+                auto f1 = [tok, pred_projected = HPX_MOVE(pred_projected)](
+                              Iter part_begin,
                               std::size_t part_count) mutable -> bool {
                     bool fst_bool =
                         hpx::util::invoke(pred_projected, *part_begin);
@@ -219,12 +219,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     [tok](std::vector<hpx::future<bool>>&& results) -> bool {
                     if (tok.was_cancelled())
                         return false;
-                    return sequential_is_partitioned(std::move(results));
+                    return sequential_is_partitioned(HPX_MOVE(results));
                 };
 
                 return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy), first, count, std::move(f1),
-                    std::move(f2));
+                    HPX_FORWARD(ExPolicy, policy), first, count, HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -245,8 +245,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::is_partitioned<FwdIter, FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, last,
-            std::forward<Pred>(pred), util::projection_identity());
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(Pred, pred),
+            util::projection_identity());
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -268,8 +268,7 @@ namespace hpx {
             hpx::is_partitioned_t, FwdIter first, FwdIter last, Pred&& pred)
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, FwdIter>()
-                .call(hpx::execution::seq, first, last,
-                    std::forward<Pred>(pred),
+                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
                     hpx::parallel::util::projection_identity());
         }
 
@@ -287,8 +286,8 @@ namespace hpx {
             FwdIter first, FwdIter last, Pred&& pred)
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Pred>(pred),
+                .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(Pred, pred),
                     hpx::parallel::util::projection_identity());
         }
     } is_partitioned{};

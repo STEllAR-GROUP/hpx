@@ -74,7 +74,7 @@ namespace hpx { namespace lcos { namespace local {
         stage_data(detail::guard_function task_,
             std::vector<std::shared_ptr<guard>>& guards)
           : gs()
-          , task(std::move(task_))
+          , task(HPX_MOVE(task_))
           , n(guards.size())
           , stages(new detail::guard_task*[n])
         {
@@ -176,12 +176,12 @@ namespace hpx { namespace lcos { namespace local {
         }
         else if (n == 1)
         {
-            run_guarded(*guards.guards[0], std::move(task));
+            run_guarded(*guards.guards[0], HPX_MOVE(task));
             guards.check_();
             return;
         }
         guards.sort();
-        stage_data* sd = new stage_data(std::move(task), guards.guards);
+        stage_data* sd = new stage_data(HPX_MOVE(task), guards.guards);
         int k = 0;
         sd->stages[k]->run = util::bind_front(stage_task, sd, k, n);
         sd->gs = guards;
@@ -192,7 +192,7 @@ namespace hpx { namespace lcos { namespace local {
     void run_guarded(guard& guard, detail::guard_function task)
     {
         detail::guard_task* tptr = new detail::guard_task();
-        tptr->run = std::move(task);
+        tptr->run = HPX_MOVE(task);
         run_guarded(guard, tptr);
     }
 

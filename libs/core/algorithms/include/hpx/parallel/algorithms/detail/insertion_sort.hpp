@@ -33,16 +33,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         for (Iter alfa = first + 1; alfa != last; ++alfa)
         {
-            value_type aux = std::move(*alfa);
+            value_type aux = HPX_MOVE(*alfa);
             Iter beta = alfa;
 
             while (beta != first && comp(aux, *(beta - 1)))
             {
-                *beta = std::move(*(beta - 1));
+                *beta = HPX_MOVE(*(beta - 1));
                 --beta;
             }
 
-            *beta = std::move(aux);
+            *beta = HPX_MOVE(aux);
         }
     }
 }}}}    // namespace hpx::parallel::v1::detail

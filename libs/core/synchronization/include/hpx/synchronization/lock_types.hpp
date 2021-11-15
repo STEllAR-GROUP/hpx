@@ -87,7 +87,7 @@ namespace hpx { namespace lcos { namespace local {
 
         upgrade_lock& operator=(upgrade_lock<Mutex>&& other) noexcept
         {
-            upgrade_lock temp(std::move(other));
+            upgrade_lock temp(HPX_MOVE(other));
             swap(temp);
             return *this;
         }
@@ -211,13 +211,13 @@ namespace hpx { namespace lcos { namespace local {
         {
             if (source != nullptr)
             {
-                *source = upgrade_lock<Mutex>(std::move(exclusive));
+                *source = upgrade_lock<Mutex>(HPX_MOVE(exclusive));
             }
         }
 
         upgrade_to_unique_lock(upgrade_to_unique_lock<Mutex>&& other) noexcept
           : source(other.source)
-          , exclusive(std::move(other.exclusive))
+          , exclusive(HPX_MOVE(other.exclusive))
         {
             other.source = nullptr;
         }
@@ -225,7 +225,7 @@ namespace hpx { namespace lcos { namespace local {
         upgrade_to_unique_lock& operator=(
             upgrade_to_unique_lock<Mutex>&& other) noexcept
         {
-            upgrade_to_unique_lock temp(std::move(other));
+            upgrade_to_unique_lock temp(HPX_MOVE(other));
             swap(temp);
             return *this;
         }

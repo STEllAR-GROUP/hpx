@@ -70,7 +70,7 @@ namespace hpx { namespace parallel { namespace util {
                     datapar_transform_loop_step::call1(f, first, dest);
                 }
 
-                return std::make_pair(std::move(first), std::move(dest));
+                return std::make_pair(HPX_MOVE(first), HPX_MOVE(dest));
             }
 
             template <typename InIter, typename OutIter, typename F>
@@ -82,7 +82,7 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter first, std::size_t count, OutIter dest, F&& f)
             {
                 return util::transform_loop_n<hpx::execution::sequenced_policy>(
-                    first, count, dest, std::forward<F>(f));
+                    first, count, dest, HPX_FORWARD(F, f));
             }
         };
     }    // namespace detail
@@ -95,7 +95,7 @@ namespace hpx { namespace parallel { namespace util {
         std::size_t count, OutIter dest, F&& f)
     {
         return detail::datapar_transform_loop_n<Iter>::call(
-            it, count, dest, std::forward<F>(f));
+            it, count, dest, HPX_FORWARD(F, f));
     }
 
     namespace detail {
@@ -141,7 +141,7 @@ namespace hpx { namespace parallel { namespace util {
                     datapar_transform_loop_step_ind::call1(f, first, dest);
                 }
 
-                return std::make_pair(std::move(first), std::move(dest));
+                return std::make_pair(HPX_MOVE(first), HPX_MOVE(dest));
             }
 
             template <typename InIter, typename OutIter, typename F>
@@ -154,7 +154,7 @@ namespace hpx { namespace parallel { namespace util {
             {
                 return util::transform_loop_n_ind<
                     hpx::execution::sequenced_policy>(
-                    first, count, dest, std::forward<F>(f));
+                    first, count, dest, HPX_FORWARD(F, f));
             }
         };
     }    // namespace detail
@@ -167,7 +167,7 @@ namespace hpx { namespace parallel { namespace util {
         std::size_t count, OutIter dest, F&& f)
     {
         return detail::datapar_transform_loop_n_ind<Iter>::call(
-            it, count, dest, std::forward<F>(f));
+            it, count, dest, HPX_FORWARD(F, f));
     }
 
     namespace detail {
@@ -191,8 +191,7 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter first, InIter last, OutIter dest, F&& f)
             {
                 return util::transform_loop_n<hpx::execution::simd_policy>(
-                    first, std::distance(first, last), dest,
-                    std::forward<F>(f));
+                    first, std::distance(first, last), dest, HPX_FORWARD(F, f));
             }
 
             template <typename InIter, typename OutIter, typename F>
@@ -204,7 +203,7 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter first, InIter last, OutIter dest, F&& f)
             {
                 return util::transform_loop(
-                    hpx::execution::seq, first, last, dest, std::forward<F>(f));
+                    hpx::execution::seq, first, last, dest, HPX_FORWARD(F, f));
             }
         };
     }    // namespace detail
@@ -217,10 +216,10 @@ namespace hpx { namespace parallel { namespace util {
             F&& f)
     {
         auto ret = detail::datapar_transform_loop<IterB>::call(
-            it, end, dest, std::forward<F>(f));
+            it, end, dest, HPX_FORWARD(F, f));
 
         return util::in_out_result<IterB, OutIter>{
-            std::move(ret.first), std::move(ret.second)};
+            HPX_MOVE(ret.first), HPX_MOVE(ret.second)};
     }
 
     template <typename IterB, typename IterE, typename OutIter, typename F>
@@ -231,10 +230,10 @@ namespace hpx { namespace parallel { namespace util {
             F&& f)
     {
         auto ret = detail::datapar_transform_loop<IterB>::call(
-            it, end, dest, std::forward<F>(f));
+            it, end, dest, HPX_FORWARD(F, f));
 
         return util::in_out_result<IterB, OutIter>{
-            std::move(ret.first), std::move(ret.second)};
+            HPX_MOVE(ret.first), HPX_MOVE(ret.second)};
     }
 
     namespace detail {
@@ -258,8 +257,7 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter first, InIter last, OutIter dest, F&& f)
             {
                 return util::transform_loop_n_ind<hpx::execution::simd_policy>(
-                    first, std::distance(first, last), dest,
-                    std::forward<F>(f));
+                    first, std::distance(first, last), dest, HPX_FORWARD(F, f));
             }
 
             template <typename InIter, typename OutIter, typename F>
@@ -271,9 +269,9 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter first, InIter last, OutIter dest, F&& f)
             {
                 auto ret = util::transform_loop_ind(
-                    hpx::execution::seq, first, last, dest, std::forward<F>(f));
+                    hpx::execution::seq, first, last, dest, HPX_FORWARD(F, f));
                 return std::pair<InIter, OutIter>{
-                    std::move(ret.in), std::move(ret.out)};
+                    HPX_MOVE(ret.in), HPX_MOVE(ret.out)};
             }
         };
     }    // namespace detail
@@ -286,10 +284,10 @@ namespace hpx { namespace parallel { namespace util {
             F&& f)
     {
         auto ret = detail::datapar_transform_loop_ind<IterB>::call(
-            it, end, dest, std::forward<F>(f));
+            it, end, dest, HPX_FORWARD(F, f));
 
         return util::in_out_result<IterB, OutIter>{
-            std::move(ret.first), std::move(ret.second)};
+            HPX_MOVE(ret.first), HPX_MOVE(ret.second)};
     }
 
     template <typename IterB, typename IterE, typename OutIter, typename F>
@@ -300,10 +298,10 @@ namespace hpx { namespace parallel { namespace util {
             F&& f)
     {
         auto ret = detail::datapar_transform_loop_ind<IterB>::call(
-            it, end, dest, std::forward<F>(f));
+            it, end, dest, HPX_FORWARD(F, f));
 
         return util::in_out_result<IterB, OutIter>{
-            std::move(ret.first), std::move(ret.second)};
+            HPX_MOVE(ret.first), HPX_MOVE(ret.second)};
     }
 
     namespace detail {
@@ -355,7 +353,7 @@ namespace hpx { namespace parallel { namespace util {
                 }
 
                 return hpx::make_tuple(
-                    std::move(first1), std::move(first2), std::move(dest));
+                    HPX_MOVE(first1), HPX_MOVE(first2), HPX_MOVE(dest));
             }
 
             template <typename InIter1, typename InIter2, typename OutIter,
@@ -372,7 +370,7 @@ namespace hpx { namespace parallel { namespace util {
             {
                 return util::transform_binary_loop_n<
                     hpx::execution::sequenced_policy>(
-                    first1, count, first2, dest, std::forward<F>(f));
+                    first1, count, first2, dest, HPX_FORWARD(F, f));
             }
         };
     }    // namespace detail
@@ -386,7 +384,7 @@ namespace hpx { namespace parallel { namespace util {
         InIter1 first1, std::size_t count, InIter2 first2, OutIter dest, F&& f)
     {
         return detail::datapar_transform_binary_loop_n<InIter1, InIter2>::call(
-            first1, count, first2, dest, std::forward<F>(f));
+            first1, count, first2, dest, HPX_FORWARD(F, f));
     }
 
     namespace detail {
@@ -423,7 +421,7 @@ namespace hpx { namespace parallel { namespace util {
                 auto ret = util::transform_binary_loop_n<
                     hpx::execution::par_simd_policy>(first1,
                     std::distance(first1, last1), first2, dest,
-                    std::forward<F>(f));
+                    HPX_FORWARD(F, f));
 
                 return util::in_in_out_result<InIter1, InIter2, OutIter>{
                     hpx::get<0>(ret), hpx::get<1>(ret), hpx::get<2>(ret)};
@@ -443,7 +441,7 @@ namespace hpx { namespace parallel { namespace util {
             {
                 return util::transform_binary_loop<
                     hpx::execution::sequenced_policy>(
-                    first1, last1, first2, dest, std::forward<F>(f));
+                    first1, last1, first2, dest, HPX_FORWARD(F, f));
             }
 
             template <typename InIter1, typename InIter2, typename OutIter,
@@ -466,7 +464,7 @@ namespace hpx { namespace parallel { namespace util {
 
                 auto ret = util::transform_binary_loop_n<
                     hpx::execution::par_simd_policy>(
-                    first1, count, first2, dest, std::forward<F>(f));
+                    first1, count, first2, dest, HPX_FORWARD(F, f));
 
                 return util::in_in_out_result<InIter1, InIter2, OutIter>{
                     hpx::get<0>(ret), hpx::get<1>(ret), hpx::get<2>(ret)};
@@ -486,7 +484,7 @@ namespace hpx { namespace parallel { namespace util {
             {
                 return util::transform_binary_loop<
                     hpx::execution::sequenced_policy>(
-                    first1, last1, first2, last2, dest, std::forward<F>(f));
+                    first1, last1, first2, last2, dest, HPX_FORWARD(F, f));
             }
         };
     }    // namespace detail
@@ -500,7 +498,7 @@ namespace hpx { namespace parallel { namespace util {
         InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest, F&& f)
     {
         return detail::datapar_transform_binary_loop<InIter1, InIter2>::call(
-            first1, last1, first2, dest, std::forward<F>(f));
+            first1, last1, first2, dest, HPX_FORWARD(F, f));
     }
 
     template <typename ExPolicy, typename InIter1, typename InIter2,
@@ -513,7 +511,7 @@ namespace hpx { namespace parallel { namespace util {
         OutIter dest, F&& f)
     {
         return detail::datapar_transform_binary_loop<InIter1, InIter2>::call(
-            first1, last1, first2, last2, dest, std::forward<F>(f));
+            first1, last1, first2, last2, dest, HPX_FORWARD(F, f));
     }
 
     namespace detail {

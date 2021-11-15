@@ -39,6 +39,6 @@ namespace hpx { namespace detail {
         {
             ep = std::current_exception();
         }
-        return c(std::move(ep));
+        return c(HPX_MOVE(ep));
     }
 }}    // namespace hpx::detail

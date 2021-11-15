@@ -121,7 +121,7 @@ namespace hpx { namespace execution { namespace experimental {
             auto sched_with_annotation = scheduler;
             sched_with_annotation.annotation_ =
                 hpx::util::detail::store_function_annotation(
-                    std::move(annotation));
+                    HPX_MOVE(annotation));
             return sched_with_annotation;
         }
 
@@ -141,7 +141,7 @@ namespace hpx { namespace execution { namespace experimental {
                 annotation_;
 
             threads::thread_init_data data(
-                threads::make_thread_function_nullary(std::forward<F>(f)),
+                threads::make_thread_function_nullary(HPX_FORWARD(F, f)),
                 annotation, priority_, schedulehint_, stacksize_);
             threads::register_work(data, pool_);
         }
@@ -154,8 +154,8 @@ namespace hpx { namespace execution { namespace experimental {
 
             template <typename Scheduler_, typename Receiver_>
             operation_state(Scheduler_&& scheduler, Receiver_&& receiver)
-              : scheduler(std::forward<Scheduler_>(scheduler))
-              , receiver(std::forward<Receiver_>(receiver))
+              : scheduler(HPX_FORWARD(Scheduler_, scheduler))
+              , receiver(HPX_FORWARD(Receiver_, receiver))
             {
             }
 
@@ -169,14 +169,14 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
                         os.scheduler.execute(
-                            [receiver = std::move(os.receiver)]() mutable {
+                            [receiver = HPX_MOVE(os.receiver)]() mutable {
                                 hpx::execution::experimental::set_value(
-                                    std::move(receiver));
+                                    HPX_MOVE(receiver));
                             });
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
-                            std::move(os.receiver), std::move(ep));
+                            HPX_MOVE(os.receiver), HPX_MOVE(ep));
                     });
             }
         };
@@ -199,15 +199,14 @@ namespace hpx { namespace execution { namespace experimental {
             friend operation_state<Scheduler, Receiver> tag_invoke(
                 connect_t, sender&& s, Receiver&& receiver)
             {
-                return {
-                    std::move(s.scheduler), std::forward<Receiver>(receiver)};
+                return {HPX_MOVE(s.scheduler), HPX_FORWARD(Receiver, receiver)};
             }
 
             template <typename Receiver>
             friend operation_state<Scheduler, Receiver> tag_invoke(
                 connect_t, sender& s, Receiver&& receiver)
             {
-                return {s.scheduler, std::forward<Receiver>(receiver)};
+                return {s.scheduler, HPX_FORWARD(Receiver, receiver)};
             }
 
             template <typename CPO,
@@ -224,7 +223,7 @@ namespace hpx { namespace execution { namespace experimental {
         friend constexpr sender<thread_pool_scheduler> tag_invoke(
             schedule_t, thread_pool_scheduler&& sched)
         {
-            return {std::move(sched)};
+            return {HPX_MOVE(sched)};
         }
 
         friend constexpr sender<thread_pool_scheduler> tag_invoke(

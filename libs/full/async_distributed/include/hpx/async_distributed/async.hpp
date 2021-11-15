@@ -51,7 +51,7 @@ namespace hpx { namespace detail {
         {
             HPX_ASSERT(c.is_ready());
             return hpx::detail::async_impl<Action>(
-                launch_policy, c.get_id(), std::forward<Ts>(ts)...);
+                launch_policy, c.get_id(), HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -69,8 +69,8 @@ namespace hpx { namespace detail {
         call(Policy_&& launch_policy, naming::id_type const& id, Ts&&... ts)
         {
             return hpx::detail::async_impl<Action>(
-                std::forward<Policy_>(launch_policy), id,
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Policy_, launch_policy), id,
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename Policy_, typename Client, typename Stub,
@@ -93,15 +93,14 @@ namespace hpx { namespace detail {
             if (c.is_ready())
             {
                 return hpx::detail::async_impl<Action>(
-                    std::forward<Policy_>(launch_policy), c.get_id(),
-                    std::forward<Ts>(ts)...);
+                    HPX_FORWARD(Policy_, launch_policy), c.get_id(),
+                    HPX_FORWARD(Ts, ts)...);
             }
 
             // defer invocation otherwise
-            return c.then(util::one_shot(
-                util::bind_back(async_action_client_dispatch<Action>(),
-                    std::forward<Policy_>(launch_policy),
-                    std::forward<Ts>(ts)...)));
+            return c.then(util::one_shot(util::bind_back(
+                async_action_client_dispatch<Action>(),
+                HPX_FORWARD(Policy_, launch_policy), HPX_FORWARD(Ts, ts)...)));
         }
 
         // distribution policy
@@ -112,7 +111,7 @@ namespace hpx { namespace detail {
         call(Policy_&& launch_policy, DistPolicy const& policy, Ts&&... ts)
         {
             return policy.template async<Action>(
-                std::forward<Policy_>(launch_policy), std::forward<Ts>(ts)...);
+                HPX_FORWARD(Policy_, launch_policy), HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -128,7 +127,7 @@ namespace hpx { namespace detail {
         {
             return async_action_dispatch<Action,
                 hpx::detail::async_policy>::call(launch::async, id,
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -145,7 +144,7 @@ namespace hpx { namespace detail {
         {
             return async_action_dispatch<Action,
                 hpx::detail::async_policy>::call(launch::async, c,
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -162,7 +161,7 @@ namespace hpx { namespace detail {
         {
             return async_action_dispatch<Action,
                 hpx::detail::async_policy>::call(launch::async, policy,
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -178,13 +177,13 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static auto call(
             Policy&& launch_policy, Action const&, Ts&&... ts)
             -> decltype(async<Action>(
-                std::forward<Policy>(launch_policy), std::forward<Ts>(ts)...))
+                HPX_FORWARD(Policy, launch_policy), HPX_FORWARD(Ts, ts)...))
         {
             static_assert(traits::is_launch_policy<
                               typename std::decay<Policy>::type>::value,
                 "Policy must be a valid launch policy");
             return async<Action>(
-                std::forward<Policy>(launch_policy), std::forward<Ts>(ts)...);
+                HPX_FORWARD(Policy, launch_policy), HPX_FORWARD(Ts, ts)...);
         }
     };
 }}    // namespace hpx::detail
@@ -193,12 +192,12 @@ namespace hpx {
     template <typename Action, typename F, typename... Ts>
     HPX_FORCEINLINE auto async(F&& f, Ts&&... ts)
         -> decltype(detail::async_action_dispatch<Action,
-            typename std::decay<F>::type>::call(std::forward<F>(f),
-            std::forward<Ts>(ts)...))
+            typename std::decay<F>::type>::call(HPX_FORWARD(F, f),
+            HPX_FORWARD(Ts, ts)...))
     {
         return detail::async_action_dispatch<Action,
-            typename std::decay<F>::type>::call(std::forward<F>(f),
-            std::forward<Ts>(ts)...);
+            typename std::decay<F>::type>::call(HPX_FORWARD(F, f),
+            HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx
 
@@ -218,7 +217,7 @@ namespace hpx { namespace detail {
         call(hpx::actions::basic_action<Component, Signature, Derived> const&,
             naming::id_type const& id, Ts&&... vs)
         {
-            return async<Derived>(launch::async, id, std::forward<Ts>(vs)...);
+            return async<Derived>(launch::async, id, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Component, typename Signature, typename Derived,
@@ -237,7 +236,7 @@ namespace hpx { namespace detail {
                 "The action to invoke is not supported by the target");
 
             return async<Derived>(
-                launch::async, c.get_id(), std::forward<Ts>(vs)...);
+                launch::async, c.get_id(), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Component, typename Signature, typename Derived,
@@ -248,7 +247,7 @@ namespace hpx { namespace detail {
                      Derived> const&,
                 DistPolicy const& policy, Ts&&... vs)
         {
-            return async<Derived>(policy, std::forward<Ts>(vs)...);
+            return async<Derived>(policy, HPX_FORWARD(Ts, vs)...);
         }
     };
 
@@ -260,14 +259,15 @@ namespace hpx { namespace detail {
         template <typename Policy_, typename F, typename... Ts>
         HPX_FORCEINLINE static auto call(
             Policy_&& launch_policy, F&& f, Ts&&... ts)
-            -> decltype(
-                detail::async_launch_policy_dispatch<typename std::decay<
-                    F>::type>::call(std::forward<Policy_>(launch_policy),
-                    std::forward<F>(f), std::forward<Ts>(ts)...))
+            -> decltype(detail::async_launch_policy_dispatch<
+                typename std::decay<F>::type>::call(HPX_FORWARD(Policy_,
+                                                        launch_policy),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
         {
-            return detail::async_launch_policy_dispatch<typename std::decay<
-                F>::type>::call(std::forward<Policy_>(launch_policy),
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return detail::async_launch_policy_dispatch<
+                typename std::decay<F>::type>::call(HPX_FORWARD(Policy_,
+                                                        launch_policy),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename Policy_, typename Component, typename Signature,
@@ -286,8 +286,8 @@ namespace hpx { namespace detail {
             static_assert(is_valid::value,
                 "The action to invoke is not supported by the target");
 
-            return async<Derived>(std::forward<Policy_>(launch_policy),
-                c.get_id(), std::forward<Ts>(ts)...);
+            return async<Derived>(HPX_FORWARD(Policy_, launch_policy),
+                c.get_id(), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename Policy_, typename Component, typename Signature,
@@ -299,8 +299,8 @@ namespace hpx { namespace detail {
             hpx::actions::basic_action<Component, Signature, Derived> const&,
             DistPolicy const& policy, Ts&&... ts)
         {
-            return async<Derived>(std::forward<Policy_>(launch_policy), policy,
-                std::forward<Ts>(ts)...);
+            return async<Derived>(HPX_FORWARD(Policy_, launch_policy), policy,
+                HPX_FORWARD(Ts, ts)...);
         }
     };
 }}    // namespace hpx::detail
@@ -319,7 +319,7 @@ namespace hpx { namespace detail {
         call(hpx::util::detail::bound_action<Action, Is, Ts...> const& bound,
             Us&&... vs)
         {
-            return bound.async(std::forward<Us>(vs)...);
+            return bound.async(HPX_FORWARD(Us, vs)...);
         }
     };
 }}    // namespace hpx::detail

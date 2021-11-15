@@ -22,6 +22,6 @@ namespace hpx {
     HPX_FORCEINLINE decltype(auto) async(F&& f, Ts&&... ts)
     {
         return detail::async_dispatch<typename std::decay<F>::type>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx

@@ -71,7 +71,7 @@ namespace hpx { namespace cuda { namespace experimental {
         }
 
         allocator(target_type&& tgt)
-          : target_(std::move(tgt))
+          : target_(HPX_MOVE(tgt))
         {
         }
 
@@ -194,10 +194,10 @@ namespace hpx { namespace cuda { namespace experimental {
                     std::size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
                     if (idx < count)
                     {
-                        ::new (p + idx) T(std::forward<Args>(args)...);
+                        ::new (p + idx) T(HPX_FORWARD(Args, args)...);
                     }
                 },
-                p.device_ptr(), count, std::forward<Args>(args)...);
+                p.device_ptr(), count, HPX_FORWARD(Args, args)...);
             target_.synchronize();
 #else
             HPX_UNUSED(p);
@@ -219,9 +219,9 @@ namespace hpx { namespace cuda { namespace experimental {
             detail::launch(
                 target_, 1, 1,
                 [] HPX_DEVICE(T * p, Args const&... args) {
-                    ::new (p) T(std::forward<Args>(args)...);
+                    ::new (p) T(HPX_FORWARD(Args, args)...);
                 },
-                p.device_ptr(), std::forward<Args>(args)...);
+                p.device_ptr(), HPX_FORWARD(Args, args)...);
             target_.synchronize();
 #else
             HPX_UNUSED(p);

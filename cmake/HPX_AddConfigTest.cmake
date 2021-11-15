@@ -520,6 +520,15 @@ function(hpx_check_for_cxx20_std_ranges_iter_swap)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx_lambda_capture_decltype)
+  add_hpx_config_test(
+    HPX_WITH_CXX_LAMBDA_CAPTURE_DECLTYPE
+    SOURCE cmake/tests/cxx_lambda_capture_decltype.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_builtin_integer_pack)
   add_hpx_config_test(
     HPX_WITH_BUILTIN_INTEGER_PACK

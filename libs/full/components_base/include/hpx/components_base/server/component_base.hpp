@@ -44,14 +44,14 @@ namespace hpx { namespace components {
 
             // just move our gid_
             base_component(base_component&& rhs) noexcept
-              : gid_(std::move(rhs.gid_))
+              : gid_(HPX_MOVE(rhs.gid_))
             {
             }
             base_component& operator=(base_component&& rhs) noexcept
             {
                 if (this != &rhs)
                 {
-                    gid_ = std::move(rhs.gid_);
+                    gid_ = HPX_MOVE(rhs.gid_);
                 }
                 return *this;
             }

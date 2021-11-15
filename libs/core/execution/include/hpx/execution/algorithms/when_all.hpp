@@ -46,7 +46,7 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     try
                     {
-                        r.op_state.error = std::forward<Error>(error);
+                        r.op_state.error = HPX_FORWARD(Error, error);
                     }
                     catch (...)
                     {
@@ -73,7 +73,7 @@ namespace hpx { namespace execution { namespace experimental {
                     try
                     {
                         r.op_state.ts.template get<I>().emplace(
-                            std::forward<T>(t));
+                            HPX_FORWARD(T, t));
                     }
                     catch (...)
                     {
@@ -98,8 +98,8 @@ namespace hpx { namespace execution { namespace experimental {
 
             template <typename... Senders_>
             explicit constexpr when_all_sender(Senders_&&... senders)
-              : senders(std::piecewise_construct,
-                    std::forward<Senders_>(senders)...)
+              : senders(
+                    std::piecewise_construct, HPX_FORWARD(Senders_, senders)...)
             {
             }
 
@@ -159,9 +159,13 @@ namespace hpx { namespace execution { namespace experimental {
 
                 template <typename Receiver_, typename Senders_>
                 operation_state(Receiver_&& receiver, Senders_&& senders)
-                  : receiver(std::forward<Receiver_>(receiver))
+                  : receiver(HPX_FORWARD(Receiver_, receiver))
                   , op_state(hpx::execution::experimental::connect(
+#if defined(HPX_CUDA_VERSION)
                         std::forward<Senders_>(senders).template get<I>(),
+#else
+                        HPX_FORWARD(Senders_, senders).template get<I>(),
+#endif
                         when_all_receiver<I, operation_state>(*this)))
                 {
                 }
@@ -181,8 +185,8 @@ namespace hpx { namespace execution { namespace experimental {
                     hpx::util::member_pack<hpx::util::index_pack<Is...>, Ts...>&
                         ts)
                 {
-                    hpx::execution::experimental::set_value(std::move(receiver),
-                        std::move(*(ts.template get<Is>()))...);
+                    hpx::execution::experimental::set_value(HPX_MOVE(receiver),
+                        HPX_MOVE(*(ts.template get<Is>()))...);
                 }
 
                 void finish() noexcept
@@ -198,15 +202,15 @@ namespace hpx { namespace execution { namespace experimental {
                             hpx::visit(
                                 [this](auto&& error) {
                                     hpx::execution::experimental::set_error(
-                                        std::move(receiver),
-                                        std::forward<decltype(error)>(error));
+                                        HPX_MOVE(receiver),
+                                        HPX_FORWARD(decltype(error), error));
                                 },
-                                std::move(error.value()));
+                                HPX_MOVE(error.value()));
                         }
                         else
                         {
                             hpx::execution::experimental::set_done(
-                                std::move(receiver));
+                                HPX_MOVE(receiver));
                         }
                     }
                 }
@@ -220,17 +224,21 @@ namespace hpx { namespace execution { namespace experimental {
 
                 using operation_state_type =
                     std::decay_t<decltype(hpx::execution::experimental::connect(
-                        std::forward<SendersPack>(senders).template get<I>(),
+                        HPX_FORWARD(SendersPack, senders).template get<I>(),
                         when_all_receiver<I, operation_state>(
                             std::declval<std::decay_t<operation_state>&>())))>;
                 operation_state_type op_state;
 
                 template <typename Receiver_, typename SendersPack_>
                 operation_state(Receiver_&& receiver, SendersPack_&& senders)
-                  : base_type(std::forward<Receiver_>(receiver),
-                        std::forward<SendersPack>(senders))
+                  : base_type(HPX_FORWARD(Receiver_, receiver),
+                        HPX_FORWARD(SendersPack, senders))
                   , op_state(hpx::execution::experimental::connect(
+#if defined(HPX_CUDA_VERSION)
                         std::forward<SendersPack_>(senders).template get<I>(),
+#else
+                        HPX_FORWARD(SendersPack_, senders).template get<I>(),
+#endif
                         when_all_receiver<I, operation_state>(*this)))
                 {
                 }
@@ -261,7 +269,7 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 return operation_state<Receiver, senders_type&&,
                     num_predecessors - 1>(
-                    std::forward<Receiver>(receiver), std::move(s.senders));
+                    HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.senders));
             }
 
             template <typename Receiver>
@@ -288,7 +296,7 @@ namespace hpx { namespace execution { namespace experimental {
             when_all_t, Senders&&... senders)
         {
             return detail::when_all_sender<Senders...>{
-                std::forward<Senders>(senders)...};
+                HPX_FORWARD(Senders, senders)...};
         }
     } when_all{};
 }}}    // namespace hpx::execution::experimental

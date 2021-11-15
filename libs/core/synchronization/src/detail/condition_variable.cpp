@@ -37,7 +37,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
             local::no_mutex no_mtx;
             std::unique_lock<local::no_mutex> lock(no_mtx);
-            abort_all<local::no_mutex>(std::move(lock));
+            abort_all<local::no_mutex>(HPX_MOVE(lock));
         }
     }
 
@@ -148,7 +148,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     {
         HPX_ASSERT(lock.owns_lock());
 
-        abort_all<mutex_type>(std::move(lock));
+        abort_all<mutex_type>(HPX_MOVE(lock));
     }
 
     threads::thread_restart_state condition_variable::wait(

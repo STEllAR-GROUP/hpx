@@ -33,7 +33,7 @@ namespace hpx { namespace traits {
         {
             static auto error(Future future, F& f)
             {
-                f(std::move(future));
+                f(HPX_MOVE(future));
             }
 
             using type =

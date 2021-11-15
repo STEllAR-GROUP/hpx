@@ -26,22 +26,22 @@ namespace hpx { namespace parallel { namespace util {
 
         template <typename Pred_, typename Proj_>
         invoke_projected(Pred_&& pred, Proj_&& proj)
-          : pred_(std::forward<Pred_>(pred))
-          , proj_(std::forward<Proj_>(proj))
+          : pred_(HPX_FORWARD(Pred_, pred))
+          , proj_(HPX_FORWARD(Proj_, proj))
         {
         }
 
         template <typename T>
         decltype(auto) operator()(T&& t)
         {
-            return HPX_INVOKE(pred_, HPX_INVOKE(proj_, std::forward<T>(t)));
+            return HPX_INVOKE(pred_, HPX_INVOKE(proj_, HPX_FORWARD(T, t)));
         }
 
         template <typename T>
         decltype(auto) operator()(T&& t, T&& u)
         {
-            return HPX_INVOKE(pred_, HPX_INVOKE(proj_, std::forward<T>(t)),
-                HPX_INVOKE(proj_, std::forward<T>(u)));
+            return HPX_INVOKE(pred_, HPX_INVOKE(proj_, HPX_FORWARD(T, t)),
+                HPX_INVOKE(proj_, HPX_FORWARD(T, u)));
         }
     };
 
@@ -54,20 +54,20 @@ namespace hpx { namespace parallel { namespace util {
 
         template <typename Pred_>
         invoke_projected(Pred_&& pred, projection_identity)
-          : pred_(std::forward<Pred_>(pred))
+          : pred_(HPX_FORWARD(Pred_, pred))
         {
         }
 
         template <typename T>
         decltype(auto) operator()(T&& t)
         {
-            return HPX_INVOKE(pred_, std::forward<T>(t));
+            return HPX_INVOKE(pred_, HPX_FORWARD(T, t));
         }
 
         template <typename T>
         auto operator()(T&& t, T&& u)
         {
-            return HPX_INVOKE(pred_, std::forward<T>(t), std::forward<T>(u));
+            return HPX_INVOKE(pred_, HPX_FORWARD(T, t), HPX_FORWARD(T, u));
         }
     };
 }}}    // namespace hpx::parallel::util

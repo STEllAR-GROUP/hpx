@@ -262,7 +262,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 for (Iter i = first; ++i != last;)
                     if (!hpx::util::invoke(pred, hpx::util::invoke(proj, *i)))
                     {
-                        *first++ = std::move(*i);
+                        *first++ = HPX_MOVE(*i);
                     }
             return first;
         }
@@ -281,7 +281,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, Iter first, Sent last, Pred&& pred, Proj&& proj)
             {
                 return sequential_remove_if(first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -299,7 +299,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 difference_type count = detail::distance(first, last);
 
                 if (count == 0)
-                    return algorithm_result::get(std::move(first));
+                    return algorithm_result::get(HPX_MOVE(first));
 
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);
@@ -314,8 +314,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     void, util::scan_partitioner_sequential_f3_tag>
                     scan_partitioner_type;
 
-                auto f1 = [pred = std::forward<Pred>(pred),
-                              proj = std::forward<Proj>(proj)](
+                auto f1 = [pred = HPX_FORWARD(Pred, pred),
+                              proj = HPX_FORWARD(Proj, proj)](
                               zip_iterator part_begin,
                               std::size_t part_size) -> std::size_t {
                     // MSVC complains if pred or proj is captured by ref below
@@ -364,7 +364,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 if (!get<1>(*it))
                                 {
                                     if (dest != get<0>(it.get_iterator_tuple()))
-                                        *dest++ = std::move(get<0>(*it));
+                                        *dest++ = HPX_MOVE(get<0>(*it));
                                     else
                                         ++dest;
                                 }
@@ -376,7 +376,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         util::loop_n<execution_policy_type>(
                             part_begin, part_size, [&dest](zip_iterator it) {
                                 if (!get<1>(*it))
-                                    *dest++ = std::move(get<0>(*it));
+                                    *dest++ = HPX_MOVE(get<0>(*it));
                             });
                     }
                 };
@@ -396,17 +396,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 return scan_partitioner_type::call(
-                    std::forward<ExPolicy>(policy),
+                    HPX_FORWARD(ExPolicy, policy),
                     make_zip_iterator(first, flags.get()), count, init,
                     // step 1 performs first part of scan algorithm
-                    std::move(f1),
+                    HPX_MOVE(f1),
                     // step 2 propagates the partition results from left
                     // to right
-                    std::move(f2),
+                    HPX_MOVE(f2),
                     // step 3 runs final accumulation on each partition
-                    std::move(f3),
+                    HPX_MOVE(f3),
                     // step 4 use this return value
-                    std::move(f4));
+                    HPX_MOVE(f4));
             }
         };
         /// \endcond
@@ -432,8 +432,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
-        return detail::remove_if<FwdIter>().call(std::forward<ExPolicy>(policy),
-            first, last, std::forward<Pred>(pred), std::forward<Proj>(proj));
+        return detail::remove_if<FwdIter>().call(HPX_FORWARD(ExPolicy, policy),
+            first, last, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
     }
 
     // clang-format off
@@ -460,9 +460,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         // Just utilize existing parallel remove_if.
         return detail::remove_if<FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, last,
+            HPX_FORWARD(ExPolicy, policy), first, last,
             [value](value_type const& a) -> bool { return value == a; },
-            std::forward<Proj>(proj));
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -492,7 +492,7 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::remove_if<FwdIter>().call(
                 hpx::execution::sequenced_policy{}, first, last,
-                std::forward<Pred>(pred),
+                HPX_FORWARD(Pred, pred),
                 hpx::parallel::util::projection_identity());
         }
 
@@ -515,8 +515,8 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::remove_if<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Pred>(pred),
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Pred, pred),
                 hpx::parallel::util::projection_identity());
         }
 
@@ -557,7 +557,7 @@ namespace hpx {
         {
             typedef typename std::iterator_traits<FwdIter>::value_type Type;
 
-            return hpx::remove_if(std::forward<ExPolicy>(policy), first, last,
+            return hpx::remove_if(HPX_FORWARD(ExPolicy, policy), first, last,
                 [value](Type const& a) -> bool { return value == a; });
         }
     } remove{};

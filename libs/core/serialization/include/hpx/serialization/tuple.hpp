@@ -85,7 +85,7 @@ namespace hpx { namespace util { namespace detail {
                 std::unique_ptr<T> data(
                     serialization::detail::constructor_selector_ptr<T>::create(
                         ar));
-                t = std::move(*data);
+                t = HPX_MOVE(*data);
             }
             else
             {

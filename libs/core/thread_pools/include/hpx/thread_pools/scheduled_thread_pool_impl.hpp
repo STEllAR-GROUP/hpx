@@ -98,7 +98,7 @@ namespace hpx { namespace threads { namespace detail {
         std::unique_ptr<Scheduler> sched,
         thread_pool_init_parameters const& init)
       : thread_pool_base(init)
-      , sched_(std::move(sched))
+      , sched_(HPX_MOVE(sched))
       , thread_count_(0)
       , tasks_scheduled_(0)
       , network_background_callback_(init.network_background_callback_)
@@ -686,7 +686,7 @@ namespace hpx { namespace threads { namespace detail {
     {
         while (first != last)
         {
-            init = std::move(init) + HPX_INVOKE(proj, *first++);
+            init = HPX_MOVE(init) + HPX_INVOKE(proj, *first++);
         }
         return init;
     }
@@ -1875,7 +1875,7 @@ namespace hpx { namespace threads { namespace detail {
         HPX_UNUSED(oldstate);
 
         threads_[virt_core] = std::thread(&scheduled_thread_pool::thread_func,
-            this, virt_core, thread_num, std::move(startup));
+            this, virt_core, thread_num, HPX_MOVE(startup));
 
         if (&ec != &throws)
             ec = make_success_code();

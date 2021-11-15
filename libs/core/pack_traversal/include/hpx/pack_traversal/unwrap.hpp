@@ -62,9 +62,9 @@ namespace hpx {
     ///
     template <typename... Args>
     auto unwrap(Args&&... args) -> decltype(
-        util::detail::unwrap_depth_impl<1U>(std::forward<Args>(args)...))
+        util::detail::unwrap_depth_impl<1U>(HPX_FORWARD(Args, args)...))
     {
-        return util::detail::unwrap_depth_impl<1U>(std::forward<Args>(args)...);
+        return util::detail::unwrap_depth_impl<1U>(HPX_FORWARD(Args, args)...);
     }
 
     namespace functional {
@@ -76,9 +76,9 @@ namespace hpx {
             /// \cond NOINTERNAL
             template <typename... Args>
             auto operator()(Args&&... args)
-                -> decltype(hpx::unwrap(std::forward<Args>(args)...))
+                -> decltype(hpx::unwrap(HPX_FORWARD(Args, args)...))
             {
-                return hpx::unwrap(std::forward<Args>(args)...);
+                return hpx::unwrap(HPX_FORWARD(Args, args)...);
             }
             /// \endcond
         };
@@ -94,11 +94,11 @@ namespace hpx {
     ///
     template <std::size_t Depth, typename... Args>
     auto unwrap_n(Args&&... args) -> decltype(
-        util::detail::unwrap_depth_impl<Depth>(std::forward<Args>(args)...))
+        util::detail::unwrap_depth_impl<Depth>(HPX_FORWARD(Args, args)...))
     {
         static_assert(Depth > 0U, "The unwrapping depth must be >= 1!");
         return util::detail::unwrap_depth_impl<Depth>(
-            std::forward<Args>(args)...);
+            HPX_FORWARD(Args, args)...);
     }
 
     namespace functional {
@@ -111,9 +111,9 @@ namespace hpx {
             /// \cond NOINTERNAL
             template <typename... Args>
             auto operator()(Args&&... args)
-                -> decltype(hpx::unwrap_n<Depth>(std::forward<Args>(args)...))
+                -> decltype(hpx::unwrap_n<Depth>(HPX_FORWARD(Args, args)...))
             {
-                return hpx::unwrap_n<Depth>(std::forward<Args>(args)...);
+                return hpx::unwrap_n<Depth>(HPX_FORWARD(Args, args)...);
             }
             /// \endcond
         };
@@ -127,9 +127,9 @@ namespace hpx {
     ///
     template <typename... Args>
     auto unwrap_all(Args&&... args) -> decltype(
-        util::detail::unwrap_depth_impl<0U>(std::forward<Args>(args)...))
+        util::detail::unwrap_depth_impl<0U>(HPX_FORWARD(Args, args)...))
     {
-        return util::detail::unwrap_depth_impl<0U>(std::forward<Args>(args)...);
+        return util::detail::unwrap_depth_impl<0U>(HPX_FORWARD(Args, args)...);
     }
 
     namespace functional {
@@ -141,9 +141,9 @@ namespace hpx {
             /// \cond NOINTERNAL
             template <typename... Args>
             auto operator()(Args&&... args)
-                -> decltype(hpx::unwrap_all(std::forward<Args>(args)...))
+                -> decltype(hpx::unwrap_all(HPX_FORWARD(Args, args)...))
             {
-                return hpx::unwrap_all(std::forward<Args>(args)...);
+                return hpx::unwrap_all(HPX_FORWARD(Args, args)...);
             }
             /// \endcond
         };
@@ -170,10 +170,10 @@ namespace hpx {
     template <typename T>
     auto unwrapping(T&& callable)
         -> decltype(util::detail::functional_unwrap_depth_impl<1U>(
-            std::forward<T>(callable)))
+            HPX_FORWARD(T, callable)))
     {
         return util::detail::functional_unwrap_depth_impl<1U>(
-            std::forward<T>(callable));
+            HPX_FORWARD(T, callable));
     }
 
     /// Returns a callable object which unwraps its arguments upon
@@ -185,11 +185,11 @@ namespace hpx {
     template <std::size_t Depth, typename T>
     auto unwrapping_n(T&& callable)
         -> decltype(util::detail::functional_unwrap_depth_impl<Depth>(
-            std::forward<T>(callable)))
+            HPX_FORWARD(T, callable)))
     {
         static_assert(Depth > 0U, "The unwrapping depth must be >= 1!");
         return util::detail::functional_unwrap_depth_impl<Depth>(
-            std::forward<T>(callable));
+            HPX_FORWARD(T, callable));
     }
 
     /// Returns a callable object which unwraps its arguments upon
@@ -201,19 +201,19 @@ namespace hpx {
     template <typename T>
     auto unwrapping_all(T&& callable)
         -> decltype(util::detail::functional_unwrap_depth_impl<0U>(
-            std::forward<T>(callable)))
+            HPX_FORWARD(T, callable)))
     {
         return util::detail::functional_unwrap_depth_impl<0U>(
-            std::forward<T>(callable));
+            HPX_FORWARD(T, callable));
     }
 
     namespace util {
         template <typename... Args>
         HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrap instead.")
         auto unwrap(Args&&... args) -> decltype(
-            detail::unwrap_depth_impl<1U>(std::forward<Args>(args)...))
+            detail::unwrap_depth_impl<1U>(HPX_FORWARD(Args, args)...))
         {
-            return detail::unwrap_depth_impl<1U>(std::forward<Args>(args)...);
+            return detail::unwrap_depth_impl<1U>(HPX_FORWARD(Args, args)...);
         }
 
         namespace functional {
@@ -222,9 +222,9 @@ namespace hpx {
             {
                 template <typename... Args>
                 auto operator()(Args&&... args)
-                    -> decltype(hpx::unwrap(std::forward<Args>(args)...))
+                    -> decltype(hpx::unwrap(HPX_FORWARD(Args, args)...))
                 {
-                    return hpx::unwrap(std::forward<Args>(args)...);
+                    return hpx::unwrap(HPX_FORWARD(Args, args)...);
                 }
             };
         }    // namespace functional
@@ -232,11 +232,10 @@ namespace hpx {
         template <std::size_t Depth, typename... Args>
         HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrap_n instead.")
         auto unwrap_n(Args&&... args) -> decltype(
-            detail::unwrap_depth_impl<Depth>(std::forward<Args>(args)...))
+            detail::unwrap_depth_impl<Depth>(HPX_FORWARD(Args, args)...))
         {
             static_assert(Depth > 0U, "The unwrapping depth must be >= 1!");
-            return detail::unwrap_depth_impl<Depth>(
-                std::forward<Args>(args)...);
+            return detail::unwrap_depth_impl<Depth>(HPX_FORWARD(Args, args)...);
         }
 
         namespace functional {
@@ -246,9 +245,9 @@ namespace hpx {
             {
                 template <typename... Args>
                 auto operator()(Args&&... args) -> decltype(
-                    hpx::unwrap_n<Depth>(std::forward<Args>(args)...))
+                    hpx::unwrap_n<Depth>(HPX_FORWARD(Args, args)...))
                 {
-                    return hpx::unwrap_n<Depth>(std::forward<Args>(args)...);
+                    return hpx::unwrap_n<Depth>(HPX_FORWARD(Args, args)...);
                 }
             };
         }    // namespace functional
@@ -256,9 +255,9 @@ namespace hpx {
         template <typename... Args>
         HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrap_all instead.")
         auto unwrap_all(Args&&... args) -> decltype(
-            detail::unwrap_depth_impl<0U>(std::forward<Args>(args)...))
+            detail::unwrap_depth_impl<0U>(HPX_FORWARD(Args, args)...))
         {
-            return detail::unwrap_depth_impl<0U>(std::forward<Args>(args)...);
+            return detail::unwrap_depth_impl<0U>(HPX_FORWARD(Args, args)...);
         }
 
         namespace functional {
@@ -267,9 +266,9 @@ namespace hpx {
             {
                 template <typename... Args>
                 auto operator()(Args&&... args)
-                    -> decltype(hpx::unwrap_all(std::forward<Args>(args)...))
+                    -> decltype(hpx::unwrap_all(HPX_FORWARD(Args, args)...))
                 {
-                    return hpx::unwrap_all(std::forward<Args>(args)...);
+                    return hpx::unwrap_all(HPX_FORWARD(Args, args)...);
                 }
             };
         }    // namespace functional
@@ -277,30 +276,30 @@ namespace hpx {
         template <typename T>
         HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrapping instead.")
         auto unwrapping(T&& callable) -> decltype(
-            detail::functional_unwrap_depth_impl<1U>(std::forward<T>(callable)))
+            detail::functional_unwrap_depth_impl<1U>(HPX_FORWARD(T, callable)))
         {
             return detail::functional_unwrap_depth_impl<1U>(
-                std::forward<T>(callable));
+                HPX_FORWARD(T, callable));
         }
 
         template <std::size_t Depth, typename T>
         HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrapping_n instead.")
         auto unwrapping_n(T&& callable)
             -> decltype(detail::functional_unwrap_depth_impl<Depth>(
-                std::forward<T>(callable)))
+                HPX_FORWARD(T, callable)))
         {
             static_assert(Depth > 0U, "The unwrapping depth must be >= 1!");
             return detail::functional_unwrap_depth_impl<Depth>(
-                std::forward<T>(callable));
+                HPX_FORWARD(T, callable));
         }
 
         template <typename T>
         HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrapping_all instead.")
         auto unwrapping_all(T&& callable) -> decltype(
-            detail::functional_unwrap_depth_impl<0U>(std::forward<T>(callable)))
+            detail::functional_unwrap_depth_impl<0U>(HPX_FORWARD(T, callable)))
         {
             return detail::functional_unwrap_depth_impl<0U>(
-                std::forward<T>(callable));
+                HPX_FORWARD(T, callable));
         }
     }    // namespace util
 }    // namespace hpx

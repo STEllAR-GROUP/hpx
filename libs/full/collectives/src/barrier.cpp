@@ -89,7 +89,7 @@ namespace hpx { namespace lcos {
     barrier::barrier() = default;
 
     barrier::barrier(barrier&& other)
-      : node_(std::move(other.node_))
+      : node_(HPX_MOVE(other.node_))
     {
         other.node_.reset();
     }
@@ -97,7 +97,7 @@ namespace hpx { namespace lcos {
     barrier& barrier::operator=(barrier&& other)
     {
         release();
-        node_ = std::move(other.node_);
+        node_ = HPX_MOVE(other.node_);
         other.node_.reset();
 
         return *this;
@@ -145,7 +145,7 @@ namespace hpx { namespace lcos {
                 hpx::intrusive_ptr<wrapping_type> node = node_;
                 hpx::when_all(f, wait(hpx::launch::async))
                     .then(hpx::launch::sync,
-                        [node = std::move(node)](hpx::future<void> f) {
+                        [node = HPX_MOVE(node)](hpx::future<void> f) {
                             HPX_UNUSED(node);
                             f.get();
                         })

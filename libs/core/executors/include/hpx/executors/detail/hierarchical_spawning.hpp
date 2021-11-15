@@ -123,8 +123,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             "helper");
 
         return hierarchical_bulk_async_execute_helper(desc, pool, first_thread,
-            num_threads, hierarchical_threshold, policy, std::forward<F>(f),
-            shape, std::forward<Ts>(ts)...);
+            num_threads, hierarchical_threshold, policy, HPX_FORWARD(F, f),
+            shape, HPX_FORWARD(Ts, ts)...);
     }
 
     template <typename Executor, typename Launch, typename F, typename S,
@@ -141,8 +141,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         using result_type = std::vector<hpx::future<func_result_type>>;
 
         auto&& func = detail::make_fused_bulk_async_execute_helper<result_type>(
-            executor, std::forward<F>(f), shape,
-            hpx::make_tuple(std::forward<Ts>(ts)...));
+            executor, HPX_FORWARD(F, f), shape,
+            hpx::make_tuple(HPX_FORWARD(Ts, ts)...));
 
         // void or std::vector<func_result_type>
         using vector_result_type = typename detail::bulk_then_execute_result<F,
@@ -159,16 +159,16 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
         // vector<future<func_result_type>> -> vector<func_result_type>
         shared_state_type p = hpx::lcos::detail::make_continuation_exec_policy<
-            vector_result_type>(std::forward<Future>(predecessor), executor,
+            vector_result_type>(HPX_FORWARD(Future, predecessor), executor,
             policy,
-            [func = std::move(func)](
+            [func = HPX_MOVE(func)](
                 future_type&& predecessor) mutable -> vector_result_type {
                 // use unwrap directly (instead of lazily) to avoid
                 // having to pull in dataflow
-                return hpx::unwrap(func(std::move(predecessor)));
+                return hpx::unwrap(func(HPX_MOVE(predecessor)));
             });
 
         return hpx::traits::future_access<result_future_type>::create(
-            std::move(p));
+            HPX_MOVE(p));
     }
 }}}}    // namespace hpx::parallel::execution::detail

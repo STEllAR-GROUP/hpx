@@ -284,7 +284,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::swap_ranges<
                 swap_ranges_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first1, last1, first2,
+                .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
                     last2);
         }
 
@@ -338,7 +338,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::swap_ranges<
                 swap_ranges_result<iterator_type1, iterator_type2>>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng1),
                     std::end(rng1), std::begin(rng2), std::end(rng2));
         }
     } swap_ranges{};

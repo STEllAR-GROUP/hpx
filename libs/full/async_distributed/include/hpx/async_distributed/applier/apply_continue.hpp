@@ -26,8 +26,8 @@ namespace hpx {
         using local_result_type = typename action_type::local_result_type;
 
         return apply<Action>(hpx::actions::typed_continuation<local_result_type,
-                                 remote_result_type>(std::forward<Cont>(cont)),
-            gid, std::forward<Ts>(vs)...);
+                                 remote_result_type>(HPX_FORWARD(Cont, cont)),
+            gid, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Component, typename Signature, typename Derived,
@@ -37,7 +37,7 @@ namespace hpx {
         Cont&& cont, id_type const& gid, Ts&&... vs)
     {
         return apply_continue<Derived>(
-            std::forward<Cont>(cont), gid, std::forward<Ts>(vs)...);
+            HPX_FORWARD(Cont, cont), gid, HPX_FORWARD(Ts, vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ namespace hpx {
 
         return apply<Action>(hpx::actions::typed_continuation<local_result_type,
                                  remote_result_type>(cont, make_continuation()),
-            gid, std::forward<Ts>(vs)...);
+            gid, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Component, typename Signature, typename Derived,
@@ -59,6 +59,6 @@ namespace hpx {
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         id_type const& cont, id_type const& gid, Ts&&... vs)
     {
-        return apply_continue<Derived>(cont, gid, std::forward<Ts>(vs)...);
+        return apply_continue<Derived>(cont, gid, HPX_FORWARD(Ts, vs)...);
     }
 }    // namespace hpx

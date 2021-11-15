@@ -62,7 +62,7 @@ namespace hpx { namespace compute { namespace host {
             };
 
             policy_allocator(Policy&& policy)
-              : policy_(std::move(policy))
+              : policy_(HPX_MOVE(policy))
             {
             }
 
@@ -142,7 +142,7 @@ namespace hpx { namespace compute { namespace host {
                     parallel::util::detail::no_data>;
 
                 auto&& arguments =
-                    hpx::forward_as_tuple(std::forward<Args>(args)...);
+                    hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
 
                 cancellation_token tok;
                 partitioner::call(
@@ -187,7 +187,7 @@ namespace hpx { namespace compute { namespace host {
             {
                 hpx::parallel::execution::sync_execute(
                     hpx::util::functional::placement_new<U>(), p,
-                    std::forward<Args>(args)...);
+                    HPX_FORWARD(Args, args)...);
             }
 
             // Calls the destructor of count objects pointed to by p
@@ -268,7 +268,7 @@ namespace hpx { namespace compute { namespace host {
 
         block_allocator(target_type&& targets)
           : base_type(policy_type(
-                executor_type(std::move(targets)), executor_parameters_type()))
+                executor_type(HPX_MOVE(targets)), executor_parameters_type()))
         {
         }
 

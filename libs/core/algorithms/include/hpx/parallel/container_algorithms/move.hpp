@@ -168,7 +168,7 @@ namespace hpx { namespace ranges {
         {
             return hpx::parallel::v1::detail::transfer<
                 hpx::parallel::v1::detail::move<Iter1, Iter2>>(
-                std::forward<ExPolicy>(policy), first, last, dest);
+                HPX_FORWARD(ExPolicy, policy), first, last, dest);
         }
 
         // clang-format off
@@ -189,7 +189,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::transfer<
                 hpx::parallel::v1::detail::move<iterator_type, Iter2>>(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), dest);
         }
 
@@ -256,7 +256,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::transfer<move_iter_t>(
-            std::forward<ExPolicy>(policy), iter, sent, dest);
+            HPX_FORWARD(ExPolicy, policy), iter, sent, dest);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -285,7 +285,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::transfer<move_iter_t>(std::forward<ExPolicy>(policy),
+        return detail::transfer<move_iter_t>(HPX_FORWARD(ExPolicy, policy),
             hpx::util::begin(rng), hpx::util::end(rng), dest);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop

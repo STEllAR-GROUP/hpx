@@ -111,7 +111,7 @@ namespace hpx { namespace lcos { namespace local {
         // Effects:        Sets both the initial expected count for each
         //                 barrier phase and the current expected count for the
         //                 first phase to expected. Initializes completion with
-        //                 std::move(f). Starts the first phase. [Note: If
+        //                 HPX_MOVE(f). Starts the first phase. [Note: If
         //                 expected is 0 this object can only be destroyed.-
         //                 end note]
         // Throws:         Any exception thrown by CompletionFunction's move
@@ -120,7 +120,7 @@ namespace hpx { namespace lcos { namespace local {
             std::ptrdiff_t expected, OnCompletion completion = OnCompletion())
           : expected_(expected)
           , arrived_(expected)
-          , completion_(std::move(completion))
+          , completion_(HPX_MOVE(completion))
           , phase_(false)
         {
             HPX_ASSERT(expected >= 0 && expected <= (max)());
@@ -142,7 +142,7 @@ namespace hpx { namespace lcos { namespace local {
                 completion_();
                 arrived_ = new_expected;
                 phase_ = !old_phase;
-                cond_.notify_all(std::move(l));
+                cond_.notify_all(HPX_MOVE(l));
             }
             return old_phase;
         }
@@ -175,7 +175,7 @@ namespace hpx { namespace lcos { namespace local {
         //                 point for the current phase or the immediately
         //                 preceding phase of the same barrier object.
         // Effects:        Blocks at the synchronization point associated with
-        //                 std::move(arrival) until the phase completion step
+        //                 HPX_MOVE(arrival) until the phase completion step
         //                 of the synchronization point's phase is run. [ Note:
         //                 If arrival is associated with the synchronization
         //                 point for a previous phase, the call returns

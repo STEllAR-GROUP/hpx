@@ -308,9 +308,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce<T>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op));
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(T, init), HPX_FORWARD(Reduce, red_op),
+                HPX_FORWARD(Convert, conv_op));
         }
 
         // clang-format off
@@ -338,8 +338,8 @@ namespace hpx { namespace ranges {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce<T>().call(
-                hpx::execution::seq, first, last, std::forward<T>(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
+                hpx::execution::seq, first, last, HPX_FORWARD(T, init),
+                HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op));
         }
 
         // clang-format off
@@ -362,8 +362,8 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), first, last, first2,
-                std::move(init), hpx::parallel::v1::detail::plus(),
+                HPX_FORWARD(ExPolicy, policy), first, last, first2,
+                HPX_MOVE(init), hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies());
         }
 
@@ -383,7 +383,7 @@ namespace hpx { namespace ranges {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                hpx::execution::seq, first, last, first2, std::move(init),
+                hpx::execution::seq, first, last, first2, HPX_MOVE(init),
                 hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies());
         }
@@ -422,9 +422,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), first, last, first2,
-                std::move(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op));
+                HPX_FORWARD(ExPolicy, policy), first, last, first2,
+                HPX_MOVE(init), HPX_FORWARD(Reduce, red_op),
+                HPX_FORWARD(Convert, conv_op));
         }
 
         // clang-format off
@@ -458,8 +458,8 @@ namespace hpx { namespace ranges {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                hpx::execution::seq, first, last, first2, std::move(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
+                hpx::execution::seq, first, last, first2, HPX_MOVE(init),
+                HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op));
         }
 
         // range based versions
@@ -495,9 +495,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce<T>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<T>(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(T, init),
+                HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op));
         }
 
         // clang-format off
@@ -528,8 +528,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::transform_reduce<T>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<T>(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op));
+                HPX_FORWARD(T, init), HPX_FORWARD(Reduce, red_op),
+                HPX_FORWARD(Convert, conv_op));
         }
 
         // clang-format off
@@ -555,8 +555,8 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), first2, std::move(init),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), first2, HPX_MOVE(init),
                 hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies());
         }
@@ -581,7 +581,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                first2, std::move(init), hpx::parallel::v1::detail::plus(),
+                first2, HPX_MOVE(init), hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies());
         }
 
@@ -623,9 +623,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), first2, std::move(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), first2, HPX_MOVE(init),
+                HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op));
         }
 
         // clang-format off
@@ -663,8 +663,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                first2, std::move(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op));
+                first2, HPX_MOVE(init), HPX_FORWARD(Reduce, red_op),
+                HPX_FORWARD(Convert, conv_op));
         }
     } transform_reduce{};
 }}    // namespace hpx::ranges

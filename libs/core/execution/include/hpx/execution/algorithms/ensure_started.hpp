@@ -34,7 +34,7 @@ namespace hpx::execution::experimental {
         {
             return detail::split_sender<Sender, Allocator,
                 detail::submission_type::eager>{
-                std::forward<Sender>(sender), allocator};
+                HPX_FORWARD(Sender, sender), allocator};
         }
 
         template <typename Sender, typename Allocator>

@@ -184,7 +184,7 @@ namespace hpx { namespace collectives {
         channel_communicator comm, that_site_arg site, T&& value, tag_arg tag)
     {
         return comm.comm_->set(
-            site.that_site_, std::forward<T>(value), tag.tag_);
+            site.that_site_, HPX_FORWARD(T, value), tag.tag_);
     }
 }}    // namespace hpx::collectives
 

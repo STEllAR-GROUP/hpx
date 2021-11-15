@@ -87,7 +87,7 @@ namespace hpx { namespace collectives { namespace detail {
             util::ignore_while_checking il(&l);
             HPX_UNUSED(il);
 
-            data_[which].channels_[tag].set(std::move(value));
+            data_[which].channels_[tag].set(HPX_MOVE(value));
         }
 
         template <typename T>
@@ -145,7 +145,7 @@ namespace hpx { namespace collectives { namespace detail {
                 channel_communicator_server::template set_action<
                     std::decay_t<T>>;
             return hpx::async(action_type(), clients_[site], this_site_,
-                std::forward<T>(value), tag);
+                HPX_FORWARD(T, value), tag);
         }
 
         std::pair<std::size_t, std::size_t> get_info() const noexcept

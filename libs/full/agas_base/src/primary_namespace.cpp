@@ -163,7 +163,7 @@ namespace hpx { namespace agas {
         }
 
         server::primary_namespace::begin_migration_action action;
-        return hpx::async(action, std::move(dest), id);
+        return hpx::async(action, HPX_MOVE(dest), id);
 #else
         HPX_ASSERT(false);
         HPX_UNUSED(id);
@@ -197,7 +197,7 @@ namespace hpx { namespace agas {
         }
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::primary_namespace::bind_gid_action action;
-        return hpx::async(action, std::move(dest), g, id, locality);
+        return hpx::async(action, HPX_MOVE(dest), g, id, locality);
 #else
         HPX_ASSERT(false);
         return hpx::make_ready_future(true);
@@ -217,14 +217,14 @@ namespace hpx { namespace agas {
             agas::get_locality_id())
         {
             hpx::apply(
-                &server::primary_namespace::route, server_.get(), std::move(p));
+                &server::primary_namespace::route, server_.get(), HPX_MOVE(p));
             f(std::error_code(), parcelset::parcel());
             return;
         }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::primary_namespace::route_action action;
-        hpx::apply_cb(action, std::move(dest), std::move(f), std::move(p));
+        hpx::apply_cb(action, HPX_MOVE(dest), HPX_MOVE(f), HPX_MOVE(p));
 #else
         HPX_ASSERT(false);
 #endif
@@ -249,7 +249,7 @@ namespace hpx { namespace agas {
         }
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::primary_namespace::resolve_gid_action action;
-        return hpx::async(action, std::move(dest), id);
+        return hpx::async(action, HPX_MOVE(dest), id);
 #else
         HPX_ASSERT(false);
         return hpx::make_ready_future(primary_namespace::resolved_type{});
@@ -267,7 +267,7 @@ namespace hpx { namespace agas {
         }
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::primary_namespace::colocate_action action;
-        return hpx::async(action, std::move(dest), id);
+        return hpx::async(action, HPX_MOVE(dest), id);
 #else
         HPX_ASSERT(false);
         return hpx::make_ready_future(naming::invalid_id);
@@ -288,7 +288,7 @@ namespace hpx { namespace agas {
         }
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::primary_namespace::unbind_gid_action action;
-        return hpx::async(action, std::move(dest), count, stripped_id);
+        return hpx::async(action, HPX_MOVE(dest), count, stripped_id);
 #else
         HPX_ASSERT(false);
         return hpx::make_ready_future(naming::address{});
@@ -308,7 +308,7 @@ namespace hpx { namespace agas {
         }
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::primary_namespace::unbind_gid_action action;
-        return action(std::move(dest), count, stripped_id);
+        return action(HPX_MOVE(dest), count, stripped_id);
 #else
         HPX_ASSERT(false);
         return naming::address{};
@@ -328,7 +328,7 @@ namespace hpx { namespace agas {
         }
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::primary_namespace::increment_credit_action action;
-        return hpx::async(action, std::move(dest), credits, lower, upper);
+        return hpx::async(action, HPX_MOVE(dest), credits, lower, upper);
 #else
         HPX_ASSERT(false);
         return hpx::make_ready_future(std::int64_t{});

@@ -110,8 +110,8 @@ namespace hpx { namespace execution { namespace experimental {
                     template <typename Receiver_, typename F_>
                     let_error_predecessor_receiver(
                         Receiver_&& receiver, F_&& f, operation_state& op_state)
-                      : receiver(std::forward<Receiver_>(receiver))
-                      , f(std::forward<F_>(f))
+                      : receiver(HPX_FORWARD(Receiver_, receiver))
+                      , f(HPX_FORWARD(F_, f))
                       , op_state(op_state)
                     {
                     }
@@ -150,7 +150,7 @@ namespace hpx { namespace execution { namespace experimental {
                         {
                             using operation_state_type =
                                 decltype(hpx::execution::experimental::connect(
-                                    HPX_INVOKE(std::move(f), error),
+                                    HPX_INVOKE(HPX_MOVE(f), error),
                                     std::declval<Receiver>()));
 
 #if defined(HPX_HAVE_CXX17_COPY_ELISION)
@@ -163,8 +163,8 @@ namespace hpx { namespace execution { namespace experimental {
                                     hpx::util::detail::with_result_of([&]() {
                                         return hpx::execution::experimental::
                                             connect(
-                                                HPX_INVOKE(std::move(f), error),
-                                                std::move(receiver));
+                                                HPX_INVOKE(HPX_MOVE(f), error),
+                                                HPX_MOVE(receiver));
                                     }));
 #else
                             // MSVC doesn't get copy elision quite right, the operation
@@ -172,8 +172,8 @@ namespace hpx { namespace execution { namespace experimental {
                             op_state.successor_op_state
                                 .template emplace_f<operation_state_type>(
                                     hpx::execution::experimental::connect,
-                                    HPX_INVOKE(std::move(f), error),
-                                    std::move(receiver));
+                                    HPX_INVOKE(HPX_MOVE(f), error),
+                                    HPX_MOVE(receiver));
 #endif
                             hpx::visit(
                                 start_visitor{}, op_state.successor_op_state);
@@ -191,15 +191,15 @@ namespace hpx { namespace execution { namespace experimental {
                                 // the invoke inside the visit may throw.
                                 r.op_state.predecessor_error
                                     .template emplace<Error>(
-                                        std::forward<Error>(error));
+                                        HPX_FORWARD(Error, error));
                                 hpx::visit(
-                                    set_error_visitor{std::move(r.receiver),
-                                        std::move(r.f), r.op_state},
+                                    set_error_visitor{HPX_MOVE(r.receiver),
+                                        HPX_MOVE(r.f), r.op_state},
                                     r.op_state.predecessor_error);
                             },
                             [&](std::exception_ptr ep) {
                                 hpx::execution::experimental::set_error(
-                                    std::move(r.receiver), std::move(ep));
+                                    HPX_MOVE(r.receiver), HPX_MOVE(ep));
                             });
                     }
 
@@ -207,7 +207,7 @@ namespace hpx { namespace execution { namespace experimental {
                         set_done_t, let_error_predecessor_receiver&& r) noexcept
                     {
                         hpx::execution::experimental::set_done(
-                            std::move(r.receiver));
+                            HPX_MOVE(r.receiver));
                     };
 
                     template <typename... Ts,
@@ -218,7 +218,7 @@ namespace hpx { namespace execution { namespace experimental {
                         let_error_predecessor_receiver&& r, Ts&&... ts) noexcept
                     {
                         hpx::execution::experimental::set_value(
-                            std::move(r.receiver), std::forward<Ts>(ts)...);
+                            HPX_MOVE(r.receiver), HPX_FORWARD(Ts, ts)...);
                     }
                 };
 
@@ -268,8 +268,8 @@ namespace hpx { namespace execution { namespace experimental {
                             std::forward<PredecessorSender_>(
                                 predecessor_sender),
                             let_error_predecessor_receiver(
-                                std::forward<Receiver_>(receiver),
-                                std::forward<F_>(f), *this))}
+                                HPX_FORWARD(Receiver_, receiver),
+                                HPX_FORWARD(F_, f), *this))}
                 {
                 }
 
@@ -289,9 +289,8 @@ namespace hpx { namespace execution { namespace experimental {
             friend auto tag_invoke(
                 connect_t, let_error_sender&& s, Receiver&& receiver)
             {
-                return operation_state<Receiver>(
-                    std::move(s.predecessor_sender),
-                    std::forward<Receiver>(receiver), std::move(s.f));
+                return operation_state<Receiver>(HPX_MOVE(s.predecessor_sender),
+                    HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.f));
             }
         };
     }    // namespace detail
@@ -310,16 +309,15 @@ namespace hpx { namespace execution { namespace experimental {
             let_error_t, PredecessorSender&& predecessor_sender, F&& f)
         {
             return detail::let_error_sender<PredecessorSender, F>{
-                std::forward<PredecessorSender>(predecessor_sender),
-                std::forward<F>(f)};
+                HPX_FORWARD(PredecessorSender, predecessor_sender),
+                HPX_FORWARD(F, f)};
         }
 
         template <typename F>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             let_error_t, F&& f)
         {
-            return detail::partial_algorithm<let_error_t, F>{
-                std::forward<F>(f)};
+            return detail::partial_algorithm<let_error_t, F>{HPX_FORWARD(F, f)};
         }
     } let_error{};
 }}}    // namespace hpx::execution::experimental

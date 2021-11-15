@@ -130,31 +130,31 @@ namespace hpx { namespace lcos {
     template <typename F, typename Future>
     void wait_each(F&& f, std::vector<Future>& lazy_values)
     {
-        lcos::when_each(std::forward<F>(f), lazy_values).wait();
+        lcos::when_each(HPX_FORWARD(F, f), lazy_values).wait();
     }
 
     template <typename F, typename Future>
     void wait_each(F&& f, std::vector<Future>&& lazy_values)
     {
-        lcos::when_each(std::forward<F>(f), lazy_values).wait();
+        lcos::when_each(HPX_FORWARD(F, f), lazy_values).wait();
     }
 
     template <typename F, typename Iterator>
     void wait_each(F&& f, Iterator begin, Iterator end)
     {
-        lcos::when_each(std::forward<F>(f), begin, end).wait();
+        lcos::when_each(HPX_FORWARD(F, f), begin, end).wait();
     }
 
     template <typename F, typename Iterator>
     void wait_each_n(F&& f, Iterator begin, std::size_t count)
     {
-        when_each_n(std::forward<F>(f), begin, count).wait();
+        when_each_n(HPX_FORWARD(F, f), begin, count).wait();
     }
 
     template <typename F>
     void wait_each(F&& f)
     {
-        lcos::when_each(std::forward<F>(f)).wait();
+        lcos::when_each(HPX_FORWARD(F, f)).wait();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -164,7 +164,7 @@ namespace hpx { namespace lcos {
         util::all_of<traits::is_future<Ts>...>::value>::type
     wait_each(F&& f, Ts&&... ts)
     {
-        lcos::when_each(std::forward<F>(f), std::forward<Ts>(ts)...).wait();
+        lcos::when_each(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...).wait();
     }
 }}    // namespace hpx::lcos
 

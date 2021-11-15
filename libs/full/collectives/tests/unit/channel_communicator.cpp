@@ -12,6 +12,8 @@
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
+#include <cstdint>
+#include <iostream>
 #include <utility>
 #include <vector>
 

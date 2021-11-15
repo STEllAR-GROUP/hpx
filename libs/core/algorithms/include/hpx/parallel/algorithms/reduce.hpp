@@ -254,8 +254,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static T sequential(
                 ExPolicy, InIterB first, InIterE last, T_&& init, Reduce&& r)
             {
-                return detail::accumulate(first, last, std::forward<T_>(init),
-                    std::forward<Reduce>(r));
+                return detail::accumulate(
+                    first, last, HPX_FORWARD(T_, init), HPX_FORWARD(Reduce, r));
             }
 
             template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
@@ -267,20 +267,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first == last)
                 {
                     return util::detail::algorithm_result<ExPolicy, T>::get(
-                        std::forward<T_>(init));
+                        HPX_FORWARD(T_, init));
                 }
 
                 auto f1 = [r](FwdIterB part_begin, std::size_t part_size) -> T {
                     T val = *part_begin;
                     return util::accumulate_n(
-                        ++part_begin, --part_size, std::move(val), r);
+                        ++part_begin, --part_size, HPX_MOVE(val), r);
                 };
 
                 return util::partitioner<ExPolicy, T>::call(
-                    std::forward<ExPolicy>(policy), first,
-                    detail::distance(first, last), std::move(f1),
-                    hpx::unwrapping([init = std::forward<T_>(init),
-                                        r = std::forward<Reduce>(r)](
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1),
+                    hpx::unwrapping([init = HPX_FORWARD(T_, init),
+                                        r = HPX_FORWARD(Reduce, r)](
                                         std::vector<T>&& results) -> T {
                         return util::accumulate_n(hpx::util::begin(results),
                             hpx::util::size(results), init, r);
@@ -312,8 +312,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::reduce<T>().call(std::forward<ExPolicy>(policy), first,
-            last, std::move(init), std::forward<F>(f));
+        return detail::reduce<T>().call(HPX_FORWARD(ExPolicy, policy), first,
+            last, HPX_MOVE(init), HPX_FORWARD(F, f));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -341,8 +341,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::reduce<T>().call(std::forward<ExPolicy>(policy), first,
-            last, std::move(init), std::plus<T>());
+        return detail::reduce<T>().call(HPX_FORWARD(ExPolicy, policy), first,
+            last, HPX_MOVE(init), std::plus<T>());
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -372,7 +372,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::reduce<value_type>().call(std::forward<ExPolicy>(policy),
+        return detail::reduce<value_type>().call(HPX_FORWARD(ExPolicy, policy),
             first, last, value_type{}, std::plus<value_type>());
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -404,8 +404,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                std::forward<ExPolicy>(policy), first, last, std::move(init),
-                std::forward<F>(f));
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
+                HPX_FORWARD(F, f));
         }
 
         // clang-format off
@@ -424,7 +424,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                std::forward<ExPolicy>(policy), first, last, std::move(init),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
                 std::plus<T>{});
         }
 
@@ -447,7 +447,7 @@ namespace hpx {
                 typename std::iterator_traits<FwdIter>::value_type;
 
             return hpx::parallel::v1::detail::reduce<value_type>().call(
-                std::forward<ExPolicy>(policy), first, last, value_type{},
+                HPX_FORWARD(ExPolicy, policy), first, last, value_type{},
                 std::plus<value_type>{});
         }
 
@@ -464,8 +464,8 @@ namespace hpx {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                hpx::execution::seq, first, last, std::move(init),
-                std::forward<F>(f));
+                hpx::execution::seq, first, last, HPX_MOVE(init),
+                HPX_FORWARD(F, f));
         }
 
         // clang-format off
@@ -481,7 +481,7 @@ namespace hpx {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                hpx::execution::seq, first, last, std::move(init),
+                hpx::execution::seq, first, last, HPX_MOVE(init),
                 std::plus<T>{});
         }
 

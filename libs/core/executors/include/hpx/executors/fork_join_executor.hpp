@@ -323,7 +323,7 @@ namespace hpx { namespace execution { namespace experimental {
                     hpx::util::index_pack<Is_...>, F_&& f, A_&& a, Tuple_&& t)
                 {
                     hpx::util::invoke(
-                        f, a, hpx::get<Is_>(std::forward<Tuple_>(t))...);
+                        f, a, hpx::get<Is_>(HPX_FORWARD(Tuple_, t))...);
                 }
 
                 static void set_state(thread_states_type& thread_states,
@@ -427,7 +427,7 @@ namespace hpx { namespace execution { namespace experimental {
                 element_function_ = static_cast<void*>(&f);
                 shape_ = static_cast<void const*>(&shape);
                 size_ = hpx::util::size(shape);
-                auto argument_pack = hpx::make_tuple<>(std::forward<Ts>(ts)...);
+                auto argument_pack = hpx::make_tuple<>(HPX_FORWARD(Ts, ts)...);
                 argument_pack_ = static_cast<void*>(&argument_pack);
                 thread_function_helper_ =
                     static_cast<thread_function_helper_type*>(
@@ -450,7 +450,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                 if (exception_)
                 {
-                    std::rethrow_exception(std::move(exception_));
+                    std::rethrow_exception(HPX_MOVE(exception_));
                 }
             }
 
@@ -468,7 +468,7 @@ namespace hpx { namespace execution { namespace experimental {
                 try
                 {
                     bulk_sync_execute(
-                        std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+                        HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
                 }
                 catch (...)
                 {
@@ -488,14 +488,14 @@ namespace hpx { namespace execution { namespace experimental {
         void bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
         {
             shared_data_->bulk_sync_execute(
-                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename... Ts>
         decltype(auto) bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
         {
             return shared_data_->bulk_async_execute(
-                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
         bool operator==(fork_join_executor const& rhs) const noexcept

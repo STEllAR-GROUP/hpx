@@ -106,7 +106,7 @@ namespace hpx { namespace cuda { namespace experimental {
         }
 
         HPX_HOST_DEVICE target(target&& rhs) noexcept
-          : handle_(std::move(rhs.handle_))
+          : handle_(HPX_MOVE(rhs.handle_))
         {
         }
 
@@ -123,7 +123,7 @@ namespace hpx { namespace cuda { namespace experimental {
         {
             if (&rhs != this)
             {
-                handle_ = std::move(rhs.handle_);
+                handle_ = HPX_MOVE(rhs.handle_);
             }
             return *this;
         }

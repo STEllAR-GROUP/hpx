@@ -41,9 +41,9 @@ namespace hpx { namespace resiliency { namespace experimental {
             template <typename Pred_, typename Action_, typename Tuple_>
             distributed_async_replay_helper(
                 Pred_&& pred, Action_&& action, Tuple_&& tuple)
-              : pred_(std::forward<Pred_>(pred))
-              , action_(std::forward<Action_>(action))
-              , t_(std::forward<Tuple_>(tuple))
+              : pred_(HPX_FORWARD(Pred_, pred))
+              , action_(HPX_FORWARD(Action_, action))
+              , t_(HPX_FORWARD(Tuple_, tuple))
             {
             }
 
@@ -66,7 +66,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                 // necessary
                 auto this_ = this->shared_from_this();
                 return f.then(hpx::launch::sync,
-                    [this_ = std::move(this_), ids, iteration](
+                    [this_ = HPX_MOVE(this_), ids, iteration](
                         hpx::future<Result>&& f) {
                         if (f.has_exception())
                         {
@@ -104,7 +104,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                         if (iteration != ids.size())
                         {
                             // return result
-                            return hpx::make_ready_future(std::move(result));
+                            return hpx::make_ready_future(HPX_MOVE(result));
                         }
 
                         // throw aborting exception as attempts were
@@ -131,9 +131,9 @@ namespace hpx { namespace resiliency { namespace experimental {
                 typename std::decay<Action>::type,
                 std::tuple<typename std::decay<Ts>::type...>>;
 
-            return std::make_shared<return_type>(std::forward<Pred>(pred),
-                std::forward<Action>(action),
-                std::make_tuple(std::forward<Ts>(ts)...));
+            return std::make_shared<return_type>(HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Action, action),
+                std::make_tuple(HPX_FORWARD(Ts, ts)...));
         }
     }    // namespace detail
 
@@ -154,8 +154,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                 hpx::naming::id_type, Ts...>::type;
 
         auto helper = detail::make_distributed_async_replay_helper<result_type>(
-            detail::replay_validator{}, std::forward<Action>(action),
-            std::forward<Ts>(ts)...);
+            detail::replay_validator{}, HPX_FORWARD(Action, action),
+            HPX_FORWARD(Ts, ts)...);
 
         return helper->call(ids);
     }
@@ -178,8 +178,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                 hpx::naming::id_type, Ts...>::type;
 
         auto helper = detail::make_distributed_async_replay_helper<result_type>(
-            std::forward<Pred>(pred), std::forward<Action>(action),
-            std::forward<Ts>(ts)...);
+            HPX_FORWARD(Pred, pred), HPX_FORWARD(Action, action),
+            HPX_FORWARD(Ts, ts)...);
 
         return helper->call(ids);
     }

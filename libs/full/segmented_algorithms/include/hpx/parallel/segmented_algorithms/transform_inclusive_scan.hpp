@@ -54,7 +54,7 @@ namespace hpx { namespace segmented {
 
         return hpx::parallel::v1::detail::segmented_inclusive_scan(
             hpx::execution::seq, first, last, dest, value_type{},
-            std::forward<Op>(op), std::true_type{}, std::forward<Conv>(conv));
+            HPX_FORWARD(Op, op), std::true_type{}, HPX_FORWARD(Conv, conv));
     }
 
     // clang-format off
@@ -80,14 +80,14 @@ namespace hpx { namespace segmented {
 
         if (first == last)
             return parallel::util::detail::algorithm_result<ExPolicy,
-                FwdIter2>::get(std::move(dest));
+                FwdIter2>::get(HPX_MOVE(dest));
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
         using value_type = typename std::iterator_traits<FwdIter1>::value_type;
 
         return hpx::parallel::v1::detail::segmented_inclusive_scan(
-            std::forward<ExPolicy>(policy), first, last, dest, value_type{},
-            std::forward<Op>(op), is_seq(), std::forward<Conv>(conv));
+            HPX_FORWARD(ExPolicy, policy), first, last, dest, value_type{},
+            HPX_FORWARD(Op, op), is_seq(), HPX_FORWARD(Conv, conv));
     }
 
     // clang-format off
@@ -113,8 +113,8 @@ namespace hpx { namespace segmented {
             return dest;
 
         return hpx::parallel::v1::detail::segmented_inclusive_scan(
-            hpx::execution::seq, first, last, dest, std::move(init),
-            std::forward<Op>(op), std::true_type{}, std::forward<Conv>(conv));
+            hpx::execution::seq, first, last, dest, HPX_MOVE(init),
+            HPX_FORWARD(Op, op), std::true_type{}, HPX_FORWARD(Conv, conv));
     }
 
     // clang-format off
@@ -141,12 +141,12 @@ namespace hpx { namespace segmented {
 
         if (first == last)
             return parallel::util::detail::algorithm_result<ExPolicy,
-                FwdIter2>::get(std::move(dest));
+                FwdIter2>::get(HPX_MOVE(dest));
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
         return hpx::parallel::v1::detail::segmented_inclusive_scan(
-            std::forward<ExPolicy>(policy), first, last, dest, std::move(init),
-            std::forward<Op>(op), is_seq(), std::forward<Conv>(conv));
+            HPX_FORWARD(ExPolicy, policy), first, last, dest, HPX_MOVE(init),
+            HPX_FORWARD(Op, op), is_seq(), HPX_FORWARD(Conv, conv));
     }
 }}    // namespace hpx::segmented

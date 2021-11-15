@@ -25,7 +25,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         template <typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE Result operator()(T&& t)
         {
-            return hpx::util::invoke_fused_r<Result>(f_, std::forward<T>(t));
+            return hpx::util::invoke_fused_r<Result>(f_, HPX_FORWARD(T, t));
         }
     };
 }}}}    // namespace hpx::parallel::util::detail

@@ -262,7 +262,7 @@ namespace hpx { namespace lcos {
 
         explicit when_some_result(Sequence&& futures)
           : indices()
-          , futures(std::move(futures))
+          , futures(HPX_MOVE(futures))
         {
         }
 
@@ -273,8 +273,8 @@ namespace hpx { namespace lcos {
         }
 
         when_some_result(when_some_result&& rhs)
-          : indices(std::move(rhs.indices))
-          , futures(std::move(rhs.futures))
+          : indices(HPX_MOVE(rhs.indices))
+          , futures(HPX_MOVE(rhs.futures))
         {
         }
 
@@ -292,8 +292,8 @@ namespace hpx { namespace lcos {
         {
             if (this != &rhs)
             {
-                indices = std::move(rhs.indices);
-                futures = std::move(rhs.futures);
+                indices = HPX_MOVE(rhs.indices);
+                futures = HPX_MOVE(rhs.futures);
             }
             return *this;
         }
@@ -444,7 +444,7 @@ namespace hpx { namespace lcos {
             typedef Sequence argument_type;
 
             when_some(argument_type&& lazy_values, std::size_t n)
-              : lazy_values_(std::move(lazy_values))
+              : lazy_values_(HPX_MOVE(lazy_values))
               , count_(0)
               , needed_count_(n)
               , goal_reached_on_calling_thread_(false)
@@ -470,7 +470,7 @@ namespace hpx { namespace lcos {
                 HPX_ASSERT(
                     count_.load(std::memory_order_seq_cst) >= needed_count_);
 
-                return std::move(lazy_values_);
+                return HPX_MOVE(lazy_values_);
             }
 
             mutable mutex_type mtx_;
@@ -495,7 +495,7 @@ namespace hpx { namespace lcos {
         if (n == 0)
         {
             return lcos::make_ready_future(
-                when_some_result<result_type>(std::move(lazy_values_)));
+                when_some_result<result_type>(HPX_MOVE(lazy_values_)));
         }
 
         if (n > lazy_values_.size())
@@ -508,10 +508,10 @@ namespace hpx { namespace lcos {
 
         std::shared_ptr<detail::when_some<result_type>> f =
             std::make_shared<detail::when_some<result_type>>(
-                std::move(lazy_values_), n);
+                HPX_MOVE(lazy_values_), n);
 
         lcos::local::futures_factory<when_some_result<result_type>()> p(
-            [f = std::move(f)]() -> when_some_result<result_type> {
+            [f = HPX_MOVE(f)]() -> when_some_result<result_type> {
                 return (*f)();
             });
 
@@ -565,7 +565,7 @@ namespace hpx { namespace lcos {
         if (n == 0)
         {
             return lcos::make_ready_future(
-                when_some_result<result_type>(std::move(lazy_values)));
+                when_some_result<result_type>(HPX_MOVE(lazy_values)));
         }
 
         HPX_THROWS_IF(ec, hpx::bad_parameter, "hpx::lcos::when_some",
@@ -588,12 +588,12 @@ namespace hpx { namespace lcos {
 
         traits::acquire_future_disp func;
         result_type lazy_values(
-            func(std::forward<T>(t)), func(std::forward<Ts>(ts))...);
+            func(HPX_FORWARD(T, t)), func(HPX_FORWARD(Ts, ts))...);
 
         if (n == 0)
         {
             return lcos::make_ready_future(
-                when_some_result<result_type>(std::move(lazy_values)));
+                when_some_result<result_type>(HPX_MOVE(lazy_values)));
         }
 
         if (n > 1 + sizeof...(Ts))
@@ -605,10 +605,10 @@ namespace hpx { namespace lcos {
 
         std::shared_ptr<detail::when_some<result_type>> f =
             std::make_shared<detail::when_some<result_type>>(
-                std::move(lazy_values), n);
+                HPX_MOVE(lazy_values), n);
 
         lcos::local::futures_factory<when_some_result<result_type>()> p(
-            [f = std::move(f)]() -> when_some_result<result_type> {
+            [f = HPX_MOVE(f)]() -> when_some_result<result_type> {
                 return (*f)();
             });
 
@@ -630,12 +630,12 @@ namespace hpx { namespace lcos {
 
         traits::acquire_future_disp func;
         result_type lazy_values(
-            func(std::forward<T>(t)), func(std::forward<Ts>(ts))...);
+            func(HPX_FORWARD(T, t)), func(HPX_FORWARD(Ts, ts))...);
 
         if (n == 0)
         {
             return lcos::make_ready_future(
-                when_some_result<result_type>(std::move(lazy_values)));
+                when_some_result<result_type>(HPX_MOVE(lazy_values)));
         }
 
         if (n > 1 + sizeof...(Ts))
@@ -647,10 +647,10 @@ namespace hpx { namespace lcos {
 
         std::shared_ptr<detail::when_some<result_type>> f =
             std::make_shared<detail::when_some<result_type>>(
-                std::move(lazy_values), n);
+                HPX_MOVE(lazy_values), n);
 
         lcos::local::futures_factory<when_some_result<result_type>()> p(
-            [f = std::move(f)]() -> when_some_result<result_type> {
+            [f = HPX_MOVE(f)]() -> when_some_result<result_type> {
                 return (*f)();
             });
 

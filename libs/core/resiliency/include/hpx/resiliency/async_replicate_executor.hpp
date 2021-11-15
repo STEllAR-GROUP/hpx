@@ -49,8 +49,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                         result_type>::type;
 
                 // launch given function n times
-                auto func = [f = std::forward<F>(f),
-                                t = hpx::make_tuple(std::forward<Ts>(ts)...)](
+                auto func = [f = HPX_FORWARD(F, f),
+                                t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
                                 std::size_t) mutable -> result_type {
                     // ignore argument (invocation count of bulk_execute)
                     return hpx::util::invoke_fused(f, t);
@@ -58,15 +58,15 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                 std::vector<future_type> results =
                     hpx::parallel::execution::bulk_async_execute(
-                        std::forward<Executor>(exec), std::move(func), n);
+                        HPX_FORWARD(Executor, exec), HPX_MOVE(func), n);
 
                 // wait for all threads to finish executing and return the first
                 // result that passes the predicate, properly handle exceptions
                 // do not schedule new thread for the lambda
                 return hpx::dataflow(
                     hpx::launch::sync,
-                    [pred = std::forward<Pred>(pred),
-                        vote = std::forward<Vote>(vote),
+                    [pred = HPX_FORWARD(Pred, pred),
+                        vote = HPX_FORWARD(Vote, vote),
                         n](std::vector<future_type>&& results) mutable
                     -> result_type {
                         // Store all valid results
@@ -75,7 +75,7 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                         std::exception_ptr ex;
 
-                        for (auto&& f : std::move(results))
+                        for (auto&& f : HPX_MOVE(results))
                         {
                             if (f.has_exception())
                             {
@@ -88,15 +88,15 @@ namespace hpx { namespace resiliency { namespace experimental {
                                 if (HPX_INVOKE(pred, result))
                                 {
                                     valid_results.emplace_back(
-                                        std::move(result));
+                                        HPX_MOVE(result));
                                 }
                             }
                         }
 
                         if (!valid_results.empty())
                         {
-                            return HPX_INVOKE(std::forward<Vote>(vote),
-                                std::move(valid_results));
+                            return HPX_INVOKE(HPX_FORWARD(Vote, vote),
+                                HPX_MOVE(valid_results));
                         }
 
                         if (bool(ex))
@@ -107,7 +107,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                         // throw aborting exception no correct results ere produced
                         throw abort_replicate_exception{};
                     },
-                    std::move(results));
+                    HPX_MOVE(results));
             }
         };
 
@@ -125,8 +125,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                     typename hpx::traits::executor_future<Executor, void>::type;
 
                 // launch given function n times
-                auto func = [f = std::forward<F>(f),
-                                t = hpx::make_tuple(std::forward<Ts>(ts)...)](
+                auto func = [f = HPX_FORWARD(F, f),
+                                t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
                                 std::size_t) mutable {
                     // ignore argument (invocation count of bulk_execute)
                     hpx::util::invoke_fused(f, t);
@@ -134,7 +134,7 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                 std::vector<future_type> results =
                     hpx::parallel::execution::bulk_async_execute(
-                        std::forward<Executor>(exec), std::move(func), n);
+                        HPX_FORWARD(Executor, exec), HPX_MOVE(func), n);
 
                 // wait for all threads to finish executing and return the first
                 // result that passes the predicate, properly handle exceptions
@@ -145,7 +145,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                         std::exception_ptr ex;
 
                         std::size_t count = 0;
-                        for (auto&& f : std::move(results))
+                        for (auto&& f : HPX_MOVE(results))
                         {
                             if (f.has_exception())
                             {
@@ -171,7 +171,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                         // throw aborting exception if no correct results were produced
                         throw abort_replicate_exception{};
                     },
-                    std::move(results));
+                    HPX_MOVE(results));
             }
         };
     }    // namespace detail
@@ -196,9 +196,9 @@ namespace hpx { namespace resiliency { namespace experimental {
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
 
         return detail::async_replicate_vote_validate_executor<
-            result_type>::call(std::forward<Executor>(exec), n,
-            std::forward<Vote>(vote), std::forward<Pred>(pred),
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+            result_type>::call(HPX_FORWARD(Executor, exec), n,
+            HPX_FORWARD(Vote, vote), HPX_FORWARD(Pred, pred), HPX_FORWARD(F, f),
+            HPX_FORWARD(Ts, ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -220,9 +220,9 @@ namespace hpx { namespace resiliency { namespace experimental {
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
 
         return detail::async_replicate_vote_validate_executor<
-            result_type>::call(std::forward<Executor>(exec), n,
-            std::forward<Vote>(vote), detail::replicate_validator{},
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+            result_type>::call(HPX_FORWARD(Executor, exec), n,
+            HPX_FORWARD(Vote, vote), detail::replicate_validator{},
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -243,9 +243,9 @@ namespace hpx { namespace resiliency { namespace experimental {
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
 
         return detail::async_replicate_vote_validate_executor<
-            result_type>::call(std::forward<Executor>(exec), n,
-            detail::replicate_voter{}, std::forward<Pred>(pred),
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+            result_type>::call(HPX_FORWARD(Executor, exec), n,
+            detail::replicate_voter{}, HPX_FORWARD(Pred, pred),
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -266,8 +266,8 @@ namespace hpx { namespace resiliency { namespace experimental {
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
 
         return detail::async_replicate_vote_validate_executor<
-            result_type>::call(std::forward<Executor>(exec), n,
+            result_type>::call(HPX_FORWARD(Executor, exec), n,
             detail::replicate_voter{}, detail::replicate_validator{},
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 }}}    // namespace hpx::resiliency::experimental

@@ -54,7 +54,7 @@ namespace hpx { namespace execution { namespace experimental {
             void operator()(Error const& error)
             {
                 hpx::execution::experimental::set_error(
-                    std::move(receiver), error);
+                    HPX_MOVE(receiver), error);
             }
         };
 
@@ -69,7 +69,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::util::invoke_fused(
                     hpx::util::bind_front(
                         hpx::execution::experimental::set_value,
-                        std::move(receiver)),
+                        HPX_MOVE(receiver)),
                     ts);
             }
         };
@@ -144,7 +144,7 @@ namespace hpx { namespace execution { namespace experimental {
                         set_error_t, split_receiver&& r, Error&& error) noexcept
                     {
                         r.state->v.template emplace<error_type>(
-                            error_type(std::forward<Error>(error)));
+                            error_type(HPX_FORWARD(Error, error)));
                         r.state->set_predecessor_done();
                         r.state.reset();
                     }
@@ -171,11 +171,11 @@ namespace hpx { namespace execution { namespace experimental {
                             std::declval<
                                 hpx::variant<hpx::monostate, value_type>>()
                                 .template emplace<value_type>(
-                                    hpx::make_tuple<>(std::forward<Ts>(ts)...)),
+                                    hpx::make_tuple<>(HPX_FORWARD(Ts, ts)...)),
                             void())
                     {
                         r.state->v.template emplace<value_type>(
-                            hpx::make_tuple<>(std::forward<Ts>(ts)...));
+                            hpx::make_tuple<>(HPX_FORWARD(Ts, ts)...));
 
                         r.state->set_predecessor_done();
                         r.state.reset();
@@ -188,7 +188,7 @@ namespace hpx { namespace execution { namespace experimental {
                 shared_state(Sender_&& sender, allocator_type const& alloc)
                   : alloc(alloc)
                   , os(hpx::execution::experimental::connect(
-                        std::forward<Sender_>(sender), split_receiver{this}))
+                        HPX_FORWARD(Sender_, sender), split_receiver{this}))
                 {
                 }
 
@@ -214,22 +214,20 @@ namespace hpx { namespace execution { namespace experimental {
                     void operator()(done_type)
                     {
                         hpx::execution::experimental::set_done(
-                            std::move(receiver));
+                            HPX_MOVE(receiver));
                     }
 
                     void operator()(error_type const& error)
                     {
-                        hpx::visit(
-                            error_visitor<Receiver>{
-                                std::forward<Receiver>(receiver)},
+                        hpx::visit(error_visitor<Receiver>{HPX_FORWARD(
+                                       Receiver, receiver)},
                             error);
                     }
 
                     void operator()(value_type const& ts)
                     {
-                        hpx::visit(
-                            value_visitor<Receiver>{
-                                std::forward<Receiver>(receiver)},
+                        hpx::visit(value_visitor<Receiver>{HPX_FORWARD(
+                                       Receiver, receiver)},
                             ts);
                     }
                 };
@@ -301,7 +299,7 @@ namespace hpx { namespace execution { namespace experimental {
                         // if we call set_* inline.
                         hpx::visit(
                             done_error_value_visitor<Receiver>{
-                                std::forward<Receiver>(receiver)},
+                                HPX_FORWARD(Receiver, receiver)},
                             v);
                     }
                     else
@@ -320,7 +318,7 @@ namespace hpx { namespace execution { namespace experimental {
                             l.unlock();
                             hpx::visit(
                                 done_error_value_visitor<Receiver>{
-                                    std::forward<Receiver>(receiver)},
+                                    HPX_FORWARD(Receiver, receiver)},
                                 v);
                         }
                         else
@@ -334,11 +332,11 @@ namespace hpx { namespace execution { namespace experimental {
                             // when set_error/set_done/set_value is called.
                             continuations.emplace_back(
                                 [this,
-                                    receiver =
-                                        std::forward<Receiver>(receiver)]() {
+                                    receiver = HPX_FORWARD(
+                                        Receiver, receiver)]() mutable {
                                     hpx::visit(
                                         done_error_value_visitor<Receiver>{
-                                            std::move(receiver)},
+                                            HPX_MOVE(receiver)},
                                         v);
                                 });
                         }
@@ -388,7 +386,7 @@ namespace hpx { namespace execution { namespace experimental {
                     hpx::util::allocator_deleter<other_allocator>{alloc});
 
                 new (p.get())
-                    shared_state{std::forward<Sender_>(sender), allocator};
+                    shared_state{HPX_FORWARD(Sender_, sender), allocator};
                 state = p.release();
 
                 // Eager submission means that we start the predecessor
@@ -414,8 +412,8 @@ namespace hpx { namespace execution { namespace experimental {
                 template <typename Receiver_>
                 operation_state(Receiver_&& receiver,
                     hpx::intrusive_ptr<shared_state> state)
-                  : receiver(std::forward<Receiver_>(receiver))
-                  , state(std::move(state))
+                  : receiver(HPX_FORWARD(Receiver_, receiver))
+                  , state(HPX_MOVE(state))
                 {
                 }
 
@@ -434,7 +432,7 @@ namespace hpx { namespace execution { namespace experimental {
                         os.state->start();
                     }
 
-                    os.state->add_continuation(std::move(os.receiver));
+                    os.state->add_continuation(HPX_MOVE(os.receiver));
                 }
             };
 
@@ -442,14 +440,14 @@ namespace hpx { namespace execution { namespace experimental {
             friend operation_state<Receiver> tag_invoke(
                 connect_t, split_sender&& s, Receiver&& receiver)
             {
-                return {std::forward<Receiver>(receiver), std::move(s.state)};
+                return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.state)};
             }
 
             template <typename Receiver>
             friend operation_state<Receiver> tag_invoke(
                 connect_t, split_sender& s, Receiver&& receiver)
             {
-                return {std::forward<Receiver>(receiver), s.state};
+                return {HPX_FORWARD(Receiver, receiver), s.state};
             }
         };
     }    // namespace detail
@@ -471,7 +469,7 @@ namespace hpx { namespace execution { namespace experimental {
         {
             return detail::split_sender<Sender, Allocator,
                 detail::submission_type::lazy>{
-                std::forward<Sender>(sender), allocator};
+                HPX_FORWARD(Sender, sender), allocator};
         }
 
         template <typename Sender, typename Allocator>

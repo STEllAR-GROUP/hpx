@@ -77,7 +77,7 @@ namespace hpx { namespace actions {
             HPX_FORCEINLINE typename Action::internal_result_type operator()(
                 Ts&&... vs) const
             {
-                return Action::invoke(lva, comptype, std::forward<Ts>(vs)...);
+                return Action::invoke(lva, comptype, HPX_FORWARD(Ts, vs)...);
             }
         };
 
@@ -93,10 +93,10 @@ namespace hpx { namespace actions {
             explicit thread_function(naming::id_type&& target,
                 naming::address_type lva, naming::component_type comptype,
                 Ts&&... vs)
-              : target_(std::move(target))
+              : target_(HPX_MOVE(target))
               , lva_(lva)
               , comptype_(comptype)
-              , args_(std::forward<Ts>(vs)...)
+              , args_(HPX_FORWARD(Ts, vs)...)
             {
             }
 
@@ -110,7 +110,7 @@ namespace hpx { namespace actions {
 
                     // invoke the action, ignoring the return value
                     util::invoke_fused(action_invoke<Action>{lva_, comptype_},
-                        std::move(args_));
+                        HPX_MOVE(args_));
                 }
                 catch (hpx::thread_interrupted const&)
                 {    //-V565
@@ -162,11 +162,11 @@ namespace hpx { namespace actions {
                 typename Action::continuation_type&& cont,
                 naming::address_type lva, naming::component_type comptype,
                 Ts&&... vs)
-              : target_(std::move(target))
-              , cont_(std::move(cont))
+              : target_(HPX_MOVE(target))
+              , cont_(HPX_MOVE(cont))
               , lva_(lva)
               , comptype_(comptype)
-              , args_(std::forward<Ts>(vs)...)
+              , args_(HPX_FORWARD(Ts, vs)...)
             {
             }
 
@@ -179,9 +179,9 @@ namespace hpx { namespace actions {
                     Action::get_action_name(lva_), cont_.get_id());
 
                 traits::action_trigger_continuation<
-                    typename Action::continuation_type>::call(std::move(cont_),
+                    typename Action::continuation_type>::call(HPX_MOVE(cont_),
                     util::functional::invoke_fused{},
-                    action_invoke<Action>{lva_, comptype_}, std::move(args_));
+                    action_invoke<Action>{lva_, comptype_}, HPX_MOVE(args_));
 
                 return threads::thread_result_type(
                     threads::thread_schedule_state::terminated,
@@ -276,7 +276,7 @@ namespace hpx { namespace actions {
         {
             using is_void = typename std::is_void<R>::type;
             return invoker_impl(
-                is_void{}, lva, comptype, std::forward<Ts>(vs)...);
+                is_void{}, lva, comptype, HPX_FORWARD(Ts, vs)...);
         }
 
     protected:
@@ -285,7 +285,7 @@ namespace hpx { namespace actions {
             naming::address_type lva, naming::component_type comptype,
             Ts&&... vs)
         {
-            Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
+            Derived::invoke(lva, comptype, HPX_FORWARD(Ts, vs)...);
             return util::unused;
         }
 
@@ -294,7 +294,7 @@ namespace hpx { namespace actions {
             naming::address_type lva, naming::component_type comptype,
             Ts&&... vs)
         {
-            return Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
+            return Derived::invoke(lva, comptype, HPX_FORWARD(Ts, vs)...);
         }
 
     public:
@@ -314,7 +314,7 @@ namespace hpx { namespace actions {
             using thread_function = detail::thread_function<Derived>;
             return traits::action_decorate_function<Derived>::call(lva,
                 thread_function(
-                    std::move(target), lva, comptype, std::forward<Ts>(vs)...));
+                    HPX_MOVE(target), lva, comptype, HPX_FORWARD(Ts, vs)...));
         }
 
         // This static construct_thread_function allows to construct
@@ -334,8 +334,8 @@ namespace hpx { namespace actions {
             using thread_function =
                 detail::continuation_thread_function<Derived>;
             return traits::action_decorate_function<Derived>::call(lva,
-                thread_function(std::move(target), std::move(cont), lva,
-                    comptype, std::forward<Ts>(vs)...));
+                thread_function(HPX_MOVE(target), HPX_MOVE(cont), lva, comptype,
+                    HPX_FORWARD(Ts, vs)...));
         }
 
         // direct execution
@@ -347,7 +347,7 @@ namespace hpx { namespace actions {
             LTM_(debug).format("basic_action::execute_function {}",
                 Derived::get_action_name(lva));
 
-            return invoker(lva, comptype, std::forward<Ts>(vs)...);
+            return invoker(lva, comptype, HPX_FORWARD(Ts, vs)...);
         }
 
     private:
@@ -357,7 +357,7 @@ namespace hpx { namespace actions {
             IdOrPolicy const& id_or_policy, error_code&, Ts&&... vs)
         {
             return hpx::sync<basic_action>(
-                policy, id_or_policy, std::forward<Ts>(vs)...);
+                policy, id_or_policy, HPX_FORWARD(Ts, vs)...);
         }
 
     public:
@@ -366,21 +366,21 @@ namespace hpx { namespace actions {
         HPX_FORCEINLINE result_type operator()(launch policy,
             naming::id_type const& id, error_code& ec, Ts&&... vs) const
         {
-            return sync_invoke(policy, id, ec, std::forward<Ts>(vs)...);
+            return sync_invoke(policy, id, ec, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
         HPX_FORCEINLINE result_type operator()(
             naming::id_type const& id, error_code& ec, Ts&&... vs) const
         {
-            return sync_invoke(launch::sync, id, ec, std::forward<Ts>(vs)...);
+            return sync_invoke(launch::sync, id, ec, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
         HPX_FORCEINLINE result_type operator()(
             launch policy, naming::id_type const& id, Ts&&... vs) const
         {
-            return sync_invoke(policy, id, throws, std::forward<Ts>(vs)...);
+            return sync_invoke(policy, id, throws, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
@@ -388,7 +388,7 @@ namespace hpx { namespace actions {
             naming::id_type const& id, Ts&&... vs) const
         {
             return sync_invoke(
-                launch::sync, id, throws, std::forward<Ts>(vs)...);
+                launch::sync, id, throws, HPX_FORWARD(Ts, vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -399,8 +399,7 @@ namespace hpx { namespace actions {
         operator()(launch policy, DistPolicy const& dist_policy, error_code& ec,
             Ts&&... vs) const
         {
-            return sync_invoke(
-                policy, dist_policy, ec, std::forward<Ts>(vs)...);
+            return sync_invoke(policy, dist_policy, ec, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename DistPolicy, typename... Ts>
@@ -411,7 +410,7 @@ namespace hpx { namespace actions {
             DistPolicy const& dist_policy, error_code& ec, Ts&&... vs) const
         {
             return sync_invoke(
-                launch::sync, dist_policy, ec, std::forward<Ts>(vs)...);
+                launch::sync, dist_policy, ec, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename DistPolicy, typename... Ts>
@@ -422,7 +421,7 @@ namespace hpx { namespace actions {
             launch policy, DistPolicy const& dist_policy, Ts&&... vs) const
         {
             return sync_invoke(
-                policy, dist_policy, throws, std::forward<Ts>(vs)...);
+                policy, dist_policy, throws, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename DistPolicy, typename... Ts>
@@ -432,7 +431,7 @@ namespace hpx { namespace actions {
         operator()(DistPolicy const& dist_policy, Ts&&... vs) const
         {
             return sync_invoke(
-                launch::sync, dist_policy, throws, std::forward<Ts>(vs)...);
+                launch::sync, dist_policy, throws, HPX_FORWARD(Ts, vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////

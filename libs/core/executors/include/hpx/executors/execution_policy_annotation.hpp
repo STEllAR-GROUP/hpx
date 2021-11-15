@@ -37,7 +37,7 @@ namespace hpx { namespace execution { namespace experimental {
             policy.executor(), annotation);
 
         return hpx::parallel::execution::create_rebound_policy(
-            policy, std::move(exec), policy.parameters());
+            policy, HPX_MOVE(exec), policy.parameters());
     }
 
     // clang-format off
@@ -50,10 +50,10 @@ namespace hpx { namespace execution { namespace experimental {
         ExPolicy&& policy, std::string annotation)
     {
         auto exec = hpx::execution::experimental::with_annotation(
-            policy.executor(), std::move(annotation));
+            policy.executor(), HPX_MOVE(annotation));
 
         return hpx::parallel::execution::create_rebound_policy(
-            policy, std::move(exec), policy.parameters());
+            policy, HPX_MOVE(exec), policy.parameters());
     }
 
     // get_annotation property implementation for execution policies

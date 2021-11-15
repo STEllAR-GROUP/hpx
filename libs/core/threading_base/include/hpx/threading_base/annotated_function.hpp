@@ -102,7 +102,7 @@ namespace hpx { namespace util {
 #if defined(HPX_HAVE_APEX)
                     detail::store_function_annotation(name);
 #else
-                    detail::store_function_annotation(std::move(name));
+                    detail::store_function_annotation(HPX_MOVE(name));
 #endif
                 desc_ = threads::get_thread_id_data(self->get_thread_id())
                             ->set_description(name_c_str);
@@ -111,7 +111,7 @@ namespace hpx { namespace util {
 #if defined(HPX_HAVE_APEX)
             /* update the task wrapper in APEX to use the specified name */
             threads::set_self_timer_data(external_timer::update_task(
-                threads::get_self_timer_data(), std::move(name)));
+                threads::get_self_timer_data(), HPX_MOVE(name)));
 #endif
         }
 
@@ -165,7 +165,7 @@ namespace hpx { namespace util {
             }
 
             annotated_function(F&& f, char const* name)
-              : f_(std::move(f))
+              : f_(HPX_MOVE(f))
               , name_(name)
             {
             }
@@ -174,7 +174,7 @@ namespace hpx { namespace util {
             invoke_result_t<fun_type, Ts...> operator()(Ts&&... ts)
             {
                 annotate_function annotate(get_function_annotation());
-                return HPX_INVOKE(f_, std::forward<Ts>(ts)...);
+                return HPX_INVOKE(f_, HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename Archive>
@@ -225,7 +225,7 @@ namespace hpx { namespace util {
     {
         typedef detail::annotated_function<std::decay_t<F>> result_type;
 
-        return result_type(std::forward<F>(f), name);
+        return result_type(HPX_FORWARD(F, f), name);
     }
 
     template <typename F>
@@ -237,8 +237,8 @@ namespace hpx { namespace util {
         // Store string in a set to ensure it lives for the entire duration of
         // the task.
         char const* name_c_str =
-            detail::store_function_annotation(std::move(name));
-        return result_type(std::forward<F>(f), name_c_str);
+            detail::store_function_annotation(HPX_MOVE(name));
+        return result_type(HPX_FORWARD(F, f), name_c_str);
     }
 
 #else
@@ -267,13 +267,13 @@ namespace hpx { namespace util {
     template <typename F>
     constexpr F&& annotated_function(F&& f, char const* = nullptr) noexcept
     {
-        return std::forward<F>(f);
+        return HPX_FORWARD(F, f);
     }
 
     template <typename F>
     constexpr F&& annotated_function(F&& f, std::string const&) noexcept
     {
-        return std::forward<F>(f);
+        return HPX_FORWARD(F, f);
     }
 #endif
 }}    // namespace hpx::util

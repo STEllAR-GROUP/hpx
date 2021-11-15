@@ -289,7 +289,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 spin_sort(first, last_iter,
                     compare_type(
-                        std::forward<Compare>(comp), std::forward<Proj>(proj)));
+                        HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj, proj)));
                 return last_iter;
             }
 
@@ -332,12 +332,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     // call the sort routine and return the right type,
                     // depending on execution policy
-                    compare_type comp(std::forward<Compare>(compare),
-                        std::forward<Proj>(proj));
+                    compare_type comp(
+                        HPX_FORWARD(Compare, compare), HPX_FORWARD(Proj, proj));
 
                     return algorithm_result::get(
                         parallel_stable_sort(policy.executor(), first,
-                            last_iter, cores, chunk_size, std::move(comp)));
+                            last_iter, cores, chunk_size, HPX_MOVE(comp)));
                 }
                 catch (...)
                 {
@@ -380,8 +380,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::stable_sort<RandomIt>().call(
-            std::forward<ExPolicy>(policy), first, last,
-            std::forward<Compare>(comp), std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), first, last,
+            HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -415,8 +415,8 @@ namespace hpx {
                 "Requires a random access iterator.");
 
             hpx::parallel::v1::detail::stable_sort<RandomIt>().call(
-                hpx::execution::seq, first, last, std::forward<Comp>(comp),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -447,8 +447,8 @@ namespace hpx {
 
             return hpx::util::void_guard<result_type>(),
                    hpx::parallel::v1::detail::stable_sort<RandomIt>().call(
-                       std::forward<ExPolicy>(policy), first, last,
-                       std::forward<Comp>(comp), std::forward<Proj>(proj));
+                       HPX_FORWARD(ExPolicy, policy), first, last,
+                       HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
     } stable_sort{};
 }    // namespace hpx

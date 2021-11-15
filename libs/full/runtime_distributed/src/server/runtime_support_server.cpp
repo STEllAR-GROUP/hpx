@@ -180,14 +180,14 @@ namespace hpx { namespace components { namespace server {
                 // execute locally, action is executed immediately as it is
                 // a direct_action
                 hpx::applier::detail::apply_l<action_type>(
-                    respond_to, std::move(addr));
+                    respond_to, HPX_MOVE(addr));
             }
 #if defined(HPX_HAVE_NETWORKING)
             else
             {
                 // apply remotely, parcel is sent synchronously
                 hpx::applier::detail::apply_r_sync<action_type>(
-                    std::move(addr), respond_to);
+                    HPX_MOVE(addr), respond_to);
             }
 #endif
         }
@@ -691,7 +691,7 @@ namespace hpx { namespace components { namespace server {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
                         // apply remotely, parcel is sent synchronously
                         hpx::applier::detail::apply_r_sync<action_type>(
-                            std::move(addr), respond_to);
+                            HPX_MOVE(addr), respond_to);
 #else
                         HPX_ASSERT(false);
 #endif
@@ -875,7 +875,7 @@ namespace hpx { namespace components { namespace server {
         void operator()(Ts&&... /* vs */)
         {
             // This needs to be run on a HPX thread
-            hpx::apply(std::move(*pt));
+            hpx::apply(HPX_MOVE(*pt));
             pt.reset();
         }
 
@@ -907,8 +907,8 @@ namespace hpx { namespace components { namespace server {
 
             indirect_packaged_task ipt;
             callbacks.push_back(ipt.get_future());
-            apply_cb(act, id, std::move(ipt), agas::get_locality(),
-                rtd->endpoints());
+            apply_cb(
+                act, id, HPX_MOVE(ipt), agas::get_locality(), rtd->endpoints());
         }
 
         wait_all(callbacks);
@@ -936,7 +936,7 @@ namespace hpx { namespace components { namespace server {
         // handle console separately
         id_type id = naming::get_id_from_locality_id(0);
         apply_cb(
-            act, id, std::move(ipt), agas::get_locality(), rtd->endpoints());
+            act, id, HPX_MOVE(ipt), agas::get_locality(), rtd->endpoints());
 
         callback.wait();
 #endif
@@ -1366,11 +1366,11 @@ namespace hpx { namespace components { namespace server {
                 {
                     if (pre_startup)
                     {
-                        pre_startup_functions_.push_back(std::move(startup));
+                        pre_startup_functions_.push_back(HPX_MOVE(startup));
                     }
                     else
                     {
-                        startup_functions_.push_back(std::move(startup));
+                        startup_functions_.push_back(HPX_MOVE(startup));
                     }
                 }
             }
@@ -1383,11 +1383,11 @@ namespace hpx { namespace components { namespace server {
                 {
                     if (pre_shutdown)
                     {
-                        pre_shutdown_functions_.push_back(std::move(shutdown));
+                        pre_shutdown_functions_.push_back(HPX_MOVE(shutdown));
                     }
                     else
                     {
-                        shutdown_functions_.push_back(std::move(shutdown));
+                        shutdown_functions_.push_back(HPX_MOVE(shutdown));
                     }
                 }
             }
@@ -1540,9 +1540,9 @@ namespace hpx { namespace components { namespace server {
             if (startup_shutdown->get_startup_function(startup, pre_startup))
             {
                 if (pre_startup)
-                    pre_startup_functions_.push_back(std::move(startup));
+                    pre_startup_functions_.push_back(HPX_MOVE(startup));
                 else
-                    startup_functions_.push_back(std::move(startup));
+                    startup_functions_.push_back(HPX_MOVE(startup));
             }
 
             shutdown_function_type shutdown;
@@ -1550,9 +1550,9 @@ namespace hpx { namespace components { namespace server {
             if (startup_shutdown->get_shutdown_function(shutdown, pre_shutdown))
             {
                 if (pre_shutdown)
-                    pre_shutdown_functions_.push_back(std::move(shutdown));
+                    pre_shutdown_functions_.push_back(HPX_MOVE(shutdown));
                 else
-                    shutdown_functions_.push_back(std::move(shutdown));
+                    shutdown_functions_.push_back(HPX_MOVE(shutdown));
             }
         }
         catch (hpx::exception const&)

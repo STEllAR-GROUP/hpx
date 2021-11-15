@@ -72,7 +72,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
           : context_base(stack_size, id)
           , m_result(thread_schedule_state::unknown, invalid_thread_id)
           , m_arg(nullptr)
-          , m_fun(std::move(f))
+          , m_fun(HPX_MOVE(f))
         {
         }
 
@@ -137,7 +137,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             m_result =
                 result_type(thread_schedule_state::unknown, invalid_thread_id);
             m_arg = nullptr;
-            m_fun = std::move(f);
+            m_fun = HPX_MOVE(f);
             this->super_type::rebind_base(id);
         }
 

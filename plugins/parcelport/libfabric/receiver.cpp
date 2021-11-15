@@ -24,21 +24,18 @@
 #include <exception>
 #include <utility>
 
-namespace hpx {
-namespace parcelset {
-namespace policies {
-namespace libfabric
-{
+namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
     // --------------------------------------------------------------------
     receiver::receiver(parcelport* pp, fid_ep* endpoint,
         rma_memory_pool<region_provider>& memory_pool)
-        : pp_(pp)
-        , endpoint_(endpoint)
-        , header_region_(memory_pool.allocate_region(memory_pool.small_.chunk_size()))
-        , memory_pool_(&memory_pool)
-        , messages_handled_(0)
-        , acks_received_(0)
-        , active_receivers_(0)
+      : pp_(pp)
+      , endpoint_(endpoint)
+      , header_region_(
+            memory_pool.allocate_region(memory_pool.small_.chunk_size()))
+      , memory_pool_(&memory_pool)
+      , messages_handled_(0)
+      , acks_received_(0)
+      , active_receivers_(0)
     {
         LOG_DEBUG_MSG("created receiver: " << hexpointer(this));
         // Once constructed, we need to post the receive...
@@ -48,7 +45,7 @@ namespace libfabric
     // these constructors are provided because boost::lockfree::stack requires them
     // they should not be used
     receiver::receiver(receiver&& other)
-        : active_receivers_(0)
+      : active_receivers_(0)
     {
         std::terminate();
     }
@@ -60,7 +57,8 @@ namespace libfabric
     // --------------------------------------------------------------------
     receiver::~receiver()
     {
-        if (header_region_ && memory_pool_) {
+        if (header_region_ && memory_pool_)
+        {
             memory_pool_->deallocate(header_region_);
         }
         // this is safe to call twice - it might have been called already
@@ -71,13 +69,13 @@ namespace libfabric
     // --------------------------------------------------------------------
     void receiver::cleanup()
     {
-        rma_receiver *rcv = nullptr;
-        while(receiver::rma_receivers_.pop(rcv))
+        rma_receiver* rcv = nullptr;
+        while (receiver::rma_receivers_.pop(rcv))
         {
-            msg_plain_    += rcv->msg_plain_;
-            msg_rma_      += rcv->msg_rma_;
-            sent_ack_     += rcv->sent_ack_;
-            rma_reads_    += rcv->rma_reads_;
+            msg_plain_ += rcv->msg_plain_;
+            msg_rma_ += rcv->msg_rma_;
+            sent_ack_ += rcv->sent_ack_;
+            rma_reads_ += rcv->rma_reads_;
             recv_deletes_ += rcv->recv_deletes_;
             delete rcv;
         }
@@ -98,7 +96,8 @@ namespace libfabric
             // @TODO: fixme immediate tag retrieval
             // Get the sender that has completed rma operations and signal to it
             // that it can now cleanup - all remote get operations are done.
-            sender* snd = *reinterpret_cast<sender **>(header_region_->get_address());
+            sender* snd =
+                *reinterpret_cast<sender**>(header_region_->get_address());
             pre_post_receive();
             LOG_DEBUG_MSG("Handling sender tag (RMA ack) completion: "
                 << hexpointer(snd));
@@ -111,28 +110,27 @@ namespace libfabric
         rma_receiver* recv = nullptr;
         if (!receiver::rma_receivers_.pop(recv))
         {
-            auto f = [this](rma_receiver* recv)
-            {
+            auto f = [this](rma_receiver* recv) {
                 --active_receivers_;
-                if (!receiver::rma_receivers_.push(recv)) {
+                if (!receiver::rma_receivers_.push(recv))
+                {
                     // if the capacity overflowed, just delete this one
                     delete recv;
                 }
                 // Notify one possibly waiting receiver that one receive just finished
-                if (threads::threadmanager_is_at_least(state_running)
-                    && hpx::threads::get_self_ptr())
+                if (threads::threadmanager_is_at_least(state_running) &&
+                    hpx::threads::get_self_ptr())
                 {
                     std::unique_lock<mutex_type> l(active_receivers_mtx_);
-                    active_receivers_cv_.notify_one(std::move(l));
+                    active_receivers_cv_.notify_one(HPX_MOVE(l));
                 }
             };
             // throttle the creation of new receivers. Wait until the active_receivers_
             // count drops below the maximum. This can not be a busy wait since it could
             // potentially block all background threads.
-            const long max_receivers =
-                HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS;
-            if (threads::threadmanager_is_at_least(state_running)
-                && hpx::threads::get_self_ptr())
+            const long max_receivers = HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS;
+            if (threads::threadmanager_is_at_least(state_running) &&
+                hpx::threads::get_self_ptr())
             {
                 while (active_receivers_ > max_receivers)
                 {
@@ -141,7 +139,7 @@ namespace libfabric
                 }
             }
 
-            recv = new rma_receiver(pp_, endpoint_, memory_pool_, std::move(f));
+            recv = new rma_receiver(pp_, endpoint_, memory_pool_, HPX_MOVE(f));
         }
         ++active_receivers_;
 
@@ -150,7 +148,8 @@ namespace libfabric
         // We save the received region and swap it with a newly allocated one
         // so that we can post a recv again as soon as possible.
         region_type* region = header_region_;
-        header_region_ = memory_pool_->allocate_region(memory_pool_->small_.chunk_size());
+        header_region_ =
+            memory_pool_->allocate_region(memory_pool_->small_.chunk_size());
         pre_post_receive();
 
         // we dispatch our work to our rma_receiver once it completed the
@@ -166,12 +165,11 @@ namespace libfabric
     {
         FUNC_START_DEBUG_MSG;
         void* desc = header_region_->get_desc();
-        LOG_DEBUG_MSG("Pre-Posting receive "
-            << *header_region_
-            << "context " << hexpointer(this));
+        LOG_DEBUG_MSG("Pre-Posting receive " << *header_region_ << "context "
+                                             << hexpointer(this));
 
-        hpx::util::yield_while([this, desc]()
-            {
+        hpx::util::yield_while(
+            [this, desc]() {
                 // post a receive using 'this' as the context, so that this
                 // receiver object can be used to handle the incoming
                 // receive/request
@@ -190,8 +188,9 @@ namespace libfabric
                 }
 
                 return false;
-            }, "libfabric::receiver::post_recv");
+            },
+            "libfabric::receiver::post_recv");
 
         FUNC_END_DEBUG_MSG;
     }
-}}}}
+}}}}    // namespace hpx::parcelset::policies::libfabric

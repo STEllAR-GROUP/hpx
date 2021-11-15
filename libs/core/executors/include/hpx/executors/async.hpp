@@ -31,12 +31,12 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static auto call(
             Policy_&& launch_policy, F&& f, Ts&&... ts)
             -> decltype(async_launch_policy_dispatch<std::decay_t<F>>::call(
-                std::forward<Policy_>(launch_policy), std::forward<F>(f),
-                std::forward<Ts>(ts)...))
+                HPX_FORWARD(Policy_, launch_policy), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...))
         {
             return async_launch_policy_dispatch<std::decay_t<F>>::call(
-                std::forward<Policy_>(launch_policy), std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Policy_, launch_policy), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -49,12 +49,12 @@ namespace hpx { namespace detail {
             Policy_&& launch_policy, F&& f, Ts&&... ts)
             -> decltype(
                 async_dispatch_launch_policy_helper<std::decay_t<F>>::call(
-                    std::forward<Policy_>(launch_policy), std::forward<F>(f),
-                    std::forward<Ts>(ts)...))
+                    HPX_FORWARD(Policy_, launch_policy), HPX_FORWARD(F, f),
+                    HPX_FORWARD(Ts, ts)...))
         {
             return async_dispatch_launch_policy_helper<std::decay_t<F>>::call(
-                std::forward<Policy_>(launch_policy), std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Policy_, launch_policy), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -70,8 +70,7 @@ namespace hpx { namespace detail {
         call(F&& f, Ts&&... ts)
         {
             return async_launch_policy_dispatch<std::decay_t<F>>::call(
-                hpx::launch::async, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                hpx::launch::async, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -90,8 +89,8 @@ namespace hpx { namespace detail {
             Executor_&& exec, F&& f, Ts&&... ts)
         {
             return parallel::execution::async_execute(
-                std::forward<Executor_>(exec), std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Executor_, exec), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
     };
 }}    // namespace hpx::detail

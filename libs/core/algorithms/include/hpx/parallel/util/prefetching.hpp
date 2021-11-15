@@ -354,7 +354,7 @@ namespace hpx { namespace parallel { namespace util {
                 prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f)
         {
             return loop_n_helper::call(
-                it, count, std::forward<F>(f), std::true_type());
+                it, count, HPX_FORWARD(F, f), std::true_type());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -437,7 +437,7 @@ namespace hpx { namespace parallel { namespace util {
                 prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f)
         {
             return loop_n_ind_helper::call(
-                it, count, std::forward<F>(f), std::true_type());
+                it, count, HPX_FORWARD(F, f), std::true_type());
         }
     }    // namespace prefetching
 
@@ -456,7 +456,7 @@ namespace hpx { namespace parallel { namespace util {
 
         auto&& ranges = ranges_type(std::cref(rngs)...);
         return prefetching::prefetcher_context<Itr, Ts const...>(
-            base_begin, base_end, std::move(ranges), p_factor);
+            base_begin, base_end, HPX_MOVE(ranges), p_factor);
     }
 
     namespace detail {

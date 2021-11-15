@@ -60,8 +60,8 @@ namespace hpx { namespace execution {
             sync_execute(F&& f, Ts&&... ts)
         {
             return hpx::detail::sync_launch_policy_dispatch<
-                launch::sync_policy>::call(launch::sync, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                launch::sync_policy>::call(launch::sync, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // TwoWayExecutor interface
@@ -72,14 +72,14 @@ namespace hpx { namespace execution {
         {
             return hpx::detail::async_launch_policy_dispatch<
                 launch::deferred_policy>::call(launch::deferred,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename... Ts>
         static void post(F&& f, Ts&&... ts)
         {
-            sync_execute(std::forward<F>(f), std::forward<Ts>(ts)...);
+            sync_execute(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkTwoWayExecutor interface
@@ -118,7 +118,7 @@ namespace hpx { namespace execution {
         bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
         {
             return hpx::unwrap(bulk_async_execute(
-                std::forward<F>(f), shape, std::forward<Ts>(ts)...));
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
         }
 
         template <typename Parameters>

@@ -55,7 +55,7 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename Callback>
     static void run_on_completed_on_new_thread(Callback&& f)
     {
-        lcos::local::futures_factory<void()> p(std::forward<Callback>(f));
+        lcos::local::futures_factory<void()> p(HPX_FORWARD(Callback, f));
 
         bool is_hpx_thread = nullptr != hpx::threads::get_self_ptr();
         hpx::launch policy = launch::fork;
@@ -174,7 +174,7 @@ namespace hpx { namespace lcos { namespace detail {
     {
         for (auto&& func : on_completed)
         {
-            run_on_completed(std::move(func));
+            run_on_completed(HPX_MOVE(func));
         }
     }
 
@@ -199,7 +199,7 @@ namespace hpx { namespace lcos { namespace detail {
         if (!recurse_asynchronously)
         {
             // directly execute continuation on this thread
-            run_on_completed(std::forward<Callback>(on_completed));
+            run_on_completed(HPX_FORWARD(Callback, on_completed));
         }
         else
         {
@@ -209,7 +209,7 @@ namespace hpx { namespace lcos { namespace detail {
             try
             {
                 run_on_completed_on_new_thread(util::deferred_call(
-                    p, std::forward<Callback>(on_completed)));
+                    p, HPX_FORWARD(Callback, on_completed)));
             }
             catch (...)
             {
@@ -249,7 +249,7 @@ namespace hpx { namespace lcos { namespace detail {
         if (is_ready())
         {
             // invoke the callback (continuation) function right away
-            handle_on_completed(std::move(data_sink));
+            handle_on_completed(HPX_MOVE(data_sink));
         }
         else
         {
@@ -259,11 +259,11 @@ namespace hpx { namespace lcos { namespace detail {
                 l.unlock();
 
                 // invoke the callback (continuation) function
-                handle_on_completed(std::move(data_sink));
+                handle_on_completed(HPX_MOVE(data_sink));
             }
             else
             {
-                on_completed_.push_back(std::move(data_sink));
+                on_completed_.push_back(HPX_MOVE(data_sink));
             }
         }
     }

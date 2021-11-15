@@ -33,7 +33,7 @@ namespace hpx { namespace detail {
         if (naming::is_locality(gid))
         {
             return apply_cb<Action>(
-                gid, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                gid, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         // Attach the requested action as a continuation to a resolve_async
@@ -48,8 +48,8 @@ namespace hpx { namespace detail {
         return apply_continue_cb<action_type>(
             util::functional::apply_continuation(util::bind<Action>(
                 util::bind(util::functional::extract_locality(), _2, gid),
-                std::forward<Ts>(vs)...)),
-            service_target, std::forward<Callback>(cb), gid.get_gid());
+                HPX_FORWARD(Ts, vs)...)),
+            service_target, HPX_FORWARD(Callback, cb), gid.get_gid());
     }
 
     template <typename Component, typename Signature, typename Derived,
@@ -59,7 +59,7 @@ namespace hpx { namespace detail {
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return apply_colocated_cb<Derived>(
-            gid, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            gid, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -71,9 +71,9 @@ namespace hpx { namespace detail {
         // shortcut co-location code if target already is a locality
         if (naming::is_locality(gid))
         {
-            return apply_p_cb<Action>(std::forward<Continuation>(cont), gid,
-                actions::action_priority<Action>(), std::forward<Callback>(cb),
-                std::forward<Ts>(vs)...);
+            return apply_p_cb<Action>(HPX_FORWARD(Continuation, cont), gid,
+                actions::action_priority<Action>(), HPX_FORWARD(Callback, cb),
+                HPX_FORWARD(Ts, vs)...);
         }
 
         // Attach the requested action as a continuation to a resolve_async
@@ -89,9 +89,9 @@ namespace hpx { namespace detail {
             util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid),
-                    std::forward<Ts>(vs)...),
-                std::forward<Continuation>(cont)),
-            service_target, std::forward<Callback>(cb), gid.get_gid());
+                    HPX_FORWARD(Ts, vs)...),
+                HPX_FORWARD(Continuation, cont)),
+            service_target, HPX_FORWARD(Callback, cb), gid.get_gid());
     }
 
     template <typename Continuation, typename Component, typename Signature,
@@ -100,8 +100,8 @@ namespace hpx { namespace detail {
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
-        return apply_colocated_cb<Derived>(std::forward<Continuation>(cont),
-            gid, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        return apply_colocated_cb<Derived>(HPX_FORWARD(Continuation, cont), gid,
+            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 }}    // namespace hpx::detail
 

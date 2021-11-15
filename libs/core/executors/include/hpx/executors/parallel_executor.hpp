@@ -205,7 +205,7 @@ namespace hpx { namespace execution {
         {
             auto exec_with_annotation = exec;
             exec_with_annotation.annotation_ =
-                util::detail::store_function_annotation(std::move(annotation));
+                util::detail::store_function_annotation(HPX_MOVE(annotation));
             return exec_with_annotation;
         }
 
@@ -247,7 +247,7 @@ namespace hpx { namespace execution {
                     annotation_ :
                     "parallel_policy_executor::sync_execute");
             return hpx::detail::sync_launch_policy_dispatch<Policy>::call(
-                launch::sync, std::forward<F>(f), std::forward<Ts>(ts)...);
+                launch::sync, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // TwoWayExecutor interface
@@ -261,8 +261,7 @@ namespace hpx { namespace execution {
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
 
             return hpx::detail::async_launch_policy_dispatch<Policy>::call(
-                policy_, desc, pool, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                policy_, desc, pool, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename Future, typename... Ts>
@@ -276,17 +275,16 @@ namespace hpx { namespace execution {
                     Ts...>::type;
 
             auto&& func = hpx::util::one_shot(hpx::util::bind_back(
-                hpx::util::annotated_function(std::forward<F>(f), annotation_),
-                std::forward<Ts>(ts)...));
+                hpx::util::annotated_function(HPX_FORWARD(F, f), annotation_),
+                HPX_FORWARD(Ts, ts)...));
 
             typename hpx::traits::detail::shared_state_ptr<result_type>::type
                 p = lcos::detail::make_continuation_alloc_nounwrap<result_type>(
                     hpx::util::internal_allocator<>{},
-                    std::forward<Future>(predecessor), policy_,
-                    std::move(func));
+                    HPX_FORWARD(Future, predecessor), policy_, HPX_MOVE(func));
 
             return hpx::traits::future_access<hpx::future<result_type>>::create(
-                std::move(p));
+                HPX_MOVE(p));
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
@@ -297,8 +295,7 @@ namespace hpx { namespace execution {
             auto pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
             parallel::execution::detail::post_policy_dispatch<Policy>::call(
-                policy_, desc, pool, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                policy_, desc, pool, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkTwoWayExecutor interface
@@ -313,8 +310,7 @@ namespace hpx { namespace execution {
             return parallel::execution::detail::
                 hierarchical_bulk_async_execute_helper(desc, pool, 0,
                     pool->get_os_thread_count(), hierarchical_threshold_,
-                    policy_, std::forward<F>(f), shape,
-                    std::forward<Ts>(ts)...);
+                    policy_, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
@@ -326,9 +322,9 @@ namespace hpx { namespace execution {
             return parallel::execution::detail::
                 hierarchical_bulk_then_execute_helper(*this, policy_,
                     hpx::util::annotated_function(
-                        std::forward<F>(f), annotation_),
-                    shape, std::forward<Future>(predecessor),
-                    std::forward<Ts>(ts)...);
+                        HPX_FORWARD(F, f), annotation_),
+                    shape, HPX_FORWARD(Future, predecessor),
+                    HPX_FORWARD(Ts, ts)...);
         }
         /// \endcond
 

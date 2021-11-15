@@ -201,8 +201,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     !std::is_same<typename std::decay<Op_>::type,
                         count_iteration>::value>::type>
             HPX_HOST_DEVICE count_iteration(Op_&& op, Proj_&& proj)
-              : op_(std::forward<Op_>(op))
-              , proj_(std::forward<Proj_>(proj))
+              : op_(HPX_FORWARD(Op_, op))
+              , proj_(HPX_FORWARD(Proj_, proj))
             {
             }
 
@@ -217,8 +217,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             HPX_HOST_DEVICE count_iteration(count_iteration&& rhs)
-              : op_(std::move(rhs.op_))
-              , proj_(std::move(rhs.proj_))
+              : op_(HPX_MOVE(rhs.op_))
+              , proj_(HPX_MOVE(rhs.proj_))
             {
             }
 #endif
@@ -264,12 +264,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 auto f1 =
                     count_iteration<ExPolicy, detail::compare_to<T>, Proj>(
-                        detail::compare_to<T>(value), std::forward<Proj>(proj));
+                        detail::compare_to<T>(value), HPX_FORWARD(Proj, proj));
 
                 typename std::iterator_traits<InIterB>::difference_type ret = 0;
 
-                util::loop(std::forward<ExPolicy>(policy), first, last,
-                    hpx::util::bind_back(std::move(f1), std::ref(ret)));
+                util::loop(HPX_FORWARD(ExPolicy, policy), first, last,
+                    hpx::util::bind_back(HPX_MOVE(f1), std::ref(ret)));
 
                 return ret;
             }
@@ -289,11 +289,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 auto f1 =
                     count_iteration<ExPolicy, detail::compare_to<T>, Proj>(
-                        detail::compare_to<T>(value), std::forward<Proj>(proj));
+                        detail::compare_to<T>(value), HPX_FORWARD(Proj, proj));
 
                 return util::partitioner<ExPolicy, difference_type>::call(
-                    std::forward<ExPolicy>(policy), first,
-                    detail::distance(first, last), std::move(f1),
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1),
                     hpx::unwrapping([](std::vector<difference_type>&& results) {
                         return util::accumulate_n(hpx::util::begin(results),
                             hpx::util::size(results), difference_type(0),
@@ -331,8 +331,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return hpx::parallel::v1::detail::count<difference_type>().call(
-            std::forward<ExPolicy>(policy), first, last, value,
-            std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), first, last, value,
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -358,12 +358,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 InIterE last, Pred&& op, Proj&& proj)
             {
                 auto f1 = count_iteration<ExPolicy, Pred, Proj>(
-                    op, std::forward<Proj>(proj));
+                    op, HPX_FORWARD(Proj, proj));
 
                 typename std::iterator_traits<InIterB>::difference_type ret = 0;
 
-                util::loop(std::forward<ExPolicy>(policy), first, last,
-                    hpx::util::bind_back(std::move(f1), std::ref(ret)));
+                util::loop(HPX_FORWARD(ExPolicy, policy), first, last,
+                    hpx::util::bind_back(HPX_MOVE(f1), std::ref(ret)));
 
                 return ret;
             }
@@ -382,11 +382,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 auto f1 = count_iteration<ExPolicy, Pred, Proj>(
-                    op, std::forward<Proj>(proj));
+                    op, HPX_FORWARD(Proj, proj));
 
                 return util::partitioner<ExPolicy, difference_type>::call(
-                    std::forward<ExPolicy>(policy), first,
-                    detail::distance(first, last), std::move(f1),
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1),
                     hpx::unwrapping([](std::vector<difference_type>&& results) {
                         return util::accumulate_n(hpx::util::begin(results),
                             hpx::util::size(results), difference_type(0),
@@ -427,8 +427,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return hpx::parallel::v1::detail::count_if<difference_type>().call(
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-            std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -462,7 +462,7 @@ namespace hpx {
                 typename std::iterator_traits<FwdIter>::difference_type;
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
-                std::forward<ExPolicy>(policy), first, last, value,
+                HPX_FORWARD(ExPolicy, policy), first, last, value,
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -515,7 +515,7 @@ namespace hpx {
                 typename std::iterator_traits<FwdIter>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -538,7 +538,7 @@ namespace hpx {
                 typename std::iterator_traits<InIter>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                hpx::execution::seq, first, last, std::forward<F>(f),
+                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
                 hpx::parallel::util::projection_identity{});
         }
     } count_if{};

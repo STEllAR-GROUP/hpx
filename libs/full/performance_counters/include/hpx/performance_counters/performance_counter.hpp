@@ -44,12 +44,12 @@ namespace hpx { namespace performance_counters {
         }
 
         performance_counter(future<id_type>&& id)
-          : base_type(std::move(id))
+          : base_type(HPX_MOVE(id))
         {
         }
 
         performance_counter(hpx::future<performance_counter>&& c)
-          : base_type(std::move(c))
+          : base_type(HPX_MOVE(c))
         {
         }
 

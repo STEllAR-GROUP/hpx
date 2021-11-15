@@ -46,7 +46,7 @@ namespace hpx { namespace lcos {
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         lcos::server::latch::set_value_action act;
-        return hpx::async(act, get_id(), std::move(n));
+        return hpx::async(act, get_id(), HPX_MOVE(n));
 #else
         HPX_ASSERT(false);
         HPX_UNUSED(n);

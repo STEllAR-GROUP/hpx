@@ -48,7 +48,7 @@ namespace hpx { namespace serialization { namespace detail {
 
             ar >> *t;
 
-            return std::move(*t);
+            return HPX_MOVE(*t);
         }
     };
 }}}    // namespace hpx::serialization::detail

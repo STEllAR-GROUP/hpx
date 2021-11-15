@@ -120,10 +120,10 @@ namespace hpx { namespace execution { namespace experimental {
                     typename Receiver_>
                 operation_state(Sender_&& predecessor_sender,
                     Scheduler_&& scheduler, Receiver_&& receiver)
-                  : scheduler(std::forward<Scheduler>(scheduler))
-                  , receiver(std::forward<Receiver_>(receiver))
+                  : scheduler(HPX_FORWARD(Scheduler, scheduler))
+                  , receiver(HPX_FORWARD(Receiver_, receiver))
                   , sender_os(hpx::execution::experimental::connect(
-                        std::forward<Sender_>(predecessor_sender),
+                        HPX_FORWARD(Sender_, predecessor_sender),
                         predecessor_sender_receiver{*this}))
                 {
                 }
@@ -142,7 +142,7 @@ namespace hpx { namespace execution { namespace experimental {
                         predecessor_sender_receiver&& r, Error&& error) noexcept
                     {
                         r.op_state.set_error_predecessor_sender(
-                            std::forward<Error>(error));
+                            HPX_FORWARD(Error, error));
                     }
 
                     friend void tag_invoke(
@@ -165,11 +165,11 @@ namespace hpx { namespace execution { namespace experimental {
                         predecessor_sender_receiver&& r, Ts&&... ts) noexcept
                         -> decltype(std::declval<value_type>()
                                         .template emplace<hpx::tuple<Ts...>>(
-                                            std::forward<Ts>(ts)...),
+                                            HPX_FORWARD(Ts, ts)...),
                             void())
                     {
                         r.op_state.set_value_predecessor_sender(
-                            std::forward<Ts>(ts)...);
+                            HPX_FORWARD(Ts, ts)...);
                     }
                 };
 
@@ -177,19 +177,19 @@ namespace hpx { namespace execution { namespace experimental {
                 void set_error_predecessor_sender(Error&& error) noexcept
                 {
                     hpx::execution::experimental::set_error(
-                        std::move(receiver), std::forward<Error>(error));
+                        HPX_MOVE(receiver), HPX_FORWARD(Error, error));
                 }
 
                 void set_done_predecessor_sender() noexcept
                 {
-                    hpx::execution::experimental::set_done(std::move(receiver));
+                    hpx::execution::experimental::set_done(HPX_MOVE(receiver));
                 }
 
                 template <typename... Us>
                 void set_value_predecessor_sender(Us&&... us) noexcept
                 {
                     ts.template emplace<hpx::tuple<Us...>>(
-                        std::forward<Us>(us)...);
+                        HPX_FORWARD(Us, us)...);
 #if defined(HPX_HAVE_CXX17_COPY_ELISION)
                     // with_result_of is used to emplace the operation
                     // state returned from connect without any
@@ -199,7 +199,7 @@ namespace hpx { namespace execution { namespace experimental {
                         hpx::util::detail::with_result_of([&]() {
                             return hpx::execution::experimental::connect(
                                 hpx::execution::experimental::schedule(
-                                    std::move(scheduler)),
+                                    HPX_MOVE(scheduler)),
                                 scheduler_sender_receiver{*this});
                         }));
 #else
@@ -208,7 +208,7 @@ namespace hpx { namespace execution { namespace experimental {
                     scheduler_op_state.emplace_f(
                         hpx::execution::experimental::connect,
                         hpx::execution::experimental::schedule(
-                            std::move(scheduler)),
+                            HPX_MOVE(scheduler)),
                         scheduler_sender_receiver{*this});
 #endif
                     hpx::execution::experimental::start(
@@ -224,7 +224,7 @@ namespace hpx { namespace execution { namespace experimental {
                         scheduler_sender_receiver&& r, Error&& error) noexcept
                     {
                         r.op_state.set_error_scheduler_sender(
-                            std::forward<Error>(error));
+                            HPX_FORWARD(Error, error));
                     }
 
                     friend void tag_invoke(
@@ -257,8 +257,8 @@ namespace hpx { namespace execution { namespace experimental {
                         hpx::util::invoke_fused(
                             hpx::util::bind_front(
                                 hpx::execution::experimental::set_value,
-                                std::move(receiver)),
-                            std::forward<Ts>(ts));
+                                HPX_MOVE(receiver)),
+                            HPX_FORWARD(Ts, ts));
                     }
                 };
 
@@ -267,21 +267,21 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     scheduler_op_state.reset();
                     hpx::execution::experimental::set_error(
-                        std::move(receiver), std::forward<Error>(error));
+                        HPX_MOVE(receiver), HPX_FORWARD(Error, error));
                 }
 
                 void set_done_scheduler_sender() noexcept
                 {
                     scheduler_op_state.reset();
-                    hpx::execution::experimental::set_done(std::move(receiver));
+                    hpx::execution::experimental::set_done(HPX_MOVE(receiver));
                 }
 
                 void set_value_scheduler_sender() noexcept
                 {
                     scheduler_op_state.reset();
                     hpx::visit(
-                        scheduler_sender_value_visitor{std::move(receiver)},
-                        std::move(ts));
+                        scheduler_sender_value_visitor{HPX_MOVE(receiver)},
+                        HPX_MOVE(ts));
                 }
 
                 friend void tag_invoke(start_t, operation_state& os) noexcept
@@ -294,8 +294,8 @@ namespace hpx { namespace execution { namespace experimental {
             friend operation_state<Receiver> tag_invoke(
                 connect_t, on_sender&& s, Receiver&& receiver)
             {
-                return {std::move(s.predecessor_sender), std::move(s.scheduler),
-                    std::forward<Receiver>(receiver)};
+                return {HPX_MOVE(s.predecessor_sender), HPX_MOVE(s.scheduler),
+                    HPX_FORWARD(Receiver, receiver)};
             }
 
             template <typename Receiver>
@@ -303,7 +303,7 @@ namespace hpx { namespace execution { namespace experimental {
                 connect_t, on_sender& s, Receiver&& receiver)
             {
                 return {s.predecessor_sender, s.scheduler,
-                    std::forward<Receiver>(receiver)};
+                    HPX_FORWARD(Receiver, receiver)};
             }
         };
     }    // namespace detail
@@ -322,8 +322,8 @@ namespace hpx { namespace execution { namespace experimental {
             on_t, Sender&& predecessor_sender, Scheduler&& scheduler)
         {
             return detail::on_sender<Sender, Scheduler>{
-                std::forward<Sender>(predecessor_sender),
-                std::forward<Scheduler>(scheduler)};
+                HPX_FORWARD(Sender, predecessor_sender),
+                HPX_FORWARD(Scheduler, scheduler)};
         }
 
         template <typename Scheduler>
@@ -331,7 +331,7 @@ namespace hpx { namespace execution { namespace experimental {
             on_t, Scheduler&& scheduler)
         {
             return detail::partial_algorithm<on_t, Scheduler>{
-                std::forward<Scheduler>(scheduler)};
+                HPX_FORWARD(Scheduler, scheduler)};
         }
     } on{};
 }}}    // namespace hpx::execution::experimental

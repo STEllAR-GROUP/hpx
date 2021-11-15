@@ -89,8 +89,8 @@ namespace hpx { namespace util { namespace plugin {
         }
 
         dll(dll&& rhs) noexcept
-          : dll_name(std::move(rhs.dll_name))
-          , map_name(std::move(rhs.map_name))
+          : dll_name(HPX_MOVE(rhs.dll_name))
+          , map_name(HPX_MOVE(rhs.map_name))
           , dll_handle(rhs.dll_handle)
         {
             rhs.dll_handle = nullptr;
@@ -115,8 +115,8 @@ namespace hpx { namespace util { namespace plugin {
         {
             if (&rhs != this)
             {
-                dll_name = std::move(rhs.dll_name);
-                map_name = std::move(rhs.map_name);
+                dll_name = HPX_MOVE(rhs.dll_name);
+                map_name = HPX_MOVE(rhs.map_name);
                 dll_handle = rhs.dll_handle;
                 rhs.dll_handle = nullptr;
             }

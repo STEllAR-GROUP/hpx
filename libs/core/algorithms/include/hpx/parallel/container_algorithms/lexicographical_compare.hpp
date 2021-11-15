@@ -420,8 +420,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::lexicographical_compare().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                std::forward<Pred>(pred), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -458,9 +458,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::lexicographical_compare().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                std::forward<Pred>(pred), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -497,8 +497,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::lexicographical_compare().call(
                 hpx::execution::seq, std::begin(rng1), std::end(rng1),
-                std::begin(rng2), std::end(rng2), std::forward<Pred>(pred),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                std::begin(rng2), std::end(rng2), HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -539,10 +539,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::lexicographical_compare().call(
-                std::forward<ExPolicy>(policy), std::begin(rng1),
-                std::end(rng1), std::begin(rng2), std::end(rng2),
-                std::forward<Pred>(pred), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), std::begin(rng1), std::end(rng1),
+                std::begin(rng2), std::end(rng2), HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
     } lexicographical_compare{};
 }}    // namespace hpx::ranges

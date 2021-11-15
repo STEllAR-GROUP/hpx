@@ -30,7 +30,7 @@ namespace hpx { namespace lcos { namespace local {
         template <typename Condition>
         future<void> get_future(Condition&& func, error_code& ec = hpx::throws)
         {
-            cond_.assign(std::forward<Condition>(func));
+            cond_.assign(HPX_FORWARD(Condition, func));
 
             future<void> f = promise_.get_future(ec);
 

@@ -261,7 +261,7 @@ namespace hpx { namespace threads { namespace policies {
                 // pushing the new thread into the pending queue of the
                 // specified thread_queue
                 ++added;
-                schedule_thread(std::move(thrd));
+                schedule_thread(HPX_MOVE(thrd));
             }
 
             if (added)
@@ -705,7 +705,7 @@ namespace hpx { namespace threads { namespace policies {
                         {
                             *id = thrd;
                         }
-                        schedule_thread(std::move(thrd));
+                        schedule_thread(HPX_MOVE(thrd));
                     }
                     else
                     {
@@ -713,7 +713,7 @@ namespace hpx { namespace threads { namespace policies {
                         // returned to the caller as otherwise the thread would
                         // go out of scope right away.
                         HPX_ASSERT(id != nullptr);
-                        *id = std::move(thrd);
+                        *id = HPX_MOVE(thrd);
                     }
 
                     if (&ec != &throws)
@@ -739,9 +739,9 @@ namespace hpx { namespace threads { namespace policies {
             task_description* td = task_description_alloc_.allocate(1);
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             new (td) task_description{
-                std::move(data), hpx::chrono::high_resolution_clock::now()};
+                HPX_MOVE(data), hpx::chrono::high_resolution_clock::now()};
 #else
-            new (td) task_description{std::move(data)};    //-V106
+            new (td) task_description{HPX_MOVE(data)};    //-V106
 #endif
             new_tasks_.push(td);
             if (&ec != &throws)
@@ -835,7 +835,7 @@ namespace hpx { namespace threads { namespace policies {
                     ++work_items_wait_count_;
                 }
 
-                thrd = std::move(tdesc->data);
+                thrd = HPX_MOVE(tdesc->data);
                 delete tdesc;
 
                 return true;
@@ -856,11 +856,11 @@ namespace hpx { namespace threads { namespace policies {
         {
             ++work_items_count_.data_;
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            work_items_.push(new thread_description{std::move(thrd),
+            work_items_.push(new thread_description{HPX_MOVE(thrd),
                                  hpx::chrono::high_resolution_clock::now()},
                 other_end);
 #else
-            work_items_.push(std::move(thrd), other_end);
+            work_items_.push(HPX_MOVE(thrd), other_end);
 #endif
         }
 

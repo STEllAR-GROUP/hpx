@@ -61,13 +61,13 @@ namespace hpx { namespace actions {
             argument_holder() = default;
 
             explicit argument_holder(Args&& args)
-              : data_(new Args(std::move(args)))
+              : data_(new Args(HPX_MOVE(args)))
             {
             }
 
             template <typename... Ts>
             argument_holder(Ts&&... ts)
-              : data_(new Args(std::forward<Ts>(ts)...))
+              : data_(new Args(HPX_FORWARD(Ts, ts)...))
             {
             }
 
@@ -181,14 +181,14 @@ namespace hpx { namespace actions {
         explicit transfer_base_action(Ts&&... vs)
           : base_action_data(threads::thread_priority::default_,
                 threads::thread_stacksize::default_)
-          , arguments_(std::forward<Ts>(vs)...)
+          , arguments_(HPX_FORWARD(Ts, vs)...)
         {
         }
 
         template <typename... Ts>
         transfer_base_action(threads::thread_priority priority, Ts&&... vs)
           : base_action_data(priority, threads::thread_stacksize::default_)
-          , arguments_(std::forward<Ts>(vs)...)
+          , arguments_(HPX_FORWARD(Ts, vs)...)
         {
         }
 

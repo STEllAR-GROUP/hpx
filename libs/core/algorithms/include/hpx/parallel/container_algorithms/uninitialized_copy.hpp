@@ -377,7 +377,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::uninitialized_copy_sent<
                 parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first1, last1, first2,
+                .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
                     last2);
         }
 
@@ -442,7 +442,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::uninitialized_copy_sent<
                 parallel::util::in_out_result<iterator_type1, iterator_type2>>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng1),
                     std::end(rng1), std::begin(rng2), std::end(rng2));
         }
     } uninitialized_copy{};
@@ -499,7 +499,7 @@ namespace hpx { namespace ranges {
             std::size_t d = parallel::v1::detail::distance(first2, last2);
             return hpx::parallel::v1::detail::uninitialized_copy_n<
                 parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first1,
+                .call(HPX_FORWARD(ExPolicy, policy), first1,
                     count <= d ? count : d, first2);
         }
     } uninitialized_copy_n{};

@@ -163,7 +163,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                     while (!hpx::util::invoke(f, end_value1, end_value) &&
                         --end1 != 0)
                     {
-                        end_value = std::move(end_value1);
+                        end_value = HPX_MOVE(end_value1);
                         end_value1 = hpx::util::invoke(proj1, first1[end1 - 1]);
                     }
                 }
@@ -179,7 +179,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 while (!hpx::util::invoke(f, start_value1, start_value) &&
                     --start1 != 0)
                 {
-                    start_value = std::move(start_value1);
+                    start_value = HPX_MOVE(start_value1);
                     start_value1 = hpx::util::invoke(proj1, first1[start1 - 1]);
                 }
             }
@@ -271,7 +271,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         // fill the buffer piecewise
         return parallel::util::partitioner<ExPolicy, result_type, void>::call(
-            policy, chunks.get(), cores, std::move(f1), std::move(f2));
+            policy, chunks.get(), cores, HPX_MOVE(f1), HPX_MOVE(f2));
     }
 
     /// \endcond

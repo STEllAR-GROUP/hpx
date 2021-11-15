@@ -297,12 +297,12 @@ namespace hpx { namespace parallel { namespace util {
         {
             if (cmp(*rbx.begin(), *rx2.begin()))
             {
-                *rx1.begin() = std::move(*rbx.begin());
+                *rx1.begin() = HPX_MOVE(*rbx.begin());
                 rbx = range<Iter2, Sent2>(rbx.begin() + 1, rbx.end());
             }
             else
             {
-                *rx1.begin() = std::move(*rx2.begin());
+                *rx1.begin() = HPX_MOVE(*rx2.begin());
                 rx2 = range<Iter2, Sent2>(rx2.begin() + 1, rx2.end());
             }
             rx1 = range<Iter1, Sent1>(rx1.begin() + 1, rx1.end());

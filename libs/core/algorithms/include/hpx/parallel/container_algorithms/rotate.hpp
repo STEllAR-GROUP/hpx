@@ -418,7 +418,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         rotate(ExPolicy&& policy, Rng&& rng,
             hpx::traits::range_iterator_t<Rng> middle)
     {
-        return rotate(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+        return rotate(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
             middle, hpx::util::end(rng));
     }
 
@@ -439,8 +439,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 OutIter>>::type rotate_copy(ExPolicy&& policy, Rng&& rng,
             hpx::traits::range_iterator_t<Rng> middle, OutIter dest_first)
     {
-        return rotate_copy(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), middle, hpx::util::end(rng), dest_first);
+        return rotate_copy(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            middle, hpx::util::end(rng), dest_first);
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -493,7 +493,7 @@ namespace hpx { namespace ranges {
             return hpx::parallel::util::get_subrange<FwdIter, Sent>(
                 hpx::parallel::v1::detail::rotate<
                     parallel::util::in_out_result<FwdIter, Sent>>()
-                    .call2(std::forward<ExPolicy>(policy), is_seq(), first,
+                    .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first,
                         middle, last));
         }
 
@@ -540,7 +540,7 @@ namespace hpx { namespace ranges {
                 hpx::parallel::v1::detail::rotate<parallel::util::in_out_result<
                     hpx::traits::range_iterator_t<Rng>,
                     typename hpx::traits::range_sentinel<Rng>::type>>()
-                    .call2(std::forward<ExPolicy>(policy), is_seq(),
+                    .call2(HPX_FORWARD(ExPolicy, policy), is_seq(),
                         hpx::util::begin(rng), middle, hpx::util::end(rng)));
         }
     } rotate{};
@@ -601,7 +601,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::rotate_copy<
                 rotate_copy_result<FwdIter1, FwdIter2>>()
-                .call2(std::forward<ExPolicy>(policy), is_seq(), first, middle,
+                .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first, middle,
                     last, dest_first);
         }
 
@@ -644,7 +644,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::rotate_copy<rotate_copy_result<
                 hpx::traits::range_iterator_t<Rng>, OutIter>>()
-                .call2(std::forward<ExPolicy>(policy), is_seq(),
+                .call2(HPX_FORWARD(ExPolicy, policy), is_seq(),
                     hpx::util::begin(rng), middle, hpx::util::end(rng),
                     dest_first);
         }

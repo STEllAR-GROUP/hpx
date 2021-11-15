@@ -28,10 +28,10 @@ namespace hpx { namespace detail {
 
         template <typename T1, typename... Ts>
         auto operator()(T1&& t1, Ts&&... ts) -> decltype(Tag{}(
-            std::move(policy), std::forward<T1>(t1), std::forward<Ts>(ts)...))
+            HPX_MOVE(policy), HPX_FORWARD(T1, t1), HPX_FORWARD(Ts, ts)...))
         {
-            return Tag{}(std::move(policy), std::forward<T1>(t1),
-                std::forward<Ts>(ts)...);
+            return Tag{}(
+                HPX_MOVE(policy), HPX_FORWARD(T1, t1), HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -61,11 +61,11 @@ namespace hpx { namespace detail {
                           ExPolicy>)
         {
             auto task_policy =
-                std::forward<ExPolicy>(policy)(hpx::execution::task);
+                HPX_FORWARD(ExPolicy, policy)(hpx::execution::task);
             return hpx::execution::experimental::let_value(
-                std::forward<Predecessor>(predecessor),
+                HPX_FORWARD(Predecessor, predecessor),
                 bound_algorithm<Tag, decltype(task_policy)>{
-                    std::move(task_policy)});
+                    HPX_MOVE(task_policy)});
         }
         // If the policy does not have a task policy, the algorithm can only be
         // called synchronously. In this case we only use then to chain the
@@ -73,8 +73,8 @@ namespace hpx { namespace detail {
         else
         {
             return hpx::execution::experimental::then(
-                std::forward<Predecessor>(predecessor),
-                bound_algorithm<Tag, ExPolicy>{std::forward<ExPolicy>(policy)});
+                HPX_FORWARD(Predecessor, predecessor),
+                bound_algorithm<Tag, ExPolicy>{HPX_FORWARD(ExPolicy, policy)});
         }
     }
 
@@ -109,8 +109,8 @@ namespace hpx { namespace detail {
             Tag, Predecessor&& predecessor, ExPolicy&& policy)
         {
             return detail::then_with_bound_algorithm<Tag>(
-                std::forward<Predecessor>(predecessor),
-                std::forward<ExPolicy>(policy));
+                HPX_FORWARD(Predecessor, predecessor),
+                HPX_FORWARD(ExPolicy, policy));
         }
 
         template <typename ExPolicy,
@@ -118,7 +118,7 @@ namespace hpx { namespace detail {
         friend auto tag_fallback_invoke(Tag, ExPolicy&& policy)
         {
             return hpx::execution::experimental::detail::partial_algorithm<Tag,
-                ExPolicy>{std::forward<ExPolicy>(policy)};
+                ExPolicy>{HPX_FORWARD(ExPolicy, policy)};
         }
     };
 }}    // namespace hpx::detail

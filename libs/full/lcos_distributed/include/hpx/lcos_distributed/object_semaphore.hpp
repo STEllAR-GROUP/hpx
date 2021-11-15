@@ -31,7 +31,7 @@ namespace hpx { namespace lcos {
         object_semaphore() = default;
 
         explicit object_semaphore(naming::id_type gid)
-          : base_type(std::move(gid))
+          : base_type(HPX_MOVE(gid))
         {
         }
 

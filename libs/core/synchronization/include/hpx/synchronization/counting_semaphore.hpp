@@ -91,7 +91,7 @@ namespace hpx { namespace lcos { namespace local {
         void release(std::ptrdiff_t update = 1)
         {
             std::unique_lock<mutex_type> l(mtx_);
-            sem_.signal(std::move(l), update);
+            sem_.signal(HPX_MOVE(l), update);
         }
 
         // Effects:         Attempts to atomically decrement counter if it is
@@ -237,13 +237,13 @@ namespace hpx { namespace lcos { namespace local {
         void signal(std::ptrdiff_t count = 1)
         {
             std::unique_lock<mutex_type> l(this->mtx_);
-            this->sem_.signal(std::move(l), count);
+            this->sem_.signal(HPX_MOVE(l), count);
         }
 
         std::ptrdiff_t signal_all()
         {
             std::unique_lock<mutex_type> l(this->mtx_);
-            return this->sem_.signal_all(std::move(l));
+            return this->sem_.signal_all(HPX_MOVE(l));
         }
     };
 

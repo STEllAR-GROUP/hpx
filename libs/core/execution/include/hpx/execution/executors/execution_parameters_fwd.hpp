@@ -95,8 +95,8 @@ namespace hpx { namespace parallel { namespace execution {
         {
             return detail::get_chunk_size_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec), std::forward<F>(f), cores,
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f), cores,
                 num_tasks);
         }
     } get_chunk_size{};
@@ -131,8 +131,8 @@ namespace hpx { namespace parallel { namespace execution {
         {
             return detail::maximal_number_of_chunks_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec), cores, num_tasks);
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec), cores, num_tasks);
         }
     } maximal_number_of_chunks{};
 
@@ -162,8 +162,8 @@ namespace hpx { namespace parallel { namespace execution {
         {
             return detail::reset_thread_distribution_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec));
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec));
         }
     } reset_thread_distribution{};
 
@@ -193,8 +193,8 @@ namespace hpx { namespace parallel { namespace execution {
         {
             return detail::processing_units_count_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec));
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec));
         }
     } processing_units_count{};
 
@@ -222,8 +222,8 @@ namespace hpx { namespace parallel { namespace execution {
         {
             return detail::mark_begin_execution_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec));
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec));
         }
     } mark_begin_execution{};
 
@@ -251,8 +251,8 @@ namespace hpx { namespace parallel { namespace execution {
         {
             return detail::mark_end_of_scheduling_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec));
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec));
         }
     } mark_end_of_scheduling{};
 
@@ -280,8 +280,8 @@ namespace hpx { namespace parallel { namespace execution {
         {
             return detail::mark_end_execution_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec));
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec));
         }
     } mark_end_execution{};
 }}}    // namespace hpx::parallel::execution

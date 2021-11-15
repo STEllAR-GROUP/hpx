@@ -165,12 +165,12 @@ namespace hpx { namespace segmented {
                 if (!it_.get_data())
                 {
                     it_.get_partition().set_value(launch::sync,
-                        it_.get_local_index(), std::forward<T_>(value));
+                        it_.get_local_index(), HPX_FORWARD(T_, value));
                 }
                 else
                 {
                     *(it_.get_data()->begin() + it_.get_local_index()) =
-                        std::forward<T_>(value);
+                        HPX_FORWARD(T_, value);
                 }
                 return *this;
             }
@@ -221,7 +221,7 @@ namespace hpx { namespace segmented {
                     !std::is_same_v<std::decay_t<T_>, vector_value_proxy>>>
             vector_value_proxy& operator=(T_&& value)
             {
-                v_.set_value(launch::sync, index_, std::forward<T_>(value));
+                v_.set_value(launch::sync, index_, HPX_FORWARD(T_, value));
                 return *this;
             }
 

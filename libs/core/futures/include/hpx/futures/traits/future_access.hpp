@@ -152,7 +152,7 @@ namespace hpx { namespace traits {
         static lcos::future<R> create(
             hpx::intrusive_ptr<SharedState>&& shared_state)
         {
-            return lcos::future<R>(std::move(shared_state));
+            return lcos::future<R>(HPX_MOVE(shared_state));
         }
 
         template <typename T = void>
@@ -160,7 +160,7 @@ namespace hpx { namespace traits {
             detail::shared_state_ptr_for_t<lcos::future<lcos::future<R>>>&&
                 shared_state)
         {
-            return lcos::future<lcos::future<R>>(std::move(shared_state));
+            return lcos::future<lcos::future<R>>(HPX_MOVE(shared_state));
         }
 
         template <typename SharedState>
@@ -205,7 +205,7 @@ namespace hpx { namespace traits {
         HPX_FORCEINLINE static void transfer_result(
             lcos::future<R>&& src, Destination& dest)
         {
-            transfer_result_impl(std::move(src), dest, std::is_void<R>{});
+            transfer_result_impl(HPX_MOVE(src), dest, std::is_void<R>{});
         }
     };
 
@@ -230,15 +230,14 @@ namespace hpx { namespace traits {
         static lcos::shared_future<R> create(
             hpx::intrusive_ptr<SharedState>&& shared_state)
         {
-            return lcos::shared_future<R>(std::move(shared_state));
+            return lcos::shared_future<R>(HPX_MOVE(shared_state));
         }
 
         template <typename T = void>
         static lcos::shared_future<R> create(detail::shared_state_ptr_for_t<
             lcos::shared_future<lcos::future<R>>>&& shared_state)
         {
-            return lcos::shared_future<lcos::future<R>>(
-                std::move(shared_state));
+            return lcos::shared_future<lcos::future<R>>(HPX_MOVE(shared_state));
         }
 
         template <typename SharedState>
@@ -283,7 +282,7 @@ namespace hpx { namespace traits {
         HPX_FORCEINLINE static void transfer_result(
             lcos::shared_future<R>&& src, Destination& dest)
         {
-            transfer_result_impl(std::move(src), dest, std::is_void<R>{});
+            transfer_result_impl(HPX_MOVE(src), dest, std::is_void<R>{});
         }
     };
 

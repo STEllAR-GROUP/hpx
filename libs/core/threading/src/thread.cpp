@@ -168,7 +168,7 @@ namespace hpx {
 
         threads::thread_init_data data(
             util::one_shot(
-                util::bind(&thread::thread_function_nullary, std::move(func))),
+                util::bind(&thread::thread_function_nullary, HPX_MOVE(func))),
             "thread::thread_function_nullary",
             threads::thread_priority::default_, threads::thread_schedule_hint(),
             threads::thread_stacksize::default_,
@@ -360,7 +360,7 @@ namespace hpx {
         }
 
         using traits::future_access;
-        return future_access<lcos::future<void>>::create(std::move(base));
+        return future_access<lcos::future<void>>::create(HPX_MOVE(base));
     }
 
     ///////////////////////////////////////////////////////////////////////////

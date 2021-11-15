@@ -31,7 +31,7 @@ namespace hpx { namespace util {
 
         template <typename... Ts_>
         tagged_tuple(Ts_&&... ts)
-          : base_type(std::forward<Ts_>(ts)...)
+          : base_type(HPX_FORWARD(Ts_, ts)...)
         {
         }
     };
@@ -54,7 +54,7 @@ namespace hpx { namespace util {
         using result_type =
             tagged_tuple<typename detail::tagged_type<Tags, Ts>::type...>;
 
-        return result_type(std::forward<Ts>(ts)...);
+        return result_type(HPX_FORWARD(Ts, ts)...);
     }
 
     template <typename... Tags, typename... Ts>
@@ -70,7 +70,7 @@ namespace hpx { namespace util {
         using result_type =
             tagged_tuple<typename detail::tagged_type<Tags, Ts>::type...>;
 
-        return result_type(std::move(t));
+        return result_type(HPX_MOVE(t));
     }
 
     ///////////////////////////////////////////////////////////////////////////

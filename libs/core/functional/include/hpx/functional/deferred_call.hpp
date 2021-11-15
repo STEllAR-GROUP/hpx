@@ -63,8 +63,8 @@ namespace hpx { namespace util {
             template <typename F_, typename... Ts_,
                 typename = std::enable_if_t<std::is_constructible_v<F, F_&&>>>
             explicit constexpr HPX_HOST_DEVICE deferred(F_&& f, Ts_&&... vs)
-              : _f(std::forward<F_>(f))
-              , _args(std::piecewise_construct, std::forward<Ts_>(vs)...)
+              : _f(HPX_FORWARD(F_, f))
+              , _args(std::piecewise_construct, HPX_FORWARD(Ts_, vs)...)
             {
             }
 
@@ -72,8 +72,8 @@ namespace hpx { namespace util {
             deferred(deferred&&) = default;
 #else
             constexpr HPX_HOST_DEVICE deferred(deferred&& other)
-              : _f(std::move(other._f))
-              , _args(std::move(other._args))
+              : _f(HPX_MOVE(other._f))
+              , _args(HPX_MOVE(other._args))
             {
             }
 #endif
@@ -85,7 +85,7 @@ namespace hpx { namespace util {
             operator()()
             {
                 return HPX_INVOKE(
-                    std::move(_f), std::move(_args).template get<Is>()...);
+                    HPX_MOVE(_f), HPX_MOVE(_args).template get<Is>()...);
             }
 
             template <typename Archive>
@@ -141,7 +141,7 @@ namespace hpx { namespace util {
             util::make_index_pack_t<sizeof...(Ts)>,
             util::decay_unwrap_t<Ts>...>;
 
-        return result_type(std::forward<F>(f), std::forward<Ts>(vs)...);
+        return result_type(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
     }
 
     // nullary functions do not need to be bound again
@@ -151,7 +151,7 @@ namespace hpx { namespace util {
         static_assert(traits::detail::is_deferred_invocable_v<F>,
             "F shall be Callable with no arguments");
 
-        return std::forward<F>(f);
+        return HPX_FORWARD(F, f);
     }
 }}    // namespace hpx::util
 

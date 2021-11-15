@@ -68,12 +68,12 @@ namespace hpx { namespace util {
             std::unique_ptr<held_locks_data> release()
             {
                 HPX_ASSERT(!!data_);
-                return std::move(data_);
+                return HPX_MOVE(data_);
             }
 
             void set(std::unique_ptr<held_locks_data>&& data)
             {
-                data_ = std::move(data);
+                data_ = HPX_MOVE(data);
             }
 
             std::unique_ptr<held_locks_data> data_;
@@ -151,7 +151,7 @@ namespace hpx { namespace util {
     // set the current thread_local data about held locks
     void set_held_locks_data(std::unique_ptr<held_locks_data>&& data)
     {
-        detail::register_locks::get_held_locks().set(std::move(data));
+        detail::register_locks::get_held_locks().set(HPX_MOVE(data));
     }
 
     ///////////////////////////////////////////////////////////////////////////

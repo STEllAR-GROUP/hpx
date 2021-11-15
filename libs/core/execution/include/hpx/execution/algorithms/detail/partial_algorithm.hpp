@@ -28,7 +28,7 @@ namespace hpx {
     public:
         template <typename... Ts_>
         explicit constexpr partial_algorithm_base(Ts_&&... ts)
-          : ts(std::piecewise_construct, std::forward<Ts_>(ts)...)
+          : ts(std::piecewise_construct, HPX_FORWARD(Ts_, ts)...)
         {
         }
 
@@ -43,7 +43,7 @@ namespace hpx {
             U&& u, partial_algorithm_base p)
         {
             return Tag{}(
-                std::forward<U>(u), std::move(p.ts).template get<Is>()...);
+                HPX_FORWARD(U, u), HPX_MOVE(p.ts).template get<Is>()...);
         }
     };
 

@@ -58,8 +58,8 @@ namespace hpx { namespace resiliency { namespace experimental {
             return hpx::dataflow(
                 // do not schedule new thread for the lambda
                 hpx::launch::sync,
-                [pred = std::forward<Pred>(pred),
-                    vote = std::forward<Vote>(vote), ids](
+                [pred = HPX_FORWARD(Pred, pred), vote = HPX_FORWARD(Vote, vote),
+                    ids](
                     std::vector<hpx::future<result_type>>&& results) mutable
                 -> result_type {
                     // Store all valid results
@@ -68,7 +68,7 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                     std::exception_ptr ex;
 
-                    for (auto&& f : std::move(results))
+                    for (auto&& f : HPX_MOVE(results))
                     {
                         if (f.has_exception())
                         {
@@ -80,7 +80,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                             auto&& result = f.get();
                             if (hpx::util::invoke(pred, result))
                             {
-                                valid_results.emplace_back(std::move(result));
+                                valid_results.emplace_back(HPX_MOVE(result));
                             }
                         }
                     }
@@ -88,7 +88,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                     if (!valid_results.empty())
                     {
                         return hpx::util::invoke(
-                            std::forward<Vote>(vote), std::move(valid_results));
+                            HPX_FORWARD(Vote, vote), HPX_MOVE(valid_results));
                     }
 
                     if (bool(ex))
@@ -97,7 +97,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                     // throw aborting exception no correct results ere produced
                     throw abort_replicate_exception{};
                 },
-                std::move(results));
+                HPX_MOVE(results));
         }
     }    // namespace detail
 
@@ -117,8 +117,8 @@ namespace hpx { namespace resiliency { namespace experimental {
         HPX_ASSERT(ids.size() > 0);
 
         return detail::async_replicate_vote_validate(ids,
-            std::forward<Vote>(vote), std::forward<Pred>(pred),
-            std::forward<Action>(action), std::forward<Ts>(ts)...);
+            HPX_FORWARD(Vote, vote), HPX_FORWARD(Pred, pred),
+            HPX_FORWARD(Action, action), HPX_FORWARD(Ts, ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -137,8 +137,8 @@ namespace hpx { namespace resiliency { namespace experimental {
         HPX_ASSERT(ids.size() > 0);
 
         return detail::async_replicate_vote_validate(ids,
-            std::forward<Vote>(vote), detail::replicate_validator{},
-            std::forward<Action>(action), std::forward<Ts>(ts)...);
+            HPX_FORWARD(Vote, vote), detail::replicate_validator{},
+            HPX_FORWARD(Action, action), HPX_FORWARD(Ts, ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -157,8 +157,8 @@ namespace hpx { namespace resiliency { namespace experimental {
         HPX_ASSERT(ids.size() > 0);
 
         return detail::async_replicate_vote_validate(ids,
-            detail::replicate_voter{}, std::forward<Pred>(pred),
-            std::forward<Action>(action), std::forward<Ts>(ts)...);
+            detail::replicate_voter{}, HPX_FORWARD(Pred, pred),
+            HPX_FORWARD(Action, action), HPX_FORWARD(Ts, ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -177,7 +177,7 @@ namespace hpx { namespace resiliency { namespace experimental {
 
         return detail::async_replicate_vote_validate(ids,
             detail::replicate_voter{}, detail::replicate_validator{},
-            std::forward<Action>(action), std::forward<Ts>(ts)...);
+            HPX_FORWARD(Action, action), HPX_FORWARD(Ts, ts)...);
     }
 
 }}}    // namespace hpx::resiliency::experimental

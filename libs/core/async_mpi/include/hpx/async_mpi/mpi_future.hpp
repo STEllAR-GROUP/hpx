@@ -169,7 +169,7 @@ namespace hpx { namespace mpi { namespace experimental {
                 new detail::future_data(detail::future_data::init_no_addref{});
 
             // invoke the call to MPI_Ixxx, ignore the returned result for now
-            int result = f(std::forward<Ts>(ts)..., &data->request_);
+            int result = f(HPX_FORWARD(Ts, ts)..., &data->request_);
             (void) result;    // silence unused var warning
 
             // enqueue the future state internally for processing
@@ -177,7 +177,7 @@ namespace hpx { namespace mpi { namespace experimental {
 
             // return a future bound to the shared state
             using traits::future_access;
-            return future_access<hpx::future<int>>::create(std::move(data));
+            return future_access<hpx::future<int>>::create(HPX_MOVE(data));
         }
     }    // namespace detail
 
@@ -259,6 +259,6 @@ namespace hpx { namespace mpi { namespace experimental {
     template <typename... Args>
     inline void debug(Args&&... args)
     {
-        mpi_debug.debug(detail::get_mpi_info(), std::forward<Args>(args)...);
+        mpi_debug.debug(detail::get_mpi_info(), HPX_FORWARD(Args, args)...);
     }
 }}}    // namespace hpx::mpi::experimental

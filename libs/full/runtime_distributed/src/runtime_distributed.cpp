@@ -1360,7 +1360,7 @@ namespace hpx {
         if (postfix && *postfix)
             fullname += postfix;
         fullname += "#" + std::to_string(global_thread_num);
-        detail::thread_name() = std::move(fullname);
+        detail::thread_name() = HPX_MOVE(fullname);
 
         char const* name = detail::thread_name().c_str();
 
@@ -1442,23 +1442,23 @@ namespace hpx {
 
     void runtime_distributed::add_pre_startup_function(startup_function_type f)
     {
-        runtime_support_->add_pre_startup_function(std::move(f));
+        runtime_support_->add_pre_startup_function(HPX_MOVE(f));
     }
 
     void runtime_distributed::add_startup_function(startup_function_type f)
     {
-        runtime_support_->add_startup_function(std::move(f));
+        runtime_support_->add_startup_function(HPX_MOVE(f));
     }
 
     void runtime_distributed::add_pre_shutdown_function(
         shutdown_function_type f)
     {
-        runtime_support_->add_pre_shutdown_function(std::move(f));
+        runtime_support_->add_pre_shutdown_function(HPX_MOVE(f));
     }
 
     void runtime_distributed::add_shutdown_function(shutdown_function_type f)
     {
-        runtime_support_->add_shutdown_function(std::move(f));
+        runtime_support_->add_shutdown_function(HPX_MOVE(f));
     }
 
     hpx::util::io_service_pool* runtime_distributed::get_thread_pool(

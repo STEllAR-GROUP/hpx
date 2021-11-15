@@ -56,7 +56,7 @@ namespace hpx { namespace serialization {
                 {
                     T value;
                     ar >> value;
-                    v = std::move(value);
+                    v = HPX_MOVE(value);
                     return;
                 }
                 boost_variant_impl<Ts...>::load(ar, which - 1, v);

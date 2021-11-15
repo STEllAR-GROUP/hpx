@@ -104,7 +104,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             if (throw_errors && !errors.empty())
             {
-                throw exception_list(std::move(errors));
+                throw exception_list(HPX_MOVE(errors));
             }
 #endif
         }
@@ -140,7 +140,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             if (throw_errors && !errors.empty())
             {
-                throw exception_list(std::move(errors));
+                throw exception_list(HPX_MOVE(errors));
             }
 #endif
         }
@@ -201,7 +201,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             if (throw_errors && !errors.empty())
             {
-                throw exception_list(std::move(errors));
+                throw exception_list(HPX_MOVE(errors));
             }
 #endif
         }
