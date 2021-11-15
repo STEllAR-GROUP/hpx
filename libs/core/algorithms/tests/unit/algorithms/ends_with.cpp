@@ -14,17 +14,23 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "test_utils.hpp"
 
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_ends_with(IteratorTag)
 {
-    auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % (end1 - 1) + 1;
+    std::uniform_int_distribution<int> dis1(2, 10007);
+    auto end1 = dis1(gen);
+    std::uniform_int_distribution<int> dis2(1, end1 - 1);
+    auto end2 = dis2(gen);
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
 
@@ -50,8 +56,10 @@ void test_ends_with(ExPolicy policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % (end1 - 1) + 1;
+    std::uniform_int_distribution<int> dis1(2, 10007);
+    auto end1 = dis1(gen);
+    std::uniform_int_distribution<int> dis2(1, end1 - 1);
+    auto end2 = dis2(gen);
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
     auto some_more_ints = std::vector<int>(end1 - end2 + 1);
@@ -74,8 +82,10 @@ void test_ends_with(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_ends_with_async(ExPolicy p, IteratorTag)
 {
-    auto end1 = std::rand() % 10007 + 1;
-    auto end2 = std::rand() % (end1 - 1) + 1;
+    std::uniform_int_distribution<int> dis1(2, 10007);
+    auto end1 = dis1(gen);
+    std::uniform_int_distribution<int> dis2(1, end1 - 1);
+    auto end2 = dis2(gen);
     auto some_ints = std::vector<int>(end1);
     std::iota(some_ints.begin(), some_ints.end(), 1);
     auto some_more_ints = std::vector<int>(end1 - end2 + 1);
@@ -124,7 +134,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     ends_with_test();
     return hpx::local::finalize();
