@@ -47,12 +47,16 @@ function(add_hpx_module libname modulename)
       ${HPX_ENABLED_MODULES} ${modulename}
       CACHE INTERNAL "List of enabled HPX modules" FORCE
   )
+  list(SORT HPX_ENABLED_MODULES)
+  list(REMOVE_DUPLICATES HPX_ENABLED_MODULES)
 
   set(HPX_${libname_upper}_ENABLED_MODULES
       ${HPX_${libname_upper}_ENABLED_MODULES} ${modulename}
       CACHE INTERNAL "List of enabled HPX modules in the ${libname} library"
             FORCE
   )
+  list(SORT HPX_${libname_upper}_ENABLED_MODULES)
+  list(REMOVE_DUPLICATES HPX_${libname_upper}_ENABLED_MODULES)
 
   # Main directories of the module
   set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
