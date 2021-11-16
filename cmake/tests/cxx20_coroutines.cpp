@@ -30,6 +30,7 @@ struct resumable
         }
 
         void return_value(int value) const noexcept {}
+        void unhandled_exception() const noexcept {}
     };
 
     bool await_ready() const noexcept

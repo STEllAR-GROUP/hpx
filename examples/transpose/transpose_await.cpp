@@ -4,10 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/algorithm.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/numeric.hpp>
+#include <hpx/hpx.hpp>
+#include <hpx/init.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/numeric.hpp>
 
 #include <boost/range/irange.hpp>
 
@@ -96,7 +98,7 @@ struct sub_block
         return data_[i];
     }
 
-    void load(hpx::serialization::input_archive& ar, unsigned version)
+    void load(hpx::serialization::input_archive& ar, unsigned)
     {
         ar& size_;
         if (size_ > 0)
@@ -108,7 +110,7 @@ struct sub_block
         }
     }
 
-    void save(hpx::serialization::output_archive& ar, unsigned version) const
+    void save(hpx::serialization::output_archive& ar, unsigned) const
     {
         ar& size_;
         if (size_ > 0)
@@ -153,20 +155,20 @@ struct block : hpx::components::client_base<block, block_component>
     block(std::uint64_t id, const char* base_name)
       : base_type(hpx::find_from_basename(base_name, id))
     {
-        get_gid();
+        get_id();
     }
 
     block(std::uint64_t id, std::uint64_t size, const char* base_name)
       : base_type(hpx::new_<block_component>(hpx::find_here(), size))
     {
-        hpx::register_with_basename(base_name, get_gid(), id);
+        hpx::register_with_basename(base_name, get_id(), id);
     }
 
     hpx::future<sub_block> get_sub_block(
         std::uint64_t offset, std::uint64_t size) const
     {
         block_component::get_sub_block_action act;
-        return hpx::async(act, get_gid(), offset, size);
+        return hpx::async(act, get_id(), offset, size);
     }
 };
 
@@ -195,7 +197,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
 // co_await below
 hpx::future<sub_block> transpose_phase(std::vector<block> const& A,
     std::vector<block>& B, std::uint64_t block_order, std::uint64_t b,
-    std::uint64_t num_blocks, std::uint64_t num_local_blocks,
+    std::uint64_t num_blocks, std::uint64_t /* num_local_blocks */,
     std::uint64_t block_size, std::uint64_t tile_size)
 {
     const std::uint64_t from_phase = b;
@@ -289,9 +291,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
         auto range = boost::irange(blocks_start, blocks_end);
         for_each(par, range, [&](std::uint64_t b) {
             std::shared_ptr<block_component> A_ptr =
-                hpx::get_ptr<block_component>(A[b].get_gid()).get();
+                hpx::get_ptr<block_component>(A[b].get_id()).get();
             std::shared_ptr<block_component> B_ptr =
-                hpx::get_ptr<block_component>(B[b].get_gid()).get();
+                hpx::get_ptr<block_component>(B[b].get_id()).get();
 
             for (std::uint64_t i = 0; i != order; ++i)
             {
@@ -366,7 +368,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
     }
 
-    return hpx::local::finalize();
+    return hpx::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -394,11 +396,11 @@ int main(int argc, char* argv[])
     // localities
     std::vector<std::string> const cfg = {"hpx.run_hpx_main!=1"};
 
-    hpx::local::init_params init_args;
+    hpx::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
     init_args.cfg = cfg;
 
-    return hpx::local::init(hpx_main, argc, argv, init_args);
+    return hpx::init(argc, argv, init_args);
 }
 
 void transpose(sub_block const A, sub_block B, std::uint64_t block_order,
