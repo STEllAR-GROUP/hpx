@@ -335,18 +335,15 @@ namespace hpx {
     /// calling thread.
     ///
     /// \returns  The \a partition_copy algorithm returns
-    ///           \a tagged_tuple<tag::in(InIter), tag::out1(OutIter1),
-    ///           tag::out2(OutIter2)>.
-    ///           The \a partition_copy algorithm returns the tuple of
-    ///           the source iterator \a last,
+    ///           \a std::pair<OutIter1, OutIter2>.
+    ///           The \a partition_copy algorithm returns the pair of
     ///           the destination iterator to the end of the \a dest_true
     ///           range, and the destination iterator to the end of the \a
     ///           dest_false range.
     ///
     template <typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename Pred, typename Proj>
-    hpx::util::tagged_tuple<tag::in(FwdIter1), tag::out1(FwdIter2),
-            tag::out2(FwdIter3)>
+    std::pair<FwdIter2 ,FwdIter3>
     partition_copy(FwdIter1 first, FwdIter1 last,
         FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj);
 
@@ -427,24 +424,18 @@ namespace hpx {
     /// within each thread.
     ///
     /// \returns  The \a partition_copy algorithm returns a
-    ///           \a hpx::future<tagged_tuple<tag::in(InIter),
-    ///           tag::out1(OutIter1), tag::out2(OutIter2)> >
+    ///           \a hpx::future<std::pair<OutIter1, OutIter2>>
     ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns
-    ///           \a tagged_tuple<tag::in(InIter),
-    ///           tag::out1(OutIter1), tag::out2(OutIter2)>
-    ///           otherwise.
-    ///           The \a partition_copy algorithm returns the tuple of
-    ///           the source iterator \a last,
+    ///           \a std::pair<OutIter1, OutIter2> otherwise.
+    ///           The \a partition_copy algorithm returns the pair of
     ///           the destination iterator to the end of the \a dest_true
     ///           range, and the destination iterator to the end of the \a
     ///           dest_false range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename Pred, typename Proj>
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_tuple<tag::in(FwdIter1), tag::out1(FwdIter2),
-            tag::out2(FwdIter3)>>::type
+    util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter2, FwdIter3>>
     partition_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj);
 
@@ -461,7 +452,6 @@ namespace hpx {
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/async_local.hpp>
-#include <hpx/parallel/util/tagged_tuple.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -504,6 +494,31 @@ namespace hpx {
 #include <vector>
 
 namespace hpx { namespace parallel { inline namespace v1 {
+
+    template <typename Tuple>
+    constexpr HPX_FORCEINLINE
+        std::pair<typename hpx::tuple_element<1, Tuple>::type,
+            typename hpx::tuple_element<2, Tuple>::type>
+        tuple_to_pair(Tuple&& t)
+    {
+        return std::make_pair(hpx::get<1>(t), hpx::get<2>(t));
+    }
+
+    template <typename Tuple>
+    hpx::future<std::pair<typename hpx::tuple_element<1, Tuple>::type,
+        typename hpx::tuple_element<2, Tuple>::type>>
+    tuple_to_pair(hpx::future<Tuple>&& f)
+    {
+        using result_type =
+            std::pair<typename hpx::tuple_element<1, Tuple>::type,
+                typename hpx::tuple_element<2, Tuple>::type>;
+
+        return lcos::make_future<result_type>(
+            HPX_MOVE(f), [](Tuple&& t) -> result_type {
+                return tuple_to_pair(HPX_MOVE(t));
+            });
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // stable_partition
     namespace detail {
@@ -1657,9 +1672,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected<Proj, FwdIter1>>
         )>
     // clang-format on
-    util::detail::algorithm_result_t<ExPolicy,
-        hpx::util::tagged_tuple<tag::in(FwdIter1), tag::out1(FwdIter2),
-            tag::out2(FwdIter3)>>
+    util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter2, FwdIter3>>
     partition_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
         Proj&& proj = Proj())
@@ -1677,7 +1690,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
         using result_type = hpx::tuple<FwdIter1, FwdIter2, FwdIter3>;
 
-        return hpx::util::make_tagged_tuple<tag::in, tag::out1, tag::out2>(
+        return parallel::v1::tuple_to_pair(
             detail::partition_copy<result_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, dest_true,
                 dest_false, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
@@ -1815,11 +1828,9 @@ namespace hpx {
                     parallel::traits::projected<Proj, FwdIter1>>
             )>
         // clang-format on
-        friend hpx::util::tagged_tuple<parallel::v1::tag::in(FwdIter1),
-            parallel::v1::tag::out1(FwdIter2),
-            parallel::v1::tag::out2(FwdIter3)>
-        tag_fallback_invoke(hpx::partition_copy_t, FwdIter1 first,
-            FwdIter1 last, FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
+        friend std::pair<FwdIter2, FwdIter3> tag_fallback_invoke(
+            hpx::partition_copy_t, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
             Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
@@ -1831,8 +1842,7 @@ namespace hpx {
 
             using result_type = hpx::tuple<FwdIter1, FwdIter2, FwdIter3>;
 
-            return hpx::util::make_tagged_tuple<parallel::v1::tag::in,
-                parallel::v1::tag::out1, parallel::v1::tag::out2>(
+            return parallel::v1::tuple_to_pair(
                 parallel::v1::detail::partition_copy<result_type>().call(
                     hpx::execution::seq, first, last, dest_true, dest_false,
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
@@ -1853,9 +1863,7 @@ namespace hpx {
             )>
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            hpx::util::tagged_tuple<parallel::v1::tag::in(FwdIter1),
-                parallel::v1::tag::out1(FwdIter2),
-                parallel::v1::tag::out2(FwdIter3)>>
+            std::pair<FwdIter2, FwdIter3>>
         tag_fallback_invoke(hpx::partition_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest_true,
             FwdIter3 dest_false, Pred&& pred, Proj&& proj = Proj())
@@ -1869,8 +1877,7 @@ namespace hpx {
 
             using result_type = hpx::tuple<FwdIter1, FwdIter2, FwdIter3>;
 
-            return hpx::util::make_tagged_tuple<parallel::v1::tag::in,
-                parallel::v1::tag::out1, parallel::v1::tag::out2>(
+            return parallel::v1::tuple_to_pair(
                 parallel::v1::detail::partition_copy<result_type>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last, dest_true,
                     dest_false, HPX_FORWARD(Pred, pred),

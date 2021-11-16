@@ -52,14 +52,12 @@ namespace hpx {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a move algorithm returns a
-    ///           \a  hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
+    ///           \a  hpx::future<FwdIter2>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
-    ///           otherwise.
-    ///           The \a move algorithm returns the pair of the input iterator
-    ///           \a last and the output iterator to the
+    ///           returns \a FwdIter2 otherwise.
+    ///           The \a move algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           moved.
     ///

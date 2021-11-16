@@ -165,7 +165,6 @@ set(algorithms_headers
     hpx/parallel/memory.hpp
     hpx/parallel/numeric.hpp
     hpx/parallel/spmd_block.hpp
-    hpx/parallel/tagspec.hpp
     hpx/parallel/task_block.hpp
     hpx/parallel/task_group.hpp
     hpx/parallel/util/cancellation_token.hpp
@@ -195,8 +194,6 @@ set(algorithms_headers
     hpx/parallel/util/ranges_facilities.hpp
     hpx/parallel/util/result_types.hpp
     hpx/parallel/util/scan_partitioner.hpp
-    hpx/parallel/util/tagged_pair.hpp
-    hpx/parallel/util/tagged_tuple.hpp
     hpx/parallel/util/transfer.hpp
     hpx/parallel/util/transform_loop.hpp
     hpx/parallel/util/zip_iterator.hpp
@@ -210,8 +207,6 @@ set(algorithms_compat_headers
     hpx/traits/is_value_proxy.hpp => hpx/algorithms/traits/is_value_proxy.hpp
     hpx/traits/pointer_category.hpp => hpx/algorithms/traits/pointer_category.hpp
     hpx/traits/segmented_iterator_traits.hpp => hpx/algorithms/traits/segmented_iterator_traits.hpp
-    hpx/util/tagged_pair.hpp => hpx/datastructures/tagged_pair.hpp
-    hpx/util/tagged_tuple.hpp => hpx/datastructures/tagged_tuple.hpp
 )
 # cmake-format: on
 

@@ -83,7 +83,7 @@ namespace hpx {
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns
-    ///           \a tagged_tuple<RandIter3> otherwise.
+    ///           \a RandIter3 otherwise.
     ///           The \a merge algorithm returns the destination iterator to
     ///           the end of the \a dest range.
     ///

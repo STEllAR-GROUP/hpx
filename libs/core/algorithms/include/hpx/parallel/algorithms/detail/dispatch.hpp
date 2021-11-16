@@ -129,7 +129,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             catch (...)
             {
                 // this does not return
-                return hpx::parallel::detail::handle_exception<ExPolicy,
+                return hpx::parallel::v1::detail::handle_exception<ExPolicy,
                     local_result_type>::call();
             }
 #endif

@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         util::in_out_result<iKey, iVal> make_pair_result(
             ZIter zipiter, iKey key_start, iVal val_start)
         {
-            // the iterator we want is 'second' part of tagged_pair type (from copy_if)
+            // the iterator we want is 'second' part of pair type (from copy_if)
             auto t = zipiter.out.get_iterator_tuple();
             iKey key_end = hpx::get<0>(t);
             return util::in_out_result<iKey, iVal>{key_end,

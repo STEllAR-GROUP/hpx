@@ -616,8 +616,7 @@ namespace hpx {
     ///
     template <typename FwdIter1, typename Sent, typename FwdIter2,
         typename FwdIter3, typename Pred, typename Proj>
-    hpx::util::tagged_tuple<tag::in(FwdIter1), tag::out1(FwdIter2),
-            tag::out2(FwdIter3)>
+    hpx::util::in_out_out<FwdIter1, FwdIter2, FwdIter3>
     partition_copy(FwdIter1 first, Sent last,
         FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj);
 
@@ -906,7 +905,6 @@ namespace hpx {
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/parallel/util/tagged_tuple.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
@@ -962,20 +960,28 @@ namespace hpx { namespace parallel { inline namespace v1 {
         )>
     // clang-format on
     HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::partition_copy is deprecated, use hpx::partition_copy "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_tuple<tag::in(hpx::traits::range_iterator_t<Rng>),
-            tag::out1(FwdIter2), tag::out2(FwdIter3)>>::type
-        partition_copy(ExPolicy&& policy, Rng&& rng, FwdIter2 dest_true,
-            FwdIter3 dest_false, Pred&& pred, Proj&& proj = Proj())
+        "hpx::parallel::partition_copy is deprecated, use "
+        "hpx::partition_copy "
+        "instead") util::detail::algorithm_result_t<ExPolicy,
+        parallel::util::in_out_out_result<hpx::traits::range_iterator_t<Rng>,
+            FwdIter2, FwdIter3>> partition_copy(ExPolicy&& policy, Rng&& rng,
+        FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
+        Proj&& proj = Proj())
     {
+        using iterator = hpx::traits::range_iterator_t<Rng>;
+        using result_type = hpx::tuple<iterator, FwdIter2, FwdIter3>;
+
+        static_assert(hpx::traits::is_forward_iterator_v<iterator>,
+            "Requires at least forward iterator.");
+
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return partition_copy(HPX_FORWARD(ExPolicy, policy),
-            hpx::util::begin(rng), hpx::util::end(rng), dest_true, dest_false,
-            HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+        return parallel::util::make_in_out_out_result(
+            partition_copy(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), dest_true, dest_false,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif

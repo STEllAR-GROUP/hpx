@@ -13,7 +13,6 @@
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <utility>
 
@@ -83,39 +82,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         return lcos::make_future<result_type>(HPX_MOVE(zipiter),
             [](ZipIter zipiter) { return get_iter_pair(HPX_MOVE(zipiter)); });
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Tag1, typename Tag2, typename ZipIter>
-    hpx::util::tagged_pair<Tag1(typename hpx::tuple_element<0,
-                               typename ZipIter::iterator_tuple_type>::type),
-        Tag2(typename hpx::tuple_element<1,
-            typename ZipIter::iterator_tuple_type>::type)>
-    get_iter_tagged_pair(ZipIter&& zipiter)
-    {
-        return hpx::util::make_tagged_pair<Tag1, Tag2>(
-            zipiter.get_iterator_tuple());
-    }
-
-    template <typename Tag1, typename Tag2, typename ZipIter>
-    hpx::future<hpx::util::tagged_pair<
-        Tag1(typename hpx::tuple_element<0,
-            typename ZipIter::iterator_tuple_type>::type),
-        Tag2(typename hpx::tuple_element<1,
-            typename ZipIter::iterator_tuple_type>::type)>>
-    get_iter_tagged_pair(hpx::future<ZipIter>&& zipiter)
-    {
-        typedef typename ZipIter::iterator_tuple_type iterator_tuple_type;
-
-        typedef hpx::util::tagged_pair<
-            Tag1(typename hpx::tuple_element<0, iterator_tuple_type>::type),
-            Tag2(typename hpx::tuple_element<1, iterator_tuple_type>::type)>
-            result_type;
-
-        return lcos::make_future<result_type>(
-            HPX_MOVE(zipiter), [](ZipIter&& zipiter) {
-                return get_iter_tagged_pair<Tag1, Tag2>(HPX_MOVE(zipiter));
-            });
     }
 
     ///////////////////////////////////////////////////////////////////////////
