@@ -1615,13 +1615,6 @@ if(WIN32)
     # even VS2017 has an ICE when compiling with -Ob2
     hpx_add_target_compile_option(-Ob1 PUBLIC CONFIGURATIONS Release)
 
-    # /RTC1 is incompatible with /await
-    if(HPX_WITH_CXX20_COROUTINES)
-      hpx_remove_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
-    else()
-      hpx_add_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
-    endif()
-
     # VS2012 and above has a special flag for improving the debug experience by
     # adding more symbol information to the build (-d2Zi)
     hpx_add_target_compile_option(-d2Zi+ PUBLIC CONFIGURATIONS RelWithDebInfo)
