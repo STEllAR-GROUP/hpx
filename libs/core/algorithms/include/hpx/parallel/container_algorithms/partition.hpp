@@ -909,7 +909,6 @@ namespace hpx {
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/partition.hpp>
-#include <hpx/parallel/tagspec.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -969,15 +968,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
         Proj&& proj = Proj())
     {
         using iterator = hpx::traits::range_iterator_t<Rng>;
-        using result_type = hpx::tuple<iterator, FwdIter2, FwdIter3>;
-
-        static_assert(hpx::traits::is_forward_iterator_v<iterator>,
-            "Requires at least forward iterator.");
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
+        static_assert(hpx::traits::is_forward_iterator_v<iterator>,
+            "Requires at least forward iterator.");
+
         return parallel::util::make_in_out_out_result(
             partition_copy(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), dest_true, dest_false,

@@ -191,36 +191,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename Iterator1, typename Iterator2, typename Iterator3>
     struct algorithm_result_helper<
-        future<hpx::tuple<Iterator1, Iterator2, Iterator3>>,
-        std::enable_if_t<
-            hpx::traits::is_segmented_local_iterator_v<Iterator1> ||
-            hpx::traits::is_segmented_local_iterator_v<Iterator2> ||
-            hpx::traits::is_segmented_local_iterator_v<Iterator3>>>
-    {
-        using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator1>;
-        using traits2 = hpx::traits::segmented_local_iterator_traits<Iterator2>;
-        using traits3 = hpx::traits::segmented_local_iterator_traits<Iterator3>;
-
-        using arg_type = hpx::tuple<typename traits1::local_raw_iterator,
-            typename traits2::local_raw_iterator,
-            typename traits3::local_raw_iterator>;
-        using result_type = hpx::tuple<typename traits1::local_iterator,
-            typename traits2::local_iterator, typename traits3::local_iterator>;
-
-        HPX_FORCEINLINE static future<result_type> call(future<arg_type>&& f)
-        {
-            return hpx::make_future<result_type>(
-                HPX_MOVE(f), [](arg_type&& p) -> result_type {
-                    return hpx::make_tuple(
-                        traits1::remote(HPX_MOVE(hpx::get<0>(p))),
-                        traits2::remote(HPX_MOVE(hpx::get<1>(p))),
-                        traits3::remote(HPX_MOVE(hpx::get<2>(p))));
-                });
-        }
-    };
-
-    template <typename Iterator1, typename Iterator2, typename Iterator3>
-    struct algorithm_result_helper<
         future<util::in_in_out_result<Iterator1, Iterator2, Iterator3>>,
         std::enable_if_t<
             hpx::traits::is_segmented_local_iterator_v<Iterator1> ||

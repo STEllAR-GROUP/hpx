@@ -11,7 +11,6 @@
 #include <hpx/datastructures/tuple.hpp>
 
 #include <hpx/parallel/algorithms/sort.hpp>
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
@@ -20,6 +19,10 @@
 #include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1 {
+
+    template <typename KeyIter, typename ValueIter>
+    using sort_by_key_result = std::pair<KeyIter, ValueIter>;
+
     ///////////////////////////////////////////////////////////////////////////
     // sort
     namespace detail {
@@ -99,11 +102,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a sort_by-key algorithm returns a
-    /// \a hpx::future<std::pair<KeyIter, ValueIter>>
+    /// \a hpx::future<sort_by_key_result<KeyIter, ValueIter>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a
-    ///           \a std::pair<KeyIter, ValueIter>
+    ///           \a sort_by_key_result<KeyIter, ValueIter>
     ///           otherwise.
     ///           The algorithm returns a pair holding an iterator pointing to
     ///           the first element after the last element in the input key
@@ -113,7 +116,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
     template <typename ExPolicy, typename KeyIter, typename ValueIter,
         typename Compare = detail::less>
-    util::detail::algorithm_result_t<ExPolicy, std::pair<KeyIter, ValueIter>>
+    util::detail::algorithm_result_t<ExPolicy,
+        sort_by_key_result<KeyIter, ValueIter>>
     sort_by_key(ExPolicy&& policy, KeyIter key_first, KeyIter key_last,
         ValueIter value_first, Compare&& comp = Compare())
     {

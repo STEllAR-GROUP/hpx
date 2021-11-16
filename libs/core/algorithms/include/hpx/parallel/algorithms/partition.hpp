@@ -465,7 +465,6 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
@@ -513,7 +512,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::pair<typename hpx::tuple_element<1, Tuple>::type,
                 typename hpx::tuple_element<2, Tuple>::type>;
 
-        return lcos::make_future<result_type>(
+        return hpx::make_future<result_type>(
             HPX_MOVE(f), [](Tuple&& t) -> result_type {
                 return tuple_to_pair(HPX_MOVE(t));
             });
