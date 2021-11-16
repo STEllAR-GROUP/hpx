@@ -8,7 +8,7 @@ export CXX_STD="17"
 export CXX=hipcc
 export HPXRUN_RUNWRAPPER=srun
 
-module load rocm/4.3.0
+spack load hip
 spack load boost@1.77.0
 spack load hwloc@2.5.0
 
