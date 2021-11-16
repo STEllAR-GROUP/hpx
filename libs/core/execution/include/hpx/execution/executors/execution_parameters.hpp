@@ -126,8 +126,7 @@ namespace hpx { namespace parallel { namespace execution {
         using with_get_chunk_size_t =
             with_property_t<get_chunk_size_property, has_get_chunk_size_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_get_chunk_size_t
-            with_get_chunk_size{};
+        inline constexpr with_get_chunk_size_t with_get_chunk_size{};
 
         //////////////////////////////////////////////////////////////////////
         // customization point for interface get_chunk_size()
@@ -188,7 +187,7 @@ namespace hpx { namespace parallel { namespace execution {
             with_property_t<maximal_number_of_chunks_property,
                 has_maximal_number_of_chunks_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_maximal_number_of_chunks_t
+        inline constexpr with_maximal_number_of_chunks_t
             with_maximal_number_of_chunks{};
 
         ///////////////////////////////////////////////////////////////////////
@@ -242,7 +241,7 @@ namespace hpx { namespace parallel { namespace execution {
             with_property_t<reset_thread_distribution_property,
                 has_reset_thread_distribution_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_reset_thread_distribution_t
+        inline constexpr with_reset_thread_distribution_t
             with_reset_thread_distribution{};
 
         ///////////////////////////////////////////////////////////////////////
@@ -296,7 +295,7 @@ namespace hpx { namespace parallel { namespace execution {
             with_property_t<processing_units_count_property,
                 has_processing_units_count_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_processing_units_count_t
+        inline constexpr with_processing_units_count_t
             with_processing_units_count{};
 
         ///////////////////////////////////////////////////////////////////////
@@ -349,7 +348,7 @@ namespace hpx { namespace parallel { namespace execution {
             with_property_t<mark_begin_execution_property,
                 has_mark_begin_execution_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_mark_begin_execution_t
+        inline constexpr with_mark_begin_execution_t
             with_mark_begin_execution{};
 
         ///////////////////////////////////////////////////////////////////////
@@ -402,7 +401,7 @@ namespace hpx { namespace parallel { namespace execution {
             with_property_t<mark_end_of_scheduling_property,
                 has_mark_end_of_scheduling_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_mark_end_of_scheduling_t
+        inline constexpr with_mark_end_of_scheduling_t
             with_mark_end_of_scheduling{};
 
         ///////////////////////////////////////////////////////////////////////
@@ -455,8 +454,7 @@ namespace hpx { namespace parallel { namespace execution {
             with_property_t<mark_end_execution_property,
                 has_mark_end_execution_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_mark_end_execution_t
-            with_mark_end_execution{};
+        inline constexpr with_mark_end_execution_t with_mark_end_execution{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface mark_end_execution()

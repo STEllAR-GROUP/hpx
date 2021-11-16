@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_INLINE_CONSTEXPR_VARIABLE sequential_generate_t sequential_generate =
+    inline constexpr sequential_generate_t sequential_generate =
         sequential_generate_t{};
 #else
     template <typename ExPolicy, typename Iter, typename Sent, typename F>
@@ -72,8 +72,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_INLINE_CONSTEXPR_VARIABLE sequential_generate_n_t
-        sequential_generate_n = sequential_generate_n_t{};
+    inline constexpr sequential_generate_n_t sequential_generate_n =
+        sequential_generate_n_t{};
 #else
     template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter sequential_generate_n(

@@ -148,9 +148,8 @@ namespace hpx::functional::detail {
 
     namespace tag_fallback_invoke_ns {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        HPX_INLINE_CONSTEXPR_VARIABLE
-        tag_fallback_invoke_t_ns::tag_fallback_invoke_t tag_fallback_invoke =
-            {};
+        inline constexpr tag_fallback_invoke_t_ns::tag_fallback_invoke_t
+            tag_fallback_invoke = {};
 #else
         HPX_DEVICE static tag_fallback_invoke_t_ns::tag_fallback_invoke_t const
             tag_fallback_invoke = {};
@@ -164,7 +163,7 @@ namespace hpx::functional::detail {
             Tag, Args...>;
 
     template <typename Tag, typename... Args>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_tag_fallback_invocable_v =
+    inline constexpr bool is_tag_fallback_invocable_v =
         is_tag_fallback_invocable<Tag, Args...>::value;
 
     template <typename Sig, bool Dispatchable>
@@ -206,7 +205,7 @@ namespace hpx::functional::detail {
 #endif
 
     template <typename Tag, typename... Args>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_nothrow_tag_fallback_invocable_v =
+    inline constexpr bool is_nothrow_tag_fallback_invocable_v =
         is_nothrow_tag_fallback_invocable<Tag, Args...>::value;
 
     template <typename Tag, typename... Args>

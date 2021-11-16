@@ -40,8 +40,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_INLINE_CONSTEXPR_VARIABLE sequential_fill_t sequential_fill =
-        sequential_fill_t{};
+    inline constexpr sequential_fill_t sequential_fill = sequential_fill_t{};
 #else
     template <typename ExPolicy, typename Iter, typename Sent, typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter sequential_fill(
@@ -73,7 +72,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_INLINE_CONSTEXPR_VARIABLE sequential_fill_n_t sequential_fill_n =
+    inline constexpr sequential_fill_n_t sequential_fill_n =
         sequential_fill_n_t{};
 #else
     template <typename ExPolicy, typename Iter, typename T>

@@ -291,7 +291,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct starts_with_t final
+    inline constexpr struct starts_with_t final
       : hpx::functional::detail::tag_fallback<starts_with_t>
     {
     private:

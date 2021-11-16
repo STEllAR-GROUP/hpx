@@ -339,7 +339,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::lexicographical_compare
-    HPX_INLINE_CONSTEXPR_VARIABLE struct lexicographical_compare_t final
+    inline constexpr struct lexicographical_compare_t final
       : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
     {
         // clang-format off

@@ -67,6 +67,6 @@
         typename HPX_PP_CAT(has_, MEMBER)<T>::type;                            \
                                                                                \
     template <typename T>                                                      \
-    HPX_INLINE_CONSTEXPR_VARIABLE bool HPX_PP_CAT(                             \
-        HPX_PP_CAT(has_, MEMBER), _v) = HPX_PP_CAT(has_, MEMBER)<T>::value;    \
+    inline constexpr bool HPX_PP_CAT(HPX_PP_CAT(has_, MEMBER), _v) =           \
+        HPX_PP_CAT(has_, MEMBER)<T>::value;                                    \
     /**/

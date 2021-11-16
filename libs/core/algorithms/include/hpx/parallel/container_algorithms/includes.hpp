@@ -226,7 +226,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::includes
-    HPX_INLINE_CONSTEXPR_VARIABLE struct includes_t final
+    inline constexpr struct includes_t final
       : hpx::detail::tag_parallel_algorithm<includes_t>
     {
     private:

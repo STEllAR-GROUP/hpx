@@ -311,7 +311,7 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct let_value_t final
+    inline constexpr struct let_value_t final
       : hpx::functional::detail::tag_fallback<let_value_t>
     {
     private:

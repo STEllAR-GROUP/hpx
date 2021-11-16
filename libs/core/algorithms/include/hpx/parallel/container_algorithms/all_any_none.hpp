@@ -351,7 +351,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::none_of
-    HPX_INLINE_CONSTEXPR_VARIABLE struct none_of_t final
+    inline constexpr struct none_of_t final
       : hpx::detail::tag_parallel_algorithm<none_of_t>
     {
     private:
@@ -464,7 +464,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::any_of
-    HPX_INLINE_CONSTEXPR_VARIABLE struct any_of_t final
+    inline constexpr struct any_of_t final
       : hpx::detail::tag_parallel_algorithm<any_of_t>
     {
     private:
@@ -576,7 +576,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::all_of
-    HPX_INLINE_CONSTEXPR_VARIABLE struct all_of_t final
+    inline constexpr struct all_of_t final
       : hpx::detail::tag_parallel_algorithm<all_of_t>
     {
     private:

@@ -40,15 +40,15 @@ namespace hpx { namespace util {
     }                             // namespace detail
 
     namespace placeholders {
-        HPX_INLINE_CONSTEXPR_VARIABLE detail::placeholder<1> _1 = {};
-        HPX_INLINE_CONSTEXPR_VARIABLE detail::placeholder<2> _2 = {};
-        HPX_INLINE_CONSTEXPR_VARIABLE detail::placeholder<3> _3 = {};
-        HPX_INLINE_CONSTEXPR_VARIABLE detail::placeholder<4> _4 = {};
-        HPX_INLINE_CONSTEXPR_VARIABLE detail::placeholder<5> _5 = {};
-        HPX_INLINE_CONSTEXPR_VARIABLE detail::placeholder<6> _6 = {};
-        HPX_INLINE_CONSTEXPR_VARIABLE detail::placeholder<7> _7 = {};
-        HPX_INLINE_CONSTEXPR_VARIABLE detail::placeholder<8> _8 = {};
-        HPX_INLINE_CONSTEXPR_VARIABLE detail::placeholder<9> _9 = {};
+        inline constexpr detail::placeholder<1> _1 = {};
+        inline constexpr detail::placeholder<2> _2 = {};
+        inline constexpr detail::placeholder<3> _3 = {};
+        inline constexpr detail::placeholder<4> _4 = {};
+        inline constexpr detail::placeholder<5> _5 = {};
+        inline constexpr detail::placeholder<6> _6 = {};
+        inline constexpr detail::placeholder<7> _7 = {};
+        inline constexpr detail::placeholder<8> _8 = {};
+        inline constexpr detail::placeholder<9> _9 = {};
     }    // namespace placeholders
 
     ///////////////////////////////////////////////////////////////////////////

@@ -162,7 +162,7 @@ namespace hpx {
             typename pure_traversal_tag<Traversal>::type;
 
         template <typename Traversal>
-        HPX_INLINE_CONSTEXPR_VARIABLE bool pure_traversal_tag_v =
+        inline constexpr bool pure_traversal_tag_v =
             pure_traversal_tag<Traversal>::value;
 
         template <typename Iterator>
@@ -175,7 +175,7 @@ namespace hpx {
             typename pure_iterator_traversal<Iterator>::type;
 
         template <typename Iterator>
-        HPX_INLINE_CONSTEXPR_VARIABLE bool pure_iterator_traversal_v =
+        inline constexpr bool pure_iterator_traversal_v =
             pure_iterator_traversal<Iterator>::value;
 
         ///////////////////////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ namespace hpx {
             typename iterator_category_to_traversal<Cat>::type;
 
         template <typename Cat>
-        HPX_INLINE_CONSTEXPR_VARIABLE bool iterator_category_to_traversal_v =
+        inline constexpr bool iterator_category_to_traversal_v =
             iterator_category_to_traversal<Cat>::value;
 
         template <typename Iterator>
@@ -201,7 +201,7 @@ namespace hpx {
             typename iterator_traversal<Iterator>::type;
 
         template <typename Iterator>
-        HPX_INLINE_CONSTEXPR_VARIABLE bool iterator_traversal_v =
+        inline constexpr bool iterator_traversal_v =
             iterator_traversal<Iterator>::value;
     }    // namespace traits
 }    // namespace hpx

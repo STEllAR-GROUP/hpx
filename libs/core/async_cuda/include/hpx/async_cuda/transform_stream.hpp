@@ -316,7 +316,7 @@ namespace hpx { namespace cuda { namespace experimental {
     // - a cudaStream_t is inserted as an additional argument into the call to f
     // - values from the predecessor sender are not forwarded, only passed by
     //   reference, to the call to f to keep them alive until the event is ready
-    HPX_INLINE_CONSTEXPR_VARIABLE struct transform_stream_t final
+    inline constexpr struct transform_stream_t final
       : hpx::functional::detail::tag_fallback<transform_stream_t>
     {
     private:

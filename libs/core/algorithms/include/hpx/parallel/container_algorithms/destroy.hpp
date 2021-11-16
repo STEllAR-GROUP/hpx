@@ -129,7 +129,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::destroy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct destroy_t final
+    inline constexpr struct destroy_t final
       : hpx::detail::tag_parallel_algorithm<destroy_t>
     {
     private:
@@ -213,7 +213,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::destroy_n
-    HPX_INLINE_CONSTEXPR_VARIABLE struct destroy_n_t final
+    inline constexpr struct destroy_n_t final
       : hpx::detail::tag_parallel_algorithm<destroy_n_t>
     {
     private:

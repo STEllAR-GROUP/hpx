@@ -507,7 +507,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::mismatch
-    HPX_INLINE_CONSTEXPR_VARIABLE struct mismatch_t final
+    inline constexpr struct mismatch_t final
       : hpx::detail::tag_parallel_algorithm<mismatch_t>
     {
     private:

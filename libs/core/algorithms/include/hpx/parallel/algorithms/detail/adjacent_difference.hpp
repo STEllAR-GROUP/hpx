@@ -51,7 +51,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE sequential_adjacent_difference_t<ExPolicy>
+    inline constexpr sequential_adjacent_difference_t<ExPolicy>
         sequential_adjacent_difference =
             sequential_adjacent_difference_t<ExPolicy>{};
 #else

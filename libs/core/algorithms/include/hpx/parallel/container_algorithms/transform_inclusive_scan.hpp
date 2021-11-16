@@ -825,7 +825,7 @@ namespace hpx { namespace ranges {
     template <typename I, typename O>
     using transform_inclusive_scan_result = parallel::util::in_out_result<I, O>;
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct transform_inclusive_scan_t final
+    inline constexpr struct transform_inclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<transform_inclusive_scan_t>
     {
     private:

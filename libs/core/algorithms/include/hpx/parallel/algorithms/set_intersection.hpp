@@ -285,7 +285,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::set_intersection
-    HPX_INLINE_CONSTEXPR_VARIABLE struct set_intersection_t final
+    inline constexpr struct set_intersection_t final
       : hpx::detail::tag_parallel_algorithm<set_intersection_t>
     {
     private:

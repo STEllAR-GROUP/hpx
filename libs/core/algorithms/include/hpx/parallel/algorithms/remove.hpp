@@ -472,7 +472,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::remove_if
-    HPX_INLINE_CONSTEXPR_VARIABLE struct remove_if_t final
+    inline constexpr struct remove_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_if_t>
     {
         // clang-format off
@@ -524,7 +524,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::remove
-    HPX_INLINE_CONSTEXPR_VARIABLE struct remove_t final
+    inline constexpr struct remove_t final
       : hpx::detail::tag_parallel_algorithm<remove_t>
     {
     private:

@@ -12,8 +12,7 @@ struct property1
     int v = 0;
 };
 
-HPX_INLINE_CONSTEXPR_VARIABLE struct with_property_t
-  : hpx::functional::tag<with_property_t>
+inline constexpr struct with_property_t : hpx::functional::tag<with_property_t>
 {
 } with_property;
 

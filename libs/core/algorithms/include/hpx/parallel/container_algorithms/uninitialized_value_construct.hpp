@@ -274,7 +274,7 @@ namespace hpx { namespace ranges {
 #include <vector>
 
 namespace hpx { namespace ranges {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_value_construct_t final
+    inline constexpr struct uninitialized_value_construct_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_t>
     {
     private:
@@ -366,7 +366,7 @@ namespace hpx { namespace ranges {
         }
     } uninitialized_value_construct{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_value_construct_n_t final
+    inline constexpr struct uninitialized_value_construct_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_n_t>
     {
     private:

@@ -301,7 +301,7 @@ namespace hpx { namespace traits {
     using is_iterator_t = typename is_iterator<Iter>::type;
 
     template <typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_iterator_v = is_iterator<Iter>::value;
+    inline constexpr bool is_iterator_v = is_iterator<Iter>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -394,8 +394,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename Iter, typename Category>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_category_v =
-        has_category<Iter, Category>::value;
+    inline constexpr bool has_category_v = has_category<Iter, Category>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>
@@ -414,7 +413,7 @@ namespace hpx { namespace traits {
     using is_output_iterator_t = typename is_output_iterator<Iter>::type;
 
     template <typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_output_iterator_v =
+    inline constexpr bool is_output_iterator_v =
         is_output_iterator<Iter>::value;
 
     template <typename Iter, typename Enable = void>
@@ -433,8 +432,7 @@ namespace hpx { namespace traits {
     using is_input_iterator_t = typename is_input_iterator<Iter>::type;
 
     template <typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_input_iterator_v =
-        is_input_iterator<Iter>::value;
+    inline constexpr bool is_input_iterator_v = is_input_iterator<Iter>::value;
 
     template <typename Iter, typename Enable = void>
     struct is_forward_iterator
@@ -452,7 +450,7 @@ namespace hpx { namespace traits {
     using is_forward_iterator_t = typename is_forward_iterator<Iter>::type;
 
     template <typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_forward_iterator_v =
+    inline constexpr bool is_forward_iterator_v =
         is_forward_iterator<Iter>::value;
 
     template <typename Iter, typename Enable = void>
@@ -472,7 +470,7 @@ namespace hpx { namespace traits {
         typename is_bidirectional_iterator<Iter>::type;
 
     template <typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_bidirectional_iterator_v =
+    inline constexpr bool is_bidirectional_iterator_v =
         is_bidirectional_iterator<Iter>::value;
 
     template <typename Iter, typename Enable = void>
@@ -490,7 +488,7 @@ namespace hpx { namespace traits {
         typename is_random_access_iterator<Iter>::type;
 
     template <typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_random_access_iterator_v =
+    inline constexpr bool is_random_access_iterator_v =
         is_random_access_iterator<Iter>::value;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -501,7 +499,7 @@ namespace hpx { namespace traits {
     using is_segmented_iterator_t = typename is_segmented_iterator<Iter>::type;
 
     template <typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_segmented_iterator_v =
+    inline constexpr bool is_segmented_iterator_v =
         is_segmented_iterator<Iter>::value;
 
     template <typename Iterator, typename Enable = void>
@@ -512,7 +510,7 @@ namespace hpx { namespace traits {
         typename is_segmented_local_iterator<Iter>::type;
 
     template <typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_segmented_local_iterator_v =
+    inline constexpr bool is_segmented_local_iterator_v =
         is_segmented_local_iterator<Iter>::value;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -525,8 +523,7 @@ namespace hpx { namespace traits {
     using is_zip_iterator_t = typename is_zip_iterator<Iter>::type;
 
     template <typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_zip_iterator_v =
-        is_zip_iterator<Iter>::value;
+    inline constexpr bool is_zip_iterator_v = is_zip_iterator<Iter>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     // Iterators are contiguous if they are pointers (without concepts we have
@@ -564,7 +561,7 @@ namespace hpx { namespace traits {
         typename is_contiguous_iterator<Iter>::type;
 
     template <typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_contiguous_iterator_v =
+    inline constexpr bool is_contiguous_iterator_v =
         is_contiguous_iterator<Iter>::value;
 
     ///////////////////////////////////////////////////////////////////////////

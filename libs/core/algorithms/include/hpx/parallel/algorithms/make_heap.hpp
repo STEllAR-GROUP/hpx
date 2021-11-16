@@ -413,7 +413,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::make_heap
-    HPX_INLINE_CONSTEXPR_VARIABLE struct make_heap_t final
+    inline constexpr struct make_heap_t final
       : hpx::detail::tag_parallel_algorithm<make_heap_t>
     {
     private:

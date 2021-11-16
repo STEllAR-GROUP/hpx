@@ -30,7 +30,7 @@ namespace hpx { namespace traits { namespace detail {
     };
 
     template <typename F, typename... Ts>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_deferred_invocable_v =
+    inline constexpr bool is_deferred_invocable_v =
         is_deferred_invocable<F, Ts...>::value;
 
 }}}    // namespace hpx::traits::detail

@@ -911,7 +911,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::min_element
-    HPX_INLINE_CONSTEXPR_VARIABLE struct min_element_t final
+    inline constexpr struct min_element_t final
       : hpx::detail::tag_parallel_algorithm<min_element_t>
     {
     private:
@@ -1033,7 +1033,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::max_element
-    HPX_INLINE_CONSTEXPR_VARIABLE struct max_element_t final
+    inline constexpr struct max_element_t final
       : hpx::detail::tag_parallel_algorithm<max_element_t>
     {
     private:
@@ -1155,7 +1155,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::minmax_element
-    HPX_INLINE_CONSTEXPR_VARIABLE struct minmax_element_t final
+    inline constexpr struct minmax_element_t final
       : hpx::detail::tag_parallel_algorithm<minmax_element_t>
     {
     private:

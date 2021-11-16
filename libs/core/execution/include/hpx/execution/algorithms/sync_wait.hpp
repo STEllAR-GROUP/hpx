@@ -169,7 +169,7 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct sync_wait_t final
+    inline constexpr struct sync_wait_t final
       : hpx::functional::detail::tag_fallback<sync_wait_t>
     {
     private:

@@ -250,7 +250,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::swap_ranges
-    HPX_INLINE_CONSTEXPR_VARIABLE struct swap_ranges_t final
+    inline constexpr struct swap_ranges_t final
       : hpx::detail::tag_parallel_algorithm<swap_ranges_t>
     {
         // clang-format off

@@ -274,7 +274,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::set_symmetric_difference
-    HPX_INLINE_CONSTEXPR_VARIABLE struct set_symmetric_difference_t final
+    inline constexpr struct set_symmetric_difference_t final
       : hpx::detail::tag_parallel_algorithm<set_symmetric_difference_t>
     {
     private:

@@ -457,7 +457,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::equal
-    HPX_INLINE_CONSTEXPR_VARIABLE struct equal_t final
+    inline constexpr struct equal_t final
       : hpx::detail::tag_parallel_algorithm<equal_t>
     {
     private:

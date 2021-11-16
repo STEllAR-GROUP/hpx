@@ -35,9 +35,8 @@
 
 namespace hpx { namespace components {
 
-    HPX_INLINE_CONSTEXPR_VARIABLE char const* const
-        default_binpacking_counter_name =
-            "/runtime{locality/total}/count/component@";
+    inline constexpr char const* const default_binpacking_counter_name =
+        "/runtime{locality/total}/count/component@";
 
     namespace detail {
 

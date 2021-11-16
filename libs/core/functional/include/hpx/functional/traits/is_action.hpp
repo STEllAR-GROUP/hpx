@@ -32,7 +32,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_action_v = is_action<T>::value;
+    inline constexpr bool is_action_v = is_action<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
@@ -41,6 +41,5 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_bound_action_v =
-        is_bound_action<T>::value;
+    inline constexpr bool is_bound_action_v = is_bound_action<T>::value;
 }}    // namespace hpx::traits

@@ -35,8 +35,7 @@ namespace hpx { namespace parallel { namespace execution {
     using is_timed_executor_t = typename is_timed_executor<T>::type;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_timed_executor_v =
-        is_timed_executor<T>::value;
+    inline constexpr bool is_timed_executor_v = is_timed_executor<T>::value;
 }}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace traits {

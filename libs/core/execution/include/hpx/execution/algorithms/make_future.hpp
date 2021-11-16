@@ -156,7 +156,7 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_INLINE_CONSTEXPR_VARIABLE struct make_future_t final
+    inline constexpr struct make_future_t final
       : hpx::functional::detail::tag_fallback<make_future_t>
     {
     private:

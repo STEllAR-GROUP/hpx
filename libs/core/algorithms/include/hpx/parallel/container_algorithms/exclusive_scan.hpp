@@ -592,7 +592,7 @@ namespace hpx { namespace ranges {
     template <typename I, typename O>
     using exclusive_scan_result = parallel::util::in_out_result<I, O>;
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct exclusive_scan_t final
+    inline constexpr struct exclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<exclusive_scan_t>
     {
     private:

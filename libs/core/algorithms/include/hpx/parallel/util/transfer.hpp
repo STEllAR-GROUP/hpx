@@ -200,8 +200,7 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE copy_n_t<ExPolicy> copy_n =
-        copy_n_t<ExPolicy>{};
+    inline constexpr copy_n_t<ExPolicy> copy_n = copy_n_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename InIter, typename OutIter>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter>

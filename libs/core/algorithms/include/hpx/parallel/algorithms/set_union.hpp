@@ -307,7 +307,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::set_union
-    HPX_INLINE_CONSTEXPR_VARIABLE struct set_union_t final
+    inline constexpr struct set_union_t final
       : hpx::detail::tag_parallel_algorithm<set_union_t>
     {
     private:

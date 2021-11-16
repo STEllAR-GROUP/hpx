@@ -143,26 +143,23 @@ namespace hpx { namespace traits {
     using is_executor_any_t = typename is_executor_any<T>::type;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_one_way_executor_v =
-        is_one_way_executor<T>::value;
+    inline constexpr bool is_one_way_executor_v = is_one_way_executor<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_never_blocking_one_way_executor_v =
+    inline constexpr bool is_never_blocking_one_way_executor_v =
         is_never_blocking_one_way_executor<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_bulk_one_way_executor_v =
+    inline constexpr bool is_bulk_one_way_executor_v =
         is_bulk_one_way_executor<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_two_way_executor_v =
-        is_two_way_executor<T>::value;
+    inline constexpr bool is_two_way_executor_v = is_two_way_executor<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_bulk_two_way_executor_v =
+    inline constexpr bool is_bulk_two_way_executor_v =
         is_bulk_two_way_executor<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_executor_any_v =
-        is_executor_any<T>::value;
+    inline constexpr bool is_executor_any_v = is_executor_any<T>::value;
 }}    // namespace hpx::traits

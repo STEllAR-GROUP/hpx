@@ -224,7 +224,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ends_with
-    HPX_INLINE_CONSTEXPR_VARIABLE struct ends_with_t final
+    inline constexpr struct ends_with_t final
       : hpx::functional::detail::tag_fallback<ends_with_t>
     {
     private:

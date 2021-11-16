@@ -17,7 +17,7 @@
 #include <utility>
 
 namespace hpx::execution::experimental {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct ensure_started_t final
+    inline constexpr struct ensure_started_t final
       : hpx::functional::detail::tag_fallback<ensure_started_t>
     {
     private:

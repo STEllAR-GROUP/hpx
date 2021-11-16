@@ -65,12 +65,10 @@ namespace hpx {
     };
 
     template <typename F, typename... Ts>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_invocable_v =
-        is_invocable<F, Ts...>::value;
+    inline constexpr bool is_invocable_v = is_invocable<F, Ts...>::value;
 
     template <typename R, typename F, typename... Ts>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_invocable_r_v =
-        is_invocable_r<R, F, Ts...>::value;
+    inline constexpr bool is_invocable_r_v = is_invocable_r<R, F, Ts...>::value;
 
     namespace traits {
         template <typename F, typename... Ts>

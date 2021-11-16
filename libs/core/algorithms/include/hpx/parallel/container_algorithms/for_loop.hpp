@@ -733,7 +733,7 @@ namespace hpx { namespace ranges {
 #include <utility>
 
 namespace hpx { namespace ranges {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_t final
+    inline constexpr struct for_loop_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_t>
     {
     private:
@@ -819,7 +819,7 @@ namespace hpx { namespace ranges {
         }
     } for_loop{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_strided_t final
+    inline constexpr struct for_loop_strided_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_strided_t>
     {
     private:

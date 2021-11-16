@@ -20,8 +20,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_value_proxy_v =
-        is_value_proxy<T>::value;
+    inline constexpr bool is_value_proxy_v = is_value_proxy<T>::value;
 
     template <typename T>
     struct proxy_value

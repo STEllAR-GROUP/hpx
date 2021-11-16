@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE sequential_find_t<ExPolicy> sequential_find =
+    inline constexpr sequential_find_t<ExPolicy> sequential_find =
         sequential_find_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Iterator, typename Sentinel,
@@ -140,8 +140,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE sequential_find_if_t<ExPolicy>
-        sequential_find_if = sequential_find_if_t<ExPolicy>{};
+    inline constexpr sequential_find_if_t<ExPolicy> sequential_find_if =
+        sequential_find_if_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Iterator, typename Sentinel,
         typename Pred, typename Proj = util::projection_identity>
@@ -226,8 +226,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE sequential_find_if_not_t<ExPolicy>
-        sequential_find_if_not = sequential_find_if_not_t<ExPolicy>{};
+    inline constexpr sequential_find_if_not_t<ExPolicy> sequential_find_if_not =
+        sequential_find_if_not_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Iterator, typename Sentinel,
         typename Pred, typename Proj = util::projection_identity>

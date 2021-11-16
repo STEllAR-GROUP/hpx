@@ -86,6 +86,5 @@ namespace hpx { namespace parallel { namespace execution {
         }
     };
 
-    HPX_INLINE_CONSTEXPR_VARIABLE create_rebound_policy_t
-        create_rebound_policy{};
+    inline constexpr create_rebound_policy_t create_rebound_policy{};
 }}}    // namespace hpx::parallel::execution

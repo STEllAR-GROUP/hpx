@@ -562,7 +562,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct partial_sort_t final
+    inline constexpr struct partial_sort_t final
       : hpx::detail::tag_parallel_algorithm<partial_sort_t>
     {
     private:

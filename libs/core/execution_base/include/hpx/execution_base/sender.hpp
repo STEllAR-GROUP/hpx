@@ -130,7 +130,7 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     template <typename Sender>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_sender_v = is_sender<Sender>::value;
+    inline constexpr bool is_sender_v = is_sender<Sender>::value;
 
     struct invocable_archetype
     {
@@ -416,8 +416,7 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     template <typename Scheduler>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_scheduler_v =
-        is_scheduler<Scheduler>::value;
+    inline constexpr bool is_scheduler_v = is_scheduler<Scheduler>::value;
 
     template <typename S, typename R>
     using connect_result_t =

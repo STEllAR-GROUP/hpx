@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       calling execution::post() on the underlying non-time-scheduled
     ///       execution agent.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct post_at_t final
+    inline constexpr struct post_at_t final
       : hpx::functional::detail::tag_fallback<post_at_t>
     {
     private:
@@ -105,7 +105,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       calling execution::post() on the underlying non-time-scheduled
     ///       execution agent.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct post_after_t final
+    inline constexpr struct post_after_t final
       : hpx::functional::detail::tag_fallback<post_after_t>
     {
     private:
@@ -152,7 +152,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       calling execution::async_execute() on the underlying
     ///       non-time-scheduled execution agent.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct async_execute_at_t final
+    inline constexpr struct async_execute_at_t final
       : hpx::functional::detail::tag_fallback<async_execute_at_t>
     {
     private:
@@ -194,7 +194,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       calling execution::async_execute() on the underlying
     ///       non-time-scheduled execution agent.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct async_execute_after_t final
+    inline constexpr struct async_execute_after_t final
       : hpx::functional::detail::tag_fallback<async_execute_after_t>
     {
     private:
@@ -236,7 +236,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       calling execution::sync_execute() on the underlying
     ///       non-time-scheduled execution agent.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct sync_execute_at_t final
+    inline constexpr struct sync_execute_at_t final
       : hpx::functional::detail::tag_fallback<sync_execute_at_t>
     {
     private:
@@ -278,7 +278,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       calling execution::sync_execute() on the underlying
     ///       non-time-scheduled execution agent.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct sync_execute_after_t final
+    inline constexpr struct sync_execute_after_t final
       : hpx::functional::detail::tag_fallback<sync_execute_after_t>
     {
     private:

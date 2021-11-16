@@ -40,7 +40,7 @@ namespace hpx { namespace parallel { namespace execution {
     /// \note If the executor does not expose this information, this call
     ///       will always return \a false
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct has_pending_closures_t final
+    inline constexpr struct has_pending_closures_t final
       : hpx::functional::detail::tag_fallback<has_pending_closures_t>
     {
     private:
@@ -85,7 +85,7 @@ namespace hpx { namespace parallel { namespace execution {
     /// \note If the executor does not support this operation, this call
     ///       will always invoke hpx::threads::get_pu_mask()
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct get_pu_mask_t final
+    inline constexpr struct get_pu_mask_t final
       : hpx::functional::detail::tag_fallback<get_pu_mask_t>
     {
     private:
@@ -125,7 +125,7 @@ namespace hpx { namespace parallel { namespace execution {
     /// \note This calls exec.set_scheduler_mode(mode) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct set_scheduler_mode_t final
+    inline constexpr struct set_scheduler_mode_t final
       : hpx::functional::detail::tag_fallback<set_scheduler_mode_t>
     {
     private:

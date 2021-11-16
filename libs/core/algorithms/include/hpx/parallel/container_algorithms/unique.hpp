@@ -678,7 +678,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::unique
-    HPX_INLINE_CONSTEXPR_VARIABLE struct unique_t final
+    inline constexpr struct unique_t final
       : hpx::detail::tag_parallel_algorithm<unique_t>
     {
     private:
@@ -817,7 +817,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::unique_copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct unique_copy_t final
+    inline constexpr struct unique_copy_t final
       : hpx::detail::tag_parallel_algorithm<unique_copy_t>
     {
     private:

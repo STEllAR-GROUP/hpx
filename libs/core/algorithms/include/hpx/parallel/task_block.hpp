@@ -341,8 +341,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
             }
         };
 
-        HPX_INLINE_CONSTEXPR_VARIABLE define_task_block_impl
-            define_task_block{};
+        inline constexpr define_task_block_impl define_task_block{};
         /// \endcond
     }    // namespace detail
 

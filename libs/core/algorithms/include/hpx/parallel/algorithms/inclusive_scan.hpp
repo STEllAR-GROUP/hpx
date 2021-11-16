@@ -753,7 +753,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::inclusive_scan
-    HPX_INLINE_CONSTEXPR_VARIABLE struct inclusive_scan_t final
+    inline constexpr struct inclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<inclusive_scan_t>
     {
         // clang-format off

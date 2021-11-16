@@ -11,7 +11,7 @@
 #include <utility>
 
 namespace mylib {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct foo_fn
+    inline constexpr struct foo_fn
     {
         // We use std::declval<foo_fn> in the function signature instead of
         // *this to work around a bug in GCC <= 8.
@@ -26,7 +26,7 @@ namespace mylib {
         }
     } foo;
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct bar_fn
+    inline constexpr struct bar_fn
     {
         // See above for an explanation of std::declval<bar_fn>().
         template <typename T, typename U>

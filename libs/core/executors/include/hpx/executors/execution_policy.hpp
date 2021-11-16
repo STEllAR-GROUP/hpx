@@ -32,9 +32,9 @@ namespace hpx { namespace execution {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Default sequential execution policy object.
-    HPX_INLINE_CONSTEXPR_VARIABLE task_policy_tag task{};
+    inline constexpr task_policy_tag task{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE non_task_policy_tag non_task{};
+    inline constexpr non_task_policy_tag non_task{};
 
     namespace detail {
         template <typename T, typename Enable = void>
@@ -511,7 +511,7 @@ namespace hpx { namespace execution {
     };
 
     /// Default sequential execution policy object.
-    HPX_INLINE_CONSTEXPR_VARIABLE sequenced_policy seq{};
+    inline constexpr sequenced_policy seq{};
 
     /// The class sequenced_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
@@ -1365,7 +1365,7 @@ namespace hpx { namespace execution {
     };
 
     /// Default vector execution policy object.
-    HPX_INLINE_CONSTEXPR_VARIABLE parallel_unsequenced_policy par_unseq{};
+    inline constexpr parallel_unsequenced_policy par_unseq{};
 
     ///////////////////////////////////////////////////////////////////////////
     /// The class unsequenced_policy is an execution policy type
@@ -1437,7 +1437,7 @@ namespace hpx { namespace execution {
     };
 
     /// Default vector execution policy object.
-    HPX_INLINE_CONSTEXPR_VARIABLE unsequenced_policy unseq{};
+    inline constexpr unsequenced_policy unseq{};
 
     constexpr decltype(auto) sequenced_task_policy::operator()(
         non_task_policy_tag /*tag*/) const
@@ -1478,19 +1478,19 @@ namespace hpx { namespace parallel { namespace execution {
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::par is deprecated. Please use "
         "hpx::execution::par instead.")
-    HPX_INLINE_CONSTEXPR_VARIABLE hpx::execution::parallel_policy par{};
+    inline constexpr hpx::execution::parallel_policy par{};
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::par_unseq is deprecated. Please use "
         "hpx::execution::par_unseq instead.")
-    HPX_INLINE_CONSTEXPR_VARIABLE hpx::execution::parallel_policy par_unseq{};
+    inline constexpr hpx::execution::parallel_policy par_unseq{};
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::seq is deprecated. Please use "
         "hpx::execution::seq instead.")
-    HPX_INLINE_CONSTEXPR_VARIABLE hpx::execution::sequenced_policy seq{};
+    inline constexpr hpx::execution::sequenced_policy seq{};
     HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::task is deprecated. Please use "
         "hpx::execution::task instead.")
-    HPX_INLINE_CONSTEXPR_VARIABLE hpx::execution::task_policy_tag task{};
+    inline constexpr hpx::execution::task_policy_tag task{};
     using parallel_executor HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::execution::parallel_executor is deprecated. Please "
         "use "

@@ -377,7 +377,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct copy_t final
+    inline constexpr struct copy_t final
       : hpx::detail::tag_parallel_algorithm<copy_t>
     {
     private:
@@ -468,7 +468,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::copy_n
-    HPX_INLINE_CONSTEXPR_VARIABLE struct copy_n_t final
+    inline constexpr struct copy_n_t final
       : hpx::detail::tag_parallel_algorithm<copy_n_t>
     {
     private:
@@ -535,7 +535,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::copy_if
-    HPX_INLINE_CONSTEXPR_VARIABLE struct copy_if_t final
+    inline constexpr struct copy_if_t final
       : hpx::detail::tag_parallel_algorithm<copy_if_t>
     {
     private:

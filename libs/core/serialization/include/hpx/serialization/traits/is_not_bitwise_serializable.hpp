@@ -30,7 +30,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_not_bitwise_serializable_v =
+    inline constexpr bool is_not_bitwise_serializable_v =
         is_not_bitwise_serializable<T>::value;
 #else
     template <typename T>
@@ -39,7 +39,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_not_bitwise_serializable_v = true;
+    inline constexpr bool is_not_bitwise_serializable_v = true;
 #endif
 
 }}    // namespace hpx::traits
