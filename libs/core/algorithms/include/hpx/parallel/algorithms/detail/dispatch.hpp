@@ -39,17 +39,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     };
 
     template <typename Result1, typename Result2>
-    struct local_algorithm_result<std::pair<Result1, Result2>>
-    {
-        using type1 = typename hpx::traits::segmented_local_iterator_traits<
-            Result1>::local_raw_iterator;
-        using type2 = typename hpx::traits::segmented_local_iterator_traits<
-            Result2>::local_raw_iterator;
-
-        using type = std::pair<type1, type2>;
-    };
-
-    template <typename Result1, typename Result2>
     struct local_algorithm_result<util::in_out_result<Result1, Result2>>
     {
         using type1 = typename hpx::traits::segmented_local_iterator_traits<
@@ -67,19 +56,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             Result>::local_raw_iterator;
 
         using type = util::min_max_result<type1>;
-    };
-
-    template <typename Result1, typename Result2, typename Result3>
-    struct local_algorithm_result<hpx::tuple<Result1, Result2, Result3>>
-    {
-        using type1 = typename hpx::traits::segmented_local_iterator_traits<
-            Result1>::local_raw_iterator;
-        using type2 = typename hpx::traits::segmented_local_iterator_traits<
-            Result2>::local_raw_iterator;
-        using type3 = typename hpx::traits::segmented_local_iterator_traits<
-            Result3>::local_raw_iterator;
-
-        using type = hpx::tuple<type1, type2, type3>;
     };
 
     template <typename Result1, typename Result2, typename Result3>

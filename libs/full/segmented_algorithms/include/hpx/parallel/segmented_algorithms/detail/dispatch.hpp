@@ -63,25 +63,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     };
 
     template <typename Iterator1, typename Iterator2>
-    struct algorithm_result_helper<std::pair<Iterator1, Iterator2>,
-        std::enable_if_t<
-            hpx::traits::is_segmented_local_iterator_v<Iterator1> ||
-            hpx::traits::is_segmented_local_iterator_v<Iterator2>>>
-    {
-        using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator1>;
-        using traits2 = hpx::traits::segmented_local_iterator_traits<Iterator2>;
-
-        HPX_FORCEINLINE static std::pair<typename traits1::local_iterator,
-            typename traits2::local_iterator>
-        call(std::pair<typename traits1::local_raw_iterator,
-            typename traits2::local_raw_iterator>&& p)
-        {
-            return std::make_pair(traits1::remote(HPX_MOVE(p.first)),
-                traits2::remote(HPX_MOVE(p.second)));
-        }
-    };
-
-    template <typename Iterator1, typename Iterator2>
     struct algorithm_result_helper<util::in_out_result<Iterator1, Iterator2>,
         std::enable_if_t<
             hpx::traits::is_segmented_local_iterator_v<Iterator1> ||
@@ -115,29 +96,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             return util::min_max_result<typename traits1::local_iterator>{
                 traits1::remote(HPX_MOVE(p.min)),
                 traits1::remote(HPX_MOVE(p.max))};
-        }
-    };
-
-    template <typename Iterator1, typename Iterator2, typename Iterator3>
-    struct algorithm_result_helper<hpx::tuple<Iterator1, Iterator2, Iterator3>,
-        std::enable_if_t<
-            hpx::traits::is_segmented_local_iterator_v<Iterator1> ||
-            hpx::traits::is_segmented_local_iterator_v<Iterator2> ||
-            hpx::traits::is_segmented_local_iterator_v<Iterator3>>>
-    {
-        using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator1>;
-        using traits2 = hpx::traits::segmented_local_iterator_traits<Iterator2>;
-        using traits3 = hpx::traits::segmented_local_iterator_traits<Iterator3>;
-
-        HPX_FORCEINLINE static hpx::tuple<typename traits1::local_iterator,
-            typename traits2::local_iterator, typename traits3::local_iterator>
-        call(hpx::tuple<typename traits1::local_raw_iterator,
-            typename traits2::local_raw_iterator,
-            typename traits3::local_raw_iterator>&& p)
-        {
-            return hpx::make_tuple(traits1::remote(HPX_MOVE(hpx::get<0>(p))),
-                traits2::remote(HPX_MOVE(hpx::get<1>(p))),
-                traits3::remote(HPX_MOVE(hpx::get<2>(p))));
         }
     };
 
@@ -181,30 +139,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             return hpx::make_future<Iterator>(HPX_MOVE(f),
                 [](typename traits::local_raw_iterator&& val) -> Iterator {
                     return traits::remote(HPX_MOVE(val));
-                });
-        }
-    };
-
-    template <typename Iterator1, typename Iterator2>
-    struct algorithm_result_helper<future<std::pair<Iterator1, Iterator2>>,
-        std::enable_if_t<
-            hpx::traits::is_segmented_local_iterator_v<Iterator1> ||
-            hpx::traits::is_segmented_local_iterator_v<Iterator2>>>
-    {
-        using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator1>;
-        using traits2 = hpx::traits::segmented_local_iterator_traits<Iterator2>;
-
-        using arg_type = std::pair<typename traits1::local_raw_iterator,
-            typename traits2::local_raw_iterator>;
-        using result_type = std::pair<typename traits1::local_iterator,
-            typename traits2::local_iterator>;
-
-        HPX_FORCEINLINE static future<result_type> call(future<arg_type>&& f)
-        {
-            return hpx::make_future<result_type>(
-                HPX_MOVE(f), [](arg_type&& p) -> result_type {
-                    return std::make_pair(
-                        traits1::remote(p.first), traits2::remote(p.second));
                 });
         }
     };
