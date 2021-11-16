@@ -15,16 +15,17 @@ set(execution_headers
     hpx/execution/algorithms/ensure_started.hpp
     hpx/execution/algorithms/execute.hpp
     hpx/execution/algorithms/just.hpp
-    hpx/execution/algorithms/just_on.hpp
     hpx/execution/algorithms/keep_future.hpp
     hpx/execution/algorithms/let_error.hpp
     hpx/execution/algorithms/let_value.hpp
     hpx/execution/algorithms/make_future.hpp
-    hpx/execution/algorithms/on.hpp
+    hpx/execution/algorithms/schedule_from.hpp
     hpx/execution/algorithms/split.hpp
     hpx/execution/algorithms/start_detached.hpp
     hpx/execution/algorithms/sync_wait.hpp
     hpx/execution/algorithms/then.hpp
+    hpx/execution/algorithms/transfer.hpp
+    hpx/execution/algorithms/transfer_just.hpp
     hpx/execution/algorithms/when_all.hpp
     hpx/execution/detail/async_launch_policy_dispatch.hpp
     hpx/execution/detail/execution_parameter_callbacks.hpp

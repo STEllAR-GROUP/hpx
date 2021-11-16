@@ -11,7 +11,6 @@
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
-#include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -30,7 +29,7 @@
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
         template <typename Sender, typename Scheduler>
-        struct on_sender
+        struct schedule_from_sender
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> predecessor_sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
@@ -75,7 +74,7 @@ namespace hpx { namespace execution { namespace experimental {
                 >
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
-                on_sender const& sender)
+                schedule_from_sender const& sender)
             {
                 if constexpr (std::is_same_v<std::decay_t<CPO>,
                                   hpx::execution::experimental::set_value_t>)
@@ -292,7 +291,7 @@ namespace hpx { namespace execution { namespace experimental {
 
             template <typename Receiver>
             friend operation_state<Receiver> tag_invoke(
-                connect_t, on_sender&& s, Receiver&& receiver)
+                connect_t, schedule_from_sender&& s, Receiver&& receiver)
             {
                 return {HPX_MOVE(s.predecessor_sender), HPX_MOVE(s.scheduler),
                     HPX_FORWARD(Receiver, receiver)};
@@ -300,7 +299,7 @@ namespace hpx { namespace execution { namespace experimental {
 
             template <typename Receiver>
             friend operation_state<Receiver> tag_invoke(
-                connect_t, on_sender& s, Receiver&& receiver)
+                connect_t, schedule_from_sender& s, Receiver&& receiver)
             {
                 return {s.predecessor_sender, s.scheduler,
                     HPX_FORWARD(Receiver, receiver)};
@@ -308,30 +307,22 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-    inline constexpr struct on_t final
-      : hpx::functional::detail::tag_fallback<on_t>
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct schedule_from_t final
+      : hpx::functional::detail::tag_fallback<schedule_from_t>
     {
     private:
         // clang-format off
-        template <typename Sender, typename Scheduler,
+        template <typename Scheduler, typename Sender,
             HPX_CONCEPT_REQUIRES_(
                 is_sender_v<Sender>
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            on_t, Sender&& predecessor_sender, Scheduler&& scheduler)
+            schedule_from_t, Scheduler&& scheduler, Sender&& predecessor_sender)
         {
-            return detail::on_sender<Sender, Scheduler>{
+            return detail::schedule_from_sender<Sender, Scheduler>{
                 HPX_FORWARD(Sender, predecessor_sender),
                 HPX_FORWARD(Scheduler, scheduler)};
         }
-
-        template <typename Scheduler>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            on_t, Scheduler&& scheduler)
-        {
-            return detail::partial_algorithm<on_t, Scheduler>{
-                HPX_FORWARD(Scheduler, scheduler)};
-        }
-    } on{};
+    } schedule_from{};
 }}}    // namespace hpx::execution::experimental
