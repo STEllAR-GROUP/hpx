@@ -32,7 +32,7 @@ int hpx_main(hpx::program_options::variables_map&)
             hpx::naming::id_type a = id;
 
             test_action act;
-            hpx::lcos::future<void> f = hpx::async(act, id, a);
+            hpx::future<void> f = hpx::async(act, id, a);
             f.get();
 
             HPX_TEST_EQ(id, a);
@@ -50,7 +50,7 @@ int hpx_main(hpx::program_options::variables_map&)
         {
 
             test_return_action act;
-            hpx::lcos::future<hpx::naming::id_type> f = hpx::async(act, id);
+            hpx::future<hpx::naming::id_type> f = hpx::async(act, id);
 
             HPX_TEST_EQ(id, f.get());
         }

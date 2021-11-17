@@ -372,7 +372,7 @@ namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Range>
     typename std::enable_if<traits::is_future_range<Range>::value,
-        lcos::future<when_any_result<typename std::decay<Range>::type>>>::type
+        hpx::future<when_any_result<typename std::decay<Range>::type>>>::type
     when_any(Range&& lazy_values)
     {
         typedef typename std::decay<Range>::type result_type;
@@ -396,7 +396,7 @@ namespace hpx { namespace lcos {
     template <typename Iterator,
         typename Container = std::vector<
             typename lcos::detail::future_iterator_traits<Iterator>::type>>
-    lcos::future<when_any_result<Container>> when_any(
+    hpx::future<when_any_result<Container>> when_any(
         Iterator begin, Iterator end)
     {
         Container lazy_values_;
@@ -413,19 +413,19 @@ namespace hpx { namespace lcos {
         return lcos::when_any(HPX_MOVE(lazy_values_));
     }
 
-    inline lcos::future<when_any_result<hpx::tuple<>>>    //-V524
+    inline hpx::future<when_any_result<hpx::tuple<>>>    //-V524
     when_any()
     {
         typedef when_any_result<hpx::tuple<>> result_type;
 
-        return lcos::make_ready_future(result_type());
+        return hpx::make_ready_future(result_type());
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator,
         typename Container = std::vector<
             typename lcos::detail::future_iterator_traits<Iterator>::type>>
-    lcos::future<when_any_result<Container>> when_any_n(
+    hpx::future<when_any_result<Container>> when_any_n(
         Iterator begin, std::size_t count)
     {
         Container lazy_values_;
@@ -442,7 +442,7 @@ namespace hpx { namespace lcos {
     template <typename T, typename... Ts>
     typename std::enable_if<!(traits::is_future_range<T>::value &&
                                 sizeof...(Ts) == 0),
-        lcos::future<
+        hpx::future<
             when_any_result<hpx::tuple<typename traits::acquire_future<T>::type,
                 typename traits::acquire_future<Ts>::type...>>>>::type
     when_any(T&& t, Ts&&... ts)

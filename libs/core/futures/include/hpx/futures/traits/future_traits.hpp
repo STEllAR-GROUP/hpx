@@ -11,12 +11,12 @@
 
 #include <type_traits>
 
-namespace hpx { namespace lcos {
+namespace hpx {
     template <typename R>
     class future;
     template <typename R>
     class shared_future;
-}}    // namespace hpx::lcos
+}    // namespace hpx
 
 namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
@@ -48,21 +48,21 @@ namespace hpx { namespace traits {
     };
 
     template <typename R>
-    struct future_traits<lcos::future<R>>
+    struct future_traits<hpx::future<R>>
     {
         using type = R;
         using result_type = R;
     };
 
     template <typename R>
-    struct future_traits<lcos::shared_future<R>>
+    struct future_traits<hpx::shared_future<R>>
     {
         using type = R;
         using result_type = R const&;
     };
 
     template <>
-    struct future_traits<lcos::shared_future<void>>
+    struct future_traits<hpx::shared_future<void>>
     {
         using type = void;
         using result_type = void;

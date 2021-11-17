@@ -34,7 +34,7 @@ int hpx_main()
     {
         HPX_TEST_EQ(test::count, 0);
         hpx::lcos::promise<test> p;
-        hpx::lcos::future<test> f = p.get_future();
+        hpx::future<test> f = p.get_future();
         p.set_value(test());
         HPX_TEST_EQ(test::count, 1);
         f.get();

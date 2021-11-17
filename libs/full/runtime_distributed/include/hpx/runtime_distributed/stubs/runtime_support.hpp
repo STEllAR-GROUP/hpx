@@ -38,7 +38,7 @@ namespace hpx { namespace components { namespace stubs {
         /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object.
         template <typename Component, typename... Ts>
-        static lcos::future<naming::id_type> create_component_async(
+        static hpx::future<naming::id_type> create_component_async(
             naming::id_type const& gid, Ts&&... vs)
         {
             if (!naming::is_locality(gid))
@@ -47,7 +47,7 @@ namespace hpx { namespace components { namespace stubs {
                     "stubs::runtime_support::create_component_async",
                     "The id passed as the first argument is not representing"
                     " a locality");
-                return lcos::make_ready_future(naming::invalid_id);
+                return hpx::make_ready_future(naming::invalid_id);
             }
 
             typedef server::create_component_action<Component,
@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace stubs {
         /// colocated with the with the given \a targetgid. This is a
         /// non-blocking call.
         template <typename Component, typename... Ts>
-        static lcos::future<std::vector<naming::id_type>>
+        static hpx::future<std::vector<naming::id_type>>
         bulk_create_component_colocated_async(
             naming::id_type const& gid, std::size_t count, Ts&&... vs)
         {
@@ -98,7 +98,7 @@ namespace hpx { namespace components { namespace stubs {
         /// Create multiple new components \a type using the runtime_support
         /// on the given locality. This is a  non-blocking call.
         template <typename Component, typename... Ts>
-        static lcos::future<std::vector<naming::id_type>>
+        static hpx::future<std::vector<naming::id_type>>
         bulk_create_component_async(
             naming::id_type const& gid, std::size_t count, Ts&&... vs)
         {
@@ -108,7 +108,7 @@ namespace hpx { namespace components { namespace stubs {
                     "stubs::runtime_support::bulk_create_component_async",
                     "The id passed as the first argument is not representing"
                     " a locality");
-                return lcos::make_ready_future(std::vector<naming::id_type>());
+                return hpx::make_ready_future(std::vector<naming::id_type>());
             }
 
             typedef server::bulk_create_component_action<Component,
@@ -133,7 +133,7 @@ namespace hpx { namespace components { namespace stubs {
         /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object.
         template <typename Component, typename... Ts>
-        static lcos::future<naming::id_type> create_component_colocated_async(
+        static hpx::future<naming::id_type> create_component_colocated_async(
             naming::id_type const& gid, Ts&&... vs)
         {
             typedef server::create_component_action<Component,
@@ -157,7 +157,7 @@ namespace hpx { namespace components { namespace stubs {
         ///////////////////////////////////////////////////////////////////////
         // copy construct a component
         template <typename Component>
-        static lcos::future<naming::id_type> copy_create_component_async(
+        static hpx::future<naming::id_type> copy_create_component_async(
             naming::id_type const& gid, std::shared_ptr<Component> const& p,
             bool local_op)
         {
@@ -167,7 +167,7 @@ namespace hpx { namespace components { namespace stubs {
                     "stubs::runtime_support::copy_create_component_async",
                     "The id passed as the first argument is not representing"
                     " a locality");
-                return lcos::make_ready_future(naming::invalid_id);
+                return hpx::make_ready_future(naming::invalid_id);
             }
 
             typedef typename server::copy_create_component_action<Component>
@@ -188,7 +188,7 @@ namespace hpx { namespace components { namespace stubs {
         ///////////////////////////////////////////////////////////////////////
         // copy construct a component
         template <typename Component>
-        static lcos::future<naming::id_type> migrate_component_async(
+        static hpx::future<naming::id_type> migrate_component_async(
             naming::id_type const& target_locality,
             std::shared_ptr<Component> const& p,
             naming::id_type const& to_migrate)
@@ -199,7 +199,7 @@ namespace hpx { namespace components { namespace stubs {
                     "stubs::runtime_support::migrate_component_async",
                     "The id passed as the first argument is not representing"
                     " a locality");
-                return lcos::make_ready_future(naming::invalid_id);
+                return hpx::make_ready_future(naming::invalid_id);
             }
 
             typedef typename server::migrate_component_here_action<Component>
@@ -208,7 +208,7 @@ namespace hpx { namespace components { namespace stubs {
         }
 
         template <typename Component, typename DistPolicy>
-        static lcos::future<naming::id_type> migrate_component_async(
+        static hpx::future<naming::id_type> migrate_component_async(
             DistPolicy const& policy, std::shared_ptr<Component> const& p,
             naming::id_type const& to_migrate)
         {
@@ -229,17 +229,17 @@ namespace hpx { namespace components { namespace stubs {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<int> load_components_async(
+        static hpx::future<int> load_components_async(
             naming::id_type const& gid);
         static int load_components(naming::id_type const& gid);
 
-        static lcos::future<void> call_startup_functions_async(
+        static hpx::future<void> call_startup_functions_async(
             naming::id_type const& gid, bool pre_startup);
         static void call_startup_functions(
             naming::id_type const& gid, bool pre_startup);
 
         /// \brief Shutdown the given runtime system
-        static lcos::future<void> shutdown_async(
+        static hpx::future<void> shutdown_async(
             naming::id_type const& targetgid, double timeout = -1);
         static void shutdown(
             naming::id_type const& targetgid, double timeout = -1);
@@ -253,7 +253,7 @@ namespace hpx { namespace components { namespace stubs {
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve configuration information
         /// \brief Terminate the given runtime system
-        static lcos::future<void> terminate_async(
+        static hpx::future<void> terminate_async(
             naming::id_type const& targetgid);
 
         static void terminate(naming::id_type const& targetgid);
@@ -267,13 +267,13 @@ namespace hpx { namespace components { namespace stubs {
         static void garbage_collect_non_blocking(
             naming::id_type const& targetgid);
 
-        static lcos::future<void> garbage_collect_async(
+        static hpx::future<void> garbage_collect_async(
             naming::id_type const& targetgid);
 
         static void garbage_collect(naming::id_type const& targetgid);
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<naming::id_type> create_performance_counter_async(
+        static hpx::future<naming::id_type> create_performance_counter_async(
             naming::id_type targetgid,
             performance_counters::counter_info const& info);
         static naming::id_type create_performance_counter(
@@ -283,7 +283,7 @@ namespace hpx { namespace components { namespace stubs {
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve configuration information
-        static lcos::future<util::section> get_config_async(
+        static hpx::future<util::section> get_config_async(
             naming::id_type const& targetgid);
         static void get_config(
             naming::id_type const& targetgid, util::section& ini);

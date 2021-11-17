@@ -23,14 +23,14 @@ namespace jacobi
     {
         row() {}
 
-        hpx::lcos::future<void> init(std::size_t nx, double value = 0.0)
+        hpx::future<void> init(std::size_t nx, double value = 0.0)
         {
             return hpx::async<server::row::init_action>(id, nx, value);
         }
 
         hpx::naming::id_type id;
 
-        hpx::lcos::future<row_range> get(std::size_t begin, std::size_t end)
+        hpx::future<row_range> get(std::size_t begin, std::size_t end)
         {
             return hpx::async<server::row::get_action>(id, begin, end);
         }

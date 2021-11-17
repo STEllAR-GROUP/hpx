@@ -44,7 +44,7 @@ namespace hpx { namespace agas {
         virtual std::string get_component_type_name(
             components::component_type type) = 0;
 
-        virtual lcos::future<std::uint32_t> get_num_localities(
+        virtual hpx::future<std::uint32_t> get_num_localities(
             components::component_type type) = 0;
 
         virtual void register_server_instance(std::uint32_t /*locality_id*/) {}

@@ -227,7 +227,7 @@ namespace hpx { namespace parallel { namespace util {
     hpx::future<O> get_third_element(
         hpx::future<util::in_in_out_result<I1, I2, O>>&& f)
     {
-        return lcos::make_future<O>(
+        return hpx::make_future<O>(
             HPX_MOVE(f), [](in_in_out_result<I1, I2, O>&& p) { return p.out; });
     }
 
@@ -289,7 +289,7 @@ namespace hpx { namespace parallel { namespace util {
 
         using result_type = in_out_out_result<Ts...>;
 
-        return lcos::make_future<result_type>(
+        return hpx::make_future<result_type>(
             HPX_MOVE(f), [](hpx::tuple<Ts...>&& t) -> result_type {
                 return make_in_out_out_result(HPX_MOVE(t));
             });
@@ -340,7 +340,7 @@ namespace hpx { namespace parallel { namespace util {
     hpx::future<hpx::util::iterator_range<Iterator, Sentinel>> make_subrange(
         hpx::future<Iterator>&& iterator, Sentinel sentinel)
     {
-        return lcos::make_future<hpx::util::iterator_range<Iterator, Sentinel>>(
+        return hpx::make_future<hpx::util::iterator_range<Iterator, Sentinel>>(
             HPX_MOVE(iterator), [sentinel](Iterator&& it) {
                 return hpx::util::iterator_range<Iterator, Sentinel>(
                     it, sentinel);
@@ -380,7 +380,7 @@ namespace hpx { namespace parallel { namespace util {
                 typename hpx::tuple_element<0, iterator_tuple_type>::type,
                 typename hpx::tuple_element<1, iterator_tuple_type>::type>;
 
-            return lcos::make_future<result_type>(
+            return hpx::make_future<result_type>(
                 HPX_MOVE(zipiter), [](ZipIter zipiter) {
                     return get_in_out_result(HPX_MOVE(zipiter));
                 });
@@ -410,7 +410,7 @@ namespace hpx { namespace parallel { namespace util {
             using result_type = min_max_result<
                 typename hpx::tuple_element<0, iterator_tuple_type>::type>;
 
-            return lcos::make_future<result_type>(
+            return hpx::make_future<result_type>(
                 std::move(zipiter), [](ZipIter zipiter) {
                     return get_min_max_result(std::move(zipiter));
                 });
@@ -453,7 +453,7 @@ namespace hpx { namespace parallel { namespace util {
                 typename hpx::tuple_element<1, iterator_tuple_type>::type,
                 typename hpx::tuple_element<2, iterator_tuple_type>::type>;
 
-            return lcos::make_future<result_type>(
+            return hpx::make_future<result_type>(
                 HPX_MOVE(zipiter), [](ZipIter zipiter) {
                     return get_in_in_out_result(HPX_MOVE(zipiter));
                 });

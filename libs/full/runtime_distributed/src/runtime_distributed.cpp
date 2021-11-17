@@ -1553,7 +1553,7 @@ namespace hpx {
         return get_config().get_num_localities();
     }
 
-    lcos::future<std::uint32_t> runtime_distributed::get_num_localities() const
+    hpx::future<std::uint32_t> runtime_distributed::get_num_localities() const
     {
         return agas_client_.get_num_localities_async();
     }
@@ -1574,7 +1574,7 @@ namespace hpx {
         return agas_client_.get_num_localities(type, ec);
     }
 
-    lcos::future<std::uint32_t> runtime_distributed::get_num_localities(
+    hpx::future<std::uint32_t> runtime_distributed::get_num_localities(
         components::component_type type) const
     {
         return agas_client_.get_num_localities_async(type);
@@ -1845,7 +1845,7 @@ namespace hpx {
         return rt->get_num_localities(hpx::launch::sync, type, ec);
     }
 
-    lcos::future<std::uint32_t> get_num_localities(
+    hpx::future<std::uint32_t> get_num_localities(
         components::component_type type)
     {
         runtime_distributed* rt = get_runtime_distributed_ptr();

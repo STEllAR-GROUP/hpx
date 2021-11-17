@@ -34,7 +34,7 @@ using hpx::actions::action;
 
 using hpx::lcos::wait_each;
 using hpx::async;
-using hpx::lcos::future;
+using hpx::future;
 
 using hpx::find_here;
 

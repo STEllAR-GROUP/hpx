@@ -23,7 +23,7 @@ int test()
 HPX_PLAIN_ACTION(test, test_action)
 
 ///////////////////////////////////////////////////////////////////////////////
-int future_callback(hpx::lcos::future<int> p)
+int future_callback(hpx::future<int> p)
 {
     HPX_TEST(p.has_value());
     int result = p.get();
@@ -35,7 +35,7 @@ int future_callback(hpx::lcos::future<int> p)
 int hpx_main()
 {
     using hpx::async;
-    using hpx::lcos::future;
+    using hpx::future;
 
     {
         test_action do_test;

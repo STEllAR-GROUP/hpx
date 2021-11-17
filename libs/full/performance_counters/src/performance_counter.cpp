@@ -45,7 +45,7 @@ namespace hpx { namespace performance_counters {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    future<counter_info> performance_counter::get_info() const
+    hpx::future<counter_info> performance_counter::get_info() const
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type =
@@ -62,7 +62,8 @@ namespace hpx { namespace performance_counters {
         return get_info().get(ec);
     }
 
-    future<counter_value> performance_counter::get_counter_value(bool reset)
+    hpx::future<counter_value> performance_counter::get_counter_value(
+        bool reset)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type =
@@ -80,7 +81,7 @@ namespace hpx { namespace performance_counters {
         return get_counter_value(reset).get(ec);
     }
 
-    future<counter_value> performance_counter::get_counter_value() const
+    hpx::future<counter_value> performance_counter::get_counter_value() const
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type =
@@ -97,8 +98,8 @@ namespace hpx { namespace performance_counters {
         return get_counter_value().get(ec);
     }
 
-    future<counter_values_array> performance_counter::get_counter_values_array(
-        bool reset)
+    hpx::future<counter_values_array>
+    performance_counter::get_counter_values_array(bool reset)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type =
@@ -116,8 +117,8 @@ namespace hpx { namespace performance_counters {
         return get_counter_values_array(reset).get(ec);
     }
 
-    future<counter_values_array> performance_counter::get_counter_values_array()
-        const
+    hpx::future<counter_values_array>
+    performance_counter::get_counter_values_array() const
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type =
@@ -135,7 +136,7 @@ namespace hpx { namespace performance_counters {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    future<bool> performance_counter::start()
+    hpx::future<bool> performance_counter::start()
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type = server::base_performance_counter::start_action;
@@ -150,7 +151,7 @@ namespace hpx { namespace performance_counters {
         return start().get(ec);
     }
 
-    future<bool> performance_counter::stop()
+    hpx::future<bool> performance_counter::stop()
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type = server::base_performance_counter::stop_action;
@@ -165,7 +166,7 @@ namespace hpx { namespace performance_counters {
         return stop().get(ec);
     }
 
-    future<void> performance_counter::reset()
+    hpx::future<void> performance_counter::reset()
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type =
@@ -181,7 +182,7 @@ namespace hpx { namespace performance_counters {
         reset().get(ec);
     }
 
-    future<void> performance_counter::reinit(bool reset)
+    hpx::future<void> performance_counter::reinit(bool reset)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type = server::base_performance_counter::reinit_action;
@@ -199,9 +200,9 @@ namespace hpx { namespace performance_counters {
     }
 
     ///
-    future<std::string> performance_counter::get_name() const
+    hpx::future<std::string> performance_counter::get_name() const
     {
-        return lcos::make_future<std::string>(get_info(),
+        return hpx::make_future<std::string>(get_info(),
             [](counter_info&& info) -> std::string { return info.fullname_; });
     }
 

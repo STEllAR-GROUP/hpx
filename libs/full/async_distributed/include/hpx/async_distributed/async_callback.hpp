@@ -32,7 +32,7 @@ namespace hpx { namespace detail {
     {
         // id_type
         template <typename Policy_, typename Callback, typename... Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Action>::remote_result_type>::type>
         call(Policy_&& launch_policy, naming::id_type const& id, Callback&& cb,
@@ -45,7 +45,7 @@ namespace hpx { namespace detail {
 
         template <typename Policy_, typename Client, typename Stub,
             typename Callback, typename... Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Action>::remote_result_type>::type>
         call(Policy_&& launch_policy,
@@ -69,7 +69,7 @@ namespace hpx { namespace detail {
             typename... Ts>
         HPX_FORCEINLINE static typename std::enable_if<
             traits::is_distribution_policy<DistPolicy>::value,
-            lcos::future<typename traits::promise_local_result<typename traits::
+            hpx::future<typename traits::promise_local_result<typename traits::
                     extract_action<Action>::remote_result_type>::type>>::type
         call(Policy_&& launch_policy, DistPolicy const& policy, Callback&& cb,
             Ts&&... ts)
@@ -85,7 +85,7 @@ namespace hpx { namespace detail {
     struct async_cb_action_dispatch<Action, naming::id_type>
     {
         template <typename Callback, typename... Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Action>::remote_result_type>::type>
         call(naming::id_type const& id, Callback&& cb, Ts&&... ts)
@@ -103,7 +103,7 @@ namespace hpx { namespace detail {
     {
         template <typename Client_, typename Stub, typename Callback,
             typename... Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Action>::remote_result_type>::type>
         call(components::client_base<Client_, Stub> const& c, Callback&& cb,
@@ -129,7 +129,7 @@ namespace hpx { namespace detail {
             traits::is_distribution_policy<Policy>::value>::type>
     {
         template <typename DistPolicy, typename Callback, typename... Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Action>::remote_result_type>::type>
         call(DistPolicy const& policy, Callback&& cb, Ts&&... ts)
@@ -163,7 +163,7 @@ namespace hpx { namespace detail {
     {
         template <typename Component, typename Signature, typename Derived,
             typename Callback, typename... Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Derived>::remote_result_type>::type>
         call(hpx::actions::basic_action<Component, Signature, Derived> const&,
@@ -175,7 +175,7 @@ namespace hpx { namespace detail {
 
         template <typename Component, typename Signature, typename Derived,
             typename Client, typename Stub, typename Callback, typename... Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Derived>::remote_result_type>::type>
         call(hpx::actions::basic_action<Component, Signature, Derived> const&,
@@ -195,7 +195,7 @@ namespace hpx { namespace detail {
 
         template <typename Component, typename Signature, typename Derived,
             typename DistPolicy, typename Callback, typename... Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Derived>::remote_result_type>::type>
         call(hpx::actions::basic_action<Component, Signature, Derived> const&,
@@ -212,7 +212,7 @@ namespace hpx { namespace detail {
     {
         template <typename Policy_, typename Component, typename Signature,
             typename Derived, typename Callback, typename... Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Derived>::remote_result_type>::type>
         call(Policy_&& launch_policy,
@@ -226,7 +226,7 @@ namespace hpx { namespace detail {
         template <typename Policy_, typename Component, typename Signature,
             typename Derived, typename Client, typename Stub, typename Callback,
             typename... Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Derived>::remote_result_type>::type>
         call(Policy_&& launch_policy,
@@ -248,7 +248,7 @@ namespace hpx { namespace detail {
         template <typename Policy_, typename Component, typename Signature,
             typename Derived, typename DistPolicy, typename Callback,
             typename... Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Derived>::remote_result_type>::type>
         call(Policy_&& launch_policy,

@@ -43,6 +43,6 @@ namespace hpx {
     /// \param id [in] The id of the object to locate.
     ///
     /// \see    \a hpx::get_colocation_id(launch::sync_policy)
-    HPX_EXPORT lcos::future<naming::id_type> get_colocation_id(
+    HPX_EXPORT hpx::future<naming::id_type> get_colocation_id(
         naming::id_type const& id);
 }    // namespace hpx

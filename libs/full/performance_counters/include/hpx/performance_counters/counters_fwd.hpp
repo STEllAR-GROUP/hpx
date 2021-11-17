@@ -495,7 +495,7 @@ namespace hpx { namespace performance_counters {
     /// \brief Get the global id of an existing performance counter, if the
     ///        counter does not exist yet, the function attempts to create the
     ///        counter based on the given counter name.
-    HPX_EXPORT lcos::future<naming::id_type> get_counter_async(
+    HPX_EXPORT hpx::future<naming::id_type> get_counter_async(
         std::string name, error_code& ec = throws);
 
     inline naming::id_type get_counter(
@@ -504,7 +504,7 @@ namespace hpx { namespace performance_counters {
     /// \brief Get the global id of an existing performance counter, if the
     ///        counter does not exist yet, the function attempts to create the
     ///        counter based on the given counter info.
-    HPX_EXPORT lcos::future<naming::id_type> get_counter_async(
+    HPX_EXPORT hpx::future<naming::id_type> get_counter_async(
         counter_info const& info, error_code& ec = throws);
 
     inline naming::id_type get_counter(

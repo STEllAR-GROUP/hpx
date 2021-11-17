@@ -30,8 +30,7 @@ int hpx_main()
 
         auto f = hpx::async([]() {});
 
-        if (f.wait_for(std::chrono::seconds(1)) ==
-            hpx::lcos::future_status::timeout)
+        if (f.wait_for(std::chrono::seconds(1)) == hpx::future_status::timeout)
         {
             auto now = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> dif = now - start_time;

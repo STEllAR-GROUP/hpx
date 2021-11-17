@@ -20,13 +20,13 @@
 namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
-    lcos::future<typename traits::promise_local_result<
+    hpx::future<typename traits::promise_local_result<
         typename hpx::traits::extract_action<Action>::remote_result_type>::type>
     async_colocated(naming::id_type const& id, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename... Ts>
-    lcos::future<typename traits::promise_local_result<typename hpx::traits::
+    hpx::future<typename traits::promise_local_result<typename hpx::traits::
             extract_action<Derived>::remote_result_type>::type>
     async_colocated(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
@@ -38,22 +38,19 @@ namespace hpx { namespace detail {
 #if !defined(HPX_MSVC)
     template <typename Action, typename Continuation, typename... Ts>
     typename std::enable_if<traits::is_continuation<Continuation>::value,
-        lcos::future<typename traits::promise_local_result<typename hpx::
-                traits::extract_action<Action>::remote_result_type>::type>>::
-        type
-        async_colocated(
-            Continuation&& cont, naming::id_type const& id, Ts&&... vs);
+        hpx::future<typename traits::promise_local_result<typename hpx::traits::
+                extract_action<Action>::remote_result_type>::type>>::type
+    async_colocated(Continuation&& cont, naming::id_type const& id, Ts&&... vs);
 
     template <typename Continuation, typename Component, typename Signature,
         typename Derived, typename... Ts>
     typename std::enable_if<traits::is_continuation<Continuation>::value,
-        lcos::future<typename traits::promise_local_result<typename hpx::
-                traits::extract_action<Derived>::remote_result_type>::type>>::
-        type
-        async_colocated(Continuation&& cont,
-            hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-            ,
-            naming::id_type const& id, Ts&&... vs);
+        hpx::future<typename traits::promise_local_result<typename hpx::traits::
+                extract_action<Derived>::remote_result_type>::type>>::type
+    async_colocated(Continuation&& cont,
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
+        ,
+        naming::id_type const& id, Ts&&... vs);
 #endif
 }}    // namespace hpx::detail
 

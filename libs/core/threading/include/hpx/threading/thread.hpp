@@ -117,7 +117,7 @@ namespace hpx {
 
         static void interrupt(id, bool flag = true);
 
-        lcos::future<void> get_future(error_code& ec = throws);
+        hpx::future<void> get_future(error_code& ec = throws);
 
         std::size_t get_thread_data() const;
         std::size_t set_thread_data(std::size_t);

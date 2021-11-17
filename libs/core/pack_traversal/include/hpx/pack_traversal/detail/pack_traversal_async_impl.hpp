@@ -221,7 +221,7 @@ namespace hpx {
             }
 
         private:
-            void destroy() override
+            void destroy() noexcept override
             {
                 typedef std::allocator_traits<other_allocator> traits;
 

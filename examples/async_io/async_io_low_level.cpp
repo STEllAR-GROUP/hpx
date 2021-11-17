@@ -29,7 +29,7 @@ void do_async_io(char const* string_to_write,
 }
 
 // This function will be executed by an HPX thread
-hpx::lcos::future<int> async_io(char const* string_to_write)
+hpx::future<int> async_io(char const* string_to_write)
 {
     std::shared_ptr<hpx::lcos::local::promise<int> > p =
         std::make_shared<hpx::lcos::local::promise<int> >();
@@ -50,7 +50,7 @@ int hpx_main()
     {
         // Initiate an asynchronous IO operation wait for it to complete without
         // blocking any of the HPX thread-manager threads.
-        hpx::lcos::future<int> f = async_io("Write this string to std::cout");
+        hpx::future<int> f = async_io("Write this string to std::cout");
 
         // This will suspend the current HPX thread until the IO operation is
         // finished.

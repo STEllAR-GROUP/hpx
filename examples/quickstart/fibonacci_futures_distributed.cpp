@@ -41,11 +41,11 @@ hpx::id_type here;
 struct when_all_wrapper
 {
     typedef hpx::tuple<
-            hpx::lcos::future<std::uint64_t>
-          , hpx::lcos::future<std::uint64_t> > data_type;
+            hpx::future<std::uint64_t>
+          , hpx::future<std::uint64_t> > data_type;
 
     std::uint64_t operator()(
-        hpx::lcos::future<data_type> data
+        hpx::future<data_type> data
     ) const
     {
         data_type v = data.get();

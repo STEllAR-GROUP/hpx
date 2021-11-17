@@ -57,7 +57,7 @@ namespace jacobi { namespace server {
                     hpx::default_layout(hpx::find_all_localities()), ny)
                     .get();
 
-            std::vector<hpx::lcos::shared_future<void>> init_futures;
+            std::vector<hpx::shared_future<void>> init_futures;
             init_futures.reserve(ny);
             std::size_t y = 0;
             for (hpx::naming::id_type const& id : ids)
@@ -72,7 +72,7 @@ namespace jacobi { namespace server {
             }
             HPX_ASSERT(y == ny);
 
-            std::vector<hpx::lcos::shared_future<void>> boundary_futures;
+            std::vector<hpx::shared_future<void>> boundary_futures;
             hpx::lcos::wait(init_futures, [&](std::size_t y) {
                 if (y > 0 && y < ny - 1)
                 {
@@ -111,7 +111,7 @@ namespace jacobi { namespace server {
 
             for (std::size_t iter = 0; iter < max_iterations; ++iter)
             {
-                std::vector<hpx::lcos::shared_future<void>> run_futures;
+                std::vector<hpx::shared_future<void>> run_futures;
                 run_futures.reserve(ny - 2);
                 for (std::size_t y = 1; y < ny - 1; ++y)
                 {

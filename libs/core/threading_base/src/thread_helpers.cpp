@@ -297,16 +297,17 @@ namespace hpx { namespace threads {
     ////////////////////////////////////////////////////////////////////////////
     static thread_local std::size_t continuation_recursion_count(0);
 
-    std::size_t& get_continuation_recursion_count()
+    std::size_t& get_continuation_recursion_count() noexcept
     {
         thread_self* self_ptr = get_self_ptr();
         if (self_ptr)
+        {
             return self_ptr->get_continuation_recursion_count();
-
+        }
         return continuation_recursion_count;
     }
 
-    void reset_continuation_recursion_count()
+    void reset_continuation_recursion_count() noexcept
     {
         continuation_recursion_count = 0;
     }

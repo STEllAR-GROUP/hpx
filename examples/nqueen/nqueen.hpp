@@ -41,7 +41,7 @@ namespace nqueen
             return init_board_async(size).get();
         }
 
-        hpx::lcos::future<void> init_board_async(std::size_t size)
+        hpx::future<void> init_board_async(std::size_t size)
         {
             return hpx::async<server::board::init_action>(this->get_id(), size);
         }
@@ -52,7 +52,7 @@ namespace nqueen
             return access_board_async().get();
         }
 
-        hpx::lcos::future<list_type> access_board_async()
+        hpx::future<list_type> access_board_async()
         {
             typedef server::board::access_action action_type;
             return hpx::async<action_type>(this->get_id());
@@ -71,7 +71,7 @@ namespace nqueen
             return check_board_async(list, level).get();
         }
 
-        hpx::lcos::future<bool> check_board_async(list_type const& list,
+        hpx::future<bool> check_board_async(list_type const& list,
             std::size_t level)
         {
             typedef server::board::check_action action_type;
@@ -85,7 +85,7 @@ namespace nqueen
             return solve_board_async(list, size, level, col).get();
         }
 
-        hpx::lcos::future<std::size_t> solve_board_async(list_type const& list,
+        hpx::future<std::size_t> solve_board_async(list_type const& list,
             std::size_t size, std::size_t level, std::size_t col)
         {
             typedef server::board::solve_action action_type;

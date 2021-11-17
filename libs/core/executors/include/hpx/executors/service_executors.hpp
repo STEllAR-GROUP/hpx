@@ -89,7 +89,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         }
 
         template <typename F, typename Shape, typename... Ts>
-        std::vector<hpx::lcos::future<
+        std::vector<hpx::future<
             typename detail::bulk_function_result<F, Shape, Ts...>::type>>
         bulk_async_execute(F&& f, Shape const& shape, Ts&&... ts) const
         {
@@ -122,8 +122,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             using func_result_type =
                 typename parallel::execution::detail::then_bulk_function_result<
                     F, Shape, Future, Ts...>::type;
-            using result_type =
-                std::vector<hpx::lcos::future<func_result_type>>;
+            using result_type = std::vector<hpx::future<func_result_type>>;
 
             auto func = parallel::execution::detail::
                 make_fused_bulk_async_execute_helper<result_type>(*this,

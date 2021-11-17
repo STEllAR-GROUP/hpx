@@ -414,8 +414,8 @@ namespace hpx { namespace threads {
         thread_id_type const& id, std::size_t data, error_code& ec = throws);
 #endif
 
-    HPX_CORE_EXPORT std::size_t& get_continuation_recursion_count();
-    HPX_CORE_EXPORT void reset_continuation_recursion_count();
+    HPX_CORE_EXPORT std::size_t& get_continuation_recursion_count() noexcept;
+    HPX_CORE_EXPORT void reset_continuation_recursion_count() noexcept;
     /// \endcond
 
     /// Returns a pointer to the pool that was used to run the current thread

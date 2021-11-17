@@ -15,17 +15,17 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace lcos {
+namespace hpx {
     template <typename R>
     class future;
     template <typename R>
     class shared_future;
 
-    namespace detail {
+    namespace lcos::detail {
         template <typename Result>
         struct future_data_base;
-    }
-}}    // namespace hpx::lcos
+    }    // namespace lcos::detail
+}    // namespace hpx
 
 namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
@@ -131,55 +131,55 @@ namespace hpx { namespace traits {
     };
 
     template <typename R>
-    struct future_access<lcos::future<R>>
+    struct future_access<hpx::future<R>>
     {
         template <typename SharedState>
-        static lcos::future<R> create(
+        static hpx::future<R> create(
             hpx::intrusive_ptr<SharedState> const& shared_state)
         {
-            return lcos::future<R>(shared_state);
+            return hpx::future<R>(shared_state);
         }
 
         template <typename T = void>
-        static lcos::future<R> create(
-            detail::shared_state_ptr_for_t<lcos::future<lcos::future<R>>> const&
+        static hpx::future<R> create(
+            detail::shared_state_ptr_for_t<hpx::future<hpx::future<R>>> const&
                 shared_state)
         {
-            return lcos::future<lcos::future<R>>(shared_state);
+            return hpx::future<hpx::future<R>>(shared_state);
         }
 
         template <typename SharedState>
-        static lcos::future<R> create(
+        static hpx::future<R> create(
             hpx::intrusive_ptr<SharedState>&& shared_state)
         {
-            return lcos::future<R>(HPX_MOVE(shared_state));
+            return hpx::future<R>(HPX_MOVE(shared_state));
         }
 
         template <typename T = void>
-        static lcos::future<R> create(
-            detail::shared_state_ptr_for_t<lcos::future<lcos::future<R>>>&&
+        static hpx::future<R> create(
+            detail::shared_state_ptr_for_t<hpx::future<hpx::future<R>>>&&
                 shared_state)
         {
-            return lcos::future<lcos::future<R>>(HPX_MOVE(shared_state));
+            return hpx::future<hpx::future<R>>(HPX_MOVE(shared_state));
         }
 
         template <typename SharedState>
-        static lcos::future<R> create(
+        static hpx::future<R> create(
             SharedState* shared_state, bool addref = true)
         {
-            return lcos::future<R>(
+            return hpx::future<R>(
                 hpx::intrusive_ptr<SharedState>(shared_state, addref));
         }
 
         HPX_FORCEINLINE static traits::detail::shared_state_ptr_t<R> const&
-        get_shared_state(lcos::future<R> const& f)
+        get_shared_state(hpx::future<R> const& f)
         {
             return f.shared_state_;
         }
 
         HPX_FORCEINLINE static
             typename traits::detail::shared_state_ptr_t<R>::element_type*
-            detach_shared_state(lcos::future<R>&& f)
+            detach_shared_state(hpx::future<R>&& f)
         {
             return f.shared_state_.detach();
         }
@@ -187,14 +187,14 @@ namespace hpx { namespace traits {
     private:
         template <typename Destination>
         HPX_FORCEINLINE static void transfer_result_impl(
-            lcos::future<R>&& src, Destination& dest, std::false_type)
+            hpx::future<R>&& src, Destination& dest, std::false_type)
         {
             dest.set_value(src.get());
         }
 
         template <typename Destination>
         HPX_FORCEINLINE static void transfer_result_impl(
-            lcos::future<R>&& src, Destination& dest, std::true_type)
+            hpx::future<R>&& src, Destination& dest, std::true_type)
         {
             src.get();
             dest.set_value(util::unused);
@@ -203,60 +203,61 @@ namespace hpx { namespace traits {
     public:
         template <typename Destination>
         HPX_FORCEINLINE static void transfer_result(
-            lcos::future<R>&& src, Destination& dest)
+            hpx::future<R>&& src, Destination& dest)
         {
             transfer_result_impl(HPX_MOVE(src), dest, std::is_void<R>{});
         }
     };
 
     template <typename R>
-    struct future_access<lcos::shared_future<R>>
+    struct future_access<hpx::shared_future<R>>
     {
         template <typename SharedState>
-        static lcos::shared_future<R> create(
+        static hpx::shared_future<R> create(
             hpx::intrusive_ptr<SharedState> const& shared_state)
         {
-            return lcos::shared_future<R>(shared_state);
+            return hpx::shared_future<R>(shared_state);
         }
 
         template <typename T = void>
-        static lcos::shared_future<R> create(detail::shared_state_ptr_for_t<
-            lcos::shared_future<lcos::future<R>>> const& shared_state)
+        static hpx::shared_future<R> create(detail::shared_state_ptr_for_t<
+            hpx::shared_future<hpx::future<R>>> const& shared_state)
         {
-            return lcos::shared_future<lcos::future<R>>(shared_state);
+            return hpx::shared_future<hpx::future<R>>(shared_state);
         }
 
         template <typename SharedState>
-        static lcos::shared_future<R> create(
+        static hpx::shared_future<R> create(
             hpx::intrusive_ptr<SharedState>&& shared_state)
         {
-            return lcos::shared_future<R>(HPX_MOVE(shared_state));
+            return hpx::shared_future<R>(HPX_MOVE(shared_state));
         }
 
         template <typename T = void>
-        static lcos::shared_future<R> create(detail::shared_state_ptr_for_t<
-            lcos::shared_future<lcos::future<R>>>&& shared_state)
+        static hpx::shared_future<R> create(
+            detail::shared_state_ptr_for_t<hpx::shared_future<hpx::future<R>>>&&
+                shared_state)
         {
-            return lcos::shared_future<lcos::future<R>>(HPX_MOVE(shared_state));
+            return hpx::shared_future<hpx::future<R>>(HPX_MOVE(shared_state));
         }
 
         template <typename SharedState>
-        static lcos::shared_future<R> create(
+        static hpx::shared_future<R> create(
             SharedState* shared_state, bool addref = true)
         {
-            return lcos::shared_future<R>(
+            return hpx::shared_future<R>(
                 hpx::intrusive_ptr<SharedState>(shared_state, addref));
         }
 
         HPX_FORCEINLINE static traits::detail::shared_state_ptr_t<R> const&
-        get_shared_state(lcos::shared_future<R> const& f)
+        get_shared_state(hpx::shared_future<R> const& f)
         {
             return f.shared_state_;
         }
 
         HPX_FORCEINLINE static
             typename traits::detail::shared_state_ptr_t<R>::element_type*
-            detach_shared_state(lcos::shared_future<R> const& f)
+            detach_shared_state(hpx::shared_future<R> const& f)
         {
             return f.shared_state_.get();
         }
@@ -264,14 +265,14 @@ namespace hpx { namespace traits {
     private:
         template <typename Destination>
         HPX_FORCEINLINE static void transfer_result_impl(
-            lcos::shared_future<R>&& src, Destination& dest, std::false_type)
+            hpx::shared_future<R>&& src, Destination& dest, std::false_type)
         {
             dest.set_value(src.get());
         }
 
         template <typename Destination>
         HPX_FORCEINLINE static void transfer_result_impl(
-            lcos::shared_future<R>&& src, Destination& dest, std::true_type)
+            hpx::shared_future<R>&& src, Destination& dest, std::true_type)
         {
             src.get();
             dest.set_value(util::unused);
@@ -280,7 +281,7 @@ namespace hpx { namespace traits {
     public:
         template <typename Destination>
         HPX_FORCEINLINE static void transfer_result(
-            lcos::shared_future<R>&& src, Destination& dest)
+            hpx::shared_future<R>&& src, Destination& dest)
         {
             transfer_result_impl(HPX_MOVE(src), dest, std::is_void<R>{});
         }
@@ -292,4 +293,8 @@ namespace hpx { namespace traits {
       : detail::shared_state_allocator<SharedState, Allocator>
     {
     };
+
+    template <typename SharedState, typename Allocator>
+    using shared_state_allocator_t =
+        typename shared_state_allocator<SharedState, Allocator>::type;
 }}    // namespace hpx::traits

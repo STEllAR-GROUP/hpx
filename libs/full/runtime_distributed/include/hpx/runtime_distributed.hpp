@@ -354,14 +354,14 @@ namespace hpx {
 
         std::uint32_t get_initial_num_localities() const override;
 
-        lcos::future<std::uint32_t> get_num_localities() const override;
+        hpx::future<std::uint32_t> get_num_localities() const override;
 
         std::string get_locality_name() const override;
 
         std::uint32_t get_num_localities(hpx::launch::sync_policy,
             components::component_type type, error_code& ec) const;
 
-        lcos::future<std::uint32_t> get_num_localities(
+        hpx::future<std::uint32_t> get_num_localities(
             components::component_type type) const;
 
         std::uint32_t assign_cores(std::string const& locality_basename,

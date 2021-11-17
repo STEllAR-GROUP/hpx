@@ -185,7 +185,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             typedef util::in_out_result<iKey, iVal> result_type;
 
-            return lcos::make_future<result_type>(
+            return hpx::make_future<result_type>(
                 HPX_MOVE(ziter), [=](ZIter zipiter) {
                     auto t = zipiter.second.get_iterator_tuple();
                     iKey key_end = hpx::get<0>(t);
