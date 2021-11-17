@@ -230,9 +230,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
             HPX_ASSERT(ninput >= 0 || noutput >= 0);
 
-            util::compare_projected<Compare, Proj1, Proj2> proj_comp{
-                HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj1, proj1),
-                HPX_FORWARD(Proj2, proj2)};
+            util::compare_projected<Compare&, Proj1&, Proj2&> proj_comp{
+                comp, proj1, proj2};
 
             auto nmin = ninput < noutput ? ninput : noutput;
             if (noutput >= ninput)
@@ -307,9 +306,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 std::int64_t noutput = d_last_iter - d_first;
                 HPX_ASSERT(ninput >= 0 and noutput >= 0);
 
-                util::compare_projected<Compare, Proj1, Proj2> proj_comp{
-                    HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj1, proj1),
-                    HPX_FORWARD(Proj2, proj2)};
+                util::compare_projected<Compare&, Proj1&, Proj2&> proj_comp{
+                    comp, proj1, proj2};
 
                 auto nmin = ninput < noutput ? ninput : noutput;
                 if (noutput >= ninput)
@@ -414,8 +412,8 @@ namespace hpx {
 
             return parallel::util::get_second_element(
                 parallel::v1::detail::partial_sort_copy<result_type>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, last, d_first,
-                    d_last, HPX_FORWARD(Comp, comp),
+                    HPX_FORWARD(ExPolicy, policy), first, last, d_first, d_last,
+                    HPX_FORWARD(Comp, comp),
                     parallel::util::projection_identity{},
                     parallel::util::projection_identity{}));
         }

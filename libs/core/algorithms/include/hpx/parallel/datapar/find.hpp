@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
             auto ret = util::loop_n<ExPolicy>(first, std::distance(first, last),
                 tok, [&offset, &val, &tok, &proj](auto const& curr) {
-                    auto msk = hpx::util::invoke(proj, *curr) == val;
+                    auto msk = HPX_INVOKE(proj, *curr) == val;
                     offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
                     {
@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             util::loop_idx_n<ExPolicy>(base_idx, part_begin, part_count, tok,
                 [&val, &proj, &tok](auto& v, std::size_t i) -> void {
-                    auto msk = hpx::util::invoke(proj, v) == val;
+                    auto msk = HPX_INVOKE(proj, v) == val;
                     int offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
                         tok.cancel(i + offset);
@@ -102,8 +102,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
             auto ret = util::loop_n<ExPolicy>(first, std::distance(first, last),
                 tok, [&offset, &pred, &tok, &proj](auto const& curr) {
-                    auto msk =
-                        hpx::util::invoke(pred, hpx::util::invoke(proj, *curr));
+                    auto msk = HPX_INVOKE(pred, HPX_INVOKE(proj, *curr));
                     offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
                     {
@@ -122,8 +121,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count, tok,
                 [&op, &tok, &proj](auto const& curr) {
-                    auto msk =
-                        hpx::util::invoke(op, hpx::util::invoke(proj, *curr));
+                    auto msk = HPX_INVOKE(op, HPX_INVOKE(proj, *curr));
                     if (hpx::parallel::traits::any_of(msk))
                     {
                         tok.cancel();
@@ -138,7 +136,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             util::loop_idx_n<ExPolicy>(base_idx, part_begin, part_count, tok,
                 [&f, &proj, &tok](auto& v, std::size_t i) -> void {
-                    auto msk = hpx::util::invoke(f, hpx::util::invoke(proj, v));
+                    auto msk = HPX_INVOKE(f, HPX_INVOKE(proj, v));
                     int offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
                         tok.cancel(i + offset);
@@ -190,16 +188,17 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             int offset = 0;
             util::cancellation_token<> tok;
 
-            auto ret = util::loop_n<ExPolicy>(first, std::distance(first, last),
-                tok, [&offset, &pred, &tok, &proj](auto const& curr) {
-                    auto msk = !hpx::util::invoke(
-                        pred, hpx::util::invoke(proj, *curr));
-                    offset = hpx::parallel::traits::find_first_of(msk);
-                    if (offset != -1)
-                    {
-                        tok.cancel();
-                    }
-                });
+            auto ret =
+                util::loop_n<ExPolicy>(first, std::distance(first, last), tok,
+                    [&offset, &pred, &tok, &proj](
+                        auto const& curr) mutable -> void {
+                        auto msk = !HPX_INVOKE(pred, HPX_INVOKE(proj, *curr));
+                        offset = hpx::parallel::traits::find_first_of(msk);
+                        if (offset != -1)
+                        {
+                            tok.cancel();
+                        }
+                    });
 
             if (tok.was_cancelled())
                 std::advance(ret, offset);
@@ -212,8 +211,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count, tok,
                 [&op, &tok, &proj](auto const& curr) {
-                    auto msk =
-                        !hpx::util::invoke(op, hpx::util::invoke(proj, *curr));
+                    auto msk = !HPX_INVOKE(op, HPX_INVOKE(proj, *curr));
                     if (hpx::parallel::traits::any_of(msk))
                     {
                         tok.cancel();
@@ -228,8 +226,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             util::loop_idx_n<ExPolicy>(base_idx, part_begin, part_count, tok,
                 [&f, &proj, &tok](auto& v, std::size_t i) -> void {
-                    auto msk =
-                        !hpx::util::invoke(f, hpx::util::invoke(proj, v));
+                    auto msk = !HPX_INVOKE(f, HPX_INVOKE(proj, v));
                     int offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
                         tok.cancel(i + offset);

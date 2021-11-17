@@ -158,15 +158,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
             RndIter child_i = first + child;
 
             if ((child + 1) < len &&
-                hpx::util::invoke(comp, hpx::util::invoke(proj, *child_i),
-                    hpx::util::invoke(proj, *(child_i + 1))))
+                HPX_INVOKE(comp, HPX_INVOKE(proj, *child_i),
+                    HPX_INVOKE(proj, *(child_i + 1))))
             {
                 ++child_i;
                 ++child;
             }
 
-            if (hpx::util::invoke(comp, hpx::util::invoke(proj, *child_i),
-                    hpx::util::invoke(proj, *start)))
+            if (HPX_INVOKE(
+                    comp, HPX_INVOKE(proj, *child_i), HPX_INVOKE(proj, *start)))
                 return;
 
             typename std::iterator_traits<RndIter>::value_type top = *start;
@@ -183,15 +183,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 child_i = first + child;
 
                 if ((child + 1) < len &&
-                    hpx::util::invoke(comp, hpx::util::invoke(proj, *child_i),
-                        hpx::util::invoke(proj, *(child_i + 1))))
+                    HPX_INVOKE(comp, HPX_INVOKE(proj, *child_i),
+                        HPX_INVOKE(proj, *(child_i + 1))))
                 {
                     ++child_i;
                     ++child;
                 }
 
-            } while (!hpx::util::invoke(comp, hpx::util::invoke(proj, *child_i),
-                hpx::util::invoke(proj, top)));
+            } while (!HPX_INVOKE(
+                comp, HPX_INVOKE(proj, *child_i), HPX_INVOKE(proj, top)));
 
             *start = top;
         }

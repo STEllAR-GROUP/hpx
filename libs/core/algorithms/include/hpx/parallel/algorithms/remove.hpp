@@ -258,7 +258,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             if (first != last)
                 for (Iter i = first; ++i != last;)
-                    if (!hpx::util::invoke(pred, hpx::util::invoke(proj, *i)))
+                    if (!HPX_INVOKE(pred, HPX_INVOKE(proj, *i)))
                     {
                         *first++ = HPX_MOVE(*i);
                     }
@@ -312,6 +312,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     void, util::scan_partitioner_sequential_f3_tag>
                     scan_partitioner_type;
 
+                // Note: replacing the invoke() with HPX_INVOKE()
+                // below makes gcc generate errors
                 auto f1 = [pred = HPX_FORWARD(Pred, pred),
                               proj = HPX_FORWARD(Proj, proj)](
                               zip_iterator part_begin,

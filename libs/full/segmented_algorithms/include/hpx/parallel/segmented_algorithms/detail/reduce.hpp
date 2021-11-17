@@ -79,9 +79,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             typedef typename std::iterator_traits<FwdIter>::reference reference;
             return util::accumulate<T>(
                 first, last,
-                [=](T const& res, reference next) -> T {
-                    return hpx::util::invoke(
-                        r, res, hpx::util::invoke(conv, next));
+                [=](T const& res, reference next) mutable -> T {
+                    return HPX_INVOKE(r, res, HPX_INVOKE(conv, next));
                 },
                 HPX_FORWARD(Convert, conv));
         }
@@ -97,15 +96,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             return util::partitioner<ExPolicy, T>::call(
                 HPX_FORWARD(ExPolicy, policy), first,
                 std::distance(first, last),
-                [r, conv](FwdIter part_begin, std::size_t part_size) -> T {
-                    T val = hpx::util::invoke(conv, *part_begin);
+                [r, conv](
+                    FwdIter part_begin, std::size_t part_size) mutable -> T {
+                    T val = HPX_INVOKE(conv, *part_begin);
                     return util::accumulate_n(++part_begin, --part_size,
                         HPX_MOVE(val),
                         // MSVC14 bails out if r and conv are captured by
                         // reference
-                        [=](T const& res, reference next) -> T {
-                            return hpx::util::invoke(
-                                r, res, hpx::util::invoke(conv, next));
+                        [=](T const& res, reference next) mutable -> T {
+                            return HPX_INVOKE(r, res, HPX_INVOKE(conv, next));
                         });
                 },
                 hpx::unwrapping([r](std::vector<T>&& results) -> T {

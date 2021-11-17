@@ -176,9 +176,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             for (difference_type i = 1; i < count; ++i)
             {
-                if (hpx::util::invoke(comp,
-                        hpx::util::invoke(proj, *(first + (i - 1) / 2)),
-                        hpx::util::invoke(proj, *(first + i))))
+                if (HPX_INVOKE(comp, HPX_INVOKE(proj, *(first + (i - 1) / 2)),
+                        HPX_INVOKE(proj, *(first + i))))
                     return false;
             }
             return true;
@@ -208,6 +207,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<std::size_t> tok(count);
 
+                // Note: replacing the invoke() with HPX_INVOKE()
+                // below makes gcc generate errors
                 auto f1 = [tok, first, comp = HPX_FORWARD(Comp, comp),
                               proj = HPX_FORWARD(Proj, proj)](Iter it,
                               std::size_t part_size,
@@ -215,7 +216,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
                         part_size, tok,
                         [&tok, first, &comp, &proj](
-                            type const& v, std::size_t i) -> void {
+                            type const& v, std::size_t i) mutable -> void {
                             if (hpx::util::invoke(comp,
                                     hpx::util::invoke(proj, *(first + i / 2)),
                                     hpx::util::invoke(proj, v)))
@@ -321,9 +322,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             for (difference_type i = 1; i < count; ++i)
             {
-                if (hpx::util::invoke(comp,
-                        hpx::util::invoke(proj, *(first + (i - 1) / 2)),
-                        hpx::util::invoke(proj, *(first + i))))
+                if (HPX_INVOKE(comp, HPX_INVOKE(proj, *(first + (i - 1) / 2)),
+                        HPX_INVOKE(proj, *(first + i))))
                     return first + i;
             }
             return last;
@@ -353,6 +353,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<std::size_t> tok(count);
 
+                // Note: replacing the invoke() with HPX_INVOKE()
+                // below makes gcc generate errors
                 auto f1 = [tok, first, comp = HPX_FORWARD(Comp, comp),
                               proj = HPX_FORWARD(Proj, proj)](Iter it,
                               std::size_t part_size,

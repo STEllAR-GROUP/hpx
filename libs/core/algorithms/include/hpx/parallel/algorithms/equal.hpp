@@ -211,8 +211,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             for (/* */; first1 != last1 && first2 != last2;
                  (void) ++first1, ++first2)
             {
-                if (!hpx::util::invoke(f, hpx::util::invoke(proj1, *first1),
-                        hpx::util::invoke(proj2, *first2)))
+                if (!HPX_INVOKE(f, HPX_INVOKE(proj1, *first1),
+                        HPX_INVOKE(proj2, *first2)))
                     return false;
             }
             return first1 == last1 && first2 == last2;
@@ -281,6 +281,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typedef typename zip_iterator::reference reference;
 
                 util::cancellation_token<> tok;
+
+                // Note: replacing the invoke() with HPX_INVOKE()
+                // below makes gcc generate errors
                 auto f1 = [tok, f = HPX_FORWARD(F, f),
                               proj1 = HPX_FORWARD(Proj1, proj1),
                               proj2 = HPX_FORWARD(Proj2, proj2)](
@@ -392,10 +395,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f1 = [f, tok](zip_iterator it,
                               std::size_t part_count) mutable -> bool {
                     util::loop_n<std::decay_t<ExPolicy>>(it, part_count, tok,
-                        [&f, &tok](zip_iterator const& curr) {
+                        [&f, &tok](zip_iterator const& curr) mutable -> void {
                             reference t = *curr;
-                            if (!hpx::util::invoke(
-                                    f, hpx::get<0>(t), hpx::get<1>(t)))
+                            if (!HPX_INVOKE(f, hpx::get<0>(t), hpx::get<1>(t)))
                             {
                                 tok.cancel();
                             }

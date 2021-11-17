@@ -1402,10 +1402,8 @@ namespace hpx {
         else
         {
             return f.then(hpx::launch::sync,
-                [conv = HPX_FORWARD(Conv, conv)](
-                    hpx::shared_future<U> const& f) -> R {
-                    return HPX_INVOKE(conv, f.get());
-                });
+                [conv = HPX_FORWARD(Conv, conv)](hpx::shared_future<U> const& f)
+                    -> R { return HPX_INVOKE(conv, f.get()); });
         }
     }
 

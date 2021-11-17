@@ -528,8 +528,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             Comp&& comp, Proj&& proj)
         {
             return sequential_partial_sort(first, middle, last,
-                util::compare_projected<Comp, Proj>(
-                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj)));
+                util::compare_projected<Comp&, Proj&>(comp, proj));
         }
 
         template <typename ExPolicy, typename Iter, typename Sent,
@@ -547,8 +546,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // depending on execution policy
                 return algorithm_result::get(parallel_partial_sort(
                     HPX_FORWARD(ExPolicy, policy), first, middle, last,
-                    util::compare_projected<Comp, Proj>(
-                        HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj))));
+                    util::compare_projected<Comp&, Proj&>(comp, proj)));
             }
             catch (...)
             {

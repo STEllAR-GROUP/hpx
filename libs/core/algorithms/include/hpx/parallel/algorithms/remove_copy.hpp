@@ -285,7 +285,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             for (/* */; first != last; ++first)
             {
-                if (!(hpx::util::invoke(proj, *first) == value))
+                if (!(HPX_INVOKE(proj, *first) == value))
                 {
                     *dest++ = *first;
                 }
@@ -371,8 +371,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             for (/* */; first != last; ++first)
             {
-                using hpx::util::invoke;
-                if (!invoke(p, invoke(proj, *first)))
+                if (!HPX_INVOKE(p, HPX_INVOKE(proj, *first)))
                 {
                     *dest++ = *first;
                 }
@@ -411,7 +410,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return copy_if<IterPair>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last, dest,
                     [f = HPX_FORWARD(F, f)](value_type const& a) -> bool {
-                        return !hpx::util::invoke(f, a);
+                        return !HPX_INVOKE(f, a);
                     },
                     HPX_FORWARD(Proj, proj));
             }

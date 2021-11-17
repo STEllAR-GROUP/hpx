@@ -277,6 +277,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<std::size_t> tok(count1);
 
+                // Note: replacing the invoke() with HPX_INVOKE()
+                // below makes gcc generate errors
                 auto f1 = [tok, f = HPX_FORWARD(F, f),
                               proj1 = HPX_FORWARD(Proj1, proj1),
                               proj2 = HPX_FORWARD(Proj2, proj2)](
@@ -284,7 +286,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
                         part_count, tok,
-                        [&f, &proj1, &proj2, &tok](reference t, std::size_t i) {
+                        [&f, &proj1, &proj2, &tok](
+                            reference t, std::size_t i) mutable -> void {
                             if (!hpx::util::invoke(f,
                                     hpx::util::invoke(proj1, hpx::get<0>(t)),
                                     hpx::util::invoke(proj2, hpx::get<1>(t))))
@@ -424,12 +427,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<std::size_t> tok(count);
 
+                // Note: replacing the invoke() with HPX_INVOKE()
+                // below makes gcc generate errors
                 auto f1 = [tok, f = HPX_FORWARD(F, f)](zip_iterator it,
                               std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
                         part_count, tok,
-                        [&f, &tok](reference t, std::size_t i) {
+                        [&f, &tok](reference t, std::size_t i) mutable -> void {
                             if (!hpx::util::invoke(
                                     f, hpx::get<0>(t), hpx::get<1>(t)))
                             {

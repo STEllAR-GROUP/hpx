@@ -202,13 +202,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 for (; (first1 != last1) && (first2 != last2);
                      ++first1, (void) ++first2)
                 {
-                    if (hpx::util::invoke(pred,
-                            hpx::util::invoke(proj1, *first1),
-                            hpx::util::invoke(proj2, *first2)))
+                    if (HPX_INVOKE(pred, HPX_INVOKE(proj1, *first1),
+                            HPX_INVOKE(proj2, *first2)))
                         return true;
-                    if (hpx::util::invoke(pred,
-                            hpx::util::invoke(proj2, *first2),
-                            hpx::util::invoke(proj1, *first1)))
+                    if (HPX_INVOKE(pred, HPX_INVOKE(proj2, *first2),
+                            HPX_INVOKE(proj1, *first1)))
                         return false;
                 }
                 return (first1 == last1) && (first2 != last2);
@@ -252,13 +250,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
                         part_count, tok,
                         [&pred, &tok, &proj1, &proj2](
-                            reference t, std::size_t i) -> void {
+                            reference t, std::size_t i) mutable -> void {
                             using hpx::get;
-                            using hpx::util::invoke;
-                            if (invoke(pred, invoke(proj1, get<0>(t)),
-                                    invoke(proj2, get<1>(t))) ||
-                                invoke(pred, invoke(proj2, get<1>(t)),
-                                    invoke(proj1, get<0>(t))))
+                            if (HPX_INVOKE(pred, HPX_INVOKE(proj1, get<0>(t)),
+                                    HPX_INVOKE(proj2, get<1>(t))) ||
+                                HPX_INVOKE(pred, HPX_INVOKE(proj2, get<1>(t)),
+                                    HPX_INVOKE(proj1, get<0>(t))))
                             {
                                 tok.cancel(i);
                             }
@@ -278,9 +275,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::advance(first2, mismatched);
 
                     if (first1 != last1 && first2 != last2)
-                        return hpx::util::invoke(pred,
-                            hpx::util::invoke(proj1, *first1),
-                            hpx::util::invoke(proj2, *first2));
+                        return HPX_INVOKE(pred, HPX_INVOKE(proj1, *first1),
+                            HPX_INVOKE(proj2, *first2));
 
                     return first2 != last2;
                 };

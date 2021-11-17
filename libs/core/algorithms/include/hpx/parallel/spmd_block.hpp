@@ -163,7 +163,7 @@ namespace hpx { namespace lcos { namespace local {
             {
                 spmd_block block(
                     num_images_, image_id, *barrier_, *barriers_, *mtx_);
-                hpx::util::invoke(f_, HPX_MOVE(block), HPX_FORWARD(Ts, ts)...);
+                HPX_INVOKE(f_, HPX_MOVE(block), HPX_FORWARD(Ts, ts)...);
             }
         };
     }    // namespace detail

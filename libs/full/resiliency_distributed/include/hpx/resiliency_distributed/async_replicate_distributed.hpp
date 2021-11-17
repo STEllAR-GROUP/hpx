@@ -78,7 +78,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                         else
                         {
                             auto&& result = f.get();
-                            if (hpx::util::invoke(pred, result))
+                            if (HPX_INVOKE(pred, result))
                             {
                                 valid_results.emplace_back(HPX_MOVE(result));
                             }
@@ -87,7 +87,7 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                     if (!valid_results.empty())
                     {
-                        return hpx::util::invoke(
+                        return HPX_INVOKE(
                             HPX_FORWARD(Vote, vote), HPX_MOVE(valid_results));
                     }
 

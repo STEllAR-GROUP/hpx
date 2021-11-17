@@ -190,18 +190,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
 
                 util::cancellation_token<> tok;
+
+                // Note: replacing the invoke() with HPX_INVOKE()
+                // below makes gcc generate errors
                 auto f1 = [tok, pred_projected = HPX_MOVE(pred_projected)](
                               Iter part_begin,
                               std::size_t part_count) mutable -> bool {
-                    bool fst_bool =
-                        hpx::util::invoke(pred_projected, *part_begin);
+                    bool fst_bool = HPX_INVOKE(pred_projected, *part_begin);
                     if (part_count == 1)
                         return fst_bool;
 
                     util::loop_n<std::decay_t<ExPolicy>>(++part_begin,
                         --part_count, tok,
                         [&fst_bool, &pred_projected, &tok](
-                            Iter const& a) -> void {
+                            Iter const& a) mutable -> void {
                             if (fst_bool !=
                                 hpx::util::invoke(pred_projected, *a))
                             {

@@ -285,6 +285,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
 
                 util::cancellation_token<> tok;
+
+                // Note: replacing the invoke() with HPX_INVOKE()
+                // below makes gcc generate errors
                 auto f1 = [tok, last,
                               pred_projected = HPX_MOVE(pred_projected)](
                               FwdIter part_begin,
@@ -292,7 +295,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     FwdIter trail = part_begin++;
                     util::loop_n<std::decay_t<ExPolicy>>(part_begin,
                         part_size - 1,
-                        [&trail, &tok, &pred_projected](FwdIter it) -> void {
+                        [&trail, &tok, &pred_projected](
+                            FwdIter it) mutable -> void {
                             if (hpx::util::invoke(
                                     pred_projected, *it, *trail++))
                             {
@@ -386,6 +390,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
 
                 util::cancellation_token<difference_type> tok(count);
+
+                // Note: replacing the invoke() with HPX_INVOKE()
+                // below makes gcc generate errors
                 auto f1 = [tok, last,
                               pred_projected = HPX_MOVE(pred_projected)](
                               FwdIter part_begin, std::size_t part_size,
@@ -408,7 +415,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     if (!tok.was_cancelled(base_idx + part_size) &&
                         trail != last)
                     {
-                        if (hpx::util::invoke(pred_projected, *trail, *i))
+                        if (HPX_INVOKE(pred_projected, *trail, *i))
                         {
                             tok.cancel(base_idx + part_size);
                         }

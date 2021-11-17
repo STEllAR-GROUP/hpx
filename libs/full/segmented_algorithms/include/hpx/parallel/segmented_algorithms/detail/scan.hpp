@@ -46,13 +46,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         T sequential_segmented_scan_T(
             InIter first, InIter last, Op&& op, Conv&& conv)
         {
-            T ret = hpx::util::invoke(conv, *first);
+            T ret = HPX_INVOKE(conv, *first);
             if (first != last)
             {
                 for (++first; first != last; ++first)
                 {
-                    ret = hpx::util::invoke(
-                        op, ret, hpx::util::invoke(conv, *first));
+                    ret = HPX_INVOKE(op, ret, HPX_INVOKE(conv, *first));
                 }
             }
             return ret;
@@ -89,35 +88,38 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy, T>::call(
                     HPX_FORWARD(ExPolicy, policy), first,
                     std::distance(first, last),
-                    [op, conv](FwdIter part_begin, std::size_t part_size) -> T {
-                        T ret = hpx::util::invoke(conv, *part_begin);
+                    [op, conv](FwdIter part_begin,
+                        std::size_t part_size) mutable -> T {
+                        T ret = HPX_INVOKE(conv, *part_begin);
                         if (part_size > 1)
                         {
                             // MSVC complains if 'op' is captured by reference
                             util::loop_n<execution_policy_type>(part_begin + 1,
                                 part_size - 1,
-                                [&ret, op, conv](FwdIter const& curr) {
-                                    ret = hpx::util::invoke(op, ret,
-                                        hpx::util::invoke(conv, *curr));
+                                [&ret, op, conv](
+                                    FwdIter const& curr) mutable -> void {
+                                    ret = HPX_INVOKE(
+                                        op, ret, HPX_INVOKE(conv, *curr));
                                 });
                         }
                         return ret;
                     },
-                    hpx::unwrapping([op](std::vector<T>&& results) -> T {
-                        T ret = *results.begin();
-                        if (results.size() > 1)
-                        {
-                            // MSVC complains if 'op' is captured by reference
-                            util::loop_n<execution_policy_type>(
-                                results.begin() + 1, results.size() - 1,
-                                [&ret, op](
-                                    typename std::vector<T>::iterator const&
-                                        curr) {
-                                    ret = hpx::util::invoke(op, ret, *curr);
-                                });
-                        }
-                        return ret;
-                    }));
+                    hpx::unwrapping(
+                        [op](std::vector<T>&& results) mutable -> T {
+                            T ret = *results.begin();
+                            if (results.size() > 1)
+                            {
+                                // MSVC complains if 'op' is captured by reference
+                                util::loop_n<execution_policy_type>(
+                                    results.begin() + 1, results.size() - 1,
+                                    [&ret, op](
+                                        typename std::vector<T>::iterator const&
+                                            curr) mutable {
+                                        ret = HPX_INVOKE(op, ret, *curr);
+                                    });
+                            }
+                            return ret;
+                        }));
             }
         };
 

@@ -422,8 +422,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::partial_sort_copy<result_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last, r_first,
-                    r_last, HPX_FORWARD(Comp, comp),
-                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+                    r_last, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off

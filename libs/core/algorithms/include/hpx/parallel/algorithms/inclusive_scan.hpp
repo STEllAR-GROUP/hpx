@@ -466,7 +466,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             for (/* */; first != last; (void) ++first, ++dest)
             {
-                init = hpx::util::invoke(op, init, *first);
+                init = HPX_INVOKE(op, init, *first);
                 *dest = init;
             }
             return util::in_out_result<InIter, OutIter>{first, dest};
@@ -493,7 +493,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             for (/* */; count-- != 0; (void) ++first, ++dest)
             {
-                init = hpx::util::invoke(op, init, *first);
+                init = HPX_INVOKE(op, init, *first);
                 *dest = init;
             }
             return init;
@@ -563,13 +563,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using hpx::util::make_zip_iterator;
 
                 auto f3 = [op](zip_iterator part_begin, std::size_t part_size,
-                              T val) {
+                              T val) mutable -> void {
                     FwdIter2 dst = get<1>(part_begin.get_iterator_tuple());
 
                     // MSVC 2015 fails if op is captured by reference
                     util::loop_n<std::decay_t<ExPolicy>>(
-                        dst, part_size, [=, &val](FwdIter2 it) {
-                            *it = hpx::util::invoke(op, val, *it);
+                        dst, part_size, [=, &val](FwdIter2 it) mutable -> void {
+                            *it = HPX_INVOKE(op, val, *it);
                         });
                 };
 

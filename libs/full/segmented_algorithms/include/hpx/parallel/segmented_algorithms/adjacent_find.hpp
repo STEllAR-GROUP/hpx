@@ -87,8 +87,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
                 FwdIter ending = traits::compose(sit, std::prev(end));
                 if (!found &&
-                    hpx::util::invoke(
-                        pred_projected, *ending, *std::next(ending)))
+                    HPX_INVOKE(pred_projected, *ending, *std::next(ending)))
                 {
                     found = true;
                     output = traits::compose(sit, std::prev(end));
@@ -113,7 +112,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             }
                         }
                         ending = traits::compose(sit, std::prev(end));
-                        if (hpx::util::invoke(
+                        if (HPX_INVOKE(
                                 pred_projected, *ending, *std::next(ending)) &&
                             !found)
                         {
@@ -263,10 +262,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     {
                         if (*it != last)
                             return *it;
-                        if (hpx::util::invoke(pred_projected,
+                        if (HPX_INVOKE(pred_projected,
                                 *std::prev(between_segments[i]),
                                 *(between_segments[i])))
+                        {
                             return std::prev(between_segments[i]);
+                        }
                         ++it;
                         i += 1;
                     }
