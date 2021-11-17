@@ -213,7 +213,6 @@ namespace hpx {
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -223,7 +222,6 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/find.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>

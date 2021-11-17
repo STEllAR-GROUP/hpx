@@ -1072,11 +1072,9 @@ namespace hpx { namespace ranges {
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/replace.hpp>
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <type_traits>

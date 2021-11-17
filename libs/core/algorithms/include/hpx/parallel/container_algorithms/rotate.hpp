@@ -393,7 +393,6 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/parallel/algorithms/rotate.hpp>
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/result_types.hpp>
