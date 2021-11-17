@@ -504,7 +504,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first == last)
                 {
                     return util::detail::algorithm_result<ExPolicy,
-                        FwdIter>::get(std::move(first));
+                        FwdIter>::get(HPX_MOVE(first));
                 }
 
                 auto f1 = [f, proj, policy](
@@ -512,17 +512,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return sequential_min_element(
                         policy, it, part_count, f, proj);
                 };
-                auto f2 = [policy, f = std::forward<F>(f),
-                              proj = std::forward<Proj>(proj)](
+                auto f2 = [policy, f = HPX_FORWARD(F, f),
+                              proj = HPX_FORWARD(Proj, proj)](
                               std::vector<FwdIter>&& positions) -> FwdIter {
                     return min_element::sequential_minmax_element_ind(
                         policy, positions.begin(), positions.size(), f, proj);
                 };
 
                 return util::partitioner<ExPolicy, FwdIter, FwdIter>::call(
-                    std::forward<ExPolicy>(policy), first,
-                    detail::distance(first, last), std::move(f1),
-                    hpx::unwrapping(std::move(f2)));
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1),
+                    hpx::unwrapping(HPX_MOVE(f2)));
             }
         };
 
@@ -644,7 +644,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto largest = first;
 
                 element_type value = HPX_INVOKE(proj, *largest);
-                util::loop(std::forward<ExPolicy>(policy), ++first, last,
+                util::loop(HPX_FORWARD(ExPolicy, policy), ++first, last,
                     [&](FwdIter const& curr) -> void {
                         element_type curr_value = HPX_INVOKE(proj, *curr);
                         if (!HPX_INVOKE(f, curr_value, value))
@@ -878,7 +878,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy, result_type,
                     result_type>::call(HPX_FORWARD(ExPolicy, policy),
                     result.min, detail::distance(result.min, last),
-                    HPX_MOVE(f1), hpx::unwrapping(std::move(f2)));
+                    HPX_MOVE(f1), hpx::unwrapping(HPX_MOVE(f2)));
             }
         };
 
@@ -909,8 +909,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         return detail::minmax_element<FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-            std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+            HPX_FORWARD(Proj, proj));
     }
 }}}    // namespace hpx::parallel::v1
 
@@ -938,7 +938,7 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::min_element<FwdIter>().call(
-                hpx::execution::seq, first, last, std::forward<F>(f),
+                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -983,7 +983,7 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::max_element<FwdIter>().call(
-                hpx::execution::seq, first, last, std::forward<F>(f),
+                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -1004,7 +1004,7 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::max_element<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
                 hpx::parallel::util::projection_identity());
         }
     } max_element{};
@@ -1028,7 +1028,7 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::minmax_element<FwdIter>().call(
-                hpx::execution::seq, first, last, std::forward<F>(f),
+                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -1049,7 +1049,7 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::minmax_element<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
                 hpx::parallel::util::projection_identity());
         }
     } minmax_element{};

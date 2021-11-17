@@ -356,7 +356,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename... Ts>
             decltype(auto) operator()(Ts&&... ts) const
             {
-                return sort_thread(std::forward<Ts>(ts)...);
+                return sort_thread(HPX_FORWARD(Ts, ts)...);
             }
         };
 
@@ -369,7 +369,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename... Ts>
             decltype(auto) operator()(Ts&&... ts) const
             {
-                return parallel_partial_sort(std::forward<Ts>(ts)...);
+                return parallel_partial_sort(HPX_FORWARD(Ts, ts)...);
             }
         };
 

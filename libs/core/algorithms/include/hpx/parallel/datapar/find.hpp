@@ -85,7 +85,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Proj&& proj)
     {
         return datapar_find<ExPolicy>::call(base_idx, part_begin, part_count,
-            tok, val, std::forward<Proj>(proj));
+            tok, val, HPX_FORWARD(Proj, proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -164,7 +164,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         std::size_t part_count, Token& tok, F&& op, Proj&& proj)
     {
         return datapar_find_if<ExPolicy>::call(part_begin, part_count, tok,
-            std::forward<F>(op), std::forward<Proj>(proj));
+            HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
     template <typename ExPolicy, typename FwdIter, typename Token, typename F,
@@ -176,7 +176,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Proj&& proj)
     {
         return datapar_find_if<ExPolicy>::call(base_idx, part_begin, part_count,
-            tok, std::forward<F>(op), std::forward<Proj>(proj));
+            tok, HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy>
@@ -255,7 +255,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         std::size_t part_count, Token& tok, F&& op, Proj&& proj)
     {
         return datapar_find_if_not<ExPolicy>::call(part_begin, part_count, tok,
-            std::forward<F>(op), std::forward<Proj>(proj));
+            HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
     template <typename ExPolicy, typename FwdIter, typename Token, typename F,
@@ -267,7 +267,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Proj&& proj)
     {
         return datapar_find_if_not<ExPolicy>::call(base_idx, part_begin,
-            part_count, tok, std::forward<F>(op), std::forward<Proj>(proj));
+            part_count, tok, HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 }}}}    // namespace hpx::parallel::v1::detail
 #endif

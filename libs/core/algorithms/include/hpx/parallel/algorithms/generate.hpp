@@ -179,7 +179,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static typename util::detail::algorithm_result<ExPolicy, Iter>::type
             parallel(ExPolicy&& policy, Iter first, Sent last, F&& f)
             {
-                auto f1 = [policy, f = std::forward<F>(f)](
+                auto f1 = [policy, f = HPX_FORWARD(F, f)](
                               Iter part_begin, std::size_t part_size) mutable {
                     auto part_end = part_begin;
                     std::advance(part_end, part_size);
@@ -187,8 +187,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         HPX_MOVE(policy), part_begin, part_end, HPX_MOVE(f));
                 };
                 return util::partitioner<ExPolicy, Iter>::call(
-                    std::forward<ExPolicy>(policy), first,
-                    detail::distance(first, last), std::move(f1),
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1),
                     [first, last](std::vector<hpx::future<Iter>>&&) {
                         return detail::advance_to_sentinel(first, last);
                     });
@@ -240,7 +240,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy&& policy, InIter first, std::size_t count, F&& f)
             {
                 return sequential_generate_n(
-                    std::forward<ExPolicy>(policy), first, count, f);
+                    HPX_FORWARD(ExPolicy, policy), first, count, f);
             }
 
             template <typename ExPolicy, typename F>
@@ -255,7 +255,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         HPX_MOVE(policy), part_begin, part_size, HPX_MOVE(f));
                 };
                 return util::partitioner<ExPolicy, FwdIter>::call(
-                    HPX_FORWARD(ExPolicy, policy), first, count, std::move(f1),
+                    HPX_FORWARD(ExPolicy, policy), first, count, HPX_MOVE(f1),
                     [first, count](
                         std::vector<hpx::future<FwdIter>>&&) mutable {
                         std::advance(first, count);

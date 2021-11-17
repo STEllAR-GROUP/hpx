@@ -82,7 +82,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Proj&& proj)
     {
         return sequential_find_t<ExPolicy>{}(base_idx, part_begin, part_count,
-            tok, val, std::forward<Proj>(proj));
+            tok, val, HPX_FORWARD(Proj, proj));
     }
 #endif
 
@@ -157,7 +157,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         std::size_t part_count, Token& tok, F&& op, Proj&& proj)
     {
         return sequential_find_if_t<ExPolicy>{}(part_begin, part_count, tok,
-            std::forward<F>(op), std::forward<Proj>(proj));
+            HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
     template <typename ExPolicy, typename FwdIter, typename Token, typename F,
@@ -167,7 +167,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Proj&& proj)
     {
         return sequential_find_if_t<ExPolicy>{}(base_idx, part_begin,
-            part_count, tok, std::forward<F>(f), std::forward<Proj>(proj));
+            part_count, tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
     }
 #endif
 
@@ -243,7 +243,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         std::size_t part_count, Token& tok, F&& op, Proj&& proj)
     {
         return sequential_find_if_not_t<ExPolicy>{}(part_begin, part_count, tok,
-            std::forward<F>(op), std::forward<Proj>(proj));
+            HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
     template <typename ExPolicy, typename FwdIter, typename Token, typename F,
@@ -253,7 +253,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Proj&& proj)
     {
         return sequential_find_if_not_t<ExPolicy>{}(base_idx, part_begin,
-            part_count, tok, std::forward<F>(f), std::forward<Proj>(proj));
+            part_count, tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
     }
 #endif
 }}}}    // namespace hpx::parallel::v1::detail

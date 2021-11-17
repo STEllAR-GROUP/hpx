@@ -22,7 +22,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     constexpr Iter sequential_generate_helper(Iter first, Sent last, F&& f)
     {
         return util::loop_ind(hpx::execution::seq, first, last,
-            [f = std::forward<F>(f)](auto& v) mutable { v = f(); });
+            [f = HPX_FORWARD(F, f)](auto& v) mutable { v = f(); });
     }
 
     struct sequential_generate_t
@@ -33,7 +33,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         friend constexpr Iter tag_fallback_invoke(
             sequential_generate_t, ExPolicy&&, Iter first, Sent last, F&& f)
         {
-            return sequential_generate_helper(first, last, std::forward<F>(f));
+            return sequential_generate_helper(first, last, HPX_FORWARD(F, f));
         }
     };
 
@@ -46,7 +46,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         ExPolicy&& policy, Iter first, Sent last, F&& f)
     {
         return sequential_generate_t{}(
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f));
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f));
     }
 #endif
 
@@ -67,7 +67,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             ExPolicy&&, Iter first, std::size_t count, F&& f)
         {
             return sequential_generate_n_helper(
-                first, count, std::forward<F>(f));
+                first, count, HPX_FORWARD(F, f));
         }
     };
 
@@ -80,7 +80,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         ExPolicy&& policy, Iter first, std::size_t count, F&& f)
     {
         return sequential_generate_n_t{}(
-            std::forward<ExPolicy>(policy), first, count, std::forward<F>(f));
+            HPX_FORWARD(ExPolicy, policy), first, count, HPX_FORWARD(F, f));
     }
 #endif
 

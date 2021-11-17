@@ -640,7 +640,7 @@ namespace hpx { namespace parallel { namespace util {
         End end, CancelToken& tok, F&& f)
     {
         return detail::datapar_loop<Begin>::call(
-            begin, end, tok, std::forward<F>(f));
+            begin, end, tok, HPX_FORWARD(F, f));
     }
 
     template <typename Begin, typename End, typename CancelToken, typename F>
@@ -649,7 +649,7 @@ namespace hpx { namespace parallel { namespace util {
         Begin begin, End end, CancelToken& tok, F&& f)
     {
         return detail::datapar_loop<Begin>::call(
-            begin, end, tok, std::forward<F>(f));
+            begin, end, tok, HPX_FORWARD(F, f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -703,7 +703,7 @@ namespace hpx { namespace parallel { namespace util {
         std::size_t count, CancelToken& tok, F&& f)
     {
         return hpx::parallel::util::detail::datapar_loop_n<Iter>::call(
-            it, count, tok, std::forward<F>(f));
+            it, count, tok, HPX_FORWARD(F, f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -725,7 +725,7 @@ namespace hpx { namespace parallel { namespace util {
         std::size_t base_idx, Iter it, std::size_t count, F&& f)
     {
         return hpx::parallel::util::detail::datapar_loop_idx_n<Iter>::call(
-            base_idx, it, count, std::forward<F>(f));
+            base_idx, it, count, HPX_FORWARD(F, f));
     }
 
     template <typename ExPolicy, typename Iter, typename CancelToken,
@@ -737,7 +737,7 @@ namespace hpx { namespace parallel { namespace util {
         F&& f)
     {
         return hpx::parallel::util::detail::datapar_loop_idx_n<Iter>::call(
-            base_idx, it, count, tok, std::forward<F>(f));
+            base_idx, it, count, tok, HPX_FORWARD(F, f));
     }
 }}}    // namespace hpx::parallel::util
 

@@ -336,7 +336,7 @@ namespace hpx { namespace ranges {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
-                .call(std::forward<ExPolicy>(policy), first, last, dest,
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
                     std::minus<>());
         }
 
@@ -360,7 +360,7 @@ namespace hpx { namespace ranges {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng), dest, std::minus<>());
         }
 
@@ -383,7 +383,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
                 .call(hpx::execution::sequenced_policy{}, first, last, dest,
-                    std::forward<Op>(op));
+                    HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -404,7 +404,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, std::forward<Op>(op));
+                    hpx::util::end(rng), dest, HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -429,8 +429,8 @@ namespace hpx { namespace ranges {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
-                .call(std::forward<ExPolicy>(policy), first, last, dest,
-                    std::forward<Op>(op));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                    HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -454,8 +454,8 @@ namespace hpx { namespace ranges {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, std::forward<Op>(op));
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), dest, HPX_FORWARD(Op, op));
         }
     } adjacent_difference{};
 }}    // namespace hpx::ranges

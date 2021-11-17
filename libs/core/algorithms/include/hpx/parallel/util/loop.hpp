@@ -1176,7 +1176,7 @@ namespace hpx { namespace parallel { namespace util {
         {
             using cat = typename std::iterator_traits<Iter>::iterator_category;
             return detail::loop_idx_n<cat>::call(
-                base_idx, it, count, std::forward<F>(f));
+                base_idx, it, count, HPX_FORWARD(F, f));
         }
 
         template <typename Iter, typename CancelToken, typename F>
@@ -1187,7 +1187,7 @@ namespace hpx { namespace parallel { namespace util {
         {
             using cat = typename std::iterator_traits<Iter>::iterator_category;
             return detail::loop_idx_n<cat>::call(
-                base_idx, it, count, tok, std::forward<F>(f));
+                base_idx, it, count, tok, HPX_FORWARD(F, f));
         }
     };
 

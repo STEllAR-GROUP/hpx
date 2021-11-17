@@ -90,7 +90,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             std::size_t count = std::distance(first, last);
             return datapar_generate_helper<Iter>::call(
-                first, count, std::forward<F>(f));
+                first, count, HPX_FORWARD(F, f));
         }
     };
 
@@ -101,7 +101,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         sequential_generate_t, ExPolicy&& policy, Iter first, Sent last, F&& f)
     {
         return datapar_generate::call(
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f));
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -112,7 +112,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             ExPolicy&&, Iter first, std::size_t count, F&& f)
         {
             return datapar_generate_helper<Iter>::call(
-                first, count, std::forward<F>(f));
+                first, count, HPX_FORWARD(F, f));
         }
     };
 
@@ -123,7 +123,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         std::size_t count, F&& f)
     {
         return datapar_generate_n::call(
-            std::forward<ExPolicy>(policy), first, count, std::forward<F>(f));
+            HPX_FORWARD(ExPolicy, policy), first, count, HPX_FORWARD(F, f));
     }
 }}}}    // namespace hpx::parallel::v1::detail
 #endif

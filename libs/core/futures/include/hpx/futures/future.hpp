@@ -1107,7 +1107,7 @@ namespace hpx {
         else
         {
             return f.then(hpx::launch::sync,
-                [conv = std::forward<Conv>(conv)](hpx::future<U>&& f) -> R {
+                [conv = HPX_FORWARD(Conv, conv)](hpx::future<U>&& f) -> R {
                     return HPX_INVOKE(conv, f.get());
                 });
         }
@@ -1402,7 +1402,7 @@ namespace hpx {
         else
         {
             return f.then(hpx::launch::sync,
-                [conv = std::forward<Conv>(conv)](
+                [conv = HPX_FORWARD(Conv, conv)](
                     hpx::shared_future<U> const& f) -> R {
                     return HPX_INVOKE(conv, f.get());
                 });

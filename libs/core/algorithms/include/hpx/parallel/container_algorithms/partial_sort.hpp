@@ -303,7 +303,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::partial_sort<RandomIt>().call(
                 hpx::execution::seq, first, middle, last,
-                std::forward<Comp>(comp), std::forward<Proj>(proj));
+                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -331,8 +331,8 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::partial_sort<RandomIt>().call(
-                std::forward<ExPolicy>(policy), first, middle, last,
-                std::forward<Comp>(comp), std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, middle, last,
+                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -362,8 +362,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::partial_sort<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), middle,
-                hpx::util::end(rng), std::forward<Compare>(comp),
-                std::forward<Proj>(proj));
+                hpx::util::end(rng), HPX_FORWARD(Compare, comp),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -393,9 +393,9 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::partial_sort<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng), middle,
-                hpx::util::end(rng), std::forward<Compare>(comp),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng), middle,
+                hpx::util::end(rng), HPX_FORWARD(Compare, comp),
+                HPX_FORWARD(Proj, proj));
         }
     } partial_sort{};
 }}    // namespace hpx::ranges

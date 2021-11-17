@@ -231,21 +231,21 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             HPX_ASSERT(ninput >= 0 || noutput >= 0);
 
             util::compare_projected<Compare, Proj1, Proj2> proj_comp{
-                std::forward<Compare>(comp), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2)};
+                HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2)};
 
             auto nmin = ninput < noutput ? ninput : noutput;
             if (noutput >= ninput)
             {
                 detail::sort<vec_iter_t>().call(hpx::execution::seq,
-                    aux.begin(), aux.end(), std::move(proj_comp),
+                    aux.begin(), aux.end(), HPX_MOVE(proj_comp),
                     util::projection_identity{});
             }
             else
             {
                 parallel::v1::partial_sort<vec_iter_t>().call(
                     hpx::execution::seq, aux.begin(), aux.begin() + nmin,
-                    aux.end(), std::move(proj_comp),
+                    aux.end(), HPX_MOVE(proj_comp),
                     util::projection_identity{});
             }
 
@@ -308,15 +308,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 HPX_ASSERT(ninput >= 0 and noutput >= 0);
 
                 util::compare_projected<Compare, Proj1, Proj2> proj_comp{
-                    std::forward<Compare>(comp), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2)};
+                    HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2)};
 
                 auto nmin = ninput < noutput ? ninput : noutput;
                 if (noutput >= ninput)
                 {
                     detail::sort<vec_iter_t>().call(
                         policy(hpx::execution::non_task), aux.begin(),
-                        aux.end(), std::move(proj_comp),
+                        aux.end(), HPX_MOVE(proj_comp),
                         util::projection_identity{});
                 }
                 else
@@ -324,7 +324,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                     //
                     hpx::parallel::v1::partial_sort<vec_iter_t>().call(
                         policy(hpx::execution::non_task), aux.begin(),
-                        aux.begin() + nmin, aux.end(), std::move(proj_comp),
+                        aux.begin() + nmin, aux.end(), HPX_MOVE(proj_comp),
                         util::projection_identity{});
                 };
 
@@ -379,7 +379,7 @@ namespace hpx {
             return parallel::util::get_second_element(
                 parallel::v1::detail::partial_sort_copy<result_type>().call(
                     hpx::execution::seq, first, last, d_first, d_last,
-                    std::forward<Comp>(comp),
+                    HPX_FORWARD(Comp, comp),
                     parallel::util::projection_identity{},
                     parallel::util::projection_identity{}));
         }
@@ -414,8 +414,8 @@ namespace hpx {
 
             return parallel::util::get_second_element(
                 parallel::v1::detail::partial_sort_copy<result_type>().call(
-                    std::forward<ExPolicy>(policy), first, last, d_first,
-                    d_last, std::forward<Comp>(comp),
+                    HPX_FORWARD(ExPolicy, policy), first, last, d_first,
+                    d_last, HPX_FORWARD(Comp, comp),
                     parallel::util::projection_identity{},
                     parallel::util::projection_identity{}));
         }

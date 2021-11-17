@@ -380,8 +380,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::partial_sort_copy<result_type>()
                 .call(hpx::execution::seq, first, last, r_first, r_last,
-                    std::forward<Comp>(comp), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -421,9 +421,9 @@ namespace hpx { namespace ranges {
             using result_type = partial_sort_copy_result<FwdIter, RandIter>;
 
             return hpx::parallel::v1::detail::partial_sort_copy<result_type>()
-                .call(std::forward<ExPolicy>(policy), first, last, r_first,
-                    r_last, std::forward<Comp>(comp),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, r_first,
+                    r_last, HPX_FORWARD(Comp, comp),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -464,8 +464,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::partial_sort_copy<result_type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Compare>(comp),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Compare, comp),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -506,10 +506,10 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::partial_sort_copy<result_type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Compare>(comp),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Compare, comp),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
     } partial_sort_copy{};
 }}    // namespace hpx::ranges
