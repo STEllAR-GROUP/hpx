@@ -276,7 +276,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::transform_reduce
-    HPX_INLINE_CONSTEXPR_VARIABLE struct transform_reduce_t final
+    inline constexpr struct transform_reduce_t final
       : hpx::detail::tag_parallel_algorithm<transform_reduce_t>
     {
     private:

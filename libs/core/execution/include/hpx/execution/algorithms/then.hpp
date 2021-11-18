@@ -163,7 +163,7 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct then_t final
+    inline constexpr struct then_t final
       : hpx::functional::detail::tag_fallback<then_t>
     {
     private:

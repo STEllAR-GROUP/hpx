@@ -664,7 +664,7 @@ namespace hpx { namespace naming {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_INLINE_CONSTEXPR_VARIABLE gid_type const invalid_gid{};
+    inline constexpr gid_type const invalid_gid{};
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT std::ostream& operator<<(std::ostream& os, gid_type const& id);

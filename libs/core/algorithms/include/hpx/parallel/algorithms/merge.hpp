@@ -793,7 +793,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::merge
-    HPX_INLINE_CONSTEXPR_VARIABLE struct merge_t final
+    inline constexpr struct merge_t final
       : hpx::detail::tag_parallel_algorithm<merge_t>
     {
     private:
@@ -879,7 +879,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::inplace_merge
-    HPX_INLINE_CONSTEXPR_VARIABLE struct inplace_merge_t final
+    inline constexpr struct inplace_merge_t final
       : hpx::detail::tag_parallel_algorithm<inplace_merge_t>
     {
     private:

@@ -296,7 +296,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::adjacent_difference
-    HPX_INLINE_CONSTEXPR_VARIABLE struct adjacent_difference_t final
+    inline constexpr struct adjacent_difference_t final
       : hpx::detail::tag_parallel_algorithm<adjacent_difference_t>
     {
         // clang-format off

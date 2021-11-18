@@ -327,7 +327,7 @@ namespace hpx { namespace parallel { inline namespace rangev1 {
 namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::stable_sort
-    HPX_INLINE_CONSTEXPR_VARIABLE struct stable_sort_t final
+    inline constexpr struct stable_sort_t final
       : hpx::detail::tag_parallel_algorithm<stable_sort_t>
     {
     private:

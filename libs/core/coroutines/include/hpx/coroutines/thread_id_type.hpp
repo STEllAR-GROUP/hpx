@@ -396,7 +396,7 @@ namespace hpx { namespace threads {
     // the compiler.
     extern HPX_DEVICE thread_id invalid_thread_id;
 #else
-    HPX_INLINE_CONSTEXPR_VARIABLE thread_id const invalid_thread_id;
+    inline constexpr thread_id const invalid_thread_id;
 #endif
 }}    // namespace hpx::threads
 

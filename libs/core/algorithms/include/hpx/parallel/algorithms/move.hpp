@@ -201,7 +201,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::move
-    HPX_INLINE_CONSTEXPR_VARIABLE struct move_t final
+    inline constexpr struct move_t final
       : hpx::detail::tag_parallel_algorithm<move_t>
     {
     private:

@@ -502,7 +502,7 @@ namespace hpx { namespace ranges {
 #include <vector>
 
 namespace hpx { namespace ranges {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct is_sorted_t final
+    inline constexpr struct is_sorted_t final
       : hpx::detail::tag_parallel_algorithm<is_sorted_t>
     {
     private:
@@ -609,7 +609,7 @@ namespace hpx { namespace ranges {
         }
     } is_sorted{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct is_sorted_until_t final
+    inline constexpr struct is_sorted_until_t final
       : hpx::detail::tag_parallel_algorithm<is_sorted_until_t>
     {
     private:

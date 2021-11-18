@@ -421,7 +421,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::for_each
-    HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_t final
+    inline constexpr struct for_each_t final
       : hpx::detail::tag_parallel_algorithm<for_each_t>
     {
         // clang-format off
@@ -530,7 +530,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::for_each_n
-    HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_n_t final
+    inline constexpr struct for_each_n_t final
       : hpx::detail::tag_parallel_algorithm<for_each_n_t>
     {
         // clang-format off

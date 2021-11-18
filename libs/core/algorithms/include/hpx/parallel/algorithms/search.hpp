@@ -368,7 +368,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct search_t final
+    inline constexpr struct search_t final
       : hpx::detail::tag_parallel_algorithm<search_t>
     {
     private:
@@ -421,7 +421,7 @@ namespace hpx {
 
     } search{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct search_n_t final
+    inline constexpr struct search_n_t final
       : hpx::detail::tag_parallel_algorithm<search_n_t>
     {
     private:

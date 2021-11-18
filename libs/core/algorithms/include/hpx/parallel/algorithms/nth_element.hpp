@@ -344,7 +344,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::nth_element
-    HPX_INLINE_CONSTEXPR_VARIABLE struct nth_element_t final
+    inline constexpr struct nth_element_t final
       : hpx::detail::tag_parallel_algorithm<nth_element_t>
     {
         // clang-format off

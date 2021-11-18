@@ -292,7 +292,7 @@ namespace hpx {
         explicit nostopstate_t() = default;
     };
 
-    HPX_INLINE_CONSTEXPR_VARIABLE nostopstate_t nostopstate{};
+    inline constexpr nostopstate_t nostopstate{};
 
     class stop_source
     {

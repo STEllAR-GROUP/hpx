@@ -162,8 +162,7 @@ namespace hpx { namespace parallel { namespace traits {
     using is_projected_t = typename is_projected<F, Iter>::type;
 
     template <typename F, typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_projected_v =
-        is_projected<F, Iter>::value;
+    inline constexpr bool is_projected_v = is_projected<F, Iter>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Proj, typename Iter>
@@ -248,7 +247,7 @@ namespace hpx { namespace parallel { namespace traits {
         typename is_indirect_callable<ExPolicy, F, Projected...>::type;
 
     template <typename ExPolicy, typename F, typename... Projected>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_indirect_callable_v =
+    inline constexpr bool is_indirect_callable_v =
         is_indirect_callable<ExPolicy, F, Projected...>::value;
 
 }}}    // namespace hpx::parallel::traits

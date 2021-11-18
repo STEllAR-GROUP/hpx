@@ -248,7 +248,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct adjacent_find_t final
+    inline constexpr struct adjacent_find_t final
       : hpx::detail::tag_parallel_algorithm<adjacent_find_t>
     {
     private:

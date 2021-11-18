@@ -452,7 +452,7 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct split_t final
+    inline constexpr struct split_t final
       : hpx::functional::detail::tag_fallback<split_t>
     {
     private:

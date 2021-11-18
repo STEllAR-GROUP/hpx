@@ -142,8 +142,7 @@ namespace hpx { namespace functional {
 
     namespace tag_invoke_ns {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        HPX_INLINE_CONSTEXPR_VARIABLE
-        tag_invoke_t_ns::tag_invoke_t tag_invoke = {};
+        inline constexpr tag_invoke_t_ns::tag_invoke_t tag_invoke = {};
 #else
         HPX_DEVICE static tag_invoke_t_ns::tag_invoke_t const tag_invoke = {};
 #endif
@@ -155,7 +154,7 @@ namespace hpx { namespace functional {
         hpx::is_invocable<decltype(tag_invoke_ns::tag_invoke), Tag, Args...>;
 
     template <typename Tag, typename... Args>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_tag_invocable_v =
+    inline constexpr bool is_tag_invocable_v =
         is_tag_invocable<Tag, Args...>::value;
 
     namespace detail {
@@ -198,7 +197,7 @@ namespace hpx { namespace functional {
 #endif
 
     template <typename Tag, typename... Args>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_nothrow_tag_invocable_v =
+    inline constexpr bool is_nothrow_tag_invocable_v =
         is_nothrow_tag_invocable<Tag, Args...>::value;
 
     template <typename Tag, typename... Args>

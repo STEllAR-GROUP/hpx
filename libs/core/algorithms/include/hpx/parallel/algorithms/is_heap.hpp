@@ -461,7 +461,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::is_heap
-    HPX_INLINE_CONSTEXPR_VARIABLE struct is_heap_t final
+    inline constexpr struct is_heap_t final
       : hpx::detail::tag_parallel_algorithm<is_heap_t>
     {
     private:
@@ -518,7 +518,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::is_heap_until
-    HPX_INLINE_CONSTEXPR_VARIABLE struct is_heap_until_t final
+    inline constexpr struct is_heap_until_t final
       : hpx::detail::tag_parallel_algorithm<is_heap_until_t>
     {
     private:

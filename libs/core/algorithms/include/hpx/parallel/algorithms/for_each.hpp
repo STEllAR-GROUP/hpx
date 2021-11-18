@@ -677,7 +677,7 @@ namespace hpx {
     //       that the non-segmented algorithms do not need to be explicitly
     //       disabled for other, possibly external specializations.
     //
-    HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_t final
+    inline constexpr struct for_each_t final
       : hpx::detail::tag_parallel_algorithm<for_each_t>
     {
     private:
@@ -735,7 +735,7 @@ namespace hpx {
     } for_each{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_INLINE_CONSTEXPR_VARIABLE struct for_each_n_t final
+    inline constexpr struct for_each_n_t final
       : hpx::detail::tag_parallel_algorithm<for_each_n_t>
     {
     private:

@@ -130,7 +130,7 @@ namespace hpx { namespace parallel { namespace execution {
     /// \note This is valid for one way executors only, it will call
     ///       exec.sync_execute(f, ts...) if it exists.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct sync_execute_t final
+    inline constexpr struct sync_execute_t final
       : hpx::functional::detail::tag_fallback<sync_execute_t>
     {
     private:
@@ -177,7 +177,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///
     /// \returns f(ts...)'s result through a future
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct async_execute_t final
+    inline constexpr struct async_execute_t final
       : hpx::functional::detail::tag_fallback<async_execute_t>
     {
     private:
@@ -216,7 +216,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       exec.then_execute(f, predecessor, ts...) if it exists) and
     ///       for one way executors (calls predecessor.then(bind(f, ts...))).
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct then_execute_t final
+    inline constexpr struct then_execute_t final
       : hpx::functional::detail::tag_fallback<then_execute_t>
     {
     private:
@@ -257,7 +257,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       returned future), and for non-blocking two way executors
     ///       (calls exec.post(f, ts...) if it exists).
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct post_t final
+    inline constexpr struct post_t final
       : hpx::functional::detail::tag_fallback<post_t>
     {
     private:
@@ -315,7 +315,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       exists; otherwise it executes sync_execute(f, shape, ts...)
     ///       as often as needed.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct bulk_sync_execute_t final
+    inline constexpr struct bulk_sync_execute_t final
       : hpx::functional::detail::tag_fallback<bulk_sync_execute_t>
     {
     private:
@@ -387,7 +387,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       exists; otherwise it executes async_execute(f, shape, ts...)
     ///       as often as needed.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct bulk_async_execute_t final
+    inline constexpr struct bulk_async_execute_t final
       : hpx::functional::detail::tag_fallback<bulk_async_execute_t>
     {
     private:
@@ -463,7 +463,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       async_execute(f, shape, pred.share(), ts...) (if this executor
     ///       is also a TwoWayExecutor) - as often as needed.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct bulk_then_execute_t final
+    inline constexpr struct bulk_then_execute_t final
       : hpx::functional::detail::tag_fallback<bulk_then_execute_t>
     {
     private:

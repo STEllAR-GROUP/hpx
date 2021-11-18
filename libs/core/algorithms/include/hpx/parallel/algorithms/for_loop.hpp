@@ -1315,7 +1315,7 @@ namespace hpx {
     }}    // namespace parallel::v2
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_t final
+    inline constexpr struct for_loop_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_t>
     {
     private:
@@ -1364,7 +1364,7 @@ namespace hpx {
     } for_loop{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_strided_t final
+    inline constexpr struct for_loop_strided_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_strided_t>
     {
     private:
@@ -1418,7 +1418,7 @@ namespace hpx {
     } for_loop_strided{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_n_t final
+    inline constexpr struct for_loop_n_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_n_t>
     {
     private:
@@ -1468,7 +1468,7 @@ namespace hpx {
     } for_loop_n{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_n_strided_t final
+    inline constexpr struct for_loop_n_strided_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_n_strided_t>
     {
     private:

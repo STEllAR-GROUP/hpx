@@ -267,7 +267,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::shift_right
-    HPX_INLINE_CONSTEXPR_VARIABLE struct shift_right_t final
+    inline constexpr struct shift_right_t final
       : hpx::functional::detail::tag_fallback<shift_right_t>
     {
     private:

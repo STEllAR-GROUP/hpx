@@ -973,7 +973,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::unique
-    HPX_INLINE_CONSTEXPR_VARIABLE struct unique_t final
+    inline constexpr struct unique_t final
       : hpx::detail::tag_parallel_algorithm<unique_t>
     {
         // clang-format off
@@ -1029,7 +1029,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::unique_copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct unique_copy_t final
+    inline constexpr struct unique_copy_t final
       : hpx::detail::tag_parallel_algorithm<unique_copy_t>
     {
         // clang-format off

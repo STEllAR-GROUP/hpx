@@ -20,7 +20,7 @@ namespace hpx::execution::experimental {
     };
 
     template <typename Scheduler>
-    HPX_INLINE_CONSTEXPR_VARIABLE get_completion_scheduler_t<Scheduler>
+    inline constexpr get_completion_scheduler_t<Scheduler>
         get_completion_scheduler{};
 
     namespace detail {
@@ -47,7 +47,7 @@ namespace hpx::execution::experimental {
         };
 
         template <typename CPO, typename Sender>
-        HPX_INLINE_CONSTEXPR_VARIABLE bool has_completion_scheduler_v =
+        inline constexpr bool has_completion_scheduler_v =
             has_completion_scheduler<CPO, Sender>::value;
 
         template <bool HasCompletionScheduler, typename ReceiverCPO,
@@ -82,10 +82,9 @@ namespace hpx::execution::experimental {
 
         template <typename ReceiverCPO, typename Sender, typename AlgorithmCPO,
             typename... Ts>
-        HPX_INLINE_CONSTEXPR_VARIABLE bool
-            is_completion_scheduler_tag_invocable_v =
-                is_completion_scheduler_tag_invocable<ReceiverCPO, Sender,
-                    AlgorithmCPO, Ts...>::value;
+        inline constexpr bool is_completion_scheduler_tag_invocable_v =
+            is_completion_scheduler_tag_invocable<ReceiverCPO, Sender,
+                AlgorithmCPO, Ts...>::value;
 
     }    // namespace detail
 }    // namespace hpx::execution::experimental

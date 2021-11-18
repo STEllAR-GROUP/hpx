@@ -78,7 +78,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///        iteration the function has already executed (i.e. which
     ///        don't have to be scheduled anymore).
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct get_chunk_size_t final
+    inline constexpr struct get_chunk_size_t final
       : hpx::functional::detail::tag_fallback<get_chunk_size_t>
     {
     private:
@@ -114,7 +114,7 @@ namespace hpx { namespace parallel { namespace execution {
     /// \param num_tasks [in] The number of tasks the chunk size should be
     ///                 determined for
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct maximal_number_of_chunks_t final
+    inline constexpr struct maximal_number_of_chunks_t final
       : hpx::functional::detail::tag_fallback<maximal_number_of_chunks_t>
     {
     private:
@@ -146,7 +146,7 @@ namespace hpx { namespace parallel { namespace execution {
     /// \note This calls params.reset_thread_distribution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct reset_thread_distribution_t final
+    inline constexpr struct reset_thread_distribution_t final
       : hpx::functional::detail::tag_fallback<reset_thread_distribution_t>
     {
     private:
@@ -177,7 +177,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///       exists; otherwise it forwards the request to the executor
     ///       parameters object.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct processing_units_count_t final
+    inline constexpr struct processing_units_count_t final
       : hpx::functional::detail::tag_fallback<processing_units_count_t>
     {
     private:
@@ -206,7 +206,7 @@ namespace hpx { namespace parallel { namespace execution {
     /// \note This calls params.mark_begin_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct mark_begin_execution_t final
+    inline constexpr struct mark_begin_execution_t final
       : hpx::functional::detail::tag_fallback<mark_begin_execution_t>
     {
     private:
@@ -235,7 +235,7 @@ namespace hpx { namespace parallel { namespace execution {
     /// \note This calls params.mark_begin_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct mark_end_of_scheduling_t final
+    inline constexpr struct mark_end_of_scheduling_t final
       : hpx::functional::detail::tag_fallback<mark_end_of_scheduling_t>
     {
     private:
@@ -264,7 +264,7 @@ namespace hpx { namespace parallel { namespace execution {
     /// \note This calls params.mark_end_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct mark_end_execution_t final
+    inline constexpr struct mark_end_execution_t final
       : hpx::functional::detail::tag_fallback<mark_end_execution_t>
     {
     private:

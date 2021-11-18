@@ -299,7 +299,7 @@ namespace hpx { namespace ranges {
 #include <vector>
 
 namespace hpx { namespace ranges {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct nth_element_t final
+    inline constexpr struct nth_element_t final
       : hpx::detail::tag_parallel_algorithm<nth_element_t>
     {
     private:

@@ -107,7 +107,7 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct start_detached_t final
+    inline constexpr struct start_detached_t final
       : hpx::functional::detail::tag_fallback<start_detached_t>
     {
     private:

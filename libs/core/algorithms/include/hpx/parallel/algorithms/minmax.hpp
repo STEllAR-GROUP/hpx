@@ -921,7 +921,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::min_element
-    HPX_INLINE_CONSTEXPR_VARIABLE struct min_element_t final
+    inline constexpr struct min_element_t final
       : hpx::detail::tag_parallel_algorithm<min_element_t>
     {
         // clang-format off
@@ -966,7 +966,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::max_element
-    HPX_INLINE_CONSTEXPR_VARIABLE struct max_element_t final
+    inline constexpr struct max_element_t final
       : hpx::detail::tag_parallel_algorithm<max_element_t>
     {
         // clang-format off
@@ -1011,7 +1011,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::minmax_element
-    HPX_INLINE_CONSTEXPR_VARIABLE struct minmax_element_t final
+    inline constexpr struct minmax_element_t final
       : hpx::detail::tag_parallel_algorithm<minmax_element_t>
     {
         // clang-format off

@@ -356,7 +356,7 @@ void plain_deferred_arguments(Executor& exec)
     }
 }
 
-HPX_INLINE_CONSTEXPR_VARIABLE struct void_f_wrapper
+inline constexpr struct void_f_wrapper
 {
     // This should not be instantiated by the dataflow internals for launch
     // policies, since that would not add an additional argument and compilation

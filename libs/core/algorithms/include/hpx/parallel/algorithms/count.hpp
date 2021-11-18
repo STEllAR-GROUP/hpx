@@ -439,7 +439,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::count
-    HPX_INLINE_CONSTEXPR_VARIABLE struct count_t final
+    inline constexpr struct count_t final
       : hpx::detail::tag_parallel_algorithm<count_t>
     {
     private:
@@ -489,7 +489,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::count_if
-    HPX_INLINE_CONSTEXPR_VARIABLE struct count_if_t final
+    inline constexpr struct count_if_t final
       : hpx::detail::tag_parallel_algorithm<count_if_t>
     {
     private:

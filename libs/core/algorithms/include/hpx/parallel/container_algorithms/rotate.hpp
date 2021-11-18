@@ -446,7 +446,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::rotate
-    HPX_INLINE_CONSTEXPR_VARIABLE struct rotate_t final
+    inline constexpr struct rotate_t final
       : hpx::detail::tag_parallel_algorithm<rotate_t>
     {
     private:
@@ -549,7 +549,7 @@ namespace hpx { namespace ranges {
     template <typename I, typename O>
     using rotate_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct rotate_copy_t final
+    inline constexpr struct rotate_copy_t final
       : hpx::detail::tag_parallel_algorithm<rotate_copy_t>
     {
     private:

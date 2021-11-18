@@ -145,7 +145,7 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     template <typename T, typename E = std::exception_ptr>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_receiver_v = is_receiver<T, E>::value;
+    inline constexpr bool is_receiver_v = is_receiver<T, E>::value;
 
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -172,8 +172,7 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     template <typename T, typename... As>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_receiver_of_v =
-        is_receiver_of<T, As...>::value;
+    inline constexpr bool is_receiver_of_v = is_receiver_of<T, As...>::value;
 
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -201,7 +200,7 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     template <typename T, typename... As>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_nothrow_receiver_of_v =
+    inline constexpr bool is_nothrow_receiver_of_v =
         is_nothrow_receiver_of<T, As...>::value;
 
     namespace detail {
@@ -226,7 +225,6 @@ namespace hpx { namespace execution { namespace experimental {
         };
 
         template <typename CPO>
-        HPX_INLINE_CONSTEXPR_VARIABLE bool is_receiver_cpo_v =
-            is_receiver_cpo<CPO>::value;
+        inline constexpr bool is_receiver_cpo_v = is_receiver_cpo<CPO>::value;
     }    // namespace detail
 }}}      // namespace hpx::execution::experimental

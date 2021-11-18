@@ -14,7 +14,7 @@
 #include <utility>
 
 namespace hpx { namespace execution { namespace experimental {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct just_on_t final
+    inline constexpr struct just_on_t final
       : hpx::functional::detail::tag_fallback<just_on_t>
     {
     private:

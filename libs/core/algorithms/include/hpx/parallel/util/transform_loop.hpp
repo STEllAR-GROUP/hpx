@@ -62,8 +62,7 @@ namespace hpx { namespace parallel { namespace util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_INLINE_CONSTEXPR_VARIABLE transform_loop_t transform_loop =
-        transform_loop_t{};
+    inline constexpr transform_loop_t transform_loop = transform_loop_t{};
 #else
     template <typename ExPolicy, typename IterB, typename IterE,
         typename OutIter, typename F>
@@ -118,7 +117,7 @@ namespace hpx { namespace parallel { namespace util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_INLINE_CONSTEXPR_VARIABLE transform_loop_ind_t transform_loop_ind =
+    inline constexpr transform_loop_ind_t transform_loop_ind =
         transform_loop_ind_t{};
 #else
     template <typename ExPolicy, typename IterB, typename IterE,
@@ -208,8 +207,8 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE transform_binary_loop_t<ExPolicy>
-        transform_binary_loop = transform_binary_loop_t<ExPolicy>{};
+    inline constexpr transform_binary_loop_t<ExPolicy> transform_binary_loop =
+        transform_binary_loop_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename InIter1B, typename InIter1E,
         typename InIter2, typename OutIter, typename F>
@@ -310,7 +309,7 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE transform_binary_loop_ind_t<ExPolicy>
+    inline constexpr transform_binary_loop_ind_t<ExPolicy>
         transform_binary_loop_ind = transform_binary_loop_ind_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename InIter1B, typename InIter1E,
@@ -428,8 +427,8 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE transform_loop_n_t<ExPolicy>
-        transform_loop_n = transform_loop_n_t<ExPolicy>{};
+    inline constexpr transform_loop_n_t<ExPolicy> transform_loop_n =
+        transform_loop_n_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Iter, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
@@ -532,8 +531,8 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE transform_loop_n_ind_t<ExPolicy>
-        transform_loop_n_ind = transform_loop_n_ind_t<ExPolicy>{};
+    inline constexpr transform_loop_n_ind_t<ExPolicy> transform_loop_n_ind =
+        transform_loop_n_ind_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Iter, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
@@ -600,7 +599,7 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE transform_binary_loop_n_t<ExPolicy>
+    inline constexpr transform_binary_loop_n_t<ExPolicy>
         transform_binary_loop_n = transform_binary_loop_n_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename InIter1, typename InIter2,
@@ -671,7 +670,7 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE transform_binary_loop_ind_n_t<ExPolicy>
+    inline constexpr transform_binary_loop_ind_n_t<ExPolicy>
         transform_binary_loop_ind_n = transform_binary_loop_ind_n_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename InIter1, typename InIter2,

@@ -95,7 +95,7 @@ namespace hpx { namespace parallel { namespace execution {
     using is_executor_parameters_t = typename is_executor_parameters<T>::type;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_executor_parameters_v =
+    inline constexpr bool is_executor_parameters_v =
         is_executor_parameters<T>::value;
 }}}    // namespace hpx::parallel::execution
 
@@ -111,6 +111,6 @@ namespace hpx { namespace traits {
     using is_executor_parameters_t = typename is_executor_parameters<T>::type;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_executor_parameters_v =
+    inline constexpr bool is_executor_parameters_v =
         is_executor_parameters<T>::value;
 }}    // namespace hpx::traits

@@ -117,7 +117,7 @@ namespace hpx { namespace util {
     };
 
     template <typename... Ts>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool all_of_v = all_of<Ts...>::value;
+    inline constexpr bool all_of_v = all_of<Ts...>::value;
 
     namespace detail {
         template <typename... Ts>
@@ -140,7 +140,7 @@ namespace hpx { namespace util {
     };
 
     template <typename... Ts>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool any_of_v = any_of<Ts...>::value;
+    inline constexpr bool any_of_v = any_of<Ts...>::value;
 
     template <typename... Ts>
     struct none_of : std::integral_constant<bool, !any_of<Ts...>::value>
@@ -148,7 +148,7 @@ namespace hpx { namespace util {
     };
 
     template <typename... Ts>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool none_of_v = none_of<Ts...>::value;
+    inline constexpr bool none_of_v = none_of<Ts...>::value;
 
     template <typename T, typename... Ts>
     struct contains : any_of<std::is_same<T, Ts>...>

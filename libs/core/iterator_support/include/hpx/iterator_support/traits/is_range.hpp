@@ -31,7 +31,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_range_v = is_range<T>::value;
+    inline constexpr bool is_range_v = is_range<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>

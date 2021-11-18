@@ -902,7 +902,7 @@ namespace hpx { namespace traits {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::transform
-    HPX_INLINE_CONSTEXPR_VARIABLE struct transform_t final
+    inline constexpr struct transform_t final
       : hpx::detail::tag_parallel_algorithm<transform_t>
     {
     private:

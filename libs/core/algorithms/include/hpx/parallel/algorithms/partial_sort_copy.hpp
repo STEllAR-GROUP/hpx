@@ -348,7 +348,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::partial_sort_copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct partial_sort_copy_t final
+    inline constexpr struct partial_sort_copy_t final
       : hpx::detail::tag_parallel_algorithm<partial_sort_copy_t>
     {
     private:

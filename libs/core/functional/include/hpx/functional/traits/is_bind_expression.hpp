@@ -22,6 +22,5 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_bind_expression_v =
-        is_bind_expression<T>::value;
+    inline constexpr bool is_bind_expression_v = is_bind_expression<T>::value;
 }}    // namespace hpx::traits

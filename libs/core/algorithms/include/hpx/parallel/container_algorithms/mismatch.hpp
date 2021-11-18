@@ -235,7 +235,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::mismatch
-    HPX_INLINE_CONSTEXPR_VARIABLE struct mismatch_t final
+    inline constexpr struct mismatch_t final
       : hpx::detail::tag_parallel_algorithm<mismatch_t>
     {
     private:

@@ -253,31 +253,30 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_post_member_v =
-        has_post_member<T>::value;
+    inline constexpr bool has_post_member_v = has_post_member<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_sync_execute_member_v =
+    inline constexpr bool has_sync_execute_member_v =
         has_sync_execute_member<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_async_execute_member_v =
+    inline constexpr bool has_async_execute_member_v =
         has_async_execute_member<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_then_execute_member_v =
+    inline constexpr bool has_then_execute_member_v =
         has_then_execute_member<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_bulk_sync_execute_member_v =
+    inline constexpr bool has_bulk_sync_execute_member_v =
         has_bulk_sync_execute_member<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_bulk_async_execute_member_v =
+    inline constexpr bool has_bulk_async_execute_member_v =
         has_bulk_async_execute_member<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_bulk_then_execute_member_v =
+    inline constexpr bool has_bulk_then_execute_member_v =
         has_bulk_then_execute_member<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////

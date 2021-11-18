@@ -991,7 +991,7 @@ namespace hpx { namespace ranges {
     template <typename I, typename O1, typename O2>
     using partition_copy_result = parallel::util::in_out_out_result<I, O1, O2>;
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct partition_t final
+    inline constexpr struct partition_t final
       : hpx::detail::tag_parallel_algorithm<partition_t>
     {
     private:
@@ -1108,7 +1108,7 @@ namespace hpx { namespace ranges {
         }
     } partition{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct stable_partition_t final
+    inline constexpr struct stable_partition_t final
       : hpx::detail::tag_parallel_algorithm<stable_partition_t>
     {
     private:
@@ -1233,7 +1233,7 @@ namespace hpx { namespace ranges {
         }
     } stable_partition{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct partition_copy_t final
+    inline constexpr struct partition_copy_t final
       : hpx::detail::tag_parallel_algorithm<partition_copy_t>
     {
     private:

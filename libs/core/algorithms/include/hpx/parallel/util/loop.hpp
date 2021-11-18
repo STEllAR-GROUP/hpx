@@ -44,8 +44,7 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE loop_step_t<ExPolicy> loop_step =
-        loop_step_t<ExPolicy>{};
+    inline constexpr loop_step_t<ExPolicy> loop_step = loop_step_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename VecOnly, typename F,
         typename... Iters>
@@ -74,8 +73,8 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE loop_optimization_t<ExPolicy>
-        loop_optimization = loop_optimization_t<ExPolicy>{};
+    inline constexpr loop_optimization_t<ExPolicy> loop_optimization =
+        loop_optimization_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Iter>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool loop_optimization(
@@ -144,7 +143,7 @@ namespace hpx { namespace parallel { namespace util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_INLINE_CONSTEXPR_VARIABLE loop_t loop = loop_t{};
+    inline constexpr loop_t loop = loop_t{};
 #else
     template <typename ExPolicy, typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop(
@@ -223,7 +222,7 @@ namespace hpx { namespace parallel { namespace util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_INLINE_CONSTEXPR_VARIABLE loop_ind_t loop_ind = loop_ind_t{};
+    inline constexpr loop_ind_t loop_ind = loop_ind_t{};
 #else
     template <typename ExPolicy, typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop_ind(
@@ -287,7 +286,7 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE loop2_t<ExPolicy> loop2 = loop2_t<ExPolicy>{};
+    inline constexpr loop2_t<ExPolicy> loop2 = loop2_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename VecOnly, typename Begin1,
         typename End1, typename Begin2, typename F>
@@ -470,8 +469,7 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE loop_n_t<ExPolicy> loop_n =
-        loop_n_t<ExPolicy>{};
+    inline constexpr loop_n_t<ExPolicy> loop_n = loop_n_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iter loop_n(
@@ -510,7 +508,7 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         template <typename ExPolicy>
-        HPX_INLINE_CONSTEXPR_VARIABLE extract_value_t<ExPolicy> extract_value =
+        inline constexpr extract_value_t<ExPolicy> extract_value =
             extract_value_t<ExPolicy>{};
 #else
         template <typename ExPolicy, typename T>
@@ -548,8 +546,8 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         template <typename ExPolicy>
-        HPX_INLINE_CONSTEXPR_VARIABLE accumulate_values_t<ExPolicy>
-            accumulate_values = accumulate_values_t<ExPolicy>{};
+        inline constexpr accumulate_values_t<ExPolicy> accumulate_values =
+            accumulate_values_t<ExPolicy>{};
 #else
         template <typename ExPolicy, typename F, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T const& accumulate_values(
@@ -738,7 +736,7 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE loop_n_ind_t<ExPolicy> loop_n_ind =
+    inline constexpr loop_n_ind_t<ExPolicy> loop_n_ind =
         loop_n_ind_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Iter, typename F>
@@ -1195,7 +1193,7 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE loop_idx_n_t<ExPolicy> loop_idx_n =
+    inline constexpr loop_idx_n_t<ExPolicy> loop_idx_n =
         loop_idx_n_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Iter, typename F>

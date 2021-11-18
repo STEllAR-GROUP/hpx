@@ -367,7 +367,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::reverse
-    HPX_INLINE_CONSTEXPR_VARIABLE struct reverse_t final
+    inline constexpr struct reverse_t final
       : hpx::detail::tag_parallel_algorithm<reverse_t>
     {
     private:
@@ -412,7 +412,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::reverse_copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct reverse_copy_t final
+    inline constexpr struct reverse_copy_t final
       : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
     {
     private:

@@ -273,7 +273,7 @@ namespace hpx { namespace ranges {
 #include <vector>
 
 namespace hpx { namespace ranges {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_fill_t final
+    inline constexpr struct uninitialized_fill_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_fill_t>
     {
     private:
@@ -364,7 +364,7 @@ namespace hpx { namespace ranges {
         }
     } uninitialized_fill{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_fill_n_t final
+    inline constexpr struct uninitialized_fill_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_fill_n_t>
     {
     private:

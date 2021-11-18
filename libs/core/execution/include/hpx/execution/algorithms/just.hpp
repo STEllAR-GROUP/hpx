@@ -111,7 +111,7 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct just_t final
+    inline constexpr struct just_t final
     {
         template <typename... Ts>
         constexpr HPX_FORCEINLINE auto operator()(Ts&&... ts) const

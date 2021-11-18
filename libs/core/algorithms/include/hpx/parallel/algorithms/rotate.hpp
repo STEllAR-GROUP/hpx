@@ -402,7 +402,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::rotate
-    HPX_INLINE_CONSTEXPR_VARIABLE struct rotate_t final
+    inline constexpr struct rotate_t final
       : hpx::detail::tag_parallel_algorithm<rotate_t>
     {
         // clang-format off
@@ -452,7 +452,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::rotate_copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct rotate_copy_t final
+    inline constexpr struct rotate_copy_t final
       : hpx::detail::tag_parallel_algorithm<rotate_copy_t>
     {
         // clang-format off

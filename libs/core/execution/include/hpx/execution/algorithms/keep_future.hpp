@@ -143,7 +143,7 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct keep_future_t final
+    inline constexpr struct keep_future_t final
     {
         // clang-format off
         template <typename Future,

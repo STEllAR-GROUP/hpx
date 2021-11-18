@@ -384,7 +384,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::reduce
-    HPX_INLINE_CONSTEXPR_VARIABLE struct reduce_t final
+    inline constexpr struct reduce_t final
       : hpx::detail::tag_parallel_algorithm<reduce_t>
     {
     private:

@@ -15,7 +15,7 @@
 
 namespace hpx { namespace experimental {
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct prefer_t
+    inline constexpr struct prefer_t
       : hpx::functional::detail::tag_fallback<prefer_t>
     {
         // clang-format off

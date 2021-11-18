@@ -428,7 +428,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::reverse
-    HPX_INLINE_CONSTEXPR_VARIABLE struct reverse_t final
+    inline constexpr struct reverse_t final
       : hpx::detail::tag_parallel_algorithm<reverse_t>
     {
     private:
@@ -515,7 +515,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::reverse_copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct reverse_copy_t final
+    inline constexpr struct reverse_copy_t final
       : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
     {
     private:

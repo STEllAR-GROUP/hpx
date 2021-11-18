@@ -233,7 +233,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::swap_ranges
-    HPX_INLINE_CONSTEXPR_VARIABLE struct swap_ranges_t final
+    inline constexpr struct swap_ranges_t final
       : hpx::detail::tag_parallel_algorithm<swap_ranges_t>
     {
     private:

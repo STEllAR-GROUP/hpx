@@ -35,7 +35,7 @@ namespace hpx { namespace util {
             static constexpr std::uint64_t shift_amount = 64 - log2;
         };
 
-        static HPX_INLINE_CONSTEXPR_VARIABLE std::uint64_t golden_ratio =
+        static inline constexpr std::uint64_t golden_ratio =
             11400714819323198485llu;
     }    // namespace detail
 

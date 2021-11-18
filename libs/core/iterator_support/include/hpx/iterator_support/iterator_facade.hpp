@@ -449,7 +449,7 @@ namespace hpx { namespace util {
         };
 
         template <typename Reference, typename Value>
-        HPX_INLINE_CONSTEXPR_VARIABLE bool is_non_proxy_reference_v =
+        inline constexpr bool is_non_proxy_reference_v =
             is_non_proxy_reference<Reference, Value>::value;
 
         // Because the C++98 input iterator requirements say that *r++ has

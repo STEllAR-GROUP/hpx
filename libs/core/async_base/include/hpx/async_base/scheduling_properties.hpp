@@ -40,42 +40,41 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct with_priority_t final
+    inline constexpr struct with_priority_t final
       : detail::property_base<with_priority_t>
     {
     } with_priority{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct get_priority_t final
+    inline constexpr struct get_priority_t final
       : detail::property_base<get_priority_t>
     {
     } get_priority{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct with_stacksize_t final
+    inline constexpr struct with_stacksize_t final
       : detail::property_base<with_stacksize_t>
     {
     } with_stacksize{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct get_stacksize_t final
+    inline constexpr struct get_stacksize_t final
       : detail::property_base<get_stacksize_t>
     {
     } get_stacksize{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct with_hint_t final
+    inline constexpr struct with_hint_t final
       : detail::property_base<with_hint_t>
     {
     } with_hint{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct get_hint_t final
-      : detail::property_base<get_hint_t>
+    inline constexpr struct get_hint_t final : detail::property_base<get_hint_t>
     {
     } get_hint{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct with_annotation_t final
+    inline constexpr struct with_annotation_t final
       : detail::property_base<with_annotation_t>
     {
     } with_annotation{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct get_annotation_t final
+    inline constexpr struct get_annotation_t final
       : detail::property_base<get_annotation_t>
     {
     } get_annotation{};

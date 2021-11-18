@@ -660,7 +660,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::remove_copy_if
-    HPX_INLINE_CONSTEXPR_VARIABLE struct remove_copy_if_t final
+    inline constexpr struct remove_copy_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_copy_if_t>
     {
         // clang-format off
@@ -790,7 +790,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::remove_copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct remove_copy_t final
+    inline constexpr struct remove_copy_t final
       : hpx::detail::tag_parallel_algorithm<remove_copy_t>
     {
     private:
