@@ -242,9 +242,10 @@ namespace hpx { namespace threads { namespace detail {
 
             // state has changed since we fetched it from the thread, retry
             // NOLINTNEXTLINE(bugprone-branch-clone)
-            LTM_(error).format("set_thread_state: state has been changed since "
-                               "it was fetched, retrying, thread({}), "
-                               "description({}), new state({}), old state({})",
+            LTM_(warning).format(
+                "set_thread_state: state has been changed since it was "
+                "fetched, retrying, thread({}), description({}), new "
+                "state({}), old state({})",
                 get_thread_id_data(thrd),
                 get_thread_id_data(thrd)->get_description(),
                 get_thread_state_name(new_state),
