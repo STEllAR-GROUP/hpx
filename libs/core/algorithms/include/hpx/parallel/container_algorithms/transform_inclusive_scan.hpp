@@ -979,7 +979,8 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename InIter, typename Sent, typename OutIter,
-            typename BinOp, typename UnOp, typename T,
+            typename BinOp, typename UnOp,
+            typename T = typename std::iterator_traits<InIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for<Sent, InIter>::value &&
@@ -1016,7 +1017,8 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent,
-            typename FwdIter2, typename BinOp, typename UnOp, typename T,
+            typename FwdIter2, typename BinOp, typename UnOp,
+            typename T = typename std::iterator_traits<FwdIter1>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
@@ -1055,7 +1057,9 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename Rng, typename O, typename BinOp,
-            typename UnOp, typename T,
+            typename UnOp,
+            typename T = typename std::iterator_traits<
+                hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::is_invocable_v<UnOp,
@@ -1091,7 +1095,9 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename Rng,  typename O,
-            typename BinOp, typename UnOp, typename T,
+            typename BinOp, typename UnOp,
+            typename T = typename std::iterator_traits<
+                hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&

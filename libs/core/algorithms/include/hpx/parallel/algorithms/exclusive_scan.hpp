@@ -541,7 +541,8 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<exclusive_scan_t>
     {
         // clang-format off
-        template <typename InIter, typename OutIter, typename T,
+        template <typename InIter, typename OutIter,
+            typename T = typename std::iterator_traits<InIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter>
@@ -565,7 +566,7 @@ namespace hpx {
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T,
+            typename T = typename std::iterator_traits<FwdIter1>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
@@ -592,7 +593,8 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename InIter, typename OutIter, typename T,
+        template <typename InIter, typename OutIter,
+            typename T = typename std::iterator_traits<InIter>::value_type,
             typename Op,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<InIter> &&
@@ -621,7 +623,8 @@ namespace hpx {
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T, typename Op,
+            typename T = typename std::iterator_traits<FwdIter1>::value_type,
+            typename Op,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator_v<FwdIter1> &&

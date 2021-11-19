@@ -189,7 +189,9 @@ namespace hpx { namespace ranges {
     {
     private:
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename T,
+        template <typename ExPolicy, typename Rng,
+            typename T = typename std::iterator_traits<
+                hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value
@@ -213,7 +215,8 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename Iter, typename Sent, typename T,
+        template <typename ExPolicy, typename Iter, typename Sent,
+            typename T = typename std::iterator_traits<Iter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
@@ -232,13 +235,15 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename Rng, typename T,
+        template <typename Rng,
+            typename T = typename std::iterator_traits<
+                hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend typename hpx::traits::range_traits<Rng>::iterator_type
-        tag_fallback_invoke(fill_t, Rng&& rng, T const& value)
+        friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
+            fill_t, Rng&& rng, T const& value)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -253,7 +258,8 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename Iter, typename Sent, typename T,
+        template <typename Iter, typename Sent,
+            typename T = typename std::iterator_traits<Iter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
@@ -276,14 +282,16 @@ namespace hpx { namespace ranges {
     {
     private:
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename T,
+        template <typename ExPolicy, typename Rng,
+            typename T = typename std::iterator_traits<
+                hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_traits<Rng>::iterator_type>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            hpx::traits::range_iterator_t<Rng>>
         tag_fallback_invoke(
             fill_n_t, ExPolicy&& policy, Rng&& rng, T const& value)
         {
@@ -308,7 +316,8 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename Size, typename T,
+        template <typename ExPolicy, typename FwdIter, typename Size,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
@@ -335,7 +344,9 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename Rng, typename T,
+        template <typename Rng,
+            typename T = typename std::iterator_traits<
+                hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value
             )>
@@ -362,7 +373,8 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename FwdIter, typename Size, typename T,
+        template <typename FwdIter, typename Size,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value
             )>

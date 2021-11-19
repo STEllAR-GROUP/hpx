@@ -1209,7 +1209,9 @@ namespace hpx { namespace ranges {
     private:
         // clang-format off
         template <typename Iter, typename Sent, typename Pred,
-        typename T, typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<Iter,
+                Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
@@ -1232,7 +1234,9 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename Rng, typename Pred,
-        typename T, typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
@@ -1261,7 +1265,9 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent, typename Pred,
-        typename T, typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<Iter,
+                Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<Iter>::value &&
@@ -1287,7 +1293,9 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename Rng, typename Pred,
-        typename T, typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
@@ -1321,8 +1329,11 @@ namespace hpx { namespace ranges {
     {
     private:
         // clang-format off
-        template <typename Iter, typename Sent, typename T1,
-        typename T2, typename Proj = hpx::parallel::util::projection_identity,
+        template <typename Iter, typename Sent,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T1 = typename hpx::parallel::traits::projected<Iter,
+                Proj>::value_type,
+            typename T2 = T1,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
@@ -1345,8 +1356,11 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename Rng, typename T1,
-        typename T2, typename Proj = hpx::parallel::util::projection_identity,
+        template <typename Rng,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T1 = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
+            typename T2 = T1,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value
@@ -1372,8 +1386,11 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename Iter, typename Sent, typename T1,
-        typename T2, typename Proj = hpx::parallel::util::projection_identity,
+        template <typename ExPolicy, typename Iter, typename Sent,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T1 = typename hpx::parallel::traits::projected<Iter,
+                Proj>::value_type,
+            typename T2 = T1,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<Iter>::value &&
@@ -1399,8 +1416,11 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename T1,
-        typename T2, typename Proj = hpx::parallel::util::projection_identity,
+        template <typename ExPolicy, typename Rng,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T1 = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
+            typename T2 = T1,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
@@ -1436,8 +1456,10 @@ namespace hpx { namespace ranges {
     {
     private:
         // clang-format off
-        template <typename InIter, typename Sent, typename OutIter, typename Pred,
-        typename T, typename Proj = hpx::parallel::util::projection_identity,
+        template <typename InIter, typename Sent, typename OutIter,
+            typename T = typename std::iterator_traits<OutIter>::value_type,
+            typename Pred,
+            typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<InIter>::value &&
                 hpx::traits::is_iterator<OutIter>::value &&
@@ -1467,7 +1489,8 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename Rng, typename OutIter, typename Pred,
-        typename T, typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename std::iterator_traits<OutIter>::value_type,
+            typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::traits::is_iterator<OutIter>::value &&
@@ -1502,8 +1525,9 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent,
-        typename FwdIter2, typename Pred, typename T,
-        typename Proj = hpx::parallel::util::projection_identity,
+            typename FwdIter2, typename Pred,
+            typename T = typename std::iterator_traits<FwdIter2>::value_type,
+            typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
@@ -1535,7 +1559,8 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename Rng, typename FwdIter, typename Pred,
-        typename T, typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
+            typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
@@ -1577,8 +1602,10 @@ namespace hpx { namespace ranges {
     private:
         // clang-format off
         template <typename InIter, typename Sent,
-        typename OutIter, typename T1, typename T2,
-        typename Proj = hpx::parallel::util::projection_identity,
+            typename OutIter,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T1 = typename hpx::parallel::traits::projected<InIter,
+                Proj>::value_type, typename T2 = T1,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<InIter>::value &&
                 hpx::parallel::traits::is_projected<Proj, InIter>::value &&
@@ -1605,8 +1632,10 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename Rng, typename OutIter,
-        typename T1, typename T2,
-        typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T1 = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
+            typename T2 = T1,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value
@@ -1639,8 +1668,10 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1,
-        typename Sent, typename FwdIter2, typename T1,
-        typename T2, typename Proj = hpx::parallel::util::projection_identity,
+            typename Sent, typename FwdIter2,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T1 = typename hpx::parallel::traits::projected<FwdIter1,
+                Proj>::value_type, typename T2 = T1,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
@@ -1671,8 +1702,10 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename Rng, typename FwdIter,
-        typename T1, typename T2,
-        typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T1 = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
+            typename T2 = T1,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&

@@ -389,7 +389,9 @@ namespace hpx {
     {
     private:
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename T, typename F,
+        template <typename ExPolicy, typename FwdIter,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
+            typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
@@ -409,7 +411,8 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename T,
+        template <typename ExPolicy, typename FwdIter,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
@@ -452,7 +455,9 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename FwdIter, typename T, typename F,
+        template <typename FwdIter,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
+            typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value
             )>
@@ -469,7 +474,8 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename FwdIter, typename T,
+        template <typename FwdIter,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value
             )>
