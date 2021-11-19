@@ -58,6 +58,101 @@ int main()
 
     {
         std::atomic<bool> set_value_called{false};
+        auto s = ex::when_all(
+            ex::just(), ex::just(std::string("hello")), ex::just(3.14));
+        auto f = [](std::string y, double z) {
+            HPX_TEST_EQ(y, std::string("hello"));
+            HPX_TEST_EQ(z, 3.14);
+        };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s = ex::when_all(ex::just(42), ex::just(), ex::just(3.14));
+        auto f = [](int x, double z) {
+            HPX_TEST_EQ(x, 42);
+            HPX_TEST_EQ(z, 3.14);
+        };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s = ex::when_all(ex::just(), ex::just(), ex::just());
+        auto f = []() {};
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s = ex::when_all(
+            ex::just(42), ex::just(std::string("hello")), ex::just());
+        auto f = [](int x, std::string y) {
+            HPX_TEST_EQ(x, 42);
+            HPX_TEST_EQ(y, std::string("hello"));
+        };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s = ex::when_all(ex::just(42, std::string("hello"), 3.14));
+        auto f = [](int x, std::string y, double z) {
+            HPX_TEST_EQ(x, 42);
+            HPX_TEST_EQ(y, std::string("hello"));
+            HPX_TEST_EQ(z, 3.14);
+        };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s =
+            ex::when_all(ex::just(42, std::string("hello")), ex::just(3.14));
+        auto f = [](int x, std::string y, double z) {
+            HPX_TEST_EQ(x, 42);
+            HPX_TEST_EQ(y, std::string("hello"));
+            HPX_TEST_EQ(z, 3.14);
+        };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        auto s = ex::when_all(ex::just(), ex::just(42, std::string("hello")),
+            ex::just(), ex::just(3.14), ex::just());
+        auto f = [](int x, std::string y, double z) {
+            HPX_TEST_EQ(x, 42);
+            HPX_TEST_EQ(y, std::string("hello"));
+            HPX_TEST_EQ(z, 3.14);
+        };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
         auto s =
             ex::when_all(ex::just(custom_type_non_default_constructible(42)));
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };

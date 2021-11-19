@@ -28,7 +28,11 @@
 
 namespace hpx { namespace execution { namespace experimental {
     namespace detail {
-        template <std::size_t I, typename OperationState>
+        // This is a receiver to be connected to the ith predecessor sender
+        // passed to when_all. When set_value is called, it will emplace the
+        // values sent into the appropriate position in the pack used to store
+        // values from all predecessor senders.
+        template <typename OperationState>
         struct when_all_receiver
         {
             std::decay_t<OperationState>& op_state;
@@ -64,30 +68,67 @@ namespace hpx { namespace execution { namespace experimental {
                 r.op_state.finish();
             };
 
-            template <typename T>
-            friend void tag_invoke(
-                set_value_t, when_all_receiver&& r, T&& t) noexcept
+            template <typename... Ts, std::size_t... Is>
+            auto set_value_helper(hpx::util::index_pack<Is...>, Ts&&... ts)
+                -> decltype((
+                    std::declval<
+                        typename OperationState::value_types_storage_type>()
+                        .template get<OperationState::i_storage_offset + Is>()
+                        .emplace(HPX_FORWARD(Ts, ts)),
+                    ...))
             {
-                if (!r.op_state.set_done_error_called)
+                // op_state.ts holds values from all predecessor senders. We
+                // emplace the values using the offset calculated while
+                // constructing the operation state.
+                (op_state.ts
+                        .template get<OperationState::i_storage_offset + Is>()
+                        .emplace(HPX_FORWARD(Ts, ts)),
+                    ...);
+            }
+
+            using index_pack_type = typename hpx::util::make_index_pack<
+                OperationState::sender_pack_size>::type;
+
+            template <typename... Ts>
+            auto set_value(Ts&&... ts) noexcept -> decltype(
+                set_value_helper(index_pack_type{}, HPX_FORWARD(Ts, ts)...))
+            {
+                if constexpr (OperationState::sender_pack_size > 0)
                 {
-                    try
+                    if (!op_state.set_done_error_called)
                     {
-                        r.op_state.ts.template get<I>().emplace(
-                            HPX_FORWARD(T, t));
-                    }
-                    catch (...)
-                    {
-                        if (!r.op_state.set_done_error_called.exchange(true))
+                        try
                         {
-                            // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
-                            r.op_state.error = std::current_exception();
+                            set_value_helper(
+                                index_pack_type{}, HPX_FORWARD(Ts, ts)...);
+                        }
+                        catch (...)
+                        {
+                            if (!op_state.set_done_error_called.exchange(true))
+                            {
+                                // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
+                                op_state.error = std::current_exception();
+                            }
                         }
                     }
                 }
 
-                r.op_state.finish();
+                op_state.finish();
             }
         };
+
+        // Due to what appears to be a bug in clang this is not a hidden friend
+        // of when_all_receiver. The trailing decltype for SFINAE in the member
+        // set_value would give an error about accessing an incomplete type, if
+        // the member set_value were a hidden friend tag_invoke overload
+        // instead.
+        template <typename OperationState, typename... Ts>
+        auto tag_invoke(set_value_t, when_all_receiver<OperationState>&& r,
+            Ts&&... ts) noexcept
+            -> decltype(r.set_value(HPX_FORWARD(Ts, ts)...))
+        {
+            r.set_value(HPX_FORWARD(Ts, ts)...);
+        }
 
         template <typename... Senders>
         struct when_all_sender
@@ -119,8 +160,10 @@ namespace hpx { namespace execution { namespace experimental {
 
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
-            using value_types =
-                Variant<Tuple<value_types_helper_t<Senders>...>>;
+            using value_types = hpx::util::detail::concat_inner_packs_t<
+                hpx::util::detail::concat_t<
+                    typename hpx::execution::experimental::sender_traits<
+                        Senders>::template value_types<Tuple, Variant>...>>;
 
             template <template <typename...> class Variant>
             using error_types = hpx::util::detail::unique_concat_t<
@@ -134,26 +177,59 @@ namespace hpx { namespace execution { namespace experimental {
             static_assert(num_predecessors > 0,
                 "when_all expects at least one predecessor sender");
 
-            template <typename Receiver, typename SendersPack, std::size_t I>
+            template <std::size_t I>
+            static constexpr std::size_t sender_pack_size_at_index =
+                single_variant_t<typename sender_traits<hpx::util::at_index_t<I,
+                    Senders...>>::template value_types<hpx::util::pack,
+                    hpx::util::pack>>::size;
+
+            template <typename Receiver, typename SendersPack,
+                std::size_t I = num_predecessors - 1>
             struct operation_state;
 
             template <typename Receiver, typename SendersPack>
             struct operation_state<Receiver, SendersPack, 0>
             {
-                static constexpr std::size_t I = 0;
+                // The index of the sender that this operation state handles.
+                static constexpr std::size_t i = 0;
+                // The offset at which we start to emplace values sent by the
+                // ith predecessor sender.
+                static constexpr std::size_t i_storage_offset = 0;
+                // The number of values sent by the ith predecessor sender.
+                static constexpr std::size_t sender_pack_size =
+                    sender_pack_size_at_index<i>;
+
+                // Number of predecessor senders that have not yet called any of
+                // the set signals.
                 std::atomic<std::size_t> predecessors_remaining =
                     num_predecessors;
-                hpx::util::member_pack_for<hpx::optional<
-                    std::decay_t<value_types_helper_t<Senders>>>...>
-                    ts;
+
+                template <typename T>
+                struct add_optional
+                {
+                    using type = hpx::optional<std::decay_t<T>>;
+                };
+                using value_types_storage_type =
+                    hpx::util::detail::change_pack_t<hpx::util::member_pack_for,
+                        hpx::util::detail::transform_t<
+                            hpx::util::detail::concat_pack_of_packs_t<
+                                value_types<hpx::util::pack, hpx::util::pack>>,
+                            add_optional>>;
+                // Values sent by all predecessor senders are stored here in the
+                // base-case operation state. They are stored in a
+                // member_pack<optional<T0>, ..., optional<Tn>>, where T0, ...,
+                // Tn are the types of the values sent by all predecessor
+                // senders.
+                value_types_storage_type ts;
+
                 hpx::optional<error_types<hpx::variant>> error;
                 std::atomic<bool> set_done_error_called{false};
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
                 using operation_state_type =
                     std::decay_t<decltype(hpx::execution::experimental::connect(
-                        std::declval<SendersPack>().template get<I>(),
-                        when_all_receiver<I, operation_state>(
+                        std::declval<SendersPack>().template get<i>(),
+                        when_all_receiver<operation_state>(
                             std::declval<std::decay_t<operation_state>&>())))>;
                 operation_state_type op_state;
 
@@ -162,11 +238,11 @@ namespace hpx { namespace execution { namespace experimental {
                   : receiver(HPX_FORWARD(Receiver_, receiver))
                   , op_state(hpx::execution::experimental::connect(
 #if defined(HPX_CUDA_VERSION)
-                        std::forward<Senders_>(senders).template get<I>(),
+                        std::forward<Senders_>(senders).template get<i>(),
 #else
-                        HPX_FORWARD(Senders_, senders).template get<I>(),
+                        HPX_FORWARD(Senders_, senders).template get<i>(),
 #endif
-                        when_all_receiver<I, operation_state>(*this)))
+                        when_all_receiver<operation_state>(*this)))
                 {
                 }
 
@@ -222,10 +298,20 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 using base_type = operation_state<Receiver, SendersPack, I - 1>;
 
+                // The index of the sender that this operation state handles.
+                static constexpr std::size_t i = I;
+                // The number of values sent by the ith predecessor sender.
+                static constexpr std::size_t sender_pack_size =
+                    sender_pack_size_at_index<i>;
+                // The offset at which we start to emplace values sent by the
+                // ith predecessor sender.
+                static constexpr std::size_t i_storage_offset =
+                    base_type::i_storage_offset + base_type::sender_pack_size;
+
                 using operation_state_type =
                     std::decay_t<decltype(hpx::execution::experimental::connect(
-                        HPX_FORWARD(SendersPack, senders).template get<I>(),
-                        when_all_receiver<I, operation_state>(
+                        HPX_FORWARD(SendersPack, senders).template get<i>(),
+                        when_all_receiver<operation_state>(
                             std::declval<std::decay_t<operation_state>&>())))>;
                 operation_state_type op_state;
 
@@ -235,11 +321,11 @@ namespace hpx { namespace execution { namespace experimental {
                         HPX_FORWARD(SendersPack, senders))
                   , op_state(hpx::execution::experimental::connect(
 #if defined(HPX_CUDA_VERSION)
-                        std::forward<SendersPack_>(senders).template get<I>(),
+                        std::forward<SendersPack_>(senders).template get<i>(),
 #else
-                        HPX_FORWARD(SendersPack_, senders).template get<I>(),
+                        HPX_FORWARD(SendersPack_, senders).template get<i>(),
 #endif
-                        when_all_receiver<I, operation_state>(*this)))
+                        when_all_receiver<operation_state>(*this)))
                 {
                 }
 
