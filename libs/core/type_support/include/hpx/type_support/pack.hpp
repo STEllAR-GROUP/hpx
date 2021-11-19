@@ -280,6 +280,11 @@ namespace hpx { namespace util {
         template <typename... Packs>
         using concat_t = typename concat<Packs...>::type;
 
+        /// Concatenate the elements in the given packs into a single pack and then
+        /// remove duplicates.
+        template <typename... Packs>
+        using unique_concat_t = unique_t<concat_t<Packs...>>;
+
         template <typename Pack>
         struct concat_pack_of_packs;
 
@@ -289,13 +294,25 @@ namespace hpx { namespace util {
             using type = typename concat<Ts...>::type;
         };
 
-        template <typename... Packs>
-        using unique_concat_t = unique_t<concat_t<Packs...>>;
-
-        /// Concatenate the packs in the given pack into a single pack.
+        /// Concatenate the packs in the given pack into a single pack. The
+        /// outer pack is discarded.
         template <typename Pack>
         using concat_pack_of_packs_t =
             typename concat_pack_of_packs<Pack>::type;
+
+        template <typename Pack>
+        struct concat_inner_packs;
+
+        template <template <typename...> class Pack, typename... Ts>
+        struct concat_inner_packs<Pack<Ts...>>
+        {
+            using type = Pack<typename concat<Ts...>::type>;
+        };
+
+        /// Concatenate the packs in the given pack into a single pack. The
+        /// outer pack is kept.
+        template <typename Pack>
+        using concat_inner_packs_t = typename concat_inner_packs<Pack>::type;
 
         template <typename Pack, typename T>
         struct prepend;
@@ -322,5 +339,19 @@ namespace hpx { namespace util {
         /// Append a given type to the given pack.
         template <typename Pack, typename T>
         using append_t = typename prepend<Pack, T>::type;
+
+        template <template <typename...> class NewPack, typename OldPack>
+        struct change_pack;
+
+        template <template <typename...> class NewPack,
+            template <typename...> class OldPack, typename... Ts>
+        struct change_pack<NewPack, OldPack<Ts...>>
+        {
+            using type = NewPack<Ts...>;
+        };
+
+        /// Change a OldPack<Ts...> to NewPack<Ts...>
+        template <template <typename...> class NewPack, typename OldPack>
+        using change_pack_t = typename change_pack<NewPack, OldPack>::type;
     }    // namespace detail
 }}       // namespace hpx::util
