@@ -307,6 +307,16 @@ namespace hpx { namespace threads {
             thrd_.reset();
         }
 
+        void reset(thread_repr* thrd, bool add_ref = true) noexcept
+        {
+            thrd_.reset(thrd, add_ref);
+        }
+
+        constexpr thread_repr* detach() noexcept
+        {
+            return thrd_.detach();
+        }
+
         friend bool operator==(
             std::nullptr_t, thread_id_ref const& rhs) noexcept
         {
