@@ -111,7 +111,8 @@ namespace hpx { namespace threads { namespace policies {
         };
         using thread_description_ptr = thread_description*;
 #else
-        using thread_description_ptr = thread_id_ref_type;
+        using thread_description_ptr =
+            typename thread_id_ref_type::thread_repr*;
 #endif
 
         using work_items_type = typename PendingQueuing::template apply<
@@ -841,8 +842,10 @@ namespace hpx { namespace threads { namespace policies {
                 return true;
             }
 #else
-            if (0 != work_items_count && work_items_.pop(thrd, steal))
+            thread_description_ptr next_thrd;
+            if (0 != work_items_count && work_items_.pop(next_thrd, steal))
             {
+                thrd.reset(next_thrd, false);    // do not addref!
                 --work_items_count_.data_;
                 return true;
             }
@@ -860,7 +863,9 @@ namespace hpx { namespace threads { namespace policies {
                                  hpx::chrono::high_resolution_clock::now()},
                 other_end);
 #else
-            work_items_.push(HPX_MOVE(thrd), other_end);
+            // detach the thread from the id_ref without decrementing
+            // the reference count
+            work_items_.push(thrd.detach(), other_end);
 #endif
         }
 
