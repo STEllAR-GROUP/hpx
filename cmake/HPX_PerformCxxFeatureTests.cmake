@@ -62,7 +62,7 @@ function(hpx_perform_cxx_feature_tests)
   )
 
   # C++20 feature tests
-  if(HPX_WITH_CXX20)
+  if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 20)
     hpx_check_for_cxx20_coroutines(DEFINITIONS HPX_HAVE_CXX20_COROUTINES)
 
     hpx_check_for_cxx20_experimental_simd(
