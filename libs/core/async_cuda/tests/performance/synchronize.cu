@@ -8,7 +8,6 @@
 #include <hpx/local/execution.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/async_cuda.hpp>
-#include <hpx/modules/compute_cuda.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -22,15 +21,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::size_t const batch_iterations = iterations / batch_size;
     std::size_t const non_batch_iterations = iterations % batch_size;
 
-    // Get the cuda targets we want to run on
-    hpx::cuda::experimental::target target;
-
-    // Create the executor
-    hpx::cuda::experimental::default_executor executor(target);
+    cudaStream_t cuda_stream;
+    hpx::cuda::experimental::check_cuda_error(cudaStreamCreate(&cuda_stream));
 
     // Warmup
     {
-        auto cuda_stream = target.native_handle().get_stream();
         hpx::chrono::high_resolution_timer timer;
         for (std::size_t i = 0; i != iterations; ++i)
         {
@@ -45,7 +40,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     }
 
     {
-        auto cuda_stream = target.native_handle().get_stream();
         hpx::chrono::high_resolution_timer timer;
         for (std::size_t i = 0; i != iterations; ++i)
         {
@@ -60,8 +54,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     }
 
     {
-        auto cuda_stream = target.native_handle().get_stream();
-
         hpx::chrono::high_resolution_timer timer;
 
         for (std::size_t i = 0; i < batch_iterations; ++i)
@@ -88,170 +80,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     }
 
     {
-        hpx::chrono::high_resolution_timer timer;
-        for (std::size_t i = 0; i != iterations; ++i)
-        {
-            executor.sync_execute([] HPX_DEVICE() {});
-        }
-        double elapsed = timer.elapsed();
-        std::cout
-            << "executor.sync_execute([](){}):                                 "
-            << elapsed << '\n';
-    }
-
-    {
-        hpx::chrono::high_resolution_timer timer;
-        for (std::size_t i = 0; i != iterations; ++i)
-        {
-            executor.post([] HPX_DEVICE() {});
-            target.synchronize();
-        }
-        double elapsed = timer.elapsed();
-        std::cout
-            << "executor.post([](){}) + synchronize:                           "
-            << elapsed << '\n';
-    }
-
-    {
-        hpx::chrono::high_resolution_timer timer;
-        for (std::size_t i = 0; i < batch_iterations; ++i)
-        {
-            for (std::size_t b = 0; b < batch_size; ++b)
-            {
-                executor.post([] HPX_DEVICE() {});
-            }
-            target.synchronize();
-        }
-
-        for (std::size_t i = 0; i < non_batch_iterations; ++i)
-        {
-            executor.post([] HPX_DEVICE() {});
-        }
-        target.synchronize();
-
-        double elapsed = timer.elapsed();
-        std::cout
-            << "executor.post([](){}) + synchronize batched:                   "
-            << elapsed << '\n';
-    }
-
-    {
-        hpx::chrono::high_resolution_timer timer;
-        for (std::size_t i = 0; i != iterations; ++i)
-        {
-            executor.post([] HPX_DEVICE() {});
-            target.get_future_with_callback().get();
-        }
-        double elapsed = timer.elapsed();
-        std::cout
-            << "executor.post([](){}) + get_future() callback:                 "
-            << elapsed << '\n';
-    }
-
-    {
-        hpx::chrono::high_resolution_timer timer;
-
-        for (std::size_t i = 0; i < batch_iterations; ++i)
-        {
-            for (std::size_t b = 0; b < batch_size; ++b)
-            {
-                executor.post([] HPX_DEVICE() {});
-            }
-            target.get_future_with_callback().get();
-        }
-
-        for (std::size_t i = 0; i < non_batch_iterations; ++i)
-        {
-            executor.post([] HPX_DEVICE() {});
-        }
-        target.get_future_with_callback().get();
-
-        double elapsed = timer.elapsed();
-        std::cout
-            << "executor.post([](){}) + get_future() callback batched:         "
-            << elapsed << '\n';
-    }
-
-    {
-        hpx::cuda::experimental::enable_user_polling poll("default");
-
-        hpx::chrono::high_resolution_timer timer;
-        for (std::size_t i = 0; i != iterations; ++i)
-        {
-            executor.post([] HPX_DEVICE() {});
-            target.get_future_with_event().get();
-        }
-        double elapsed = timer.elapsed();
-        std::cout
-            << "executor.post([](){}) + get_future() event:                    "
-            << elapsed << '\n';
-    }
-
-    {
-        hpx::cuda::experimental::enable_user_polling poll("default");
-
-        hpx::chrono::high_resolution_timer timer;
-
-        for (std::size_t i = 0; i < batch_iterations; ++i)
-        {
-            for (std::size_t b = 0; b < batch_size; ++b)
-            {
-                executor.post([] HPX_DEVICE() {});
-            }
-            target.get_future_with_event().get();
-        }
-
-        for (std::size_t i = 0; i < non_batch_iterations; ++i)
-        {
-            executor.post([] HPX_DEVICE() {});
-        }
-        target.get_future_with_event().get();
-
-        double elapsed = timer.elapsed();
-        std::cout
-            << "executor.post([](){}) + get_future() event batched:            "
-            << elapsed << '\n';
-    }
-
-    {
-        hpx::chrono::high_resolution_timer timer;
-        for (std::size_t i = 0; i != iterations; ++i)
-        {
-            executor.async_execute([] HPX_DEVICE() {}).get();
-        }
-        double elapsed = timer.elapsed();
-        std::cout
-            << "executor.async_execute([](){}).get():                          "
-            << elapsed << '\n';
-    }
-
-    {
-        hpx::chrono::high_resolution_timer timer;
-
-        for (std::size_t i = 0; i < batch_iterations; ++i)
-        {
-            hpx::future<void> f;
-            for (std::size_t b = 0; b < batch_size; ++b)
-            {
-                f = executor.async_execute([] HPX_DEVICE() {});
-            }
-            f.get();
-        }
-
-        hpx::future<void> f;
-        for (std::size_t i = 0; i < non_batch_iterations; ++i)
-        {
-            f = executor.async_execute([] HPX_DEVICE() {});
-        }
-        f.get();
-
-        double elapsed = timer.elapsed();
-        std::cout
-            << "executor.async_execute([](){}).get() batched:                  "
-            << elapsed << '\n';
-    }
-
-    {
         hpx::cuda::experimental::enable_user_polling poll("default");
 
         namespace ex = hpx::execution::experimental;
@@ -260,8 +88,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
         auto const f = [](cudaStream_t cuda_stream) {
             dummy<<<1, 1, 0, cuda_stream>>>();
         };
-
-        auto cuda_stream = target.native_handle().get_stream();
 
         hpx::chrono::high_resolution_timer timer;
         for (std::size_t i = 0; i != iterations; ++i)
@@ -283,8 +109,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
         auto const f = [](cudaStream_t cuda_stream) {
             dummy<<<1, 1, 0, cuda_stream>>>();
         };
-
-        auto cuda_stream = target.native_handle().get_stream();
 
         hpx::chrono::high_resolution_timer timer;
         for (std::size_t i = 0; i < batch_iterations; ++i)
@@ -324,8 +148,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
             dummy<<<1, 1, 0, cuda_stream>>>();
         };
 
-        auto cuda_stream = target.native_handle().get_stream();
-
         hpx::chrono::high_resolution_timer timer;
         for (std::size_t i = 0; i < batch_iterations; ++i)
         {
@@ -335,17 +157,16 @@ int hpx_main(hpx::program_options::variables_map& vm)
             // intentionally insert dummy then([]{}) calls between the
             // transform_stream calls to force synchronization between the
             // kernel launches.
-            cu::transform_stream(ex::just(), f, cuda_stream) |
-                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::then([] {}) | cu::transform_stream(f, cuda_stream) |
-                ex::sync_wait();
+            cu::transform_stream(ex::just(), f, cuda_stream) | ex::then([] {}) |
+                cu::transform_stream(f, cuda_stream) | ex::then([] {}) |
+                cu::transform_stream(f, cuda_stream) | ex::then([] {}) |
+                cu::transform_stream(f, cuda_stream) | ex::then([] {}) |
+                cu::transform_stream(f, cuda_stream) | ex::then([] {}) |
+                cu::transform_stream(f, cuda_stream) | ex::then([] {}) |
+                cu::transform_stream(f, cuda_stream) | ex::then([] {}) |
+                cu::transform_stream(f, cuda_stream) | ex::then([] {}) |
+                cu::transform_stream(f, cuda_stream) | ex::then([] {}) |
+                cu::transform_stream(f, cuda_stream) | ex::sync_wait();
         }
         // Do the remainder one-by-one
         for (std::size_t i = 0; i < non_batch_iterations; ++i)
@@ -368,8 +189,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
             dummy<<<1, 1, 0, cuda_stream>>>();
         };
 
-        auto cuda_stream = target.native_handle().get_stream();
-
         hpx::chrono::high_resolution_timer timer;
         for (std::size_t i = 0; i != iterations; ++i)
         {
@@ -378,7 +197,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
         double elapsed = timer.elapsed();
         std::cout
-            << "transform_stream with on:                                      "
+            << "transform_stream with transfer:                                "
             << elapsed << '\n';
     }
 
@@ -391,8 +210,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
         auto const f = [](cudaStream_t cuda_stream) {
             dummy<<<1, 1, 0, cuda_stream>>>();
         };
-
-        auto cuda_stream = target.native_handle().get_stream();
 
         hpx::chrono::high_resolution_timer timer;
         for (std::size_t i = 0; i < batch_iterations; ++i)
@@ -420,9 +237,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
         double elapsed = timer.elapsed();
         std::cout
-            << "transform_stream with on batched:                              "
+            << "transform_stream with transfer batched:                        "
             << elapsed << '\n';
     }
+
+    hpx::cuda::experimental::check_cuda_error(cudaStreamDestroy(cuda_stream));
 
     return hpx::local::finalize();
 }
