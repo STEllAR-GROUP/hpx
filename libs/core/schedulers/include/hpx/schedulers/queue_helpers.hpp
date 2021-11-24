@@ -73,13 +73,13 @@ namespace hpx { namespace threads { namespace policies {
                     {
                         if (running)
                         {
-                            LTM_(error).format("Listing suspended threads "
-                                               "while queue ({}) is empty:",
+                            LTM_(warning).format("Listing suspended threads "
+                                                 "while queue ({}) is empty:",
                                 num_thread);
                         }
                         else
                         {
-                            LHPX_CONSOLE_(hpx::util::logging::level::error)
+                            LHPX_CONSOLE_(hpx::util::logging::level::warning)
                                 .format("  [TM] Listing suspended threads "
                                         "while queue ({}) is empty:\n",
                                     num_thread);
@@ -89,7 +89,7 @@ namespace hpx { namespace threads { namespace policies {
 
                     if (running)
                     {
-                        LTM_(error)
+                        LTM_(warning)
                             .format("queue({}): {}({:08x}.{:02x}/{:08x})",
                                 num_thread, get_thread_state_name(state), *it,
                                 thrd->get_thread_phase(),
@@ -102,7 +102,7 @@ namespace hpx { namespace threads { namespace policies {
                     }
                     else
                     {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error)
+                        LHPX_CONSOLE_(hpx::util::logging::level::warning)
                             .format("queue({}): {}({:08x}.{:02x}/{:08x})",
                                 num_thread, get_thread_state_name(state), *it,
                                 thrd->get_thread_phase(),

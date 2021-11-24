@@ -845,17 +845,17 @@ namespace hpx { namespace threads { namespace policies {
                 {
                     if (running)
                     {
-                        LTM_(error).format("pool({}), scheduler({}), "
-                                           "queue({}): no new work available, "
-                                           "are we deadlocked?",
+                        LTM_(warning).format(
+                            "pool({}), scheduler({}), queue({}): no new work "
+                            "available, are we deadlocked?",
                             *this->get_parent_pool(), *this, num_thread);
                     }
                     else
                     {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error)
-                            .format("  [TM] pool({}), scheduler({}), "
-                                    "queue({}): no new work available, are we "
-                                    "deadlocked?\n",
+                        LHPX_CONSOLE_(hpx::util::logging::level::warning)
+                            .format(
+                                "  [TM] pool({}), scheduler({}), queue({}): no "
+                                "new work available, are we deadlocked?\n",
                                 *this->get_parent_pool(), *this, num_thread);
                     }
                 }
