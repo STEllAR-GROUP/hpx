@@ -8,6 +8,7 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/invoke_fused.hpp>
+#include <hpx/local/execution.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -15,6 +16,8 @@
 #include <exception>
 #include <string>
 #include <utility>
+
+namespace ex = hpx::execution::experimental;
 
 struct custom_type_non_copyable
 {
@@ -311,8 +314,6 @@ struct error_receiver
 template <template <typename...> typename Sender, typename... Ts, typename F>
 void test_any_sender(F&& f, Ts&&... ts)
 {
-    namespace ex = hpx::execution::experimental;
-
     static_assert(std::is_copy_constructible_v<Sender<Ts...>>,
         "This test requires the sender to be copy constructible.");
 
@@ -400,8 +401,6 @@ void test_any_sender(F&& f, Ts&&... ts)
 template <template <typename...> typename Sender, typename... Ts, typename F>
 void test_unique_any_sender(F&& f, Ts&&... ts)
 {
-    namespace ex = hpx::execution::experimental;
-
     Sender<std::decay_t<Ts>...> s{std::forward<Ts>(ts)...};
 
     ex::unique_any_sender<std::decay_t<Ts>...> as1{std::move(s)};
@@ -441,8 +440,6 @@ void test_unique_any_sender(F&& f, Ts&&... ts)
 
 void test_any_sender_set_error()
 {
-    namespace ex = hpx::execution::experimental;
-
     error_sender s;
 
     ex::any_sender<> as1{std::move(s)};
@@ -524,8 +521,6 @@ void test_any_sender_set_error()
 
 void test_unique_any_sender_set_error()
 {
-    namespace ex = hpx::execution::experimental;
-
     error_sender s;
 
     ex::unique_any_sender<> as1{std::move(s)};
@@ -560,6 +555,24 @@ void test_unique_any_sender_set_error()
         }
         HPX_TEST(!set_error_called);
     }
+}
+
+// This tests that the empty vtable types used in the implementation of any_*
+// are not destroyed too early. We use ensure_started inside the function to
+// trigger the use of the empty vtables for any_receiver and
+// any_operation_state. If the empty vtables are function-local statics they
+// would get constructed after s_global is constructed, and thus destroyed
+// before s_global is destroyed. This will typically lead to a segfault. If the
+// empty vtables are (constant) global variables they should be constructed
+// before s_global is constructed and destroyed after s_global is destroyed.
+ex::unique_any_sender<> global_unique_any_sender{ex::just()};
+ex::any_sender<> global_any_sender{ex::just()};
+
+void test_globals()
+{
+    global_unique_any_sender =
+        std::move(global_unique_any_sender) | ex::ensure_started();
+    global_any_sender = std::move(global_any_sender) | ex::ensure_started();
 }
 
 int main()
@@ -642,6 +655,9 @@ int main()
     // Failure paths
     test_any_sender_set_error();
     test_unique_any_sender_set_error();
+
+    // Test use of *any_* in globals
+    test_globals();
 
     return hpx::util::report_errors();
 }
