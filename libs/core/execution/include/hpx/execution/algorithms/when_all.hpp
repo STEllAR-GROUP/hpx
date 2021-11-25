@@ -195,9 +195,20 @@ namespace hpx { namespace execution { namespace experimental {
                 // The offset at which we start to emplace values sent by the
                 // ith predecessor sender.
                 static constexpr std::size_t i_storage_offset = 0;
+#if !defined(HPX_CUDA_VERSION)
                 // The number of values sent by the ith predecessor sender.
                 static constexpr std::size_t sender_pack_size =
                     sender_pack_size_at_index<i>;
+#else
+                // nvcc does not like using the helper sender_pack_size_at_index
+                // here and complains about incmplete types. Lifting the helper
+                // explicitly in here works.
+                static constexpr std::size_t sender_pack_size =
+                    single_variant_t<
+                        typename sender_traits<hpx::util::at_index_t<i,
+                            Senders...>>::template value_types<hpx::util::pack,
+                            hpx::util::pack>>::size;
+#endif
 
                 // Number of predecessor senders that have not yet called any of
                 // the set signals.
