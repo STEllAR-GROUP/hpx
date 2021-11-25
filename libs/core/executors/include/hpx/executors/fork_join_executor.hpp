@@ -401,9 +401,10 @@ namespace hpx { namespace execution { namespace experimental {
                                 invoke_helper(index_pack_type{},
                                     element_function, *it, argument_pack);
                             }
-                            set_state(thread_states, thread_index,
-                                thread_state::idle);
                         }
+
+                        set_state(
+                            thread_states, thread_index, thread_state::idle);
                     }
                     catch (...)
                     {
