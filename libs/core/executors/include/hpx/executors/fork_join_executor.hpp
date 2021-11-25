@@ -27,6 +27,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iosfwd>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -534,6 +535,9 @@ namespace hpx { namespace execution { namespace experimental {
         {
         }
     };
+
+    HPX_CORE_EXPORT std::ostream& operator<<(
+        std::ostream& os, fork_join_executor::loop_schedule const& schedule);
 }}}    // namespace hpx::execution::experimental
 
 namespace hpx { namespace parallel { namespace execution {
