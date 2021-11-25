@@ -8,22 +8,22 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/just.hpp>
-#include <hpx/execution/algorithms/on.hpp>
+#include <hpx/execution/algorithms/transfer.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 
 #include <utility>
 
 namespace hpx { namespace execution { namespace experimental {
-    inline constexpr struct just_on_t final
-      : hpx::functional::detail::tag_fallback<just_on_t>
+    inline constexpr struct transfer_just_t final
+      : hpx::functional::detail::tag_fallback<transfer_just_t>
     {
     private:
         template <typename Scheduler, typename... Ts>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            just_on_t, Scheduler&& scheduler, Ts&&... ts)
+            transfer_just_t, Scheduler&& scheduler, Ts&&... ts)
         {
-            return on(just(HPX_FORWARD(Ts, ts)...),
+            return transfer(just(HPX_FORWARD(Ts, ts)...),
                 HPX_FORWARD(Scheduler, scheduler));
         }
-    } just_on{};
+    } transfer_just{};
 }}}    // namespace hpx::execution::experimental

@@ -13,10 +13,10 @@
 #include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/algorithms/keep_future.hpp>
 #include <hpx/execution/algorithms/make_future.hpp>
-#include <hpx/execution/algorithms/on.hpp>
 #include <hpx/execution/algorithms/start_detached.hpp>
 #include <hpx/execution/algorithms/sync_wait.hpp>
 #include <hpx/execution/algorithms/then.hpp>
+#include <hpx/execution/algorithms/transfer.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
@@ -233,10 +233,10 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename F, typename Future, typename... Ts>
         decltype(auto) then_execute(F&& f, Future&& predecessor, Ts&&... ts)
         {
-            auto&& predecessor_on_sched =
-                on(keep_future(HPX_FORWARD(Future, predecessor)), sched_);
+            auto&& predecessor_transfer_sched =
+                transfer(keep_future(HPX_FORWARD(Future, predecessor)), sched_);
 
-            return make_future(then(HPX_MOVE(predecessor_on_sched),
+            return make_future(then(HPX_MOVE(predecessor_transfer_sched),
                 hpx::util::bind_back(
                     HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
@@ -293,8 +293,8 @@ namespace hpx { namespace execution { namespace experimental {
                 };
 
                 start_detached(
-                    bulk(just_on(sched_, HPX_MOVE(promises), HPX_FORWARD(F, f),
-                             shape, HPX_FORWARD(Ts, ts)...),
+                    bulk(transfer_just(sched_, HPX_MOVE(promises),
+                             HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...),
                         n, HPX_MOVE(f_helper)));
 
                 return results;
@@ -323,7 +323,7 @@ namespace hpx { namespace execution { namespace experimental {
                 auto prereq =
                     when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
-                auto loop = bulk(on(HPX_MOVE(prereq), sched_), shape,
+                auto loop = bulk(transfer(HPX_MOVE(prereq), sched_), shape,
                     hpx::util::bind_back(
                         HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
@@ -336,7 +336,7 @@ namespace hpx { namespace execution { namespace experimental {
                     when_all(keep_future(HPX_FORWARD(Future, predecessor)),
                         just(std::vector<result_type>(hpx::util::size(shape))));
 
-                auto loop = bulk(on(HPX_MOVE(prereq), sched_), shape,
+                auto loop = bulk(transfer(HPX_MOVE(prereq), sched_), shape,
                     detail::captured_args_then(
                         HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 

@@ -19,10 +19,10 @@ namespace ex = hpx::execution::experimental;
 // This overload is only used to check dispatching. It is not a useful
 // implementation.
 template <typename T>
-auto tag_invoke(ex::just_on_t, scheduler2 s, T&& t)
+auto tag_invoke(ex::transfer_just_t, scheduler2 s, T&& t)
 {
     s.tag_invoke_overload_called = true;
-    return ex::just_on(
+    return ex::transfer_just(
         std::move(static_cast<scheduler>(s)), std::forward<T>(t));
 }
 
@@ -34,7 +34,7 @@ int main()
         std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
-        auto s = ex::just_on(scheduler{scheduler_schedule_called,
+        auto s = ex::transfer_just(scheduler{scheduler_schedule_called,
             scheduler_execute_called, tag_invoke_overload_called});
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
@@ -51,7 +51,7 @@ int main()
         std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
-        auto s = ex::just_on(
+        auto s = ex::transfer_just(
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             3);
@@ -71,7 +71,7 @@ int main()
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         int x = 3;
-        auto s = ex::just_on(
+        auto s = ex::transfer_just(
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             x);
@@ -90,7 +90,7 @@ int main()
         std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
-        auto s = ex::just_on(
+        auto s = ex::transfer_just(
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             custom_type_non_default_constructible{42});
@@ -110,7 +110,7 @@ int main()
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         custom_type_non_default_constructible x{42};
-        auto s = ex::just_on(
+        auto s = ex::transfer_just(
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             x);
@@ -129,7 +129,7 @@ int main()
         std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
-        auto s = ex::just_on(
+        auto s = ex::transfer_just(
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             custom_type_non_default_constructible_non_copyable{42});
@@ -149,7 +149,7 @@ int main()
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         custom_type_non_default_constructible_non_copyable x{42};
-        auto s = ex::just_on(
+        auto s = ex::transfer_just(
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             std::move(x));
@@ -168,7 +168,7 @@ int main()
         std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
-        auto s = ex::just_on(
+        auto s = ex::transfer_just(
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             std::string("hello"), 3);
@@ -192,7 +192,7 @@ int main()
         std::atomic<bool> tag_invoke_overload_called{false};
         std::string str{"hello"};
         int x = 3;
-        auto s = ex::just_on(
+        auto s = ex::transfer_just(
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             str, x);
@@ -215,7 +215,7 @@ int main()
         std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
-        auto s = ex::just_on(
+        auto s = ex::transfer_just(
             scheduler2{scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called}},
             3);
@@ -235,7 +235,7 @@ int main()
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         int x = 3;
-        auto s = ex::just_on(
+        auto s = ex::transfer_just(
             scheduler2{scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called}},
             x);
