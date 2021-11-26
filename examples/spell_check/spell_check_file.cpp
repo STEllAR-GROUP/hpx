@@ -217,7 +217,7 @@ int hpx_main()
                 sAct.push_back(temp);
                 //cout << search(0, wordcount, single) << endl;
             }
-            wait_all(wordRun);
+            hpx::wait_all(wordRun);
             cout << "Search completed in " << t.elapsed() << "s.\n";
             for (string::size_type i = 0; i < strs.size(); i++)
             {

@@ -83,7 +83,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             futures.push_back(hpx::async(act, localities[next], item));
         }
         std::cout << "Issued work for block " << block << std::endl;
-        hpx::lcos::wait_all(futures.begin(), futures.end());
+        hpx::wait_all(futures.begin(), futures.end());
         std::cout << "Work done for block " << block << std::endl;
     }
 

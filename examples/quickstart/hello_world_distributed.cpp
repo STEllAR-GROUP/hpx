@@ -149,7 +149,7 @@ int main()
         futures.push_back(hpx::async<action_type>(node));
     }
 
-    // The non-callback version of hpx::lcos::wait_all takes a single parameter,
+    // The non-callback version of hpx::wait_all takes a single parameter,
     // a vector of futures to wait on. hpx::wait_all only returns when
     // all of the futures have finished.
     hpx::wait_all(futures);

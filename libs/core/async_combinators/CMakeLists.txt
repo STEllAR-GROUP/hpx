@@ -7,6 +7,7 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(async_combinators_headers
+    hpx/async_combinators/detail/throw_if_exceptional.hpp
     hpx/async_combinators/future_wait.hpp
     hpx/async_combinators/split_future.hpp
     hpx/async_combinators/wait_all.hpp

@@ -9,9 +9,9 @@
 #include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <array>
 #include <chrono>
 #include <stdexcept>
+#include <vector>
 
 int make_int_slowly()
 {
@@ -28,8 +28,9 @@ hpx::future<int> make_future()
 void test_wait_all()
 {
     {
-        std::array<hpx::future<int>, 2> future_array = {
-            make_future(), make_future()};
+        std::vector<hpx::future<int>> future_array;
+        future_array.push_back(make_future());
+        future_array.push_back(make_future());
 
         hpx::wait_all_nothrow(future_array);
 
@@ -39,8 +40,19 @@ void test_wait_all()
         }
     }
     {
-        std::array<hpx::future<int>, 2> future_array = {make_future(),
-            hpx::make_exceptional_future<int>(std::runtime_error(""))};
+        auto f1 = make_future();
+        auto f2 = make_future();
+
+        hpx::wait_all_nothrow(f1, f2);
+
+        HPX_TEST(f1.is_ready());
+        HPX_TEST(f2.is_ready());
+    }
+    {
+        std::vector<hpx::future<int>> future_array;
+        future_array.push_back(make_future());
+        future_array.push_back(
+            hpx::make_exceptional_future<int>(std::runtime_error("")));
 
         bool caught_exception = false;
         try
@@ -54,6 +66,7 @@ void test_wait_all()
         }
         catch (std::runtime_error const&)
         {
+            HPX_TEST(false);
             caught_exception = true;
         }
         catch (...)
@@ -63,8 +76,10 @@ void test_wait_all()
         HPX_TEST(!caught_exception);
     }
     {
-        std::array<hpx::future<int>, 2> future_array = {make_future(),
-            hpx::make_exceptional_future<int>(std::runtime_error(""))};
+        std::vector<hpx::future<int>> future_array;
+        future_array.push_back(make_future());
+        future_array.push_back(
+            hpx::make_exceptional_future<int>(std::runtime_error("")));
 
         bool caught_exception = false;
         try
@@ -82,15 +97,36 @@ void test_wait_all()
         }
         HPX_TEST(caught_exception);
     }
+    {
+        auto f1 = make_future();
+        auto f2 = hpx::make_exceptional_future<int>(std::runtime_error(""));
+
+        bool caught_exception = false;
+        try
+        {
+            hpx::wait_all(f1, f2);
+            HPX_TEST(false);
+        }
+        catch (std::runtime_error const&)
+        {
+            caught_exception = true;
+        }
+        catch (...)
+        {
+            HPX_TEST(false);
+        }
+        HPX_TEST(caught_exception);
+    }
 }
 
 void test_wait_all_n()
 {
     {
-        std::array<hpx::future<int>, 2> future_array = {
-            make_future(), make_future()};
+        std::vector<hpx::future<int>> future_array;
+        future_array.push_back(make_future());
+        future_array.push_back(make_future());
 
-        hpx::wait_all_n_nothrow(future_array.begin(), 2);
+        hpx::wait_all_n_nothrow(future_array.begin(), future_array.size());
 
         for (auto& f : future_array)
         {
@@ -98,13 +134,15 @@ void test_wait_all_n()
         }
     }
     {
-        std::array<hpx::future<int>, 2> future_array = {make_future(),
-            hpx::make_exceptional_future<int>(std::runtime_error(""))};
+        std::vector<hpx::future<int>> future_array;
+        future_array.push_back(make_future());
+        future_array.push_back(
+            hpx::make_exceptional_future<int>(std::runtime_error("")));
 
         bool caught_exception = false;
         try
         {
-            hpx::wait_all_n_nothrow(future_array.begin(), 2);
+            hpx::wait_all_n_nothrow(future_array.begin(), future_array.size());
 
             for (auto& f : future_array)
             {
@@ -122,13 +160,15 @@ void test_wait_all_n()
         HPX_TEST(!caught_exception);
     }
     {
-        std::array<hpx::future<int>, 2> future_array = {make_future(),
-            hpx::make_exceptional_future<int>(std::runtime_error(""))};
+        std::vector<hpx::future<int>> future_array;
+        future_array.push_back(make_future());
+        future_array.push_back(
+            hpx::make_exceptional_future<int>(std::runtime_error("")));
 
         bool caught_exception = false;
         try
         {
-            hpx::wait_all_n(future_array.begin(), 2);
+            hpx::wait_all_n(future_array.begin(), future_array.size());
             HPX_TEST(false);
         }
         catch (std::runtime_error const&)

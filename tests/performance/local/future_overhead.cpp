@@ -161,7 +161,7 @@ void measure_action_futures_wait_all(std::uint64_t count, bool csv)
     high_resolution_timer walltime;
     for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async<null_action>(here));
-    wait_all(futures);
+    hpx::wait_all(futures);
 
     // stop the clock
     const double duration = walltime.elapsed();
@@ -199,7 +199,7 @@ void measure_function_futures_wait_all(
     high_resolution_timer walltime;
     for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async(exec, &null_function));
-    wait_all(futures);
+    hpx::wait_all(futures);
 
     const double duration = walltime.elapsed();
     print_stats("async", "WaitAll", exec_name(exec), count, duration, csv);
