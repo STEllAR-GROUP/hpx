@@ -882,7 +882,7 @@ namespace hpx { namespace parallel { namespace execution {
                             execution::async_execute(exec, f, elem, ts...));
                     }
 
-                    hpx::wait_all(results);
+                    hpx::wait_all_nothrow(results);
                 }
                 catch (std::bad_alloc const& ba)
                 {

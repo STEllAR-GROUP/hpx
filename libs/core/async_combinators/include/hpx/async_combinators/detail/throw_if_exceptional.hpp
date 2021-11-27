@@ -8,6 +8,8 @@
 
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 
 #include <array>
 #include <cstddef>
@@ -25,6 +27,14 @@ namespace hpx::detail {
         {
             shared_state->get_result_void();    // throws stored exception
         }
+    }
+
+    template <typename Future,
+        typename Enable = std::enable_if_t<hpx::traits::is_future_v<Future> ||
+            hpx::traits::is_shared_state_v<Future>>>
+    void throw_if_exceptional(Future const& f)
+    {
+        rethrow_if_needed(f);
     }
 
     template <typename Future>
@@ -48,7 +58,7 @@ namespace hpx::detail {
     template <typename... Ts>
     void throw_if_exceptional(Ts const&... ts)
     {
-        int const _sequencer[] = {0, (rethrow_if_needed(ts), 0)...};
+        int const _sequencer[] = {0, (throw_if_exceptional(ts), 0)...};
         (void) _sequencer;
     }
 }    // namespace hpx::detail

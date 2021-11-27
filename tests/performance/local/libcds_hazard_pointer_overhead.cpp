@@ -6,7 +6,6 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/async_combinators/wait_each.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
@@ -46,7 +45,6 @@ using hpx::naming::id_type;
 using hpx::apply;
 using hpx::async;
 using hpx::future;
-using hpx::lcos::wait_each;
 
 using hpx::chrono::high_resolution_timer;
 

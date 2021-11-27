@@ -28,8 +28,9 @@ hpx::future<int> make_future()
 void test_wait_some()
 {
     {
-        std::array<hpx::future<int>, 2> future_array = {
-            make_future(), make_future()};
+        std::array<hpx::future<int>, 2> future_array;
+        future_array[0] = make_future();
+        future_array[1] = make_future();
 
         hpx::wait_some_nothrow(1, future_array);
 
@@ -44,8 +45,10 @@ void test_wait_some()
         HPX_TEST_NEQ(count, 0);
     }
     {
-        std::array<hpx::future<int>, 2> future_array = {make_future(),
-            hpx::make_exceptional_future<int>(std::runtime_error(""))};
+        std::array<hpx::future<int>, 2> future_array;
+        future_array[0] = make_future();
+        future_array[1] =
+            hpx::make_exceptional_future<int>(std::runtime_error(""));
 
         bool caught_exception = false;
         try
@@ -73,8 +76,10 @@ void test_wait_some()
         HPX_TEST(!caught_exception);
     }
     {
-        std::array<hpx::future<int>, 2> future_array = {make_future(),
-            hpx::make_exceptional_future<int>(std::runtime_error(""))};
+        std::array<hpx::future<int>, 2> future_array;
+        future_array[0] = make_future();
+        future_array[1] =
+            hpx::make_exceptional_future<int>(std::runtime_error(""));
 
         bool caught_exception = false;
         try
@@ -97,8 +102,9 @@ void test_wait_some()
 void test_wait_some_n()
 {
     {
-        std::array<hpx::future<int>, 2> future_array = {
-            make_future(), make_future()};
+        std::array<hpx::future<int>, 2> future_array;
+        future_array[0] = make_future();
+        future_array[1] = make_future();
 
         hpx::wait_some_n_nothrow(1, future_array.begin(), 2);
 
@@ -113,8 +119,10 @@ void test_wait_some_n()
         HPX_TEST_NEQ(count, 0);
     }
     {
-        std::array<hpx::future<int>, 2> future_array = {make_future(),
-            hpx::make_exceptional_future<int>(std::runtime_error(""))};
+        std::array<hpx::future<int>, 2> future_array;
+        future_array[0] = make_future();
+        future_array[1] =
+            hpx::make_exceptional_future<int>(std::runtime_error(""));
 
         bool caught_exception = false;
         try
@@ -142,8 +150,10 @@ void test_wait_some_n()
         HPX_TEST(!caught_exception);
     }
     {
-        std::array<hpx::future<int>, 2> future_array = {make_future(),
-            hpx::make_exceptional_future<int>(std::runtime_error(""))};
+        std::array<hpx::future<int>, 2> future_array;
+        future_array[0] = make_future();
+        future_array[1] =
+            hpx::make_exceptional_future<int>(std::runtime_error(""));
 
         bool caught_exception = false;
         try

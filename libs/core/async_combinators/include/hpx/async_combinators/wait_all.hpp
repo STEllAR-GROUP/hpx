@@ -28,7 +28,7 @@ namespace hpx {
     ///
     /// \note           The function wait_all will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_all_nothrow
+    ///                 behavior is undesirable, use \a wait_all_nothrow
     ///                 instead.
     ///
     template <typename InputIter>
@@ -48,7 +48,7 @@ namespace hpx {
     ///
     /// \note           The function wait_all will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_all_nothrow
+    ///                 behavior is undesirable, use \a wait_all_nothrow
     ///                 instead.
     ///
     template <typename R>
@@ -68,7 +68,7 @@ namespace hpx {
     ///
     /// \note           The function wait_all will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_all_nothrow
+    ///                 behavior is undesirable, use \a wait_all_nothrow
     ///                 instead.
     ///
     template <typename R, std::size_t N>
@@ -88,7 +88,7 @@ namespace hpx {
     ///
     /// \note           The function wait_all will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_all_nothrow
+    ///                 behavior is undesirable, use \a wait_all_nothrow
     ///                 instead.
     ///
     template <typename... T>
@@ -114,7 +114,7 @@ namespace hpx {
     ///
     /// \note           The function wait_all_n will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_all_n_nothrow
+    ///                 behavior is undesirable, use \a wait_all_n_nothrow
     ///                 instead.
     ///
     template <typename InputIter>

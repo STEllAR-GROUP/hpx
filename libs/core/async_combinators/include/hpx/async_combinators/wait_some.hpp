@@ -31,7 +31,7 @@ namespace hpx {
     ///
     /// \note           The function wait_some will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_some_nothrow
+    ///                 behavior is undesirable, use \a wait_some_nothrow
     ///                 instead.
     ///
     template <typename InputIter>
@@ -55,7 +55,7 @@ namespace hpx {
     ///
     /// \note           The function wait_some will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_some_nothrow
+    ///                 behavior is undesirable, use \a wait_some_nothrow
     ///                 instead.
     ///
     template <typename R>
@@ -79,7 +79,7 @@ namespace hpx {
     ///
     /// \note           The function wait_some will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_some_nothrow
+    ///                 behavior is undesirable, use \a wait_some_nothrow
     ///                 instead.
     ///
     template <typename R, std::size_t N>
@@ -106,7 +106,7 @@ namespace hpx {
     ///
     /// \note           The function wait_some will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_some_nothrow
+    ///                 behavior is undesirable, use \a wait_some_nothrow
     ///                 instead.
     ///
     template <typename... T>
@@ -132,7 +132,7 @@ namespace hpx {
     ///
     /// \note           The function wait_some_n will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_some_n_nothrow
+    ///                 behavior is undesirable, use \a wait_some_n_nothrow
     ///                 instead.
     ///
     template <typename InputIter>
@@ -579,7 +579,7 @@ namespace hpx::lcos {
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
     void wait_some(std::size_t n, std::vector<Future> const& lazy_values,
-        error_code& ec = throws)
+        error_code& = throws)
     {
         hpx::wait_some(n, lazy_values);
     }
@@ -587,8 +587,8 @@ namespace hpx::lcos {
     template <typename Future>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(std::size_t n, std::vector<Future>& lazy_values,
-        error_code& ec = throws)
+    void wait_some(
+        std::size_t n, std::vector<Future>& lazy_values, error_code& = throws)
     {
         hpx::wait_some(n, const_cast<std::vector<Future> const&>(lazy_values));
     }
@@ -596,8 +596,8 @@ namespace hpx::lcos {
     template <typename Future>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(std::size_t n, std::vector<Future>&& lazy_values,
-        error_code& ec = throws)
+    void wait_some(
+        std::size_t n, std::vector<Future>&& lazy_values, error_code& = throws)
     {
         hpx::wait_some(n, const_cast<std::vector<Future> const&>(lazy_values));
     }
@@ -606,7 +606,7 @@ namespace hpx::lcos {
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
     void wait_some(std::size_t n, std::array<Future, N> const& lazy_values,
-        error_code& ec = throws)
+        error_code& = throws)
     {
         hpx::wait_some(n, lazy_values);
     }
@@ -614,8 +614,8 @@ namespace hpx::lcos {
     template <typename Future, std::size_t N>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(std::size_t n, std::array<Future, N>& lazy_values,
-        error_code& ec = throws)
+    void wait_some(
+        std::size_t n, std::array<Future, N>& lazy_values, error_code& = throws)
     {
         hpx::wait_some(
             n, const_cast<std::array<Future, N> const&>(lazy_values));
@@ -625,7 +625,7 @@ namespace hpx::lcos {
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
     void wait_some(std::size_t n, std::array<Future, N>&& lazy_values,
-        error_code& ec = throws)
+        error_code& = throws)
     {
         hpx::wait_some(
             n, const_cast<std::array<Future, N> const&>(lazy_values));
@@ -655,7 +655,7 @@ namespace hpx::lcos {
 
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    inline void wait_some(std::size_t n, error_code& ec = throws)
+    inline void wait_some(std::size_t n, error_code& = throws)
     {
         hpx::wait_some(n);
     }
@@ -663,7 +663,7 @@ namespace hpx::lcos {
     template <typename T>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(std::size_t n, hpx::future<T>&& f, error_code& ec = throws)
+    void wait_some(std::size_t n, hpx::future<T>&& f, error_code& = throws)
     {
         hpx::wait_some(n, HPX_MOVE(f));
     }
@@ -672,7 +672,7 @@ namespace hpx::lcos {
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
     void wait_some(
-        std::size_t n, hpx::shared_future<T>&& f, error_code& ec = throws)
+        std::size_t n, hpx::shared_future<T>&& f, error_code& = throws)
     {
         hpx::wait_some(n, HPX_MOVE(f));
     }
@@ -680,7 +680,7 @@ namespace hpx::lcos {
     template <typename... Ts>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(std::size_t n, error_code& ec, Ts&&... ts)
+    void wait_some(std::size_t n, error_code&, Ts&&... ts)
     {
         hpx::wait_some(n, HPX_FORWARD(Ts, ts)...);
     }

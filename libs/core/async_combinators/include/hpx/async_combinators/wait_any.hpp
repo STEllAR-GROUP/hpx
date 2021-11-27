@@ -28,7 +28,7 @@ namespace hpx {
     ///
     /// \note           The function wait_any will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_any_nothrow
+    ///                 behavior is undesirable, use \a wait_any_nothrow
     ///                 instead.
     ///
     template <typename InputIter>
@@ -48,7 +48,7 @@ namespace hpx {
     ///
     /// \note           The function wait_any will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_any_nothrow
+    ///                 behavior is undesirable, use \a wait_any_nothrow
     ///                 instead.
     ///
     template <typename R>
@@ -68,7 +68,7 @@ namespace hpx {
     ///
     /// \note           The function wait_any will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_any_nothrow
+    ///                 behavior is undesirable, use \a wait_any_nothrow
     ///                 instead.
     ///
     template <typename R, std::size_t N>
@@ -88,7 +88,7 @@ namespace hpx {
     ///
     /// \note           The function wait_any will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_any_nothrow
+    ///                 behavior is undesirable, use \a wait_any_nothrow
     ///                 instead.
     ///
     template <typename... T>
@@ -110,7 +110,7 @@ namespace hpx {
     ///
     /// \note           The function wait_any_n will rethrow any exceptions
     ///                 captured by the futures while becoming ready. If this
-    ///                 behavior is undesireable, use \a wait_any_n_nothrow
+    ///                 behavior is undesirable, use \a wait_any_n_nothrow
     ///                 instead.
     ///
     template <typename InputIter>
@@ -123,6 +123,7 @@ namespace hpx {
 #include <hpx/async_combinators/wait_some.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/type_support/always_void.hpp>
 
@@ -276,7 +277,7 @@ namespace hpx::lcos {
     template <typename Future>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
-    void wait_any(std::vector<Future> const& futures, error_code& ec = throws)
+    void wait_any(std::vector<Future> const& futures, error_code& = throws)
     {
         hpx::wait_some(1, futures);
     }
@@ -284,7 +285,7 @@ namespace hpx::lcos {
     template <typename Future>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
-    void wait_any(std::vector<Future>& lazy_values, error_code& ec = throws)
+    void wait_any(std::vector<Future>& lazy_values, error_code& = throws)
     {
         hpx::wait_any(const_cast<std::vector<Future> const&>(lazy_values));
     }
@@ -292,7 +293,7 @@ namespace hpx::lcos {
     template <typename Future>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
-    void wait_any(std::vector<Future>&& lazy_values, error_code& ec = throws)
+    void wait_any(std::vector<Future>&& lazy_values, error_code& = throws)
     {
         hpx::wait_any(const_cast<std::vector<Future> const&>(lazy_values));
     }
@@ -301,7 +302,7 @@ namespace hpx::lcos {
     template <typename Future, std::size_t N>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
-    void wait_any(std::array<Future, N> const& futures, error_code& ec = throws)
+    void wait_any(std::array<Future, N> const& futures, error_code& = throws)
     {
         hpx::wait_some(1, futures);
     }
@@ -309,7 +310,7 @@ namespace hpx::lcos {
     template <typename Future, std::size_t N>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
-    void wait_any(std::array<Future, N>& lazy_values, error_code& ec = throws)
+    void wait_any(std::array<Future, N>& lazy_values, error_code& = throws)
     {
         hpx::wait_any(const_cast<std::array<Future, N> const&>(lazy_values));
     }
@@ -317,7 +318,7 @@ namespace hpx::lcos {
     template <typename Future, std::size_t N>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
-    void wait_any(std::array<Future, N>&& lazy_values, error_code& ec = throws)
+    void wait_any(std::array<Future, N>&& lazy_values, error_code& = throws)
     {
         hpx::wait_any(const_cast<std::array<Future, N> const&>(lazy_values));
     }
@@ -328,14 +329,14 @@ namespace hpx::lcos {
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
-    void wait_any(Iterator begin, Iterator end, error_code& ec = throws)
+    void wait_any(Iterator begin, Iterator end, error_code& = throws)
     {
         hpx::wait_some(1, begin, end);
     }
 
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
-    inline void wait_any(error_code& ec = throws)
+    inline void wait_any(error_code& = throws)
     {
         hpx::wait_some(1);
     }
@@ -346,7 +347,7 @@ namespace hpx::lcos {
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
-    void wait_any_n(Iterator begin, std::size_t count, error_code& ec = throws)
+    void wait_any_n(Iterator begin, std::size_t count, error_code& = throws)
     {
         hpx::wait_some_n(1, begin, count);
     }

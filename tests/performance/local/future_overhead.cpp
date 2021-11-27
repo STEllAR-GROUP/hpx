@@ -43,7 +43,6 @@ using hpx::program_options::variables_map;
 using hpx::apply;
 using hpx::async;
 using hpx::future;
-using hpx::lcos::wait_each;
 
 using hpx::chrono::high_resolution_timer;
 
@@ -143,7 +142,7 @@ void measure_action_futures_wait_each(std::uint64_t count, bool csv)
     high_resolution_timer walltime;
     for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async<null_action>(here));
-    wait_each(scratcher(), futures);
+    hpx::wait_each(scratcher(), futures);
 
     // stop the clock
     const double duration = walltime.elapsed();
@@ -181,7 +180,7 @@ void measure_function_futures_wait_each(
     high_resolution_timer walltime;
     for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async(exec, &null_function));
-    wait_each(scratcher(), futures);
+    hpx::wait_each(scratcher(), futures);
 
     // stop the clock
     const double duration = walltime.elapsed();

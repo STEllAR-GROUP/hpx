@@ -156,7 +156,8 @@ void test_wait_some_n()
         bool caught_exception = false;
         try
         {
-            hpx::wait_some_n_nothrow(1, future_array.begin(), future_array.size());
+            hpx::wait_some_n_nothrow(
+                1, future_array.begin(), future_array.size());
 
             int count = 0;
             for (auto& f : future_array)

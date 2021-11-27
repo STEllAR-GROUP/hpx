@@ -124,7 +124,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::rotate(locales.begin(), locales.begin() + 1, locales.end());
         }
 
-        hpx::wait_all(tasks);
+        hpx::wait_all_nothrow(tasks);
 
         double elapsed = t.elapsed();
         std::cout << "Replay Validate: " << elapsed << std::endl;

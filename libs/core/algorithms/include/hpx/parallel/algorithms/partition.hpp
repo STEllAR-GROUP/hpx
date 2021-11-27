@@ -1344,11 +1344,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 // Wait sub-partitioning to be all finished.
-                hpx::wait_all(remaining_block_futures);
+                hpx::wait_all_nothrow(remaining_block_futures);
 
                 // Handle exceptions in parallel phrase.
                 std::list<std::exception_ptr> errors;
-                // TODO: Is it okay to use thing in util::detail:: ?
+
                 util::detail::handle_local_exceptions<ExPolicy>::call(
                     remaining_block_futures, errors);
 

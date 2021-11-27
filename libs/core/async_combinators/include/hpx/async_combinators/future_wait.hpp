@@ -205,20 +205,22 @@ namespace hpx { namespace lcos {
     /// The one argument version is special in the sense that it returns the
     /// expected value directly (without wrapping it into a tuple).
     template <typename Future, typename F>
-    inline typename std::enable_if<
-        !std::is_void<typename traits::future_traits<Future>::type>::value,
-        std::size_t>::type
-    wait(Future&& f1, F&& f)
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::wait is deprecated and will be removed. Use hpx::wait_each "
+        "instead.")
+    std::enable_if_t<!std::is_void_v<traits::future_traits_t<Future>>,
+        std::size_t> wait(Future&& f1, F&& f)
     {
         f(0, f1.get());
         return 1;
     }
 
     template <typename Future, typename F>
-    inline typename std::enable_if<    //-V659
-        std::is_void<typename traits::future_traits<Future>::type>::value,
-        std::size_t>::type
-    wait(Future&& f1, F&& f)
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::wait is deprecated and will be removed. Use hpx::wait_each "
+        "instead.")
+    std::enable_if_t<std::is_void_v<traits::future_traits_t<Future>>,
+        std::size_t> wait(Future&& f1, F&& f)
     {
         f1.get();
         f(0);
@@ -230,6 +232,9 @@ namespace hpx { namespace lcos {
     // invoked as soon as a value becomes available, it will not wait for all
     // results to be there.
     template <typename Future, typename F>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::wait is deprecated and will be removed. Use hpx::wait_each "
+        "instead.")
     inline std::size_t wait(std::vector<Future>& lazy_values, F&& f,
         std::int32_t /* suspend_for */ = 10)
     {
@@ -256,6 +261,9 @@ namespace hpx { namespace lcos {
     }
 
     template <typename Future, typename F>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::wait is deprecated and will be removed. Use hpx::wait_each "
+        "instead.")
     inline std::size_t wait(
         std::vector<Future>&& lazy_values, F&& f, std::int32_t suspend_for = 10)
     {
@@ -263,6 +271,9 @@ namespace hpx { namespace lcos {
     }
 
     template <typename Future, typename F>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::wait is deprecated and will be removed. Use hpx::wait_each "
+        "instead.")
     inline std::size_t wait(std::vector<Future> const& lazy_values, F&& f,
         std::int32_t /* suspend_for */ = 10)
     {
