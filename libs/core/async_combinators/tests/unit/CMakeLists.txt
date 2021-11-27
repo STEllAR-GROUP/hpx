@@ -7,8 +7,12 @@
 
 set(tests
     split_shared_future
+    wait_all
     wait_all_std_array
+    wait_any
     wait_any_std_array
+    wait_some
+    wait_some_std_array
     when_all
     when_all_std_array
     when_any
