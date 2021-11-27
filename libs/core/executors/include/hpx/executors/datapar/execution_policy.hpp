@@ -139,7 +139,10 @@ namespace hpx { namespace execution { inline namespace v1 {
         }
 
         using base_policy_type = sequenced_task_policy;
-        static constexpr base_policy_type base_policy = sequenced_task_policy{};
+        base_policy_type base_policy()
+        {
+            return sequenced_task_policy{};
+        }
 
     public:
         /// Return the associated executor object.
@@ -290,8 +293,11 @@ namespace hpx { namespace execution { inline namespace v1 {
 
         using base_policy_type =
             sequenced_task_policy_shim<Executor, Parameters>;
-        static constexpr base_policy_type base_policy =
-            sequenced_task_policy_shim<Executor, Parameters>{};
+        base_policy_type base_policy()
+        {
+            return simd_task_policy_shim<Executor, Parameters>(
+                HPX_FORWARD(Executor, exec_), HPX_FORWARD(Parameters, params_));
+        }
 
         /// Return the associated executor object.
         Executor& executor()
@@ -452,7 +458,10 @@ namespace hpx { namespace execution { inline namespace v1 {
         }
 
         using base_policy_type = sequenced_policy;
-        static constexpr base_policy_type base_policy = sequenced_policy{};
+        base_policy_type base_policy()
+        {
+            return sequenced_policy{};
+        }
 
     public:
         /// Return the associated executor object.
@@ -603,8 +612,11 @@ namespace hpx { namespace execution { inline namespace v1 {
         }
 
         using base_policy_type = sequenced_policy_shim<Executor, Parameters>;
-        static constexpr base_policy_type base_policy =
-            sequenced_policy_shim<Executor, Parameters>{};
+        base_policy_type base_policy()
+        {
+            return sequenced_policy_shim<Executor, Parameters>(
+                HPX_FORWARD(Executor, exec_), HPX_FORWARD(Parameters, params_));
+        }
 
         /// Return the associated executor object.
         Executor& executor()
@@ -767,7 +779,10 @@ namespace hpx { namespace execution { inline namespace v1 {
         }
 
         using base_policy_type = parallel_task_policy;
-        static constexpr base_policy_type base_policy = parallel_task_policy{};
+        base_policy_type base_policy()
+        {
+            return parallel_task_policy{};
+        }
 
     public:
         /// Return the associated executor object.
@@ -911,7 +926,10 @@ namespace hpx { namespace execution { inline namespace v1 {
         }
 
         using base_policy_type = parallel_policy;
-        static constexpr base_policy_type base_policy = parallel_policy{};
+        base_policy_type base_policy()
+        {
+            return parallel_policy{};
+        }
 
     public:
         /// Return the associated executor object.
@@ -1061,8 +1079,11 @@ namespace hpx { namespace execution { inline namespace v1 {
         }
 
         using base_policy_type = parallel_policy_shim<Executor, Parameters>;
-        static constexpr base_policy_type base_policy =
-            parallel_policy_shim<Executor, Parameters>{};
+        base_policy_type base_policy()
+        {
+            return parallel_policy_shim<Executor, Parameters>(
+                HPX_FORWARD(Executor, exec_), HPX_FORWARD(Parameters, params_));
+        }
 
         /// Return the associated executor object.
         Executor& executor()
@@ -1221,8 +1242,11 @@ namespace hpx { namespace execution { inline namespace v1 {
 
         using base_policy_type =
             parallel_task_policy_shim<Executor, Parameters>;
-        static constexpr base_policy_type base_policy =
-            parallel_task_policy_shim<Executor, Parameters>{};
+        base_policy_type base_policy()
+        {
+            return parallel_task_policy_shim<Executor, Parameters>(
+                HPX_FORWARD(Executor, exec_), HPX_FORWARD(Parameters, params_));
+        }
 
         /// Return the associated executor object.
         Executor& executor()
