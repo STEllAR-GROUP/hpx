@@ -55,8 +55,12 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
         std::string affinity_domain,    // -V813
         std::string const& affinity_description, bool use_process_mask)
     {
-        num_threads_ = num_threads;
+#if defined(__APPLE__)
+        use_process_mask = false;
+#endif
+
         use_process_mask_ = use_process_mask;
+        num_threads_ = num_threads;
         std::size_t num_system_pus = hardware_concurrency();
 
         if (pu_offset == std::size_t(-1))
@@ -97,7 +101,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
 
             parse_affinity_options(affinity_description, affinity_masks_,
                 used_cores, max_cores, num_threads_, pu_nums_,
-                use_process_mask);
+                use_process_mask_);
 
             std::size_t num_initialized = count_initialized(affinity_masks_);
             if (num_initialized != num_threads_)
