@@ -16,6 +16,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/datapar/execution_policy_fwd.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/executors/sequenced_executor.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -135,6 +136,12 @@ namespace hpx { namespace execution { inline namespace v1 {
             return rebound_type(executor(),
                 parallel::execution::join_executor_parameters(
                     HPX_FORWARD(Parameters, params)...));
+        }
+
+        using base_policy_type = sequenced_task_policy;
+        base_policy_type base_policy()
+        {
+            return sequenced_task_policy{};
         }
 
     public:
@@ -282,6 +289,13 @@ namespace hpx { namespace execution { inline namespace v1 {
             return rebound_type(exec_,
                 parallel::execution::join_executor_parameters(
                     HPX_FORWARD(Parameters_, params)...));
+        }
+
+        using base_policy_type =
+            sequenced_task_policy_shim<Executor, Parameters>;
+        base_policy_type base_policy()
+        {
+            return simd_task_policy_shim<Executor, Parameters>(exec_, params_);
         }
 
         /// Return the associated executor object.
@@ -442,6 +456,12 @@ namespace hpx { namespace execution { inline namespace v1 {
                     HPX_FORWARD(Parameters, params)...));
         }
 
+        using base_policy_type = sequenced_policy;
+        base_policy_type base_policy()
+        {
+            return sequenced_policy{};
+        }
+
     public:
         /// Return the associated executor object.
         /// Return the associated executor object.
@@ -588,6 +608,12 @@ namespace hpx { namespace execution { inline namespace v1 {
             return rebound_type(exec_,
                 parallel::execution::join_executor_parameters(
                     HPX_FORWARD(Parameters_, params)...));
+        }
+
+        using base_policy_type = sequenced_policy_shim<Executor, Parameters>;
+        base_policy_type base_policy()
+        {
+            return sequenced_policy_shim<Executor, Parameters>(exec_, params_);
         }
 
         /// Return the associated executor object.
@@ -750,6 +776,12 @@ namespace hpx { namespace execution { inline namespace v1 {
                     HPX_FORWARD(Parameters, params)...));
         }
 
+        using base_policy_type = parallel_task_policy;
+        base_policy_type base_policy()
+        {
+            return parallel_task_policy{};
+        }
+
     public:
         /// Return the associated executor object.
         executor_type& executor()
@@ -889,6 +921,12 @@ namespace hpx { namespace execution { inline namespace v1 {
             return rebound_type(executor(),
                 parallel::execution::join_executor_parameters(
                     HPX_FORWARD(Parameters, params)...));
+        }
+
+        using base_policy_type = parallel_policy;
+        base_policy_type base_policy()
+        {
+            return parallel_policy{};
         }
 
     public:
@@ -1036,6 +1074,12 @@ namespace hpx { namespace execution { inline namespace v1 {
             return rebound_type(exec_,
                 parallel::execution::join_executor_parameters(
                     HPX_FORWARD(Parameters_, params)...));
+        }
+
+        using base_policy_type = parallel_policy_shim<Executor, Parameters>;
+        base_policy_type base_policy()
+        {
+            return parallel_policy_shim<Executor, Parameters>(exec_, params_);
         }
 
         /// Return the associated executor object.
@@ -1191,6 +1235,14 @@ namespace hpx { namespace execution { inline namespace v1 {
             return rebound_type(exec_,
                 parallel::execution::join_executor_parameters(
                     HPX_FORWARD(Parameters_, params)...));
+        }
+
+        using base_policy_type =
+            parallel_task_policy_shim<Executor, Parameters>;
+        base_policy_type base_policy()
+        {
+            return parallel_task_policy_shim<Executor, Parameters>(
+                exec_, params_);
         }
 
         /// Return the associated executor object.
