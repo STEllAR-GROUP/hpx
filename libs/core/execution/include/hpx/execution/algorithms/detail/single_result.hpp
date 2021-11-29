@@ -67,4 +67,20 @@ namespace hpx {
     template <typename Variants>
     using single_result_non_void_t =
         typename single_result_non_void<Variants>::type;
+
+    template <typename Variants>
+    struct single_variant
+    {
+        static_assert(sizeof(Variants) == 0,
+            "expected a single variant sender_traits<>::value_types");
+    };
+
+    template <typename T>
+    struct single_variant<hpx::util::pack<T>>
+    {
+        using type = T;
+    };
+
+    template <typename Variants>
+    using single_variant_t = typename single_variant<Variants>::type;
 }}}}    // namespace hpx::execution::experimental::detail
