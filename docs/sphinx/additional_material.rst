@@ -17,7 +17,7 @@ Additional material
   * `Slides <https://github.com/STEllAR-GROUP/tutorials/tree/master/cscs2016>`_
 * `Tutorials repository <https://github.com/STEllAR-GROUP/tutorials>`_
 * `STE||AR Group blog posts <http://stellar-group.org/blog/>`_
-* Basic HPX recipes
+* Basic |hpx| recipes
 
   * `Exporting a free function from a shared library which lives in a namespace, to use as Action <https://gitlab.com/-/snippets/1821389>`_
   * `Turning a struct or class into a component and use it's methods <https://gitlab.com/-/snippets/1822983>`_
