@@ -42,13 +42,13 @@ The table below shows the supported compilers for |hpx|.
 
 .. table:: Supported Compilers for |hpx|
 
-   =================== ================== 
-   Name                Minimum Version    
-   =================== ================== 
-   |gcc|_              7.0              
-   |clang|_            7.0             
-   |visual_cxx|_ (x64) 2015     
-   =================== ================== 
+   =================== ==================
+   Name                Minimum Version
+   =================== ==================
+   |gcc|_              7.0
+   |clang|_            7.0
+   |visual_cxx|_ (x64) 2015
+   =================== ==================
 
 Software and libraries
 ----------------------
@@ -57,23 +57,23 @@ The table below presents all the necessary prerequisites for building |hpx|.
 
 .. table:: Software prerequisites for |hpx|
 
-   ====================== =================== ================== 
-   \                      Name                Minimum Version    
-   ====================== =================== ================== 
+   ====================== =================== ==================
+   \                      Name                Minimum Version
+   ====================== =================== ==================
    **Build System**       |cmake|_            3.18
    **Required Libraries** |boost|_            1.71.0
    \                      |hwloc|_            1.5
    \                      |asio|_             1.12.0
-   ====================== =================== ================== 
+   ====================== =================== ==================
 
-The most important dependencies are |boost|_ and |hwloc|_. The installation of Boost 
+The most important dependencies are |boost|_ and |hwloc|_. The installation of Boost
 is described in detail in Boost's `Getting Started <https://www.boost.org/more/getting_started/index.html>`_
 document. A recent version of hwloc is required in order to support thread
-pinning and NUMA awareness and can be found in |hwloc_downloads|_. 
+pinning and NUMA awareness and can be found in |hwloc_downloads|_.
 
 |hpx| is written in 99.99% Standard C++ (the remaining 0.01% is platform
 specific assembly code). As such, |hpx| is compilable with almost any standards
-compliant C++ compiler. The code base takes advantage of C++ language and 
+compliant C++ compiler. The code base takes advantage of C++ language and
 standard library features when available.
 
 .. note::
@@ -128,7 +128,7 @@ unpack it or clone the repository directly using ``git``:
 It is also recommended that you check out the latest stable tag:
 
 .. code-block:: shell-session
-    
+
     $ cd hpx
     $ git checkout 1.7.1
 
@@ -143,9 +143,9 @@ Basic information
 -----------------
 
 The build system for |hpx| is based on |cmake|_, a cross-platform
-build-generator tool which is not responsible for building the project 
-but rather generates the files needed by your build tool (GNU make, Visual 
-Studio, etc.) for building |hpx|. If CMake is not already installed in your 
+build-generator tool which is not responsible for building the project
+but rather generates the files needed by your build tool (GNU make, Visual
+Studio, etc.) for building |hpx|. If CMake is not already installed in your
 system, you can download it and install it here: |cmake_download|_.
 
 Once |cmake| has been run, the build process can be started. The |hpx| build
@@ -180,12 +180,8 @@ libraries, you need to specify them as link dependencies in your build (See
 
 As |hpx| is a modern C++ library which relies on C++17 by default. The use of
 more recent standards can be opted into explicitly. If you want to force |hpx|
-to use a specific C++ standard version, you can use the following CMake
-variables:
-
-* ``HPX_WITH_CXX17``: [Deprecated] C++17 is now the default C++ standard used in HPX.
-* ``HPX_WITH_CXX20``: [Deprecated] In order to use the C++20 standard, it is preferable 
-  to set CMAKE_CXX_STANDARD and HPX_USE_CMAKE_CXX_STANDARD to ON.
+to use a specific C++ standard version, you can use the ``HPX_WITH_CXX_STANDARD``
+CMake variable; e.g. ``HPX_WITH_CXX_STANDARD=20``.
 
 .. _build_types:
 
