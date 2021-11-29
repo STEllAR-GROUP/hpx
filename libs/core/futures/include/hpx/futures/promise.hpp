@@ -114,7 +114,7 @@ namespace hpx { namespace lcos { namespace local {
                 return shared_state_ != nullptr;
             }
 
-            future<R> get_future(error_code& ec = throws)
+            hpx::future<R> get_future(error_code& ec = throws)
             {
                 if (future_retrieved_ || shared_future_retrieved_)
                 {
@@ -122,7 +122,7 @@ namespace hpx { namespace lcos { namespace local {
                         "local::detail::promise_base<R>::get_future",
                         "future or shared future has already been retrieved "
                         "from this promise");
-                    return future<R>();
+                    return hpx::future<R>();
                 }
 
                 if (shared_state_ == nullptr)
@@ -130,21 +130,22 @@ namespace hpx { namespace lcos { namespace local {
                     HPX_THROWS_IF(ec, no_state,
                         "local::detail::promise_base<R>::get_future",
                         "this promise has no valid shared state");
-                    return future<R>();
+                    return hpx::future<R>();
                 }
 
                 future_retrieved_ = true;
-                return traits::future_access<future<R>>::create(shared_state_);
+                return traits::future_access<hpx::future<R>>::create(
+                    shared_state_);
             }
 
-            shared_future<R> get_shared_future(error_code& ec = throws)
+            hpx::shared_future<R> get_shared_future(error_code& ec = throws)
             {
                 if (future_retrieved_)
                 {
                     HPX_THROWS_IF(ec, future_already_retrieved,
                         "local::detail::promise_base<R>::get_shared_future",
                         "future has already been retrieved from this promise");
-                    return shared_future<R>();
+                    return hpx::shared_future<R>();
                 }
 
                 if (shared_state_ == nullptr)
@@ -152,11 +153,11 @@ namespace hpx { namespace lcos { namespace local {
                     HPX_THROWS_IF(ec, no_state,
                         "local::detail::promise_base<R>::get_shared_future",
                         "this promise has no valid shared state");
-                    return shared_future<R>();
+                    return hpx::shared_future<R>();
                 }
 
                 shared_future_retrieved_ = true;
-                return traits::future_access<shared_future<R>>::create(
+                return traits::future_access<hpx::shared_future<R>>::create(
                     shared_state_);
             }
 

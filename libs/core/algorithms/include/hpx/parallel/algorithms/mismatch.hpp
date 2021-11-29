@@ -333,7 +333,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         hpx::future<std::pair<I1, I2>> get_pair(
             hpx::future<util::in_in_result<I1, I2>>&& f)
         {
-            return lcos::make_future<std::pair<I1, I2>>(HPX_MOVE(f),
+            return hpx::make_future<std::pair<I1, I2>>(HPX_MOVE(f),
                 [](util::in_in_result<I1, I2>&& p) -> std::pair<I1, I2> {
                     return {HPX_MOVE(p.in1), HPX_MOVE(p.in2)};
                 });

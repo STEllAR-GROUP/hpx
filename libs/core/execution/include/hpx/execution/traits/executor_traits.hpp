@@ -17,10 +17,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace lcos {
+namespace hpx {
     template <typename R>
     class future;
-}}    // namespace hpx::lcos
+}    // namespace hpx
 
 namespace hpx { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
@@ -191,7 +191,7 @@ namespace hpx { namespace parallel { namespace execution {
         struct executor_future<Executor, T, Ts,
             std::enable_if_t<!hpx::traits::is_two_way_executor_v<Executor>>>
         {
-            using type = hpx::lcos::future<T>;
+            using type = hpx::future<T>;
         };
     }    // namespace detail
 

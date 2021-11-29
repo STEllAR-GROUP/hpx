@@ -28,9 +28,9 @@
 
 using hpx::async;
 using hpx::dataflow;
+using hpx::shared_future;
 using hpx::unwrapping;
 using hpx::wait_all;
-using hpx::lcos::shared_future;
 using std::vector;
 
 struct block

@@ -61,36 +61,36 @@ namespace hpx { namespace traits {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename R>
-        struct acquire_future_impl<hpx::lcos::future<R>>
+        struct acquire_future_impl<hpx::future<R>>
         {
-            typedef hpx::lcos::future<R> type;
+            typedef hpx::future<R> type;
 
-            HPX_FORCEINLINE hpx::lcos::future<R> operator()(
-                hpx::lcos::future<R>& future) const
+            HPX_FORCEINLINE hpx::future<R> operator()(
+                hpx::future<R>& future) const
             {
                 return HPX_MOVE(future);
             }
 
-            HPX_FORCEINLINE hpx::lcos::future<R> operator()(
-                hpx::lcos::future<R>&& future) const
+            HPX_FORCEINLINE hpx::future<R> operator()(
+                hpx::future<R>&& future) const
             {
                 return HPX_MOVE(future);
             }
         };
 
         template <typename R>
-        struct acquire_future_impl<hpx::lcos::shared_future<R>>
+        struct acquire_future_impl<hpx::shared_future<R>>
         {
-            typedef hpx::lcos::shared_future<R> type;
+            typedef hpx::shared_future<R> type;
 
-            HPX_FORCEINLINE hpx::lcos::shared_future<R> operator()(
-                hpx::lcos::shared_future<R> const& future) const
+            HPX_FORCEINLINE hpx::shared_future<R> operator()(
+                hpx::shared_future<R> const& future) const
             {
                 return future;
             }
 
-            HPX_FORCEINLINE hpx::lcos::shared_future<R> operator()(
-                hpx::lcos::shared_future<R>&& future) const
+            HPX_FORCEINLINE hpx::shared_future<R> operator()(
+                hpx::shared_future<R>&& future) const
             {
                 return HPX_MOVE(future);
             }

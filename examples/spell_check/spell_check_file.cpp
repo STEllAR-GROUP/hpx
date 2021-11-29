@@ -201,7 +201,7 @@ int hpx_main()
         fin.close();
         t.restart();
         {
-            using hpx::lcos::future;
+            using hpx::future;
             using hpx::async;
             using hpx::wait_all;
             vector<search_action> sAct;//[sizeX * sizeY];

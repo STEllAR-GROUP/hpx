@@ -378,7 +378,7 @@ namespace hpx {
 
         virtual std::uint32_t get_initial_num_localities() const;
 
-        virtual lcos::future<std::uint32_t> get_num_localities() const;
+        virtual hpx::future<std::uint32_t> get_num_localities() const;
 
         virtual std::string get_locality_name() const;
 

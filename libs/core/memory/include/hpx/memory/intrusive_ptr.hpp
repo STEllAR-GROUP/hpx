@@ -56,8 +56,8 @@ namespace hpx { namespace memory {
         }
 
         template <typename U,
-            typename Enable = typename std::enable_if<
-                memory::detail::sp_convertible<U, T>::value>::type>
+            typename Enable =
+                std::enable_if_t<memory::detail::sp_convertible_v<U, T>>>
         intrusive_ptr(intrusive_ptr<U> const& rhs)
           : px(rhs.get())
         {
@@ -102,9 +102,9 @@ namespace hpx { namespace memory {
         friend class intrusive_ptr;
 
         template <typename U,
-            typename Enable = typename std::enable_if<
-                memory::detail::sp_convertible<U, T>::value>::type>
-        constexpr intrusive_ptr(intrusive_ptr<U>&& rhs)
+            typename Enable =
+                std::enable_if_t<memory::detail::sp_convertible_v<U, T>>>
+        constexpr intrusive_ptr(intrusive_ptr<U>&& rhs) noexcept
           : px(rhs.px)
         {
             rhs.px = nullptr;
@@ -118,29 +118,29 @@ namespace hpx { namespace memory {
         }
 
         // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
-        intrusive_ptr& operator=(intrusive_ptr const& rhs)
+        intrusive_ptr& operator=(intrusive_ptr const& rhs) noexcept
         {
             this_type(rhs).swap(*this);
             return *this;
         }
 
-        intrusive_ptr& operator=(T* rhs)
+        intrusive_ptr& operator=(T* rhs) noexcept
         {
             this_type(rhs).swap(*this);
             return *this;
         }
 
-        void reset()
+        void reset() noexcept
         {
             this_type().swap(*this);
         }
 
-        void reset(T* rhs)
+        void reset(T* rhs) noexcept
         {
             this_type(rhs).swap(*this);
         }
 
-        void reset(T* rhs, bool add_ref)
+        void reset(T* rhs, bool add_ref) noexcept
         {
             this_type(rhs, add_ref).swap(*this);
         }
@@ -186,69 +186,73 @@ namespace hpx { namespace memory {
     };
 
     template <typename T, typename U>
-    inline bool operator==(
+    inline constexpr bool operator==(
         intrusive_ptr<T> const& a, intrusive_ptr<U> const& b) noexcept
     {
         return a.get() == b.get();
     }
 
     template <typename T, typename U>
-    inline bool operator!=(
+    inline constexpr bool operator!=(
         intrusive_ptr<T> const& a, intrusive_ptr<U> const& b) noexcept
     {
         return a.get() != b.get();
     }
 
     template <typename T, typename U>
-    inline bool operator==(intrusive_ptr<T> const& a, U* b) noexcept
+    inline constexpr bool operator==(intrusive_ptr<T> const& a, U* b) noexcept
     {
         return a.get() == b;
     }
 
     template <typename T, typename U>
-    inline bool operator!=(intrusive_ptr<T> const& a, U* b) noexcept
+    inline constexpr bool operator!=(intrusive_ptr<T> const& a, U* b) noexcept
     {
         return a.get() != b;
     }
 
     template <typename T, typename U>
-    inline bool operator==(T* a, intrusive_ptr<U> const& b) noexcept
+    inline constexpr bool operator==(T* a, intrusive_ptr<U> const& b) noexcept
     {
         return a == b.get();
     }
 
     template <typename T, typename U>
-    inline bool operator!=(T* a, intrusive_ptr<U> const& b) noexcept
+    inline constexpr bool operator!=(T* a, intrusive_ptr<U> const& b) noexcept
     {
         return a != b.get();
     }
 
     template <typename T>
-    inline bool operator==(intrusive_ptr<T> const& p, std::nullptr_t) noexcept
+    inline constexpr bool operator==(
+        intrusive_ptr<T> const& p, std::nullptr_t) noexcept
     {
         return p.get() == nullptr;
     }
 
     template <typename T>
-    inline bool operator==(std::nullptr_t, intrusive_ptr<T> const& p) noexcept
+    inline constexpr bool operator==(
+        std::nullptr_t, intrusive_ptr<T> const& p) noexcept
     {
         return p.get() == nullptr;
     }
 
     template <typename T>
-    inline bool operator!=(intrusive_ptr<T> const& p, std::nullptr_t) noexcept
+    inline constexpr bool operator!=(
+        intrusive_ptr<T> const& p, std::nullptr_t) noexcept
     {
         return p.get() != nullptr;
     }
 
     template <typename T>
-    inline bool operator!=(std::nullptr_t, intrusive_ptr<T> const& p) noexcept
+    inline constexpr bool operator!=(
+        std::nullptr_t, intrusive_ptr<T> const& p) noexcept
     {
         return p.get() != nullptr;
     }
 
     template <typename T>
-    inline bool operator<(
+    inline constexpr bool operator<(
         intrusive_ptr<T> const& a, intrusive_ptr<T> const& b) noexcept
     {
         return std::less<T*>{}(a.get(), b.get());
@@ -262,20 +266,20 @@ namespace hpx { namespace memory {
 
     // mem_fn support
     template <typename T>
-    T* get_pointer(intrusive_ptr<T> const& p) noexcept
+    constexpr T* get_pointer(intrusive_ptr<T> const& p) noexcept
     {
         return p.get();
     }
 
     // pointer casts
     template <typename T, typename U>
-    intrusive_ptr<T> static_pointer_cast(intrusive_ptr<U> const& p)
+    constexpr intrusive_ptr<T> static_pointer_cast(intrusive_ptr<U> const& p)
     {
         return static_cast<T*>(p.get());
     }
 
     template <typename T, typename U>
-    intrusive_ptr<T> const_pointer_cast(intrusive_ptr<U> const& p)
+    constexpr intrusive_ptr<T> const_pointer_cast(intrusive_ptr<U> const& p)
     {
         return const_cast<T*>(p.get());
     }
@@ -287,13 +291,14 @@ namespace hpx { namespace memory {
     }
 
     template <typename T, typename U>
-    intrusive_ptr<T> static_pointer_cast(intrusive_ptr<U>&& p) noexcept
+    constexpr intrusive_ptr<T> static_pointer_cast(
+        intrusive_ptr<U>&& p) noexcept
     {
         return intrusive_ptr<T>(static_cast<T*>(p.detach()), false);
     }
 
     template <typename T, typename U>
-    intrusive_ptr<T> const_pointer_cast(intrusive_ptr<U>&& p) noexcept
+    constexpr intrusive_ptr<T> const_pointer_cast(intrusive_ptr<U>&& p) noexcept
     {
         return intrusive_ptr<T>(const_cast<T*>(p.detach()), false);
     }

@@ -24,25 +24,29 @@ namespace hpx { namespace memory { namespace detail {
         static yes f(T*);
         static no f(...);
 
-        HPX_STATIC_CONSTEXPR bool value =
+        static constexpr bool value =
             sizeof((f)(static_cast<Y*>(nullptr))) == sizeof(yes);
     };
 
     template <typename Y, typename T>
     struct sp_convertible<Y, T[]>
     {
-        HPX_STATIC_CONSTEXPR bool value = false;
+        static constexpr bool value = false;
     };
 
     template <typename Y, typename T>
     struct sp_convertible<Y[], T[]>
     {
-        HPX_STATIC_CONSTEXPR bool value = sp_convertible<Y[1], T[1]>::value;
+        static constexpr bool value = sp_convertible<Y[1], T[1]>::value;
     };
 
     template <typename Y, std::size_t N, typename T>
     struct sp_convertible<Y[N], T[]>
     {
-        HPX_STATIC_CONSTEXPR bool value = sp_convertible<Y[1], T[1]>::value;
+        static constexpr bool value = sp_convertible<Y[1], T[1]>::value;
     };
+
+    template <typename Y, typename T>
+    inline constexpr bool sp_convertible_v = sp_convertible<Y, T>::value;
+
 }}}    // namespace hpx::memory::detail

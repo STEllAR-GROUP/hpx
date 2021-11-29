@@ -50,7 +50,7 @@ namespace hpx { namespace components {
 
         /// Asynchronously create a new component using the runtime_support
         template <typename Component, typename... Ts>
-        lcos::future<naming::id_type> create_component_async(Ts&&... vs)
+        hpx::future<naming::id_type> create_component_async(Ts&&... vs)
         {
             return this->base_type::template create_component_async<Component>(
                 gid_, HPX_FORWARD(Ts, vs)...);
@@ -68,7 +68,7 @@ namespace hpx { namespace components {
 
         /// Asynchronously create a new component using the runtime_support
         template <typename Component, typename... Ts>
-        lcos::future<std::vector<naming::id_type>> bulk_create_components_async(
+        hpx::future<std::vector<naming::id_type>> bulk_create_components_async(
             std::size_t /* count */, Ts&&... vs)
         {
             return this->base_type::template bulk_create_component<Component>(
@@ -76,7 +76,7 @@ namespace hpx { namespace components {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        lcos::future<int> load_components_async()
+        hpx::future<int> load_components_async()
         {
             return this->base_type::load_components_async(gid_);
         }
@@ -86,7 +86,7 @@ namespace hpx { namespace components {
             return this->base_type::load_components(gid_);
         }
 
-        lcos::future<void> call_startup_functions_async(bool pre_startup)
+        hpx::future<void> call_startup_functions_async(bool pre_startup)
         {
             return this->base_type::call_startup_functions_async(
                 gid_, pre_startup);
@@ -98,7 +98,7 @@ namespace hpx { namespace components {
         }
 
         /// \brief Shutdown the given runtime system
-        lcos::future<void> shutdown_async(double timeout = -1)
+        hpx::future<void> shutdown_async(double timeout = -1)
         {
             return this->base_type::shutdown_async(gid_, timeout);
         }
@@ -115,7 +115,7 @@ namespace hpx { namespace components {
         }
 
         /// \brief Terminate the given runtime system
-        lcos::future<void> terminate_async()
+        hpx::future<void> terminate_async()
         {
             return this->base_type::terminate_async(gid_);
         }

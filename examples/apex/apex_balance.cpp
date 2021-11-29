@@ -9,8 +9,8 @@
 // Naive SMP version implemented with futures.
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/future.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
 
 #include <apex_api.hpp>
@@ -75,7 +75,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     for(std::uint64_t block = 0; block < blocks; ++block) {
         std::cout << "Block " << block << std::endl;
         std::list<std::uint64_t> work(units, n);
-        std::list<hpx::lcos::future<double> > futures;
+        std::list<hpx::future<double> > futures;
         for(std::uint64_t & item : work) {
             do_work_action act;
             size_t next = next_locality(probabilities);

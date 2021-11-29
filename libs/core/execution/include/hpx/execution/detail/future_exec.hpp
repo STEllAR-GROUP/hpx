@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -34,9 +34,10 @@
 #include <utility>
 
 namespace hpx { namespace lcos { namespace detail {
+
     template <typename Executor, typename Future, typename F>
-    inline typename hpx::traits::future_then_executor_result<Executor,
-        typename std::decay<Future>::type, F>::type
+    inline hpx::traits::future_then_executor_result_t<Executor,
+        std::decay_t<Future>, F>
     then_execute_helper(Executor&& exec, F&& f, Future&& predecessor)
     {
         // simply forward this to executor
@@ -48,42 +49,42 @@ namespace hpx { namespace lcos { namespace detail {
     // launch
     template <typename Future, typename Policy>
     struct future_then_dispatch<Future, Policy,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+        std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         template <typename Policy_, typename F>
-        HPX_FORCEINLINE static
-            typename hpx::traits::future_then_result<Future, F>::type
-            call(Future&& fut, Policy_&& policy, F&& f)
+        HPX_FORCEINLINE static hpx::traits::future_then_result_t<Future, F>
+        call(Future&& fut, Policy_&& policy, F&& f)
         {
             using result_type = typename hpx::traits::future_then_result<Future,
                 F>::result_type;
             using continuation_result_type =
-                typename hpx::util::invoke_result<F, Future>::type;
+                hpx::util::invoke_result_t<F, Future>;
 
-            typename hpx::traits::detail::shared_state_ptr<result_type>::type
-                p = detail::make_continuation_alloc<continuation_result_type>(
+            hpx::traits::detail::shared_state_ptr_t<result_type> p =
+                detail::make_continuation_alloc<continuation_result_type>(
                     hpx::util::internal_allocator<>{}, HPX_MOVE(fut),
                     HPX_FORWARD(Policy_, policy), HPX_FORWARD(F, f));
-            return hpx::traits::future_access<future<result_type>>::create(
+
+            return hpx::traits::future_access<hpx::future<result_type>>::create(
                 HPX_MOVE(p));
         }
 
         template <typename Allocator, typename Policy_, typename F>
-        HPX_FORCEINLINE static
-            typename hpx::traits::future_then_result<Future, F>::type
-            call_alloc(
-                Allocator const& alloc, Future&& fut, Policy_&& policy, F&& f)
+        HPX_FORCEINLINE static hpx::traits::future_then_result_t<Future, F>
+        call_alloc(
+            Allocator const& alloc, Future&& fut, Policy_&& policy, F&& f)
         {
             using result_type = typename hpx::traits::future_then_result<Future,
                 F>::result_type;
             using continuation_result_type =
-                typename hpx::util::invoke_result<F, Future>::type;
+                hpx::util::invoke_result_t<F, Future>;
 
-            typename hpx::traits::detail::shared_state_ptr<result_type>::type
-                p = detail::make_continuation_alloc<continuation_result_type>(
-                    alloc, HPX_MOVE(fut), HPX_FORWARD(Policy_, policy),
+            hpx::traits::detail::shared_state_ptr_t<result_type> p =
+                detail::make_continuation_alloc<continuation_result_type>(alloc,
+                    HPX_MOVE(fut), HPX_FORWARD(Policy_, policy),
                     HPX_FORWARD(F, f));
-            return hpx::traits::future_access<future<result_type>>::create(
+
+            return hpx::traits::future_access<hpx::future<result_type>>::create(
                 HPX_MOVE(p));
         }
     };
@@ -95,14 +96,13 @@ namespace hpx { namespace lcos { namespace detail {
     // threads::executor
     template <typename Future, typename Executor>
     struct future_then_dispatch<Future, Executor,
-        typename std::enable_if<traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value>::type>
+        std::enable_if_t<traits::is_one_way_executor_v<Executor> ||
+            traits::is_two_way_executor_v<Executor>>>
     {
         template <typename Executor_, typename F>
-        HPX_FORCEINLINE static
-            typename hpx::traits::future_then_executor_result<Executor_, Future,
-                F>::type
-            call(Future&& fut, Executor_&& exec, F&& f)
+        HPX_FORCEINLINE static hpx::traits::future_then_executor_result_t<
+            Executor_, Future, F>
+        call(Future&& fut, Executor_&& exec, F&& f)
         {
             // simply forward this to executor
             return detail::then_execute_helper(
@@ -110,10 +110,9 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         template <typename Allocator, typename Executor_, typename F>
-        HPX_FORCEINLINE static
-            typename hpx::traits::future_then_executor_result<Executor_, Future,
-                F>::type
-            call_alloc(Allocator const&, Future&& fut, Executor_&& exec, F&& f)
+        HPX_FORCEINLINE static hpx::traits::future_then_executor_result_t<
+            Executor_, Future, F>
+        call_alloc(Allocator const&, Future&& fut, Executor_&& exec, F&& f)
         {
             return call(HPX_FORWARD(Future, fut), HPX_FORWARD(Executor_, exec),
                 HPX_FORWARD(F, f));
@@ -123,9 +122,9 @@ namespace hpx { namespace lcos { namespace detail {
     // plain function, or function object
     template <typename Future, typename FD>
     struct future_then_dispatch<Future, FD,
-        typename std::enable_if<!traits::is_launch_policy<FD>::value &&
-            !(traits::is_one_way_executor<FD>::value ||
-                traits::is_two_way_executor<FD>::value)>::type>
+        std::enable_if_t<!traits::is_launch_policy_v<FD> &&
+            !(traits::is_one_way_executor_v<FD> ||
+                traits::is_two_way_executor_v<FD>)>>
     {
         template <typename F>
         HPX_FORCEINLINE static auto call(Future&& fut, F&& f)
@@ -173,36 +172,36 @@ namespace hpx { namespace lcos { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ContResult, typename Future, typename Policy, typename F>
-    inline typename traits::detail::shared_state_ptr<
-        typename continuation_result<ContResult>::type>::type
+    inline traits::detail::shared_state_ptr_t<continuation_result_t<ContResult>>
     make_continuation(Future const& future, Policy&& policy, F&& f)
     {
-        using result_type = typename continuation_result<ContResult>::type;
+        using result_type = continuation_result_t<ContResult>;
         using shared_state = detail::continuation<Future, F, result_type>;
         using init_no_addref = typename shared_state::init_no_addref;
         using spawner_type = post_policy_spawner;
 
         // create a continuation
-        typename traits::detail::shared_state_ptr<result_type>::type p(
+        traits::detail::shared_state_ptr_t<result_type> p(
             new shared_state(init_no_addref{}, HPX_FORWARD(F, f)), false);
+
         static_cast<shared_state*>(p.get())->template attach<spawner_type>(
             future, spawner_type{}, HPX_FORWARD(Policy, policy));
+
         return p;
     }
 
     // same as above, except with allocator
     template <typename ContResult, typename Allocator, typename Future,
         typename Policy, typename F>
-    inline typename traits::detail::shared_state_ptr<
-        typename continuation_result<ContResult>::type>::type
+    inline traits::detail::shared_state_ptr_t<continuation_result_t<ContResult>>
     make_continuation_alloc(
         Allocator const& a, Future const& future, Policy&& policy, F&& f)
     {
-        using result_type = typename continuation_result<ContResult>::type;
+        using result_type = continuation_result_t<ContResult>;
 
         using base_allocator = Allocator;
-        using shared_state = typename traits::detail::shared_state_allocator<
-            detail::continuation<Future, F, result_type>, base_allocator>::type;
+        using shared_state = traits::shared_state_allocator_t<
+            detail::continuation<Future, F, result_type>, base_allocator>;
 
         using other_allocator = typename std::allocator_traits<
             base_allocator>::template rebind_alloc<shared_state>;
@@ -222,7 +221,7 @@ namespace hpx { namespace lcos { namespace detail {
             alloc, p.get(), init_no_addref{}, alloc, HPX_FORWARD(F, f));
 
         // create a continuation
-        typename hpx::traits::detail::shared_state_ptr<result_type>::type r(
+        hpx::traits::detail::shared_state_ptr_t<result_type> r(
             p.release(), false);
 
         static_cast<shared_state*>(r.get())->template attach<spawner_type>(
@@ -235,15 +234,15 @@ namespace hpx { namespace lcos { namespace detail {
     // futures
     template <typename ContResult, typename Allocator, typename Future,
         typename Policy, typename F>
-    inline typename traits::detail::shared_state_ptr<ContResult>::type
+    inline traits::detail::shared_state_ptr_t<ContResult>
     make_continuation_alloc_nounwrap(
         Allocator const& a, Future const& future, Policy&& policy, F&& f)
     {
         using result_type = ContResult;
 
         using base_allocator = Allocator;
-        using shared_state = typename traits::detail::shared_state_allocator<
-            detail::continuation<Future, F, result_type>, base_allocator>::type;
+        using shared_state = traits::shared_state_allocator_t<
+            detail::continuation<Future, F, result_type>, base_allocator>;
 
         using other_allocator = typename std::allocator_traits<
             base_allocator>::template rebind_alloc<shared_state>;
@@ -275,42 +274,44 @@ namespace hpx { namespace lcos { namespace detail {
 
     template <typename ContResult, typename Future, typename Executor,
         typename F>
-    inline typename traits::detail::shared_state_ptr<ContResult>::type
+    inline traits::detail::shared_state_ptr_t<ContResult>
     make_continuation_exec(Future const& future, Executor&& exec, F&& f)
     {
         using shared_state = detail::continuation<Future, F, ContResult>;
         using init_no_addref = typename shared_state::init_no_addref;
-        using spawner_type =
-            executor_spawner<typename std::decay<Executor>::type>;
+        using spawner_type = executor_spawner<std::decay_t<Executor>>;
 
         // create a continuation
-        typename traits::detail::shared_state_ptr<ContResult>::type p(
+        traits::detail::shared_state_ptr_t<ContResult> p(
             new shared_state(init_no_addref{}, HPX_FORWARD(F, f)), false);
+
         static_cast<shared_state*>(p.get())
             ->template attach_nounwrap<spawner_type>(future,
                 spawner_type{HPX_FORWARD(Executor, exec)},
                 launch::async_policy{});
+
         return p;
     }
 
     template <typename ContResult, typename Future, typename Executor,
         typename Policy, typename F>
-    inline typename traits::detail::shared_state_ptr<ContResult>::type
+    inline traits::detail::shared_state_ptr_t<ContResult>
     make_continuation_exec_policy(
         Future const& future, Executor&& exec, Policy&& policy, F&& f)
     {
         using shared_state = detail::continuation<Future, F, ContResult>;
         using init_no_addref = typename shared_state::init_no_addref;
-        using spawner_type =
-            executor_spawner<typename std::decay<Executor>::type>;
+        using spawner_type = executor_spawner<std::decay_t<Executor>>;
 
         // create a continuation
-        typename traits::detail::shared_state_ptr<ContResult>::type p(
+        traits::detail::shared_state_ptr_t<ContResult> p(
             new shared_state(init_no_addref{}, HPX_FORWARD(F, f)), false);
+
         static_cast<shared_state*>(p.get())
             ->template attach_nounwrap<spawner_type>(future,
                 spawner_type{HPX_FORWARD(Executor, exec)},
                 HPX_FORWARD(Policy, policy));
+
         return p;
     }
 }}}    // namespace hpx::lcos::detail

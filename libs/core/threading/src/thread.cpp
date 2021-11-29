@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -47,15 +47,15 @@ namespace hpx {
 
     thread::thread(thread&& rhs) noexcept
     {
-        std::lock_guard<mutex_type> l(rhs.mtx_);
+        std::lock_guard l(rhs.mtx_);
         id_ = rhs.id_;
         rhs.id_ = threads::invalid_thread_id;
     }
 
     thread& thread::operator=(thread&& rhs) noexcept
     {
-        std::unique_lock<mutex_type> l(mtx_);
-        std::unique_lock<mutex_type> l2(rhs.mtx_);
+        std::unique_lock l(mtx_);
+        std::unique_lock l2(rhs.mtx_);
         if (joinable_locked())
         {
             l2.unlock();
@@ -96,8 +96,8 @@ namespace hpx {
 
     void thread::swap(thread& rhs) noexcept
     {
-        std::lock_guard<mutex_type> l(mtx_);
-        std::lock_guard<mutex_type> l2(rhs.mtx_);
+        std::lock_guard l(mtx_);
+        std::lock_guard l2(rhs.mtx_);
         std::swap(id_, rhs.id_);
     }
 
@@ -193,7 +193,7 @@ namespace hpx {
 
     void thread::join()
     {
-        std::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock l(mtx_);
 
         if (!joinable_locked())
         {
@@ -217,7 +217,7 @@ namespace hpx {
                 id_.noref(), util::bind_front(&resume_thread, this_id)))
         {
             // wait for thread to be terminated
-            util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+            util::unlock_guard ul(l);
             this_thread::suspend(
                 threads::thread_schedule_state::suspended, "thread::join");
         }
@@ -285,11 +285,13 @@ namespace hpx {
         struct thread_task_base : lcos::detail::future_data<void>
         {
         private:
-            typedef lcos::detail::future_data<void>::mutex_type mutex_type;
             typedef hpx::intrusive_ptr<thread_task_base> future_base_type;
 
         protected:
-            typedef lcos::detail::future_data<void>::result_type result_type;
+            using base_type = lcos::detail::future_data<void>;
+            using result_type = base_type::result_type;
+
+            using base_type::mtx_;
 
         public:
             thread_task_base(threads::thread_id_ref_type const& id)
@@ -303,20 +305,20 @@ namespace hpx {
                 }
             }
 
-            bool valid() const
+            bool valid() const noexcept
             {
                 return id_ != threads::invalid_thread_id;
             }
 
             // cancellation support
-            bool cancelable() const
+            bool cancelable() const noexcept override
             {
                 return true;
             }
 
-            void cancel()
+            void cancel() override
             {
-                std::lock_guard<mutex_type> l(this->mtx_);
+                std::lock_guard l(mtx_);
                 if (!this->is_ready())
                 {
                     threads::interrupt_thread(id_.noref());
@@ -330,7 +332,7 @@ namespace hpx {
             void thread_exit_function()
             {
                 // might have been finished or canceled
-                std::lock_guard<mutex_type> l(this->mtx_);
+                std::lock_guard l(mtx_);
                 if (!this->is_ready())
                     this->set_data(result_type());
                 id_ = threads::invalid_thread_id;
@@ -341,13 +343,13 @@ namespace hpx {
         };
     }    // namespace detail
 
-    lcos::future<void> thread::get_future(error_code& ec)
+    hpx::future<void> thread::get_future(error_code& ec)
     {
         if (id_ == threads::invalid_thread_id)
         {
             HPX_THROWS_IF(ec, null_thread_id, "thread::get_future",
                 "null thread id encountered");
-            return lcos::future<void>();
+            return hpx::future<void>();
         }
 
         detail::thread_task_base* p = new detail::thread_task_base(id_);
@@ -356,11 +358,11 @@ namespace hpx {
         {
             HPX_THROWS_IF(ec, thread_resource_error, "thread::get_future",
                 "Could not create future as thread has been terminated.");
-            return lcos::future<void>();
+            return hpx::future<void>();
         }
 
         using traits::future_access;
-        return future_access<lcos::future<void>>::create(HPX_MOVE(base));
+        return future_access<hpx::future<void>>::create(HPX_MOVE(base));
     }
 
     ///////////////////////////////////////////////////////////////////////////

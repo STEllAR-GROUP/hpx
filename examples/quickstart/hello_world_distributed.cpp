@@ -85,7 +85,7 @@ void hello_world_foreman()
         // Each iteration, we create a task for each element in the set of
         // OS-threads that have not said "Hello world". Each of these tasks
         // is encapsulated in a future.
-        std::vector<hpx::lcos::future<std::size_t>> futures;
+        std::vector<hpx::future<std::size_t>> futures;
         futures.reserve(attendance.size());
 
         for (std::size_t worker : attendance)
@@ -137,7 +137,7 @@ int main()
     std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
 
     // Reserve storage space for futures, one for each locality.
-    std::vector<hpx::lcos::future<void>> futures;
+    std::vector<hpx::future<void>> futures;
     futures.reserve(localities.size());
 
     for (hpx::naming::id_type const& node : localities)

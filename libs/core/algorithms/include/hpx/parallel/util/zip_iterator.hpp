@@ -30,7 +30,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         typedef typename hpx::tuple_element<N,
             typename ZipIter::iterator_tuple_type>::type result_type;
 
-        return lcos::make_future<result_type>(
+        return hpx::make_future<result_type>(
             HPX_MOVE(zipiter), [](ZipIter zipiter) {
                 return get_iter<N, result_type>(HPX_MOVE(zipiter));
             });
@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         hpx::future<ZipIter>&& zipiter)
     {
         typedef typename ZipIter::iterator_tuple_type result_type;
-        return lcos::make_future<result_type>(HPX_MOVE(zipiter),
+        return hpx::make_future<result_type>(HPX_MOVE(zipiter),
             [](ZipIter zipiter) { return get_iter_tuple(HPX_MOVE(zipiter)); });
     }
 
@@ -80,7 +80,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             typename hpx::tuple_element<1, iterator_tuple_type>::type>
             result_type;
 
-        return lcos::make_future<result_type>(HPX_MOVE(zipiter),
+        return hpx::make_future<result_type>(HPX_MOVE(zipiter),
             [](ZipIter zipiter) { return get_iter_pair(HPX_MOVE(zipiter)); });
     }
 
@@ -116,7 +116,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             typename hpx::tuple_element<0, iterator_tuple_type>::type,
             typename hpx::tuple_element<1, iterator_tuple_type>::type>;
 
-        return lcos::make_future<result_type>(
+        return hpx::make_future<result_type>(
             HPX_MOVE(zipiter), [](ZipIter zipiter) {
                 return get_iter_in_in_result(HPX_MOVE(zipiter));
             });

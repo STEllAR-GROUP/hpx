@@ -20,7 +20,7 @@
 namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename... Ts>
-    lcos::future<typename traits::promise_local_result<
+    hpx::future<typename traits::promise_local_result<
         typename hpx::traits::extract_action<Action>::remote_result_type>::type>
     async_colocated_cb(naming::id_type const& gid, Callback&& cb,
         Ts&&...
@@ -55,7 +55,7 @@ namespace hpx { namespace detail {
 
     template <typename Component, typename Signature, typename Derived,
         typename Callback, typename... Ts>
-    lcos::future<typename traits::promise_local_result<typename hpx::traits::
+    hpx::future<typename traits::promise_local_result<typename hpx::traits::
             extract_action<Derived>::remote_result_type>::type>
     async_colocated_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
@@ -69,7 +69,7 @@ namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
-    lcos::future<typename traits::promise_local_result<
+    hpx::future<typename traits::promise_local_result<
         typename hpx::traits::extract_action<Action>::remote_result_type>::type>
     async_colocated_cb(
         Continuation&& cont, naming::id_type const& gid, Callback&& cb,
@@ -108,7 +108,7 @@ namespace hpx { namespace detail {
 
     template <typename Continuation, typename Component, typename Signature,
         typename Derived, typename Callback, typename... Ts>
-    lcos::future<typename traits::promise_local_result<typename hpx::traits::
+    hpx::future<typename traits::promise_local_result<typename hpx::traits::
             extract_action<Derived>::remote_result_type>::type>
     async_colocated_cb(Continuation&& cont,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/

@@ -487,7 +487,7 @@ namespace hpx { namespace agas {
         return std::uint32_t(-1);
     }    // }}}
 
-    lcos::future<std::uint32_t> addressing_service::get_num_localities_async(
+    hpx::future<std::uint32_t> addressing_service::get_num_localities_async(
         components::component_type type) const
     {    // {{{ get_num_localities implementation
         if (type == components::component_invalid)
@@ -514,7 +514,7 @@ namespace hpx { namespace agas {
         return std::uint32_t(0);
     }    // }}}
 
-    lcos::future<std::uint32_t>
+    hpx::future<std::uint32_t>
     addressing_service::get_num_overall_threads_async() const
     {    // {{{
         return locality_ns_->get_num_overall_threads_async();
@@ -534,7 +534,7 @@ namespace hpx { namespace agas {
         return std::vector<std::uint32_t>();
     }    // }}}
 
-    lcos::future<std::vector<std::uint32_t>>
+    hpx::future<std::vector<std::uint32_t>>
     addressing_service::get_num_threads_async() const
     {    // {{{
         return locality_ns_->get_num_threads_async();
@@ -1256,7 +1256,7 @@ namespace hpx { namespace agas {
         return fut.get() + compensated_credit;
     }
 
-    lcos::future<std::int64_t> addressing_service::incref_async(
+    hpx::future<std::int64_t> addressing_service::incref_async(
         naming::gid_type const& id, std::int64_t credit,
         naming::id_type const& keep_alive)
     {    // {{{ incref implementation
@@ -1265,7 +1265,7 @@ namespace hpx { namespace agas {
         if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
         {
             // reschedule this call as an HPX thread
-            lcos::future<std::int64_t> (addressing_service::*incref_async_ptr)(
+            hpx::future<std::int64_t> (addressing_service::*incref_async_ptr)(
                 naming::gid_type const&, std::int64_t, naming::id_type const&) =
                 &addressing_service::incref_async;
 
@@ -1277,7 +1277,7 @@ namespace hpx { namespace agas {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "addressing_service::incref_async",
                 "invalid credit count of {1}", credit);
-            return lcos::future<std::int64_t>();
+            return hpx::future<std::int64_t>();
         }
 
         HPX_ASSERT(keep_alive != naming::invalid_id);
@@ -1350,7 +1350,7 @@ namespace hpx { namespace agas {
 
         naming::gid_type const e_lower = pending_incref.first;
 
-        lcos::future<std::int64_t> f = primary_ns_.increment_credit(
+        hpx::future<std::int64_t> f = primary_ns_.increment_credit(
             pending_incref.second, e_lower, e_lower);
 
         // pass the amount of compensated decrefs to the callback
@@ -1480,7 +1480,7 @@ namespace hpx { namespace agas {
         return false;
     }
 
-    lcos::future<bool> addressing_service::register_name_async(
+    hpx::future<bool> addressing_service::register_name_async(
         std::string const& name, naming::id_type const& id)
     {    // {{{
         // We need to modify the reference count.
@@ -1517,7 +1517,7 @@ namespace hpx { namespace agas {
         }
     }    // }}}
 
-    lcos::future<naming::id_type> addressing_service::unregister_name_async(
+    hpx::future<naming::id_type> addressing_service::unregister_name_async(
         std::string const& name)
     {    // {{{
         return symbol_ns_.unbind_async(name);
@@ -1538,7 +1538,7 @@ namespace hpx { namespace agas {
         }
     }    // }}}
 
-    lcos::future<naming::id_type> addressing_service::resolve_name_async(
+    hpx::future<naming::id_type> addressing_service::resolve_name_async(
         std::string const& name)
     {    // {{{
         return symbol_ns_.resolve_async(name);

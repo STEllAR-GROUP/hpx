@@ -11,12 +11,13 @@
 #include <functional>
 #include <type_traits>
 
-namespace hpx { namespace lcos {
+namespace hpx {
     template <typename R>
     class future;
+
     template <typename R>
     class shared_future;
-}}    // namespace hpx::lcos
+}    // namespace hpx
 
 namespace hpx { namespace traits {
     namespace detail {
@@ -26,9 +27,12 @@ namespace hpx { namespace traits {
         };
 
         template <typename R>
-        struct is_unique_future<lcos::future<R>> : std::true_type
+        struct is_unique_future<hpx::future<R>> : std::true_type
         {
         };
+
+        template <typename R>
+        inline constexpr bool is_unique_future_v = is_unique_future<R>::value;
 
         template <typename Future, typename Enable = void>
         struct is_future_customization_point : std::false_type
@@ -42,12 +46,12 @@ namespace hpx { namespace traits {
     };
 
     template <typename R>
-    struct is_future<lcos::future<R>> : std::true_type
+    struct is_future<hpx::future<R>> : std::true_type
     {
     };
 
     template <typename R>
-    struct is_future<lcos::shared_future<R>> : std::true_type
+    struct is_future<hpx::shared_future<R>> : std::true_type
     {
     };
 

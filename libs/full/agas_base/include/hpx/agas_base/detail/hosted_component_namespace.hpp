@@ -52,7 +52,7 @@ namespace hpx { namespace agas { namespace detail {
 
         std::string get_component_type_name(components::component_type type);
 
-        lcos::future<std::uint32_t> get_num_localities(
+        hpx::future<std::uint32_t> get_num_localities(
             components::component_type type);
 
     private:

@@ -97,14 +97,14 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         // result retrieval
-        lcos::future<R> get_future(error_code& ec = throws)
+        hpx::future<R> get_future(error_code& ec = throws)
         {
             if (function_.empty())
             {
                 HPX_THROWS_IF(ec, no_state,
                     "packaged_task<Signature>::get_future",
                     "this packaged_task has no valid shared state");
-                return lcos::future<R>();
+                return hpx::future<R>();
             }
             return promise_.get_future();
         }

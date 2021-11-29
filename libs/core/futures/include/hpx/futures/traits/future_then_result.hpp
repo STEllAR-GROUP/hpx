@@ -60,7 +60,7 @@ namespace hpx { namespace traits {
                 hpx::traits::future_traits<cont_result>,
                 hpx::util::identity<cont_result>>;
 
-            using type = hpx::lcos::future<result_type>;
+            using type = hpx::future<result_type>;
         };
 
     }    // namespace detail

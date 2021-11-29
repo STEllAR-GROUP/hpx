@@ -39,14 +39,14 @@ namespace hpx { namespace lcos {
     {
         broadcast()
           : ready_future(ready_promise.get_future())
-          , bcast_future(hpx::lcos::make_ready_future())
+          , bcast_future(hpx::make_ready_future())
         {
         }
 
         explicit broadcast(hpx::id_type id, std::size_t fan_out = 2)
           : this_id(id)
           , ready_future(ready_promise.get_future())
-          , bcast_future(hpx::lcos::make_ready_future())
+          , bcast_future(hpx::make_ready_future())
         {
         }
 
@@ -89,7 +89,7 @@ namespace hpx { namespace lcos {
                         hpx::util::bind(act, hpx::util::placeholders::_1, a0),
                         fan_out);
                 }
-                return hpx::lcos::make_ready_future(a0);
+                return hpx::make_ready_future(a0);
             }
             else
             {

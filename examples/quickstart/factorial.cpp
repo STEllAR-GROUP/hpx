@@ -31,7 +31,7 @@ std::uint64_t factorial(std::uint64_t n)
     if (n == 0)
         return 1;
 
-    hpx::lcos::future<std::uint64_t> n1 =
+    hpx::future<std::uint64_t> n1 =
         hpx::async<factorial_action>(hpx::find_here(), n - 1);
     return n * n1.get();
 }

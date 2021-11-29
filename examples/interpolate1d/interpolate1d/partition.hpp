@@ -45,7 +45,7 @@ namespace interpolate1d
         {}
 
         // initialize this partition
-        hpx::lcos::future<void>
+        hpx::future<void>
         init_async(std::string const& datafilename, dimension const& dim,
             std::size_t num_nodes)
         {
@@ -62,7 +62,7 @@ namespace interpolate1d
 
         // ask this partition to interpolate, note that value must be in the
         // range valid for this partition
-        hpx::lcos::future<double>
+        hpx::future<double>
         interpolate_async(double value) const
         {
             typedef server::partition::interpolate_action interpolate_action;

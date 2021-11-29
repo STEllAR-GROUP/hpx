@@ -53,7 +53,7 @@ namespace hpx { namespace components
             add_async().get();
         }
 
-        hpx::lcos::future<void> add_async()
+        hpx::future<void> add_async()
         {
             typedef server::random_mem_access::add_action action_type;
             return hpx::async<action_type>(this->get_id());
@@ -65,7 +65,7 @@ namespace hpx { namespace components
             print_async().get();
         }
         /// Asynchronously query the current value of the random_mem_access
-        hpx::lcos::future<void> print_async ()
+        hpx::future<void> print_async ()
         {
             typedef server::random_mem_access::print_action action_type;
             return hpx::async<action_type>(this->get_id());
@@ -78,7 +78,7 @@ namespace hpx { namespace components
         }
 
         /// Asynchronously query the current value of the random_mem_access
-        lcos::future<std::size_t> query_async()
+        hpx::future<std::size_t> query_async()
         {
             typedef server::random_mem_access::query_action action_type;
             return hpx::async<action_type>(this->get_id());

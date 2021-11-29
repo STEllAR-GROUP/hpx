@@ -113,7 +113,7 @@ namespace hpx { namespace lcos {
         (*node_)->wait(false).get();
     }
 
-    future<void> barrier::wait(hpx::launch::async_policy)
+    hpx::future<void> barrier::wait(hpx::launch::async_policy)
     {
         return (*node_)->wait(true);
     }

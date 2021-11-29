@@ -590,7 +590,7 @@ namespace hpx { namespace parallel { namespace execution {
                         HPX_MOVE(func));
 
                 return hpx::traits::future_access<
-                    hpx::lcos::future<result_type>>::create(HPX_MOVE(p));
+                    hpx::future<result_type>>::create(HPX_MOVE(p));
             }
         }
 

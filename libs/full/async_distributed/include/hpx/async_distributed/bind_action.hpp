@@ -97,8 +97,7 @@ namespace hpx { namespace util {
             }
 
             template <typename... Us>
-            HPX_FORCEINLINE hpx::lcos::future<result_type> async(
-                Us&&... vs) const
+            HPX_FORCEINLINE hpx::future<result_type> async(Us&&... vs) const
             {
                 return hpx::async<Action>(
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(

@@ -112,7 +112,7 @@ namespace hpx { namespace lcos { namespace detail {
         /*IsAction=*/false, Policy, F, Args,
         typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
     {
-        using type = hpx::lcos::future<
+        using type = hpx::future<
             typename util::detail::invoke_fused_result<F, Args>::type>;
     };
 

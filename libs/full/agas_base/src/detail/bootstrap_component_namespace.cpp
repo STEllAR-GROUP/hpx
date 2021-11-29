@@ -62,7 +62,7 @@ namespace hpx { namespace agas { namespace detail {
         return server_.get_component_type_name(type);
     }
 
-    lcos::future<std::uint32_t>
+    hpx::future<std::uint32_t>
     bootstrap_component_namespace::get_num_localities(
         components::component_type type)
     {

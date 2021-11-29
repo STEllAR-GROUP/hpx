@@ -34,7 +34,7 @@ namespace jacobi
             HPX_ASSERT(this->get_unmanaged_id() != top.id);
             HPX_ASSERT(this->get_unmanaged_id() != bottom.id);
 
-            std::vector<hpx::lcos::future<void> > fs;
+            std::vector<hpx::future<void> > fs;
             for(std::size_t x = 1; x < nx-1; x += line_block)
             {
                 std::size_t x_end = (std::min)(nx-1, x + line_block);
@@ -54,10 +54,10 @@ namespace jacobi
         }
 
         void stencil_iterator::update(
-            hpx::lcos::future<row_range> dst
-          , hpx::lcos::future<row_range> src
-          , hpx::lcos::future<row_range> top
-          , hpx::lcos::future<row_range> bottom
+            hpx::future<row_range> dst
+          , hpx::future<row_range> src
+          , hpx::future<row_range> top
+          , hpx::future<row_range> bottom
         )
         {
             row_range d = dst.get();

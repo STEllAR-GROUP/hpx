@@ -131,8 +131,8 @@ namespace hpx { namespace parallel { namespace execution {
                 p = hpx::lcos::detail::make_continuation_exec<result_type>(
                     HPX_FORWARD(Future, predecessor), *this, HPX_MOVE(func));
 
-            return hpx::traits::future_access<
-                hpx::lcos::future<result_type>>::create(HPX_MOVE(p));
+            return hpx::traits::future_access<hpx::future<result_type>>::create(
+                HPX_MOVE(p));
         }
 
         // NonBlockingOneWayExecutor (adapted) interface

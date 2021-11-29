@@ -55,7 +55,7 @@ namespace hpx { namespace lcos { namespace local {
             {
                 return 0 == release();
             }
-            virtual void destroy()
+            virtual void destroy() noexcept
             {
                 delete this;
             }

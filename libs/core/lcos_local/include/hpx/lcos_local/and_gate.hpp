@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -94,7 +94,7 @@ namespace hpx { namespace lcos { namespace local {
     protected:
         /// \brief get a future allowing to wait for the gate to fire
         template <typename OuterLock>
-        future<void> get_future(OuterLock& outer_lock,
+        hpx::future<void> get_future(OuterLock& outer_lock,
             std::size_t count = std::size_t(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
@@ -125,7 +125,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
     public:
-        future<void> get_future(std::size_t count = std::size_t(-1),
+        hpx::future<void> get_future(std::size_t count = std::size_t(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
@@ -137,7 +137,7 @@ namespace hpx { namespace lcos { namespace local {
     protected:
         /// \brief get a shared future allowing to wait for the gate to fire
         template <typename OuterLock>
-        shared_future<void> get_shared_future(OuterLock& outer_lock,
+        hpx::shared_future<void> get_shared_future(OuterLock& outer_lock,
             std::size_t count = std::size_t(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
@@ -171,7 +171,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
     public:
-        shared_future<void> get_shared_future(
+        hpx::shared_future<void> get_shared_future(
             std::size_t count = std::size_t(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
@@ -265,7 +265,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             template <typename Condition>
-            future<void> get_future(
+            hpx::future<void> get_future(
                 Condition&& func, error_code& ec = hpx::throws)
             {
                 return (*it_)->get_future(HPX_FORWARD(Condition, func), ec);
@@ -308,7 +308,7 @@ namespace hpx { namespace lcos { namespace local {
                 conditional_trigger c;
                 manage_condition cond(*this, c);
 
-                future<void> f = cond.get_future(util::bind(
+                hpx::future<void> f = cond.get_future(util::bind(
                     &base_and_gate::test_condition, this, generation_value));
 
                 {
@@ -398,7 +398,8 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         template <typename Lock>
-        future<void> get_future(Lock& l, std::size_t count = std::size_t(-1),
+        hpx::future<void> get_future(Lock& l,
+            std::size_t count = std::size_t(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
@@ -406,7 +407,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         template <typename Lock>
-        shared_future<void> get_shared_future(Lock& l,
+        hpx::shared_future<void> get_shared_future(Lock& l,
             std::size_t count = std::size_t(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)

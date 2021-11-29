@@ -36,7 +36,7 @@ namespace hpx { namespace lcos {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        lcos::future<void> signal(
+        hpx::future<void> signal(
             launch::async_policy, ValueType const& val, std::uint64_t count = 1)
         {
             HPX_ASSERT(this->get_id());
@@ -51,7 +51,7 @@ namespace hpx { namespace lcos {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        lcos::future<ValueType> get(launch::async_policy)
+        hpx::future<ValueType> get(launch::async_policy)
         {
             HPX_ASSERT(this->get_id());
             typedef typename server_type::get_action action_type;

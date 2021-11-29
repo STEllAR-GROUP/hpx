@@ -32,7 +32,7 @@ namespace hpx { namespace test {
 
     private:
         lcos::promise<void> flag_promise_;
-        lcos::future<void> flag_;
+        hpx::future<void> flag_;
         naming::id_type const locality_;
 
     public:
@@ -68,7 +68,7 @@ namespace hpx { namespace test {
                     locality_, flag_promise_.get_id());
         }
 
-        lcos::future<void> take_reference_async(naming::id_type const& gid)
+        hpx::future<void> take_reference_async(naming::id_type const& gid)
         {
             return this->base_type::take_reference_async(get_id(), gid);
         }

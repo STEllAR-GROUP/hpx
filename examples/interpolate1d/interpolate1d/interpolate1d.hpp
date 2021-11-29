@@ -32,7 +32,7 @@ namespace interpolate1d
         // Return the interpolated  function value for the given argument. This
         // function dispatches to the proper partition for the actual
         // interpolation.
-        hpx::lcos::future<double>
+        hpx::future<double>
         interpolate_async(double value) const
         {
             return get_partition(value).interpolate_async(value);

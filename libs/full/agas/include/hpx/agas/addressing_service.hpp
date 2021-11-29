@@ -358,7 +358,7 @@ namespace hpx { namespace agas {
         ///                   throw but returns the result code using the
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
-        lcos::future<std::uint32_t> get_num_localities_async(
+        hpx::future<std::uint32_t> get_num_localities_async(
             components::component_type type =
                 components::component_invalid) const;
 
@@ -370,11 +370,11 @@ namespace hpx { namespace agas {
             return get_num_localities(components::component_invalid, ec);
         }
 
-        lcos::future<std::uint32_t> get_num_overall_threads_async() const;
+        hpx::future<std::uint32_t> get_num_overall_threads_async() const;
 
         std::uint32_t get_num_overall_threads(error_code& ec = throws) const;
 
-        lcos::future<std::vector<std::uint32_t>> get_num_threads_async() const;
+        hpx::future<std::vector<std::uint32_t>> get_num_threads_async() const;
 
         std::vector<std::uint32_t> get_num_threads(
             error_code& ec = throws) const;
@@ -970,7 +970,7 @@ namespace hpx { namespace agas {
         ///                   throw but returns the result code using the
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
-        lcos::future<std::int64_t> incref_async(naming::gid_type const& gid,
+        hpx::future<std::int64_t> incref_async(naming::gid_type const& gid,
             std::int64_t credits = 1,
             naming::id_type const& keep_alive = naming::invalid_id);
 
@@ -1045,7 +1045,7 @@ namespace hpx { namespace agas {
         bool register_name(std::string const& name, naming::gid_type const& id,
             error_code& ec = throws);
 
-        lcos::future<bool> register_name_async(
+        hpx::future<bool> register_name_async(
             std::string const& name, naming::id_type const& id);
 
         bool register_name(std::string const& name, naming::id_type const& id,
@@ -1073,7 +1073,7 @@ namespace hpx { namespace agas {
         ///                   throw but returns the result code using the
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
-        lcos::future<naming::id_type> unregister_name_async(
+        hpx::future<naming::id_type> unregister_name_async(
             std::string const& name);
 
         naming::id_type unregister_name(
@@ -1104,7 +1104,7 @@ namespace hpx { namespace agas {
         ///                   throw but returns the result code using the
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
-        lcos::future<naming::id_type> resolve_name_async(
+        hpx::future<naming::id_type> resolve_name_async(
             std::string const& name);
 
         naming::id_type resolve_name(
