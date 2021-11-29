@@ -64,7 +64,9 @@ set(executors_compat_headers
 )
 # cmake-format: on
 
-set(executors_sources current_executor.cpp exception_list_callbacks.cpp)
+set(executors_sources current_executor.cpp exception_list_callbacks.cpp
+                      fork_join_executor.cpp
+)
 
 include(HPX_AddModule)
 add_hpx_module(
