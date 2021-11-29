@@ -465,7 +465,7 @@ namespace hpx { namespace components { namespace server {
         // way.
         std::reverse(locality_ids.begin(), locality_ids.end());
         std::uint32_t locality_id = get_locality_id();
-        std::vector<lcos::future<void>> lazy_actions;
+        std::vector<hpx::future<void>> lazy_actions;
 
         for (naming::id_type const& id : locality_ids)
         {
@@ -501,7 +501,7 @@ namespace hpx { namespace components { namespace server {
         // way.
         {
             std::uint32_t locality_id = get_locality_id();
-            std::vector<lcos::future<void>> lazy_actions;
+            std::vector<hpx::future<void>> lazy_actions;
 
             for (naming::gid_type gid : locality_ids)
             {

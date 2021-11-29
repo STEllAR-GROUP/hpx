@@ -484,7 +484,7 @@ namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Range>
     typename std::enable_if<traits::is_future_range<Range>::value,
-        lcos::future<when_some_result<typename std::decay<Range>::type>>>::type
+        hpx::future<when_some_result<typename std::decay<Range>::type>>>::type
     when_some(std::size_t n, Range&& lazy_values, error_code& ec = throws)
     {
         typedef typename std::decay<Range>::type result_type;
@@ -494,7 +494,7 @@ namespace hpx { namespace lcos {
 
         if (n == 0)
         {
-            return lcos::make_ready_future(
+            return hpx::make_ready_future(
                 when_some_result<result_type>(HPX_MOVE(lazy_values_)));
         }
 
@@ -502,7 +502,7 @@ namespace hpx { namespace lcos {
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter, "hpx::lcos::when_some",
                 "number of results to wait for is out of bounds");
-            return lcos::make_ready_future(
+            return hpx::make_ready_future(
                 when_some_result<result_type>(result_type()));
         }
 
@@ -522,7 +522,7 @@ namespace hpx { namespace lcos {
     template <typename Iterator,
         typename Container = std::vector<
             typename lcos::detail::future_iterator_traits<Iterator>::type>>
-    lcos::future<when_some_result<Container>> when_some(
+    hpx::future<when_some_result<Container>> when_some(
         std::size_t n, Iterator begin, Iterator end, error_code& ec = throws)
     {
         Container lazy_values_;
@@ -542,7 +542,7 @@ namespace hpx { namespace lcos {
     template <typename Iterator,
         typename Container = std::vector<
             typename lcos::detail::future_iterator_traits<Iterator>::type>>
-    lcos::future<when_some_result<Container>> when_some_n(std::size_t n,
+    hpx::future<when_some_result<Container>> when_some_n(std::size_t n,
         Iterator begin, std::size_t count, error_code& ec = throws)
     {
         Container lazy_values_;
@@ -555,7 +555,7 @@ namespace hpx { namespace lcos {
         return lcos::when_some(n, lazy_values_, ec);
     }
 
-    inline lcos::future<when_some_result<hpx::tuple<>>> when_some(
+    inline hpx::future<when_some_result<hpx::tuple<>>> when_some(
         std::size_t n, error_code& ec = throws)
     {
         typedef hpx::tuple<> result_type;
@@ -564,20 +564,20 @@ namespace hpx { namespace lcos {
 
         if (n == 0)
         {
-            return lcos::make_ready_future(
+            return hpx::make_ready_future(
                 when_some_result<result_type>(HPX_MOVE(lazy_values)));
         }
 
         HPX_THROWS_IF(ec, hpx::bad_parameter, "hpx::lcos::when_some",
             "number of results to wait for is out of bounds");
-        return lcos::make_ready_future(when_some_result<result_type>());
+        return hpx::make_ready_future(when_some_result<result_type>());
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename... Ts>
     typename std::enable_if<!(traits::is_future_range<T>::value &&
                                 sizeof...(Ts) == 0),
-        lcos::future<when_some_result<
+        hpx::future<when_some_result<
             hpx::tuple<typename traits::acquire_future<T>::type,
                 typename traits::acquire_future<Ts>::type...>>>>::type
     when_some(std::size_t n, T&& t, Ts&&... ts)
@@ -592,7 +592,7 @@ namespace hpx { namespace lcos {
 
         if (n == 0)
         {
-            return lcos::make_ready_future(
+            return hpx::make_ready_future(
                 when_some_result<result_type>(HPX_MOVE(lazy_values)));
         }
 
@@ -600,7 +600,7 @@ namespace hpx { namespace lcos {
         {
             HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::lcos::when_some",
                 "number of results to wait for is out of bounds");
-            return lcos::make_ready_future(when_some_result<result_type>());
+            return hpx::make_ready_future(when_some_result<result_type>());
         }
 
         std::shared_ptr<detail::when_some<result_type>> f =
@@ -619,7 +619,7 @@ namespace hpx { namespace lcos {
     template <typename T, typename... Ts>
     typename std::enable_if<!(traits::is_future_range<T>::value &&
                                 sizeof...(Ts) == 0),
-        lcos::future<when_some_result<
+        hpx::future<when_some_result<
             hpx::tuple<typename traits::acquire_future<T>::type,
                 typename traits::acquire_future<Ts>::type...>>>>::type
     when_some(std::size_t n, error_code& ec, T&& t, Ts&&... ts)
@@ -634,7 +634,7 @@ namespace hpx { namespace lcos {
 
         if (n == 0)
         {
-            return lcos::make_ready_future(
+            return hpx::make_ready_future(
                 when_some_result<result_type>(HPX_MOVE(lazy_values)));
         }
 
@@ -642,7 +642,7 @@ namespace hpx { namespace lcos {
         {
             HPX_THROWS_IF(ec, hpx::bad_parameter, "hpx::lcos::when_some",
                 "number of results to wait for is out of bounds");
-            return lcos::make_ready_future(when_some_result<result_type>());
+            return hpx::make_ready_future(when_some_result<result_type>());
         }
 
         std::shared_ptr<detail::when_some<result_type>> f =

@@ -29,7 +29,7 @@
 
 namespace hpx { namespace components { namespace stubs {
 
-    lcos::future<int> runtime_support::load_components_async(
+    hpx::future<int> runtime_support::load_components_async(
         naming::id_type const& gid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -47,7 +47,7 @@ namespace hpx { namespace components { namespace stubs {
         return load_components_async(gid).get();
     }
 
-    lcos::future<void> runtime_support::call_startup_functions_async(
+    hpx::future<void> runtime_support::call_startup_functions_async(
         naming::id_type const& gid, bool pre_startup)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -69,7 +69,7 @@ namespace hpx { namespace components { namespace stubs {
     }
 
     /// \brief Shutdown the given runtime system
-    lcos::future<void> runtime_support::shutdown_async(
+    hpx::future<void> runtime_support::shutdown_async(
         naming::id_type const& targetgid, double timeout)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -133,7 +133,7 @@ namespace hpx { namespace components { namespace stubs {
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve configuration information
     /// \brief Terminate the given runtime system
-    lcos::future<void> runtime_support::terminate_async(
+    hpx::future<void> runtime_support::terminate_async(
         naming::id_type const& targetgid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -197,7 +197,7 @@ namespace hpx { namespace components { namespace stubs {
 #endif
     }
 
-    lcos::future<void> runtime_support::garbage_collect_async(
+    hpx::future<void> runtime_support::garbage_collect_async(
         naming::id_type const& targetgid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -222,7 +222,7 @@ namespace hpx { namespace components { namespace stubs {
     }
 
     ///////////////////////////////////////////////////////////////////////
-    lcos::future<naming::id_type>
+    hpx::future<naming::id_type>
     runtime_support::create_performance_counter_async(naming::id_type targetgid,
         performance_counters::counter_info const& info)
     {
@@ -256,7 +256,7 @@ namespace hpx { namespace components { namespace stubs {
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve configuration information
-    lcos::future<util::section> runtime_support::get_config_async(
+    hpx::future<util::section> runtime_support::get_config_async(
         naming::id_type const& targetgid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)

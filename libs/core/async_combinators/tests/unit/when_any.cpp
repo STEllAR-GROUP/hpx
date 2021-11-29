@@ -29,17 +29,16 @@ int make_int_slowly()
 void test_wait_for_either_of_two_futures_1()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
 
     pt1();
 
-    hpx::lcos::future<hpx::when_any_result<
-        hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>>>>
+    hpx::future<
+        hpx::when_any_result<hpx::tuple<hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>> t =
-        r.get().futures;
+    hpx::tuple<hpx::future<int>, hpx::future<int>> t = r.get().futures;
 
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
@@ -51,17 +50,16 @@ void test_wait_for_either_of_two_futures_1()
 void test_wait_for_either_of_two_futures_2()
 {
     hpx::lcos::local::packaged_task<int()> pt(make_int_slowly);
-    hpx::lcos::future<int> f1(pt.get_future());
+    hpx::future<int> f1(pt.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
 
     pt2();
 
-    hpx::lcos::future<hpx::when_any_result<
-        hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>>>>
+    hpx::future<
+        hpx::when_any_result<hpx::tuple<hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>> t =
-        r.get().futures;
+    hpx::tuple<hpx::future<int>, hpx::future<int>> t = r.get().futures;
 
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
@@ -81,8 +79,7 @@ void test_wait_for_either_of_two_futures_list_1()
 
     pt1();
 
-    hpx::lcos::future<hpx::when_any_result<Container>> r =
-        hpx::when_any(futures);
+    hpx::future<hpx::when_any_result<Container>> r = hpx::when_any(futures);
     hpx::when_any_result<Container> raw = r.get();
 
     HPX_TEST_EQ(raw.index, 0u);
@@ -107,8 +104,7 @@ void test_wait_for_either_of_two_futures_list_2()
 
     pt2();
 
-    hpx::lcos::future<hpx::when_any_result<Container>> r =
-        hpx::when_any(futures);
+    hpx::future<hpx::when_any_result<Container>> r = hpx::when_any(futures);
     hpx::when_any_result<Container> raw = r.get();
 
     HPX_TEST_EQ(raw.index, 1u);
@@ -125,20 +121,19 @@ void test_wait_for_either_of_two_futures_list_2()
 void test_wait_for_either_of_three_futures_1()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
 
     pt1();
 
-    hpx::lcos::future<hpx::when_any_result<hpx::tuple<hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>>>>
+    hpx::future<hpx::when_any_result<
+        hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2, f3);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>>
-        t = r.get().futures;
+    hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>> t =
+        r.get().futures;
 
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
@@ -151,20 +146,19 @@ void test_wait_for_either_of_three_futures_1()
 void test_wait_for_either_of_three_futures_2()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
 
     pt2();
 
-    hpx::lcos::future<hpx::when_any_result<hpx::tuple<hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>>>>
+    hpx::future<hpx::when_any_result<
+        hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2, f3);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>>
-        t = r.get().futures;
+    hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>> t =
+        r.get().futures;
 
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
@@ -177,20 +171,19 @@ void test_wait_for_either_of_three_futures_2()
 void test_wait_for_either_of_three_futures_3()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
 
     pt3();
 
-    hpx::lcos::future<hpx::when_any_result<hpx::tuple<hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>>>>
+    hpx::future<hpx::when_any_result<
+        hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2, f3);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>>
-        t = r.get().futures;
+    hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>> t =
+        r.get().futures;
 
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
@@ -203,22 +196,21 @@ void test_wait_for_either_of_three_futures_3()
 void test_wait_for_either_of_four_futures_1()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
-    hpx::lcos::future<int> f4(pt4.get_future());
+    hpx::future<int> f4(pt4.get_future());
 
     pt1();
 
-    hpx::lcos::future<hpx::when_any_result<
-        hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-            hpx::lcos::future<int>, hpx::lcos::future<int>>>>
+    hpx::future<hpx::when_any_result<hpx::tuple<hpx::future<int>,
+        hpx::future<int>, hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2, f3, f4);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>>
+    hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>,
+        hpx::future<int>>
         t = r.get().futures;
 
     HPX_TEST(!f1.valid());
@@ -233,22 +225,21 @@ void test_wait_for_either_of_four_futures_1()
 void test_wait_for_either_of_four_futures_2()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
-    hpx::lcos::future<int> f4(pt4.get_future());
+    hpx::future<int> f4(pt4.get_future());
 
     pt2();
 
-    hpx::lcos::future<hpx::when_any_result<
-        hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-            hpx::lcos::future<int>, hpx::lcos::future<int>>>>
+    hpx::future<hpx::when_any_result<hpx::tuple<hpx::future<int>,
+        hpx::future<int>, hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2, f3, f4);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>>
+    hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>,
+        hpx::future<int>>
         t = r.get().futures;
 
     HPX_TEST(!f1.valid());
@@ -263,22 +254,21 @@ void test_wait_for_either_of_four_futures_2()
 void test_wait_for_either_of_four_futures_3()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
-    hpx::lcos::future<int> f4(pt4.get_future());
+    hpx::future<int> f4(pt4.get_future());
 
     pt3();
 
-    hpx::lcos::future<hpx::when_any_result<
-        hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-            hpx::lcos::future<int>, hpx::lcos::future<int>>>>
+    hpx::future<hpx::when_any_result<hpx::tuple<hpx::future<int>,
+        hpx::future<int>, hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2, f3, f4);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>>
+    hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>,
+        hpx::future<int>>
         t = r.get().futures;
 
     HPX_TEST(!f1.valid());
@@ -293,22 +283,21 @@ void test_wait_for_either_of_four_futures_3()
 void test_wait_for_either_of_four_futures_4()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
-    hpx::lcos::future<int> f4(pt4.get_future());
+    hpx::future<int> f4(pt4.get_future());
 
     pt4();
 
-    hpx::lcos::future<hpx::when_any_result<
-        hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-            hpx::lcos::future<int>, hpx::lcos::future<int>>>>
+    hpx::future<hpx::when_any_result<hpx::tuple<hpx::future<int>,
+        hpx::future<int>, hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2, f3, f4);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>>
+    hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>,
+        hpx::future<int>>
         t = r.get().futures;
 
     HPX_TEST(!f1.valid());
@@ -326,25 +315,24 @@ void test_wait_for_either_of_five_futures_1_from_list()
     Container futures;
 
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     futures.push_back(std::move(f1));
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     futures.push_back(std::move(f2));
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
     futures.push_back(std::move(f3));
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
-    hpx::lcos::future<int> f4(pt4.get_future());
+    hpx::future<int> f4(pt4.get_future());
     futures.push_back(std::move(f4));
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
-    hpx::lcos::future<int> f5(pt5.get_future());
+    hpx::future<int> f5(pt5.get_future());
     futures.push_back(std::move(f5));
 
     pt1();
 
-    hpx::lcos::future<hpx::when_any_result<Container>> r =
-        hpx::when_any(futures);
+    hpx::future<hpx::when_any_result<Container>> r = hpx::when_any(futures);
     hpx::when_any_result<Container> raw = r.get();
 
     HPX_TEST_EQ(raw.index, 0u);
@@ -369,24 +357,24 @@ void test_wait_for_either_of_five_futures_1_from_list_iterators()
     Container futures;
 
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     futures.push_back(std::move(f1));
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     futures.push_back(std::move(f2));
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
     futures.push_back(std::move(f3));
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
-    hpx::lcos::future<int> f4(pt4.get_future());
+    hpx::future<int> f4(pt4.get_future());
     futures.push_back(std::move(f4));
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
-    hpx::lcos::future<int> f5(pt5.get_future());
+    hpx::future<int> f5(pt5.get_future());
     futures.push_back(std::move(f5));
 
     pt1();
 
-    hpx::lcos::future<hpx::when_any_result<Container>> r =
+    hpx::future<hpx::when_any_result<Container>> r =
         hpx::when_any<iterator, Container>(futures.begin(), futures.end());
     hpx::when_any_result<Container> raw = r.get();
 
@@ -407,24 +395,24 @@ void test_wait_for_either_of_five_futures_1_from_list_iterators()
 void test_wait_for_either_of_five_futures_1()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
-    hpx::lcos::future<int> f4(pt4.get_future());
+    hpx::future<int> f4(pt4.get_future());
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
-    hpx::lcos::future<int> f5(pt5.get_future());
+    hpx::future<int> f5(pt5.get_future());
 
     pt1();
 
-    hpx::lcos::future<hpx::when_any_result<hpx::tuple<hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>>>>
+    hpx::future<
+        hpx::when_any_result<hpx::tuple<hpx::future<int>, hpx::future<int>,
+            hpx::future<int>, hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2, f3, f4, f5);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>>
+    hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>,
+        hpx::future<int>, hpx::future<int>>
         t = r.get().futures;
 
     HPX_TEST(!f1.valid());
@@ -440,24 +428,24 @@ void test_wait_for_either_of_five_futures_1()
 void test_wait_for_either_of_five_futures_2()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
-    hpx::lcos::future<int> f4(pt4.get_future());
+    hpx::future<int> f4(pt4.get_future());
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
-    hpx::lcos::future<int> f5(pt5.get_future());
+    hpx::future<int> f5(pt5.get_future());
 
     pt2();
 
-    hpx::lcos::future<hpx::when_any_result<hpx::tuple<hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>>>>
+    hpx::future<
+        hpx::when_any_result<hpx::tuple<hpx::future<int>, hpx::future<int>,
+            hpx::future<int>, hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2, f3, f4, f5);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>>
+    hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>,
+        hpx::future<int>, hpx::future<int>>
         t = r.get().futures;
 
     HPX_TEST(!f1.valid());
@@ -473,24 +461,24 @@ void test_wait_for_either_of_five_futures_2()
 void test_wait_for_either_of_five_futures_3()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
-    hpx::lcos::future<int> f4(pt4.get_future());
+    hpx::future<int> f4(pt4.get_future());
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
-    hpx::lcos::future<int> f5(pt5.get_future());
+    hpx::future<int> f5(pt5.get_future());
 
     pt3();
 
-    hpx::lcos::future<hpx::when_any_result<hpx::tuple<hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>>>>
+    hpx::future<
+        hpx::when_any_result<hpx::tuple<hpx::future<int>, hpx::future<int>,
+            hpx::future<int>, hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2, f3, f4, f5);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>>
+    hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>,
+        hpx::future<int>, hpx::future<int>>
         t = r.get().futures;
 
     HPX_TEST(!f1.valid());
@@ -506,24 +494,24 @@ void test_wait_for_either_of_five_futures_3()
 void test_wait_for_either_of_five_futures_4()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
-    hpx::lcos::future<int> f4(pt4.get_future());
+    hpx::future<int> f4(pt4.get_future());
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
-    hpx::lcos::future<int> f5(pt5.get_future());
+    hpx::future<int> f5(pt5.get_future());
 
     pt4();
 
-    hpx::lcos::future<hpx::when_any_result<hpx::tuple<hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>>>>
+    hpx::future<
+        hpx::when_any_result<hpx::tuple<hpx::future<int>, hpx::future<int>,
+            hpx::future<int>, hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2, f3, f4, f5);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>>
+    hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>,
+        hpx::future<int>, hpx::future<int>>
         t = r.get().futures;
 
     HPX_TEST(!f1.valid());
@@ -539,24 +527,24 @@ void test_wait_for_either_of_five_futures_4()
 void test_wait_for_either_of_five_futures_5()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
-    hpx::lcos::future<int> f3(pt3.get_future());
+    hpx::future<int> f3(pt3.get_future());
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
-    hpx::lcos::future<int> f4(pt4.get_future());
+    hpx::future<int> f4(pt4.get_future());
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
-    hpx::lcos::future<int> f5(pt5.get_future());
+    hpx::future<int> f5(pt5.get_future());
 
     pt5();
 
-    hpx::lcos::future<hpx::when_any_result<hpx::tuple<hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>>>>
+    hpx::future<
+        hpx::when_any_result<hpx::tuple<hpx::future<int>, hpx::future<int>,
+            hpx::future<int>, hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2, f3, f4, f5);
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>>
+    hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>,
+        hpx::future<int>, hpx::future<int>>
         t = r.get().futures;
 
     HPX_TEST(!f1.valid());
@@ -574,9 +562,9 @@ void test_wait_for_either_of_five_futures_5()
 // {
 //     callback_called = 0;
 //     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-//     hpx::lcos::future<int> fi = pt1.get_future();
+//     hpx::future<int> fi = pt1.get_future();
 //     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-//     hpx::lcos::future<int> fi2 = pt2.get_future();
+//     hpx::future<int> fi2 = pt2.get_future();
 //     pt1.set_wait_callback(wait_callback_for_task);
 //
 //     hpx::thread t(std::move(pt));
@@ -592,7 +580,7 @@ void test_wait_for_either_of_five_futures_5()
 //     for(unsigned i = 0; i < count; ++i)
 //     {
 //         hpx::lcos::local::packaged_task<int()> tasks[count];
-//         hpx::lcos::future<int> futures[count];
+//         hpx::future<int> futures[count];
 //         for(unsigned j = 0; j < count; ++j)
 //         {
 //             tasks[j] =
@@ -603,7 +591,7 @@ void test_wait_for_either_of_five_futures_5()
 //
 //         hpx::lcos::wait_any(futures, futures);
 //
-//         hpx::lcos::future<int>* const future =
+//         hpx::future<int>* const future =
 //               boost::wait_for_any(futures, futures+count);
 //
 //         HPX_TEST_EQ(future, (futures + i));
@@ -625,12 +613,12 @@ void test_wait_for_either_of_five_futures_5()
 void test_wait_for_either_of_two_late_futures()
 {
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
-    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::future<int> f1(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
-    hpx::lcos::future<int> f2(pt2.get_future());
+    hpx::future<int> f2(pt2.get_future());
 
-    hpx::lcos::future<hpx::when_any_result<
-        hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>>>>
+    hpx::future<
+        hpx::when_any_result<hpx::tuple<hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2);
 
     HPX_TEST(!f1.valid());
@@ -639,8 +627,7 @@ void test_wait_for_either_of_two_late_futures()
     pt2();
     pt1();
 
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>> t =
-        r.get().futures;
+    hpx::tuple<hpx::future<int>, hpx::future<int>> t = r.get().futures;
 
     HPX_TEST(hpx::get<1>(t).is_ready());
     HPX_TEST_EQ(hpx::get<1>(t).get(), 42);
@@ -648,20 +635,17 @@ void test_wait_for_either_of_two_late_futures()
 
 void test_wait_for_either_of_two_deferred_futures()
 {
-    hpx::lcos::future<int> f1 =
-        hpx::async(hpx::launch::deferred, &make_int_slowly);
-    hpx::lcos::future<int> f2 =
-        hpx::async(hpx::launch::deferred, &make_int_slowly);
+    hpx::future<int> f1 = hpx::async(hpx::launch::deferred, &make_int_slowly);
+    hpx::future<int> f2 = hpx::async(hpx::launch::deferred, &make_int_slowly);
 
-    hpx::lcos::future<hpx::when_any_result<
-        hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>>>>
+    hpx::future<
+        hpx::when_any_result<hpx::tuple<hpx::future<int>, hpx::future<int>>>>
         r = hpx::when_any(f1, f2);
 
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
 
-    hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>> t =
-        r.get().futures;
+    hpx::tuple<hpx::future<int>, hpx::future<int>> t = r.get().futures;
 
     HPX_TEST(hpx::get<0>(t).is_ready());
     HPX_TEST_EQ(hpx::get<0>(t).get(), 42);
@@ -671,7 +655,7 @@ void test_wait_for_either_of_two_deferred_futures()
 using hpx::program_options::options_description;
 using hpx::program_options::variables_map;
 
-using hpx::lcos::future;
+using hpx::future;
 
 int hpx_main(variables_map&)
 {

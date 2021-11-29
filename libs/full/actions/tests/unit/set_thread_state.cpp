@@ -28,7 +28,7 @@ using hpx::naming::id_type;
 using hpx::threads::register_thread;
 
 using hpx::async;
-using hpx::lcos::future;
+using hpx::future;
 
 using hpx::this_thread::suspend;
 using hpx::threads::set_thread_state;

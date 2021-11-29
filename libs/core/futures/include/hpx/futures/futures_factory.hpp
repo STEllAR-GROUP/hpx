@@ -172,7 +172,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
         private:
-            void destroy() override
+            void destroy() noexcept override
             {
                 using traits = std::allocator_traits<other_allocator>;
 
@@ -339,7 +339,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
         private:
-            void destroy() override
+            void destroy() noexcept override
             {
                 using traits = std::allocator_traits<other_allocator>;
 
@@ -772,27 +772,27 @@ namespace hpx { namespace lcos { namespace local {
 
         // This is the same as get_future, except that it moves the
         // shared state into the returned future.
-        lcos::future<Result> get_future(error_code& ec = throws)
+        hpx::future<Result> get_future(error_code& ec = throws)
         {
             if (!task_)
             {
                 HPX_THROWS_IF(ec, task_moved,
                     "futures_factory<Result()>::get_future",
                     "futures_factory invalid (has it been moved?)");
-                return lcos::future<Result>();
+                return hpx::future<Result>();
             }
             if (future_obtained_)
             {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "futures_factory<Result()>::get_future",
                     "future already has been retrieved from this factory");
-                return lcos::future<Result>();
+                return hpx::future<Result>();
             }
 
             future_obtained_ = true;
 
             using traits::future_access;
-            return future_access<future<Result>>::create(HPX_MOVE(task_));
+            return future_access<hpx::future<Result>>::create(HPX_MOVE(task_));
         }
 
         bool valid() const noexcept

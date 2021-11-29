@@ -15,7 +15,7 @@
 
 int hpx_main()
 {
-    hpx::lcos::future<int> future = hpx::lcos::make_ready_future(0);
+    hpx::future<int> future = hpx::make_ready_future(0);
     std::chrono::nanoseconds tn(static_cast<long long>(1000000000LL));
     future.wait_for(tn);
 

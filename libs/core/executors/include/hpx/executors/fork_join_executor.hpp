@@ -27,6 +27,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iosfwd>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -401,9 +402,10 @@ namespace hpx { namespace execution { namespace experimental {
                                 invoke_helper(index_pack_type{},
                                     element_function, *it, argument_pack);
                             }
-                            set_state(thread_states, thread_index,
-                                thread_state::idle);
                         }
+
+                        set_state(
+                            thread_states, thread_index, thread_state::idle);
                     }
                     catch (...)
                     {
@@ -481,7 +483,7 @@ namespace hpx { namespace execution { namespace experimental {
         };
 
     private:
-        std::shared_ptr<shared_data> shared_data_;
+        std::shared_ptr<shared_data> shared_data_ = nullptr;
 
     public:
         template <typename F, typename S, typename... Ts>
@@ -517,7 +519,8 @@ namespace hpx { namespace execution { namespace experimental {
         /// \brief Construct a fork_join_executor.
         ///
         /// \param priority The priority of the worker threads.
-        /// \param stacksize The stacksize of the worker threads.
+        /// \param stacksize The stacksize of the worker threads. Must not be
+        ///                  nostack.
         /// \param schedule The loop schedule of the parallel regions.
         /// \param yield_delay The time after which the executor yields to
         ///        other work if it hasn't received any new work for bulk
@@ -528,11 +531,23 @@ namespace hpx { namespace execution { namespace experimental {
                 threads::thread_stacksize::small_,
             loop_schedule schedule = loop_schedule::static_,
             std::chrono::nanoseconds yield_delay = std::chrono::milliseconds(1))
-          : shared_data_(
-                new shared_data(priority, stacksize, schedule, yield_delay))
         {
+            if (stacksize == threads::thread_stacksize::nostack)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "fork_join_executor::fork_join_executor",
+                    "The fork_join_executor does not support using "
+                    "thread_stacksize::nostack as the stacksize (stackful "
+                    "threads are required to yield correctly when idle)");
+            }
+
+            shared_data_ = std::make_shared<shared_data>(
+                priority, stacksize, schedule, yield_delay);
         }
     };
+
+    HPX_CORE_EXPORT std::ostream& operator<<(
+        std::ostream& os, fork_join_executor::loop_schedule const& schedule);
 }}}    // namespace hpx::execution::experimental
 
 namespace hpx { namespace parallel { namespace execution {

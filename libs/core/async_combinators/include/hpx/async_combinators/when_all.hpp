@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //  Copyright (c) 2017 Denis Blank
 //
@@ -41,7 +41,7 @@ namespace hpx {
     template <typename InputIter,
         typename Container = vector<
             future<typename std::iterator_traits<InputIter>::value_type>>>
-    future<Container> when_all(InputIter first, InputIter last);
+    hpx::future<Container> when_all(InputIter first, InputIter last);
 
     /// The function \a when_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -67,7 +67,7 @@ namespace hpx {
     ///       The future returned by \a when_all will not throw an exception,
     ///       but the futures held in the output collection may.
     template <typename Range>
-    future<Range> when_all(Range&& values);
+    hpx::future<Range> when_all(Range&& values);
 
     /// The function \a when_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -92,7 +92,7 @@ namespace hpx {
     ///       The future returned by \a when_all will not throw an exception,
     ///       but the futures held in the output collection may.
     template <typename... T>
-    future<tuple<future<T>...>> when_all(T&&... futures);
+    hpx::future<hpx::tuple<hpx::future<T>...>> when_all(T&&... futures);
 
     /// The function \a when_all_n is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -127,7 +127,7 @@ namespace hpx {
     template <typename InputIter,
         typename Container = vector<
             future<typename std::iterator_traits<InputIter>::value_type>>>
-    future<Container> when_all_n(InputIter begin, std::size_t count);
+    hpx::future<Container> when_all_n(InputIter begin, std::size_t count);
 }    // namespace hpx
 
 #else    // DOXYGEN
@@ -184,7 +184,7 @@ namespace hpx { namespace lcos {
         {
         public:
             typedef typename when_all_result<Tuple>::type result_type;
-            typedef hpx::lcos::future<result_type> type;
+            typedef hpx::future<result_type> type;
             typedef hpx::lcos::detail::future_data<result_type> base_type;
 
             explicit async_when_all_frame(
@@ -253,24 +253,24 @@ namespace hpx { namespace lcos {
     template <typename Iterator,
         typename Container = std::vector<
             typename detail::future_iterator_traits<Iterator>::type>>
-    future<Container> when_all(Iterator begin, Iterator end)
+    hpx::future<Container> when_all(Iterator begin, Iterator end)
     {
         return detail::when_all_impl(
             detail::acquire_future_iterators<Iterator, Container>(begin, end));
     }
 
-    inline lcos::future<hpx::tuple<>>    //-V524
+    inline hpx::future<hpx::tuple<>>    //-V524
     when_all()
     {
         typedef hpx::tuple<> result_type;
-        return lcos::make_ready_future(result_type());
+        return hpx::make_ready_future(result_type());
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator,
         typename Container = std::vector<
             typename lcos::detail::future_iterator_traits<Iterator>::type>>
-    lcos::future<Container> when_all_n(Iterator begin, std::size_t count)
+    hpx::future<Container> when_all_n(Iterator begin, std::size_t count)
     {
         return detail::when_all_impl(
             detail::acquire_future_n<Iterator, Container>(begin, count));

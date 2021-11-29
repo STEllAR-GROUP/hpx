@@ -461,17 +461,21 @@ compared to the C++ standard library.
 Classes
 -------
 
-- :cpp:class:`hpx::lcos::future`
-- :cpp:class:`hpx::lcos::shared_future`
+- :cpp:class:`hpx::future`
+- :cpp:class:`hpx::shared_future`
 - :cpp:class:`hpx::lcos::local::promise`
 - :cpp:class:`hpx::launch`
 
 Functions
 ---------
 
-- :cpp:func:`hpx::lcos::make_future`
-- :cpp:func:`hpx::lcos::make_shared_future`
-- :cpp:func:`hpx::lcos::make_ready_future`
+- :cpp:func:`hpx::make_future`
+- :cpp:func:`hpx::make_shared_future`
+- :cpp:func:`hpx::make_ready_future`
+- :cpp:func:`hpx::make_ready_future_alloc`
+- :cpp:func:`hpx::make_ready_future_at`
+- :cpp:func:`hpx::make_ready_future_after`
+- :cpp:func:`hpx::make_exceptional_future`
 - :cpp:func:`hpx::async`
 - :cpp:func:`hpx::apply`
 - :cpp:func:`hpx::sync`

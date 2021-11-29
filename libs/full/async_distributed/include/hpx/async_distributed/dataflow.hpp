@@ -50,7 +50,7 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename Policy, typename Action, typename Args>
     struct dataflow_return_impl</*IsAction=*/true, Policy, Action, Args>
     {
-        using type = hpx::lcos::future<typename Action::result_type>;
+        using type = hpx::future<typename Action::result_type>;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ namespace hpx { namespace lcos { namespace detail {
     struct dataflow_action_dispatch
     {
         template <typename Allocator, typename... Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename hpx::traits::
                     extract_action<Action>::remote_result_type>::type>
         call(Allocator const& alloc, naming::id_type const& id, Ts&&... ts)
@@ -111,7 +111,7 @@ namespace hpx { namespace lcos { namespace detail {
             typename std::decay<Policy>::type>::value>::type>
     {
         template <typename Allocator, typename... Ts>
-        HPX_FORCEINLINE static lcos::future<
+        HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename hpx::traits::
                     extract_action<Action>::remote_result_type>::type>
         call(Allocator const& alloc, Policy&& policy, naming::id_type const& id,

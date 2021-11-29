@@ -147,7 +147,7 @@ namespace sheneos
         ///                  and rest mass densities of the plasma.
         /// \param eosvalue  [in] The EOS value to interpolate. Must be
         ///                  in the range of the given partition.
-        hpx::lcos::future<std::vector<double> >
+        hpx::future<std::vector<double> >
         interpolate_one_bulk_async(std::vector<sheneos_coord> const& coords,
             std::uint32_t eosvalue) const
         {

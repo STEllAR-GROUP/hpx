@@ -537,14 +537,14 @@ void test_when_each_deferred_futures()
         HPX_TEST_LT(id, count);
     };
 
-    hpx::lcos::future<unsigned> f1 =
+    hpx::future<unsigned> f1 =
         hpx::async(hpx::launch::deferred, &make_unsigned_slowly<0>);
-    hpx::lcos::future<unsigned> f2 =
+    hpx::future<unsigned> f2 =
         hpx::async(hpx::launch::deferred, &make_unsigned_slowly<1>);
 
-    hpx::lcos::future<unsigned> g1 =
+    hpx::future<unsigned> g1 =
         hpx::async(hpx::launch::deferred, &make_unsigned_slowly<0>);
-    hpx::lcos::future<unsigned> g2 =
+    hpx::future<unsigned> g2 =
         hpx::async(hpx::launch::deferred, &make_unsigned_slowly<1>);
 
     hpx::future<void> r =
@@ -570,7 +570,7 @@ void test_when_each_deferred_futures()
 using hpx::program_options::options_description;
 using hpx::program_options::variables_map;
 
-using hpx::lcos::future;
+using hpx::future;
 
 int hpx_main(variables_map&)
 {

@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2001-2011 Joel de Guzman
-    Copyright (c) 2007-2019 Hartmut Kaiser
+    Copyright (c) 2007-2021 Hartmut Kaiser
 
 //  SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,13 +24,17 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     struct unused_type
     {
-        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type() noexcept {}
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type() noexcept =
+            default;
 
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type(
-            unused_type const&)
+            unused_type const&) noexcept
         {
         }
-        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type(unused_type&&) {}
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type(
+            unused_type&&) noexcept
+        {
+        }
 
         template <typename T>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type(T const&) noexcept
@@ -43,7 +47,6 @@ namespace hpx { namespace util {
         {
             return *this;
         }
-
         template <typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE unused_type& operator=(
             T const&) noexcept
@@ -56,19 +59,17 @@ namespace hpx { namespace util {
         {
             return *this;
         }
-
-        HPX_HOST_DEVICE HPX_FORCEINLINE unused_type& operator=(
-            unused_type const&) noexcept
-        {
-            return *this;
-        }
-
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type const& operator=(
             unused_type&&) const noexcept
         {
             return *this;
         }
 
+        HPX_HOST_DEVICE HPX_FORCEINLINE unused_type& operator=(
+            unused_type const&) noexcept
+        {
+            return *this;
+        }
         HPX_HOST_DEVICE HPX_FORCEINLINE unused_type& operator=(
             unused_type&&) noexcept
         {

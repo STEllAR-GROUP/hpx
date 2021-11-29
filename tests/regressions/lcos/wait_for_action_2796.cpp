@@ -31,7 +31,7 @@ int main()
     {
         auto fut = hpx::async<f_action>(hpx::find_here());
         auto status = fut.wait_for(std::chrono::seconds(3));
-        HPX_TEST(status != hpx::lcos::future_status::deferred);
+        HPX_TEST(status != hpx::future_status::deferred);
         HPX_TEST(called.load());
     }
 
@@ -39,7 +39,7 @@ int main()
     {
         auto fut = hpx::async<f_direct_action>(hpx::find_here());
         auto status = fut.wait_for(std::chrono::seconds(3));
-        HPX_TEST(status != hpx::lcos::future_status::deferred);
+        HPX_TEST(status != hpx::future_status::deferred);
         HPX_TEST(called.load());
     }
 

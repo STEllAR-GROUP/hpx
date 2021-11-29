@@ -141,7 +141,7 @@ int hpx_main()
         print_tuple(tuple2);
         hpx::cout << hpx::endl;
 
-        std::vector<hpx::lcos::future<void>> futures;
+        std::vector<hpx::future<void>> futures;
 
         for (hpx::naming::id_type const& node : localities)
         {

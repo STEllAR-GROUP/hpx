@@ -23,7 +23,7 @@
 
 using hpx::unwrapping;
 
-typedef hpx::lcos::shared_future<double> future_type;
+typedef hpx::shared_future<double> future_type;
 
 struct mul
 {

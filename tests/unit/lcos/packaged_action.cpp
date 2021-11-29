@@ -20,7 +20,7 @@
 using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 
-using hpx::lcos::future;
+using hpx::future;
 
 ///////////////////////////////////////////////////////////////////////////////
 bool null_thread_executed = false;
@@ -67,7 +67,7 @@ int hpx_main(variables_map&)
         HPX_TEST(null_thread_executed);
 
         //test two successive 'get' from a promise
-        hpx::lcos::shared_future<int> int_promise(async<int_action>(hpx::find_here()));
+        hpx::shared_future<int> int_promise(async<int_action>(hpx::find_here()));
         HPX_TEST_EQ(int_promise.get(), int_promise.get());
     }
 
@@ -91,7 +91,7 @@ int hpx_main(variables_map&)
 
         //test two successive 'get' from a promise
         int_action do_int;
-        hpx::lcos::shared_future<int> int_promise(async(do_int, hpx::find_here()));
+        hpx::shared_future<int> int_promise(async(do_int, hpx::find_here()));
         HPX_TEST_EQ(int_promise.get(), int_promise.get());
     }
 

@@ -611,7 +611,7 @@ namespace hpx {
         return 1;
     }
 
-    lcos::future<std::uint32_t> runtime::get_num_localities() const
+    hpx::future<std::uint32_t> runtime::get_num_localities() const
     {
         return make_ready_future(std::uint32_t(1));
     }
@@ -2024,7 +2024,7 @@ namespace hpx {
         return rt->get_initial_num_localities();
     }
 
-    lcos::future<std::uint32_t> get_num_localities()
+    hpx::future<std::uint32_t> get_num_localities()
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)

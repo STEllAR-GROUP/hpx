@@ -140,7 +140,7 @@ namespace hpx { namespace detail {
     struct sync_local_invoke
     {
         template <typename... Ts>
-        static lcos::future<Result> call(
+        static hpx::future<Result> call(
             naming::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
         {
             try
@@ -177,7 +177,7 @@ namespace hpx { namespace detail {
     struct sync_local_invoke<Action, void>
     {
         template <typename... Ts>
-        static lcos::future<void> call(
+        static hpx::future<void> call(
             naming::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
         {
             try
@@ -199,7 +199,7 @@ namespace hpx { namespace detail {
     struct sync_local_invoke_cb
     {
         template <typename Callback, typename... Ts>
-        static lcos::future<Result> call(naming::id_type const& id,
+        static hpx::future<Result> call(naming::id_type const& id,
             naming::address&& addr, Callback&& cb, Ts&&... vs)
         {
             future<Result> f;

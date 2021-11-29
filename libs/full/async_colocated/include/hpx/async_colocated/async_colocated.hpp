@@ -67,7 +67,7 @@ namespace hpx { namespace detail {
 namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
-    lcos::future<typename traits::promise_local_result<
+    hpx::future<typename traits::promise_local_result<
         typename hpx::traits::extract_action<Action>::remote_result_type>::type>
     async_colocated(naming::id_type const& gid,
         Ts&&...
@@ -95,14 +95,14 @@ namespace hpx { namespace detail {
             service_target, gid.get_gid());
 #else
         HPX_ASSERT(false);
-        return lcos::future<typename traits::promise_local_result<typename hpx::
+        return hpx::future<typename traits::promise_local_result<typename hpx::
                 traits::extract_action<Action>::remote_result_type>::type>{};
 #endif
     }
 
     template <typename Component, typename Signature, typename Derived,
         typename... Ts>
-    lcos::future<typename traits::promise_local_result<typename hpx::traits::
+    hpx::future<typename traits::promise_local_result<typename hpx::traits::
             extract_action<Derived>::remote_result_type>::type>
     async_colocated(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
@@ -115,15 +115,14 @@ namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Continuation, typename... Ts>
     typename std::enable_if<traits::is_continuation<Continuation>::value,
-        lcos::future<typename traits::promise_local_result<typename hpx::
-                traits::extract_action<Action>::remote_result_type>::type>>::
-        type
-        async_colocated(Continuation&& cont, naming::id_type const& gid,
-            Ts&&...
+        hpx::future<typename traits::promise_local_result<typename hpx::traits::
+                extract_action<Action>::remote_result_type>::type>>::type
+    async_colocated(Continuation&& cont, naming::id_type const& gid,
+        Ts&&...
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-            vs
+        vs
 #endif
-        )
+    )
     {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_UNUSED(cont);
@@ -154,13 +153,12 @@ namespace hpx { namespace detail {
     template <typename Continuation, typename Component, typename Signature,
         typename Derived, typename... Ts>
     typename std::enable_if<traits::is_continuation<Continuation>::value,
-        lcos::future<typename traits::promise_local_result<typename hpx::
-                traits::extract_action<Derived>::remote_result_type>::type>>::
-        type
-        async_colocated(Continuation&& cont,
-            hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-            ,
-            naming::id_type const& gid, Ts&&... vs)
+        hpx::future<typename traits::promise_local_result<typename hpx::traits::
+                extract_action<Derived>::remote_result_type>::type>>::type
+    async_colocated(Continuation&& cont,
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
+        ,
+        naming::id_type const& gid, Ts&&... vs)
     {
         return async_colocated<Derived>(
             HPX_FORWARD(Continuation, cont), gid, HPX_FORWARD(Ts, vs)...);

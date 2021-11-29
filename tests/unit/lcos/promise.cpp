@@ -39,7 +39,7 @@ char const* const error_msg = "throwing test exception: HPX(not_implemented)";
 int future_callback(
     bool& data_cb_called
   , bool& error_cb_called
-  , hpx::lcos::shared_future<int> f
+  , hpx::shared_future<int> f
     )
 {
     if (f.has_value()) {
@@ -76,13 +76,13 @@ int future_callback(
 int hpx_main(hpx::program_options::variables_map&)
 {
     {
-        hpx::lcos::future<int> p = hpx::async<test_action>(hpx::find_here());
+        hpx::future<int> p = hpx::async<test_action>(hpx::find_here());
         HPX_TEST_EQ(p.get(), 42);
     }
 
     {
         test_action do_test;
-        hpx::lcos::future<int> p = hpx::async(do_test, hpx::find_here());
+        hpx::future<int> p = hpx::async(do_test, hpx::find_here());
         HPX_TEST_EQ(p.get(), 42);
     }
 
@@ -90,8 +90,8 @@ int hpx_main(hpx::program_options::variables_map&)
         bool data_cb_called = false;
         bool error_cb_called = false;
 
-        hpx::lcos::shared_future<int> f = hpx::async<test_action>(hpx::find_here());
-        hpx::lcos::future<int> p = f.then(hpx::util::bind(future_callback,
+        hpx::shared_future<int> f = hpx::async<test_action>(hpx::find_here());
+        hpx::future<int> p = f.then(hpx::util::bind(future_callback,
             std::ref(data_cb_called), std::ref(error_cb_called),
             hpx::util::placeholders::_1));
 
@@ -105,9 +105,9 @@ int hpx_main(hpx::program_options::variables_map&)
         bool error_cb_called = false;
         test_action do_test;
 
-        hpx::lcos::shared_future<int> f = hpx::async(do_test, hpx::find_here());
+        hpx::shared_future<int> f = hpx::async(do_test, hpx::find_here());
 
-        hpx::lcos::future<int> p = f.then(
+        hpx::future<int> p = f.then(
                 hpx::util::bind(future_callback, std::ref(data_cb_called),
                     std::ref(error_cb_called), hpx::util::placeholders::_1));
 
@@ -117,7 +117,7 @@ int hpx_main(hpx::program_options::variables_map&)
     }
 
     {
-        hpx::lcos::future<int> p =
+        hpx::future<int> p =
             hpx::async<test_error_action>(hpx::find_here());
 
         std::string what_msg;
@@ -141,7 +141,7 @@ int hpx_main(hpx::program_options::variables_map&)
 
     {
         test_error_action do_error;
-        hpx::lcos::future<int> p = hpx::async(do_error, hpx::find_here());
+        hpx::future<int> p = hpx::async(do_error, hpx::find_here());
 
         std::string what_msg;
         bool caught_exception = false;
@@ -163,9 +163,9 @@ int hpx_main(hpx::program_options::variables_map&)
         bool data_cb_called = false;
         bool error_cb_called = false;
 
-        hpx::lcos::shared_future<int> f =
+        hpx::shared_future<int> f =
             hpx::async<test_error_action>(hpx::find_here());
-        hpx::lcos::future<int> p = f.then(hpx::util::bind(future_callback,
+        hpx::future<int> p = f.then(hpx::util::bind(future_callback,
             std::ref(data_cb_called), std::ref(error_cb_called),
             hpx::util::placeholders::_1));
 
@@ -196,9 +196,9 @@ int hpx_main(hpx::program_options::variables_map&)
         bool error_cb_called = false;
         test_error_action do_test_error;
 
-        hpx::lcos::shared_future<int> f = hpx::async(do_test_error, hpx::find_here());
+        hpx::shared_future<int> f = hpx::async(do_test_error, hpx::find_here());
 
-        hpx::lcos::future<int> p = f.then(
+        hpx::future<int> p = f.then(
                 hpx::util::bind(future_callback, std::ref(data_cb_called),
                     std::ref(error_cb_called), hpx::util::placeholders::_1));
 

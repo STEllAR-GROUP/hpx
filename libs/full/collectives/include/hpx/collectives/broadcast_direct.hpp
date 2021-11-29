@@ -382,7 +382,7 @@ namespace hpx { namespace lcos {
             std::true_type, Ts const&... vs)
         {
             if (ids.empty())
-                return;    // hpx::lcos::make_ready_future();
+                return;    // hpx::make_ready_future();
 
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
             std::size_t local_size = (std::min)(ids.size(), local_fanout);
@@ -439,7 +439,7 @@ namespace hpx { namespace lcos {
                 typename broadcast_result<Action>::action_result action_result;
             typedef typename broadcast_result<Action>::type result_type;
 
-            //if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
+            //if(ids.empty()) return hpx::make_ready_future(result_type());
             if (ids.empty())
                 return result_type();
 

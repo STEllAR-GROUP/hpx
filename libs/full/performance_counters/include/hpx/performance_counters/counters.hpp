@@ -395,7 +395,7 @@ namespace hpx { namespace performance_counters {
 
     inline naming::id_type get_counter(std::string const& name, error_code& ec)
     {
-        lcos::future<naming::id_type> f = get_counter_async(name, ec);
+        hpx::future<naming::id_type> f = get_counter_async(name, ec);
         if (ec)
             return naming::invalid_id;
 
@@ -404,7 +404,7 @@ namespace hpx { namespace performance_counters {
 
     inline naming::id_type get_counter(counter_info const& info, error_code& ec)
     {
-        lcos::future<naming::id_type> f = get_counter_async(info, ec);
+        hpx::future<naming::id_type> f = get_counter_async(info, ec);
         if (ec)
             return naming::invalid_id;
 

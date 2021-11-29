@@ -46,7 +46,7 @@ using hpx::naming::id_type;
 using hpx::naming::invalid_id;
 
 using hpx::async;
-using hpx::lcos::future;
+using hpx::future;
 using hpx::lcos::wait;
 
 using hpx::chrono::high_resolution_timer;

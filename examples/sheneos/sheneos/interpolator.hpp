@@ -133,7 +133,7 @@ namespace sheneos
         /// temp and rho from the ShenEOS tables. This function dispatches to
         /// the proper partition for the actual interpolation using bulk
         /// operations.
-        hpx::lcos::future<std::vector<std::vector<double> > >
+        hpx::future<std::vector<std::vector<double> > >
         interpolate_bulk_async(std::vector<sheneos_coord> const& coords,
             std::uint32_t eosvalues = server::partition3d::small_api_values) const;
 

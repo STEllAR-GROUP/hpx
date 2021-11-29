@@ -87,7 +87,7 @@ namespace hpx { namespace lcos { namespace detail {
     hpx::future<void> barrier_node::wait(bool async)
     {
         hpx::intrusive_ptr<barrier_node> this_(this);
-        future<void> result;
+        hpx::future<void> result;
 
         if (num_ < cut_off_)
         {
@@ -266,7 +266,7 @@ namespace hpx { namespace lcos { namespace detail {
         // Once we notified our children, we mark ourself ready.
         hpx::intrusive_ptr<barrier_node> this_(this);
         hpx::when_all(futures).then(
-            hpx::launch::sync, [this_ = HPX_MOVE(this_)](future<void> f) {
+            hpx::launch::sync, [this_ = HPX_MOVE(this_)](hpx::future<void> f) {
                 // Trigger possible errors...
                 f.get();
                 this_->broadcast_promise_.set_value();

@@ -104,7 +104,7 @@ namespace hpx { namespace agas { namespace detail {
 #endif
     }
 
-    lcos::future<std::uint32_t> hosted_component_namespace::get_num_localities(
+    hpx::future<std::uint32_t> hosted_component_namespace::get_num_localities(
         components::component_type type)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)

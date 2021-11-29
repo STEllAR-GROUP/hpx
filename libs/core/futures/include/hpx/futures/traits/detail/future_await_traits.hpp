@@ -40,11 +40,11 @@ namespace hpx { namespace lcos { namespace detail {
         {
         }
 
-        constexpr bool await_ready() const noexcept
+        HPX_NODISCARD constexpr bool await_ready() const noexcept
         {
             return is_ready_;
         }
-        void await_suspend(coroutine_handle<>) const noexcept {}
+        constexpr void await_suspend(coroutine_handle<>) const noexcept {}
         constexpr void await_resume() const noexcept {}
     };
 
@@ -52,14 +52,14 @@ namespace hpx { namespace lcos { namespace detail {
     // Allow using co_await with an expression which evaluates to
     // hpx::future<T>.
     template <typename T>
-    HPX_FORCEINLINE bool await_ready(future<T> const& f) noexcept
+    HPX_FORCEINLINE bool await_ready(hpx::future<T> const& f) noexcept
     {
         return f.is_ready();
     }
 
     template <typename T, typename Promise>
     HPX_FORCEINLINE void await_suspend(
-        future<T>& f, coroutine_handle<Promise> rh)
+        hpx::future<T>& f, coroutine_handle<Promise> rh)
     {
         // f.then([=](future<T> result) {});
         auto st = traits::detail::get_shared_state(f);
@@ -73,20 +73,20 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     template <typename T>
-    HPX_FORCEINLINE T await_resume(future<T>& f)
+    HPX_FORCEINLINE T await_resume(hpx::future<T>& f)
     {
         return f.get();
     }
 
     // Allow wrapped futures to be unwrapped, if possible.
     template <typename T>
-    HPX_FORCEINLINE T await_resume(future<future<T>>& f)
+    HPX_FORCEINLINE T await_resume(hpx::future<hpx::future<T>>& f)
     {
         return f.get().get();
     }
 
     template <typename T>
-    HPX_FORCEINLINE T await_resume(future<shared_future<T>>& f)
+    HPX_FORCEINLINE T await_resume(hpx::future<hpx::shared_future<T>>& f)
     {
         return f.get().get();
     }
@@ -94,14 +94,14 @@ namespace hpx { namespace lcos { namespace detail {
     // Allow using co_await with an expression which evaluates to
     // hpx::shared_future<T>.
     template <typename T>
-    HPX_FORCEINLINE bool await_ready(shared_future<T> const& f) noexcept
+    HPX_FORCEINLINE bool await_ready(hpx::shared_future<T> const& f) noexcept
     {
         return f.is_ready();
     }
 
     template <typename T, typename Promise>
     HPX_FORCEINLINE void await_suspend(
-        shared_future<T>& f, coroutine_handle<Promise> rh)
+        hpx::shared_future<T>& f, coroutine_handle<Promise> rh)
     {
         // f.then([=](shared_future<T> result) {})
         auto st = traits::detail::get_shared_state(f);
@@ -115,7 +115,7 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     template <typename T>
-    HPX_FORCEINLINE T await_resume(shared_future<T>& f)
+    HPX_FORCEINLINE T await_resume(hpx::shared_future<T>& f)
     {
         return f.get();
     }
@@ -137,11 +137,11 @@ namespace hpx { namespace lcos { namespace detail {
         {
         }
 
-        hpx::lcos::future<T> get_return_object()
+        hpx::future<T> get_return_object()
         {
             hpx::intrusive_ptr<Derived> shared_state(
                 static_cast<Derived*>(this));
-            return hpx::traits::future_access<hpx::lcos::future<T>>::create(
+            return hpx::traits::future_access<hpx::future<T>>::create(
                 HPX_MOVE(shared_state));
         }
 
@@ -158,7 +158,7 @@ namespace hpx { namespace lcos { namespace detail {
             return suspend_if{!this->base_type::requires_delete()};
         }
 
-        void destroy() override
+        void destroy() noexcept override
         {
             coroutine_handle<Derived>::from_promise(
                 *static_cast<Derived*>(this))
@@ -197,7 +197,7 @@ namespace hpx { namespace lcos { namespace detail {
 namespace std {
     // Allow for functions which use co_await to return an hpx::future<T>
     template <typename T, typename... Ts>
-    struct coroutine_traits<hpx::lcos::future<T>, Ts...>
+    struct coroutine_traits<hpx::future<T>, Ts...>
     {
         using allocator_type = hpx::util::internal_allocator<coroutine_traits>;
 
@@ -235,7 +235,7 @@ namespace std {
     };
 
     template <typename... Ts>
-    struct coroutine_traits<hpx::lcos::future<void>, Ts...>
+    struct coroutine_traits<hpx::future<void>, Ts...>
     {
         using allocator_type = hpx::util::internal_allocator<coroutine_traits>;
 
@@ -274,7 +274,7 @@ namespace std {
     // Allow for functions which use co_await to return an
     // hpx::shared_future<T>
     template <typename T, typename... Ts>
-    struct coroutine_traits<hpx::lcos::shared_future<T>, Ts...>
+    struct coroutine_traits<hpx::shared_future<T>, Ts...>
     {
         using allocator_type = hpx::util::internal_allocator<coroutine_traits>;
 
@@ -312,7 +312,7 @@ namespace std {
     };
 
     template <typename... Ts>
-    struct coroutine_traits<hpx::lcos::shared_future<void>, Ts...>
+    struct coroutine_traits<hpx::shared_future<void>, Ts...>
     {
         using allocator_type = hpx::util::internal_allocator<coroutine_traits>;
 

@@ -35,7 +35,7 @@ void test_wait_for_either_of_two_futures_list()
 
     pt1();
 
-    hpx::lcos::future<hpx::when_any_result<std::array<hpx::future<int>, 2>>> r =
+    hpx::future<hpx::when_any_result<std::array<hpx::future<int>, 2>>> r =
         hpx::when_any(futures);
     hpx::when_any_result<std::array<hpx::future<int>, 2>> raw = r.get();
 
@@ -54,7 +54,7 @@ void test_wait_for_either_of_two_futures_list()
 using hpx::program_options::options_description;
 using hpx::program_options::variables_map;
 
-using hpx::lcos::future;
+using hpx::future;
 
 int hpx_main(variables_map&)
 {

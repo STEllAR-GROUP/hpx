@@ -1105,7 +1105,7 @@ namespace hpx { namespace performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     static naming::id_type register_with_agas(
-        std::string const& fullname, lcos::future<naming::id_type> f)
+        std::string const& fullname, hpx::future<naming::id_type> f)
     {
         // register the canonical name with AGAS
         naming::id_type id = f.get();
@@ -1114,10 +1114,10 @@ namespace hpx { namespace performance_counters {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future<naming::id_type> get_counter_async(
+    hpx::future<naming::id_type> get_counter_async(
         counter_info const& info, error_code& ec)
     {
-        typedef lcos::future<naming::id_type> result_type;
+        typedef hpx::future<naming::id_type> result_type;
 
         // complement counter info data
         counter_info complemented_info = info;
@@ -1163,7 +1163,7 @@ namespace hpx { namespace performance_counters {
 
                 // use the runtime_support component of the target locality to
                 // create the new performance counter
-                lcos::future<naming::id_type> f;
+                hpx::future<naming::id_type> f;
                 if (p.parentinstanceindex_ >= 0)
                 {
                     f = create_performance_counter_async(
@@ -1192,16 +1192,16 @@ namespace hpx { namespace performance_counters {
                 LPCS_(warning).format("failed to create counter {} ({})",
                     remove_counter_prefix(complemented_info.fullname_),
                     e.what());
-                return lcos::future<naming::id_type>();
+                return hpx::future<naming::id_type>();
             }
         }
         if (ec)
             return result_type();
 
-        return lcos::make_ready_future(id);
+        return hpx::make_ready_future(id);
     }
 
-    lcos::future<naming::id_type> get_counter_async(
+    hpx::future<naming::id_type> get_counter_async(
         std::string name, error_code& ec)
     {
         ensure_counter_prefix(name);    // prepend prefix, if necessary

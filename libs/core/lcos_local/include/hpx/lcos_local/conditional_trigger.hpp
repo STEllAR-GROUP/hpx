@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,11 +28,12 @@ namespace hpx { namespace lcos { namespace local {
 
         /// \brief get a future allowing to wait for the trigger to fire
         template <typename Condition>
-        future<void> get_future(Condition&& func, error_code& ec = hpx::throws)
+        hpx::future<void> get_future(
+            Condition&& func, error_code& ec = hpx::throws)
         {
             cond_.assign(HPX_FORWARD(Condition, func));
 
-            future<void> f = promise_.get_future(ec);
+            hpx::future<void> f = promise_.get_future(ec);
 
             set(ec);    // trigger as soon as possible
 
