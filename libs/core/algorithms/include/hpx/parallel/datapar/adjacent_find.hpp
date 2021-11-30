@@ -13,6 +13,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution/traits/vector_pack_all_any_none.hpp>
 #include <hpx/execution/traits/vector_pack_find.hpp>
+#include <hpx/executors/datapar/execution_policy.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_find.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
@@ -84,6 +85,19 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             first, last, std::forward<PredProj>(pred_projected));
     }
 
+    template <typename ExPolicy, typename InIter, typename Sent_,
+        typename PredProj,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
+            !hpx::parallel::util::detail::iterator_datapar_compatible<
+                InIter>::value)>
+    inline InIter tag_invoke(sequential_adjacent_find_t<ExPolicy>, InIter first,
+        Sent_ last, PredProj&& pred_projected)
+    {
+        return sequential_adjacent_find<typename ExPolicy::base_policy_type>(
+            first, last, std::forward<PredProj>(pred_projected));
+    }
+
     template <typename ExPolicy, typename ZipIter, typename Token,
         typename PredProj,
         HPX_CONCEPT_REQUIRES_(
@@ -98,5 +112,19 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             part_count, tok, std::forward<PredProj>(pred_projected));
     }
 
+    template <typename ExPolicy, typename ZipIter, typename Token,
+        typename PredProj,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
+            !hpx::parallel::util::detail::iterator_datapar_compatible<
+                ZipIter>::value)>
+    inline void tag_invoke(sequential_adjacent_find_t<ExPolicy>,
+        std::size_t base_idx, ZipIter part_begin, std::size_t part_count,
+        Token& tok, PredProj&& pred_projected)
+    {
+        return sequential_adjacent_find<typename ExPolicy::base_policy_type>(
+            base_idx, part_begin, part_count, tok,
+            std::forward<PredProj>(pred_projected));
+    }
 }}}}    // namespace hpx::parallel::v1::detail
 #endif
