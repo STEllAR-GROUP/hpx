@@ -32,7 +32,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             PredProj&& pred_projected)
         {
             return std::adjacent_find(
-                first, last, std::forward<PredProj>(pred_projected));
+                first, last, HPX_FORWARD(PredProj, pred_projected));
         }
 
         template <typename ZipIter, typename Token, typename PredProj>
@@ -61,7 +61,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         InIter first, Sent_ last, PredProj&& pred_projected)
     {
         return sequential_adjacent_find_t<ExPolicy>{}(
-            first, last, std::forward<PredProj>(pred_projected));
+            first, last, HPX_FORWARD(PredProj, pred_projected));
     }
 #endif
 
