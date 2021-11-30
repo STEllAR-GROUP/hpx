@@ -360,8 +360,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE sequential_find_end_t<ExPolicy>
-        sequential_find_end = sequential_find_end_t<ExPolicy>{};
+    inline constexpr sequential_find_end_t<ExPolicy> sequential_find_end =
+        sequential_find_end_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
         typename Sent2, typename Pred, typename Proj1, typename Proj2>
@@ -446,7 +446,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     };
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE sequential_find_first_of_t<ExPolicy>
+    inline constexpr sequential_find_first_of_t<ExPolicy>
         sequential_find_first_of = sequential_find_first_of_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename InIter1, typename InIter2,
