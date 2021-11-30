@@ -728,8 +728,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op,
                 Proj1&& proj1, Proj2&& proj2)
             {
-                return sequential_find_end<ExPolicy>(first1, last1, first2, last2,
-                    HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                return sequential_find_end<ExPolicy>(first1, last1, first2,
+                    last2, HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
                     HPX_FORWARD(Proj2, proj2));
             }
 

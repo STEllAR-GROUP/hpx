@@ -30,7 +30,7 @@ void test_find_if_not()
 void find_if_not_test()
 {
     test_find_if_not<std::random_access_iterator_tag>();
-    // test_find_if_not<std::forward_iterator_tag>();
+    test_find_if_not<std::forward_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@ void test_find_if_not_exception()
 void find_if_not_exception_test()
 {
     test_find_if_not_exception<std::random_access_iterator_tag>();
-    // test_find_if_not_exception<std::forward_iterator_tag>();
+    test_find_if_not_exception<std::forward_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ void test_find_if_not_bad_alloc()
 void find_if_not_bad_alloc_test()
 {
     test_find_if_not_bad_alloc<std::random_access_iterator_tag>();
-    // test_find_if_not_bad_alloc<std::forward_iterator_tag>();
+    test_find_if_not_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

@@ -12,6 +12,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution/traits/vector_pack_all_any_none.hpp>
 #include <hpx/execution/traits/vector_pack_find.hpp>
+#include <hpx/executors/datapar/execution_policy.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/find.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
@@ -340,7 +341,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
         typename Sent2, typename Pred, typename Proj1, typename Proj2,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
+            (hpx::parallel::util::detail::iterator_datapar_compatible<
+                 Iter1>::value &&
+                hpx::parallel::util::detail::iterator_datapar_compatible<
+                    Iter2>::value))>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter1 tag_invoke(
         sequential_find_end_t<ExPolicy>, Iter1 first1, Sent1 last1,
         Iter2 first2, Sent2 last2, Pred&& op, Proj1&& proj1, Proj2&& proj2)
@@ -350,10 +355,31 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             std::forward<Proj2>(proj2));
     }
 
+    template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
+        typename Sent2, typename Pred, typename Proj1, typename Proj2,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
+            !(hpx::parallel::util::detail::iterator_datapar_compatible<
+                  Iter1>::value &&
+                hpx::parallel::util::detail::iterator_datapar_compatible<
+                    Iter2>::value))>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Iter1 tag_invoke(
+        sequential_find_end_t<ExPolicy>, Iter1 first1, Sent1 last1,
+        Iter2 first2, Sent2 last2, Pred&& op, Proj1&& proj1, Proj2&& proj2)
+    {
+        return sequential_find_end<typename ExPolicy::base_policy_type>(first1,
+            last1, first2, last2, std::forward<Pred>(op),
+            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+    }
+
     template <typename ExPolicy, typename Iter1, typename Iter2, typename Token,
         typename Pred, typename Proj1, typename Proj2,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
+            (hpx::parallel::util::detail::iterator_datapar_compatible<
+                 Iter1>::value &&
+                hpx::parallel::util::detail::iterator_datapar_compatible<
+                    Iter2>::value))>
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_find_end_t<ExPolicy>, Iter1 it, Iter2 first2,
         std::size_t base_idx, std::size_t part_size, std::size_t diff,
@@ -361,6 +387,24 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         return datapar_find_end_t<ExPolicy>::call(it, first2, base_idx,
             part_size, diff, tok, std::forward<Pred>(op),
+            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+    }
+
+    template <typename ExPolicy, typename Iter1, typename Iter2, typename Token,
+        typename Pred, typename Proj1, typename Proj2,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
+            !(hpx::parallel::util::detail::iterator_datapar_compatible<
+                  Iter1>::value &&
+                hpx::parallel::util::detail::iterator_datapar_compatible<
+                    Iter2>::value))>
+    HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
+        sequential_find_end_t<ExPolicy>, Iter1 it, Iter2 first2,
+        std::size_t base_idx, std::size_t part_size, std::size_t diff,
+        Token& tok, Pred&& op, Proj1&& proj1, Proj2&& proj2)
+    {
+        return sequential_find_end<typename ExPolicy::base_policy_type>(it,
+            first2, base_idx, part_size, diff, tok, std::forward<Pred>(op),
             std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
     }
 
@@ -427,7 +471,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename Pred, typename Proj1, typename Proj2,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
+            (hpx::parallel::util::detail::iterator_datapar_compatible<
+                 InIter1>::value &&
+                hpx::parallel::util::detail::iterator_datapar_compatible<
+                    InIter2>::value))>
     HPX_HOST_DEVICE HPX_FORCEINLINE InIter1 tag_invoke(
         sequential_find_first_of_t<ExPolicy>, InIter1 first, InIter1 last,
         InIter2 s_first, InIter2 s_last, Pred&& op, Proj1&& proj1,
@@ -438,10 +486,32 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             std::forward<Proj2>(proj2));
     }
 
+    template <typename ExPolicy, typename InIter1, typename InIter2,
+        typename Pred, typename Proj1, typename Proj2,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
+            !(hpx::parallel::util::detail::iterator_datapar_compatible<
+                  InIter1>::value &&
+                hpx::parallel::util::detail::iterator_datapar_compatible<
+                    InIter2>::value))>
+    HPX_HOST_DEVICE HPX_FORCEINLINE InIter1 tag_invoke(
+        sequential_find_first_of_t<ExPolicy>, InIter1 first, InIter1 last,
+        InIter2 s_first, InIter2 s_last, Pred&& op, Proj1&& proj1,
+        Proj2&& proj2)
+    {
+        return sequential_find_first_of<typename ExPolicy::base_policy_type>(
+            first, last, s_first, s_last, std::forward<Pred>(op),
+            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+    }
+
     template <typename ExPolicy, typename FwdIter, typename FwdIter2,
         typename Token, typename Pred, typename Proj1, typename Proj2,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
+            (hpx::parallel::util::detail::iterator_datapar_compatible<
+                 FwdIter>::value &&
+                hpx::parallel::util::detail::iterator_datapar_compatible<
+                    FwdIter2>::value))>
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_find_first_of_t<ExPolicy>, FwdIter it, FwdIter2 s_first,
         FwdIter2 s_last, std::size_t base_idx, std::size_t part_size,
@@ -449,6 +519,24 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         return datapar_find_first_of<ExPolicy>::call(it, s_first, s_last,
             base_idx, part_size, tok, std::forward<Pred>(op),
+            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+    }
+
+    template <typename ExPolicy, typename FwdIter, typename FwdIter2,
+        typename Token, typename Pred, typename Proj1, typename Proj2,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
+            !(hpx::parallel::util::detail::iterator_datapar_compatible<
+                  FwdIter>::value &&
+                hpx::parallel::util::detail::iterator_datapar_compatible<
+                    FwdIter2>::value))>
+    HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
+        sequential_find_first_of_t<ExPolicy>, FwdIter it, FwdIter2 s_first,
+        FwdIter2 s_last, std::size_t base_idx, std::size_t part_size,
+        Token& tok, Pred&& op, Proj1&& proj1, Proj2&& proj2)
+    {
+        return sequential_find_first_of<typename ExPolicy::base_policy_type>(it,
+            s_first, s_last, base_idx, part_size, tok, std::forward<Pred>(op),
             std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
     }
 }}}}    // namespace hpx::parallel::v1::detail
