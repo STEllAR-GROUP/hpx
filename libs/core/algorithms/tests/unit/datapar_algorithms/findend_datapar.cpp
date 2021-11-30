@@ -31,7 +31,7 @@ void test_find_end1()
 void find_end_test1()
 {
     test_find_end1<std::random_access_iterator_tag>();
-    // test_find_end1<std::forward_iterator_tag>();
+    test_find_end1<std::forward_iterator_tag>();
 }
 
 template <typename IteratorTag>
@@ -51,7 +51,7 @@ void test_find_end2()
 void find_end_test2()
 {
     test_find_end2<std::random_access_iterator_tag>();
-    // test_find_end2<std::forward_iterator_tag>();
+    test_find_end2<std::forward_iterator_tag>();
 }
 
 template <typename IteratorTag>
@@ -71,7 +71,7 @@ void test_find_end3()
 void find_end_test3()
 {
     test_find_end3<std::random_access_iterator_tag>();
-    // test_find_end3<std::forward_iterator_tag>();
+    test_find_end3<std::forward_iterator_tag>();
 }
 
 template <typename IteratorTag>
