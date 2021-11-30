@@ -20,6 +20,7 @@
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/synchronization/latch.hpp>
 
+#include <atomic>
 #include <exception>
 #include <stdexcept>
 #include <type_traits>
@@ -50,10 +51,13 @@ namespace hpx { namespace execution { namespace experimental {
     private:
         struct on_exit
         {
-            explicit on_exit(hpx::lcos::local::latch& l)
-              : latch_(&l)
+            explicit on_exit(task_group& tg)
+              : latch_(&tg.latch_)
             {
-                latch_->count_up(1);
+                if (latch_->reset_if_needed_and_count_up(1, 1))
+                {
+                    tg.has_arrived_.store(false, std::memory_order_release);
+                }
             }
 
             ~on_exit()
@@ -67,12 +71,12 @@ namespace hpx { namespace execution { namespace experimental {
             on_exit(on_exit const& rhs) = delete;
             on_exit& operator=(on_exit const& rhs) = delete;
 
-            on_exit(on_exit&& rhs)
+            on_exit(on_exit&& rhs) noexcept
               : latch_(rhs.latch_)
             {
                 rhs.latch_ = nullptr;
             }
-            on_exit& operator=(on_exit&& rhs)
+            on_exit& operator=(on_exit&& rhs) noexcept
             {
                 latch_ = rhs.latch_;
                 rhs.latch_ = nullptr;
@@ -87,13 +91,13 @@ namespace hpx { namespace execution { namespace experimental {
         // clang-format off
         template <typename Executor, typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<std::decay_t<Executor>>::value
+                hpx::traits::is_executor_any_v<std::decay_t<Executor>>
             )>
         // clang-format on
         void run(Executor&& exec, F&& f, Ts&&... ts)
         {
             // make sure exceptions don't leave the latch in the wrong state
-            on_exit l(latch_);
+            on_exit l(*this);
 
             hpx::parallel::execution::post(HPX_FORWARD(Executor, exec),
                 [this, l = HPX_MOVE(l), f = HPX_FORWARD(F, f),
@@ -122,7 +126,7 @@ namespace hpx { namespace execution { namespace experimental {
         // clang-format off
         template <typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                !hpx::traits::is_executor_any<std::decay_t<F>>::value
+                !hpx::traits::is_executor_any_v<std::decay_t<F>>
             )>
         // clang-format on
         void run(F&& f, Ts&&... ts)
@@ -134,10 +138,10 @@ namespace hpx { namespace execution { namespace experimental {
         /// Waits for all tasks in the group to complete.
         void wait()
         {
-            if (!has_arrived_)
+            bool expected = false;
+            if (has_arrived_.compare_exchange_strong(expected, true))
             {
                 latch_.arrive_and_wait();
-                has_arrived_ = true;
                 if (errors_.size() != 0)
                 {
                     throw errors_;
@@ -153,6 +157,6 @@ namespace hpx { namespace execution { namespace experimental {
     private:
         hpx::lcos::local::latch latch_;
         hpx::exception_list errors_;
-        bool has_arrived_;
+        std::atomic<bool> has_arrived_;
     };
 }}}    // namespace hpx::execution::experimental
