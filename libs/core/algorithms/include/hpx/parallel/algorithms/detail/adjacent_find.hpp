@@ -52,7 +52,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE sequential_adjacent_find_t<ExPolicy>
+    inline constexpr sequential_adjacent_find_t<ExPolicy>
         sequential_adjacent_find = sequential_adjacent_find_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename InIter, typename Sent_,
