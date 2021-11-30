@@ -33,7 +33,7 @@ namespace hpx::detail {
         static_assert(std::is_base_of_v<T, empty_vtable_type>,
             "Given empty vtable type should be a base of T");
 
-        static T* call()
+        static T const* call()
         {
             static empty_vtable_type empty;
             return &empty;
@@ -60,9 +60,10 @@ namespace hpx::detail {
         {
             std::aligned_storage_t<embedded_storage_size, alignment_size>
                 embedded_storage;
-            base_type* heap_storage;
+            base_type* heap_storage = nullptr;
         };
-        base_type* object;
+        base_type* object =
+            const_cast<base_type*>(get_empty_vtable<base_type>::call());
 
         // Returns true when it's safe to use the embedded storage, i.e.
         // when the size and alignment of Impl are small enough.
@@ -87,6 +88,12 @@ namespace hpx::detail {
             return get().empty();
         }
 
+        void reset_vtable()
+        {
+            object =
+                const_cast<base_type*>(get_empty_vtable<base_type>::call());
+        }
+
         void release()
         {
             HPX_ASSERT(!empty());
@@ -101,7 +108,7 @@ namespace hpx::detail {
                 heap_storage = nullptr;
             }
 
-            object = get_empty_vtable<base_type>::call();
+            reset_vtable();
         }
 
         void move_assign(movable_sbo_storage&& other) &
@@ -125,16 +132,12 @@ namespace hpx::detail {
                     object = heap_storage;
                 }
 
-                other.object = get_empty_vtable<base_type>::call();
+                other.reset_vtable();
             }
         }
 
     public:
-        movable_sbo_storage()
-          : heap_storage(nullptr)
-          , object(get_empty_vtable<base_type>::call())
-        {
-        }
+        movable_sbo_storage() = default;
 
         ~movable_sbo_storage()
         {
@@ -145,8 +148,6 @@ namespace hpx::detail {
         }
 
         movable_sbo_storage(movable_sbo_storage&& other)
-          : heap_storage(nullptr)
-          , object(get_empty_vtable<base_type>::call())
         {
             move_assign(HPX_MOVE(other));
         }
