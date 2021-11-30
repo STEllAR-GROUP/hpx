@@ -1240,14 +1240,6 @@ hpx_option(
   ADVANCED
 )
 hpx_option(
-  HPX_WITH_VERIFY_LOCKS_GLOBALLY
-  BOOL
-  "Enable global lock verification code (default: OFF, implicitly enabled in debug builds)"
-  OFF
-  CATEGORY "Debugging"
-  ADVANCED
-)
-hpx_option(
   HPX_WITH_VERIFY_LOCKS_BACKTRACE
   BOOL
   "Enable thread stack back trace being captured on lock registration (to be used in combination with HPX_WITH_VERIFY_LOCKS=ON, default: OFF)"
@@ -1274,9 +1266,6 @@ if(HPX_WITH_VERIFY_LOCKS)
   if(HPX_WITH_VERIFY_LOCKS_BACKTRACE)
     hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_BACKTRACE)
   endif()
-endif()
-if(HPX_WITH_VERIFY_LOCKS_GLOBALLY)
-  hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
 endif()
 
 # Additional debug support

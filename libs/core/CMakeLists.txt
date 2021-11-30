@@ -48,6 +48,7 @@ set(_hpx_core_modules
     iterator_support
     itt_notify
     lcos_local
+    lock_registration
     logging
     memory
     mpi_base

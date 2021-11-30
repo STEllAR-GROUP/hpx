@@ -7,8 +7,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/futures/futures_factory.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>

@@ -51,6 +51,7 @@ add_hpx_module(
     hpx_execution
     hpx_executors
     hpx_futures
+    hpx_lock_registration
     hpx_pack_traversal
     hpx_errors
     hpx_memory

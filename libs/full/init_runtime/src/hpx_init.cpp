@@ -13,7 +13,6 @@
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/coroutines/detail/context_impl.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
-#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
@@ -24,6 +23,7 @@
 #include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/init_runtime/detail/run_or_start.hpp>
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
@@ -68,7 +68,6 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime_configuration/register_locks_globally.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
@@ -351,17 +350,6 @@ namespace hpx {
             else
             {
                 util::disable_lock_detection();
-            }
-#endif
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) &&                                   \
-    defined(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
-            if (cmdline.rtcfg_.enable_global_lock_detection())
-            {
-                util::enable_global_lock_detection();
-            }
-            else
-            {
-                util::disable_global_lock_detection();
             }
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
