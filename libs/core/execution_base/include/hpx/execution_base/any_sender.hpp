@@ -18,6 +18,8 @@
 #include <type_traits>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::detail {
     template <typename T>
     struct empty_vtable
@@ -27,17 +29,16 @@ namespace hpx::detail {
     };
 
     template <typename T>
-    struct get_empty_vtable
+    using empty_vtable_t = typename empty_vtable<T>::type;
+
+    template <typename T>
+    T const* get_empty_vtable()
     {
-        using empty_vtable_type = typename empty_vtable<T>::type;
-        static_assert(std::is_base_of_v<T, empty_vtable_type>,
+        static_assert(std::is_base_of_v<T, empty_vtable_t<T>>,
             "Given empty vtable type should be a base of T");
 
-        static T const* call()
-        {
-            static empty_vtable_type empty;
-            return &empty;
-        }
+        static empty_vtable_t<T> empty;
+        return &empty;
     };
 
     template <typename Base, std::size_t EmbeddedStorageSize,
@@ -63,7 +64,7 @@ namespace hpx::detail {
             base_type* heap_storage = nullptr;
         };
         base_type* object =
-            const_cast<base_type*>(get_empty_vtable<base_type>::call());
+            const_cast<base_type*>(get_empty_vtable<base_type>());
 
         // Returns true when it's safe to use the embedded storage, i.e.
         // when the size and alignment of Impl are small enough.
@@ -90,8 +91,7 @@ namespace hpx::detail {
 
         void reset_vtable()
         {
-            object =
-                const_cast<base_type*>(get_empty_vtable<base_type>::call());
+            object = const_cast<base_type*>(get_empty_vtable<base_type>());
         }
 
         void release()
@@ -269,382 +269,420 @@ namespace hpx::detail {
     };
 }    // namespace hpx::detail
 
-#include <hpx/config/warnings_prefix.hpp>
+namespace hpx::execution::experimental::detail {
+    struct any_operation_state_base
+    {
+        virtual ~any_operation_state_base() = default;
+        virtual bool empty() const noexcept
+        {
+            return false;
+        }
+        virtual void start() & noexcept = 0;
+    };
+
+    struct HPX_CORE_EXPORT empty_any_operation_state final
+      : any_operation_state_base
+    {
+        bool empty() const noexcept override;
+        void start() & noexcept override;
+    };
+}    // namespace hpx::execution::experimental::detail
+
+namespace hpx::detail {
+    template <>
+    struct empty_vtable<
+        hpx::execution::experimental::detail::any_operation_state_base>
+    {
+        using type =
+            hpx::execution::experimental::detail::empty_any_operation_state;
+    };
+}    // namespace hpx::detail
+
+namespace hpx::execution::experimental::detail {
+    template <typename Sender, typename Receiver>
+    struct any_operation_state_impl final : any_operation_state_base
+    {
+        std::decay_t<
+            connect_result_t<std::decay_t<Sender>, std::decay_t<Receiver>>>
+            operation_state;
+
+        template <typename Sender_, typename Receiver_>
+        any_operation_state_impl(Sender_&& sender, Receiver_&& receiver)
+          : operation_state(hpx::execution::experimental::connect(
+                HPX_FORWARD(Sender_, sender), HPX_FORWARD(Receiver_, receiver)))
+        {
+        }
+
+        void start() & noexcept override
+        {
+            hpx::execution::experimental::start(operation_state);
+        }
+    };
+
+    class HPX_CORE_EXPORT any_operation_state
+    {
+        using base_type = detail::any_operation_state_base;
+        template <typename Sender, typename Receiver>
+        using impl_type = detail::any_operation_state_impl<Sender, Receiver>;
+        using storage_type =
+            hpx::detail::movable_sbo_storage<base_type, 8 * sizeof(void*)>;
+
+        storage_type storage{};
+
+    public:
+        template <typename Sender, typename Receiver>
+        any_operation_state(Sender&& sender, Receiver&& receiver)
+        {
+            storage.template store<impl_type<Sender, Receiver>>(
+                HPX_FORWARD(Sender, sender), HPX_FORWARD(Receiver, receiver));
+        }
+
+        ~any_operation_state() = default;
+        any_operation_state(any_operation_state&&) = delete;
+        any_operation_state(any_operation_state const&) = delete;
+        any_operation_state& operator=(any_operation_state&&) = delete;
+        any_operation_state& operator=(any_operation_state const&) = delete;
+
+        HPX_CORE_EXPORT friend void tag_invoke(
+            hpx::execution::experimental::start_t,
+            any_operation_state& os) noexcept;
+    };
+
+    template <typename... Ts>
+    struct any_receiver_base
+    {
+        virtual ~any_receiver_base() = default;
+        virtual void move_into(void* p) = 0;
+        virtual void set_value(Ts... ts) && = 0;
+        virtual void set_error(std::exception_ptr ep) && noexcept = 0;
+        virtual void set_done() && noexcept = 0;
+        virtual bool empty() const noexcept
+        {
+            return false;
+        }
+    };
+
+    HPX_NORETURN HPX_CORE_EXPORT void throw_bad_any_call(
+        char const* class_name, char const* function_name);
+
+    template <typename... Ts>
+    struct empty_any_receiver final : any_receiver_base<Ts...>
+    {
+        void move_into(void*) override
+        {
+            HPX_UNREACHABLE;
+        }
+
+        bool empty() const noexcept override
+        {
+            return true;
+        }
+
+        void set_value(Ts...) && override
+        {
+            throw_bad_any_call("any_receiver", "set_value");
+        }
+
+        HPX_NORETURN void set_error(std::exception_ptr) && noexcept override
+        {
+            throw_bad_any_call("any_receiver", "set_error");
+        }
+
+        HPX_NORETURN void set_done() && noexcept override
+        {
+            throw_bad_any_call("any_receiver", "set_done");
+        }
+    };
+}    // namespace hpx::execution::experimental::detail
+
+namespace hpx::detail {
+    template <typename... Ts>
+    struct empty_vtable<
+        hpx::execution::experimental::detail::any_receiver_base<Ts...>>
+    {
+        using type =
+            hpx::execution::experimental::detail::empty_any_receiver<Ts...>;
+    };
+}    // namespace hpx::detail
+
+namespace hpx::execution::experimental::detail {
+    template <typename Receiver, typename... Ts>
+    struct any_receiver_impl final : any_receiver_base<Ts...>
+    {
+        std::decay_t<Receiver> receiver;
+
+        template <typename Receiver_,
+            typename = std::enable_if_t<
+                !std::is_same_v<std::decay_t<Receiver_>, any_receiver_impl>>>
+        explicit any_receiver_impl(Receiver_&& receiver)
+          : receiver(HPX_FORWARD(Receiver_, receiver))
+        {
+        }
+
+        void move_into(void* p) override
+        {
+            new (p) any_receiver_impl(HPX_MOVE(receiver));
+        }
+
+        void set_value(Ts... ts) && override
+        {
+            hpx::execution::experimental::set_value(
+                HPX_MOVE(receiver), HPX_MOVE(ts)...);
+        }
+
+        void set_error(std::exception_ptr ep) && noexcept override
+        {
+            hpx::execution::experimental::set_error(
+                HPX_MOVE(receiver), HPX_MOVE(ep));
+        }
+
+        void set_done() && noexcept override
+        {
+            hpx::execution::experimental::set_done(HPX_MOVE(receiver));
+        }
+    };
+
+    template <typename... Ts>
+    class any_receiver
+    {
+        using base_type = detail::any_receiver_base<Ts...>;
+        template <typename Receiver>
+        using impl_type = detail::any_receiver_impl<Receiver, Ts...>;
+        using storage_type =
+            hpx::detail::movable_sbo_storage<base_type, 4 * sizeof(void*)>;
+
+        storage_type storage{};
+
+    public:
+        template <typename Receiver,
+            typename = std::enable_if_t<
+                !std::is_same_v<std::decay_t<Receiver>, any_receiver>>>
+        explicit any_receiver(Receiver&& receiver)
+        {
+            storage.template store<impl_type<Receiver>>(
+                HPX_FORWARD(Receiver, receiver));
+        }
+
+        template <typename Receiver,
+            typename = std::enable_if_t<
+                !std::is_same_v<std::decay_t<Receiver>, any_receiver>>>
+        any_receiver& operator=(Receiver&& receiver)
+        {
+            storage.template store<impl_type<Receiver>>(
+                HPX_FORWARD(Receiver, receiver));
+            return *this;
+        }
+
+        ~any_receiver() = default;
+        any_receiver(any_receiver&&) = default;
+        any_receiver(any_receiver const&) = delete;
+        any_receiver& operator=(any_receiver&&) = default;
+        any_receiver& operator=(any_receiver const&) = delete;
+
+        friend void tag_invoke(hpx::execution::experimental::set_value_t,
+            any_receiver&& r, Ts... ts)
+        {
+            // We first move the storage to a temporary variable so that
+            // this any_receiver is empty after this set_value. Doing
+            // HPX_MOVE(storage.get()).set_value(...) would leave us with a
+            // non-empty any_receiver holding a moved-from receiver.
+            auto moved_storage = HPX_MOVE(r.storage);
+            HPX_MOVE(moved_storage.get()).set_value(HPX_MOVE(ts)...);
+        }
+
+        friend void tag_invoke(hpx::execution::experimental::set_error_t,
+            any_receiver&& r, std::exception_ptr ep) noexcept
+        {
+            // We first move the storage to a temporary variable so that
+            // this any_receiver is empty after this set_error. Doing
+            // HPX_MOVE(storage.get()).set_error(...) would leave us with a
+            // non-empty any_receiver holding a moved-from receiver.
+            auto moved_storage = HPX_MOVE(r.storage);
+            HPX_MOVE(moved_storage.get()).set_error(HPX_MOVE(ep));
+        }
+
+        friend void tag_invoke(
+            hpx::execution::experimental::set_done_t, any_receiver&& r) noexcept
+        {
+            // We first move the storage to a temporary variable so that
+            // this any_receiver is empty after this set_done. Doing
+            // HPX_MOVE(storage.get()).set_done(...) would leave us with a
+            // non-empty any_receiver holding a moved-from receiver.
+            auto moved_storage = HPX_MOVE(r.storage);
+            HPX_MOVE(moved_storage.get()).set_done();
+        }
+    };
+
+    template <typename... Ts>
+    struct unique_any_sender_base
+    {
+        virtual ~unique_any_sender_base() = default;
+        virtual void move_into(void* p) = 0;
+        virtual any_operation_state connect(
+            any_receiver<Ts...>&& receiver) && = 0;
+        virtual bool empty() const noexcept
+        {
+            return false;
+        }
+    };
+
+    template <typename... Ts>
+    struct any_sender_base : public unique_any_sender_base<Ts...>
+    {
+        virtual any_sender_base* clone() const = 0;
+        virtual void clone_into(void* p) const = 0;
+        using unique_any_sender_base<Ts...>::connect;
+        virtual any_operation_state connect(
+            any_receiver<Ts...>&& receiver) & = 0;
+    };
+
+    template <typename... Ts>
+    struct empty_unique_any_sender final : unique_any_sender_base<Ts...>
+    {
+        void move_into(void*) override
+        {
+            HPX_UNREACHABLE;
+        }
+
+        bool empty() const noexcept override
+        {
+            return true;
+        }
+
+        HPX_NORETURN any_operation_state connect(any_receiver<Ts...>&&) &&
+            override
+        {
+            throw_bad_any_call("unique_any_sender", "connect");
+        }
+    };
+
+    template <typename... Ts>
+    struct empty_any_sender final : any_sender_base<Ts...>
+    {
+        void move_into(void*) override
+        {
+            HPX_UNREACHABLE;
+        }
+
+        any_sender_base<Ts...>* clone() const override
+        {
+            HPX_UNREACHABLE;
+        }
+
+        void clone_into(void*) const override
+        {
+            HPX_UNREACHABLE;
+        }
+
+        bool empty() const noexcept override
+        {
+            return true;
+        }
+
+        HPX_NORETURN any_operation_state connect(any_receiver<Ts...>&&) &
+            override
+        {
+            throw_bad_any_call("any_sender", "connect");
+        }
+
+        HPX_NORETURN any_operation_state connect(any_receiver<Ts...>&&) &&
+            override
+        {
+            throw_bad_any_call("any_sender", "connect");
+        }
+    };
+
+    template <typename Sender, typename... Ts>
+    struct unique_any_sender_impl final : unique_any_sender_base<Ts...>
+    {
+        std::decay_t<Sender> sender;
+
+        template <typename Sender_,
+            typename = std::enable_if_t<
+                !std::is_same_v<std::decay_t<Sender_>, unique_any_sender_impl>>>
+        explicit unique_any_sender_impl(Sender_&& sender)
+          : sender(HPX_FORWARD(Sender_, sender))
+        {
+        }
+
+        void move_into(void* p) override
+        {
+            new (p) unique_any_sender_impl(HPX_MOVE(sender));
+        }
+
+        any_operation_state connect(any_receiver<Ts...>&& receiver) && override
+        {
+            return any_operation_state{HPX_MOVE(sender), HPX_MOVE(receiver)};
+        }
+    };
+
+    template <typename Sender, typename... Ts>
+    struct any_sender_impl final : any_sender_base<Ts...>
+    {
+        std::decay_t<Sender> sender;
+
+        template <typename Sender_,
+            typename = std::enable_if_t<
+                !std::is_same_v<std::decay_t<Sender_>, any_sender_impl>>>
+        explicit any_sender_impl(Sender_&& sender)
+          : sender(HPX_FORWARD(Sender_, sender))
+        {
+        }
+
+        void move_into(void* p) override
+        {
+            new (p) any_sender_impl(HPX_MOVE(sender));
+        }
+
+        any_sender_base<Ts...>* clone() const override
+        {
+            return new any_sender_impl(sender);
+        }
+
+        void clone_into(void* p) const override
+        {
+            new (p) any_sender_impl(sender);
+        }
+
+        any_operation_state connect(any_receiver<Ts...>&& receiver) & override
+        {
+            return any_operation_state{sender, HPX_MOVE(receiver)};
+        }
+
+        any_operation_state connect(any_receiver<Ts...>&& receiver) && override
+        {
+            return any_operation_state{HPX_MOVE(sender), HPX_MOVE(receiver)};
+        }
+    };
+}    // namespace hpx::execution::experimental::detail
 
 namespace hpx::execution::experimental {
     namespace detail {
-        struct any_operation_state_base
-        {
-            virtual ~any_operation_state_base() = default;
-            virtual bool empty() const noexcept
-            {
-                return false;
-            }
-            virtual void start() & noexcept = 0;
-        };
-
-        struct HPX_CORE_EXPORT empty_any_operation_state final
-          : any_operation_state_base
-        {
-            bool empty() const noexcept override;
-            void start() & noexcept override;
-        };
-
-        template <typename Sender, typename Receiver>
-        struct any_operation_state_impl final : any_operation_state_base
-        {
-            std::decay_t<
-                connect_result_t<std::decay_t<Sender>, std::decay_t<Receiver>>>
-                operation_state;
-
-            template <typename Sender_, typename Receiver_>
-            any_operation_state_impl(Sender_&& sender, Receiver_&& receiver)
-              : operation_state(hpx::execution::experimental::connect(
-                    HPX_FORWARD(Sender_, sender),
-                    HPX_FORWARD(Receiver_, receiver)))
-            {
-            }
-
-            void start() & noexcept override
-            {
-                hpx::execution::experimental::start(operation_state);
-            }
-        };
-
-        class HPX_CORE_EXPORT any_operation_state
-        {
-            using base_type = detail::any_operation_state_base;
-            template <typename Sender, typename Receiver>
-            using impl_type =
-                detail::any_operation_state_impl<Sender, Receiver>;
-            using storage_type =
-                hpx::detail::movable_sbo_storage<base_type, 8 * sizeof(void*)>;
-
-            storage_type storage{};
-
-        public:
-            template <typename Sender, typename Receiver>
-            any_operation_state(Sender&& sender, Receiver&& receiver)
-            {
-                storage.template store<impl_type<Sender, Receiver>>(
-                    HPX_FORWARD(Sender, sender),
-                    HPX_FORWARD(Receiver, receiver));
-            }
-
-            ~any_operation_state() = default;
-            any_operation_state(any_operation_state&&) = delete;
-            any_operation_state(any_operation_state const&) = delete;
-            any_operation_state& operator=(any_operation_state&&) = delete;
-            any_operation_state& operator=(any_operation_state const&) = delete;
-
-            HPX_CORE_EXPORT friend void tag_invoke(
-                hpx::execution::experimental::start_t,
-                any_operation_state& os) noexcept;
-        };
-
+        // This helper only exists to make it possible to use
+        // any_(unique_)sender in global variables or in general static
+        // that may be created before main. When used as a base for
+        // any_(unique_)_sender, this ensures that the empty vtables for
+        // any_receiver and any_operation_state are created as the first thing
+        // when creating an any_(unique_)sender. The empty vtables for
+        // any_receiver and any_operation_state may otherwise be created much
+        // later (when the sender is connected and started), and thus destroyed
+        // before the any_(unique_)sender is destroyed. This would be
+        // problematic since the any_(unique_)sender can hold previously created
+        // any_receivers and any_operation_states indirectly.
         template <typename... Ts>
-        struct any_receiver_base
+        struct any_sender_static_empty_vtable_helper
         {
-            virtual ~any_receiver_base() = default;
-            virtual void move_into(void* p) = 0;
-            virtual void set_value(Ts... ts) && = 0;
-            virtual void set_error(std::exception_ptr ep) && noexcept = 0;
-            virtual void set_done() && noexcept = 0;
-            virtual bool empty() const noexcept
+            any_sender_static_empty_vtable_helper()
             {
-                return false;
-            }
-        };
-
-        HPX_NORETURN HPX_CORE_EXPORT void throw_bad_any_call(
-            char const* class_name, char const* function_name);
-
-        template <typename... Ts>
-        struct empty_any_receiver final : any_receiver_base<Ts...>
-        {
-            void move_into(void*) override
-            {
-                HPX_UNREACHABLE;
-            }
-
-            bool empty() const noexcept override
-            {
-                return true;
-            }
-
-            void set_value(Ts...) && override
-            {
-                throw_bad_any_call("any_receiver", "set_value");
-            }
-
-            HPX_NORETURN void set_error(std::exception_ptr) && noexcept override
-            {
-                throw_bad_any_call("any_receiver", "set_error");
-            }
-
-            HPX_NORETURN void set_done() && noexcept override
-            {
-                throw_bad_any_call("any_receiver", "set_done");
-            }
-        };
-
-        template <typename Receiver, typename... Ts>
-        struct any_receiver_impl final : any_receiver_base<Ts...>
-        {
-            std::decay_t<Receiver> receiver;
-
-            template <typename Receiver_,
-                typename = std::enable_if_t<!std::is_same_v<
-                    std::decay_t<Receiver_>, any_receiver_impl>>>
-            explicit any_receiver_impl(Receiver_&& receiver)
-              : receiver(HPX_FORWARD(Receiver_, receiver))
-            {
-            }
-
-            void move_into(void* p) override
-            {
-                new (p) any_receiver_impl(HPX_MOVE(receiver));
-            }
-
-            void set_value(Ts... ts) && override
-            {
-                hpx::execution::experimental::set_value(
-                    HPX_MOVE(receiver), HPX_MOVE(ts)...);
-            }
-
-            void set_error(std::exception_ptr ep) && noexcept override
-            {
-                hpx::execution::experimental::set_error(
-                    HPX_MOVE(receiver), HPX_MOVE(ep));
-            }
-
-            void set_done() && noexcept override
-            {
-                hpx::execution::experimental::set_done(HPX_MOVE(receiver));
-            }
-        };
-
-        template <typename... Ts>
-        class any_receiver
-        {
-            using base_type = detail::any_receiver_base<Ts...>;
-            template <typename Receiver>
-            using impl_type = detail::any_receiver_impl<Receiver, Ts...>;
-            using storage_type =
-                hpx::detail::movable_sbo_storage<base_type, 4 * sizeof(void*)>;
-
-            storage_type storage{};
-
-        public:
-            template <typename Receiver,
-                typename = std::enable_if_t<
-                    !std::is_same_v<std::decay_t<Receiver>, any_receiver>>>
-            explicit any_receiver(Receiver&& receiver)
-            {
-                storage.template store<impl_type<Receiver>>(
-                    HPX_FORWARD(Receiver, receiver));
-            }
-
-            template <typename Receiver,
-                typename = std::enable_if_t<
-                    !std::is_same_v<std::decay_t<Receiver>, any_receiver>>>
-            any_receiver& operator=(Receiver&& receiver)
-            {
-                storage.template store<impl_type<Receiver>>(
-                    HPX_FORWARD(Receiver, receiver));
-                return *this;
-            }
-
-            ~any_receiver() = default;
-            any_receiver(any_receiver&&) = default;
-            any_receiver(any_receiver const&) = delete;
-            any_receiver& operator=(any_receiver&&) = default;
-            any_receiver& operator=(any_receiver const&) = delete;
-
-            friend void tag_invoke(hpx::execution::experimental::set_value_t,
-                any_receiver&& r, Ts... ts)
-            {
-                // We first move the storage to a temporary variable so that
-                // this any_receiver is empty after this set_value. Doing
-                // HPX_MOVE(storage.get()).set_value(...) would leave us with a
-                // non-empty any_receiver holding a moved-from receiver.
-                auto moved_storage = HPX_MOVE(r.storage);
-                HPX_MOVE(moved_storage.get()).set_value(HPX_MOVE(ts)...);
-            }
-
-            friend void tag_invoke(hpx::execution::experimental::set_error_t,
-                any_receiver&& r, std::exception_ptr ep) noexcept
-            {
-                // We first move the storage to a temporary variable so that
-                // this any_receiver is empty after this set_error. Doing
-                // HPX_MOVE(storage.get()).set_error(...) would leave us with a
-                // non-empty any_receiver holding a moved-from receiver.
-                auto moved_storage = HPX_MOVE(r.storage);
-                HPX_MOVE(moved_storage.get()).set_error(HPX_MOVE(ep));
-            }
-
-            friend void tag_invoke(hpx::execution::experimental::set_done_t,
-                any_receiver&& r) noexcept
-            {
-                // We first move the storage to a temporary variable so that
-                // this any_receiver is empty after this set_done. Doing
-                // HPX_MOVE(storage.get()).set_done(...) would leave us with a
-                // non-empty any_receiver holding a moved-from receiver.
-                auto moved_storage = HPX_MOVE(r.storage);
-                HPX_MOVE(moved_storage.get()).set_done();
-            }
-        };
-
-        template <typename... Ts>
-        struct unique_any_sender_base
-        {
-            virtual ~unique_any_sender_base() = default;
-            virtual void move_into(void* p) = 0;
-            virtual any_operation_state connect(
-                any_receiver<Ts...>&& receiver) && = 0;
-            virtual bool empty() const noexcept
-            {
-                return false;
-            }
-        };
-
-        template <typename... Ts>
-        struct any_sender_base : public unique_any_sender_base<Ts...>
-        {
-            virtual any_sender_base* clone() const = 0;
-            virtual void clone_into(void* p) const = 0;
-            using unique_any_sender_base<Ts...>::connect;
-            virtual any_operation_state connect(
-                any_receiver<Ts...>&& receiver) & = 0;
-        };
-
-        template <typename... Ts>
-        struct empty_unique_any_sender final : unique_any_sender_base<Ts...>
-        {
-            void move_into(void*) override
-            {
-                HPX_UNREACHABLE;
-            }
-
-            bool empty() const noexcept override
-            {
-                return true;
-            }
-
-            HPX_NORETURN any_operation_state connect(any_receiver<Ts...>&&) &&
-                override
-            {
-                throw_bad_any_call("unique_any_sender", "connect");
-            }
-        };
-
-        template <typename... Ts>
-        struct empty_any_sender final : any_sender_base<Ts...>
-        {
-            void move_into(void*) override
-            {
-                HPX_UNREACHABLE;
-            }
-
-            any_sender_base<Ts...>* clone() const override
-            {
-                HPX_UNREACHABLE;
-            }
-
-            void clone_into(void*) const override
-            {
-                HPX_UNREACHABLE;
-            }
-
-            bool empty() const noexcept override
-            {
-                return true;
-            }
-
-            HPX_NORETURN any_operation_state connect(any_receiver<Ts...>&&) &
-                override
-            {
-                throw_bad_any_call("any_sender", "connect");
-            }
-
-            HPX_NORETURN any_operation_state connect(any_receiver<Ts...>&&) &&
-                override
-            {
-                throw_bad_any_call("any_sender", "connect");
-            }
-        };
-
-        template <typename Sender, typename... Ts>
-        struct unique_any_sender_impl final : unique_any_sender_base<Ts...>
-        {
-            std::decay_t<Sender> sender;
-
-            template <typename Sender_,
-                typename = std::enable_if_t<!std::is_same_v<
-                    std::decay_t<Sender_>, unique_any_sender_impl>>>
-            explicit unique_any_sender_impl(Sender_&& sender)
-              : sender(HPX_FORWARD(Sender_, sender))
-            {
-            }
-
-            void move_into(void* p) override
-            {
-                new (p) unique_any_sender_impl(HPX_MOVE(sender));
-            }
-
-            any_operation_state connect(any_receiver<Ts...>&& receiver) &&
-                override
-            {
-                return any_operation_state{
-                    HPX_MOVE(sender), HPX_MOVE(receiver)};
-            }
-        };
-
-        template <typename Sender, typename... Ts>
-        struct any_sender_impl final : any_sender_base<Ts...>
-        {
-            std::decay_t<Sender> sender;
-
-            template <typename Sender_,
-                typename = std::enable_if_t<
-                    !std::is_same_v<std::decay_t<Sender_>, any_sender_impl>>>
-            explicit any_sender_impl(Sender_&& sender)
-              : sender(HPX_FORWARD(Sender_, sender))
-            {
-            }
-
-            void move_into(void* p) override
-            {
-                new (p) any_sender_impl(HPX_MOVE(sender));
-            }
-
-            any_sender_base<Ts...>* clone() const override
-            {
-                return new any_sender_impl(sender);
-            }
-
-            void clone_into(void* p) const override
-            {
-                new (p) any_sender_impl(sender);
-            }
-
-            any_operation_state connect(any_receiver<Ts...>&& receiver) &
-                override
-            {
-                return any_operation_state{sender, HPX_MOVE(receiver)};
-            }
-
-            any_operation_state connect(any_receiver<Ts...>&& receiver) &&
-                override
-            {
-                return any_operation_state{
-                    HPX_MOVE(sender), HPX_MOVE(receiver)};
+                hpx::detail::get_empty_vtable<any_operation_state_base>();
+                hpx::detail::get_empty_vtable<any_receiver_base<Ts...>>();
             }
         };
     }    // namespace detail
 
     template <typename... Ts>
     class unique_any_sender
+      : private detail::any_sender_static_empty_vtable_helper<Ts...>
     {
         using base_type = detail::unique_any_sender_base<Ts...>;
         template <typename Sender>
@@ -708,6 +746,7 @@ namespace hpx::execution::experimental {
 
     template <typename... Ts>
     class any_sender
+      : private detail::any_sender_static_empty_vtable_helper<Ts...>
     {
         using base_type = detail::any_sender_base<Ts...>;
         template <typename Sender>
@@ -787,25 +826,7 @@ namespace hpx::execution::experimental {
     };
 }    // namespace hpx::execution::experimental
 
-#include <hpx/config/warnings_suffix.hpp>
-
 namespace hpx::detail {
-    template <>
-    struct empty_vtable<
-        hpx::execution::experimental::detail::any_operation_state_base>
-    {
-        using type =
-            hpx::execution::experimental::detail::empty_any_operation_state;
-    };
-
-    template <typename... Ts>
-    struct empty_vtable<
-        hpx::execution::experimental::detail::any_receiver_base<Ts...>>
-    {
-        using type =
-            hpx::execution::experimental::detail::empty_any_receiver<Ts...>;
-    };
-
     template <typename... Ts>
     struct empty_vtable<
         hpx::execution::experimental::detail::unique_any_sender_base<Ts...>>
@@ -823,3 +844,5 @@ namespace hpx::detail {
             hpx::execution::experimental::detail::empty_any_sender<Ts...>;
     };
 }    // namespace hpx::detail
+
+#include <hpx/config/warnings_suffix.hpp>
