@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2020 Hartmut Kaiser
+//  Copyright (c) 2015-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -94,7 +94,7 @@ namespace hpx { namespace lcos { namespace local {
 
             if (new_count == 0)
             {
-                std::unique_lock<mutex_type> l(mtx_.data_);
+                std::unique_lock l(mtx_.data_);
                 notified_ = true;
 
                 // Note: we use notify_one repeatedly instead of notify_all as we
@@ -105,7 +105,7 @@ namespace hpx { namespace lcos { namespace local {
                 while (cond_.data_.notify_one(
                     HPX_MOVE(l), threads::thread_priority::boost))
                 {
-                    l = std::unique_lock<mutex_type>(mtx_.data_);
+                    l = std::unique_lock(mtx_.data_);
                 }
             }
         }
@@ -125,7 +125,7 @@ namespace hpx { namespace lcos { namespace local {
         ///
         void wait() const
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
+            std::unique_lock l(mtx_.data_);
             if (counter_.load(std::memory_order_relaxed) > 0 || !notified_)
             {
                 cond_.data_.wait(l, "hpx::local::cpp20_latch::wait");
@@ -142,7 +142,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ASSERT(update >= 0);
 
-            std::unique_lock<mutex_type> l(mtx_.data_);
+            std::unique_lock l(mtx_.data_);
 
             std::ptrdiff_t old_count =
                 counter_.fetch_sub(update, std::memory_order_relaxed);
@@ -150,8 +150,7 @@ namespace hpx { namespace lcos { namespace local {
 
             if (old_count > update)
             {
-                cond_.data_.wait(
-                    l, "hpx::local::cpp20_latch::count_down_and_wait");
+                cond_.data_.wait(l, "hpx::local::cpp20_latch::arrive_and_wait");
 
                 HPX_ASSERT(counter_.load(std::memory_order_relaxed) == 0);
                 HPX_ASSERT(notified_);
@@ -168,7 +167,7 @@ namespace hpx { namespace lcos { namespace local {
                 while (cond_.data_.notify_one(
                     HPX_MOVE(l), threads::thread_priority::boost))
                 {
-                    l = std::unique_lock<mutex_type>(mtx_.data_);
+                    l = std::unique_lock(mtx_.data_);
                 }
             }
         }
@@ -249,7 +248,7 @@ namespace hpx { namespace lcos { namespace local {
 
         void abort_all()
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
+            std::unique_lock l(mtx_.data_);
             cond_.data_.abort_all(HPX_MOVE(l));
         }
 
@@ -285,9 +284,44 @@ namespace hpx { namespace lcos { namespace local {
             HPX_ASSERT(old_count == 0);
             HPX_UNUSED(old_count);
 
-            std::unique_lock<mutex_type> l(mtx_.data_);
+            std::scoped_lock l(mtx_.data_);
             HPX_ASSERT(notified_);
             notified_ = false;
+        }
+
+        /// Effects: Equivalent to:
+        ///             if (is_ready())
+        ///                 reset(count);
+        ///             count_up(n);
+        /// Returns: true if the latch was reset
+        bool reset_if_needed_and_count_up(
+            std::ptrdiff_t n, std::ptrdiff_t count)
+        {
+            HPX_ASSERT(n >= 0);
+            HPX_ASSERT(count >= 0);
+
+            std::unique_lock l(mtx_.data_);
+
+            if (notified_)
+            {
+                notified_ = false;
+
+                std::ptrdiff_t old_count =
+                    counter_.fetch_add(n + count, std::memory_order_relaxed);
+
+                HPX_ASSERT(old_count == 0);
+                HPX_UNUSED(old_count);
+
+                return true;
+            }
+
+            std::ptrdiff_t old_count =
+                counter_.fetch_add(n, std::memory_order_relaxed);
+
+            HPX_ASSERT(old_count > 0);
+            HPX_UNUSED(old_count);
+
+            return false;
         }
     };
 }}}    // namespace hpx::lcos::local

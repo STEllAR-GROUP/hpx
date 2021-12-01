@@ -14,7 +14,7 @@ module load openmpi
 
 export CXX_STD="17"
 
-configure_extra_options+=" -DHPX_WITH_CXX${CXX_STD}=ON"
+configure_extra_options+=" -DHPX_WITH_CXX_STANDARD=${CXX_STD}"
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
 configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
