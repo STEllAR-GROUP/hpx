@@ -342,34 +342,25 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         typename Sent2, typename Pred, typename Proj1, typename Proj2,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
-            (hpx::parallel::util::detail::iterator_datapar_compatible<
-                 Iter1>::value &&
-                hpx::parallel::util::detail::iterator_datapar_compatible<
-                    Iter2>::value))>
+        )>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter1 tag_invoke(
         sequential_find_end_t<ExPolicy>, Iter1 first1, Sent1 last1,
         Iter2 first2, Sent2 last2, Pred&& op, Proj1&& proj1, Proj2&& proj2)
     {
-        return datapar_find_end_t<ExPolicy>::call(first1, last1, first2, last2,
-            std::forward<Pred>(op), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
-    }
-
-    template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Pred, typename Proj1, typename Proj2,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
-            !(hpx::parallel::util::detail::iterator_datapar_compatible<
-                  Iter1>::value &&
-                hpx::parallel::util::detail::iterator_datapar_compatible<
-                    Iter2>::value))>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Iter1 tag_invoke(
-        sequential_find_end_t<ExPolicy>, Iter1 first1, Sent1 last1,
-        Iter2 first2, Sent2 last2, Pred&& op, Proj1&& proj1, Proj2&& proj2)
-    {
-        return sequential_find_end<typename ExPolicy::base_policy_type>(first1,
-            last1, first2, last2, std::forward<Pred>(op),
-            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        if constexpr (
+                hpx::parallel::util::detail::iterator_datapar_compatible_v<Iter1> &&
+                hpx::parallel::util::detail::iterator_datapar_compatible_v<Iter2>)
+        {
+            return datapar_find_end_t<ExPolicy>::call(first1, last1, first2, last2,
+                std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                std::forward<Proj2>(proj2));
+        }
+        else
+        {
+            return sequential_find_end<typename ExPolicy::base_policy_type>(
+                first1, last1, first2, last2, std::forward<Pred>(op),
+                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        }
     }
 
     template <typename ExPolicy, typename Iter1, typename Iter2, typename Token,
