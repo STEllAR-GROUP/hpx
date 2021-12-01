@@ -433,9 +433,8 @@ namespace hpx { namespace ranges {
       : hpx::detail::tag_parallel_algorithm<reduce_t>
     {
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename Sent,
+        template <typename ExPolicy, typename FwdIter, typename Sent, typename F,
             typename T = typename std::iterator_traits<FwdIter>::value_type,
-            typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
@@ -455,10 +454,9 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename Rng,
+        template <typename ExPolicy, typename Rng, typename F,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
-            typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value
@@ -575,9 +573,8 @@ namespace hpx { namespace ranges {
 
         ////////////////////////////////////////////////////////////////////////
         // clang-format off
-        template <typename FwdIter, typename Sent,
+        template <typename FwdIter, typename Sent, typename F,
             typename T = typename std::iterator_traits<FwdIter>::value_type,
-            typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
@@ -594,10 +591,9 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename Rng,
+        template <typename Rng, typename F,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
-            typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value
             )>

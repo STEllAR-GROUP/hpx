@@ -1457,8 +1457,8 @@ namespace hpx { namespace ranges {
     private:
         // clang-format off
         template <typename InIter, typename Sent, typename OutIter,
-            typename T = typename std::iterator_traits<OutIter>::value_type,
             typename Pred,
+            typename T = typename std::iterator_traits<OutIter>::value_type,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<InIter>::value &&

@@ -904,8 +904,7 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename Rng, typename O,
-            typename BinOp, typename UnOp,
+        template <typename Rng, typename O, typename BinOp, typename UnOp,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::is_invocable_v<UnOp,
@@ -1056,8 +1055,7 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename Rng, typename O, typename BinOp,
-            typename UnOp,
+        template <typename Rng, typename O, typename BinOp, typename UnOp,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
