@@ -796,7 +796,9 @@ namespace hpx { namespace ranges {
     private:
         // clang-format off
         template <typename I, typename Sent, typename O,
-        typename T, typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<I,
+                Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<I>::value &&
                 hpx::traits::is_sentinel_for<Sent, I>::value &&
@@ -820,8 +822,10 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename Rng, typename O, typename T,
+        template <typename Rng, typename O,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value
@@ -849,7 +853,9 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename I, typename Sent, typename O,
-         typename T, typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<I,
+                Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<I>::value &&
@@ -875,8 +881,10 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename O, typename T,
+        template <typename ExPolicy, typename Rng, typename O,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&

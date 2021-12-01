@@ -883,7 +883,9 @@ namespace hpx {
     private:
         // clang-format off
         template <typename Iter,
-            typename Pred, typename T, HPX_CONCEPT_REQUIRES_(
+            typename Pred,
+            typename T = typename std::iterator_traits<Iter>::value_type,
+            HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<Iter>::value &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
@@ -904,7 +906,9 @@ namespace hpx {
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename Pred,  typename T, HPX_CONCEPT_REQUIRES_(
+            typename Pred,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
+            HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value &&
                 hpx::is_invocable_v<Pred,
@@ -936,7 +940,8 @@ namespace hpx {
     private:
         // clang-format off
         template <typename InIter,
-            typename T, HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<InIter>::value_type,
+            HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<InIter>::value
             )>
         // clang-format on
@@ -956,7 +961,8 @@ namespace hpx {
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename T, HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
+            HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
@@ -986,7 +992,9 @@ namespace hpx {
     private:
         // clang-format off
         template <typename InIter, typename OutIter,
-            typename Pred, typename T, HPX_CONCEPT_REQUIRES_(
+            typename Pred,
+            typename T = typename std::iterator_traits<OutIter>::value_type,
+            HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<InIter>::value &&
                 hpx::traits::is_iterator<OutIter>::value &&
                 hpx::is_invocable_v<Pred,
@@ -1013,7 +1021,9 @@ namespace hpx {
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Pred,  typename T, HPX_CONCEPT_REQUIRES_(
+            typename Pred,
+            typename T = typename std::iterator_traits<FwdIter2>::value_type,
+            HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value &&
@@ -1051,7 +1061,8 @@ namespace hpx {
     private:
         // clang-format off
         template <typename InIter, typename OutIter,
-            typename T, HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<OutIter>::value_type,
+            HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<InIter>::value &&
                 hpx::traits::is_iterator<OutIter>::value
             )>
@@ -1075,7 +1086,8 @@ namespace hpx {
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T, HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter2>::value_type,
+            HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value
