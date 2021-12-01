@@ -24,7 +24,6 @@ set(_hpx_full_modules
     components
     components_base
     compute
-    compute_cuda
     distribution_policies
     executors_distributed
     include

@@ -25,9 +25,6 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/version.hpp>
-#if defined(HPX_HAVE_MODULE_COMPUTE_CUDA)
-#include <hpx/modules/compute_cuda.hpp>
-#endif
 
 #include <cstddef>
 #include <iostream>
@@ -516,33 +513,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     double time_total = mysecond();
     std::vector<std::vector<double>> timing;
 
-#if defined(HPX_HAVE_MODULE_COMPUTE_CUDA)
-    bool use_accel = false;
-    if (vm.count("use-accelerator"))
-        use_accel = true;
-
-    if (use_accel)
-    {
-        using executor_type = hpx::cuda::experimental::concurrent_executor<>;
-        using allocator_type = hpx::cuda::experimental::allocator<STREAM_TYPE>;
-
-        // Get the cuda targets we want to run on
-        hpx::cuda::experimental::target target;
-
-        // Get the host targets we want to run on
-        auto host_targets = hpx::compute::host::get_local_targets();
-
-        allocator_type alloc(target);
-        executor_type exec(target, host_targets);
-        auto policy = hpx::execution::par.on(exec);
-
-        // perform benchmark
-        timing = run_benchmark<>(warmup_iterations, iterations, vector_size,
-            std::move(alloc), std::move(policy));
-        //iterations, vector_size, std::move(target));
-    }
-    else
-#endif
     {
         if (executor == 0)
         {
@@ -743,11 +713,6 @@ int main(int argc, char* argv[])
         (   "executor",
             hpx::program_options::value<std::size_t>()->default_value(2),
             "executor to use (0-4) (default: 2, parallel_executor)")
-
-#if defined(HPX_HAVE_COMPUTE)
-        (   "use-accelerator",
-            "Use this flag to run the stream benchmark on the GPU")
-#endif
         ;
     // clang-format on
 

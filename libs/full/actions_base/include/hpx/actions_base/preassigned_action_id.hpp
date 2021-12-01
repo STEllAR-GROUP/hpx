@@ -176,8 +176,6 @@ namespace hpx { namespace actions {
         base_lco_with_value_parcelset_endpoints_set,
         base_lco_with_value_vector_compute_host_target_get,
         base_lco_with_value_vector_compute_host_target_set,
-        base_lco_with_value_vector_compute_cuda_target_get,
-        base_lco_with_value_vector_compute_cuda_target_set,
 
         // typed continuations...
         typed_continuation_hpx_agas_response,
