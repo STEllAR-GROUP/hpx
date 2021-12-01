@@ -659,7 +659,7 @@ namespace hpx::execution::experimental {
         template <typename Sender,
             typename = std::enable_if_t<
                 !std::is_same_v<std::decay_t<Sender>, unique_any_sender>>>
-        explicit unique_any_sender(Sender&& sender)
+        unique_any_sender(Sender&& sender)
         {
             storage.template store<impl_type<Sender>>(
                 HPX_FORWARD(Sender, sender));
@@ -722,7 +722,7 @@ namespace hpx::execution::experimental {
         template <typename Sender,
             typename = std::enable_if_t<
                 !std::is_same_v<std::decay_t<Sender>, any_sender>>>
-        explicit any_sender(Sender&& sender)
+        any_sender(Sender&& sender)
         {
             static_assert(std::is_copy_constructible_v<std::decay_t<Sender>>,
                 "any_sender requires the given sender to be copy "
