@@ -123,15 +123,8 @@ api_ref_header = '''
 {0}
 -------------------------------------------------------------------------------
 
-The contents of this module can be included with the header
-``hpx/modules/{0}.hpp``. These headers may be used by user-code but are not
-guaranteed stable (neither header location nor contents). You are using these at
-your own risk. If you wish to use non-public functionality from a module we
-*strongly* suggest only including the module header ``hpx/modules/{0}.hpp``, not
-the particular header in which the functionality you would like to use is
-defined. See :ref:`public_api` for a list of names that are part of the public
+See :ref:`public_api` for a list of names and headers that are part of the public 
 |hpx| API.
-
 '''
 
 api_ref_file = '''
