@@ -14,7 +14,6 @@ set(config_headers
     hpx/config/autolink.hpp
     hpx/config/branch_hints.hpp
     hpx/config/compiler_fence.hpp
-    hpx/config/compiler_native_tls.hpp
     hpx/config/compiler_specific.hpp
     hpx/config/constexpr.hpp
     hpx/config/debug.hpp
