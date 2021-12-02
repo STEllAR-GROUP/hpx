@@ -12,6 +12,7 @@
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/threading_base/scoped_annotation.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/type_support/decay.hpp>
@@ -36,117 +37,6 @@ namespace hpx {
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-    struct HPX_NODISCARD scoped_annotation
-    {
-        HPX_NON_COPYABLE(scoped_annotation);
-
-        explicit constexpr scoped_annotation(char const*) noexcept {}
-
-        template <typename F>
-        explicit HPX_HOST_DEVICE constexpr scoped_annotation(F&&) noexcept
-        {
-        }
-
-        // add empty (but non-trivial) destructor to silence warnings
-        HPX_HOST_DEVICE ~scoped_annotation() {}
-    };
-#elif HPX_HAVE_ITTNOTIFY != 0
-    struct HPX_NODISCARD scoped_annotation
-    {
-        HPX_NON_COPYABLE(scoped_annotation);
-
-        explicit scoped_annotation(char const* name)
-          : task_(thread_domain_, hpx::util::itt::string_handle(name))
-        {
-        }
-        template <typename F>
-        explicit scoped_annotation(F&& f)
-          : task_(thread_domain_,
-                hpx::traits::get_function_annotation_itt<std::decay_t<F>>::call(
-                    f))
-        {
-        }
-
-    private:
-        hpx::util::itt::thread_domain thread_domain_;
-        hpx::util::itt::task task_;
-    };
-#else
-    struct HPX_NODISCARD scoped_annotation
-    {
-        HPX_NON_COPYABLE(scoped_annotation);
-
-        explicit scoped_annotation(char const* name)
-        {
-            auto* self = hpx::threads::get_self_ptr();
-            if (self != nullptr)
-            {
-                desc_ = threads::get_thread_id_data(self->get_thread_id())
-                            ->set_description(name);
-            }
-
-#if defined(HPX_HAVE_APEX)
-            /* update the task wrapper in APEX to use the specified name */
-            threads::set_self_timer_data(external_timer::update_task(
-                threads::get_self_timer_data(), std::string(name)));
-#endif
-        }
-
-        explicit scoped_annotation(std::string name)
-        {
-            auto* self = hpx::threads::get_self_ptr();
-            if (self != nullptr)
-            {
-                char const* name_c_str =
-#if defined(HPX_HAVE_APEX)
-                    detail::store_function_annotation(name);
-#else
-                    detail::store_function_annotation(HPX_MOVE(name));
-#endif
-                desc_ = threads::get_thread_id_data(self->get_thread_id())
-                            ->set_description(name_c_str);
-            }
-
-#if defined(HPX_HAVE_APEX)
-            /* update the task wrapper in APEX to use the specified name */
-            threads::set_self_timer_data(external_timer::update_task(
-                threads::get_self_timer_data(), HPX_MOVE(name)));
-#endif
-        }
-
-        template <typename F,
-            typename =
-                std::enable_if_t<!std::is_same_v<std::decay_t<F>, std::string>>>
-        explicit scoped_annotation(F&& f)
-        {
-            auto* self = hpx::threads::get_self_ptr();
-            if (self != nullptr)
-            {
-                desc_ = threads::get_thread_id_data(self->get_thread_id())
-                            ->set_description(hpx::util::thread_description(f));
-            }
-
-#if defined(HPX_HAVE_APEX)
-            /* no need to update the task description in APEX, because
-             * this same description was used when the task was created. */
-#endif
-        }
-
-        ~scoped_annotation()
-        {
-            auto* self = hpx::threads::get_self_ptr();
-            if (self != nullptr)
-            {
-                threads::get_thread_id_data(self->get_thread_id())
-                    ->set_description(desc_);
-            }
-        }
-
-        hpx::util::thread_description desc_;
-    };
-#endif
-
     namespace detail {
         template <typename F>
         struct annotated_function
@@ -171,7 +61,7 @@ namespace hpx {
             }
 
             template <typename... Ts>
-            invoke_result_t<fun_type, Ts...> operator()(Ts&&... ts)
+            hpx::util::invoke_result_t<fun_type, Ts...> operator()(Ts&&... ts)
             {
                 scoped_annotation annotate(get_function_annotation());
                 return HPX_INVOKE(f_, HPX_FORWARD(Ts, ts)...);
@@ -243,24 +133,8 @@ namespace hpx {
 
 #else
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_NODISCARD scoped_annotation
-    {
-        HPX_NON_COPYABLE(scoped_annotation);
-
-        explicit constexpr scoped_annotation(char const* /*name*/) noexcept {}
-
-        template <typename F>
-        explicit HPX_HOST_DEVICE constexpr scoped_annotation(F&& /*f*/) noexcept
-        {
-        }
-
-        // add empty (but non-trivial) destructor to silence warnings
-        HPX_HOST_DEVICE ~scoped_annotation() {}
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Given a function as an argument, the user can scoped_annotation
-    /// as well.
+    /// \brief Returns a function annotated with the given annotation.
+    ///
     /// Annotating includes setting the thread description per thread id.
     ///
     /// \param function
@@ -320,8 +194,4 @@ namespace hpx::util {
     {
         return hpx::annotated_function(HPX_FORWARD(F, f), name);
     }
-
-    using annotate_function HPX_DEPRECATED_V(1, 8,
-        "Please use hpx::scoped_annotation instead.") = hpx::scoped_annotation;
-
 }    // namespace hpx::util

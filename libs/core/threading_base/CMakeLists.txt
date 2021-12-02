@@ -23,6 +23,7 @@ set(threading_base_headers
     hpx/threading_base/scheduler_base.hpp
     hpx/threading_base/scheduler_mode.hpp
     hpx/threading_base/scheduler_state.hpp
+    hpx/threading_base/scoped_annotation.hpp
     hpx/threading_base/set_thread_state.hpp
     hpx/threading_base/set_thread_state_timed.hpp
     hpx/threading_base/thread_data.hpp
