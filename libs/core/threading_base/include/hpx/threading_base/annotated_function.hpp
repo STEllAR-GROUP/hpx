@@ -37,31 +37,31 @@ namespace hpx {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-    struct HPX_NODISCARD annotate_function
+    struct HPX_NODISCARD scoped_annotation
     {
-        HPX_NON_COPYABLE(annotate_function);
+        HPX_NON_COPYABLE(scoped_annotation);
 
-        explicit constexpr annotate_function(char const*) noexcept {}
+        explicit constexpr scoped_annotation(char const*) noexcept {}
 
         template <typename F>
-        explicit HPX_HOST_DEVICE constexpr annotate_function(F&&) noexcept
+        explicit HPX_HOST_DEVICE constexpr scoped_annotation(F&&) noexcept
         {
         }
 
         // add empty (but non-trivial) destructor to silence warnings
-        HPX_HOST_DEVICE ~annotate_function() {}
+        HPX_HOST_DEVICE ~scoped_annotation() {}
     };
 #elif HPX_HAVE_ITTNOTIFY != 0
-    struct HPX_NODISCARD annotate_function
+    struct HPX_NODISCARD scoped_annotation
     {
-        HPX_NON_COPYABLE(annotate_function);
+        HPX_NON_COPYABLE(scoped_annotation);
 
-        explicit annotate_function(char const* name)
+        explicit scoped_annotation(char const* name)
           : task_(thread_domain_, hpx::util::itt::string_handle(name))
         {
         }
         template <typename F>
-        explicit annotate_function(F&& f)
+        explicit scoped_annotation(F&& f)
           : task_(thread_domain_,
                 hpx::traits::get_function_annotation_itt<std::decay_t<F>>::call(
                     f))
@@ -73,11 +73,11 @@ namespace hpx {
         hpx::util::itt::task task_;
     };
 #else
-    struct HPX_NODISCARD annotate_function
+    struct HPX_NODISCARD scoped_annotation
     {
-        HPX_NON_COPYABLE(annotate_function);
+        HPX_NON_COPYABLE(scoped_annotation);
 
-        explicit annotate_function(char const* name)
+        explicit scoped_annotation(char const* name)
         {
             auto* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
@@ -93,7 +93,7 @@ namespace hpx {
 #endif
         }
 
-        explicit annotate_function(std::string name)
+        explicit scoped_annotation(std::string name)
         {
             auto* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
@@ -118,7 +118,7 @@ namespace hpx {
         template <typename F,
             typename =
                 std::enable_if_t<!std::is_same_v<std::decay_t<F>, std::string>>>
-        explicit annotate_function(F&& f)
+        explicit scoped_annotation(F&& f)
         {
             auto* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
@@ -133,7 +133,7 @@ namespace hpx {
 #endif
         }
 
-        ~annotate_function()
+        ~scoped_annotation()
         {
             auto* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
@@ -173,7 +173,7 @@ namespace hpx {
             template <typename... Ts>
             invoke_result_t<fun_type, Ts...> operator()(Ts&&... ts)
             {
-                annotate_function annotate(get_function_annotation());
+                scoped_annotation annotate(get_function_annotation());
                 return HPX_INVOKE(f_, HPX_FORWARD(Ts, ts)...);
             }
 
@@ -243,23 +243,23 @@ namespace hpx {
 
 #else
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_NODISCARD annotate_function
+    struct HPX_NODISCARD scoped_annotation
     {
-        HPX_NON_COPYABLE(annotate_function);
+        HPX_NON_COPYABLE(scoped_annotation);
 
-        explicit constexpr annotate_function(char const* /*name*/) noexcept {}
+        explicit constexpr scoped_annotation(char const* /*name*/) noexcept {}
 
         template <typename F>
-        explicit HPX_HOST_DEVICE constexpr annotate_function(F&& /*f*/) noexcept
+        explicit HPX_HOST_DEVICE constexpr scoped_annotation(F&& /*f*/) noexcept
         {
         }
 
         // add empty (but non-trivial) destructor to silence warnings
-        HPX_HOST_DEVICE ~annotate_function() {}
+        HPX_HOST_DEVICE ~scoped_annotation() {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Given a function as an argument, the user can annotate_function
+    /// \brief Given a function as an argument, the user can scoped_annotation
     /// as well.
     /// Annotating includes setting the thread description per thread id.
     ///
@@ -322,6 +322,6 @@ namespace hpx::util {
     }
 
     using annotate_function HPX_DEPRECATED_V(1, 8,
-        "Please use hpx::annotate_function instead.") = hpx::annotate_function;
+        "Please use hpx::scoped_annotation instead.") = hpx::scoped_annotation;
 
 }    // namespace hpx::util

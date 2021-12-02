@@ -114,16 +114,16 @@ execution_string(const Policy& policy)
 }
 
 // --------------------------------------------------------------------------
-// use annotate_function
-void test_annotate_function()
+// use scoped_annotation
+void test_scoped_annotation()
 {
     hpx::async([]() {
-        hpx::annotate_function annotate("4-char annotate_function");
+        hpx::scoped_annotation annotate("4-char scoped_annotation");
     }).get();
 
     hpx::async([]() {
-        std::string s("4-string annotate_function");
-        hpx::annotate_function annotate(std::move(s));
+        std::string s("4-string scoped_annotation");
+        hpx::scoped_annotation annotate(std::move(s));
     }).get();
 }
 
@@ -204,7 +204,7 @@ int hpx_main()
     // setup executors
     hpx::execution::parallel_executor par_exec{};
 
-    test_annotate_function();
+    test_scoped_annotation();
     //
     test_none().get();
     //

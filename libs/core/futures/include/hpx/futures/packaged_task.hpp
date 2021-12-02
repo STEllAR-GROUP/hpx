@@ -80,7 +80,7 @@ namespace hpx { namespace lcos { namespace local {
             // synchronous execution of the embedded function (object)
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    hpx::annotate_function annotate(function_);
+                    hpx::scoped_annotation annotate(function_);
                     if constexpr (std::is_void_v<R>)
                     {
                         function_(HPX_FORWARD(Ts, ts)...);

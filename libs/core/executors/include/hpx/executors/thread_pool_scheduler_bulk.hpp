@@ -404,8 +404,8 @@ namespace hpx { namespace execution { namespace experimental {
                         char const* scheduler_annotation =
                             get_annotation(op_state->scheduler);
                         auto af = scheduler_annotation ?
-                            hpx::annotate_function(scheduler_annotation) :
-                            hpx::annotate_function(op_state->f);
+                            hpx::scoped_annotation(scheduler_annotation) :
+                            hpx::scoped_annotation(op_state->f);
                         task_function{
                             this->op_state, n, chunk_size, worker_thread}();
                     }

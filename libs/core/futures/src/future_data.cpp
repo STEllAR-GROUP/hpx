@@ -160,7 +160,7 @@ namespace hpx { namespace lcos { namespace detail {
     {
         hpx::detail::try_catch_exception_ptr(
             [&]() {
-                hpx::annotate_function annotate(on_completed);
+                hpx::scoped_annotation annotate(on_completed);
                 on_completed();
             },
             [&](std::exception_ptr ep) {

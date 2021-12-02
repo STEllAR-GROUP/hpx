@@ -243,7 +243,7 @@ namespace hpx { namespace execution {
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         sync_execute(F&& f, Ts&&... ts) const
         {
-            hpx::annotate_function annotate(annotation_ ?
+            hpx::scoped_annotation annotate(annotation_ ?
                     annotation_ :
                     "parallel_policy_executor::sync_execute");
             return hpx::detail::sync_launch_policy_dispatch<Policy>::call(

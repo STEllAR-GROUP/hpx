@@ -888,7 +888,7 @@ namespace hpx {
                 HPX_HOST_DEVICE HPX_FORCEINLINE void operator()(B part_begin,
                     std::size_t part_steps, std::size_t part_index)
                 {
-                    hpx::annotate_function annotate(f_);
+                    hpx::scoped_annotation annotate(f_);
                     execute(part_begin, part_steps, part_index);
                 }
             };
@@ -955,7 +955,7 @@ namespace hpx {
                 HPX_HOST_DEVICE HPX_FORCEINLINE void operator()(
                     B part_begin, std::size_t part_steps, std::size_t)
                 {
-                    hpx::annotate_function annotate(f_);
+                    hpx::scoped_annotation annotate(f_);
                     execute(part_begin, part_steps);
                 }
             };
