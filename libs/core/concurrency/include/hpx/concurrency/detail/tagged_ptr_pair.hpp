@@ -62,11 +62,11 @@ namespace boost { namespace lockfree {
             tag_t tags[8];
         };
 
-        HPX_STATIC_CONSTEXPR std::size_t left_tag_index = 3;
-        HPX_STATIC_CONSTEXPR std::size_t right_tag_index = 7;
-        HPX_STATIC_CONSTEXPR std::size_t left_ptr_index = 0;
-        HPX_STATIC_CONSTEXPR std::size_t right_ptr_index = 1;
-        HPX_STATIC_CONSTEXPR compressed_ptr_t ptr_mask = 0xffffffffffff;
+        static constexpr std::size_t left_tag_index = 3;
+        static constexpr std::size_t right_tag_index = 7;
+        static constexpr std::size_t left_ptr_index = 0;
+        static constexpr std::size_t right_ptr_index = 1;
+        static constexpr compressed_ptr_t ptr_mask = 0xffffffffffff;
 
         static Left* extract_left_ptr(volatile compressed_ptr_pair_t const& i)
         {
@@ -289,9 +289,9 @@ namespace boost { namespace lockfree {
             tag_t tags[8];
         };
 
-        HPX_STATIC_CONSTEXPR std::size_t left_tag_index = 3;
-        HPX_STATIC_CONSTEXPR std::size_t right_tag_index = 7;
-        HPX_STATIC_CONSTEXPR compressed_ptr_t ptr_mask = 0xffffffffffff;
+        static constexpr std::size_t left_tag_index = 3;
+        static constexpr std::size_t right_tag_index = 7;
+        static constexpr compressed_ptr_t ptr_mask = 0xffffffffffff;
 
         static Left* extract_left_ptr(volatile compressed_ptr_pair_t const& i)
         {

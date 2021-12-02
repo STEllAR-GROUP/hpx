@@ -19,10 +19,3 @@
 #else
 #define HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE inline constexpr
 #endif
-
-/// This macro evaluates to ``static constexpr`` if the compiler supports it,
-/// ``static const`` otherwise.
-///
-/// This macro is deprecated. It is always replaced with the ``static
-/// constexpr`` keyword. Prefer using ``static constexpr`` directly instead.
-#define HPX_STATIC_CONSTEXPR static constexpr

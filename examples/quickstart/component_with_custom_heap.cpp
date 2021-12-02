@@ -64,7 +64,7 @@ namespace allocator
     template <typename T>
     struct alloc_block : alloc_block_header
     {
-        HPX_STATIC_CONSTEXPR std::size_t allocation_size =
+        static constexpr std::size_t allocation_size =
             ((sizeof(T) + BLOCK_ALIGNMENT - 1) & ~(BLOCK_ALIGNMENT - 1)) +
             sizeof(alloc_block_header);
 
@@ -206,8 +206,8 @@ namespace allocator
 
         // for the available page size we account for the members of this
         // class below
-        HPX_STATIC_CONSTEXPR std::size_t page_size =
-            PAGE_SIZE_ - sizeof(void*) - 2*sizeof(std::size_t);
+        static constexpr std::size_t page_size =
+            PAGE_SIZE_ - sizeof(void*) - 2 * sizeof(std::size_t);
 
         typename std::aligned_storage<page_size>::type data;
 

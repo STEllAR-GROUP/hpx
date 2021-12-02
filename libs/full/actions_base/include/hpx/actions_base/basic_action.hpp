@@ -646,7 +646,7 @@ namespace hpx { namespace actions {
             template <>                                                        \
             struct action_stacksize<action>                                    \
             {                                                                  \
-                HPX_STATIC_CONSTEXPR threads::thread_stacksize value = size;   \
+                static constexpr threads::thread_stacksize value = size;       \
             };                                                                 \
         }                                                                      \
     }                                                                          \
@@ -699,8 +699,7 @@ namespace hpx { namespace actions {
             template <>                                                        \
             struct action_priority<action>                                     \
             {                                                                  \
-                HPX_STATIC_CONSTEXPR threads::thread_priority value =          \
-                    priority;                                                  \
+                static constexpr threads::thread_priority value = priority;    \
             };                                                                 \
             /* make sure the action is not executed directly */                \
             template <>                                                        \
