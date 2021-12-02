@@ -43,8 +43,8 @@ namespace hpx { namespace execution { namespace experimental {
                 std::enable_if_t<hpx::traits::is_executor_any_v<Executor>>>
         explicit annotating_executor(Executor&& exec, std::string annotation)
           : exec_(HPX_FORWARD(Executor, exec))
-          , annotation_(hpx::util::detail::store_function_annotation(
-                HPX_MOVE(annotation)))
+          , annotation_(
+                hpx::detail::store_function_annotation(HPX_MOVE(annotation)))
         {
         }
 
@@ -81,7 +81,7 @@ namespace hpx { namespace execution { namespace experimental {
         decltype(auto) post(F&& f, Ts&&... ts)
         {
             return parallel::execution::post(exec_,
-                hpx::util::annotated_function(HPX_FORWARD(F, f), annotation_),
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
                 HPX_FORWARD(Ts, ts)...);
         }
 
@@ -90,7 +90,7 @@ namespace hpx { namespace execution { namespace experimental {
         decltype(auto) sync_execute(F&& f, Ts&&... ts)
         {
             return parallel::execution::sync_execute(exec_,
-                hpx::util::annotated_function(HPX_FORWARD(F, f), annotation_),
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
                 HPX_FORWARD(Ts, ts)...);
         }
 
@@ -99,7 +99,7 @@ namespace hpx { namespace execution { namespace experimental {
         decltype(auto) async_execute(F&& f, Ts&&... ts)
         {
             return parallel::execution::async_execute(exec_,
-                hpx::util::annotated_function(HPX_FORWARD(F, f), annotation_),
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
                 HPX_FORWARD(Ts, ts)...);
         }
 
@@ -107,7 +107,7 @@ namespace hpx { namespace execution { namespace experimental {
         decltype(auto) then_execute(F&& f, Future&& predecessor, Ts&&... ts)
         {
             return parallel::execution::then_execute(exec_,
-                hpx::util::annotated_function(HPX_FORWARD(F, f), annotation_),
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
                 HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
 
@@ -116,16 +116,16 @@ namespace hpx { namespace execution { namespace experimental {
         decltype(auto) bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
         {
             return parallel::execution::bulk_async_execute(exec_,
-                hpx::util::annotated_function(HPX_FORWARD(F, f), annotation_),
-                shape, HPX_FORWARD(Ts, ts)...);
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_), shape,
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename... Ts>
         decltype(auto) bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
         {
             return parallel::execution::bulk_sync_execute(exec_,
-                hpx::util::annotated_function(HPX_FORWARD(F, f), annotation_),
-                shape, HPX_FORWARD(Ts, ts)...);
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_), shape,
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
@@ -133,9 +133,8 @@ namespace hpx { namespace execution { namespace experimental {
             F&& f, S const& shape, Future&& predecessor, Ts&&... ts)
         {
             return parallel::execution::bulk_then_execute(exec_,
-                hpx::util::annotated_function(HPX_FORWARD(F, f), annotation_),
-                shape, HPX_FORWARD(Future, predecessor),
-                HPX_FORWARD(Ts, ts)...);
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_), shape,
+                HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
 
         // support with_annotation property
@@ -154,8 +153,7 @@ namespace hpx { namespace execution { namespace experimental {
         {
             auto exec_with_annotation = exec;
             exec_with_annotation.annotation_ =
-                hpx::util::detail::store_function_annotation(
-                    HPX_MOVE(annotation));
+                hpx::detail::store_function_annotation(HPX_MOVE(annotation));
             return exec_with_annotation;
         }
 

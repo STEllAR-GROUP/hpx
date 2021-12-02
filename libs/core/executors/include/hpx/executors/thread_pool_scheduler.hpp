@@ -120,8 +120,7 @@ namespace hpx { namespace execution { namespace experimental {
         {
             auto sched_with_annotation = scheduler;
             sched_with_annotation.annotation_ =
-                hpx::util::detail::store_function_annotation(
-                    HPX_MOVE(annotation));
+                hpx::detail::store_function_annotation(HPX_MOVE(annotation));
             return sched_with_annotation;
         }
 

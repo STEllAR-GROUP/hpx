@@ -205,7 +205,7 @@ namespace hpx { namespace execution {
         {
             auto exec_with_annotation = exec;
             exec_with_annotation.annotation_ =
-                util::detail::store_function_annotation(HPX_MOVE(annotation));
+                detail::store_function_annotation(HPX_MOVE(annotation));
             return exec_with_annotation;
         }
 
@@ -243,7 +243,7 @@ namespace hpx { namespace execution {
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         sync_execute(F&& f, Ts&&... ts) const
         {
-            hpx::util::annotate_function annotate(annotation_ ?
+            hpx::annotate_function annotate(annotation_ ?
                     annotation_ :
                     "parallel_policy_executor::sync_execute");
             return hpx::detail::sync_launch_policy_dispatch<Policy>::call(
@@ -275,7 +275,7 @@ namespace hpx { namespace execution {
                     Ts...>::type;
 
             auto&& func = hpx::util::one_shot(hpx::util::bind_back(
-                hpx::util::annotated_function(HPX_FORWARD(F, f), annotation_),
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
                 HPX_FORWARD(Ts, ts)...));
 
             typename hpx::traits::detail::shared_state_ptr<result_type>::type
@@ -321,8 +321,7 @@ namespace hpx { namespace execution {
         {
             return parallel::execution::detail::
                 hierarchical_bulk_then_execute_helper(*this, policy_,
-                    hpx::util::annotated_function(
-                        HPX_FORWARD(F, f), annotation_),
+                    hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
                     shape, HPX_FORWARD(Future, predecessor),
                     HPX_FORWARD(Ts, ts)...);
         }

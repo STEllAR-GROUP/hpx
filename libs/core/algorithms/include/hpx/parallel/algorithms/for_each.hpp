@@ -444,7 +444,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using pred = hpx::traits::is_value_proxy<std::decay_t<
                     typename std::iterator_traits<Iter>::reference>>;
 
-                hpx::util::annotate_function annotate(f_);
+                hpx::annotate_function annotate(f_);
                 execute(part_begin, part_size, pred());
             }
         };

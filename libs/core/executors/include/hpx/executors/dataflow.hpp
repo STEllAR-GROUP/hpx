@@ -296,7 +296,7 @@ namespace hpx { namespace lcos { namespace detail {
 #endif
             if (!recurse_asynchronously)
             {
-                hpx::util::annotate_function annotate(func_);
+                hpx::annotate_function annotate(func_);
                 execute(is_void{}, HPX_FORWARD(Futures_, futures));
             }
             else

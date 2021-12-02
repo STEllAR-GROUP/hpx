@@ -77,7 +77,7 @@ namespace hpx { namespace lcos { namespace detail {
     {
         using is_void = std::is_void<util::invoke_result_t<Func, Future>>;
 
-        hpx::util::annotate_function annotate(func);
+        hpx::annotate_function annotate(func);
         invoke_continuation_nounwrap(
             func, HPX_FORWARD(Future, future), cont, is_void());
     }

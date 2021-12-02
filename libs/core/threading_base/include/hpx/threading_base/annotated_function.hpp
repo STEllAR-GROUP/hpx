@@ -29,7 +29,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx {
     namespace detail {
         HPX_CORE_EXPORT char const* store_function_annotation(std::string name);
     }    // namespace detail
@@ -237,7 +237,7 @@ namespace hpx { namespace util {
         // Store string in a set to ensure it lives for the entire duration of
         // the task.
         char const* name_c_str =
-            detail::store_function_annotation(HPX_MOVE(name));
+            hpx::detail::store_function_annotation(HPX_MOVE(name));
         return result_type(HPX_FORWARD(F, f), name_c_str);
     }
 
@@ -276,30 +276,52 @@ namespace hpx { namespace util {
         return HPX_FORWARD(F, f);
     }
 #endif
-}}    // namespace hpx::util
+}    // namespace hpx
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
-    struct get_function_address<util::detail::annotated_function<F>>
+    struct get_function_address<hpx::detail::annotated_function<F>>
     {
         static constexpr std::size_t call(
-            util::detail::annotated_function<F> const& f) noexcept
+            hpx::detail::annotated_function<F> const& f) noexcept
         {
             return f.get_function_address();
         }
     };
 
     template <typename F>
-    struct get_function_annotation<util::detail::annotated_function<F>>
+    struct get_function_annotation<hpx::detail::annotated_function<F>>
     {
         static constexpr char const* call(
-            util::detail::annotated_function<F> const& f) noexcept
+            hpx::detail::annotated_function<F> const& f) noexcept
         {
             return f.get_function_annotation();
         }
     };
 #endif
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
+
+namespace hpx::util {
+    template <typename F>
+    HPX_DEPRECATED_V(1, 8, "Please use hpx::annotated_function instead.")
+    constexpr decltype(auto)
+        annotated_function(F&& f, char const* name = nullptr) noexcept
+    {
+        return hpx::annotated_function(HPX_FORWARD(F, f), name);
+    }
+
+    template <typename F>
+    HPX_DEPRECATED_V(1, 8, "Please use hpx::annotated_function instead.")
+    constexpr decltype(auto)
+        annotated_function(F&& f, std::string const& name) noexcept
+    {
+        return hpx::annotated_function(HPX_FORWARD(F, f), name);
+    }
+
+    using annotate_function HPX_DEPRECATED_V(1, 8,
+        "Please use hpx::annotate_function instead.") = hpx::annotate_function;
+
+}    // namespace hpx::util

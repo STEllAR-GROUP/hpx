@@ -63,7 +63,7 @@ namespace hpx { namespace components {
             hpx::parallel::execution::async_execute(
                 hpx::get_lva<executor_component>::call(lva)->exec_,
                 hpx::util::deferred_call(
-                    hpx::util::annotated_function(
+                    hpx::annotated_function(
                         &executor_component::execute, desc.get_description()),
                     HPX_MOVE(data.func)));
         }
