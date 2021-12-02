@@ -16,6 +16,8 @@
 #include <hpx/functional/traits/is_bind_expression.hpp>
 #include <hpx/functional/traits/is_placeholder.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/threading_base/scoped_annotation.hpp>
 
 namespace hpx {
     using hpx::traits::is_bind_expression;
