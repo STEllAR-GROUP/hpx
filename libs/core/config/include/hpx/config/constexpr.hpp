@@ -12,19 +12,6 @@
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/defines.hpp>
 
-/// This macro evaluates to ``constexpr`` if the compiler supports it.
-///
-/// This macro is deprecated. It is always replaced with the ``constexpr``
-/// keyword. Prefer using ``constexpr`` directly instead.
-#define HPX_CONSTEXPR constexpr
-
-/// This macro evaluates to ``constexpr`` if the compiler supports it, ``const``
-/// otherwise.
-///
-/// This macro is deprecated. It is always replaced with the ``constexpr``
-/// keyword. Prefer using ``constexpr`` directly instead.
-#define HPX_CONSTEXPR_OR_CONST constexpr
-
 /// This macro evaluates to ``inline constexpr`` for host code and
 // ``device static const`` for device code
 #if defined(HPX_COMPUTE_DEVICE_CODE)
