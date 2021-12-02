@@ -344,45 +344,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         t.restart();
 
-//         // Kick off the computation asynchronously. On each locality,
-//         // num_workers test_actions are created.
-//         std::vector<hpx::future<void> > tests;
-//         for (hpx::naming::id_type const& id : locality_ids)
-//         {
-//             using hpx::async;
-//             for (std::size_t i = 0; i < num_workers; ++i)
-//                 tests.push_back(async<test_action>(id, num_ye_points,
-//                     num_temp_points, num_rho_points, seed));
-//         }
-//
-//         using hpx::util::placeholders::_1;
-//         hpx::lcos::wait(tests,
-//             hpx::util::bind(wait_for_task, _1, std::ref(t)));
-//
-//         std::cout << "Completed tests: " << t.elapsed() << " [s]" << std::endl;
-//
-//         t.restart();
-//
-//         // Kick off the computation asynchronously. On each locality,
-//         // num_workers test_actions are created.
-//         std::vector<hpx::future<void> > bulk_one_tests;
-//         for (hpx::naming::id_type const& id : locality_ids)
-//         {
-//             using hpx::async;
-//             for (std::size_t i = 0; i < num_workers; ++i)
-//                 bulk_one_tests.push_back(async<test_one_bulk_action>(id,
-//                     num_ye_points, num_temp_points, num_rho_points, seed));
-//         }
-//
-//         using hpx::util::placeholders::_1;
-//         hpx::lcos::wait(bulk_one_tests,
-//             hpx::util::bind(wait_for_bulk_one_task, _1, std::ref(t)));
-//
-//         std::cout << "Completed bulk-one tests: " << t.elapsed() << " [s]"
-//             << std::endl;
-//
-//         t.restart();
-
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
         std::vector<hpx::future<void> > bulk_tests;

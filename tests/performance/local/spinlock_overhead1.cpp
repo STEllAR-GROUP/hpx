@@ -35,7 +35,6 @@ using hpx::naming::id_type;
 
 using hpx::future;
 using hpx::async;
-using hpx::lcos::wait_each;
 
 using hpx::chrono::high_resolution_timer;
 
@@ -219,7 +218,7 @@ int hpx_main(
                 for (std::uint64_t i = 0; i < count; ++i)
                     futures.push_back(async<null_action>(here, i));
 
-                wait_each(
+                hpx::wait_each(
                     hpx::unwrapping([](double r) { global_scratch += r; }),
                     futures);
 

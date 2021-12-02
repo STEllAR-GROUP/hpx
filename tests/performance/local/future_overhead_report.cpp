@@ -26,7 +26,6 @@ using hpx::program_options::variables_map;
 using hpx::apply;
 using hpx::async;
 using hpx::future;
-using hpx::lcos::wait_each;
 
 using hpx::chrono::high_resolution_timer;
 

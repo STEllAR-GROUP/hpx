@@ -345,7 +345,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 policy.executor(), op, shapes);
 
                             // Required synchronization per level
-                            hpx::wait_all(workitems);
+                            hpx::wait_all_nothrow(workitems);
 
                             // collect exceptions
                             util::detail::handle_local_exceptions<

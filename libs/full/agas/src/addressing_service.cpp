@@ -15,7 +15,6 @@
 #include <hpx/agas_base/detail/bootstrap_locality_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/execution_base/register_locks.hpp>

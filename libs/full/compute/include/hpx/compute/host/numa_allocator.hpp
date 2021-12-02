@@ -130,7 +130,7 @@ namespace hpx { namespace parallel { namespace util {
 #endif
                     }));
             }
-            hpx::wait_all(first_touch);
+            hpx::wait_all_nothrow(first_touch);
 
             for (auto&& f : first_touch)
             {

@@ -87,7 +87,7 @@ namespace hpx {
                         .then(get_ptr_helper{l, partitions_}));
             }
         }
-        wait_all(ptrs);
+        hpx::wait_all(ptrs);
 
         partition_size_ = get_partition_size();
         this->base_type::reset(HPX_MOVE(id));
@@ -436,7 +436,7 @@ namespace hpx {
             objs.push_back(
                 hpx::components::copy<component_type>(it->partition_));
         }
-        wait_all(objs);
+        hpx::wait_all(objs);
 
         std::uint32_t this_locality = get_locality_id();
         std::vector<future<void>> ptrs;

@@ -7,7 +7,7 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(async_combinators_headers
-    hpx/async_combinators/future_wait.hpp
+    hpx/async_combinators/detail/throw_if_exceptional.hpp
     hpx/async_combinators/split_future.hpp
     hpx/async_combinators/wait_all.hpp
     hpx/async_combinators/wait_any.hpp
@@ -40,6 +40,7 @@ add_hpx_module(
   GLOBAL_HEADER_GEN ON
   HEADERS ${async_combinators_headers}
   COMPAT_HEADERS ${async_combinators_compat_headers}
+  EXCLUDE_FROM_GLOBAL_HEADER "hpx/async_combinators/future_wait.hpp"
   MODULE_DEPENDENCIES hpx_async_base hpx_config hpx_errors hpx_futures
                       hpx_memory hpx_pack_traversal
   CMAKE_SUBDIRS examples tests

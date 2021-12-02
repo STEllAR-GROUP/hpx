@@ -589,7 +589,7 @@ void test_wait_for_either_of_five_futures_5()
 //         }
 //         hpx::thread t(std::move(tasks[i]));
 //
-//         hpx::lcos::wait_any(futures, futures);
+//         hpx::wait_any(futures, futures);
 //
 //         hpx::future<int>* const future =
 //               boost::wait_for_any(futures, futures+count);

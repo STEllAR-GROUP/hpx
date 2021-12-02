@@ -467,7 +467,7 @@ namespace hpx { namespace compute { namespace host {
                     debug::dec<2>(domain), " ", nodesets[i]);
                 tasks.push_back(HPX_MOVE(f1));
             }
-            wait_all(tasks);
+            hpx::wait_all(tasks);
             nba_deb.debug(debug::str<>("First-Touch"), "Done tasks");
         }
 
