@@ -249,8 +249,10 @@ namespace hpx { namespace ranges {
     {
     private:
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename T,
+        template <typename ExPolicy, typename Rng,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
@@ -279,8 +281,10 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename Iter, typename Sent, typename T,
+        template <typename ExPolicy, typename Iter, typename Sent,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<Iter,
+                Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
@@ -303,8 +307,10 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename Rng, typename T,
+        template <typename Rng,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::traits::is_range<Rng>::value
@@ -331,8 +337,10 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename Iter, typename Sent, typename T,
+        template <typename Iter, typename Sent,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<Iter,
+                Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>

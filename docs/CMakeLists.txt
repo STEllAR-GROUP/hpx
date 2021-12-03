@@ -30,7 +30,6 @@ set(doxygen_definition_list
     "extern="
     "HPX_FORCEINLINE="
     "HPX_CONCEPT_REQUIRES_(...)="
-    "HPX_STATIC_CONSTEXPR=static constexpr"
     "HPX_HOST_DEVICE="
 )
 

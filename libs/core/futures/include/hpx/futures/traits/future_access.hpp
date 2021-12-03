@@ -119,6 +119,9 @@ namespace hpx { namespace traits {
     {
     };
 
+    template <typename R>
+    inline constexpr bool is_shared_state_v = is_shared_state<R>::value;
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename T, typename Enable = void>

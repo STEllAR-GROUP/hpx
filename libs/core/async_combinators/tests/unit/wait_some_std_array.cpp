@@ -25,14 +25,14 @@ hpx::future<int> make_future()
     return task.get_future();
 }
 
-void test_wait_any()
+void test_wait_some()
 {
     {
         std::array<hpx::future<int>, 2> future_array;
         future_array[0] = make_future();
         future_array[1] = make_future();
 
-        hpx::wait_any_nothrow(future_array);
+        hpx::wait_some_nothrow(1, future_array);
 
         int count = 0;
         for (auto& f : future_array)
@@ -53,7 +53,7 @@ void test_wait_any()
         bool caught_exception = false;
         try
         {
-            hpx::wait_any_nothrow(future_array);
+            hpx::wait_some_nothrow(1, future_array);
 
             int count = 0;
             for (auto& f : future_array)
@@ -84,7 +84,7 @@ void test_wait_any()
         bool caught_exception = false;
         try
         {
-            hpx::wait_any(future_array);
+            hpx::wait_some(1, future_array);
             HPX_TEST(false);
         }
         catch (std::runtime_error const&)
@@ -99,14 +99,14 @@ void test_wait_any()
     }
 }
 
-void test_wait_any_n()
+void test_wait_some_n()
 {
     {
         std::array<hpx::future<int>, 2> future_array;
         future_array[0] = make_future();
         future_array[1] = make_future();
 
-        hpx::wait_any_n_nothrow(future_array.begin(), 2);
+        hpx::wait_some_n_nothrow(1, future_array.begin(), 2);
 
         int count = 0;
         for (auto& f : future_array)
@@ -127,7 +127,7 @@ void test_wait_any_n()
         bool caught_exception = false;
         try
         {
-            hpx::wait_any_n_nothrow(future_array.begin(), 2);
+            hpx::wait_some_n_nothrow(1, future_array.begin(), 2);
 
             int count = 0;
             for (auto& f : future_array)
@@ -158,7 +158,7 @@ void test_wait_any_n()
         bool caught_exception = false;
         try
         {
-            hpx::wait_any_n(future_array.begin(), 2);
+            hpx::wait_some_n(1, future_array.begin(), 2);
             HPX_TEST(false);
         }
         catch (std::runtime_error const&)
@@ -175,8 +175,8 @@ void test_wait_any_n()
 
 int hpx_main()
 {
-    test_wait_any();
-    test_wait_any_n();
+    test_wait_some();
+    test_wait_some_n();
     return hpx::local::finalize();
 }
 

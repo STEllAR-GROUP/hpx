@@ -420,7 +420,7 @@ namespace hpx {
                 }
             }
 
-            wait_all(ptrs);
+            hpx::wait_all(ptrs);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -475,7 +475,7 @@ namespace hpx {
                 objs.push_back(hpx::components::copy<component_type>(
                     it->partition_.get()));
             }
-            wait_all(objs);
+            hpx::wait_all(objs);
 
             std::uint32_t this_locality = get_locality_id();
             std::vector<future<void>> ptrs;
@@ -496,7 +496,7 @@ namespace hpx {
                 }
             }
 
-            wait_all(ptrs);
+            hpx::wait_all(ptrs);
 
             std::swap(partitions_, partitions);
         }

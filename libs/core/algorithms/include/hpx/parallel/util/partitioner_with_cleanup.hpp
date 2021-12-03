@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { namespace util {
                 Cleanup&& cleanup)
             {
                 // wait for all tasks to finish
-                hpx::wait_all(workitems);
+                hpx::wait_all_nothrow(workitems);
 
                 // always rethrow if 'errors' is not empty or workitems has
                 // exceptional future

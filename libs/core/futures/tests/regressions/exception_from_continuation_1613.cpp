@@ -61,7 +61,7 @@ void test_exception_from_continuation2()
 
     // make futures ready in backwards sequence
     hpx::apply([&p]() { p.set_value(); });
-    hpx::wait_all(results);
+    hpx::wait_all_nothrow(results);
 
     HPX_TEST_EQ(recursion_level.load(), NUM_FUTURES);
     HPX_TEST_EQ(exceptions_thrown.load(), std::size_t(1));

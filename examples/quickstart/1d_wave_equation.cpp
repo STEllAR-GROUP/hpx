@@ -47,7 +47,7 @@ using hpx::naming::invalid_id;
 
 using hpx::async;
 using hpx::future;
-using hpx::lcos::wait;
+
 
 using hpx::chrono::high_resolution_timer;
 
@@ -234,11 +234,11 @@ int hpx_main(variables_map& vm)
         std::ofstream outfile;
         outfile.open("output.dat");
 
-        auto f = [&](std::size_t i, double n) {
+        auto f = [&](std::size_t i, hpx::future<double>&& f) {
             double x_here = i * dx;
-            hpx::util::format_to(outfile, "{1} {2}\n", x_here, n) << flush;
+            hpx::util::format_to(outfile, "{1} {2}\n", x_here, f.get()) << flush;
         };
-        wait(futures, f);
+        hpx::wait_each(f, futures);
 
         outfile.close();
 

@@ -112,7 +112,7 @@ namespace hpx { namespace util {
         }
 
         // wait for all counters to be started
-        wait_all(started);
+        hpx::wait_all(started);
 
         for (future<bool>& f : started)
         {
@@ -154,7 +154,7 @@ namespace hpx { namespace util {
         }
 
         // wait for all counters to be started
-        wait_all(stopped);
+        hpx::wait_all(stopped);
 
         ids_.clear();    // give up control over all performance counters
 
@@ -198,7 +198,7 @@ namespace hpx { namespace util {
         }
 
         // wait for all counters to be started
-        wait_all(reset);
+        hpx::wait_all(reset);
 
         for (future<void>& f : reset)
         {

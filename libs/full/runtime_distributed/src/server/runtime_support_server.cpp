@@ -478,7 +478,7 @@ namespace hpx { namespace components { namespace server {
         }
 
         // wait for all localities to be stopped
-        wait_all(lazy_actions);
+        hpx::wait_all(lazy_actions);
 
         LRT_(info).format("runtime_support::shutdown_all: all localities have "
                           "been shut down");
@@ -515,7 +515,7 @@ namespace hpx { namespace components { namespace server {
             }
 
             // wait for all localities to be stopped
-            wait_all(lazy_actions);
+            hpx::wait_all(lazy_actions);
         }
 
         // now make sure this local locality gets terminated as well.
@@ -911,7 +911,7 @@ namespace hpx { namespace components { namespace server {
                 act, id, HPX_MOVE(ipt), agas::get_locality(), rtd->endpoints());
         }
 
-        wait_all(callbacks);
+        hpx::wait_all(callbacks);
 #endif
 #else
         HPX_ASSERT(false);

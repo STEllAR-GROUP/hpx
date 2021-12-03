@@ -32,7 +32,6 @@ using hpx::util::report_errors;
 
 using hpx::actions::action;
 
-using hpx::lcos::wait_each;
 using hpx::async;
 using hpx::future;
 
@@ -115,7 +114,7 @@ int hpx_main()
         ///////////////////////////////////////////////////////////////////////
         // Async wait, single future, void return.
         {
-            wait_each(cb, async<null_action>(here_));
+            hpx::wait_each(cb, async<null_action>(here_));
 
             HPX_TEST_EQ(1U, cb.count());
             HPX_TEST_EQ(1U, void_counter.load());
@@ -127,7 +126,7 @@ int hpx_main()
         ///////////////////////////////////////////////////////////////////////
         // Async wait, single future, non-void return.
         {
-            wait_each(cb, async<null_result_action>(here_));
+            hpx::wait_each(cb, async<null_result_action>(here_));
 
             HPX_TEST_EQ(1U, cb.count());
             HPX_TEST_EQ(1U, result_counter.load());
@@ -145,7 +144,7 @@ int hpx_main()
             for (std::size_t i = 0; i < 64; ++i)
                 futures.push_back(async<null_action>(here_));
 
-            wait_each(cb, futures);
+            hpx::wait_each(cb, futures);
 
             HPX_TEST_EQ(64U, cb.count());
             HPX_TEST_EQ(64U, void_counter.load());
@@ -163,7 +162,7 @@ int hpx_main()
             for (std::size_t i = 0; i < 64; ++i)
                 futures.push_back(async<null_result_action>(here_));
 
-            wait_each(cb, futures);
+            hpx::wait_each(cb, futures);
 
             HPX_TEST_EQ(64U, cb.count());
             HPX_TEST_EQ(64U, result_counter.load());
@@ -175,7 +174,7 @@ int hpx_main()
         ///////////////////////////////////////////////////////////////////////
         // Async wait, single future, deferred.
         {
-            wait_each(cb, async(hpx::launch::deferred, &null_thread));
+            hpx::wait_each(cb, async(hpx::launch::deferred, &null_thread));
 
             HPX_TEST_EQ(1U, cb.count());
             HPX_TEST_EQ(1U, void_counter.load());
@@ -201,7 +200,7 @@ int hpx_main()
                     futures.push_back(async(hpx::launch::deferred, &null_thread));
                 }
             }
-            wait_each(cb, futures);
+            hpx::wait_each(cb, futures);
 
             HPX_TEST_EQ(64U, cb.count());
             HPX_TEST_EQ(64U, void_counter.load());

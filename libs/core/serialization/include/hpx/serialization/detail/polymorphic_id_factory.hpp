@@ -38,7 +38,7 @@ namespace hpx { namespace serialization { namespace detail {
         typedef std::map<std::string, std::uint32_t> typename_to_id_t;
         typedef std::vector<ctor_t> cache_t;
 
-        HPX_STATIC_CONSTEXPR std::uint32_t invalid_id = ~0u;
+        static constexpr std::uint32_t invalid_id = ~0u;
 
         HPX_CORE_EXPORT void register_factory_function(
             const std::string& type_name, ctor_t ctor);

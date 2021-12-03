@@ -56,7 +56,7 @@ int hpx_main()
             fut1.push_back(hpx::async<out_act>(locs.at(i), vec));
             hpx::cout << "Scheduled out to " << i + 1 << std::endl;
         }
-        wait_all(fut1);
+        hpx::wait_all(fut1);
         hpx::cout << j + 1 << ". round finished " << std::endl;
     }
     hpx::cout << "program finished!!!" << std::endl;

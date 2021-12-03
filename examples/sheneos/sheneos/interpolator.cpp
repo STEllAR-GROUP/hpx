@@ -386,7 +386,7 @@ namespace sheneos
             }
 
             // wait for all asynchronous operations to complete
-            wait_all(lazy_results);
+            hpx::wait_all(lazy_results);
 
             return overall_result;
         }
@@ -495,7 +495,7 @@ namespace sheneos
             }
 
             // wait for all asynchronous operations to complete
-            wait_all(lazy_results);
+            hpx::wait_all(lazy_results);
 
             return overall_results;
         }

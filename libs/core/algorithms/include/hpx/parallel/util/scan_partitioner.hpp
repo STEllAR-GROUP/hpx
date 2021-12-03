@@ -148,7 +148,7 @@ namespace hpx { namespace parallel { namespace util {
                     }
 
                     // Wait for all f1 tasks to finish
-                    hpx::wait_all(workitems);
+                    hpx::wait_all_nothrow(workitems);
 
                     // perform f2 sequentially in one go
                     f2results.resize(workitems.size());
@@ -343,7 +343,7 @@ namespace hpx { namespace parallel { namespace util {
                 return R();
 #else
                 // wait for all tasks to finish
-                hpx::wait_all(workitems, finalitems);
+                hpx::wait_all_nothrow(workitems, finalitems);
 
                 // always rethrow if 'errors' is not empty or 'workitems' or
                 // 'finalitems' have an exceptional future
@@ -376,7 +376,7 @@ namespace hpx { namespace parallel { namespace util {
                 return R();
 #else
                 // wait for all tasks to finish
-                hpx::wait_all(finalitems);
+                hpx::wait_all_nothrow(finalitems);
 
                 // always rethrow if 'errors' is not empty or
                 // 'finalitems' have an exceptional future

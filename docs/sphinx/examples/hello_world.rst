@@ -116,14 +116,14 @@ wrapped in the action above:
 
 Now, before we discuss ``hello_world_foreman()``, let's talk about the
 :cpp:func:`hpx::wait_each()` function.
-The version of :cpp:func:`hpx::lcos::wait_each` invokes a callback function
+The version of :cpp:func:`hpx::wait_each` invokes a callback function
 provided by the user, supplying the callback function with the result of the
 future.
 
 In ``hello_world_foreman()``, an ``std::set<>`` called ``attendance`` keeps
 track of which OS-threads have printed out the hello world message. When the
 OS-thread prints out the statement, the future is marked as ready, and
-:cpp:func:`hpx::lcos::wait_each` in ``hello_world_foreman()``. If it is not
+:cpp:func:`hpx::wait_each` in ``hello_world_foreman()``. If it is not
 executing on the correct OS-thread, it returns a value of -1, which causes
 ``hello_world_foreman()`` to leave the OS-thread id in ``attendance``.
 
