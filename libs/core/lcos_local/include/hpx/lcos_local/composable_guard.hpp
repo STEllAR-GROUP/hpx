@@ -97,7 +97,7 @@ namespace hpx { namespace lcos { namespace local {
         struct debug_object
         {
 #ifdef HPX_DEBUG
-            HPX_STATIC_CONSTEXPR int debug_magic = 0x2cab;
+            static constexpr int debug_magic = 0x2cab;
 
             int magic;
 

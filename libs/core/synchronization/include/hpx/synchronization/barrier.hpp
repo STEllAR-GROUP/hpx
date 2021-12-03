@@ -246,8 +246,8 @@ namespace hpx { namespace lcos { namespace local {
     private:
         typedef lcos::local::spinlock mutex_type;
 
-        HPX_STATIC_CONSTEXPR std::size_t barrier_flag =
-            static_cast<std::size_t>(1) << (CHAR_BIT * sizeof(std::size_t) - 1);
+        static constexpr std::size_t barrier_flag = static_cast<std::size_t>(1)
+            << (CHAR_BIT * sizeof(std::size_t) - 1);
 
     public:
         barrier(std::size_t number_of_threads);

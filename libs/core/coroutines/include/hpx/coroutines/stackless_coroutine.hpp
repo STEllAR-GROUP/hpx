@@ -34,7 +34,7 @@ namespace hpx { namespace threads { namespace coroutines {
             ctx_exited      // context is finished.
         };
 
-        HPX_STATIC_CONSTEXPR std::ptrdiff_t default_stack_size = -1;
+        static constexpr std::ptrdiff_t default_stack_size = -1;
 
         bool running() const
         {
