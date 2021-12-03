@@ -728,9 +728,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op,
                 Proj1&& proj1, Proj2&& proj2)
             {
-                return sequential_find_end<ExPolicy>(first1, last1, first2,
-                    last2, HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
-                    HPX_FORWARD(Proj2, proj2));
+                return sequential_find_end<std::decay_t<ExPolicy>>(first1,
+                    last1, first2, last2, HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
             }
 
             template <typename ExPolicy, typename Iter1, typename Sent1,
@@ -853,9 +853,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 InIter2 s_first, InIter2 s_last, Pred&& op, Proj1&& proj1,
                 Proj2&& proj2)
             {
-                return sequential_find_first_of<ExPolicy>(first, last, s_first,
-                    s_last, HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
-                    HPX_FORWARD(Proj2, proj2));
+                return sequential_find_first_of<std::decay_t<ExPolicy>>(first,
+                    last, s_first, s_last, HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
             }
 
             template <typename ExPolicy, typename FwdIter2, typename Pred,
