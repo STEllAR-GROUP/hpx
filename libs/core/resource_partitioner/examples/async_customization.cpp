@@ -321,7 +321,7 @@ int test(const std::string& message, Executor& exec)
     auto fw1 = hpx::async(&dummy_task<decltype(testval2)>, testval2);
     auto fw2 = hpx::async(&dummy_task<decltype(testval3)>, testval3);
     //
-    auto fw = when_all(fw1, fw2).then(exec,
+    auto fw = hpx::when_all(fw1, fw2).then(exec,
         [testval2, testval3](
             future<hpx::tuple<future<int>, future<double>>>&& f) {
             std::cout << "Inside when_all : " << std::endl;
@@ -347,7 +347,7 @@ int test(const std::string& message, Executor& exec)
     auto fws2 = hpx::async(&dummy_task<decltype(testval5)>, testval5).share();
     //
     auto fws =
-        when_all(fws1, fws2)
+        hpx::when_all(fws1, fws2)
             .then(exec,
                 [testval4, testval5](future<hpx::tuple<future<std::uint64_t>,
                         shared_future<float>>>&& f) {

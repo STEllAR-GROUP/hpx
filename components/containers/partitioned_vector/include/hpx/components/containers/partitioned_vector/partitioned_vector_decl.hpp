@@ -1036,7 +1036,7 @@ namespace hpx {
                     std::vector<size_type>(pos_block_begin, pos.end())),
                 std::vector<T>(val_block_begin, val.end())));
 
-            return when_all(part_futures);
+            return hpx::when_all(part_futures);
         }
 
         void set_values(launch::sync_policy, std::vector<size_type> const& pos,
