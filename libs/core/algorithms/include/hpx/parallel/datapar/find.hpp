@@ -37,9 +37,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             int offset = 0;
             util::cancellation_token<> tok;
 
-            auto ret = util::loop_n<ExPolicy>(first, std::distance(first, last),
-                tok, [&offset, &val, &tok, &proj](auto const& curr) {
-                    auto msk = hpx::util::invoke(proj, *curr) == val;
+            auto ret = util::loop_n<std::decay_t<ExPolicy>>(first,
+                std::distance(first, last), tok,
+                [&offset, &val, &tok, &proj](auto const& curr) {
+                    auto msk = HPX_INVOKE(proj, *curr) == val;
                     offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
                     {
@@ -57,9 +58,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             FwdIter part_begin, std::size_t part_count, Token& tok,
             T const& val, Proj&& proj)
         {
-            util::loop_idx_n<ExPolicy>(base_idx, part_begin, part_count, tok,
+            util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, part_begin,
+                part_count, tok,
                 [&val, &proj, &tok](auto& v, std::size_t i) -> void {
-                    auto msk = hpx::util::invoke(proj, v) == val;
+                    auto msk = HPX_INVOKE(proj, v) == val;
                     int offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
                         tok.cancel(i + offset);
@@ -87,7 +89,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Token& tok, T const& val, Proj&& proj)
     {
         return datapar_find<ExPolicy>::call(base_idx, part_begin, part_count,
-            tok, val, std::forward<Proj>(proj));
+            tok, val, HPX_FORWARD(Proj, proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -102,10 +104,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             int offset = 0;
             util::cancellation_token<> tok;
 
-            auto ret = util::loop_n<ExPolicy>(first, std::distance(first, last),
-                tok, [&offset, &pred, &tok, &proj](auto const& curr) {
-                    auto msk =
-                        hpx::util::invoke(pred, hpx::util::invoke(proj, *curr));
+            auto ret = util::loop_n<std::decay_t<ExPolicy>>(first,
+                std::distance(first, last), tok,
+                [&offset, &pred, &tok, &proj](auto const& curr) {
+                    auto msk = HPX_INVOKE(pred, HPX_INVOKE(proj, *curr));
                     offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
                     {
@@ -124,8 +126,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count, tok,
                 [&op, &tok, &proj](auto const& curr) {
-                    auto msk =
-                        hpx::util::invoke(op, hpx::util::invoke(proj, *curr));
+                    auto msk = HPX_INVOKE(op, HPX_INVOKE(proj, *curr));
                     if (hpx::parallel::traits::any_of(msk))
                     {
                         tok.cancel();
@@ -138,9 +139,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             FwdIter part_begin, std::size_t part_count, Token& tok, F&& f,
             Proj&& proj)
         {
-            util::loop_idx_n<ExPolicy>(base_idx, part_begin, part_count, tok,
+            util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, part_begin,
+                part_count, tok,
                 [&f, &proj, &tok](auto& v, std::size_t i) -> void {
-                    auto msk = hpx::util::invoke(f, hpx::util::invoke(proj, v));
+                    auto msk = HPX_INVOKE(f, HPX_INVOKE(proj, v));
                     int offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
                         tok.cancel(i + offset);
@@ -168,7 +170,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         std::size_t part_count, Token& tok, F&& op, Proj&& proj)
     {
         return datapar_find_if<ExPolicy>::call(part_begin, part_count, tok,
-            std::forward<F>(op), std::forward<Proj>(proj));
+            HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
     template <typename ExPolicy, typename FwdIter, typename Token, typename F,
@@ -181,7 +183,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Proj&& proj)
     {
         return datapar_find_if<ExPolicy>::call(base_idx, part_begin, part_count,
-            tok, std::forward<F>(op), std::forward<Proj>(proj));
+            tok, HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -198,8 +200,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
             auto ret = util::loop_n<ExPolicy>(first, std::distance(first, last),
                 tok, [&offset, &pred, &tok, &proj](auto const& curr) {
-                    auto msk = !hpx::util::invoke(
-                        pred, hpx::util::invoke(proj, *curr));
+                    auto msk = !HPX_INVOKE(pred, HPX_INVOKE(proj, *curr));
                     offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
                     {
@@ -218,8 +219,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count, tok,
                 [&op, &tok, &proj](auto const& curr) {
-                    auto msk =
-                        !hpx::util::invoke(op, hpx::util::invoke(proj, *curr));
+                    auto msk = !HPX_INVOKE(op, HPX_INVOKE(proj, *curr));
                     if (hpx::parallel::traits::any_of(msk))
                     {
                         tok.cancel();
@@ -232,10 +232,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             FwdIter part_begin, std::size_t part_count, Token& tok, F&& f,
             Proj&& proj)
         {
-            util::loop_idx_n<ExPolicy>(base_idx, part_begin, part_count, tok,
+            util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, part_begin,
+                part_count, tok,
                 [&f, &proj, &tok](auto& v, std::size_t i) -> void {
-                    auto msk =
-                        !hpx::util::invoke(f, hpx::util::invoke(proj, v));
+                    auto msk = !HPX_INVOKE(f, HPX_INVOKE(proj, v));
                     int offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
                         tok.cancel(i + offset);
@@ -263,7 +263,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         std::size_t part_count, Token& tok, F&& op, Proj&& proj)
     {
         return datapar_find_if_not<ExPolicy>::call(part_begin, part_count, tok,
-            std::forward<F>(op), std::forward<Proj>(proj));
+            HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
     template <typename ExPolicy, typename FwdIter, typename Token, typename F,
@@ -276,7 +276,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Proj&& proj)
     {
         return datapar_find_if_not<ExPolicy>::call(base_idx, part_begin,
-            part_count, tok, std::forward<F>(op), std::forward<Proj>(proj));
+            part_count, tok, HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -297,8 +297,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 tok(-1);
 
             call(first1, first2, 0, count - diff + 1, diff, tok,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
 
             difference_type find_end_res = tok.get_data();
 
@@ -344,62 +344,52 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
         typename Sent2, typename Pred, typename Proj1, typename Proj2,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
-        )>
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter1 tag_invoke(
         sequential_find_end_t<ExPolicy>, Iter1 first1, Sent1 last1,
         Iter2 first2, Sent2 last2, Pred&& op, Proj1&& proj1, Proj2&& proj2)
     {
-        if constexpr (
-                hpx::parallel::util::detail::iterator_datapar_compatible_v<Iter1> &&
-                hpx::parallel::util::detail::iterator_datapar_compatible_v<Iter2>)
+        if constexpr (hpx::parallel::util::detail::iterator_datapar_compatible<
+                          Iter1>::value &&
+            hpx::parallel::util::detail::iterator_datapar_compatible<
+                Iter2>::value)
         {
-            return datapar_find_end_t<ExPolicy>::call(first1, last1, first2, last2,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+            return datapar_find_end_t<ExPolicy>::call(first1, last1, first2,
+                last2, HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
         else
         {
             return sequential_find_end<typename ExPolicy::base_policy_type>(
-                first1, last1, first2, last2, std::forward<Pred>(op),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                first1, last1, first2, last2, HPX_FORWARD(Pred, op),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
     }
 
     template <typename ExPolicy, typename Iter1, typename Iter2, typename Token,
         typename Pred, typename Proj1, typename Proj2,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
-            (hpx::parallel::util::detail::iterator_datapar_compatible<
-                 Iter1>::value &&
-                hpx::parallel::util::detail::iterator_datapar_compatible<
-                    Iter2>::value))>
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_find_end_t<ExPolicy>, Iter1 it, Iter2 first2,
         std::size_t base_idx, std::size_t part_size, std::size_t diff,
         Token& tok, Pred&& op, Proj1&& proj1, Proj2&& proj2)
     {
-        return datapar_find_end_t<ExPolicy>::call(it, first2, base_idx,
-            part_size, diff, tok, std::forward<Pred>(op),
-            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
-    }
-
-    template <typename ExPolicy, typename Iter1, typename Iter2, typename Token,
-        typename Pred, typename Proj1, typename Proj2,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
-            !(hpx::parallel::util::detail::iterator_datapar_compatible<
-                  Iter1>::value &&
-                hpx::parallel::util::detail::iterator_datapar_compatible<
-                    Iter2>::value))>
-    HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
-        sequential_find_end_t<ExPolicy>, Iter1 it, Iter2 first2,
-        std::size_t base_idx, std::size_t part_size, std::size_t diff,
-        Token& tok, Pred&& op, Proj1&& proj1, Proj2&& proj2)
-    {
-        return sequential_find_end<typename ExPolicy::base_policy_type>(it,
-            first2, base_idx, part_size, diff, tok, std::forward<Pred>(op),
-            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        if constexpr (hpx::parallel::util::detail::iterator_datapar_compatible<
+                          Iter1>::value &&
+            hpx::parallel::util::detail::iterator_datapar_compatible<
+                Iter2>::value)
+        {
+            return datapar_find_end_t<ExPolicy>::call(it, first2, base_idx,
+                part_size, diff, tok, HPX_FORWARD(Pred, op),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+        }
+        else
+        {
+            return sequential_find_end<typename ExPolicy::base_policy_type>(it,
+                first2, base_idx, part_size, diff, tok, HPX_FORWARD(Pred, op),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -417,8 +407,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             std::size_t count = std::distance(first, last);
             util::cancellation_token<std::size_t> tok(count);
 
-            call(first, s_first, s_last, 0, count, tok, std::forward<Pred>(op),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+            call(first, s_first, s_last, 0, count, tok, HPX_FORWARD(Pred, op),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
 
             std::size_t find_first_of_res = tok.get_data();
 
@@ -447,8 +437,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                     util::loop_n<hpx::execution::simd_policy>(s_first,
                         std::distance(s_first, s_last), local_tok,
                         [&local_tok, &proj2, &op, &val](auto curr) {
-                            auto msk = hpx::util::invoke(
-                                op, val, hpx::util::invoke(proj2, *curr));
+                            auto msk =
+                                HPX_INVOKE(op, val, HPX_INVOKE(proj2, *curr));
                             if (hpx::parallel::traits::any_of(msk))
                             {
                                 local_tok.cancel();
@@ -465,73 +455,55 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename Pred, typename Proj1, typename Proj2,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
-            (hpx::parallel::util::detail::iterator_datapar_compatible<
-                 InIter1>::value &&
-                hpx::parallel::util::detail::iterator_datapar_compatible<
-                    InIter2>::value))>
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
     HPX_HOST_DEVICE HPX_FORCEINLINE InIter1 tag_invoke(
         sequential_find_first_of_t<ExPolicy>, InIter1 first, InIter1 last,
         InIter2 s_first, InIter2 s_last, Pred&& op, Proj1&& proj1,
         Proj2&& proj2)
     {
-        return datapar_find_first_of<ExPolicy>::call(first, last, s_first,
-            s_last, std::forward<Pred>(op), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
-    }
-
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename Pred, typename Proj1, typename Proj2,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
-            !(hpx::parallel::util::detail::iterator_datapar_compatible<
-                  InIter1>::value &&
-                hpx::parallel::util::detail::iterator_datapar_compatible<
-                    InIter2>::value))>
-    HPX_HOST_DEVICE HPX_FORCEINLINE InIter1 tag_invoke(
-        sequential_find_first_of_t<ExPolicy>, InIter1 first, InIter1 last,
-        InIter2 s_first, InIter2 s_last, Pred&& op, Proj1&& proj1,
-        Proj2&& proj2)
-    {
-        return sequential_find_first_of<typename ExPolicy::base_policy_type>(
-            first, last, s_first, s_last, std::forward<Pred>(op),
-            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        if constexpr ((hpx::parallel::util::detail::iterator_datapar_compatible<
+                           InIter1>::value &&
+                          hpx::parallel::util::detail::
+                              iterator_datapar_compatible<InIter2>::value))
+        {
+            return datapar_find_first_of<std::decay_t<ExPolicy>>::call(first,
+                last, s_first, s_last, HPX_FORWARD(Pred, op),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+        }
+        else
+        {
+            return sequential_find_first_of<
+                typename ExPolicy::base_policy_type>(first, last, s_first,
+                s_last, HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
+        }
     }
 
     template <typename ExPolicy, typename FwdIter, typename FwdIter2,
         typename Token, typename Pred, typename Proj1, typename Proj2,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
-            (hpx::parallel::util::detail::iterator_datapar_compatible<
-                 FwdIter>::value &&
-                hpx::parallel::util::detail::iterator_datapar_compatible<
-                    FwdIter2>::value))>
+            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_find_first_of_t<ExPolicy>, FwdIter it, FwdIter2 s_first,
         FwdIter2 s_last, std::size_t base_idx, std::size_t part_size,
         Token& tok, Pred&& op, Proj1&& proj1, Proj2&& proj2)
     {
-        return datapar_find_first_of<ExPolicy>::call(it, s_first, s_last,
-            base_idx, part_size, tok, std::forward<Pred>(op),
-            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
-    }
-
-    template <typename ExPolicy, typename FwdIter, typename FwdIter2,
-        typename Token, typename Pred, typename Proj1, typename Proj2,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
-            !(hpx::parallel::util::detail::iterator_datapar_compatible<
-                  FwdIter>::value &&
-                hpx::parallel::util::detail::iterator_datapar_compatible<
-                    FwdIter2>::value))>
-    HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
-        sequential_find_first_of_t<ExPolicy>, FwdIter it, FwdIter2 s_first,
-        FwdIter2 s_last, std::size_t base_idx, std::size_t part_size,
-        Token& tok, Pred&& op, Proj1&& proj1, Proj2&& proj2)
-    {
-        return sequential_find_first_of<typename ExPolicy::base_policy_type>(it,
-            s_first, s_last, base_idx, part_size, tok, std::forward<Pred>(op),
-            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        if constexpr (hpx::parallel::util::detail::iterator_datapar_compatible<
+                          FwdIter>::value &&
+            hpx::parallel::util::detail::iterator_datapar_compatible<
+                FwdIter2>::value)
+        {
+            return datapar_find_first_of<ExPolicy>::call(it, s_first, s_last,
+                base_idx, part_size, tok, HPX_FORWARD(Pred, op),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+        }
+        else
+        {
+            return sequential_find_first_of<
+                typename ExPolicy::base_policy_type>(it, s_first, s_last,
+                base_idx, part_size, tok, HPX_FORWARD(Pred, op),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+        }
     }
 }}}}    // namespace hpx::parallel::v1::detail
 #endif
