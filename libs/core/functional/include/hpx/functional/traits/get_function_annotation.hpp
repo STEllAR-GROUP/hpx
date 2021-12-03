@@ -19,7 +19,7 @@ namespace hpx { namespace traits {
     {
         static constexpr char const* call(F const& /*f*/) noexcept
         {
-            return nullptr;
+            return typeid(F).name();
         }
     };
 
