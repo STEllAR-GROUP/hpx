@@ -53,22 +53,24 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    inline void adjust_chunk_size_and_max_chunks(std::size_t cores,
+    inline constexpr void adjust_chunk_size_and_max_chunks(std::size_t cores,
         std::size_t count, std::size_t& max_chunks, std::size_t& chunk_size,
-        bool has_variable_chunk_size = false)
+        bool has_variable_chunk_size = false) noexcept
     {
         if (max_chunks == 0)
         {
             if (chunk_size == 0)
             {
+                std::size_t cores_times_4 = 4 * cores;    // -V112
+
                 // try to calculate chunk-size and maximum number of chunks
-                chunk_size = (count + 4 * cores - 1) / (4 * cores);    // -V112
+                chunk_size = (count + cores_times_4 - 1) / cores_times_4;
 
                 // different versions of clang-format do different things
                 // clang-format off
 
                 // we should not consider more chunks than we have elements
-                max_chunks = (std::min) (4 * cores, count);    // -V112
+                max_chunks = (std::min) (cores_times_4, count);    // -V112
 
                 // we should not make chunks smaller than what's determined by
                 // the max chunk size
@@ -126,10 +128,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
 
-        FwdIter last = begin;
-        std::advance(last, count);
-
+        FwdIter last = parallel::v1::detail::next(begin, count);
         Stride stride = parallel::v1::detail::abs(s);
+
         auto test_function = [&](std::size_t test_chunk_size) -> std::size_t {
             if (test_chunk_size == 0)
                 return 0;
@@ -165,14 +166,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             // different versions of clang-format do different things
             // clang-format off
             chunk_size = (std::max) (std::size_t(stride),
-                ((chunk_size + stride) / stride - 1) * stride);
+                ((chunk_size + stride - 1) / stride) * stride);
             // clang-format on
         }
 
         using iterator = parallel::util::detail::chunk_size_iterator<FwdIter>;
 
         iterator shape_begin(begin, chunk_size, count);
-        iterator shape_end(last, chunk_size);
+        iterator shape_end(last, chunk_size, count, count);
 
         return hpx::util::make_iterator_range(shape_begin, shape_end);
     }
@@ -219,7 +220,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             if (stride != 1)
             {
                 chunk_size = (std::max) (std::size_t(stride),
-                    ((chunk_size + stride) / stride - 1) * stride);
+                    ((chunk_size + stride - 1) / stride) * stride);
             }
 
             // in last chunk, consider only remaining number of elements
@@ -290,7 +291,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 // different versions of clang-format do different things
                 // clang-format off
                 test_chunk_size = (std::max)(std::size_t(stride),
-                    ((test_chunk_size + stride) / stride - 1) * stride);
+                    ((test_chunk_size + stride - 1) / stride) * stride);
                 // clang-format on
             }
 
@@ -317,7 +318,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             // different versions of clang-format do different things
             // clang-format off
             chunk_size = (std::max) (std::size_t(stride),
-                ((chunk_size + stride) / stride - 1) * stride);
+                ((chunk_size + stride - 1) / stride) * stride);
             // clang-format on
         }
 
@@ -325,7 +326,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             parallel::util::detail::chunk_size_idx_iterator<FwdIter>;
 
         iterator shape_begin(begin, chunk_size, count, base_idx);
-        iterator shape_end(last, chunk_size);
+        iterator shape_end(last, chunk_size, count, count);
 
         return hpx::util::make_iterator_range(shape_begin, shape_end);
     }
@@ -372,7 +373,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             if (stride != 1)
             {
                 chunk_size = (std::max) (std::size_t(stride),
-                    ((chunk_size + stride) / stride - 1) * stride);
+                    ((chunk_size + stride - 1) / stride) * stride);
             }
 
             // in last chunk, consider only remaining number of elements

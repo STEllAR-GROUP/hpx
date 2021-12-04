@@ -39,23 +39,23 @@ namespace hpx { namespace concurrency { namespace detail {
 
             range() = default;
 
-            range(T first, T last)
+            range(T first, T last) noexcept
               : first(first)
               , last(last)
             {
             }
 
-            constexpr range increment_first()
+            constexpr range increment_first() noexcept
             {
                 return range{first + 1, last};
             }
 
-            constexpr range decrement_last()
+            constexpr range decrement_last() noexcept
             {
                 return range{first, last - 1};
             }
 
-            constexpr bool empty()
+            constexpr bool empty() noexcept
             {
                 return first >= last;
             }

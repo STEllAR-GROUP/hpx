@@ -11,11 +11,10 @@
 // This is really an incomplete test; should be fleshed out.
 
 #include <hpx/iterator_support/iterator_facade.hpp>
+#include <hpx/iterator_support/tests/iterator_tests.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/type_support/always_void.hpp>
-
-#include "iterator_tests.hpp"
 
 #include <type_traits>
 #include <utility>

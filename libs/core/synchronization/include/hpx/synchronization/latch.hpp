@@ -285,7 +285,6 @@ namespace hpx { namespace lcos { namespace local {
             HPX_UNUSED(old_count);
 
             std::scoped_lock l(mtx_.data_);
-            HPX_ASSERT(notified_);
             notified_ = false;
         }
 

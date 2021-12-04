@@ -271,27 +271,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
             F& f_;
             Proj& proj_;
 
-            template <typename T>
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-                !hpx::traits::is_value_proxy<T>::value>::type
-            call(T&& t)
-            {
-                HPX_INVOKE(f_, HPX_INVOKE(proj_, HPX_FORWARD(T, t)));
-            }
-
-            template <typename T>
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-                hpx::traits::is_value_proxy<T>::value>::type
-            call(T&& t)
-            {
-                auto tmp = HPX_INVOKE(proj_, HPX_FORWARD(T, t));
-                HPX_INVOKE(f_, tmp);
-            }
-
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(Iter curr)
             {
-                call(*curr);
+                using value_type = std::decay_t<
+                    typename std::iterator_traits<Iter>::reference>;
+                if constexpr (hpx::traits::is_value_proxy_v<value_type>)
+                {
+                    hpx::traits::proxy_value_t<value_type> tmp = *curr;
+                    HPX_INVOKE(f_, tmp);
+                }
+                else
+                {
+                    HPX_INVOKE(f_, *curr);
+                }
             }
         };
 
@@ -311,32 +304,26 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             F& f_;
 
-            template <typename T>
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-                !hpx::traits::is_value_proxy<T>::value>::type
-            call(T&& t)
-            {
-                HPX_INVOKE(f_, HPX_FORWARD(T, t));
-            }
-
-            template <typename T>
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
-                hpx::traits::is_value_proxy<T>::value>::type
-            call(T&& t)
-            {
-                auto tmp = HPX_FORWARD(T, t);
-                HPX_INVOKE(f_, tmp);
-            }
-
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(Iter curr)
             {
-                call(*curr);
+                using value_type = std::decay_t<
+                    typename std::iterator_traits<Iter>::reference>;
+                if constexpr (hpx::traits::is_value_proxy_v<value_type>)
+                {
+                    hpx::traits::proxy_value_t<value_type> tmp = *curr;
+                    HPX_INVOKE(f_, tmp);
+                }
+                else
+                {
+                    HPX_INVOKE(f_, *curr);
+                }
             }
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename F, typename Proj>
+        template <typename ExPolicy, typename F,
+            typename Proj = util::projection_identity>
         struct for_each_iteration
         {
             using execution_policy_type = std::decay_t<ExPolicy>;
@@ -345,14 +332,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             fun_type f_;
             proj_type proj_;
-
-            template <typename Iter>
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void execute(
-                Iter part_begin, std::size_t part_size)
-            {
-                util::loop_n<execution_policy_type>(part_begin, part_size,
-                    invoke_projected<fun_type, proj_type>{f_, proj_});
-            }
 
             template <typename F_, typename Proj_>
             HPX_HOST_DEVICE for_each_iteration(F_&& f, Proj_&& proj)
@@ -377,15 +356,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 #endif
-
             for_each_iteration& operator=(for_each_iteration const&) = default;
             for_each_iteration& operator=(for_each_iteration&&) = default;
 
             template <typename Iter>
-            HPX_HOST_DEVICE HPX_FORCEINLINE void operator()(Iter part_begin,
-                std::size_t part_size, std::size_t /*part_index*/)
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                Iter part_begin, std::size_t part_size, std::size_t)
             {
-                execute(part_begin, part_size);
+                util::loop_n<execution_policy_type>(part_begin, part_size,
+                    invoke_projected<fun_type, proj_type>{f_, proj_});
             }
         };
 
@@ -397,20 +376,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             fun_type f_;
 
-            template <typename Iter>
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void execute(
-                Iter part_begin, std::size_t part_size, std::true_type)
+            template <typename F_,
+                typename Enable = std::enable_if_t<
+                    !std::is_same_v<std::decay_t<F_>, for_each_iteration>>>
+            HPX_HOST_DEVICE explicit for_each_iteration(F_&& f)
+              : f_(HPX_FORWARD(F_, f))
             {
-                util::loop_n<execution_policy_type>(
-                    part_begin, part_size, invoke_projected<F>(f_));
-            }
-
-            template <typename Iter>
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void execute(
-                Iter part_begin, std::size_t part_size, std::false_type)
-            {
-                util::loop_n_ind<execution_policy_type>(
-                    part_begin, part_size, f_);
             }
 
             template <typename F_, typename Proj_>
@@ -433,19 +404,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 #endif
-
             for_each_iteration& operator=(for_each_iteration const&) = default;
             for_each_iteration& operator=(for_each_iteration&&) = default;
 
             template <typename Iter>
-            HPX_HOST_DEVICE HPX_FORCEINLINE void operator()(Iter part_begin,
-                std::size_t part_size, std::size_t /*part_index*/)
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                Iter part_begin, std::size_t part_size, std::size_t)
             {
-                using pred = hpx::traits::is_value_proxy<std::decay_t<
-                    typename std::iterator_traits<Iter>::reference>>;
-
-                hpx::scoped_annotation annotate(f_);
-                execute(part_begin, part_size, pred());
+                using value_type = std::decay_t<
+                    typename std::iterator_traits<Iter>::reference>;
+                if constexpr (hpx::traits::is_value_proxy_v<value_type>)
+                {
+                    util::loop_n<execution_policy_type>(
+                        part_begin, part_size, invoke_projected<F>(f_));
+                }
+                else
+                {
+                    util::loop_n_ind<execution_policy_type>(
+                        part_begin, part_size, f_);
+                }
             }
         };
 
@@ -453,7 +430,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Iter>
         struct for_each_n : public detail::algorithm<for_each_n<Iter>, Iter>
         {
-            for_each_n()
+            constexpr for_each_n() noexcept
               : for_each_n::algorithm("for_each_n")
             {
             }
@@ -508,59 +485,47 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Iter>
         struct for_each : public detail::algorithm<for_each<Iter>, Iter>
         {
-            for_each()
+            constexpr for_each() noexcept
               : for_each::algorithm("for_each")
             {
             }
 
             template <typename ExPolicy, typename InIterB, typename InIterE,
                 typename F, typename Proj>
-            static constexpr typename std::enable_if<
-                hpx::traits::is_random_access_iterator<InIterB>::value,
-                InIterB>::type
-            sequential(
-                ExPolicy&&, InIterB first, InIterE last, F&& f, Proj&& proj)
+            static constexpr InIterB sequential(ExPolicy&& policy,
+                InIterB first, InIterE last, F&& f, Proj&& proj)
             {
-                return util::loop_n<std::decay_t<ExPolicy>>(first,
-                    static_cast<std::size_t>(detail::distance(first, last)),
-                    invoke_projected<F, std::decay_t<Proj>>{f, proj});
-            }
-
-            template <typename ExPolicy, typename InIterB, typename InIterE,
-                typename F, typename Proj>
-            static constexpr typename std::enable_if<
-                !hpx::traits::is_random_access_iterator<InIterB>::value,
-                InIterB>::type
-            sequential(ExPolicy&& policy, InIterB first, InIterE last, F&& f,
-                Proj&& proj)
-            {
-                return util::loop(HPX_FORWARD(ExPolicy, policy), first, last,
-                    invoke_projected<F, std::decay_t<Proj>>{f, proj});
+                if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
+                {
+                    HPX_UNUSED(policy);
+                    return util::loop_n<std::decay_t<ExPolicy>>(first,
+                        static_cast<std::size_t>(detail::distance(first, last)),
+                        invoke_projected<F, std::decay_t<Proj>>{f, proj});
+                }
+                else
+                {
+                    return util::loop(HPX_FORWARD(ExPolicy, policy), first,
+                        last, invoke_projected<F, std::decay_t<Proj>>{f, proj});
+                }
             }
 
             template <typename ExPolicy, typename InIterB, typename InIterE,
                 typename F>
-            static constexpr typename std::enable_if<
-                hpx::traits::is_random_access_iterator<InIterB>::value,
-                InIterB>::type
-            sequential(ExPolicy&&, InIterB first, InIterE last, F&& f,
-                util::projection_identity)
+            static constexpr InIterB sequential(ExPolicy&& policy,
+                InIterB first, InIterE last, F&& f, util::projection_identity)
             {
-                return util::loop_n_ind<std::decay_t<ExPolicy>>(first,
-                    static_cast<std::size_t>(detail::distance(first, last)),
-                    HPX_FORWARD(F, f));
-            }
-
-            template <typename ExPolicy, typename InIterB, typename InIterE,
-                typename F>
-            static constexpr typename std::enable_if<
-                !hpx::traits::is_random_access_iterator<InIterB>::value,
-                InIterB>::type
-            sequential(ExPolicy&& policy, InIterB first, InIterE last, F&& f,
-                util::projection_identity)
-            {
-                return util::loop_ind(HPX_FORWARD(ExPolicy, policy), first,
-                    last, HPX_FORWARD(F, f));
+                if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
+                {
+                    HPX_UNUSED(policy);
+                    return util::loop_n_ind<std::decay_t<ExPolicy>>(first,
+                        static_cast<std::size_t>(detail::distance(first, last)),
+                        HPX_FORWARD(F, f));
+                }
+                else
+                {
+                    return util::loop_ind(HPX_FORWARD(ExPolicy, policy), first,
+                        last, HPX_FORWARD(F, f));
+                }
             }
 
             template <typename ExPolicy, typename FwdIterB, typename FwdIterE,

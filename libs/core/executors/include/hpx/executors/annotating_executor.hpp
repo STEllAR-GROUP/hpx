@@ -29,8 +29,9 @@ namespace hpx { namespace execution { namespace experimental {
     struct annotating_executor
     {
         template <typename Executor,
-            typename Enable =
-                std::enable_if_t<hpx::traits::is_executor_any_v<Executor>>>
+            typename Enable = std::enable_if_t<
+                hpx::traits::is_executor_any_v<Executor> &&
+                !std::is_same_v<std::decay_t<Executor>, annotating_executor>>>
         constexpr explicit annotating_executor(
             Executor&& exec, char const* annotation = nullptr)
           : exec_(HPX_FORWARD(Executor, exec))

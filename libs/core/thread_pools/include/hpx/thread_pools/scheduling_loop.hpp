@@ -624,7 +624,6 @@ namespace hpx { namespace threads { namespace detail {
         while (true)
         {
             thread_id_ref_type thrd = HPX_MOVE(next_thrd);
-            next_thrd = thread_id_ref_type();
 
             // Get the next HPX thread from the queue
             bool running =

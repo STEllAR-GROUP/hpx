@@ -78,7 +78,8 @@ namespace hpx::detail {
             noexcept(Allocator()))
           : memory_()
           , resource_(alloc)
-          , pool_(std::data(memory_), std::size(memory_), &resource_)
+          , pool_(
+                std::data(memory_), std::size(memory_) * sizeof(T), &resource_)
           , allocator_(&pool_)
         {
         }
@@ -86,14 +87,16 @@ namespace hpx::detail {
         memory_storage(memory_storage const& rhs)
           : memory_()    // data will be provided by small_vector ctor
           , resource_(rhs.resource_)
-          , pool_(std::data(memory_), std::size(memory_), &resource_)
+          , pool_(
+                std::data(memory_), std::size(memory_) * sizeof(T), &resource_)
           , allocator_(&pool_)
         {
         }
         memory_storage(memory_storage&& rhs) noexcept
           : memory_()    // data will be provided by small_vector ctor
           , resource_(std::move(rhs.resource_))
-          , pool_(std::data(memory_), std::size(memory_), &resource_)
+          , pool_(
+                std::data(memory_), std::size(memory_) * sizeof(T), &resource_)
           , allocator_(&pool_)
         {
         }
@@ -113,7 +116,7 @@ namespace hpx::detail {
 
             // reconstruct the memory management infrastructure
             new (&pool_) buffer_resource_type(
-                std::data(memory_), std::size(memory_), &resource_);
+                std::data(memory_), std::size(memory_) * sizeof(T), &resource_);
             new (&allocator_) allocator_type(&pool_);
 
             return *this;
@@ -133,7 +136,7 @@ namespace hpx::detail {
 
             // reconstruct the memory management infrastructure
             new (&pool_) buffer_resource_type(
-                std::data(memory_), std::size(memory_), &resource_);
+                std::data(memory_), std::size(memory_) * sizeof(T), &resource_);
             new (&allocator_) allocator_type(&pool_);
 
             return *this;

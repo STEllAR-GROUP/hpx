@@ -256,9 +256,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
     };
 
-    template <typename Iterable>
+    template <typename Iterable, typename Stride>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iterable next(
-        Iterable iter, std::size_t offset)
+        Iterable iter, Stride offset)
     {
         return calculate_next<typename std::decay<Iterable>::type>::call(
             iter, offset);
@@ -266,7 +266,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename Iterable, typename Stride>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iterable next(
-        Iterable iter, std::size_t max_count, Stride& offset)
+        Iterable iter, std::size_t max_count, Stride offset)
     {
         return calculate_next<typename std::decay<Iterable>::type>::call(
             iter, max_count, offset);

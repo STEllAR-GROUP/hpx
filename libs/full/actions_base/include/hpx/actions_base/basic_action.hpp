@@ -597,25 +597,6 @@ namespace hpx { namespace actions {
     HPX_REGISTER_ACTION_2(action, action)                                      \
     /**/
 
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                     \
-    namespace hpx { namespace actions { namespace detail {                     \
-                template <>                                                    \
-                HPX_ALWAYS_EXPORT util::itt::string_handle const&              \
-                get_action_name_itt<action>()                                  \
-                {                                                              \
-                    static util::itt::string_handle sh(                        \
-                        HPX_PP_STRINGIZE(actionname));                         \
-                    return sh;                                                 \
-                }                                                              \
-            }                                                                  \
-        }                                                                      \
-    }                                                                          \
-/**/
-#else
-#define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)
-#endif
-
 #if !defined(HPX_HAVE_NETWORKING)
 
 #define HPX_DEFINE_GET_ACTION_NAME(action) /**/

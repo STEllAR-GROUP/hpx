@@ -84,6 +84,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
+            if (workitems.empty())
+            {
+                return;
+            }
+
             // first extract exception from all futures
             std::vector<std::exception_ptr> exceptions;
             exceptions.reserve(workitems.size());
@@ -120,6 +125,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
+            if (workitems.empty())
+            {
+                return;
+            }
+
             // first extract exception from all futures
             std::vector<std::exception_ptr> exceptions;
             exceptions.reserve(workitems.size());
@@ -157,6 +167,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
+            if (workitems.empty())
+            {
+                return;
+            }
+
             bool has_exception = false;
             std::exception_ptr bad_alloc_exception;
             for (auto& f : workitems)

@@ -7,6 +7,7 @@
 //  This code is based on boost::iterators::counting_iterator
 // (C) Copyright David Abrahams 2001.
 
+#include <hpx/iterator_support/tests/iterator_tests.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/program_options.hpp>
