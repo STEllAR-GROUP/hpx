@@ -52,6 +52,7 @@ set(_hpx_core_modules
     logging
     memory
     mpi_base
+    lci_base
     pack_traversal
     plugin
     prefix

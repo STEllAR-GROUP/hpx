@@ -135,7 +135,7 @@ namespace hpx {
         Proj2&& proj2);
 
     // clang-format on
-}
+}    // namespace hpx
 }    // namespace hpx
 
 #else    // DOXYGEN

@@ -25,10 +25,14 @@ set(command_line_handling_sources
 )
 
 if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
-  # setup MPI, if necessary
   include(HPX_SetupMPI)
   hpx_setup_mpi()
-  set(additional_dependencies Mpi::mpi)
+  set(additional_dependencies ${additional_dependencies} Mpi::mpi)
+endif()
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
+  include(HPX_SetupLCI)
+  hpx_setup_lci()
+  set(additional_dependencies ${additional_dependencies} Mpi::mpi LCI::LCI)
 endif()
 
 include(HPX_AddModule)

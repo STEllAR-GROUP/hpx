@@ -31,9 +31,11 @@ Main |hpx| modules
    /libs/full/executors_distributed/docs/index.rst
    /libs/full/include/docs/index.rst
    /libs/full/init_runtime/docs/index.rst
+   /libs/full/lci_base/docs/index.rst
    /libs/full/lcos_distributed/docs/index.rst
    /libs/full/naming/docs/index.rst
    /libs/full/naming_base/docs/index.rst
+   /libs/full/parcelport_lci/docs/index.rst
    /libs/full/parcelport_libfabric/docs/index.rst
    /libs/full/parcelport_mpi/docs/index.rst
    /libs/full/parcelport_tcp/docs/index.rst
