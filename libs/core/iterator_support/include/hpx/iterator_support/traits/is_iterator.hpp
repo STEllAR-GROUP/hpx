@@ -546,13 +546,21 @@ namespace hpx { namespace traits {
     }    // namespace detail
 
     template <typename Iter,
-        bool not_vector = !detail::is_vector_iterator<Iter>::value>
+        bool not_vector =
+    // When _GLIBCXX_DEBUG is defined vectors are contiguous, but the iterators
+    // are not plain pointers.
+#if defined(_GLIBCXX_DEBUG)
+            false
+#else
+            detail::is_vector_iterator<Iter>::value
+#endif
+        >
     struct is_contiguous_iterator : std::is_pointer<Iter>::type
     {
     };
 
     template <typename Iter>
-    struct is_contiguous_iterator<Iter, false> : std::true_type
+    struct is_contiguous_iterator<Iter, true> : std::true_type
     {
     };
 
