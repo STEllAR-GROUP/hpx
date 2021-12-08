@@ -15,9 +15,11 @@
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading/thread.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
@@ -87,12 +89,38 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::concurrency::detail::contiguous_index_queue<std::uint32_t>;
             using queues_type =
                 std::vector<hpx::util::cache_aligned_data<queue_type>>;
-            using thread_states_type = std::vector<
-                hpx::util::cache_aligned_data<std::atomic<thread_state>>>;
-            using thread_function_helper_type = void(void*, void const*, void*,
-                std::size_t, std::size_t, loop_schedule, queues_type&,
-                thread_states_type&, hpx::lcos::local::spinlock&,
-                std::exception_ptr&);
+
+            struct region_data_type;
+            using thread_function_helper_type = void(region_data_type&,
+                std::size_t, std::size_t, queues_type&,
+                hpx::lcos::local::spinlock&, std::exception_ptr&) noexcept;
+
+            // Members that change for each parallel region.
+            struct region_data
+            {
+                // the thread state for each of the executed threads
+                std::atomic<thread_state> state_;
+
+                // The helper function that does the actual work for a single
+                // parallel region.
+                std::atomic<thread_function_helper_type*>
+                    thread_function_helper_;
+
+                // Pointers to inputs to bulk_sync_execute.
+                void* element_function_;
+                void const* shape_;
+                void* argument_pack_;
+            };
+
+            // Can't apply 'using' here as the type needs to be forward
+            // declared
+            struct region_data_type
+              : std::vector<hpx::util::cache_aligned_data<region_data>>
+            {
+                using base_type =
+                    std::vector<hpx::util::cache_aligned_data<region_data>>;
+                using base_type::base_type;
+            };
 
             // Members that are used for all parallel regions executed through
             // this executor.
@@ -102,25 +130,15 @@ namespace hpx { namespace execution { namespace experimental {
             threads::thread_stacksize stacksize_ =
                 threads::thread_stacksize::small_;
             loop_schedule schedule_ = loop_schedule::static_;
-            std::size_t main_thread_;
-            std::size_t num_threads_;
-            thread_states_type thread_states_;
-            hpx::lcos::local::spinlock exception_mutex_;
-            std::exception_ptr exception_;
             std::chrono::nanoseconds yield_delay_;
 
-            // Members that change for each parallel region.
+            std::size_t main_thread_;
+            std::size_t num_threads_;
+            hpx::lcos::local::spinlock exception_mutex_;
+            std::exception_ptr exception_;
 
-            // The helper function that does the actual work for a single
-            // parallel region.
-            std::atomic<thread_function_helper_type*> thread_function_helper_{
-                nullptr};
-
-            // Pointers to inputs to bulk_sync_execute.
-            std::atomic<void*> element_function_{nullptr};
-            std::atomic<void const*> shape_{nullptr};
-            std::atomic<std::size_t> size_{0};
-            std::atomic<void*> argument_pack_{nullptr};
+            // Data for each parallel region.
+            region_data_type region_data_;
 
             // The current queues for each worker HPX thread.
             queues_type queues_;
@@ -133,88 +151,123 @@ namespace hpx { namespace execution { namespace experimental {
                 std::size_t const num_threads_;
                 std::size_t const thread_index_;
                 loop_schedule const schedule_;
-                std::atomic<thread_state>& thread_state_;
                 hpx::lcos::local::spinlock& exception_mutex_;
                 std::exception_ptr& exception_;
-                std::chrono::nanoseconds& yield_delay_;
+                std::chrono::nanoseconds yield_delay_;
 
                 // Changing data for each parallel region.
-                std::atomic<thread_function_helper_type*>&
-                    thread_function_helper_;
-                std::atomic<void*>& element_function_;
-                std::atomic<void const*>& shape_;
-                std::atomic<std::size_t>& size_;
-                std::atomic<void*>& argument_pack_;
+                region_data_type& region_data_;
                 queues_type& queues_;
-                thread_states_type& thread_states_;
 
-                void wait_not_state_this_thread(thread_state state)
+                thread_state wait_not_state_this_thread(
+                    thread_state state) const
                 {
+                    std::atomic<thread_state>& thread_state =
+                        region_data_[thread_index_].data_.state_;
+
                     hpx::chrono::high_resolution_timer t;
-                    while (
-                        thread_state_.load(std::memory_order_acquire) == state)
+                    auto current = thread_state.load(std::memory_order_relaxed);
+                    while (current == state)
                     {
+                        for (int i = 0; i < 128; ++i)
+                        {
+                            current =
+                                thread_state.load(std::memory_order_relaxed);
+                            if (current != state)
+                            {
+                                return current;
+                            }
+                            HPX_SMT_PAUSE;
+                        }
+
                         if (t.elapsed_nanoseconds() > yield_delay_.count())
                         {
                             hpx::this_thread::yield();
                         }
                     }
+                    return current;
                 }
 
-                void set_state_this_thread(thread_state state)
+                void set_state_this_thread(thread_state state) noexcept
                 {
-                    thread_state_.store(state, std::memory_order_release);
+                    region_data_[thread_index_].data_.state_.store(
+                        state, std::memory_order_release);
                 }
 
-                void operator()()
+                thread_state get_state_this_thread() const noexcept
                 {
-                    HPX_ASSERT(thread_state_ == thread_state::starting);
+                    return region_data_[thread_index_].data_.state_.load(
+                        std::memory_order_relaxed);
+                }
+
+                void operator()() noexcept
+                {
+                    HPX_ASSERT(
+                        get_state_this_thread() == thread_state::starting);
                     set_state_this_thread(thread_state::idle);
 
-                    do
+                    region_data& data = region_data_[thread_index_].data_;
+                    auto state = wait_not_state_this_thread(thread_state::idle);
+                    while (state != thread_state::stopping)
                     {
-                        wait_not_state_this_thread(thread_state::idle);
-                        if (thread_state_ == thread_state::stopping)
-                        {
-                            break;
-                        }
+                        (data.thread_function_helper_.load(
+                            std::memory_order_relaxed))(region_data_,
+                            thread_index_, num_threads_, queues_,
+                            exception_mutex_, exception_);
 
-                        (thread_function_helper_.load(
-                            std::memory_order_relaxed))(
-                            element_function_.load(std::memory_order_relaxed),
-                            shape_.load(std::memory_order_relaxed),
-                            argument_pack_.load(std::memory_order_relaxed),
-                            thread_index_, num_threads_, schedule_, queues_,
-                            thread_states_, exception_mutex_, exception_);
-                    } while (true);
+                        state = wait_not_state_this_thread(thread_state::idle);
+                    }
 
-                    HPX_ASSERT(thread_state_ == thread_state::stopping);
+                    HPX_ASSERT(
+                        get_state_this_thread() == thread_state::stopping);
                     set_state_this_thread(thread_state::stopped);
                 }
             };
 
-            void set_state_main_thread(thread_state state)
+            void set_state_main_thread(thread_state state) noexcept
             {
-                thread_states_[main_thread_].data_.store(
+                region_data_[main_thread_].data_.state_.store(
                     state, std::memory_order_relaxed);
             }
 
-            void set_state_all(thread_state state)
+            void set_state_all(thread_state state) noexcept
             {
                 for (std::size_t t = 0; t < num_threads_; ++t)
                 {
-                    thread_states_[t].data_.store(
+                    region_data_[t].data_.state_.store(
                         state, std::memory_order_release);
+                    HPX_SMT_PAUSE;
                 }
             }
 
-            void wait_state_all(thread_state state)
+            void wait_state_all(thread_state state) const noexcept
             {
                 for (std::size_t t = 0; t < num_threads_; ++t)
                 {
-                    while (thread_states_[t].data_.load(
-                               std::memory_order_acquire) != state)
+                    auto& thread_state = region_data_[t].data_.state_;
+
+                    hpx::chrono::high_resolution_timer tim;
+                    auto current = thread_state.load(std::memory_order_relaxed);
+                    while (current != state)
                     {
+                        bool continue_with_next = false;
+                        for (int i = 0; i < 64; ++i)
+                        {
+                            current =
+                                thread_state.load(std::memory_order_relaxed);
+                            if (current == state)
+                            {
+                                continue_with_next = true;
+                                break;
+                            }
+                            HPX_SMT_PAUSE;
+                        }
+
+                        if (!continue_with_next &&
+                            tim.elapsed_nanoseconds() > yield_delay_.count())
+                        {
+                            hpx::this_thread::yield();
+                        }
                     }
                 }
             }
@@ -223,18 +276,22 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 main_thread_ = get_local_worker_thread_num();
                 num_threads_ = pool_->get_os_thread_count();
-                queues_.resize(num_threads_);
+                if (schedule_ == loop_schedule::dynamic || num_threads_ > 1)
+                {
+                    queues_.resize(num_threads_);
+                }
 
+                hpx::util::thread_description desc("fork_join_executor");
                 for (std::size_t t = 0; t < num_threads_; ++t)
                 {
                     if (t == main_thread_)
                     {
-                        thread_states_[t].data_ = thread_state::idle;
+                        set_state_main_thread(thread_state::idle);
                         continue;
                     }
 
-                    thread_states_[t].data_ = thread_state::starting;
-                    hpx::util::thread_description desc("fork_join_executor");
+                    region_data_[t].data_.state_.store(
+                        thread_state::starting, std::memory_order_relaxed);
 
                     auto policy = launch::async_policy(priority_, stacksize_,
                         threads::thread_schedule_hint{
@@ -243,18 +300,16 @@ namespace hpx { namespace execution { namespace experimental {
                     hpx::detail::async_launch_policy_dispatch<
                         launch::async_policy>::call(policy, desc, pool_,
                         thread_function{num_threads_, t, schedule_,
-                            thread_states_[t].data_, exception_mutex_,
-                            exception_, yield_delay_, thread_function_helper_,
-                            element_function_, shape_, size_, argument_pack_,
-                            queues_, thread_states_});
+                            exception_mutex_, exception_, yield_delay_,
+                            region_data_, queues_});
                 }
 
                 wait_state_all(thread_state::idle);
             }
 
-            static void init_local_work_queue(queue_type& queue,
+            static constexpr void init_local_work_queue(queue_type& queue,
                 std::size_t thread_index, std::size_t num_threads,
-                std::size_t size)
+                std::size_t size) noexcept
             {
                 auto const part_begin = static_cast<std::uint32_t>(
                     (thread_index * size) / num_threads);
@@ -271,11 +326,11 @@ namespace hpx { namespace execution { namespace experimental {
               , priority_(priority)
               , stacksize_(stacksize)
               , schedule_(schedule)
+              , yield_delay_(yield_delay)
               , num_threads_(pool_->get_os_thread_count())
-              , thread_states_(num_threads_)
               , exception_mutex_()
               , exception_()
-              , yield_delay_(yield_delay)
+              , region_data_(num_threads_)
             {
                 HPX_ASSERT(pool_);
                 init_threads();
@@ -312,45 +367,93 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename F, typename S, typename Tuple>
             struct thread_function_helper
             {
-                using function_type = typename std::decay<F>::type;
-                using shape_type = typename std::decay<S>::type;
-                using argument_pack_type = typename std::decay<Tuple>::type;
+                using argument_pack_type = std::decay_t<Tuple>;
                 using index_pack_type =
                     typename hpx::util::detail::fused_index_pack<Tuple>::type;
 
                 template <std::size_t... Is_, typename F_, typename A_,
                     typename Tuple_>
-                static void invoke_helper(
+                static constexpr void invoke_helper(
                     hpx::util::index_pack<Is_...>, F_&& f, A_&& a, Tuple_&& t)
                 {
-                    hpx::util::invoke(
-                        f, a, hpx::get<Is_>(HPX_FORWARD(Tuple_, t))...);
+                    HPX_INVOKE(HPX_FORWARD(F_, f), HPX_FORWARD(A_, a),
+                        hpx::get<Is_>(HPX_FORWARD(Tuple_, t))...);
                 }
 
-                static void set_state(thread_states_type& thread_states,
-                    std::size_t thread_index, thread_state state)
+                static void set_state(region_data_type& region_data,
+                    std::size_t thread_index, thread_state state) noexcept
                 {
-                    thread_states[thread_index].data_ = state;
+                    region_data[thread_index].data_.state_.store(
+                        state, std::memory_order_release);
                 }
 
-                /// Main entry point for a single parallel region.
-                static void call(void* element_function_void,
-                    void const* shape_void, void* argument_pack_void,
+                /// Main entry point for a single parallel region (static
+                /// scheduling).
+                static void call_static(region_data_type& rdata,
                     std::size_t thread_index, std::size_t num_threads,
-                    loop_schedule schedule, queues_type& queues,
-                    thread_states_type& thread_states,
-                    hpx::lcos::local::spinlock& exception_mutex,
-                    std::exception_ptr& exception)
+                    queues_type&, hpx::lcos::local::spinlock& exception_mutex,
+                    std::exception_ptr& exception) noexcept
                 {
                     try
                     {
                         // Cast void pointers back to the actual types given to
                         // bulk_sync_execute.
-                        F& element_function =
-                            *static_cast<F*>(element_function_void);
-                        S const& shape = *static_cast<S const*>(shape_void);
-                        Tuple argument_pack =
-                            *static_cast<Tuple*>(argument_pack_void);
+                        region_data& data = rdata[thread_index].data_;
+                        auto& element_function =
+                            *static_cast<F*>(data.element_function_);
+                        auto& shape = *static_cast<S const*>(data.shape_);
+                        auto& argument_pack = *static_cast<Tuple*>(
+                            data.argument_pack_);
+
+                        // Set up the local queues and state.
+                        std::size_t size = hpx::util::size(shape);
+
+                        auto part_begin = static_cast<std::uint32_t>(
+                            (thread_index * size) / num_threads);
+                        auto const part_end = static_cast<std::uint32_t>(
+                            ((thread_index + 1) * size) / num_threads);
+
+                        set_state(rdata, thread_index, thread_state::active);
+
+                        // Process local items.
+                        for (; part_begin != part_end; ++part_begin)
+                        {
+                            auto it =
+                                std::next(hpx::util::begin(shape), part_begin);
+                            invoke_helper(index_pack_type{}, element_function,
+                                *it, argument_pack);
+                        }
+                    }
+                    catch (...)
+                    {
+                        std::lock_guard l(exception_mutex);
+                        if (!exception)
+                        {
+                            exception = std::current_exception();
+                        }
+                    }
+
+                    set_state(rdata, thread_index, thread_state::idle);
+                }
+
+                /// Main entry point for a single parallel region (dynamic
+                /// scheduling).
+                static void call_dynamic(region_data_type& rdata,
+                    std::size_t thread_index, std::size_t num_threads,
+                    queues_type& queues,
+                    hpx::lcos::local::spinlock& exception_mutex,
+                    std::exception_ptr& exception) noexcept
+                {
+                    try
+                    {
+                        // Cast void pointers back to the actual types given to
+                        // bulk_sync_execute.
+                        region_data& data = rdata[thread_index].data_;
+                        auto& element_function =
+                            *static_cast<F*>(data.element_function_);
+                        auto& shape = *static_cast<S const*>(data.shape_);
+                        auto& argument_pack = *static_cast<Tuple*>(
+                            data.argument_pack_);
 
                         // Set up the local queues and state.
                         queue_type& local_queue = queues[thread_index].data_;
@@ -358,35 +461,28 @@ namespace hpx { namespace execution { namespace experimental {
                         init_local_work_queue(
                             local_queue, thread_index, num_threads, size);
 
-                        set_state(
-                            thread_states, thread_index, thread_state::active);
+                        set_state(rdata, thread_index, thread_state::active);
 
                         // Process local items first.
                         hpx::util::optional<std::uint32_t> index;
                         while ((index = local_queue.pop_left()))
                         {
-                            auto it = hpx::util::begin(shape);
-                            std::advance(it, index.value());
+                            auto it = std::next(
+                                hpx::util::begin(shape), index.value());
                             invoke_helper(index_pack_type{}, element_function,
                                 *it, argument_pack);
                         }
 
-                        if (schedule == loop_schedule::static_ ||
-                            num_threads == 1)
-                        {
-                            set_state(thread_states, thread_index,
-                                thread_state::idle);
-                            return;
-                        }
-
-                        // If loop schedule is dynamic, steal from neighboring threads.
+                        // As loop schedule is dynamic, steal from neighboring
+                        // threads.
                         for (std::size_t offset = 1; offset < num_threads;
                              ++offset)
                         {
                             std::size_t neighbor_index =
                                 (thread_index + offset) % num_threads;
 
-                            if (thread_states[neighbor_index].data_.load() !=
+                            if (rdata[neighbor_index].data_.state_.load(
+                                    std::memory_order_acquire) !=
                                 thread_state::active)
                             {
                                 continue;
@@ -397,59 +493,87 @@ namespace hpx { namespace execution { namespace experimental {
 
                             while ((index = neighbor_queue.pop_right()))
                             {
-                                auto it = hpx::util::begin(shape);
-                                std::advance(it, index.value());
+                                auto it = std::next(
+                                    hpx::util::begin(shape), index.value());
                                 invoke_helper(index_pack_type{},
                                     element_function, *it, argument_pack);
                             }
                         }
-
-                        set_state(
-                            thread_states, thread_index, thread_state::idle);
                     }
                     catch (...)
                     {
-                        std::lock_guard<hpx::lcos::local::spinlock> l(
-                            exception_mutex);
+                        std::lock_guard l(exception_mutex);
                         if (!exception)
                         {
                             exception = std::current_exception();
                         }
-                        set_state(
-                            thread_states, thread_index, thread_state::idle);
                     }
-                };
+
+                    set_state(rdata, thread_index, thread_state::idle);
+                }
             };
+
+            template <typename F, typename S, typename Args>
+            thread_function_helper_type* set_all_states_and_region_data(
+                thread_state state, F& f, S const& shape,
+                Args& argument_pack) noexcept
+            {
+                thread_function_helper_type* func = nullptr;
+                if (schedule_ == loop_schedule::static_ || num_threads_ == 1)
+                {
+                    func = &thread_function_helper<F, S, Args>::call_static;
+                }
+                else
+                {
+                    func = &thread_function_helper<F, S, Args>::call_dynamic;
+                }
+
+                for (std::size_t t = 0; t < num_threads_; ++t)
+                {
+                    region_data& data = region_data_[t].data_;
+
+                    data.element_function_ = &f;
+                    data.shape_ = &shape;
+                    data.argument_pack_ = &argument_pack;
+                    data.thread_function_helper_.store(
+                        func, std::memory_order_relaxed);
+
+                    data.state_.store(state, std::memory_order_release);
+                }
+                return func;
+            }
 
         public:
             template <typename F, typename S, typename... Ts>
             void bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
             {
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+                static hpx::util::itt::event notify_event(
+                    "fork_join_executor::bulk_sync_execute");
+
+                hpx::util::itt::mark_event e(notify_event);
+#endif
+
                 // Set the data for this parallel region
-                element_function_ = static_cast<void*>(&f);
-                shape_ = static_cast<void const*>(&shape);
-                size_ = hpx::util::size(shape);
-                auto argument_pack = hpx::make_tuple<>(HPX_FORWARD(Ts, ts)...);
-                argument_pack_ = static_cast<void*>(&argument_pack);
-                thread_function_helper_ =
-                    static_cast<thread_function_helper_type*>(
-                        &thread_function_helper<typename std::decay<F>::type,
-                            typename std::decay<S>::type,
-                            decltype(argument_pack)>::call);
+                auto argument_pack =
+                    hpx::forward_as_tuple(HPX_FORWARD(Ts, ts)...);
 
                 // Signal all worker threads to start partitioning work for
                 // themselves, and then starting the actual work.
-                set_state_all(thread_state::partitioning_work);
+                thread_function_helper_type* func =
+                    set_all_states_and_region_data(
+                        thread_state::partitioning_work, f, shape,
+                        argument_pack);
 
                 // Start work on the main thread.
-                thread_function_helper<typename std::decay<F>::type,
-                    typename std::decay<S>::type,
-                    decltype(argument_pack)>::call(element_function_, shape_,
-                    argument_pack_, main_thread_, num_threads_, schedule_,
-                    queues_, thread_states_, exception_mutex_, exception_);
+                func(region_data_, main_thread_, num_threads_, queues_,
+                    exception_mutex_, exception_);
 
+                // Wait for all threads to finish their work assigned to
+                // them in this parallel region.
                 wait_state_all(thread_state::idle);
 
+                std::lock_guard l(exception_mutex_);
                 if (exception_)
                 {
                     std::rethrow_exception(HPX_MOVE(exception_));
@@ -457,15 +581,16 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename F, typename S, typename... Ts>
-            std::vector<hpx::future<typename hpx::parallel::execution::detail::
-                    bulk_function_result<F, S, Ts...>::type>>
+            std::vector<hpx::future<hpx::parallel::execution::detail::
+                    bulk_function_result_t<F, S, Ts...>>>
             bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
             {
                 // Forward to the synchronous version as we can't create
                 // futures to the completion of the parallel region (this HPX
                 // thread participates in computation).
-                using result_type = typename hpx::parallel::execution::detail::
-                    bulk_function_result<F, S, Ts...>::type;
+                using result_type =
+                    hpx::parallel::execution::detail::bulk_function_result_t<F,
+                        S, Ts...>;
                 std::vector<hpx::future<result_type>> v;
                 try
                 {
@@ -477,7 +602,6 @@ namespace hpx { namespace execution { namespace experimental {
                     v.push_back(hpx::make_exceptional_future<result_type>(
                         std::current_exception()));
                 }
-
                 return v;
             }
         };
