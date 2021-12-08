@@ -17,8 +17,8 @@ set(init_runtime_headers
     hpx/hpx_start_impl.hpp
     hpx/hpx_suspend.hpp
     hpx/hpx_user_main_config.hpp
-    hpx/init_runtime/detail/run_or_start.hpp
     hpx/init_runtime/detail/init_logging.hpp
+    hpx/init_runtime/detail/run_or_start.hpp
 )
 
 set(init_runtime_sources hpx_init.cpp hpx_main_winsocket.cpp init_logging.cpp)

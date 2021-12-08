@@ -14,7 +14,6 @@ set(execution_base_headers
     hpx/execution_base/completion_scheduler.hpp
     hpx/execution_base/operation_state.hpp
     hpx/execution_base/receiver.hpp
-    hpx/execution_base/register_locks.hpp
     hpx/execution_base/resource_base.hpp
     hpx/execution_base/sender.hpp
     hpx/execution_base/this_thread.hpp
@@ -26,13 +25,11 @@ set(execution_base_headers
 set(execution_base_compat_headers
     hpx/basic_execution.hpp => hpx/modules/execution_base.hpp
     hpx/parallel/executors/execution_fwd.hpp => hpx/modules/execution_base.hpp
-    hpx/util/register_locks.hpp => hpx/modules/execution_base.hpp
     hpx/util/yield_while.hpp => hpx/modules/execution_base.hpp
     hpx/basic_execution/agent_base.hpp => hpx/modules/execution_base.hpp
     hpx/basic_execution/agent_ref.hpp => hpx/modules/execution_base.hpp
     hpx/basic_execution/context_base.hpp => hpx/modules/execution_base.hpp
     hpx/basic_execution/execution.hpp => hpx/modules/execution_base.hpp
-    hpx/basic_execution/register_locks.hpp => hpx/modules/execution_base.hpp
     hpx/basic_execution/resource_base.hpp => hpx/modules/execution_base.hpp
     hpx/basic_execution/this_thread.hpp => hpx/modules/execution_base.hpp
     hpx/traits/is_executor.hpp => hpx/execution.hpp
@@ -40,7 +37,7 @@ set(execution_base_compat_headers
 )
 # cmake-format: on
 
-set(execution_base_sources agent_ref.cpp any_sender.cpp register_locks.cpp
+set(execution_base_sources agent_ref.cpp any_sender.cpp
                            spinlock_deadlock_detection.cpp this_thread.cpp
 )
 
@@ -58,6 +55,7 @@ add_hpx_module(
     hpx_format
     hpx_functional
     hpx_iterator_support
+    hpx_lock_registration
     hpx_timing
     hpx_type_support
   CMAKE_SUBDIRS examples tests

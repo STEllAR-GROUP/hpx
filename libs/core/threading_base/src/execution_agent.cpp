@@ -8,7 +8,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/throw_exception.hpp>
-#include <hpx/execution_base/register_locks.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/thread_data.hpp>
