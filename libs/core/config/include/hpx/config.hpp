@@ -201,16 +201,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable minimal thread deadlock detection in debug builds only.
-#if !defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-#  endif
-#endif
-#if !defined(HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-#  endif
-#endif
 #if !defined(HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT)
 #  define HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT 1073741823
 #endif
@@ -219,40 +209,6 @@
 /// This defines the default number of coroutine heaps.
 #if !defined(HPX_COROUTINE_NUM_HEAPS)
 #  define HPX_COROUTINE_NUM_HEAPS 7
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// By default, enable storing the parent thread information in debug builds
-/// only.
-#if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_THREAD_PARENT_REFERENCE
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// By default, enable storing the thread phase in debug builds only.
-#if !defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_THREAD_PHASE_INFORMATION
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// By default, enable storing the thread description in debug builds only.
-#if !defined(HPX_HAVE_THREAD_DESCRIPTION)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_THREAD_DESCRIPTION
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// By default, enable storing the target address of the data the thread is
-/// accessing in debug builds only.
-#if !defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_THREAD_TARGET_ADDRESS
-#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -452,15 +408,6 @@
 
 #if !defined(HPX_INITIAL_GID_RANGE)
 #  define HPX_INITIAL_GID_RANGE 0xFFFFU
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Enable lock verification code which allows to check whether there are locks
-// held while HPX-threads are suspended and/or interrupted.
-#if !defined(HPX_HAVE_VERIFY_LOCKS)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_VERIFY_LOCKS
-#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

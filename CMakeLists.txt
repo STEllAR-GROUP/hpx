@@ -909,6 +909,7 @@ hpx_option(
   HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF
   CATEGORY "Profiling"
 )
+
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_APEX) # tell HPX that we use APEX
   hpx_option(
@@ -1231,11 +1232,16 @@ hpx_option(
   OFF CATEGORY "Debugging"
 )
 
+set(HPX_WITH_VERIFY_LOCKS_DEFAULT OFF)
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+  set(HPX_WITH_VERIFY_LOCKS_DEFAULT ON)
+endif()
+
 hpx_option(
   HPX_WITH_VERIFY_LOCKS
   BOOL
-  "Enable lock verification code (default: OFF, implicitly enabled in debug builds)"
-  OFF
+  "Enable lock verification code (default: OFF, enabled in debug builds)"
+  ${HPX_WITH_VERIFY_LOCKS_DEFAULT}
   CATEGORY "Debugging"
   ADVANCED
 )
@@ -1339,13 +1345,14 @@ if(HPX_WITH_APEX)
 endif()
 
 if(HPX_WITH_THREAD_DEBUG_INFO)
+  hpx_add_config_define(HPX_HAVE_THREAD_TARGET_ADDRESS)
   hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
   hpx_add_config_define(HPX_HAVE_THREAD_PHASE_INFORMATION)
   hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
-  hpx_add_config_define(HPX_HAVE_THREAD_DEADLOCK_DETECTION)
   if(HPX_WITH_THREAD_DESCRIPTION_FULL)
     hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION_FULL)
   endif()
+  hpx_add_config_define(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
 endif()
 
 # run hpx_main on all localities by default
