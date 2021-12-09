@@ -48,17 +48,17 @@ namespace hpx { namespace lcos { namespace local {
 
             F f_;
 
-            task_object(F const& f) noexcept
+            explicit task_object(F const& f)
               : f_(f)
             {
             }
 
-            task_object(F&& f) noexcept
+            explicit task_object(F&& f) noexcept
               : f_(HPX_MOVE(f))
             {
             }
 
-            task_object(init_no_addref no_addref, F const& f) noexcept
+            task_object(init_no_addref no_addref, F const& f)
               : base_type(no_addref)
               , f_(f)
             {
@@ -137,8 +137,7 @@ namespace hpx { namespace lcos { namespace local {
             using other_allocator = typename std::allocator_traits<
                 Allocator>::template rebind_alloc<task_object_allocator>;
 
-            task_object_allocator(
-                other_allocator const& alloc, F const& f) noexcept
+            task_object_allocator(other_allocator const& alloc, F const& f)
               : base_type(f)
               , alloc_(alloc)
             {
@@ -151,7 +150,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             task_object_allocator(init_no_addref no_addref,
-                other_allocator const& alloc, F const& f) noexcept
+                other_allocator const& alloc, F const& f)
               : base_type(no_addref, f)
               , alloc_(alloc)
             {
@@ -186,17 +185,17 @@ namespace hpx { namespace lcos { namespace local {
 
             Executor* exec_ = nullptr;
 
-            task_object(F const& f) noexcept
+            explicit task_object(F const& f)
               : base_type(f)
             {
             }
 
-            task_object(F&& f) noexcept
+            explicit task_object(F&& f) noexcept
               : base_type(HPX_MOVE(f))
             {
             }
 
-            task_object(Executor& exec, F const& f) noexcept
+            task_object(Executor& exec, F const& f)
               : base_type(f)
               , exec_(&exec)
             {
@@ -208,7 +207,7 @@ namespace hpx { namespace lcos { namespace local {
             {
             }
 
-            task_object(init_no_addref no_addref, F const& f) noexcept
+            task_object(init_no_addref no_addref, F const& f)
               : base_type(no_addref, f)
             {
             }
@@ -218,8 +217,7 @@ namespace hpx { namespace lcos { namespace local {
             {
             }
 
-            task_object(
-                Executor& exec, init_no_addref no_addref, F const& f) noexcept
+            task_object(Executor& exec, init_no_addref no_addref, F const& f)
               : base_type(no_addref, f)
               , exec_(&exec)
             {
@@ -267,18 +265,17 @@ namespace hpx { namespace lcos { namespace local {
             using result_type = typename base_type::result_type;
             using init_no_addref = typename base_type::init_no_addref;
 
-            cancelable_task_object(F const& f) noexcept
+            explicit cancelable_task_object(F const& f)
               : base_type(f)
             {
             }
 
-            cancelable_task_object(F&& f) noexcept
+            explicit cancelable_task_object(F&& f) noexcept
               : base_type(HPX_MOVE(f))
             {
             }
 
-            cancelable_task_object(
-                init_no_addref no_addref, F const& f) noexcept
+            cancelable_task_object(init_no_addref no_addref, F const& f)
               : base_type(no_addref, f)
             {
             }
@@ -301,7 +298,7 @@ namespace hpx { namespace lcos { namespace local {
                 template rebind_alloc<cancelable_task_object_allocator>;
 
             cancelable_task_object_allocator(
-                other_allocator const& alloc, F const& f) noexcept
+                other_allocator const& alloc, F const& f)
               : base_type(f)
               , alloc_(alloc)
             {
@@ -315,7 +312,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             cancelable_task_object_allocator(init_no_addref no_addref,
-                other_allocator const& alloc, F const& f) noexcept
+                other_allocator const& alloc, F const& f)
               : base_type(no_addref, f)
               , alloc_(alloc)
             {
@@ -351,17 +348,17 @@ namespace hpx { namespace lcos { namespace local {
             using result_type = typename base_type::result_type;
             using init_no_addref = typename base_type::init_no_addref;
 
-            cancelable_task_object(F const& f) noexcept
+            explicit cancelable_task_object(F const& f)
               : base_type(f)
             {
             }
 
-            cancelable_task_object(F&& f) noexcept
+            explicit cancelable_task_object(F&& f) noexcept
               : base_type(HPX_MOVE(f))
             {
             }
 
-            cancelable_task_object(Executor& exec, F const& f) noexcept
+            cancelable_task_object(Executor& exec, F const& f)
               : base_type(exec, f)
             {
             }
@@ -372,7 +369,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             cancelable_task_object(
-                init_no_addref no_addref, F const& f) noexcept
+                init_no_addref no_addref, F const& f)
               : base_type(no_addref, f)
             {
             }
@@ -383,7 +380,7 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             cancelable_task_object(
-                Executor& exec, init_no_addref no_addref, F const& f) noexcept
+                Executor& exec, init_no_addref no_addref, F const& f)
               : base_type(exec, no_addref, f)
             {
             }

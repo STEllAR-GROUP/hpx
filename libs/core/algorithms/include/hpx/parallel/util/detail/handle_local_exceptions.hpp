@@ -84,7 +84,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
-            if (workitems.empty())
+            if (workitems.empty() && errors.empty())
             {
                 return;
             }
@@ -125,7 +125,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
-            if (workitems.empty())
+            if (workitems.empty() && errors.empty())
             {
                 return;
             }
@@ -167,7 +167,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
-            if (workitems.empty())
+            if (workitems.empty() && errors.empty())
             {
                 return;
             }

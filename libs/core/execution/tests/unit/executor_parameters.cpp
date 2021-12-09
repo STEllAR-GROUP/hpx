@@ -187,9 +187,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    test_dynamic_chunk_size();
-    test_static_chunk_size();
-    test_guided_chunk_size();
+    //test_dynamic_chunk_size();
+    //test_static_chunk_size();
+    //test_guided_chunk_size();
     test_auto_chunk_size();
     test_persistent_auto_chunk_size();
 

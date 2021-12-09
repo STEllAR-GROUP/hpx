@@ -121,7 +121,7 @@ namespace hpx { namespace lcos { namespace detail {
           : count_(0)
         {
         }
-        future_data_refcnt_base(init_no_addref) noexcept
+        explicit future_data_refcnt_base(init_no_addref) noexcept
           : count_(1)
         {
         }
@@ -230,7 +230,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
         }
 
-        future_data_base(init_no_addref no_addref)
+        explicit future_data_base(init_no_addref no_addref) noexcept
           : future_data_refcnt_base(no_addref)
           , state_(empty)
         {
@@ -376,7 +376,7 @@ namespace hpx { namespace lcos { namespace detail {
     public:
         future_data_base() = default;
 
-        future_data_base(init_no_addref no_addref) noexcept
+        explicit future_data_base(init_no_addref no_addref) noexcept
           : base_type(no_addref)
         {
         }
@@ -656,7 +656,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         future_data() = default;
 
-        future_data(init_no_addref no_addref) noexcept
+        explicit future_data(init_no_addref no_addref) noexcept
           : future_data_base<Result>(no_addref)
         {
         }
@@ -692,7 +692,7 @@ namespace hpx { namespace lcos { namespace detail {
         using other_allocator = typename std::allocator_traits<
             Allocator>::template rebind_alloc<allocated_type>;
 
-        future_data_allocator(other_allocator const& alloc) noexcept
+        explicit future_data_allocator(other_allocator const& alloc) noexcept
           : future_data<Result>()
           , alloc_(alloc)
         {
@@ -809,7 +809,7 @@ namespace hpx { namespace lcos { namespace detail {
     public:
         task_base() = default;
 
-        task_base(init_no_addref no_addref) noexcept
+        explicit task_base(init_no_addref no_addref) noexcept
           : base_type(no_addref)
         {
         }
@@ -968,7 +968,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
         }
 
-        cancelable_task_base(init_no_addref no_addref) noexcept
+        explicit cancelable_task_base(init_no_addref no_addref) noexcept
           : task_base<Result>(no_addref)
           , id_(threads::invalid_thread_id)
         {

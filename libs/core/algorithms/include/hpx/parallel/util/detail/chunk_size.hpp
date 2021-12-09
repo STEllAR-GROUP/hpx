@@ -325,8 +325,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         using iterator =
             parallel::util::detail::chunk_size_idx_iterator<FwdIter>;
 
-        iterator shape_begin(begin, chunk_size, count, base_idx);
-        iterator shape_end(last, chunk_size, count, count);
+        iterator shape_begin(begin, chunk_size, count, 0, base_idx);
+        iterator shape_end(last, chunk_size, count, count, base_idx);
 
         return hpx::util::make_iterator_range(shape_begin, shape_end);
     }

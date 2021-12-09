@@ -81,6 +81,7 @@ add_hpx_module(
     hpx_execution
     hpx_futures
     hpx_io_service
+    hpx_itt_notify
     hpx_properties
     hpx_threading
     hpx_errors

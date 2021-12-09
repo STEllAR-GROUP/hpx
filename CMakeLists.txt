@@ -1238,8 +1238,7 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 endif()
 
 hpx_option(
-  HPX_WITH_VERIFY_LOCKS
-  BOOL
+  HPX_WITH_VERIFY_LOCKS BOOL
   "Enable lock verification code (default: OFF, enabled in debug builds)"
   ${HPX_WITH_VERIFY_LOCKS_DEFAULT}
   CATEGORY "Debugging"

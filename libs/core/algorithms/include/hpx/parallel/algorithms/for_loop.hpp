@@ -1105,8 +1105,8 @@ namespace hpx {
                                 hpx::util::empty_function{});
                         }
 
-                        return util::partitioner<ExPolicy>::call(
-                            HPX_FORWARD(ExPolicy, policy), first, size,
+                        return util::partitioner<ExPolicy>::call_with_index(
+                            HPX_FORWARD(ExPolicy, policy), first, size, stride,
                             part_iterations<ExPolicy, F, S>{
                                 HPX_FORWARD(F, f), stride},
                             hpx::util::empty_function{});

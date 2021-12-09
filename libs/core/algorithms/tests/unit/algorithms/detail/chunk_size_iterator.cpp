@@ -151,7 +151,7 @@ void test_container(std::size_t chunk_size)
     category_test(first, last, *first, category());
 }
 
-int main(int argc, char* argv[])
+int main(int, char*[])
 {
     // Test the built-in integer types.
     test_integer<int>(0, 20, 5, 20);

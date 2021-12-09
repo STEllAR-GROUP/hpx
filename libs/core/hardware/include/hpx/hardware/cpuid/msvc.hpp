@@ -30,13 +30,13 @@ namespace hpx { namespace util { namespace hardware {
         };
     };
 
-    inline void cpuid(std::uint32_t (&cpuinfo)[4], std::uint32_t eax)
+    inline void cpuid(int (&cpuinfo)[4], std::uint32_t eax)
     {
         ::__cpuid(cpuinfo, eax);
     }
 
     inline void cpuidex(
-        std::uint32_t (&cpuinfo)[4], std::uint32_t eax, std::uint32_t ecx)
+        int (&cpuinfo)[4], std::uint32_t eax, std::uint32_t ecx)
     {
         ::__cpuidex(cpuinfo, eax, ecx);
     }

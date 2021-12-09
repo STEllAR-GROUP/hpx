@@ -278,12 +278,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     typename std::iterator_traits<Iter>::reference>;
                 if constexpr (hpx::traits::is_value_proxy_v<value_type>)
                 {
-                    hpx::traits::proxy_value_t<value_type> tmp = *curr;
+                    auto tmp = HPX_INVOKE(proj_, *curr);
                     HPX_INVOKE(f_, tmp);
                 }
                 else
                 {
-                    HPX_INVOKE(f_, *curr);
+                    HPX_INVOKE(f_, HPX_INVOKE(proj_, *curr));
                 }
             }
         };
@@ -311,7 +311,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     typename std::iterator_traits<Iter>::reference>;
                 if constexpr (hpx::traits::is_value_proxy_v<value_type>)
                 {
-                    hpx::traits::proxy_value_t<value_type> tmp = *curr;
+                    auto tmp = *curr;
                     HPX_INVOKE(f_, tmp);
                 }
                 else

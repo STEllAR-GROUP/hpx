@@ -258,12 +258,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         HPX_HOST_DEVICE chunk_size_idx_iterator(Iterator it,
             std::size_t chunk_size, std::size_t count = 0,
-            std::size_t base_idx = 0)
-          : data_(it, (hpx::detail::min)(chunk_size, count),
-                get_current(base_idx, chunk_size))
+            std::size_t current = 0, std::size_t base_idx = 0)
+          : data_(it, (hpx::detail::min)(chunk_size, count), base_idx)
           , chunk_size_(chunk_size)
           , last_chunk_size_(get_last_chunk_size(count, chunk_size))
           , count_(count)
+          , current_(get_current(current, chunk_size))
         {
         }
 
@@ -303,6 +303,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         {
             return iterator() == other.iterator() &&
                 chunk_size_ == other.chunk_size_ &&
+                current_ == other.current_ &&
                 base_index() == other.base_index();
         }
 
@@ -315,14 +316,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE void increment(std::size_t offset)
         {
             base_index() += offset + chunk_size_;
-            if (base_index() >= count_)
+            current_ += offset + chunk_size_;
+            if (current_ >= count_)
             {
                 // reached the end of the sequence
                 iterator() = parallel::v1::detail::next(
                     iterator(), offset + last_chunk_size_);
                 chunk() = 0;
             }
-            else if (base_index() == count_ - last_chunk_size_)
+            else if (current_ == count_ - last_chunk_size_)
             {
                 // reached last chunk
                 iterator() = parallel::v1::detail::next(
@@ -332,7 +334,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             else
             {
                 // normal chunk
-                HPX_ASSERT(base_index() < count_ - last_chunk_size_);
+                HPX_ASSERT(current_ < count_ - last_chunk_size_);
                 iterator() = parallel::v1::detail::next(
                     iterator(), offset + chunk_size_);
                 chunk() = chunk_size_;
@@ -347,14 +349,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE void decrement(std::size_t offset)
         {
             base_index() -= offset + chunk_size_;
-            if (base_index() == 0)
+            current_ -= offset + chunk_size_;
+            if (current_ == 0)
             {
                 // reached the begin of the sequence
                 chunk() = base_index() + chunk_size_ >= count_ ?
                     last_chunk_size_ :
                     chunk_size_;
             }
-            else if (base_index() == count_ - last_chunk_size_)
+            else if (current_ == count_ - last_chunk_size_)
             {
                 // reached last chunk (was at end)
                 chunk() = last_chunk_size_;
@@ -362,7 +365,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             else
             {
                 // normal chunk
-                HPX_ASSERT(base_index() < count_ - last_chunk_size_);
+                HPX_ASSERT(current_ < count_ - last_chunk_size_);
                 chunk() = chunk_size_;
             }
 
@@ -413,5 +416,6 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         std::size_t chunk_size_ = 0;
         std::size_t last_chunk_size_ = 0;
         std::size_t count_ = 0;
+        std::size_t current_ = 0;
     };
 }}}}    // namespace hpx::parallel::util::detail
