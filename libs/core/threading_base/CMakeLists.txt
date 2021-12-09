@@ -108,6 +108,7 @@ add_hpx_module(
     hpx_functional
     hpx_hardware
     hpx_itt_notify
+    hpx_lock_registration
     hpx_logging
     hpx_memory
     hpx_timing

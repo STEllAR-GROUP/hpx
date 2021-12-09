@@ -463,12 +463,6 @@
 #  endif
 #endif
 
-#if !defined(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_VERIFY_LOCKS_GLOBALLY
-#  endif
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 // This limits how deep the internal recursion of future continuations will go
 // before a new operation is re-spawned.

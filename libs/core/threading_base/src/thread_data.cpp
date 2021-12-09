@@ -8,8 +8,8 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/detail/coroutine_accessor.hpp>
-#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
