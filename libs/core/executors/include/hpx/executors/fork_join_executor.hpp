@@ -19,10 +19,10 @@
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
+#include <hpx/modules/hardware.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading/thread.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -130,7 +130,7 @@ namespace hpx { namespace execution { namespace experimental {
             threads::thread_stacksize stacksize_ =
                 threads::thread_stacksize::small_;
             loop_schedule schedule_ = loop_schedule::static_;
-            std::chrono::nanoseconds yield_delay_;
+            std::uint64_t yield_delay_;
 
             std::size_t main_thread_;
             std::size_t num_threads_;
@@ -143,6 +143,33 @@ namespace hpx { namespace execution { namespace experimental {
             // The current queues for each worker HPX thread.
             queues_type queues_;
 
+            template <typename Op>
+            static thread_state wait_state_this_thread_while(
+                std::atomic<thread_state> const& tstate, thread_state state,
+                std::uint64_t yield_delay, Op&& op)
+            {
+                std::uint64_t base_time = util::hardware::timestamp();
+                auto current = tstate.load(std::memory_order_relaxed);
+                while (op(current, state))
+                {
+                    for (int i = 0; i < 128; ++i)
+                    {
+                        current = tstate.load(std::memory_order_relaxed);
+                        if (!op(current, state))
+                        {
+                            return current;
+                        }
+                        HPX_SMT_PAUSE;
+                    }
+
+                    if ((util::hardware::timestamp() - base_time) > yield_delay)
+                    {
+                        hpx::this_thread::yield();
+                    }
+                }
+                return current;
+            }
+
             // Entry point for each worker HPX thread. Holds references to the
             // member variables of fork_join_executor.
             struct thread_function
@@ -153,40 +180,11 @@ namespace hpx { namespace execution { namespace experimental {
                 loop_schedule const schedule_;
                 hpx::lcos::local::spinlock& exception_mutex_;
                 std::exception_ptr& exception_;
-                std::chrono::nanoseconds yield_delay_;
+                std::uint64_t yield_delay_;
 
                 // Changing data for each parallel region.
                 region_data_type& region_data_;
                 queues_type& queues_;
-
-                thread_state wait_not_state_this_thread(
-                    thread_state state) const
-                {
-                    std::atomic<thread_state>& thread_state =
-                        region_data_[thread_index_].data_.state_;
-
-                    hpx::chrono::high_resolution_timer t;
-                    auto current = thread_state.load(std::memory_order_relaxed);
-                    while (current == state)
-                    {
-                        for (int i = 0; i < 128; ++i)
-                        {
-                            current =
-                                thread_state.load(std::memory_order_relaxed);
-                            if (current != state)
-                            {
-                                return current;
-                            }
-                            HPX_SMT_PAUSE;
-                        }
-
-                        if (t.elapsed_nanoseconds() > yield_delay_.count())
-                        {
-                            hpx::this_thread::yield();
-                        }
-                    }
-                    return current;
-                }
 
                 void set_state_this_thread(thread_state state) noexcept
                 {
@@ -207,7 +205,12 @@ namespace hpx { namespace execution { namespace experimental {
                     set_state_this_thread(thread_state::idle);
 
                     region_data& data = region_data_[thread_index_].data_;
-                    auto state = wait_not_state_this_thread(thread_state::idle);
+
+                    // wait as long the state is 'idle'
+                    auto state = shared_data::wait_state_this_thread_while(
+                        data.state_, thread_state::idle, yield_delay_,
+                        std::equal_to<>());
+
                     while (state != thread_state::stopping)
                     {
                         (data.thread_function_helper_.load(
@@ -215,7 +218,10 @@ namespace hpx { namespace execution { namespace experimental {
                             thread_index_, num_threads_, queues_,
                             exception_mutex_, exception_);
 
-                        state = wait_not_state_this_thread(thread_state::idle);
+                        // wait as long the state is 'idle'
+                        state = shared_data::wait_state_this_thread_while(
+                            data.state_, thread_state::idle, yield_delay_,
+                            std::equal_to<>());
                     }
 
                     HPX_ASSERT(
@@ -244,31 +250,9 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 for (std::size_t t = 0; t < num_threads_; ++t)
                 {
-                    auto& thread_state = region_data_[t].data_.state_;
-
-                    hpx::chrono::high_resolution_timer tim;
-                    auto current = thread_state.load(std::memory_order_relaxed);
-                    while (current != state)
-                    {
-                        bool continue_with_next = false;
-                        for (int i = 0; i < 64; ++i)
-                        {
-                            current =
-                                thread_state.load(std::memory_order_relaxed);
-                            if (current == state)
-                            {
-                                continue_with_next = true;
-                                break;
-                            }
-                            HPX_SMT_PAUSE;
-                        }
-
-                        if (!continue_with_next &&
-                            tim.elapsed_nanoseconds() > yield_delay_.count())
-                        {
-                            hpx::this_thread::yield();
-                        }
-                    }
+                    // wait for thread-state to be equal to 'state'
+                    wait_state_this_thread_while(region_data_[t].data_.state_,
+                        state, yield_delay_, std::not_equal_to<>());
                 }
             }
 
@@ -326,7 +310,8 @@ namespace hpx { namespace execution { namespace experimental {
               , priority_(priority)
               , stacksize_(stacksize)
               , schedule_(schedule)
-              , yield_delay_(yield_delay)
+              , yield_delay_(std::uint64_t(
+                    yield_delay.count() / pool_->timestamp_scale()))
               , num_threads_(pool_->get_os_thread_count())
               , exception_mutex_()
               , exception_()
@@ -402,8 +387,8 @@ namespace hpx { namespace execution { namespace experimental {
                         auto& element_function =
                             *static_cast<F*>(data.element_function_);
                         auto& shape = *static_cast<S const*>(data.shape_);
-                        auto& argument_pack = *static_cast<Tuple*>(
-                            data.argument_pack_);
+                        auto& argument_pack =
+                            *static_cast<Tuple*>(data.argument_pack_);
 
                         // Set up the local queues and state.
                         std::size_t size = hpx::util::size(shape);
@@ -452,8 +437,8 @@ namespace hpx { namespace execution { namespace experimental {
                         auto& element_function =
                             *static_cast<F*>(data.element_function_);
                         auto& shape = *static_cast<S const*>(data.shape_);
-                        auto& argument_pack = *static_cast<Tuple*>(
-                            data.argument_pack_);
+                        auto& argument_pack =
+                            *static_cast<Tuple*>(data.argument_pack_);
 
                         // Set up the local queues and state.
                         queue_type& local_queue = queues[thread_index].data_;

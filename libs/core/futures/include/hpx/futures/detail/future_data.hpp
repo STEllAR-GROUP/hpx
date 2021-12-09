@@ -856,7 +856,7 @@ namespace hpx { namespace lcos { namespace detail {
     private:
         bool started_test() const noexcept
         {
-            std::lock_guard l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return started_;
         }
 
@@ -875,13 +875,13 @@ namespace hpx { namespace lcos { namespace detail {
     protected:
         bool started_test_and_set()
         {
-            std::lock_guard l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return started_test_and_set_locked(l);
         }
 
         void check_started()
         {
-            std::unique_lock l(mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             if (started_)
             {
                 l.unlock();
@@ -953,12 +953,12 @@ namespace hpx { namespace lcos { namespace detail {
     protected:
         threads::thread_id_type get_thread_id() const noexcept
         {
-            std::lock_guard l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return id_;
         }
         void set_thread_id(threads::thread_id_type id) noexcept
         {
-            std::lock_guard l(mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             id_ = id;
         }
 

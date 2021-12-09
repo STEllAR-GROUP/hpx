@@ -368,8 +368,7 @@ namespace hpx { namespace lcos { namespace local {
             {
             }
 
-            cancelable_task_object(
-                init_no_addref no_addref, F const& f)
+            cancelable_task_object(init_no_addref no_addref, F const& f)
               : base_type(no_addref, f)
             {
             }

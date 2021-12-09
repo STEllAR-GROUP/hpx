@@ -302,9 +302,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE bool equal(chunk_size_idx_iterator const& other) const
         {
             return iterator() == other.iterator() &&
-                chunk_size_ == other.chunk_size_ &&
-                current_ == other.current_ &&
-                base_index() == other.base_index();
+                chunk_size_ == other.chunk_size_ && current_ == other.current_;
         }
 
         HPX_HOST_DEVICE typename base_type::reference dereference()

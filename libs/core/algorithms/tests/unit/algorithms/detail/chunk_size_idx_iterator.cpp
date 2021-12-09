@@ -1,5 +1,9 @@
 //  Copyright (c) 2021 Hartmut Kaiser
 //
+//  Copyright David Abrahams 2001-2004.
+//  Copyright (c) Jeremy Siek 2001-2003.
+//  Copyright (c) Thomas Witt 2002.
+//
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -55,17 +59,8 @@ void category_test(
 
     HPX_TEST(std::distance(x, y) == 1);
 
-// disable warning: unary minus operator applied to unsigned type, result
-// still unsigned
-#if defined(HPX_MSVC)
-#pragma warning(push)
-#pragma warning(disable : 4146)
-#endif
     // Show that values outside the range can't be found
     HPX_TEST(!std::binary_search(start, std::prev(finish), *finish));
-#if defined(HPX_MSVC)
-#pragma warning(pop)
-#endif
 
     // Do the generic random_access_iterator_test
     std::vector<typename Iterator::value_type> v;
