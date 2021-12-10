@@ -650,11 +650,11 @@ endif()
 
 # Thread Manager related build options
 
-set(HPX_MAX_CPU_COUNT_DEFAULT "64")
+set(HPX_MAX_CPU_COUNT_DEFAULT "")
 hpx_option(
   HPX_WITH_MAX_CPU_COUNT
   STRING
-  "HPX applications will not use more that this number of OS-Threads (empty string means dynamic) (default: ${HPX_MAX_CPU_COUNT_DEFAULT})"
+  "HPX applications will not use more that this number of OS-Threads (empty string means dynamic) (default: \"${HPX_MAX_CPU_COUNT_DEFAULT}\")"
   "${HPX_MAX_CPU_COUNT_DEFAULT}"
   CATEGORY "Thread Manager"
   ADVANCED
