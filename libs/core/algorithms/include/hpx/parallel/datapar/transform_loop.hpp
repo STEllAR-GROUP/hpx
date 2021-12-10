@@ -11,6 +11,7 @@
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/executors/datapar/execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/tag_invoke.hpp>
