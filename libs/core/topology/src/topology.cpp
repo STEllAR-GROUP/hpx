@@ -1236,6 +1236,7 @@ namespace hpx { namespace threads {
         mask_type mask = mask_type();
         resize(mask, get_number_of_pus());
 
+#if !defined(__APPLE__)
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
             if (hwloc_get_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
@@ -1258,6 +1259,7 @@ namespace hpx { namespace threads {
                     set(mask, detail::get_index(pu_obj));
             }
         }
+#endif    // __APPLE__
 
         hwloc_bitmap_free(cpuset);
 
