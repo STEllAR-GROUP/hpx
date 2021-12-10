@@ -408,15 +408,18 @@ jobs:
           paths:
             - ./build
 
-  tests.unit:
+  tests.unit.algorithms:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Unit Tests
+          name: Building Unit Tests (Algorithms)
           command: |
-              ninja -j2 -k 0 tests.unit
+              ninja -j2 -k 0 \
+                tests.unit.modules.algorithms.algorithms \
+                tests.unit.modules.algorithms.block \
+                tests.unit.modules.algorithms.datapar_algorithms
       - run:
           name: Running Unit Tests
           when: always
@@ -427,13 +430,68 @@ jobs:
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
-                --tests-regex tests.unit \
-                --exclude-regex \
-              "tests.unit.modules.segmented_algorithms|\
-              tests.unit.modules.compute.numa_allocator|\
-              tests.unit.modules.resource_partitioner.scheduler_binding_check"
+                --tests-regex \
+              "tests.unit.modules.algorithms.algorithms|\
+              tests.unit.modules.algorithms.block|\
+              tests.unit.modules.algorithms.datapar_algorithms"
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.algorithms
+      - store_artifacts:
+          path: tests.unit.algorithms
+
+  tests.unit.container_algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (Container Algorithms)
+          command: |
+              ninja -j2 -k 0 tests.unit.modules.algorithms.container_algorithms
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
               ctest \
                 --timeout 120 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex tests.unit.modules.algorithms.container_algorithms
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.container_algorithms
+      - store_artifacts:
+          path: tests.unit.container_algorithms
+
+  tests.unit.segmented_algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (Segmented Algorithms)
+          command: |
+              ninja -j2 -k 0 tests.unit.modules.segmented_algorithms
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 180 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
@@ -445,9 +503,76 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.unit
+          path: tests.unit.segmented_algorithms
       - store_artifacts:
-          path: tests.unit
+          path: tests.unit.segmented_algorithms
+
+  tests.unit1:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.targets`
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 120 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.targets | sed ':b;N;$!bb;s/\n/|/g'` \
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit1
+      - store_artifacts:
+          path: tests.unit1
+
+  tests.unit2:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.targets`
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              # NOTE: the numa_allocator test is disabled because
+              # hwloc_get_area_membind_nodeset used by it fails with EPERM.
+              ctest \
+                --timeout 120 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.targets | sed ':b;N;$!bb;s/\n/|/g'` \
+                --exclude-regex \
+              "tests.unit.modules.compute.numa_allocator|\
+              tests.unit.modules.resource_partitioner.scheduler_binding_check"
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit2
+      - store_artifacts:
+          path: tests.unit2
 
   tests.regressions:
     <<: *defaults
@@ -484,7 +609,7 @@ jobs:
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
                 -R tests.headers \
-                -E "tests.headers.modules.[a-h].*"
+                -E "tests.headers.modules.[a-n].*"
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -501,13 +626,30 @@ jobs:
           name: Building Header Tests (part 2)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.[a-h].*"
+                -R "tests.headers.modules.[a-g].*"
       - run:
           <<: *convert_xml
       - store_test_results:
           path: tests.headers2
       - store_artifacts:
           path: tests.headers2
+
+  tests.headers3:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Header Tests (part 3)
+          command: |
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
+                -R "tests.headers.modules.[h-n].*"
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.headers3
+      - store_artifacts:
+          path: tests.headers3
 
   tests.performance:
     <<: *defaults
@@ -663,7 +805,15 @@ workflows:
           <<: *gh_pages_filter
       - tests.examples:
           <<: *core_dependency
-      - tests.unit:
+      - tests.unit.algorithms:
+          <<: *core_dependency
+      - tests.unit.container_algorithms:
+          <<: *core_dependency
+      - tests.unit.segmented_algorithms:
+          <<: *core_dependency
+      - tests.unit1:
+          <<: *core_dependency
+      - tests.unit2:
           <<: *core_dependency
       - tests.regressions:
           <<: *core_dependency
@@ -672,6 +822,8 @@ workflows:
       - tests.headers1:
           <<: *core_dependency
       - tests.headers2:
+          <<: *core_dependency
+      - tests.headers3:
           <<: *core_dependency
       - docs:
           requires:
@@ -688,11 +840,16 @@ workflows:
           requires:
             - core
             - tests.examples
-            - tests.unit
+            - tests.unit.algorithms
+            - tests.unit.container_algorithms
+            - tests.unit.segmented_algorithms
+            - tests.unit1
+            - tests.unit2
             - tests.regressions
             - tests.performance
             - tests.headers1
             - tests.headers2
+            - tests.headers3
           <<: *gh_pages_filter
       - push_stable_tag:
           requires:

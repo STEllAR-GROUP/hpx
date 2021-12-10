@@ -144,5 +144,7 @@ foreach(test ${tests})
     ${test}_test PRIVATE hpx_iterator_support_test_utilities
   )
 
-  add_hpx_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test(
+    "modules.algorithms.container_algorithms" ${test} ${${test}_PARAMETERS}
+  )
 endforeach()
