@@ -22,15 +22,28 @@
 
 namespace hpx::detail {
     template <typename T>
-    struct empty_vtable
+    struct empty_vtable_type
     {
         static_assert(
             sizeof(T) == 0, "No empty vtable type defined for given type T");
     };
 
     template <typename T>
-    using empty_vtable_t = typename empty_vtable<T>::type;
+    using empty_vtable_t = typename empty_vtable_type<T>::type;
 
+#if defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
+    template <typename T>
+    inline constexpr empty_vtable_t<T> empty_vtable{};
+
+    template <typename T>
+    T const* get_empty_vtable()
+    {
+        static_assert(std::is_base_of_v<T, empty_vtable_t<T>>,
+            "Given empty vtable type should be a base of T");
+
+        return &empty_vtable<T>;
+    }
+#else
     template <typename T>
     T const* get_empty_vtable()
     {
@@ -39,7 +52,8 @@ namespace hpx::detail {
 
         static empty_vtable_t<T> empty;
         return &empty;
-    };
+    }
+#endif
 
     template <typename Base, std::size_t EmbeddedStorageSize,
         std::size_t AlignmentSize = sizeof(void*)>
@@ -290,7 +304,7 @@ namespace hpx::execution::experimental::detail {
 
 namespace hpx::detail {
     template <>
-    struct empty_vtable<
+    struct empty_vtable_type<
         hpx::execution::experimental::detail::any_operation_state_base>
     {
         using type =
@@ -397,7 +411,7 @@ namespace hpx::execution::experimental::detail {
 
 namespace hpx::detail {
     template <typename... Ts>
-    struct empty_vtable<
+    struct empty_vtable_type<
         hpx::execution::experimental::detail::any_receiver_base<Ts...>>
     {
         using type =
@@ -657,6 +671,7 @@ namespace hpx::execution::experimental::detail {
 }    // namespace hpx::execution::experimental::detail
 
 namespace hpx::execution::experimental {
+#if !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
     namespace detail {
         // This helper only exists to make it possible to use
         // any_(unique_)sender in global variables or in general static
@@ -679,10 +694,13 @@ namespace hpx::execution::experimental {
             }
         };
     }    // namespace detail
+#endif
 
     template <typename... Ts>
     class unique_any_sender
+#if !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
       : private detail::any_sender_static_empty_vtable_helper<Ts...>
+#endif
     {
         using base_type = detail::unique_any_sender_base<Ts...>;
         template <typename Sender>
@@ -746,7 +764,9 @@ namespace hpx::execution::experimental {
 
     template <typename... Ts>
     class any_sender
+#if !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
       : private detail::any_sender_static_empty_vtable_helper<Ts...>
+#endif
     {
         using base_type = detail::any_sender_base<Ts...>;
         template <typename Sender>
@@ -828,7 +848,7 @@ namespace hpx::execution::experimental {
 
 namespace hpx::detail {
     template <typename... Ts>
-    struct empty_vtable<
+    struct empty_vtable_type<
         hpx::execution::experimental::detail::unique_any_sender_base<Ts...>>
     {
         using type =
@@ -837,7 +857,7 @@ namespace hpx::detail {
     };
 
     template <typename... Ts>
-    struct empty_vtable<
+    struct empty_vtable_type<
         hpx::execution::experimental::detail::any_sender_base<Ts...>>
     {
         using type =
