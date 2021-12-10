@@ -449,17 +449,6 @@ jobs:
       - store_artifacts:
           path: tests.unit
 
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit2
-      - store_artifacts:
-          path: tests.unit2
-
   tests.regressions:
     <<: *defaults
     steps:
@@ -485,21 +474,40 @@ jobs:
       - store_artifacts:
           path: tests.regressions
 
-  tests.headers:
+  tests.headers1:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Header Tests
+          name: Building Header Tests (part 1)
           command: |
-              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure -R tests.headers
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
+                -R tests.headers \
+                -E "tests.headers.modules.[a-h].*"
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: tests.headers
+          path: tests.headers1
       - store_artifacts:
-          path: tests.headers
+          path: tests.headers1
+
+  tests.headers2:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Header Tests (part 2)
+          command: |
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
+                -R "tests.headers.modules.[a-h].*"
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.headers2
+      - store_artifacts:
+          path: tests.headers2
 
   tests.performance:
     <<: *defaults
@@ -661,7 +669,9 @@ workflows:
           <<: *core_dependency
       - tests.performance:
           <<: *core_dependency
-      - tests.headers:
+      - tests.headers1:
+          <<: *core_dependency
+      - tests.headers2:
           <<: *core_dependency
       - docs:
           requires:
@@ -681,7 +691,8 @@ workflows:
             - tests.unit
             - tests.regressions
             - tests.performance
-            - tests.headers
+            - tests.headers1
+            - tests.headers2
           <<: *gh_pages_filter
       - push_stable_tag:
           requires:
