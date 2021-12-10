@@ -178,10 +178,63 @@ In order to use |hpx|, only the core libraries are required. In order to use the
 libraries, you need to specify them as link dependencies in your build (See
 :ref:`creating_hpx_projects`).
 
-As |hpx| is a modern C++ library which relies on C++17 by default. The use of
-more recent standards can be opted into explicitly. If you want to force |hpx|
-to use a specific C++ standard version, you can use the ``HPX_WITH_CXX_STANDARD``
-CMake variable; e.g. ``HPX_WITH_CXX_STANDARD=20``.
+.. _important_cmake_options:
+
+Most important |cmake| options 
+------------------------------
+
+While building |hpx|, you are provided with multiple CMake options which correspond 
+to different configurations. Below, there is a set of the most important and frequently 
+used CMake options.
+
+.. option:: HPX_WITH_MALLOC
+
+   Use a custom allocator. Using a custom allocator tuned for multithreaded applications is very 
+   important for the performance of |hpx| applications. When debugging applications, it's useful to set 
+   this to ``system``, as custom allocators can hide some memory-related bugs. Note that setting this to 
+   something other than ``system`` requires an external dependency.
+
+.. option:: HPX_WITH_CUDA
+
+   Enable support for CUDA. Use ``CMAKE_CUDA_COMPILER`` to set the CUDA compiler. This is a standard |cmake| variable, 
+   like ``CMAKE_CXX_COMPILER``. 
+
+.. option:: HPX_WITH_PARCELPORT_MPI
+
+   Enable the MPI parcelport. This enables the use of MPI for the networking operations in the HPX runtime. 
+   The default value is ``OFF`` because it's not available on all systems and/or requires another dependency. However, 
+   it is the recommended parcelport.
+
+.. option:: HPX_WITH_PARCELPORT_TCP
+
+   Enable the TCP parcelport. Enables the use of TCP for networking in the runtime. The default value is ``ON``. 
+   However, it's only recommended for debugging purposes, as it is slower than the MPI parcelport.
+
+.. option:: HPX_WITH_APEX
+   
+   Enable APEX integration. `APEX <https://uo-oaciss.github.io/apex/quickstarthpx/>`_ can be used to profile |hpx|
+   applications. In particular, it provides information about individual tasks in the |hpx| runtime.
+
+.. option:: HPX_WITH_GENERIC_CONTEXT_COROUTINES
+
+   Enable Boost. Context for task context switching. It must be enabled for non-x86 architectures such as ARM and Power.
+
+.. option:: HPX_WITH_MAX_CPU_COUNT
+
+   Set the maximum CPU count supported by |hpx|. The default value is 64, and should be set to a number at least as
+   high as the number of cores on a system including virtual cores such as hyperthreads.
+
+.. option:: HPX_WITH_CXX_STANDARD
+
+   Set a specific C++ standard version e.g. ``HPX_WITH_CXX_STANDARD=20``. The default and minimum value is 17. 
+
+.. option:: HPX_WITH_EXAMPLES
+
+   Build examples.
+
+.. option:: HPX_WITH_TESTS
+   
+   Build tests.
 
 .. _build_types:
 
