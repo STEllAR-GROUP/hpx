@@ -64,7 +64,8 @@ void test_tss()
 
     int const NUMTHREADS = 5;
 
-    std::vector<hpx::future<void>> threads(NUMTHREADS);
+    std::vector<hpx::future<void>> threads;
+    threads.reserve(NUMTHREADS);
     for (int i = 0; i < NUMTHREADS; ++i)
     {
         hpx::lcos::local::promise<void> p;
