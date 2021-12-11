@@ -250,8 +250,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     local_iterator_pair_type out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, f, proj);
 
-                    positions.emplace_back(traits::compose(send, out.min),
-                        traits::compose(send, out.max));
+                    positions.emplace_back(
+                        result_type{traits::compose(send, out.min),
+                            traits::compose(send, out.max)});
                 }
             }
             else
@@ -265,8 +266,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     local_iterator_pair_type out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, f, proj);
 
-                    positions.emplace_back(traits::compose(sit, out.min),
-                        traits::compose(sit, out.max));
+                    positions.emplace_back(
+                        result_type{traits::compose(sit, out.min),
+                            traits::compose(sit, out.max)});
                 }
 
                 // handle all of the full partitions
@@ -281,8 +283,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             dispatch(traits::get_id(sit), algo, policy,
                                 std::true_type(), beg, end, f, proj);
 
-                        positions.emplace_back(traits::compose(sit, out.min),
-                            traits::compose(sit, out.max));
+                        positions.emplace_back(
+                            result_type{traits::compose(sit, out.min),
+                                traits::compose(sit, out.max)});
                     }
                 }
 
@@ -294,8 +297,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     local_iterator_pair_type out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, f, proj);
 
-                    positions.emplace_back(traits::compose(sit, out.min),
-                        traits::compose(sit, out.max));
+                    positions.emplace_back(
+                        result_type{traits::compose(sit, out.min),
+                            traits::compose(sit, out.max)});
                 }
             }
 
