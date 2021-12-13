@@ -135,23 +135,53 @@ namespace hpx { namespace parcelset {
 
     std::shared_ptr<parcelport> parcelhandler::get_bootstrap_parcelport() const
     {
+        std::string cfgkey("hpx.parcel.bootstrap");
         if (!pports_.empty())
         {
-            std::string cfgkey("hpx.parcel.bootstrap");
-            pports_type::const_iterator it =
+            auto it =
                 pports_.find(get_priority(get_config_entry(cfgkey, "tcp")));
             if (it != pports_.end() && it->first > 0)
             {
                 return it->second;
             }
         }
-        for (pports_type::value_type const& pp : pports_)
+
+        for (auto const& pp : pports_)
         {
             if (pp.first > 0 && pp.second->can_bootstrap())
             {
                 return pp.second;
             }
         }
+
+        if (hpx::is_networking_enabled())
+        {
+            std::cerr << "Could not find usable bootstrap parcelport.\n";
+            std::cerr << hpx::util::format(
+                "Preconfigured bootstrap parcelport: '{}'\n",
+                get_config_entry(cfgkey, "tcp"));
+
+            if (pports_.empty())
+            {
+                std::cerr << "No available parcelports\n";
+            }
+            else
+            {
+                std::cerr << "List of available parcelports:\n";
+                for (auto const& pp : pports_)
+                {
+                    std::cerr << hpx::util::format(
+                        "  {}, priority: {}, can bootstrap: {}\n",
+                        pp.second->type(), pp.first,
+                        pp.second->can_bootstrap());
+                }
+                std::cerr << "\n";
+            }
+
+            // terminate this locality as there is nothing else we can do
+            std::terminate();
+        }
+
         return std::shared_ptr<parcelport>();
     }
 

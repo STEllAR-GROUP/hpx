@@ -7,6 +7,7 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/modules/logging.hpp>
 #include <hpx/modules/mpi_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/util.hpp>
@@ -33,16 +34,23 @@ namespace hpx { namespace util {
             std::string mpi_environment_strings =
                 cfg.get_entry("hpx.parcel.mpi.env", default_env);
 
-            typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
             boost::char_separator<char> sep(";,: ");
-            tokenizer tokens(mpi_environment_strings, sep);
-            for (tokenizer::iterator it = tokens.begin(); it != tokens.end();
-                 ++it)
+            boost::tokenizer<boost::char_separator<char>> tokens(
+                mpi_environment_strings, sep);
+            for (auto const& tok : tokens)
             {
-                char* env = std::getenv(it->c_str());
+                char* env = std::getenv(tok.c_str());
                 if (env)
+                {
+                    LBT_(debug)
+                        << "Found MPI environment variable: " << tok << "="
+                        << std::string(env) << ", enabling MPI support\n";
                     return true;
+                }
             }
+
+            LBT_(info) << "No known MPI environment variable found, disabling "
+                          "MPI support\n";
             return false;
 #endif
         }
@@ -58,11 +66,17 @@ namespace hpx { namespace util {
         // - The application is not run in an MPI environment
         // - The TCP parcelport is enabled and has higher priority
         if (get_entry_as(cfg, "hpx.parcel.mpi.enable", 1) == 0 ||
-            !detail::detect_mpi_environment(cfg, HPX_HAVE_PARCELPORT_MPI_ENV) ||
             (get_entry_as(cfg, "hpx.parcel.tcp.enable", 1) &&
                 (get_entry_as(cfg, "hpx.parcel.tcp.priority", 1) >
                     get_entry_as(cfg, "hpx.parcel.mpi.priority", 0))))
         {
+            LBT_(info) << "MPI support disabled via configuration settings\n";
+            return false;
+        }
+
+        if (!detail::detect_mpi_environment(cfg, HPX_HAVE_PARCELPORT_MPI_ENV))
+        {
+            // log message was already generated
             return false;
         }
 
