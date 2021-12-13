@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/type_support/always_void.hpp>
@@ -297,10 +298,11 @@ namespace tests {
         }
     }    // namespace detail
 
-    // Preconditions: [i,i+N) is a valid range
+    // Preconditions: [i,i+N) is a valid range, N >= 2
     template <typename Iterator, typename TrueVals>
     void random_access_iterator_test(Iterator i, int N, TrueVals vals)
     {
+        HPX_ASSERT(N >= 2);
         bidirectional_iterator_test(i, vals[0], vals[1]);
         Iterator const j = i;
         int c;
