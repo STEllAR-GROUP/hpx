@@ -402,10 +402,12 @@ Classes
 - :cpp:class:`hpx::util::unique_function_nonser`
 - :cpp:struct:`hpx::traits::is_bind_expression`
 - :cpp:struct:`hpx::traits::is_placeholder`
+- :cpp:struct:`hpx::scoped_annotation`
 
 Functions
 ---------
 
+- :cpp:func:`hpx::annotated_function`
 - :cpp:func:`hpx::util::bind`
 - :cpp:func:`hpx::util::bind_back`
 - :cpp:func:`hpx::util::bind_front`

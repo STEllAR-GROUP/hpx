@@ -118,14 +118,14 @@ int hpx_main(variables_map& vm)
     std::atomic<int> count_down((np_loop + hp_loop) * cycles);
     std::atomic<int> counter(0);
     auto f3 = hpx::async(NP_executor,
-        hpx::util::annotated_function(
+        hpx::annotated_function(
             [&]() {
                 ++launch_count;
                 for (int i = 0; i < np_total; ++i)
                 {
                     // normal priority
                     auto f3 = hpx::async(NP_executor,
-                        hpx::util::annotated_function(
+                        hpx::annotated_function(
                             [&, np_m]() {
                                 np_task_count++;
                                 dec_counter dec(count_down);
@@ -141,13 +141,13 @@ int hpx_main(variables_map& vm)
 
                         // Launch HP tasks using an HP task to do it
                         hpx::async(HP_executor,
-                            hpx::util::annotated_function(
+                            hpx::annotated_function(
                                 [&]() {
                                     ++hp_launch_count;
                                     for (int j = 0; j < hp_loop; ++j)
                                     {
                                         hpx::async(HP_executor,
-                                            hpx::util::annotated_function(
+                                            hpx::annotated_function(
                                                 [&]() {
                                                     ++hp_task_count;
                                                     dec_counter dec(count_down);

@@ -28,7 +28,7 @@ int hpx_main()
     double extent;
 
     hpx::async(hpx::launch::sync,
-        hpx::util::annotated_function(
+        hpx::annotated_function(
             [&]() { extent = compute_minmax(vec); }, "compute_minmax"));
     HPX_TEST_EQ(extent, 76.6);
 

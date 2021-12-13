@@ -102,7 +102,7 @@ struct test_async_executor
 
         // forward the task execution on to the real internal executor
         return hpx::parallel::execution::async_execute(executor_,
-            util::annotated_function(std::forward<F>(f), "custom"),
+            hpx::annotated_function(std::forward<F>(f), "custom"),
             std::forward<Ts>(ts)...);
     }
 
@@ -187,7 +187,7 @@ struct test_async_executor
 
         // forward the task execution on to the real internal executor
         return hpx::parallel::execution::then_execute(executor_,
-            util::annotated_function(std::forward<F>(f), "custom then"),
+            hpx::annotated_function(std::forward<F>(f), "custom then"),
             std::forward<OuterFuture<hpx::tuple<InnerFutures...>>>(predecessor),
             std::forward<Ts>(ts)...);
     }
@@ -230,7 +230,7 @@ struct test_async_executor
 
         // forward the task execution on to the real internal executor
         return hpx::parallel::execution::async_execute(executor_,
-            util::annotated_function(std::forward<F>(f), "custom async"),
+            hpx::annotated_function(std::forward<F>(f), "custom async"),
             std::forward<hpx::tuple<InnerFutures...>>(predecessor));
     }
 
