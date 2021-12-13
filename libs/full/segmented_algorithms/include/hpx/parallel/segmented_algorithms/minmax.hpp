@@ -250,8 +250,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     local_iterator_pair_type out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, f, proj);
 
-                    positions.emplace_back(traits::compose(send, out.min),
-                        traits::compose(send, out.max));
+                    positions.emplace_back(
+                        result_type{traits::compose(send, out.min),
+                            traits::compose(send, out.max)});
                 }
             }
             else
@@ -265,8 +266,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     local_iterator_pair_type out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, f, proj);
 
-                    positions.emplace_back(traits::compose(sit, out.min),
-                        traits::compose(sit, out.max));
+                    positions.emplace_back(
+                        result_type{traits::compose(sit, out.min),
+                            traits::compose(sit, out.max)});
                 }
 
                 // handle all of the full partitions
@@ -281,8 +283,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             dispatch(traits::get_id(sit), algo, policy,
                                 std::true_type(), beg, end, f, proj);
 
-                        positions.emplace_back(traits::compose(sit, out.min),
-                            traits::compose(sit, out.max));
+                        positions.emplace_back(
+                            result_type{traits::compose(sit, out.min),
+                                traits::compose(sit, out.max)});
                     }
                 }
 
@@ -294,8 +297,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     local_iterator_pair_type out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, f, proj);
 
-                    positions.emplace_back(traits::compose(sit, out.min),
-                        traits::compose(sit, out.max));
+                    positions.emplace_back(
+                        result_type{traits::compose(sit, out.min),
+                            traits::compose(sit, out.max)});
                 }
             }
 
@@ -430,7 +434,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<SegIter>
         )>
     // clang-format on
-    SegIter tag_dispatch(hpx::min_element_t, SegIter first, SegIter last, F&& f)
+    SegIter tag_invoke(hpx::min_element_t, SegIter first, SegIter last, F&& f)
     {
         static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
             "Requires at least forward iterator.");
@@ -459,7 +463,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
-    tag_dispatch(hpx::min_element_t, ExPolicy&& policy, SegIter first,
+    tag_invoke(hpx::min_element_t, ExPolicy&& policy, SegIter first,
         SegIter last, F&& f)
     {
         static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
@@ -490,7 +494,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<SegIter>
         )>
     // clang-format on
-    SegIter tag_dispatch(hpx::max_element_t, SegIter first, SegIter last, F&& f)
+    SegIter tag_invoke(hpx::max_element_t, SegIter first, SegIter last, F&& f)
     {
         static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
             "Requires at least forward iterator.");
@@ -519,7 +523,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
-    tag_dispatch(hpx::max_element_t, ExPolicy&& policy, SegIter first,
+    tag_invoke(hpx::max_element_t, ExPolicy&& policy, SegIter first,
         SegIter last, F&& f)
     {
         static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
@@ -550,7 +554,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<SegIter>
         )>
     // clang-format on
-    minmax_element_result<SegIter> tag_dispatch(
+    minmax_element_result<SegIter> tag_invoke(
         hpx::minmax_element_t, SegIter first, SegIter last, F&& f)
     {
         static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
@@ -581,7 +585,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         minmax_element_result<SegIter>>
-    tag_dispatch(hpx::minmax_element_t, ExPolicy&& policy, SegIter first,
+    tag_invoke(hpx::minmax_element_t, ExPolicy&& policy, SegIter first,
         SegIter last, F&& f)
     {
         static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
