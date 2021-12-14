@@ -2119,7 +2119,7 @@ namespace hpx { namespace agas {
             send_refcnt_requests_async(l);
 
         // re throw possible errors
-        when_all(lazy_results).get();
+        hpx::when_all(lazy_results).get();
 
         if (&ec != &throws)
             ec = make_success_code();

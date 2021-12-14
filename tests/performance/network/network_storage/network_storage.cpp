@@ -655,7 +655,8 @@ void test_write(
         DEBUG_ONLY(int numwait = static_cast<int>(final_list.size());)
 
         DEBUG_OUTPUT(1, "Waiting for when_all future on rank " << rank);
-        hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
+        hpx::future<int> result =
+            hpx::when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
 #ifdef USE_CLEANING_THREAD
         int total = numwait+removed;
@@ -869,7 +870,8 @@ void test_read(
         hpx::chrono::high_resolution_timer futuretimer;
 
         DEBUG_OUTPUT(1, "Waiting for whena_all future on rank " << rank);
-        hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
+        hpx::future<int> result =
+            hpx::when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
 #ifdef USE_CLEANING_THREAD
         int total = numwait+removed;

@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file lcos/wait_all.hpp
+/// \file wait_all.hpp
 
 #pragma once
 
@@ -557,64 +557,6 @@ namespace hpx {
 }    // namespace hpx
 
 namespace hpx::lcos {
-
-    template <typename Future>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_all is deprecated. Use hpx::wait_all instead.")
-    void wait_all(std::vector<Future> const& values)
-    {
-        hpx::wait_all(values);
-    }
-
-    template <typename Future>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_all is deprecated. Use hpx::wait_all instead.")
-    void wait_all(std::vector<Future>& values)
-    {
-        hpx::wait_all(values);
-    }
-
-    template <typename Future>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_all is deprecated. Use hpx::wait_all instead.")
-    void wait_all(std::vector<Future>&& values)
-    {
-        hpx::wait_all(HPX_MOVE(values));
-    }
-
-    template <typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_all is deprecated. Use hpx::wait_all instead.")
-    void wait_all(Iterator begin, Iterator end)
-    {
-        hpx::wait_all(begin, end);
-    }
-
-    template <typename Future, std::size_t N>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_all is deprecated. Use hpx::wait_all instead.")
-    void wait_all(std::array<Future, N> const& values)
-    {
-        hpx::wait_all(values);
-    }
-
-    template <typename Future, std::size_t N>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_all is deprecated. Use hpx::wait_all instead.")
-    void wait_all(std::array<Future, N>& values)
-    {
-        hpx::wait_all(const_cast<std::array<Future, N> const&>(values));
-    }
-
-    template <typename Future, std::size_t N>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_all is deprecated. Use hpx::wait_all instead.")
-    void wait_all(std::array<Future, N>&& values)
-    {
-        hpx::wait_all(HPX_MOVE(values));
-    }
 
     template <typename... Ts>
     HPX_DEPRECATED_V(

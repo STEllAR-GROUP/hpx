@@ -108,7 +108,7 @@ int hpx_main()
         large_stack_executor, &dummy_task, 3, "true default + large stack"));
 
     // just wait until everything is done
-    when_all(lotsa_futures).get();
+    hpx::when_all(lotsa_futures).get();
 
     return hpx::local::finalize();
 }

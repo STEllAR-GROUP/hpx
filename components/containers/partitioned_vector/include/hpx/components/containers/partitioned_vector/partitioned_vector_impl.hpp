@@ -397,7 +397,7 @@ namespace hpx {
         }
         HPX_ASSERT(l == num_parts);
 
-        when_all(ptrs).get();
+        hpx::when_all(ptrs).get();
 
         // cache our partition size
         partition_size_ = get_partition_size();
@@ -461,7 +461,7 @@ namespace hpx {
             }
         }
 
-        when_all(ptrs).get();
+        hpx::when_all(ptrs).get();
 
         size_ = rhs.size_;
         partition_size_ = rhs.partition_size_;
