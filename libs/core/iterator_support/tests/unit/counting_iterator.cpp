@@ -25,8 +25,6 @@
 #include <utility>
 #include <vector>
 
-#include "iterator_tests.hpp"
-
 int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
