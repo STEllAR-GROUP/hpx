@@ -18,7 +18,11 @@
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/invoke_fused.hpp>
+#include <hpx/futures/detail/future_data.hpp>
+#include <hpx/modules/memory.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/synchronization/latch.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <exception>
@@ -32,62 +36,26 @@ namespace hpx { namespace execution { namespace experimental {
     class task_group
     {
     public:
-        task_group()
-          : latch_(1)
-          , has_arrived_(false)
-        {
-        }
-
-#if defined(HPX_DEBUG)
-        ~task_group()
-        {
-            // wait() must have been called
-            HPX_ASSERT(latch_.is_ready());
-        }
-#else
-        ~task_group() = default;
-#endif
+        HPX_CORE_EXPORT task_group();
+        HPX_CORE_EXPORT ~task_group();
 
     private:
         struct on_exit
         {
-            explicit on_exit(task_group& tg)
-              : latch_(&tg.latch_)
-            {
-                if (latch_->reset_if_needed_and_count_up(1, 1))
-                {
-                    tg.has_arrived_.store(false, std::memory_order_release);
-                }
-            }
+            HPX_CORE_EXPORT explicit on_exit(task_group& tg);
+            HPX_CORE_EXPORT ~on_exit();
 
-            ~on_exit()
-            {
-                if (latch_)
-                {
-                    latch_->count_down(1);
-                }
-            }
+            HPX_CORE_EXPORT on_exit(on_exit const& rhs) = delete;
+            HPX_CORE_EXPORT on_exit& operator=(on_exit const& rhs) = delete;
 
-            on_exit(on_exit const& rhs) = delete;
-            on_exit& operator=(on_exit const& rhs) = delete;
-
-            on_exit(on_exit&& rhs) noexcept
-              : latch_(rhs.latch_)
-            {
-                rhs.latch_ = nullptr;
-            }
-            on_exit& operator=(on_exit&& rhs) noexcept
-            {
-                latch_ = rhs.latch_;
-                rhs.latch_ = nullptr;
-                return *this;
-            }
+            HPX_CORE_EXPORT on_exit(on_exit&& rhs) noexcept;
+            HPX_CORE_EXPORT on_exit& operator=(on_exit&& rhs) noexcept;
 
             hpx::lcos::local::latch* latch_;
         };
 
     public:
-        /// Spawns a task to compute f() and returns immediately.
+        // Spawns a task to compute f() and returns immediately.
         // clang-format off
         template <typename Executor, typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
@@ -135,27 +103,25 @@ namespace hpx { namespace execution { namespace experimental {
                 HPX_FORWARD(Ts, ts)...);
         }
 
-        /// Waits for all tasks in the group to complete.
-        void wait()
-        {
-            bool expected = false;
-            if (has_arrived_.compare_exchange_strong(expected, true))
-            {
-                latch_.arrive_and_wait();
-                if (errors_.size() != 0)
-                {
-                    throw errors_;
-                }
-            }
-        }
+        // Waits for all tasks in the group to complete.
+        HPX_CORE_EXPORT void wait();
 
-        void add_exception(std::exception_ptr p)
-        {
-            errors_.add(HPX_MOVE(p));
-        }
+        // Add an exception to this task_group
+        HPX_CORE_EXPORT void add_exception(std::exception_ptr p);
 
     private:
+        friend class serialization::access;
+
+        HPX_CORE_EXPORT void serialize(
+            serialization::input_archive&, unsigned const);
+        HPX_CORE_EXPORT void serialize(
+            serialization::output_archive&, unsigned const);
+
+    private:
+        using shared_state_type = lcos::detail::future_data<void>;
+
         hpx::lcos::local::latch latch_;
+        hpx::intrusive_ptr<shared_state_type> state_;
         hpx::exception_list errors_;
         std::atomic<bool> has_arrived_;
     };

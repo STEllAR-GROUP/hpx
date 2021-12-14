@@ -210,7 +210,7 @@ set(algorithms_compat_headers
 )
 # cmake-format: on
 
-set(algorithms_sources handle_exception_termination_handler.cpp)
+set(algorithms_sources handle_exception_termination_handler.cpp task_group.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -225,7 +225,9 @@ add_hpx_module(
     hpx_execution
     hpx_executors
     hpx_futures
+    hpx_lcos_local
     hpx_pack_traversal
+    hpx_serialization
     hpx_util
   CMAKE_SUBDIRS examples tests
 )
