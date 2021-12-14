@@ -88,7 +88,7 @@ namespace hpx { namespace debug {
     namespace detail {
 
         template <typename Int>
-        HPX_CORE_EXPORT void print_hex(std::ostream& os, Int v, int N)
+        void print_hex(std::ostream& os, Int v, int N)
         {
             os << std::right << "0x" << std::setfill('0') << std::setw(N)
                << std::noshowbase << std::hex << v;
@@ -98,15 +98,14 @@ namespace hpx { namespace debug {
             std::ostream&, std::thread::id, int);
         template HPX_CORE_EXPORT void print_hex(
             std::ostream&, unsigned long, int);
+        template HPX_CORE_EXPORT void print_hex(std::ostream&, int, int);
 
-        template <typename Int>
-        HPX_CORE_EXPORT void print_ptr(std::ostream& os, Int v, int N)
+        void print_ptr(std::ostream& os, void* v, int N)
         {
             os << std::right << std::setw(N) << std::noshowbase << std::hex
                << v;
         }
 
-        template HPX_CORE_EXPORT void print_ptr(std::ostream&, void*, int);
     }    // namespace detail
 
     // ------------------------------------------------------------------
