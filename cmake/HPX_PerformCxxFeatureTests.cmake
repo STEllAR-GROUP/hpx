@@ -98,6 +98,10 @@ function(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx20_std_ranges_iter_swap(
       DEFINITIONS HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP
     )
+
+    hpx_check_for_cxx20_trivial_virtual_destructor(
+      DEFINITIONS HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR
+    )
   endif()
 
   hpx_check_for_cxx_lambda_capture_decltype(

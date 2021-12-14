@@ -531,6 +531,15 @@ function(hpx_check_for_cxx20_std_ranges_iter_swap)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx20_trivial_virtual_destructor)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR
+    SOURCE cmake/tests/cxx20_trivial_virtual_destructor.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_cxx_lambda_capture_decltype)
   add_hpx_config_test(
     HPX_WITH_CXX_LAMBDA_CAPTURE_DECLTYPE
