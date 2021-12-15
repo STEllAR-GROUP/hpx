@@ -40,7 +40,7 @@ def driver(verbose, logfile):
           help='only execute CMake but do not build')
 @args.arg('--build-dir', '-o', required=True, help='build directory')
 @args.arg('--build-type', '-b', choices=['release', 'debug'], required=True)
-@args.arg('--environment', '-e', help='path to environment file')
+@args.arg('--environment', '-e', nargs='?', help='path to environment file')
 @args.arg('--install-dir', '-i', help='install directory')
 @args.arg('--source-dir', help= var._project_name +' source directory')
 @args.arg('--target', '-t', nargs='+', help='make targets to build')
