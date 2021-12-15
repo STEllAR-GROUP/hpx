@@ -32,7 +32,7 @@ namespace hpx { namespace execution { namespace experimental {
                         transfer_t, Scheduler>)>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
-            bulk_t, Sender&& sender, Scheduler&& scheduler)
+            transfer_t, Sender&& sender, Scheduler&& scheduler)
         {
             auto completion_scheduler =
                 hpx::execution::experimental::get_completion_scheduler<

@@ -22,5 +22,5 @@ foreach(test ${tests})
     FOLDER "Tests/Unit/Modules/Core/Algorithms/Block"
   )
 
-  add_hpx_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test("modules.algorithms.block" ${test} ${${test}_PARAMETERS})
 endforeach()

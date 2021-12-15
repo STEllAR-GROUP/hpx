@@ -583,7 +583,7 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
 
    [hpx.parcel.mpi]
    enable = ${HPX_HAVE_PARCELPORT_MPI:$[hpx.parcel.enabled]}
-   env = ${HPX_HAVE_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE}
+   env = ${HPX_HAVE_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE,PALS_NODEID}
    multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:0}
    rank = <MPI_rank>
    processor_name = <MPI_processor_name>

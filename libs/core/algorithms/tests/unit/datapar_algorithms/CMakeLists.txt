@@ -46,5 +46,7 @@ foreach(test ${tests})
     FOLDER "Tests/Unit/Modules/Core/Algorithms/Datapar"
   )
 
-  add_hpx_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test(
+    "modules.algorithms.datapar_algorithms" ${test} ${${test}_PARAMETERS}
+  )
 endforeach()

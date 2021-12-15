@@ -173,5 +173,7 @@ foreach(test ${tests})
     FOLDER ${folder_name}
   )
 
-  add_hpx_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test(
+    "modules.algorithms.algorithms" ${test} ${${test}_PARAMETERS}
+  )
 endforeach()
