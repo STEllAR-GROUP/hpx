@@ -31,6 +31,7 @@ fi
 # Start the actual build
 set +e
 sbatch \
+    -vvv \
     --job-name="${job_name}" \
     --nodes="1" \
     --constraint="${configuration_slurm_constraint}" \
@@ -40,6 +41,7 @@ sbatch \
     --output="jenkins-hpx-${configuration_name_with_build_type}.out" \
     --error="jenkins-hpx-${configuration_name_with_build_type}.err" \
     --wait .jenkins/cscs/batch.sh
+echo $?
 
 # Print slurm logs
 echo "= stdout =================================================="

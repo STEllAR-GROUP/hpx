@@ -54,6 +54,8 @@ pipeline {
                             dir("${CHECKOUT_DIR}") {
                                 sh '''
                                 #!/bin/bash -l
+                                echo ${CHECKOUT_DIR}
+                                pwd
                                 .jenkins/cscs/entry.sh
                                 '''
                             }
