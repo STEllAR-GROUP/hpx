@@ -168,7 +168,7 @@ namespace hpx { namespace parallel { namespace util {
             typename Enable = std::enable_if_t<std::is_convertible_v<T, T2>>>
         constexpr operator min_max_result<T2>() &&
         {
-            return {std::move(min), std::move(max)};
+            return {HPX_MOVE(min), HPX_MOVE(max)};
         }
 
         template <typename Archive>
@@ -411,8 +411,8 @@ namespace hpx { namespace parallel { namespace util {
                 typename hpx::tuple_element<0, iterator_tuple_type>::type>;
 
             return hpx::make_future<result_type>(
-                std::move(zipiter), [](ZipIter zipiter) {
-                    return get_min_max_result(std::move(zipiter));
+                HPX_MOVE(zipiter), [](ZipIter zipiter) {
+                    return get_min_max_result(HPX_MOVE(zipiter));
                 });
         }
 

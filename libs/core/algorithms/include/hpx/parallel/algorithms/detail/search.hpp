@@ -174,7 +174,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             Proj2&& proj2)
         {
             return std::search(first, std::next(first, count), s_first, s_last,
-                util::compare_projected<Pred, Proj1, Proj2>(op, proj1, proj2));
+                util::compare_projected<Pred&, Proj1&, Proj2&>(
+                    op, proj1, proj2));
         }
 
         template <typename ExPolicy, typename FwdIter2, typename Pred,

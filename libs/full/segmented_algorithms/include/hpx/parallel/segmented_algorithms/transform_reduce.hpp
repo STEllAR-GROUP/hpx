@@ -61,7 +61,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    overall_result = hpx::util::invoke(red_op, overall_result,
+                    overall_result = HPX_INVOKE(red_op, overall_result,
                         dispatch(traits::get_id(sit), algo, policy,
                             std::true_type(), beg, end, red_op, conv_op));
                 }
@@ -73,7 +73,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 local_iterator_type end = traits::end(sit);
                 if (beg != end)
                 {
-                    overall_result = hpx::util::invoke(red_op, overall_result,
+                    overall_result = HPX_INVOKE(red_op, overall_result,
                         dispatch(traits::get_id(sit), algo, policy,
                             std::true_type(), beg, end, red_op, conv_op));
                 }
@@ -85,8 +85,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     end = traits::end(sit);
                     if (beg != end)
                     {
-                        overall_result = hpx::util::invoke(red_op,
-                            overall_result,
+                        overall_result = HPX_INVOKE(red_op, overall_result,
                             dispatch(traits::get_id(sit), algo, policy,
                                 std::true_type(), beg, end, red_op, conv_op));
                     }
@@ -97,7 +96,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    overall_result = hpx::util::invoke(red_op, overall_result,
+                    overall_result = HPX_INVOKE(red_op, overall_result,
                         dispatch(traits::get_id(sit), algo, policy,
                             std::true_type(), beg, end, red_op, conv_op));
                 }
@@ -223,7 +222,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 local_iterator_type1 end1 = traits1::local(last1);
                 if (beg1 != end1)
                 {
-                    overall_result = hpx::util::invoke(red_op, overall_result,
+                    overall_result = HPX_INVOKE(red_op, overall_result,
                         dispatch(traits1::get_id(sit1), algo, policy,
                             std::true_type(), beg1, end1, beg2, red_op,
                             conv_op));
@@ -237,7 +236,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 local_iterator_type1 end1 = traits1::end(sit1);
                 if (beg1 != end1)
                 {
-                    overall_result = hpx::util::invoke(red_op, overall_result,
+                    overall_result = HPX_INVOKE(red_op, overall_result,
                         dispatch(traits1::get_id(sit1), algo, policy,
                             std::true_type(), beg1, end1, beg2, red_op,
                             conv_op));
@@ -251,11 +250,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     end1 = traits1::end(sit1);
                     if (beg1 != end1)
                     {
-                        overall_result =
-                            hpx::util::invoke(red_op, overall_result,
-                                dispatch(traits1::get_id(sit1), algo, policy,
-                                    std::true_type(), beg1, end1, beg2, red_op,
-                                    conv_op));
+                        overall_result = HPX_INVOKE(red_op, overall_result,
+                            dispatch(traits1::get_id(sit1), algo, policy,
+                                std::true_type(), beg1, end1, beg2, red_op,
+                                conv_op));
                     }
                 }
 
@@ -265,7 +263,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 end1 = traits1::local(last1);
                 if (beg1 != end1)
                 {
-                    overall_result = hpx::util::invoke(red_op, overall_result,
+                    overall_result = HPX_INVOKE(red_op, overall_result,
                         dispatch(traits1::get_id(sit1), algo, policy,
                             std::true_type(), beg1, end1, beg2, red_op,
                             conv_op));

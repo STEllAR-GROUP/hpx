@@ -13,7 +13,6 @@
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
-#include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
@@ -38,7 +37,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             for (; first != last; ++first)
             {
-                if (hpx::util::invoke(proj, *first) == value)
+                if (HPX_INVOKE(proj, *first) == value)
                 {
                     return first;
                 }
@@ -54,7 +53,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             util::loop_idx_n<ExPolicy>(base_idx, part_begin, part_count, tok,
                 [&val, &proj, &tok](auto& v, std::size_t i) -> void {
-                    if (hpx::util::invoke(proj, v) == val)
+                    if (HPX_INVOKE(proj, v) == val)
                     {
                         tok.cancel(i);
                     }
@@ -82,7 +81,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Proj&& proj)
     {
         return sequential_find_t<ExPolicy>{}(base_idx, part_begin, part_count,
-            tok, val, std::forward<Proj>(proj));
+            tok, val, HPX_FORWARD(Proj, proj));
     }
 #endif
 
@@ -100,7 +99,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             for (; first != last; ++first)
             {
-                if (hpx::util::invoke(pred, hpx::util::invoke(proj, *first)))
+                if (HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
                 {
                     return first;
                 }
@@ -115,7 +114,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count, tok,
                 [&op, &tok, &proj](auto const& curr) {
-                    if (hpx::util::invoke(op, hpx::util::invoke(proj, *curr)))
+                    if (HPX_INVOKE(op, HPX_INVOKE(proj, *curr)))
                     {
                         tok.cancel();
                     }
@@ -130,7 +129,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             util::loop_idx_n<ExPolicy>(base_idx, part_begin, part_count, tok,
                 [&f, &proj, &tok](auto& v, std::size_t i) -> void {
-                    if (hpx::util::invoke(f, hpx::util::invoke(proj, v)))
+                    if (HPX_INVOKE(f, HPX_INVOKE(proj, v)))
                     {
                         tok.cancel(i);
                     }
@@ -157,7 +156,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         std::size_t part_count, Token& tok, F&& op, Proj&& proj)
     {
         return sequential_find_if_t<ExPolicy>{}(part_begin, part_count, tok,
-            std::forward<F>(op), std::forward<Proj>(proj));
+            HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
     template <typename ExPolicy, typename FwdIter, typename Token, typename F,
@@ -167,7 +166,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Proj&& proj)
     {
         return sequential_find_if_t<ExPolicy>{}(base_idx, part_begin,
-            part_count, tok, std::forward<F>(f), std::forward<Proj>(proj));
+            part_count, tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
     }
 #endif
 
@@ -186,7 +185,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             for (; first != last; ++first)
             {
-                if (!hpx::util::invoke(pred, hpx::util::invoke(proj, *first)))
+                if (!HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
                 {
                     return first;
                 }
@@ -201,7 +200,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count, tok,
                 [&op, &tok, &proj](auto const& curr) {
-                    if (!hpx::util::invoke(op, hpx::util::invoke(proj, *curr)))
+                    if (!HPX_INVOKE(op, HPX_INVOKE(proj, *curr)))
                     {
                         tok.cancel();
                     }
@@ -216,7 +215,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             util::loop_idx_n<ExPolicy>(base_idx, part_begin, part_count, tok,
                 [&f, &proj, &tok](auto& v, std::size_t i) -> void {
-                    if (!hpx::util::invoke(f, hpx::util::invoke(proj, v)))
+                    if (!HPX_INVOKE(f, HPX_INVOKE(proj, v)))
                     {
                         tok.cancel(i);
                     }
@@ -243,7 +242,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         std::size_t part_count, Token& tok, F&& op, Proj&& proj)
     {
         return sequential_find_if_not_t<ExPolicy>{}(part_begin, part_count, tok,
-            std::forward<F>(op), std::forward<Proj>(proj));
+            HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
     template <typename ExPolicy, typename FwdIter, typename Token, typename F,
@@ -253,7 +252,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         Proj&& proj)
     {
         return sequential_find_if_not_t<ExPolicy>{}(base_idx, part_begin,
-            part_count, tok, std::forward<F>(f), std::forward<Proj>(proj));
+            part_count, tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
     }
 #endif
 }}}}    // namespace hpx::parallel::v1::detail

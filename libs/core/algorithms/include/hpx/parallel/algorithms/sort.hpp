@@ -429,8 +429,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 auto last_iter = detail::advance_to_sentinel(first, last);
                 std::sort(first, last_iter,
-                    util::compare_projected<Comp, Proj>(
-                        HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj)));
+                    util::compare_projected<Comp&, Proj&>(comp, proj));
                 return last_iter;
             }
 
@@ -451,8 +450,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     // depending on execution policy
                     return algorithm_result::get(parallel_sort_async(
                         HPX_FORWARD(ExPolicy, policy), first, last,
-                        util::compare_projected<Comp, Proj>(
-                            HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj))));
+                        util::compare_projected<Comp&, Proj&>(comp, proj)));
                 }
                 catch (...)
                 {

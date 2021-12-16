@@ -148,17 +148,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return {result.in, first2, result.out};
                 }
 
-                auto&& value1 = hpx::util::invoke(proj1, *first1);
-                auto&& value2 = hpx::util::invoke(proj2, *first2);
+                auto&& value1 = HPX_INVOKE(proj1, *first1);
+                auto&& value2 = HPX_INVOKE(proj2, *first2);
 
-                if (hpx::util::invoke(comp, value2, value1))
+                if (HPX_INVOKE(comp, value2, value1))
                 {
                     *dest = *first2++;
                 }
                 else
                 {
                     *dest = *first1;
-                    if (!hpx::util::invoke(comp, value1, value2))
+                    if (!HPX_INVOKE(comp, value1, value2))
                     {
                         ++first2;
                     }

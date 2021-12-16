@@ -242,7 +242,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typename std::iterator_traits<Iter>::difference_type& ret)
             {
                 ret += traits::count_bits(
-                    hpx::util::invoke(op_, hpx::util::invoke(proj_, *curr)));
+                    HPX_INVOKE(op_, HPX_INVOKE(proj_, *curr)));
             }
         };
 

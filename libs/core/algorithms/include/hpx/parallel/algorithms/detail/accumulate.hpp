@@ -19,7 +19,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         for (/**/; first != last; ++first)
         {
-            value = hpx::util::invoke(reduce_op, value, *first);
+            value = HPX_INVOKE(reduce_op, value, *first);
         }
         return value;
     }

@@ -384,7 +384,7 @@ namespace hpx { namespace parallel { namespace util {
 
                 try
                 {
-                    return f(std::move(workitems), std::move(finalitems));
+                    return f(HPX_MOVE(workitems), HPX_MOVE(finalitems));
                 }
                 catch (...)
                 {

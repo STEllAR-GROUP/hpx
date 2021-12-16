@@ -472,7 +472,6 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
-#include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
@@ -588,13 +587,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               std::size_t part_size) -> std::size_t {
                     FwdIter base = get<0>(part_begin.get_iterator_tuple());
 
+                    // Note: replacing the invoke() with HPX_INVOKE()
+                    // below makes gcc generate errors
+
                     // MSVC complains if pred or proj is captured by ref below
                     util::loop_n<std::decay_t<ExPolicy>>(++part_begin,
-                        part_size, [base, pred, proj](zip_iterator it) mutable {
-                            using hpx::util::invoke;
-
-                            bool f = invoke(pred, invoke(proj, *base),
-                                invoke(proj, get<0>(*it)));
+                        part_size,
+                        [base, pred, proj](zip_iterator it) mutable -> void {
+                            bool f = hpx::util::invoke(pred,
+                                hpx::util::invoke(proj, *base),
+                                hpx::util::invoke(proj, get<0>(*it)));
 
                             if (!(get<1>(*it) = f))
                                 base = get<0>(it.get_iterator_tuple());

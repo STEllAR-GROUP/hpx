@@ -293,8 +293,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
                     detail::sequential_find_if<std::decay_t<ExPolicy>>(
-                        part_begin, part_count, tok, std::forward<F>(op),
-                        std::forward<Proj>(proj));
+                        part_begin, part_count, tok, HPX_FORWARD(F, op),
+                        HPX_FORWARD(Proj, proj));
 
                     return !tok.was_cancelled();
                 };
@@ -388,8 +388,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
                     detail::sequential_find_if<std::decay_t<ExPolicy>>(
-                        part_begin, part_count, tok, std::forward<F>(op),
-                        std::forward<Proj>(proj));
+                        part_begin, part_count, tok, HPX_FORWARD(F, op),
+                        HPX_FORWARD(Proj, proj));
 
                     return tok.was_cancelled();
                 };
@@ -482,8 +482,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
                     detail::sequential_find_if_not<std::decay_t<ExPolicy>>(
-                        part_begin, part_count, tok, std::forward<F>(op),
-                        std::forward<Proj>(proj));
+                        part_begin, part_count, tok, HPX_FORWARD(F, op),
+                        HPX_FORWARD(Proj, proj));
 
                     return !tok.was_cancelled();
                 };

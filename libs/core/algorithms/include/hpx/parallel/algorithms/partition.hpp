@@ -755,16 +755,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
         BidirIter sequential_partition(
             BidirIter first, BidirIter last, Pred&& pred, Proj&& proj)
         {
-            using hpx::util::invoke;
-
             while (true)
             {
-                while (first != last && invoke(pred, invoke(proj, *first)))
+                while (
+                    first != last && HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
                     ++first;
                 if (first == last)
                     break;
 
-                while (first != --last && !invoke(pred, invoke(proj, *last)))
+                while (first != --last &&
+                    !HPX_INVOKE(pred, HPX_INVOKE(proj, *last)))
                     ;
                 if (first == last)
                     break;
@@ -786,9 +786,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         FwdIter sequential_partition(
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
         {
-            using hpx::util::invoke;
-
-            while (first != last && invoke(pred, invoke(proj, *first)))
+            while (first != last && HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
                 ++first;
 
             if (first == last)
@@ -796,7 +794,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             for (FwdIter it = std::next(first); it != last; ++it)
             {
-                if (invoke(pred, invoke(proj, *it)))
+                if (HPX_INVOKE(pred, HPX_INVOKE(proj, *it)))
                 {
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                     std::ranges::iter_swap(first++, it);
@@ -1044,8 +1042,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static block<FwdIter> partition_thread(
                 block_manager<FwdIter>& block_manager, Pred pred, Proj proj)
             {
-                using hpx::util::invoke;
-
                 block<FwdIter> left_block, right_block;
 
                 left_block = block_manager.get_left_block();
@@ -1056,7 +1052,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     while ((!left_block.empty() ||
                                !(left_block = block_manager.get_left_block())
                                     .empty()) &&
-                        invoke(pred, invoke(proj, *left_block.first)))
+                        HPX_INVOKE(pred, HPX_INVOKE(proj, *left_block.first)))
                     {
                         ++left_block.first;
                     }
@@ -1064,7 +1060,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     while ((!right_block.empty() ||
                                !(right_block = block_manager.get_right_block())
                                     .empty()) &&
-                        !invoke(pred, invoke(proj, *right_block.first)))
+                        !HPX_INVOKE(pred, HPX_INVOKE(proj, *right_block.first)))
                     {
                         ++right_block.first;
                     }
@@ -1102,8 +1098,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 while (true)
                 {
-                    using hpx::util::invoke;
-
                     while (true)
                     {
                         if (left_iter->empty())
@@ -1113,7 +1107,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 left_iter->block_no > 0)
                                 break;
                         }
-                        if (!invoke(pred, invoke(proj, *left_iter->first)))
+                        if (!HPX_INVOKE(
+                                pred, HPX_INVOKE(proj, *left_iter->first)))
                             break;
                         ++left_iter->first;
                     }
@@ -1126,7 +1121,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 (--right_iter)->block_no < 0)
                                 break;
                         }
-                        if (invoke(pred, invoke(proj, *right_iter->first)))
+                        if (HPX_INVOKE(
+                                pred, HPX_INVOKE(proj, *right_iter->first)))
                             break;
                         ++right_iter->first;
                     }
@@ -1509,7 +1505,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             while (first != last)
             {
-                if (hpx::util::invoke(pred, hpx::util::invoke(proj, *first)))
+                if (HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
                     *dest_true++ = *first;
                 else
                     *dest_false++ = *first;
@@ -1579,6 +1575,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     hpx::tuple<FwdIter1, FwdIter2, FwdIter3>,
                     output_iterator_offset>;
 
+                // Note: replacing the invoke() with HPX_INVOKE()
+                // below makes gcc generate errors
                 auto f1 = [pred = HPX_FORWARD(Pred, pred),
                               proj = HPX_FORWARD(Proj, proj)](
                               zip_iterator part_begin,
@@ -1587,9 +1585,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     // MSVC complains if pred or proj is captured by ref below
                     util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_size,
-                        [pred, proj, &true_count](zip_iterator it) mutable {
-                            using hpx::util::invoke;
-                            bool f = invoke(pred, invoke(proj, get<0>(*it)));
+                        [pred, proj, &true_count](
+                            zip_iterator it) mutable -> void {
+                            bool f = hpx::util::invoke(
+                                pred, hpx::util::invoke(proj, get<0>(*it)));
 
                             if ((get<1>(*it) = f))
                                 ++true_count;

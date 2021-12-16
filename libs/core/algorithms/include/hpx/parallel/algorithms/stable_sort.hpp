@@ -281,15 +281,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static RandomIt sequential(ExPolicy, RandomIt first, Sentinel last,
                 Compare&& comp, Proj&& proj)
             {
-                using compare_type =
-                    util::compare_projected<typename std::decay<Compare>::type,
-                        typename std::decay<Proj>::type>;
+                using compare_type = util::compare_projected<Compare&, Proj&>;
 
                 auto last_iter = detail::advance_to_sentinel(first, last);
 
-                spin_sort(first, last_iter,
-                    compare_type(
-                        HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj, proj)));
+                spin_sort(first, last_iter, compare_type(comp, proj));
                 return last_iter;
             }
 
@@ -302,9 +298,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 using algorithm_result =
                     util::detail::algorithm_result<ExPolicy, RandomIt>;
-                using compare_type =
-                    util::compare_projected<typename std::decay<Compare>::type,
-                        typename std::decay<Proj>::type>;
+                using compare_type = util::compare_projected<Compare&, Proj&>;
 
                 // number of elements to sort
                 auto last_iter = first;
@@ -332,8 +326,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     // call the sort routine and return the right type,
                     // depending on execution policy
-                    compare_type comp(
-                        HPX_FORWARD(Compare, compare), HPX_FORWARD(Proj, proj));
+                    compare_type comp(compare, proj);
 
                     return algorithm_result::get(
                         parallel_stable_sort(policy.executor(), first,

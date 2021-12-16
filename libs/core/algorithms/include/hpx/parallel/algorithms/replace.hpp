@@ -502,7 +502,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             for (/* */; first != last; ++first)
             {
-                if (hpx::util::invoke(proj, *first) == old_value)
+                if (HPX_INVOKE(proj, *first) == old_value)
                 {
                     *first = new_value;
                 }
@@ -541,7 +541,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::distance(first, last),
                     [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
                         type& t) -> void {
-                        if (hpx::util::invoke(proj, t) == old_value)
+                        if (HPX_INVOKE(proj, t) == old_value)
                         {
                             t = new_value;
                         }
@@ -591,8 +591,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             for (/* */; first != sent; ++first)
             {
-                using hpx::util::invoke;
-                if (invoke(f, invoke(proj, *first)))
+                if (HPX_INVOKE(f, HPX_INVOKE(proj, *first)))
                 {
                     *first = new_value;
                 }
@@ -630,10 +629,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last),
                     [new_value, f = HPX_FORWARD(F, f),
-                        proj = HPX_FORWARD(Proj, proj)](type& t) -> void {
-                        using hpx::util::invoke;
-                        if (invoke(f, invoke(proj, t)))
+                        proj = HPX_FORWARD(Proj, proj)](
+                        type& t) mutable -> void {
+                        if (HPX_INVOKE(f, HPX_INVOKE(proj, t)))
+                        {
                             t = new_value;
+                        }
                     },
                     util::projection_identity());
             }
@@ -679,7 +680,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             for (/* */; first != sent; ++first)
             {
-                if (hpx::util::invoke(proj, *first) == old_value)
+                if (HPX_INVOKE(proj, *first) == old_value)
                     *dest++ = new_value;
                 else
                     *dest++ = *first;
@@ -726,7 +727,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
                             reference t) -> void {
                             using hpx::get;
-                            if (hpx::util::invoke(proj, get<0>(t)) == old_value)
+                            if (HPX_INVOKE(proj, get<0>(t)) == old_value)
                                 get<1>(t) = new_value;
                             else
                                 get<1>(t) = get<0>(t);    //-V573
@@ -783,11 +784,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             for (/* */; first != sent; ++first)
             {
-                using hpx::util::invoke;
-                if (invoke(f, invoke(proj, *first)))
+                if (HPX_INVOKE(f, HPX_INVOKE(proj, *first)))
+                {
                     *dest++ = new_value;
+                }
                 else
+                {
                     *dest++ = *first;
+                }
             }
             return util::in_out_result<InIter, OutIter>{first, dest};
         }
@@ -829,13 +833,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         detail::distance(first, sent),
                         [new_value, f = HPX_FORWARD(F, f),
                             proj = HPX_FORWARD(Proj, proj)](
-                            reference t) -> void {
+                            reference t) mutable -> void {
                             using hpx::get;
-                            using hpx::util::invoke;
-                            if (invoke(f, invoke(proj, get<0>(t))))
+                            if (HPX_INVOKE(f, HPX_INVOKE(proj, get<0>(t))))
+                            {
                                 get<1>(t) = new_value;
+                            }
                             else
+                            {
                                 get<1>(t) = get<0>(t);    //-V573
+                            }
                         },
                         util::projection_identity()));
             }

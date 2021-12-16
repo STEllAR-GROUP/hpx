@@ -445,8 +445,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             for (/**/; first != last; (void) ++first, ++dest)
             {
-                init = hpx::util::invoke(
-                    op, init, hpx::util::invoke(conv, *first));
+                init = HPX_INVOKE(op, init, HPX_INVOKE(conv, *first));
                 *dest = init;
             }
             return util::in_out_result<InIter, OutIter>{first, dest};
@@ -460,7 +459,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             if (first != last)
             {
-                auto init = hpx::util::invoke(conv, *first);
+                auto init = HPX_INVOKE(conv, *first);
 
                 *dest++ = init;
                 return sequential_transform_inclusive_scan(++first, last, dest,
@@ -477,8 +476,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             for (/**/; count-- != 0; (void) ++first, ++dest)
             {
-                init = hpx::util::invoke(
-                    op, init, hpx::util::invoke(conv, *first));
+                init = HPX_INVOKE(op, init, HPX_INVOKE(conv, *first));
                 *dest = init;
             }
             return init;
@@ -550,12 +548,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using hpx::util::make_zip_iterator;
 
                 auto f3 = [op](zip_iterator part_begin, std::size_t part_size,
-                              T val) -> void {
+                              T val) mutable -> void {
                     FwdIter2 dst = get<1>(part_begin.get_iterator_tuple());
 
                     util::loop_n<std::decay_t<ExPolicy>>(
                         dst, part_size, [&op, &val](FwdIter2 it) -> void {
-                            *it = hpx::util::invoke(op, val, *it);
+                            *it = HPX_INVOKE(op, val, *it);
                         });
                 };
 
@@ -563,10 +561,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     HPX_FORWARD(ExPolicy, policy),
                     make_zip_iterator(first, dest), count, init,
                     // step 1 performs first part of scan algorithm
-                    [op, conv](
-                        zip_iterator part_begin, std::size_t part_size) -> T {
-                        T part_init =
-                            hpx::util::invoke(conv, get<0>(*part_begin));
+                    [op, conv](zip_iterator part_begin,
+                        std::size_t part_size) mutable -> T {
+                        T part_init = HPX_INVOKE(conv, get<0>(*part_begin));
                         get<1>(*part_begin++) = part_init;
 
                         auto iters = part_begin.get_iterator_tuple();
@@ -598,7 +595,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 if (first != last)
                 {
-                    auto init = hpx::util::invoke(conv, *first);
+                    auto init = HPX_INVOKE(conv, *first);
 
                     *dest++ = init;
                     return parallel(HPX_FORWARD(ExPolicy, policy), ++first,

@@ -486,7 +486,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             while (first != last)
             {
-                if (hpx::util::invoke(pred, hpx::util::invoke(proj, *first)))
+                if (HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
                     *dest++ = *first;
                 first++;
             }
@@ -555,9 +555,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               std::size_t part_size) -> std::size_t {
                     std::size_t curr = 0;
 
+                    // Note: replacing the invoke() with HPX_INVOKE()
+                    // below makes gcc generate errors
+
                     // MSVC complains if proj is captured by ref below
                     util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_size,
-                        [&pred, proj, &curr](zip_iterator it) mutable {
+                        [&pred, proj, &curr](zip_iterator it) mutable -> void {
                             bool f = hpx::util::invoke(
                                 pred, hpx::util::invoke(proj, get<0>(*it)));
 

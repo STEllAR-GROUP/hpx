@@ -139,15 +139,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return false;
                 }
 
-                auto&& value1 = hpx::util::invoke(proj1, *first1);
-                auto&& value2 = hpx::util::invoke(proj2, *first2);
+                auto&& value1 = HPX_INVOKE(proj1, *first1);
+                auto&& value2 = HPX_INVOKE(proj2, *first2);
 
-                if (hpx::util::invoke(f, value2, value1))
+                if (HPX_INVOKE(f, value2, value1))
                 {
                     return false;
                 }
 
-                if (!hpx::util::invoke(f, value1, value2))
+                if (!HPX_INVOKE(f, value1, value2))
                 {
                     ++first2;
                 }
@@ -169,15 +169,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return false;
                 }
 
-                auto&& value1 = hpx::util::invoke(proj1, *first1);
-                auto&& value2 = hpx::util::invoke(proj2, *first2);
+                auto&& value1 = HPX_INVOKE(proj1, *first1);
+                auto&& value2 = HPX_INVOKE(proj2, *first2);
 
-                if (hpx::util::invoke(f, value2, value1))
+                if (HPX_INVOKE(f, value2, value1))
                 {
                     return false;
                 }
 
-                if (!hpx::util::invoke(f, value1, value2))
+                if (!HPX_INVOKE(f, value1, value2))
                 {
                     ++first2;
                 }
@@ -233,7 +233,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         std::size_t part_count) mutable -> bool {
                     Iter2 part_end = detail::next(part_begin, part_count);
 
-                    auto value = hpx::util::invoke(proj2, *part_begin);
+                    auto value = HPX_INVOKE(proj2, *part_begin);
                     if (first2 != part_begin && part_count > 1)
                     {
                         part_begin = detail::upper_bound(
@@ -246,7 +246,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         {
                             return true;
                         }
-                        value = hpx::util::invoke(proj2, *part_begin);
+                        value = HPX_INVOKE(proj2, *part_begin);
                     }
 
                     Iter1 low = detail::lower_bound(
@@ -257,8 +257,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     }
 
                     if (low == last1 ||
-                        hpx::util::invoke(
-                            f, value, hpx::util::invoke(proj1, *low)))
+                        HPX_INVOKE(f, value, HPX_INVOKE(proj1, *low)))
                     {
                         tok.cancel();
                         return false;
@@ -267,7 +266,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     Iter1 high = last1;
                     if (part_end != last2)
                     {
-                        auto&& value1 = hpx::util::invoke(proj2, *part_end);
+                        auto&& value1 = HPX_INVOKE(proj2, *part_end);
 
                         high = detail::upper_bound(
                             low, last1, value1, f, proj1, tok);

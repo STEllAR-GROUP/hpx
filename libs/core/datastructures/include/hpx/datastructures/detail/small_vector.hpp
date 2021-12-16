@@ -94,7 +94,7 @@ namespace hpx::detail {
         }
         memory_storage(memory_storage&& rhs) noexcept
           : memory_()    // data will be provided by small_vector ctor
-          , resource_(std::move(rhs.resource_))
+          , resource_(HPX_MOVE(rhs.resource_))
           , pool_(
                 std::data(memory_), std::size(memory_) * sizeof(T), &resource_)
           , allocator_(&pool_)
@@ -132,7 +132,7 @@ namespace hpx::detail {
             // be provided by the small_vector::operator= below
 
             // move allocator
-            resource_ = std::move(rhs.resource_);
+            resource_ = HPX_MOVE(rhs.resource_);
 
             // reconstruct the memory management infrastructure
             new (&pool_) buffer_resource_type(
@@ -229,7 +229,7 @@ namespace hpx::detail {
 
         small_vector(small_vector&& rhs) noexcept
           : storage_(rhs.storage_)
-          , data_(std::move(rhs.data_), storage_.allocator_)
+          , data_(HPX_MOVE(rhs.data_), storage_.allocator_)
         {
         }
 
@@ -258,11 +258,11 @@ namespace hpx::detail {
 
                 // reconstruct the memory management infrastructure for
                 // the new instance
-                storage_ = std::move(rhs.storage_);
+                storage_ = HPX_MOVE(rhs.storage_);
 
                 // fill the new instance with the moved rhs data
                 new (&data_)
-                    data_type(std::move(rhs.data_), storage_.allocator_);
+                    data_type(HPX_MOVE(rhs.data_), storage_.allocator_);
             }
             return *this;
         }
@@ -433,7 +433,7 @@ namespace hpx::detail {
         }
         iterator insert(const_iterator pos, value_type&& value)
         {
-            return data_.insert(pos, std::move(value));
+            return data_.insert(pos, HPX_MOVE(value));
         }
         iterator insert(
             const_iterator pos, size_type count, value_type const& value)
@@ -458,7 +458,7 @@ namespace hpx::detail {
         template <typename... Ts>
         iterator emplace(const_iterator pos, Ts&&... ts)
         {
-            return data_.emplace(pos, std::forward<Ts>(ts)...);
+            return data_.emplace(pos, HPX_FORWARD(Ts, ts)...);
         }
 
         iterator erase(const_iterator pos)
@@ -472,13 +472,13 @@ namespace hpx::detail {
         }
         void push_back(value_type&& value)
         {
-            data_.push_back(std::move(value));
+            data_.push_back(HPX_MOVE(value));
         }
 
         template <typename... Ts>
         reference emplace_back(Ts&&... ts)
         {
-            return data_.emplace_back(std::forward<Ts>(ts)...);
+            return data_.emplace_back(HPX_FORWARD(Ts, ts)...);
         }
 
         void pop_back()
@@ -500,9 +500,9 @@ namespace hpx::detail {
             // data.swap(other.data_);
             // explicitly move the objects as the MSVC standard library has a
             // bug preventing to swap two std::pmr::vectors
-            small_vector tmp = std::move(*this);
-            *this = std::move(other);
-            other = std::move(tmp);
+            small_vector tmp = HPX_MOVE(*this);
+            *this = HPX_MOVE(other);
+            other = HPX_MOVE(tmp);
         }
 
         friend bool operator==(small_vector const& lhs, small_vector const& rhs)
