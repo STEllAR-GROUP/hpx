@@ -6,10 +6,10 @@
 
 module purge
 module load cmake
-module load gcc/9
-module load boost/1.73.0-${build_type,,}
+module load gcc/10
+module load boost/1.75.0-${build_type,,}
 module load hwloc
-module load cuda/11.4
+module load cuda/11.5
 module load openmpi
 
 export CXX_STD="17"
