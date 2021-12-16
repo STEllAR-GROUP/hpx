@@ -95,7 +95,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         using result_type = Result;
         using local_result_type = local_algorithm_result_t<result_type>;
 
-        explicit algorithm(char const* const name) noexcept
+        explicit constexpr algorithm(char const* const name) noexcept
           : name_(name)
         {
         }

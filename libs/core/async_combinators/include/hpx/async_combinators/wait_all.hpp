@@ -390,14 +390,17 @@ namespace hpx {
     template <typename Future>
     void wait_all_nothrow(std::vector<Future> const& values)
     {
-        using result_type = hpx::tuple<std::vector<Future> const&>;
-        using frame_type = hpx::detail::wait_all_frame<result_type>;
+        if (!values.empty())
+        {
+            using result_type = hpx::tuple<std::vector<Future> const&>;
+            using frame_type = hpx::detail::wait_all_frame<result_type>;
 
-        result_type data(values);
+            result_type data(values);
 
-        // frame is initialized with initial reference count
-        hpx::intrusive_ptr<frame_type> frame(new frame_type(data), false);
-        frame->wait_all();
+            // frame is initialized with initial reference count
+            hpx::intrusive_ptr<frame_type> frame(new frame_type(data), false);
+            frame->wait_all();
+        }
     }
 
     template <typename Future>
@@ -494,8 +497,11 @@ namespace hpx {
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     void wait_all_nothrow(Iterator begin, Iterator end)
     {
-        auto values = traits::acquire_shared_state<Iterator>()(begin, end);
-        hpx::wait_all_nothrow(values);
+        if (begin != end)
+        {
+            auto values = traits::acquire_shared_state<Iterator>()(begin, end);
+            hpx::wait_all_nothrow(values);
+        }
     }
 
     template <typename Iterator,
@@ -503,9 +509,12 @@ namespace hpx {
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     void wait_all(Iterator begin, Iterator end)
     {
-        auto values = traits::acquire_shared_state<Iterator>()(begin, end);
-        hpx::wait_all_nothrow(values);
-        hpx::detail::throw_if_exceptional(values);
+        if (begin != end)
+        {
+            auto values = traits::acquire_shared_state<Iterator>()(begin, end);
+            hpx::wait_all_nothrow(values);
+            hpx::detail::throw_if_exceptional(values);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -514,8 +523,12 @@ namespace hpx {
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     void wait_all_n_nothrow(Iterator begin, std::size_t count)
     {
-        auto values = traits::acquire_shared_state<Iterator>()(begin, count);
-        hpx::wait_all_nothrow(values);
+        if (count != 0)
+        {
+            auto values =
+                traits::acquire_shared_state<Iterator>()(begin, count);
+            hpx::wait_all_nothrow(values);
+        }
     }
 
     template <typename Iterator,
@@ -523,9 +536,13 @@ namespace hpx {
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     void wait_all_n(Iterator begin, std::size_t count)
     {
-        auto values = traits::acquire_shared_state<Iterator>()(begin, count);
-        hpx::wait_all_nothrow(values);
-        hpx::detail::throw_if_exceptional(values);
+        if (count != 0)
+        {
+            auto values =
+                traits::acquire_shared_state<Iterator>()(begin, count);
+            hpx::wait_all_nothrow(values);
+            hpx::detail::throw_if_exceptional(values);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -536,16 +553,19 @@ namespace hpx {
     template <typename... Ts>
     void wait_all_nothrow(Ts&&... ts)
     {
-        using result_type =
-            hpx::tuple<traits::detail::shared_state_ptr_for_t<Ts>...>;
-        using frame_type = detail::wait_all_frame<result_type>;
+        if constexpr (sizeof...(Ts) != 0)
+        {
+            using result_type =
+                hpx::tuple<traits::detail::shared_state_ptr_for_t<Ts>...>;
+            using frame_type = detail::wait_all_frame<result_type>;
 
-        result_type values =
-            result_type(hpx::traits::detail::get_shared_state(ts)...);
+            result_type values =
+                result_type(hpx::traits::detail::get_shared_state(ts)...);
 
-        // frame is initialized with initial reference count
-        hpx::intrusive_ptr<frame_type> frame(new frame_type(values), false);
-        frame->wait_all();
+            // frame is initialized with initial reference count
+            hpx::intrusive_ptr<frame_type> frame(new frame_type(values), false);
+            frame->wait_all();
+        }
     }
 
     template <typename... Ts>

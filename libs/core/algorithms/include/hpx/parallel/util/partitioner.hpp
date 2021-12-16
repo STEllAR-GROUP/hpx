@@ -15,6 +15,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/type_support/empty_function.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
@@ -272,6 +273,18 @@ namespace hpx { namespace parallel { namespace util {
                     HPX_ASSERT(false);
                     return f(HPX_MOVE(workitems));
                 }
+            }
+
+            static R reduce(std::vector<hpx::future<Result>>&& workitems,
+                std::list<std::exception_ptr>&& errors,
+                hpx::util::empty_function)
+            {
+                // wait for all tasks to finish
+                hpx::wait_all_nothrow(workitems);
+
+                // always rethrow if 'errors' is not empty or workitems has
+                // exceptional future
+                handle_local_exceptions::call(workitems, errors);
             }
         };
 

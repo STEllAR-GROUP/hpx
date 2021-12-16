@@ -344,6 +344,7 @@ namespace tests {
     template <typename Iterator, typename TrueVals>
     void random_access_readable_iterator_test(Iterator i, int N, TrueVals vals)
     {
+        HPX_ASSERT(N >= 2);
         bidirectional_readable_iterator_test(i, vals[0], vals[1]);
         const Iterator j = i;
         int c;

@@ -16,10 +16,9 @@
 //       Moved test of transform iterator into its own file. It to
 //       to be in iterator_adaptor_test.cpp.
 
+#include <hpx/iterator_support/tests/iterator_tests.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
-
-#include "iterator_tests.hpp"
 
 #include <algorithm>
 #include <iterator>

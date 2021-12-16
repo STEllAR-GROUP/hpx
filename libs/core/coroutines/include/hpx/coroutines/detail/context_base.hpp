@@ -215,7 +215,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         ~context_base() noexcept
         {
             HPX_ASSERT(!running());
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
             HPX_ASSERT(exited() || (is_ready() && m_phase == 0));
+#else
+            HPX_ASSERT(exited() || is_ready());
+#endif
             m_thread_id.reset();
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             delete_tss_storage(m_thread_data);

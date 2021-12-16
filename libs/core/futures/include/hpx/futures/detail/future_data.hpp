@@ -63,6 +63,7 @@ namespace hpx {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail {
+
     using run_on_completed_error_handler_type =
         util::function_nonser<void(std::exception_ptr const& e)>;
     HPX_CORE_EXPORT void set_run_on_completed_error_handler(
@@ -120,7 +121,7 @@ namespace hpx { namespace lcos { namespace detail {
           : count_(0)
         {
         }
-        future_data_refcnt_base(init_no_addref) noexcept
+        explicit future_data_refcnt_base(init_no_addref) noexcept
           : count_(1)
         {
         }
@@ -152,7 +153,7 @@ namespace hpx { namespace lcos { namespace detail {
         using type = Result;
 
         template <typename U>
-        HPX_FORCEINLINE static U&& set(U&& u)
+        HPX_FORCEINLINE static constexpr U&& set(U&& u) noexcept
         {
             return HPX_FORWARD(U, u);
         }
@@ -163,12 +164,12 @@ namespace hpx { namespace lcos { namespace detail {
     {
         using type = Result*;
 
-        HPX_FORCEINLINE static Result* set(Result* u)
+        HPX_FORCEINLINE static constexpr Result* set(Result* u) noexcept
         {
             return u;
         }
 
-        HPX_FORCEINLINE static Result* set(Result& u)
+        HPX_FORCEINLINE static constexpr Result* set(Result& u) noexcept
         {
             return &u;
         }
@@ -179,7 +180,8 @@ namespace hpx { namespace lcos { namespace detail {
     {
         using type = util::unused_type;
 
-        HPX_FORCEINLINE static util::unused_type set(util::unused_type u)
+        HPX_FORCEINLINE static constexpr util::unused_type set(
+            util::unused_type u) noexcept
         {
             return u;
         }
@@ -223,12 +225,12 @@ namespace hpx { namespace lcos { namespace detail {
     {
         using mutex_type = lcos::local::spinlock;
 
-        future_data_base()
+        future_data_base() noexcept
           : state_(empty)
         {
         }
 
-        future_data_base(init_no_addref no_addref)
+        explicit future_data_base(init_no_addref no_addref) noexcept
           : future_data_refcnt_base(no_addref)
           , state_(empty)
         {
@@ -374,7 +376,7 @@ namespace hpx { namespace lcos { namespace detail {
     public:
         future_data_base() = default;
 
-        future_data_base(init_no_addref no_addref)
+        explicit future_data_base(init_no_addref no_addref) noexcept
           : base_type(no_addref)
         {
         }
@@ -654,7 +656,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         future_data() = default;
 
-        future_data(init_no_addref no_addref)
+        explicit future_data(init_no_addref no_addref) noexcept
           : future_data_base<Result>(no_addref)
         {
         }
@@ -690,14 +692,14 @@ namespace hpx { namespace lcos { namespace detail {
         using other_allocator = typename std::allocator_traits<
             Allocator>::template rebind_alloc<allocated_type>;
 
-        future_data_allocator(other_allocator const& alloc)
+        explicit future_data_allocator(other_allocator const& alloc) noexcept
           : future_data<Result>()
           , alloc_(alloc)
         {
         }
 
         future_data_allocator(
-            init_no_addref no_addref, other_allocator const& alloc)
+            init_no_addref no_addref, other_allocator const& alloc) noexcept
           : future_data<Result>(no_addref)
           , alloc_(alloc)
         {
@@ -748,7 +750,7 @@ namespace hpx { namespace lcos { namespace detail {
         using result_type = typename base_type::result_type;
 
     public:
-        timed_future_data() {}
+        timed_future_data() = default;
 
         template <typename Result_>
         timed_future_data(std::chrono::steady_clock::time_point const& abs_time,
@@ -805,14 +807,10 @@ namespace hpx { namespace lcos { namespace detail {
         using base_type::mtx_;
 
     public:
-        task_base()
-          : started_(false)
-        {
-        }
+        task_base() = default;
 
-        task_base(init_no_addref no_addref)
+        explicit task_base(init_no_addref no_addref) noexcept
           : base_type(no_addref)
-          , started_(false)
         {
         }
 
@@ -856,7 +854,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
     private:
-        bool started_test() const
+        bool started_test() const noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             return started_;
@@ -936,7 +934,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
     protected:
-        bool started_;
+        bool started_ = false;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -953,24 +951,24 @@ namespace hpx { namespace lcos { namespace detail {
         using base_type::mtx_;
 
     protected:
-        threads::thread_id_type get_thread_id() const
+        threads::thread_id_type get_thread_id() const noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             return id_;
         }
-        void set_thread_id(threads::thread_id_type id)
+        void set_thread_id(threads::thread_id_type id) noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             id_ = id;
         }
 
     public:
-        cancelable_task_base()
+        cancelable_task_base() noexcept
           : id_(threads::invalid_thread_id)
         {
         }
 
-        cancelable_task_base(init_no_addref no_addref)
+        explicit cancelable_task_base(init_no_addref no_addref) noexcept
           : task_base<Result>(no_addref)
           , id_(threads::invalid_thread_id)
         {

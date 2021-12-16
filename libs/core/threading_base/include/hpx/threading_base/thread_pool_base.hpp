@@ -527,6 +527,10 @@ namespace hpx { namespace threads {
             notifier_.on_error(global_thread_num, e);
         }
 
+        double timestamp_scale() const
+        {
+            return timestamp_scale_;
+        }
         /// \endcond
 
     protected:

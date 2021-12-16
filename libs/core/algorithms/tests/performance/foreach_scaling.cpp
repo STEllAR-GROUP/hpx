@@ -458,11 +458,15 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // verify that input is within domain of program
     if (test_count == 0 || test_count < 0)
     {
-        std::cout << "test_count cannot be zero or negative...\n" << std::flush;
+        std::cerr << "test_count cannot be zero or negative...\n" << std::flush;
+        hpx::local::finalize();
+        return -1;
     }
     else if (delay < 0)
     {
-        std::cout << "delay cannot be a negative number...\n" << std::flush;
+        std::cerr << "delay cannot be a negative number...\n" << std::flush;
+        hpx::local::finalize();
+        return -1;
     }
     else
     {
@@ -490,7 +494,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::uint64_t plain_time_for_iter =
             averageout_plain_for_iter(vector_size);
 
-        if (vm.count("aggregated") != 0)
+        if (vm["executor"].as<std::string>() == "aggregated")
         {
             hpx::parallel::execution::parallel_executor_aggregated par;
 
@@ -522,7 +526,39 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 seq_time_forloop = averageout_sequential_forloop(vector_size);
             }
         }
-        else
+        else if (vm["executor"].as<std::string>() == "forkjoin")
+        {
+            hpx::execution::experimental::fork_join_executor par;
+
+            if (enable_all || vm.count("parallel_foreach"))
+            {
+                par_time_foreach =
+                    averageout_parallel_foreach(vector_size, par);
+            }
+            if (enable_all || vm.count("task_foreach"))
+            {
+                task_time_foreach = averageout_task_foreach(vector_size, par);
+            }
+            if (enable_all || vm.count("sequential_foreach"))
+            {
+                seq_time_foreach = averageout_sequential_foreach(vector_size);
+            }
+
+            if (enable_all || vm.count("parallel_forloop"))
+            {
+                par_time_forloop =
+                    averageout_parallel_forloop(vector_size, par);
+            }
+            if (enable_all || vm.count("task_forloop"))
+            {
+                task_time_forloop = averageout_task_forloop(vector_size, par);
+            }
+            if (enable_all || vm.count("sequential_forloop"))
+            {
+                seq_time_forloop = averageout_sequential_forloop(vector_size);
+            }
+        }
+        else if (vm["executor"].as<std::string>() == "parallel")
         {
             hpx::execution::parallel_executor par;
 
@@ -553,6 +589,14 @@ int hpx_main(hpx::program_options::variables_map& vm)
             {
                 seq_time_forloop = averageout_sequential_forloop(vector_size);
             }
+        }
+        else
+        {
+            std::cerr << "unknown executor option (should be aggregated, "
+                         "forkjoin or parallel (default)\n"
+                      << std::flush;
+            hpx::local::finalize();
+            return -1;
         }
 
         if (disable_stealing)
@@ -674,7 +718,9 @@ int main(int argc, char* argv[])
         ("overlapping_loops", value<int>()->default_value(0),
             "number of overlapping task loops")
         ("csv_output", "print results in csv format")
-        ("aggregated", "use aggregated executor")
+        ("executor", value<std::string>()->default_value("parallel"),
+            "use specified executor (possible values: aggregated, "
+            "forkjoin, or parallel (default)")
         ("disable_stealing", "disable thread stealing")
         ("fast_idle_mode", "enable fast idle mode")
 
