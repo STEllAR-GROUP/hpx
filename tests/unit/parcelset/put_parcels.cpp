@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,15 +8,15 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/performance_counters.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/task_group.hpp>
 
 #include <cstddef>
 #include <iostream>
+#include <memory>
 #include <string>
-#include <utility>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,8 +25,8 @@ std::size_t const numparcels_default = 10;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename T>
-hpx::parcelset::parcel
-generate_parcel(hpx::id_type const& dest_id, hpx::id_type const& cont, T && data)
+hpx::parcelset::parcel generate_parcel(
+    hpx::id_type const& dest_id, hpx::id_type const& cont, T&& data)
 {
     hpx::naming::address addr;
     hpx::naming::gid_type dest = dest_id.get_gid();
@@ -52,7 +52,7 @@ void test_plain_argument(hpx::id_type const& id)
     std::vector<double> data(vsize_default);
     std::generate(data.begin(), data.end(), std::rand);
 
-    std::vector<hpx::future<hpx::id_type> > results;
+    std::vector<hpx::future<hpx::id_type>> results;
     results.reserve(numparcels_default);
 
     // create parcels
@@ -61,9 +61,7 @@ void test_plain_argument(hpx::id_type const& id)
     {
         hpx::lcos::promise<hpx::id_type> p;
         auto f = p.get_future();
-        parcels.push_back(
-            generate_parcel<test1_action>(id, p.get_id(), data)
-        );
+        parcels.push_back(generate_parcel<test1_action>(id, p.get_id(), data));
         results.push_back(std::move(f));
     }
 
@@ -89,10 +87,10 @@ HPX_PLAIN_ACTION(test2)
 
 void test_future_argument(hpx::id_type const& id)
 {
-    std::vector<hpx::lcos::local::promise<double> > args;
+    std::vector<hpx::lcos::local::promise<double>> args;
     args.reserve(numparcels_default);
 
-    std::vector<hpx::future<hpx::id_type> > results;
+    std::vector<hpx::future<hpx::id_type>> results;
     results.reserve(numparcels_default);
 
     // create parcels
@@ -103,10 +101,8 @@ void test_future_argument(hpx::id_type const& id)
         hpx::lcos::promise<hpx::id_type> p_cont;
         auto f_cont = p_cont.get_future();
 
-        parcels.push_back(
-            generate_parcel<test2_action>(id, p_cont.get_id(),
-                p_arg.get_future())
-        );
+        parcels.push_back(generate_parcel<test2_action>(
+            id, p_cont.get_id(), p_arg.get_future()));
 
         args.push_back(std::move(p_arg));
         results.push_back(std::move(f_cont));
@@ -136,10 +132,10 @@ void test_mixed_arguments(hpx::id_type const& id)
     std::vector<double> data(vsize_default);
     std::generate(data.begin(), data.end(), std::rand);
 
-    std::vector<hpx::lcos::local::promise<double> > args;
+    std::vector<hpx::lcos::local::promise<double>> args;
     args.reserve(numparcels_default);
 
-    std::vector<hpx::future<hpx::id_type> > results;
+    std::vector<hpx::future<hpx::id_type>> results;
     results.reserve(numparcels_default);
 
     // create parcels
@@ -152,17 +148,14 @@ void test_mixed_arguments(hpx::id_type const& id)
         if (std::rand() % 2)
         {
             parcels.push_back(
-                generate_parcel<test1_action>(id, p_cont.get_id(), data)
-            );
+                generate_parcel<test1_action>(id, p_cont.get_id(), data));
         }
         else
         {
             hpx::lcos::local::promise<double> p_arg;
 
-            parcels.push_back(
-                generate_parcel<test2_action>(id, p_cont.get_id(),
-                    p_arg.get_future())
-            );
+            parcels.push_back(generate_parcel<test2_action>(
+                id, p_cont.get_id(), p_arg.get_future()));
 
             args.push_back(std::move(p_arg));
         }
@@ -190,6 +183,65 @@ void test_mixed_arguments(hpx::id_type const& id)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+hpx::id_type test3(std::shared_ptr<hpx::execution::experimental::task_group> tg)
+{
+    tg->wait();
+    return hpx::find_here();
+}
+HPX_PLAIN_ACTION(test3)
+
+void wait_a_while()
+{
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+
+void test_task_group_argument(hpx::id_type const& id)
+{
+    std::vector<std::shared_ptr<hpx::execution::experimental::task_group>> args;
+    args.reserve(numparcels_default);
+
+    std::vector<hpx::future<hpx::id_type>> results;
+    results.reserve(numparcels_default);
+
+    // create parcels
+    std::vector<hpx::parcelset::parcel> parcels;
+    for (std::size_t i = 0; i != numparcels_default; ++i)
+    {
+        auto tg = std::make_shared<hpx::execution::experimental::task_group>();
+        tg->run(wait_a_while);
+        tg->run(wait_a_while);
+        tg->run(wait_a_while);
+
+        hpx::lcos::promise<hpx::id_type> p_cont;
+        auto f_cont = p_cont.get_future();
+
+        parcels.push_back(
+            generate_parcel<test3_action>(id, p_cont.get_id(), tg));
+
+        args.push_back(std::move(tg));
+        results.push_back(std::move(f_cont));
+    }
+
+    // send parcels
+    hpx::get_runtime_distributed().get_parcel_handler().put_parcels(
+        std::move(parcels));
+
+    // now wait for task groups
+    for (auto& arg : args)
+    {
+        arg->wait();
+    }
+
+    // verify all messages got actually sent to the correct locality
+    hpx::wait_all(results);
+
+    for (hpx::future<hpx::id_type>& f : results)
+    {
+        HPX_TEST_EQ(f.get(), id);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 void print_counters(char const* name)
 {
     using namespace hpx::performance_counters;
@@ -199,17 +251,15 @@ void print_counters(char const* name)
     for (performance_counter const& c : counters)
     {
         counter_value value = c.get_counter_value(hpx::launch::sync);
-        hpx::cout
-            << "counter: " << c.get_name(hpx::launch::sync)
-            << ", value: " << value.get_value<double>()
-            << std::endl;
+        std::cout << "counter: " << c.get_name(hpx::launch::sync)
+                  << ", value: " << value.get_value<double>() << std::endl;
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -221,6 +271,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         test_plain_argument(id);
         test_future_argument(id);
         test_mixed_arguments(id);
+        test_task_group_argument(id);
     }
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -243,10 +294,12 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     desc_commandline.add_options()
         ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
+         "the random number generator seed to use for this run")
         ;
+    // clang-format on
 
     // explicitly disable message handlers (parcel coalescing)
     std::vector<std::string> const cfg = {

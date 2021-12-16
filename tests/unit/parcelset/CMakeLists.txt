@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2016 Hartmut Kaiser
+# Copyright (c) 2007-2021 Hartmut Kaiser
 # Copyright (c)      2014 Thomas Heller
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
@@ -9,7 +9,6 @@
 set(tests put_parcels set_parcel_write_handler)
 
 set(put_parcels_PARAMETERS LOCALITIES 2)
-set(put_parcels_FLAGS DEPENDENCIES iostreams_component)
 set(set_parcel_write_handler_PARAMETERS LOCALITIES 2)
 
 if(HPX_WITH_PARCEL_COALESCING)
