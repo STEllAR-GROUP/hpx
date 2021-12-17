@@ -55,13 +55,13 @@ elseif(NOT TARGET HPX::hpx_local AND NOT HPX_FIND_PACKAGE)
           CACHE "HPX_WITH_${config_option}"
           PROPERTY HELPSTRING
         )
-        if(NOT option_type)
-          set(option_description "")
+        if(NOT option_description)
+          set(option_description "propagated from HPX_WITH_${config_option}")
         endif()
 
         set(HPXLocal_WITH_${compat_option}
             "${HPX_WITH_${compat_option}}"
-            CACHE ${option_type} ${option_description} FORCE
+            CACHE ${option_type} "${option_description}" FORCE
         )
 
         unset(HPX_WITH_${compat_option} CACHE)
@@ -128,8 +128,8 @@ elseif(NOT TARGET HPX::hpx_local AND NOT HPX_FIND_PACKAGE)
           CACHE "HPX_WITH_${config_option}"
           PROPERTY HELPSTRING
         )
-        if(NOT option_type)
-          set(option_description "")
+        if(NOT option_description)
+          set(option_description "propagated from HPX_WITH_${config_option}")
         endif()
 
         set(HPXLocal_WITH_${config_option}
