@@ -25,14 +25,30 @@ elseif(NOT TARGET HPX::hpx_local AND NOT HPX_FIND_PACKAGE)
       HIP
       ITTNOTIFY
       MALLOC
+      MAX_CPU_COUNT
+      MAX_NUMA_DOMAIN_COUNT
+      MORE_THAN_64_THREADS
       NICE_THREADLEVEL
       PARCELPORT_MPI_ENV
       PARCELPORT_MPI_MULTITHREADED
       SANITIZERS
+      SCHEDULER_LOCAL_STORAGE
       SPINLOCK_DEADLOCK_DETECTION
+      SPINLOCK_POOL_NUM
+      THREAD_BACKTRACE_DEPTH
+      THREAD_BACKTRACE_ON_SUSPENSION
+      THREAD_DEBUG_INFO
+      THREAD_DESCRIPTION_FULL
+      THREAD_GUARD_PAGE
+      THREAD_LOCAL_STORAGE
+      THREAD_MANAGER_IDLE_BACKOFF
+      THREAD_QUEUE_WAITTIME
+      THREAD_STACK_MMAP
+      THREAD_TARGET_ADDRESS
       VALGRIND
       VERIFY_LOCKS
       VERIFY_LOCKS_BACKTRACE
+      ZERO_COPY_SERIALIZATION_THRESHOLD
   )
   foreach(compat_option ${HPX_HPXLOCAL_COMPATIBILITY_OPTIONS})
     if(DEFINED HPX_WITH_${compat_option})
@@ -160,7 +176,7 @@ elseif(NOT TARGET HPX::hpx_local AND NOT HPX_FIND_PACKAGE)
     )
   endif()
 
-  # The MPI parcelport HPXLocal to be built using MPI support.
+  # The MPI parcelport forces HPXLocal to be built using MPI support.
   if(HPX_WITH_PARCELPORT_MPI)
     set(HPXLocal_WITH_ASYNC_MPI
         ON
@@ -172,7 +188,7 @@ elseif(NOT TARGET HPX::hpx_local AND NOT HPX_FIND_PACKAGE)
   if(MSVC AND NOT DEFINED HPXLocal_WITH_BINARY_DIR)
     set(HPXLocal_WITH_BINARY_DIR
         "${PROJECT_BINARY_DIR}"
-        CACHE STRING "" FORCE
+        CACHE STRING "Binary directory for local should be the same as for full library" FORCE
     )
   endif()
 
@@ -193,7 +209,7 @@ elseif(NOT TARGET HPX::hpx_local AND NOT HPX_FIND_PACKAGE)
   )
   set(HPX_WITH_HPXLOCAL_TAG
       "${HPX_WITH_HPXLOCAL_TAG_DEFAULT}"
-      CACHE BOOL "" FORCE
+      CACHE STRING "HPXLocal repository tag or branch" FORCE
   )
   fetchcontent_declare(
     HPXLocal
