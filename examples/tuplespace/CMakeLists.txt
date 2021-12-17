@@ -5,10 +5,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  return()
-endif()
-
 add_subdirectory(central_tuplespace)
 
 set(example_programs simple_central_tuplespace)
@@ -26,7 +22,7 @@ foreach(example_program ${example_programs})
     ${example_program}_client INTERNAL_FLAGS
     SOURCES ${sources}
     COMPONENT_DEPENDENCIES ${example_program} iostreams
-    FOLDER "Examples/TupleSpace/${example_program}"
+    FOLDER "Examples/Full/TupleSpace"
   )
 
   add_hpx_example_target_dependencies("tuplespace" ${example_program}_client)

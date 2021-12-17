@@ -4,10 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  return()
-endif()
-
 if(NOT HPX_WITH_STATIC_LINKING)
   set(_libraries hpx iostreams_component)
 
@@ -17,7 +13,7 @@ if(NOT HPX_WITH_STATIC_LINKING)
   target_link_libraries(test_server_1950 PUBLIC ${_libraries})
 
   set_target_properties(
-    test_server_1950 PROPERTIES FOLDER "Tests/Regressions/Build/"
+    test_server_1950 PROPERTIES FOLDER "Tests/Regressions/Full/Build/"
   )
 
   add_executable(test_client_1950_test EXCLUDE_FROM_ALL client_1950.cpp)
@@ -27,7 +23,7 @@ if(NOT HPX_WITH_STATIC_LINKING)
 
   # Keep the same semantics *_test as the other tests
   set_target_properties(
-    test_client_1950_test PROPERTIES FOLDER "Tests/Regressions/Build/"
+    test_client_1950_test PROPERTIES FOLDER "Tests/Regressions/Full/Build/"
   )
 
   add_hpx_regression_test(

@@ -37,8 +37,8 @@ if(HPX_WITH_PARCELPORT_LIBFABRIC)
     libfabric STATIC
     SOURCES ${_parcelport_CXX_srcs}
     # do we need to declare any headers? HEADERS FIXME : Could this be private
-    DEPENDENCIES ${_libfabric_libraries} hpx_command_line_handling
-                 hpx_performance_counters hpx_core
+    DEPENDENCIES ${_libfabric_libraries} hpx_command_line_handling hpx_config
+                 hpx_performance_counters
     INCLUDE_DIRS ${_libfabric_include_dirs} ${PROJECT_SOURCE_DIR}
                  ${PROJECT_BINARY_DIR}
     FOLDER "Core/Plugins/Parcelport/libfabric"

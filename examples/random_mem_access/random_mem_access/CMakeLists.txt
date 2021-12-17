@@ -26,5 +26,5 @@ add_hpx_component(
   random_mem_access INTERNAL_FLAGS NOEXPORT MODULE random_mem_access
   SOURCES ${client_sources}
   HEADERS ${headers}
-  FOLDER "Examples/RandomMemoryAccess/random_mem_access"
+  FOLDER "Examples/Full/RandomMemoryAccess"
 )

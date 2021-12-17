@@ -55,7 +55,7 @@ extensions = [
 breathe_projects = { "hpx": "../hpx_autodoc" }
 breathe_projects_source = {}
 
-hpx_source_dir = '@HPX_SOURCE_DIR@'
+hpx_source_dir = '@HPX_DOCS_SOURCE_DIR@'
 hpx_libs_dir = hpx_source_dir + '/libs'
 hpx_libs = {}
 
@@ -151,7 +151,7 @@ for lib in hpx_libs.keys():
         api_refs += '   /libs/' + lib + '/' + module + '/api.rst\n'
 
 api_rst = open(os.path.abspath('.') + '/api.rst', 'w')
-for line in open(hpx_source_dir + '/docs/sphinx/api.rst').readlines():
+for line in open('@HPX_DOCS_API_RST@').readlines():
     api_rst.write(line.format(api_refs))
 api_rst.close()
 
@@ -572,7 +572,7 @@ html_theme_options = {'logo_only': True}
 html_logo = '_static/images/HPX_STELLAR_blue.png'
 
 #  The name of an image file (relative to this directory) to place at the top
-# of the brower page.
+# of the browser page.
 html_favicon = '_static/images/favicon.png'
 
 # Add any paths that contain custom static files (such as style sheets) here,

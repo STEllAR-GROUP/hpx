@@ -247,19 +247,13 @@ function(add_hpx_module libname modulename)
     PUBLIC hpx_public_flags
     PRIVATE hpx_private_flags
     PUBLIC hpx_base_libraries
+    PUBLIC HPX::hpx_local
   )
 
   if(HPX_WITH_PRECOMPILED_HEADERS)
     target_precompile_headers(
       hpx_${modulename} REUSE_FROM hpx_precompiled_headers
     )
-  endif()
-
-  # All core modules depend on the config registry
-  if("${libname}" STREQUAL "core" AND NOT "${modulename}" STREQUAL
-                                      "config_registry"
-  )
-    target_link_libraries(hpx_${modulename} PUBLIC hpx_config_registry)
   endif()
 
   if(${modulename}_COMPAT_HEADERS)
@@ -274,9 +268,7 @@ function(add_hpx_module libname modulename)
 
   # This is a temporary solution until all of HPX has been modularized as it
   # enables using header files from HPX for compiling this module.
-  if("${libname}" STREQUAL "full")
-    target_include_directories(hpx_${modulename} PRIVATE ${HPX_SOURCE_DIR})
-  endif()
+  target_include_directories(hpx_${modulename} PRIVATE ${HPX_SOURCE_DIR})
 
   add_hpx_source_group(
     NAME hpx_${modulename}

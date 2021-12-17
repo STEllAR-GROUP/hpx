@@ -4,10 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  return()
-endif()
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(components_headers
@@ -43,7 +39,7 @@ add_hpx_module(
   SOURCES ${components_sources}
   HEADERS ${components_headers}
   COMPAT_HEADERS ${components_compat_headers}
-  DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_actions_base hpx_components_base
+  DEPENDENCIES HPX::hpx_local
+  MODULE_DEPENDENCIES hpx_actions_base hpx_components_base hpx_config
   CMAKE_SUBDIRS examples tests
 )

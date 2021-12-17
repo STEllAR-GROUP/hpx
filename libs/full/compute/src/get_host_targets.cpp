@@ -5,21 +5,18 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/compute/host/target.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/async_distributed.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/runtime_distributed/find_here.hpp>
 #include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/topology/topology.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/actions_base/plain_action.hpp>
-#include <hpx/modules/async_distributed.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime_distributed/find_here.hpp>
-#endif
 
 #include <cstddef>
 #include <vector>
@@ -55,7 +52,6 @@ namespace hpx { namespace compute { namespace host {
     }
 }}}    // namespace hpx::compute::host
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 HPX_PLAIN_ACTION(
     hpx::compute::host::get_local_targets, compute_host_get_targets_action)
 
@@ -68,4 +64,3 @@ namespace hpx { namespace compute { namespace host {
         return hpx::async(compute_host_get_targets_action(), locality);
     }
 }}}    // namespace hpx::compute::host
-#endif

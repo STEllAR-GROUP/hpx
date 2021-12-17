@@ -18,8 +18,8 @@ if(HPX_WITH_PARCELPORT_TCP)
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/locality.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/receiver.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/sender.hpp"
-    DEPENDENCIES hpx_actions hpx_command_line_handling hpx_performance_counters
-                 hpx_core
+    DEPENDENCIES hpx_actions hpx_command_line_handling hpx_config
+                 hpx_performance_counters
     INCLUDE_DIRS "${PROJECT_SOURCE_DIR}"
     FOLDER "Core/Plugins/Parcelport/Tcp"
   )

@@ -39,13 +39,6 @@ set(compute_compat_headers
 
 set(compute_sources get_host_targets.cpp host_target.cpp numa_domains.cpp)
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(compute_optional_module_dependencies
-      hpx_actions hpx_actions_base hpx_naming hpx_performance_counters
-      hpx_async_distributed hpx_runtime_components
-  )
-endif()
-
 include(HPX_AddModule)
 add_hpx_module(
   full compute
@@ -53,7 +46,14 @@ add_hpx_module(
   SOURCES ${compute_sources}
   HEADERS ${compute_headers}
   COMPAT_HEADERS ${compute_compat_headers}
-  DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES ${compute_optional_module_dependencies}
+  DEPENDENCIES HPX::hpx_local
+  MODULE_DEPENDENCIES
+    hpx_config
+    hpx_actions
+    hpx_actions_base
+    hpx_naming
+    hpx_performance_counters
+    hpx_async_distributed
+    hpx_runtime_components
   CMAKE_SUBDIRS examples tests
 )

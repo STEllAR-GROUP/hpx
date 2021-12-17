@@ -52,7 +52,7 @@ Using sanitizers with |hpx| applications
    with false positives from |hpx| itself when using sanitizers for their
    applications.
 
-To use sanitizers with |hpx|, turn on ``HPX_WITH_SANITIZERS`` and turn
+To use sanitizers with |hpx|, turn on ``HPXLocal_WITH_SANITIZERS`` and turn
 off ``HPX_WITH_STACKOVERFLOW_DETECTION`` during |cmake| configuration. It's
 recommended to also build |boost| with the same sanitizers that will be
 used for |hpx|. The appropriate sanitizers can then be enabled using |cmake| by

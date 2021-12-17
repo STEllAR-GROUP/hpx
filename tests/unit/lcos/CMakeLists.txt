@@ -5,20 +5,16 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests)
-
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests
-      ${tests}
-      client_then
-      future_wait
-      packaged_action
-      promise
-      promise_allocator
-      promise_emplace
-      use_allocator
-  )
-endif()
+set(tests
+    ${tests}
+    client_then
+    future_wait
+    packaged_action
+    promise
+    promise_allocator
+    promise_emplace
+    use_allocator
+)
 
 set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -31,7 +27,7 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  set(folder_name "Tests/Unit/LCOs")
+  set(folder_name "Tests/Unit/Full/LCOs")
 
   # add example executable
   add_hpx_executable(

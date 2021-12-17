@@ -6,12 +6,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests runtime_type parcel_pool shutdown_suspended_thread
-          start_stop_callbacks
+          start_stop_callbacks handled_exception unhandled_exception
 )
-
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} handled_exception unhandled_exception)
-endif()
 
 set(unhandled_exception_PARAMETERS FAILURE_EXPECTED)
 

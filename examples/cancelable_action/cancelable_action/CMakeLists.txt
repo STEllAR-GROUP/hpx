@@ -8,5 +8,5 @@ add_hpx_component(
   cancelable_action INTERNAL_FLAGS NOEXPORT AUTOGLOB
   HEADER_GLOB "cancelable_action.h*"
   SOURCE_GLOB "cancelable_action.c*"
-  FOLDER "Examples/CancelableAction"
+  FOLDER "Examples/Full/CancelableAction"
 )

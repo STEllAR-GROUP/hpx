@@ -244,13 +244,13 @@ The ``hpx`` configuration section
    * * ``hpx.spinlock_deadlock_detection``
      * This setting verifies that spinlocks don't spin longer than specified
        using the ``hpx.spinlock_deadlock_detection_limit``. This setting is
-       applicable only if ``HPX_WITH_SPINLOCK_DEADLOCK_DETECTION`` is set during
+       applicable only if ``HPXLocal_WITH_SPINLOCK_DEADLOCK_DETECTION`` is set during
        configuration in CMake. By default this is set to ``1`` (for Debug
        builds) or to ``0`` (for Release, RelWithDebInfo, RelMinSize builds).
    * * ``hpx.spinlock_deadlock_detection_limit``
      * This setting specifies the upper limit of allowed number of spins that
        spinlocks are allowed to perform. This setting is applicable only if
-       ``HPX_WITH_SPINLOCK_DEADLOCK_DETECTION`` is set during configuration in
+       ``HPXLocal_WITH_SPINLOCK_DEADLOCK_DETECTION`` is set during configuration in
        CMake. By default this is set to ``1000000``.
    * * ``hpx.max_background_threads``
      * This setting defines the number of threads in the scheduler which are

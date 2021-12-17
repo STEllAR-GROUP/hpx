@@ -5,17 +5,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(example_programs transpose_serial transpose_serial_block transpose_smp
-                     transpose_smp_block
+set(example_programs ${example_programs} transpose_block
+                     transpose_serial_vector
 )
 
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(example_programs ${example_programs} transpose_block
-                       transpose_serial_vector
-  )
-  if(HPX_WITH_CXX20_COROUTINES)
-    set(example_programs ${example_programs} transpose_await)
-  endif()
+if(HPXLocal_WITH_CXX20_COROUTINES)
+  set(example_programs ${example_programs} transpose_await)
 endif()
 
 set(transpose_serial_vector_FLAGS DEPENDENCIES partitioned_vector_component)
@@ -38,7 +33,7 @@ foreach(example_program ${example_programs})
   add_hpx_executable(
     ${example_program} INTERNAL_FLAGS
     SOURCES ${sources} ${${example_program}_FLAGS}
-    FOLDER "Examples/Transpose"
+    FOLDER "Examples/Full/Transpose"
   )
 
   add_hpx_example_target_dependencies("transpose" ${example_program})

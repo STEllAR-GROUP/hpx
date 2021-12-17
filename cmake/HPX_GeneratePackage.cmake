@@ -129,7 +129,7 @@ if(HPX_WITH_PKGCONFIG)
     hpx_pkgconfig_application INTERFACE HPX_APPLICATION_EXPORTS
   )
   target_compile_options(
-    hpx_pkgconfig_application INTERFACE "-std=c++${HPX_CXX_STANDARD}"
+    hpx_pkgconfig_application INTERFACE "-std=c++${HPXLocal_WITH_CXX_STANDARD}"
   )
 
   add_library(hpx_pkgconfig_component INTERFACE)
@@ -138,10 +138,13 @@ if(HPX_WITH_PKGCONFIG)
   )
   target_link_libraries(hpx_pkgconfig_component INTERFACE hpx)
   target_compile_options(
-    hpx_pkgconfig_component INTERFACE "-std=c++${HPX_CXX_STANDARD}"
+    hpx_pkgconfig_component INTERFACE "-std=c++${HPXLocal_WITH_CXX_STANDARD}"
   )
 
   set(exclude_targets hpx_interface Threads::Threads)
+  if(HPX_WITH_FETCH_HPXLOCAL)
+    list(APPEND exclude_targets HPX::hpx_local)
+  endif()
 
   # Generate the pkconfig files for HPX_APPLICATION (both for build and install)
   hpx_generate_pkgconfig_from_target(

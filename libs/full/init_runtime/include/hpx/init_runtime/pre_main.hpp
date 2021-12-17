@@ -7,14 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 
 namespace hpx { namespace detail {
 
     HPX_EXPORT int pre_main(runtime_mode);
 }}    // namespace hpx::detail
-
-#endif

@@ -71,16 +71,34 @@ function(
   if("${_target_type}" STREQUAL "STATIC_LIBRARY" OR "${_target_type}" STREQUAL
                                                     "SHARED_LIBRARY"
   )
-    # Necessary cause TARGET_FILE doesn't find the target in the install dir
-    if(${is_component})
-      # We put the link directory and let the user specify -l<component>
-      set(_libraries
-          -L$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>$<BUILD_INTERFACE:$<TARGET_FILE_DIR:${target}>>
-      )
+    # Is there a better way to handle this? When HPX::hpx_local is an imported
+    # target the generator expression $<TARGET_FILE_BASE_NAME:HPX::hpx_local>
+    # evaluates to HPX::hpx_local, which is wrong.
+    if("${target}" STREQUAL "HPX::hpx_local")
+      if(HPX_WITH_FETCH_HPXLOCAL)
+        set(_libraries
+            $<INSTALL_INTERFACE:-L${CMAKE_INSTALL_LIBDIR};-l$<TARGET_FILE_BASE_NAME:${target}>>$<BUILD_INTERFACE:$<TARGET_FILE:${target}>>
+        )
+      else()
+        string(TOLOWER ${CMAKE_BUILD_TYPE} build_type)
+        if("${build_type}" STREQUAL "debug")
+          set(debug_postfix ${HPXLocal_DEBUG_POSTFIX})
+        endif()
+        set(_libraries
+            -L$<TARGET_FILE_DIR:HPX::hpx_local>;-lhpx_local${debug_postfix}
+        )
+      endif()
     else()
-      set(_libraries
-          $<INSTALL_INTERFACE:-L${CMAKE_INSTALL_LIBDIR};-l$<TARGET_FILE_BASE_NAME:${target}>>$<BUILD_INTERFACE:$<TARGET_FILE:${target}>>
-      )
+      if(${is_component})
+        # We put the link directory and let the user specify -l<component>
+        set(_libraries
+            -L$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>$<BUILD_INTERFACE:$<TARGET_FILE_DIR:${target}>>
+        )
+      else()
+        set(_libraries
+            $<INSTALL_INTERFACE:-L${CMAKE_INSTALL_LIBDIR};-l$<TARGET_FILE_BASE_NAME:${target}>>$<BUILD_INTERFACE:$<TARGET_FILE:${target}>>
+        )
+      endif()
     endif()
   else()
     set(_libraries "")
@@ -317,6 +335,8 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
 
   if(${is_build})
     set(OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib/pkgconfig/)
+    set(hpx_local_library_list ${HPXLocal_BUILD_PKGCONFIG_LIBRARY_LIST})
+    set(hpx_local_cflags_list ${HPXLocal_BUILD_PKGCONFIG_CFLAGS_LIST})
   else()
     # Parent_scope to use the same variable to install
     set(OUTPUT_DIR ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/)
@@ -324,6 +344,8 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
         ${OUTPUT_DIR}
         PARENT_SCOPE
     )
+    set(hpx_local_library_list ${HPXLocal_INSTALL_PKGCONFIG_LIBRARY_LIST})
+    set(hpx_local_cflags_list ${HPXLocal_INSTALL_PKGCONFIG_CFLAGS_LIST})
   endif()
 
   set(is_component FALSE)

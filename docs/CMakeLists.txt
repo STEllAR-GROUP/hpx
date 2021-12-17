@@ -4,6 +4,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(NOT HPX_WITH_FETCH_HPXLOCAL)
+  hpx_warn(
+    "HPX is configured only with an installed HPXLocal. Documentation will not include an API reference for HPXLocal."
+  )
+endif()
+
 # Add all files here which should be passed to doxygen
 set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/components/component_storage/include/hpx/components/component_storage/migrate_from_storage.hpp"
@@ -23,8 +29,6 @@ set(doxygen_definition_list
     "DOXYGEN:=1"
     "BOOST_SYSTEM_NOEXCEPT="
     "HPX_EXCEPTION_EXPORT="
-    "HPX_CORE_EXPORT="
-    "HPX_FULL_EXPORT="
     "HPX_EXPORT="
     "HPX_ALWAYS_EXPORT="
     "extern="
@@ -132,6 +136,8 @@ else()
 endif()
 
 set(SPHINX_CONF_PY_DEST "${CMAKE_CURRENT_BINARY_DIR}/sphinx/conf.py")
+set(HPX_DOCS_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+set(HPX_DOCS_API_RST "${CMAKE_CURRENT_SOURCE_DIR}/sphinx/api.rst")
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/conf.py.in" ${SPHINX_CONF_PY_DEST}
   @ONLY
@@ -166,7 +172,7 @@ foreach(sphinx_source_file ${sphinx_source_files})
   )
 endforeach()
 
-# Copy the Sphinx source files of the libs directory to build directory
+# Copy the Sphinx source files of the HPX libs directory to the build directory
 file(
   GLOB_RECURSE sphinx_libs_source_files
   LIST_DIRECTORIES false
@@ -176,9 +182,7 @@ file(
 
 list(APPEND sphinx_libs_source_files "index.rst" "overview.rst")
 
-foreach(lib ${HPX_LIBS})
-  list(APPEND sphinx_libs_source_files "${lib}/modules.rst")
-endforeach()
+list(APPEND sphinx_libs_source_files "full/modules.rst")
 
 foreach(sphinx_source_file ${sphinx_libs_source_files})
   add_custom_command(
@@ -190,6 +194,30 @@ foreach(sphinx_source_file ${sphinx_libs_source_files})
       "${CMAKE_CURRENT_BINARY_DIR}/sphinx/libs/${sphinx_source_file}"
   )
 endforeach()
+
+# Copy the Sphinx source files of the HPXLocal libs directory to the build
+# directory
+if(HPX_WITH_FETCH_HPXLOCAL)
+  file(
+    GLOB_RECURSE sphinx_libs_source_files
+    LIST_DIRECTORIES false
+    RELATIVE "${HPXLocal_SOURCE_DIR}/libs"
+    "${HPXLocal_SOURCE_DIR}/libs/*/*/docs/*"
+  )
+
+  list(APPEND sphinx_libs_source_files "core/modules.rst")
+
+  foreach(sphinx_source_file ${sphinx_libs_source_files})
+    add_custom_command(
+      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/sphinx/libs/${sphinx_source_file}"
+      DEPENDS "${HPXLocal_SOURCE_DIR}/libs/${sphinx_source_file}"
+      COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different
+        "${HPXLocal_SOURCE_DIR}/libs/${sphinx_source_file}"
+        "${CMAKE_CURRENT_BINARY_DIR}/sphinx/libs/${sphinx_source_file}"
+    )
+  endforeach()
+endif()
 
 foreach(sphinx_source_file ${sphinx_libs_source_files})
   set(sphinx_source_files_build
@@ -211,9 +239,19 @@ create_symbolic_link(
 create_symbolic_link(
   "${PROJECT_SOURCE_DIR}/tests" "${CMAKE_CURRENT_BINARY_DIR}/tests"
 )
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/libs")
 create_symbolic_link(
-  "${PROJECT_SOURCE_DIR}/libs" "${CMAKE_CURRENT_BINARY_DIR}/libs"
+  "${PROJECT_SOURCE_DIR}/libs/full" "${CMAKE_CURRENT_BINARY_DIR}/libs/full"
 )
+create_symbolic_link(
+  "${PROJECT_SOURCE_DIR}/libs/index.rst"
+  "${CMAKE_CURRENT_BINARY_DIR}/libs/index.rst"
+)
+if(HPX_WITH_FETCH_HPXLOCAL)
+  create_symbolic_link(
+    "${HPXLocal_SOURCE_DIR}/libs/core" "${CMAKE_CURRENT_BINARY_DIR}/libs/core"
+  )
+endif()
 
 hpx_source_to_doxygen(hpx_autodoc DEPENDENCIES ${doxygen_dependencies})
 
@@ -253,7 +291,7 @@ foreach(output_format ${HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS})
 
   add_custom_command(
     OUTPUT "${SPHINX_DOCS_OUTPUT_FILE}"
-    DEPENDS "${sphinx_source_files_build}"
+    DEPENDS "${SPHINX_CONF_PY_DEST}" "${sphinx_source_files_build}"
             "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc/index.xml"
     COMMAND ${SPHINX_DOCS_BUILD_COMMAND}
   )
