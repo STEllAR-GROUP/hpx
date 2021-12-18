@@ -81,7 +81,8 @@ namespace hpx { namespace mpi { namespace experimental {
         {
             get_requests_vector().push_back(req_callback.request);
             get_request_callback_vector().push_back(std::move(req_callback));
-            get_mpi_info().requests_vector_size_ = get_requests_vector().size();
+            get_mpi_info().requests_vector_size_ =
+                static_cast<std::uint32_t>(get_requests_vector().size());
 
             if constexpr (mpi_debug.is_enabled())
             {
@@ -340,7 +341,7 @@ namespace hpx { namespace mpi { namespace experimental {
                 }
 
                 detail::get_mpi_info().requests_vector_size_ =
-                    requests_vector.size();
+                    static_cast<std::uint32_t>(requests_vector.size());
 
                 if constexpr (mpi_debug.is_enabled())
                 {
