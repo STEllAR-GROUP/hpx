@@ -188,7 +188,10 @@ elseif(NOT TARGET HPX::hpx_local AND NOT HPX_FIND_PACKAGE)
   if(MSVC AND NOT DEFINED HPXLocal_WITH_BINARY_DIR)
     set(HPXLocal_WITH_BINARY_DIR
         "${PROJECT_BINARY_DIR}"
-        CACHE STRING "Binary directory for local should be the same as for full library" FORCE
+        CACHE
+          STRING
+          "Binary directory for local should be the same as for full library"
+          FORCE
     )
   endif()
 
