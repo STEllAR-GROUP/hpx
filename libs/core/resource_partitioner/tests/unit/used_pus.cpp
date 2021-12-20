@@ -36,10 +36,10 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg = {"hpx.os_threads=4"};
-
     hpx::local::init_params init_args;
-    init_args.cfg = std::move(cfg);
+    init_args.cfg = {"hpx.os_threads=" +
+        std::to_string(((std::min)(std::size_t(4),
+            std::size_t(hpx::threads::hardware_concurrency()))))};
 
     // now run the test
     HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);

@@ -6,6 +6,7 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
+#include <hpx/assert.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/local/thread.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
@@ -16,10 +17,13 @@
 #include <utility>
 #include <vector>
 
+std::size_t const max_threads = (std::min)(
+    std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
+
 int hpx_main()
 {
-    HPX_TEST_EQ(std::size_t(4), hpx::resource::get_num_threads());
-    HPX_TEST_EQ(std::size_t(4), hpx::resource::get_num_threads(0));
+    HPX_TEST_EQ(std::size_t(max_threads), hpx::resource::get_num_threads());
+    HPX_TEST_EQ(std::size_t(max_threads), hpx::resource::get_num_threads(0));
     HPX_TEST_EQ(std::size_t(1), hpx::resource::get_num_thread_pools());
     HPX_TEST_EQ(std::size_t(0), hpx::resource::get_pool_index("default"));
     HPX_TEST_EQ(std::string("default"), hpx::resource::get_pool_name(0));
@@ -45,10 +49,12 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg = {"hpx.os_threads=4"};
+    HPX_ASSERT(max_threads >= 2);
 
     hpx::local::init_params init_args;
-    init_args.cfg = std::move(cfg);
+    init_args.cfg = {"hpx.os_threads=" +
+        std::to_string(((std::min)(std::size_t(4),
+            std::size_t(hpx::threads::hardware_concurrency()))))};
 
     // now run the test
     HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);

@@ -6,6 +6,7 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
+#include <hpx/assert.hpp>
 #include <hpx/local/chrono.hpp>
 #include <hpx/local/execution.hpp>
 #include <hpx/local/future.hpp>
@@ -26,6 +27,9 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+std::size_t const max_threads = (std::min)(
+    std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
 
 int hpx_main()
 {
@@ -139,13 +143,14 @@ void test_scheduler(
 {
     hpx::local::init_params init_args;
 
-    init_args.cfg = {"hpx.os_threads=4"};
+    init_args.cfg = {"hpx.os_threads=" + std::to_string(max_threads)};
     init_args.rp_callback = [scheduler](auto& rp,
                                 hpx::program_options::variables_map const&) {
         rp.create_thread_pool("worker", scheduler);
 
-        int const worker_pool_threads = 3;
-        int worker_pool_threads_added = 0;
+        std::size_t const worker_pool_threads = max_threads - 1;
+        HPX_ASSERT(worker_pool_threads >= 1);
+        std::size_t worker_pool_threads_added = 0;
 
         for (hpx::resource::numa_domain const& d : rp.numa_domains())
         {
@@ -168,6 +173,8 @@ void test_scheduler(
 
 int main(int argc, char* argv[])
 {
+    HPX_ASSERT(max_threads >= 2);
+
     std::vector<hpx::resource::scheduling_policy> schedulers = {
         hpx::resource::scheduling_policy::local,
         hpx::resource::scheduling_policy::local_priority_fifo,
