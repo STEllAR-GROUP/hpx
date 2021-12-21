@@ -359,10 +359,44 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 seq_time_forloop = averageout_sequential_forloop(vector_size);
             }
         }
+        else if (vm["executor"].as<std::string>() == "scheduler")
+        {
+            hpx::execution::experimental::scheduler_executor<
+                hpx::execution::experimental::thread_pool_scheduler>
+                par;
+
+            if (enable_all || vm.count("parallel_foreach"))
+            {
+                par_time_foreach =
+                    averageout_parallel_foreach(vector_size, par);
+            }
+            if (enable_all || vm.count("task_foreach"))
+            {
+                task_time_foreach = averageout_task_foreach(vector_size, par);
+            }
+            if (enable_all || vm.count("sequential_foreach"))
+            {
+                seq_time_foreach = averageout_sequential_foreach(vector_size);
+            }
+
+            if (enable_all || vm.count("parallel_forloop"))
+            {
+                par_time_forloop =
+                    averageout_parallel_forloop(vector_size, par);
+            }
+            if (enable_all || vm.count("task_forloop"))
+            {
+                task_time_forloop = averageout_task_forloop(vector_size, par);
+            }
+            if (enable_all || vm.count("sequential_forloop"))
+            {
+                seq_time_forloop = averageout_sequential_forloop(vector_size);
+            }
+        }
         else
         {
             std::cerr << "unknown executor option (should be aggregated, "
-                         "forkjoin or parallel (default)\n"
+                         "forkjoin, scheduler or parallel (default)\n"
                       << std::flush;
             hpx::local::finalize();
             return -1;
@@ -489,7 +523,7 @@ int main(int argc, char* argv[])
         ("csv_output", "print results in csv format")
         ("executor", value<std::string>()->default_value("parallel"),
             "use specified executor (possible values: aggregated, "
-            "forkjoin, or parallel (default)")
+            "forkjoin, scheduler, or parallel (default)")
         ("disable_stealing", "disable thread stealing")
         ("fast_idle_mode", "enable fast idle mode")
 
