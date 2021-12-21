@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
-
+#include <hpx/local/init.hpp>
 #include <hpx/modules/async_mpi.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
@@ -233,7 +232,7 @@ int hpx_main()
                         ex::sync_wait();
                     HPX_TEST(false);
                 }
-                catch (std::runtime_error const& e)
+                catch (std::runtime_error const&)
                 {
                     exception_thrown = true;
                 }
@@ -243,14 +242,14 @@ int hpx_main()
         }
     }
 
-    return hpx::finalize();
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
     MPI_Init(&argc, &argv);
 
-    auto result = hpx::init(argc, argv);
+    auto result = hpx::local::init(hpx_main, argc, argv);
 
     MPI_Finalize();
 
