@@ -21,6 +21,7 @@ set(benchmarks
     benchmark_scan_algorithms
     benchmark_unique
     benchmark_unique_copy
+    foreach_report
     foreach_scaling
     transform_reduce_scaling
 )
