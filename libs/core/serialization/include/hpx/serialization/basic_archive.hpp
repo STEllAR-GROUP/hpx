@@ -69,7 +69,7 @@ namespace hpx { namespace serialization {
         void invoke(T& t)
         {
 #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
-            static_assert(!std::is_pointer<T>::value,
+            static_assert(!std::is_pointer_v<T>,
                 "HPX does not support serialization of raw pointers. "
                 "Please use smart pointers.");
 #endif

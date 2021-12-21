@@ -322,7 +322,8 @@ namespace hpx { namespace lcos { namespace detail {
                     return hpx::future_status::uninitialized;
                 }
 
-                if (reason == threads::thread_restart_state::timeout)
+                if (reason == threads::thread_restart_state::timeout &&
+                    state_.load(std::memory_order_acquire) == empty)
                 {
                     return hpx::future_status::timeout;
                 }

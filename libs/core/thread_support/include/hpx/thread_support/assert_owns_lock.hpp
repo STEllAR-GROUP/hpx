@@ -29,7 +29,7 @@ namespace hpx { namespace util { namespace detail {
 
     template <typename Lock>
     typename std::enable_if<has_owns_lock<Lock>::value>::type assert_owns_lock(
-        Lock const& l, long) HPX_NOEXCEPT_WITH_ASSERT
+        Lock const& l, long) noexcept
     {
         HPX_ASSERT(l.owns_lock());
         HPX_UNUSED(l);
@@ -37,7 +37,7 @@ namespace hpx { namespace util { namespace detail {
 
     template <typename Lock>
     typename std::enable_if<has_owns_lock<Lock>::value>::type
-    assert_doesnt_own_lock(Lock const& l, long) HPX_NOEXCEPT_WITH_ASSERT
+    assert_doesnt_own_lock(Lock const& l, long) noexcept
     {
         HPX_ASSERT(!l.owns_lock());
         HPX_UNUSED(l);

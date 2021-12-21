@@ -375,14 +375,14 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             template <typename Lock>
-            bool is_empty(Lock& l) const HPX_NOEXCEPT_WITH_ASSERT
+            bool is_empty(Lock& l) const noexcept
             {
                 HPX_ASSERT_OWNS_LOCK(l);
                 return empty_;
             }
 
             template <typename Lock>
-            bool has_pending_request(Lock& l) const HPX_NOEXCEPT_WITH_ASSERT
+            bool has_pending_request(Lock& l) const noexcept
             {
                 HPX_ASSERT_OWNS_LOCK(l);
                 return push_active_;

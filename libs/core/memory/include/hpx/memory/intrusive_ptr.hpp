@@ -157,13 +157,13 @@ namespace hpx { namespace memory {
             return ret;
         }
 
-        T& operator*() const HPX_NOEXCEPT_WITH_ASSERT
+        T& operator*() const noexcept
         {
             HPX_ASSERT(px != nullptr);
             return *px;
         }
 
-        T* operator->() const HPX_NOEXCEPT_WITH_ASSERT
+        T* operator->() const noexcept
         {
             HPX_ASSERT(px != nullptr);
             return px;
