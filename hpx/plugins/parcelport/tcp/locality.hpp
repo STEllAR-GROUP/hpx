@@ -15,7 +15,7 @@
 #if defined(HPX_HAVE_PARCELPORT_TCP)
 
 #include <hpx/config/asio.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/util/ios_flags_saver.hpp>
 

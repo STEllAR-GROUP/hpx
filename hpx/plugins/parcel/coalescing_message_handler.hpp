@@ -12,7 +12,7 @@
 
 #include <hpx/functional/function.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/parcelset/policies/message_handler.hpp>
+#include <hpx/parcelset_base/policies/message_handler.hpp>
 #include <hpx/runtime_local/pool_timer.hpp>
 #include <hpx/statistics/histogram.hpp>
 #include <hpx/synchronization/spinlock.hpp>

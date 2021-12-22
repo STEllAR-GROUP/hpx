@@ -105,6 +105,6 @@ add_hpx_module(
   HEADERS ${components_base_headers}
   COMPAT_HEADERS ${components_base_compat_headers}
   DEPENDENCIES HPX::hpx_local
-  MODULE_DEPENDENCIES hpx_config hpx_naming_base
+  MODULE_DEPENDENCIES hpx_config hpx_naming_base hpx_parcelset_base
   CMAKE_SUBDIRS examples tests
 )

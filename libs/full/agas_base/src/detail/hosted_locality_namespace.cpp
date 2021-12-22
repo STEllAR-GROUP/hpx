@@ -14,7 +14,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/unused.hpp>
 

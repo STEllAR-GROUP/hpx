@@ -27,7 +27,7 @@ namespace boost
     {
       char const* name_regex;
       char const* name;
-      char const* include;
+      std::vector<char const*> include;
     };
 
     struct names_regex_data

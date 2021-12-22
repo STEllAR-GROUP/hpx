@@ -28,13 +28,13 @@
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/parcelset/parcelhandler.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime_components/components_fwd.hpp>
 #include <hpx/runtime_components/console_error_sink.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
@@ -306,7 +306,7 @@ namespace hpx {
         }
 
         agas_client_.initialize(std::uint64_t(runtime_support_.get()));
-        parcel_handler_.initialize(agas_client_, &applier_);
+        parcel_handler_.initialize();
 #else
         if (agas_client_.is_bootstrap())
         {

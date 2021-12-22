@@ -15,6 +15,7 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/parcelset_base/parcel_interface.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/unused.hpp>
 

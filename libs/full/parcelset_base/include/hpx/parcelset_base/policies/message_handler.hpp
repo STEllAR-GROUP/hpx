@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,13 +9,14 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
+
+#include <hpx/parcelset_base/parcelset_base_fwd.hpp>
 
 #include <system_error>
 
-namespace hpx { namespace parcelset { namespace policies
-{
+namespace hpx::parcelset::policies {
+
     struct message_handler
     {
         enum flush_mode
@@ -25,16 +26,15 @@ namespace hpx { namespace parcelset { namespace policies
             flush_mode_buffer_full = 2
         };
 
-        typedef util::function_nonser<
-            void(std::error_code const&, parcel const&)
-        > write_handler_type;
+        using write_handler_type = util::function_nonser<void(
+            std::error_code const&, parcelset::parcel const&)>;
 
-        virtual ~message_handler() {}
-        virtual void put_parcel(
-            parcelset::locality const& dest, parcel p,
+        virtual ~message_handler() = default;
+
+        virtual void put_parcel(parcelset::locality const& dest, parcel p,
             write_handler_type f) = 0;
         virtual bool flush(flush_mode mode, bool stop_buffering = false) = 0;
     };
-}}}
+}    // namespace hpx::parcelset::policies
 
 #endif

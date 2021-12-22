@@ -28,17 +28,17 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/runtime_local/detail/serialize_exception.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/unique_ptr.hpp>
-#include <hpx/traits/action_message_handler.hpp>
-#include <hpx/traits/action_serialization_filter.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/util.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/modules/itt_notify.hpp>
 #endif
+
+#include <hpx/parcelset_base/traits/action_get_embedded_parcel.hpp>
+#include <hpx/parcelset_base/traits/action_message_handler.hpp>
+#include <hpx/parcelset_base/traits/action_serialization_filter.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -261,19 +261,22 @@ namespace hpx { namespace actions {
 
         /// Return a pointer to the filter to be used while serializing an
         /// instance of this action type.
-        serialization::binary_filter* get_serialization_filter(
-            parcelset::parcel const& p) const override
+        serialization::binary_filter* get_serialization_filter() const override
         {
-            return traits::action_serialization_filter<derived_type>::call(p);
+            return traits::action_serialization_filter<derived_type>::call();
+        }
+
+        /// Return an embedded parcel if available (e.g. routing action).
+        hpx::optional<parcelset::parcel> get_embedded_parcel() const override
+        {
+            return traits::action_get_embedded_parcel<Action>::call(*this);
         }
 
         /// Return a pointer to the message handler to be used for this action.
         parcelset::policies::message_handler* get_message_handler(
-            parcelset::parcelhandler* ph, parcelset::locality const& loc,
-            parcelset::parcel const& p) const override
+            parcelset::locality const& loc) const override
         {
-            return traits::action_message_handler<derived_type>::call(
-                ph, loc, p);
+            return traits::action_message_handler<derived_type>::call(loc);
         }
 
     public:

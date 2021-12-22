@@ -13,7 +13,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 
 #include <cstdint>
 #include <string>

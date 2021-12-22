@@ -19,10 +19,10 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/naming/detail/preprocess_gid_types.hpp>
 #include <hpx/naming/split_gid.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_local/report_error.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -219,7 +219,7 @@ namespace hpx { namespace parcelset {
                             timer.elapsed_nanoseconds() - serialize_time;
                         action_data.num_parcels_ = 1;
                         pp.add_sent_data(
-                            ps[i].get_action()->get_action_name(), action_data);
+                            ps[i].get_action_name(), action_data);
 #else
                         HPX_UNUSED(pp);
 #endif

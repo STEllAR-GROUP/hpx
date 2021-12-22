@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,11 +11,9 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assert.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/serialization/map.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <map>
 #include <memory>
@@ -27,7 +25,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset {
-    ////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT locality
     {
         template <typename Impl>
@@ -67,57 +66,19 @@ namespace hpx { namespace parcelset {
         locality() = default;
 
         template <typename Impl,
-            typename Enable1 = typename std::enable_if<!std::is_same<locality,
-                typename std::decay<Impl>::type>::value>::type,
-            typename Enable2 = typename std::enable_if<
-                !traits::is_iterator<Impl>::value>::type>
+            typename Enable1 =
+                std::enable_if_t<!std::is_same_v<locality, std::decay_t<Impl>>>,
+            typename Enable2 = std::enable_if_t<!traits::is_iterator_v<Impl>>>
         explicit locality(Impl&& i)
-          : impl_(
-                new impl<typename std::decay<Impl>::type>(HPX_FORWARD(Impl, i)))
+          : impl_(new impl<std::decay_t<Impl>>(HPX_FORWARD(Impl, i)))
         {
         }
 
-        locality(locality const& other)
-          : impl_(other.impl_ ? other.impl_->clone() : nullptr)
-        {
-        }
+        locality(locality const& other);
+        locality(locality&& other) noexcept;
 
-        locality(locality&& other) noexcept
-          : impl_(other.impl_ ? other.impl_->move() : nullptr)
-        {
-        }
-
-        locality& operator=(locality const& other)
-        {
-            if (this != &other)
-            {
-                if (other.impl_)
-                {
-                    impl_.reset(other.impl_->clone());
-                }
-                else
-                {
-                    impl_.reset();
-                }
-            }
-            return *this;
-        }
-
-        locality& operator=(locality&& other) noexcept
-        {
-            if (this != &other)
-            {
-                if (other.impl_)
-                {
-                    impl_.reset(other.impl_->move());
-                }
-                else
-                {
-                    impl_.reset();
-                }
-            }
-            return *this;
-        }
+        locality& operator=(locality const& other);
+        locality& operator=(locality&& other) noexcept;
 
         ///////////////////////////////////////////////////////////////////////
         explicit operator bool() const noexcept
@@ -125,7 +86,7 @@ namespace hpx { namespace parcelset {
             return impl_ ? impl_->valid() : false;
         }
 
-        const char* type() const
+        char const* type() const
         {
             return impl_ ? impl_->type() : "";
         }
@@ -145,44 +106,17 @@ namespace hpx { namespace parcelset {
         }
 
     private:
-        friend bool operator==(locality const& lhs, locality const& rhs)
-        {
-            if (lhs.impl_ == rhs.impl_)
-                return true;
-            if (!lhs.impl_ || !rhs.impl_)
-                return false;
-            return lhs.impl_->equal(*rhs.impl_);
-        }
+        friend HPX_EXPORT bool operator==(
+            locality const& lhs, locality const& rhs);
+        friend HPX_EXPORT bool operator!=(
+            locality const& lhs, locality const& rhs);
+        friend HPX_EXPORT bool operator<(
+            locality const& lhs, locality const& rhs);
+        friend HPX_EXPORT bool operator>(
+            locality const& lhs, locality const& rhs);
 
-        friend bool operator!=(locality const& lhs, locality const& rhs)
-        {
-            return !(lhs == rhs);
-        }
-
-        friend bool operator<(locality const& lhs, locality const& rhs)
-        {
-            if (lhs.impl_ == rhs.impl_)
-                return false;
-            if (!lhs.impl_ || !rhs.impl_)
-                return false;
-            return lhs.impl_->less_than(*rhs.impl_);
-        }
-
-        friend bool operator>(locality const& lhs, locality const& rhs)
-        {
-            if (lhs.impl_ == rhs.impl_)
-                return false;
-            if (!lhs.impl_ || !rhs.impl_)
-                return false;
-            return !(lhs < rhs) && !(lhs == rhs);
-        }
-
-        friend std::ostream& operator<<(std::ostream& os, locality const& l)
-        {
-            if (!l.impl_)
-                return os;
-            return l.impl_->print(os);
-        }
+        friend HPX_EXPORT std::ostream& operator<<(
+            std::ostream& os, locality const& l);
 
         // serialization support
         friend class hpx::serialization::access;
@@ -264,7 +198,8 @@ namespace hpx { namespace parcelset {
 
     using endpoints_type = std::map<std::string, locality>;
 
-    std::ostream& operator<<(std::ostream& os, endpoints_type const& endpoints);
+    HPX_EXPORT std::ostream& operator<<(
+        std::ostream& os, endpoints_type const& endpoints);
 }}    // namespace hpx::parcelset
 
 #include <hpx/config/warnings_suffix.hpp>

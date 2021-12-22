@@ -26,10 +26,10 @@
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/parcelset/parcel.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/put_parcel_fwd.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 
 #include <type_traits>

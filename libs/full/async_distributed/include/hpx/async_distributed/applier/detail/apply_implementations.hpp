@@ -16,7 +16,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/parcelset/parcel.hpp>
 
 #include <system_error>
 #include <type_traits>

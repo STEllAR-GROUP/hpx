@@ -9,13 +9,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/plugin/traits/plugin_config_data.hpp>
 #include <hpx/plugins/parcelport_factory_base.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/preprocessor/cat.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>

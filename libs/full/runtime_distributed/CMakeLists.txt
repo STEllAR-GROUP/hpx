@@ -45,6 +45,7 @@ set(runtime_distributed_sources
     applier.cpp
     big_boot_barrier.cpp
     get_locality_name.cpp
+    locality_interface.cpp
     runtime_support.cpp
     runtime_distributed.cpp
     server/runtime_support_server.cpp
@@ -70,6 +71,7 @@ add_hpx_module(
     hpx_distribution_policies
     hpx_naming
     hpx_naming_base
+    hpx_parcelset
     hpx_performance_counters
     hpx_runtime_components
   CMAKE_SUBDIRS examples tests

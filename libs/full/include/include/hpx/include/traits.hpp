@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #include <hpx/algorithms/traits/pointer_category.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
@@ -19,6 +20,7 @@
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/functional/traits/is_bind_expression.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/functional/traits/is_placeholder.hpp>
@@ -26,13 +28,14 @@
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
+#include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
 #include <hpx/futures/traits/is_future_tuple.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/futures/traits/promise_remote_result.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/plugin/traits/plugin_config_data.hpp>
 #include <hpx/serialization/traits/brace_initializable_traits.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
@@ -67,8 +70,7 @@
 #include <hpx/components_base/traits/component_type_is_compatible.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/components_base/traits/managed_component_policies.hpp>
-#include <hpx/functional/traits/is_action.hpp>
-#include <hpx/futures/traits/get_remote_result.hpp>
-#include <hpx/futures/traits/promise_remote_result.hpp>
-#include <hpx/traits/action_message_handler.hpp>
-#include <hpx/traits/action_serialization_filter.hpp>
+#include <hpx/parcelset_base/traits/action_get_embedded_parcel.hpp>
+#include <hpx/parcelset_base/traits/action_message_handler.hpp>
+#include <hpx/parcelset_base/traits/action_serialization_filter.hpp>
+#include <hpx/plugin/traits/plugin_config_data.hpp>

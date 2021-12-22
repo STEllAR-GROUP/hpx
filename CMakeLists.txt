@@ -1,5 +1,5 @@
 # Copyright (c)      2020 Mikael Simberg
-# Copyright (c) 2007-2020 Hartmut Kaiser
+# Copyright (c) 2007-2021 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
@@ -598,7 +598,7 @@ if(HPX_WITH_NETWORKING)
   endif()
 endif(HPX_WITH_NETWORKING)
 
-# External libraries/frameworks used by sme of the examples and benchmarks
+# External libraries/frameworks used by some of the examples and benchmarks
 hpx_option(
   HPX_WITH_EXAMPLES_HDF5 BOOL
   "Enable examples requiring HDF5 support (default: OFF)." OFF
@@ -1208,6 +1208,12 @@ endif()
 add_hpx_pseudo_target(core)
 
 # ##############################################################################
+# Add libraries
+# ##############################################################################
+add_subdirectory(src)
+add_subdirectory(libs)
+
+# ##############################################################################
 # Configure compression and other plugins
 # ##############################################################################
 set(HPX_STATIC_PARCELPORT_PLUGINS
@@ -1216,12 +1222,6 @@ set(HPX_STATIC_PARCELPORT_PLUGINS
 )
 add_hpx_pseudo_target(plugins)
 add_subdirectory(plugins)
-
-# ##############################################################################
-# Add libraries
-# ##############################################################################
-add_subdirectory(src)
-add_subdirectory(libs)
 
 # ##############################################################################
 # Add static init and wrap library

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,19 +9,18 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/io_service/io_service_pool.hpp>
-#include <hpx/modules/errors.hpp>
-#include <hpx/modules/threading.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/runtime_distributed/applier.hpp>
-#include <hpx/runtime_distributed/runtime_fwd.hpp>
-#include <hpx/runtime_local/state.hpp>
-#include <hpx/util/get_entry_as.hpp>
-#if defined(HPX_HAVE_APEX)
-#include <hpx/threading_base/external_timer.hpp>
-#endif
 #include <hpx/assert.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/io_service.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/threading.hpp>
+#include <hpx/modules/util.hpp>
+#if defined(HPX_HAVE_APEX)
+#include <hpx/modules/threading_base.hpp>
+#endif
+
+#include <hpx/runtime/parcelset/parcelport.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -30,28 +29,26 @@
 #include <system_error>
 #include <utility>
 
-namespace hpx { namespace parcelset
-{
+namespace hpx { namespace parcelset {
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::runtime_configuration const& ini,
-            locality const & here, std::string const& type)
-      : applier_(nullptr),
-        num_parcel_destinations_(0),
-        here_(here),
-        max_inbound_message_size_(ini.get_max_inbound_message_size()),
-        max_outbound_message_size_(ini.get_max_outbound_message_size()),
-        allow_array_optimizations_(true),
-        allow_zero_copy_optimizations_(true),
-        async_serialization_(false),
-        priority_(hpx::util::get_entry_as<int>(ini,
-            "hpx.parcel." + type + ".priority", 0)),
-        type_(type)
+        locality const& here, std::string const& type)
+      : num_parcel_destinations_(0)
+      , here_(here)
+      , max_inbound_message_size_(ini.get_max_inbound_message_size())
+      , max_outbound_message_size_(ini.get_max_outbound_message_size())
+      , allow_array_optimizations_(true)
+      , allow_zero_copy_optimizations_(true)
+      , async_serialization_(false)
+      , priority_(hpx::util::get_entry_as<int>(
+            ini, "hpx.parcel." + type + ".priority", 0))
+      , type_(type)
     {
         std::string key("hpx.parcel.");
         key += type;
 
-        if (hpx::util::get_entry_as<int>(
-                ini, key + ".array_optimization", 1) == 0)
+        if (hpx::util::get_entry_as<int>(ini, key + ".array_optimization", 1) ==
+            0)
         {
             allow_array_optimizations_ = false;
             allow_zero_copy_optimizations_ = false;
@@ -191,12 +188,11 @@ namespace hpx { namespace parcelset
     {
         std::lock_guard<lcos::local::spinlock> l(mtx_);
         std::int64_t count = 0;
-        for (auto && p : pending_parcels_)
+        for (auto&& p : pending_parcels_)
         {
             count += hpx::get<0>(p.second).size();
             HPX_ASSERT(
-                hpx::get<0>(p.second).size() ==
-                hpx::get<1>(p.second).size());
+                hpx::get<0>(p.second).size() == hpx::get<1>(p.second).size());
         }
         return count;
     }
@@ -270,17 +266,16 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     // the code below is needed to bootstrap the parcel layer
     void parcelport::early_pending_parcel_handler(
-        std::error_code const& ec, parcel const & p)
+        std::error_code const& ec, parcel const& p)
     {
-        if (ec) {
+        if (ec)
+        {
             // all errors during early parcel handling are fatal
             std::exception_ptr exception =
-                HPX_GET_EXCEPTION(ec,
-                    "early_pending_parcel_handler",
-                    "error while handling early parcel: " +
-                        ec.message() + "(" +
-                        std::to_string(ec.value()) +
-                        ")" + parcelset::dump_parcel(p));
+                HPX_GET_EXCEPTION(ec, "early_pending_parcel_handler",
+                    "error while handling early parcel: " + ec.message() + "(" +
+                        std::to_string(ec.value()) + ")" +
+                        parcelset::dump_parcel(p));
 
             hpx::report_error(exception);
             return;
@@ -288,11 +283,11 @@ namespace hpx { namespace parcelset
 
 #if defined(HPX_HAVE_APEX) && defined(HPX_HAVE_PARCEL_PROFILING)
         // tell APEX about the sent parcel
-        util::external_timer::send(p.parcel_id().get_lsb(), p.size(),
-            p.destination_locality_id());
+        util::external_timer::send(
+            p.parcel_id().get_lsb(), p.size(), p.destination_locality_id());
 #endif
     }
 
-}}
+}}    // namespace hpx::parcelset
 
 #endif

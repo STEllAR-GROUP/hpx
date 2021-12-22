@@ -73,5 +73,6 @@ add_hpx_module(
     hpx_actions
     hpx_components_base
     hpx_naming_base
+    hpx_parcelset_base
   CMAKE_SUBDIRS examples tests
 )

@@ -11,10 +11,10 @@
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/components_base/generate_unique_ids.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/parcelset/parcelhandler.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime_components/server/console_error_sink_singleton.hpp>
 #include <hpx/runtime_distributed/applier.hpp>

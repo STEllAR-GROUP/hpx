@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,20 +11,21 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/agas/agas_fwd.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/threadmanager.hpp>
+#include <hpx/modules/timing.hpp>
+
+#include <hpx/components_base/component_type.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
+#include <hpx/parcelset_base/locality.hpp>
+#include <hpx/parcelset_base/parcel_interface.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime_distributed/applier.hpp>
-#include <hpx/runtime_distributed/runtime_fwd.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
@@ -43,14 +44,18 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace parcelset {
+namespace hpx::parcelset {
+
     /// The \a parcelhandler is the representation of the parcelset inside a
     /// locality. It is built on top of a single parcelport. Several
     /// parcel-handlers may be connected to a single parcelport.
     class HPX_EXPORT parcelhandler
     {
     public:
-        HPX_NON_COPYABLE(parcelhandler);
+        parcelhandler(parcelhandler const&) = delete;
+        parcelhandler(parcelhandler&&) = delete;
+        parcelhandler& operator=(parcelhandler const&) = delete;
+        parcelhandler& operator=(parcelhandler&&) = delete;
 
     private:
         void parcel_sink(parcel const& p);
@@ -62,31 +67,20 @@ namespace hpx { namespace parcelset {
         // make sure the parcel has been properly initialized
         void init_parcel(parcel& p);
 
-        typedef lcos::local::spinlock mutex_type;
+        using mutex_type = lcos::local::spinlock;
 
     public:
-        typedef std::pair<locality, std::string> handler_key_type;
-        typedef std::map<handler_key_type,
-            std::shared_ptr<policies::message_handler>>
-            message_handler_map;
+        using handler_key_type = std::pair<locality, std::string>;
+        using message_handler_map = std::map<handler_key_type,
+            std::shared_ptr<policies::message_handler>>;
 
-        typedef parcelport::read_handler_type read_handler_type;
-        typedef parcelport::write_handler_type write_handler_type;
+        using read_handler_type = parcelport::read_handler_type;
+        using write_handler_type = parcelport::write_handler_type;
 
-        /// Construct a new \a parcelhandler initializing it from a AGAS client
-        /// instance (parameter \a resolver) and the parcelport to be used for
-        /// parcel send and receive (parameter \a pp).
-        ///
-        /// \param resolver [in] A reference to the AGAS client to use for
-        ///                 address translation requests to be made by the
-        ///                 parcelhandler.
-        /// \param pp       [in] A reference to the \a parcelport this \a
-        ///                 parcelhandler is connected to. This \a parcelport
-        ///                 instance will be used for any parcel related
-        ///                 transport operations the parcelhandler carries out.
+        /// Construct a new \a parcelhandler.
         parcelhandler(util::runtime_configuration& cfg);
 
-        ~parcelhandler() = default;
+        ~parcelhandler();
 
         void set_notification_policies(util::runtime_configuration& cfg,
             threads::threadmanager* tm,
@@ -94,8 +88,7 @@ namespace hpx { namespace parcelset {
 
         std::shared_ptr<parcelport> get_bootstrap_parcelport() const;
 
-        void initialize(
-            naming::resolver_client& resolver, applier::applier* applier);
+        void initialize();
 
         void flush_parcels();
 
@@ -108,14 +101,6 @@ namespace hpx { namespace parcelset {
         bool do_background_work(std::size_t num_thread = 0,
             bool stop_buffering = false,
             parcelport_background_mode mode = parcelport_background_mode_all);
-
-        /// \brief Allow access to AGAS resolver instance.
-        ///
-        /// This accessor returns a reference to the AGAS resolver client
-        /// object the parcelhandler has been initialized with (see
-        /// parcelhandler constructors). This is the same resolver instance
-        /// this parcelhandler has been initialized with.
-        naming::resolver_client& get_resolver();
 
         /// Return the list of all remote localities supporting the given
         /// component type
@@ -387,14 +372,12 @@ namespace hpx { namespace parcelset {
         void invoke_write_handler(
             std::error_code const& ec, parcel const& p) const;
 
-        write_handler_type set_write_handler(write_handler_type f)
-        {
-            std::lock_guard<mutex_type> l(mtx_);
-            std::swap(f, write_handler_);
-            return f;
-        }
+        write_handler_type set_write_handler(write_handler_type f);
 
-    protected:
+        bool enum_parcelports(
+            hpx::util::unique_function_nonser<bool(std::string const&)> const&
+                f) const;
+
         std::int64_t get_incoming_queue_length(bool /*reset*/) const
         {
             return 0;
@@ -402,40 +385,20 @@ namespace hpx { namespace parcelset {
 
         std::int64_t get_outgoing_queue_length(bool reset) const;
 
+    protected:
         std::pair<std::shared_ptr<parcelport>, locality>
         find_appropriate_destination(naming::gid_type const& dest_gid);
         locality find_endpoint(
             endpoints_type const& eps, std::string const& name);
 
-        void register_counter_types(std::string const& pp_type);
-        void register_connection_cache_counter_types(
-            std::string const& pp_type);
-
     private:
-        int get_priority(std::string const& name) const
-        {
-            std::map<std::string, int>::const_iterator it =
-                priority_.find(name);
-            if (it == priority_.end())
-                return 0;
-            return it->second;
-        }
+        int get_priority(std::string const& name) const;
 
         parcelport* find_parcelport(
-            std::string const& type, error_code& = throws) const
-        {
-            int priority = get_priority(type);
-            if (priority <= 0)
-                return nullptr;
-            HPX_ASSERT(pports_.find(priority) != pports_.end());
-            return pports_.find(priority)->second.get();    // -V783
-        }
+            std::string const& type, error_code& = throws) const;
 
         /// \brief Attach the given parcel port to this handler
         void attach_parcelport(std::shared_ptr<parcelport> const& pp);
-
-        /// The AGAS client
-        naming::resolver_client* resolver_;
 
         /// the parcelport this handler is associated with
         using pports_type =
@@ -473,6 +436,11 @@ namespace hpx { namespace parcelset {
         bool is_networking_enabled_;
 
     public:
+        bool is_networking_enabled() const
+        {
+            return is_networking_enabled_;
+        }
+
         static std::vector<plugins::parcelport_factory_base*>&
         get_parcelport_factories();
 
@@ -483,7 +451,7 @@ namespace hpx { namespace parcelset {
     };
 
     std::vector<std::string> load_runtime_configuration();
-}}    // namespace hpx::parcelset
+}    // namespace hpx::parcelset
 
 #include <hpx/config/warnings_suffix.hpp>
 

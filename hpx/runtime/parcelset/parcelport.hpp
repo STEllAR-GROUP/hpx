@@ -17,17 +17,16 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/io_service.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/parcelset/parcel.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/runtime/parcelset/detail/data_point.hpp>
 #include <hpx/runtime/parcelset/detail/gatherer.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime_distributed/applier_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
 #include <cstddef>
-#include <cstdint>
 #include <cstdint>
 #include <list>
 #include <map>
@@ -41,15 +40,13 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace agas
-{
+namespace hpx { namespace agas {
     // forward declaration only
     struct HPX_EXPORT big_boot_barrier;
-}}
+}}    // namespace hpx::agas
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset
-{
+namespace hpx { namespace parcelset {
     /// The parcelport is the lowest possible representation of the parcelset
     /// inside a locality. It provides the minimal functionality to send and
     /// to receive parcels.
@@ -61,22 +58,24 @@ namespace hpx { namespace parcelset
 
     private:
         // avoid warnings about using \a this in member initializer list
-        parcelport& This() { return *this; }
+        parcelport& This()
+        {
+            return *this;
+        }
 
         friend struct agas::big_boot_barrier;
 
     public:
-        typedef util::function_nonser<
-            void(std::error_code const&, parcel const&)
-        > write_handler_type;
+        typedef util::function_nonser<void(
+            std::error_code const&, parcel const&)>
+            write_handler_type;
 
-        typedef util::function_nonser<
-            void(parcelport& pp, std::shared_ptr<std::vector<char> >,
-                 threads::thread_priority)
-        > read_handler_type;
+        typedef util::function_nonser<void(parcelport& pp,
+            std::shared_ptr<std::vector<char>>, threads::thread_priority)>
+            read_handler_type;
 
         /// Construct the parcelport on the given locality.
-        parcelport(util::runtime_configuration const& ini, locality const & here,
+        parcelport(util::runtime_configuration const& ini, locality const& here,
             std::string const& type);
 
         /// Virtual destructor
@@ -84,10 +83,16 @@ namespace hpx { namespace parcelset
 
         virtual bool can_bootstrap() const = 0;
 
-        int priority() const { return priority_; }
+        int priority() const
+        {
+            return priority_;
+        }
 
         /// Retrieve the type of the locality represented by this parcelport
-        std::string const& type() const { return type_; }
+        std::string const& type() const
+        {
+            return type_;
+        }
 
         /// Start the parcelport I/O thread pool.
         ///
@@ -109,7 +114,8 @@ namespace hpx { namespace parcelset
         ///
         /// The default is to return true if it can be used at bootstrap or alternative
         /// parcelports are enabled.
-        virtual bool can_connect(locality const &, bool use_alternative_parcelport)
+        virtual bool can_connect(
+            locality const&, bool use_alternative_parcelport)
         {
             return use_alternative_parcelport || can_bootstrap();
         }
@@ -129,8 +135,8 @@ namespace hpx { namespace parcelset
         ///      void handler(std::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcel(locality const & dest, parcel p,
-            write_handler_type f) = 0;
+        virtual void put_parcel(
+            locality const& dest, parcel p, write_handler_type f) = 0;
 
         /// Queues a list of parcels for transmission to another locality
         ///
@@ -157,7 +163,7 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        virtual void send_early_parcel(locality const & dest, parcel p) = 0;
+        virtual void send_early_parcel(locality const& dest, parcel p) = 0;
 
         /// Cache specific functionality
         virtual void remove_from_connection_cache(locality const& loc) = 0;
@@ -198,8 +204,8 @@ namespace hpx { namespace parcelset
 
         virtual locality create_locality() const = 0;
 
-        virtual locality agas_locality(util::runtime_configuration const& ini)
-            const = 0;
+        virtual locality agas_locality(
+            util::runtime_configuration const& ini) const = 0;
 
         /// Performance counter data
 
@@ -269,20 +275,13 @@ namespace hpx { namespace parcelset
             std::string const&, bool reset);
 
         // total data sent (bytes)
-        std::int64_t get_action_data_sent(
-            std::string const&, bool reset);
+        std::int64_t get_action_data_sent(std::string const&, bool reset);
 
         // total data received (bytes)
-        std::int64_t get_action_data_received(
-            std::string const&, bool reset);
+        std::int64_t get_action_data_received(std::string const&, bool reset);
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        void set_applier(applier::applier * applier)
-        {
-            applier_ = applier;
-        }
-
         /// Update performance counter data
         void add_received_data(
             performance_counters::parcels::data_point const& data);
@@ -327,20 +326,16 @@ namespace hpx { namespace parcelset
         }
 
         // callback while bootstrap the parcel layer
-        void early_pending_parcel_handler(std::error_code const& ec,
-            parcel const & p);
+        void early_pending_parcel_handler(
+            std::error_code const& ec, parcel const& p);
 
     protected:
         /// mutex for all of the member data
         mutable lcos::local::spinlock mtx_;
 
-        hpx::applier::applier *applier_;
-
         /// The cache for pending parcels
-        typedef hpx::tuple<
-            std::vector<parcel>
-          , std::vector<write_handler_type>
-        > map_second_type;
+        typedef hpx::tuple<std::vector<parcel>, std::vector<write_handler_type>>
+            map_second_type;
         typedef std::map<locality, map_second_type> pending_parcels_map;
         pending_parcels_map pending_parcels_;
 
@@ -376,7 +371,7 @@ namespace hpx { namespace parcelset
         int priority_;
         std::string type_;
     };
-}}
+}}    // namespace hpx::parcelset
 
 #include <hpx/config/warnings_suffix.hpp>
 

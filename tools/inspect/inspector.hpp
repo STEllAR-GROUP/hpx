@@ -108,7 +108,7 @@ namespace boost
     inline string relative_to( const path & src_arg, const path & base_arg )
     {
       path base( base_arg );
-      base.lexically_normal();
+      base = base.lexically_normal();
       string::size_type pos( base.string().size() );
       string src_arg_s(src_arg.string());
       path src;
@@ -116,7 +116,7 @@ namespace boost
         src = path(src_arg.string().substr(pos));
       else
         src = path(src_arg_s);
-      src.lexically_normal();
+      src = src.lexically_normal();
       return src.string();
     }
 

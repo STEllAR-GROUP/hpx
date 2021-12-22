@@ -17,7 +17,7 @@
 #include <hpx/runtime/parcelset/detail/gatherer.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstddef>

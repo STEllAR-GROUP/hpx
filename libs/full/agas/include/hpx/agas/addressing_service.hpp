@@ -20,7 +20,7 @@
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <boost/dynamic_bitset.hpp>
@@ -209,6 +209,11 @@ namespace hpx { namespace agas {
         server::symbol_namespace& get_local_symbol_namespace_service()
         {
             return symbol_ns_.get_service();
+        }
+
+        naming::address::address_type get_runtime_support_lva() const
+        {
+            return reinterpret_cast<naming::address::address_type>(rts_lva_);
         }
 
     protected:
