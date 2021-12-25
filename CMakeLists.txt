@@ -598,15 +598,6 @@ if(HPX_WITH_NETWORKING)
   endif()
 endif(HPX_WITH_NETWORKING)
 
-if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPXLocal_WITH_ASYNC_MPI)
-  if(MSVC)
-    # FIXME: add OpenMPI specific flag here for now as the
-    # hpx_add_compile_flag() below does not add the extra options to the top
-    # level directory
-    hpx_add_config_define(OMPI_IMPORTS)
-  endif()
-endif()
-
 # External libraries/frameworks used by sme of the examples and benchmarks
 hpx_option(
   HPX_WITH_EXAMPLES_HDF5 BOOL
