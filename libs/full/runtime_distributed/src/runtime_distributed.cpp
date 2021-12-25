@@ -181,7 +181,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     components::server::runtime_support* get_runtime_support_ptr()
     {
-        return reinterpret_cast<components::server::runtime_support*>(
+        return static_cast<components::server::runtime_support*>(
             get_runtime_distributed().get_runtime_support_lva());
     }
 
@@ -914,9 +914,9 @@ namespace hpx {
 #endif
     }
 
-    std::uint64_t runtime_distributed::get_runtime_support_lva() const
+    naming::address_type runtime_distributed::get_runtime_support_lva() const
     {
-        return reinterpret_cast<std::uint64_t>(runtime_support_.get());
+        return runtime_support_.get();
     }
 
     naming::gid_type get_next_id(std::size_t count = 1);

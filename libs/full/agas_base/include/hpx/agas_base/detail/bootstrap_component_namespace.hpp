@@ -28,7 +28,7 @@ namespace hpx { namespace agas { namespace detail {
 
         naming::address::address_type ptr() const
         {
-            return reinterpret_cast<naming::address::address_type>(&server_);
+            return const_cast<server::component_namespace*>(&server_);
         }
         naming::address addr() const;
         naming::id_type gid() const;
@@ -48,8 +48,6 @@ namespace hpx { namespace agas { namespace detail {
 
         hpx::future<std::uint32_t> get_num_localities(
             components::component_type type);
-
-        void register_counter_types();
 
         void register_server_instance(std::uint32_t locality_id);
 

@@ -50,6 +50,14 @@ namespace hpx { namespace lcos { namespace server {
         }
         static void set_component_type(components::component_type) {}
 
+        naming::address get_current_address() const
+        {
+            return naming::address(
+                naming::get_gid_from_locality_id(agas::get_locality_id()),
+                components::get_component_type<latch>(),
+                const_cast<latch*>(this));
+        }
+
     public:
         // This is the component type id. Every component type needs to have an
         // embedded enumerator 'value' which is used by the generic action

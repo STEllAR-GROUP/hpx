@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -17,7 +17,6 @@
 #include <hpx/actions_base/detail/action_factory.hpp>
 #include <hpx/actions_base/detail/invocation_count_registry.hpp>
 #include <hpx/actions_base/detail/per_action_data_counter_registry.hpp>
-#include <hpx/actions_base/preassigned_action_id.hpp>
 #include <hpx/actions_base/traits/action_continuation.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
@@ -201,9 +200,8 @@ namespace hpx { namespace actions {
         template <typename T>
         struct is_non_const_reference
           : std::integral_constant<bool,
-                std::is_lvalue_reference<T>::value &&
-                    !std::is_const<
-                        typename std::remove_reference<T>::type>::value>
+                std::is_lvalue_reference_v<T> &&
+                    !std::is_const_v<std::remove_reference_t<T>>>
         {
         };
 
@@ -274,27 +272,15 @@ namespace hpx { namespace actions {
         static remote_result_type invoker(naming::address_type lva,
             naming::component_type comptype, Ts&&... vs)
         {
-            using is_void = typename std::is_void<R>::type;
-            return invoker_impl(
-                is_void{}, lva, comptype, HPX_FORWARD(Ts, vs)...);
-        }
-
-    protected:
-        template <typename... Ts>
-        HPX_FORCEINLINE static remote_result_type invoker_impl(std::true_type,
-            naming::address_type lva, naming::component_type comptype,
-            Ts&&... vs)
-        {
-            Derived::invoke(lva, comptype, HPX_FORWARD(Ts, vs)...);
-            return util::unused;
-        }
-
-        template <typename... Ts>
-        HPX_FORCEINLINE static remote_result_type invoker_impl(std::false_type,
-            naming::address_type lva, naming::component_type comptype,
-            Ts&&... vs)
-        {
-            return Derived::invoke(lva, comptype, HPX_FORWARD(Ts, vs)...);
+            if constexpr (std::is_void_v<R>)
+            {
+                Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
+                return util::unused;
+            }
+            else
+            {
+                return Derived::invoke(lva, comptype, std::forward<Ts>(vs)...);
+            }
         }
 
     public:
@@ -309,7 +295,9 @@ namespace hpx { namespace actions {
         {
             if (target &&
                 target.get_management_type() == naming::id_type::unmanaged)
+            {
                 target = {};
+            }
 
             using thread_function = detail::thread_function<Derived>;
             return traits::action_decorate_function<Derived>::call(lva,
@@ -329,7 +317,9 @@ namespace hpx { namespace actions {
         {
             if (target &&
                 target.get_management_type() == naming::id_type::unmanaged)
+            {
                 target = {};
+            }
 
             using thread_function =
                 detail::continuation_thread_function<Derived>;
@@ -436,7 +426,7 @@ namespace hpx { namespace actions {
 
         ///////////////////////////////////////////////////////////////////////
         /// retrieve component type
-        static int get_component_type()
+        static int get_component_type() noexcept
         {
             return static_cast<int>(
                 components::get_component_type<Component>());
@@ -444,9 +434,9 @@ namespace hpx { namespace actions {
 
         using direct_execution = std::false_type;
 
-        /// The function \a get_action_type returns whether this action needs
-        /// to be executed in a new thread or directly.
-        static constexpr actions::action_flavor get_action_type()
+        // The function \a get_action_type returns whether this action needs
+        // to be executed in a new thread or directly.
+        static constexpr actions::action_flavor get_action_type() noexcept
         {
             return actions::action_flavor::plain_action;
         }
@@ -502,6 +492,10 @@ namespace hpx { namespace actions {
         {
             using type = Action;
         };
+
+        template <typename Action, typename Derived>
+        using action_type_t = typename action_type<Action, Derived>::type;
+
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -512,17 +506,14 @@ namespace hpx { namespace actions {
     template <typename TF, TF F, typename Derived = detail::this_type>
     struct direct_action
       : action<TF, F,
-            typename detail::action_type<direct_action<TF, F, Derived>,
-                Derived>::type>
+            detail::action_type_t<direct_action<TF, F, Derived>, Derived>>
     {
-        using derived_type =
-            typename detail::action_type<direct_action, Derived>::type;
-
+        using derived_type = detail::action_type_t<direct_action, Derived>;
         using direct_execution = std::true_type;
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        static constexpr actions::action_flavor action_flavor()
+        static constexpr actions::action_flavor get_action_type() noexcept
         {
             return actions::action_flavor::direct_action;
         }
@@ -545,10 +536,18 @@ namespace hpx { namespace actions {
         using type = direct_action<TF, F, Derived>;
     };
 
+    template <typename TF, TF F, typename Derived = detail::this_type,
+        typename Direct = std::false_type>
+    using make_action_t = typename make_action<TF, F, Derived, Direct>::type;
+
     template <typename TF, TF F, typename Derived = detail::this_type>
     struct make_direct_action : make_action<TF, F, Derived, std::true_type>
     {
     };
+
+    template <typename TF, TF F, typename Derived>
+    using make_direct_action_t =
+        typename make_direct_action<TF, F, Derived>::type;
 
 // Macros usable to refer to an action given the function to expose
 #define HPX_MAKE_ACTION(func)                                                  \
@@ -644,23 +643,6 @@ namespace hpx { namespace actions {
 /**/
 #define HPX_ACTION_USES_HUGE_STACK(action)                                     \
     HPX_ACTION_USES_STACK(action, threads::thread_stacksize::huge)             \
-/**/
-#endif
-
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-#define HPX_ACTION_DOES_NOT_SUSPEND(action) /**/
-#else
-// This macro is deprecated. It expands to an inline function which will emit a
-// warning.
-#define HPX_ACTION_DOES_NOT_SUSPEND(action)                                    \
-    HPX_DEPRECATED_V(1, 4,                                                     \
-        "HPX_ACTION_DOES_NOT_SUSPEND is deprecated and will be "               \
-        "removed in the future")                                               \
-    static inline void HPX_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)();     \
-    void HPX_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)()                    \
-    {                                                                          \
-        HPX_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)();                    \
-    }                                                                          \
 /**/
 #endif
 

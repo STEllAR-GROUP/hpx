@@ -68,8 +68,8 @@ std::size_t pass_movable_object_value(movable_object obj)
     return obj.get_count();
 }
 
-auto movable_object_value_void_passer =
-    hpx::actions::lambda_to_action([](movable_object) -> void {});
+//auto movable_object_value_void_passer =
+//    hpx::actions::lambda_to_action([](movable_object) -> void {});
 
 auto movable_object_value_passer = hpx::actions::lambda_to_action(
     [](movable_object obj) -> std::size_t { return obj.get_count(); });
@@ -118,8 +118,8 @@ std::size_t pass_non_movable_object_value(non_movable_object obj)
     return obj.get_count();
 }
 
-auto non_movable_object_value_void_passer =
-    hpx::actions::lambda_to_action([](non_movable_object) -> void {});
+//auto non_movable_object_value_void_passer =
+//    hpx::actions::lambda_to_action([](non_movable_object) -> void {});
 
 auto non_movable_object_value_passer = hpx::actions::lambda_to_action(
     [](non_movable_object obj) -> std::size_t { return obj.get_count(); });
@@ -268,6 +268,7 @@ void test_void_actions()
 
         // test void(movable_object const&)
         {
+            (void) movable_object_void_passer;
             HPX_TEST_EQ((pass_object_void<decltype(movable_object_void_passer),
                             movable_object>()),
                 1u);    // bind
@@ -279,6 +280,7 @@ void test_void_actions()
 
         // test void(non_movable_object const&)
         {
+            (void) non_movable_object_void_passer;
             HPX_TEST_EQ(
                 (pass_object_void<decltype(non_movable_object_void_passer),
                     non_movable_object>()),
@@ -292,6 +294,7 @@ void test_void_actions()
 
         // test void(movable_object)
         {
+            (void) movable_object_value_passer;
             HPX_TEST_EQ((pass_object_void<decltype(movable_object_value_passer),
                             movable_object>()),
                 1u);    // call
@@ -304,6 +307,7 @@ void test_void_actions()
 
         // test void(non_movable_object)
         {
+            (void) non_movable_object_value_passer;
             HPX_TEST_EQ(
                 (pass_object_void<decltype(non_movable_object_value_passer),
                     non_movable_object>()),
@@ -532,6 +536,7 @@ void test_object_actions()
             bool is_local = id == find_here();
 
             // test size_t(movable_object const&)
+            (void) movable_object_passer;
             if (is_local)
             {
                 HPX_TEST_EQ((pass_object<decltype(movable_object_passer),
@@ -556,6 +561,7 @@ void test_object_actions()
 #endif
 
             // test size_t(non_movable_object const&)
+            (void) non_movable_object_passer;
             if (is_local)
             {
                 HPX_TEST_EQ((pass_object<decltype(non_movable_object_passer),
@@ -580,6 +586,7 @@ void test_object_actions()
 #endif
 
             // test size_t(movable_object)
+            (void) movable_object_value_passer;
             if (is_local)
             {
                 HPX_TEST_EQ((pass_object<decltype(movable_object_value_passer),
@@ -604,6 +611,7 @@ void test_object_actions()
 #endif
 
             // test size_t(non_movable_object)
+            (void) non_movable_object_value_passer;
             if (is_local)
             {
                 HPX_TEST_EQ(
@@ -632,6 +640,7 @@ void test_object_actions()
 #endif
 
             // test movable_object()
+            (void) movable_object_returner;
             if (is_local)
             {
                 HPX_TEST_EQ((return_object<decltype(movable_object_returner),
@@ -648,6 +657,7 @@ void test_object_actions()
 #endif
 
             // test non_movable_object()
+            (void) non_movable_object_returner;
             if (is_local)
             {
                 //FIXME: bumped number for intel compiler

@@ -255,8 +255,7 @@ namespace hpx { namespace components {
         // derived from a) stub_base.
         template <typename Stub>
         struct make_stub<Stub,
-            typename util::always_void<
-                typename Stub::server_component_type>::type>
+            util::always_void_t<typename Stub::server_component_type>>
         {
             using type = Stub;
             using server_component_type = typename Stub::server_component_type;

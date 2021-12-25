@@ -387,16 +387,18 @@ namespace hpx { namespace parcelset {
 
         // decode the local virtual address of the parcel
         naming::address::address_type lva = data_.addr_.address_;
+
         // by convention, a zero address references either the local
         // runtime support component or one of the AGAS components
-        if (0 == lva)
+        if (nullptr == lva)
         {
             switch (comptype)
             {
             case components::component_runtime_support:
-                lva = hpx::applier::get_applier()
-                          .get_runtime_support_raw_gid()
-                          .get_lsb();
+                lva = reinterpret_cast<naming::address::address_type>(
+                    hpx::applier::get_applier()
+                        .get_runtime_support_raw_gid()
+                        .get_lsb());
                 break;
 
             case components::component_agas_primary_namespace:

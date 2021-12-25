@@ -37,6 +37,14 @@ namespace hpx { namespace components {
         {
             hpx::components::set_component_type<wrapping_type>(t);
         }
+
+        virtual naming::address get_current_address() const
+        {
+            return naming::address(
+                naming::get_gid_from_locality_id(agas::get_locality_id()),
+                components::get_component_type<Component>(),
+                const_cast<Component*>(static_cast<Component const*>(this)));
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -60,6 +68,14 @@ namespace hpx { namespace components {
         {
             hpx::components::set_component_type<wrapping_type>(t);
         }
+
+        virtual naming::address get_current_address() const
+        {
+            return naming::address(
+                naming::get_gid_from_locality_id(agas::get_locality_id()),
+                components::get_component_type<Component>(),
+                const_cast<Component*>(static_cast<Component const*>(this)));
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -82,6 +98,14 @@ namespace hpx { namespace components {
         static constexpr void set_component_type(component_type t)
         {
             hpx::components::set_component_type<wrapping_type>(t);
+        }
+
+        virtual naming::address get_current_address() const
+        {
+            return naming::address(
+                naming::get_gid_from_locality_id(agas::get_locality_id()),
+                components::get_component_type<Component>(),
+                const_cast<Component*>(static_cast<Component const*>(this)));
         }
     };
 }}    // namespace hpx::components

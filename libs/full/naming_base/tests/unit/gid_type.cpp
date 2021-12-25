@@ -401,12 +401,12 @@ int main()
     }
 
     {    // post-increment tests (post-increment should return a temporary)
-        gid_type gid0(~0x0ULL),        // boundary case
-            gid1(0xabULL),             // < ~0x0ULL case
-            gid2(0xdeULL, 0x0ULL),     // 0 lsb, > ~0x0ULL case
-            gid3(0xdeULL, 0xadULL),    // none-zero lsb, > ~0x0ULL case
+        gid_type gid0(~0x0ULL),                // boundary case
+            gid1(0xabULL),                     // < ~0x0ULL case
+            gid2(0xdeULL, nullptr),            // 0 lsb, > ~0x0ULL case
+            gid3(0xdeULL, (void*) 0xadULL),    // none-zero lsb, > ~0x0ULL case
             // we need these to check the order of operations
-            eq0(~0x0ULL), eq1(0xabULL), eq2(0xdeULL, 0x0ULL),
+            eq0(~0x0ULL), eq1(0xabULL), eq2(0xdeULL, nullptr),
             eq3(0xdeULL, 0xadULL);
 
         // sanity checks
@@ -455,12 +455,12 @@ int main()
     }
 
     {    // pre-increment tests (post-increment should return the original)
-        gid_type gid0(~0x0ULL),        // boundary case
-            gid1(0xabULL),             // < ~0x0ULL case
-            gid2(0xdeULL, 0x0ULL),     // 0 lsb, > ~0x0ULL case
-            gid3(0xdeULL, 0xadULL),    // none-zero lsb, > ~0x0ULL case
+        gid_type gid0(~0x0ULL),                // boundary case
+            gid1(0xabULL),                     // < ~0x0ULL case
+            gid2(0xdeULL, nullptr),            // 0 lsb, > ~0x0ULL case
+            gid3(0xdeULL, (void*) 0xadULL),    // none-zero lsb, > ~0x0ULL case
             // we need these to check the order of operations
-            eq0(~0x0ULL), eq1(0xabULL), eq2(0xdeULL, 0x0ULL),
+            eq0(~0x0ULL), eq1(0xabULL), eq2(0xdeULL, nullptr),
             eq3(0xdeULL, 0xadULL);
 
         // sanity checks
@@ -508,12 +508,12 @@ int main()
         HPX_TEST_EQ(gid3.get_lsb(), 0xaeULL);
     }
 
-    {                                  // arithmetic (operator+) tests
-        gid_type gid0(~0x0ULL),        // boundary case
-            gid1(0xabULL),             // < ~0x0ULL case
-            gid2(0xdeULL, 0x0ULL),     // 0 lsb, > ~0x0ULL case
-            gid3(0xdeULL, 0xadULL),    // none-zero lsb, > ~0x0ULL case
-            gid4(0x1ULL);              // 1 case
+    {                                          // arithmetic (operator+) tests
+        gid_type gid0(~0x0ULL),                // boundary case
+            gid1(0xabULL),                     // < ~0x0ULL case
+            gid2(0xdeULL, nullptr),            // 0 lsb, > ~0x0ULL case
+            gid3(0xdeULL, (void*) 0xadULL),    // none-zero lsb, > ~0x0ULL case
+            gid4(0x1ULL);                      // 1 case
 
         // sanity checks
         HPX_SANITY_EQ(gid0.get_msb(), 0x0ULL);

@@ -28,9 +28,9 @@ namespace hpx { namespace components {
     struct executor_component : BaseComponent
     {
     private:
-        typedef BaseComponent base_type;
-        typedef Executor executor_type;
-        typedef typename base_type::this_component_type this_component_type;
+        using base_type = BaseComponent;
+        using executor_type = Executor;
+        using this_component_type = typename base_type::this_component_type;
 
     public:
         template <typename... Arg>

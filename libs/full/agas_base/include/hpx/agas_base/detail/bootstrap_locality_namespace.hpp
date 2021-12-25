@@ -31,7 +31,7 @@ namespace hpx { namespace agas { namespace detail {
 
         naming::address::address_type ptr() const override
         {
-            return reinterpret_cast<naming::address::address_type>(&server_);
+            return const_cast<server::locality_namespace*>(&server_);
         }
         naming::address addr() const override;
         naming::id_type gid() const override;

@@ -90,7 +90,8 @@ namespace hpx { namespace components {
                 naming::address addr(
                     naming::get_gid_from_locality_id(agas::get_locality_id()),
                     components::get_component_type<wrapped_type>(),
-                    std::size_t(static_cast<this_component_type const*>(this)));
+                    const_cast<this_component_type*>(
+                        static_cast<this_component_type const*>(this)));
 
                 gid_ = naming::gid_type(msb_, lsb_);
 
@@ -141,7 +142,7 @@ namespace hpx { namespace components {
             }
         }
 
-        static void mark_as_migrated()
+        static void mark_as_migrated() noexcept
         {
             // If this assertion is triggered then this component instance is being
             // migrated even if the component type has not been enabled to support
@@ -149,7 +150,7 @@ namespace hpx { namespace components {
             HPX_ASSERT(false);
         }
 
-        static void on_migrated()
+        static void on_migrated() noexcept
         {
             // If this assertion is triggered then this component instance is being
             // migrated even if the component type has not been enabled to support
@@ -168,12 +169,12 @@ namespace hpx { namespace components {
         ///////////////////////////////////////////////////////////////////////
         struct fixed_heap
         {
-            static void* alloc(std::size_t)
+            static void* alloc(std::size_t) noexcept
             {
                 HPX_ASSERT(false);    // this shouldn't ever be called
                 return nullptr;
             }
-            static void free(void*, std::size_t)
+            static void free(void*, std::size_t) noexcept
             {
                 HPX_ASSERT(false);    // this shouldn't ever be called
             }
@@ -192,7 +193,7 @@ namespace hpx { namespace components {
 
         /// \brief  The function \a create is used for allocation and
         ///         initialization of instances of the derived components.
-        static Component* create(std::size_t /* count */)
+        static Component* create(std::size_t /* count */) noexcept
         {
             HPX_ASSERT(false);    // this shouldn't ever be called
             return nullptr;
@@ -200,7 +201,8 @@ namespace hpx { namespace components {
 
         /// \brief  The function \a destroy is used for destruction and
         ///         de-allocation of instances of the derived components.
-        static void destroy(Component* /* p */, std::size_t /* count */ = 1)
+        static void destroy(
+            Component* /* p */, std::size_t /* count */ = 1) noexcept
         {
             HPX_ASSERT(false);    // this shouldn't ever be called
         }

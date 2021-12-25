@@ -22,7 +22,7 @@ namespace hpx { namespace util {
     /// unique ids for components, parcels, threads etc.
     class HPX_EXPORT unique_id_ranges
     {
-        typedef hpx::util::spinlock mutex_type;
+        using mutex_type = hpx::util::spinlock;
 
         mutex_type mtx_;
 
@@ -36,8 +36,8 @@ namespace hpx { namespace util {
     public:
         unique_id_ranges()
           : mtx_()
-          , lower_(0)
-          , upper_(0)
+          , lower_(nullptr)
+          , upper_(nullptr)
         {
         }
 
@@ -47,7 +47,7 @@ namespace hpx { namespace util {
         void set_range(
             naming::gid_type const& lower, naming::gid_type const& upper)
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard l(mtx_);
             lower_ = lower;
             upper_ = upper;
         }

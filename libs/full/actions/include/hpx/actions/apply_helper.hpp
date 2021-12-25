@@ -40,8 +40,7 @@ namespace hpx { namespace applier { namespace detail {
         threads::thread_priority priority)
     {
         return hpx::actions::detail::thread_priority<
-            static_cast<threads::thread_priority>(
-                traits::action_priority<Action>::value)>::call(priority);
+            traits::action_priority_v<Action>>::call(priority);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -51,8 +50,7 @@ namespace hpx { namespace applier { namespace detail {
         naming::address::component_type comptype,
         threads::thread_priority priority, Ts&&... vs)
     {
-        using continuation_type =
-            typename traits::action_continuation<Action>::type;
+        using continuation_type = traits::action_continuation_t<Action>;
 
         continuation_type cont;
         if (traits::action_decorate_continuation<Action>::call(cont))    //-V614

@@ -19,6 +19,10 @@ namespace hpx { namespace traits {
     {
     };
 
+    template <typename T>
+    inline constexpr bool is_distribution_policy_v =
+        is_distribution_policy<T>::value;
+
     // By default the number of partitions is the same as the number of
     // localities represented by the given distribution policy
     template <typename Policy, typename Enable = void>

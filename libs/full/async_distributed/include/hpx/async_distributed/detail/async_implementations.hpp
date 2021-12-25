@@ -168,8 +168,8 @@ namespace hpx { namespace detail {
         std::ptrdiff_t requested_stack_size =
             threads::get_stack_size(static_cast<threads::thread_stacksize>(
                 traits::action_stacksize<Action>::value));
-        return !traits::action_decorate_function<Action>::value &&
-            this_thread::get_stack_size() >= requested_stack_size &&
+        constexpr bool df = traits::action_decorate_function<Action>::value;
+        return !df && this_thread::get_stack_size() >= requested_stack_size &&
             this_thread::has_sufficient_stack_space(requested_stack_size);
     }
 

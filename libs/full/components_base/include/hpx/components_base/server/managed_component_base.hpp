@@ -167,7 +167,7 @@ namespace hpx { namespace components {
             // finalize() will be called just before the instance gets destructed
             static constexpr void finalize() noexcept {}
 
-            static void mark_as_migrated()
+            static void mark_as_migrated() noexcept
             {
                 // If this assertion is triggered then this component instance is
                 // being migrated even if the component type has not been enabled
@@ -175,7 +175,7 @@ namespace hpx { namespace components {
                 HPX_ASSERT(false);
             }
 
-            static void on_migrated()
+            static void on_migrated() noexcept
             {
                 // If this assertion is triggered then this component instance is being
                 // migrated even if the component type has not been enabled to support
@@ -205,14 +205,12 @@ namespace hpx { namespace components {
 
         // make sure that we have a back_ptr whenever we need to control the
         // lifetime of the managed_component
-        static_assert((std::is_same<ctor_policy,
-                           traits::construct_without_back_ptr>::value ||
-                          std::is_same<dtor_policy,
-                              traits::managed_object_controls_lifetime>::value),
-            "std::is_same<ctor_policy, "
-            "traits::construct_without_back_ptr>::value || "
-            "std::is_same<dtor_policy, "
-            "traits::managed_object_controls_lifetime>::value");
+        static_assert(
+            (std::is_same_v<ctor_policy, traits::construct_without_back_ptr> ||
+                std::is_same_v<dtor_policy,
+                    traits::managed_object_controls_lifetime>),
+            "std::is_same_v<ctor_policy, construct_without_back_ptr> || "
+            "std::is_same_v<dtor_policy, managed_object_controls_lifetime>");
 
         constexpr managed_component_base() noexcept
           : back_ptr_(nullptr)
@@ -220,7 +218,7 @@ namespace hpx { namespace components {
         }
 
         explicit managed_component_base(
-            managed_component<Component, Wrapper>* back_ptr)
+            managed_component<Component, Wrapper>* back_ptr) noexcept
           : back_ptr_(back_ptr)
         {
             HPX_ASSERT(back_ptr);
@@ -249,7 +247,8 @@ namespace hpx { namespace components {
         template <typename>
         friend struct detail_adl_barrier::init;
 
-        void set_back_ptr(components::managed_component<Component, Wrapper>* bp)
+        void set_back_ptr(
+            components::managed_component<Component, Wrapper>* bp) noexcept
         {
             HPX_ASSERT(nullptr == back_ptr_);
             HPX_ASSERT(bp);
@@ -265,14 +264,14 @@ namespace hpx { namespace components {
     void intrusive_ptr_add_ref(managed_component<Component, Derived>* p)
     {
         detail_adl_barrier::manage_lifetime<
-            typename traits::managed_component_dtor_policy<Component>::type>::
+            traits::managed_component_dtor_policy_t<Component>>::
             addref(p->component_);
     }
     template <typename Component, typename Derived>
     void intrusive_ptr_release(managed_component<Component, Derived>* p)
     {
         detail_adl_barrier::manage_lifetime<
-            typename traits::managed_component_dtor_policy<Component>::type>::
+            traits::managed_component_dtor_policy_t<Component>>::
             release(p->component_);
     }
 
@@ -327,22 +326,31 @@ namespace hpx { namespace components {
         explicit managed_component(Component* comp)
           : component_(comp)
         {
-            detail_adl_barrier::init<
-                typename traits::managed_component_ctor_policy<
-                    Component>::type>::call(component_, this);
+            detail_adl_barrier::
+                init<traits::managed_component_ctor_policy_t<Component>>::call(
+                    component_, this);
             intrusive_ptr_add_ref(this);
         }
 
     public:
         // Construct a managed_component instance holding a new wrapped instance
-        template <typename... Ts>
-        managed_component(Ts&&... vs)
+        managed_component()
           : component_(nullptr)
         {
-            detail_adl_barrier::init<
-                typename traits::managed_component_ctor_policy<
-                    Component>::type>::call_new(component_, this,
-                HPX_FORWARD(Ts, vs)...);
+            detail_adl_barrier::init<traits::managed_component_ctor_policy_t<
+                Component>>::call_new(component_, this);
+            intrusive_ptr_add_ref(this);
+        }
+
+        template <typename T, typename... Ts,
+            typename Enable = std::enable_if_t<
+                !std::is_same_v<std::decay_t<T>, managed_component>>>
+        explicit managed_component(T&& t, Ts&&... ts)
+          : component_(nullptr)
+        {
+            detail_adl_barrier::init<traits::managed_component_ctor_policy_t<
+                Component>>::call_new(component_, this, HPX_FORWARD(T, t),
+                HPX_FORWARD(Ts, ts)...);
             intrusive_ptr_add_ref(this);
         }
 
@@ -352,8 +360,8 @@ namespace hpx { namespace components {
         {
             intrusive_ptr_release(this);
             detail_adl_barrier::manage_lifetime<
-                typename traits::managed_component_dtor_policy<
-                    Component>::type>::call(component_);
+                traits::managed_component_dtor_policy_t<Component>>::
+                call(component_);
         }
 
         //finalize() will be called just before the instance gets destructed

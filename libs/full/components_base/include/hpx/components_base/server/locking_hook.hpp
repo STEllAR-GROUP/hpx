@@ -35,9 +35,13 @@ namespace hpx { namespace components {
         using this_component_type = typename base_type::this_component_type;
 
     public:
-        template <typename... Arg>
-        locking_hook(Arg&&... arg)
-          : base_type(HPX_FORWARD(Arg, arg)...)
+        locking_hook() = default;
+
+        template <typename T, typename... Ts,
+            typename Enable = std::enable_if_t<
+                !std::is_same_v<std::decay_t<T>, locking_hook>>>
+        explicit locking_hook(T&& t, Ts&&... ts)
+          : base_type(HPX_FORWARD(T, t), HPX_FORWARD(Ts, ts)...)
         {
         }
 
@@ -46,24 +50,26 @@ namespace hpx { namespace components {
           , mtx_()
         {
         }
-        locking_hook(locking_hook&& rhs)
+
+        locking_hook(locking_hook&& rhs) noexcept
           : base_type(HPX_MOVE(rhs))
           , mtx_()
         {
         }
-
-        using decorates_action = void;
 
         locking_hook& operator=(locking_hook const& rhs)
         {
             this->base_type::operator=(rhs);
             return *this;
         }
-        locking_hook& operator=(locking_hook&& rhs)
+
+        locking_hook& operator=(locking_hook&& rhs) noexcept
         {
             this->base_type::operator=(HPX_MOVE(rhs));
             return *this;
         }
+
+        using decorates_action = void;
 
         // This is the hook implementation for decorate_action which locks
         // the component ensuring that only one action is executed at a time
@@ -87,9 +93,8 @@ namespace hpx { namespace components {
         struct decorate_wrapper
         {
             template <typename F,
-                typename Enable = typename std::enable_if<
-                    !std::is_same<typename std::decay<F>::type,
-                        decorate_wrapper>::value>::type>
+                typename Enable = std::enable_if_t<
+                    !std::is_same_v<std::decay_t<F>, decorate_wrapper>>>
             // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
             decorate_wrapper(F&& f)
             {
@@ -112,7 +117,7 @@ namespace hpx { namespace components {
                 threads::invalid_thread_id);
 
             // now lock the mutex and execute the action
-            std::unique_lock<mutex_type> l(mtx_);
+            std::unique_lock l(mtx_);
 
             // We can safely ignore this lock while checking as it is
             // guaranteed to be unlocked before the thread is suspended.
@@ -162,7 +167,7 @@ namespace hpx { namespace components {
                 threads::thread_restart_state::unknown;
 
             {
-                util::unlock_guard<mutex_type> ul(mtx_);
+                util::unlock_guard ul(mtx_);
                 result = threads::get_self().yield_impl(state);
             }
 

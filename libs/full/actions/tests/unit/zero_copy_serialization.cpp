@@ -179,8 +179,7 @@ void test_normal_serialization(T& arg)
 {
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
-        hpx::components::component_invalid,
-        reinterpret_cast<std::uint64_t>(&test_function1));
+        hpx::components::component_invalid, (void*) &test_function1);
 
     // compose archive flags
     std::uint32_t out_archive_flags = hpx::serialization::disable_data_chunking;
@@ -210,8 +209,7 @@ void test_normal_serialization(T1& arg1, T2& arg2)
 {
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
-        hpx::components::component_invalid,
-        reinterpret_cast<std::uint64_t>(&test_function2));
+        hpx::components::component_invalid, (void*) &test_function2);
 
     // compose archive flags
     std::uint32_t out_archive_flags = hpx::serialization::disable_data_chunking;
@@ -242,8 +240,7 @@ void test_normal_serialization(
 {
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
-        hpx::components::component_invalid,
-        reinterpret_cast<std::uint64_t>(&test_function2));
+        hpx::components::component_invalid, (void*) &test_function2);
 
     // compose archive flags
     std::uint32_t out_archive_flags = hpx::serialization::disable_data_chunking;
@@ -274,8 +271,7 @@ void test_zero_copy_serialization(T& arg)
 {
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
-        hpx::components::component_invalid,
-        reinterpret_cast<std::uint64_t>(&test_function1));
+        hpx::components::component_invalid, (void*) &test_function1);
 
     // compose archive flags
     std::uint32_t out_archive_flags = 0U;
@@ -305,8 +301,7 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
 {
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
-        hpx::components::component_invalid,
-        reinterpret_cast<std::uint64_t>(&test_function2));
+        hpx::components::component_invalid, (void*) &test_function2);
 
     // compose archive flags
     std::uint32_t out_archive_flags = 0U;
@@ -337,8 +332,7 @@ void test_zero_copy_serialization(
 {
     hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
-        hpx::components::component_invalid,
-        reinterpret_cast<std::uint64_t>(&test_function2));
+        hpx::components::component_invalid, (void*) &test_function2);
 
     // compose archive flags
     std::uint32_t out_archive_flags = 0U;

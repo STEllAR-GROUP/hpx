@@ -294,8 +294,8 @@ namespace hpx { namespace agas {
     struct registration_header
     {
         registration_header()
-          : primary_ns_ptr(0)
-          , symbol_ns_ptr(0)
+          : primary_ns_ptr(nullptr)
+          , symbol_ns_ptr(nullptr)
           , cores_needed(0)
           , num_threads(0)
         {
@@ -303,9 +303,9 @@ namespace hpx { namespace agas {
 
         // TODO: pass head address as a GVA
         registration_header(parcelset::endpoints_type const& endpoints_,
-            std::uint64_t primary_ns_ptr_, std::uint64_t symbol_ns_ptr_,
-            std::uint32_t cores_needed_, std::uint32_t num_threads_,
-            std::string const& hostname_,
+            naming::address_type primary_ns_ptr_,
+            naming::address_type symbol_ns_ptr_, std::uint32_t cores_needed_,
+            std::uint32_t num_threads_, std::string const& hostname_,
             detail::unassigned_typename_sequence const& typenames_,
             naming::gid_type prefix_ = naming::gid_type())
           : endpoints(endpoints_)
@@ -320,8 +320,8 @@ namespace hpx { namespace agas {
         }
 
         parcelset::endpoints_type endpoints;
-        std::uint64_t primary_ns_ptr;
-        std::uint64_t symbol_ns_ptr;
+        naming::address_type primary_ns_ptr;
+        naming::address_type symbol_ns_ptr;
         std::uint32_t cores_needed;
         std::uint32_t num_threads;
         std::string hostname;    // hostname of locality
@@ -331,14 +331,23 @@ namespace hpx { namespace agas {
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            ar& endpoints;
-            ar& primary_ns_ptr;
-            ar& symbol_ns_ptr;
-            ar& cores_needed;
-            ar& num_threads;
-            ar& hostname;
-            ar& typenames;
-            ar& prefix;
+            // clang-format off
+            ar & endpoints;
+
+            std::size_t address = reinterpret_cast<std::size_t>(primary_ns_ptr);
+            ar & address;
+            primary_ns_ptr = reinterpret_cast<naming::address_type>(address);
+
+            address = reinterpret_cast<std::size_t>(symbol_ns_ptr);
+            ar & address;
+            symbol_ns_ptr = reinterpret_cast<naming::address_type>(address);
+
+            ar & cores_needed;
+            ar & num_threads;
+            ar & hostname;
+            ar & typenames;
+            ar & prefix;
+            // clang-format on
         }
     };
 
@@ -389,17 +398,19 @@ namespace hpx { namespace agas {
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            ar& prefix;
-            ar& agas_locality;
-            ar& locality_ns_address;
-            ar& primary_ns_address;
-            ar& component_ns_address;
-            ar& symbol_ns_address;
-            ar& num_localities;
-            ar& used_cores;
-            ar& agas_endpoints;
-            ar& ids;
-            ar& endpoints;
+            // clang-format off
+            ar & prefix;
+            ar & agas_locality;
+            ar & locality_ns_address;
+            ar & primary_ns_address;
+            ar & component_ns_address;
+            ar & symbol_ns_address;
+            ar & num_localities;
+            ar & used_cores;
+            ar & agas_endpoints;
+            ar & ids;
+            ar & endpoints;
+            // clang-format on
         }
     };
 
@@ -409,13 +420,13 @@ namespace hpx { namespace agas {
     // }}}
 
     // {{{ early action types
-    typedef actions::direct_action<void (*)(registration_header const&),
-        register_worker>
-        register_worker_action;
+    using register_worker_action =
+        actions::direct_action<void (*)(registration_header const&),
+            register_worker>;
 
-    typedef actions::direct_action<void (*)(notification_header const&),
-        notify_worker>
-        notify_worker_action;
+    using notify_worker_action =
+        actions::direct_action<void (*)(notification_header const&),
+            notify_worker>;
     // }}}
 
 }}    // namespace hpx::agas
@@ -713,8 +724,8 @@ namespace hpx { namespace agas {
         HPX_ASSERT(service_mode_bootstrap != service_type);
 
         // any worker sends a request for registration and waits
-        HPX_ASSERT(0 != primary_ns_server);
-        HPX_ASSERT(0 != symbol_ns_server);
+        HPX_ASSERT(nullptr != primary_ns_server);
+        HPX_ASSERT(nullptr != symbol_ns_server);
 
         runtime& rt = get_runtime_distributed();
 

@@ -99,8 +99,16 @@ namespace hpx { namespace naming {
         {
         }
 
+        explicit gid_type(void* lsb_id) noexcept
+          : id_msb_(0)
+          , id_lsb_(reinterpret_cast<std::uint64_t>(lsb_id))
+        {
+        }
+
         explicit inline gid_type(
             std::uint64_t msb_id, std::uint64_t lsb_id) noexcept;
+        explicit inline gid_type(std::uint64_t msb_id, void* lsb_id) noexcept;
+
         inline constexpr gid_type(gid_type const& rhs) noexcept;
         inline constexpr gid_type(gid_type&& rhs) noexcept;
 
@@ -357,7 +365,8 @@ namespace hpx { namespace naming {
     inline gid_type get_gid_from_locality_id(std::uint32_t locality_id) noexcept
     {
         return gid_type(
-            (std::uint64_t(locality_id) + 1) << gid_type::locality_id_shift, 0);
+            (std::uint64_t(locality_id) + 1) << gid_type::locality_id_shift,
+            nullptr);
     }
 
     inline std::uint32_t get_locality_id_from_gid(
@@ -674,6 +683,12 @@ namespace hpx { namespace naming {
         std::uint64_t msb_id, std::uint64_t lsb_id) noexcept
       : id_msb_(naming::detail::strip_lock_from_gid(msb_id))
       , id_lsb_(lsb_id)
+    {
+    }
+
+    inline gid_type::gid_type(std::uint64_t msb_id, void* lsb_id) noexcept
+      : id_msb_(naming::detail::strip_lock_from_gid(msb_id))
+      , id_lsb_(reinterpret_cast<std::uint64_t>(lsb_id))
     {
     }
 

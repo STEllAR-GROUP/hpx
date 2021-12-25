@@ -120,24 +120,26 @@ namespace hpx { namespace lcos {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     template <>
     struct get_lva<lcos::base_lco>
     {
-        static lcos::base_lco* call(naming::address_type lva)
+        constexpr static lcos::base_lco* call(naming::address_type lva) noexcept
         {
-            typedef typename lcos::base_lco::wrapping_type wrapping_type;
-            return reinterpret_cast<wrapping_type*>(lva)->get_checked();
+            using wrapping_type = typename lcos::base_lco::wrapping_type;
+            return static_cast<wrapping_type*>(lva)->get();
         }
     };
 
     template <>
     struct get_lva<lcos::base_lco const>
     {
-        static lcos::base_lco const* call(naming::address_type lva)
+        constexpr static lcos::base_lco const* call(
+            naming::address_type lva) noexcept
         {
-            typedef typename std::add_const<
-                typename lcos::base_lco::wrapping_type>::type wrapping_type;
-            return reinterpret_cast<wrapping_type*>(lva)->get_checked();
+            using wrapping_type =
+                std::add_const_t<typename lcos::base_lco::wrapping_type>;
+            return static_cast<wrapping_type*>(lva)->get();
         }
     };
 }    // namespace hpx

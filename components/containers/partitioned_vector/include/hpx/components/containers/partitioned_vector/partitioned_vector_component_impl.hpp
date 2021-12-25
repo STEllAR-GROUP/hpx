@@ -62,24 +62,6 @@ namespace hpx { namespace server {
     {
     }
 
-    template <typename T, typename Data>
-    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
-    partitioned_vector<T, Data>::partitioned_vector(
-        partitioned_vector const& rhs)
-      : base_type(rhs)
-      , partitioned_vector_partition_(rhs.partitioned_vector_partition_)
-    {
-    }
-
-    template <typename T, typename Data>
-    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
-    partitioned_vector<T, Data>::partitioned_vector(partitioned_vector&& rhs)
-      : base_type(HPX_MOVE(rhs))
-      , partitioned_vector_partition_(
-            HPX_MOVE(rhs.partitioned_vector_partition_))
-    {
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Data>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT

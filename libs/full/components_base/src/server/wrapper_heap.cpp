@@ -90,8 +90,11 @@ namespace hpx { namespace components { namespace detail {
     {
         util::itt::heap_internal_access hia;
         HPX_UNUSED(hia);
+
         if (!init_pool())
+        {
             throw std::bad_alloc();
+        }
     }
 
     wrapper_heap::wrapper_heap()
@@ -115,6 +118,7 @@ namespace hpx { namespace components { namespace detail {
     {
         util::itt::heap_internal_access hia;
         HPX_UNUSED(hia);
+
         tidy();
     }
 
@@ -122,6 +126,7 @@ namespace hpx { namespace components { namespace detail {
     {
         util::itt::heap_internal_access hia;
         HPX_UNUSED(hia);
+
         return parameters_.capacity - free_size_;
     }
 
@@ -129,6 +134,7 @@ namespace hpx { namespace components { namespace detail {
     {
         util::itt::heap_internal_access hia;
         HPX_UNUSED(hia);
+
         return free_size_;
     }
 
@@ -136,6 +142,7 @@ namespace hpx { namespace components { namespace detail {
     {
         util::itt::heap_internal_access hia;
         HPX_UNUSED(hia);
+
         return nullptr == pool_;
     }
 
@@ -143,6 +150,7 @@ namespace hpx { namespace components { namespace detail {
     {
         util::itt::heap_internal_access hia;
         HPX_UNUSED(hia);
+
         std::size_t const num_bytes =
             parameters_.capacity * parameters_.element_size;
         return first_free_ < pool_ + num_bytes;
@@ -154,7 +162,7 @@ namespace hpx { namespace components { namespace detail {
             count * parameters_.element_size,
             HPX_WRAPPER_HEAP_INITIALIZED_MEMORY);
 
-        scoped_lock l(mtx_);
+        std::unique_lock l(mtx_);
 
         if (!ensure_pool(count))
             return false;
@@ -187,7 +195,7 @@ namespace hpx { namespace components { namespace detail {
 #if HPX_DEBUG_WRAPPER_HEAP != 0
         HPX_ASSERT(did_alloc(p));
 #endif
-        scoped_lock l(mtx_);
+        std::unique_lock l(mtx_);
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
         char* p1 = p;
@@ -241,7 +249,7 @@ namespace hpx { namespace components { namespace detail {
 
         HPX_ASSERT(did_alloc(p));
 
-        scoped_lock l(mtx_);
+        std::unique_lock l(mtx_);
 
         if (!base_gid_)
         {
@@ -250,7 +258,7 @@ namespace hpx { namespace components { namespace detail {
             {
                 // this is the first call to get_gid() for this heap - allocate
                 // a sufficiently large range of global ids
-                util::unlock_guard<scoped_lock> ul(l);
+                util::unlock_guard ul(l);
                 base_gid = ids.get_id(parameters_.capacity);
 
                 // register the global ids and the base address of this heap
@@ -276,7 +284,7 @@ namespace hpx { namespace components { namespace detail {
             else
             {
                 // unbind the range which is not needed anymore
-                util::unlock_guard<scoped_lock> ul(l);
+                util::unlock_guard ul(l);
                 agas::unbind_range_local(base_gid, parameters_.capacity);
             }
         }
@@ -290,14 +298,16 @@ namespace hpx { namespace components { namespace detail {
         util::itt::heap_internal_access hia;
         HPX_UNUSED(hia);
 
-        scoped_lock l(mtx_);
+        std::unique_lock l(mtx_);
         base_gid_ = g;
     }
 
-    bool wrapper_heap::test_release(scoped_lock& lk)
+    bool wrapper_heap::test_release(std::unique_lock<mutex_type>& lk)
     {
         if (pool_ == nullptr)
+        {
             return false;
+        }
 
         std::size_t const total_num_bytes =
             parameters_.capacity * parameters_.element_size;
@@ -317,7 +327,7 @@ namespace hpx { namespace components { namespace detail {
             naming::gid_type base_gid = base_gid_;
             base_gid_ = naming::invalid_gid;
 
-            util::unlock_guard<scoped_lock> ull(lk);
+            util::unlock_guard ull(lk);
             agas::unbind_range_local(base_gid, parameters_.capacity);
         }
 
