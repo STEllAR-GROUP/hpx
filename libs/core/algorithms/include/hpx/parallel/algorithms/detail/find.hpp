@@ -13,6 +13,7 @@
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
+#include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
@@ -25,7 +26,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     // provide implementation of std::find supporting iterators/sentinels
     template <typename ExPolicy>
-    struct sequential_find_t
+    struct sequential_find_t final
       : hpx::functional::detail::tag_fallback<sequential_find_t<ExPolicy>>
     {
     private:
@@ -87,7 +88,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     // provide implementation of std::find_if supporting iterators/sentinels
     template <typename ExPolicy>
-    struct sequential_find_if_t
+    struct sequential_find_if_t final
       : hpx::functional::detail::tag_fallback<sequential_find_if_t<ExPolicy>>
     {
     private:
@@ -172,7 +173,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     // provide implementation of std::find_if_not supporting iterators/sentinels
     template <typename ExPolicy>
-    struct sequential_find_if_not_t
+    struct sequential_find_if_not_t final
       : hpx::functional::detail::tag_fallback<
             sequential_find_if_not_t<ExPolicy>>
     {
@@ -285,7 +286,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 
     template <typename ExPolicy>
-    struct sequential_find_end_t
+    struct sequential_find_end_t final
       : hpx::functional::detail::tag_fallback<sequential_find_end_t<ExPolicy>>
     {
     private:
@@ -387,7 +388,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 #endif
 
     template <typename ExPolicy>
-    struct sequential_find_first_of_t
+    struct sequential_find_first_of_t final
       : hpx::functional::detail::tag_fallback<
             sequential_find_first_of_t<ExPolicy>>
     {
