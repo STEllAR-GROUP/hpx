@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/local/config.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -21,7 +21,7 @@
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename ExPolicy>
-    struct sequential_adjacent_find_t
+    struct sequential_adjacent_find_t final
       : hpx::functional::detail::tag_fallback<
             sequential_adjacent_find_t<ExPolicy>>
     {
