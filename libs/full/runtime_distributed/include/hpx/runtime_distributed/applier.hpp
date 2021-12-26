@@ -16,8 +16,8 @@
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/parcelset/parcel.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>

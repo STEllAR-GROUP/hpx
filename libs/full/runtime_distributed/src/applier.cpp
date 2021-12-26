@@ -17,8 +17,8 @@
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threadmanager.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/parcelset/parcel.hpp>
+#include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>

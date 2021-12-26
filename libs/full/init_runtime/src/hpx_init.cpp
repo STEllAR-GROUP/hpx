@@ -38,12 +38,12 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
+#include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/variables_map.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>

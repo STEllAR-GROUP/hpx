@@ -14,7 +14,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/address.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/parcelset_base/parcel_interface.hpp>
 
 #include <cstdint>
 #include <memory>

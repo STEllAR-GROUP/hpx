@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/serialization/array.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/util/ios_flags_saver.hpp>

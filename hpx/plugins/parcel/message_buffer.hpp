@@ -12,10 +12,9 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 
 #include <cstddef>

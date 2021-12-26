@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,7 @@
 
 #if defined(HPX_HAVE_COMPRESSION_SNAPPY)
 
-#include <hpx/traits/action_serialization_filter.hpp>
+#include <hpx/parcelsel_base/traits/action_serialization_filter.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_USES_SNAPPY_COMPRESSION(action)                            \

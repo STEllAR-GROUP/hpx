@@ -84,36 +84,6 @@ namespace hpx { namespace agas { namespace server {
         }
     }
 
-#if defined(HPX_HAVE_NETWORKING) && !defined(HPX_COMPUTE_DEVICE_CODE)
-    // Parcel routing forwards the message handler request to the routed action
-    parcelset::policies::message_handler*
-    primary_namespace::get_message_handler(parcelset::parcelhandler* ph,
-        parcelset::locality const& loc, parcelset::parcel const& p)
-    {
-        typedef hpx::actions::transfer_action<
-            server::primary_namespace::route_action>
-            action_type;
-
-        action_type* act = static_cast<action_type*>(p.get_action());
-
-        parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
-        return routed_p.get_message_handler(ph, loc);
-    }
-
-    serialization::binary_filter* primary_namespace::get_serialization_filter(
-        parcelset::parcel const& p)
-    {
-        typedef hpx::actions::transfer_action<
-            server::primary_namespace::route_action>
-            action_type;
-
-        action_type* act = static_cast<action_type*>(p.get_action());
-
-        parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
-        return routed_p.get_serialization_filter();
-    }
-#endif
-
     // start migration of the given object
     std::pair<naming::id_type, naming::address>
     primary_namespace::begin_migration(naming::gid_type id)

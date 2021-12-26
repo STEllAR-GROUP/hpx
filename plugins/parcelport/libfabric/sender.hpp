@@ -14,7 +14,7 @@
 #include <plugins/parcelport/performance_counter.hpp>
 #include <plugins/parcelport/rma_memory_pool.hpp>
 
-#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 
 #include <hpx/assert.hpp>
 #include <hpx/functional/unique_function.hpp>

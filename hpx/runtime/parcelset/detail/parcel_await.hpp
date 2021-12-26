@@ -9,28 +9,27 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
 
 #include <cstdint>
 #include <vector>
 
-namespace hpx { namespace parcelset { namespace detail
-{
-    using put_parcel_type = hpx::util::unique_function_nonser<
-            void(parcel&&, write_handler_type&&)
-        >;
+namespace hpx { namespace parcelset { namespace detail {
 
-    void HPX_EXPORT parcel_await_apply(parcel&& p, write_handler_type&& f,
-        std::uint32_t archive_flags, put_parcel_type pp);
+    using put_parcel_type = hpx::util::unique_function_nonser<void(
+        parcelset::parcel&&, write_handler_type&&)>;
 
-    using put_parcels_type = hpx::util::unique_function_nonser<
-            void(std::vector<parcel>&&, std::vector<write_handler_type>&&)
-        >;
+    void HPX_EXPORT parcel_await_apply(parcelset::parcel&& p,
+        write_handler_type&& f, std::uint32_t archive_flags,
+        put_parcel_type pp);
 
-    void HPX_EXPORT parcels_await_apply(std::vector<parcel>&& p,
+    using put_parcels_type = hpx::util::unique_function_nonser<void(
+        std::vector<parcelset::parcel>&&, std::vector<write_handler_type>&&)>;
+
+    void HPX_EXPORT parcels_await_apply(std::vector<parcelset::parcel>&& p,
         std::vector<write_handler_type>&& f, std::uint32_t archive_flags,
         put_parcels_type pp);
-}}}
+}}}    // namespace hpx::parcelset::detail
 
 #endif

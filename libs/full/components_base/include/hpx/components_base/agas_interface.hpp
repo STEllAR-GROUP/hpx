@@ -8,18 +8,23 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
-#include <hpx/functional/unique_function.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/parcelset_base/locality.hpp>
+#include <hpx/parcelset_base/parcel_interface.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <map>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -105,6 +110,14 @@ namespace hpx { namespace agas {
     {
         return get_all_locality_ids(naming::component_invalid, ec);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
+    HPX_EXPORT parcelset::endpoints_type const& resolve_locality(
+        naming::gid_type const& gid, error_code& ec = throws);
+
+    HPX_EXPORT void remove_resolved_locality(naming::gid_type const& gid);
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT bool is_local_address_cached(
@@ -268,4 +281,19 @@ namespace hpx { namespace agas {
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT void destroy_component(
         naming::gid_type const& gid, naming::address const& addr);
+
+    ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
+    HPX_EXPORT void route(parcelset::parcel&& p,
+        util::function_nonser<void(
+            std::error_code const&, parcelset::parcel const&)>&& f,
+        threads::thread_priority local_priority =
+            threads::thread_priority::default_);
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT naming::address_type get_primary_ns_lva();
+    HPX_EXPORT naming::address_type get_symbol_ns_lva();
+    HPX_EXPORT naming::address_type get_runtime_support_lva();
+
 }}    // namespace hpx::agas

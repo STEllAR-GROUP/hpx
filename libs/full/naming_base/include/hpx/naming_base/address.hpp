@@ -13,6 +13,7 @@
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
 #include <cstdint>
+#include <ostream>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -90,6 +91,8 @@ namespace hpx { namespace naming {
 
         HPX_SERIALIZATION_SPLIT_MEMBER();
     };
+
+    HPX_EXPORT std::ostream& operator<<(std::ostream& os, address const& addr);
 }}    // namespace hpx::naming
 
 HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::address)

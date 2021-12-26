@@ -5,20 +5,24 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
-#include <hpx/functional/unique_function.hpp>
-#include <hpx/futures/future_fwd.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/naming_base/naming_base.hpp>
+#include <hpx/parcelset_base/parcel_interface.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <map>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -77,6 +81,14 @@ namespace hpx { namespace agas { namespace detail {
 
     std::vector<std::uint32_t> (*get_all_locality_ids)(
         naming::component_type type, error_code& ec) = nullptr;
+
+    ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
+    parcelset::endpoints_type const& (*resolve_locality)(
+        naming::gid_type const& gid, error_code& ec) = nullptr;
+
+    void (*remove_resolved_locality)(naming::gid_type const& gid) = nullptr;
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     bool (*is_local_address_cached)(
@@ -214,4 +226,18 @@ namespace hpx { namespace agas { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     void (*destroy_component)(
         naming::gid_type const& gid, naming::address const& addr) = nullptr;
+
+    ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
+    void (*route)(parcelset::parcel&& p,
+        util::function_nonser<void(
+            std::error_code const&, parcelset::parcel const&)>&&,
+        threads::thread_priority local_priority) = nullptr;
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    naming::address_type (*get_primary_ns_lva)() = nullptr;
+    naming::address_type (*get_symbol_ns_lva)() = nullptr;
+    naming::address_type (*get_runtime_support_lva)() = nullptr;
+
 }}}    // namespace hpx::agas::detail

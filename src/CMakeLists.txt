@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2017 Hartmut Kaiser
+# Copyright (c) 2007-2021 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2018 Nikunj Gupta
 #
@@ -13,9 +13,6 @@ set(hpx_SOURCES
     runtime/parcelset/detail/parcel_await.cpp
     runtime/parcelset/detail/parcel_route_handler.cpp
     runtime/parcelset/detail/per_action_data_counter.cpp
-    runtime/parcelset/locality.cpp
-    runtime/parcelset/parcel.cpp
-    runtime/parcelset/parcelhandler.cpp
     runtime/parcelset/parcelport.cpp
     runtime/parcelset/put_parcel.cpp
     runtime/set_parcel_write_handler.cpp
@@ -81,19 +78,12 @@ set(hpx_HEADERS
     hpx/runtime/parcelset/detail/parcel_route_handler.hpp
     hpx/runtime/parcelset/detail/per_action_data_counter.hpp
     hpx/runtime/parcelset/encode_parcels.hpp
-    hpx/runtime/parcelset_fwd.hpp
-    hpx/runtime/parcelset/locality.hpp
     hpx/runtime/parcelset/parcel_buffer.hpp
-    hpx/runtime/parcelset/parcelhandler.hpp
-    hpx/runtime/parcelset/parcel.hpp
     hpx/runtime/parcelset/parcelport_connection.hpp
     hpx/runtime/parcelset/parcelport.hpp
     hpx/runtime/parcelset/parcelport_impl.hpp
-    hpx/runtime/parcelset/policies/message_handler.hpp
     hpx/runtime/parcelset/put_parcel.hpp
     hpx/runtime/set_parcel_write_handler.hpp
-    hpx/traits/action_message_handler.hpp
-    hpx/traits/action_serialization_filter.hpp
 )
 list(TRANSFORM hpx_HEADERS PREPEND ${PROJECT_SOURCE_DIR}/)
 
@@ -212,11 +202,6 @@ else()
 endif()
 
 target_link_libraries(hpx_full PUBLIC hpx_base_libraries)
-
-# Link to each parcelport plugin
-foreach(_parcelport_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
-  target_link_libraries(hpx_full PRIVATE ${_parcelport_plugin})
-endforeach()
 
 if((NOT HPX_WITH_STATIC_LINKING) AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
                                       OR (APPLE))

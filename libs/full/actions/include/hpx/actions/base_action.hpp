@@ -11,6 +11,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/datastructures.hpp>
+
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/actions_base/actions_base_fwd.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
@@ -19,19 +21,15 @@
 #include <hpx/components_base/pinned_ptr.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/runtime/parcelset_fwd.hpp>
-
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/preprocessor/stringize.hpp>
-#include <hpx/serialization/traits/needs_automatic_registration.hpp>
-#include <hpx/serialization/traits/polymorphic_traits.hpp>
-#include <hpx/serialization/tuple.hpp>
-
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/serialization.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/modules/itt_notify.hpp>
 #endif
+
+#include <hpx/naming_base/id_type.hpp>
+#include <hpx/parcelset_base/parcel_interface.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -106,15 +104,20 @@ namespace hpx { namespace actions {
         virtual std::pair<bool, components::pinned_ptr> was_object_migrated(
             hpx::naming::gid_type const&, naming::address_type) = 0;
 
+#if defined(HPX_HAVE_NETWORKING)
         /// Return a pointer to the filter to be used while serializing an
         /// instance of this action type.
-        virtual serialization::binary_filter* get_serialization_filter(
-            parcelset::parcel const& p) const = 0;
+        virtual serialization::binary_filter* get_serialization_filter()
+            const = 0;
+
+        /// Return an embedded parcel if available (e.g. routing action).
+        virtual hpx::optional<parcelset::parcel> get_embedded_parcel()
+            const = 0;
 
         /// Return a pointer to the message handler to be used for this action.
         virtual parcelset::policies::message_handler* get_message_handler(
-            parcelset::parcelhandler* ph, parcelset::locality const& loc,
-            parcelset::parcel const& p) const = 0;
+            parcelset::locality const& loc) const = 0;
+#endif
 
         virtual void load(serialization::input_archive& ar) = 0;
         virtual void save(serialization::output_archive& ar) = 0;

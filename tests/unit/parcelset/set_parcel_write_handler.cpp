@@ -13,6 +13,7 @@
 #include <atomic>
 #include <cstddef>
 #include <memory>
+#include <string>
 #include <system_error>
 #include <utility>
 #include <vector>
@@ -30,15 +31,13 @@ std::atomic<std::size_t> write_handler_called(0);
 bool is_test_action(hpx::parcelset::parcel const& p)
 {
 #if defined(HPX_HAVE_NETWORKING)
-    return dynamic_cast<hpx::actions::transfer_action<test_action>*>(
-               p.get_action()) != nullptr;
+    return std::string(p.get_action_name()) == std::string("test_action");
 #else
     return true;
 #endif
 }
 
-void write_handler(std::error_code const&,
-    hpx::parcelset::parcel const& p)
+void write_handler(std::error_code const&, hpx::parcelset::parcel const& p)
 {
     if (is_test_action(p))
         ++write_handler_called;

@@ -16,8 +16,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/naming_base/address.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <boost/lockfree/queue.hpp>

@@ -1,5 +1,5 @@
 //  Copyright (c)      2013 Thomas Heller
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,47 +19,46 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset {
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
-        struct call_for_each
+namespace hpx::parcelset::detail {
+
+    struct call_for_each
+    {
+        using handlers_type = std::vector<parcelport::write_handler_type>;
+        using parcels_type = std::vector<parcelset::parcel>;
+
+        handlers_type handlers_;
+        parcels_type parcels_;
+
+        call_for_each(handlers_type&& handlers, parcels_type&& parcels)
+          : handlers_(HPX_MOVE(handlers))
+          , parcels_(HPX_MOVE(parcels))
         {
-            typedef std::vector<parcelport::write_handler_type> handlers_type;
-            typedef std::vector<parcel> parcels_type;
-            handlers_type handlers_;
-            parcels_type parcels_;
+        }
 
-            call_for_each(handlers_type&& handlers, parcels_type&& parcels)
-              : handlers_(HPX_MOVE(handlers))
-              , parcels_(HPX_MOVE(parcels))
+        call_for_each(call_for_each&& other) noexcept
+          : handlers_(HPX_MOVE(other.handlers_))
+          , parcels_(HPX_MOVE(other.parcels_))
+        {
+        }
+
+        call_for_each& operator=(call_for_each&& other) noexcept
+        {
+            handlers_ = HPX_MOVE(other.handlers_);
+            parcels_ = HPX_MOVE(other.parcels_);
+
+            return *this;
+        }
+
+        void operator()(std::error_code const& e)
+        {
+            HPX_ASSERT(parcels_.size() == handlers_.size());
+            for (std::size_t i = 0; i < parcels_.size(); ++i)
             {
+                handlers_[i](e, parcels_[i]);
+                handlers_[i].reset();
             }
-
-            call_for_each(call_for_each&& other)
-              : handlers_(HPX_MOVE(other.handlers_))
-              , parcels_(HPX_MOVE(other.parcels_))
-            {
-            }
-
-            call_for_each& operator=(call_for_each&& other)
-            {
-                handlers_ = HPX_MOVE(other.handlers_);
-                parcels_ = HPX_MOVE(other.parcels_);
-
-                return *this;
-            }
-
-            void operator()(std::error_code const& e)
-            {
-                HPX_ASSERT(parcels_.size() == handlers_.size());
-                for (std::size_t i = 0; i < parcels_.size(); ++i)
-                {
-                    handlers_[i](e, parcels_[i]);
-                    handlers_[i].reset();
-                }
-            }
-        };
-    }    // namespace detail
-}}       // namespace hpx::parcelset
+        }
+    };
+}    // namespace hpx::parcelset::detail
 
 #endif

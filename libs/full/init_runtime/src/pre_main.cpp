@@ -16,6 +16,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/performance_counters/agas_counter_types.hpp>
+#include <hpx/performance_counters/parcelhandler_counter_types.hpp>
 #include <hpx/performance_counters/threadmanager_counter_types.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
@@ -61,7 +62,8 @@ namespace hpx { namespace detail {
                 "counter types";
 
 #if defined(HPX_HAVE_NETWORKING)
-        applier::get_applier().get_parcel_handler().register_counter_types();
+        performance_counters::register_parcelhandler_counter_types(
+            applier::get_applier().get_parcel_handler());
         lbt_ << "(2nd stage) pre_main: registered parcelset performance "
                 "counter types";
 #endif

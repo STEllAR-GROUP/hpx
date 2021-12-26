@@ -11,9 +11,9 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos_local/detail/preprocess_future.hpp>
 #include <hpx/naming/detail/preprocess_gid_types.hpp>
+#include <hpx/parcelset/parcel.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -47,7 +47,7 @@ namespace hpx { namespace parcelset { namespace detail {
             put_parcel_(HPX_MOVE(parcel_), HPX_MOVE(handler_));
         }
 
-        bool apply_single(parcel& p)
+        bool apply_single(parcelset::parcel& p)
         {
             archive_.reset();
 
@@ -94,24 +94,24 @@ namespace hpx { namespace parcelset { namespace detail {
     };
 
     struct parcel_await
-      : parcel_await_base<parcel, write_handler_type, parcel_await>
+      : parcel_await_base<parcelset::parcel, write_handler_type, parcel_await>
     {
-        using base_type =
-            parcel_await_base<parcel, write_handler_type, parcel_await>;
-        parcel_await(parcel&& p, write_handler_type&& f,
+        using base_type = parcel_await_base<parcelset::parcel,
+            write_handler_type, parcel_await>;
+        parcel_await(parcelset::parcel&& p, write_handler_type&& f,
             std::uint32_t archive_flags, put_parcel_type pp);
 
         void apply();
     };
 
     struct parcels_await
-      : parcel_await_base<std::vector<parcel>, std::vector<write_handler_type>,
-            parcels_await>
+      : parcel_await_base<std::vector<parcelset::parcel>,
+            std::vector<write_handler_type>, parcels_await>
     {
-        using base_type = parcel_await_base<std::vector<parcel>,
+        using base_type = parcel_await_base<std::vector<parcelset::parcel>,
             std::vector<write_handler_type>, parcels_await>;
 
-        parcels_await(std::vector<parcel>&& p,
+        parcels_await(std::vector<parcelset::parcel>&& p,
             std::vector<write_handler_type>&& f, std::uint32_t archive_flags,
             put_parcel_type pp);
 
@@ -121,7 +121,7 @@ namespace hpx { namespace parcelset { namespace detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    parcel_await::parcel_await(parcel&& p, write_handler_type&& f,
+    parcel_await::parcel_await(parcelset::parcel&& p, write_handler_type&& f,
         std::uint32_t archive_flags, parcel_await::put_parcel_type pp)
       : base_type(HPX_MOVE(p), HPX_MOVE(f), archive_flags, HPX_MOVE(pp))
     {
@@ -135,7 +135,7 @@ namespace hpx { namespace parcelset { namespace detail {
         }
     }
 
-    parcels_await::parcels_await(std::vector<parcel>&& p,
+    parcels_await::parcels_await(std::vector<parcelset::parcel>&& p,
         std::vector<write_handler_type>&& f, std::uint32_t archive_flags,
         parcels_await::put_parcel_type pp)
       : base_type(HPX_MOVE(p), HPX_MOVE(f), archive_flags, HPX_MOVE(pp))
@@ -154,7 +154,7 @@ namespace hpx { namespace parcelset { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcel_await_apply(parcel&& p, write_handler_type&& f,
+    void parcel_await_apply(parcelset::parcel&& p, write_handler_type&& f,
         std::uint32_t archive_flags, put_parcel_type pp)
     {
         auto ptr = std::make_shared<parcel_await>(
@@ -162,7 +162,7 @@ namespace hpx { namespace parcelset { namespace detail {
         ptr->apply();
     }
 
-    void parcels_await_apply(std::vector<parcel>&& p,
+    void parcels_await_apply(std::vector<parcelset::parcel>&& p,
         std::vector<write_handler_type>&& f, std::uint32_t archive_flags,
         put_parcels_type pp)
     {

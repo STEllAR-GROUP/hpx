@@ -21,8 +21,8 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/agas_base.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>

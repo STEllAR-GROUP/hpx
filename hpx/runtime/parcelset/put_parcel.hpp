@@ -22,10 +22,11 @@
 #include <hpx/naming/split_gid.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/parcelset/parcel.hpp>
+#include <hpx/parcelset/parcelhandler.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
+#include <hpx/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/put_parcel_fwd.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -72,18 +73,20 @@ namespace hpx { namespace parcelset {
         }
 
         template <typename... Args>
-        parcel create_parcel::call(
+        parcelset::parcel create_parcel::call(
             naming::gid_type&& dest, naming::address&& addr, Args&&... args)
         {
-            return parcel(HPX_MOVE(dest), HPX_MOVE(addr),
-                detail::make_parcel_action(HPX_FORWARD(Args, args)...));
+            return parcelset::parcel(
+                new detail::parcel(HPX_MOVE(dest), HPX_MOVE(addr),
+                    detail::make_parcel_action(HPX_FORWARD(Args, args)...)));
         }
 
-        parcel create_parcel::call_with_action(naming::gid_type&& dest,
-            naming::address&& addr,
+        parcelset::parcel create_parcel::call_with_action(
+            naming::gid_type&& dest, naming::address&& addr,
             std::unique_ptr<actions::base_action>&& action)
         {
-            return parcel(HPX_MOVE(dest), HPX_MOVE(addr), HPX_MOVE(action));
+            return parcelset::parcel(new detail::parcel(
+                HPX_MOVE(dest), HPX_MOVE(addr), HPX_MOVE(action)));
         }
 
         template <typename PutParcel>
@@ -139,15 +142,15 @@ namespace hpx { namespace parcelset {
 
         struct HPX_EXPORT put_parcel_handler
         {
-            void operator()(parcel&& p) const;
+            void operator()(parcelset::parcel&& p) const;
         };
 
         template <typename Callback>
         struct put_parcel_handler_cb
         {
-            typename std::decay<Callback>::type cb_;
+            std::decay_t<Callback> cb_;
 
-            void operator()(parcel&& p)
+            void operator()(parcelset::parcel&& p)
             {
                 hpx::parcelset::put_parcel(HPX_MOVE(p), HPX_MOVE(cb_));
             }
