@@ -11,14 +11,16 @@
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/components_base/generate_unique_ids.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
+#include <hpx/parcelset/parcelport.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime_components/server/console_error_sink_singleton.hpp>
 #include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
@@ -37,12 +39,6 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx {
-    namespace detail {
-
-        // Get access to the registry of registered message handlers
-        HPX_EXPORT std::vector<hpx::tuple<char const*, char const*>>&
-        get_message_handler_registrations();
-    }    // namespace detail
 
     /// The \a runtime class encapsulates the HPX runtime system in a simple to
     /// use way. It makes sure all required parts of the HPX runtime system are

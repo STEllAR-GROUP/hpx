@@ -14,9 +14,9 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/locality.hpp>
-#include <hpx/runtime/parcelset/detail/gatherer.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset/parcelport_connection.hpp>
+#include <hpx/parcelset/parcelport_connection.hpp>
+#include <hpx/parcelset/detail/gatherer.hpp>
+#include <hpx/parcelset/parcelport.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 

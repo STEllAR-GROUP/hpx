@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,16 +8,16 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/actions/actions_fwd.hpp>
-#include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos_local/detail/preprocess_future.hpp>
-#include <hpx/naming/detail/preprocess_gid_types.hpp>
-#include <hpx/parcelset/parcel.hpp>
-#include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/runtime/parcelset/detail/parcel_await.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/serialization/detail/preprocess_container.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
+
+#include <hpx/actions/actions_fwd.hpp>
+#include <hpx/naming/detail/preprocess_gid_types.hpp>
+#include <hpx/parcelset/detail/parcel_await.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
+#include <hpx/parcelset_base/parcel_interface.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -24,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parcelset { namespace detail {
+namespace hpx::parcelset::detail {
 
     template <typename Parcel, typename Handler, typename Derived>
     struct parcel_await_base : std::enable_shared_from_this<Derived>
@@ -33,7 +34,7 @@ namespace hpx { namespace parcelset { namespace detail {
             hpx::util::unique_function_nonser<void(Parcel&&, Handler&&)>;
 
         parcel_await_base(Parcel&& parcel, Handler&& handler,
-            std::uint32_t archive_flags, put_parcel_type pp)
+            std::uint32_t archive_flags, put_parcel_type pp) noexcept
           : put_parcel_(HPX_MOVE(pp))
           , parcel_(HPX_MOVE(parcel))
           , handler_(HPX_MOVE(handler))
@@ -62,7 +63,7 @@ namespace hpx { namespace parcelset { namespace detail {
             //  - (shared_)future<id_type>: when the future wasn't ready yet, we
             //      need to do another await round for the id splitting
             //  - id_type: we need to await, if and only if, the credit of the
-            //      needs to split.
+            //      id needs to split.
             if (handle_futures && handle_futures->has_futures())
             {
                 auto this_ = this->shared_from_this();
@@ -98,10 +99,20 @@ namespace hpx { namespace parcelset { namespace detail {
     {
         using base_type = parcel_await_base<parcelset::parcel,
             write_handler_type, parcel_await>;
-        parcel_await(parcelset::parcel&& p, write_handler_type&& f,
-            std::uint32_t archive_flags, put_parcel_type pp);
 
-        void apply();
+        parcel_await(parcelset::parcel&& p, write_handler_type&& f,
+            std::uint32_t archive_flags, put_parcel_type pp) noexcept
+          : base_type(HPX_MOVE(p), HPX_MOVE(f), archive_flags, HPX_MOVE(pp))
+        {
+        }
+
+        void apply()
+        {
+            if (apply_single(parcel_))
+            {
+                done();
+            }
+        }
     };
 
     struct parcels_await
@@ -113,45 +124,24 @@ namespace hpx { namespace parcelset { namespace detail {
 
         parcels_await(std::vector<parcelset::parcel>&& p,
             std::vector<write_handler_type>&& f, std::uint32_t archive_flags,
-            put_parcel_type pp);
+            put_parcel_type pp) noexcept
+          : base_type(HPX_MOVE(p), HPX_MOVE(f), archive_flags, HPX_MOVE(pp))
+          , idx_(0)
+        {
+        }
 
-        void apply();
+        void apply()
+        {
+            for (/*idx_*/; idx_ != parcel_.size(); ++idx_)
+            {
+                if (!apply_single(parcel_[idx_]))
+                    return;
+            }
+            done();
+        }
 
         std::size_t idx_;
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    parcel_await::parcel_await(parcelset::parcel&& p, write_handler_type&& f,
-        std::uint32_t archive_flags, parcel_await::put_parcel_type pp)
-      : base_type(HPX_MOVE(p), HPX_MOVE(f), archive_flags, HPX_MOVE(pp))
-    {
-    }
-
-    void parcel_await::apply()
-    {
-        if (apply_single(parcel_))
-        {
-            done();
-        }
-    }
-
-    parcels_await::parcels_await(std::vector<parcelset::parcel>&& p,
-        std::vector<write_handler_type>&& f, std::uint32_t archive_flags,
-        parcels_await::put_parcel_type pp)
-      : base_type(HPX_MOVE(p), HPX_MOVE(f), archive_flags, HPX_MOVE(pp))
-      , idx_(0)
-    {
-    }
-
-    void parcels_await::apply()
-    {
-        for (/*idx_*/; idx_ != parcel_.size(); ++idx_)
-        {
-            if (!apply_single(parcel_[idx_]))
-                return;
-        }
-        done();
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     void parcel_await_apply(parcelset::parcel&& p, write_handler_type&& f,
@@ -170,6 +160,6 @@ namespace hpx { namespace parcelset { namespace detail {
             HPX_MOVE(p), HPX_MOVE(f), archive_flags, HPX_MOVE(pp));
         ptr->apply();
     }
-}}}    // namespace hpx::parcelset::detail
+}    // namespace hpx::parcelset::detail
 
 #endif

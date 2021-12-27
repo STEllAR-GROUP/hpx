@@ -14,7 +14,6 @@ endif()
 set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/components/component_storage/include/hpx/components/component_storage/migrate_from_storage.hpp"
     "${PROJECT_SOURCE_DIR}/components/component_storage/include/hpx/components/component_storage/migrate_to_storage.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
 )
 
 # Definitions for autodoc.doxy.in

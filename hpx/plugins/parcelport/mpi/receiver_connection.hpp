@@ -12,8 +12,8 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/plugins/parcelport/mpi/header.hpp>
-#include <hpx/runtime/parcelset/decode_parcels.hpp>
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/parcelset/decode_parcels.hpp>
+#include <hpx/parcelset/parcel_buffer.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -53,8 +53,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi {
         {
             header_.assert_valid();
 
-            performance_counters::parcels::data_point& data =
-                buffer_.data_point_;
+            parcelset::data_point& data = buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
             data.bytes_ = static_cast<std::size_t>(header_.numbytes());
 
@@ -167,8 +166,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi {
             if (!request_done())
                 return false;
 
-            performance_counters::parcels::data_point& data =
-                buffer_.data_point_;
+            parcelset::data_point& data = buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds() - data.time_;
 
             {

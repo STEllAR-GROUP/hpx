@@ -8,8 +8,8 @@
 #include <plugins/parcelport/libfabric/parcelport_libfabric.hpp>
 #include <plugins/parcelport/libfabric/rma_receiver.hpp>
 //
-#include <hpx/runtime/parcelset/decode_parcels.hpp>
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/parcelset/decode_parcels.hpp>
+#include <hpx/parcelset/parcel_buffer.hpp>
 //
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/this_thread.hpp>
@@ -137,7 +137,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
 
         buffer.num_chunks_ = std::make_pair(zc_chunks, oo_chunks);
         buffer.data_size_ = header_->message_size();
-        performance_counters::parcels::data_point& data = buffer.data_point_;
+        parcelset::data_point& data = buffer.data_point_;
+
         data.bytes_ = static_cast<std::size_t>(header_->message_size());
         data.time_ = hpx::chrono::high_resolution_clock::now() - start_time_;
         LOG_DEBUG_MSG("receiver "
@@ -469,7 +470,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
 
         buffer.num_chunks_ = std::make_pair(zc_chunks, oo_chunks);
         buffer.data_size_ = header_->message_size();
-        performance_counters::parcels::data_point& data = buffer.data_point_;
+        parcelset::data_point& data = buffer.data_point_;
+
         data.bytes_ = static_cast<std::size_t>(header_->message_size());
         data.time_ = hpx::chrono::high_resolution_clock::now() - start_time_;
 

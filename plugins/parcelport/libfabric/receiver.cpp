@@ -13,8 +13,8 @@
 #include <plugins/parcelport/libfabric/sender.hpp>
 #include <plugins/parcelport/rma_memory_pool.hpp>
 //
-#include <hpx/runtime/parcelset/decode_parcels.hpp>
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/parcelset/decode_parcels.hpp>
+#include <hpx/parcelset/parcel_buffer.hpp>
 //
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/this_thread.hpp>

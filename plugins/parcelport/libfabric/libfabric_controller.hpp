@@ -16,7 +16,7 @@
 #include <hpx/synchronization/shared_mutex.hpp>
 //
 #include <hpx/agas/addressing_service.hpp>
-#include <hpx/runtime/parcelset/parcelport_impl.hpp>
+#include <hpx/parcelset/parcelport_impl.hpp>
 //
 #include <plugins/parcelport/libfabric/locality.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>

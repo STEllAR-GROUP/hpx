@@ -16,11 +16,11 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/preprocessor.hpp>
 
+#include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality_interface.hpp>
 #include <hpx/parcelset_base/policies/message_handler.hpp>
 #include <hpx/parcelset_base/traits/action_message_handler.hpp>
-#include <hpx/runtime/message_handler_fwd.hpp>
 
 #include <cstddef>
 
@@ -29,7 +29,7 @@ namespace hpx { namespace parcelset {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
-    char const* get_action_coalescing_name();
+    constexpr char const* get_action_coalescing_name() noexcept;
 
     template <typename Action>
     struct register_coalescing_for_action
@@ -53,7 +53,8 @@ namespace hpx { namespace parcelset {
 #define HPX_REGISTER_COALESCING_COUNTERS(Action, coalescing_name)              \
     namespace hpx { namespace parcelset {                                      \
             template <>                                                        \
-            HPX_ALWAYS_EXPORT char const* get_action_coalescing_name<Action>() \
+            HPX_ALWAYS_EXPORT constexpr char const*                            \
+            get_action_coalescing_name<Action>() noexcept                      \
             {                                                                  \
                 return coalescing_name;                                        \
             }                                                                  \

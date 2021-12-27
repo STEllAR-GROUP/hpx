@@ -27,18 +27,15 @@
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
+#include <hpx/util/from_string.hpp>
 
-#include <hpx/config/asio.hpp>
-#include <hpx/config/detail/compat_error_code.hpp>
-#include <hpx/config/endian.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/naming_base/gid_type.hpp>
+#include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset/static_parcelports.hpp>
 #include <hpx/parcelset_base/policies/message_handler.hpp>
-#include <hpx/runtime/message_handler_fwd.hpp>
-#include <hpx/util/from_string.hpp>
-#include <hpx/util/get_entry_as.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 

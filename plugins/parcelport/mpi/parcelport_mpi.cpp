@@ -17,8 +17,8 @@
 
 // parcelport
 #include <hpx/runtime_distributed.hpp>
+#include <hpx/parcelset/parcelport_impl.hpp>
 #include <hpx/parcelset_base/locality.hpp>
-#include <hpx/runtime/parcelset/parcelport_impl.hpp>
 
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/synchronization/condition_variable.hpp>

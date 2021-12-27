@@ -9,16 +9,7 @@
 # ##############################################################################
 # gather sources
 
-set(hpx_SOURCES
-    runtime/parcelset/detail/parcel_await.cpp
-    runtime/parcelset/detail/parcel_route_handler.cpp
-    runtime/parcelset/detail/per_action_data_counter.cpp
-    runtime/parcelset/parcelport.cpp
-    runtime/parcelset/put_parcel.cpp
-    runtime/set_parcel_write_handler.cpp
-)
-list(TRANSFORM hpx_SOURCES PREPEND ${PROJECT_SOURCE_DIR}/src/)
-
+set(hpx_SOURCES "${PROJECT_SOURCE_DIR}/libs/src/dummy.cpp")
 set(hpx_external_objects_SOURCES)
 
 if(MSVC AND MSVC14)
@@ -68,22 +59,6 @@ set(hpx_HEADERS
     hpx/plugins/plugin_factory_base.hpp
     hpx/plugins/plugin_registry.hpp
     hpx/plugins/unique_plugin_name.hpp
-    hpx/runtime/message_handler_fwd.hpp
-    hpx/runtime/parcelset/connection_cache.hpp
-    hpx/runtime/parcelset/decode_parcels.hpp
-    hpx/runtime/parcelset/detail/call_for_each.hpp
-    hpx/runtime/parcelset/detail/data_point.hpp
-    hpx/runtime/parcelset/detail/gatherer.hpp
-    hpx/runtime/parcelset/detail/parcel_await.hpp
-    hpx/runtime/parcelset/detail/parcel_route_handler.hpp
-    hpx/runtime/parcelset/detail/per_action_data_counter.hpp
-    hpx/runtime/parcelset/encode_parcels.hpp
-    hpx/runtime/parcelset/parcel_buffer.hpp
-    hpx/runtime/parcelset/parcelport_connection.hpp
-    hpx/runtime/parcelset/parcelport.hpp
-    hpx/runtime/parcelset/parcelport_impl.hpp
-    hpx/runtime/parcelset/put_parcel.hpp
-    hpx/runtime/set_parcel_write_handler.hpp
 )
 list(TRANSFORM hpx_HEADERS PREPEND ${PROJECT_SOURCE_DIR}/)
 
@@ -103,7 +78,7 @@ endforeach()
 add_hpx_source_group(
   NAME hpx
   CLASS "Source Files"
-  ROOT "${PROJECT_SOURCE_DIR}/src"
+  ROOT "${PROJECT_SOURCE_DIR}/libs/src"
   TARGETS ${hpx_SOURCES}
 )
 

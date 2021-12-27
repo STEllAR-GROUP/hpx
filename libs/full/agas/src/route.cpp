@@ -16,7 +16,7 @@
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/parcelset/parcel.hpp>
-#include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
+#include <hpx/parcelset_base/detail/parcel_route_handler.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/timing/scoped_timer.hpp>
 

@@ -9,13 +9,33 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+
 #include <hpx/parcelset/parcelset_fwd.hpp>
 
 #include <cstddef>
+#include <vector>
 
-namespace hpx
-{
+namespace hpx {
+
+    /// \cond NOINTERN
+    namespace parcelset {
+
+        namespace detail {
+
+            // Get access to the registry of registered message handlers
+            HPX_EXPORT std::vector<hpx::tuple<char const*, char const*>>&
+            get_message_handler_registrations();
+        }    // namespace detail
+
+        HPX_EXPORT parcelset::policies::message_handler* get_message_handler(
+            char const* action, char const* message_handler_type,
+            std::size_t num_messages, std::size_t interval,
+            parcelset::locality const& loc, error_code& ec = throws);
+    }    // namespace parcelset
+    /// \endcond
+
     ///////////////////////////////////////////////////////////////////////////
     /// Register an instance of a message handler plugin
     ///
@@ -33,9 +53,8 @@ namespace hpx
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
-    HPX_EXPORT void register_message_handler(
-        char const* message_handler_type, char const* action,
-        error_code& ec = throws);
+    HPX_EXPORT void register_message_handler(char const* message_handler_type,
+        char const* action, error_code& ec = throws);
 
     /// \brief Create an instance of a message handler plugin
     ///
@@ -59,7 +78,6 @@ namespace hpx
         char const* message_handler_type, char const* action,
         parcelset::parcelport* pp, std::size_t num_messages,
         std::size_t interval, error_code& ec = throws);
-
-}
+}    // namespace hpx
 
 #endif

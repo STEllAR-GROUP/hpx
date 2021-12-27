@@ -13,7 +13,7 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/modules/mpi_base.hpp>
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/parcelset/parcel_buffer.hpp>
 
 #include <array>
 #include <cstddef>

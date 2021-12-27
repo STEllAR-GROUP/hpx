@@ -10,6 +10,7 @@
 #include <hpx/modules/errors.hpp>
 
 #include <hpx/parcelset_base/detail/locality_interface_functions.hpp>
+#include <hpx/parcelset_base/detail/parcel_route_handler.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/parcelset_base/locality_interface.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
@@ -17,6 +18,8 @@
 
 #include <cstddef>
 #include <string>
+#include <system_error>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parcelset {
@@ -31,13 +34,14 @@ namespace hpx::parcelset {
         return detail::create_locality(name);
     }
 
-    policies::message_handler* get_message_handler(char const* action,
-        char const* type, std::size_t num, std::size_t interval,
-        locality const& loc, error_code& ec)
-    {
-        return detail::get_message_handler(
-            action, type, num, interval, loc, ec);
-    }
+    namespace detail {
+
+        void parcel_route_handler(
+            std::error_code const& ec, parcelset::parcel const& p)
+        {
+            parcel_route_handler_func(ec, p);
+        }
+    }    // namespace detail
 }    // namespace hpx::parcelset
 
 #endif

@@ -15,6 +15,7 @@
 #include <hpx/init_runtime/pre_main.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/performance_counters/agas_counter_types.hpp>
 #include <hpx/performance_counters/parcelhandler_counter_types.hpp>
 #include <hpx/performance_counters/threadmanager_counter_types.hpp>
@@ -74,7 +75,8 @@ namespace hpx { namespace detail {
     static void register_message_handlers()
     {
         runtime_distributed& rtd = get_runtime_distributed();
-        for (auto const& t : detail::get_message_handler_registrations())
+        for (auto const& t :
+            parcelset::detail::get_message_handler_registrations())
         {
             error_code ec(lightweight);
             rtd.register_message_handler(hpx::get<0>(t), hpx::get<1>(t), ec);

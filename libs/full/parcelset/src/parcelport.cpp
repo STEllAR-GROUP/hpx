@@ -20,7 +20,7 @@
 #include <hpx/modules/threading_base.hpp>
 #endif
 
-#include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/parcelset/parcelport.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -29,7 +29,8 @@
 #include <system_error>
 #include <utility>
 
-namespace hpx { namespace parcelset {
+namespace hpx::parcelset {
+
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::runtime_configuration const& ini,
         locality const& here, std::string const& type)
@@ -69,29 +70,48 @@ namespace hpx { namespace parcelset {
         }
     }
 
+    int parcelport::priority() const
+    {
+        return priority_;
+    }
+
+    std::string const& parcelport::type() const
+    {
+        return type_;
+    }
+
+    locality const& parcelport::here() const
+    {
+        return here_;
+    }
+
+    bool parcelport::can_connect(
+        locality const&, bool use_alternative_parcelport)
+    {
+        return use_alternative_parcelport || can_bootstrap();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Update performance counter data
-    void parcelport::add_received_data(
-        performance_counters::parcels::data_point const& data)
+    void parcelport::add_received_data(parcelset::data_point const& data)
     {
         parcels_received_.add_data(data);
     }
 
-    void parcelport::add_sent_data(
-        performance_counters::parcels::data_point const& data)
+    void parcelport::add_sent_data(parcelset::data_point const& data)
     {
         parcels_sent_.add_data(data);
     }
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-    void parcelport::add_received_data(char const* action,
-        performance_counters::parcels::data_point const& data)
+    void parcelport::add_received_data(
+        char const* action, parcelset::data_point const& data)
     {
         action_parcels_received_.add_data(action, data);
     }
 
-    void parcelport::add_sent_data(char const* action,
-        performance_counters::parcels::data_point const& data)
+    void parcelport::add_sent_data(
+        char const* action, parcelset::data_point const& data)
     {
         action_parcels_sent_.add_data(action, data);
     }
@@ -263,6 +283,31 @@ namespace hpx { namespace parcelset {
         return pp.get_max_inbound_message_size();
     }
 
+    std::int64_t parcelport::get_max_inbound_message_size() const
+    {
+        return max_inbound_message_size_;
+    }
+
+    std::int64_t parcelport::get_max_outbound_message_size() const
+    {
+        return max_outbound_message_size_;
+    }
+
+    bool parcelport::allow_array_optimizations() const
+    {
+        return allow_array_optimizations_;
+    }
+
+    bool parcelport::allow_zero_copy_optimizations() const
+    {
+        return allow_zero_copy_optimizations_;
+    }
+
+    bool parcelport::async_serialization() const
+    {
+        return async_serialization_;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // the code below is needed to bootstrap the parcel layer
     void parcelport::early_pending_parcel_handler(
@@ -288,6 +333,6 @@ namespace hpx { namespace parcelset {
 #endif
     }
 
-}}    // namespace hpx::parcelset
+}    // namespace hpx::parcelset
 
 #endif

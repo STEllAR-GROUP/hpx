@@ -10,16 +10,22 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+
 #include <hpx/parcelset_base/parcelset_base_fwd.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <system_error>
 
 namespace hpx::parcelset {
 
     class HPX_EXPORT parcelport;
+
+    template <typename ConnectionHandler>
+    class parcelport_impl;
+
     class HPX_EXPORT parcelhandler;
 
     namespace policies {
@@ -54,8 +60,7 @@ namespace hpx::parcelset {
     HPX_EXPORT bool do_background_work(std::size_t num_thread = 0,
         parcelport_background_mode mode = parcelport_background_mode_all);
 
-    using write_handler_type =
-        util::function_nonser<void(std::error_code const&, parcel const&)>;
+    using write_handler_type = parcel_write_handler_type;
 
     ///////////////////////////////////////////////////////////////////////
     // default callback for put_parcel
@@ -70,6 +75,9 @@ namespace hpx::parcelset {
     /// Hand a parcel to the underlying parcel layer for delivery.
     /// Wait for the operation to finish before returning to the user.
     HPX_EXPORT void sync_put_parcel(parcelset::parcel&& p);
+
+    /// Return the maximally allowed size of an inbound message (in bytes)
+    HPX_EXPORT std::int64_t get_max_inbound_size(parcelport&);
 }    // namespace hpx::parcelset
 
 #endif

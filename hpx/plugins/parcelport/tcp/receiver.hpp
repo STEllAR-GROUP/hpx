@@ -21,10 +21,10 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/protect.hpp>
-#include <hpx/runtime/parcelset/decode_parcels.hpp>
-#include <hpx/runtime/parcelset/detail/data_point.hpp>
-#include <hpx/runtime/parcelset/detail/gatherer.hpp>
-#include <hpx/runtime/parcelset/parcelport_connection.hpp>
+#include <hpx/parcelset/decode_parcels.hpp>
+#include <hpx/parcelset/detail/data_point.hpp>
+#include <hpx/parcelset/detail/gatherer.hpp>
+#include <hpx/parcelset/parcelport_connection.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 
 #include <asio/buffer.hpp>
@@ -86,8 +86,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp {
         {
             HPX_ASSERT(buffer_.data_.empty());
             // Store the time of the begin of the read operation
-            performance_counters::parcels::data_point& data =
-                buffer_.data_point_;
+            parcelset::data_point& data = buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
             data.serialization_time_ = 0;
             data.bytes_ = 0;

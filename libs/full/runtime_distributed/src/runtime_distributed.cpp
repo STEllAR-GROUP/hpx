@@ -91,16 +91,6 @@
 namespace hpx {
 
     namespace detail {
-        // There is no need to protect these global from thread concurrent access
-        // as they are access during early startup only.
-        std::vector<hpx::tuple<char const*, char const*>>&
-        get_message_handler_registrations()
-        {
-            static std::vector<hpx::tuple<char const*, char const*>>
-                message_handler_registrations;
-            return message_handler_registrations;
-        }
-
         naming::gid_type get_next_id(std::size_t count)
         {
             if (nullptr == get_runtime_ptr())
@@ -1621,40 +1611,6 @@ namespace hpx {
     }
 
 #if defined(HPX_HAVE_NETWORKING)
-    ///////////////////////////////////////////////////////////////////////////
-    // Create an instance of a message handler plugin
-    void register_message_handler(
-        char const* message_handler_type, char const* action, error_code& ec)
-    {
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        if (nullptr != rtd)
-        {
-            return rtd->register_message_handler(
-                message_handler_type, action, ec);
-        }
-
-        // store the request for later
-        detail::get_message_handler_registrations().push_back(
-            hpx::make_tuple(message_handler_type, action));
-    }
-
-    parcelset::policies::message_handler* create_message_handler(
-        char const* message_handler_type, char const* action,
-        parcelset::parcelport* pp, std::size_t num_messages,
-        std::size_t interval, error_code& ec)
-    {
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        if (nullptr != rtd)
-        {
-            return rtd->create_message_handler(
-                message_handler_type, action, pp, num_messages, interval, ec);
-        }
-
-        HPX_THROWS_IF(ec, invalid_status, "create_message_handler",
-            "the runtime system is not available at this time");
-        return nullptr;
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // Create an instance of a binary filter plugin
     serialization::binary_filter* create_binary_filter(
