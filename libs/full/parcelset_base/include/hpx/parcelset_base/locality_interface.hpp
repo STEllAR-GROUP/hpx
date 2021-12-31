@@ -23,10 +23,6 @@ namespace hpx::parcelset {
     HPX_EXPORT parcelset::parcel create_parcel();
 
     HPX_EXPORT locality create_locality(std::string const& name);
-
-    HPX_EXPORT policies::message_handler* get_message_handler(
-        char const* action, char const* type, std::size_t num,
-        std::size_t interval, locality const& loc, error_code& ec = throws);
 }    // namespace hpx::parcelset
 
 #endif

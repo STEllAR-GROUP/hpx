@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/parcelset/parcel_buffer.hpp>
 #include <plugins/parcelport/parcelport_logging.hpp>
 //
 #include <array>

@@ -22,10 +22,10 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/parcelset/parcelport.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
@@ -62,7 +62,7 @@ namespace hpx::parcelset {
 
         threads::thread_schedule_state decode_parcel(parcelport& pp,
             std::shared_ptr<std::vector<char>> parcel_data,
-            performance_counters::parcels::data_point receive_data);
+            parcelset::data_point receive_data);
 
         // make sure the parcel has been properly initialized
         void init_parcel(parcel& p);

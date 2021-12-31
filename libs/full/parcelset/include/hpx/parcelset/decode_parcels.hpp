@@ -1,5 +1,5 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
-//  Copyright (c) 2014-2015 Thomas Heller
+//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2014-2021 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,20 +10,19 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/functional/deferred_call.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/timing.hpp>
+
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset/parcel.hpp>
-#include <hpx/runtime/parcelset/detail/data_point.hpp>
-#include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
-#include <hpx/runtime_distributed/runtime_fwd.hpp>
-#include <hpx/runtime_local/report_error.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/parcelset/detail/data_point.hpp>
+#include <hpx/parcelset_base/detail/parcel_route_handler.hpp>
+#include <hpx/parcelset_base/parcel_interface.hpp>
 
 #if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/exception.hpp>
@@ -37,13 +36,14 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parcelset {
+namespace hpx::parcelset {
+
     template <typename Buffer>
     std::vector<serialization::serialization_chunk> decode_chunks(
         Buffer& buffer)
     {
-        typedef
-            typename Buffer::transmission_chunk_type transmission_chunk_type;
+        using transmission_chunk_type =
+            typename Buffer::transmission_chunk_type;
 
         std::vector<serialization::serialization_chunk> chunks;
 
@@ -115,7 +115,7 @@ namespace hpx { namespace parcelset {
         std::size_t inbound_data_size = static_cast<std::size_t>(
             static_cast<std::uint64_t>(buffer.data_size_));
 
-        // protect from un-handled exceptions bubbling up
+        // protect from unhandled exceptions bubbling up
         try
         {
             try
@@ -123,11 +123,10 @@ namespace hpx { namespace parcelset {
                 // mark start of serialization
                 hpx::chrono::high_resolution_timer timer;
                 std::int64_t overall_add_parcel_time = 0;
-                performance_counters::parcels::data_point& data =
-                    buffer.data_point_;
+                parcelset::data_point& data = buffer.data_point_;
 
                 {
-                    std::vector<parcel> deferred_parcels;
+                    std::vector<parcelset::parcel> deferred_parcels;
                     // De-serialize the parcel data
                     serialization::input_archive archive(
                         buffer.data_, inbound_data_size, &chunks);
@@ -137,7 +136,9 @@ namespace hpx { namespace parcelset {
                         archive >> parcel_count;    //-V128
                     }
                     if (parcel_count > 1)
+                    {
                         deferred_parcels.reserve(parcel_count);
+                    }
 
                     for (std::size_t i = 0; i != parcel_count; ++i)
                     {
@@ -149,7 +150,7 @@ namespace hpx { namespace parcelset {
                             timer.elapsed_nanoseconds();
 #endif
                         // de-serialize parcel and add it to incoming parcel queue
-                        parcel p;
+                        parcelset::parcel p;
 
                         // deferred_schedule will be set to false if the action
                         // to be loaded is a non direct action. If we only got
@@ -163,7 +164,7 @@ namespace hpx { namespace parcelset {
                             timer.elapsed_nanoseconds();
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-                        performance_counters::parcels::data_point action_data;
+                        parcelset::data_point action_data;
                         action_data.bytes_ =
                             archive.current_pos() - archive_pos;
                         action_data.serialization_time_ =
@@ -188,15 +189,15 @@ namespace hpx { namespace parcelset {
 
                         if (migrated)
                         {
-                            naming::resolver_client& client =
-                                hpx::naming::get_agas_client();
-                            client.route(HPX_MOVE(p),
+                            agas::route(HPX_MOVE(p),
                                 &parcelset::detail::parcel_route_handler,
                                 threads::thread_priority::normal);
                         }
-                        // If we got a direct action,
                         else if (deferred_schedule)
+                        {
+                            // If we got a direct action
                             deferred_parcels.push_back(HPX_MOVE(p));
+                        }
 
                         // be sure not to measure add_parcel as serialization time
                         overall_add_parcel_time +=
@@ -212,13 +213,14 @@ namespace hpx { namespace parcelset {
                         for (std::size_t i = 1; i != deferred_parcels.size();
                              ++i)
                         {
-                            auto f = [num_thread](parcel&& p) {
+                            auto f = [num_thread](parcelset::parcel&& p) {
                                 if (p.schedule_action(num_thread))
                                 {
                                     // route this parcel as the object
                                     // was migrated
                                     agas::route(HPX_MOVE(p),
-                                        &detail::parcel_route_handler,
+                                        &parcelset::detail::
+                                            parcel_route_handler,
                                         threads::thread_priority::normal);
                                 }
                             };
@@ -243,7 +245,7 @@ namespace hpx { namespace parcelset {
                         {
                             // route this parcel as the object was migrated
                             agas::route(HPX_MOVE(deferred_parcels[0]),
-                                &detail::parcel_route_handler,
+                                &parcelset::detail::parcel_route_handler,
                                 threads::thread_priority::normal);
                         }
                     }
@@ -305,44 +307,15 @@ namespace hpx { namespace parcelset {
     void decode_parcel(
         Parcelport& parcelport, Buffer buffer, std::size_t num_thread)
     {
-        // if(hpx::is_running() && parcelport.async_serialization())
-        // {
-        //     hpx::threads::register_thread_nullary(
-        //         util::deferred_call(
-        //             &decode_message<Parcelport, Buffer>,
-        //             std::ref(parcelport), HPX_MOVE(buffer), 1, num_thread),
-        //         "decode_parcels",
-        //         threads::thread_schedule_state::pending, true,
-        //         threads::thread_priority::boost,
-        //         parcelport.get_next_num_thread());
-        // }
-        // else
-        {
-            decode_message(parcelport, HPX_MOVE(buffer), 1, num_thread);
-        }
+        decode_message(parcelport, HPX_MOVE(buffer), 1, num_thread);
     }
 
     template <typename Parcelport, typename Buffer>
     void decode_parcels(
         Parcelport& parcelport, Buffer buffer, std::size_t num_thread)
     {
-        // if(hpx::is_running() && parcelport.async_serialization())
-        // {
-        //     hpx::threads::register_thread_nullary(
-        //         util::deferred_call(
-        //             &decode_message<Parcelport, Buffer>,
-        //             std::ref(parcelport), HPX_MOVE(buffer), 0, num_thread),
-        //         "decode_parcels",
-        //         threads::thread_schedule_state::pending, true,
-        //         threads::thread_priority::boost,
-        //         parcelport.get_next_num_thread());
-        // }
-        // else
-        {
-            decode_message(parcelport, HPX_MOVE(buffer), 0, num_thread);
-        }
+        decode_message(parcelport, HPX_MOVE(buffer), 0, num_thread);
     }
-
-}}    // namespace hpx::parcelset
+}    // namespace hpx::parcelset
 
 #endif

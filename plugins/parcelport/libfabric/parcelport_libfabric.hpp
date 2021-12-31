@@ -17,10 +17,10 @@
 
 // The memory pool specialization need to be pulled in before encode_parcels
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/parcelset/parcelport.hpp>
+#include <hpx/parcelset/parcel_buffer.hpp>
+#include <hpx/parcelset/parcelport_impl.hpp>
 #include <hpx/plugins/parcelport_factory.hpp>
-#include <hpx/runtime/parcelset/parcelport_impl.hpp>
 //
 #include <hpx/runtime_local/thread_stacktrace.hpp>
 //
@@ -139,7 +139,7 @@ namespace libfabric
 
         memory_pool_type*         chunk_pool_;
 
-        // performance_counters::parcels::gatherer& parcels_sent_;
+        // parcelset::gatherer& parcels_sent_;
 
         // for debugging/performance measurement
         performance_counter<unsigned int> completions_handled_;

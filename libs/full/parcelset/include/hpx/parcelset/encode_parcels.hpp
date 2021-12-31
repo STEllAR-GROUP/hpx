@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2011-2015 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -13,23 +13,19 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/actions_base/basic_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/timing.hpp>
+
+#include <hpx/actions_base/basic_action.hpp>
 #include <hpx/naming/detail/preprocess_gid_types.hpp>
 #include <hpx/naming/split_gid.hpp>
 #include <hpx/parcelset/parcel.hpp>
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/parcelset/parcelport.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/runtime_distributed/runtime_fwd.hpp>
-#include <hpx/runtime_local/report_error.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-#include <hpx/actions/base_action.hpp>
-#endif
 
 #if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/exception.hpp>
@@ -44,10 +40,13 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parcelset {
+namespace hpx::parcelset {
+
     namespace detail {
+
+#if defined(HPX_HAVE_LOGGING)
         ///////////////////////////////////////////////////////////////////
-        inline char to_digit(int number)
+        inline constexpr char to_digit(int number) noexcept
         {
             char number_tmp = static_cast<char>(number);
             if (number >= 0 && number <= 9)
@@ -57,8 +56,8 @@ namespace hpx { namespace parcelset {
             return static_cast<char>(number_tmp - 10 + 'A');
         }
 
-        inline void convert_byte(
-            std::uint8_t b, char* buffer, char const* /* end */)
+        inline constexpr void convert_byte(
+            std::uint8_t b, char* buffer, char const* /* end */) noexcept
         {
             *buffer++ = to_digit((b & 0xF0) >> 4);
             *buffer++ = to_digit(b & 0x0F);
@@ -80,6 +79,7 @@ namespace hpx { namespace parcelset {
             }
             return result;
         }
+#endif
 
         template <typename Buffer>
         void encode_finalize(Buffer& buffer, std::size_t arg_size)
@@ -87,10 +87,11 @@ namespace hpx { namespace parcelset {
             buffer.size_ = buffer.data_.size();
             buffer.data_size_ = arg_size;
 
+#if defined(HPX_HAVE_LOGGING)
             LPT_(debug) << binary_archive_content(buffer);
+#endif
 
-            performance_counters::parcels::data_point& data =
-                buffer.data_point_;
+            parcelset::data_point& data = buffer.data_point_;
             data.bytes_ = buffer.data_.size();
             data.raw_bytes_ = arg_size;
 
@@ -162,7 +163,9 @@ namespace hpx { namespace parcelset {
 
                 int archive_flags = archive_flags_;
                 if (filter.get() != nullptr)
+                {
                     archive_flags |= serialization::enable_compression;
+                }
 
                 // preallocate data
                 std::size_t num_chunks = 0;
@@ -175,7 +178,6 @@ namespace hpx { namespace parcelset {
                 }
 
                 buffer.data_.reserve(arg_size);
-
                 buffer.chunks_.reserve(num_chunks);
 
                 // mark start of serialization
@@ -184,7 +186,9 @@ namespace hpx { namespace parcelset {
                 {
                     // Serialize the data
                     if (filter.get() != nullptr)
+                    {
                         filter->set_max_length(buffer.data_.capacity());
+                    }
 
                     serialization::output_archive archive(buffer.data_,
                         archive_flags, &buffer.chunks_, filter.get());
@@ -212,14 +216,13 @@ namespace hpx { namespace parcelset {
                         archive << ps[i];
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-                        performance_counters::parcels::data_point action_data;
+                        parcelset::data_point action_data;
                         action_data.bytes_ =
                             archive.current_pos() - archive_pos;
                         action_data.serialization_time_ =
                             timer.elapsed_nanoseconds() - serialize_time;
                         action_data.num_parcels_ = 1;
-                        pp.add_sent_data(
-                            ps[i].get_action_name(), action_data);
+                        pp.add_sent_data(ps[i].get_action_name(), action_data);
 #else
                         HPX_UNUSED(pp);
 #endif
@@ -276,6 +279,6 @@ namespace hpx { namespace parcelset {
 
         return parcels_sent;
     }
-}}    // namespace hpx::parcelset
+}    // namespace hpx::parcelset
 
 #endif

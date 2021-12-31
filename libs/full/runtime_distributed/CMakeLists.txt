@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,6 @@ set(runtime_distributed_headers
     hpx/runtime_distributed/big_boot_barrier.hpp
     hpx/runtime_distributed/copy_component.hpp
     hpx/runtime_distributed.hpp
-    hpx/runtime_distributed/detail/runtime_fwd.hpp
     hpx/runtime_distributed/find_all_localities.hpp
     hpx/runtime_distributed/find_here.hpp
     hpx/runtime_distributed/find_localities.hpp

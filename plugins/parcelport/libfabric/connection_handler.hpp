@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config/warnings_prefix.hpp>
+#include <hpx/parcelset/parcelport_impl.hpp>
 #include <hpx/parcelset_base/locality.hpp>
-#include <hpx/runtime/parcelset/parcelport_impl.hpp>
 //
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/libfabric/fabric_error.hpp>

@@ -19,12 +19,12 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/plugins/parcelport/tcp/locality.hpp>
-#include <hpx/runtime/parcelset/detail/data_point.hpp>
-#include <hpx/runtime/parcelset/detail/gatherer.hpp>
+#include <hpx/parcelset/detail/data_point.hpp>
+#include <hpx/parcelset/detail/gatherer.hpp>
+#include <hpx/parcelset/parcelport.hpp>
+#include <hpx/parcelset/parcelport_connection.hpp>
 #include <hpx/parcelset_base/locality.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset/parcelport_connection.hpp>
+#include <hpx/plugins/parcelport/tcp/locality.hpp>
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>

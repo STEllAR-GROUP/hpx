@@ -1,5 +1,5 @@
 //  Copyright (c) 2014-2015 Thomas Heller
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
@@ -13,17 +13,18 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/io_service.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
-#include <hpx/parcelset/parcel.hpp>
+#include <hpx/modules/synchronization.hpp>
+
+#include <hpx/parcelset/detail/data_point.hpp>
+#include <hpx/parcelset/detail/gatherer.hpp>
+#include <hpx/parcelset/detail/per_action_data_counter.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>
-#include <hpx/runtime/parcelset/detail/data_point.hpp>
-#include <hpx/runtime/parcelset/detail/gatherer.hpp>
-#include <hpx/runtime/parcelset/detail/per_action_data_counter.hpp>
-#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/parcelset_base/parcel_interface.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -40,59 +41,43 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace agas {
-    // forward declaration only
-    struct HPX_EXPORT big_boot_barrier;
-}}    // namespace hpx::agas
+namespace hpx::parcelset {
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset {
-    /// The parcelport is the lowest possible representation of the parcelset
-    /// inside a locality. It provides the minimal functionality to send and
-    /// to receive parcels.
+    /// The parcelport is the lowest possible representation of the parcel
+    /// interface inside a locality. It provides the minimal functionality
+    /// to send and to receive parcels.
     class HPX_EXPORT parcelport
       : public std::enable_shared_from_this<parcelport>
     {
-    public:
-        HPX_NON_COPYABLE(parcelport);
-
-    private:
-        // avoid warnings about using \a this in member initializer list
-        parcelport& This()
-        {
-            return *this;
-        }
-
-        friend struct agas::big_boot_barrier;
+        parcelport(parcelport const&) = delete;
+        parcelport(parcelport&&) = delete;
+        parcelport& operator=(parcelport const&) = delete;
+        parcelport& operator=(parcelport&&) = delete;
 
     public:
-        typedef util::function_nonser<void(
-            std::error_code const&, parcel const&)>
-            write_handler_type;
+        using write_handler_type = parcel_write_handler_type;
 
-        typedef util::function_nonser<void(parcelport& pp,
-            std::shared_ptr<std::vector<char>>, threads::thread_priority)>
-            read_handler_type;
+        using read_handler_type = util::function_nonser<void(parcelport& pp,
+            std::shared_ptr<std::vector<char>>, threads::thread_priority)>;
 
         /// Construct the parcelport on the given locality.
         parcelport(util::runtime_configuration const& ini, locality const& here,
             std::string const& type);
 
         /// Virtual destructor
-        virtual ~parcelport() {}
+        virtual ~parcelport() = default;
 
         virtual bool can_bootstrap() const = 0;
 
-        int priority() const
-        {
-            return priority_;
-        }
+        /// Access the parcelport priority (negative if disabled)
+        int priority() const;
 
         /// Retrieve the type of the locality represented by this parcelport
-        std::string const& type() const
-        {
-            return type_;
-        }
+        std::string const& type() const;
+
+        /// This accessor returns a reference to the locality this parcelport
+        /// is associated with.
+        locality const& here() const;
 
         /// Start the parcelport I/O thread pool.
         ///
@@ -115,10 +100,7 @@ namespace hpx { namespace parcelset {
         /// The default is to return true if it can be used at bootstrap or alternative
         /// parcelports are enabled.
         virtual bool can_connect(
-            locality const&, bool use_alternative_parcelport)
-        {
-            return use_alternative_parcelport || can_bootstrap();
-        }
+            locality const&, bool use_alternative_parcelport);
 
         /// Queues a parcel for transmission to another locality
         ///
@@ -191,16 +173,6 @@ namespace hpx { namespace parcelset {
 
         /// Return the name of this locality
         virtual std::string get_locality_name() const = 0;
-
-        /// \brief Allow access to the locality this parcelport is associated
-        /// with.
-        ///
-        /// This accessor returns a reference to the locality this parcelport
-        /// is associated with.
-        locality const& here() const
-        {
-            return here_;
-        }
 
         virtual locality create_locality() const = 0;
 
@@ -283,76 +255,62 @@ namespace hpx { namespace parcelset {
 
         ///////////////////////////////////////////////////////////////////////
         /// Update performance counter data
-        void add_received_data(
-            performance_counters::parcels::data_point const& data);
+        void add_received_data(parcelset::data_point const& data);
 
-        void add_sent_data(
-            performance_counters::parcels::data_point const& data);
+        void add_sent_data(parcelset::data_point const& data);
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-        void add_received_data(char const* action,
-            performance_counters::parcels::data_point const& data);
+        void add_received_data(
+            char const* action, parcelset::data_point const& data);
 
-        void add_sent_data(char const* action,
-            performance_counters::parcels::data_point const& data);
+        void add_sent_data(
+            char const* action, parcelset::data_point const& data);
 #endif
 
-        /// Return the configured maximal allowed message data size
-        std::int64_t get_max_inbound_message_size() const
-        {
-            return max_inbound_message_size_;
-        }
+        /// Return the configured maximal allowed inbound message data
+        /// size
+        std::int64_t get_max_inbound_message_size() const;
 
-        std::int64_t get_max_outbound_message_size() const
-        {
-            return max_outbound_message_size_;
-        }
+        /// Return the configured maximal allowed outbound message data
+        /// size
+        std::int64_t get_max_outbound_message_size() const;
 
         /// Return whether it is allowed to apply array optimizations
-        bool allow_array_optimizations() const
-        {
-            return allow_array_optimizations_;
-        }
+        bool allow_array_optimizations() const;
 
         /// Return whether it is allowed to apply zero copy optimizations
-        bool allow_zero_copy_optimizations() const
-        {
-            return allow_zero_copy_optimizations_;
-        }
+        bool allow_zero_copy_optimizations() const;
 
-        bool async_serialization() const
-        {
-            return async_serialization_;
-        }
+        bool async_serialization() const;
 
         // callback while bootstrap the parcel layer
         void early_pending_parcel_handler(
             std::error_code const& ec, parcel const& p);
 
     protected:
-        /// mutex for all of the member data
+        // mutex for all of the member data
         mutable lcos::local::spinlock mtx_;
 
-        /// The cache for pending parcels
-        typedef hpx::tuple<std::vector<parcel>, std::vector<write_handler_type>>
-            map_second_type;
-        typedef std::map<locality, map_second_type> pending_parcels_map;
+        // The cache for pending parcels
+        using map_second_type =
+            hpx::tuple<std::vector<parcel>, std::vector<write_handler_type>>;
+        using pending_parcels_map = std::map<locality, map_second_type>;
         pending_parcels_map pending_parcels_;
 
-        typedef std::set<locality> pending_parcels_destinations;
+        using pending_parcels_destinations = std::set<locality>;
         pending_parcels_destinations parcel_destinations_;
         std::atomic<std::uint32_t> num_parcel_destinations_;
 
-        /// The local locality
+        // The local locality
         locality here_;
 
-        /// The maximally allowed message size
+        // The maximally allowed message size
         std::int64_t const max_inbound_message_size_;
         std::int64_t const max_outbound_message_size_;
 
-        /// Overall parcel statistics
-        performance_counters::parcels::gatherer parcels_sent_;
-        performance_counters::parcels::gatherer parcels_received_;
+        // Overall parcel statistics
+        parcelset::gatherer parcels_sent_;
+        parcelset::gatherer parcels_received_;
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
         // Per-action based parcel statistics
@@ -371,7 +329,7 @@ namespace hpx { namespace parcelset {
         int priority_;
         std::string type_;
     };
-}}    // namespace hpx::parcelset
+}    // namespace hpx::parcelset
 
 #include <hpx/config/warnings_suffix.hpp>
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,22 +9,13 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/parcelset_base/parcelset_base_fwd.hpp>
 
-#include <system_error>
-namespace hpx
-{
-    /// The type of a function which can be registered as a parcel write handler
-    /// using the function \a hpx::set_parcel_write_handler.
-    ///
-    /// \note A parcel write handler is a function which is called by the
-    ///       parcel layer whenever a parcel has been sent by the underlying
-    ///       networking library and if no explicit parcel handler function was
-    ///       specified for the parcel.
-    typedef util::function_nonser<
-            void(std::error_code const&, parcelset::parcel const&)
-        > parcel_write_handler_type;
+namespace hpx {
+
+    /// \cond NOINTERN
+    using parcel_write_handler_type = parcelset::parcel_write_handler_type;
+    /// \endcond
 
     /// Set the default parcel write handler which is invoked once a parcel has
     /// been sent if no explicit write handler was specified.
@@ -42,6 +33,6 @@ namespace hpx
     ///
     HPX_EXPORT parcel_write_handler_type set_parcel_write_handler(
         parcel_write_handler_type const& f);
-}
+}    // namespace hpx
 
 #endif

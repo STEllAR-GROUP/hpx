@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,6 +18,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/async_distributed/continuation.hpp>
+#include <hpx/async_distributed/put_parcel_fwd.hpp>
 #include <hpx/async_local/apply.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components_base/agas_interface.hpp>
@@ -26,10 +27,9 @@
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset/parcel.hpp>
+#include <hpx/parcelset/detail/parcel_await.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/runtime/parcelset/detail/parcel_await.hpp>
-#include <hpx/runtime/parcelset/put_parcel_fwd.hpp>
+#include <hpx/parcelset_base/parcel_interface.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 
 #include <type_traits>
@@ -684,4 +684,4 @@ namespace hpx {
 // these files are intentionally #included last as it refers to functions
 // defined here
 #include <hpx/async_distributed/applier/detail/apply_implementations.hpp>
-#include <hpx/runtime/parcelset/put_parcel.hpp>
+#include <hpx/async_distributed/put_parcel.hpp>

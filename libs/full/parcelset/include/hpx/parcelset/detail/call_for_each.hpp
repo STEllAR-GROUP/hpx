@@ -11,7 +11,9 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/modules/errors.hpp>
+
+#include <hpx/parcelset/parcelport.hpp>
 
 #include <cstddef>
 #include <system_error>
@@ -29,25 +31,14 @@ namespace hpx::parcelset::detail {
         handlers_type handlers_;
         parcels_type parcels_;
 
-        call_for_each(handlers_type&& handlers, parcels_type&& parcels)
+        call_for_each(handlers_type&& handlers, parcels_type&& parcels) noexcept
           : handlers_(HPX_MOVE(handlers))
           , parcels_(HPX_MOVE(parcels))
         {
         }
 
-        call_for_each(call_for_each&& other) noexcept
-          : handlers_(HPX_MOVE(other.handlers_))
-          , parcels_(HPX_MOVE(other.parcels_))
-        {
-        }
-
-        call_for_each& operator=(call_for_each&& other) noexcept
-        {
-            handlers_ = HPX_MOVE(other.handlers_);
-            parcels_ = HPX_MOVE(other.parcels_);
-
-            return *this;
-        }
+        call_for_each(call_for_each&& other) noexcept = default;
+        call_for_each& operator=(call_for_each&& other) noexcept = default;
 
         void operator()(std::error_code const& e)
         {

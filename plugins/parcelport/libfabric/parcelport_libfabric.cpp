@@ -20,11 +20,11 @@
 // The memory pool specialization need to be pulled in before encode_parcels
 #include <hpx/plugins/parcelport_factory.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/parcelset/decode_parcels.hpp>
-#include <hpx/runtime/parcelset/encode_parcels.hpp>
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset/parcelport_impl.hpp>
+#include <hpx/parcelset/decode_parcels.hpp>
+#include <hpx/parcelset/encode_parcels.hpp>
+#include <hpx/parcelset/parcel_buffer.hpp>
+#include <hpx/parcelset/parcelport.hpp>
+#include <hpx/parcelset/parcelport_impl.hpp>
 //
 #include <hpx/assert.hpp>
 #include <hpx/runtime_local/thread_stacktrace.hpp>

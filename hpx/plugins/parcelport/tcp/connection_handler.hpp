@@ -16,8 +16,8 @@
 #include <hpx/config/asio.hpp>
 
 #include <hpx/plugins/parcelport/tcp/locality.hpp>
+#include <hpx/parcelset/parcelport_impl.hpp>
 #include <hpx/parcelset_base/locality.hpp>
-#include <hpx/runtime/parcelset/parcelport_impl.hpp>
 
 #include <asio/ip/host_name.hpp>
 #include <asio/ip/tcp.hpp>

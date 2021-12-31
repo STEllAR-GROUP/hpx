@@ -12,8 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/components/basename_registration_fwd.hpp>
 #include <hpx/modules/naming_base.hpp>
-#include <hpx/runtime/set_parcel_write_handler.hpp>
-#include <hpx/runtime_distributed/detail/runtime_fwd.hpp>
+#include <hpx/parcelset_base/set_parcel_write_handler.hpp>
 #include <hpx/runtime_distributed/find_all_localities.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
 #include <hpx/runtime_distributed/get_locality_name.hpp>

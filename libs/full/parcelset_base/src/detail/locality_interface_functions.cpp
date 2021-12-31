@@ -12,6 +12,7 @@
 
 #include <cstddef>
 #include <string>
+#include <system_error>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parcelset::detail {
@@ -20,9 +21,16 @@ namespace hpx::parcelset::detail {
 
     locality (*create_locality)(std::string const& name) = nullptr;
 
-    policies::message_handler* (*get_message_handler)(char const* action,
-        char const* type, std::size_t num, std::size_t interval,
-        locality const& loc, error_code& ec) = nullptr;
+    parcel_write_handler_type (*set_parcel_write_handler)(
+        parcel_write_handler_type const& f) = nullptr;
+
+    void (*put_parcel)(
+        parcelset::parcel&& p, parcel_write_handler_type&& f) = nullptr;
+
+    void (*sync_put_parcel)(parcelset::parcel&& p) = nullptr;
+
+    void (*parcel_route_handler_func)(
+        std::error_code const& ec, parcelset::parcel const& p) = nullptr;
 }    // namespace hpx::parcelset::detail
 
 #endif

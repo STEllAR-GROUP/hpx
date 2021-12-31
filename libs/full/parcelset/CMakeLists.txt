@@ -6,19 +6,51 @@
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(parcelset_headers hpx/parcelset/parcel.hpp hpx/parcelset/parcelhandler.hpp
-                      hpx/parcelset/parcelset_fwd.hpp
+set(parcelset_headers
+    hpx/parcelset/parcel.hpp
+    hpx/parcelset/parcelhandler.hpp
+    hpx/parcelset/parcelport.hpp
+    hpx/parcelset/parcelport_impl.hpp
+    hpx/parcelset/connection_cache.hpp
+    hpx/parcelset/decode_parcels.hpp
+    hpx/parcelset/detail/data_point.hpp
+    hpx/parcelset/detail/call_for_each.hpp
+    hpx/parcelset/detail/parcel_await.hpp
+    hpx/parcelset/detail/gatherer.hpp
+    hpx/parcelset/detail/message_handler_interface_functions.hpp
+    hpx/parcelset/detail/per_action_data_counter.hpp
+    hpx/parcelset/encode_parcels.hpp
+    hpx/parcelset/message_handler_fwd.hpp
+    hpx/parcelset/parcel_buffer.hpp
+    hpx/parcelset/parcelport_connection.hpp
+    hpx/parcelset/parcelset_fwd.hpp
 )
 
 # cmake-format: off
 set(parcelset_compat_headers
-    hpx/runtime/parcelset/parcel.hpp => hpx/parcelset/parcel.hpp
-    hpx/runtime/parcelset/parcelhandler.hpp => hpx/parcelset/parcelhandler.hpp
-    hpx/runtime/parcelset_fwd.hpp => hpx/parcelset/parcelset_fwd.hpp
+    hpx/runtime/message_handler_fwd.hpp => hpx/modules/parcelset.hpp
+    hpx/runtime/parcelset/connection_cache.hpp => hpx/modules/parcelset.hpp
+    hpx/runtime/parcelset/decode_parcels.hpp => hpx/modules/parcelset.hpp
+    hpx/runtime/parcelset/encode_parcels.hpp => hpx/modules/parcelset.hpp
+    hpx/runtime/parcelset/parcel.hpp => hpx/modules/parcelset.hpp
+    hpx/runtime/parcelset/parcel_buffer.hpp => hpx/modules/parcelset.hpp
+    hpx/runtime/parcelset/parcelport_connection.hpp => hpx/modules/parcelset.hpp
+    hpx/runtime/parcelset/parcelhandler.hpp => hpx/modules/parcelset.hpp
+    hpx/runtime/parcelset/parcelport.hpp => hpx/modules/parcelset.hpp
+    hpx/runtime/parcelset/parcelport_impl.hpp => hpx/modules/parcelset.hpp
+    hpx/runtime/parcelset_fwd.hpp => hpx/modules/parcelset.hpp
 )
 # cmake-format: on
 
-set(parcelset_sources parcel.cpp parcelhandler.cpp)
+set(parcelset_sources
+    detail/message_handler_interface_functions.cpp
+    detail/parcel_await.cpp
+    detail/per_action_data_counter.cpp
+    message_handler.cpp
+    parcel.cpp
+    parcelhandler.cpp
+    parcelport.cpp
+)
 
 include(HPX_AddModule)
 add_hpx_module(

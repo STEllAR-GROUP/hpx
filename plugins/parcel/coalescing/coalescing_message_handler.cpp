@@ -12,7 +12,7 @@
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/plugin/traits/plugin_config_data.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/parcelset/parcelport.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>

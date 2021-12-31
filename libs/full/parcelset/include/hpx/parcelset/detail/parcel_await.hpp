@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +10,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/modules/functional.hpp>
+
 #include <hpx/parcelset/parcelset_fwd.hpp>
 
 #include <cstdint>
