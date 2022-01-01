@@ -11,15 +11,15 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
+#include <hpx/parcelset_base/parcelport.hpp>
 #include <hpx/plugin/traits/plugin_config_data.hpp>
-#include <hpx/parcelset/parcelport.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
-#include <hpx/plugins/message_handler_factory.hpp>
+#include <hpx/plugin_factories/message_handler_factory.hpp>
 #include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
 

@@ -16,7 +16,6 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#include <hpx/modules/collectives.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
@@ -241,12 +240,6 @@ namespace hpx { namespace agas {
     }
 }}    // namespace hpx::agas
 
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-using iterate_action = symbol_namespace::iterate_action;
-#endif
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(iterate_action)
-HPX_REGISTER_BROADCAST_ACTION(iterate_action)
-
 namespace hpx { namespace agas {
 
     hpx::future<symbol_namespace::iterate_names_return_type>
@@ -257,34 +250,36 @@ namespace hpx { namespace agas {
 
         std::vector<std::uint32_t> ids = agas::get_all_locality_ids();
 
-        std::vector<hpx::id_type> localities;
-        localities.reserve(ids.size());
+        std::vector<hpx::future<return_type>> results;
+        results.reserve(ids.size());
         for (auto id : ids)
         {
-            localities.push_back(hpx::id_type(
-                get_service_instance(id), hpx::id_type::unmanaged));
+            hpx::id_type target(
+                get_service_instance(id), hpx::id_type::unmanaged);
+
+            using iterate_action = server::symbol_namespace::iterate_action;
+            results.push_back(
+                hpx::async(iterate_action(), HPX_MOVE(target), pattern));
         }
 
-        hpx::future<std::vector<return_type>> f =
-            lcos::broadcast<iterate_action>(localities, pattern);
-
-        return f.then([](hpx::future<std::vector<return_type>>&& f) {
-            std::vector<return_type>&& data = f.get();
-            std::map<std::string, hpx::id_type> result;
-
-            for (auto&& d : data)
-            {
-                for (auto&& e : d)
+        return hpx::dataflow(
+            hpx::unwrapping([](std::vector<return_type>&& data) {
+                std::map<std::string, hpx::id_type> result;
+                for (auto&& d : data)
                 {
-                    bool has_credits = naming::detail::has_credits(e.second);
-                    result[HPX_MOVE(e.first)] = hpx::id_type(HPX_MOVE(e.second),
-                        has_credits ? naming::id_type::managed :
-                                      naming::id_type::unmanaged);
+                    for (auto&& e : d)
+                    {
+                        bool has_credits =
+                            naming::detail::has_credits(e.second);
+                        result[HPX_MOVE(e.first)] =
+                            hpx::id_type(HPX_MOVE(e.second),
+                                has_credits ? naming::id_type::managed :
+                                              naming::id_type::unmanaged);
+                    }
                 }
-            }
-
-            return result;
-        });
+                return result;
+            }),
+            results);
 #else
         HPX_UNUSED(pattern);
         HPX_ASSERT(false);

@@ -176,8 +176,8 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime_distributed::runtime_distributed(
-        util::runtime_configuration& rtcfg, int (*pre_main)(runtime_mode))
+    runtime_distributed::runtime_distributed(util::runtime_configuration& rtcfg,
+        int (*pre_main)(runtime_mode), void (*post_main)())
       : runtime(rtcfg)
       , mode_(rtcfg_.mode_)
 #if defined(HPX_HAVE_NETWORKING)
@@ -188,6 +188,7 @@ namespace hpx {
       , applier_()
       , runtime_support_()
       , pre_main_(pre_main)
+      , post_main_(post_main)
     {
         // set notification policies only after the object was completely
         // initialized
@@ -397,7 +398,14 @@ namespace hpx {
             finalize(-1.0);    // make sure the application exits
         }
 
-        return runtime::run_helper(func, result, false);
+        auto result_value = runtime::run_helper(func, result, false);
+
+        if (post_main_ != nullptr)
+        {
+            post_main_();
+        }
+
+        return result_value;
     }
 
     int runtime_distributed::start(

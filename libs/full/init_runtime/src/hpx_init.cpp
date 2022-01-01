@@ -922,8 +922,8 @@ namespace hpx {
                 default:
                 {
                     LPROGRESS_ << "creating distributed runtime";
-                    rt.reset(new hpx::runtime_distributed(
-                        cmdline.rtcfg_, &hpx::detail::pre_main));
+                    rt.reset(new hpx::runtime_distributed(cmdline.rtcfg_,
+                        &hpx::detail::pre_main, &hpx::detail::post_main));
                     break;
                 }
                 }

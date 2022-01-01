@@ -117,7 +117,6 @@ hpx_info("HPX version: ${HPX_VERSION}")
 unset(HPX_COMPONENTS CACHE)
 unset(HPX_EXPORT_TARGETS CACHE)
 unset(HPX_EXPORT_INTERNAL_TARGETS CACHE)
-unset(HPX_LIBS CACHE)
 unset(HPX_ENABLED_MODULES CACHE)
 unset(HPX_STATIC_PARCELPORT_PLUGINS CACHE)
 
@@ -313,7 +312,18 @@ else()
 endif()
 
 # ##############################################################################
+# In some some restricted environments (e.g. CircleCI, Github builders) cmake
+# runs out of memory when the modules are being built as OBJECT libraries. Set
+# this option to ON to fall back to building the modules as static libraries.
+hpx_option(
+  HPX_WITH_MODULES_AS_STATIC_LIBRARIES
+  BOOL
+  "Compile HPX modules as static (whole-archive) libraries instead of OBJECT libraries (Default: OFF)"
+  OFF
+  ADVANCED
+)
 
+# ##############################################################################
 hpx_option(
   HPX_WITH_EXAMPLES BOOL "Build the HPX examples (default ON)" ON
   CATEGORY "Build Targets"
@@ -1211,17 +1221,21 @@ add_hpx_pseudo_target(core)
 # Add libraries
 # ##############################################################################
 add_subdirectory(src)
+
+# collect names of static parcelports
+set(HPX_STATIC_PARCELPORT_PLUGINS
+    ""
+    CACHE INTERNAL "" FORCE
+)
 add_subdirectory(libs)
 
 # ##############################################################################
 # Configure compression and other plugins
 # ##############################################################################
-set(HPX_STATIC_PARCELPORT_PLUGINS
-    ""
-    CACHE INTERNAL "" FORCE
-)
 add_hpx_pseudo_target(plugins)
 add_subdirectory(plugins)
+
+include(HPX_ParcelPorts)
 
 # ##############################################################################
 # Add static init and wrap library

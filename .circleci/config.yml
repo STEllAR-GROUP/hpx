@@ -210,6 +210,7 @@ jobs:
                 -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" \
                 -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
+                -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
                 -DHPX_WITH_FETCH_HPXLOCAL=On \
                 -DHPXLocal_WITH_TESTS=OFF \
                 -DHPXLocal_WITH_EXAMPLES=OFF \
@@ -249,6 +250,7 @@ jobs:
             cmake \
                 /hpx/source \
                 -G "Ninja" \
+                -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
                 -DHPX_WITH_FETCH_HPXLOCAL=On \
                 -DHPXLocal_WITH_MALLOC=system \
                 -DHPXLocal_WITH_FETCH_ASIO=OFF \
@@ -261,6 +263,7 @@ jobs:
             cmake \
                 /hpx/source \
                 -G "Ninja" \
+                -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
                 -DHPX_WITH_FETCH_HPXLOCAL=On \
                 -DHPXLocal_WITH_MALLOC=system \
                 -DHPXLocal_WITH_FETCH_ASIO=OFF \
@@ -273,6 +276,7 @@ jobs:
             cmake \
                 /hpx/source \
                 -G "Ninja" \
+                -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
                 -DHPX_WITH_FETCH_HPXLOCAL=On \
                 -DHPXLocal_WITH_MALLOC=system \
                 -DHPXLocal_WITH_FETCH_ASIO=Off \
@@ -615,7 +619,9 @@ jobs:
               # not support the same vector intrinsics as this machine. The
               # "Test Docker Image" below fails with "Illegal instruction" if VC
               # is enabled, and other machines may fail similarly.
-              cmake -DHPXLocal_WITH_DATAPAR_VC=Off .
+              cmake \
+                -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
+                -DHPXLocal_WITH_DATAPAR_VC=Off .
               ninja -j2 install
           working_directory: /hpx/build
           when: always

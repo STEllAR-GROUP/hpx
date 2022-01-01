@@ -42,8 +42,8 @@ add_hpx_module(
   SOURCES ${actions_sources}
   HEADERS ${actions_headers}
   COMPAT_HEADERS ${actions_compat_headers}
-  MODULE_DEPENDENCIES hpx_actions_base hpx_agas hpx_async_distributed hpx_config
-                      hpx_naming hpx_parcelset_base
+  MODULE_DEPENDENCIES hpx_actions_base hpx_components_base hpx_config
+                      hpx_naming_base hpx_parcelset_base
   DEPENDENCIES HPX::hpx_local
   CMAKE_SUBDIRS examples tests
 )

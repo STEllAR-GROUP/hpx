@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <hpx/config/parcelport_defines.hpp>
-//
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <mutex>
 

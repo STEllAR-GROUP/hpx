@@ -21,8 +21,6 @@
 
 namespace hpx::parcelset {
 
-    class HPX_EXPORT parcelport;
-
     template <typename ConnectionHandler>
     class parcelport_impl;
 
@@ -35,20 +33,6 @@ namespace hpx::parcelset {
     namespace detail {
         struct create_parcel;
     }
-
-    ////////////////////////////////////////////////////////////////////////
-    /// Type of background work to perform
-    enum parcelport_background_mode
-    {
-        /// perform buffer flush operations
-        parcelport_background_mode_flush_buffers = 0x01,
-        /// perform send operations (includes buffer flush)
-        parcelport_background_mode_send = 0x03,
-        /// perform receive operations
-        parcelport_background_mode_receive = 0x04,
-        /// perform all operations
-        parcelport_background_mode_all = 0x07
-    };
 
     ////////////////////////////////////////////////////////////////////////
     /// \brief Return boolean value when thread processing is completed.

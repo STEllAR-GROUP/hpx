@@ -34,7 +34,12 @@ add_hpx_module(
   SOURCES ${init_runtime_sources}
   DEPENDENCIES HPX::hpx_local
   MODULE_DEPENDENCIES
-    hpx_command_line_handling hpx_config hpx_async_distributed hpx_naming
-    hpx_performance_counters hpx_runtime_distributed
+    hpx_async_distributed
+    hpx_collectives
+    hpx_command_line_handling
+    hpx_config
+    hpx_naming
+    hpx_performance_counters
+    hpx_runtime_distributed
   CMAKE_SUBDIRS examples tests
 )

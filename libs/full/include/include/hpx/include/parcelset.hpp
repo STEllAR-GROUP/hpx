@@ -9,4 +9,4 @@
 #include <hpx/config.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
-#include <hpx/parcelset/parcelport.hpp>
+#include <hpx/parcelset_base/parcelport.hpp>

@@ -35,9 +35,12 @@ Main |hpx| modules
    /libs/full/lcos_distributed/docs/index.rst
    /libs/full/naming/docs/index.rst
    /libs/full/naming_base/docs/index.rst
+   /libs/full/parcelport_mpi/docs/index.rst
+   /libs/full/parcelport_tcp/docs/index.rst
    /libs/full/parcelset/docs/index.rst
    /libs/full/parcelset_base/docs/index.rst
    /libs/full/performance_counters/docs/index.rst
+   /libs/full/plugin_factories/docs/index.rst
    /libs/full/resiliency_distributed/docs/index.rst
    /libs/full/runtime_components/docs/index.rst
    /libs/full/runtime_distributed/docs/index.rst

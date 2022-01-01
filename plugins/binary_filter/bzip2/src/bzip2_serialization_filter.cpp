@@ -1,15 +1,16 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/modules/actions.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 
-#include <hpx/plugins/plugin_registry.hpp>
-#include <hpx/plugins/binary_filter_factory.hpp>
+#include <hpx/modules/actions.hpp>
+#include <hpx/plugin_factories/binary_filter_factory.hpp>
+#include <hpx/plugin_factories/plugin_registry.hpp>
 #include <hpx/plugins/binary_filter/bzip2_serialization_filter.hpp>
 
 #include <cstddef>
@@ -22,22 +23,24 @@ HPX_REGISTER_BINARY_FILTER_FACTORY(
     bzip2_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace plugins { namespace compression
-{
-    namespace detail
-    {
-        bzip2_compdecomp::bzip2_compdecomp()
-          : boost::iostreams::detail::bzip2_base(
-                boost::iostreams::bzip2_params(
-                    boost::iostreams::bzip2::default_small)),
-            compress_(false), eof_(false)
-        {}
+namespace hpx::plugins::compression {
 
-        bzip2_compdecomp::bzip2_compdecomp(bool compress,
-                boost::iostreams::bzip2_params const& params)
-          : boost::iostreams::detail::bzip2_base(params),
-            compress_(compress), eof_(false)
-        {}
+    namespace detail {
+        bzip2_compdecomp::bzip2_compdecomp()
+          : boost::iostreams::detail::bzip2_base(boost::iostreams::bzip2_params(
+                boost::iostreams::bzip2::default_small))
+          , compress_(false)
+          , eof_(false)
+        {
+        }
+
+        bzip2_compdecomp::bzip2_compdecomp(
+            bool compress, boost::iostreams::bzip2_params const& params)
+          : boost::iostreams::detail::bzip2_base(params)
+          , compress_(compress)
+          , eof_(false)
+        {
+        }
 
         bzip2_compdecomp::~bzip2_compdecomp()
         {
@@ -68,9 +71,10 @@ namespace hpx { namespace plugins { namespace compression
             using namespace boost::iostreams;
             using namespace boost::iostreams::bzip2;
 
-            if (eof_) {
+            if (eof_)
+            {
                 // reset the stream if there are more characters
-                if(src_begin == src_end)
+                if (src_begin == src_end)
                     return false;
                 else
                     this->close();
@@ -80,7 +84,7 @@ namespace hpx { namespace plugins { namespace compression
 
             this->before(src_begin, src_end, dest_begin, dest_end);
             int result = this->decompress();
-            if(result == ok)
+            if (result == ok)
                 result = this->check_end(src_begin, dest_begin);
             this->after(src_begin, dest_begin);
             (bzip2_error::check)(result);
@@ -90,15 +94,18 @@ namespace hpx { namespace plugins { namespace compression
 
         void bzip2_compdecomp::close()
         {
-            try {
+            try
+            {
                 this->end(compress_);
-            } catch (...) {
+            }
+            catch (...)
+            {
                 eof_ = false;
                 throw;
             }
             eof_ = false;
         }
-    }
+    }    // namespace detail
 
     void bzip2_serialization_filter::set_max_length(std::size_t size)
     {
@@ -111,9 +118,9 @@ namespace hpx { namespace plugins { namespace compression
     {
         char const* src_begin = static_cast<char const*>(src);
         char* dst_begin = static_cast<char*>(dst);
-        compdecomp_.load(src_begin, src_begin+src_count, dst_begin,
-            dst_begin+dst_count);
-        return src_begin-static_cast<char const*>(src);
+        compdecomp_.load(
+            src_begin, src_begin + src_count, dst_begin, dst_begin + dst_count);
+        return src_begin - static_cast<char const*>(src);
     }
 
     std::size_t bzip2_serialization_filter::init_data(
@@ -125,7 +132,8 @@ namespace hpx { namespace plugins { namespace compression
         {
             HPX_THROW_EXCEPTION(serialization_error,
                 "bzip2_serialization_filter::load",
-                hpx::util::format("decompression failure, number of "
+                hpx::util::format(
+                    "decompression failure, number of "
                     "bytes expected: {}, number of bytes decoded: {}",
                     size, s));
             return 0;
@@ -137,11 +145,11 @@ namespace hpx { namespace plugins { namespace compression
     ///////////////////////////////////////////////////////////////////////////
     void bzip2_serialization_filter::load(void* dst, std::size_t dst_count)
     {
-        if (current_+dst_count > buffer_.size())
+        if (current_ + dst_count > buffer_.size())
         {
             HPX_THROW_EXCEPTION(serialization_error,
-                    "bzip2_serialization_filter::load",
-                    "archive data bstream is too short");
+                "bzip2_serialization_filter::load",
+                "archive data bstream is too short");
             return;
         }
 
@@ -150,23 +158,24 @@ namespace hpx { namespace plugins { namespace compression
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void bzip2_serialization_filter::save(void const* src, std::size_t src_count)
+    void bzip2_serialization_filter::save(
+        void const* src, std::size_t src_count)
     {
         char const* src_begin = static_cast<char const*>(src);
-        std::copy(src_begin, src_begin+src_count, std::back_inserter(buffer_));
+        std::copy(
+            src_begin, src_begin + src_count, std::back_inserter(buffer_));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool bzip2_serialization_filter::flush(void* dst, std::size_t dst_count,
-        std::size_t& written)
+    bool bzip2_serialization_filter::flush(
+        void* dst, std::size_t dst_count, std::size_t& written)
     {
         // compress everything in one go
         char* dst_begin = static_cast<char*>(dst);
         char const* src_begin = buffer_.data();
-        bool eof = compdecomp_.save(src_begin, src_begin+buffer_.size(),
-                dst_begin, dst_begin+dst_count, true);
-        written = dst_begin-static_cast<char*>(dst);
+        bool eof = compdecomp_.save(src_begin, src_begin + buffer_.size(),
+            dst_begin, dst_begin + dst_count, true);
+        written = dst_begin - static_cast<char*>(dst);
         return !eof;
     }
-}}}
-
+}    // namespace hpx::plugins::compression

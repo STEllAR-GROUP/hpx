@@ -7,23 +7,19 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(parcelset_headers
-    hpx/parcelset/parcel.hpp
-    hpx/parcelset/parcelhandler.hpp
-    hpx/parcelset/parcelport.hpp
-    hpx/parcelset/parcelport_impl.hpp
     hpx/parcelset/connection_cache.hpp
     hpx/parcelset/decode_parcels.hpp
-    hpx/parcelset/detail/data_point.hpp
     hpx/parcelset/detail/call_for_each.hpp
     hpx/parcelset/detail/parcel_await.hpp
-    hpx/parcelset/detail/gatherer.hpp
     hpx/parcelset/detail/message_handler_interface_functions.hpp
-    hpx/parcelset/detail/per_action_data_counter.hpp
     hpx/parcelset/encode_parcels.hpp
     hpx/parcelset/message_handler_fwd.hpp
-    hpx/parcelset/parcel_buffer.hpp
+    hpx/parcelset/parcel.hpp
+    hpx/parcelset/parcelhandler.hpp
+    hpx/parcelset/parcelport_impl.hpp
     hpx/parcelset/parcelport_connection.hpp
     hpx/parcelset/parcelset_fwd.hpp
+    hpx/parcelset/parcel_buffer.hpp
 )
 
 # cmake-format: off
@@ -36,20 +32,14 @@ set(parcelset_compat_headers
     hpx/runtime/parcelset/parcel_buffer.hpp => hpx/modules/parcelset.hpp
     hpx/runtime/parcelset/parcelport_connection.hpp => hpx/modules/parcelset.hpp
     hpx/runtime/parcelset/parcelhandler.hpp => hpx/modules/parcelset.hpp
-    hpx/runtime/parcelset/parcelport.hpp => hpx/modules/parcelset.hpp
     hpx/runtime/parcelset/parcelport_impl.hpp => hpx/modules/parcelset.hpp
     hpx/runtime/parcelset_fwd.hpp => hpx/modules/parcelset.hpp
 )
 # cmake-format: on
 
 set(parcelset_sources
-    detail/message_handler_interface_functions.cpp
-    detail/parcel_await.cpp
-    detail/per_action_data_counter.cpp
-    message_handler.cpp
-    parcel.cpp
-    parcelhandler.cpp
-    parcelport.cpp
+    detail/message_handler_interface_functions.cpp detail/parcel_await.cpp
+    message_handler.cpp parcel.cpp parcelhandler.cpp
 )
 
 include(HPX_AddModule)
@@ -60,7 +50,14 @@ add_hpx_module(
   HEADERS ${parcelset_headers}
   COMPAT_HEADERS ${parcelset_compat_headers}
   DEPENDENCIES HPX::hpx_local
-  MODULE_DEPENDENCIES hpx_actions hpx_components_base hpx_config
-                      hpx_parcelset_base
+  MODULE_DEPENDENCIES
+    hpx_actions
+    hpx_actions_base
+    hpx_components_base
+    hpx_config
+    hpx_naming
+    hpx_naming_base
+    hpx_parcelset_base
+    hpx_plugin_factories
   CMAKE_SUBDIRS examples tests
 )

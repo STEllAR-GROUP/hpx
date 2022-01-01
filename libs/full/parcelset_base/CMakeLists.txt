@@ -7,11 +7,15 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(parcelset_base_headers
+    hpx/parcelset_base/detail/data_point.hpp
+    hpx/parcelset_base/detail/gatherer.hpp
     hpx/parcelset_base/detail/locality_interface_functions.hpp
     hpx/parcelset_base/detail/parcel_route_handler.hpp
+    hpx/parcelset_base/detail/per_action_data_counter.hpp
     hpx/parcelset_base/locality.hpp
     hpx/parcelset_base/parcelset_base_fwd.hpp
     hpx/parcelset_base/locality_interface.hpp
+    hpx/parcelset_base/parcelport.hpp
     hpx/parcelset_base/parcel_interface.hpp
     hpx/parcelset_base/policies/message_handler.hpp
     hpx/parcelset_base/set_parcel_write_handler.hpp
@@ -23,6 +27,7 @@ set(parcelset_base_headers
 # cmake-format: off
 set(parcelset_base_compat_headers
     hpx/runtime/parcelset/locality.hpp => hpx/modules/parcelset_base.hpp
+    hpx/runtime/parcelset/parcelport.hpp => hpx/modules/parcelset_base.hpp
     hpx/runtime/parcelset/policies/message_handler.hpp => hpx/modules/parcelset_base.hpp
     hpx/runtime/set_parcel_write_handler.hpp => hpx/modules/parcelset_base.hpp
     hpx/runtime/traits/action_get_embedded_parcel.hpp => hpx/modules/parcelset_base.hpp
@@ -31,8 +36,13 @@ set(parcelset_base_compat_headers
 # cmake-format: on
 
 set(parcelset_base_sources
-    detail/locality_interface_functions.cpp locality.cpp locality_interface.cpp
-    parcel_interface.cpp set_parcel_write_handler.cpp
+    detail/locality_interface_functions.cpp
+    detail/per_action_data_counter.cpp
+    locality.cpp
+    locality_interface.cpp
+    parcelport.cpp
+    parcel_interface.cpp
+    set_parcel_write_handler.cpp
 )
 
 include(HPX_AddModule)

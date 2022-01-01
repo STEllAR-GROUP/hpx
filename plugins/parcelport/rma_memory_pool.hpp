@@ -10,8 +10,6 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 //
-#include <hpx/config/parcelport_defines.hpp>
-//
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/rma_memory_region.hpp>
 #include <plugins/parcelport/performance_counter.hpp>

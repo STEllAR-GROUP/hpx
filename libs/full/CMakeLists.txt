@@ -32,9 +32,12 @@ set(_hpx_full_modules
     lcos_distributed
     naming
     naming_base
+    parcelport_mpi
+    parcelport_tcp
     parcelset
     parcelset_base
     performance_counters
+    plugin_factories
     resiliency_distributed
     runtime_components
     runtime_distributed

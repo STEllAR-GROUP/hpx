@@ -30,7 +30,7 @@
 #include <hpx/parcelset/detail/call_for_each.hpp>
 #include <hpx/parcelset/detail/parcel_await.hpp>
 #include <hpx/parcelset/encode_parcels.hpp>
-#include <hpx/parcelset/parcelport.hpp>
+#include <hpx/parcelset_base/parcelport.hpp>
 
 #include <atomic>
 #include <chrono>

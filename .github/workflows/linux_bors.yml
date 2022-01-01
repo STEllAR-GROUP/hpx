@@ -28,6 +28,7 @@ jobs:
               -Bbuild \
               -GNinja \
               -DCMAKE_BUILD_TYPE=Debug \
+              -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=ON \
               -DHPX_WITH_FETCH_HPXLOCAL=ON \
               -DHPXLocal_WITH_FETCH_ASIO=ON \
               -DHPXLocal_WITH_MALLOC=system \

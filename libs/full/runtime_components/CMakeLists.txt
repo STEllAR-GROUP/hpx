@@ -60,13 +60,13 @@ add_hpx_module(
   DEPENDENCIES HPX::hpx_local
   MODULE_DEPENDENCIES
     hpx_actions
+    hpx_actions_base
     hpx_agas
     hpx_async_colocated
     hpx_async_distributed
     hpx_components
+    hpx_components_base
     hpx_config
-    hpx_distribution_policies
-    hpx_naming
-    hpx_performance_counters
+    hpx_naming_base
   CMAKE_SUBDIRS examples tests
 )
