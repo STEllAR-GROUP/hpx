@@ -225,4 +225,8 @@ elseif(NOT TARGET HPX::hpx_local AND NOT HPX_FIND_PACKAGE)
   if(HPXLocal_WITH_CUDA)
     enable_language(CUDA)
   endif()
+
+  # make sure the HPXLocal cmake files are available to HPX
+  list(APPEND CMAKE_MODULE_PATH "${hpxlocal_SOURCE_DIR}/cmake")
+
 endif()

@@ -49,8 +49,8 @@ namespace hpx::parcelset {
         }
 
         explicit parcel_buffer(BufferType&& data,
-            allocator_type const& allocator = allocator_type())
-          : data_(HPX_MOVE(data), allocator)
+            allocator_type const& /*allocator*/ = allocator_type())
+          : data_(HPX_MOVE(data))
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0)
           , data_size_(0)
@@ -58,8 +58,8 @@ namespace hpx::parcelset {
         {
         }
 
-        parcel_buffer(parcel_buffer&& other) noexcept = default;
-        parcel_buffer& operator=(parcel_buffer&& other) noexcept = default;
+        parcel_buffer(parcel_buffer&& other) = default;
+        parcel_buffer& operator=(parcel_buffer&& other) = default;
 
         void clear()
         {

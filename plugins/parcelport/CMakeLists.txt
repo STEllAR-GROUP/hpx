@@ -8,7 +8,7 @@
 set(parcelport_plugins)
 
 if(HPX_WITH_NETWORKING)
-  set(parcelport_plugins ${parcelport_plugins} libfabric)
+  set(parcelport_plugins ${parcelport_plugins})
 endif()
 
 foreach(type ${parcelport_plugins})

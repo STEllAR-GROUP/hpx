@@ -26,6 +26,7 @@ set(parcelport_mpi_compat_headers)
 
 set(parcelport_mpi_sources locality.cpp parcelport_mpi.cpp)
 
+include(HPXLocal_SetupMPI)
 hpx_local_setup_mpi()
 
 include(HPX_AddModule)
