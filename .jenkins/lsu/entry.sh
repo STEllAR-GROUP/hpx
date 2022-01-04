@@ -31,7 +31,7 @@ else
 
     # Cancel currently running builds on the same branch, but only for pull
     # requests
-    scancel --jobname="${job_name}"
+    scancel --verbose --verbose --verbose --verbose --jobname="${job_name}"
 
     export install_hpx=0
 fi
@@ -39,6 +39,7 @@ fi
 # Start the actual build
 set +e
 sbatch \
+    --verbose --verbose --verbose --verbose \
     --job-name="${job_name}" \
     --nodes="${configuration_slurm_num_nodes}" \
     --partition="${configuration_slurm_partition}" \

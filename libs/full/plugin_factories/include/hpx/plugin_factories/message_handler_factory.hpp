@@ -7,6 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/preprocessor.hpp>
@@ -98,3 +100,5 @@ namespace hpx::plugins {
     template struct hpx::plugins::message_handler_factory<MessageHandler>;     \
     HPX_REGISTER_PLUGIN_REGISTRY_2(MessageHandler, pluginname)                 \
     /**/
+
+#endif

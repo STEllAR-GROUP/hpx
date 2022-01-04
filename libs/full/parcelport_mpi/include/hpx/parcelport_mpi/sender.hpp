@@ -135,6 +135,7 @@ namespace hpx::parcelset::policies::mpi {
                 int ret =
                     MPI_Test(&next_free_tag_request_, &completed, &status);
                 HPX_ASSERT(ret == MPI_SUCCESS);
+                (void) ret;
                 if (completed)    // && status->MPI_ERROR != MPI_ERR_PENDING)
                 {
                     return get_next_free_tag();
