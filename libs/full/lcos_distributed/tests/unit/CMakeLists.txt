@@ -5,7 +5,20 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests channel)
+set(tests
+    channel
+    client_then
+    future_wait
+    packaged_action
+    promise
+    promise_allocator
+    promise_emplace
+    use_allocator
+)
+
+set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
+set(packaged_action_PARAMETERS THREADS_PER_LOCALITY 4)
+set(promise_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

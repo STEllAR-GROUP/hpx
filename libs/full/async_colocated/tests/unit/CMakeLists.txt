@@ -5,13 +5,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests apply_colocated async_cb_colocated async_colocated
-          async_continue_cb_colocated async_continue_colocated
+          async_continue_cb_colocated async_continue_colocated new_colocated
 )
 
 set(apply_colocated_PARAMETERS LOCALITIES 2)
 set(async_cb_colocated_PARAMETERS LOCALITIES 2)
-
 set(async_continue_cb_colocated_PARAMETERS LOCALITIES 2)
+set(new_colocated_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

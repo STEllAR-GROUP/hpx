@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2020 Hartmut Kaiser
+# Copyright (c) 2007-2021 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -6,7 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # add subdirectories
-set(subdirs actions)
+set(subdirs actions util)
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.unit.modules.async_distributed.${subdir})
