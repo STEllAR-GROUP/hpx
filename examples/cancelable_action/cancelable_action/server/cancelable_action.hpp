@@ -98,9 +98,9 @@ namespace examples { namespace server {
             hpx::thread::interrupt(id_);
         }
 
-        HPX_DEFINE_COMPONENT_ACTION(cancelable_action, do_it, do_it_action);
+        HPX_DEFINE_COMPONENT_ACTION(cancelable_action, do_it, do_it_action)
         HPX_DEFINE_COMPONENT_ACTION(
-            cancelable_action, cancel_it, cancel_it_action);
+            cancelable_action, cancel_it, cancel_it_action)
 
     private:
         hpx::lcos::local::mutex mtx_;

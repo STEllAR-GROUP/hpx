@@ -23,7 +23,7 @@ namespace examples { namespace server
         : hpx::components::component_base<hello_world>
     {
         void invoke();
-        HPX_DEFINE_COMPONENT_ACTION(hello_world, invoke);
+        HPX_DEFINE_COMPONENT_ACTION(hello_world, invoke)
     };
 }}
 

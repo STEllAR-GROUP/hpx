@@ -21,7 +21,7 @@
     {                                                                          \
         NAME.set(hpx::any(value));                                             \
     }                                                                          \
-    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, HPX_PP_CAT(NAME, _));     \
+    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, HPX_PP_CAT(NAME, _))      \
                                                                                \
     ::hpx::lcos::broadcast<HPX_PP_CAT(HPX_PP_CAT(NAME, _), _action)> NAME;     \
     /**/

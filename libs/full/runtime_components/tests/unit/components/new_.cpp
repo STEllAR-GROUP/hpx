@@ -24,7 +24,7 @@ struct test_server : hpx::components::component_base<test_server>
         return hpx::find_here();
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call)
 };
 
 typedef hpx::components::component<test_server> server_type;

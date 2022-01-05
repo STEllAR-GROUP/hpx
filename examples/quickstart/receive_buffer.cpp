@@ -62,7 +62,7 @@ public:
 
     // Do all the work for 'nt' time steps on the local
     hpx::future<void> do_work(std::size_t nt);
-    HPX_DEFINE_COMPONENT_ACTION(partition_server, do_work, do_work_action);
+    HPX_DEFINE_COMPONENT_ACTION(partition_server, do_work, do_work_action)
 
     // Receive the data from the left partition. This will be called by the
     // other partition, sending us its data.
@@ -70,7 +70,7 @@ public:
     {
         right_buffer_.store_received(timestep, std::move(data));
     }
-    HPX_DEFINE_COMPONENT_ACTION(partition_server, from_right, from_right_action);
+    HPX_DEFINE_COMPONENT_ACTION(partition_server, from_right, from_right_action)
 
     // Explicitly release dependencies to avoid circular dependencies in the
     // reference counting chain.
@@ -79,7 +79,7 @@ public:
         left_.free();
     }
     HPX_DEFINE_COMPONENT_ACTION(partition_server, release_dependencies,
-        release_dependencies_action);
+        release_dependencies_action)
 
 public:
     // Other helper functions

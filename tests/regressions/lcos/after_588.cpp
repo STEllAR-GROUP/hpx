@@ -29,7 +29,7 @@ struct test
     void pong()
     {}
 
-    HPX_DEFINE_COMPONENT_ACTION(test, pong);
+    HPX_DEFINE_COMPONENT_ACTION(test, pong)
 
     void ping(hpx::id_type id, std::size_t iterations)
     {
@@ -48,7 +48,7 @@ struct test
         finished = true;
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(test, ping);
+    HPX_DEFINE_COMPONENT_ACTION(test, ping)
 
     std::atomic<bool> finished;
 };

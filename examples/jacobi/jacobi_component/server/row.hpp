@@ -45,8 +45,8 @@ namespace jacobi {
                 return row_range(values, begin, end);
             }
 
-            HPX_DEFINE_COMPONENT_ACTION(row, get, get_action);
-            HPX_DEFINE_COMPONENT_ACTION(row, init, init_action);
+            HPX_DEFINE_COMPONENT_ACTION(row, get, get_action)
+            HPX_DEFINE_COMPONENT_ACTION(row, init, init_action)
         };
     }
 }

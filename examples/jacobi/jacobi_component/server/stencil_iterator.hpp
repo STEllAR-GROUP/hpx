@@ -82,11 +82,11 @@ namespace jacobi
               , hpx::future<row_range> bottom
             );
 
-            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, init, init_action);
+            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, init, init_action)
             HPX_DEFINE_COMPONENT_ACTION(stencil_iterator,
-                setup_boundary, setup_boundary_action);
-            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, step, step_action);
-            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, get, get_action);
+                setup_boundary, setup_boundary_action)
+            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, step, step_action)
+            HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, get, get_action)
 
             std::size_t y;
             std::size_t ny;

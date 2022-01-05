@@ -45,7 +45,7 @@ struct A : hpx::components::managed_component_base<A>
     {
         return test0();
     }
-    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action);
+    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action)
 };
 
 typedef hpx::components::managed_component<A> serverA_type;
@@ -93,7 +93,7 @@ struct B
     {
         return test1();
     }
-    HPX_DEFINE_COMPONENT_ACTION(B, test1_nonvirt, test1_action);
+    HPX_DEFINE_COMPONENT_ACTION(B, test1_nonvirt, test1_action)
 };
 
 typedef hpx::components::managed_component<B> serverB_type;
@@ -142,7 +142,7 @@ struct C
     {
         return "C";
     }
-    HPX_DEFINE_COMPONENT_ACTION(C, test2, test2_action);
+    HPX_DEFINE_COMPONENT_ACTION(C, test2, test2_action)
 };
 
 typedef hpx::components::managed_component<C> serverC_type;

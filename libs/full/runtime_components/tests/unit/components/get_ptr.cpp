@@ -26,7 +26,7 @@ struct test_server : hpx::components::component_base<test_server>
         return reinterpret_cast<std::size_t>(this);
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, check_ptr, check_ptr_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, check_ptr, check_ptr_action)
 };
 
 typedef hpx::components::component<test_server> server_type;

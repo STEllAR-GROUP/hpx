@@ -45,7 +45,7 @@ namespace hpx { namespace test { namespace server {
             references_.push_back(gid);
         }
 
-        HPX_DEFINE_COMPONENT_ACTION(managed_refcnt_checker, take_reference);
+        HPX_DEFINE_COMPONENT_ACTION(managed_refcnt_checker, take_reference)
     };
 
 }}}    // namespace hpx::test::server

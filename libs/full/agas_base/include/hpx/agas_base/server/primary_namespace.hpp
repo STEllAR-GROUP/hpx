@@ -333,17 +333,17 @@ namespace hpx::agas::server {
             error_code& ec);
 
     public:
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, allocate);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, bind_gid);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, colocate);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, begin_migration);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, end_migration);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, decrement_credit);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, increment_credit);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, resolve_gid);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, unbind_gid);
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, allocate)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, bind_gid)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, colocate)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, begin_migration)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, end_migration)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, decrement_credit)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, increment_credit)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, resolve_gid)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, unbind_gid)
 #if defined(HPX_HAVE_NETWORKING)
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route);
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route)
 #endif
     };
 }    // namespace hpx::agas::server

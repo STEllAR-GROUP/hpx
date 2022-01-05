@@ -41,25 +41,25 @@ struct vector_t_server:
   vector_t_server() { HPX_ASSERT(0); }
 
   std::shared_ptr<vector_t> get_data() { return data; }
-  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, get_data);
+  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, get_data)
 
   double get_elt(std::ptrdiff_t i) const { return (*data)(i); }
-  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, get_elt);
+  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, get_elt)
   void set_elt(std::ptrdiff_t i, double x) { (*data)(i) = x; }
-  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, set_elt);
+  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, set_elt)
 
   void axpy(double alpha, const hpx::id_type& x);
-  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, axpy);
+  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, axpy)
   void copy(const hpx::id_type& x);
-  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, copy);
+  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, copy)
   void gemv(bool trans, double alpha, const hpx::id_type& a,
             const hpx::id_type& x,
             double beta);
-  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, gemv);
+  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, gemv)
   double nrm2_process() const;
-  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, nrm2_process);
+  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, nrm2_process)
   void scal(double alpha);
-  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, scal);
+  HPX_DEFINE_COMPONENT_ACTION(vector_t_server, scal)
 };
 
 struct vector_t_client:
@@ -130,33 +130,33 @@ struct matrix_t_server:
   matrix_t_server() { HPX_ASSERT(0); }
 
   std::shared_ptr<matrix_t> get_data() { return data; }
-  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, get_data);
+  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, get_data)
 
   double get_elt(std::ptrdiff_t i, std::ptrdiff_t j) const
   {
     return (*data)(i,j);
   }
-  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, get_elt);
+  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, get_elt)
   void set_elt(std::ptrdiff_t i, std::ptrdiff_t j, double x)
   {
     (*data)(i,j) = x;
   }
-  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, set_elt);
+  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, set_elt)
 
   void axpy(bool trans, double alpha, const hpx::id_type& a);
-  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, axpy);
+  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, axpy)
   void copy(bool transa, const hpx::id_type& a);
-  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, copy);
+  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, copy)
   void gemm(bool transa, bool transb, double alpha, const hpx::id_type& a,
             const hpx::id_type& b, double beta);
-  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, gemm);
+  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, gemm)
   hpx::id_type gemv_process(bool trans, double alpha, const hpx::id_type& x)
     const;
-  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, gemv_process);
+  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, gemv_process)
   double nrm2_process() const;
-  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, nrm2_process);
+  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, nrm2_process)
   void scal(double alpha);
-  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, scal);
+  HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, scal)
 };
 
 struct matrix_t_client:

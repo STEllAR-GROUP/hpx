@@ -102,7 +102,7 @@ namespace gc {
             collector_data* cd;
 
             std::vector<hpx::id_type> outgoing();
-            HPX_DEFINE_COMPONENT_ACTION(collectable, outgoing);
+            HPX_DEFINE_COMPONENT_ACTION(collectable, outgoing)
 
             // Assume a root is pointing to the object
             collectable()
@@ -135,7 +135,7 @@ namespace gc {
                 }
                 return n;
             }
-            HPX_DEFINE_COMPONENT_ACTION(collectable, add_ref);
+            HPX_DEFINE_COMPONENT_ACTION(collectable, add_ref)
 
             void set_ref(unsigned int index, hpx::naming::id_type id)
             {
@@ -148,30 +148,30 @@ namespace gc {
                 if (id != hpx::naming::invalid_id)
                     incref_(weight, id);
             }
-            HPX_DEFINE_COMPONENT_ACTION(collectable, set_ref);
+            HPX_DEFINE_COMPONENT_ACTION(collectable, set_ref)
 
             void phantomize_ref(
                 unsigned int weight, hpx::id_type parent, hpx::id_type cid);
-            HPX_DEFINE_COMPONENT_ACTION(collectable, phantomize_ref);
+            HPX_DEFINE_COMPONENT_ACTION(collectable, phantomize_ref)
             void incref(unsigned int weight);
-            HPX_DEFINE_COMPONENT_ACTION(collectable, incref);
+            HPX_DEFINE_COMPONENT_ACTION(collectable, incref)
             void incref_(unsigned int weight, hpx::naming::id_type id);
             void decref(unsigned int weight);
-            HPX_DEFINE_COMPONENT_ACTION(collectable, decref);
+            HPX_DEFINE_COMPONENT_ACTION(collectable, decref)
             void decref_(unsigned int weight, hpx::naming::id_type id);
 
             void phantom_wait_complete();
 
             void done(hpx::id_type child);
-            HPX_DEFINE_COMPONENT_ACTION(collectable, done);
+            HPX_DEFINE_COMPONENT_ACTION(collectable, done)
 
             void recover(hpx::id_type cid);
-            HPX_DEFINE_COMPONENT_ACTION(collectable, recover);
+            HPX_DEFINE_COMPONENT_ACTION(collectable, recover)
 
             void spread(unsigned int weight);
 
             void recover_done();
-            HPX_DEFINE_COMPONENT_ACTION(collectable, recover_done);
+            HPX_DEFINE_COMPONENT_ACTION(collectable, recover_done)
 
             void check_recover_done();
 

@@ -52,8 +52,8 @@ public:
 
     void do_work();
 
-    HPX_DEFINE_COMPONENT_ACTION(test_receive_buffer_server, from, from_action);
-    HPX_DEFINE_COMPONENT_ACTION(test_receive_buffer_server, do_work, do_work_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_receive_buffer_server, from, from_action)
+    HPX_DEFINE_COMPONENT_ACTION(test_receive_buffer_server, do_work, do_work_action)
 
 protected:
     hpx::future<std::size_t> receive(std::size_t t)

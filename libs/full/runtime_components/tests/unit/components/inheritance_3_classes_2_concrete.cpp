@@ -45,7 +45,7 @@ struct A : hpx::components::component_base<A>
     {
         return test0();
     }
-    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action);
+    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action)
 
     hpx::naming::address get_current_address() const
     {
@@ -83,7 +83,7 @@ struct B : hpx::components::component_base<B>
     {
         return test1();
     }
-    HPX_DEFINE_COMPONENT_ACTION(B, test1_nonvirt, test1_action);
+    HPX_DEFINE_COMPONENT_ACTION(B, test1_nonvirt, test1_action)
 
     hpx::naming::address get_current_address() const
     {
@@ -139,7 +139,7 @@ struct C
     {
         return "C";
     }
-    HPX_DEFINE_COMPONENT_ACTION(C, test2, test2_action);
+    HPX_DEFINE_COMPONENT_ACTION(C, test2, test2_action)
 
     hpx::naming::address get_current_address() const
     {

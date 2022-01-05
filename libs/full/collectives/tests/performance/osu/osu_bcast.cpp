@@ -42,7 +42,7 @@ struct broadcast_component
         send_buffer = std::vector<char>(max_msg_size);
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, init);
+    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, init)
 
     typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
@@ -69,7 +69,7 @@ struct broadcast_component
         return latency;
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, run);
+    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, run)
 
     HPX_DEFINE_COMPONENT_BROADCAST(bcast, buffer_type);
     std::vector<hpx::id_type> ids;

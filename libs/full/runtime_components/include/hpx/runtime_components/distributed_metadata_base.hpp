@@ -55,7 +55,7 @@ namespace hpx { namespace components { namespace server {
             return data_;
         }
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(distributed_metadata_base, get);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(distributed_metadata_base, get)
 
     private:
         ConfigData data_;

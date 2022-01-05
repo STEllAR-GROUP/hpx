@@ -74,37 +74,37 @@ namespace hpx { namespace performance_counters { namespace server {
         /// The \a get_counter_info_action retrieves a performance counters
         /// information.
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            get_counter_info_nonvirt, get_counter_info_action);
+            get_counter_info_nonvirt, get_counter_info_action)
 
         /// The \a get_counter_value_action queries the value of a performance
         /// counter.
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            get_counter_value_nonvirt, get_counter_value_action);
+            get_counter_value_nonvirt, get_counter_value_action)
 
         /// The \a get_counter_value_action queries the value of a performance
         /// counter.
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            get_counter_values_array_nonvirt, get_counter_values_array_action);
+            get_counter_values_array_nonvirt, get_counter_values_array_action)
 
         /// The \a set_counter_value_action
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            set_counter_value_nonvirt, set_counter_value_action);
+            set_counter_value_nonvirt, set_counter_value_action)
 
         /// The \a reset_counter_value_action
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            reset_counter_value_nonvirt, reset_counter_value_action);
+            reset_counter_value_nonvirt, reset_counter_value_action)
 
         /// The \a start_action
         HPX_DEFINE_COMPONENT_ACTION(
-            base_performance_counter, start_nonvirt, start_action);
+            base_performance_counter, start_nonvirt, start_action)
 
         /// The \a stop_action
         HPX_DEFINE_COMPONENT_ACTION(
-            base_performance_counter, stop_nonvirt, stop_action);
+            base_performance_counter, stop_nonvirt, stop_action)
 
         /// The \a reinit_action
         HPX_DEFINE_COMPONENT_ACTION(
-            base_performance_counter, reinit_nonvirt, reinit_action);
+            base_performance_counter, reinit_nonvirt, reinit_action)
 
     protected:
         hpx::performance_counters::counter_info info_;

@@ -96,7 +96,7 @@ namespace hpx { namespace lcos {
         /// The \a set_event_action may be used to unconditionally trigger any
         /// LCO instances, it carries no additional parameters.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco, set_event_nonvirt, set_event_action);
+            base_lco, set_event_nonvirt, set_event_action)
 
         /// The \a set_exception_action may be used to transfer arbitrary error
         /// information from the remote site to the LCO instance specified as
@@ -106,15 +106,15 @@ namespace hpx { namespace lcos {
         ///               [in] The exception encapsulating the error to report
         ///               to this LCO instance.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco, set_exception_nonvirt, set_exception_action);
+            base_lco, set_exception_nonvirt, set_exception_action)
 
         /// The \a connect_action may be used to
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco, connect_nonvirt, connect_action);
+            base_lco, connect_nonvirt, connect_action)
 
         /// The \a set_exception_action may be used to
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco, disconnect_nonvirt, disconnect_action);
+            base_lco, disconnect_nonvirt, disconnect_action)
     };
 }}    // namespace hpx::lcos
 

@@ -39,9 +39,9 @@ namespace hpx { namespace components { namespace server
         std::vector<char> migrate_from_here(naming::gid_type const&);
         std::size_t size() const { return data_.size(); }
 
-        HPX_DEFINE_COMPONENT_ACTION(component_storage, migrate_to_here);
-        HPX_DEFINE_COMPONENT_ACTION(component_storage, migrate_from_here);
-        HPX_DEFINE_COMPONENT_ACTION(component_storage, size);
+        HPX_DEFINE_COMPONENT_ACTION(component_storage, migrate_to_here)
+        HPX_DEFINE_COMPONENT_ACTION(component_storage, migrate_from_here)
+        HPX_DEFINE_COMPONENT_ACTION(component_storage, size)
 
     private:
         hpx::unordered_map<naming::gid_type, std::vector<char> > data_;

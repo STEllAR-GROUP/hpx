@@ -56,7 +56,7 @@ struct test_server1
 
     void test();
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server1, test, test_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server1, test, test_action)
 
     hpx::id_type other;
     static bool alive;
@@ -84,7 +84,7 @@ struct test_server2
     }
 
     HPX_DEFINE_COMPONENT_ACTION(test_server2, create_test_server1,
-        create_test_server1_action);
+        create_test_server1_action)
 
     static bool alive;
 };

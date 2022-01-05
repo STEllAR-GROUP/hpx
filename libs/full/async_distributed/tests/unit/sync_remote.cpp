@@ -40,7 +40,7 @@ struct decrement_server
         return i - 1;
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(decrement_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(decrement_server, call)
 };
 
 typedef hpx::components::managed_component<decrement_server> server_type;

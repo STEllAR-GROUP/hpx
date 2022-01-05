@@ -50,9 +50,9 @@ namespace throttle { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(throttle, suspend, suspend_action);
-        HPX_DEFINE_COMPONENT_ACTION(throttle, resume, resume_action);
-        HPX_DEFINE_COMPONENT_ACTION(throttle, is_suspended, is_suspended_action);
+        HPX_DEFINE_COMPONENT_ACTION(throttle, suspend, suspend_action)
+        HPX_DEFINE_COMPONENT_ACTION(throttle, resume, resume_action)
+        HPX_DEFINE_COMPONENT_ACTION(throttle, is_suspended, is_suspended_action)
 
     private:
         // this function is periodically scheduled as a worker thread with the

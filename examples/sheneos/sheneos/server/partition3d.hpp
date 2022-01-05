@@ -145,11 +145,11 @@ namespace sheneos { namespace server
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(partition3d, init);
-        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate);
-        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_one);
-        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_bulk);
-        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_one_bulk);
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, init)
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate)
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_one)
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_bulk)
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_one_bulk)
 
     protected:
         double interpolate_one(sheneos_coord const& c,

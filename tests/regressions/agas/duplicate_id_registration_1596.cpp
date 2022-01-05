@@ -44,7 +44,7 @@ struct ViewRegistrationListener
         hpx::util::format_to(cout, "register view at listener {1} ({2})",
             name, this) << endl;
     }
-    HPX_DEFINE_COMPONENT_ACTION(ViewRegistrationListener, register_view);
+    HPX_DEFINE_COMPONENT_ACTION(ViewRegistrationListener, register_view)
 
     string name;
 };

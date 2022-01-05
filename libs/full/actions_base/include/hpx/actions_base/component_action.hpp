@@ -280,7 +280,7 @@ namespace hpx { namespace actions {
       : hpx::actions::make_action_t<decltype(&component::func),                \
             &component::func, name>                                            \
     {                                                                          \
-    } /**/
+    }; /**/
 #define HPX_DEFINE_COMPONENT_ACTION_2(component, func)                         \
     HPX_DEFINE_COMPONENT_ACTION_3(component, func, HPX_PP_CAT(func, _action))  \
     /**/
@@ -301,7 +301,7 @@ namespace hpx { namespace actions {
       : hpx::actions::make_direct_action_t<decltype(&component::func),         \
             &component::func, name>                                            \
     {                                                                          \
-    } /**/
+    }; /**/
 
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_2(component, func)                  \
     HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(                                      \

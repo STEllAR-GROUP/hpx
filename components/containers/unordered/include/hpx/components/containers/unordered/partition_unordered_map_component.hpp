@@ -315,20 +315,20 @@ namespace hpx { namespace server {
         }
 
         /// Macros to define HPX component actions for all exported functions.
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, size);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, size)
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, get_value);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, get_values);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, get_value)
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, get_values)
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, set_value);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, set_values);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, set_value)
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, set_values)
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, erase);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_unordered_map, erase)
 
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            partition_unordered_map, get_copied_data);
+            partition_unordered_map, get_copied_data)
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            partition_unordered_map, set_copied_data);
+            partition_unordered_map, set_copied_data)
     };
 }}    // namespace hpx::server
 

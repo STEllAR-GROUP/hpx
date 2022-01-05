@@ -122,12 +122,12 @@ namespace server
             return b.count_;
         }
 
-        HPX_DEFINE_COMPONENT_ACTION(board, init_board, init_action);
-        HPX_DEFINE_COMPONENT_ACTION(board, access_board, access_action);
-        HPX_DEFINE_COMPONENT_ACTION(board, update_board, update_action);
-        HPX_DEFINE_COMPONENT_ACTION(board, check_board, check_action);
-        HPX_DEFINE_COMPONENT_ACTION(board, solve_board, solve_action);
-        HPX_DEFINE_COMPONENT_ACTION(board, clear_board, clear_action);
+        HPX_DEFINE_COMPONENT_ACTION(board, init_board, init_action)
+        HPX_DEFINE_COMPONENT_ACTION(board, access_board, access_action)
+        HPX_DEFINE_COMPONENT_ACTION(board, update_board, update_action)
+        HPX_DEFINE_COMPONENT_ACTION(board, check_board, check_action)
+        HPX_DEFINE_COMPONENT_ACTION(board, solve_board, solve_action)
+        HPX_DEFINE_COMPONENT_ACTION(board, clear_board, clear_action)
     };
 }}
 

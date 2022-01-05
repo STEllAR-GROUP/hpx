@@ -343,7 +343,7 @@ struct hello_world_server
         }
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(hello_world_server, print, print_action);
+    HPX_DEFINE_COMPONENT_ACTION(hello_world_server, print, print_action)
 
     std::size_t count_;
 };

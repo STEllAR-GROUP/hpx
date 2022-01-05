@@ -32,7 +32,7 @@ struct test_server : managed_component_base<test_server>
         HPX_TEST_NEQ(hpx::invalid_id, id);
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, check_gid, check_gid_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, check_gid, check_gid_action)
 };
 
 using server_type = managed_component<test_server>;

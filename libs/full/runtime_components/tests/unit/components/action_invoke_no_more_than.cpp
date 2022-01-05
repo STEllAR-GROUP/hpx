@@ -57,9 +57,9 @@ struct test_server : hpx::components::component_base<test_server>
         return hpx::make_ready_future();
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, call_void, call_void_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call_void, call_void_action)
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server, call_future_void, call_future_void_action);
+        test_server, call_future_void, call_future_void_action)
 };
 
 typedef hpx::components::component<test_server> server_type;
