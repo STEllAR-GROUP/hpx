@@ -29,7 +29,7 @@ struct test_server : hpx::components::component_base<test_server>
 
     int call() const { return i_; }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call)
 
     int i_;
 };

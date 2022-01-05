@@ -34,8 +34,8 @@ namespace hpx { namespace components { namespace process { namespace server {
         void terminate();
         int wait_for_exit();
 
-        HPX_DEFINE_COMPONENT_ACTION(child, terminate);
-        HPX_DEFINE_COMPONENT_ACTION(child, wait_for_exit);
+        HPX_DEFINE_COMPONENT_ACTION(child, terminate)
+        HPX_DEFINE_COMPONENT_ACTION(child, wait_for_exit)
 
     private:
         process::util::child child_;

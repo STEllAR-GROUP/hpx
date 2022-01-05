@@ -45,7 +45,7 @@ struct test_server : hpx::components::component_base<test_server>
         return *this;
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action)
 
     template <typename Archive>
     void serialize(Archive&, unsigned)

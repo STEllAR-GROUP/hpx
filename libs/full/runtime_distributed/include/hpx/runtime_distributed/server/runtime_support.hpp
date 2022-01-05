@@ -192,30 +192,29 @@ namespace hpx { namespace components { namespace server {
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, load_components);
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_startup_functions);
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_shutdown_functions);
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown);
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown_all);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, load_components)
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_startup_functions)
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_shutdown_functions)
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown)
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown_all)
         HPX_DEFINE_COMPONENT_ACTION(
-            runtime_support, terminate_act, terminate_action);
+            runtime_support, terminate_act, terminate_action)
         HPX_DEFINE_COMPONENT_ACTION(
-            runtime_support, terminate_all_act, terminate_all_action);
+            runtime_support, terminate_all_act, terminate_all_action)
 
         // even if this is not a short/minimal action, we still execute it
         // directly to avoid a deadlock condition inside the thread manager
         // waiting for this thread to finish, which waits for the thread
         // manager to exit
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(runtime_support, get_config);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(runtime_support, get_config)
 
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, garbage_collect);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, garbage_collect)
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, create_performance_counter)
         HPX_DEFINE_COMPONENT_ACTION(
-            runtime_support, create_performance_counter);
-        HPX_DEFINE_COMPONENT_ACTION(
-            runtime_support, remove_from_connection_cache);
+            runtime_support, remove_from_connection_cache)
 
 #if defined(HPX_HAVE_NETWORKING)
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, dijkstra_termination);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, dijkstra_termination)
 #endif
 
         ///////////////////////////////////////////////////////////////////////

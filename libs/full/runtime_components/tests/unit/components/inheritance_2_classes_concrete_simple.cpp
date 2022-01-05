@@ -40,7 +40,7 @@ struct A : hpx::components::component_base<A>
     {
         return test0();
     }
-    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action);
+    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action)
 
     hpx::naming::address get_current_address() const
     {
@@ -97,7 +97,7 @@ struct B
     {
         return "B";
     }
-    HPX_DEFINE_COMPONENT_ACTION(B, test1, test1_action);
+    HPX_DEFINE_COMPONENT_ACTION(B, test1, test1_action)
 };
 
 typedef hpx::components::component<B> serverB_type;

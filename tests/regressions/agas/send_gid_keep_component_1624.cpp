@@ -31,8 +31,8 @@ namespace server
 
         void update();
 
-        HPX_DEFINE_COMPONENT_ACTION(view_registry, register_view);
-        HPX_DEFINE_COMPONENT_ACTION(view_registry, update);
+        HPX_DEFINE_COMPONENT_ACTION(view_registry, register_view)
+        HPX_DEFINE_COMPONENT_ACTION(view_registry, update)
 
         std::vector<hpx::naming::id_type> registered_regions_;
     };
@@ -113,8 +113,8 @@ namespace server
                 << this->get_unmanaged_id() << std::endl;
         }
 
-        HPX_DEFINE_COMPONENT_ACTION(viewer, register_region);
-        HPX_DEFINE_COMPONENT_ACTION(viewer, update);
+        HPX_DEFINE_COMPONENT_ACTION(viewer, register_region)
+        HPX_DEFINE_COMPONENT_ACTION(viewer, update)
     };
 }
 

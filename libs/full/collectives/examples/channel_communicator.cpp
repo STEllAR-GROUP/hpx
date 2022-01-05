@@ -84,6 +84,8 @@ int main(int argc, char* argv[])
     params.cfg = {"--hpx:run-hpx-main"};
     return hpx::init(argc, argv, params);
 #else
+    (void) argc;
+    (void) argv;
     return 0;
 #endif
 }

@@ -168,14 +168,13 @@ namespace hpx { namespace agas { namespace server {
         std::uint32_t get_num_overall_threads();
 
     public:
-        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, allocate);
-        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, free);
-        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, localities);
-        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, resolve_locality);
-        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, get_num_localities);
-        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, get_num_threads);
-        HPX_DEFINE_COMPONENT_ACTION(
-            locality_namespace, get_num_overall_threads);
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, allocate)
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, free)
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, localities)
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, resolve_locality)
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, get_num_localities)
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, get_num_threads)
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, get_num_overall_threads)
     };
 
 }}}    // namespace hpx::agas::server

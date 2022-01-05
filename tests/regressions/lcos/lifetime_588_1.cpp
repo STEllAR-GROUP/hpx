@@ -37,7 +37,7 @@ struct foo
 
     int bar() { return 42; }
 
-    HPX_DEFINE_COMPONENT_ACTION(foo, bar, bar_action);
+    HPX_DEFINE_COMPONENT_ACTION(foo, bar, bar_action)
 };
 
 HPX_REGISTER_ACTION(foo::bar_action, foo_bar_action)

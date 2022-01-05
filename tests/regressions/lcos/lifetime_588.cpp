@@ -27,7 +27,7 @@ struct test_server
 
     hpx::id_type create_new(hpx::id_type const& id) const;
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, create_new, create_new_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, create_new, create_new_action)
 };
 
 typedef hpx::components::component<test_server> server_type;

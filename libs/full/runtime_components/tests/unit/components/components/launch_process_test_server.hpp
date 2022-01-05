@@ -28,14 +28,14 @@ namespace launch_process {
             return msg_;
         }
         HPX_DEFINE_COMPONENT_ACTION(
-            test_server, get_message, get_message_action);
+            test_server, get_message, get_message_action)
 
         void set_message(std::string const& msg)
         {
             msg_ = msg;
         }
         HPX_DEFINE_COMPONENT_ACTION(
-            test_server, set_message, set_message_action);
+            test_server, set_message, set_message_action)
 
         std::string msg_;
     };

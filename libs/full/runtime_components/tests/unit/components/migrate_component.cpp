@@ -32,7 +32,7 @@ struct dummy_server : hpx::components::component_base<dummy_server>
         return hpx::find_here();
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(dummy_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(dummy_server, call)
 };
 
 typedef hpx::components::component<dummy_server> dummy_server_type;
@@ -164,16 +164,16 @@ struct test_server
         return *this;
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action);
-    HPX_DEFINE_COMPONENT_ACTION(test_server, busy_work, busy_work_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action)
+    HPX_DEFINE_COMPONENT_ACTION(test_server, busy_work, busy_work_action)
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server, lazy_busy_work, lazy_busy_work_action);
+        test_server, lazy_busy_work, lazy_busy_work_action)
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, get_data, get_data_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, get_data, get_data_action)
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server, lazy_get_data, lazy_get_data_action);
+        test_server, lazy_get_data, lazy_get_data_action)
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server, lazy_get_client, lazy_get_client_action);
+        test_server, lazy_get_client, lazy_get_client_action)
 
     template <typename Archive>
     void serialize(Archive& ar, unsigned)

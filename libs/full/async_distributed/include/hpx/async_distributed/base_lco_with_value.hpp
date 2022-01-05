@@ -166,12 +166,12 @@ namespace hpx { namespace lcos {
         /// \param RemoteResult [in] The type of the result to be transferred
         ///               back to this LCO instance.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco_with_value, set_value_nonvirt, set_value_action);
+            base_lco_with_value, set_value_nonvirt, set_value_action)
 
         /// The \a get_value_action may be used to query the value this LCO
         /// instance exposes as its 'result' value.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco_with_value, get_value_nonvirt, get_value_action);
+            base_lco_with_value, get_value_nonvirt, get_value_action)
     };
 
     /// The base_lco<void> specialization is used whenever the set_event action
@@ -207,7 +207,7 @@ namespace hpx { namespace lcos {
         void get_value() {}
 
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco_with_value, get_value, get_value_action);
+            base_lco_with_value, get_value, get_value_action)
     };
 }}    // namespace hpx::lcos
 

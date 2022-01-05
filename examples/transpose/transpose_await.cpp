@@ -142,7 +142,7 @@ struct block_component : hpx::components::component_base<block_component>
         return sub_block(&data_[offset], size);
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(block_component, get_sub_block);
+    HPX_DEFINE_COMPONENT_ACTION(block_component, get_sub_block)
 
     std::vector<double> data_;
 };

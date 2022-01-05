@@ -151,11 +151,11 @@ namespace hpx { namespace agas { namespace server {
         bool on_event(std::string const& name, bool call_for_past_events,
             hpx::id_type lco);
 
-        HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, bind);
-        HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, resolve);
-        HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, unbind);
-        HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, iterate);
-        HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, on_event);
+        HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, bind)
+        HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, resolve)
+        HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, unbind)
+        HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, iterate)
+        HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, on_event)
     };
 
 }}}    // namespace hpx::agas::server

@@ -168,9 +168,9 @@ namespace examples { namespace server {
         // serialization, etc.
 
         //[simple_central_tuplespace_action_types
-        HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, write);
-        HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, read);
-        HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, take);
+        HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, write)
+        HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, read)
+        HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, take)
         //]
 
         //[simple_central_tuplespace_server_data_member

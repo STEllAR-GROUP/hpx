@@ -20,7 +20,7 @@ struct test_server : hpx::components::component_base<test_server>
 {
     hpx::id_type call() const { return hpx::find_here(); }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action)
 };
 
 typedef hpx::components::component<test_server> server_type;

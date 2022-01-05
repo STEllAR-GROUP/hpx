@@ -40,7 +40,7 @@ struct A : hpx::components::abstract_managed_component_base<A>
     {
         return test0();
     }
-    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action);
+    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action)
 };
 
 HPX_REGISTER_COMPONENT_HEAP(hpx::components::managed_component<A>)
@@ -80,7 +80,7 @@ struct B
     {
         return "B";
     }
-    HPX_DEFINE_COMPONENT_ACTION(B, test1, test1_action);
+    HPX_DEFINE_COMPONENT_ACTION(B, test1, test1_action)
 };
 
 typedef hpx::components::managed_component<B> serverB_type;

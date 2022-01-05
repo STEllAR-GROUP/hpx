@@ -35,7 +35,7 @@ namespace startup_shutdown { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(startup_shutdown_component, init);
+        HPX_DEFINE_COMPONENT_ACTION(startup_shutdown_component, init)
 
     private:
         std::string arg_;

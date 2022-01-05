@@ -36,8 +36,8 @@ namespace interpolate1d { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(partition, init);
-        HPX_DEFINE_COMPONENT_ACTION(partition, interpolate);
+        HPX_DEFINE_COMPONENT_ACTION(partition, init)
+        HPX_DEFINE_COMPONENT_ACTION(partition, interpolate)
 
     private:
         static mutex_type mtx_;     // one for whole application

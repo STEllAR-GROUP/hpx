@@ -249,31 +249,31 @@ namespace hpx { namespace server {
         void clear();
 
         /// Macros to define HPX component actions for all exported functions.
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, size);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, size)
 
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, max_size);
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, max_size)
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, resize);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, resize)
 
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, capacity);
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, empty);
-        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, reserve);
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, capacity)
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, empty)
+        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, reserve)
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_value);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_values);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_value)
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_values)
 
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, front);
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, back);
-        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, assign);
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, push_back);
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, pop_back);
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, front)
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, back)
+        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, assign)
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, push_back)
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, pop_back)
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_value);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_values);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_value)
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_values)
 
-        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, clear);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_copied_data);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_data);
+        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, clear)
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_copied_data)
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_data)
     };
 }}    // namespace hpx::server
 

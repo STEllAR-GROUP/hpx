@@ -95,10 +95,10 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(random_mem_access, init);
-        HPX_DEFINE_COMPONENT_ACTION(random_mem_access, add);
-        HPX_DEFINE_COMPONENT_ACTION(random_mem_access, query);
-        HPX_DEFINE_COMPONENT_ACTION(random_mem_access, print);
+        HPX_DEFINE_COMPONENT_ACTION(random_mem_access, init)
+        HPX_DEFINE_COMPONENT_ACTION(random_mem_access, add)
+        HPX_DEFINE_COMPONENT_ACTION(random_mem_access, query)
+        HPX_DEFINE_COMPONENT_ACTION(random_mem_access, print)
 
     private:
         std::size_t arg_;

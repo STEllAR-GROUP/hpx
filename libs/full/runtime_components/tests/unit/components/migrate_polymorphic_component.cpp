@@ -37,7 +37,7 @@ struct test_server_base
     {
         return hpx::find_here();
     }
-    HPX_DEFINE_COMPONENT_ACTION(test_server_base, call, call_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server_base, call, call_action)
 
     void busy_work() const
     {
@@ -45,7 +45,7 @@ struct test_server_base
         hpx::this_thread::sleep_for(std::chrono::seconds(1));
         HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
     }
-    HPX_DEFINE_COMPONENT_ACTION(test_server_base, busy_work, busy_work_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server_base, busy_work, busy_work_action)
 
     hpx::future<void> lazy_busy_work() const
     {
@@ -60,7 +60,7 @@ struct test_server_base
         });
     }
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server_base, lazy_busy_work, lazy_busy_work_action);
+        test_server_base, lazy_busy_work, lazy_busy_work_action)
 
     int get_base_data() const
     {
@@ -68,7 +68,7 @@ struct test_server_base
         return base_data_;
     }
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server_base, get_base_data, get_base_data_action);
+        test_server_base, get_base_data, get_base_data_action)
 
     hpx::future<int> lazy_get_base_data() const
     {
@@ -84,7 +84,7 @@ struct test_server_base
         });
     }
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server_base, lazy_get_base_data, lazy_get_base_data_action);
+        test_server_base, lazy_get_base_data, lazy_get_base_data_action)
 
     virtual int get_data() const
     {
@@ -95,7 +95,7 @@ struct test_server_base
         return get_data();
     }
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server_base, get_data_nonvirt, get_data_action);
+        test_server_base, get_data_nonvirt, get_data_action)
 
     virtual hpx::future<int> lazy_get_data() const
     {
@@ -106,7 +106,7 @@ struct test_server_base
         return lazy_get_data();
     }
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server_base, lazy_get_data_nonvirt, lazy_get_data_action);
+        test_server_base, lazy_get_data_nonvirt, lazy_get_data_action)
 
     // Components which should be migrated using hpx::migrate<> need to
     // be Serializable and CopyConstructable. Components can be

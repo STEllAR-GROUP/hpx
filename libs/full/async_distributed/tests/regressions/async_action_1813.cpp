@@ -35,7 +35,7 @@ struct get_locality_server
         return hpx::find_here();
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(get_locality_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(get_locality_server, call)
 };
 
 typedef hpx::components::component<get_locality_server> server_type;

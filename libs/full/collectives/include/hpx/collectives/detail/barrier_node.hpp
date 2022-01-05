@@ -56,7 +56,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         hpx::future<void> wait(bool async);
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(barrier_node, gather);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(barrier_node, gather)
 
     private:
         hpx::util::atomic_count count_;

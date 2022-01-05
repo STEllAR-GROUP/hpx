@@ -38,7 +38,7 @@ struct A : hpx::components::abstract_component_base<A>
     {
         print();
     }
-    HPX_DEFINE_COMPONENT_ACTION(A, print_nonvirt, print_action);
+    HPX_DEFINE_COMPONENT_ACTION(A, print_nonvirt, print_action)
 
     // Overload this function to allow to extract the proper base address
     // of the component that is used as part of the generated global id.

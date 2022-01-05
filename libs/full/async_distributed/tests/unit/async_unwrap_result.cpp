@@ -29,7 +29,7 @@ struct decrement_server
         return hpx::make_ready_future(i - 1);
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(decrement_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(decrement_server, call)
 };
 
 typedef hpx::components::managed_component<decrement_server> server_type;
@@ -46,14 +46,14 @@ struct test_server : hpx::components::component_base<test_server>
     {
         return hpx::make_ready_future(i + 1);
     }
-    HPX_DEFINE_COMPONENT_ACTION(test_server, increment);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, increment)
 
     hpx::future<std::int32_t> increment_with_future(
         hpx::shared_future<std::int32_t> fi)
     {
         return hpx::make_ready_future(fi.get() + 1);
     }
-    HPX_DEFINE_COMPONENT_ACTION(test_server, increment_with_future);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, increment_with_future)
 };
 
 typedef hpx::components::component<test_server> test_server_type;

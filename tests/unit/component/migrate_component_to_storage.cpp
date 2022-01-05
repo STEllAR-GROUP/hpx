@@ -43,7 +43,7 @@ struct test_server
         return hpx::find_here();
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action)
 
     template <typename Archive>
     void serialize(Archive&, unsigned)

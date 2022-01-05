@@ -131,7 +131,7 @@ namespace jacobi { namespace server {
                       << hpx::flush;
         }
 
-        HPX_DEFINE_COMPONENT_ACTION(solver, run, run_action);
+        HPX_DEFINE_COMPONENT_ACTION(solver, run, run_action)
 
         std::size_t ny;
         std::size_t nx;

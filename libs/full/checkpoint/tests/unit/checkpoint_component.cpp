@@ -42,7 +42,7 @@ struct data_server : hpx::components::component_base<data_server>
     {
         return data_;
     }
-    HPX_DEFINE_COMPONENT_ACTION(data_server, get_data, get_data_action);
+    HPX_DEFINE_COMPONENT_ACTION(data_server, get_data, get_data_action)
 
     void print()
     {
@@ -56,7 +56,7 @@ struct data_server : hpx::components::component_base<data_server>
         }
         std::cout << std::endl;
     }
-    HPX_DEFINE_COMPONENT_ACTION(data_server, print, print_action);
+    HPX_DEFINE_COMPONENT_ACTION(data_server, print, print_action)
 
     std::vector<int> data_;
 

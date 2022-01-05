@@ -137,7 +137,7 @@ namespace hpx { namespace lcos { namespace server {
         {
             latch_.wait();
         }
-        HPX_DEFINE_COMPONENT_ACTION(latch, wait, wait_action);
+        HPX_DEFINE_COMPONENT_ACTION(latch, wait, wait_action)
 
     private:
         lcos::local::latch latch_;

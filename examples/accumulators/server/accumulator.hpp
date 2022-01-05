@@ -87,9 +87,9 @@ namespace examples { namespace server
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
         //[accumulator_action_types
-        HPX_DEFINE_COMPONENT_ACTION(accumulator, reset);
-        HPX_DEFINE_COMPONENT_ACTION(accumulator, add);
-        HPX_DEFINE_COMPONENT_ACTION(accumulator, query);
+        HPX_DEFINE_COMPONENT_ACTION(accumulator, reset)
+        HPX_DEFINE_COMPONENT_ACTION(accumulator, add)
+        HPX_DEFINE_COMPONENT_ACTION(accumulator, query)
         //]
 
     private:
