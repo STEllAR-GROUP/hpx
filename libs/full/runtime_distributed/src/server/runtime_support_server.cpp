@@ -22,15 +22,14 @@
 #include <hpx/futures/packaged_task.hpp>
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#include <hpx/modules/collectives.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/plugins/binary_filter_factory_base.hpp>
-#include <hpx/plugins/message_handler_factory_base.hpp>
+#include <hpx/plugin_factories/binary_filter_factory_base.hpp>
+#include <hpx/plugin_factories/message_handler_factory_base.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_configuration/component_commandline_base.hpp>
@@ -200,31 +199,23 @@ namespace hpx { namespace components { namespace server {
 }}}    // namespace hpx::components::server
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-typedef hpx::components::server::runtime_support::call_shutdown_functions_action
-    call_shutdown_functions_action;
-typedef hpx::lcos::detail::make_broadcast_action<
-    call_shutdown_functions_action>::type
-    call_shutdown_functions_broadcast_action;
-#endif
-
-HPX_ACTION_USES_MEDIUM_STACK(call_shutdown_functions_broadcast_action)
-
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(
-    call_shutdown_functions_action, call_shutdown_functions_action)
-HPX_REGISTER_BROADCAST_ACTION_ID(call_shutdown_functions_action,
-    call_shutdown_functions_action,
-    hpx::actions::broadcast_call_shutdown_functions_action_id)
-
 namespace hpx { namespace components { namespace server {
-    ///////////////////////////////////////////////////////////////////////////
+
     // initiate system shutdown for all localities
     void invoke_shutdown_functions(
         std::vector<naming::id_type> const& localities, bool pre_shutdown)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        call_shutdown_functions_action act;
-        lcos::broadcast(act, localities, pre_shutdown).get();
+        std::vector<hpx::future<void>> results;
+        results.reserve(localities.size());
+        for (auto const& l : localities)
+        {
+            using call_shutdown_functions_action = hpx::components::server::
+                runtime_support::call_shutdown_functions_action;
+            results.push_back(
+                hpx::async(call_shutdown_functions_action(), l, pre_shutdown));
+        }
+        hpx::wait_all(results);
 #else
         HPX_ASSERT(false);
         HPX_UNUSED(localities);
@@ -852,7 +843,6 @@ namespace hpx { namespace components { namespace server {
                     rt.report_error(std::current_exception());
                 }
             }
-            lcos::barrier::get_global_barrier().detach();
         }
     }
 

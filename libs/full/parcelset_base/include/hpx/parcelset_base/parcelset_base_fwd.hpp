@@ -13,6 +13,7 @@
 
 namespace hpx::parcelset {
 
+    class HPX_EXPORT parcelport;
     class HPX_EXPORT locality;
     class HPX_EXPORT parcel;
 
@@ -25,4 +26,18 @@ namespace hpx::parcelset {
     ///       specified for the parcel.
     using parcel_write_handler_type = util::function_nonser<void(
         std::error_code const&, parcelset::parcel const&)>;
+
+    ////////////////////////////////////////////////////////////////////////
+    /// Type of background work to perform
+    enum parcelport_background_mode
+    {
+        /// perform buffer flush operations
+        parcelport_background_mode_flush_buffers = 0x01,
+        /// perform send operations (includes buffer flush)
+        parcelport_background_mode_send = 0x03,
+        /// perform receive operations
+        parcelport_background_mode_receive = 0x04,
+        /// perform all operations
+        parcelport_background_mode_all = 0x07
+    };
 }    // namespace hpx::parcelset

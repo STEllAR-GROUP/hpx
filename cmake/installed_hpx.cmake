@@ -135,13 +135,10 @@ if(HPX_WITH_TESTS)
   endif()
 
   # add actual tests, first iterate through all modules
-  foreach(lib ${HPX_LIBS})
-    string(TOUPPER ${lib} lib_upper)
-    foreach(module ${HPX_${lib_upper}_ENABLED_MODULES})
-      if(EXISTS ${PROJECT_SOURCE_DIR}/libs/${lib}/${module}/tests)
-        add_subdirectory(libs/${lib}/${module}/tests)
-      endif()
-    endforeach()
+  foreach(module ${HPX_FULL_ENABLED_MODULES})
+    if(EXISTS ${PROJECT_SOURCE_DIR}/libs/full/${module}/tests)
+      add_subdirectory(libs/full/${module}/tests)
+    endif()
   endforeach()
 
   # then main tests directory

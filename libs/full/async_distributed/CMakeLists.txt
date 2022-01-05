@@ -120,6 +120,15 @@ add_hpx_module(
   HEADERS ${async_headers}
   COMPAT_HEADERS ${async_compat_headers}
   DEPENDENCIES HPX::hpx_local
-  MODULE_DEPENDENCIES hpx_actions hpx_config hpx_naming hpx_parcelset
+  MODULE_DEPENDENCIES
+    hpx_actions
+    hpx_actions_base
+    hpx_components
+    hpx_components_base
+    hpx_config
+    hpx_naming
+    hpx_naming_base
+    hpx_parcelset
+    hpx_parcelset_base
   CMAKE_SUBDIRS examples tests
 )

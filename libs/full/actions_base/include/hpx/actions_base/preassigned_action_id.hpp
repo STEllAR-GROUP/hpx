@@ -25,7 +25,6 @@ namespace hpx { namespace actions {
         base_disconnect_action_id,
         base_set_event_action_id,
         base_set_exception_action_id,
-        broadcast_call_shutdown_functions_action_id,
         broadcast_call_startup_functions_action_id,
         broadcast_symbol_namespace_on_event_action_id,
         call_shutdown_functions_action_id,

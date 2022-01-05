@@ -66,12 +66,12 @@ add_hpx_module(
   COMPAT_HEADERS ${agas_base_compat_headers}
   DEPENDENCIES HPX::hpx_local
   MODULE_DEPENDENCIES
-    hpx_async_colocated
-    hpx_async_distributed
-    hpx_collectives
-    hpx_config
     hpx_actions
+    hpx_actions_base
+    hpx_async_distributed
     hpx_components_base
+    hpx_config
+    hpx_naming
     hpx_naming_base
     hpx_parcelset_base
   CMAKE_SUBDIRS examples tests

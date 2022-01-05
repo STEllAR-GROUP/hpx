@@ -7,10 +7,6 @@
 
 set(subdirs build lcos util actions component)
 
-if(HPX_WITH_NETWORKING)
-  set(subdirs ${subdirs} parcelset)
-endif()
-
 if(HPX_WITH_APEX)
   set(subdirs ${subdirs} apex)
 endif()

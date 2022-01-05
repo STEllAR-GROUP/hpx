@@ -67,7 +67,14 @@ add_hpx_module(
   HEADERS ${collectives_headers}
   COMPAT_HEADERS ${collectives_compat_headers}
   DEPENDENCIES HPX::hpx_local
-  MODULE_DEPENDENCIES hpx_actions hpx_async_colocated hpx_async_distributed
-                      hpx_components hpx_config hpx_runtime_components
+  MODULE_DEPENDENCIES
+    hpx_actions
+    hpx_actions_base
+    hpx_async_distributed
+    hpx_components
+    hpx_components_base
+    hpx_config
+    hpx_naming_base
+    hpx_runtime_distributed
   CMAKE_SUBDIRS examples tests
 )

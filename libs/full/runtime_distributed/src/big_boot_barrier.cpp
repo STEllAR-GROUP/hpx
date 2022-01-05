@@ -23,8 +23,8 @@
 #include <hpx/modules/agas_base.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/parcelset/detail/parcel_await.hpp>
-#include <hpx/parcelset/parcelport.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
+#include <hpx/parcelset_base/parcelport.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/big_boot_barrier.hpp>

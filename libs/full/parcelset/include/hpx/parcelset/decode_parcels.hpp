@@ -20,7 +20,7 @@
 
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset/detail/data_point.hpp>
+#include <hpx/parcelset_base/detail/data_point.hpp>
 #include <hpx/parcelset_base/detail/parcel_route_handler.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
 

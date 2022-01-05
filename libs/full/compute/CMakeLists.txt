@@ -55,5 +55,6 @@ add_hpx_module(
     hpx_performance_counters
     hpx_async_distributed
     hpx_runtime_components
+    hpx_runtime_distributed
   CMAKE_SUBDIRS examples tests
 )

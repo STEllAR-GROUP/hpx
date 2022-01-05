@@ -36,8 +36,7 @@
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset/static_parcelports.hpp>
 #include <hpx/parcelset_base/policies/message_handler.hpp>
-
-#include <hpx/plugins/parcelport_factory_base.hpp>
+#include <hpx/plugin_factories/parcelport_factory_base.hpp>
 
 #include <asio/error.hpp>
 
@@ -1187,32 +1186,12 @@ namespace hpx::parcelset {
     std::vector<plugins::parcelport_factory_base*>&
     parcelhandler::get_parcelport_factories()
     {
-        static std::vector<plugins::parcelport_factory_base*> factories;
+        auto& factories = plugins::get_parcelport_factories();
         if (factories.empty() && hpx::is_networking_enabled())
         {
             init_static_parcelport_factories(factories);
         }
         return factories;
-    }
-
-    void parcelhandler::add_parcelport_factory(
-        plugins::parcelport_factory_base* factory)
-    {
-#if defined(HPX_HAVE_NETWORKING)
-        bool is_networking_enabled = hpx::get_config().enable_networking();
-#else
-        bool is_networking_enabled = false;
-#endif
-        if (is_networking_enabled)
-        {
-            auto& factories = get_parcelport_factories();
-            if (std::find(factories.begin(), factories.end(), factory) !=
-                factories.end())
-            {
-                return;
-            }
-            factories.push_back(factory);
-        }
     }
 
     void parcelhandler::init(

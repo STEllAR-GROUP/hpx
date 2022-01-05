@@ -12,4 +12,5 @@
 namespace hpx { namespace detail {
 
     HPX_EXPORT int pre_main(runtime_mode);
+    HPX_EXPORT void post_main();
 }}    // namespace hpx::detail

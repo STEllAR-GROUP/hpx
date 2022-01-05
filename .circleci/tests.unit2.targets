@@ -14,5 +14,5 @@ tests.unit.modules.performance_counters
 tests.unit.modules.resiliency_distributed
 tests.unit.modules.runtime_components
 tests.unit.modules.runtime_distributed
-tests.unit.parcelset
+tests.unit.modules.parcelset
 tests.unit.util

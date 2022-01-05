@@ -22,12 +22,11 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset/parcelport.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
-
-#include <hpx/plugins/parcelport_factory_base.hpp>
+#include <hpx/parcelset_base/parcelport.hpp>
+#include <hpx/plugin_factories/parcelport_factory_base.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -443,8 +442,6 @@ namespace hpx::parcelset {
 
         static std::vector<plugins::parcelport_factory_base*>&
         get_parcelport_factories();
-
-        static void add_parcelport_factory(plugins::parcelport_factory_base*);
 
         static void init(
             int* argc, char*** argv, util::command_line_handling& cfg);

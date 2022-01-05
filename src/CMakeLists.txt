@@ -33,33 +33,6 @@ endif()
 
 # List all headers (local and distributed)
 set(hpx_HEADERS)
-
-set(hpx_HEADERS
-    hpx/plugins/binary_filter_factory_base.hpp
-    hpx/plugins/binary_filter_factory.hpp
-    hpx/plugins/message_handler_factory_base.hpp
-    hpx/plugins/message_handler_factory.hpp
-    hpx/plugins/parcel/coalescing_counter_registry.hpp
-    hpx/plugins/parcel/coalescing_message_handler.hpp
-    hpx/plugins/parcel/coalescing_message_handler_registration.hpp
-    hpx/plugins/parcel/message_buffer.hpp
-    hpx/plugins/parcelport_factory_base.hpp
-    hpx/plugins/parcelport_factory.hpp
-    hpx/plugins/parcelport/mpi/header.hpp
-    hpx/plugins/parcelport/mpi/locality.hpp
-    hpx/plugins/parcelport/mpi/receiver_connection.hpp
-    hpx/plugins/parcelport/mpi/receiver.hpp
-    hpx/plugins/parcelport/mpi/sender_connection.hpp
-    hpx/plugins/parcelport/mpi/sender.hpp
-    hpx/plugins/parcelport/mpi/tag_provider.hpp
-    hpx/plugins/parcelport/tcp/connection_handler.hpp
-    hpx/plugins/parcelport/tcp/locality.hpp
-    hpx/plugins/parcelport/tcp/receiver.hpp
-    hpx/plugins/parcelport/tcp/sender.hpp
-    hpx/plugins/plugin_factory_base.hpp
-    hpx/plugins/plugin_registry.hpp
-    hpx/plugins/unique_plugin_name.hpp
-)
 list(TRANSFORM hpx_HEADERS PREPEND ${PROJECT_SOURCE_DIR}/)
 
 foreach(lib "hpx" "hpx_external" "hpx_generated")
@@ -95,13 +68,6 @@ add_hpx_source_group(
   TARGETS ${hpx_external_SOURCES}
 )
 
-add_hpx_source_group(
-  NAME hpx
-  CLASS "Header Files"
-  ROOT "${PROJECT_SOURCE_DIR}/hpx"
-  TARGETS ${hpx_HEADERS}
-)
-
 if(NOT HPX_WITH_STATIC_LINKING)
   if(MSVC)
     # The MSVC linker can't handle a static library as large as we get when
@@ -118,10 +84,6 @@ add_library(
   hpx_full ${hpx_library_link_mode_core} ${hpx_SOURCES} ${hpx_external_SOURCES}
            ${hpx_external_OBJECTS} ${hpx_HEADERS}
 )
-
-if(HPX_WITH_UNITY_BUILD)
-  set_target_properties(hpx_full PROPERTIES UNITY_BUILD ON)
-endif()
 
 if(HPX_WITH_PRECOMPILED_HEADERS)
   target_precompile_headers(hpx_full REUSE_FROM hpx_precompiled_headers)

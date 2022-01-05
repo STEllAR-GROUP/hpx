@@ -53,11 +53,6 @@ set(MODULE_ENABLED_MODULE_DEFINES)
 set(CONFIG_STRINGS_MODULES_INCLUDES)
 set(CONFIG_STRINGS_MODULES_ENTRIES)
 
-set(HPX_LIBS
-    full
-    CACHE INTERNAL "List of HPX libraries" FORCE
-)
-
 add_subdirectory(full)
 
 # add_hpx_module populates HPX_ENABLED_MODULES

@@ -88,14 +88,18 @@ add_hpx_module(
   DEPENDENCIES HPX::hpx_local
   MODULE_DEPENDENCIES
     hpx_actions
+    hpx_actions_base
     hpx_agas
-    hpx_async_colocated
+    hpx_agas_base
     hpx_async_distributed
+    hpx_components
+    hpx_components_base
     hpx_config
     hpx_naming
+    hpx_naming_base
     hpx_parcelset
     hpx_runtime_components
-    hpx_runtime_distributed
     hpx_statistics
+    hpx_version
   CMAKE_SUBDIRS examples tests
 )

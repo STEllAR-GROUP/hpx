@@ -1,15 +1,16 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/modules/actions.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 
-#include <hpx/plugins/plugin_registry.hpp>
-#include <hpx/plugins/binary_filter_factory.hpp>
+#include <hpx/modules/actions.hpp>
+#include <hpx/plugin_factories/binary_filter_factory.hpp>
+#include <hpx/plugin_factories/plugin_registry.hpp>
 #include <hpx/plugins/binary_filter/zlib_serialization_filter.hpp>
 
 #include <cstddef>
@@ -22,13 +23,13 @@ HPX_REGISTER_BINARY_FILTER_FACTORY(
     zlib_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace plugins { namespace compression
-{
-    namespace detail
-    {
-        zlib_compdecomp::zlib_compdecomp(bool compress,
-                boost::iostreams::zlib_params const& params)
-          : compress_(compress), eof_(false)
+namespace hpx::plugins::compression {
+
+    namespace detail {
+        zlib_compdecomp::zlib_compdecomp(
+            bool compress, boost::iostreams::zlib_params const& params)
+          : compress_(compress)
+          , eof_(false)
         {
             this->init(params, compress_, static_cast<allocator_type&>(*this));
         }
@@ -69,7 +70,7 @@ namespace hpx { namespace plugins { namespace compression
             eof_ = false;
             this->reset(compress_, true);
         }
-    }
+    }    // namespace detail
 
     void zlib_serialization_filter::set_max_length(std::size_t size)
     {
@@ -82,9 +83,9 @@ namespace hpx { namespace plugins { namespace compression
     {
         char const* src_begin = static_cast<char const*>(src);
         char* dst_begin = static_cast<char*>(dst);
-        compdecomp_.load(src_begin, src_begin+src_count, dst_begin,
-            dst_begin+dst_count);
-        return src_begin-static_cast<char const*>(src);
+        compdecomp_.load(
+            src_begin, src_begin + src_count, dst_begin, dst_begin + dst_count);
+        return src_begin - static_cast<char const*>(src);
     }
 
     std::size_t zlib_serialization_filter::init_data(
@@ -96,7 +97,8 @@ namespace hpx { namespace plugins { namespace compression
         {
             HPX_THROW_EXCEPTION(serialization_error,
                 "zlib_serialization_filter::load",
-                hpx::util::format("decompression failure, number of "
+                hpx::util::format(
+                    "decompression failure, number of "
                     "bytes expected: {}, number of bytes decoded: {}",
                     size, s));
             return 0;
@@ -109,11 +111,11 @@ namespace hpx { namespace plugins { namespace compression
     ///////////////////////////////////////////////////////////////////////////
     void zlib_serialization_filter::load(void* dst, std::size_t dst_count)
     {
-        if (current_+dst_count > buffer_.size())
+        if (current_ + dst_count > buffer_.size())
         {
             HPX_THROW_EXCEPTION(serialization_error,
-                    "zlib_serialization_filter::load",
-                    "archive data bstream is too short");
+                "zlib_serialization_filter::load",
+                "archive data bstream is too short");
             return;
         }
 
@@ -122,25 +124,24 @@ namespace hpx { namespace plugins { namespace compression
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void zlib_serialization_filter::save(void const* src,
-        std::size_t src_count)
+    void zlib_serialization_filter::save(void const* src, std::size_t src_count)
     {
         char const* src_begin = static_cast<char const*>(src);
-        std::copy(src_begin, src_begin+src_count, std::back_inserter(buffer_));
+        std::copy(
+            src_begin, src_begin + src_count, std::back_inserter(buffer_));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool zlib_serialization_filter::flush(void* dst,
-        std::size_t dst_count, std::size_t& written)
+    bool zlib_serialization_filter::flush(
+        void* dst, std::size_t dst_count, std::size_t& written)
     {
         // compress everything in one go
         char* dst_begin = static_cast<char*>(dst);
         char const* src_begin = buffer_.data();
-        bool eof = compdecomp_.save(src_begin, src_begin+buffer_.size(),
-                dst_begin, dst_begin+dst_count, true);
+        bool eof = compdecomp_.save(src_begin, src_begin + buffer_.size(),
+            dst_begin, dst_begin + dst_count, true);
 
-        written = dst_begin-static_cast<char*>(dst);
+        written = dst_begin - static_cast<char*>(dst);
         return !eof;
     }
-}}}
-
+}    // namespace hpx::plugins::compression

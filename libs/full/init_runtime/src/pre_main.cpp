@@ -233,4 +233,10 @@ namespace hpx { namespace detail {
 
         return 0;
     }
+
+    void post_main()
+    {
+        // simply destroy global barrier
+        hpx::lcos::barrier::get_global_barrier().detach();
+    }
 }}    // namespace hpx::detail

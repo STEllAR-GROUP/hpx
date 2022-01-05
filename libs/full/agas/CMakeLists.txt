@@ -29,7 +29,15 @@ add_hpx_module(
   HEADERS ${agas_headers}
   COMPAT_HEADERS ${agas_compat_headers}
   DEPENDENCIES HPX::hpx_local
-  MODULE_DEPENDENCIES hpx_agas_base hpx_async_distributed hpx_config hpx_naming
-                      hpx_components hpx_parcelset
+  MODULE_DEPENDENCIES
+    hpx_actions_base
+    hpx_agas_base
+    hpx_async_distributed
+    hpx_components_base
+    hpx_config
+    hpx_naming
+    hpx_naming_base
+    hpx_parcelset
+    hpx_parcelset_base
   CMAKE_SUBDIRS examples tests
 )

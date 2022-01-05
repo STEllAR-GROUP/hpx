@@ -13,8 +13,8 @@
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
-#include <hpx/parcelset/parcelport.hpp>
 #include <hpx/parcelset_base/locality.hpp>
+#include <hpx/parcelset_base/parcelport.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime_components/server/console_error_sink_singleton.hpp>
@@ -51,7 +51,8 @@ namespace hpx {
         /// \param locality_mode  [in] This is the mode the given runtime
         ///                       instance should be executed in.
         explicit runtime_distributed(util::runtime_configuration& rtcfg,
-            int (*pre_main)(runtime_mode) = nullptr);
+            int (*pre_main)(runtime_mode) = nullptr,
+            void (*post_main)() = nullptr);
 
         /// \brief The destructor makes sure all HPX runtime services are
         ///        properly shut down before exiting.
@@ -407,6 +408,7 @@ namespace hpx {
         std::shared_ptr<util::query_counters> active_counters_;
 
         int (*pre_main_)(runtime_mode);
+        void (*post_main_)();
     };
 }    // namespace hpx
 
