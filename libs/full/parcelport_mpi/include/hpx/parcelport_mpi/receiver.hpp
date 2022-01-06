@@ -146,6 +146,7 @@ namespace hpx::parcelset::policies::mpi {
             int completed = 0;
             int ret = MPI_Test(&r, &completed, status);
             HPX_ASSERT(ret == MPI_SUCCESS);
+            (void) ret;
             if (completed)
             {
                 return true;

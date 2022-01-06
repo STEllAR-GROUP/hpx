@@ -1,8 +1,10 @@
-# Copyright (c) 2015-2019 Hartmut Kaiser
+# Copyright (c) 2015-2021 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+include(HPXLocal_SetupMPI)
 
 # These files can't be included at the same time.
 set(exclude_from_all_headers)
@@ -12,6 +14,7 @@ set(exclude_from_all_headers)
 set(exclude_from_headers)
 
 if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
+  hpx_local_setup_mpi()
   set(test_deps Mpi::mpi)
 endif()
 

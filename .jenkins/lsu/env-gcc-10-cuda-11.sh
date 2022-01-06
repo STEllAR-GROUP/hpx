@@ -6,18 +6,19 @@
 
 module purge
 module load cmake
-module load gcc/8
-module load boost/1.73.0-${build_type,,}
+module load gcc/10
+module load boost/1.75.0-${build_type,,}
 module load hwloc
+module load cuda/11.5
 module load openmpi
 
-export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="17"
 
 configure_extra_options+=" -DHPXLocal_WITH_CXX${CXX_STD}=ON"
 configure_extra_options+=" -DHPXLocal_WITH_MALLOC=system"
-configure_extra_options+=" -DHPXLocal_WITH_ASIO_TAG=asio-1-12-0"
-configure_extra_options+=" -DHPXLocal_WITH_ASYNC_MPI=ON"
+configure_extra_options+=" -DHPXLocal_WITH_CUDA=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
-configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
-configure_extra_options+=" -DHPX_WITH_PARCELPORT_MPI=ON"
+configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=OFF"
+configure_extra_options+=" -DHPX_WITH_NETWORKING=OFF"
+configure_extra_options+=" -DHPX_WITH_TESTS_HEADERS=ON"
+configure_extra_options+=" -DCMAKE_CUDA_ARCHITECTURES='37;70'"

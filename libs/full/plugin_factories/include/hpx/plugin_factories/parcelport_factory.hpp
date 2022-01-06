@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
@@ -171,3 +172,5 @@ namespace hpx::plugins {
 #define HPX_REGISTER_PARCELPORT(Parcelport, pluginname)                        \
     HPX_REGISTER_PARCELPORT_(                                                  \
         Parcelport, HPX_PP_CAT(parcelport_, pluginname), pluginname)
+
+#endif
