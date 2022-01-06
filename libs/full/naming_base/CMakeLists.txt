@@ -4,6 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 # Default location is $HPX_ROOT/libs/naming_base/include
 set(naming_base_headers
     hpx/naming_base/address.hpp hpx/naming_base/gid_type.hpp
@@ -28,7 +32,6 @@ add_hpx_module(
   HEADERS ${naming_base_headers}
   COMPAT_HEADERS ${naming_base_compat_headers}
   SOURCES ${naming_base_sources}
-  MODULE_DEPENDENCIES hpx_config
-  DEPENDENCIES HPX::hpx_local
+  DEPENDENCIES hpx_core
   CMAKE_SUBDIRS examples tests
 )

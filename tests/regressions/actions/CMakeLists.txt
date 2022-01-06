@@ -4,6 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 add_subdirectory(components)
 
 set(tests component_action_move_semantics make_continuation_1615
@@ -33,7 +37,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Full/Actions"
+    FOLDER "Tests/Regressions/Actions"
   )
 
   add_hpx_regression_test("actions" ${test} ${${test}_PARAMETERS})

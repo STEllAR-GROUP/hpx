@@ -9,11 +9,8 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/coroutines/detail/context_impl.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/executors/exception_list.hpp>
@@ -25,29 +22,21 @@
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/init_runtime/detail/run_or_start.hpp>
-#include <hpx/init_runtime/pre_main.hpp>
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
-#include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/modules/naming.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
-#include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/variables_map.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime_distributed.hpp>
-#include <hpx/runtime_distributed/find_localities.hpp>
-#include <hpx/runtime_distributed/runtime_fwd.hpp>
-#include <hpx/runtime_distributed/runtime_support.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/debugging.hpp>
@@ -66,10 +55,24 @@
 #include <hpx/type_support/pack.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/version.hpp>
 
 #ifdef HPX_HAVE_MODULE_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
+#endif
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/actions_base/plain_action.hpp>
+#include <hpx/async_distributed/bind_action.hpp>
+#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/init_runtime/pre_main.hpp>
+#include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/naming.hpp>
+#include <hpx/parcelset/parcelhandler.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/query_counters.hpp>
+#include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_distributed/find_localities.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>
+#include <hpx/runtime_distributed/runtime_support.hpp>
 #endif
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
@@ -78,7 +81,6 @@
 
 #include <cmath>
 #include <cstddef>
-#include <cstdint>
 #include <exception>
 #include <functional>
 #include <iostream>
@@ -106,6 +108,7 @@ namespace hpx { namespace detail {
     void console_print(std::string const&);
 }}    // namespace hpx::detail
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 namespace hpx { namespace detail {
     // forward declarations only
     void list_symbolic_name(std::string const&, hpx::id_type const&);
@@ -129,6 +132,7 @@ HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
 HPX_UTIL_REGISTER_FUNCTION(
     void(std::string const&, hpx::components::component_type),
     bound_list_component_type_action, list_component_type_function)
+#endif
 
 namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
@@ -140,6 +144,7 @@ namespace hpx { namespace detail {
 
     inline void print(std::string const& name, error_code& ec = throws)
     {
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         naming::id_type console(agas::get_console_locality(ec));
         if (ec)
             return;
@@ -147,10 +152,14 @@ namespace hpx { namespace detail {
         hpx::async<console_print_action>(console, name).get(ec);
         if (ec)
             return;
+#else
+        console_print(name);
+#endif
         if (&ec != &throws)
             ec = make_success_code();
     }
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
     ///////////////////////////////////////////////////////////////////////////
     // redirect the printing of the given counter name to the console
     bool list_counter(
@@ -297,6 +306,7 @@ namespace hpx { namespace detail {
             hpx::terminate();
         }
     }
+#endif
 }}    // namespace hpx::detail
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -322,69 +332,6 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        hpx::exception_info custom_exception_info(std::string const& func,
-            std::string const& file, long line, std::string const& auxinfo)
-        {
-            std::int64_t pid = ::getpid();
-
-            std::size_t const trace_depth =
-                util::from_string<std::size_t>(get_config_entry(
-                    "hpx.trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH));
-
-            std::string back_trace(
-                hpx::detail::trace_on_new_stack(trace_depth));
-
-            std::string state_name("not running");
-            std::string hostname;
-            hpx::runtime* rt = get_runtime_ptr();
-            if (rt)
-            {
-                state rts_state = rt->get_state();
-                state_name = get_runtime_state_name(rts_state);
-
-                if (rts_state >= state_initialized && rts_state < state_stopped)
-                {
-                    hostname = get_runtime().here();
-                }
-            }
-
-            // if this is not a HPX thread we do not need to query neither for
-            // the shepherd thread nor for the thread id
-            error_code ec(lightweight);
-            std::uint32_t node = get_locality_id(ec);
-
-            std::size_t shepherd = std::size_t(-1);
-            threads::thread_id_type thread_id;
-            util::thread_description thread_name;
-
-            threads::thread_self* self = threads::get_self_ptr();
-            if (nullptr != self)
-            {
-                if (threads::threadmanager_is(state_running))
-                    shepherd = hpx::get_worker_thread_num();
-
-                thread_id = threads::get_self_id();
-                thread_name = threads::get_thread_description(thread_id);
-            }
-
-            std::string env(get_execution_environment());
-            std::string config(hpx::configuration_string());
-
-            return hpx::exception_info().set(
-                hpx::detail::throw_stacktrace(back_trace),
-                hpx::detail::throw_locality(node),
-                hpx::detail::throw_hostname(hostname),
-                hpx::detail::throw_pid(pid),
-                hpx::detail::throw_shepherd(shepherd),
-                hpx::detail::throw_thread_id(
-                    reinterpret_cast<std::size_t>(thread_id.get())),
-                hpx::detail::throw_thread_name(util::as_string(thread_name)),
-                hpx::detail::throw_function(func),
-                hpx::detail::throw_file(file), hpx::detail::throw_line(line),
-                hpx::detail::throw_env(env), hpx::detail::throw_config(config),
-                hpx::detail::throw_state(state_name),
-                hpx::detail::throw_auxinfo(auxinfo));
-        }
 
         ///////////////////////////////////////////////////////////////////////
         void activate_global_options(
@@ -435,6 +382,7 @@ namespace hpx {
         }
 
         ///////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         void handle_list_and_print_options(hpx::runtime& rt,
             hpx::program_options::variables_map& vm,
             bool print_counters_locally)
@@ -615,6 +563,7 @@ namespace hpx {
                     "--hpx:print-counter only");
             }
         }
+#endif
 
         void add_startup_functions(hpx::runtime& rt,
             hpx::program_options::variables_map& vm, runtime_mode mode,
@@ -632,12 +581,16 @@ namespace hpx {
             if (!!shutdown)
                 rt.add_shutdown_function(HPX_MOVE(shutdown));
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             // Add startup function related to listing counter names or counter
             // infos (on console only).
             bool print_counters_locally =
                 vm.count("hpx:print-counters-locally") != 0;
             if (mode == runtime_mode::console || print_counters_locally)
                 handle_list_and_print_options(rt, vm, print_counters_locally);
+#else
+            HPX_UNUSED(mode);
+#endif
 
             // Dump the configuration before all components have been loaded.
             if (vm.count("hpx:dump-config-initial"))
@@ -739,7 +692,6 @@ namespace hpx {
                 [](std::exception_ptr const& e) {
                     report_exception_and_terminate(e);
                 });
-            hpx::detail::set_get_full_build_string(&hpx::full_build_string);
 #if defined(HPX_HAVE_VERIFY_LOCKS)
             hpx::util::set_registered_locks_error_handler(
                 &detail::registered_locks_error_handler);
@@ -921,10 +873,22 @@ namespace hpx {
                 }
                 default:
                 {
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
                     LPROGRESS_ << "creating distributed runtime";
                     rt.reset(new hpx::runtime_distributed(cmdline.rtcfg_,
                         &hpx::detail::pre_main, &hpx::detail::post_main));
                     break;
+#else
+                    HPX_THROW_EXCEPTION(invalid_status, "run_or_start",
+                        "Attempted to start the runtime in the mode \"{1}\", "
+                        "but HPX was compiled with "
+                        "HPX_WITH_DISTRIBUTED_RUNTIME=OFF, and \"{1}\" "
+                        "requires HPX_WITH_DISTRIBUTED_RUNTIME=ON. "
+                        "Recompile HPX with HPX_WITH_DISTRIBUTED_RUNTIME=ON or "
+                        "change the runtime mode.",
+                        get_runtime_mode_name(cmdline.rtcfg_.mode_));
+                    break;
+#endif
                 }
                 }
 
@@ -1014,6 +978,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     int disconnect(double shutdown_timeout, double localwait, error_code& ec)
     {
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         if (!threads::get_self_ptr())
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
@@ -1064,6 +1029,11 @@ namespace hpx {
         p->call_shutdown_functions(false);
 
         p->stop(shutdown_timeout, naming::invalid_id, true);
+#else
+        HPX_UNUSED(shutdown_timeout);
+        HPX_UNUSED(localwait);
+        HPX_UNUSED(ec);
+#endif
 
         return 0;
     }
@@ -1077,6 +1047,7 @@ namespace hpx {
             std::terminate();
         }
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         components::server::runtime_support* p =
             static_cast<components::server::runtime_support*>(
                 get_runtime_distributed().get_runtime_support_lva());
@@ -1088,6 +1059,9 @@ namespace hpx {
         }
 
         p->terminate_all();
+#else
+        std::terminate();
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////

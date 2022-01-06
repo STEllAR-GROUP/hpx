@@ -31,7 +31,6 @@ add_hpx_module(
   SOURCES ${command_line_handling_sources}
   HEADERS ${command_line_handling_headers}
   COMPAT_HEADERS ${command_line_handling_compat_headers}
-  MODULE_DEPENDENCIES hpx_config hpx_version
-  DEPENDENCIES HPX::hpx_local
+  DEPENDENCIES hpx_core
   CMAKE_SUBDIRS tests
 )

@@ -41,7 +41,7 @@ add_hpx_module(
   SOURCES ${plugin_factories_sources}
   HEADERS ${plugin_factories_headers}
   COMPAT_HEADERS ${plugin_factories_compat_headers}
-  DEPENDENCIES HPX::hpx_local
+  DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES hpx_command_line_handling hpx_config hpx_parcelset_base
   CMAKE_SUBDIRS examples tests
 )

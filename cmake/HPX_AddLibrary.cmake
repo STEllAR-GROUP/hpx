@@ -222,7 +222,7 @@ function(add_hpx_library name)
     endif()
   endif()
 
-  if(HPXLocal_WITH_HIP)
+  if(HPX_WITH_HIP)
     foreach(source ${${name}_SOURCES})
       get_filename_component(extension ${source} EXT)
       if(${extension} STREQUAL ".cu")

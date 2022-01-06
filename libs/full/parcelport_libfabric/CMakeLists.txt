@@ -56,7 +56,7 @@ add_hpx_module(
   SOURCES ${parcelport_libfabric_sources}
   HEADERS ${parcelport_libfabric_headers}
   COMPAT_HEADERS ${parcelport_libfabric_compat_headers}
-  DEPENDENCIES HPX::hpx_local ${libfabric_libraries}
+  DEPENDENCIES hpx_core ${libfabric_libraries}
   MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_config
                       hpx_parcelset
   CMAKE_SUBDIRS examples tests

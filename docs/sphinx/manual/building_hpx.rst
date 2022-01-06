@@ -322,16 +322,14 @@ known to |cmake|, the following gets you started:
 
         $ cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_1.5.1
 
-   * If you want to try |hpx| without using a custom allocator pass ``-DHPXLocal_WITH_MALLOC=system`` to |cmake|:
+   * If you want to try |hpx| without using a custom allocator pass ``-DHPX_WITH_MALLOC=system`` to |cmake|:
 
     .. code-block:: shell-session
 
-        $ cmake -DCMAKE_INSTALL_PREFIX=/install/path -DHPXLocal_WITH_MALLOC=system ..
+        $ cmake -DCMAKE_INSTALL_PREFIX=/install/path -DHPX_WITH_MALLOC=system ..
 
     .. note::
-       Please pay special attention to the section about
-       :option:`HPXLocal_WITH_MALLOC:STRING` as this is crucial for getting
-       decent performance.
+       Please pay special attention to the section about :option:`HPX_WITH_MALLOC:STRING` as this is crucial for getting decent performance.
 
    .. important::
 

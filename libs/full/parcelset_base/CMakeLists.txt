@@ -52,7 +52,7 @@ add_hpx_module(
   SOURCES ${parcelset_base_sources}
   HEADERS ${parcelset_base_headers}
   COMPAT_HEADERS ${parcelset_base_compat_headers}
-  DEPENDENCIES HPX::hpx_local
+  DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES hpx_config hpx_naming_base
   CMAKE_SUBDIRS examples tests
 )

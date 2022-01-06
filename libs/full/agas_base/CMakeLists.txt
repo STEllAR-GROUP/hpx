@@ -4,6 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(agas_base_headers
@@ -64,13 +68,12 @@ add_hpx_module(
   SOURCES ${agas_base_sources}
   HEADERS ${agas_base_headers}
   COMPAT_HEADERS ${agas_base_compat_headers}
-  DEPENDENCIES HPX::hpx_local
+  DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES
     hpx_actions
     hpx_actions_base
     hpx_async_distributed
     hpx_components_base
-    hpx_config
     hpx_naming
     hpx_naming_base
     hpx_parcelset_base

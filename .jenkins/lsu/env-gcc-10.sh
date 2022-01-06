@@ -14,9 +14,10 @@ module load openmpi
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="17"
 
-configure_extra_options+=" -DHPXLocal_WITH_CXX_STANDARD=${CXX_STD}"
-configure_extra_options+=" -DHPXLocal_WITH_MALLOC=system"
-configure_extra_options+=" -DHPXLocal_WITH_FETCH_ASIO=ON"
+configure_extra_options+=" -DHPX_WITH_CXX_STANDARD=${CXX_STD}"
+configure_extra_options+=" -DHPX_WITH_MALLOC=system"
+configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"
+configure_extra_options+=" -DHPX_WITH_ASIO_TAG=asio-1-12-0"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_MPI=ON"

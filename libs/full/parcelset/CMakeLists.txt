@@ -51,7 +51,7 @@ add_hpx_module(
   SOURCES ${parcelset_sources}
   HEADERS ${parcelset_headers}
   COMPAT_HEADERS ${parcelset_compat_headers}
-  DEPENDENCIES HPX::hpx_local
+  DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES
     hpx_actions
     hpx_actions_base

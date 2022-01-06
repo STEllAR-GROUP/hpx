@@ -30,7 +30,7 @@ add_hpx_module(
   SOURCES ${parcelport_tcp_sources}
   HEADERS ${parcelport_tcp_headers}
   COMPAT_HEADERS ${parcelport_tcp_compat_headers}
-  DEPENDENCIES HPX::hpx_local
+  DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_config
                       hpx_parcelset
   CMAKE_SUBDIRS examples tests

@@ -64,8 +64,7 @@ namespace hpx { namespace lcos {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::future<void> abort_pending(
-            launch::async_policy, error ec = no_success)
+        future<void> abort_pending(launch::async_policy, error ec = no_success)
         {
             HPX_ASSERT(this->get_id());
             typedef typename server_type::abort_pending_action action_type;

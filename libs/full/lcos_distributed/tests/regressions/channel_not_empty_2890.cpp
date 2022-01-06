@@ -8,11 +8,14 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/lcos_distributed/channel.hpp>
 #include <hpx/lcos_local/channel.hpp>
 #include <hpx/modules/testing.hpp>
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/lcos_distributed/channel.hpp>
+
 HPX_REGISTER_CHANNEL(int)
+#endif
 
 int main()
 {
@@ -22,11 +25,13 @@ int main()
         ch.close(true);
     }
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
     {
         hpx::lcos::channel<int> ch(hpx::find_here());
         ch.set(0);
         ch.close(true);
     }
+#endif
 
     return hpx::util::report_errors();
 }

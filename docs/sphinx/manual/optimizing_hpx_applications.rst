@@ -1295,7 +1295,7 @@ system and application performance.
        the instance name is ``worker-thread#*`` the counter will return the
        overall number of retired |hpx|-threads for all worker threads
        separately. This counter is available only if the configuration time
-       constant ``HPXLocal_WITH_THREAD_CUMULATIVE_COUNTS`` is set to ``ON`` (default:
+       constant ``HPX_WITH_THREAD_CUMULATIVE_COUNTS`` is set to ``ON`` (default:
        ``ON``).
      * None
    * * ``/threads/time/average``
@@ -1336,8 +1336,8 @@ system and application performance.
        is ``worker-thread#*`` the counter will return the average time spent
        executing one |hpx|-thread for all worker threads separately. This counter
        is available only if the configuration time constants
-       ``HPXLocal_WITH_THREAD_CUMULATIVE_COUNTS`` (default: ``ON``) and
-       ``HPXLocal_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The unit
+       ``HPX_WITH_THREAD_CUMULATIVE_COUNTS`` (default: ``ON``) and
+       ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The unit
        of measure for this counter is nanosecond [ns].
      * None
    * * ``/threads/time/average-overhead``
@@ -1377,8 +1377,8 @@ system and application performance.
        ``worker-thread#*`` the counter will return the average time spent on
        overhead executing one |hpx|-thread for all worker threads separately.
        This counter is available only if the configuration time constants
-       ``HPXLocal_WITH_THREAD_CUMULATIVE_COUNTS`` (default: ``ON``) and
-       ``HPXLocal_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
+       ``HPX_WITH_THREAD_CUMULATIVE_COUNTS`` (default: ``ON``) and
+       ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
        unit of measure for this counter is nanosecond [ns].
      * None
    * * ``/threads/count/cumulative-phases``
@@ -1417,7 +1417,7 @@ system and application performance.
        :term:`locality`. If the instance name is ``worker-thread#*`` the counter
        will return the overall number of executed |hpx|-thread phases for all
        worker threads separately. This counter is available only if the
-       configuration time constant ``HPXLocal_WITH_THREAD_CUMULATIVE_COUNTS`` is set
+       configuration time constant ``HPX_WITH_THREAD_CUMULATIVE_COUNTS`` is set
        to ``ON`` (default: ``ON``). The unit of measure for this counter is
        nanosecond [ns].
      * None
@@ -1458,8 +1458,8 @@ system and application performance.
        ``worker-thread#*`` the counter will return the average time spent
        executing one |hpx|-thread phase for all worker threads separately. This
        counter is available only if the configuration time constants
-       ``HPXLocal_WITH_THREAD_CUMULATIVE_COUNTS`` (default: ``ON``) and
-       ``HPXLocal_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
+       ``HPX_WITH_THREAD_CUMULATIVE_COUNTS`` (default: ``ON``) and
+       ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
        unit of measure for this counter is nanosecond [ns].
      * None
    * * ``/threads/time/average-phase-overhead``
@@ -1500,8 +1500,8 @@ system and application performance.
        is ``worker-thread#*`` the counter will return the average time spent on
        overhead executing one |hpx|-thread phase for all worker threads
        separately. This counter is available only if the configuration time
-       constants ``HPXLocal_WITH_THREAD_CUMULATIVE_COUNTS`` (default: ``ON``) and
-       ``HPXLocal_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
+       constants ``HPX_WITH_THREAD_CUMULATIVE_COUNTS`` (default: ``ON``) and
+       ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
        unit of measure for this counter is nanosecond [ns].
      * None
    * * ``/threads/time/overall``
@@ -1539,7 +1539,7 @@ system and application performance.
        worker threads (cores) on that :term:`locality`. If the instance name is
        ``worker-thread#*`` the counter will return the overall time spent running
        the scheduler for all worker threads separately. This counter is available
-       only if the configuration time constant ``HPXLocal_WITH_THREAD_IDLE_RATES`` is
+       only if the configuration time constant ``HPX_WITH_THREAD_IDLE_RATES`` is
        set to ``ON`` (default: ``OFF``). The unit of measure for this counter is
        nanosecond [ns].
      * None
@@ -1749,7 +1749,7 @@ system and application performance.
        :term:`locality`. The idle rate is defined as the ratio of the time spent
        on scheduling and management tasks and the overall time spent executing
        work since the application started. This counter is available only if the
-       configuration time constant ``HPXLocal_WITH_THREAD_IDLE_RATES`` is set to ``ON``
+       configuration time constant ``HPX_WITH_THREAD_IDLE_RATES`` is set to ``ON``
        (default: ``OFF``).
      * None
    * * ``/threads/creation-idle-rate``
@@ -1785,7 +1785,7 @@ system and application performance.
        rate is defined as the ratio of the time spent on creating new threads and
        the overall time spent executing work since the application started. This
        counter is available only if the configuration time constants
-       ``HPXLocal_WITH_THREAD_IDLE_RATES`` (default: ``OFF``) and
+       ``HPX_WITH_THREAD_IDLE_RATES`` (default: ``OFF``) and
        ``HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES`` are set to ``ON``.
      * None
    * * ``/threads/cleanup-idle-rate``
@@ -1822,7 +1822,7 @@ system and application performance.
        cleanup idle rate is defined as the ratio of the time spent on cleaning up
        terminated thread objects and the overall time spent executing work since
        the application started. This counter is available only if the
-       configuration time constants ``HPXLocal_WITH_THREAD_IDLE_RATES`` (default:
+       configuration time constants ``HPX_WITH_THREAD_IDLE_RATES`` (default:
        ``OFF``) and ``HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES`` are set to
        ``ON``.
      * None
@@ -2220,7 +2220,7 @@ system and application performance.
        performing background work for all worker threads separately. This
        counter is available only if the configuration time constants
        ``HPX_WITH_BACKGROUND_THREAD_COUNTERS`` (default: ``OFF``) and
-       ``HPXLocal_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
+       ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
        unit of measure for this counter is nanosecond [ns].
 
      * None
@@ -2253,7 +2253,7 @@ system and application performance.
        background overhead for all worker threads separately. This counter is
        available only if the configuration time constants
        ``HPX_WITH_BACKGROUND_THREAD_COUNTERS`` (default: ``OFF``) and
-       ``HPXLocal_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
+       ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
        unit of measure displayed for this counter is 0.1%.
      * None
    * * ``/threads/time/background-send-duration``
@@ -2288,7 +2288,7 @@ system and application performance.
        return the overall time spent performing background work for all worker
        threads separately. This counter is available only if the configuration
        time constants ``HPX_WITH_BACKGROUND_THREAD_COUNTERS`` (default: ``OFF``)
-       and ``HPXLocal_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``).
+       and ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``).
        The unit of measure for this counter is nanosecond [ns].
 
        This counter will currently return meaningful values for the MPI
@@ -2324,7 +2324,7 @@ system and application performance.
        will return background overhead for all worker threads separately. This
        counter is available only if the configuration time constants
        ``HPX_WITH_BACKGROUND_THREAD_COUNTERS`` (default: ``OFF``) and
-       ``HPXLocal_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
+       ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
        unit of measure displayed for this counter is 0.1%.
 
        This counter will currently return meaningful values for the MPI
@@ -2362,7 +2362,7 @@ system and application performance.
        return the overall time spent performing background work for all worker
        threads separately. This counter is available only if the configuration
        time constants ``HPX_WITH_BACKGROUND_THREAD_COUNTERS`` (default: ``OFF``)
-       and ``HPXLocal_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``).
+       and ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``).
        The unit of measure for this counter is nanosecond [ns].
 
        This counter will currently return meaningful values for the MPI
@@ -2397,7 +2397,7 @@ system and application performance.
        will return background overhead for all worker threads separately. This
        counter is available only if the configuration time constants
        ``HPX_WITH_BACKGROUND_THREAD_COUNTERS`` (default: ``OFF``) and
-       ``HPXLocal_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
+       ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
        unit of measure displayed for this counter is 0.1%.
 
        This counter will currently return meaningful values for the MPI

@@ -10,7 +10,7 @@ set(root "${PROJECT_SOURCE_DIR}/examples/performance_counters/sine")
 # add component
 add_hpx_component(
   sine INTERNAL_FLAGS NOEXPORT
-  FOLDER "Examples/Full/PerformanceCounters/Sine"
+  FOLDER "Examples/PerformanceCounters/Sine"
   HEADER_GLOB "${root}/*.h*"
   SOURCE_GLOB "${root}/sine.c*"
   AUTOGLOB PLUGIN
@@ -22,7 +22,7 @@ add_hpx_executable(
   sine_client INTERNAL_FLAGS
   SOURCES sine_client.cpp
   DEPENDENCIES sine_component
-  FOLDER "Examples/Full/PerformanceCounters/Sine"
+  FOLDER "Examples/PerformanceCounters/Sine"
 )
 
 # add a custom target for this example
