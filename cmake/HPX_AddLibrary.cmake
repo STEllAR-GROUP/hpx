@@ -9,6 +9,7 @@ function(add_hpx_library name)
   # retrieve arguments
   set(options
       EXCLUDE_FROM_ALL
+      INSTALL_HEADERS
       INTERNAL_FLAGS
       NOLIBS
       NOEXPORT
@@ -17,6 +18,8 @@ function(add_hpx_library name)
       OBJECT
       PLUGIN
       NONAMEPREFIX
+      PREPEND_SOURCE_ROOT
+      PREPEND_HEADER_ROOT
       UNITY_BUILD
   )
   set(one_value_args
@@ -105,6 +108,13 @@ function(add_hpx_library name)
       TARGETS ${${name}_HEADERS}
     )
   else()
+    if(${name}_PREPEND_SOURCE_ROOT)
+      list(TRANSFORM ${name}_SOURCES PREPEND ${${name}_SOURCE_ROOT}/)
+    endif()
+    if(${name}_PREPEND_HEADER_ROOT)
+      list(TRANSFORM ${name}_HEADERS PREPEND ${${name}_HEADER_ROOT}/)
+    endif()
+
     add_hpx_library_sources_noglob(${name} SOURCES "${${name}_SOURCES}")
 
     add_hpx_source_group(
@@ -125,17 +135,17 @@ function(add_hpx_library name)
   endif()
 
   hpx_print_list(
-    "DEBUG" "add_library.${name}" "Sources for ${name}" ${name}_SOURCES
+    "DEBUG" "add_library.${name}: Sources for ${name}" ${name}_SOURCES
   )
   hpx_print_list(
-    "DEBUG" "add_library.${name}" "Headers for ${name}" ${name}_HEADERS
+    "DEBUG" "add_library.${name}: Headers for ${name}" ${name}_HEADERS
   )
   hpx_print_list(
-    "DEBUG" "add_library.${name}" "Dependencies for ${name}"
+    "DEBUG" "add_library.${name}: Dependencies for ${name}"
     ${name}_DEPENDENCIES
   )
   hpx_print_list(
-    "DEBUG" "add_library.${name}" "Component dependencies for ${name}"
+    "DEBUG" "add_library.${name}: Component dependencies for ${name}"
     ${name}_COMPONENT_DEPENDENCIES
   )
 
@@ -225,6 +235,17 @@ function(add_hpx_library name)
     ${name} ${${name}_linktype} ${exclude_from_all} ${${name}_SOURCES}
             ${${name}_HEADERS} ${${name}_AUXILIARY}
   )
+
+  if(NOT ${${name}_HEADER_ROOT} STREQUAL ".")
+    target_include_directories(
+      ${name} PUBLIC $<BUILD_INTERFACE:${${name}_HEADER_ROOT}>
+    )
+    if(${name}_INSTALL_HEADERS)
+      set(_target_flags ${_target_flags} INSTALL_HEADERS HEADER_ROOT
+                        "${${name}_HEADER_ROOT}"
+      )
+    endif()
+  endif()
 
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)

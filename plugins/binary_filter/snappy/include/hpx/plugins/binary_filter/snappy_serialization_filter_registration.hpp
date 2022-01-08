@@ -10,7 +10,7 @@
 
 #if defined(HPX_HAVE_COMPRESSION_SNAPPY)
 
-#include <hpx/parcelsel_base/traits/action_serialization_filter.hpp>
+#include <hpx/parcelset_base/traits/action_serialization_filter.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_USES_SNAPPY_COMPRESSION(action)                            \

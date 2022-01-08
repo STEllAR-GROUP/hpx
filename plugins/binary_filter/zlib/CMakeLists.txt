@@ -1,8 +1,10 @@
-# Copyright (c) 2007-2016 Hartmut Kaiser
+# Copyright (c) 2007-2021 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+include(HPX_AddLibrary)
 
 if(HPX_WITH_COMPRESSION_ZLIB)
 
@@ -18,24 +20,25 @@ if(HPX_WITH_COMPRESSION_ZLIB)
     if(NOT ZLIB_FOUND)
       hpx_error("zlib could not be found and HPX_WITH_COMPRESSION_ZLIB=ON, \
         please point cmake to the correct location or set \
-        HPX_WITH_COMPRESSION_BZIP2 to OFF"
+        HPX_WITH_COMPRESSION_ZLIB to OFF"
       )
     endif()
 
   endif()
 
   hpx_debug("add_zlib_module" "ZLIB_FOUND: ${ZLIB_FOUND}")
-  set(HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include")
-  set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-  include(HPX_AddLibrary)
   add_hpx_library(
     compression_zlib INTERNAL_FLAGS PLUGIN
-    SOURCES "${SOURCE_ROOT}/zlib_serialization_filter.cpp"
+    SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    SOURCES "zlib_serialization_filter.cpp"
+    PREPEND_SOURCE_ROOT
+    HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
     HEADERS
-      "${HEADER_ROOT}/hpx/include/compression_zlib.hpp"
-      "${HEADER_ROOT}/hpx/plugins/binary_filter/zlib_serialization_filter.hpp"
-      "${HEADER_ROOT}/hpx/plugins/binary_filter/zlib_serialization_filter_registration.hpp"
+      "hpx/include/compression_zlib.hpp"
+      "hpx/plugins/binary_filter/zlib_serialization_filter.hpp"
+      "hpx/plugins/binary_filter/zlib_serialization_filter_registration.hpp"
+    PREPEND_HEADER_ROOT INSTALL_HEADERS
     FOLDER "Core/Plugins/Compression"
     DEPENDENCIES ${ZLIB_LIBRARIES} ${HPX_WITH_UNITY_BUILD_OPTION}
   )
