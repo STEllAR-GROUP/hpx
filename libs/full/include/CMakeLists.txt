@@ -88,7 +88,6 @@ set(include_headers
     hpx/include/parallel_uninitialized_move.hpp
     hpx/include/parallel_uninitialized_value_construct.hpp
     hpx/include/parallel_unique.hpp
-    hpx/include/parcel_coalescing.hpp
     hpx/include/parcelset.hpp
     hpx/include/performance_counters.hpp
     hpx/include/plain_actions.hpp

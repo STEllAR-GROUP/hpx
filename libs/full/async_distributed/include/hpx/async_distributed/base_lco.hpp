@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,8 +16,7 @@
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
-
-#include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
+#include <hpx/parcelset/coalescing_message_handler_registration.hpp>
 
 #include <cstddef>
 #include <exception>

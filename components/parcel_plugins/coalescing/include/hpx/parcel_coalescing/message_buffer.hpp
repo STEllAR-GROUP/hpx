@@ -9,19 +9,20 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
-
 #include <hpx/assert.hpp>
-#include <hpx/functional/deferred_call.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/threading_base.hpp>
+
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/parcelset_base/parcelport.hpp>
-#include <hpx/threading_base/register_thread.hpp>
 
 #include <cstddef>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace plugins { namespace parcel { namespace detail {
+namespace hpx::plugins::parcel::detail {
+
     class message_buffer
     {
     public:
@@ -169,6 +170,6 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail {
         std::vector<parcelset::write_handler_type> handlers_;
         std::size_t max_messages_;
     };
-}}}}    // namespace hpx::plugins::parcel::detail
+}    // namespace hpx::plugins::parcel::detail
 
 #endif

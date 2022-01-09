@@ -9,12 +9,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/hashing.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/type_support.hpp>
 
-#include <hpx/functional/function.hpp>
-#include <hpx/hashing/jenkins_hash.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
-#include <hpx/type_support/static.hpp>
 
 #include <cstdint>
 #include <string>
@@ -22,12 +22,12 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace plugins { namespace parcel
-{
+namespace hpx::plugins::parcel {
+
     ///////////////////////////////////////////////////////////////////////////
     class coalescing_counter_registry
     {
-        typedef hpx::lcos::local::spinlock mutex_type;
+        using mutex_type = hpx::lcos::local::spinlock;
 
     public:
         HPX_NON_COPYABLE(coalescing_counter_registry);
@@ -35,14 +35,12 @@ namespace hpx { namespace plugins { namespace parcel
     public:
         coalescing_counter_registry() {}
 
-        typedef util::function_nonser<std::int64_t(bool)>
-            get_counter_type;
-        typedef util::function_nonser<std::vector<std::int64_t>(bool)>
-            get_counter_values_type;
-        typedef util::function_nonser<
-                void(std::int64_t, std::int64_t, std::int64_t,
-                    get_counter_values_type&)
-            > get_counter_values_creator_type;
+        using get_counter_type = util::function_nonser<std::int64_t(bool)>;
+        using get_counter_values_type =
+            util::function_nonser<std::vector<std::int64_t>(bool)>;
+        using get_counter_values_creator_type =
+            util::function_nonser<void(std::int64_t, std::int64_t, std::int64_t,
+                get_counter_values_type&)>;
 
         struct counter_functions
         {
@@ -50,13 +48,13 @@ namespace hpx { namespace plugins { namespace parcel
             get_counter_type num_messages;
             get_counter_type num_parcels_per_message;
             get_counter_type average_time_between_parcels;
-            get_counter_values_creator_type time_between_parcels_histogram_creator;
+            get_counter_values_creator_type
+                time_between_parcels_histogram_creator;
             std::int64_t min_boundary, max_boundary, num_buckets;
         };
 
-        typedef std::unordered_map<
-                std::string, counter_functions, hpx::util::jenkins_hash
-            > map_type;
+        using map_type = std::unordered_map<std::string, counter_functions,
+            hpx::util::jenkins_hash>;
 
         static coalescing_counter_registry& instance();
 
@@ -66,7 +64,8 @@ namespace hpx { namespace plugins { namespace parcel
             get_counter_type num_parcels, get_counter_type num_messages,
             get_counter_type time_between_parcels,
             get_counter_type average_time_between_parcels,
-            get_counter_values_creator_type time_between_parcels_histogram_creator);
+            get_counter_values_creator_type
+                time_between_parcels_histogram_creator);
 
         get_counter_type get_parcels_counter(std::string const& name) const;
         get_counter_type get_messages_counter(std::string const& name) const;
@@ -78,28 +77,27 @@ namespace hpx { namespace plugins { namespace parcel
             std::string const& name, std::int64_t min_boundary,
             std::int64_t max_boundary, std::int64_t num_buckets);
 
-        bool counter_discoverer(
-            performance_counters::counter_info const& info,
+        bool counter_discoverer(performance_counters::counter_info const& info,
             performance_counters::counter_path_elements& p,
             performance_counters::discover_counter_func const& f,
             performance_counters::discover_counters_mode mode, error_code& ec);
 
         static std::vector<std::int64_t> empty_histogram(bool)
         {
-            std::vector<std::int64_t> result = { 0, 0, 1, 0 };
+            std::vector<std::int64_t> result = {0, 0, 1, 0};
             return result;
         }
 
     private:
-        struct tag {};
+        struct tag
+        {
+        };
 
-        friend struct hpx::util::static_<
-                coalescing_counter_registry, tag
-            >;
+        friend struct hpx::util::static_<coalescing_counter_registry, tag>;
 
         mutable mutex_type mtx_;
         map_type map_;
     };
-}}}
+}    // namespace hpx::plugins::parcel
 
 #endif

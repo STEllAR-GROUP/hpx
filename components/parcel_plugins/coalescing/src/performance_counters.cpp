@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,18 +7,17 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/string_util.hpp>
+#include <hpx/util/from_string.hpp>
+
 #include <hpx/components_base/component_startup_shutdown.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/parcel_coalescing/counter_registry.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
-#include <hpx/util/from_string.hpp>
-
-#include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
 
 #include <cstdint>
 #include <exception>
@@ -26,7 +25,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace plugins { namespace parcel {
+namespace hpx::plugins::parcel {
+
     ///////////////////////////////////////////////////////////////////////////
     // Discoverer for the explicit (hand-rolled performance counter. The
     // purpose of this function is to invoke the supplied function f for all
@@ -602,7 +602,7 @@ namespace hpx { namespace plugins { namespace parcel {
         pre_startup = true;        // run 'startup' as pre-startup function
         return true;
     }
-}}}    // namespace hpx::plugins::parcel
+}    // namespace hpx::plugins::parcel
 
 ///////////////////////////////////////////////////////////////////////////////
 // Register a startup function which will be called as a HPX-thread during
