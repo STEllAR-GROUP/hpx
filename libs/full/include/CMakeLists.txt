@@ -30,8 +30,6 @@ set(include_headers
     hpx/include/bind.hpp
     hpx/include/client.hpp
     hpx/include/components.hpp
-    hpx/include/compression.hpp
-    hpx/include/compression_registration.hpp
     hpx/include/compute.hpp
     hpx/include/dataflow.hpp
     hpx/include/datapar.hpp

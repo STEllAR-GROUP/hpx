@@ -1,25 +1,24 @@
-////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
 
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_COMPRESSION_SNAPPY)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/compression_snappy.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/include/parcel_coalescing.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
+#include <iostream>
 #include <vector>
 
 using hpx::program_options::options_description;
@@ -27,9 +26,7 @@ using hpx::program_options::variables_map;
 
 struct functor
 {
-    functor() {}
-
-    int operator()() const
+    constexpr int operator()() const noexcept
     {
         return 42;
     }
@@ -41,7 +38,7 @@ int pass_functor(hpx::util::function<int()> const& f)
 }
 
 HPX_DECLARE_PLAIN_ACTION(pass_functor, pass_functor_action)
-HPX_ACTION_USES_MESSAGE_COALESCING(pass_functor_action)
+HPX_ACTION_USES_SNAPPY_COMPRESSION(pass_functor_action)
 HPX_PLAIN_ACTION(pass_functor, pass_functor_action)
 
 void worker(hpx::util::function<int()> const& f)
@@ -79,7 +76,7 @@ int hpx_main()
     }
 
     double elapsed = t.elapsed();
-    hpx::cout << "Elapsed time: " << elapsed << "\n" << hpx::flush;
+    std::cout << "Elapsed time: " << elapsed << "\n" << std::flush;
 
     return hpx::finalize();
 }
