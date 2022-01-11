@@ -193,7 +193,7 @@ function(add_hpx_module libname modulename)
     hpx_debug(${header_file})
   endforeach(header_file)
 
-  # NOTE: We optionally keep the modules as static libraries as otherwise docker
+  # NOTE: We optionally keep the modules as static libraries as otherwise cmake
   # may run out of memory.
   if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES)
     set(module_library_type STATIC)
@@ -390,7 +390,6 @@ function(add_hpx_module libname modulename)
 
   # Link modules to their higher-level libraries
   if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES)
-    set(_module_target hpx_${modulename})
     if(UNIX)
       if(APPLE)
         set(_module_target "-Wl,-all_load" "hpx_${modulename}")
@@ -400,12 +399,13 @@ function(add_hpx_module libname modulename)
                            "-Wl,--no-whole-archive"
         )
       endif()
-      target_link_libraries(hpx_${libname} PRIVATE ${_module_target})
     elseif(MSVC)
+      set(_module_target hpx_${modulename})
       target_link_libraries(
         hpx_${libname} PRIVATE -WHOLEARCHIVE:$<TARGET_FILE:hpx_${modulename}>
       )
     endif()
+    target_link_libraries(hpx_${libname} PRIVATE ${_module_target})
 
     get_target_property(
       _module_interface_include_directories hpx_${modulename}

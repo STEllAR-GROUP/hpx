@@ -18,4 +18,3 @@ export CCACHE_MAXFILES=50000
 
 configure_extra_options+=" -DCMAKE_BUILD_TYPE=${build_type}"
 configure_extra_options+=" -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=ON"
-configure_extra_options+=" -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=ON"
