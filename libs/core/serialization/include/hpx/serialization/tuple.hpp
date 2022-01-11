@@ -106,15 +106,15 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         static void save_element_helper(std::true_type, Archive& ar, T& t)
         {
-            using serialization::detail::save_construct_data;
-            save_construct_data(ar, &t, 0);
-
             ar << t;
         }
 
         template <typename T>
         static void save_element_helper(std::false_type, Archive& ar, T& t)
         {
+            using serialization::detail::save_construct_data;
+            save_construct_data(ar, &t, 0);
+
             ar << t;
         }
 
