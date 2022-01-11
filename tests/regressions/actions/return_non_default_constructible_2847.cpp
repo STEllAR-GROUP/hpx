@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2017 Hartmut Kaiser
 //  Copyright (c) 2017 Igor Krivenko
+//  Copyright (c) 2022 Joseph Kleinhenz
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,30 +21,44 @@
 struct non_default_ctor
 {
     int i;
+    int j;
 
     non_default_ctor() = delete;
+
     non_default_ctor(int i)
-      : i(i)
+      : i(i), j(0)
+    {
+    }
+
+    non_default_ctor(int i, int j)
+      : i(i), j(j)
     {
     }
 
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int)
     {
-        ar & i;
+        ar & j;
+    }
+
+    template<typename Archive>
+    void friend save_construct_data(Archive& ar, const non_default_ctor* p, const unsigned int) {
+        ar << p->i;
     }
 
     template <typename Archive>
     void friend load_construct_data(
-        Archive&, non_default_ctor* p, const unsigned int)
+        Archive& ar, non_default_ctor* p, const unsigned int)
     {
-        ::new (p) non_default_ctor(0);
+        int i;
+        ar >> i;
+        ::new (p) non_default_ctor(i);
     }
 };
 
 non_default_ctor plain_non_default_ctor()
 {
-    return non_default_ctor(42);
+    return non_default_ctor(42, 11);
 }
 
 HPX_PLAIN_ACTION(plain_non_default_ctor, plain_non_default_ctor_action);
@@ -66,7 +81,9 @@ void test_plain_call_non_default_ctor(hpx::id_type id)
 
     for (auto && f : calls)
     {
-        HPX_TEST_EQ(f.get().i, 42);
+        const auto val = f.get();
+        HPX_TEST_EQ(val.i, 42);
+        HPX_TEST_EQ(val.j, 11);
     }
 }
 
