@@ -6,12 +6,9 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests tuple_serialization_803 function_argument function_serialization_728
-          wait_all_hang_1946
-)
+set(tests tuple_serialization_803 function_argument wait_all_hang_1946)
 
 set(function_argument_FLAGS DEPENDENCIES iostreams_component)
-set(function_serialization_728_dependencies iostreams_component)
 set(wait_all_hang_1946_PARAMETERS THREADS_PER_LOCALITY 8)
 set(wait_all_hang_1946_FLAGS DEPENDENCIES iostreams_component)
 
@@ -20,14 +17,6 @@ if(HPX_WITH_COMPRESSION_ZLIB)
       ${function_serialization_728_dependencies} compression_zlib
   )
 endif()
-if(WITH_PARCEL_COALESCING)
-  set(function_serialization_728_dependencies
-      ${function_serialization_728_dependencies} parcel_coalescing
-  )
-endif()
-set(function_serialization_728_FLAGS DEPENDENCIES
-                                     ${function_serialization_728_dependencies}
-)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

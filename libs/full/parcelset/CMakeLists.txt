@@ -7,6 +7,7 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(parcelset_headers
+    hpx/parcelset/coalescing_message_handler_registration.hpp
     hpx/parcelset/connection_cache.hpp
     hpx/parcelset/decode_parcels.hpp
     hpx/parcelset/detail/call_for_each.hpp
@@ -24,6 +25,7 @@ set(parcelset_headers
 
 # cmake-format: off
 set(parcelset_compat_headers
+    hpx/plugins/parcel/coalescing_message_handler_registration.hpp => hpx/modules/parcelset.hpp
     hpx/runtime/message_handler_fwd.hpp => hpx/modules/parcelset.hpp
     hpx/runtime/parcelset/connection_cache.hpp => hpx/modules/parcelset.hpp
     hpx/runtime/parcelset/decode_parcels.hpp => hpx/modules/parcelset.hpp

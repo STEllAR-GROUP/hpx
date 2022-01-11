@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +25,7 @@
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset {
+namespace hpx::parcelset {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
@@ -47,20 +47,19 @@ namespace hpx { namespace parcelset {
     template <typename Action>
     register_coalescing_for_action<Action>
         register_coalescing_for_action<Action>::instance_;
-}}    // namespace hpx::parcelset
+}    // namespace hpx::parcelset
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_COALESCING_COUNTERS(Action, coalescing_name)              \
-    namespace hpx { namespace parcelset {                                      \
-            template <>                                                        \
-            HPX_ALWAYS_EXPORT constexpr char const*                            \
-            get_action_coalescing_name<Action>() noexcept                      \
-            {                                                                  \
-                return coalescing_name;                                        \
-            }                                                                  \
-            template register_coalescing_for_action<Action>                    \
-                register_coalescing_for_action<Action>::instance_;             \
+    namespace hpx::parcelset {                                                 \
+        template <>                                                            \
+        HPX_ALWAYS_EXPORT constexpr char const*                                \
+        get_action_coalescing_name<Action>() noexcept                          \
+        {                                                                      \
+            return coalescing_name;                                            \
         }                                                                      \
+        template register_coalescing_for_action<Action>                        \
+            register_coalescing_for_action<Action>::instance_;                 \
     }                                                                          \
 /**/
 
@@ -92,18 +91,17 @@ namespace hpx { namespace parcelset {
 
 #define HPX_ACTION_USES_MESSAGE_COALESCING_DECLARATION_4(                      \
     action_type, action_name, num, interval)                                   \
-    namespace hpx { namespace traits {                                         \
-            template <>                                                        \
-            struct action_message_handler<action_type>                         \
+    namespace hpx::traits {                                                    \
+        template <>                                                            \
+        struct action_message_handler<action_type>                             \
+        {                                                                      \
+            static parcelset::policies::message_handler* call(                 \
+                parcelset::locality const& loc)                                \
             {                                                                  \
-                static parcelset::policies::message_handler* call(             \
-                    parcelset::locality const& loc)                            \
-                {                                                              \
-                    return parcelset::get_message_handler(action_name,         \
-                        "coalescing_message_handler", num, interval, loc);     \
-                }                                                              \
-            };                                                                 \
-        }                                                                      \
+                return parcelset::get_message_handler(action_name,             \
+                    "coalescing_message_handler", num, interval, loc);         \
+            }                                                                  \
+        };                                                                     \
     }                                                                          \
 /**/
 
@@ -147,19 +145,18 @@ namespace hpx { namespace parcelset {
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(                \
     action_type, action_name, num, interval)                                   \
-    namespace hpx { namespace traits {                                         \
-            template <>                                                        \
-            struct action_message_handler<action_type>                         \
+    namespace hpx::traits {                                                    \
+        template <>                                                            \
+        struct action_message_handler<action_type>                             \
+        {                                                                      \
+            static parcelset::policies::message_handler* call(                 \
+                parcelset::locality const& loc)                                \
             {                                                                  \
-                static parcelset::policies::message_handler* call(             \
-                    parcelset::locality const& loc)                            \
-                {                                                              \
-                    error_code ec(lightweight);                                \
-                    return parcelset::get_message_handler(action_name,         \
-                        "coalescing_message_handler", num, interval, loc, ec); \
-                }                                                              \
-            };                                                                 \
-        }                                                                      \
+                error_code ec(lightweight);                                    \
+                return parcelset::get_message_handler(action_name,             \
+                    "coalescing_message_handler", num, interval, loc, ec);     \
+            }                                                                  \
+        };                                                                     \
     }                                                                          \
     /**/
 

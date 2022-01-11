@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2012-2017 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -22,7 +22,7 @@
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
+#include <hpx/parcelset/coalescing_message_handler_registration.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>

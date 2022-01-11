@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,10 +7,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
-#include <hpx/performance_counters/registry.hpp>
-#include <hpx/util/regex_from_pattern.hpp>
+#include <hpx/modules/util.hpp>
 
-#include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
+#include <hpx/parcel_coalescing/counter_registry.hpp>
+#include <hpx/performance_counters/registry.hpp>
 
 #include <cstdint>
 #include <mutex>
@@ -20,7 +20,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace plugins { namespace parcel {
+namespace hpx::plugins::parcel {
+
     coalescing_counter_registry& coalescing_counter_registry::instance()
     {
         hpx::util::static_<coalescing_counter_registry, tag> registry;
@@ -376,6 +377,6 @@ namespace hpx { namespace plugins { namespace parcel {
 
         return true;
     }
-}}}    // namespace hpx::plugins::parcel
+}    // namespace hpx::plugins::parcel
 
 #endif

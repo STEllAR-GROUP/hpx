@@ -8,20 +8,18 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/assert.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/parcelset_base/parcelport.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/plugin/traits/plugin_config_data.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
 
+#include <hpx/parcel_coalescing/counter_registry.hpp>
+#include <hpx/parcel_coalescing/message_handler.hpp>
+#include <hpx/parcelset_base/parcelport.hpp>
 #include <hpx/plugin_factories/message_handler_factory.hpp>
-#include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
-#include <hpx/plugins/parcel/coalescing_message_handler.hpp>
 
 #include <boost/accumulators/accumulators.hpp>
 
@@ -33,7 +31,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     // Inject additional configuration data into the factory registry for this
     // type. This information ends up in the system wide configuration database
     // under the plugin specific section:
@@ -46,14 +45,14 @@ namespace hpx { namespace traits {
     template <>
     struct plugin_config_data<hpx::plugins::parcel::coalescing_message_handler>
     {
-        static char const* call()
+        static constexpr char const* call() noexcept
         {
             return "num_messages = 50\n"
                    "interval = 100\n"
                    "allow_background_flush = 1";
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_PLUGIN_MODULE_DYNAMIC()
@@ -62,7 +61,8 @@ HPX_REGISTER_MESSAGE_HANDLER_FACTORY(
     coalescing_message_handler)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace plugins { namespace parcel {
+namespace hpx::plugins::parcel {
+
     namespace detail {
         std::size_t get_num_messages(std::size_t num_messages)
         {
@@ -107,9 +107,9 @@ namespace hpx { namespace plugins { namespace parcel {
       , interval_(detail::get_interval(interval))
       , buffer_(num_coalesced_parcels_)
       , timer_(
-            util::bind_back(&coalescing_message_handler::timer_flush, this_()),
+            util::bind_back(&coalescing_message_handler::timer_flush, this),
             util::bind_back(
-                &coalescing_message_handler::flush_terminate, this_()),
+                &coalescing_message_handler::flush_terminate, this),
             std::string(action_name) + "_timer")
       , stopped_(false)
       , allow_background_flush_(detail::get_background_flush())
@@ -440,6 +440,6 @@ namespace hpx { namespace plugins { namespace parcel {
         if (&ec != &throws)
             ec = make_success_code();
     }
-}}}    // namespace hpx::plugins::parcel
+}    // namespace hpx::plugins::parcel
 
 #endif

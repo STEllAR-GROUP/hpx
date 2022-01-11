@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,15 +9,14 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/statistics.hpp>
+#include <hpx/modules/synchronization.hpp>
 
-#include <hpx/functional/function.hpp>
-#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/parcel_coalescing/message_buffer.hpp>
 #include <hpx/parcelset_base/policies/message_handler.hpp>
-#include <hpx/runtime_local/pool_timer.hpp>
-#include <hpx/statistics/histogram.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-
-#include <hpx/plugins/parcel/message_buffer.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -29,26 +28,23 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace plugins { namespace parcel
-{
+namespace hpx::plugins::parcel {
+
     struct HPX_LIBRARY_EXPORT coalescing_message_handler
       : parcelset::policies::message_handler
     {
-    private:
-        coalescing_message_handler* this_() { return this; }
-
-        typedef lcos::local::spinlock mutex_type;
+        using mutex_type = lcos::local::spinlock;
 
     public:
-        typedef parcelset::policies::message_handler::write_handler_type
-            write_handler_type;
+        using write_handler_type =
+            parcelset::policies::message_handler::write_handler_type;
 
         coalescing_message_handler(char const* action_name,
             parcelset::parcelport* pp, std::size_t num = std::size_t(-1),
             std::size_t interval = std::size_t(-1));
 
-        void put_parcel(parcelset::locality const & dest,
-            parcelset::parcel p, write_handler_type f);
+        void put_parcel(parcelset::locality const& dest, parcelset::parcel p,
+            write_handler_type f);
 
         bool flush(parcelset::policies::message_handler::flush_mode mode,
             bool stop_buffering = false);
@@ -60,8 +56,8 @@ namespace hpx { namespace plugins { namespace parcel
         std::int64_t get_messages_count(bool reset);
         std::int64_t get_parcels_per_message_count(bool reset);
         std::int64_t get_average_time_between_parcels(bool reset);
-        std::vector<std::int64_t>
-            get_time_between_parcels_histogram(bool reset);
+        std::vector<std::int64_t> get_time_between_parcels_histogram(
+            bool reset);
         void get_time_between_parcels_histogram_creator(
             std::int64_t min_boundary, std::int64_t max_boundary,
             std::int64_t num_buckets,
@@ -101,17 +97,17 @@ namespace hpx { namespace plugins { namespace parcel
         std::int64_t reset_time_num_parcels_;
         std::int64_t last_parcel_time_;
 
-        typedef boost::accumulators::accumulator_set<
-                double,     // collects percentiles
-                boost::accumulators::features<hpx::util::tag::histogram>
-            > histogram_collector_type;
+        // collects percentiles
+        using histogram_collector_type =
+            boost::accumulators::accumulator_set<double,
+                boost::accumulators::features<hpx::util::tag::histogram>>;
 
         std::unique_ptr<histogram_collector_type> time_between_parcels_;
         std::int64_t histogram_min_boundary_;
         std::int64_t histogram_max_boundary_;
         std::int64_t histogram_num_buckets_;
     };
-}}}
+}    // namespace hpx::plugins::parcel
 
 #include <hpx/config/warnings_suffix.hpp>
 
