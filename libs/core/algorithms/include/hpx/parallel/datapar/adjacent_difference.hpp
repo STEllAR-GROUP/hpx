@@ -14,6 +14,7 @@
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_difference.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
 #include <hpx/parallel/datapar/zip_iterator.hpp>
@@ -36,7 +37,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             if (first == last)
                 return dest;
-            auto count = std::distance(first, last) - 1;
+            auto count = parallel::detail::distance(first, last) - 1;
 
             InIter prev = first;
             *dest++ = *first++;
