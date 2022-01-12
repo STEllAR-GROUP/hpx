@@ -36,6 +36,9 @@ else
     export install_hpx=0
 fi
 
+# delay things for a random amount of time
+sleep $[(RANDOM % 10) + 1]s
+
 # Start the actual build
 set +e
 sbatch \
