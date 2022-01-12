@@ -193,9 +193,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f1 = [pred_projected = HPX_MOVE(pred_projected), tok](
                               zip_iterator it, std::size_t part_size,
                               std::size_t base_idx) mutable {
-                    sequential_adjacent_find<std::decay_t<ExPolicy>>(base_idx,
-                        it, part_size, tok,
-                        std::forward<decltype(pred_projected)>(pred_projected));
+                    sequential_adjacent_find<std::decay_t<ExPolicy>>(
+                        base_idx, it, part_size, tok, pred_projected);
                 };
 
                 auto f2 = [tok, count, first, last](
