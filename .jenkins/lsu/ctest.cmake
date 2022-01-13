@@ -42,15 +42,32 @@ set(CTEST_CONFIGURE_COMMAND
 )
 
 ctest_start(Experimental TRACK "${CTEST_TRACK}")
+
 ctest_update()
-ctest_submit(PARTS Update)
+ctest_submit(PARTS Update BUILD_ID __ctest_build_id)
+if(__ctest_build_id)
+  set(CTEST_BUILD_ID ${__ctest_build_id})
+endif()
+
 ctest_configure()
-ctest_submit(PARTS Configure)
+ctest_submit(PARTS Configure BUILD_ID __ctest_build_id)
+if(NOT CTEST_BUILD_ID AND __ctest_build_id)
+  set(CTEST_BUILD_ID ${__ctest_build_id})
+endif()
+
 ctest_build(TARGET all FLAGS "-k0 -j ${CTEST_BUILD_PARALLELISM}")
 ctest_build(TARGET tests FLAGS "-k0 -j ${CTEST_BUILD_PARALLELISM}")
-ctest_submit(PARTS Build)
+ctest_submit(PARTS Build BUILD_ID __ctest_build_id)
+if(NOT CTEST_BUILD_ID AND __ctest_build_id)
+  set(CTEST_BUILD_ID ${__ctest_build_id})
+endif()
+
 ctest_test(PARALLEL_LEVEL "${CTEST_TEST_PARALLELISM}")
-ctest_submit(PARTS Test BUILD_ID CTEST_BUILD_ID)
+ctest_submit(PARTS Test BUILD_ID __ctest_build_id)
+if(NOT CTEST_BUILD_ID AND __ctest_build_id)
+  set(CTEST_BUILD_ID ${__ctest_build_id})
+endif()
+
 file(WRITE "jenkins-hpx-${CTEST_BUILD_CONFIGURATION_NAME}-cdash-build-id.txt"
      "${CTEST_BUILD_ID}"
 )
