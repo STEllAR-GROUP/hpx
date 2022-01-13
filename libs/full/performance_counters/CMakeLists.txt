@@ -103,6 +103,5 @@ add_hpx_module(
     hpx_parcelset
     hpx_runtime_components
     hpx_statistics
-    hpx_version
   CMAKE_SUBDIRS examples tests
 )

@@ -80,6 +80,5 @@ add_hpx_module(
     hpx_performance_counters
     hpx_plugin_factories
     hpx_runtime_components
-    hpx_version
   CMAKE_SUBDIRS examples tests
 )

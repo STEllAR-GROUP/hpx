@@ -42,6 +42,6 @@ add_hpx_module(
   HEADERS ${plugin_factories_headers}
   COMPAT_HEADERS ${plugin_factories_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_command_line_handling hpx_config hpx_parcelset_base
+  MODULE_DEPENDENCIES hpx_command_line_handling hpx_parcelset_base
   CMAKE_SUBDIRS examples tests
 )
