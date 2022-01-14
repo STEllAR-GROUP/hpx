@@ -44,6 +44,13 @@ set(parcelset_sources
     message_handler.cpp parcel.cpp parcelhandler.cpp
 )
 
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(parcelset_optional_module_dependencies
+      hpx_actions hpx_actions_base hpx_components_base hpx_naming
+      hpx_naming_base
+  )
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   full parcelset
@@ -52,13 +59,7 @@ add_hpx_module(
   HEADERS ${parcelset_headers}
   COMPAT_HEADERS ${parcelset_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES
-    hpx_actions
-    hpx_actions_base
-    hpx_components_base
-    hpx_naming
-    hpx_naming_base
-    hpx_parcelset_base
-    hpx_plugin_factories
+  MODULE_DEPENDENCIES hpx_parcelset_base hpx_plugin_factories
+                      ${parcelset_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests
 )
