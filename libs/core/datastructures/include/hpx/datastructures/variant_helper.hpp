@@ -54,5 +54,5 @@ namespace hpx {
         }
     }    // namespace adl_barrier
 
-    using hpx::adl_barrier::get;
+    using namespace hpx::adl_barrier;
 }    // namespace hpx
