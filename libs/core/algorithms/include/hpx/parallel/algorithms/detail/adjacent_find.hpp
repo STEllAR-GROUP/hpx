@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/local/config.hpp>
+#include <hpx/config.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
