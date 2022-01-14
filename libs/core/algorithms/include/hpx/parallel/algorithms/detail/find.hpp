@@ -330,6 +330,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             util::loop_idx_n<ExPolicy>(base_idx, it, part_size, tok,
                 [=, &tok, &op, &proj1, &proj2](auto t, std::size_t i) -> void {
+                    // Note: replacing the invoke() with HPX_INVOKE()
+                    // below makes gcc generate errors
                     if (hpx::util::invoke(op, hpx::util::invoke(proj1, t),
                             hpx::util::invoke(proj2, *first2)))
                     {
@@ -342,6 +344,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                         for (; local_count != diff;
                              ++local_count, ++mid, ++mid2)
                         {
+                            // Note: replacing the invoke() with HPX_INVOKE()
+                            // below makes gcc generate errors
                             if (!hpx::util::invoke(op,
                                     hpx::util::invoke(proj1, mid),
                                     hpx::util::invoke(proj2, *mid2)))
