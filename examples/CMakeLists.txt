@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2021 Hartmut Kaiser
+# Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 # Copyright (c) 2011      Dylan Stark
 #
@@ -10,9 +10,12 @@ set(subdirs
     1d_stencil
     accumulators
     async_io
+    balancing
     cancelable_action
+    future_reduce
     heartbeat
     jacobi
+    jacobi_smp
     nqueen
     performance_counters
     pipeline

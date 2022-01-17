@@ -44,11 +44,10 @@ typedef hpx::components::component<
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC(
     papi_counter_type, papi_counter, "base_performance_counter")
 
-#define HPX_PAPI_NS_STR "hpx::performance_counters::papi::server::"
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace papi { namespace server
 {
+#define NS_STR "hpx::performance_counters::papi::server::"
 
     ///////////////////////////////////////////////////////////////////////////
     // static members
@@ -73,7 +72,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         pid_t tid = tm.get_linux_thread_id(tix);
         if (tid == -1)
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                HPX_PAPI_NS_STR "thread_counters::thread_counters()",
+                NS_STR "thread_counters::thread_counters()",
                 "unable to retrieve correct OS thread ID for profiling "
                 "(perhaps thread was not registered)");
         papi_call(PAPI_attach(evset_, tid),
@@ -219,7 +218,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         base_type_holder(info), event_(PAPI_NULL), index_(-1),
         value_(0), timestamp_(-1), status_(PAPI_COUNTER_STOPPED)
     {
-        char const *locstr = HPX_PAPI_NS_STR "papi_counter()";
+        char const *locstr = NS_STR "papi_counter()";
 
         // extract path elements from counter name
         counter_path_elements cpe;
@@ -327,7 +326,5 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
     }
 
 }}}}
-
-#undef HPX_PAPI_NS_STR
 
 #endif

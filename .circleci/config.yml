@@ -207,31 +207,28 @@ jobs:
                 /hpx/source \
                 -G "Ninja" \
                 -DCMAKE_BUILD_TYPE=Debug \
-                -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" \
-                -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
-                -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
                 -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
-                -DHPX_WITH_FETCH_HPXLOCAL=On \
-                -DHPXLocal_WITH_TESTS=OFF \
-                -DHPXLocal_WITH_EXAMPLES=OFF \
-                -DHPXLocal_WITH_MALLOC=system \
-                -DHPXLocal_WITH_FETCH_ASIO=Off \
-                -DHPXLocal_WITH_DATAPAR_VC=On \
-                -DHPXLocal_WITH_THREAD_LOCAL_STORAGE=On \
-                -DHPXLocal_WITH_STACKTRACES_STATIC_SYMBOLS=On \
-                -DHPXLocal_WITH_STACKTRACES_DEMANGLE_SYMBOLS=Off \
-                -DHPXLocal_WITH_SPINLOCK_DEADLOCK_DETECTION=On \
+                -DHPX_WITH_MALLOC=system \
+                -DHPX_WITH_FETCH_ASIO=Off \
+                -DHPX_WITH_DATAPAR_VC=On \
                 -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} \
                 -DHPX_WITH_GIT_BRANCH="${CIRCLE_BRANCH}" \
                 -DHPX_WITH_GIT_TAG="${CIRCLE_TAG}" \
                 -DHPX_WITH_TOOLS=On \
+                -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" \
                 -DHPX_WITH_TESTS_HEADERS=On \
                 -DHPX_WITH_COMPILER_WARNINGS=On \
                 -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=On \
                 -DHPX_WITH_DEPRECATION_WARNINGS=On \
+                -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
+                -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
+                -DHPX_WITH_STACKTRACES_STATIC_SYMBOLS=On \
+                -DHPX_WITH_STACKTRACES_DEMANGLE_SYMBOLS=Off \
                 -DHPX_WITH_TESTS_DEBUG_LOG=On \
                 -DHPX_WITH_TESTS_DEBUG_LOG_DESTINATION=/hpx/build/debug-log.txt \
+                -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=On \
                 -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On \
+                -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
                 -DHPX_WITH_DOCUMENTATION=On \
                 -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="${DOCUMENTATION_OUTPUT_FORMATS}"
       - persist_to_workspace:
@@ -251,9 +248,8 @@ jobs:
                 /hpx/source \
                 -G "Ninja" \
                 -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
-                -DHPX_WITH_FETCH_HPXLOCAL=On \
-                -DHPXLocal_WITH_MALLOC=system \
-                -DHPXLocal_WITH_FETCH_ASIO=OFF \
+                -DHPX_WITH_MALLOC=system \
+                -DHPX_WITH_FETCH_ASIO=Off \
                 -DHPX_WITH_TESTS=On \
                 -DHPX_WITH_EXAMPLES=Off
             rm -rf *
@@ -264,9 +260,8 @@ jobs:
                 /hpx/source \
                 -G "Ninja" \
                 -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
-                -DHPX_WITH_FETCH_HPXLOCAL=On \
-                -DHPXLocal_WITH_MALLOC=system \
-                -DHPXLocal_WITH_FETCH_ASIO=OFF \
+                -DHPX_WITH_MALLOC=system \
+                -DHPX_WITH_FETCH_ASIO=Off \
                 -DHPX_WITH_TESTS=Off \
                 -DHPX_WITH_EXAMPLES=On
             rm -rf *
@@ -277,9 +272,8 @@ jobs:
                 /hpx/source \
                 -G "Ninja" \
                 -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
-                -DHPX_WITH_FETCH_HPXLOCAL=On \
-                -DHPXLocal_WITH_MALLOC=system \
-                -DHPXLocal_WITH_FETCH_ASIO=Off \
+                -DHPX_WITH_MALLOC=system \
+                -DHPX_WITH_FETCH_ASIO=Off \
                 -DHPX_WITH_APEX=On \
                 -DHPX_WITH_TESTS=On \
                 -DHPX_WITH_EXAMPLES=On
@@ -417,6 +411,74 @@ jobs:
           root: /hpx
           paths:
             - ./build
+
+  tests.unit.algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (Algorithms)
+          command: |
+              ninja -j2 -k 0 \
+                tests.unit.modules.algorithms.algorithms \
+                tests.unit.modules.algorithms.block \
+                tests.unit.modules.algorithms.datapar_algorithms
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 120 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex \
+              "tests.unit.modules.algorithms.algorithms|\
+              tests.unit.modules.algorithms.block|\
+              tests.unit.modules.algorithms.datapar_algorithms"
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.algorithms
+      - store_artifacts:
+          path: tests.unit.algorithms
+
+  tests.unit.container_algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (Container Algorithms)
+          command: |
+              ninja -j2 -k 0 tests.unit.modules.algorithms.container_algorithms
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 120 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex tests.unit.modules.algorithms.container_algorithms
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.container_algorithms
+      - store_artifacts:
+          path: tests.unit.container_algorithms
 
   tests.unit.segmented_algorithms:
     <<: *defaults
@@ -621,7 +683,7 @@ jobs:
               # is enabled, and other machines may fail similarly.
               cmake \
                 -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
-                -DHPXLocal_WITH_DATAPAR_VC=Off .
+                -DHPX_WITH_DATAPAR_VC=Off .
               ninja -j2 install
           working_directory: /hpx/build
           when: always
@@ -749,6 +811,10 @@ workflows:
           <<: *gh_pages_filter
       - tests.examples:
           <<: *core_dependency
+      - tests.unit.algorithms:
+          <<: *core_dependency
+      - tests.unit.container_algorithms:
+          <<: *core_dependency
       - tests.unit.segmented_algorithms:
           <<: *core_dependency
       - tests.unit1:
@@ -780,6 +846,8 @@ workflows:
           requires:
             - core
             - tests.examples
+            - tests.unit.algorithms
+            - tests.unit.container_algorithms
             - tests.unit.segmented_algorithms
             - tests.unit1
             - tests.unit2

@@ -19,7 +19,7 @@ endif()
 # Set the basic search paths for the generated HPX headers
 target_include_directories(inspect PRIVATE ${PROJECT_BINARY_DIR})
 target_link_libraries(
-  inspect PRIVATE Boost::regex hpx_dependencies_boost HPX::hpx
+  inspect PRIVATE Boost::regex hpx_dependencies_boost hpx_core
 )
 
 # add dependencies to pseudo-target

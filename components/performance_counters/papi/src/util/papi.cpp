@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 
-#define HPX_PAPI_NS_STR "hpx::performance_counters::papi::util::"
+#define NS_STR "hpx::performance_counters::papi::util::"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace papi { namespace util
@@ -49,7 +49,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         std::map<std::string, int>::const_iterator it = papi_domain_map.find(s);
         if (it == papi_domain_map.end())
             HPX_THROW_EXCEPTION(hpx::commandline_option_error,
-                HPX_PAPI_NS_STR "check_options()",
+                NS_STR "check_options()",
                 "invalid argument "+s+" to --hpx:papi-domain");
         return it->second;
     }
@@ -95,7 +95,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         if (!retrieve_commandline_arguments(get_options_description(), vm))
         {
             HPX_THROW_EXCEPTION(hpx::commandline_option_error,
-                HPX_PAPI_NS_STR "get_options()",
+                NS_STR "get_options()",
                 "failed to handle command line options");
         }
         return vm;
@@ -134,7 +134,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             std::string v = vm["hpx:papi-event-info"].as<std::string>();
             if (v != "preset" && v != "native" && v != "all")
                 HPX_THROW_EXCEPTION(hpx::commandline_option_error,
-                    HPX_PAPI_NS_STR "check_options()",
+                    NS_STR "check_options()",
                     "unsupported mode "+v+" in --hpx:papi-event-info");
         }
         if (vm.count("hpx:papi-domain"))
@@ -143,18 +143,18 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             int dom = map_domain(v); // throws if not found
             papi_call(PAPI_set_domain(dom),
                 "could not switch to \""+v+"\" domain monitoring",
-                HPX_PAPI_NS_STR "check_options()");
+                NS_STR "check_options()");
             needed = true;
         }
         // FIXME: implement multiplexing properly and uncomment below when done
         if (vm.count("hpx:papi-multiplex"))
             HPX_THROW_EXCEPTION(hpx::not_implemented,
-                HPX_PAPI_NS_STR "check_options()",
+                NS_STR "check_options()",
                 "counter multiplexing is currently not supported");
 #if 0
         if (vm.count("hpx:papi-multiplex") && vm["hpx:papi-multiplex"].as<long>() < 0)
             HPX_THROW_EXCEPTION(hpx::commandline_option_error,
-                HPX_PAPI_NS_STR "check_options()",
+                NS_STR "check_options()",
                 "argument to --hpx:papi-multiplex must be positive");
 #endif
         return needed;
@@ -316,7 +316,5 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     }
 
 }}}}
-
-#undef HPX_PAPI_NS_STR
 
 #endif

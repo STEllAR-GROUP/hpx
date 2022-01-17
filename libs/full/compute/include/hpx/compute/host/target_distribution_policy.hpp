@@ -9,6 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/assert.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
@@ -251,3 +253,5 @@ namespace hpx { namespace traits {
     };
 }}    // namespace hpx::traits
 /// \endcond
+
+#endif

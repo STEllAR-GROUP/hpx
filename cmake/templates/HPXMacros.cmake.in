@@ -86,12 +86,12 @@ function(hpx_check_boost_compatibility)
 endfunction()
 
 function(hpx_check_allocator_compatibility)
-  string(TOUPPER "${HPXLocal_WITH_MALLOC}" HPX_MALLOC_UPPER)
-  string(TOUPPER "${HPXLocal_WITH_MALLOC_DEFAULT}" HPX_MALLOC_DEFAULT_UPPER)
+  string(TOUPPER "${HPX_WITH_MALLOC}" HPX_MALLOC_UPPER)
+  string(TOUPPER "${HPX_WITH_MALLOC_DEFAULT}" HPX_MALLOC_DEFAULT_UPPER)
   if(NOT (HPX_MALLOC_UPPER STREQUAL HPX_MALLOC_DEFAULT_UPPER))
-    hpx_error("HPXLocal_WITH_MALLOC has been changed by this project. This project "
-      "has set HPXLocal_WITH_MALLOC='${HPXLocal_WITH_MALLOC}' and HPX was configured "
-      "with '${HPXLocal_WITH_MALLOC_DEFAULT}'. HPXLocal_WITH_MALLOC is only provided for "
+    hpx_error("HPX_WITH_MALLOC has been changed by this project. This project "
+      "has set HPX_WITH_MALLOC='${HPX_WITH_MALLOC}' and HPX was configured "
+      "with '${HPX_WITH_MALLOC_DEFAULT}'. HPX_WITH_MALLOC is only provided for "
       "informational purposes to dependent projects and should not be changed.")
   endif()
 endfunction()

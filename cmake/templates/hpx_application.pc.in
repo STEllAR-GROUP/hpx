@@ -9,5 +9,5 @@
 Name: hpx_application
 Description: High Performance ParalleX (application configuration)$<$<CONFIG:Debug>: - debug build>
 Version: @HPX_VERSION@
-Libs: @hpx_local_library_list@ @hpx_library_list@
-Cflags: @CMAKE_CXX_FLAGS@ @hpx_local_cflags_list@ @hpx_cflags_list@
+Libs: @hpx_library_list@
+Cflags: @CMAKE_CXX_FLAGS@ @hpx_cflags_list@

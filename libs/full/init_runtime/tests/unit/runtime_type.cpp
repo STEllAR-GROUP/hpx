@@ -101,8 +101,13 @@ int main(int argc, char* argv[])
             caught_exception = true;
         }
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         HPX_TEST(ran_hpx_main);
         HPX_TEST(!caught_exception);
+#else
+        HPX_TEST(!ran_hpx_main);
+        HPX_TEST(caught_exception);
+#endif
     }
 
     return hpx::util::report_errors();

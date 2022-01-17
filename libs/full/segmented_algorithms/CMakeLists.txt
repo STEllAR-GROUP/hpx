@@ -4,6 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 set(segmented_algorithms_headers
     hpx/parallel/segmented_algorithm.hpp
     hpx/parallel/segmented_algorithms/adjacent_difference.hpp
@@ -42,7 +46,7 @@ add_hpx_module(
   full segmented_algorithms
   HEADERS ${segmented_algorithms_headers}
   COMPAT_HEADERS ${segmented_algorithms_compat_headers}
-  DEPENDENCIES HPX::hpx_local
-  MODULE_DEPENDENCIES hpx_async_colocated hpx_async_distributed hpx_config
+  DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_async_colocated hpx_async_distributed
   CMAKE_SUBDIRS examples tests
 )

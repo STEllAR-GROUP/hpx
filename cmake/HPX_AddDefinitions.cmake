@@ -133,18 +133,6 @@ function(write_config_defines_file)
             "${hpx_config_defines}#if __cplusplus >= 201500\n#define ${def}\n#endif\n"
         )
       else()
-        string(FIND ${def} " " _pos)
-        # TODO: This is temporary
-        if(NOT ${_pos} EQUAL -1)
-          string(SUBSTRING ${def} 0 ${_pos} defname)
-          set(hpx_config_defines
-              "${hpx_config_defines}#if defined(${defname})\nstatic_assert(false, \"${defname} already defined\");\n#endif\n"
-          )
-        else()
-          set(hpx_config_defines
-              "${hpx_config_defines}#if defined(${def})\nstatic_assert(false, \"${def} already defined\");\n#endif\n"
-          )
-        endif()
         set(hpx_config_defines "${hpx_config_defines}#define ${def}\n")
       endif()
     endif()

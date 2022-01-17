@@ -6,6 +6,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 # ##############################################################################
 set(heartbeat_HEADERS)
 
@@ -23,7 +27,7 @@ add_hpx_executable(
   heartbeat INTERNAL_FLAGS
   SOURCES ${heartbeat_SOURCES}
   HEADERS ${heartbeat_HEADERS}
-  FOLDER "Examples/Full/HeartBeat"
+  FOLDER "Examples/HeartBeat"
   DEPENDENCIES iostreams_component
 )
 
@@ -34,7 +38,7 @@ add_hpx_pseudo_dependencies(examples.heartbeat heartbeat)
 add_hpx_executable(
   heartbeat_console INTERNAL_FLAGS
   SOURCES heartbeat_console.cpp
-  FOLDER "Examples/Full/HeartBeat"
+  FOLDER "Examples/HeartBeat"
   DEPENDENCIES iostreams_component
 )
 

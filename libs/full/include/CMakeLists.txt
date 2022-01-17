@@ -4,6 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(include_headers
@@ -118,22 +122,25 @@ set(include_headers
     hpx/unwrap.hpp
 )
 
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(include_optional_module_dependencies
+      hpx_agas
+      hpx_async_distributed
+      hpx_runtime_components
+      hpx_runtime_distributed
+      hpx_lcos_distributed
+      hpx_performance_counters
+      hpx_segmented_algorithms
+  )
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   full include
   GLOBAL_HEADER_GEN OFF
   HEADERS ${include_headers}
-  DEPENDENCIES HPX::hpx_local
-  MODULE_DEPENDENCIES
-    hpx_command_line_handling
-    hpx_compute
-    hpx_config
-    hpx_agas
-    hpx_async_distributed
-    hpx_runtime_components
-    hpx_runtime_distributed
-    hpx_lcos_distributed
-    hpx_performance_counters
-    hpx_segmented_algorithms
+  DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_command_line_handling hpx_compute
+                      ${include_optional_module_dependencies}
   CMAKE_SUBDIRS tests
 )

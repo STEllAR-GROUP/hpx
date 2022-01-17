@@ -12,13 +12,15 @@
 set(hpx_SOURCES "${PROJECT_SOURCE_DIR}/libs/src/dummy.cpp")
 set(hpx_external_objects_SOURCES)
 
-if(MSVC AND MSVC14)
+if(MSVC)
   # add natvis files to solution (supported starting VS2015)
-  add_hpx_library_sources(
-    hpx_natvis_files GLOB GLOBS "${PROJECT_SOURCE_DIR}/tools/VS/*.natvis"
-  )
-  list(APPEND hpx_external_OBJECTS ${hpx_natvis_files_SOURCES})
-  source_group("Natvis Files" FILES ${hpx_natvis_files_SOURCES})
+  if(MSVC14)
+    add_hpx_library_sources(
+      hpx_natvis_files GLOB GLOBS "${PROJECT_SOURCE_DIR}/tools/VS/*.natvis"
+    )
+    list(APPEND hpx_external_OBJECTS ${hpx_natvis_files_SOURCES})
+    source_group("Natvis Files" FILES ${hpx_natvis_files_SOURCES})
+  endif()
 endif()
 
 set(hpx_external_SOURCES)
@@ -94,8 +96,15 @@ target_link_libraries(
   PUBLIC hpx_public_flags
   PRIVATE hpx_private_flags
 )
+target_link_libraries(hpx_full PUBLIC hpx_core)
 target_link_libraries(hpx_full PUBLIC hpx_dependencies_boost)
-target_link_libraries(hpx_full PUBLIC HPX::hpx_local)
+
+# Set the basic search paths for the HPX headers
+target_include_directories(
+  hpx_full
+  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}> $<INSTALL_INTERFACE:include>
+)
 
 if(TARGET APEX::apex)
   # APEX won't get explicitly pulled into libhpx.so any more.  HOWEVER, we do
@@ -104,13 +113,6 @@ if(TARGET APEX::apex)
   # shared object library, we don't need to specify the whole archive.
   target_link_libraries(hpx_full INTERFACE APEX::apex)
 endif()
-
-# Set the basic search paths for the HPX headers
-target_include_directories(
-  hpx_full
-  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
-         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}> $<INSTALL_INTERFACE:include>
-)
 
 if(TARGET Gperftools::gperftools)
   target_link_libraries(hpx_full PRIVATE Gperftools::gperftools)

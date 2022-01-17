@@ -4,6 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/actions/include
@@ -42,8 +46,8 @@ add_hpx_module(
   SOURCES ${actions_sources}
   HEADERS ${actions_headers}
   COMPAT_HEADERS ${actions_compat_headers}
-  MODULE_DEPENDENCIES hpx_actions_base hpx_components_base hpx_config
-                      hpx_naming_base hpx_parcelset_base
-  DEPENDENCIES HPX::hpx_local
+  MODULE_DEPENDENCIES hpx_actions_base hpx_components_base hpx_naming_base
+                      hpx_parcelset_base
+  DEPENDENCIES hpx_core
   CMAKE_SUBDIRS examples tests
 )

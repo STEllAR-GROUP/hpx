@@ -26,8 +26,8 @@ set(parcelport_mpi_compat_headers)
 
 set(parcelport_mpi_sources locality.cpp parcelport_mpi.cpp)
 
-include(HPXLocal_SetupMPI)
-hpx_local_setup_mpi()
+include(HPX_SetupMPI)
+hpx_setup_mpi()
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -36,9 +36,8 @@ add_hpx_module(
   SOURCES ${parcelport_mpi_sources}
   HEADERS ${parcelport_mpi_headers}
   COMPAT_HEADERS ${parcelport_mpi_compat_headers}
-  DEPENDENCIES HPX::hpx_local hpx_dependencies_boost Mpi::mpi
-  MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_config
-                      hpx_parcelset
+  DEPENDENCIES hpx_core hpx_dependencies_boost Mpi::mpi
+  MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_parcelset
   CMAKE_SUBDIRS examples tests
 )
 

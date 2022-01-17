@@ -24,4 +24,5 @@ at the moment.
    :maxdepth: 2
 
    /libs/core/modules.rst
+   /libs/parallelism/modules.rst
    /libs/full/modules.rst

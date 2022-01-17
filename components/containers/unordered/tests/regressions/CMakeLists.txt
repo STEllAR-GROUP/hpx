@@ -20,7 +20,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Full/Components/Containers/Unordered"
+    FOLDER "Tests/Regressions/Components/Containers/Unordered"
   )
 
   add_hpx_regression_test("components.unordered" ${test} ${${test}_PARAMETERS})

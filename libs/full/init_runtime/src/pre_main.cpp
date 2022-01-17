@@ -6,6 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
@@ -240,3 +243,5 @@ namespace hpx { namespace detail {
         hpx::lcos::barrier::get_global_barrier().detach();
     }
 }}    // namespace hpx::detail
+
+#endif

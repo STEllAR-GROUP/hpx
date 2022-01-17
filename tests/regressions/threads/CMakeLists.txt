@@ -5,7 +5,27 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests resume_priority)
+set(tests
+    block_os_threads_1036
+    run_as_hpx_thread_exceptions_3304
+    run_as_os_thread_lockup_2991
+    stackless_self_4155
+    thread_data_1111
+    thread_rescheduling
+    thread_suspend_pending
+    thread_suspend_duration
+    threads_all_1422
+)
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  list(APPEND tests resume_priority)
+endif()
+
+set(block_os_threads_1036_PARAMETERS THREADS_PER_LOCALITY 4 RUN_SERIAL)
+set(thread_rescheduling_PARAMETERS THREADS_PER_LOCALITY 4)
+set(thread_suspend_pending_PARAMETERS THREADS_PER_LOCALITY 1)
+set(thread_suspend_duration_PARAMETERS THREADS_PER_LOCALITY 1)
+set(threads_all_1422_PARAMETERS THREADS_PER_LOCALITY -1) # -1 means 'all'
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
@@ -18,7 +38,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Full/Threads"
+    FOLDER "Tests/Regressions/Threads"
   )
 
   add_hpx_regression_test("threads" ${test} ${${test}_PARAMETERS})

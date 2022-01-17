@@ -5,6 +5,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 set(example_programs accumulator template_accumulator
                      template_function_accumulator
 )
@@ -24,7 +28,7 @@ foreach(example_program ${example_programs})
     ${example_program} INTERNAL_FLAGS NOEXPORT
     SOURCES ${component_sources}
     HEADERS ${component_headers}
-    FOLDER "Examples/Full/Quickstart/Accumulators/${example_program}"
+    FOLDER "Examples/Quickstart/Accumulators/${example_program}"
   )
 
   # add example executable
@@ -32,7 +36,7 @@ foreach(example_program ${example_programs})
     ${example_program} INTERNAL_FLAGS
     SOURCES ${client_sources}
     DEPENDENCIES ${example_program}_component
-    FOLDER "Examples/Full/Quickstart/Accumulators/${example_program}"
+    FOLDER "Examples/Quickstart/Accumulators/${example_program}"
   )
 
   add_hpx_example_target_dependencies("accumulators" ${example_program})

@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
 
 /// \namespace hpx

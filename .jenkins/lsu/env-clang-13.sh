@@ -14,7 +14,7 @@ module load openmpi
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="20"
 
-configure_extra_options+="-DCMAKE_BUILD_TYPE=${build_type}"
+configure_extra_options+=" -DCMAKE_BUILD_TYPE=${build_type}"
 configure_extra_options+=" -DHPX_WITH_CXX_STANDARD=${CXX_STD}"
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
 configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"

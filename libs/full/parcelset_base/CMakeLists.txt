@@ -45,6 +45,10 @@ set(parcelset_base_sources
     set_parcel_write_handler.cpp
 )
 
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(parcelset_base_optional_module_dependencies hpx_naming_base)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   full parcelset_base
@@ -52,7 +56,7 @@ add_hpx_module(
   SOURCES ${parcelset_base_sources}
   HEADERS ${parcelset_base_headers}
   COMPAT_HEADERS ${parcelset_base_compat_headers}
-  DEPENDENCIES HPX::hpx_local
-  MODULE_DEPENDENCIES hpx_config hpx_naming_base
+  DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES ${parcelset_base_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests
 )

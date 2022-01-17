@@ -454,7 +454,7 @@ namespace hpx { namespace util {
                     throw hpx::detail::command_line_error("Requested more than "
                         HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
                         "to use for this application, use the option "
-                        "-DHPXLocal_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
+                        "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
                     // clang-format on
                 }
 #endif
@@ -872,7 +872,7 @@ namespace hpx { namespace util {
             {
                 rtcfg_.mode_ = hpx::runtime_mode::local;
             }
-#else
+#elif defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             if (vm.count("hpx:local"))
             {
                 rtcfg_.mode_ = hpx::runtime_mode::local;
@@ -881,6 +881,8 @@ namespace hpx { namespace util {
             {
                 rtcfg_.mode_ = hpx::runtime_mode::console;
             }
+#else
+            rtcfg_.mode_ = hpx::runtime_mode::local;
 #endif
         }
 
