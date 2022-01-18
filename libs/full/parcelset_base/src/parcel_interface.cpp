@@ -146,19 +146,19 @@ namespace hpx::parcelset {
 #if defined(HPX_HAVE_NETWORKING)
     serialization::binary_filter* parcel::get_serialization_filter() const
     {
-        return data_->get_serialization_filter();
+        return data_ ? data_->get_serialization_filter() : nullptr;
     }
 
     policies::message_handler* parcel::get_message_handler(
         locality const& loc) const
     {
-        return data_->get_message_handler(loc);
+        return data_ ? data_->get_message_handler(loc) : nullptr;
     }
 #endif
 
     bool parcel::does_termination_detection() const
     {
-        return data_->does_termination_detection();
+        return data_ ? data_->does_termination_detection() : false;
     }
 
     parcel::split_gids_type parcel::move_split_gids() const
