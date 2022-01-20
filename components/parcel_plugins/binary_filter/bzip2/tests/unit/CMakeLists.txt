@@ -1,14 +1,13 @@
-# Copyright (c) 2022 Hartmut Kaiser
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests function_serialization_728)
+set(tests put_parcels_with_compression_bzip2)
 
-set(function_serialization_728_FLAGS DEPENDENCIES iostreams_component
-                                     parcel_coalescing
-)
+set(put_parcels_with_compression_bzip2_PARAMETERS LOCALITIES 2)
+set(put_parcels_with_compression_bzip2_FLAGS DEPENDENCIES compression_bzip2)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
@@ -21,10 +20,10 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Full/Plugins/MessageHandlers"
+    FOLDER "Tests/Unit/Full/Plugins/Compression"
   )
 
-  add_hpx_regression_test(
+  add_hpx_unit_test(
     "components.parcel_plugins.coalescing" ${test} ${${test}_PARAMETERS}
   )
 endforeach()

@@ -22,7 +22,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Unit/Full/Components/MessageHandlers"
+    FOLDER "Tests/Unit/Full/Plugins/MessageHandlers"
   )
 
   add_hpx_unit_test(

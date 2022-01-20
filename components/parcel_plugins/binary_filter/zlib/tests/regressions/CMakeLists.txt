@@ -4,11 +4,9 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests function_serialization_728)
+set(tests function_serialization_728_zlib)
 
-set(function_serialization_728_FLAGS DEPENDENCIES iostreams_component
-                                     parcel_coalescing
-)
+set(function_serialization_728_zlib_FLAGS DEPENDENCIES compression_zlib)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
@@ -21,7 +19,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Full/Plugins/MessageHandlers"
+    FOLDER "Tests/Regressions/Full/Plugins/Compression"
   )
 
   add_hpx_regression_test(
