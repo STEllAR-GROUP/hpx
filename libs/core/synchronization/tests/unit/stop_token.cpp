@@ -290,16 +290,16 @@ void test_stop_token_api()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename D>
-void sleep(D dur)
+void sleep(D duration)
 {
-    if (dur > std::chrono::milliseconds{0})
+    if (duration > std::chrono::milliseconds{0})
     {
-        std::this_thread::sleep_for(dur);
+        std::this_thread::sleep_for(duration);
     }
 }
 
 template <typename D>
-void test_stoken(D dur)
+void test_stoken(D duration)
 {
     int okSteps = 0;
     try
@@ -309,38 +309,38 @@ void test_stoken(D dur)
         hpx::stop_source interruptor;
         hpx::stop_token interruptee{interruptor.get_token()};
         ++okSteps;
-        sleep(dur);    // 1
+        sleep(duration);    // 1
         HPX_TEST(!interruptor.stop_requested());
         HPX_TEST(!interruptee.stop_requested());
 
         interruptor.request_stop();    // INTERRUPT !!!
         ++okSteps;
-        sleep(dur);    // 2
+        sleep(duration);    // 2
         HPX_TEST(interruptor.stop_requested());
         HPX_TEST(interruptee.stop_requested());
 
         interruptor.request_stop();
         ++okSteps;
-        sleep(dur);    // 3
+        sleep(duration);    // 3
         HPX_TEST(interruptor.stop_requested());
         HPX_TEST(interruptee.stop_requested());
 
         interruptor = hpx::stop_source{};
         interruptee = interruptor.get_token();
         ++okSteps;
-        sleep(dur);    // 4
+        sleep(duration);    // 4
         HPX_TEST(!interruptor.stop_requested());
         HPX_TEST(!interruptee.stop_requested());
 
         interruptor.request_stop();    // INTERRUPT !!!
         ++okSteps;
-        sleep(dur);    // 5
+        sleep(duration);    // 5
         HPX_TEST(interruptor.stop_requested());
         HPX_TEST(interruptee.stop_requested());
 
         interruptor.request_stop();
         ++okSteps;
-        sleep(dur);    // 6
+        sleep(duration);    // 6
         HPX_TEST(interruptor.stop_requested());
         HPX_TEST(interruptee.stop_requested());
     }
