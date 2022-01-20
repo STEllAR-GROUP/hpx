@@ -174,7 +174,7 @@ namespace hpx { namespace util {
 #if defined(MPICH) && defined(_POSIX_SOURCE)
         // This enables multi threading support in MVAPICH if requested.
         if (required == MPI_THREAD_MULTIPLE)
-            setenv("MPICH_MAX_THREAD_SAFETY", "MPICH_MAX_THREAD_SAFETY", 1);
+            setenv("MPICH_MAX_THREAD_SAFETY", "multiple", 1);
 #endif
 
 #endif
