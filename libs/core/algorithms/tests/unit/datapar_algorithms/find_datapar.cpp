@@ -1,84 +1,74 @@
 //  Copyright (c) 2021 Srinivas Yadav
-//  copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2014 Grant Mercer
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/local/init.hpp>
+#include <hpx/parallel/datapar.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "findif_tests.hpp"
+#include "../algorithms/find_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_find_if()
+void test_find()
 {
     using namespace hpx::execution;
 
-    test_find_if(IteratorTag());
+    test_find(simd, IteratorTag());
+    test_find(par_simd, IteratorTag());
 
-    test_find_if(seq, IteratorTag());
-    test_find_if(par, IteratorTag());
-    test_find_if(par_unseq, IteratorTag());
-
-    test_find_if_async(seq(task), IteratorTag());
-    test_find_if_async(par(task), IteratorTag());
+    test_find_async(simd(task), IteratorTag());
+    test_find_async(par_simd(task), IteratorTag());
 }
 
-void find_if_test()
+void find_test()
 {
-    test_find_if<std::random_access_iterator_tag>();
-    test_find_if<std::forward_iterator_tag>();
+    test_find<std::random_access_iterator_tag>();
+    test_find<std::forward_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_find_if_exception()
+void test_find_exception()
 {
     using namespace hpx::execution;
 
-    test_find_if_exception(IteratorTag());
+    test_find_exception(simd, IteratorTag());
+    test_find_exception(par_simd, IteratorTag());
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_find_if_exception(seq, IteratorTag());
-    test_find_if_exception(par, IteratorTag());
-
-    test_find_if_exception_async(seq(task), IteratorTag());
-    test_find_if_exception_async(par(task), IteratorTag());
+    test_find_exception_async(simd(task), IteratorTag());
+    test_find_exception_async(par_simd(task), IteratorTag());
 }
 
-void find_if_exception_test()
+void find_exception_test()
 {
-    test_find_if_exception<std::random_access_iterator_tag>();
-    test_find_if_exception<std::forward_iterator_tag>();
+    test_find_exception<std::random_access_iterator_tag>();
+    test_find_exception<std::forward_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_find_if_bad_alloc()
+void test_find_bad_alloc()
 {
     using namespace hpx::execution;
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_find_if_bad_alloc(seq, IteratorTag());
-    test_find_if_bad_alloc(par, IteratorTag());
+    test_find_bad_alloc(simd, IteratorTag());
+    test_find_bad_alloc(par_simd, IteratorTag());
 
-    test_find_if_bad_alloc_async(seq(task), IteratorTag());
-    test_find_if_bad_alloc_async(par(task), IteratorTag());
+    test_find_bad_alloc_async(simd(task), IteratorTag());
+    test_find_bad_alloc_async(par_simd(task), IteratorTag());
 }
 
-void find_if_bad_alloc_test()
+void find_bad_alloc_test()
 {
-    test_find_if_bad_alloc<std::random_access_iterator_tag>();
-    test_find_if_bad_alloc<std::forward_iterator_tag>();
+    test_find_bad_alloc<std::random_access_iterator_tag>();
+    test_find_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -89,9 +79,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     gen.seed(seed);
 
-    find_if_test();
-    find_if_exception_test();
-    find_if_bad_alloc_test();
+    find_test();
+    find_exception_test();
+    find_bad_alloc_test();
     return hpx::local::finalize();
 }
 

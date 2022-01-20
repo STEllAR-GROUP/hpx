@@ -6,26 +6,24 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/local/init.hpp>
+#include <hpx/parallel/datapar.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "findfirstof_tests.hpp"
+#include "../algorithms/findfirstof_tests.hpp"
 
 template <typename IteratorTag>
 void test_find_first_of()
 {
     using namespace hpx::execution;
 
-    test_find_first_of(IteratorTag());
+    test_find_first_of(simd, IteratorTag());
+    test_find_first_of(par_simd, IteratorTag());
 
-    test_find_first_of(seq, IteratorTag());
-    test_find_first_of(par, IteratorTag());
-    test_find_first_of(par_unseq, IteratorTag());
-
-    test_find_first_of_async(seq(task), IteratorTag());
-    test_find_first_of_async(par(task), IteratorTag());
+    test_find_first_of_async(simd(task), IteratorTag());
+    test_find_first_of_async(par_simd(task), IteratorTag());
 }
 
 void find_first_of_test()
@@ -39,16 +37,11 @@ void test_find_first_of_exception()
 {
     using namespace hpx::execution;
 
-    test_find_first_of_exception(IteratorTag());
+    test_find_first_of_exception(simd, IteratorTag());
+    test_find_first_of_exception(par_simd, IteratorTag());
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_find_first_of_exception(seq, IteratorTag());
-    test_find_first_of_exception(par, IteratorTag());
-
-    test_find_first_of_exception_async(seq(task), IteratorTag());
-    test_find_first_of_exception_async(par(task), IteratorTag());
+    test_find_first_of_exception_async(simd(task), IteratorTag());
+    test_find_first_of_exception_async(par_simd(task), IteratorTag());
 }
 
 void find_first_of_exception_test()
@@ -65,11 +58,11 @@ void test_find_first_of_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_find_first_of_bad_alloc(seq, IteratorTag());
-    test_find_first_of_bad_alloc(par, IteratorTag());
+    test_find_first_of_bad_alloc(simd, IteratorTag());
+    test_find_first_of_bad_alloc(par_simd, IteratorTag());
 
-    test_find_first_of_bad_alloc_async(seq(task), IteratorTag());
-    test_find_first_of_bad_alloc_async(par(task), IteratorTag());
+    test_find_first_of_bad_alloc_async(simd(task), IteratorTag());
+    test_find_first_of_bad_alloc_async(par_simd(task), IteratorTag());
 }
 
 void find_first_of_bad_alloc_test()

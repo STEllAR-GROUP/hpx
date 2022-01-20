@@ -6,12 +6,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/local/init.hpp>
+#include <hpx/parallel/datapar.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "findifnot_tests.hpp"
+#include "../algorithms/findifnot_tests.hpp"
 
 //////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -19,14 +20,11 @@ void test_find_if_not()
 {
     using namespace hpx::execution;
 
-    test_find_if_not(IteratorTag());
+    test_find_if_not(simd, IteratorTag());
+    test_find_if_not(par_simd, IteratorTag());
 
-    test_find_if_not(seq, IteratorTag());
-    test_find_if_not(par, IteratorTag());
-    test_find_if_not(par_unseq, IteratorTag());
-
-    test_find_if_not_async(seq(task), IteratorTag());
-    test_find_if_not_async(par(task), IteratorTag());
+    test_find_if_not_async(simd(task), IteratorTag());
+    test_find_if_not_async(par_simd(task), IteratorTag());
 }
 
 void find_if_not_test()
@@ -41,16 +39,11 @@ void test_find_if_not_exception()
 {
     using namespace hpx::execution;
 
-    test_find_if_not_exception(IteratorTag());
+    test_find_if_not_exception(simd, IteratorTag());
+    test_find_if_not_exception(par_simd, IteratorTag());
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_find_if_not_exception(seq, IteratorTag());
-    test_find_if_not_exception(par, IteratorTag());
-
-    test_find_if_not_exception_async(seq(task), IteratorTag());
-    test_find_if_not_exception_async(par(task), IteratorTag());
+    test_find_if_not_exception_async(simd(task), IteratorTag());
+    test_find_if_not_exception_async(par_simd(task), IteratorTag());
 }
 
 void find_if_not_exception_test()
@@ -65,14 +58,11 @@ void test_find_if_not_bad_alloc()
 {
     using namespace hpx::execution;
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_find_if_not_bad_alloc(seq, IteratorTag());
-    test_find_if_not_bad_alloc(par, IteratorTag());
+    test_find_if_not_bad_alloc(simd, IteratorTag());
+    test_find_if_not_bad_alloc(par_simd, IteratorTag());
 
-    test_find_if_not_bad_alloc_async(seq(task), IteratorTag());
-    test_find_if_not_bad_alloc_async(par(task), IteratorTag());
+    test_find_if_not_bad_alloc_async(simd(task), IteratorTag());
+    test_find_if_not_bad_alloc_async(par_simd(task), IteratorTag());
 }
 
 void find_if_not_bad_alloc_test()

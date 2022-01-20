@@ -6,12 +6,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/local/init.hpp>
+#include <hpx/parallel/datapar.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "findend_tests.hpp"
+#include "../algorithms/findend_tests.hpp"
 
 template <typename IteratorTag>
 void test_find_end1()
@@ -20,12 +21,11 @@ void test_find_end1()
 
     test_find_end1(IteratorTag());
 
-    test_find_end1(seq, IteratorTag());
-    test_find_end1(par, IteratorTag());
-    test_find_end1(par_unseq, IteratorTag());
+    test_find_end1(simd, IteratorTag());
+    test_find_end1(par_simd, IteratorTag());
 
-    test_find_end1_async(seq(task), IteratorTag());
-    test_find_end1_async(par(task), IteratorTag());
+    test_find_end1_async(simd(task), IteratorTag());
+    test_find_end1_async(par_simd(task), IteratorTag());
 }
 
 void find_end_test1()
@@ -41,12 +41,11 @@ void test_find_end2()
 
     test_find_end2(IteratorTag());
 
-    test_find_end2(seq, IteratorTag());
-    test_find_end2(par, IteratorTag());
-    test_find_end2(par_unseq, IteratorTag());
+    test_find_end2(simd, IteratorTag());
+    test_find_end2(par_simd, IteratorTag());
 
-    test_find_end2_async(seq(task), IteratorTag());
-    test_find_end2_async(par(task), IteratorTag());
+    test_find_end2_async(simd(task), IteratorTag());
+    test_find_end2_async(par_simd(task), IteratorTag());
 }
 
 void find_end_test2()
@@ -62,12 +61,11 @@ void test_find_end3()
 
     test_find_end3(IteratorTag());
 
-    test_find_end3(seq, IteratorTag());
-    test_find_end3(par, IteratorTag());
-    test_find_end3(par_unseq, IteratorTag());
+    test_find_end3(simd, IteratorTag());
+    test_find_end3(par_simd, IteratorTag());
 
-    test_find_end3_async(seq(task), IteratorTag());
-    test_find_end3_async(par(task), IteratorTag());
+    test_find_end3_async(simd(task), IteratorTag());
+    test_find_end3_async(par_simd(task), IteratorTag());
 }
 
 void find_end_test3()
@@ -83,18 +81,17 @@ void test_find_end4()
 
     test_find_end4(IteratorTag());
 
-    test_find_end4(seq, IteratorTag());
-    test_find_end4(par, IteratorTag());
-    test_find_end4(par_unseq, IteratorTag());
+    test_find_end4(simd, IteratorTag());
+    test_find_end4(par_simd, IteratorTag());
 
-    test_find_end4_async(seq(task), IteratorTag());
-    test_find_end4_async(par(task), IteratorTag());
+    test_find_end4_async(simd(task), IteratorTag());
+    test_find_end4_async(par_simd(task), IteratorTag());
 }
 
 void find_end_test4()
 {
     test_find_end4<std::random_access_iterator_tag>();
-    test_find_end4<std::forward_iterator_tag>();
+    // test_find_end4<std::forward_iterator_tag>();
 }
 
 template <typename IteratorTag>
@@ -102,22 +99,17 @@ void test_find_end_exception()
 {
     using namespace hpx::execution;
 
-    test_find_end_exception(IteratorTag());
+    test_find_end_exception(simd, IteratorTag());
+    test_find_end_exception(par_simd, IteratorTag());
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_find_end_exception(seq, IteratorTag());
-    test_find_end_exception(par, IteratorTag());
-
-    test_find_end_exception_async(seq(task), IteratorTag());
-    test_find_end_exception_async(par(task), IteratorTag());
+    test_find_end_exception_async(simd(task), IteratorTag());
+    test_find_end_exception_async(par_simd(task), IteratorTag());
 }
 
 void find_end_exception_test()
 {
     test_find_end_exception<std::random_access_iterator_tag>();
-    test_find_end_exception<std::forward_iterator_tag>();
+    // test_find_end_exception<std::forward_iterator_tag>();
 }
 
 template <typename IteratorTag>
@@ -128,17 +120,17 @@ void test_find_end_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_find_end_bad_alloc(seq, IteratorTag());
-    test_find_end_bad_alloc(par, IteratorTag());
+    test_find_end_bad_alloc(simd, IteratorTag());
+    test_find_end_bad_alloc(par_simd, IteratorTag());
 
-    test_find_end_bad_alloc_async(seq(task), IteratorTag());
-    test_find_end_bad_alloc_async(par(task), IteratorTag());
+    test_find_end_bad_alloc_async(simd(task), IteratorTag());
+    test_find_end_bad_alloc_async(par_simd(task), IteratorTag());
 }
 
 void find_end_bad_alloc_test()
 {
     test_find_end_bad_alloc<std::random_access_iterator_tag>();
-    test_find_end_bad_alloc<std::forward_iterator_tag>();
+    // test_find_end_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

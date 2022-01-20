@@ -18,6 +18,11 @@ if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
       countif_datapar
       fill_datapar
       filln_datapar
+      find_datapar
+      findend_datapar
+      findfirstof_datapar
+      findif_datapar
+      findifnot_datapar
       foreach_datapar
       foreach_datapar_zipiter
       foreachn_datapar
@@ -26,6 +31,7 @@ if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
       none_of_datapar
       transform_binary_datapar
       transform_binary2_datapar
+      transform_datapar
       transform_reduce_binary_datapar
   )
 endif()
