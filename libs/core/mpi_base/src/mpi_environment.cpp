@@ -1,5 +1,6 @@
 //  Copyright (c) 2013-2015 Thomas Heller
 //  Copyright (c)      2020 Google
+//  Copyright (c)      2022 Patrick Diehl
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -169,6 +170,13 @@ namespace hpx { namespace util {
         if (required == MPI_THREAD_MULTIPLE)
             setenv("MV2_ENABLE_AFFINITY", "0", 1);
 #endif
+
+#if defined(MPICH) && defined(_POSIX_SOURCE)
+        // This enables multi threading support in MVAPICH if requested.
+        if (required == MPI_THREAD_MULTIPLE)
+            setenv("MPICH_MAX_THREAD_SAFETY", "multiple", 1);
+#endif
+
 #endif
 
         int retval =
