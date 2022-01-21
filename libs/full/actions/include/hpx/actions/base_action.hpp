@@ -203,14 +203,11 @@ namespace hpx { namespace serialization {
 
 #define HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                        \
     HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                         \
-    namespace hpx { namespace actions { namespace detail {                     \
-                template <>                                                    \
-                HPX_ALWAYS_EXPORT char const*                                  \
-                get_action_name<action>() noexcept                             \
-                {                                                              \
-                    return HPX_PP_STRINGIZE(actionname);                       \
-                }                                                              \
-            }                                                                  \
+    namespace hpx::actions::detail {                                           \
+        template <>                                                            \
+        HPX_ALWAYS_EXPORT char const* get_action_name</**/ action>() noexcept  \
+        {                                                                      \
+            return HPX_PP_STRINGIZE(actionname);                               \
         }                                                                      \
     }                                                                          \
     /**/
@@ -219,27 +216,22 @@ namespace hpx { namespace serialization {
 ///////////////////////////////////////////////////////////////////////////////
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                     \
-    namespace hpx { namespace actions { namespace detail {                     \
-                template <>                                                    \
-                HPX_ALWAYS_EXPORT util::itt::string_handle const&              \
-                get_action_name_itt<action>() noexcept                         \
-                {                                                              \
-                    static util::itt::string_handle sh(                        \
-                        HPX_PP_STRINGIZE(actionname));                         \
-                    return sh;                                                 \
-                }                                                              \
-            }                                                                  \
+    namespace hpx::actions::detail {                                           \
+        template <>                                                            \
+        HPX_ALWAYS_EXPORT util::itt::string_handle const&                      \
+        get_action_name_itt</**/ action>() noexcept                            \
+        {                                                                      \
+            static util::itt::string_handle sh(HPX_PP_STRINGIZE(actionname));  \
+            return sh;                                                         \
         }                                                                      \
     }                                                                          \
     /**/
 
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)            \
-    namespace hpx { namespace actions { namespace detail {                     \
-                template <>                                                    \
-                HPX_ALWAYS_EXPORT util::itt::string_handle const&              \
-                get_action_name_itt<action>() noexcept;                        \
-            }                                                                  \
-        }                                                                      \
+    namespace hpx::actions::detail {                                           \
+        template <>                                                            \
+        HPX_ALWAYS_EXPORT util::itt::string_handle const&                      \
+        get_action_name_itt</**/ action>() noexcept;                           \
     }                                                                          \
 /**/
 #else    // HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
@@ -249,25 +241,21 @@ namespace hpx { namespace serialization {
 
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)                \
     HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)                \
-    namespace hpx { namespace actions { namespace detail {                     \
-                template <>                                                    \
-                HPX_ALWAYS_EXPORT char const*                                  \
-                get_action_name<action>() noexcept;                            \
-            }                                                                  \
-        }                                                                      \
+    namespace hpx::actions::detail {                                           \
+        template <>                                                            \
+        HPX_ALWAYS_EXPORT char const* get_action_name<action>() noexcept;      \
     }                                                                          \
     HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                             \
                                                                                \
-    namespace hpx { namespace traits {                                         \
-            template <>                                                        \
-            struct is_action<action> : std::true_type                          \
-            {                                                                  \
-            };                                                                 \
-            template <>                                                        \
-            struct needs_automatic_registration<action> : std::false_type      \
-            {                                                                  \
-            };                                                                 \
-        }                                                                      \
+    namespace hpx::traits {                                                    \
+        template <>                                                            \
+        struct is_action</**/ action> : std::true_type                         \
+        {                                                                      \
+        };                                                                     \
+        template <>                                                            \
+        struct needs_automatic_registration</**/ action> : std::false_type     \
+        {                                                                      \
+        };                                                                     \
     }                                                                          \
     /**/
 
@@ -280,11 +268,10 @@ namespace hpx { namespace serialization {
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                            \
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                               \
     HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                         \
-    namespace hpx { namespace actions {                                        \
-            template struct HPX_ALWAYS_EXPORT transfer_action<action>;         \
-            template struct HPX_ALWAYS_EXPORT                                  \
-                transfer_continuation_action<action>;                          \
-        }                                                                      \
+    namespace hpx::actions {                                                   \
+        template struct HPX_ALWAYS_EXPORT transfer_action</**/ action>;        \
+        template struct HPX_ALWAYS_EXPORT                                      \
+            transfer_continuation_action</**/ action>;                         \
     }                                                                          \
 /**/
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action) /**/
@@ -295,18 +282,16 @@ namespace hpx { namespace serialization {
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                            \
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                               \
     HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                         \
-    namespace hpx { namespace actions {                                        \
-            template struct transfer_action<action>;                           \
-            template struct transfer_continuation_action<action>;              \
-        }                                                                      \
+    namespace hpx::actions {                                                   \
+        template struct transfer_action</**/ action>;                          \
+        template struct transfer_continuation_action</**/ action>;             \
     }                                                                          \
 /**/
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                         \
-    namespace hpx { namespace actions {                                        \
-            extern template struct HPX_ALWAYS_IMPORT transfer_action<action>;  \
-            extern template struct HPX_ALWAYS_IMPORT                           \
-                transfer_continuation_action<action>;                          \
-        }                                                                      \
+    namespace hpx::actions {                                                   \
+        extern template struct HPX_ALWAYS_IMPORT transfer_action</**/ action>; \
+        extern template struct HPX_ALWAYS_IMPORT                               \
+            transfer_continuation_action</**/ action>;                         \
     }                                                                          \
     /**/
 

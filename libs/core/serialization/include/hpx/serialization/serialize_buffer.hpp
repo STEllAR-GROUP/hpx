@@ -18,15 +18,14 @@
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
-#else
-#include <memory>
 #endif
 
 #include <algorithm>
 #include <cstddef>
+#include <memory>
 #include <type_traits>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Allocator = std::allocator<T>>
@@ -40,10 +39,11 @@ namespace hpx { namespace serialization {
         using buffer_type = boost::shared_array<T>;
 #endif
 
-        static void no_deleter(T*) {}
+        static constexpr void no_deleter(T*) noexcept {}
 
         template <typename Deallocator>
-        static void deleter(T* p, Deallocator dealloc, std::size_t size)
+        static void deleter(
+            T* p, Deallocator dealloc, std::size_t size) noexcept
         {
             dealloc.deallocate(p, size);
         }
@@ -74,7 +74,7 @@ namespace hpx { namespace serialization {
           , alloc_(alloc)
         {
             data_.reset(alloc_.allocate(size),
-                [alloc = this->alloc_, size = this->size_](T* p) {
+                [alloc = this->alloc_, size = this->size_](T* p) noexcept {
                     serialize_buffer::deleter<allocator_type>(p, alloc, size);
                 });
         }
@@ -90,7 +90,7 @@ namespace hpx { namespace serialization {
             if (mode == copy)
             {
                 data_.reset(alloc_.allocate(size),
-                    [alloc = this->alloc_, size = this->size_](T* p) {
+                    [alloc = this->alloc_, size = this->size_](T* p) noexcept {
                         serialize_buffer::deleter<allocator_type>(
                             p, alloc, size);
                     });
@@ -104,8 +104,8 @@ namespace hpx { namespace serialization {
             else
             {
                 // take ownership
-                data_ = buffer_type(
-                    data, [alloc = this->alloc_, size = this->size_](T* p) {
+                data_ = buffer_type(data,
+                    [alloc = this->alloc_, size = this->size_](T* p) noexcept {
                         serialize_buffer::deleter<allocator_type>(
                             p, alloc, size);
                     });
@@ -120,7 +120,7 @@ namespace hpx { namespace serialization {
           , alloc_(alloc)
         {
             // if 2 allocators are specified we assume mode 'take'
-            data_ = buffer_type(data, [this, dealloc](T* p) {
+            data_ = buffer_type(data, [this, dealloc](T* p) noexcept {
                 serialize_buffer::deleter<Deallocator>(p, dealloc, size_);
             });
         }
@@ -195,7 +195,7 @@ namespace hpx { namespace serialization {
         {
             // create from const data implies 'copy' mode
             data_.reset(alloc_.allocate(size),
-                [alloc = this->alloc_, size = this->size_](T* p) {
+                [alloc = this->alloc_, size = this->size_](T* p) noexcept {
                     serialize_buffer::deleter<allocator_type>(p, alloc, size);
                 });
             if (size != 0)
@@ -225,7 +225,7 @@ namespace hpx { namespace serialization {
             if (mode == copy)
             {
                 data_.reset(alloc_.allocate(size),
-                    [alloc = this->alloc_, size = this->size_](T* p) {
+                    [alloc = this->alloc_, size = this->size_](T* p) noexcept {
                         serialize_buffer::deleter<allocator_type>(
                             p, alloc, size);
                     });
@@ -247,20 +247,20 @@ namespace hpx { namespace serialization {
         }
 
         // accessors enabling data access
-        T* data()
+        T* data() noexcept
         {
             return data_.get();
         }
-        T const* data() const
+        T const* data() const noexcept
         {
             return data_.get();
         }
 
-        T* begin()
+        T* begin() noexcept
         {
             return data();
         }
-        T* end()
+        T* end() noexcept
         {
             return data() + size_;
         }
@@ -269,22 +269,22 @@ namespace hpx { namespace serialization {
         {
             return data_[idx];
         }
-        T operator[](std::size_t idx) const
+        T const& operator[](std::size_t idx) const
         {
             return data_[idx];
         }
 
-        buffer_type data_array() const
+        constexpr buffer_type data_array() const noexcept
         {
             return data_;
         }
 
-        std::size_t size() const
+        constexpr std::size_t size() const noexcept
         {
             return size_;
         }
 
-        void resize_norealloc(std::size_t newsize)
+        void resize_norealloc(std::size_t newsize) noexcept
         {
             HPX_ASSERT_MSG(newsize <= size_,
                 "serialize_buffer::resize_norealloc: new size shouldn't be "
@@ -303,8 +303,7 @@ namespace hpx { namespace serialization {
         template <typename Archive>
         void save(Archive& ar, unsigned int const) const
         {
-            ar << size_ << alloc_;
-            // -V128
+            ar << size_ << alloc_;    // -V128
 
             if (size_ != 0)
             {
@@ -316,8 +315,7 @@ namespace hpx { namespace serialization {
         template <typename Archive>
         void load(Archive& ar, unsigned int const)
         {
-            ar >> size_ >> alloc_;
-            // -V128
+            ar >> size_ >> alloc_;    // -V128
 
             data_.reset(alloc_.allocate(size_),
                 [alloc = this->alloc_, size = this->size_](T* p) {
@@ -334,7 +332,7 @@ namespace hpx { namespace serialization {
 
         // this is needed for util::any
         friend bool operator==(
-            serialize_buffer const& rhs, serialize_buffer const& lhs)
+            serialize_buffer const& rhs, serialize_buffer const& lhs) noexcept
         {
             return rhs.data_.get() == lhs.data_.get() && rhs.size_ == lhs.size_;
         }
@@ -344,7 +342,7 @@ namespace hpx { namespace serialization {
         std::size_t size_;
         Allocator alloc_;
     };
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
 namespace hpx { namespace traits {
 

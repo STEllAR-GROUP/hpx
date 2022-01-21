@@ -1,6 +1,7 @@
 //  (C) Copyright 2005 Matthias Troyer and Dave Abrahams
 //  Copyright (c) 2015 Anton Bikineev
 //  Copyright (c) 2015 Andreas Schaefer
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,83 +25,79 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
-    template <class T>
+    template <typename T>
     class array
     {
     public:
         using value_type = T;
 
-        array(value_type* t, std::size_t s)
+        constexpr array(value_type* t, std::size_t s) noexcept
           : m_t(t)
           , m_element_count(s)
         {
         }
 
-        value_type* address() const
+        constexpr value_type* address() const noexcept
         {
             return m_t;
         }
 
-        std::size_t count() const
+        constexpr std::size_t count() const noexcept
         {
             return m_element_count;
         }
 
-        template <class Archive>
-        void serialize_optimized(
-            Archive& ar, unsigned int /*v*/, std::false_type)
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned int)
         {
-            for (std::size_t i = 0; i != m_element_count; ++i)
-                ar& m_t[i];
-        }
-
-        void serialize_optimized(
-            output_archive& ar, unsigned int, std::true_type)
-        {
-            // try using chunking
-            ar.save_binary_chunk(m_t, m_element_count * sizeof(T));
-        }
-
-        void serialize_optimized(
-            input_archive& ar, unsigned int, std::true_type)
-        {
-            // try using chunking
-            ar.load_binary_chunk(m_t, m_element_count * sizeof(T));
-        }
-
-        template <class Archive>
-        void serialize(Archive& ar, unsigned int v)
-        {
-            using element_type = std::remove_const_t<T>;
-
-            using use_optimized = std::integral_constant<bool,
-                std::is_default_constructible_v<element_type> &&
-                    (hpx::traits::is_bitwise_serializable_v<element_type> ||
-                        !hpx::traits::is_not_bitwise_serializable_v<
-                            element_type>)>;
-
-            bool archive_endianess_differs = endian::native == endian::big ?
-                ar.endian_little() :
-                ar.endian_big();
-
 #if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
             // NOLINTNEXTLINE(bugprone-branch-clone)
-            if (ar.disable_array_optimization() || archive_endianess_differs)
+            if (ar.disable_array_optimization() || ar.endianess_differs())
             {
-                serialize_optimized(ar, v, std::false_type());
+                // normal serializtion
+                for (std::size_t i = 0; i != m_element_count; ++i)
+                {
+                    // clang-format off
+                    ar & m_t[i];
+                    // clang-format on
+                }
+                return;
+            }
+#else
+            HPX_ASSERT(
+                !(ar.disable_array_optimization() || ar.endianess_differs()));
+#endif
+            using element_type = std::remove_const_t<T>;
+
+            constexpr bool use_optimized =
+                std::is_default_constructible_v<element_type> &&
+                (hpx::traits::is_bitwise_serializable_v<element_type> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<element_type>);
+
+            if constexpr (use_optimized)
+            {
+                // try using chunking
+                if constexpr (std::is_same_v<Archive, input_archive>)
+                {
+                    ar.load_binary_chunk(m_t, m_element_count * sizeof(T));
+                }
+                else
+                {
+                    ar.save_binary_chunk(m_t, m_element_count * sizeof(T));
+                }
             }
             else
             {
-                serialize_optimized(ar, v, use_optimized());
+                // normal serialization
+                for (std::size_t i = 0; i != m_element_count; ++i)
+                {
+                    // clang-format off
+                    ar & m_t[i];
+                    // clang-format on
+                }
             }
-#else
-            (void) archive_endianess_differs;
-            HPX_ASSERT(!(
-                ar.disable_array_optimization() || archive_endianess_differs));
-            serialize_optimized(ar, v, use_optimized());
-#endif
         }
 
     private:
@@ -109,8 +106,9 @@ namespace hpx { namespace serialization {
     };
 
     // make_array function
-    template <class T>
-    HPX_FORCEINLINE array<T> make_array(T* begin, std::size_t size)
+    template <typename T>
+    HPX_FORCEINLINE constexpr array<T> make_array(
+        T* begin, std::size_t size) noexcept
     {
         return array<T>(begin, size);
     }
@@ -143,14 +141,14 @@ namespace hpx { namespace serialization {
     template <typename T>
     HPX_FORCEINLINE output_archive& operator<<(output_archive& ar, array<T> t)
     {
-        ar.invoke(t);
+        ar.save(t);
         return ar;
     }
 
     template <typename T>
     HPX_FORCEINLINE input_archive& operator>>(input_archive& ar, array<T> t)
     {
-        ar.invoke(t);
+        ar.load(t);
         return ar;
     }
 
@@ -158,7 +156,7 @@ namespace hpx { namespace serialization {
     HPX_FORCEINLINE output_archive& operator&(
         output_archive& ar, array<T> t)    //-V524
     {
-        ar.invoke(t);
+        ar.save(t);
         return ar;
     }
 
@@ -166,7 +164,7 @@ namespace hpx { namespace serialization {
     HPX_FORCEINLINE input_archive& operator&(
         input_archive& ar, array<T> t)    //-V524
     {
-        ar.invoke(t);
+        ar.load(t);
         return ar;
     }
 
@@ -175,7 +173,7 @@ namespace hpx { namespace serialization {
     HPX_FORCEINLINE output_archive& operator<<(output_archive& ar, T (&t)[N])
     {
         array<T> array = make_array(t, N);
-        ar.invoke(array);
+        ar.save(array);
         return ar;
     }
 
@@ -183,7 +181,7 @@ namespace hpx { namespace serialization {
     HPX_FORCEINLINE input_archive& operator>>(input_archive& ar, T (&t)[N])
     {
         array<T> array = make_array(t, N);
-        ar.invoke(array);
+        ar.load(array);
         return ar;
     }
 
@@ -192,7 +190,7 @@ namespace hpx { namespace serialization {
         output_archive& ar, T (&t)[N])    //-V524
     {
         array<T> array = make_array(t, N);
-        ar.invoke(array);
+        ar.save(array);
         return ar;
     }
 
@@ -201,7 +199,7 @@ namespace hpx { namespace serialization {
         input_archive& ar, T (&t)[N])    //-V524
     {
         array<T> array = make_array(t, N);
-        ar.invoke(array);
+        ar.load(array);
         return ar;
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

@@ -21,7 +21,7 @@
 #include <utility>
 #include <variant>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     namespace detail {
 
@@ -102,4 +102,4 @@ namespace hpx { namespace serialization {
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
         (template <typename... Ts>), (std::variant<Ts...>) )
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

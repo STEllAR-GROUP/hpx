@@ -47,7 +47,7 @@ namespace hpx::parcelset::policies::libfabric {
                 << decnumber((uint64_t) c.type_) << " rkey "
                 << hexpointer(c.rkey_) << " cpos " << hexpointer(c.data_.cpos_)
                 << " index " << decnumber(c.data_.index_));
-            if (c.type_ == serialization::chunk_type_pointer)
+            if (c.type_ == serialization::chunk_type::chunk_type_pointer)
             {
                 LOG_EXCLUSIVE(chrono::high_resolution_timer regtimer);
 

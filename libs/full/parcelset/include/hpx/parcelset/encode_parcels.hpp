@@ -110,7 +110,7 @@ namespace hpx::parcelset {
             std::size_t index = 0;
             for (serialization::serialization_chunk& c : buffer.chunks_)
             {
-                if (c.type_ == serialization::chunk_type_pointer)
+                if (c.type_ == serialization::chunk_type::chunk_type_pointer)
                     chunks.push_back(transmission_chunk_type(index, c.size_));
                 ++index;
             }
@@ -125,7 +125,7 @@ namespace hpx::parcelset {
                 // the remaining number of chunks are non-zero-copy
                 for (serialization::serialization_chunk& c : buffer.chunks_)
                 {
-                    if (c.type_ == serialization::chunk_type_index)
+                    if (c.type_ == serialization::chunk_type::chunk_type_index)
                     {
                         chunks.push_back(
                             transmission_chunk_type(c.data_.index_, c.size_));
@@ -164,7 +164,8 @@ namespace hpx::parcelset {
                 int archive_flags = archive_flags_;
                 if (filter.get() != nullptr)
                 {
-                    archive_flags |= serialization::enable_compression;
+                    archive_flags = archive_flags |
+                        int(serialization::archive_flags::enable_compression);
                 }
 
                 // preallocate data

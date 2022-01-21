@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2013 Hartmut Kaiser
+// Copyright (c) 2007-2022 Hartmut Kaiser
 // Copyright (c) 2015 Anton Bikineev
 //
 // SPDX-License-Identifier: BSL-1.0
@@ -13,11 +13,14 @@
 
 #include <cstddef>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
+
     ///////////////////////////////////////////////////////////////////////////
     // Base class for all serialization filters.
     struct binary_filter
     {
+        virtual ~binary_filter() = default;
+
         // compression API
         virtual void set_max_length(std::size_t size) = 0;
         virtual void save(void const* src, std::size_t src_count) = 0;
@@ -29,12 +32,10 @@ namespace hpx { namespace serialization {
             char const* buffer, std::size_t size, std::size_t buffer_size) = 0;
         virtual void load(void* dst, std::size_t dst_count) = 0;
 
-        template <class T>
+        template <typename T>
         void serialize(T& /*ar*/, unsigned)
         {
         }
         HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(binary_filter);
-
-        virtual ~binary_filter() {}
     };
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

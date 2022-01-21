@@ -51,7 +51,7 @@ void test(T minval, T maxval)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         std::vector<T> os;
         for (T c = minval; c < maxval; ++c)
         {
@@ -72,7 +72,7 @@ void test(T minval, T maxval)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         std::vector<A<T>> os;
         for (T c = minval; c < maxval; ++c)
         {
@@ -98,7 +98,7 @@ void test_fp(T minval, T maxval)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         std::vector<T> os;
         for (T c = minval; c < maxval; c += static_cast<T>(0.5))
         {
@@ -119,7 +119,7 @@ void test_fp(T minval, T maxval)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         std::vector<A<T>> os;
         for (T c = minval; c < maxval; c += static_cast<T>(0.5))
         {
@@ -139,13 +139,14 @@ void test_fp(T minval, T maxval)
     }
 }
 
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 template <class T, std::size_t N>
 void test_boost_array(T first)
 {
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         boost::array<T, N> oarray;
         std::iota(oarray.begin(), oarray.end(), first);
         oarchive << oarray;
@@ -161,7 +162,7 @@ void test_boost_array(T first)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         boost::array<A<T>, N> oarray;
         std::iota(oarray.begin(), oarray.end(), first);
         oarchive << oarray;
@@ -175,6 +176,7 @@ void test_boost_array(T first)
         }
     }
 }
+#endif
 
 template <class T, std::size_t N>
 void test_std_array(T first)
@@ -182,7 +184,7 @@ void test_std_array(T first)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         std::array<T, N> oarray;
         std::iota(oarray.begin(), oarray.end(), first);
         oarchive << oarray;
@@ -198,7 +200,7 @@ void test_std_array(T first)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         std::array<A<T>, N> oarray;
         std::iota(oarray.begin(), oarray.end(), first);
         oarchive << oarray;
@@ -213,12 +215,13 @@ void test_std_array(T first)
     }
 }
 
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 template <class T>
 void test_multi_array(T first)
 {
     std::vector<char> buffer;
     hpx::serialization::output_archive oarchive(
-        buffer, hpx::serialization::disable_data_chunking);
+        buffer, hpx::serialization::archive_flags::disable_data_chunking);
     boost::multi_array<T, 3u> oarray(boost::extents[3][4][2]);
 
     for (std::size_t i = 0; i < 3; ++i)
@@ -235,6 +238,7 @@ void test_multi_array(T first)
             for (std::size_t k = 0; k < 2; ++k)
                 HPX_TEST_EQ(oarray[i][j][k], iarray[i][j][k]);
 }
+#endif
 
 template <typename T, std::size_t N>
 void test_plain_array()
@@ -250,7 +254,7 @@ void test_plain_array()
     }
 
     hpx::serialization::output_archive oarchive(
-        buffer, hpx::serialization::disable_data_chunking);
+        buffer, hpx::serialization::archive_flags::disable_data_chunking);
     oarchive << iarray;
 
     hpx::serialization::input_archive iarchive(buffer);
@@ -278,7 +282,7 @@ void test_array_of_vectors()
     }
 
     hpx::serialization::output_archive oarchive(
-        buffer, hpx::serialization::disable_data_chunking);
+        buffer, hpx::serialization::archive_flags::disable_data_chunking);
     oarchive << iarray;
 
     hpx::serialization::input_archive iarchive(buffer);
@@ -324,16 +328,20 @@ int main()
         (std::numeric_limits<double>::min)() + 100);
     test<double>(-100, 100);
 
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
     test_boost_array<char, 100U>('\0');
     test_boost_array<double, 40U>((std::numeric_limits<double>::min)());
     test_boost_array<float, 100U>(0.f);
+#endif
 
     test_std_array<char, 100U>('\0');
     test_std_array<double, 40U>((std::numeric_limits<double>::min)());
     test_std_array<float, 100U>(0.f);
 
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
     test_multi_array(0);
     test_multi_array(0.);
+#endif
 
     test_plain_array<double, 20>();
     test_plain_array<int, 200>();

@@ -419,6 +419,9 @@ namespace hpx { namespace compute { namespace host {
                     temp << "-";
             }
             return temp.str();
+#else
+            (void) addr;
+            (void) len;
 #endif
             return "";
         }

@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,48 +22,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace hpx { namespace serialization {
-
-    namespace detail {
-
-        // load vector<T>
-        template <typename T, typename Allocator>
-        void load_impl(input_archive& ar, std::vector<T, Allocator>& vs,
-            std::size_t size, std::false_type)
-        {
-            // normal load ...
-            detail::load_collection(ar, vs, size);
-        }
-
-        template <typename T, typename Allocator>
-        void load_impl(input_archive& ar, std::vector<T, Allocator>& v,
-            std::size_t size, std::true_type)
-        {
-            bool archive_endianess_differs = endian::native == endian::big ?
-                ar.endian_little() :
-                ar.endian_big();
-
-#if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
-            if (ar.disable_array_optimization() || archive_endianess_differs)
-            {
-                load_impl(ar, v, size, std::false_type());
-                return;
-            }
-#else
-            (void) archive_endianess_differs;
-            HPX_ASSERT(!(
-                ar.disable_array_optimization() || archive_endianess_differs));
-#endif
-
-            // bitwise load ...
-            if (v.size() < size)
-            {
-                v.resize(size);
-            }
-
-            ar >> hpx::serialization::make_array(v.data(), v.size());
-        }
-    }    // namespace detail
+namespace hpx::serialization {
 
     template <typename Allocator>
     void serialize(input_archive& ar, std::vector<bool, Allocator>& v, unsigned)
@@ -76,8 +36,8 @@ namespace hpx { namespace serialization {
             return;
         }
 
-        v.reserve(size);
         // normal load ... no chance of doing bitwise here ...
+        v.reserve(size);
         for (std::size_t i = 0; i != size; ++i)
         {
             bool b = false;
@@ -89,14 +49,6 @@ namespace hpx { namespace serialization {
     template <typename T, typename Allocator>
     void serialize(input_archive& ar, std::vector<T, Allocator>& v, unsigned)
     {
-        using element_type =
-            std::remove_const_t<typename std::vector<T, Allocator>::value_type>;
-
-        using use_optimized = std::integral_constant<bool,
-            std::is_default_constructible_v<element_type> &&
-                (hpx::traits::is_bitwise_serializable_v<element_type> ||
-                    !hpx::traits::is_not_bitwise_serializable_v<element_type>)>;
-
         v.clear();
 
         std::uint64_t size;
@@ -106,44 +58,40 @@ namespace hpx { namespace serialization {
             return;
         }
 
-        detail::load_impl(ar, v, size, use_optimized());
-    }
+        using element_type =
+            std::remove_const_t<typename std::vector<T, Allocator>::value_type>;
 
-    // save vector<T>
-    namespace detail {
+        constexpr bool use_optimized =
+            std::is_default_constructible_v<element_type> &&
+            (hpx::traits::is_bitwise_serializable_v<element_type> ||
+                !hpx::traits::is_not_bitwise_serializable_v<element_type>);
 
-        template <typename T, typename Allocator>
-        void save_impl(output_archive& ar, std::vector<T, Allocator> const& vs,
-            std::false_type)
+        if constexpr (use_optimized)
         {
-            // normal save ...
-            detail::save_collection(ar, vs);
-        }
-
-        template <typename T, typename Allocator>
-        void save_impl(output_archive& ar, std::vector<T, Allocator> const& v,
-            std::true_type)
-        {
-            bool archive_endianess_differs = endian::native == endian::big ?
-                ar.endian_little() :
-                ar.endian_big();
-
 #if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
-            if (ar.disable_array_optimization() || archive_endianess_differs)
+            if (ar.disable_array_optimization() || ar.endianess_differs())
             {
-                save_impl(ar, v, std::false_type());
+                detail::load_collection(ar, v, size);
                 return;
             }
 #else
-            (void) archive_endianess_differs;
-            HPX_ASSERT(!(
-                ar.disable_array_optimization() || archive_endianess_differs));
+            HPX_ASSERT(
+                !(ar.disable_array_optimization() || ar.endianess_differs()));
 #endif
+            // bitwise load ...
+            if (v.size() < size)
+            {
+                v.resize(size);
+            }
 
-            // bitwise (zero-copy) save ...
-            ar << hpx::serialization::make_array(v.data(), v.size());
+            ar >> hpx::serialization::make_array(v.data(), v.size());
         }
-    }    // namespace detail
+        else
+        {
+            // normal load ...
+            detail::load_collection(ar, v, size);
+        }
+    }
 
     template <typename Allocator>
     void serialize(
@@ -168,14 +116,6 @@ namespace hpx { namespace serialization {
     void serialize(
         output_archive& ar, std::vector<T, Allocator> const& v, unsigned)
     {
-        using element_type =
-            std::remove_const_t<typename std::vector<T, Allocator>::value_type>;
-
-        using use_optimized = std::integral_constant<bool,
-            std::is_default_constructible_v<element_type> &&
-                (hpx::traits::is_bitwise_serializable_v<element_type> ||
-                    !hpx::traits::is_not_bitwise_serializable_v<element_type>)>;
-
         std::uint64_t size = v.size();
         ar << size;
         if (v.empty())
@@ -183,6 +123,33 @@ namespace hpx { namespace serialization {
             return;
         }
 
-        detail::save_impl(ar, v, use_optimized());
+        using element_type =
+            std::remove_const_t<typename std::vector<T, Allocator>::value_type>;
+
+        constexpr bool use_optimized =
+            std::is_default_constructible_v<element_type> &&
+            (hpx::traits::is_bitwise_serializable_v<element_type> ||
+                !hpx::traits::is_not_bitwise_serializable_v<element_type>);
+
+        if constexpr (use_optimized)
+        {
+#if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
+            if (ar.disable_array_optimization() || ar.endianess_differs())
+            {
+                detail::save_collection(ar, v);
+                return;
+            }
+#else
+            HPX_ASSERT(
+                !(ar.disable_array_optimization() || ar.endianess_differs()));
+#endif
+            // bitwise (zero-copy) save ...
+            ar << hpx::serialization::make_array(v.data(), v.size());
+        }
+        else
+        {
+            // normal save ...
+            detail::save_collection(ar, v);
+        }
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

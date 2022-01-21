@@ -52,7 +52,7 @@ namespace hpx { namespace serialization {
         using value_type = typename container_type::value_type;
 
         ar << t.size();    //-V128
-        for (const value_type& val : t)
+        for (value_type const& val : t)
         {
             ar << val;
         }

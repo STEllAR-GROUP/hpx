@@ -20,7 +20,7 @@ namespace hpx { namespace util { namespace debug {
     template <typename T>
     struct demangle_helper
     {
-        char const* type_id() const
+        char const* type_id() const noexcept
         {
             return typeid(T).name();
         }
@@ -48,7 +48,7 @@ namespace hpx { namespace util { namespace debug {
         {
         }
 
-        char const* type_id() const
+        char const* type_id() const noexcept
         {
             return demangled_ ? demangled_.get() : typeid(T).name();
         }

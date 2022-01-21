@@ -128,11 +128,13 @@ namespace hpx::parcelset {
                 endian::native == endian::big ? "big" : "little");
             if (endian_out == "little")
             {
-                archive_flags_ |= serialization::endian_little;
+                archive_flags_ = archive_flags_ |
+                    int(serialization::archive_flags::endian_little);
             }
             else if (endian_out == "big")
             {
-                archive_flags_ |= serialization::endian_big;
+                archive_flags_ = archive_flags_ |
+                    int(serialization::archive_flags::endian_big);
             }
             else
             {
@@ -141,14 +143,19 @@ namespace hpx::parcelset {
 
             if (!this->allow_array_optimizations())
             {
-                archive_flags_ |= serialization::disable_array_optimization;
-                archive_flags_ |= serialization::disable_data_chunking;
+                archive_flags_ = archive_flags_ |
+                    int(serialization::archive_flags::
+                            disable_array_optimization);
+                archive_flags_ = archive_flags_ |
+                    int(serialization::archive_flags::disable_data_chunking);
             }
             else
             {
                 if (!this->allow_zero_copy_optimizations())
                 {
-                    archive_flags_ |= serialization::disable_data_chunking;
+                    archive_flags_ = archive_flags_ |
+                        int(serialization::archive_flags::
+                                disable_data_chunking);
                 }
             }
         }

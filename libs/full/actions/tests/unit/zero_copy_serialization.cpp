@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -51,19 +51,23 @@ struct data_buffer
     void save(Archive& ar, unsigned) const
     {
         std::uint64_t size = data_.size();
-        ar& size;
-        ar& hpx::serialization::make_array(data_.data(), size);
-        ar& flag_;
+        // clang-format off
+        ar & size;
+        ar & hpx::serialization::make_array(data_.data(), size);
+        ar & flag_;
+        // clang-format on
     }
 
     template <typename Archive>
     void load(Archive& ar, unsigned)
     {
         std::uint64_t size = 0;
-        ar& size;
+        // clang-format off
+        ar & size;
         data_.resize(size);
-        ar& hpx::serialization::make_array(data_.data(), size);
-        ar& flag_;
+        ar & hpx::serialization::make_array(data_.data(), size);
+        ar & flag_;
+        // clang-format on
     }
 
     HPX_SERIALIZATION_SPLIT_MEMBER()
@@ -176,14 +180,17 @@ void test_normal_serialization(T& arg)
         hpx::components::component_invalid, (void*) &test_function1);
 
     // compose archive flags
-    std::uint32_t out_archive_flags = hpx::serialization::disable_data_chunking;
+    auto out_archive_flags =
+        std::uint32_t(hpx::serialization::archive_flags::disable_data_chunking);
     if (hpx::endian::native == hpx::endian::big)
     {
-        out_archive_flags |= hpx::serialization::endian_big;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_big);
     }
     else
     {
-        out_archive_flags |= hpx::serialization::endian_little;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_little);
     }
 
     // create a parcel with/without continuation
@@ -206,14 +213,17 @@ void test_normal_serialization(T1& arg1, T2& arg2)
         hpx::components::component_invalid, (void*) &test_function2);
 
     // compose archive flags
-    std::uint32_t out_archive_flags = hpx::serialization::disable_data_chunking;
+    auto out_archive_flags =
+        std::uint32_t(hpx::serialization::archive_flags::disable_data_chunking);
     if (hpx::endian::native == hpx::endian::big)
     {
-        out_archive_flags |= hpx::serialization::endian_big;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_big);
     }
     else
     {
-        out_archive_flags |= hpx::serialization::endian_little;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_little);
     }
 
     // create a parcel with/without continuation
@@ -237,14 +247,17 @@ void test_normal_serialization(
         hpx::components::component_invalid, (void*) &test_function2);
 
     // compose archive flags
-    std::uint32_t out_archive_flags = hpx::serialization::disable_data_chunking;
+    auto out_archive_flags =
+        std::uint32_t(hpx::serialization::archive_flags::disable_data_chunking);
     if (hpx::endian::native == hpx::endian::big)
     {
-        out_archive_flags |= hpx::serialization::endian_big;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_big);
     }
     else
     {
-        out_archive_flags |= hpx::serialization::endian_little;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_little);
     }
 
     // create a parcel with/without continuation
@@ -271,11 +284,13 @@ void test_zero_copy_serialization(T& arg)
     std::uint32_t out_archive_flags = 0U;
     if (hpx::endian::native == hpx::endian::big)
     {
-        out_archive_flags |= hpx::serialization::endian_big;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_big);
     }
     else
     {
-        out_archive_flags |= hpx::serialization::endian_little;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_little);
     }
 
     // create a parcel with/without continuation
@@ -301,11 +316,13 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
     std::uint32_t out_archive_flags = 0U;
     if (hpx::endian::native == hpx::endian::big)
     {
-        out_archive_flags |= hpx::serialization::endian_big;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_big);
     }
     else
     {
-        out_archive_flags |= hpx::serialization::endian_little;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_little);
     }
 
     // create a parcel with/without continuation
@@ -332,11 +349,13 @@ void test_zero_copy_serialization(
     std::uint32_t out_archive_flags = 0U;
     if (hpx::endian::native == hpx::endian::big)
     {
-        out_archive_flags |= hpx::serialization::endian_big;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_big);
     }
     else
     {
-        out_archive_flags |= hpx::serialization::endian_little;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_little);
     }
 
     // create a parcel with/without continuation
