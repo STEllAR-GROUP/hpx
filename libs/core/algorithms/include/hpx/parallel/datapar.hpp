@@ -13,6 +13,7 @@
 
 #include <hpx/executors/datapar/execution_policy.hpp>
 #include <hpx/parallel/datapar/adjacent_difference.hpp>
+#include <hpx/parallel/datapar/adjacent_find.hpp>
 #include <hpx/parallel/datapar/fill.hpp>
 #include <hpx/parallel/datapar/find.hpp>
 #include <hpx/parallel/datapar/generate.hpp>

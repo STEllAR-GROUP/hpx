@@ -1,29 +1,29 @@
 //  Copyright (c) 2021 Srinivas Yadav
-//  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2014-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/local/init.hpp>
+#include <hpx/parallel/datapar.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "adjacentfind_tests.hpp"
+#include "../algorithms/adjacentfind_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_adjacent_find()
 {
     using namespace hpx::execution;
-    test_adjacent_find(seq, IteratorTag());
-    test_adjacent_find(par, IteratorTag());
-    test_adjacent_find(par_unseq, IteratorTag());
+    test_adjacent_find(simd, IteratorTag());
+    test_adjacent_find(par_simd, IteratorTag());
 
-    test_adjacent_find_async(seq(task), IteratorTag());
-    test_adjacent_find_async(par(task), IteratorTag());
+    test_adjacent_find_async(simd(task), IteratorTag());
+    test_adjacent_find_async(par_simd(task), IteratorTag());
 }
 
 void adjacent_find_test()
@@ -32,20 +32,16 @@ void adjacent_find_test()
     test_adjacent_find<std::forward_iterator_tag>();
 }
 
-////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_adjacent_find_exception()
 {
     using namespace hpx::execution;
+    test_adjacent_find_exception(simd, IteratorTag());
+    test_adjacent_find_exception(par_simd, IteratorTag());
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_adjacent_find_exception(seq, IteratorTag());
-    test_adjacent_find_exception(par, IteratorTag());
-
-    test_adjacent_find_exception_async(seq(task), IteratorTag());
-    test_adjacent_find_exception_async(par(task), IteratorTag());
+    test_adjacent_find_exception_async(simd(task), IteratorTag());
+    test_adjacent_find_exception_async(par_simd(task), IteratorTag());
 }
 
 void adjacent_find_exception_test()
@@ -54,20 +50,16 @@ void adjacent_find_exception_test()
     test_adjacent_find_exception<std::forward_iterator_tag>();
 }
 
-////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_adjacent_find_bad_alloc()
 {
     using namespace hpx::execution;
+    test_adjacent_find_bad_alloc(simd, IteratorTag());
+    test_adjacent_find_bad_alloc(par_simd, IteratorTag());
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_adjacent_find_bad_alloc(seq, IteratorTag());
-    test_adjacent_find_bad_alloc(par, IteratorTag());
-
-    test_adjacent_find_bad_alloc_async(seq(task), IteratorTag());
-    test_adjacent_find_bad_alloc_async(par(task), IteratorTag());
+    test_adjacent_find_bad_alloc_async(simd(task), IteratorTag());
+    test_adjacent_find_bad_alloc_async(par_simd(task), IteratorTag());
 }
 
 void adjacent_find_bad_alloc_test()

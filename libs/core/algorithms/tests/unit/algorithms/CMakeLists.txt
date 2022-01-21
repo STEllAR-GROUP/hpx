@@ -19,11 +19,7 @@ endforeach()
 set(tests
     adjacentdifference
     adjacentfind
-    adjacentfind_exception
-    adjacentfind_bad_alloc
     adjacentfind_binary
-    adjacentfind_binary_exception
-    adjacentfind_binary_bad_alloc
     all_of
     any_of
     copy

@@ -18,6 +18,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/count.hpp
     hpx/parallel/algorithms/destroy.hpp
     hpx/parallel/algorithms/detail/adjacent_difference.hpp
+    hpx/parallel/algorithms/detail/adjacent_find.hpp
     hpx/parallel/algorithms/detail/accumulate.hpp
     hpx/parallel/algorithms/detail/advance_and_get_distance.hpp
     hpx/parallel/algorithms/detail/advance_to_sentinel.hpp
@@ -154,6 +155,7 @@ set(algorithms_headers
     hpx/parallel/container_numeric.hpp
     hpx/parallel/datapar.hpp
     hpx/parallel/datapar/adjacent_difference.hpp
+    hpx/parallel/datapar/adjacent_find.hpp
     hpx/parallel/datapar/fill.hpp
     hpx/parallel/datapar/find.hpp
     hpx/parallel/datapar/generate.hpp
