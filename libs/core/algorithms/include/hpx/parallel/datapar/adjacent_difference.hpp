@@ -37,7 +37,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             if (first == last)
                 return dest;
-            auto count = distance(first, last) - 1;
+            auto count = hpx::parallel::v1::detail::distance(first, last) - 1;
 
             InIter prev = first;
             *dest++ = *first++;
