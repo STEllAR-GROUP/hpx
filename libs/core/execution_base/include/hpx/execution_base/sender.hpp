@@ -115,9 +115,9 @@ namespace hpx { namespace execution { namespace experimental {
             return true;
         }
 
-        template <typename Sender>
+        template <typename Sender, typename Env>
         constexpr bool specialized(
-            typename sender_traits<Sender>::__unspecialized*)
+            typename sender_traits<Sender, Env>::__unspecialized*)
         {
             return false;
         }
