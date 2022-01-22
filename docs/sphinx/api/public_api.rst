@@ -11,7 +11,9 @@
 Public API
 ==========
 
-All names below are also available in the top-level ``hpx`` namespace unless
+Our API is semantically conforming; hence, the reader is highly encouraged to refer to the 
+corresponding facility in the `C++ Standard <https://en.cppreference.com/w/cpp/header>`_ if 
+needed. All names below are also available in the top-level ``hpx`` namespace unless
 otherwise noted. The names in ``hpx`` should be preferred. The names in
 sub-namespaces will eventually be removed.
 
@@ -19,7 +21,8 @@ Header ``hpx/algorithm.hpp``
 ============================
 
 This header includes :ref:`public_api_header_hpx_local_algorithm` and contains
-overloads of the algorithms for segmented iterators.
+overloads of the algorithms for segmented iterators. For more information you can refer to the 
+`C++ Standard algorithms library <https://en.cppreference.com/w/cpp/algorithm>`_. 
 
 .. _public_api_header_hpx_local_algorithm:
 
