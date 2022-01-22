@@ -1,12 +1,20 @@
 # Copyright (c) 2019 Thomas Heller
-# Copyright (c) 2020 Hartmut Kaiser
+# Copyright (c) 2020-2022 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests any_sender basic_operation_state basic_receiver basic_sender
-          basic_schedule execution_context
+set(tests
+    any_sender
+    basic_operation_state
+    basic_receiver
+    basic_sender
+    basic_schedule
+    environment_queries
+    execution_context
+    forwarding_env_query
+    get_env
 )
 
 foreach(test ${tests})
