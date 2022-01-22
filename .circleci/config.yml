@@ -207,7 +207,6 @@ jobs:
                 /hpx/source \
                 -G "Ninja" \
                 -DCMAKE_BUILD_TYPE=Debug \
-                -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_FETCH_ASIO=Off \
                 -DHPX_WITH_DATAPAR_VC=On \
@@ -247,7 +246,6 @@ jobs:
             cmake \
                 /hpx/source \
                 -G "Ninja" \
-                -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_FETCH_ASIO=Off \
                 -DHPX_WITH_TESTS=On \
@@ -259,7 +257,6 @@ jobs:
             cmake \
                 /hpx/source \
                 -G "Ninja" \
-                -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_FETCH_ASIO=Off \
                 -DHPX_WITH_TESTS=Off \
@@ -271,7 +268,6 @@ jobs:
             cmake \
                 /hpx/source \
                 -G "Ninja" \
-                -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_FETCH_ASIO=Off \
                 -DHPX_WITH_APEX=On \
@@ -682,7 +678,6 @@ jobs:
               # "Test Docker Image" below fails with "Illegal instruction" if VC
               # is enabled, and other machines may fail similarly.
               cmake \
-                -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=On \
                 -DHPX_WITH_DATAPAR_VC=Off .
               ninja -j2 install
           working_directory: /hpx/build

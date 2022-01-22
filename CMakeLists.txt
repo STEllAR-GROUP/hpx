@@ -368,16 +368,28 @@ else()
 endif()
 
 # ##############################################################################
-# In some some restricted environments (e.g. CircleCI, Github builders) cmake
-# runs out of memory when the modules are being built as OBJECT libraries. Set
-# this option to ON to fall back to building the modules as static libraries.
+# The cmake Ninja generator runs out of memory if the modules are being built as
+# OBJECT libraries. In this case the fallback is to build whole-archive STATIC
+# libraries.
+set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT ON)
+if("${CMAKE_MAKE_PROGRAM}" STREQUAL "ninja")
+  set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT OFF)
+endif()
+
 hpx_option(
   HPX_WITH_MODULES_AS_STATIC_LIBRARIES
   BOOL
-  "Compile HPX modules as static (whole-archive) libraries instead of OBJECT libraries (Default: OFF)"
-  OFF
+  "Compile HPX modules as STATIC (whole-archive) libraries instead of OBJECT\
+  libraries (Default: ${HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT})"
+  ${HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT}
   ADVANCED
 )
+
+if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES)
+  hpx_info("Building modules as STATIC (whole-archive) libraries")
+else()
+  hpx_info("Building modules as OBJECT libraries")
+endif()
 
 # ##############################################################################
 hpx_option(
