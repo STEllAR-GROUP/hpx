@@ -150,7 +150,8 @@ namespace hpx { namespace execution { namespace experimental {
                 r.signal_set_called();
             }
 
-            friend void tag_invoke(set_done_t, sync_wait_receiver&& r) noexcept
+            friend void tag_invoke(
+                set_stopped_t, sync_wait_receiver&& r) noexcept
             {
                 r.signal_set_called();
             }

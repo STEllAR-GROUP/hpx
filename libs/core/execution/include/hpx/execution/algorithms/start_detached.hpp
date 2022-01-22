@@ -51,7 +51,7 @@ namespace hpx { namespace execution { namespace experimental {
                 }
 
                 friend void tag_invoke(
-                    set_done_t, start_detached_receiver&& r) noexcept
+                    set_stopped_t, start_detached_receiver&& r) noexcept
                 {
                     r.op_state.reset();
                 };

@@ -369,7 +369,7 @@ namespace hpx::execution::experimental::detail {
         virtual void move_into(void* p) = 0;
         virtual void set_value(Ts... ts) && = 0;
         virtual void set_error(std::exception_ptr ep) && noexcept = 0;
-        virtual void set_done() && noexcept = 0;
+        virtual void set_stopped() && noexcept = 0;
         virtual bool empty() const noexcept
         {
             return false;
@@ -402,9 +402,9 @@ namespace hpx::execution::experimental::detail {
             throw_bad_any_call("any_receiver", "set_error");
         }
 
-        HPX_NORETURN void set_done() && noexcept override
+        HPX_NORETURN void set_stopped() && noexcept override
         {
-            throw_bad_any_call("any_receiver", "set_done");
+            throw_bad_any_call("any_receiver", "set_stopped");
         }
     };
 }    // namespace hpx::execution::experimental::detail
@@ -450,9 +450,9 @@ namespace hpx::execution::experimental::detail {
                 HPX_MOVE(receiver), HPX_MOVE(ep));
         }
 
-        void set_done() && noexcept override
+        void set_stopped() && noexcept override
         {
-            hpx::execution::experimental::set_done(HPX_MOVE(receiver));
+            hpx::execution::experimental::set_stopped(HPX_MOVE(receiver));
         }
     };
 
@@ -515,15 +515,15 @@ namespace hpx::execution::experimental::detail {
             HPX_MOVE(moved_storage.get()).set_error(HPX_MOVE(ep));
         }
 
-        friend void tag_invoke(
-            hpx::execution::experimental::set_done_t, any_receiver&& r) noexcept
+        friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
+            any_receiver&& r) noexcept
         {
             // We first move the storage to a temporary variable so that
-            // this any_receiver is empty after this set_done. Doing
-            // HPX_MOVE(storage.get()).set_done(...) would leave us with a
+            // this any_receiver is empty after this set_stopped. Doing
+            // HPX_MOVE(storage.get()).set_stopped(...) would leave us with a
             // non-empty any_receiver holding a moved-from receiver.
             auto moved_storage = HPX_MOVE(r.storage);
-            HPX_MOVE(moved_storage.get()).set_done();
+            HPX_MOVE(moved_storage.get()).set_stopped();
         }
     };
 

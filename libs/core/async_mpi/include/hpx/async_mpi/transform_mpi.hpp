@@ -95,10 +95,10 @@ namespace hpx { namespace mpi { namespace experimental {
             }
 
             friend constexpr void tag_invoke(
-                hpx::execution::experimental::set_done_t,
+                hpx::execution::experimental::set_stopped_t,
                 transform_mpi_receiver&& r) noexcept
             {
-                hpx::execution::experimental::set_done(HPX_MOVE(r.r));
+                hpx::execution::experimental::set_stopped(HPX_MOVE(r.r));
             };
 
             template <typename... Ts,

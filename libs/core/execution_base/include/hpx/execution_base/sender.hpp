@@ -217,7 +217,7 @@ namespace hpx { namespace execution { namespace experimental {
                 std::terminate();
             }
 
-            void set_done() noexcept {}
+            void set_stopped() noexcept {}
         };
     }    // namespace detail
 

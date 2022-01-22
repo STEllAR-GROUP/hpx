@@ -73,7 +73,7 @@ struct receiver
     {
     }
     friend void tag_invoke(
-        hpx::execution::experimental::set_done_t, receiver&&) noexcept
+        hpx::execution::experimental::set_stopped_t, receiver&&) noexcept
     {
     }
     friend void tag_invoke(
@@ -152,7 +152,7 @@ struct void_receiver
     {
     }
     friend void tag_invoke(
-        hpx::execution::experimental::set_done_t, void_receiver&&) noexcept
+        hpx::execution::experimental::set_stopped_t, void_receiver&&) noexcept
     {
     }
     friend void tag_invoke(

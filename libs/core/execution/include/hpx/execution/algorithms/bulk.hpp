@@ -92,9 +92,10 @@ namespace hpx { namespace execution { namespace experimental {
                         HPX_MOVE(r.receiver), HPX_FORWARD(Error, error));
                 }
 
-                friend void tag_invoke(set_done_t, bulk_receiver&& r) noexcept
+                friend void tag_invoke(
+                    set_stopped_t, bulk_receiver&& r) noexcept
                 {
-                    hpx::execution::experimental::set_done(
+                    hpx::execution::experimental::set_stopped(
                         HPX_MOVE(r.receiver));
                 }
 

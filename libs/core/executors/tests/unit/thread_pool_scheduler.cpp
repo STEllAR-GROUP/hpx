@@ -67,7 +67,7 @@ struct check_context_receiver
         HPX_TEST(false);
     }
 
-    friend void tag_invoke(ex::set_done_t, check_context_receiver&&) noexcept
+    friend void tag_invoke(ex::set_stopped_t, check_context_receiver&&) noexcept
     {
         HPX_TEST(false);
     }
@@ -228,7 +228,7 @@ struct callback_receiver
         HPX_TEST(false);
     }
 
-    friend void tag_invoke(ex::set_done_t, callback_receiver&&) noexcept
+    friend void tag_invoke(ex::set_stopped_t, callback_receiver&&) noexcept
     {
         HPX_TEST(false);
     }

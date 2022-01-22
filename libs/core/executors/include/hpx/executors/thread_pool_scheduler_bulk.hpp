@@ -104,7 +104,7 @@ namespace hpx { namespace execution { namespace experimental {
                                 hpx::execution::experimental::set_error_t,
                                 std::decay_t<Sender>> ||
                         hpx::execution::experimental::detail::has_completion_scheduler_v<
-                                hpx::execution::experimental::set_done_t,
+                                hpx::execution::experimental::set_stopped_t,
                                 std::decay_t<Sender>>))
                 // clang-format on
                 >
@@ -141,9 +141,9 @@ namespace hpx { namespace execution { namespace experimental {
                     }
 
                     friend void tag_invoke(
-                        set_done_t, bulk_receiver&& r) noexcept
+                        set_stopped_t, bulk_receiver&& r) noexcept
                     {
-                        hpx::execution::experimental::set_done(
+                        hpx::execution::experimental::set_stopped(
                             HPX_MOVE(r.op_state->receiver));
                     };
 

@@ -41,7 +41,8 @@ namespace hpx { namespace execution { namespace experimental {
                 r.data.reset();
             }
 
-            friend void tag_invoke(set_done_t, make_future_receiver&&) noexcept
+            friend void tag_invoke(
+                set_stopped_t, make_future_receiver&&) noexcept
             {
                 std::terminate();
             }
@@ -73,7 +74,8 @@ namespace hpx { namespace execution { namespace experimental {
                 r.data.reset();
             }
 
-            friend void tag_invoke(set_done_t, make_future_receiver&&) noexcept
+            friend void tag_invoke(
+                set_stopped_t, make_future_receiver&&) noexcept
             {
                 std::terminate();
             }

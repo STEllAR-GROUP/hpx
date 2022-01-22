@@ -46,7 +46,7 @@ namespace hpx { namespace execution { namespace experimental {
             friend void tag_invoke(
                 set_error_t, when_all_receiver&& r, Error&& error) noexcept
             {
-                if (!r.op_state.set_done_error_called.exchange(true))
+                if (!r.op_state.set_stopped_error_called.exchange(true))
                 {
                     try
                     {
@@ -62,9 +62,10 @@ namespace hpx { namespace execution { namespace experimental {
                 r.op_state.finish();
             }
 
-            friend void tag_invoke(set_done_t, when_all_receiver&& r) noexcept
+            friend void tag_invoke(
+                set_stopped_t, when_all_receiver&& r) noexcept
             {
-                r.op_state.set_done_error_called = true;
+                r.op_state.set_stopped_error_called = true;
                 r.op_state.finish();
             };
 
@@ -95,7 +96,7 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 if constexpr (OperationState::sender_pack_size > 0)
                 {
-                    if (!op_state.set_done_error_called)
+                    if (!op_state.set_stopped_error_called)
                     {
                         try
                         {
@@ -104,7 +105,8 @@ namespace hpx { namespace execution { namespace experimental {
                         }
                         catch (...)
                         {
-                            if (!op_state.set_done_error_called.exchange(true))
+                            if (!op_state.set_stopped_error_called.exchange(
+                                    true))
                             {
                                 // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
                                 op_state.error = std::current_exception();
@@ -234,7 +236,7 @@ namespace hpx { namespace execution { namespace experimental {
                 value_types_storage_type ts;
 
                 hpx::optional<error_types<hpx::variant>> error;
-                std::atomic<bool> set_done_error_called{false};
+                std::atomic<bool> set_stopped_error_called{false};
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
                 using operation_state_type =
@@ -280,7 +282,7 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     if (--predecessors_remaining == 0)
                     {
-                        if (!set_done_error_called)
+                        if (!set_stopped_error_called)
                         {
                             set_value_helper(ts);
                         }
@@ -296,7 +298,7 @@ namespace hpx { namespace execution { namespace experimental {
                         }
                         else
                         {
-                            hpx::execution::experimental::set_done(
+                            hpx::execution::experimental::set_stopped(
                                 HPX_MOVE(receiver));
                         }
                     }
