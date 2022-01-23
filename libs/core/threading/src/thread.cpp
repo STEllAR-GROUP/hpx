@@ -215,8 +215,8 @@ namespace hpx {
         this_thread::interruption_point();
 
         // register callback function to be called when thread exits
-        if (threads::add_thread_exit_callback(
-                id_.noref(), util::bind_front(&resume_thread, this_id)))
+        if (threads::add_thread_exit_callback(id_.noref(),
+                util::bind_front(&resume_thread, HPX_MOVE(this_id))))
         {
             // wait for thread to be terminated
             util::unlock_guard ul(l);

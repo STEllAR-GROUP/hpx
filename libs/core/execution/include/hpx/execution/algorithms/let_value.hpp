@@ -13,6 +13,7 @@
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
+#include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
@@ -267,6 +268,14 @@ namespace hpx { namespace execution { namespace experimental {
                         // inlined here compilation fails with an internal
                         // compiler error.
                         r.set_value(HPX_FORWARD(Ts, ts)...);
+                    }
+
+                    // Pass through the get_env receiver query
+                    friend auto tag_invoke(
+                        get_env_t, let_value_predecessor_receiver const& r)
+                        -> env_of_t<std::decay_t<Receiver>>
+                    {
+                        return get_env(r.receiver);
                     }
                 };
 

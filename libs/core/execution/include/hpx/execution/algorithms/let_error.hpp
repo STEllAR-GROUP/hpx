@@ -12,6 +12,7 @@
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
+#include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
@@ -79,14 +80,7 @@ namespace hpx { namespace execution { namespace experimental {
                 predecessor_value_types<Tuple, Variant>,
                 hpx::util::detail::concat_pack_of_packs_t<hpx::util::detail::
                         transform_t<successor_sender_types<Variant>,
-                            value_types<Tuple, Variant>::template apply
-#if defined(HPX_CLANG_VERSION) && HPX_CLANG_VERSION < 110000
-                            >
-                    //
-                    >>;
-#else
-                            >>>;
-#endif
+                            value_types<Tuple, Variant>::template apply> /**/>>;
 
             template <template <typename...> class Variant>
             using error_types =
@@ -220,6 +214,14 @@ namespace hpx { namespace execution { namespace experimental {
                         hpx::execution::experimental::set_value(
                             HPX_MOVE(r.receiver), HPX_FORWARD(Ts, ts)...);
                     }
+
+                    // Pass through the get_env receiver query
+                    friend auto tag_invoke(
+                        get_env_t, let_error_predecessor_receiver const& r)
+                        -> env_of_t<std::decay_t<Receiver>>
+                    {
+                        return get_env(r.receiver);
+                    }
                 };
 
                 // Type of the operation state returned when connecting the
@@ -236,6 +238,7 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     using type = connect_result_t<Sender, Receiver>;
                 };
+
                 template <template <typename...> class Variant>
                 using successor_operation_state_types =
                     hpx::util::detail::transform_t<

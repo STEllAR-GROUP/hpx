@@ -11,11 +11,13 @@
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
+#include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
+#include <hpx/synchronization/stop_token.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <atomic>
@@ -91,8 +93,8 @@ namespace hpx { namespace execution { namespace experimental {
                 OperationState::sender_pack_size>::type;
 
             template <typename... Ts>
-            auto set_value(Ts&&... ts) noexcept -> decltype(
-                set_value_helper(index_pack_type{}, HPX_FORWARD(Ts, ts)...))
+            auto set_value(Ts&&... ts) noexcept -> decltype(set_value_helper(
+                index_pack_type{}, HPX_FORWARD(Ts, ts)...))
             {
                 if constexpr (OperationState::sender_pack_size > 0)
                 {
@@ -116,6 +118,18 @@ namespace hpx { namespace execution { namespace experimental {
                 }
 
                 op_state.finish();
+            }
+
+            template <typename OperationState>
+            friend auto tag_invoke(
+                get_env_t, when_all_receiver<OperationState> const& r)
+                -> make_env_t<get_stop_token_t,
+                    hpx::experimental::in_place_stop_token,
+                    env_of_t<typename OperationState::receiver_type>>
+            {
+                return make_env<get_stop_token_t>(
+                    r.op_state.stop_source_.get_token(),
+                    get_env(r.op_state.receiver));
             }
         };
 
@@ -192,6 +206,8 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename Receiver, typename SendersPack>
             struct operation_state<Receiver, SendersPack, 0>
             {
+                using receiver_type = std::decay_t<Receiver>;
+
                 // The index of the sender that this operation state handles.
                 static constexpr std::size_t i = 0;
                 // The offset at which we start to emplace values sent by the
@@ -203,7 +219,7 @@ namespace hpx { namespace execution { namespace experimental {
                     sender_pack_size_at_index<i>;
 #else
                 // nvcc does not like using the helper sender_pack_size_at_index
-                // here and complains about incmplete types. Lifting the helper
+                // here and complains about incomplete types. Lifting the helper
                 // explicitly in here works.
                 static constexpr std::size_t sender_pack_size =
                     single_variant_t<
@@ -237,7 +253,8 @@ namespace hpx { namespace execution { namespace experimental {
 
                 hpx::optional<error_types<hpx::variant>> error;
                 std::atomic<bool> set_stopped_error_called{false};
-                HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
+                HPX_NO_UNIQUE_ADDRESS receiver_type receiver;
+                hpx::experimental::in_place_stop_source stop_source{};
 
                 using operation_state_type =
                     std::decay_t<decltype(hpx::execution::experimental::connect(
@@ -310,6 +327,7 @@ namespace hpx { namespace execution { namespace experimental {
               : operation_state<Receiver, SendersPack, I - 1>
             {
                 using base_type = operation_state<Receiver, SendersPack, I - 1>;
+                using receiver_type = std::decay_t<Receiver>;
 
                 // The index of the sender that this operation state handles.
                 static constexpr std::size_t i = I;
