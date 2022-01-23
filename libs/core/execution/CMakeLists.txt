@@ -122,6 +122,7 @@ add_hpx_module(
     hpx_pack_traversal
     hpx_errors
     hpx_memory
+    hpx_synchronization
     hpx_thread_support
     hpx_timing
     hpx_topology

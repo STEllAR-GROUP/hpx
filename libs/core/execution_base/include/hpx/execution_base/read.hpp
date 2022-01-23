@@ -39,7 +39,7 @@ namespace hpx::execution::experimental {
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
                 template <typename Receiver_>
-                operation_state(Receiver_&& receiver) noexcept
+                explicit operation_state(Receiver_&& receiver) noexcept
                   : receiver(HPX_FORWARD(Receiver_, receiver))
                 {
                 }

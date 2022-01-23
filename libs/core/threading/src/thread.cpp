@@ -186,9 +186,10 @@ namespace hpx {
         }
     }
 
-    static void resume_thread(threads::thread_id_type const& id)
+    static void resume_thread(threads::thread_id_ref_type const& id)
     {
-        threads::set_thread_state(id, threads::thread_schedule_state::pending);
+        threads::set_thread_state(
+            id.noref(), threads::thread_schedule_state::pending);
     }
 
     void thread::join()
@@ -202,7 +203,8 @@ namespace hpx {
                 "trying to join a non joinable thread");
         }
 
-        native_handle_type this_id = threads::get_self_id();
+        // keep ourselves alive while being suspended
+        threads::thread_id_ref_type this_id = threads::get_self_id();
         if (this_id == id_)
         {
             l.unlock();
