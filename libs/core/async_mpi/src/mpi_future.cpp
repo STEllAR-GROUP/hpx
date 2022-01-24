@@ -424,11 +424,10 @@ namespace hpx { namespace mpi { namespace experimental {
         if (init_mpi)
         {
             int required = MPI_THREAD_MULTIPLE;
-            int minimal = MPI_THREAD_FUNNELED;
             int provided;
             hpx::util::mpi_environment::init(
-                nullptr, nullptr, required, minimal, provided);
-            if (provided < MPI_THREAD_FUNNELED)
+                nullptr, nullptr, required, required, provided);
+            if (provided != required)
             {
                 mpi_debug.error(debug::str<>("hpx::mpi::experimental::init"),
                     "init failed");
