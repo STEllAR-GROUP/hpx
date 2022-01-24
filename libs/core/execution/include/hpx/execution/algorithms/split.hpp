@@ -150,7 +150,7 @@ namespace hpx { namespace execution { namespace experimental {
                     }
 
                     friend void tag_invoke(
-                        set_done_t, split_receiver&& r) noexcept
+                        set_stopped_t, split_receiver&& r) noexcept
                     {
                         r.state->set_predecessor_done();
                         r.state.reset();
@@ -213,7 +213,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                     void operator()(done_type)
                     {
-                        hpx::execution::experimental::set_done(
+                        hpx::execution::experimental::set_stopped(
                             HPX_MOVE(receiver));
                     }
 
@@ -292,7 +292,7 @@ namespace hpx { namespace execution { namespace experimental {
                     if (predecessor_done)
                     {
                         // If we read predecessor_done here it means that one of
-                        // set_error/set_done/set_value has been called and
+                        // set_error/set_stopped/set_value has been called and
                         // values/errors have been stored into the shared state.
                         // We can trigger the continuation directly.
                         // TODO: Should this preserve the scheduler? It does not
@@ -329,7 +329,7 @@ namespace hpx { namespace execution { namespace experimental {
                             // other threads may also try to add continuations
                             // to the vector and the vector is not threadsafe in
                             // itself. The continuation will be called later
-                            // when set_error/set_done/set_value is called.
+                            // when set_error/set_stopped/set_value is called.
                             continuations.emplace_back(
                                 [this,
                                     receiver = HPX_FORWARD(

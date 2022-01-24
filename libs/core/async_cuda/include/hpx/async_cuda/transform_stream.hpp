@@ -151,10 +151,10 @@ namespace hpx { namespace cuda { namespace experimental {
                     HPX_MOVE(r.r), HPX_FORWARD(E, e));
             }
 
-            friend void tag_invoke(hpx::execution::experimental::set_done_t,
+            friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
                 transform_stream_receiver&& r) noexcept
             {
-                hpx::execution::experimental::set_done(HPX_MOVE(r.r));
+                hpx::execution::experimental::set_stopped(HPX_MOVE(r.r));
             }
 
             template <typename... Ts>

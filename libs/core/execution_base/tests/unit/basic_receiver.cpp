@@ -20,7 +20,7 @@ namespace mylib {
     struct receiver_1
     {
         friend void tag_invoke(
-            hpx::execution::experimental::set_done_t, receiver_1&&) noexcept
+            hpx::execution::experimental::set_stopped_t, receiver_1&&) noexcept
         {
             done_called = true;
         }
@@ -41,7 +41,7 @@ namespace mylib {
     struct receiver_2
     {
         friend void tag_invoke(
-            hpx::execution::experimental::set_done_t, receiver_2&&) noexcept
+            hpx::execution::experimental::set_stopped_t, receiver_2&&) noexcept
         {
             done_called = true;
         }
@@ -56,7 +56,7 @@ namespace mylib {
     struct receiver_3
     {
         friend void tag_invoke(
-            hpx::execution::experimental::set_done_t, receiver_3&&) noexcept
+            hpx::execution::experimental::set_stopped_t, receiver_3&&) noexcept
         {
             done_called = true;
         }
@@ -76,8 +76,8 @@ namespace mylib {
 
     struct non_receiver_1
     {
-        friend void tag_invoke(
-            hpx::execution::experimental::set_done_t, non_receiver_1&) noexcept
+        friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
+            non_receiver_1&) noexcept
         {
             done_called = true;
         }
@@ -97,8 +97,8 @@ namespace mylib {
 
     struct non_receiver_2
     {
-        friend void tag_invoke(
-            hpx::execution::experimental::set_done_t, non_receiver_2&&) noexcept
+        friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
+            non_receiver_2&&) noexcept
         {
             done_called = true;
         }
@@ -118,8 +118,8 @@ namespace mylib {
 
     struct non_receiver_3
     {
-        friend void tag_invoke(
-            hpx::execution::experimental::set_done_t, non_receiver_3&) noexcept
+        friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
+            non_receiver_3&) noexcept
         {
             done_called = true;
         }
@@ -139,8 +139,8 @@ namespace mylib {
 
     struct non_receiver_4
     {
-        friend void tag_invoke(
-            hpx::execution::experimental::set_done_t, non_receiver_4&&) noexcept
+        friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
+            non_receiver_4&&) noexcept
         {
             done_called = true;
         }
@@ -161,7 +161,7 @@ namespace mylib {
     struct non_receiver_5
     {
         friend void tag_invoke(
-            hpx::execution::experimental::set_done_t, non_receiver_5&&)
+            hpx::execution::experimental::set_stopped_t, non_receiver_5&&)
         {
             done_called = true;
         }
@@ -175,8 +175,8 @@ namespace mylib {
 
     struct non_receiver_6
     {
-        friend void tag_invoke(
-            hpx::execution::experimental::set_done_t, non_receiver_6&&) noexcept
+        friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
+            non_receiver_6&&) noexcept
         {
             done_called = true;
         }
@@ -191,7 +191,7 @@ namespace mylib {
     struct non_receiver_7
     {
         friend void tag_invoke(
-            hpx::execution::experimental::set_done_t, non_receiver_7&&)
+            hpx::execution::experimental::set_stopped_t, non_receiver_7&&)
         {
             done_called = true;
         }
@@ -268,7 +268,7 @@ int main()
 
     {
         mylib::receiver_1 rcv;
-        hpx::execution::experimental::set_done(std::move(rcv));
+        hpx::execution::experimental::set_stopped(std::move(rcv));
         HPX_TEST(done_called);
         done_called = false;
     }
@@ -287,7 +287,7 @@ int main()
     }
     {
         mylib::receiver_2 rcv;
-        hpx::execution::experimental::set_done(std::move(rcv));
+        hpx::execution::experimental::set_stopped(std::move(rcv));
         HPX_TEST(done_called);
         done_called = false;
     }

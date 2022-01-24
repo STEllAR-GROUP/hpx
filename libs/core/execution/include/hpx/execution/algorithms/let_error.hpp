@@ -203,10 +203,10 @@ namespace hpx { namespace execution { namespace experimental {
                             });
                     }
 
-                    friend void tag_invoke(
-                        set_done_t, let_error_predecessor_receiver&& r) noexcept
+                    friend void tag_invoke(set_stopped_t,
+                        let_error_predecessor_receiver&& r) noexcept
                     {
-                        hpx::execution::experimental::set_done(
+                        hpx::execution::experimental::set_stopped(
                             HPX_MOVE(r.receiver));
                     };
 

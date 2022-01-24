@@ -32,23 +32,23 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename R, typename... As>
     void set_value(R&& r, As&&... as);
 
-    /// set_done is a customization point object. The expression
-    /// `hpx::execution::set_done(r)` is equivalent to:
-    ///     * `r.set_done()`, if that expression is valid. If the function selected
+    /// set_stopped is a customization point object. The expression
+    /// `hpx::execution::set_stopped(r)` is equivalent to:
+    ///     * `r.set_stopped()`, if that expression is valid. If the function selected
     ///       does not signal the Receiver `r`'s done channel,
     ///       the program is ill-formed (no diagnostic required).
-    ///     * Otherwise, `set_done(r), if that expression is valid, with
+    ///     * Otherwise, `set_stopped(r), if that expression is valid, with
     ///       overload resolution performed in a context that include the declaration
-    ///       `void set_done();`
+    ///       `void set_stopped();`
     ///     * Otherwise, the expression is ill-formed.
     ///
     /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
     template <typename R>
-    void set_done(R&& r);
+    void set_stopped(R&& r);
 
     /// set_error is a customization point object. The expression
     /// `hpx::execution::set_error(r, e)` is equivalent to:
-    ///     * `r.set_done(e)`, if that expression is valid. If the function selected
+    ///     * `r.set_stopped(e)`, if that expression is valid. If the function selected
     ///       does not send the error `e` the Receiver `r`'s error channel,
     ///       the program is ill-formed (no diagnostic required).
     ///     * Otherwise, `set_error(r, e), if that expression is valid, with
@@ -66,7 +66,7 @@ namespace hpx { namespace execution { namespace experimental {
     /// being canceled. As such, the Receiver concept is defined by having the
     /// following two customization points defined, which form the completion-signal
     /// operations:
-    ///     * `hpx::execution::experimental::set_done`
+    ///     * `hpx::execution::experimental::set_stopped`
     ///     * `hpx::execution::experimental::set_error`
     ///
     /// Those two functions denote the completion-signal operations. The Receiver
@@ -95,7 +95,7 @@ namespace hpx { namespace execution { namespace experimental {
     /// contract:
     ///     * If `hpx::execution::set_value` exits with an exception, it
     ///       is still valid to call `hpx::execution::set_error` or
-    ///       `hpx::execution::set_done`
+    ///       `hpx::execution::set_stopped`
     ///
     /// \see hpx::execution::traits::is_receiver
     template <typename T, typename... As>
@@ -112,9 +112,9 @@ namespace hpx { namespace execution { namespace experimental {
     } set_error{};
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct set_done_t : hpx::functional::tag_noexcept<set_done_t>
+    struct set_stopped_t : hpx::functional::tag_noexcept<set_stopped_t>
     {
-    } set_done{};
+    } set_stopped{};
 
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -129,7 +129,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename T, typename E>
         struct is_receiver_impl<true, T, E>
           : std::integral_constant<bool,
-                hpx::is_invocable_v<set_done_t, std::decay_t<T>&&> &&
+                hpx::is_invocable_v<set_stopped_t, std::decay_t<T>&&> &&
                     hpx::is_invocable_v<set_error_t, std::decay_t<T>&&, E>>
         {
         };
@@ -220,7 +220,7 @@ namespace hpx { namespace execution { namespace experimental {
         };
 
         template <>
-        struct is_receiver_cpo<set_done_t> : std::true_type
+        struct is_receiver_cpo<set_stopped_t> : std::true_type
         {
         };
 

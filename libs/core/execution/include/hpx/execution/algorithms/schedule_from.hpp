@@ -68,7 +68,7 @@ namespace hpx { namespace execution { namespace experimental {
                                 hpx::execution::experimental::set_error_t,
                                 std::decay_t<Sender>> ||
                         hpx::execution::experimental::detail::has_completion_scheduler_v<
-                                hpx::execution::experimental::set_done_t,
+                                hpx::execution::experimental::set_stopped_t,
                                 std::decay_t<Sender>>))
                 // clang-format on
                 >
@@ -145,9 +145,9 @@ namespace hpx { namespace execution { namespace experimental {
                     }
 
                     friend void tag_invoke(
-                        set_done_t, predecessor_sender_receiver&& r) noexcept
+                        set_stopped_t, predecessor_sender_receiver&& r) noexcept
                     {
-                        r.op_state.set_done_predecessor_sender();
+                        r.op_state.set_stopped_predecessor_sender();
                     }
 
                     // This typedef is duplicated from the parent struct. The
@@ -179,9 +179,10 @@ namespace hpx { namespace execution { namespace experimental {
                         HPX_MOVE(receiver), HPX_FORWARD(Error, error));
                 }
 
-                void set_done_predecessor_sender() noexcept
+                void set_stopped_predecessor_sender() noexcept
                 {
-                    hpx::execution::experimental::set_done(HPX_MOVE(receiver));
+                    hpx::execution::experimental::set_stopped(
+                        HPX_MOVE(receiver));
                 }
 
                 template <typename... Us>
@@ -227,9 +228,9 @@ namespace hpx { namespace execution { namespace experimental {
                     }
 
                     friend void tag_invoke(
-                        set_done_t, scheduler_sender_receiver&& r) noexcept
+                        set_stopped_t, scheduler_sender_receiver&& r) noexcept
                     {
-                        r.op_state.set_done_scheduler_sender();
+                        r.op_state.set_stopped_scheduler_sender();
                     }
 
                     friend void tag_invoke(
@@ -269,10 +270,11 @@ namespace hpx { namespace execution { namespace experimental {
                         HPX_MOVE(receiver), HPX_FORWARD(Error, error));
                 }
 
-                void set_done_scheduler_sender() noexcept
+                void set_stopped_scheduler_sender() noexcept
                 {
                     scheduler_op_state.reset();
-                    hpx::execution::experimental::set_done(HPX_MOVE(receiver));
+                    hpx::execution::experimental::set_stopped(
+                        HPX_MOVE(receiver));
                 }
 
                 void set_value_scheduler_sender() noexcept

@@ -98,8 +98,8 @@ struct callback_receiver
         HPX_TEST(false);
     }
 
-    friend void tag_invoke(
-        hpx::execution::experimental::set_done_t, callback_receiver&&) noexcept
+    friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
+        callback_receiver&&) noexcept
     {
         HPX_TEST(false);
     };
@@ -129,7 +129,7 @@ struct error_callback_receiver
         r.set_error_called = true;
     }
 
-    friend void tag_invoke(hpx::execution::experimental::set_done_t,
+    friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
         error_callback_receiver&&) noexcept
     {
         HPX_TEST(false);
