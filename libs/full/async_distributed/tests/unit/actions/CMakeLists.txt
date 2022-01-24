@@ -5,7 +5,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests)
+set(tests return_future)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
@@ -18,7 +18,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Unit/Modules/Full/AsyncDistributed"
+    FOLDER "Tests/Unit/Modules/Full/AsyncDistributed/Actions"
   )
 
   add_hpx_unit_test("modules.async_distributed" ${test} ${${test}_PARAMETERS})

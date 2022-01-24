@@ -8,6 +8,7 @@ set(tests set_thread_state thread_affinity thread_stacksize)
 
 if(HPX_WITH_NETWORKING)
   set(tests ${tests} serialize_buffer zero_copy_serialization)
+  set(serialize_buffer_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 endif()
 
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
