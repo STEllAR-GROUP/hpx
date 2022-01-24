@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 Jan Melech
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +15,7 @@
 #include <hpx/serialization/traits/brace_initializable_traits.hpp>
 #include <hpx/serialization/tuple.hpp>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename Archive, typename T>
     void serialize_struct(Archive& archive, T& t, const unsigned int version,
@@ -170,4 +171,4 @@ namespace hpx { namespace serialization {
     {
         serialize_struct(ar, t, version, hpx::traits::detail::arity<T>());
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

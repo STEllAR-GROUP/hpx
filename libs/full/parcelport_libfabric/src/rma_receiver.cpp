@@ -132,7 +132,7 @@ namespace hpx::parcelset::policies::libfabric {
 
         int zc_chunks =
             std::count_if(chunks_.begin(), chunks_.end(), [](chunk_struct& c) {
-                return c.type_ == serialization::chunk_type_pointer;
+                return c.type_ == serialization::chunk_type::chunk_type_pointer;
             });
         int oo_chunks = chunks_.size() - zc_chunks;
 
@@ -253,7 +253,7 @@ namespace hpx::parcelset::policies::libfabric {
         // for each zerocopy chunk, schedule a read operation
         uint64_t zc_count =
             std::count_if(chunks_.begin(), chunks_.end(), [](chunk_struct& c) {
-                return c.type_ == serialization::chunk_type_pointer;
+                return c.type_ == serialization::chunk_type::chunk_type_pointer;
             });
         LOG_DEBUG_MSG("receiver " << hexpointer(this)
                                   << "Restarting RMA reads with "
@@ -271,7 +271,7 @@ namespace hpx::parcelset::policies::libfabric {
     {
         for (chunk_struct& c : chunks_)
         {
-            if (c.type_ == serialization::chunk_type_pointer)
+            if (c.type_ == serialization::chunk_type::chunk_type_pointer)
             {
                 region_type* get_region =
                     memory_pool_->allocate_region(c.size_);
@@ -466,7 +466,7 @@ namespace hpx::parcelset::policies::libfabric {
 
         int zc_chunks =
             std::count_if(chunks_.begin(), chunks_.end(), [](chunk_struct& c) {
-                return c.type_ == serialization::chunk_type_pointer;
+                return c.type_ == serialization::chunk_type::chunk_type_pointer;
             });
         int oo_chunks = chunks_.size() - zc_chunks;
 

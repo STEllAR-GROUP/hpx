@@ -163,7 +163,8 @@ namespace hpx::parcelset::policies::tcp {
                 // now add chunks themselves, those hold zero-copy serialized chunks
                 for (serialization::serialization_chunk& c : buffer_.chunks_)
                 {
-                    if (c.type_ == serialization::chunk_type_pointer)
+                    if (c.type_ ==
+                        serialization::chunk_type::chunk_type_pointer)
                         buffers.push_back(asio::buffer(c.data_.cpos_, c.size_));
                 }
             }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,8 @@
 #include <exception>
 #include <functional>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     enum exception_type
     {
         // unknown exception
@@ -43,7 +44,7 @@ namespace hpx { namespace util {
 
         std_system_error = 14
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace serialization {

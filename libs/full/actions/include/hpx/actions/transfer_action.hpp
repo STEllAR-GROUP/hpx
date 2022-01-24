@@ -252,7 +252,7 @@ namespace hpx { namespace actions {
     }
 }}    // namespace hpx::actions
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
     /// \cond NOINTERNAL
     template <typename Action>
     struct needs_automatic_registration<hpx::actions::transfer_action<Action>>
@@ -260,7 +260,7 @@ namespace hpx { namespace traits {
     {
     };
     /// \endcond
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
 #include <hpx/config/warnings_suffix.hpp>
 

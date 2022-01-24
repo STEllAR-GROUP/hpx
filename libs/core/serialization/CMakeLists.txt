@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2021 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # Compatibility with various Boost types, introduced in V1.4.0
 hpx_option(
   HPX_SERIALIZATION_WITH_BOOST_TYPES BOOL
-  "Enable serialization of certain Boost types. (default: ON)" ON ADVANCED
+  "Enable serialization of certain Boost types. (default: OFF)" OFF ADVANCED
   CATEGORY "Modules"
   MODULE SERIALIZATION
 )
@@ -17,6 +17,21 @@ hpx_option(
 if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
   hpx_add_config_define_namespace(
     DEFINE HPX_SERIALIZATION_HAVE_BOOST_TYPES NAMESPACE SERIALIZATION
+  )
+endif()
+
+# Support endian conversion on inout and output archives
+hpx_option(
+  HPX_SERIALIZATION_WITH_SUPPORTS_ENDIANESS BOOL
+  "Support endian conversion on inout and output archives. (default: OFF)" OFF
+  ADVANCED
+  CATEGORY "Modules"
+  MODULE SERIALIZATION
+)
+
+if(HPX_SERIALIZATION_WITH_SUPPORTS_ENDIANESS)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_SERIALIZATION_HAVE_SUPPORTS_ENDIANESS NAMESPACE SERIALIZATION
   )
 endif()
 
@@ -69,7 +84,8 @@ if(HPX_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION)
 endif()
 
 # This flag can be used in systems that rely on sending constant values as part
-# of std::tuple. This option essentially casts away constness for tuple members.
+# of std::tuple. This option essentially casts away constness for tuple members
+# during de-serialization.
 hpx_option(
   HPX_SERIALIZATION_WITH_ALLOW_CONST_TUPLE_MEMBERS BOOL
   "Enable serializing std::tuple with const members. (default: OFF)" OFF

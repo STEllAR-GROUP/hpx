@@ -105,7 +105,7 @@ namespace hpx { namespace actions { namespace detail {
         /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
         /// but the header in which the action is defined misses a
         /// HPX_REGISTER_ACTION_DECLARATION
-        static_assert(traits::needs_automatic_registration<Action>::value,
+        static_assert(traits::needs_automatic_registration_v<Action>,
             "HPX_REGISTER_ACTION_DECLARATION missing");
         return util::debug::type_id<Action>::typeid_.type_id();
     }

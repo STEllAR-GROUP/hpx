@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2014-2015 Anton Bikineev
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +18,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     namespace detail {
 
@@ -49,53 +50,27 @@ namespace hpx { namespace serialization {
         template <typename T1,
             typename = decltype(
                 serialize(std::declval<hpx::serialization::output_archive&>(),
-                    std::declval<typename std::remove_const<T1>::type&>(), 0u))>
+                    std::declval<std::remove_const_t<T1>&>(), 0u))>
         static std::true_type test(int);
 
     public:
         static constexpr bool value = decltype(test<T>(0))::value;
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable = void>
-    struct serialize_non_intrusive
-    {
-        template <typename T1>
-        struct dependent_false : std::false_type
-        {
-        };
-
-        static_assert(
-            dependent_false<T>::value, "No serialization method found");
-    };
-
     template <typename T>
-    struct serialize_non_intrusive<T,
-        std::enable_if_t<has_serialize_adl<T>::value>>
-    {
-        template <typename Archive>
-        static void call(Archive& ar, T& t, unsigned)
-        {
-            // this additional indirection level is needed to
-            // force ADL on the second phase of template lookup.
-            // call of serialize function directly from base_object
-            // finds only serialize-member function and doesn't
-            // perform ADL
-            detail::serialize_force_adl(ar, t, 0);
-        }
-    };
+    inline constexpr bool has_serialize_adl_v = has_serialize_adl<T>::value;
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     class has_struct_serialization
     {
-    public:
         template <typename T1>
         static std::false_type test(...);
 
         template <typename T1,
             typename = decltype(serialize_struct(
                 std::declval<hpx::serialization::output_archive&>(),
-                std::declval<typename std::remove_const<T1>::type&>(), 0u,
+                std::declval<std::remove_const_t<T1>&>(), 0u,
                 hpx::traits::detail::arity<T1>()))>
         static std::true_type test(int);
 
@@ -103,40 +78,9 @@ namespace hpx { namespace serialization {
         static constexpr bool value = decltype(test<T>(0))::value;
     };
 
-    ///////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable = void>
-    struct serialize_brace_initialized
-    {
-        template <typename T1>
-        struct dependent_false : std::false_type
-        {
-        };
-
-        static_assert(
-            dependent_false<T>::value, "No serialization method found");
-    };
-
     template <typename T>
-    struct serialize_brace_initialized<T,
-        std::enable_if_t<has_struct_serialization<T>::value>>
-    {
-        template <typename Archive>
-        static void call(Archive& ar, T& t, unsigned)
-        {
-            // This is automatic serialization for types
-            // which are simple (brace-initializable) structs,
-            // what that means every struct's field
-            // has to be serializable and public.
-            serialize_struct(ar, t, 0);
-        }
-    };
-
-    template <typename T>
-    struct serialize_non_intrusive<T,
-        std::enable_if_t<!has_serialize_adl<T>::value>>
-      : serialize_brace_initialized<T>
-    {
-    };
+    inline constexpr bool has_struct_serialization_v =
+        has_struct_serialization<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     class access
@@ -156,80 +100,63 @@ namespace hpx { namespace serialization {
             // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82478
             template <typename T1,
                 typename = decltype(
-                    std::declval<typename std::remove_const<T1>::type&>()
-                        .serialize(
-                            std::declval<hpx::serialization::output_archive&>(),
-                            0u))>
+                    std::declval<std::remove_const_t<T1>&>().serialize(
+                        std::declval<hpx::serialization::output_archive&>(),
+                        0u))>
             static std::true_type test(int);
 
         public:
             static constexpr bool value = decltype(test<T>(0))::value;
         };
 
-    private:
         template <typename T>
-        class serialize_dispatcher
-        {
-            struct intrusive_polymorphic
-            {
-                // both following template functions are viable
-                // to call right overloaded function according to T constness
-                // and to prevent calling templated version of serialize function
-                static void call(
-                    hpx::serialization::input_archive& ar, T& t, unsigned)
-                {
-                    t.serialize(ar, 0);
-                }
-
-                static void call(hpx::serialization::output_archive& ar,
-                    T const& t, unsigned)
-                {
-                    t.serialize(ar, 0);
-                }
-            };
-
-            struct non_intrusive
-            {
-                template <class Archive>
-                static void call(Archive& ar, T& t, unsigned)
-                {
-                    serialize_non_intrusive<T>::call(ar, t, 0);
-                }
-            };
-
-            struct empty
-            {
-                template <class Archive>
-                static void call(Archive&, T&, unsigned)
-                {
-                }
-            };
-
-            struct intrusive_usual
-            {
-                template <class Archive>
-                static void call(Archive& ar, T& t, unsigned)
-                {
-                    // cast it to let it be run for templated
-                    // member functions
-                    const_cast<std::decay_t<T>&>(t).serialize(ar, 0);
-                }
-            };
-
-        public:
-            using type =
-                std::conditional_t<hpx::traits::is_intrusive_polymorphic_v<T>,
-                    intrusive_polymorphic,
-                    std::conditional_t<has_serialize<T>::value, intrusive_usual,
-                        std::conditional_t<std::is_empty<T>::value, empty,
-                            non_intrusive>>>;
-        };
+        static constexpr bool has_serialize_v = has_serialize<T>::value;
 
     public:
         template <typename Archive, typename T>
         static void serialize(Archive& ar, T& t, unsigned)
         {
-            serialize_dispatcher<T>::type::call(ar, t, 0);
+            if constexpr (hpx::traits::is_intrusive_polymorphic_v<T>)
+            {
+                // intrusive_polymorphic
+                // the following template function is viable to call right
+                // overloaded function according to T constness and to prevent
+                // calling templated version of serialize function
+                t.serialize(ar, 0);
+            }
+            else if constexpr (has_serialize_v<T>)
+            {
+                // intrusive_usual
+                // cast it to let it be run for templated member functions
+                const_cast<std::decay_t<T>&>(t).serialize(ar, 0);
+            }
+            else if constexpr (!std::is_empty_v<T>)
+            {
+                // non_intrusive
+                if constexpr (has_serialize_adl_v<T>)
+                {
+                    // this additional indirection level is needed to
+                    // force ADL on the second phase of template lookup.
+                    // call of serialize function directly from base_object
+                    // finds only serialize-member function and doesn't
+                    // perform ADL
+                    detail::serialize_force_adl(ar, t, 0);
+                }
+                else if constexpr (has_struct_serialization_v<T>)
+                {
+                    // This is automatic serialization for types
+                    // that are simple (brace-initializable) structs,
+                    // what that means every struct's field
+                    // has to be serializable and public.
+                    serialize_struct(ar, t, 0);
+                }
+                else
+                {
+                    static_assert(
+                        has_serialize_adl_v<T> || has_struct_serialization_v<T>,
+                        "No serialization method found");
+                }
+            }
         }
 
         template <typename Archive, typename T>
@@ -256,5 +183,4 @@ namespace hpx { namespace serialization {
             return t->hpx_serialization_get_name();
         }
     };
-
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

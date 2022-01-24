@@ -695,6 +695,8 @@ namespace hpx { namespace util {
       , argv0(argv0_)
 #endif
     {
+        (void) argv0_;
+
         pre_initialize_ini();
 
         // set global config options

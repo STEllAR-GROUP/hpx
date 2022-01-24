@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,7 @@
 
 #include <utility>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename T>
     void save(output_archive& ar, hpx::util::optional<T> const& o, unsigned)
@@ -43,4 +43,4 @@ namespace hpx { namespace serialization {
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
         (template <typename T>), (hpx::util::optional<T>) )
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

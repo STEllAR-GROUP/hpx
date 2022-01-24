@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2014-2015 Anton Bikineev
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,35 +13,36 @@
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename T>
-    output_archive& operator<<(output_archive& ar, T const& t)
+    HPX_FORCEINLINE output_archive& operator<<(output_archive& ar, T const& t)
     {
-        ar.invoke(t);
+        ar.save(t);
         return ar;
     }
 
     template <typename T>
-    input_archive& operator>>(input_archive& ar, T& t)
+    HPX_FORCEINLINE input_archive& operator>>(input_archive& ar, T& t)
     {
-        ar.invoke(t);
+        ar.load(t);
         return ar;
     }
 
     template <typename T>
-    output_archive& operator&(output_archive& ar, T const& t)    //-V524
+    HPX_FORCEINLINE output_archive& operator&(
+        output_archive& ar, T const& t)    //-V524
     {
-        ar.invoke(t);
+        ar.save(t);
         return ar;
     }
 
     template <typename T>
-    input_archive& operator&(input_archive& ar, T& t)    //-V524
+    HPX_FORCEINLINE input_archive& operator&(input_archive& ar, T& t)    //-V524
     {
-        ar.invoke(t);
+        ar.load(t);
         return ar;
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp>

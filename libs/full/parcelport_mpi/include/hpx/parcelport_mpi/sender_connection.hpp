@@ -217,7 +217,7 @@ namespace hpx::parcelset::policies::mpi {
             {
                 serialization::serialization_chunk& c =
                     buffer_.chunks_[chunks_idx_];
-                if (c.type_ == serialization::chunk_type_pointer)
+                if (c.type_ == serialization::chunk_type::chunk_type_pointer)
                 {
                     if (!request_done())
                     {

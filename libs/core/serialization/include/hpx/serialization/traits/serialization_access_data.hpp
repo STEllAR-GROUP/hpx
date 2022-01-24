@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,7 @@
 #include <cstring>
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ////////////////////////////////////////////////////////////////////////////
     template <typename Container>
@@ -23,7 +23,7 @@ namespace hpx { namespace traits {
     {
         using preprocessing_only = std::false_type;
 
-        static constexpr bool is_preprocessing()
+        static constexpr bool is_preprocessing() noexcept
         {
             return false;
         }
@@ -31,13 +31,13 @@ namespace hpx { namespace traits {
         // functions related to output operations
         static constexpr void write(Container& /* cont */,
             std::size_t /* count */, std::size_t /* current */,
-            void const* /* address */)
+            void const* /* address */) noexcept
         {
         }
 
         static bool flush(serialization::binary_filter* /* filter */,
             Container& /* cont */, std::size_t /* current */, std::size_t size,
-            std::size_t& written)
+            std::size_t& written) noexcept
         {
             written = size;
             return true;
@@ -46,18 +46,18 @@ namespace hpx { namespace traits {
         // functions related to input operations
         static constexpr void read(Container const& /* cont */,
             std::size_t /* count */, std::size_t /* current */,
-            void* /* address */)
+            void* /* address */) noexcept
         {
         }
 
         static constexpr std::size_t init_data(Container const& /* cont */,
             serialization::binary_filter* /* filter */,
-            std::size_t /* current */, std::size_t decompressed_size)
+            std::size_t /* current */, std::size_t decompressed_size) noexcept
         {
             return decompressed_size;
         }
 
-        static constexpr void reset(Container& /* cont */) {}
+        static constexpr void reset(Container& /* cont */) noexcept {}
     };
 
     ///////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@ namespace hpx { namespace traits {
     struct serialization_access_data
       : default_serialization_access_data<Container>
     {
-        static std::size_t size(Container const& cont)
+        static std::size_t size(Container const& cont) noexcept
         {
             return cont.size();
         }
@@ -76,7 +76,7 @@ namespace hpx { namespace traits {
         }
 
         static void write(Container& cont, std::size_t count,
-            std::size_t current, void const* address)
+            std::size_t current, void const* address) noexcept
         {
             void* dest = &cont[current];
             switch (count)
@@ -116,7 +116,7 @@ namespace hpx { namespace traits {
 
         // functions related to input operations
         static void read(Container const& cont, std::size_t count,
-            std::size_t current, void* address)
+            std::size_t current, void* address) noexcept
         {
             void const* src = &cont[current];
             switch (count)
@@ -162,4 +162,4 @@ namespace hpx { namespace traits {
       : serialization_access_data<Container>
     {
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

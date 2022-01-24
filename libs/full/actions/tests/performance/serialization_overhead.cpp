@@ -59,9 +59,11 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
     unsigned int out_archive_flags = 0U;
     if (endian_out == "little")
-        out_archive_flags |= hpx::serialization::endian_little;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_little);
     else if (endian_out == "big")
-        out_archive_flags |= hpx::serialization::endian_big;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_big);
     else
     {
         HPX_TEST(endian_out == "little" || endian_out == "big");
@@ -72,8 +74,10 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
     if (hpx::util::from_string<int>(array_optimization) == 0)
     {
-        out_archive_flags |= hpx::serialization::disable_array_optimization;
-        out_archive_flags |= hpx::serialization::disable_data_chunking;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::disable_array_optimization);
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::disable_data_chunking);
     }
     else
     {
@@ -82,7 +86,8 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         if (!zerocopy ||
             hpx::util::from_string<int>(zero_copy_optimization) == 0)
         {
-            out_archive_flags |= hpx::serialization::disable_data_chunking;
+            out_archive_flags = out_archive_flags |
+                int(hpx::serialization::archive_flags::disable_data_chunking);
         }
     }
 
