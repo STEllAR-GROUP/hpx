@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,6 +10,7 @@
 #include <hpx/command_line_handling_local/late_command_line_handling_local.hpp>
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
 #include <hpx/coroutines/coroutine.hpp>
+#include <hpx/coroutines/signal_handler_debugging.hpp>
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind.hpp>
@@ -54,7 +55,6 @@
 #include <string>
 #include <thread>
 #include <utility>
-#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure the system gets properly shut down while handling Ctrl-C and other
@@ -65,15 +65,14 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     void handle_termination(char const* reason)
     {
-        if (get_config_entry("hpx.attach_debugger", "") == "exception")
+        if (hpx::threads::coroutines::attach_debugger_on_sigv)
         {
             util::attach_debugger();
         }
 
-        if (get_config_entry("hpx.diagnostics_on_terminate", "1") == "1")
+        if (hpx::threads::coroutines::diagnostics_on_terminate)
         {
-            int const verbosity = util::from_string<int>(
-                get_config_entry("hpx.exception_verbosity", "2"));
+            int const verbosity = hpx::threads::coroutines::exception_verbosity;
 
             if (verbosity >= 2)
             {
@@ -138,16 +137,14 @@ namespace hpx {
     HPX_NORETURN HPX_CORE_EXPORT void termination_handler(int signum)
     {
         if (signum != SIGINT &&
-            get_config_entry("hpx.attach_debugger", "") == "exception")
+            hpx::threads::coroutines::attach_debugger_on_sigv)
         {
             util::attach_debugger();
         }
 
-        if (get_config_entry("hpx.diagnostics_on_terminate", "1") == "1")
+        if (hpx::threads::coroutines::diagnostics_on_terminate)
         {
-            int const verbosity = util::from_string<int>(
-                get_config_entry("hpx.exception_verbosity", "2"));
-
+            int const verbosity = hpx::threads::coroutines::exception_verbosity;
             char* reason = strsignal(signum);
 
             if (verbosity >= 2)
@@ -205,6 +202,20 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     void set_error_handlers()
     {
+        // initialize global variables
+        hpx::threads::coroutines::attach_debugger_on_sigv =
+            get_config_entry("hpx.attach_debugger", "") == "exception";
+        hpx::threads::coroutines::diagnostics_on_terminate =
+            get_config_entry("hpx.diagnostics_on_terminate", "1") == "1";
+        hpx::threads::coroutines::exception_verbosity = util::from_string<int>(
+            get_config_entry("hpx.exception_verbosity", "2"));
+        hpx::threads::coroutines::exception_verbosity = 0;
+#if defined(HPX_HAVE_STACKTRACES) && defined(HPX_HAVE_THREAD_BACKTRACE_DEPTH)
+        hpx::threads::coroutines::exception_verbosity =
+            util::from_string<std::size_t>(get_config_entry(
+                "hpx.trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH));
+#endif
+
 #if defined(HPX_WINDOWS)
         // Set console control handler to allow server to be stopped.
         SetConsoleCtrlHandler(hpx::termination_handler, TRUE);

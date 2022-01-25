@@ -235,7 +235,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-issue:`1120` - HTTS2 tests compile errors on v110 (VS2012)
 * :hpx-issue:`1119` - Remove references to boost::atomic in accumulator example
 * :hpx-issue:`1118` - Only build test thread_pool_executor_1114_test if
-  ``HPX_LOCAL_SCHEDULER`` is set
+  ``HPX_SCHEDULER`` is set
 * :hpx-issue:`1117` - local_queue_executor linker error on vc110
 * :hpx-issue:`1116` - Disabled performance counter should give runtime errors,
   not invalid data
