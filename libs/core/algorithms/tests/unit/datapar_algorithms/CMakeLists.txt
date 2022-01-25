@@ -17,6 +17,8 @@ if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
       copyn_datapar
       count_datapar
       countif_datapar
+      equal_binary_datapar
+      equal_datapar
       fill_datapar
       filln_datapar
       find_datapar
