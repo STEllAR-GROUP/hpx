@@ -107,7 +107,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     int mpi_environment::init(
-        int*, char***, const int required, const int minimal, int& provided)
+        int*, char***, const int minimal, const int required, int& provided)
     {
         has_called_init_ = false;
 
@@ -158,7 +158,6 @@ namespace hpx { namespace util {
         rtcfg.add_entry("hpx.parcel.bootstrap", "mpi");
 
         int required = MPI_THREAD_SINGLE;
-        int minimal = MPI_THREAD_SINGLE;
 #if defined(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
         required =
             (get_entry_as(rtcfg, "hpx.parcel.mpi.multithreaded", 1) != 0) ?
@@ -172,7 +171,7 @@ namespace hpx { namespace util {
 #endif
 
 #if defined(MPICH) && defined(_POSIX_SOURCE)
-        // This enables multi threading support in MVAPICH if requested.
+        // This enables multi threading support in MPICH if requested.
         if (required == MPI_THREAD_MULTIPLE)
             setenv("MPICH_MAX_THREAD_SAFETY", "multiple", 1);
 #endif
@@ -180,7 +179,7 @@ namespace hpx { namespace util {
 #endif
 
         int retval =
-            init(argc, argv, required, minimal, provided_threading_flag_);
+            init(argc, argv, required, required, provided_threading_flag_);
         if (MPI_SUCCESS != retval && MPI_ERR_OTHER != retval)
         {
             // explicitly disable mpi if not run by mpirun
