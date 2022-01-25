@@ -181,6 +181,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/mismatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -200,21 +201,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename F, typename Proj1, typename Proj2>
-        constexpr util::in_in_result<Iter1, Iter2> sequential_mismatch_binary(
-            Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2, F&& f,
-            Proj1&& proj1, Proj2&& proj2)
-        {
-            while (first1 != last1 && first2 != last2 &&
-                HPX_INVOKE(
-                    f, HPX_INVOKE(proj1, *first1), HPX_INVOKE(proj2, *first2)))
-            {
-                (void) ++first1, ++first2;
-            }
-            return {first1, first2};
-        }
-
         template <typename IterPair>
         struct mismatch_binary
           : public detail::algorithm<mismatch_binary<IterPair>, IterPair>
@@ -231,9 +217,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
                 F&& f, Proj1&& proj1, Proj2&& proj2)
             {
-                return sequential_mismatch_binary(first1, last1, first2, last2,
-                    HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
-                    HPX_FORWARD(Proj2, proj2));
+                return sequential_mismatch_binary<std::decay_t<ExPolicy>>(
+                    first1, last1, first2, last2, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
             }
 
             template <typename ExPolicy, typename Iter1, typename Sent1,
@@ -284,17 +270,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj2 = HPX_FORWARD(Proj2, proj2)](
                               zip_iterator it, std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
-                        part_count, tok,
-                        [&f, &proj1, &proj2, &tok](
-                            reference t, std::size_t i) mutable -> void {
-                            if (!hpx::util::invoke(f,
-                                    hpx::util::invoke(proj1, hpx::get<0>(t)),
-                                    hpx::util::invoke(proj2, hpx::get<1>(t))))
-                            {
-                                tok.cancel(i);
-                            }
-                        });
+                    sequential_mismatch_binary<std::decay_t<ExPolicy>>(base_idx,
+                        it, part_count, tok, HPX_FORWARD(F, f),
+                        HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
                 };
 
                 auto f2 = [=](std::vector<hpx::future<void>>&& data) mutable
@@ -398,11 +376,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static constexpr IterPair sequential(
                 ExPolicy, InIter1 first1, Sent last1, InIter2 first2, F&& f)
             {
-                while (first1 != last1 && HPX_INVOKE(f, *first1, *first2))
-                {
-                    ++first1, ++first2;
-                }
-                return std::make_pair(first1, first2);
+                return sequential_mismatch<std::decay_t<ExPolicy>>(
+                    first1, last1, first2, HPX_FORWARD(F, f));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
@@ -432,15 +407,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f1 = [tok, f = HPX_FORWARD(F, f)](zip_iterator it,
                               std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
-                        part_count, tok,
-                        [&f, &tok](reference t, std::size_t i) mutable -> void {
-                            if (!hpx::util::invoke(
-                                    f, hpx::get<0>(t), hpx::get<1>(t)))
-                            {
-                                tok.cancel(i);
-                            }
-                        });
+                    sequential_mismatch<std::decay_t<ExPolicy>>(
+                        base_idx, it, part_count, tok, HPX_FORWARD(F, f));
                 };
 
                 auto f2 = [=](std::vector<hpx::future<void>>&& data) mutable
