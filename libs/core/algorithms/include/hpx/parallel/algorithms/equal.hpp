@@ -181,6 +181,7 @@ namespace hpx {
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/equal.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -202,22 +203,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
         /// \cond NOINTERNAL
 
-        // Our own version of the C++14 equal (_binary).
-        template <typename InIter1, typename Sent1, typename InIter2,
-            typename Sent2, typename F, typename Proj1, typename Proj2>
-        bool sequential_equal_binary(InIter1 first1, Sent1 last1,
-            InIter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
-        {
-            for (/* */; first1 != last1 && first2 != last2;
-                 (void) ++first1, ++first2)
-            {
-                if (!HPX_INVOKE(f, HPX_INVOKE(proj1, *first1),
-                        HPX_INVOKE(proj2, *first2)))
-                    return false;
-            }
-            return first1 == last1 && first2 == last2;
-        }
-
         ///////////////////////////////////////////////////////////////////////
         struct equal_binary : public detail::algorithm<equal_binary, bool>
         {
@@ -232,9 +217,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static bool sequential(ExPolicy, Iter1 first1, Sent1 last1,
                 Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
             {
-                return sequential_equal_binary(first1, last1, first2, last2,
-                    HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
-                    HPX_FORWARD(Proj2, proj2));
+                return sequential_equal_binary<std::decay_t<ExPolicy>>(first1,
+                    last1, first2, last2, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
             }
 
             template <typename ExPolicy, typename Iter1, typename Sent1,
@@ -289,16 +274,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj2 = HPX_FORWARD(Proj2, proj2)](
                               zip_iterator it,
                               std::size_t part_count) mutable -> bool {
-                    util::loop_n<std::decay_t<ExPolicy>>(it, part_count, tok,
-                        [&f, &proj1, &proj2, &tok](zip_iterator const& curr) {
-                            reference t = *curr;
-                            if (!hpx::util::invoke(f,
-                                    hpx::util::invoke(proj1, hpx::get<0>(t)),
-                                    hpx::util::invoke(proj2, hpx::get<1>(t))))
-                            {
-                                tok.cancel();
-                            }
-                        });
+                    sequential_equal_binary<std::decay_t<ExPolicy>>(it,
+                        part_count, tok, HPX_FORWARD(F, f),
+                        HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
                     return !tok.was_cancelled();
                 };
 
@@ -368,7 +346,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static bool sequential(
                 ExPolicy, InIter1 first1, InIter1 last1, InIter2 first2, F&& f)
             {
-                return std::equal(first1, last1, first2, HPX_FORWARD(F, f));
+                return sequential_equal<std::decay_t<ExPolicy>>(
+                    first1, last1, first2, HPX_FORWARD(F, f));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
@@ -394,14 +373,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 util::cancellation_token<> tok;
                 auto f1 = [f, tok](zip_iterator it,
                               std::size_t part_count) mutable -> bool {
-                    util::loop_n<std::decay_t<ExPolicy>>(it, part_count, tok,
-                        [&f, &tok](zip_iterator const& curr) mutable -> void {
-                            reference t = *curr;
-                            if (!HPX_INVOKE(f, hpx::get<0>(t), hpx::get<1>(t)))
-                            {
-                                tok.cancel();
-                            }
-                        });
+                    sequential_equal<std::decay_t<ExPolicy>>(
+                        it, part_count, tok, HPX_FORWARD(F, f));
                     return !tok.was_cancelled();
                 };
 
