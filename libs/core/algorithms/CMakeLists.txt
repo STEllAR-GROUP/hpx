@@ -157,6 +157,7 @@ set(algorithms_headers
     hpx/parallel/datapar.hpp
     hpx/parallel/datapar/adjacent_difference.hpp
     hpx/parallel/datapar/adjacent_find.hpp
+    hpx/parallel/datapar/equal.hpp
     hpx/parallel/datapar/fill.hpp
     hpx/parallel/datapar/find.hpp
     hpx/parallel/datapar/generate.hpp
