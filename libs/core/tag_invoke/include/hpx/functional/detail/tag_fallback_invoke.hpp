@@ -223,6 +223,7 @@ namespace hpx::functional::detail {
         struct not_tag_fallback_noexcept_dispatchable;
 
         // poison pill
+        void tag_invoke();
         void tag_fallback_invoke();
 
         ///////////////////////////////////////////////////////////////////////////

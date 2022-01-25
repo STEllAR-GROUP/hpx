@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 Thomas Heller
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +8,7 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
+#include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/functional/invoke_result.hpp>
@@ -70,7 +72,7 @@ namespace hpx { namespace execution { namespace experimental {
     /// receiver with the corresponding value, error and done channels:
     ///     * `hpx::execution::experimental::connect`
     ///
-    /// In addition, `hpx::execution::experimental::::sender_traits ` needs to
+    /// In addition, `hpx::execution::experimental::sender_traits ` needs to
     /// be specialized in some form.
     ///
     /// A sender's destructor shall not block pending completion of submitted
@@ -86,23 +88,23 @@ namespace hpx { namespace execution { namespace experimental {
     /// by a sender. This can be either specialized directly for user defined
     /// sender types or embedded value_types, error_types and sends_done
     /// inside the sender type can be provided.
-    template <typename Sender>
+    template <typename Sender, typename Env = empty_env>
     struct sender_traits;
 
-    template <typename Sender>
-    struct sender_traits<Sender volatile> : sender_traits<Sender>
+    template <typename Sender, typename Env>
+    struct sender_traits<Sender volatile, Env> : sender_traits<Sender, Env>
     {
     };
-    template <typename Sender>
-    struct sender_traits<Sender const> : sender_traits<Sender>
+    template <typename Sender, typename Env>
+    struct sender_traits<Sender const, Env> : sender_traits<Sender, Env>
     {
     };
-    template <typename Sender>
-    struct sender_traits<Sender&> : sender_traits<Sender>
+    template <typename Sender, typename Env>
+    struct sender_traits<Sender&, Env> : sender_traits<Sender, Env>
     {
     };
-    template <typename Sender>
-    struct sender_traits<Sender&&> : sender_traits<Sender>
+    template <typename Sender, typename Env>
+    struct sender_traits<Sender&&, Env> : sender_traits<Sender, Env>
     {
     };
 
@@ -124,7 +126,7 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename Sender>
     struct is_sender
       : std::integral_constant<bool,
-            std::is_move_constructible<std::decay_t<Sender>>::value &&
+            std::is_move_constructible_v<std::decay_t<Sender>> &&
                 detail::specialized<std::decay_t<Sender>>(nullptr)>
     {
     };
@@ -138,32 +140,6 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     namespace detail {
-        template <typename Executor, typename F, typename Enable = void>
-        struct is_executor_of_base_impl : std::false_type
-        {
-        };
-
-        template <typename Executor, typename F>
-        struct is_executor_of_base_impl<Executor, F,
-            std::enable_if_t<hpx::is_invocable<std::decay_t<F>&>::value &&
-                std::is_constructible<std::decay_t<F>, F>::value &&
-                std::is_destructible<std::decay_t<F>>::value &&
-                std::is_move_constructible<std::decay_t<F>>::value &&
-                std::is_copy_constructible<Executor>::value &&
-                hpx::traits::is_equality_comparable<Executor>::value>>
-          : std::true_type
-        {
-        };
-
-        template <typename Executor>
-        struct is_executor_base
-          : is_executor_of_base_impl<std::decay_t<Executor>,
-                invocable_archetype>
-        {
-        };
-    }    // namespace detail
-
-    namespace detail {
         template <typename S, typename R, typename Enable = void>
         struct has_member_connect : std::false_type
         {
@@ -171,8 +147,8 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename S, typename R>
         struct has_member_connect<S, R,
-            typename hpx::util::always_void<decltype(std::declval<S>().connect(
-                std::declval<R>()))>::type> : std::true_type
+            hpx::util::always_void_t<decltype(
+                std::declval<S>().connect(std::declval<R>()))>> : std::true_type
         {
         };
     }    // namespace detail
@@ -229,8 +205,8 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename S>
         struct has_member_schedule<S,
-            typename hpx::util::always_void<decltype(
-                std::declval<S>().schedule())>::type> : std::true_type
+            hpx::util::always_void_t<decltype(std::declval<S>().schedule())>>
+          : std::true_type
         {
         };
     }    // namespace detail
@@ -326,11 +302,11 @@ namespace hpx { namespace execution { namespace experimental {
         {
         };
 
-        template <bool HasSenderTraits, typename Sender>
+        template <bool HasSenderTraits, typename Sender, typename Env>
         struct sender_traits_base;
 
-        template <typename Sender>
-        struct sender_traits_base<true /* HasSenderTraits */, Sender>
+        template <typename Sender, typename Env>
+        struct sender_traits_base<true /* HasSenderTraits */, Sender, Env>
         {
             template <template <typename...> class Tuple,
                 template <typename...> class Variant>
@@ -343,8 +319,8 @@ namespace hpx { namespace execution { namespace experimental {
             static constexpr bool sends_done = Sender::sends_done;
         };
 
-        template <typename Sender>
-        struct sender_traits_base<false /* HasSenderTraits */, Sender>
+        template <typename Sender, typename Env>
+        struct sender_traits_base<false /* HasSenderTraits */, Sender, Env>
         {
             using __unspecialized = void;
         };
@@ -358,10 +334,10 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
-    template <typename Sender>
+    template <typename Sender, typename Env>
     struct sender_traits
       : detail::sender_traits_base<detail::has_sender_types<Sender>::value,
-            Sender>
+            Sender, Env>
     {
     };
 
@@ -419,6 +395,5 @@ namespace hpx { namespace execution { namespace experimental {
     inline constexpr bool is_scheduler_v = is_scheduler<Scheduler>::value;
 
     template <typename S, typename R>
-    using connect_result_t =
-        typename hpx::util::invoke_result<connect_t, S, R>::type;
+    using connect_result_t = hpx::util::invoke_result_t<connect_t, S, R>;
 }}}    // namespace hpx::execution::experimental

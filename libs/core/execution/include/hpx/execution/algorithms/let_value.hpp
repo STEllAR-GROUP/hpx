@@ -73,14 +73,7 @@ namespace hpx { namespace execution { namespace experimental {
             using value_types = hpx::util::detail::unique_t<
                 hpx::util::detail::concat_pack_of_packs_t<hpx::util::detail::
                         transform_t<successor_sender_types<Tuple, Variant>,
-                            value_types<Tuple, Variant>::template apply
-#if defined(HPX_CLANG_VERSION) && HPX_CLANG_VERSION < 110000
-                            >
-                    //
-                    >>;
-#else
-                            >>>;
-#endif
+                            value_types<Tuple, Variant>::template apply> /**/>>;
 
             // hpx::util::pack acts as a concrete type in place of Tuple. It is
             // required for computing successor_sender_types, but disappears
