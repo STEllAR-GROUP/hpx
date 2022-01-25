@@ -66,7 +66,7 @@ namespace hpx {
     move(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest);
 
     // clang-format off
-}
+}   // namespace hpx
 
 #else // DOXYGEN
 

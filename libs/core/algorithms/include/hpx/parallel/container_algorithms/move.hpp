@@ -10,7 +10,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx {
+namespace hpx { namespace ranges {
     // clang-format off
 
     /// Moves the elements in the range \a rng to another range beginning
@@ -124,7 +124,7 @@ namespace hpx {
     move(ExPolicy&& policy, Rng&& rng, FwdIter dest);
 
     // clang-format on
-}    // namespace hpx
+}}  // namespace hpx::ranges
 
 #else    // DOXYGEN
 

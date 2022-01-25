@@ -11,7 +11,7 @@
 
 #if defined(DOXYGEN)
 
-namespace hpx { namespace ranges {
+namespace hpx {
     // clang-format off
 
     /// Checks whether the second range defined by [first1, last1) matches the
@@ -135,7 +135,7 @@ namespace hpx { namespace ranges {
         Proj2&& proj2);
 
     // clang-format on
-}}    // namespace hpx::ranges
+}}    // namespace hpx
 
 #else    // DOXYGEN
 

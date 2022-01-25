@@ -10,7 +10,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx {
+namespace hpx { namespace ranges {
     // clang-format off
 
     /// Returns whether the range is max heap. That is, true if the range is
@@ -283,7 +283,7 @@ namespace hpx {
         Proj&& proj = Proj());
 
     // clang-format on
-}    // namespace hpx
+}}    // namespace hpx::ranges
 
 #else    // DOXYGEN
 

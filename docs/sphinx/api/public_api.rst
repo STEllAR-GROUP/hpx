@@ -73,7 +73,7 @@ Functions
 - :cpp:func:`hpx::merge`
 - :cpp:func:`hpx::min_element`
 - :cpp:func:`hpx::minmax_element`
-- :cpp:func:`hpx::parallel::v1::mismatch`
+- :cpp:func:`hpx::mismatch`
 - :cpp:func:`hpx::move`
 - :cpp:func:`hpx::none_of`
 - :cpp:func:`hpx::nth_element`

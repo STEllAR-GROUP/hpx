@@ -10,7 +10,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx {
+namespace hpx { namespace ranges {
     // clang-format off
 
     /// Assigns the given value to the elements in the range [first, last).
@@ -100,7 +100,7 @@ namespace hpx {
     fill_n(ExPolicy&& policy, Iterator first, Size count, T const& value);
 
     // clang-format on
-}    // namespace hpx
+}}    // namespace hpx::ranges
 
 #else    // DOXYGEN
 

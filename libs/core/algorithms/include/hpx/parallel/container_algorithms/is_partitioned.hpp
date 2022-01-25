@@ -9,8 +9,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx {
-    namespace ranges {
+namespace hpx { namespace ranges {
         /// Determines if the range [first, last) is partitioned.
         ///
         /// \note   Complexity: at most (N) predicate evaluations where
@@ -230,7 +229,7 @@ namespace hpx {
         typename util::detail::algorithm_result<ExPolicy, bool>::type
         is_partitioned(
             ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj());
-    }    // namespace ranges
+}}    // namespace hpx::ranges
 #else
 
 #include <hpx/config.hpp>
