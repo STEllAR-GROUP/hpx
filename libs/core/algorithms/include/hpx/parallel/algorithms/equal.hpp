@@ -263,7 +263,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 typedef hpx::util::zip_iterator<Iter1, Iter2> zip_iterator;
-                typedef typename zip_iterator::reference reference;
 
                 util::cancellation_token<> tok;
 
@@ -368,7 +367,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
                     zip_iterator;
-                typedef typename zip_iterator::reference reference;
 
                 util::cancellation_token<> tok;
                 auto f1 = [f, tok](zip_iterator it,
