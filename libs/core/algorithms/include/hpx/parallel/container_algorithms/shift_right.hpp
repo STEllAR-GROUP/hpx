@@ -10,7 +10,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx {
+namespace hpx { namespace ranges {
     // clang-format off
 
     ///////////////////////////////////////////////////////////////////////////
@@ -189,7 +189,7 @@ namespace hpx {
     shift_right(ExPolicy&& policy, Rng&& rng, Size n);
 
     // clang-format on
-}    // namespace hpx
+}}    // namespace hpx::ranges
 
 #else    // DOXYGEN
 

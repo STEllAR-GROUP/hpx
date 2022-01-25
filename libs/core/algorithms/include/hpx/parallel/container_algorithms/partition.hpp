@@ -10,7 +10,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx {
+namespace hpx { namespace ranges {
     // clang-format off
 
     ///////////////////////////////////////////////////////////////////////////
@@ -894,7 +894,7 @@ namespace hpx {
         FwdIter3 dest_false, Pred&& pred, Proj&& proj);
 
     // clang-format on
-}    // namespace hpx
+}}    // namespace hpx::ranges
 
 #else    // DOXYGEN
 
