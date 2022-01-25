@@ -47,6 +47,11 @@ set(execution_headers
     hpx/execution/executors/polymorphic_executor.hpp
     hpx/execution/executors/rebind_executor.hpp
     hpx/execution/executors/static_chunk_size.hpp
+    hpx/execution/queries/get_allocator.hpp
+    hpx/execution/queries/get_scheduler.hpp
+    hpx/execution/queries/get_delegatee_scheduler.hpp
+    hpx/execution/queries/get_stop_token.hpp
+    hpx/execution/queries/read.hpp
     hpx/execution/traits/detail/simd/vector_pack_alignment_size.hpp
     hpx/execution/traits/detail/simd/vector_pack_all_any_none.hpp
     hpx/execution/traits/detail/simd/vector_pack_count_bits.hpp

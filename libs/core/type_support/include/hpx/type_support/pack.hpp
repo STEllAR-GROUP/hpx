@@ -101,8 +101,8 @@ namespace hpx { namespace util {
         static std::false_type all_of(...);
 
         template <typename... Ts>
-        static auto all_of(int) -> always_true<
-            typename std::enable_if<is_true<Ts>::value>::type...>;
+        static auto all_of(int)
+            -> always_true<std::enable_if_t<is_true<Ts>::value>...>;
     }    // namespace detail
 
     template <typename... Ts>
@@ -124,8 +124,8 @@ namespace hpx { namespace util {
         static std::true_type any_of(...);
 
         template <typename... Ts>
-        static auto any_of(int) -> always_false<
-            typename std::enable_if<is_false<Ts>::value>::type...>;
+        static auto any_of(int)
+            -> always_false<std::enable_if_t<is_false<Ts>::value>...>;
     }    // namespace detail
 
     template <typename... Ts>

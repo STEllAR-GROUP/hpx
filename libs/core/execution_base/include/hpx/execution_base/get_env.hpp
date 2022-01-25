@@ -133,6 +133,7 @@ namespace hpx::execution::experimental {
     inline constexpr struct get_env_t final
       : hpx::functional::detail::tag_fallback<get_env_t>
     {
+    private:
         template <typename EnvProvider>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             get_env_t, EnvProvider&&) noexcept
@@ -167,6 +168,7 @@ namespace hpx::execution::experimental {
     inline constexpr struct forwarding_env_query_t final
       : hpx::functional::detail::tag_fallback<forwarding_env_query_t>
     {
+    private:
         template <typename T>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             forwarding_env_query_t, T&&) noexcept

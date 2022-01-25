@@ -77,7 +77,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///
     /// A sender's destructor shall not block pending completion of submitted
     /// operations.
-    template <typename Sender>
+    template <typename Sender, typename Env = no_env>
     struct is_sender;
 
     /// \see is_sender
@@ -123,7 +123,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
     }    // namespace detail
 
-    template <typename Sender>
+    template <typename Sender, typename Env>
     struct is_sender
       : std::integral_constant<bool,
             std::is_move_constructible_v<std::decay_t<Sender>> &&
@@ -145,12 +145,15 @@ namespace hpx { namespace execution { namespace experimental {
         {
         };
 
+        // different versions of clang-format disagree
+        // clang-format off
         template <typename S, typename R>
         struct has_member_connect<S, R,
             hpx::util::always_void_t<decltype(
                 std::declval<S>().connect(std::declval<R>()))>> : std::true_type
         {
         };
+        // clang-format on
     }    // namespace detail
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
@@ -248,6 +251,10 @@ namespace hpx { namespace execution { namespace experimental {
             is_sender_v<Sender> && is_receiver_v<Receiver>, Sender, Receiver>
     {
     };
+
+    template <typename Sender, typename Receiver>
+    inline constexpr bool is_sender_to_v =
+        is_sender_to<Sender, Receiver>::value;
 
     namespace detail {
         template <typename... As>
@@ -384,10 +391,9 @@ namespace hpx { namespace execution { namespace experimental {
 
     template <typename Scheduler>
     struct is_scheduler<Scheduler,
-        std::enable_if_t<hpx::is_invocable<schedule_t, Scheduler>::value &&
-            std::is_copy_constructible<Scheduler>::value &&
-            hpx::traits::is_equality_comparable<Scheduler>::value>>
-      : std::true_type
+        std::enable_if_t<hpx::is_invocable_v<schedule_t, Scheduler> &&
+            std::is_copy_constructible_v<Scheduler> &&
+            hpx::traits::is_equality_comparable_v<Scheduler>>> : std::true_type
     {
     };
 

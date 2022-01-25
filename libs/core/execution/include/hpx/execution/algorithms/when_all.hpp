@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +12,8 @@
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
+#include <hpx/execution/algorithms/transfer.hpp>
+#include <hpx/execution/queries/get_stop_token.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -28,8 +31,19 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
     namespace detail {
+
+        // callback object to request cancellation
+        struct on_stop_requested
+        {
+            hpx::experimental::in_place_stop_source& stop_source_;
+            void operator()() noexcept
+            {
+                stop_source_.request_stop();
+            }
+        };
+
         // This is a receiver to be connected to the ith predecessor sender
         // passed to when_all. When set_value is called, it will emplace the
         // values sent into the appropriate position in the pack used to store
@@ -39,7 +53,8 @@ namespace hpx { namespace execution { namespace experimental {
         {
             std::decay_t<OperationState>& op_state;
 
-            when_all_receiver(std::decay_t<OperationState>& op_state)
+            explicit when_all_receiver(
+                std::decay_t<OperationState>& op_state) noexcept
               : op_state(op_state)
             {
             }
@@ -50,6 +65,7 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 if (!r.op_state.set_stopped_error_called.exchange(true))
                 {
+                    r.op_state.stop_source_.request_stop();
                     try
                     {
                         r.op_state.error = HPX_FORWARD(Error, error);
@@ -60,14 +76,17 @@ namespace hpx { namespace execution { namespace experimental {
                         r.op_state.error = std::current_exception();
                     }
                 }
-
                 r.op_state.finish();
             }
 
             friend void tag_invoke(
                 set_stopped_t, when_all_receiver&& r) noexcept
             {
-                r.op_state.set_stopped_error_called = true;
+                // request stop only if we're not in error state
+                if (!r.op_state.set_stopped_error_called.exchange(true))
+                {
+                    r.op_state.stop_source_.request_stop();
+                }
                 r.op_state.finish();
             };
 
@@ -92,9 +111,12 @@ namespace hpx { namespace execution { namespace experimental {
             using index_pack_type = typename hpx::util::make_index_pack<
                 OperationState::sender_pack_size>::type;
 
+            // different version of clang-format disagree
+            // clang-format off
             template <typename... Ts>
-            auto set_value(Ts&&... ts) noexcept -> decltype(set_value_helper(
-                index_pack_type{}, HPX_FORWARD(Ts, ts)...))
+            auto set_value(Ts&&... ts) noexcept -> decltype(
+                set_value_helper(index_pack_type{}, HPX_FORWARD(Ts, ts)...))
+            // clang-format on
             {
                 if constexpr (OperationState::sender_pack_size > 0)
                 {
@@ -120,16 +142,14 @@ namespace hpx { namespace execution { namespace experimental {
                 op_state.finish();
             }
 
-            template <typename OperationState>
-            friend auto tag_invoke(
-                get_env_t, when_all_receiver<OperationState> const& r)
+            friend auto tag_invoke(get_env_t, when_all_receiver const& r)
                 -> make_env_t<get_stop_token_t,
                     hpx::experimental::in_place_stop_token,
                     env_of_t<typename OperationState::receiver_type>>
             {
                 return make_env<get_stop_token_t>(
                     r.op_state.stop_source_.get_token(),
-                    get_env(r.op_state.receiver));
+                    hpx::execution::experimental::get_env(r.op_state.receiver));
             }
         };
 
@@ -254,7 +274,13 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::optional<error_types<hpx::variant>> error;
                 std::atomic<bool> set_stopped_error_called{false};
                 HPX_NO_UNIQUE_ADDRESS receiver_type receiver;
-                hpx::experimental::in_place_stop_source stop_source{};
+
+                hpx::experimental::in_place_stop_source stop_source_{};
+
+                using stop_token_t = stop_token_of_t<env_of_t<receiver_type>&>;
+                hpx::optional<typename stop_token_t::template callback_type<
+                    on_stop_requested>>
+                    on_stop_{};
 
                 using operation_state_type =
                     std::decay_t<decltype(hpx::execution::experimental::connect(
@@ -289,7 +315,7 @@ namespace hpx { namespace execution { namespace experimental {
                 template <std::size_t... Is, typename... Ts>
                 void set_value_helper(
                     hpx::util::member_pack<hpx::util::index_pack<Is...>, Ts...>&
-                        ts)
+                        ts) noexcept
                 {
                     hpx::execution::experimental::set_value(HPX_MOVE(receiver),
                         HPX_MOVE(*(ts.template get<Is>()))...);
@@ -299,6 +325,9 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     if (--predecessors_remaining == 0)
                     {
+                        // Stop callback is no longer needed. Destroy it.
+                        on_stop_.reset();
+
                         if (!set_stopped_error_called)
                         {
                             set_value_helper(ts);
@@ -377,7 +406,23 @@ namespace hpx { namespace execution { namespace experimental {
                 operation_state<Receiver, SendersPack, num_predecessors - 1>&
                     os) noexcept
             {
-                os.start();
+                // register stop callback
+                os.on_stop_.emplace(
+                    hpx::execution::experimental::get_stop_token(
+                        hpx::execution::experimental::get_env(os.receiver)),
+                    on_stop_requested{os.stop_source_});
+
+                // If a stop has already been requested. Don't bother starting
+                // the child operations.
+                if (os.stop_source_.stop_requested())
+                {
+                    hpx::execution::experimental::set_stopped(
+                        HPX_FORWARD(Receiver, os.receiver));
+                }
+                else
+                {
+                    os.start();
+                }
             }
 
             template <typename Receiver>
@@ -399,6 +444,9 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
+    // execution::when_all is used to join multiple sender chains and create a
+    // sender whose execution is dependent on all of the input senders that
+    // only send a single set of values.
     inline constexpr struct when_all_t final
       : hpx::functional::detail::tag_fallback<when_all_t>
     {
@@ -416,4 +464,48 @@ namespace hpx { namespace execution { namespace experimental {
                 HPX_FORWARD(Senders, senders)...};
         }
     } when_all{};
-}}}    // namespace hpx::execution::experimental
+
+    // TODO:
+    // execution::when_all_with_variant is used to join multiple sender chains
+    // and create a sender whose execution is dependent on all of the input
+    // senders, each of which may have one or more sets of sent values.
+    inline constexpr struct when_all_with_variant_t final
+      : hpx::functional::tag<when_all_with_variant_t>
+    {
+    } when_all_with_variant{};
+
+    // execution::transfer_when_all is used to join multiple sender chains
+    // and create a sender whose execution is dependent on all of the input
+    // senders that only send a single set of values each, while also making
+    // sure that they complete on the specified scheduler.
+    inline constexpr struct transfer_when_all_t final
+      : hpx::functional::detail::tag_fallback<transfer_when_all_t>
+    {
+    private:
+        // clang-format off
+        template <typename Sched, typename... Senders,
+            HPX_CONCEPT_REQUIRES_(
+                is_scheduler_v<Sched> &&
+                hpx::util::all_of_v<is_sender<Senders>...>
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+            transfer_when_all_t, Sched&& sched, Senders&&... senders)
+        {
+            return hpx::execution::experimental::transfer(
+                hpx::execution::experimental::when_all(
+                    HPX_FORWARD(Senders, senders)...),
+                HPX_FORWARD(Sched, sched));
+        }
+    } transfer_when_all{};
+
+    // TODO:
+    // execution::transfer_when_all_with_variant is used to join multiple
+    // sender chains and create a sender whose execution is dependent on all
+    // of the input senders, which may have one or more sets of sent values.
+    inline constexpr struct transfer_when_all_with_variant_t final
+      : hpx::functional::tag<transfer_when_all_with_variant_t>
+    {
+    } transfer_when_all_with_variant{};
+
+}    // namespace hpx::execution::experimental

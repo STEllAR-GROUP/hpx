@@ -177,7 +177,8 @@ namespace hpx { namespace execution { namespace experimental {
                         get_env_t, predecessor_sender_receiver const& r)
                         -> env_of_t<std::decay_t<Receiver>>
                     {
-                        return get_env(r.op_state.receiver);
+                        return hpx::execution::experimental::get_env(
+                            r.op_state.receiver);
                     }
                 };
 

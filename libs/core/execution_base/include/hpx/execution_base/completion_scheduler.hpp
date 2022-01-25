@@ -7,21 +7,52 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 
 #include <type_traits>
 
 namespace hpx::execution::experimental {
-    template <typename Scheduler>
+
+    // execution::get_completion_scheduler is used to ask a sender object for
+    // the completion scheduler for one of its signals.
+    //
+    // The name execution::get_completion_scheduler denotes a customization
+    // point object template. For some subexpression s, let S be decltype((s)).
+    // If S does not satisfy execution::sender,
+    // execution::get_completion_scheduler<CPO>(s) is ill-formed for all
+    // template arguments CPO. If the template argument CPO in
+    // execution::get_completion_scheduler<CPO> is not one of
+    // execution::set_value_t, execution::set_error_t, or
+    // execution::set_stopped_t, execution::get_completion_scheduler<CPO> is
+    // ill-formed. Otherwise, execution::get_completion_scheduler<CPO>(s) is
+    // expression-equivalent to:
+    //
+    //    1. tag_invoke(execution::get_completion_scheduler<CPO>, as_const(s))
+    //       if this expression is well formed.
+    //
+    //       - Mandates: The tag_invoke expression above is not potentially
+    //         throwing and its type satisfies execution::scheduler.
+    //
+    //    2.   Otherwise, execution::get_completion_scheduler<CPO>(s) is
+    //         ill-formed.
+    //
+    // clang-format off
+    template <typename CPO,
+        HPX_CONCEPT_REQUIRES_(
+            std::is_same_v<CPO, set_value_t> ||
+            std::is_same_v<CPO, set_error_t> ||
+            std::is_same_v<CPO, set_stopped_t>
+        )>
+    // clang-format on
     struct get_completion_scheduler_t final
-      : hpx::functional::tag<get_completion_scheduler_t<Scheduler>>
+      : hpx::functional::tag<get_completion_scheduler_t<CPO>>
     {
     };
 
-    template <typename Scheduler>
-    inline constexpr get_completion_scheduler_t<Scheduler>
-        get_completion_scheduler{};
+    template <typename CPO>
+    inline constexpr get_completion_scheduler_t<CPO> get_completion_scheduler{};
 
     namespace detail {
         template <bool TagInvocable, typename CPO, typename Sender>

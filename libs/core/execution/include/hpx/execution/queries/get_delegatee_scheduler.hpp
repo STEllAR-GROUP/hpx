@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/queries/read.hpp>
 #include <hpx/execution_base/get_env.hpp>
-#include <hpx/execution_base/read.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 
 namespace hpx::execution::experimental {
@@ -36,6 +36,7 @@ namespace hpx::execution::experimental {
     inline constexpr struct get_delegatee_scheduler_t final
       : hpx::functional::detail::tag_fallback<get_delegatee_scheduler_t>
     {
+    private:
         friend inline constexpr auto tag_fallback_invoke(
             get_delegatee_scheduler_t) noexcept;
 

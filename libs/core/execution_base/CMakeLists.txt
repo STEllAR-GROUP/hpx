@@ -12,13 +12,8 @@ set(execution_base_headers
     hpx/execution_base/context_base.hpp
     hpx/execution_base/detail/spinlock_deadlock_detection.hpp
     hpx/execution_base/execution.hpp
-    hpx/execution_base/get_allocator.hpp
     hpx/execution_base/get_env.hpp
-    hpx/execution_base/get_scheduler.hpp
-    hpx/execution_base/get_delegatee_scheduler.hpp
-    hpx/execution_base/get_stop_token.hpp
     hpx/execution_base/operation_state.hpp
-    hpx/execution_base/read.hpp
     hpx/execution_base/receiver.hpp
     hpx/execution_base/resource_base.hpp
     hpx/execution_base/sender.hpp
