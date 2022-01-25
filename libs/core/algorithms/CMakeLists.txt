@@ -162,6 +162,7 @@ set(algorithms_headers
     hpx/parallel/datapar/generate.hpp
     hpx/parallel/datapar/iterator_helpers.hpp
     hpx/parallel/datapar/loop.hpp
+    hpx/parallel/datapar/mismatch.hpp
     hpx/parallel/datapar/transfer.hpp
     hpx/parallel/datapar/transform_loop.hpp
     hpx/parallel/datapar/zip_iterator.hpp
