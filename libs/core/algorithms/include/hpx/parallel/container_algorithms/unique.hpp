@@ -582,9 +582,9 @@ namespace hpx { namespace ranges {
         Pred&& pred, Proj&& proj);
 
     // clang-format on
-}}  // namespace hpx::ranges
+}}    // namespace hpx::ranges
 
-#else // DOXYGEN
+#else    // DOXYGEN
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -942,4 +942,4 @@ namespace hpx { namespace ranges {
     } unique_copy{};
 }}    // namespace hpx::ranges
 
-#endif // DOXYGEN
+#endif    // DOXYGEN

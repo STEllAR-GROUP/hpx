@@ -124,7 +124,7 @@ namespace hpx { namespace ranges {
     move(ExPolicy&& policy, Rng&& rng, FwdIter dest);
 
     // clang-format on
-}}  // namespace hpx::ranges
+}}    // namespace hpx::ranges
 
 #else    // DOXYGEN
 

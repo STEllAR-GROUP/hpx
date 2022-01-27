@@ -145,8 +145,8 @@ namespace hpx::execution::experimental {
     using env_of_t = decltype(get_env(std::declval<T>()));
 
     template <typename Tag, typename Value, typename BaseEnv = empty_env>
-    using make_env_t =
-        decltype(make_env<Tag>(std::declval<Value>(), std::declval<BaseEnv>()));
+    using make_env_t = decltype(
+        make_env<Tag>(std::declval<Value&&>(), std::declval<BaseEnv&&>()));
 
     // execution::forwarding_env_query is used to ask a customization point
     // object whether it is an environment query that should be forwarded
