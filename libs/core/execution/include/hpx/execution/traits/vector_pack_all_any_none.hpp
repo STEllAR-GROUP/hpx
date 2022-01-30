@@ -11,6 +11,27 @@
 #if defined(HPX_HAVE_DATAPAR)
 
 #if !defined(__CUDACC__)
+
+namespace hpx { namespace parallel { namespace traits {
+    ///////////////////////////////////////////////////////////////////////
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t all_of(bool msk)
+    {
+        return msk;
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t any_of(bool msk)
+    {
+        return msk;
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t none_of(bool msk)
+    {
+        return !msk;
+    }
+}}}    // namespace hpx::parallel::traits
+
 #include <hpx/execution/traits/detail/simd/vector_pack_all_any_none.hpp>
 #include <hpx/execution/traits/detail/vc/vector_pack_all_any_none.hpp>
 #endif
