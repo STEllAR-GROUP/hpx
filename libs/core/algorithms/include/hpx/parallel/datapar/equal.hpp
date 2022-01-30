@@ -126,10 +126,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static bool call(InIter1 first1,
             InIter1 last1, InIter2 first2, F&& f, Proj1&& proj1, Proj2&& proj2)
         {
-            auto count = hpx::parallel::v1::detail::distance(first1, last1) - 1;
+            auto count = hpx::parallel::v1::detail::distance(first1, last1);
             util::cancellation_token<> tok;
             call(hpx::util::make_zip_iterator(first1, first2), count, tok,
-                HPX_FORWARD(F, f));
+                HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
             return !tok.was_cancelled();
         }
     };
@@ -157,13 +158,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
     }
 
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename F,
-        typename Proj1, typename Proj2,
+    template <typename ExPolicy, typename InIter1, typename Sent1,
+        typename InIter2, typename Sent2, typename F, typename Proj1,
+        typename Proj2,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
     HPX_HOST_DEVICE HPX_FORCEINLINE bool tag_invoke(
-        sequential_equal_binary_t<ExPolicy>, InIter1 first1, InIter1 last1,
-        InIter2 first2, F&& f, Proj1&& proj1, Proj2&& proj2)
+        sequential_equal_binary_t<ExPolicy>, InIter1 first1, Sent1 last1,
+        InIter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
     {
         if constexpr (hpx::parallel::util::detail::iterator_datapar_compatible<
                           InIter1>::value &&
@@ -177,7 +179,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         else
         {
             return sequential_equal_binary<typename ExPolicy::base_policy_type>(
-                first1, last1, first2, HPX_FORWARD(F, f),
+                first1, last1, first2, last2, HPX_FORWARD(F, f),
                 HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
     }

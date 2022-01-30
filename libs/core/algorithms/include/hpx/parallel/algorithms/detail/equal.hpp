@@ -120,22 +120,21 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     inline constexpr sequential_equal_binary_t<ExPolicy>
         sequential_equal_binary = sequential_equal_binary_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename F,
-        typename Proj1, typename Proj2>
-        > HPX_HOST_DEVICE HPX_FORCEINLINE bool sequential_equal_binary(
-              InIter1 first1, InIter1 last1, InIter2 first2, F&& f,
-              Proj1&& proj1, Proj2&& proj2)
+    template <typename ExPolicy, typename InIter1, typename Sent1,
+        typename InIter2, typename Sent2, typename F, typename Proj1,
+        typename Proj2>
+    HPX_HOST_DEVICE HPX_FORCEINLINE bool sequential_equal_binary(InIter1 first1,
+        InIter1 last1, InIter2 first2, F&& f, Proj1&& proj1, Proj2&& proj2)
     {
         return sequential_equal_binary_t<ExPolicy>{}(first1, last1, first2,
-            HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+            last2, HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
             HPX_FORWARD(Proj2, proj2));
     }
 
     template <typename ExPolicy, typename ZipIterator, typename Token,
         typename F, typename Proj1, typename Proj2>
-        > HPX_HOST_DEVICE HPX_FORCEINLINE void sequential_equal_binary(
-              ZipIterator it, std::size_t part_count, Token& tok, F&& f,
-              Proj1&& proj1, Proj2&& proj2)
+    HPX_HOST_DEVICE HPX_FORCEINLINE void sequential_equal_binary(ZipIterator it,
+        std::size_t part_count, Token& tok, F&& f, Proj1&& proj1, Proj2&& proj2)
     {
         return sequential_equal_binary_t<ExPolicy>{}(it, part_count, tok,
             HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
