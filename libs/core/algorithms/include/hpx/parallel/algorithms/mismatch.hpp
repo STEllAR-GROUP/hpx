@@ -259,7 +259,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 using zip_iterator = hpx::util::zip_iterator<Iter1, Iter2>;
-                using reference = typename zip_iterator::reference;
 
                 util::cancellation_token<std::size_t> tok(count1);
 
@@ -398,7 +397,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 using zip_iterator =
                     hpx::util::zip_iterator<FwdIter1, FwdIter2>;
-                using reference = typename zip_iterator::reference;
 
                 util::cancellation_token<std::size_t> tok(count);
 

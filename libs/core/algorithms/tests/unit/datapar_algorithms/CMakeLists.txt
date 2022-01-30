@@ -29,6 +29,8 @@ if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
       foreachn_datapar
       generate_datapar
       generaten_datapar
+      mismatch_binary_datapar
+      mismatch_datapar
       none_of_datapar
       transform_binary_datapar
       transform_binary2_datapar
