@@ -12,6 +12,8 @@
 
 #if !defined(__CUDACC__)
 
+#include <cstddef>
+
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t all_of(bool msk)
