@@ -17,6 +17,8 @@ set(tests
     condition_variable
     counting_semaphore
     counting_semaphore_cpp20
+    in_place_stop_token
+    in_place_stop_token_cb2
     latch_cpp20
     local_latch
     local_barrier
@@ -52,6 +54,9 @@ set(sliding_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(stop_token_cb2_PARAMETERS THREADS_PER_LOCALITY 4)
 set(stop_token_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(in_place_stop_token_cb2_PARAMETERS THREADS_PER_LOCALITY 4)
+set(in_place_stop_token_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
 
