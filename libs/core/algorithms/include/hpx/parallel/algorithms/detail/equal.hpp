@@ -124,7 +124,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         typename InIter2, typename Sent2, typename F, typename Proj1,
         typename Proj2>
     HPX_HOST_DEVICE HPX_FORCEINLINE bool sequential_equal_binary(InIter1 first1,
-        InIter1 last1, InIter2 first2, F&& f, Proj1&& proj1, Proj2&& proj2)
+        Sent1 last1, InIter2 first2, Sent2 last2, F&& f, Proj1&& proj1,
+        Proj2&& proj2)
     {
         return sequential_equal_binary_t<ExPolicy>{}(first1, last1, first2,
             last2, HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),

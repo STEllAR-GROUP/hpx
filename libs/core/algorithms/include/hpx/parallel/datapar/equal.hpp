@@ -121,10 +121,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 });
         }
 
-        template <typename InIter1, typename InIter2, typename F,
-            typename Proj1, typename Proj2>
+        template <typename InIter1, typename Sent1, typename InIter2,
+            typename F, typename Proj1, typename Proj2>
         HPX_HOST_DEVICE HPX_FORCEINLINE static bool call(InIter1 first1,
-            InIter1 last1, InIter2 first2, F&& f, Proj1&& proj1, Proj2&& proj2)
+            Sent1 last1, InIter2 first2, F&& f, Proj1&& proj1, Proj2&& proj2)
         {
             auto count = hpx::parallel::v1::detail::distance(first1, last1);
             util::cancellation_token<> tok;
