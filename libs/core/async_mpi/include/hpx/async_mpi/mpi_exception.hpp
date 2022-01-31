@@ -19,7 +19,7 @@ namespace hpx::mpi::experimental {
     namespace detail {
 
         // extract MPI error message
-        std::string error_message(int code)
+        inline std::string error_message(int code)
         {
             int N = 1023;
             std::unique_ptr<char[]> err_buff(new char[std::size_t(N) + 1]);
