@@ -20,16 +20,15 @@ sub-namespaces will eventually be removed.
 Header ``hpx/algorithm.hpp``
 ============================
 
-This header includes :ref:`public_api_header_hpx_local_algorithm` and contains
-overloads of the algorithms for segmented iterators. For more information you can refer to the
-`C++ Standard algorithms library <https://en.cppreference.com/w/cpp/algorithm>`_.
+The header :hpx-header:`libs/full/include/include,hpx/algorithm.hpp` includes :ref:`public_api_header_hpx_local_algorithm` and contains
+overloads of the algorithms for segmented iterators.
 
 .. _public_api_header_hpx_local_algorithm:
 
 Header ``hpx/local/algorithm.hpp``
 ==================================
 
-Corresponds to the C++ standard library header :cppreference-header:`algorithm`.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/algorithm.hpp` corresponds to the C++ standard library header :cppreference-header:`algorithm`.
 See :ref:`parallel_algorithms` for more information about the parallel
 algorithms.
 
@@ -41,6 +40,9 @@ Classes
 
 Functions
 ---------
+
+`hpx` functions
+...............
 
 - :cpp:func:`hpx::adjacent_find`
 - :cpp:func:`hpx::all_of`
@@ -112,10 +114,14 @@ Functions
 - :cpp:func:`hpx::transform`
 - :cpp:func:`hpx::unique`
 - :cpp:func:`hpx::unique_copy`
+
 - :cpp:func:`hpx::experimental::for_loop`
 - :cpp:func:`hpx::experimental::for_loop_strided`
 - :cpp:func:`hpx::experimental::for_loop_n`
 - :cpp:func:`hpx::experimental::for_loop_n_strided`
+
+`hpx::ranges` functions
+.......................
 
 - :cpp:func:`hpx::ranges::adjacent_find`
 - :cpp:func:`hpx::ranges::all_of`
@@ -235,7 +241,7 @@ Corresponds to the C++ standard library header :cppreference-header:`barrier`.
 Classes
 -------
 
-- :cpp:class:`hpx::barrier`
+- :cpp:class:`hpx::barrier` corresponding to the C++ standard :cppreference:`/thread/barrier`
 
 Header ``hpx/channel.hpp``
 ==========================
@@ -248,7 +254,7 @@ preferred.
 Classes
 -------
 
-- :cpp:class:`hpx::lcos::channel`
+- :cpp:class:`hpx::distributed::channel`
 
 .. _public_api_header_hpx_local_channel:
 
@@ -260,7 +266,7 @@ Contains a local channel implementation.
 Classes
 -------
 
-- :cpp:class:`hpx::lcos::local::channel`
+- :cpp:class:`hpx::channel`
 
 Header ``hpx/chrono.hpp``
 =========================
@@ -300,9 +306,9 @@ Corresponds to the C++ standard library header
 Classes
 -------
 
-- :cpp:class:`hpx::lcos::local::condition_variable`
-- :cpp:class:`hpx::lcos::local::condition_variable_any`
-- :cpp:class:`hpx::lcos::local::cv_status`
+- :cpp:class:`hpx::condition_variable`
+- :cpp:class:`hpx::condition_variable_any`
+- :cpp:class:`hpx::cv_status`
 
 Header ``hpx/exception.hpp``
 ============================
@@ -427,7 +433,7 @@ actions.
 
 .. note::
 
-   The alias from ``hpx::promise`` to :cpp:class:`hpx::lcos::promise` is
+   The alias from ``hpx::promise`` to :cpp:class:`hpx::distributed::promise` is
    deprecated and will be removed in a future release. The alias
    ``hpx::distributed::promise`` should be used in new applications.
 
@@ -456,7 +462,10 @@ compared to the C++ standard library.
 .. note::
 
    All names except :cpp:class:`hpx::promise` are also available in
-   the top-level ``hpx`` namespace.
+   the top-level ``hpx`` namespace. ``hpx::promise`` refers to
+   :cpp:class:`hpx::distributed::promise`, a distributed variant of
+   :cpp:class:`hpx::promise`, but will eventually refer to
+   :cpp:class:`hpx::promise` after a deprecation period.
 
 Classes
 -------
@@ -530,7 +539,7 @@ preferred.
 Classes
 -------
 
-- :cpp:class:`hpx::lcos::latch`
+- :cpp:class:`hpx::distributed::latch`
 
 .. _public_api_header_hpx_local_latch:
 
@@ -542,7 +551,7 @@ Corresponds to the C++ standard library header :cppreference-header:`latch`.
 Classes
 -------
 
-- :cpp:class:`hpx::lcos::local::cpp20_latch`
+- :cpp:class:`hpx::cpp20_latch`
 
 Header ``hpx/mutex.hpp``
 ========================
@@ -559,18 +568,18 @@ Corresponds to the C++ standard library header :cppreference-header:`mutex`.
 Classes
 -------
 
-- :cpp:class:`hpx::lcos::local::mutex`
-- :cpp:class:`hpx::lcos::local::no_mutex`
-- :cpp:class:`hpx::lcos::local::once_flag`
-- :cpp:class:`hpx::lcos::local::recursive_mutex`
-- :cpp:class:`hpx::lcos::local::spinlock`
-- :cpp:class:`hpx::lcos::local::timed_mutex`
-- :cpp:class:`hpx::lcos::local::unlock_guard`
+- :cpp:class:`hpx::mutex`
+- :cpp:class:`hpx::no_mutex`
+- :cpp:class:`hpx::once_flag`
+- :cpp:class:`hpx::recursive_mutex`
+- :cpp:class:`hpx::spinlock`
+- :cpp:class:`hpx::timed_mutex`
+- :cpp:class:`hpx::unlock_guard`
 
 Functions
 ---------
 
-- :cpp:func:`hpx::lcos::local::call_once`
+- :cpp:func:`hpx::call_once`
 
 Header ``hpx/memory.hpp``
 =========================
@@ -798,8 +807,8 @@ Corresponds to the C++ standard library header
 Classes
 -------
 
-- :cpp:class:`hpx::lcos::local::cpp20_binary_semaphore`
-- :cpp:class:`hpx::lcos::local::cpp20_counting_semaphore`
+- :cpp:class:`hpx::cpp20_binary_semaphore`
+- :cpp:class:`hpx::cpp20_counting_semaphore`
 
 Header ``hpx/shared_mutex.hpp``
 ===============================
@@ -817,7 +826,7 @@ Corresponds to the C++ standard library header
 Classes
 -------
 
-- :cpp:class:`hpx::lcos::local::shared_mutex`
+- :cpp:class:`hpx::shared_mutex`
 
 Header ``hpx/stop_token.hpp``
 =============================
