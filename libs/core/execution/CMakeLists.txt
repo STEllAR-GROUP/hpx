@@ -42,6 +42,7 @@ set(execution_headers
     hpx/execution/executors/execution_parameters_fwd.hpp
     hpx/execution/executors/fused_bulk_execute.hpp
     hpx/execution/executors/guided_chunk_size.hpp
+    hpx/execution/executors/num_cores.hpp
     hpx/execution/executors/persistent_auto_chunk_size.hpp
     hpx/execution/executors/polymorphic_executor.hpp
     hpx/execution/executors/rebind_executor.hpp
@@ -87,6 +88,7 @@ set(execution_compat_headers
     hpx/parallel/executors/execution_parameters.hpp => hpx/execution.hpp
     hpx/parallel/executors/fused_bulk_execute.hpp => hpx/execution.hpp
     hpx/parallel/executors/guided_chunk_size.hpp => hpx/execution.hpp
+    hpx/parallel/executors/num_cores.hpp => hpx/execution.hpp
     hpx/parallel/executors/persistent_auto_chunk_size.hpp => hpx/execution.hpp
     hpx/parallel/executors/post_policy_dispatch.hpp => hpx/execution.hpp
     hpx/parallel/executors/rebind_executor.hpp => hpx/execution.hpp

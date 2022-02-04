@@ -11,7 +11,7 @@
 
 #include <hpx/execution/executors/execution_parameters_fwd.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/executors/is_execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 
 #include <cstddef>
 #include <type_traits>
