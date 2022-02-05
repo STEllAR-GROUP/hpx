@@ -37,7 +37,7 @@ namespace hpx::execution::experimental {
     // 3.  execution::get_stop_token() (with no arguments) is expression-
     //     equivalent to execution::read(execution::get_stop_token).
     //
-    inline constexpr struct get_stop_token_t final
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct get_stop_token_t final
       : hpx::functional::detail::tag_fallback<get_stop_token_t>
     {
     private:
