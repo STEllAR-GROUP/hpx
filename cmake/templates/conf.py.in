@@ -123,7 +123,7 @@ api_ref_header = '''
 {0}
 -------------------------------------------------------------------------------
 
-See :ref:`public_api` for a list of names and headers that are part of the public 
+See :ref:`public_api` for a list of names and headers that are part of the public
 |hpx| API.
 '''
 
@@ -589,6 +589,13 @@ html_context = {
 
 if "@HPX_WITH_GIT_COMMIT_SHORT@" != "":
     html_context['commit'] = "@HPX_WITH_GIT_COMMIT_SHORT@"
+else:
+    html_context['commit'] = "unknown"
+
+if "@HPX_WITH_GIT_COMMIT@" != "":
+    html_context['fullcommit'] = "@HPX_WITH_GIT_COMMIT@"
+else:
+    html_context['fullcommit'] = "unknown"
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
