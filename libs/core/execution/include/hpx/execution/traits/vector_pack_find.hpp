@@ -11,6 +11,15 @@
 #if defined(HPX_HAVE_DATAPAR)
 
 #if !defined(__CUDACC__)
+
+namespace hpx { namespace parallel { namespace traits {
+    ///////////////////////////////////////////////////////////////////////
+    HPX_HOST_DEVICE HPX_FORCEINLINE int find_first_of(bool msk)
+    {
+        return msk == 1 ? 0 : -1;
+    }
+}}}    // namespace hpx::parallel::traits
+
 #include <hpx/execution/traits/detail/simd/vector_pack_find.hpp>
 #include <hpx/execution/traits/detail/vc/vector_pack_find.hpp>
 #endif

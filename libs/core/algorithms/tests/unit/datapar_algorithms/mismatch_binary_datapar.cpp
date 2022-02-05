@@ -1,103 +1,99 @@
-//  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2022 Srinivas Yadav
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/include/datapar.hpp>
 #include <hpx/local/init.hpp>
 
+#include <cstddef>
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "mismatch_tests.hpp"
+#include "../algorithms/mismatch_binary_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_mismatch1()
+void test_mismatch_binary1()
 {
     using namespace hpx::execution;
 
-    test_mismatch1(IteratorTag());
+    test_mismatch_binary1(simd, IteratorTag());
+    test_mismatch_binary1(par_simd, IteratorTag());
 
-    test_mismatch1(seq, IteratorTag());
-    test_mismatch1(par, IteratorTag());
-    test_mismatch1(par_unseq, IteratorTag());
-
-    test_mismatch1_async(seq(task), IteratorTag());
-    test_mismatch1_async(par(task), IteratorTag());
+    test_mismatch_binary1_async(simd(task), IteratorTag());
+    test_mismatch_binary1_async(par_simd(task), IteratorTag());
 }
 
-void mismatch_test1()
+void mismatch_binary_test1()
 {
-    test_mismatch1<std::random_access_iterator_tag>();
-    test_mismatch1<std::forward_iterator_tag>();
+    test_mismatch_binary1<std::random_access_iterator_tag>();
+    test_mismatch_binary1<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_mismatch2()
+void test_mismatch_binary2()
 {
     using namespace hpx::execution;
 
-    test_mismatch2(IteratorTag());
+    test_mismatch_binary2(simd, IteratorTag());
+    test_mismatch_binary2(par_simd, IteratorTag());
 
-    test_mismatch2(seq, IteratorTag());
-    test_mismatch2(par, IteratorTag());
-    test_mismatch2(par_unseq, IteratorTag());
-
-    test_mismatch2_async(seq(task), IteratorTag());
-    test_mismatch2_async(par(task), IteratorTag());
+    test_mismatch_binary2_async(simd(task), IteratorTag());
+    test_mismatch_binary2_async(par_simd(task), IteratorTag());
 }
 
-void mismatch_test2()
+void mismatch_binary_test2()
 {
-    test_mismatch2<std::random_access_iterator_tag>();
-    test_mismatch2<std::forward_iterator_tag>();
+    test_mismatch_binary2<std::random_access_iterator_tag>();
+    test_mismatch_binary2<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_mismatch_exception()
+void test_mismatch_binary_exception()
 {
     using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_mismatch_exception(seq, IteratorTag());
-    test_mismatch_exception(par, IteratorTag());
+    test_mismatch_binary_exception(simd, IteratorTag());
+    test_mismatch_binary_exception(par_simd, IteratorTag());
 
-    test_mismatch_exception_async(seq(task), IteratorTag());
-    test_mismatch_exception_async(par(task), IteratorTag());
+    test_mismatch_binary_exception_async(simd(task), IteratorTag());
+    test_mismatch_binary_exception_async(par_simd(task), IteratorTag());
 }
 
-void mismatch_exception_test()
+void mismatch_binary_exception_test()
 {
-    test_mismatch_exception<std::random_access_iterator_tag>();
-    test_mismatch_exception<std::forward_iterator_tag>();
+    test_mismatch_binary_exception<std::random_access_iterator_tag>();
+    test_mismatch_binary_exception<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_mismatch_bad_alloc()
+void test_mismatch_binary_bad_alloc()
 {
     using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_mismatch_bad_alloc(seq, IteratorTag());
-    test_mismatch_bad_alloc(par, IteratorTag());
+    test_mismatch_binary_bad_alloc(simd, IteratorTag());
+    test_mismatch_binary_bad_alloc(par_simd, IteratorTag());
 
-    test_mismatch_bad_alloc_async(seq(task), IteratorTag());
-    test_mismatch_bad_alloc_async(par(task), IteratorTag());
+    test_mismatch_binary_bad_alloc_async(simd(task), IteratorTag());
+    test_mismatch_binary_bad_alloc_async(par_simd(task), IteratorTag());
 }
 
-void mismatch_bad_alloc_test()
+void mismatch_binary_bad_alloc_test()
 {
-    test_mismatch_bad_alloc<std::random_access_iterator_tag>();
-    test_mismatch_bad_alloc<std::forward_iterator_tag>();
+    test_mismatch_binary_bad_alloc<std::random_access_iterator_tag>();
+    test_mismatch_binary_bad_alloc<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,10 +106,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     gen.seed(seed);
 
-    mismatch_test1();
-    mismatch_test2();
-    mismatch_exception_test();
-    mismatch_bad_alloc_test();
+    mismatch_binary_test1();
+    mismatch_binary_test2();
+    mismatch_binary_exception_test();
+    mismatch_binary_bad_alloc_test();
     return hpx::local::finalize();
 }
 
@@ -126,6 +122,7 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run");
+
     // By default this test should run on all available cores
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
