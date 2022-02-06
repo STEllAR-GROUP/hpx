@@ -381,7 +381,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename ExPolicy, typename Iter1, typename Iter2, typename Token,
         typename Pred, typename Proj1, typename Proj2>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Iter1 sequential_find_end(Iter1 it,
+    HPX_HOST_DEVICE HPX_FORCEINLINE void sequential_find_end(Iter1 it,
         Iter2 first2, std::size_t base_idx, std::size_t part_size,
         std::size_t diff, Token& tok, Pred&& op, Proj1&& proj1, Proj2&& proj2)
     {
@@ -465,7 +465,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename ExPolicy, typename FwdIter, typename FwdIter2,
         typename Token, typename Pred, typename Proj1, typename Proj2>
-    HPX_HOST_DEVICE HPX_FORCEINLINE FwdIter sequential_find_first_of(FwdIter it,
+    HPX_HOST_DEVICE HPX_FORCEINLINE void sequential_find_first_of(FwdIter it,
         FwdIter2 s_first, FwdIter2 s_last, std::size_t base_idx,
         std::size_t part_size, Token& tok, Pred&& op, Proj1&& proj1,
         Proj2&& proj2)

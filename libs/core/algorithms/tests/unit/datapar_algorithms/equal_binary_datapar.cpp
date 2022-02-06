@@ -4,101 +4,96 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/include/datapar.hpp>
 #include <hpx/local/init.hpp>
 
+#include <cstddef>
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "equal_tests.hpp"
+#include "../algorithms/equal_binary_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_equal1()
+void test_equal_binary1()
 {
     using namespace hpx::execution;
 
-    test_equal1(IteratorTag());
+    test_equal_binary1(simd, IteratorTag());
+    test_equal_binary1(par_simd, IteratorTag());
 
-    test_equal1(seq, IteratorTag());
-    test_equal1(par, IteratorTag());
-    test_equal1(par_unseq, IteratorTag());
-
-    test_equal1_async(seq(task), IteratorTag());
-    test_equal1_async(par(task), IteratorTag());
+    test_equal_binary1_async(simd(task), IteratorTag());
+    test_equal_binary1_async(par_simd(task), IteratorTag());
 }
 
-void equal_test1()
+void equal_binary_test1()
 {
-    test_equal1<std::random_access_iterator_tag>();
-    test_equal1<std::forward_iterator_tag>();
+    test_equal_binary1<std::random_access_iterator_tag>();
+    test_equal_binary1<std::forward_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_equal2()
+void test_equal_binary2()
 {
     using namespace hpx::execution;
 
-    test_equal2(IteratorTag());
+    test_equal_binary2(simd, IteratorTag());
+    test_equal_binary2(par_simd, IteratorTag());
 
-    test_equal2(seq, IteratorTag());
-    test_equal2(par, IteratorTag());
-    test_equal2(par_unseq, IteratorTag());
-
-    test_equal2_async(seq(task), IteratorTag());
-    test_equal2_async(par(task), IteratorTag());
+    test_equal_binary2_async(simd(task), IteratorTag());
+    test_equal_binary2_async(par_simd(task), IteratorTag());
 }
 
-void equal_test2()
+void equal_binary_test2()
 {
-    test_equal2<std::random_access_iterator_tag>();
-    test_equal2<std::forward_iterator_tag>();
+    test_equal_binary2<std::random_access_iterator_tag>();
+    test_equal_binary2<std::forward_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_equal_exception()
-{
-    using namespace hpx::execution;
-
-    test_equal_exception(IteratorTag());
-
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_equal_exception(seq, IteratorTag());
-    test_equal_exception(par, IteratorTag());
-
-    test_equal_exception_async(seq(task), IteratorTag());
-    test_equal_exception_async(par(task), IteratorTag());
-}
-
-void equal_exception_test()
-{
-    test_equal_exception<std::random_access_iterator_tag>();
-    test_equal_exception<std::forward_iterator_tag>();
-}
-
-template <typename IteratorTag>
-void test_equal_bad_alloc()
+void test_equal_binary_exception()
 {
     using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_equal_bad_alloc(seq, IteratorTag());
-    test_equal_bad_alloc(par, IteratorTag());
+    test_equal_binary_exception(simd, IteratorTag());
+    test_equal_binary_exception(par_simd, IteratorTag());
 
-    test_equal_bad_alloc_async(seq(task), IteratorTag());
-    test_equal_bad_alloc_async(par(task), IteratorTag());
+    test_equal_binary_exception_async(simd(task), IteratorTag());
+    test_equal_binary_exception_async(par_simd(task), IteratorTag());
 }
 
-void equal_bad_alloc_test()
+void equal_binary_exception_test()
 {
-    test_equal_bad_alloc<std::random_access_iterator_tag>();
-    test_equal_bad_alloc<std::forward_iterator_tag>();
+    test_equal_binary_exception<std::random_access_iterator_tag>();
+    test_equal_binary_exception<std::forward_iterator_tag>();
+}
+
+////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_equal_binary_bad_alloc()
+{
+    using namespace hpx::execution;
+
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
+    test_equal_binary_bad_alloc(simd, IteratorTag());
+    test_equal_binary_bad_alloc(par_simd, IteratorTag());
+
+    test_equal_binary_bad_alloc_async(simd(task), IteratorTag());
+    test_equal_binary_bad_alloc_async(par_simd(task), IteratorTag());
+}
+
+void equal_binary_bad_alloc_test()
+{
+    test_equal_binary_bad_alloc<std::random_access_iterator_tag>();
+    test_equal_binary_bad_alloc<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,10 +105,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     gen.seed(seed);
 
-    equal_test1();
-    equal_test2();
-    equal_exception_test();
-    equal_bad_alloc_test();
+    equal_binary_test1();
+    equal_binary_test2();
+    equal_binary_exception_test();
+    equal_binary_bad_alloc_test();
     return hpx::local::finalize();
 }
 

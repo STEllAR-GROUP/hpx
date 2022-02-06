@@ -63,6 +63,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         return sequential_adjacent_find_t<ExPolicy>{}(
             first, last, HPX_FORWARD(PredProj, pred_projected));
     }
+
+    template <typename ExPolicy, typename ZipIter, typename Token,
+        typename PredProj>
+    HPX_HOST_DEVICE HPX_FORCEINLINE void sequential_adjacent_find(
+        std::size_t base_idx, ZipIter part_begin, std::size_t part_count,
+        Token& tok, PredProj&& pred_projected)
+    {
+        return sequential_adjacent_find_t<ExPolicy>{}(base_idx, part_begin,
+            part_count, tok, HPX_FORWARD(PredProj, pred_projected));
+    }
 #endif
 
 }}}}    // namespace hpx::parallel::v1::detail
