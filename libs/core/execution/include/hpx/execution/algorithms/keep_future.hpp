@@ -64,14 +64,17 @@ namespace hpx { namespace execution { namespace experimental {
         {
             std::decay_t<Future> future;
 
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types = Variant<Tuple<std::decay_t<Future>>>;
+            struct completion_signatures
+            {
+                template <template <typename...> class Tuple,
+                    template <typename...> class Variant>
+                using value_types = Variant<Tuple<std::decay_t<Future>>>;
 
-            template <template <typename...> class Variant>
-            using error_types = Variant<std::exception_ptr>;
+                template <template <typename...> class Variant>
+                using error_types = Variant<std::exception_ptr>;
 
-            static constexpr bool sends_done = false;
+                static constexpr bool sends_stopped = false;
+            };
         };
 
         template <typename Future>

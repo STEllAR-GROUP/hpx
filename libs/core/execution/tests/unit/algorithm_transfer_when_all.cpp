@@ -10,6 +10,11 @@
 // here for this reason.
 
 #include <hpx/config.hpp>
+
+// Clang V11 ICE's on this test, Clang V8 reports a bogus constexpr problem
+#if !defined(HPX_CLANG_VERSION) ||                                             \
+    ((HPX_CLANG_VERSION / 10000) != 11 && (HPX_CLANG_VERSION / 10000) != 8)
+
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -121,8 +126,8 @@ int main()
         auto sched = scheduler{scheduler_schedule_called,
             scheduler_execute_called, tag_invoke_overload_called};
         auto s = ex::transfer_when_all(sched, error_typed_sender<double>{});
-        auto r = error_callback_receiver<decltype(check_exception_ptr)>{
-            check_exception_ptr, set_error_called};
+        auto r = error_callback_receiver<check_exception_ptr>{
+            check_exception_ptr{}, set_error_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
 
@@ -134,3 +139,9 @@ int main()
 
     return hpx::util::report_errors();
 }
+#else
+int main()
+{
+    return 0;
+}
+#endif

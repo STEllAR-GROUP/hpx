@@ -24,7 +24,7 @@ struct sender
     template <template <class...> class Variant>
     using error_types = Variant<std::exception_ptr>;
 
-    static constexpr bool sends_done = false;
+    static constexpr bool sends_stopped = false;
 
     struct operation_state
     {

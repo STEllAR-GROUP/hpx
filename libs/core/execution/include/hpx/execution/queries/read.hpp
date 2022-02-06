@@ -8,10 +8,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
@@ -67,18 +70,38 @@ namespace hpx::execution::experimental {
 
             template <typename Receiver>
             friend auto tag_invoke(
-                connect_t, read_sender&&, Receiver&& receiver)
+                connect_t, read_sender&&, Receiver&& receiver) noexcept
             {
                 return operation_state<Receiver>{
                     HPX_FORWARD(Receiver, receiver)};
             }
 
             template <typename Receiver>
-            friend auto tag_invoke(connect_t, read_sender&, Receiver&& receiver)
+            friend auto tag_invoke(
+                connect_t, read_sender&, Receiver&& receiver) noexcept
             {
                 return operation_state<Receiver>{
                     HPX_FORWARD(Receiver, receiver)};
             }
+
+            // clang-format off
+            template <typename Env>
+            friend auto tag_invoke(get_completion_signatures_t, read_sender, Env)
+            {
+                if constexpr (hpx::is_invocable_v<Tag, Env>)
+                {
+                    using result_type =
+                        completion_signatures<
+                            set_value_t(hpx::util::invoke_result<Tag, Env>),
+                            set_error_t(std::exception_ptr)>;
+                    return result_type{};
+                }
+                else
+                {
+                    return dependent_completion_signatures<Env>{};
+                }
+            }
+            // clang-format on
         };
     }    // namespace detail
 

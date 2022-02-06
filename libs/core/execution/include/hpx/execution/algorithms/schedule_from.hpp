@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +13,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -27,41 +29,50 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
     namespace detail {
+
         template <typename Sender, typename Scheduler>
         struct schedule_from_sender
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> predecessor_sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
 
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types =
-                typename hpx::execution::experimental::sender_traits<
-                    Sender>::template value_types<Tuple, Variant>;
+            template <typename Env>
+            struct generate_completion_signatures
+            {
+                template <template <typename...> typename Tuple,
+                    template <typename...> typename Variant>
+                using value_types =
+                    value_types_of_t<Sender, Env, Tuple, Variant>;
 
-            template <template <typename...> class Variant>
-            using predecessor_sender_error_types =
-                typename hpx::execution::experimental::sender_traits<
-                    Sender>::template error_types<Variant>;
+                template <template <typename...> typename Variant>
+                using predecessor_sender_error_types =
+                    error_types_of_t<Sender, Env, Variant>;
 
-            using scheduler_sender_type = typename hpx::util::invoke_result<
-                hpx::execution::experimental::schedule_t, Scheduler>::type;
-            template <template <typename...> class Variant>
-            using scheduler_sender_error_types =
-                typename hpx::execution::experimental::sender_traits<
-                    scheduler_sender_type>::template error_types<Variant>;
+                using scheduler_sender_type = hpx::util::invoke_result_t<
+                    hpx::execution::experimental::schedule_t, Scheduler>;
 
-            template <template <typename...> class Variant>
-            using error_types = hpx::util::detail::unique_concat_t<
-                predecessor_sender_error_types<Variant>,
-                scheduler_sender_error_types<Variant>>;
+                template <template <typename...> typename Variant>
+                using scheduler_sender_error_types =
+                    error_types_of_t<scheduler_sender_type, Env, Variant>;
 
-            static constexpr bool sends_done = false;
+                template <template <typename...> typename Variant>
+                using error_types = hpx::util::detail::unique_concat_t<
+                    predecessor_sender_error_types<Variant>,
+                    scheduler_sender_error_types<Variant>>;
 
+                static constexpr bool sends_stopped = false;
+            };
+
+            template <typename Env>
+            friend auto tag_invoke(
+                get_completion_signatures_t, schedule_from_sender const&, Env)
+                -> generate_completion_signatures<Env>;
+
+            // clang-format off
             template <typename CPO,
-                // clang-format off
                 HPX_CONCEPT_REQUIRES_(
                     hpx::execution::experimental::detail::is_receiver_cpo_v<CPO> &&
                     (std::is_same_v<CPO, hpx::execution::experimental::set_value_t> ||
@@ -70,9 +81,9 @@ namespace hpx { namespace execution { namespace experimental {
                                 std::decay_t<Sender>> ||
                         hpx::execution::experimental::detail::has_completion_scheduler_v<
                                 hpx::execution::experimental::set_stopped_t,
-                                std::decay_t<Sender>>))
-                // clang-format on
-                >
+                                std::decay_t<Sender>>)
+                )>
+            // clang-format on
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
                 schedule_from_sender const& sender)
@@ -100,8 +111,8 @@ namespace hpx { namespace execution { namespace experimental {
                 struct scheduler_sender_receiver;
 
                 using value_type = hpx::util::detail::prepend_t<
-                    typename hpx::execution::experimental::sender_traits<
-                        Sender>::template value_types<hpx::tuple, hpx::variant>,
+                    value_types_of_t<Sender, empty_env, decayed_tuple,
+                        hpx::variant>,
                     hpx::monostate>;
                 value_type ts;
 
@@ -109,10 +120,9 @@ namespace hpx { namespace execution { namespace experimental {
                     connect_result_t<Sender, predecessor_sender_receiver>;
                 sender_operation_state_type sender_os;
 
-                using scheduler_operation_state_type =
-                    connect_result_t<typename hpx::util::invoke_result<
-                                         schedule_t, Scheduler>::type,
-                        scheduler_sender_receiver>;
+                using scheduler_operation_state_type = connect_result_t<
+                    hpx::util::invoke_result_t<schedule_t, Scheduler>,
+                    scheduler_sender_receiver>;
                 hpx::optional<scheduler_operation_state_type>
                     scheduler_op_state;
 
@@ -155,8 +165,7 @@ namespace hpx { namespace execution { namespace experimental {
                     // parent typedef is not instantiated early enough for use
                     // here.
                     using value_type = hpx::util::detail::prepend_t<
-                        typename hpx::execution::experimental::sender_traits<
-                            Sender>::template value_types<hpx::tuple,
+                        value_types_of_t<Sender, empty_env, decayed_tuple,
                             hpx::variant>,
                         hpx::monostate>;
 
@@ -327,6 +336,20 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
+    // execution::schedule_from is used to schedule work dependent on the
+    // completion of a sender onto a scheduler's associated execution context.
+    //
+    // [Note: schedule_from is not meant to be used in user code; it is used in
+    // the implementation of transfer. -end note]
+    //
+    // Senders returned from execution::schedule_from shall not propagate the
+    // sender queries get_completion_scheduler<CPO> to an input sender. They
+    // will implement get_completion_scheduler<CPO>, where CPO is one of
+    // set_value_t and set_stopped_t; this query returns a scheduler equivalent
+    // to the sch argument from those queries. The
+    // get_completion_scheduler<set_error_t> is not implemented, as the
+    // scheduler cannot be guaranteed in case an error is thrown while trying to
+    // schedule work on the given scheduler object.
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct schedule_from_t final
       : hpx::functional::detail::tag_fallback<schedule_from_t>
     {
@@ -345,4 +368,4 @@ namespace hpx { namespace execution { namespace experimental {
                 HPX_FORWARD(Scheduler, scheduler)};
         }
     } schedule_from{};
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

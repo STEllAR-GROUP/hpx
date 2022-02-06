@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 Thomas Heller
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +12,7 @@ namespace hpx { namespace functional {
     inline namespace unspecified {
         /// The `hpx::functional::tag_invoke` name defines a constexpr object
         /// that is invocable with one or more arguments. The first argument
-        /// is a 'tag' (typically a DPO). It is only invocable if an overload
+        /// is a 'tag' (typically a CPO). It is only invocable if an overload
         /// of tag_invoke() that accepts the same arguments could be found via
         /// ADL.
         ///
@@ -101,11 +102,12 @@ namespace hpx { namespace functional {
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/type_support/meta.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace functional {
+namespace hpx::functional {
 
     template <auto& Tag>
     using tag_t = typename std::decay<decltype(Tag)>::type;
@@ -117,6 +119,8 @@ namespace hpx { namespace functional {
 
         struct tag_invoke_t
         {
+            // different versions of clang-format disagree
+            // clang-format off
             template <typename Tag, typename... Ts>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Tag tag, Ts&&... ts) const
@@ -124,6 +128,7 @@ namespace hpx { namespace functional {
                     tag_invoke(std::declval<Tag>(), HPX_FORWARD(Ts, ts)...)))
                     -> decltype(
                         tag_invoke(std::declval<Tag>(), HPX_FORWARD(Ts, ts)...))
+            // clang-format on
             {
                 return tag_invoke(tag, HPX_FORWARD(Ts, ts)...);
             }
@@ -158,7 +163,7 @@ namespace hpx { namespace functional {
         is_tag_invocable<Tag, Args...>::value;
 
     namespace detail {
-        template <typename Sig, bool Dispatchable>
+        template <typename Sig, bool Invocable>
         struct is_nothrow_tag_invocable_impl;
 
         template <typename Sig>
@@ -215,11 +220,13 @@ namespace hpx { namespace functional {
         void tag_invoke();
 
         ///////////////////////////////////////////////////////////////////////////
-        // helper base class implementing the tag_invoke logic for DPOs
-        template <typename Tag>
+        // helper base class implementing the tag_invoke logic for CPOs
+        template <typename Tag, typename Enable>
         struct tag
         {
-            template <typename... Args>
+            template <typename... Args,
+                typename = std::enable_if_t<
+                    meta::value<meta::invoke<Enable, Args...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
@@ -230,12 +237,13 @@ namespace hpx { namespace functional {
             }
         };
 
-        template <typename Tag>
+        template <typename Tag, typename Enable>
         struct tag_noexcept
         {
             template <typename... Args,
-                typename Enable =
-                    std::enable_if_t<is_nothrow_tag_invocable_v<Tag, Args...>>>
+                typename =
+                    std::enable_if_t<is_nothrow_tag_invocable_v<Tag, Args...> &&
+                        meta::value<meta::invoke<Enable, Args...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> tag_invoke_result_t<Tag, decltype(args)...>
@@ -248,17 +256,19 @@ namespace hpx { namespace functional {
 
     inline namespace tag_invoke_base_ns {
 
-        template <typename Tag>
-        using tag = tag_base_ns::tag<Tag>;
+        template <typename Tag,
+            typename Enable = meta::constant<meta::bool_<true>>>
+        using tag = tag_base_ns::tag<Tag, Enable>;
 
-        template <typename Tag>
-        using tag_noexcept = tag_base_ns::tag_noexcept<Tag>;
+        template <typename Tag,
+            typename Enable = meta::constant<meta::bool_<true>>>
+        using tag_noexcept = tag_base_ns::tag_noexcept<Tag, Enable>;
     }    // namespace tag_invoke_base_ns
 
     inline namespace tag_invoke_f_ns {
 
         using tag_invoke_ns::tag_invoke;
     }    // namespace tag_invoke_f_ns
-}}       // namespace hpx::functional
+}    // namespace hpx::functional
 
 #endif

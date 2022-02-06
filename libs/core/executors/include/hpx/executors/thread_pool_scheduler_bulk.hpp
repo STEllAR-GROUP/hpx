@@ -1,4 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,9 +13,11 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
@@ -36,7 +39,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
     namespace detail {
         /// This sender represents bulk work that will be performed using the
         /// thread_pool_scheduler.
@@ -73,6 +77,7 @@ namespace hpx { namespace execution { namespace experimental {
               , f(HPX_FORWARD(F_, f))
             {
             }
+
             thread_pool_bulk_sender(thread_pool_bulk_sender&&) = default;
             thread_pool_bulk_sender(thread_pool_bulk_sender const&) = default;
             thread_pool_bulk_sender& operator=(
@@ -80,23 +85,29 @@ namespace hpx { namespace execution { namespace experimental {
             thread_pool_bulk_sender& operator=(
                 thread_pool_bulk_sender const&) = default;
 
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types =
-                typename hpx::execution::experimental::sender_traits<
-                    Sender>::template value_types<Tuple, Variant>;
+            template <typename Env>
+            struct generate_completion_signatures
+            {
+                template <template <typename...> typename Tuple,
+                    template <typename...> typename Variant>
+                using value_types =
+                    value_types_of_t<Sender, Env, Tuple, Variant>;
 
-            template <template <typename...> class Variant>
-            using error_types =
-                hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
-                    typename hpx::execution::experimental::sender_traits<
-                        Sender>::template error_types<Variant>,
-                    std::exception_ptr>>;
+                template <template <typename...> typename Variant>
+                using error_types = hpx::util::detail::unique_concat_t<
+                    error_types_of_t<Sender, Env, Variant>,
+                    Variant<std::exception_ptr>>;
 
-            static constexpr bool sends_done = false;
+                static constexpr bool sends_stopped = false;
+            };
 
+            template <typename Env>
+            friend auto tag_invoke(get_completion_signatures_t,
+                thread_pool_bulk_sender const&, Env)
+                -> generate_completion_signatures<Env>;
+
+            // clang-format off
             template <typename CPO,
-                // clang-format off
                 HPX_CONCEPT_REQUIRES_(
                     hpx::execution::experimental::detail::is_receiver_cpo_v<CPO> &&
                     (std::is_same_v<CPO, hpx::execution::experimental::set_value_t> ||
@@ -105,9 +116,9 @@ namespace hpx { namespace execution { namespace experimental {
                                 std::decay_t<Sender>> ||
                         hpx::execution::experimental::detail::has_completion_scheduler_v<
                                 hpx::execution::experimental::set_stopped_t,
-                                std::decay_t<Sender>>))
-                // clang-format on
-                >
+                                std::decay_t<Sender>>)
+                )>
+            // clang-format on
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
                 thread_pool_bulk_sender const& s)
@@ -403,11 +414,18 @@ namespace hpx { namespace execution { namespace experimental {
                     {
                         char const* scheduler_annotation =
                             get_annotation(op_state->scheduler);
-                        auto af = scheduler_annotation ?
-                            hpx::scoped_annotation(scheduler_annotation) :
-                            hpx::scoped_annotation(op_state->f);
-                        task_function{
-                            this->op_state, n, chunk_size, worker_thread}();
+                        if (scheduler_annotation)
+                        {
+                            hpx::scoped_annotation ann(scheduler_annotation);
+                            task_function{
+                                this->op_state, n, chunk_size, worker_thread}();
+                        }
+                        else
+                        {
+                            hpx::scoped_annotation ann(op_state->f);
+                            task_function{
+                                this->op_state, n, chunk_size, worker_thread}();
+                        }
                     }
 
                     using range_value_type = hpx::traits::iter_value_t<
@@ -420,55 +438,71 @@ namespace hpx { namespace execution { namespace experimental {
                     friend void tag_invoke(
                         set_value_t, bulk_receiver&& r, Ts&&... ts) noexcept
                     {
-                        // Don't spawn tasks if there is no work to be done
-                        auto const n = hpx::util::size(r.op_state->shape);
-                        if (n == 0)
-                        {
-                            hpx::execution::experimental::set_value(
-                                HPX_MOVE(r.op_state->receiver),
-                                HPX_FORWARD(Ts, ts)...);
-                            return;
-                        }
+                        hpx::detail::try_catch_exception_ptr(
+                            [&]() {
+                                // Don't spawn tasks if there is no work to be
+                                // done
+                                auto const n =
+                                    hpx::util::size(r.op_state->shape);
+                                if (n == 0)
+                                {
+                                    hpx::execution::experimental::set_value(
+                                        HPX_MOVE(r.op_state->receiver),
+                                        HPX_FORWARD(Ts, ts)...);
+                                    return;
+                                }
 
-                        // Calculate chunk size and number of chunks
-                        auto const chunk_size =
-                            get_chunk_size(r.op_state->num_worker_threads, n);
-                        auto const num_chunks =
-                            (n + chunk_size - 1) / chunk_size;
+                                // Calculate chunk size and number of chunks
+                                auto const chunk_size = get_chunk_size(
+                                    r.op_state->num_worker_threads, n);
+                                auto const num_chunks =
+                                    (n + chunk_size - 1) / chunk_size;
 
-                        // Store sent values in the operation state
-                        r.op_state->ts.template emplace<hpx::tuple<Ts...>>(
-                            HPX_FORWARD(Ts, ts)...);
+                                // Store sent values in the operation state
+                                r.op_state->ts
+                                    .template emplace<hpx::tuple<Ts...>>(
+                                        HPX_FORWARD(Ts, ts)...);
 
-                        // Initialize the queues for all worker threads so that
-                        // worker threads can start stealing immediately when
-                        // they start.
-                        for (std::size_t worker_thread = 0;
-                             worker_thread < r.op_state->num_worker_threads;
-                             ++worker_thread)
-                        {
-                            r.init_queue(worker_thread, num_chunks);
-                        }
+                                // Initialize the queues for all worker threads
+                                // so that worker threads can start stealing
+                                // immediately when they start.
+                                for (std::size_t worker_thread = 0;
+                                     worker_thread <
+                                     r.op_state->num_worker_threads;
+                                     ++worker_thread)
+                                {
+                                    r.init_queue(worker_thread, num_chunks);
+                                }
 
-                        // Spawn the worker threads for all except the local queue.
-                        auto const local_worker_thread =
-                            hpx::get_local_worker_thread_num();
-                        for (std::size_t worker_thread = 0;
-                             worker_thread < r.op_state->num_worker_threads;
-                             ++worker_thread)
-                        {
-                            // The queue for the local thread is handled later
-                            // inline.
-                            if (worker_thread == local_worker_thread)
-                            {
-                                continue;
-                            }
+                                // Spawn the worker threads for all except the
+                                // local queue.
+                                auto const local_worker_thread =
+                                    hpx::get_local_worker_thread_num();
+                                for (std::size_t worker_thread = 0;
+                                     worker_thread <
+                                     r.op_state->num_worker_threads;
+                                     ++worker_thread)
+                                {
+                                    // The queue for the local thread is handled
+                                    // later inline.
+                                    if (worker_thread == local_worker_thread)
+                                    {
+                                        continue;
+                                    }
 
-                            r.do_work_task(n, chunk_size, worker_thread);
-                        }
+                                    r.do_work_task(
+                                        n, chunk_size, worker_thread);
+                                }
 
-                        // Handle the queue for the local thread.
-                        r.do_work_local(n, chunk_size, local_worker_thread);
+                                // Handle the queue for the local thread.
+                                r.do_work_local(
+                                    n, chunk_size, local_worker_thread);
+                            },
+                            [&](std::exception_ptr ep) {
+                                hpx::execution::experimental::set_error(
+                                    HPX_MOVE(r.op_state->receiver),
+                                    HPX_MOVE(ep));
+                            });
                     }
                 };
 
@@ -488,8 +522,10 @@ namespace hpx { namespace execution { namespace experimental {
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
                 std::atomic<decltype(hpx::util::size(shape))> tasks_remaining{
                     num_worker_threads};
-                hpx::util::detail::prepend_t<
-                    value_types<hpx::tuple, hpx::variant>, hpx::monostate>
+
+                hpx::util::detail::prepend_t<value_types_of_t<Sender, empty_env,
+                                                 decayed_tuple, hpx::variant>,
+                    hpx::monostate>
                     ts;
                 std::atomic<bool> exception_thrown{false};
                 std::optional<std::exception_ptr> exception;
@@ -535,8 +571,12 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
+    // clang-format off
     template <typename Sender, typename Shape, typename F,
-        HPX_CONCEPT_REQUIRES_(std::is_integral_v<std::decay_t<Shape>>)>
+        HPX_CONCEPT_REQUIRES_(
+            std::is_integral_v<std::decay_t<Shape>>
+        )>
+    // clang-format on
     constexpr auto tag_invoke(bulk_t, thread_pool_scheduler scheduler,
         Sender&& sender, Shape&& shape, F&& f)
     {
@@ -546,8 +586,12 @@ namespace hpx { namespace execution { namespace experimental {
             hpx::util::detail::make_counting_shape(shape), HPX_FORWARD(F, f)};
     }
 
+    // clang-format off
     template <typename Sender, typename Shape, typename F,
-        HPX_CONCEPT_REQUIRES_(!std::is_integral_v<std::decay_t<Shape>>)>
+        HPX_CONCEPT_REQUIRES_(
+            !std::is_integral_v<std::decay_t<Shape>>
+        )>
+    // clang-format on
     constexpr auto tag_invoke(bulk_t, thread_pool_scheduler scheduler,
         Sender&& sender, Shape&& shape, F&& f)
     {
@@ -556,4 +600,4 @@ namespace hpx { namespace execution { namespace experimental {
             HPX_FORWARD(Sender, sender), HPX_FORWARD(Shape, shape),
             HPX_FORWARD(F, f)};
     }
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

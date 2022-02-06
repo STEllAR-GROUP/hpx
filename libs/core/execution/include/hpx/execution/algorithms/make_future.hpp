@@ -1,4 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,21 +13,24 @@
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/promise.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <exception>
 #include <memory>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
     namespace detail {
+
         template <typename T, typename Allocator>
         struct make_future_receiver
         {
@@ -126,10 +130,10 @@ namespace hpx { namespace execution { namespace experimental {
         {
             using allocator_type = Allocator;
 
-            using value_types =
-                typename hpx::execution::experimental::sender_traits<
-                    std::decay_t<Sender>>::template value_types<hpx::util::pack,
-                    hpx::util::pack>;
+            using value_types = hpx::execution::experimental::value_types_of_t<
+                std::decay_t<Sender>, hpx::execution::experimental::empty_env,
+                meta::pack, meta::pack>;
+
             using result_type =
                 std::decay_t<detail::single_result_t<value_types>>;
             using operation_state_type = hpx::util::invoke_result_t<
@@ -158,6 +162,23 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
+    // execution::make_future is a sender consumer that submits the work
+    // described by the provided sender for execution, similarly to
+    // ensure_started, except that it returns a future that provides an optional
+    // tuple of values that were sent by the provided sender on its completion
+    // of work.
+    //
+    // Where 4.20.1 execution::schedule and 4.20.3 execution::transfer_just are
+    // meant to enter the domain of senders, make_future is meant to exit the
+    // domain of senders, retrieving the result of the task graph.
+    //
+    // If the provided sender sends an error instead of values, make_future
+    // stores that error as an exception in the future, or the original
+    // exception if the error is of type std::exception_ptr.
+    //
+    // If the provided sender sends the "stopped" signal instead of values,
+    // make_future calls std::terminate.
+    //
     inline constexpr struct make_future_t final
       : hpx::functional::detail::tag_fallback<make_future_t>
     {
@@ -189,4 +210,4 @@ namespace hpx { namespace execution { namespace experimental {
                 allocator};
         }
     } make_future{};
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

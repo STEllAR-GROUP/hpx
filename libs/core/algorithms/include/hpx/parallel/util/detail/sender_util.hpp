@@ -10,6 +10,7 @@
 #include <hpx/execution/algorithms/let_value.hpp>
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/executors/execution_policy.hpp>
 

@@ -1,4 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +15,22 @@
 
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
+    // execution::execute is used to create fire-and-forget tasks on a specified
+    // scheduler.
+    //
+    // This is a convenience function for fire-and-forget eager one-way
+    // submission of an invocable to a scheduler, to fulfil the role of one-way
+    // executors from P0443.
+    //
+    // Submits the provided function for execution on the provided scheduler,
+    // as-if by:
+    //
+    //      auto snd = execution::schedule(sched);
+    //      auto work = execution::then(snd, fn);
+    //      execution::start_detached(work);
+    //
     inline constexpr struct execute_t final
       : hpx::functional::detail::tag_fallback<execute_t>
     {
@@ -28,4 +44,4 @@ namespace hpx { namespace execution { namespace experimental {
                     HPX_FORWARD(F, f)));
         }
     } execute{};
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

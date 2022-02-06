@@ -12,14 +12,14 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // when `pm` is a pointer to member of a class `C` and
     // `is_base_of_v<C, remove_reference_t<T>>` is `true`;
     template <typename C, typename T,
-        typename = typename std::enable_if<std::is_base_of<C,
-            typename std::remove_reference<T>::type>::value>::type>
+        typename =
+            std::enable_if_t<std::is_base_of_v<C, std::remove_reference_t<T>>>>
     static constexpr T&& mem_ptr_target(T&& v) noexcept
     {
         return HPX_FORWARD(T, v);
@@ -118,8 +118,7 @@ namespace hpx { namespace util { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F,
-        typename FD = typename std::remove_cv<
-            typename std::remove_reference<F>::type>::type>
+        typename FD = std::remove_cv_t<std::remove_reference_t<F>>>
     struct dispatch_invoke
     {
         using type = F&&;
@@ -128,8 +127,8 @@ namespace hpx { namespace util { namespace detail {
     template <typename F, typename T, typename C>
     struct dispatch_invoke<F, T C::*>
     {
-        using type = typename std::conditional<std::is_function<T>::value,
-            invoke_mem_fun<T, C>, invoke_mem_obj<T, C>>::type;
+        using type = std::conditional_t<std::is_function_v<T>,
+            invoke_mem_fun<T, C>, invoke_mem_obj<T, C>>;
     };
 
     template <typename F>
@@ -138,4 +137,4 @@ namespace hpx { namespace util { namespace detail {
 #define HPX_INVOKE(F, ...)                                                     \
     (::hpx::util::detail::invoke<decltype((F))>(F)(__VA_ARGS__))
 
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

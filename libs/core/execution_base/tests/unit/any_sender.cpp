@@ -12,6 +12,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include "algorithm_test_utils.hpp"
+
 #include <atomic>
 #include <exception>
 #include <string>
@@ -40,14 +42,11 @@ struct non_copyable_sender
 {
     hpx::tuple<std::decay_t<Ts>...> ts;
 
-    template <template <class...> class Tuple,
-        template <class...> class Variant>
-    using value_types = Variant<Tuple<>>;
-
-    template <template <class...> class Variant>
-    using error_types = Variant<std::exception_ptr>;
-
-    static constexpr bool sends_done = false;
+    template <typename Env>
+    friend auto tag_invoke(ex::get_completion_signatures_t,
+        non_copyable_sender const&, Env) noexcept
+        -> ex::completion_signatures<ex::set_value_t(Ts...),
+            ex::set_error_t(std::exception_ptr)>;
 
     non_copyable_sender() = default;
     template <typename T,
@@ -97,14 +96,10 @@ struct sender
 {
     hpx::tuple<std::decay_t<Ts>...> ts;
 
-    template <template <class...> class Tuple,
-        template <class...> class Variant>
-    using value_types = Variant<Tuple<>>;
-
-    template <template <class...> class Variant>
-    using error_types = Variant<std::exception_ptr>;
-
-    static constexpr bool sends_done = false;
+    template <typename Env>
+    friend auto tag_invoke(ex::get_completion_signatures_t, sender const&,
+        Env) noexcept -> ex::completion_signatures<ex::set_value_t(Ts...),
+        ex::set_error_t(std::exception_ptr)>;
 
     sender() = default;
     template <typename T,
@@ -209,72 +204,6 @@ struct large_sender : sender<Ts...>
     large_sender& operator=(large_sender const&) = default;
 };
 
-struct error_sender
-{
-    template <template <typename...> class Tuple,
-        template <typename...> class Variant>
-    using value_types = Variant<Tuple<>>;
-
-    template <template <typename...> class Variant>
-    using error_types = Variant<std::exception_ptr>;
-
-    static constexpr bool sends_done = false;
-
-    template <typename R>
-    struct operation_state
-    {
-        std::decay_t<R> r;
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
-        {
-            try
-            {
-                throw std::runtime_error("error");
-            }
-            catch (...)
-            {
-                hpx::execution::experimental::set_error(
-                    std::move(os.r), std::current_exception());
-            }
-        }
-    };
-
-    template <typename R>
-    friend operation_state<R> tag_invoke(
-        hpx::execution::experimental::connect_t, error_sender, R&& r)
-    {
-        return {std::forward<R>(r)};
-    }
-};
-
-template <typename F>
-struct callback_receiver
-{
-    std::decay_t<F> f;
-    std::atomic<bool>& set_value_called;
-
-    template <typename E>
-    friend void tag_invoke(hpx::execution::experimental::set_error_t,
-        callback_receiver&&, E&&) noexcept
-    {
-        HPX_TEST(false);
-    }
-
-    friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
-        callback_receiver&&) noexcept
-    {
-        HPX_TEST(false);
-    };
-
-    template <typename... Ts>
-    friend auto tag_invoke(hpx::execution::experimental::set_value_t,
-        callback_receiver&& r, Ts&&... ts) noexcept
-    {
-        HPX_INVOKE(std::move(r.f), std::forward<Ts>(ts)...);
-        r.set_value_called = true;
-    }
-};
-
 struct error_receiver
 {
     std::atomic<bool>& set_error_called;
@@ -320,7 +249,22 @@ void test_any_sender(F&& f, Ts&&... ts)
     Sender<std::decay_t<Ts>...> s{std::forward<Ts>(ts)...};
 
     ex::any_sender<std::decay_t<Ts>...> as1{s};
+
+    static_assert(ex::is_sender_v<decltype(as1)>);
+    static_assert(ex::is_sender_v<decltype(as1), ex::empty_env>);
+
+    check_value_types<hpx::variant<hpx::tuple<Ts...>>>(as1);
+    check_error_types<hpx::variant<std::exception_ptr>>(as1);
+    check_sends_stopped<false>(as1);
+
     auto as2 = as1;
+
+    static_assert(ex::is_sender_v<decltype(as2)>);
+    static_assert(ex::is_sender_v<decltype(as2), ex::empty_env>);
+
+    check_value_types<hpx::variant<hpx::tuple<Ts...>>>(as2);
+    check_error_types<hpx::variant<std::exception_ptr>>(as2);
+    check_sends_stopped<false>(as2);
 
     // We should be able to connect both as1 and as2 multiple times; set_value
     // should always be called
@@ -404,7 +348,22 @@ void test_unique_any_sender(F&& f, Ts&&... ts)
     Sender<std::decay_t<Ts>...> s{std::forward<Ts>(ts)...};
 
     ex::unique_any_sender<std::decay_t<Ts>...> as1{std::move(s)};
+
+    static_assert(ex::is_sender_v<decltype(as1)>);
+    static_assert(ex::is_sender_v<decltype(as1), ex::empty_env>);
+
+    check_value_types<hpx::variant<hpx::tuple<Ts...>>>(as1);
+    check_error_types<hpx::variant<std::exception_ptr>>(as1);
+    check_sends_stopped<false>(as1);
+
     auto as2 = std::move(as1);
+
+    static_assert(ex::is_sender_v<decltype(as2)>);
+    static_assert(ex::is_sender_v<decltype(as2), ex::empty_env>);
+
+    check_value_types<hpx::variant<hpx::tuple<Ts...>>>(as2);
+    check_error_types<hpx::variant<std::exception_ptr>>(as2);
+    check_sends_stopped<false>(as2);
 
     // We expect set_value to be called here
     {
@@ -440,7 +399,7 @@ void test_unique_any_sender(F&& f, Ts&&... ts)
 
 void test_any_sender_set_error()
 {
-    error_sender s;
+    error_sender<> s;
 
     ex::any_sender<> as1{std::move(s)};
     auto as2 = as1;

@@ -17,15 +17,19 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Tuple>
         struct fused_index_pack
-          : make_index_pack<
-                hpx::tuple_size<typename std::decay<Tuple>::type>::value>
+          : make_index_pack<hpx::tuple_size<std::decay_t<Tuple>>::value>
         {
         };
+
+        template <typename Tuple>
+        using fused_index_pack_t = typename fused_index_pack<Tuple>::type;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Tuple, typename Is>
@@ -47,8 +51,7 @@ namespace hpx { namespace util {
 
         template <typename F, typename Tuple>
         struct invoke_fused_result
-          : invoke_fused_result_impl<F, Tuple&&,
-                typename fused_index_pack<Tuple>::type>
+          : invoke_fused_result_impl<F, Tuple&&, fused_index_pack_t<Tuple>>
         {
         };
 
@@ -56,7 +59,9 @@ namespace hpx { namespace util {
         template <std::size_t... Is, typename F, typename Tuple>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename invoke_fused_result<F, Tuple>::type
-            invoke_fused_impl(index_pack<Is...>, F&& f, Tuple&& t)
+            invoke_fused_impl(index_pack<Is...>, F&& f, Tuple&& t) noexcept(
+                noexcept(HPX_INVOKE(
+                    HPX_FORWARD(F, f), hpx::get<Is>(HPX_FORWARD(Tuple, t))...)))
         {
             return HPX_INVOKE(
                 HPX_FORWARD(F, f), hpx::get<Is>(HPX_FORWARD(Tuple, t))...);
@@ -83,9 +88,11 @@ namespace hpx { namespace util {
     template <typename F, typename Tuple>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         typename detail::invoke_fused_result<F, Tuple>::type
-        invoke_fused(F&& f, Tuple&& t)
+        invoke_fused(F&& f, Tuple&& t) noexcept(noexcept(
+            detail::invoke_fused_impl(detail::fused_index_pack_t<Tuple>{},
+                HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t))))
     {
-        using index_pack = typename detail::fused_index_pack<Tuple>::type;
+        using index_pack = detail::fused_index_pack_t<Tuple>;
         return detail::invoke_fused_impl(
             index_pack{}, HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t));
     }
@@ -95,9 +102,12 @@ namespace hpx { namespace util {
     /// \tparam R The result type of the function when it's called
     ///           with the content of the given sequenced type.
     template <typename R, typename F, typename Tuple>
-    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE R invoke_fused_r(F&& f, Tuple&& t)
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE R
+    invoke_fused_r(F&& f, Tuple&& t) noexcept(
+        noexcept(detail::invoke_fused_impl(detail::fused_index_pack_t<Tuple>{},
+            HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t))))
     {
-        using index_pack = typename detail::fused_index_pack<Tuple>::type;
+        using index_pack = detail::fused_index_pack_t<Tuple>;
         return util::void_guard<R>(),
                detail::invoke_fused_impl(
                    index_pack{}, HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t));
@@ -106,15 +116,18 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
     namespace functional {
+
         struct invoke_fused
         {
             template <typename F, typename Tuple>
             constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
                 typename util::detail::invoke_fused_result<F, Tuple>::type
                 operator()(F&& f, Tuple&& t) const
+                noexcept(noexcept(util::detail::invoke_fused_impl(
+                    util::detail::fused_index_pack_t<Tuple>{},
+                    HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t))))
             {
-                using index_pack =
-                    typename util::detail::fused_index_pack<Tuple>::type;
+                using index_pack = util::detail::fused_index_pack_t<Tuple>;
                 return util::detail::invoke_fused_impl(
                     index_pack{}, HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t));
             }
@@ -126,9 +139,11 @@ namespace hpx { namespace util {
             template <typename F, typename Tuple>
             constexpr HPX_HOST_DEVICE HPX_FORCEINLINE R operator()(
                 F&& f, Tuple&& t) const
+                noexcept(noexcept(util::detail::invoke_fused_impl(
+                    util::detail::fused_index_pack_t<Tuple>{},
+                    HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t))))
             {
-                using index_pack =
-                    typename util::detail::fused_index_pack<Tuple>::type;
+                using index_pack = util::detail::fused_index_pack_t<Tuple>;
                 return util::void_guard<R>(),
                        util::detail::invoke_fused_impl(index_pack{},
                            HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t));
@@ -136,4 +151,4 @@ namespace hpx { namespace util {
         };
     }    // namespace functional
     /// \endcond
-}}    // namespace hpx::util
+}    // namespace hpx::util

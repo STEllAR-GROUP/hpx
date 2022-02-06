@@ -1,4 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/throw_exception.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/sender.hpp>
 
 #include <cstddef>
@@ -21,6 +23,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::detail {
+
     template <typename T>
     struct empty_vtable_type
     {
@@ -671,6 +674,7 @@ namespace hpx::execution::experimental::detail {
 }    // namespace hpx::execution::experimental::detail
 
 namespace hpx::execution::experimental {
+
 #if !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
     namespace detail {
         // This helper only exists to make it possible to use
@@ -738,14 +742,11 @@ namespace hpx::execution::experimental {
         unique_any_sender& operator=(unique_any_sender&&) = default;
         unique_any_sender& operator=(unique_any_sender const&) = delete;
 
-        template <template <typename...> class Tuple,
-            template <typename...> class Variant>
-        using value_types = Variant<Tuple<Ts...>>;
-
-        template <template <typename...> class Variant>
-        using error_types = Variant<std::exception_ptr>;
-
-        static constexpr bool sends_done = false;
+        template <typename Env>
+        friend auto tag_invoke(
+            get_completion_signatures_t, unique_any_sender const&, Env) noexcept
+            -> completion_signatures<set_value_t(Ts...),
+                set_error_t(std::exception_ptr)>;
 
         template <typename R>
         friend detail::any_operation_state tag_invoke(
@@ -814,14 +815,10 @@ namespace hpx::execution::experimental {
         any_sender& operator=(any_sender&&) = default;
         any_sender& operator=(any_sender const&) = default;
 
-        template <template <typename...> class Tuple,
-            template <typename...> class Variant>
-        using value_types = Variant<Tuple<Ts...>>;
-
-        template <template <typename...> class Variant>
-        using error_types = Variant<std::exception_ptr>;
-
-        static constexpr bool sends_done = false;
+        template <typename Env>
+        friend auto tag_invoke(get_completion_signatures_t, any_sender const&,
+            Env) noexcept -> completion_signatures<set_value_t(Ts...),
+            set_error_t(std::exception_ptr)>;
 
         template <typename R>
         friend detail::any_operation_state tag_invoke(

@@ -8,13 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/invoke.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable = void>
         struct invoke_result_impl
@@ -23,8 +24,8 @@ namespace hpx { namespace util {
 
         template <typename F, typename... Ts>
         struct invoke_result_impl<F(Ts...),
-            typename util::always_void<decltype(
-                HPX_INVOKE(std::declval<F>(), std::declval<Ts>()...))>::type>
+            std::void_t<decltype(
+                HPX_INVOKE(std::declval<F>(), std::declval<Ts>()...))>>
         {
             using type =
                 decltype(HPX_INVOKE(std::declval<F>(), std::declval<Ts>()...));
@@ -40,4 +41,4 @@ namespace hpx { namespace util {
 
     template <typename F, typename... Ts>
     using invoke_result_t = typename invoke_result<F, Ts...>::type;
-}}    // namespace hpx::util
+}    // namespace hpx::util

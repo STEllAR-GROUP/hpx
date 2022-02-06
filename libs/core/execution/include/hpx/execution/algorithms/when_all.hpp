@@ -14,6 +14,7 @@
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution/algorithms/transfer.hpp>
 #include <hpx/execution/queries/get_stop_token.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -21,6 +22,7 @@
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/synchronization/stop_token.hpp>
+#include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <atomic>
@@ -48,7 +50,8 @@ namespace hpx::execution::experimental {
         // passed to when_all. When set_value is called, it will emplace the
         // values sent into the appropriate position in the pack used to store
         // values from all predecessor senders.
-        template <typename OperationState>
+        template <typename OperationState,
+            std::size_t I = OperationState::sender_pack_size>
         struct when_all_receiver
         {
             std::decay_t<OperationState>& op_state;
@@ -110,17 +113,18 @@ namespace hpx::execution::experimental {
                     ...);
             }
 
-            using index_pack_type = typename hpx::util::make_index_pack<
-                OperationState::sender_pack_size>::type;
+            static constexpr std::size_t sender_pack_size = I;
+            using index_pack_type =
+                hpx::util::make_index_pack_t<sender_pack_size>;
 
-            // different version of clang-format disagree
+            // different versions of clang-format disagree
             // clang-format off
             template <typename... Ts>
             auto set_value(Ts&&... ts) noexcept -> decltype(
                 set_value_helper(index_pack_type{}, HPX_FORWARD(Ts, ts)...))
             // clang-format on
             {
-                if constexpr (OperationState::sender_pack_size > 0)
+                if constexpr (sender_pack_size > 0)
                 {
                     if (!op_state.set_stopped_error_called)
                     {
@@ -182,34 +186,27 @@ namespace hpx::execution::experimental {
             {
             }
 
-            template <typename Sender>
-            struct value_types_helper
+            template <typename Env>
+            struct generate_completion_signatures
             {
-                using value_types =
-                    typename hpx::execution::experimental::sender_traits<
-                        Sender>::template value_types<hpx::util::pack,
-                        hpx::util::pack>;
-                using type = detail::single_result_non_void_t<value_types>;
+                template <template <typename...> typename Tuple,
+                    template <typename...> typename Variant>
+                using value_types = hpx::util::detail::concat_inner_packs_t<
+                    hpx::util::detail::concat_t<
+                        value_types_of_t<Senders, Env, Tuple, Variant>...>>;
+
+                template <template <typename...> typename Variant>
+                using error_types = hpx::util::detail::unique_concat_t<
+                    error_types_of_t<Senders, Env, Variant>...,
+                    Variant<std::exception_ptr>>;
+
+                static constexpr bool sends_stopped = false;
             };
 
-            template <typename Sender>
-            using value_types_helper_t =
-                typename value_types_helper<Sender>::type;
-
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types = hpx::util::detail::concat_inner_packs_t<
-                hpx::util::detail::concat_t<
-                    typename hpx::execution::experimental::sender_traits<
-                        Senders>::template value_types<Tuple, Variant>...>>;
-
-            template <template <typename...> class Variant>
-            using error_types = hpx::util::detail::unique_concat_t<
-                typename hpx::execution::experimental::sender_traits<
-                    Senders>::template error_types<Variant>...,
-                Variant<std::exception_ptr>>;
-
-            static constexpr bool sends_done = false;
+            template <typename Env>
+            friend auto tag_invoke(get_completion_signatures_t,
+                when_all_sender const&, Env) noexcept
+                -> generate_completion_signatures<Env>;
 
             static constexpr std::size_t num_predecessors = sizeof...(Senders);
             static_assert(num_predecessors > 0,
@@ -217,9 +214,9 @@ namespace hpx::execution::experimental {
 
             template <std::size_t I>
             static constexpr std::size_t sender_pack_size_at_index =
-                single_variant_t<typename sender_traits<hpx::util::at_index_t<I,
-                    Senders...>>::template value_types<hpx::util::pack,
-                    hpx::util::pack>>::size;
+                single_variant_tuple_size_v<
+                    value_types_of_t<hpx::util::at_index_t<I, Senders...>,
+                        empty_env, meta::pack, meta::pack>>;
 
             template <typename Receiver, typename SendersPack,
                 std::size_t I = num_predecessors - 1>
@@ -238,16 +235,15 @@ namespace hpx::execution::experimental {
 #if !defined(HPX_CUDA_VERSION)
                 // The number of values sent by the ith predecessor sender.
                 static constexpr std::size_t sender_pack_size =
-                    sender_pack_size_at_index<i>;
+                    sender_pack_size_at_index<0>;
 #else
                 // nvcc does not like using the helper sender_pack_size_at_index
                 // here and complains about incomplete types. Lifting the helper
                 // explicitly in here works.
                 static constexpr std::size_t sender_pack_size =
-                    single_variant_t<
-                        typename sender_traits<hpx::util::at_index_t<i,
-                            Senders...>>::template value_types<hpx::util::pack,
-                            hpx::util::pack>>::size;
+                    single_variant_tuple_size_v<
+                        value_types_of_t<hpx::util::at_index_t<0, Senders...>,
+                            empty_env, meta::pack, meta::pack>>;
 #endif
 
                 // Number of predecessor senders that have not yet called any of
@@ -255,25 +251,29 @@ namespace hpx::execution::experimental {
                 std::atomic<std::size_t> predecessors_remaining =
                     num_predecessors;
 
-                template <typename T>
-                struct add_optional
-                {
-                    using type = hpx::optional<std::decay_t<T>>;
-                };
-                using value_types_storage_type =
-                    hpx::util::detail::change_pack_t<hpx::util::member_pack_for,
-                        hpx::util::detail::transform_t<
-                            hpx::util::detail::concat_pack_of_packs_t<
-                                value_types<hpx::util::pack, hpx::util::pack>>,
-                            add_optional>>;
                 // Values sent by all predecessor senders are stored here in the
                 // base-case operation state. They are stored in a
                 // member_pack<optional<T0>, ..., optional<Tn>>, where T0, ...,
                 // Tn are the types of the values sent by all predecessor
                 // senders.
+                template <typename T>
+                struct add_optional
+                {
+                    using type = hpx::optional<std::decay_t<T>>;
+                };
+                using value_types = typename generate_completion_signatures<
+                    empty_env>::template value_types<meta::pack, meta::pack>;
+                using value_types_storage_type =
+                    hpx::util::detail::change_pack_t<hpx::util::member_pack_for,
+                        hpx::util::detail::transform_t<
+                            hpx::util::detail::concat_pack_of_packs_t<
+                                value_types>,
+                            add_optional>>;
                 value_types_storage_type ts;
 
-                hpx::optional<error_types<hpx::variant>> error;
+                using error_types = typename generate_completion_signatures<
+                    empty_env>::template error_types<hpx::variant>;
+                hpx::optional<error_types> error;
                 std::atomic<bool> set_stopped_error_called{false};
                 HPX_NO_UNIQUE_ADDRESS receiver_type receiver;
 
@@ -362,9 +362,20 @@ namespace hpx::execution::experimental {
 
                 // The index of the sender that this operation state handles.
                 static constexpr std::size_t i = I;
+
+#if !defined(HPX_CUDA_VERSION)
                 // The number of values sent by the ith predecessor sender.
                 static constexpr std::size_t sender_pack_size =
                     sender_pack_size_at_index<i>;
+#else
+                // nvcc does not like using the helper sender_pack_size_at_index
+                // here and complains about incomplete types. Lifting the helper
+                // explicitly in here works.
+                static constexpr std::size_t sender_pack_size =
+                    single_variant_tuple_size_v<
+                        value_types_of_t<hpx::util::at_index_t<i, Senders...>,
+                            empty_env, meta::pack, meta::pack>>;
+#endif
                 // The offset at which we start to emplace values sent by the
                 // ith predecessor sender.
                 static constexpr std::size_t i_storage_offset =
@@ -447,8 +458,22 @@ namespace hpx::execution::experimental {
     }    // namespace detail
 
     // execution::when_all is used to join multiple sender chains and create a
-    // sender whose execution is dependent on all of the input senders that
-    // only send a single set of values.
+    // sender whose execution is dependent on all of the input senders that only
+    // send a single set of values. execution::when_all_with_variant is used to
+    // join multiple sender chains and create a sender whose execution is
+    // dependent on all of the input senders, each of which may have one or more
+    // sets of sent values.
+    //
+    // when_all returns a sender that completes once all of the input senders
+    // have completed. It is constrained to only accept senders that can
+    // complete with a single set of values (_i.e._, it only calls one overload
+    // of set_value on its receiver). The values sent by this sender are the
+    // values sent by each of the input senders, in order of the arguments
+    // passed to when_all. It completes inline on the execution context on which
+    // the last input sender completes, unless stop is requested before when_all
+    // is started, in which case it completes inline within the call to start.
+    //
+    // The returned sender has no completion schedulers.
     inline constexpr struct when_all_t final
       : hpx::functional::detail::tag_fallback<when_all_t>
     {

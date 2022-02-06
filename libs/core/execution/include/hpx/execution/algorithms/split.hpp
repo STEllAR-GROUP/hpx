@@ -1,4 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,18 +16,22 @@
 #include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
+#include <hpx/execution_base/completion_scheduler.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/functional/detail/tag_priority_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/move_only_function.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <atomic>
@@ -37,8 +42,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
     namespace detail {
+
         enum class submission_type
         {
             eager,
@@ -51,8 +58,9 @@ namespace hpx { namespace execution { namespace experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
             template <typename Error>
-            void operator()(Error const& error)
+            void operator()(Error const& error) noexcept
             {
+                // FIXME: check whether it is ok to move the receiver
                 hpx::execution::experimental::set_error(
                     HPX_MOVE(receiver), error);
             }
@@ -64,8 +72,9 @@ namespace hpx { namespace execution { namespace experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
             template <typename Ts>
-            void operator()(Ts const& ts)
+            void operator()(Ts const& ts) noexcept
             {
+                // FIXME: check whether it is ok to move the receiver
                 hpx::util::invoke_fused(
                     hpx::util::bind_front(
                         hpx::execution::experimental::set_value,
@@ -86,21 +95,28 @@ namespace hpx { namespace execution { namespace experimental {
                     std::add_lvalue_reference>;
             };
 
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types = hpx::util::detail::transform_t<
-                typename hpx::execution::experimental::sender_traits<
-                    Sender>::template value_types<Tuple, Variant>,
-                value_types_helper>;
+            template <typename Env>
+            struct generate_completion_signatures
+            {
+                template <template <typename...> typename Tuple,
+                    template <typename...> typename Variant>
+                using value_types = hpx::util::detail::transform_t<
+                    value_types_of_t<Sender, Env, Tuple, Variant>,
+                    value_types_helper>;
 
-            template <template <typename...> class Variant>
-            using error_types =
-                hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
-                    typename hpx::execution::experimental::sender_traits<
-                        Sender>::template error_types<Variant>,
-                    std::exception_ptr>>;
+                template <template <typename...> typename Variant>
+                using error_types =
+                    hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
+                        error_types_of_t<Sender, Env, Variant>,
+                        std::exception_ptr>>;
 
-            static constexpr bool sends_done = false;
+                static constexpr bool sends_stopped = true;
+            };
+
+            template <typename Env>
+            friend auto tag_invoke(
+                get_completion_signatures_t, split_sender const&, Env)
+                -> generate_completion_signatures<Env>;
 
             struct shared_state
             {
@@ -109,8 +125,8 @@ namespace hpx { namespace execution { namespace experimental {
                 using allocator_type = typename std::allocator_traits<
                     Allocator>::template rebind_alloc<shared_state>;
                 HPX_NO_UNIQUE_ADDRESS allocator_type alloc;
-                using mutex_type = hpx::lcos::local::spinlock;
-                mutex_type mtx;
+
+                hpx::lcos::local::spinlock mtx;
                 hpx::util::atomic_count reference_count{0};
                 std::atomic<bool> start_called{false};
                 std::atomic<bool> predecessor_done{false};
@@ -119,16 +135,18 @@ namespace hpx { namespace execution { namespace experimental {
                     std::decay_t<connect_result_t<Sender, split_receiver>>;
                 operation_state_type os;
 
-                struct done_type
+                using signatures = generate_completion_signatures<empty_env>;
+
+                struct stopped_type
                 {
                 };
-                using value_type =
-                    typename hpx::execution::experimental::sender_traits<
-                        Sender>::template value_types<hpx::tuple, hpx::variant>;
-                using error_type =
-                    hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
-                        error_types<hpx::variant>, std::exception_ptr>>;
-                hpx::variant<hpx::monostate, done_type, error_type, value_type>
+                using value_type = value_types_of_t<Sender, empty_env,
+                    decayed_tuple, hpx::variant>;
+                using error_type = detail::error_types_from<signatures,
+                    meta::func<hpx::variant>>;
+
+                hpx::variant<hpx::monostate, stopped_type, error_type,
+                    value_type>
                     v;
 
                 using continuation_type = hpx::move_only_function<void()>;
@@ -142,27 +160,45 @@ namespace hpx { namespace execution { namespace experimental {
                     friend void tag_invoke(
                         set_error_t, split_receiver&& r, Error&& error) noexcept
                     {
-                        r.state->v.template emplace<error_type>(
-                            error_type(HPX_FORWARD(Error, error)));
-                        r.state->set_predecessor_done();
-                        r.state.reset();
+                        HPX_MOVE(r).set_error(HPX_FORWARD(Error, error));
+                    }
+
+                    template <typename Error>
+                    void set_error(Error&& error) && noexcept
+                    {
+                        try
+                        {
+                            state->v.template emplace<error_type>(
+                                error_type(HPX_FORWARD(Error, error)));
+                        }
+                        catch (...)
+                        {
+                            // no way of reporting this error
+                            std::terminate();
+                        }
+                        state->set_predecessor_done();
+                        state.reset();
                     }
 
                     friend void tag_invoke(
                         set_stopped_t, split_receiver&& r) noexcept
                     {
-                        r.state->set_predecessor_done();
-                        r.state.reset();
+                        if (r.state)
+                        {
+                            r.state->v.template emplace<stopped_type>();
+                            r.state->set_predecessor_done();
+                            r.state.reset();
+                        }
                     };
 
                     // This typedef is duplicated from the parent struct. The
                     // parent typedef is not instantiated early enough for use
                     // here.
-                    using value_type =
-                        typename hpx::execution::experimental::sender_traits<
-                            Sender>::template value_types<hpx::tuple,
-                            hpx::variant>;
+                    using value_type = value_types_of_t<Sender, empty_env,
+                        decayed_tuple, hpx::variant>;
 
+                    // different versions of clang-format disagree
+                    // clang-format off
                     template <typename... Ts>
                     friend auto tag_invoke(
                         set_value_t, split_receiver&& r, Ts&&... ts) noexcept
@@ -170,20 +206,30 @@ namespace hpx { namespace execution { namespace experimental {
                             std::declval<
                                 hpx::variant<hpx::monostate, value_type>>()
                                 .template emplace<value_type>(
-                                    hpx::make_tuple<>(HPX_FORWARD(Ts, ts)...)),
+                                    hpx::tuple<std::decay_t<Ts>...>(
+                                        HPX_FORWARD(Ts, ts)...)),
                             void())
+                    // clang-format on
                     {
-                        r.state->v.template emplace<value_type>(
-                            hpx::make_tuple<>(HPX_FORWARD(Ts, ts)...));
-
-                        r.state->set_predecessor_done();
-                        r.state.reset();
+                        hpx::detail::try_catch_exception_ptr(
+                            [&]() {
+                                r.state->v.template emplace<value_type>(
+                                    hpx::make_tuple(HPX_FORWARD(Ts, ts)...));
+                                r.state->set_predecessor_done();
+                                r.state.reset();
+                            },
+                            [&](std::exception_ptr ep) {
+                                HPX_MOVE(r).set_error(HPX_MOVE(ep));
+                            });
                     }
                 };
 
+                // clang-format off
                 template <typename Sender_,
-                    typename = std::enable_if_t<!std::is_same<
-                        std::decay_t<Sender_>, shared_state>::value>>
+                    HPX_CONCEPT_REQUIRES_(
+                        meta::value<meta::none_of<shared_state, Sender_>>
+                    )>
+                // clang-format on
                 shared_state(Sender_&& sender, allocator_type const& alloc)
                   : alloc(alloc)
                   , os(hpx::execution::experimental::connect(
@@ -210,7 +256,7 @@ namespace hpx { namespace execution { namespace experimental {
                         HPX_UNREACHABLE;
                     }
 
-                    void operator()(done_type)
+                    void operator()(stopped_type)
                     {
                         hpx::execution::experimental::set_stopped(
                             HPX_MOVE(receiver));
@@ -268,7 +314,7 @@ namespace hpx { namespace execution { namespace experimental {
                         // the vector must see predecessor_done = true after
                         // taking the lock in their threads and will not add
                         // continuations to the vector.
-                        std::unique_lock<mutex_type> l{mtx};
+                        std::unique_lock l{mtx};
                     }
 
                     if (!continuations.empty())
@@ -306,7 +352,7 @@ namespace hpx { namespace execution { namespace experimental {
                         // If predecessor_done is false, we have to take the
                         // lock to potentially add the continuation to the
                         // vector of continuations.
-                        std::unique_lock<mutex_type> l{mtx};
+                        std::unique_lock l{mtx};
 
                         if (predecessor_done)
                         {
@@ -350,12 +396,12 @@ namespace hpx { namespace execution { namespace experimental {
                     }
                 }
 
-                friend void intrusive_ptr_add_ref(shared_state* p)
+                friend void intrusive_ptr_add_ref(shared_state* p) noexcept
                 {
                     ++p->reference_count;
                 }
 
-                friend void intrusive_ptr_release(shared_state* p)
+                friend void intrusive_ptr_release(shared_state* p) noexcept
                 {
                     if (--p->reference_count == 0)
                     {
@@ -384,8 +430,8 @@ namespace hpx { namespace execution { namespace experimental {
                 unique_ptr p(allocator_traits::allocate(alloc, 1),
                     hpx::util::allocator_deleter<other_allocator>{alloc});
 
-                new (p.get())
-                    shared_state{HPX_FORWARD(Sender_, sender), allocator};
+                allocator_traits::construct(
+                    alloc, p.get(), HPX_FORWARD(Sender_, sender), allocator);
                 state = p.release();
 
                 // Eager submission means that we start the predecessor
@@ -451,10 +497,53 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
+    // execution::split is used to adapt an arbitrary sender into a sender that
+    // can be connected multiple times.
+    //
+    // If the provided sender is a multi-shot sender, returns that sender.
+    // Otherwise, returns a multi-shot sender which sends values equivalent to
+    // the values sent by the provided sender.
+    //
+    // A single-shot sender can only be connected to a receiver at most once.
+    // Its implementation of execution::connect only has overloads for an
+    // rvalue-qualified sender. Callers must pass the sender as an rvalue to the
+    // call to execution::connect, indicating that the call consumes the sender.
+    //
+    // A multi-shot sender can be connected to multiple receivers and can be
+    // launched multiple times. Multi-shot senders customise execution::connect
+    // to accept an lvalue reference to the sender. Callers can indicate that
+    // they want the sender to remain valid after the call to execution::connect
+    // by passing an lvalue reference to the sender to call these overloads.
+    // Multi-shot senders should also define overloads of execution::connect
+    // that accept rvalue-qualified senders to allow the sender to be also used
+    // in places where only a single-shot sender is required.
     inline constexpr struct split_t final
-      : hpx::functional::detail::tag_fallback<split_t>
+      : hpx::functional::detail::tag_priority<split_t>
     {
     private:
+        // clang-format off
+        template <typename Sender,
+            typename Allocator = hpx::util::internal_allocator<>,
+            HPX_CONCEPT_REQUIRES_(
+                is_sender_v<Sender> &&
+                hpx::traits::is_allocator_v<Allocator> &&
+                experimental::detail::is_completion_scheduler_tag_invocable_v<
+                    hpx::execution::experimental::set_value_t,
+                    Sender, split_t, Allocator
+                >
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
+            split_t, Sender&& sender, Allocator const& allocator = {})
+        {
+            auto scheduler =
+                hpx::execution::experimental::get_completion_scheduler<
+                    hpx::execution::experimental::set_value_t>(sender);
+
+            return hpx::functional::tag_invoke(split_t{}, HPX_MOVE(scheduler),
+                HPX_FORWARD(Sender, sender), allocator);
+        }
+
         // clang-format off
         template <typename Sender,
             typename Allocator = hpx::util::internal_allocator<>,
@@ -493,4 +582,4 @@ namespace hpx { namespace execution { namespace experimental {
             return detail::partial_algorithm<split_t, Allocator>{allocator};
         }
     } split{};
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

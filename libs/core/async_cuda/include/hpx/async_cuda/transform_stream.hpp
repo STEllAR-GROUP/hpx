@@ -11,6 +11,7 @@
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/then.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
@@ -265,29 +266,39 @@ namespace hpx { namespace cuda { namespace experimental {
             template <template <typename...> class Tuple, typename... Ts>
             struct invoke_result_helper<Tuple<Ts...>>
             {
-                using result_type = typename hpx::util::invoke_result<F, Ts...,
-                    cudaStream_t>::type;
-                using type =
-                    typename std::conditional<std::is_void<result_type>::value,
-                        Tuple<>, Tuple<result_type>>::type;
+                using result_type =
+                    hpx::util::invoke_result_t<F, Ts..., cudaStream_t>;
+
+                using type = std::conditional_t<std::is_void_v<result_type>,
+                    Tuple<>, Tuple<result_type>>;
             };
 
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types =
-                hpx::util::detail::unique_t<hpx::util::detail::transform_t<
-                    typename hpx::execution::experimental::sender_traits<
-                        S>::template value_types<Tuple, Variant>,
-                    invoke_result_helper>>;
+            template <typename Env>
+            struct generate_completion_signatures
+            {
+                template <template <typename...> class Tuple,
+                    template <typename...> class Variant>
+                using value_types =
+                    hpx::util::detail::unique_t<hpx::util::detail::transform_t<
+                        hpx::execution::experimental::value_types_of_t<S, Env,
+                            Tuple, Variant>,
+                        invoke_result_helper>>;
 
-            template <template <typename...> class Variant>
-            using error_types =
-                hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
-                    typename hpx::execution::experimental::sender_traits<
-                        S>::template error_types<Variant>,
-                    std::exception_ptr>>;
+                template <template <typename...> class Variant>
+                using error_types =
+                    hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
+                        hpx::execution::experimental::error_types_of_t<S, Env,
+                            Variant>,
+                        std::exception_ptr>>;
 
-            static constexpr bool sends_done = false;
+                static constexpr bool sends_stopped = false;
+            };
+
+            template <typename Env>
+            friend auto tag_invoke(
+                hpx::execution::experimental::get_completion_signatures_t,
+                transform_stream_sender const&, Env) noexcept
+                -> generate_completion_signatures<Env>;
 
             template <typename R>
             friend auto tag_invoke(hpx::execution::experimental::connect_t,

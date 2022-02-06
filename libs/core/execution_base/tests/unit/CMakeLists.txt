@@ -11,6 +11,7 @@ set(tests
     basic_receiver
     basic_sender
     basic_schedule
+    completion_signatures
     execution_context
     get_env
 )
@@ -29,6 +30,8 @@ foreach(test ${tests})
     EXCLUDE_FROM_ALL
     FOLDER "Tests/Unit/Modules/Core/ExecutionBase"
   )
+
+  target_link_libraries(${test}_test PRIVATE hpx_execution_test_utilities)
 
   add_hpx_unit_test("modules.execution_base" ${test} ${${test}_PARAMETERS})
   target_compile_definitions(${test}_test PRIVATE -DHPX_MODULE_STATIC_LINKING)

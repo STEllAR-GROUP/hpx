@@ -9,7 +9,10 @@ set(tests
     algorithm_ensure_started
     algorithm_execute
     algorithm_just
+    algorithm_just_error
+    algorithm_just_stopped
     algorithm_let_error
+    algorithm_let_stopped
     algorithm_let_value
     algorithm_split
     algorithm_start_detached
@@ -20,6 +23,7 @@ set(tests
     algorithm_transfer_when_all
     algorithm_when_all
     bulk_async
+    environment_queries
     executor_parameters
     executor_parameters_dispatching
     executor_parameters_timer_hooks

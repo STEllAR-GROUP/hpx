@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,7 +33,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
 
     namespace detail {
 #if defined(HPX_HAVE_CXX20_PERFECT_PACK_CAPTURE)
@@ -216,9 +216,10 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename F, typename... Ts>
         decltype(auto) sync_execute(F&& f, Ts&&... ts)
         {
-            return sync_wait(then(schedule(sched_),
-                hpx::util::deferred_call(
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
+            return hpx::this_thread::experimental::sync_wait(
+                then(schedule(sched_),
+                    hpx::util::deferred_call(
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
         // TwoWayExecutor interface
@@ -304,9 +305,10 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename F, typename S, typename... Ts>
         void bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
         {
-            sync_wait(bulk(schedule(sched_), shape,
-                hpx::util::bind_back(
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
+            hpx::this_thread::experimental::sync_wait(
+                bulk(schedule(sched_), shape,
+                    hpx::util::bind_back(
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
@@ -317,7 +319,7 @@ namespace hpx { namespace execution { namespace experimental {
                 parallel::execution::detail::then_bulk_function_result_t<F, S,
                     Future, Ts...>;
 
-            if constexpr (std::is_void<result_type>::value)
+            if constexpr (std::is_void_v<result_type>)
             {
                 // the overall return value is future<void>
                 auto prereq =
@@ -355,7 +357,7 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename BaseScheduler>
     explicit scheduler_executor(BaseScheduler&& sched)
         -> scheduler_executor<std::decay_t<BaseScheduler>>;
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental
 
 namespace hpx { namespace parallel { namespace execution {
 
