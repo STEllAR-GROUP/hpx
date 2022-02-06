@@ -11,12 +11,13 @@
 
 #include <hpx/execution/executors/execution_parameters_fwd.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace execution {
+namespace hpx::execution {
+
     ///Control number of cores in executors which need a functionality
     ///for setting the number of cores to be used by an algorithm directly
     ///
@@ -40,11 +41,25 @@ namespace hpx { namespace execution {
         }
         /// \endcond
 
+    private:
+        /// \cond NOINTERNAL
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, const unsigned int /* version */)
+        {
+            // clang-format off
+            ar & num_cores_;
+            // clang-format on
+        }
+        /// \endcond
+
+    private:
         /// \cond NOINTERNAL
         std::size_t num_cores_;
         /// \endcond
     };
-}}    // namespace hpx::execution
+}    // namespace hpx::execution
 
 namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
