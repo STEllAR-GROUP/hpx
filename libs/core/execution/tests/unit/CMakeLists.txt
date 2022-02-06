@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021 Hartmut Kaiser
+# Copyright (c) 2014-2022 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,11 +17,13 @@ set(tests
     algorithm_then
     algorithm_transfer
     algorithm_transfer_just
+    algorithm_transfer_when_all
     algorithm_when_all
     bulk_async
     executor_parameters
     executor_parameters_dispatching
     executor_parameters_timer_hooks
+    forwarding_env_query
     future_then_executor
     minimal_async_executor
     minimal_sync_executor

@@ -130,9 +130,10 @@ namespace hpx::execution::experimental {
     // 1. tag_invoke(execution::get_env, r) if that expression is well-formed.
     // 2. Otherwise, empty_env{}.
     //
-    inline constexpr struct get_env_t final
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct get_env_t final
       : hpx::functional::detail::tag_fallback<get_env_t>
     {
+    private:
         template <typename EnvProvider>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             get_env_t, EnvProvider&&) noexcept
@@ -144,9 +145,12 @@ namespace hpx::execution::experimental {
     template <typename T>
     using env_of_t = decltype(get_env(std::declval<T>()));
 
+    // different versions of clang-format disagree
+    // clang-format off
     template <typename Tag, typename Value, typename BaseEnv = empty_env>
     using make_env_t = decltype(
         make_env<Tag>(std::declval<Value&&>(), std::declval<BaseEnv&&>()));
+    // clang-format on
 
     // execution::forwarding_env_query is used to ask a customization point
     // object whether it is an environment query that should be forwarded
@@ -164,9 +168,10 @@ namespace hpx::execution::experimental {
     //      is a core constant expression.
     // 2. Otherwise, false.
     //
-    inline constexpr struct forwarding_env_query_t final
-      : hpx::functional::detail::tag_fallback<forwarding_env_query_t>
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct forwarding_env_query_t
+        final : hpx::functional::detail::tag_fallback<forwarding_env_query_t>
     {
+    private:
         template <typename T>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             forwarding_env_query_t, T&&) noexcept

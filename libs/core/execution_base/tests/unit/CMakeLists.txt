@@ -12,7 +12,6 @@ set(tests
     basic_sender
     basic_schedule
     execution_context
-    forwarding_env_query
     get_env
 )
 

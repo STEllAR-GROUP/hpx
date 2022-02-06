@@ -84,6 +84,7 @@ namespace hpx::execution::experimental {
 
     inline constexpr struct read_t final : hpx::functional::tag<read_t>
     {
+    private:
         template <typename Tag>
         friend constexpr auto tag_invoke(read_t, Tag) noexcept
         {

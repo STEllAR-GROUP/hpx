@@ -7,9 +7,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/queries/read.hpp>
 #include <hpx/execution_base/get_env.hpp>
-#include <hpx/execution_base/read.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/synchronization/stop_token.hpp>
+
+#include <type_traits>
+#include <utility>
 
 namespace hpx::execution::experimental {
 
@@ -33,9 +37,17 @@ namespace hpx::execution::experimental {
     // 3.  execution::get_stop_token() (with no arguments) is expression-
     //     equivalent to execution::read(execution::get_stop_token).
     //
-    inline constexpr struct get_stop_token_t final
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct get_stop_token_t final
       : hpx::functional::detail::tag_fallback<get_stop_token_t>
     {
+    private:
+        template <typename Env>
+        friend inline constexpr auto tag_fallback_invoke(
+            get_stop_token_t, Env&&) noexcept
+        {
+            return hpx::experimental::never_stop_token();
+        }
+
         friend inline constexpr auto tag_fallback_invoke(
             get_stop_token_t) noexcept;
 
@@ -45,4 +57,11 @@ namespace hpx::execution::experimental {
     {
         return hpx::execution::experimental::read(get_stop_token);
     }
+
+    // Helper template allowing to exptract the type of a stop_token
+    // extracted from a receiver environment.
+    template <typename T>
+    using stop_token_of_t = std::remove_cv_t<
+        std::remove_reference_t<decltype(get_stop_token(std::declval<T>()))>>;
+
 }    // namespace hpx::execution::experimental

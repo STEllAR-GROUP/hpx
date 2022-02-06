@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/queries/read.hpp>
 #include <hpx/execution_base/get_env.hpp>
-#include <hpx/execution_base/read.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 
 namespace hpx::execution::experimental {
@@ -34,6 +34,7 @@ namespace hpx::execution::experimental {
     inline constexpr struct get_allocator_t final
       : hpx::functional::detail::tag_fallback<get_allocator_t>
     {
+    private:
         friend inline constexpr auto tag_fallback_invoke(
             get_allocator_t) noexcept;
 

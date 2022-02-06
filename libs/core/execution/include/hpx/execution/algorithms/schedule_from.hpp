@@ -12,6 +12,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
+#include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -170,6 +171,15 @@ namespace hpx { namespace execution { namespace experimental {
                         r.op_state.set_value_predecessor_sender(
                             HPX_FORWARD(Ts, ts)...);
                     }
+
+                    // Pass through the get_env receiver query
+                    friend auto tag_invoke(
+                        get_env_t, predecessor_sender_receiver const& r)
+                        -> env_of_t<std::decay_t<Receiver>>
+                    {
+                        return hpx::execution::experimental::get_env(
+                            r.op_state.receiver);
+                    }
                 };
 
                 template <typename Error>
@@ -237,6 +247,14 @@ namespace hpx { namespace execution { namespace experimental {
                         set_value_t, scheduler_sender_receiver&& r) noexcept
                     {
                         r.op_state.set_value_scheduler_sender();
+                    }
+
+                    // Pass through the get_env receiver query
+                    friend auto tag_invoke(
+                        get_env_t, scheduler_sender_receiver const& r)
+                        -> env_of_t<std::decay_t<Receiver>>
+                    {
+                        return get_env(r.op_state.receiver);
                     }
                 };
 
