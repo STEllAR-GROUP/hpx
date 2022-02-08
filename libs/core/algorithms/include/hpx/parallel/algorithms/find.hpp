@@ -963,7 +963,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::find
+    // CPO for hpx::find
     inline constexpr struct find_t final
       : hpx::detail::tag_parallel_algorithm<find_t>
     {
@@ -1010,7 +1010,7 @@ namespace hpx {
     } find{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::find_if
+    // CPO for hpx::find_if
     inline constexpr struct find_if_t final
       : hpx::detail::tag_parallel_algorithm<find_if_t>
     {
@@ -1061,7 +1061,7 @@ namespace hpx {
     } find_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::find_if_not
+    // CPO for hpx::find_if_not
     inline constexpr struct find_if_not_t final
       : hpx::detail::tag_parallel_algorithm<find_if_not_t>
     {
@@ -1112,7 +1112,7 @@ namespace hpx {
     } find_if_not{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::find_end
+    // CPO for hpx::find_end
     inline constexpr struct find_end_t final
       : hpx::detail::tag_parallel_algorithm<find_end_t>
     {
@@ -1223,7 +1223,7 @@ namespace hpx {
     } find_end{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::find_first_of
+    // CPO for hpx::find_first_of
     inline constexpr struct find_first_of_t final
       : hpx::detail::tag_parallel_algorithm<find_first_of_t>
     {
