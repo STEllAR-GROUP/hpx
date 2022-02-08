@@ -77,7 +77,7 @@ void test_for_loop_exception(ExPolicy&& policy)
     bool caught_exception = false;
     try
     {
-        hpx::ranges::for_loop(
+        hpx::ranges::experimental::for_loop(
             std::forward<ExPolicy>(policy), c, throw_always(dis(gen)));
 
         HPX_TEST(false);
@@ -107,7 +107,7 @@ void test_for_loop_exception_async(ExPolicy&& p)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::ranges::for_loop(
+        auto f = hpx::ranges::experimental::for_loop(
             std::forward<ExPolicy>(p), c, throw_always(dis(gen)));
         returned_from_algorithm = true;
         f.get();
@@ -143,7 +143,7 @@ void test_for_loop_bad_alloc(ExPolicy policy)
     bool caught_exception = false;
     try
     {
-        hpx::ranges::for_loop(
+        hpx::ranges::experimental::for_loop(
             std::forward<ExPolicy>(policy), c, throw_bad_alloc(dis(gen)));
 
         HPX_TEST(false);
@@ -172,7 +172,7 @@ void test_for_loop_bad_alloc_async(ExPolicy p)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::ranges::for_loop(
+        auto f = hpx::ranges::experimental::for_loop(
             std::forward<ExPolicy>(p), c, throw_bad_alloc(dis(gen)));
         returned_from_algorithm = true;
         f.get();

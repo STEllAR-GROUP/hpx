@@ -53,9 +53,9 @@ hpx::future<void> send_async(
 {
     using buffer_type = hpx::serialization::serialize_buffer<char>;
 
-    using hpx::for_loop;
     using hpx::execution::par;
     using hpx::execution::task;
+    using hpx::experimental::for_loop;
 
     return for_loop(par(task), 0, window_size, [dest, size](std::uint64_t) {
         // Note: The original benchmark uses MPI_Isend which does not
@@ -76,8 +76,8 @@ HPX_PLAIN_DIRECT_ACTION(irecv)
 ///////////////////////////////////////////////////////////////////////////////
 void recv_async(hpx::id_type dest, std::size_t size, std::size_t window_size)
 {
-    using hpx::for_loop;
     using hpx::execution::par;
+    using hpx::experimental::for_loop;
 
     for_loop(par, 0, window_size, [dest, size](std::uint64_t) {
         irecv_action recv;

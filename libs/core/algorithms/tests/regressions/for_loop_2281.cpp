@@ -21,7 +21,7 @@ int hpx_main()
     hpx::lcos::local::spinlock mtx;
     std::set<hpx::thread::id> thread_ids;
 
-    hpx::for_loop(hpx::execution::par, 0, 100, [&](int) {
+    hpx::experimental::for_loop(hpx::execution::par, 0, 100, [&](int) {
         std::lock_guard<hpx::lcos::local::spinlock> l(mtx);
         thread_ids.insert(hpx::this_thread::get_id());
     });
@@ -30,7 +30,7 @@ int hpx_main()
 
     thread_ids.clear();
 
-    hpx::for_loop_n(hpx::execution::par, 0, 100, [&](int) {
+    hpx::experimental::for_loop_n(hpx::execution::par, 0, 100, [&](int) {
         std::lock_guard<hpx::lcos::local::spinlock> l(mtx);
         thread_ids.insert(hpx::this_thread::get_id());
     });

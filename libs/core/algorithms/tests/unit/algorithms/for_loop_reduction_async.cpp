@@ -36,10 +36,10 @@ void test_for_loop_reduction_plus(ExPolicy&& policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t sum = 0;
-    auto f =
-        hpx::for_loop(std::forward<ExPolicy>(policy), iterator(std::begin(c)),
-            iterator(std::end(c)), hpx::parallel::reduction_plus(sum),
-            [](iterator it, std::size_t& sum) { sum += *it; });
+    auto f = hpx::experimental::for_loop(std::forward<ExPolicy>(policy),
+        iterator(std::begin(c)), iterator(std::end(c)),
+        hpx::experimental::reduction_plus(sum),
+        [](iterator it, std::size_t& sum) { sum += *it; });
     f.wait();
 
     // verify values
@@ -61,10 +61,10 @@ void test_for_loop_reduction_multiplies(ExPolicy&& policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t prod = 0;
-    auto f =
-        hpx::for_loop(std::forward<ExPolicy>(policy), iterator(std::begin(c)),
-            iterator(std::end(c)), hpx::parallel::reduction_multiplies(prod),
-            [](iterator it, std::size_t& prod) { prod *= *it; });
+    auto f = hpx::experimental::for_loop(std::forward<ExPolicy>(policy),
+        iterator(std::begin(c)), iterator(std::end(c)),
+        hpx::experimental::reduction_multiplies(prod),
+        [](iterator it, std::size_t& prod) { prod *= *it; });
     f.wait();
 
     // verify values
@@ -87,12 +87,12 @@ void test_for_loop_reduction_min(ExPolicy&& policy, IteratorTag)
 
     std::size_t minval = c[0];
 
-    auto f =
-        hpx::for_loop(std::forward<ExPolicy>(policy), iterator(std::begin(c)),
-            iterator(std::end(c)), hpx::parallel::reduction_min(minval),
-            [](iterator it, std::size_t& minval) {
-                minval = (std::min)(minval, *it);
-            });
+    auto f = hpx::experimental::for_loop(std::forward<ExPolicy>(policy),
+        iterator(std::begin(c)), iterator(std::end(c)),
+        hpx::experimental::reduction_min(minval),
+        [](iterator it, std::size_t& minval) {
+            minval = (std::min)(minval, *it);
+        });
     f.wait();
 
     // verify values
@@ -134,8 +134,8 @@ void test_for_loop_reduction_bit_and_idx(ExPolicy&& policy)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t bits = ~std::size_t(0);
-    auto f = hpx::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
-        hpx::parallel::reduction_bit_and(bits),
+    auto f = hpx::experimental::for_loop(std::forward<ExPolicy>(policy), 0,
+        c.size(), hpx::experimental::reduction_bit_and(bits),
         [&c](std::size_t i, std::size_t& bits) { bits &= c[i]; });
     f.wait();
 
@@ -155,8 +155,8 @@ void test_for_loop_reduction_bit_or_idx(ExPolicy&& policy)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t bits = 0;
-    auto f = hpx::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
-        hpx::parallel::reduction_bit_or(bits),
+    auto f = hpx::experimental::for_loop(std::forward<ExPolicy>(policy), 0,
+        c.size(), hpx::experimental::reduction_bit_or(bits),
         [&c](std::size_t i, std::size_t& bits) { bits |= c[i]; });
     f.wait();
 

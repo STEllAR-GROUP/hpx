@@ -225,7 +225,7 @@ int hpx_main()
     auto exec = executor_example::make_executor_with_thread_hooks(
         hpx::execution::par.executor(), on_start, on_stop);
 
-    hpx::for_loop(
+    hpx::experimental::for_loop(
         hpx::execution::par.on(exec), 0, v.size(), [](std::size_t) {});
 
     std::cout << "Executed " << starts.load() << " starts and " << stops.load()

@@ -72,10 +72,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
     hpx::ranges::generate(B, generator);
 
     // Perform matrix multiplication
-    hpx::for_loop(hpx::execution::par, 0, rowsA, [&](auto i) {
-        hpx::for_loop(0, colsB, [&](auto j) {
+    hpx::experimental::for_loop(hpx::execution::par, 0, rowsA, [&](auto i) {
+        hpx::experimental::for_loop(0, colsB, [&](auto j) {
             R[i * colsR + j] = 0;
-            hpx::for_loop(0, rowsB, [&](auto k) {
+            hpx::experimental::for_loop(0, rowsB, [&](auto k) {
                 R[i * colsR + j] += A[i * colsA + k] * B[k * colsB + j];
             });
         });

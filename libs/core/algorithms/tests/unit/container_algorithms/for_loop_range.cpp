@@ -34,7 +34,7 @@ void test_for_loop(ExPolicy&& policy)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::ranges::for_loop(
+    hpx::ranges::experimental::for_loop(
         std::forward<ExPolicy>(policy), c, [](iterator it) { *it = 42; });
 
     // verify values
@@ -54,7 +54,7 @@ void test_for_loop_async(ExPolicy&& p)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    auto f = hpx::ranges::for_loop(
+    auto f = hpx::ranges::experimental::for_loop(
         std::forward<ExPolicy>(p), c, [](iterator it) { *it = 42; });
     f.wait();
 
