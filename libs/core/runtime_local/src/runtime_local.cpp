@@ -212,7 +212,7 @@ namespace hpx {
         hpx::threads::coroutines::exception_verbosity = 0;
 #if defined(HPX_HAVE_STACKTRACES) && defined(HPX_HAVE_THREAD_BACKTRACE_DEPTH)
         hpx::threads::coroutines::exception_verbosity =
-            util::from_string<std::size_t>(get_config_entry(
+            util::from_string<int>(get_config_entry(
                 "hpx.trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH));
 #endif
 
