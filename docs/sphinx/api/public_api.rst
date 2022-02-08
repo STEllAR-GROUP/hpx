@@ -416,11 +416,11 @@ Functions
 
 - :cpp:func:`hpx::annotated_function`
 - :cpp:func:`hpx::bind`
-- :cpp:func:`hpx::bind_back`
+- :cpp:func:`hpx::experimental::bind_back`
 - :cpp:func:`hpx::bind_front`
-- :cpp:func:`hpx::util::invoke`
+- :cpp:func:`hpx::invoke`
 - :cpp:func:`hpx::util::invoke_fused`
-- :cpp:func:`hpx::util::mem_fn`
+- :cpp:func:`hpx::mem_fn`
 
 Header ``hpx/future.hpp``
 =========================
@@ -662,7 +662,7 @@ Header ``hpx/local/optional.hpp``
 =================================
 
 Corresponds to the C++ standard library header :cppreference-header:`optional`.
-:cpp:type:`hpx::util::optional` is compatible with ``std::optional``.
+:cpp:type:`hpx::optional` is compatible with ``std::optional``.
 
 Constants
 ---------
