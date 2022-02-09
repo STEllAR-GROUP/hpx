@@ -8,12 +8,13 @@ from docutils import nodes
 
 def setup(app):
     app.add_role('hpx-issue', autolink('https://github.com/STEllAR-GROUP/hpx/issues/%s', "Issue #"))
-    app.add_role('hpx-header', autolink_file('http://github.com/STEllAR-GROUP/hpx/blob/%s/%s/%s'))
+    app.add_role('hpx-header', autolink_hpx_file('http://github.com/STEllAR-GROUP/hpx/blob/%s/%s/%s'))
     app.add_role('hpx-pr', autolink('https://github.com/STEllAR-GROUP/hpx/pull/%s', "PR #"))
     app.add_role('cppreference-header', autolink('http://en.cppreference.com/w/cpp/header/%s'))
     app.add_role('cppreference-algorithm', autolink('http://en.cppreference.com/w/cpp/algorithm/%s'))
     app.add_role('cppreference-memory', autolink('http://en.cppreference.com/w/cpp/memory/%s'))
     app.add_role('cppreference-container', autolink('http://en.cppreference.com/w/cpp/container/%s'))
+    app.add_role('cppreference-generic', autolink_generic('http://en.cppreference.com/w/cpp/%s/%s'))
 
 def autolink(pattern, prefix=''):
     def role(name, rawtext, text, lineno, inliner, options={}, content=[]):
@@ -24,11 +25,27 @@ def autolink(pattern, prefix=''):
 
 # The text in the rst file should be:
 # :hpx-header:`base_path,file_name`
-def autolink_file(pattern):
+def autolink_hpx_file(pattern):
     def role(name, rawtext, text, lineno, inliner, options={}, content=[]):
-        test_parts = text.split(',')
+        text_parts = [p.strip() for p in text.split(',')]
         commit = inliner.document.settings.env.app.config.html_context['fullcommit']
-        url = pattern % (commit, test_parts[0], test_parts[1])
-        node = nodes.reference(rawtext, test_parts[1], refuri=url, **options)
+        if len(text_parts) >= 2:
+            url = pattern % (commit, text_parts[0], text_parts[1])
+        else:
+            url = pattern % (commit, text_parts[0], text_parts[0])
+        node = nodes.reference(rawtext, text_parts[1], refuri=url, **options)
+        return [node], []
+    return role
+
+# The text in the rst file should be:
+# :cppreference-generic:`base_path,typename`, for instance `thread,barrier`
+def autolink_generic(pattern):
+    def role(name, rawtext, text, lineno, inliner, options={}, content=[]):
+        text_parts = [p.strip() for p in text.split(',')]
+        if len(text_parts) >= 2:
+            url = pattern % (text_parts[0], text_parts[1])
+        else:
+            url = pattern % (text_parts[0], text_parts[0])
+        node = nodes.reference(rawtext, "std::" + text_parts[1], refuri=url, **options)
         return [node], []
     return role

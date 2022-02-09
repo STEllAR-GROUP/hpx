@@ -571,8 +571,8 @@ html_theme_options = {'logo_only': True}
 # of the sidebar.
 html_logo = '_static/images/HPX_STELLAR_blue.png'
 
-#  The name of an image file (relative to this directory) to place at the top
-# of the brower page.
+# The name of an image file (relative to this directory) to place at the top
+# of the browser page.
 html_favicon = '_static/images/favicon.png'
 
 # Add any paths that contain custom static files (such as style sheets) here,
