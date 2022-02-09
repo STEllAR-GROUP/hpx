@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 //  Copyright (c) 2019 Tianyi Zhang
 //
@@ -75,7 +75,8 @@ int hpx_main(variables_map& vm)
             register_work(data);
         }
 
-        b.wait();    // wait for all threads to enter the barrier
+        // wait for all threads to enter the barrier
+        b.wait();
         HPX_TEST_EQ(pxthreads, c);
     }
 

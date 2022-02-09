@@ -41,7 +41,7 @@ namespace hpx { namespace lcos { namespace local {
     struct spmd_block
     {
     private:
-        using barrier_type = hpx::lcos::local::barrier;
+        using barrier_type = hpx::barrier<>;
         using table_type =
             std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
         using mutex_type = hpx::lcos::local::mutex;
@@ -78,7 +78,7 @@ namespace hpx { namespace lcos { namespace local {
 
         void sync_all() const
         {
-            barrier_.get().wait();
+            barrier_.get().arrive_and_wait();
         }
 
         void sync_images(std::set<std::size_t> const& images) const
@@ -104,7 +104,7 @@ namespace hpx { namespace lcos { namespace local {
 
             if (images.find(image_id_) != images.end())
             {
-                it->second->wait();
+                it->second->arrive_and_wait();
             }
         }
 
@@ -146,7 +146,7 @@ namespace hpx { namespace lcos { namespace local {
         struct spmd_block_helper
         {
         private:
-            using barrier_type = hpx::lcos::local::barrier;
+            using barrier_type = hpx::barrier<>;
             using table_type =
                 std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
             using mutex_type = hpx::lcos::local::mutex;
@@ -181,7 +181,7 @@ namespace hpx { namespace lcos { namespace local {
         using ftype = typename std::decay<F>::type;
         using first_type = typename hpx::util::first_argument<ftype>::type;
 
-        using barrier_type = hpx::lcos::local::barrier;
+        using barrier_type = hpx::barrier<>;
         using table_type =
             std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
         using mutex_type = hpx::lcos::local::mutex;
@@ -215,7 +215,7 @@ namespace hpx { namespace lcos { namespace local {
         using ftype = typename std::decay<F>::type;
         using first_type = typename hpx::util::first_argument<ftype>::type;
 
-        using barrier_type = hpx::lcos::local::barrier;
+        using barrier_type = hpx::barrier<>;
         using table_type =
             std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
         using mutex_type = hpx::lcos::local::mutex;

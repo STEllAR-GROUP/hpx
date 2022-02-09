@@ -27,23 +27,23 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx { namespace distributed { namespace detail {
 
     struct HPX_EXPORT barrier_node;
-}}}    // namespace hpx::lcos::detail
+}}}    // namespace hpx::distributed::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits {
     template <>
-    struct managed_component_dtor_policy<lcos::detail::barrier_node>
+    struct managed_component_dtor_policy<hpx::distributed::detail::barrier_node>
     {
         typedef managed_object_is_lifetime_controlled type;
     };
 }}    // namespace hpx::traits
 
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx { namespace distributed { namespace detail {
 
-    struct barrier_node : base_lco
+    struct barrier_node : hpx::lcos::base_lco
     {
         typedef components::managed_component<barrier_node> wrapping_type;
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -73,7 +73,7 @@ namespace hpx { namespace lcos { namespace detail {
     private:
         hpx::lcos::local::promise<void> gather_promise_;
         hpx::lcos::local::promise<void> broadcast_promise_;
-        hpx::lcos::local::barrier local_barrier_;
+        hpx::barrier<> local_barrier_;
 
         template <typename This>
         hpx::future<void> do_wait(This this_, hpx::future<void> future);
@@ -102,9 +102,10 @@ namespace hpx { namespace lcos { namespace detail {
             }
         }
     };
-}}}    // namespace hpx::lcos::detail
+}}}    // namespace hpx::distributed::detail
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::detail::barrier_node::gather_action, barrier_node_gather_action)
+    hpx::distributed::detail::barrier_node::gather_action,
+    barrier_node_gather_action)
 
 #include <hpx/config/warnings_suffix.hpp>

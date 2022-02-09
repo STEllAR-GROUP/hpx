@@ -504,7 +504,7 @@ void test_write(
     //
     DEBUG_OUTPUT(1, "Entering Barrier at start of write on rank " << rank);
     //
-    hpx::lcos::barrier::synchronize();
+    hpx::distributed::barrier::synchronize();
     //
     DEBUG_OUTPUT(1, "Passed Barrier at start of write on rank " << rank);
     //
@@ -668,7 +668,7 @@ void test_write(
     DEBUG_OUTPUT(2, "Exited iterations loop on rank " << rank);
 
     hpx::util::simple_profiler prof_barrier(level1, "Final Barrier");
-    hpx::lcos::barrier::synchronize();
+    hpx::distributed::barrier::synchronize();
     //
     uint64_t active_ranks = options.all2all ? nranks : 1;
     double writeMB   = static_cast<double>
@@ -728,7 +728,7 @@ void test_read(
     //
     DEBUG_OUTPUT(1, "Entering Barrier at start of read on rank " << rank);
     //
-    hpx::lcos::barrier::synchronize();
+    hpx::distributed::barrier::synchronize();
     //
     DEBUG_OUTPUT(1, "Passed Barrier at start of read on rank " << rank);
     //
@@ -884,7 +884,7 @@ void test_read(
             << " Move time " << movetime
         );
     }
-    hpx::lcos::barrier::synchronize();
+    hpx::distributed::barrier::synchronize();
     //
     if (rank==0) std::cout << std::endl;
     //

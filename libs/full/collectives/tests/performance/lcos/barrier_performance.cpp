@@ -21,7 +21,7 @@ double shutdown_start = 0.0;
 
 void global_barrier()
 {
-    hpx::lcos::barrier b("new_global_barrier");
+    hpx::distributed::barrier b("new_global_barrier");
 
     hpx::chrono::high_resolution_timer t;
     for (std::size_t i = 0; i != iterations; ++i)

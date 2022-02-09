@@ -23,7 +23,7 @@
 void barrier_test(
     std::size_t num, std::size_t rank, std::atomic<std::size_t>& c)
 {
-    hpx::lcos::barrier b(
+    hpx::distributed::barrier b(
         hpx::util::format("local_barrier_test_{}", hpx::get_locality_id()), num,
         rank);
     ++c;
@@ -52,7 +52,7 @@ void local_tests(hpx::program_options::variables_map& vm)
             hpx::async(&barrier_test, pxthreads + 1, j, std::ref(c));
         }
 
-        hpx::lcos::barrier b(
+        hpx::distributed::barrier b(
             hpx::util::format("local_barrier_test_{}", hpx::get_locality_id()),
             pxthreads + 1, 0);
         b.wait();    // wait for all threads to enter the barrier
@@ -70,7 +70,7 @@ void remote_test_multiple(hpx::program_options::variables_map& vm)
 
     char const* const barrier_test_name = "/test/barrier/multiple";
 
-    hpx::lcos::barrier b(barrier_test_name);
+    hpx::distributed::barrier b(barrier_test_name);
     for (std::size_t i = 0; i != iterations; ++i)
         b.wait();
 }
@@ -86,12 +86,12 @@ void remote_test_single(hpx::program_options::variables_map& vm)
         iterations = vm["iterations"].as<std::size_t>();
 
     char const* const barrier_test_name_outer = "/test/barrier/single_outer";
-    hpx::lcos::barrier outer(barrier_test_name_outer);
+    hpx::distributed::barrier outer(barrier_test_name_outer);
 
     char const* const barrier_test_name = "/test/barrier/single";
     for (std::size_t i = 0; i != iterations; ++i)
     {
-        hpx::lcos::barrier b(barrier_test_name);
+        hpx::distributed::barrier b(barrier_test_name);
         b.wait();
 
         outer.wait();
