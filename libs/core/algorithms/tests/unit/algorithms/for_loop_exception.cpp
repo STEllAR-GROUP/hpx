@@ -80,8 +80,9 @@ void test_for_loop_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::for_loop(std::forward<ExPolicy>(policy), iterator(std::begin(c)),
-            iterator(std::end(c)), throw_always(dis(gen)));
+        hpx::experimental::for_loop(std::forward<ExPolicy>(policy),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            throw_always(dis(gen)));
 
         HPX_TEST(false);
     }
@@ -113,9 +114,9 @@ void test_for_loop_exception_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f =
-            hpx::for_loop(std::forward<ExPolicy>(p), iterator(std::begin(c)),
-                iterator(std::end(c)), throw_always(dis(gen)));
+        auto f = hpx::experimental::for_loop(std::forward<ExPolicy>(p),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            throw_always(dis(gen)));
         returned_from_algorithm = true;
         f.get();
 
@@ -153,8 +154,9 @@ void test_for_loop_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::for_loop(std::forward<ExPolicy>(policy), iterator(std::begin(c)),
-            iterator(std::end(c)), throw_bad_alloc(dis(gen)));
+        hpx::experimental::for_loop(std::forward<ExPolicy>(policy),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            throw_bad_alloc(dis(gen)));
 
         HPX_TEST(false);
     }
@@ -185,9 +187,9 @@ void test_for_loop_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f =
-            hpx::for_loop(std::forward<ExPolicy>(p), iterator(std::begin(c)),
-                iterator(std::end(c)), throw_bad_alloc(dis(gen)));
+        auto f = hpx::experimental::for_loop(std::forward<ExPolicy>(p),
+            iterator(std::begin(c)), iterator(std::end(c)),
+            throw_bad_alloc(dis(gen)));
         returned_from_algorithm = true;
         f.get();
 
@@ -249,7 +251,7 @@ void test_for_loop_idx_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
+        hpx::experimental::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
             throw_always(dis(gen)));
 
         HPX_TEST(false);
@@ -279,7 +281,7 @@ void test_for_loop_idx_exception_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::for_loop(
+        auto f = hpx::experimental::for_loop(
             std::forward<ExPolicy>(p), 0, c.size(), throw_always(dis(gen)));
         returned_from_algorithm = true;
         f.get();
@@ -315,7 +317,7 @@ void test_for_loop_idx_bad_alloc(ExPolicy&& policy)
     bool caught_exception = false;
     try
     {
-        hpx::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
+        hpx::experimental::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
             throw_bad_alloc(dis(gen)));
 
         HPX_TEST(false);
@@ -344,7 +346,7 @@ void test_for_loop_idx_bad_alloc_async(ExPolicy&& p)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::for_loop(
+        auto f = hpx::experimental::for_loop(
             std::forward<ExPolicy>(p), 0, c.size(), throw_bad_alloc(dis(gen)));
         returned_from_algorithm = true;
         f.get();

@@ -35,8 +35,8 @@ void test_for_loop_reduction_plus(ExPolicy&& policy)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t sum = 0;
-    hpx::ranges::for_loop(std::forward<ExPolicy>(policy), c,
-        hpx::parallel::reduction_plus(sum),
+    hpx::ranges::experimental::for_loop(std::forward<ExPolicy>(policy), c,
+        hpx::experimental::reduction_plus(sum),
         [](iterator it, std::size_t& sum) { sum += *it; });
 
     // verify values
@@ -57,8 +57,8 @@ void test_for_loop_reduction_multiplies(ExPolicy&& policy)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t prod = 0;
-    hpx::ranges::for_loop(std::forward<ExPolicy>(policy), c,
-        hpx::parallel::reduction_multiplies(prod),
+    hpx::ranges::experimental::for_loop(std::forward<ExPolicy>(policy), c,
+        hpx::experimental::reduction_multiplies(prod),
         [](iterator it, std::size_t& prod) { prod *= *it; });
 
     // verify values
@@ -80,8 +80,8 @@ void test_for_loop_reduction_min(ExPolicy&& policy)
 
     std::size_t minval = c[0];
 
-    hpx::ranges::for_loop(std::forward<ExPolicy>(policy), c,
-        hpx::parallel::reduction_min(minval),
+    hpx::ranges::experimental::for_loop(std::forward<ExPolicy>(policy), c,
+        hpx::experimental::reduction_min(minval),
         [](iterator it, std::size_t& minval) {
             minval = (std::min)(minval, *it);
         });

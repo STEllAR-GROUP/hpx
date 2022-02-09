@@ -67,7 +67,7 @@ template <typename T>
 void matrixMulCPU(T* C, const T* A, const T* B, unsigned int hA,
     unsigned int wA, unsigned int wB)
 {
-    hpx::for_loop(hpx::execution::par, 0, hA, [&](int i) {
+    hpx::experimental::for_loop(hpx::execution::par, 0, hA, [&](int i) {
         for (unsigned int j = 0; j < wB; ++j)
         {
             T sum = 0;
@@ -92,7 +92,7 @@ inline bool compare_L2_err(const float* reference, const float* data,
     float error = 0;
     float ref = 0;
 
-    hpx::for_loop(hpx::execution::par, 0, len, [&](int i) {
+    hpx::experimental::for_loop(hpx::execution::par, 0, len, [&](int i) {
         float diff = reference[i] - data[i];
         error += diff * diff;
         ref += reference[i] * reference[i];

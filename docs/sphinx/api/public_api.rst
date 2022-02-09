@@ -11,8 +11,8 @@
 Public API
 ==========
 
-Our API is semantically conforming; hence, the reader is highly encouraged to refer to the 
-corresponding facility in the `C++ Standard <https://en.cppreference.com/w/cpp/header>`_ if 
+Our API is semantically conforming; hence, the reader is highly encouraged to refer to the
+corresponding facility in the `C++ Standard <https://en.cppreference.com/w/cpp/header>`_ if
 needed. All names below are also available in the top-level ``hpx`` namespace unless
 otherwise noted. The names in ``hpx`` should be preferred. The names in
 sub-namespaces will eventually be removed.
@@ -21,8 +21,8 @@ Header ``hpx/algorithm.hpp``
 ============================
 
 This header includes :ref:`public_api_header_hpx_local_algorithm` and contains
-overloads of the algorithms for segmented iterators. For more information you can refer to the 
-`C++ Standard algorithms library <https://en.cppreference.com/w/cpp/algorithm>`_. 
+overloads of the algorithms for segmented iterators. For more information you can refer to the
+`C++ Standard algorithms library <https://en.cppreference.com/w/cpp/algorithm>`_.
 
 .. _public_api_header_hpx_local_algorithm:
 
@@ -36,8 +36,8 @@ algorithms.
 Classes
 -------
 
-- :cpp:class:`hpx::parallel::v2::reduction`
-- :cpp:class:`hpx::parallel::v2::induction`
+- :cpp:class:`hpx::experimental::reduction`
+- :cpp:class:`hpx::experimental::induction`
 
 Functions
 ---------
@@ -112,10 +112,10 @@ Functions
 - :cpp:func:`hpx::transform`
 - :cpp:func:`hpx::unique`
 - :cpp:func:`hpx::unique_copy`
-- :cpp:func:`hpx::for_loop`
-- :cpp:func:`hpx::for_loop_strided`
-- :cpp:func:`hpx::for_loop_n`
-- :cpp:func:`hpx::for_loop_n_strided`
+- :cpp:func:`hpx::experimental::for_loop`
+- :cpp:func:`hpx::experimental::for_loop_strided`
+- :cpp:func:`hpx::experimental::for_loop_n`
+- :cpp:func:`hpx::experimental::for_loop_n_strided`
 
 - :cpp:func:`hpx::ranges::adjacent_find`
 - :cpp:func:`hpx::ranges::all_of`
@@ -167,8 +167,8 @@ Functions
 - :cpp:func:`hpx::ranges::swap_ranges`
 - :cpp:func:`hpx::ranges::unique`
 - :cpp:func:`hpx::ranges::unique_copy`
-- :cpp:func:`hpx::ranges::for_loop`
-- :cpp:func:`hpx::ranges::for_loop_strided`
+- :cpp:func:`hpx::ranges::experimental::for_loop`
+- :cpp:func:`hpx::ranges::experimental::for_loop_strided`
 
 Header ``hpx/any.hpp``
 ======================

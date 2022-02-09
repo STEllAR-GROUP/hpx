@@ -42,8 +42,8 @@ void test_for_loop_strided(ExPolicy&& policy)
 
     int stride = dis(gen);    //-V103
 
-    hpx::ranges::for_loop_strided(std::forward<ExPolicy>(policy), c, stride,
-        [](iterator it) { *it = 42; });
+    hpx::ranges::experimental::for_loop_strided(std::forward<ExPolicy>(policy),
+        c, stride, [](iterator it) { *it = 42; });
 
     // verify values
     std::size_t count = 0;
@@ -77,7 +77,7 @@ void test_for_loop_strided_async(ExPolicy&& p)
 
     int stride = dis(gen);    //-V103
 
-    auto f = hpx::ranges::for_loop_strided(
+    auto f = hpx::ranges::experimental::for_loop_strided(
         std::forward<ExPolicy>(p), c, stride, [](iterator it) { *it = 42; });
     f.wait();
 

@@ -187,15 +187,15 @@ void measure_sequential_forloop(
         disable_stealing_parameter dsp;
 
         // invoke sequential for_loop
-        hpx::for_loop(hpx::execution::seq.with(dsp),
+        hpx::experimental::for_loop(hpx::execution::seq.with(dsp),
             std::begin(data_representation), std::end(data_representation),
             [](iterator) { worker_timed(delay); });
     }
     else
     {
         // invoke sequential for_loop
-        hpx::for_loop(hpx::execution::seq, std::begin(data_representation),
-            std::end(data_representation),
+        hpx::experimental::for_loop(hpx::execution::seq,
+            std::begin(data_representation), std::end(data_representation),
             [](iterator) { worker_timed(delay); });
     }
 }
@@ -215,14 +215,14 @@ void measure_parallel_forloop(
         disable_stealing_parameter dsp;
 
         // invoke parallel for_loop
-        hpx::for_loop(hpx::execution::par.with(cs, dsp).on(exec),
+        hpx::experimental::for_loop(hpx::execution::par.with(cs, dsp).on(exec),
             std::begin(data_representation), std::end(data_representation),
             [](iterator) { worker_timed(delay); });
     }
     else
     {
         // invoke parallel for_loop
-        hpx::for_loop(hpx::execution::par.with(cs).on(exec),
+        hpx::experimental::for_loop(hpx::execution::par.with(cs).on(exec),
             std::begin(data_representation), std::end(data_representation),
             [](iterator) { worker_timed(delay); });
     }
@@ -244,7 +244,7 @@ hpx::future<void> measure_task_forloop(
         disable_stealing_parameter dsp;
 
         // invoke parallel for_loop
-        return hpx::for_loop(
+        return hpx::experimental::for_loop(
             hpx::execution::par(hpx::execution::task).with(cs, dsp).on(exec),
             std::begin(*data_representation), std::end(*data_representation),
             [](iterator) { worker_timed(delay); })
@@ -253,7 +253,7 @@ hpx::future<void> measure_task_forloop(
     else
     {
         // invoke parallel for_loop
-        return hpx::for_loop(
+        return hpx::experimental::for_loop(
             hpx::execution::par(hpx::execution::task).with(cs).on(exec),
             std::begin(*data_representation), std::end(*data_representation),
             [](iterator) { worker_timed(delay); })

@@ -778,16 +778,16 @@ Parallel algorithms
    * * Name
      * Description
      * In header
-   * * :cpp:func:`hpx::for_loop`
+   * * :cpp:func:`hpx::experimental::for_loop`
      * Implements loop functionality over a range specified by integral or iterator bounds.
      * ``<hpx/algorithm.hpp>``
-   * * :cpp:func:`hpx::for_loop_strided`
+   * * :cpp:func:`hpx::experimental::for_loop_strided`
      * Implements loop functionality over a range specified by integral or iterator bounds.
      * ``<hpx/algorithm.hpp>``
-   * * :cpp:func:`hpx::for_loop_n`
+   * * :cpp:func:`hpx::experimental::for_loop_n`
      * Implements loop functionality over a range specified by integral or iterator bounds.
      * ``<hpx/algorithm.hpp>``
-   * * :cpp:func:`hpx::for_loop_n_strided`
+   * * :cpp:func:`hpx::experimental::for_loop_n_strided`
      * Implements loop functionality over a range specified by integral or iterator bounds.
      * ``<hpx/algorithm.hpp>``
 

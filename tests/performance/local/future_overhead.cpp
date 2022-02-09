@@ -238,7 +238,7 @@ void measure_function_futures_limiting_executor(
     {
         hpx::execution::experimental::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
-        hpx::for_loop(
+        hpx::experimental::for_loop(
             hpx::execution::par.with(fixed), 0, count, [&](std::uint64_t) {
                 hpx::apply(signal_exec, [&]() {
                     null_function();
@@ -305,7 +305,7 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv,
 {
     // start the clock
     high_resolution_timer walltime;
-    hpx::for_loop(
+    hpx::experimental::for_loop(
         hpx::execution::par.on(exec).with(
             hpx::execution::static_chunk_size(1), unlimited_number_of_chunks()),
         0, count, [](std::uint64_t) { null_function(); });
