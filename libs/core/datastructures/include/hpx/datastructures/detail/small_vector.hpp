@@ -33,7 +33,7 @@ namespace hpx::detail {
 namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Allocator>
+    template <typename T, typename Allocator>
     class allocator_memory_resource final : public std::pmr::memory_resource
     {
     public:
@@ -48,9 +48,11 @@ namespace hpx::detail {
             return this == &rhs;
         }
 
+        // Note: the PMR infrastructure calls this with the number of bytes to
+        // allocate but the underlying allocator expects the number of elements
         void* do_allocate(std::size_t count, std::size_t) override
         {
-            return allocator_.allocate(count);
+            return allocator_.allocate((count + sizeof(T) - 1) / sizeof(T));
         }
 
         void do_deallocate(
@@ -59,7 +61,8 @@ namespace hpx::detail {
             using value_type =
                 typename std::allocator_traits<Allocator>::value_type;
 
-            return allocator_.deallocate(static_cast<value_type*>(ptr), count);
+            return allocator_.deallocate(static_cast<value_type*>(ptr),
+                (count + sizeof(T) - 1) / sizeof(T));
         }
 
     public:
@@ -71,32 +74,28 @@ namespace hpx::detail {
     {
         static_assert(Size > 0, "memory_storage::Size must be non-zero");
 
+        static constexpr std::size_t preallocated_size = Size * sizeof(T);
+
         using buffer_resource_type = std::pmr::monotonic_buffer_resource;
         using allocator_type = std::pmr::polymorphic_allocator<T>;
 
         explicit memory_storage(Allocator const& alloc = Allocator()) noexcept(
             noexcept(Allocator()))
-          : memory_()
-          , resource_(alloc)
-          , pool_(
-                std::data(memory_), std::size(memory_) * sizeof(T), &resource_)
+          : resource_(alloc)
+          , pool_(std::data(memory_), preallocated_size, &resource_)
           , allocator_(&pool_)
         {
         }
 
         memory_storage(memory_storage const& rhs)
-          : memory_()    // data will be provided by small_vector ctor
-          , resource_(rhs.resource_)
-          , pool_(
-                std::data(memory_), std::size(memory_) * sizeof(T), &resource_)
+          : resource_(rhs.resource_)
+          , pool_(std::data(memory_), preallocated_size, &resource_)
           , allocator_(&pool_)
         {
         }
         memory_storage(memory_storage&& rhs) noexcept
-          : memory_()    // data will be provided by small_vector ctor
-          , resource_(HPX_MOVE(rhs.resource_))
-          , pool_(
-                std::data(memory_), std::size(memory_) * sizeof(T), &resource_)
+          : resource_(HPX_MOVE(rhs.resource_))
+          , pool_(std::data(memory_), preallocated_size, &resource_)
           , allocator_(&pool_)
         {
         }
@@ -116,11 +115,12 @@ namespace hpx::detail {
 
             // reconstruct the memory management infrastructure
             new (&pool_) buffer_resource_type(
-                std::data(memory_), std::size(memory_) * sizeof(T), &resource_);
+                std::data(memory_), preallocated_size, &resource_);
             new (&allocator_) allocator_type(&pool_);
 
             return *this;
         }
+
         // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
         memory_storage& operator=(memory_storage&& rhs) noexcept
         {
@@ -136,14 +136,14 @@ namespace hpx::detail {
 
             // reconstruct the memory management infrastructure
             new (&pool_) buffer_resource_type(
-                std::data(memory_), std::size(memory_) * sizeof(T), &resource_);
+                std::data(memory_), preallocated_size, &resource_);
             new (&allocator_) allocator_type(&pool_);
 
             return *this;
         }
 
         std::aligned_storage_t<sizeof(T), alignof(T)> memory_[Size];
-        allocator_memory_resource<Allocator> resource_;
+        HPX_NO_UNIQUE_ADDRESS allocator_memory_resource<T, Allocator> resource_;
         buffer_resource_type pool_;
         allocator_type allocator_;
     };
