@@ -35,7 +35,7 @@ namespace hpx { namespace experimental {
         {
             using shared_state_ptr_type =
                 std::shared_ptr<async_rw_mutex_shared_state>;
-            hpx::util::optional<T> value;
+            hpx::optional<T> value;
             shared_state_ptr_type next_state;
             hpx::lcos::local::mutex mtx;
             hpx::detail::small_vector<

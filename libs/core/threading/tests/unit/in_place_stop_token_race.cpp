@@ -84,7 +84,7 @@ void test_callback_unregister()
 
     // register callback that unregisters itself
     bool cb1_called = false;
-    hpx::util::optional<
+    hpx::optional<
         hpx::experimental::in_place_stop_callback<std::function<void()>>>
         cb;
     cb.emplace(stok, [&] {
@@ -112,7 +112,7 @@ void test_callback_unregister()
 ///////////////////////////////////////////////////////////////////////////////
 struct reg_unreg_cb
 {
-    hpx::util::optional<
+    hpx::optional<
         hpx::experimental::in_place_stop_callback<std::function<void()>>>
         cb{};
     bool called = false;
@@ -134,7 +134,7 @@ void test_callback_concurrent_unregister()
     hpx::experimental::in_place_stop_token stok{ssrc.get_token()};
 
     std::atomic<bool> cb1_called{false};
-    hpx::util::optional<
+    hpx::optional<
         hpx::experimental::in_place_stop_callback<std::function<void()>>>
         opt_cb;
 
@@ -164,7 +164,7 @@ void test_callback_concurrent_unregister_other_thread()
     hpx::experimental::in_place_stop_token stok{ssrc.get_token()};
 
     std::atomic<bool> cb1_called{false};
-    hpx::util::optional<
+    hpx::optional<
         hpx::experimental::in_place_stop_callback<std::function<void()>>>
         opt_cb;
 

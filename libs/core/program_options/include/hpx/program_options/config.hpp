@@ -17,5 +17,5 @@ namespace hpx { namespace program_options {
     using any = hpx::any_nonser;
     using hpx::any_cast;
     template <typename T>
-    using optional = hpx::util::optional<T>;
+    using optional = hpx::optional<T>;
 }}    // namespace hpx::program_options

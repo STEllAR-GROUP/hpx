@@ -83,7 +83,7 @@ void test_callback_unregister()
 
     // register callback that unregisters itself
     bool cb1_called = false;
-    hpx::util::optional<hpx::stop_callback<std::function<void()>>> cb;
+    hpx::optional<hpx::stop_callback<std::function<void()>>> cb;
     cb.emplace(stok, [&] {
         cb1_called = true;
         // remove this lambda in optional while being called
@@ -109,7 +109,7 @@ void test_callback_unregister()
 ///////////////////////////////////////////////////////////////////////////////
 struct reg_unreg_cb
 {
-    hpx::util::optional<hpx::stop_callback<std::function<void()>>> cb{};
+    hpx::optional<hpx::stop_callback<std::function<void()>>> cb{};
     bool called = false;
 
     void reg(hpx::stop_token& stok)
@@ -129,7 +129,7 @@ void test_callback_concurrent_unregister()
     hpx::stop_token stok{ssrc.get_token()};
 
     std::atomic<bool> cb1_called{false};
-    hpx::util::optional<hpx::stop_callback<std::function<void()>>> opt_cb;
+    hpx::optional<hpx::stop_callback<std::function<void()>>> opt_cb;
 
     auto cb1 = [&] {
         opt_cb.reset();
@@ -157,7 +157,7 @@ void test_callback_concurrent_unregister_other_thread()
     hpx::stop_token stok{ssrc.get_token()};
 
     std::atomic<bool> cb1_called{false};
-    hpx::util::optional<hpx::stop_callback<std::function<void()>>> opt_cb;
+    hpx::optional<hpx::stop_callback<std::function<void()>>> opt_cb;
 
     auto cb1 = [&] {
         opt_cb.reset();

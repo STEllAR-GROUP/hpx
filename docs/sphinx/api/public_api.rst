@@ -663,19 +663,15 @@ Corresponds to the C++ standard library header :cppreference-header:`optional`.
 Constants
 ---------
 
-- :cpp:var:`hpx::util::nullopt`
+- :cpp:var:`hpx::nullopt`
 
 Classes
 -------
 
-- :cpp:class:`hpx::util::optional`
-- :cpp:class:`hpx::util::nullopt_t`
-- :cpp:class:`hpx::util::bad_optional_access`
+- :cpp:class:`hpx::optional`
+- :cpp:class:`hpx::nullopt_t`
+- :cpp:class:`hpx::bad_optional_access`
 
-Functions
----------
-
-- :cpp:func:`hpx::util::make_optional`
 
 Header ``hpx/runtime.hpp``
 ==========================

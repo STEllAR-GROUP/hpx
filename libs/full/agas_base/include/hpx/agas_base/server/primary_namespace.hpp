@@ -447,7 +447,8 @@ namespace hpx::traits {
             hpx::actions::transfer_base_action<
                 agas::server::primary_namespace::route_action> const& act)
         {
-            return hpx::actions::get<0>(act);
+            auto p = hpx::actions::get<0>(act);
+            return hpx::optional<parcelset::parcel>(HPX_MOVE(p));
         }
     };
 }    // namespace hpx::traits

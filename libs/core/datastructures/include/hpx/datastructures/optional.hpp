@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,28 +10,23 @@
 
 #include <cstddef>
 #include <exception>
+#include <functional>
 #include <new>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx {
+
     struct nullopt_t
     {
         struct init
         {
         };
-        constexpr explicit nullopt_t(nullopt_t::init) {}
+        constexpr explicit nullopt_t(nullopt_t::init) noexcept {}
     };
     constexpr nullopt_t nullopt{nullopt_t::init()};
-
-    struct in_place_t
-    {
-    };
-    constexpr struct in_place_t in_place
-    {
-    };
 
     class bad_optional_access : public std::logic_error
     {
@@ -48,6 +43,7 @@ namespace hpx { namespace util {
     };
 
     namespace _optional_swap {
+
         using std::swap;
 
         template <typename T>
@@ -81,7 +77,7 @@ namespace hpx { namespace util {
             }
         }
         optional(optional&& other) noexcept(
-            std::is_nothrow_move_constructible<T>::value)
+            std::is_nothrow_move_constructible_v<T>)
           : empty_(true)
         {
             if (!other.empty_)
@@ -91,21 +87,42 @@ namespace hpx { namespace util {
             }
         }
 
-        optional(T const& val)
-          : empty_(true)
-        {
-            new (&storage_) T(val);
-            empty_ = false;
-        }
-        optional(T&& val) noexcept(std::is_nothrow_move_constructible<T>::value)
+        template <typename U = T,
+            typename = std::enable_if_t<std::is_constructible_v<T, U&&>>>
+        explicit optional(U&& val) noexcept(
+            std::is_nothrow_move_constructible_v<T>)
           : empty_(true)
         {
             new (&storage_) T(HPX_MOVE(val));
             empty_ = false;
         }
 
+        template <typename U,
+            typename = std::enable_if_t<std::is_constructible_v<T, U const&>>>
+        constexpr optional(optional<U> const& val)
+          : empty_(true)
+        {
+            if (val.has_value())
+            {
+                new (&storage_) T(*val);
+                empty_ = false;
+            }
+        }
+        template <typename U,
+            typename = std::enable_if_t<std::is_constructible_v<T, U&&>>>
+        constexpr optional(optional<U>&& val) noexcept(
+            std::is_nothrow_move_constructible_v<T>)
+          : empty_(true)
+        {
+            if (val.has_value())
+            {
+                new (&storage_) T(HPX_MOVE(*val));
+                empty_ = false;
+            }
+        }
+
         template <typename... Ts>
-        explicit optional(in_place_t, Ts&&... ts)
+        explicit optional(std::in_place_t, Ts&&... ts)
           : empty_(true)
         {
             new (&storage_) T(HPX_FORWARD(Ts, ts)...);
@@ -113,7 +130,8 @@ namespace hpx { namespace util {
         }
 
         template <typename U, typename... Ts>
-        explicit optional(in_place_t, std::initializer_list<U> il, Ts&&... ts)
+        explicit optional(
+            std::in_place_t, std::initializer_list<U> il, Ts&&... ts)
           : empty_(true)
         {
             new (&storage_) T(il, HPX_FORWARD(Ts, ts)...);
@@ -133,8 +151,8 @@ namespace hpx { namespace util {
             return *this;
         }
         optional& operator=(optional&& other) noexcept(
-            std::is_nothrow_move_assignable<T>::value&&
-                std::is_nothrow_move_constructible<T>::value)
+            std::is_nothrow_move_assignable_v<T>&&
+                std::is_nothrow_move_constructible_v<T>)
         {
             if (this == &other)
             {
@@ -164,13 +182,6 @@ namespace hpx { namespace util {
             return *this;
         }
 
-        optional& operator=(T const& other)
-        {
-            optional tmp(other);
-            swap(tmp);
-
-            return *this;
-        }
         optional& operator=(T&& other)
         {
             if (!empty_)
@@ -181,6 +192,25 @@ namespace hpx { namespace util {
 
             new (&storage_) T(HPX_MOVE(other));
             empty_ = false;
+
+            return *this;
+        }
+        template <typename U,
+            typename Enable =
+                std::enable_if_t<std::is_constructible_v<T, U const&>>>
+        optional& operator=(optional<U> const& other)
+        {
+            optional tmp(other);
+            swap(tmp);
+
+            return *this;
+        }
+        template <typename U,
+            typename Enable = std::enable_if_t<std::is_constructible_v<T, U&&>>>
+        optional& operator=(optional<U>&& other)
+        {
+            optional tmp(HPX_MOVE(other));
+            swap(tmp);
 
             return *this;
         }
@@ -206,14 +236,21 @@ namespace hpx { namespace util {
             return reinterpret_cast<T*>(&storage_);
         }
 
-        constexpr T const& operator*() const noexcept
+        constexpr T const& operator*() const& noexcept
         {
             return *reinterpret_cast<T const*>(&storage_);
         }
-
-        T& operator*() noexcept
+        T& operator*() & noexcept
         {
             return *reinterpret_cast<T*>(&storage_);
+        }
+        T&& operator*() && noexcept
+        {
+            return HPX_MOVE(*reinterpret_cast<T*>(&storage_));
+        }
+        T const&& operator*() const&& noexcept
+        {
+            return HPX_MOVE(*reinterpret_cast<T*>(&storage_));
         }
 
         constexpr explicit operator bool() const noexcept
@@ -226,7 +263,16 @@ namespace hpx { namespace util {
             return !empty_;
         }
 
-        T& value()
+        T& value() &
+        {
+            if (empty_)
+            {
+                throw bad_optional_access(
+                    "object is empty during call to 'value()'");
+            }
+            return **this;
+        }
+        T&& value() &&
         {
             if (empty_)
             {
@@ -236,22 +282,38 @@ namespace hpx { namespace util {
             return **this;
         }
 
-        T const& value() const
+        constexpr T const& value() const&
         {
             if (empty_)
             {
                 throw bad_optional_access(
                     "object is empty during call to 'value()'");
             }
-            return **this;
+            return HPX_MOVE(**this);
+        }
+        constexpr T const&& value() const&&
+        {
+            if (empty_)
+            {
+                throw bad_optional_access(
+                    "object is empty during call to 'value()'");
+            }
+            return HPX_MOVE(**this);
         }
 
         template <typename U>
-        constexpr T value_or(U&& value) const
+        constexpr T value_or(U&& value) const&
         {
             if (empty_)
                 return HPX_FORWARD(U, value);
             return **this;
+        }
+        template <typename U>
+        T value_or(U&& value) &&
+        {
+            if (empty_)
+                return HPX_FORWARD(U, value);
+            return HPX_MOVE(**this);
         }
 
         template <typename... Ts>
@@ -282,7 +344,7 @@ namespace hpx { namespace util {
 #endif
 
         void swap(optional& other) noexcept(
-            std::is_nothrow_move_constructible<T>::value&& noexcept(
+            std::is_nothrow_move_constructible_v<T>&& noexcept(
                 _optional_swap::check_swap<T>()))
         {
             // do nothing if both are empty
@@ -290,6 +352,7 @@ namespace hpx { namespace util {
             {
                 return;
             }
+
             // swap content if both are non-empty
             if (!empty_ && !other.empty_)
             {
@@ -309,7 +372,7 @@ namespace hpx { namespace util {
             non_empty->empty_ = true;
         }
 
-        void reset()
+        void reset() noexcept
         {
             if (!empty_)
             {
@@ -318,8 +381,133 @@ namespace hpx { namespace util {
             }
         }
 
+        template <typename F>
+        auto and_then(F&& f) &
+        {
+            if (*this)
+            {
+                // using std::invoke to avoid circular dependencies
+                return std::invoke(HPX_FORWARD(F, f), value());
+            }
+
+            using result_type = std::invoke_result_t<F, decltype(value())>;
+            return std::remove_cv_t<std::remove_reference_t<result_type>>();
+        }
+        template <typename F>
+        constexpr auto and_then(F&& f) const&
+        {
+            if (*this)
+            {
+                // using std::invoke to avoid circular dependencies
+                return std::invoke(HPX_FORWARD(F, f), value());
+            }
+
+            using result_type = std::invoke_result_t<F, decltype(value())>;
+            return std::remove_cv_t<std::remove_reference_t<result_type>>();
+        }
+        template <typename F>
+        auto and_then(F&& f) &&
+        {
+            if (*this)
+            {
+                // using std::invoke to avoid circular dependencies
+                return std::invoke(HPX_FORWARD(F, f), HPX_MOVE(value()));
+            }
+
+            using result_type =
+                std::invoke_result_t<F, decltype(HPX_MOVE(value()))>;
+            return std::remove_cv_t<std::remove_reference_t<result_type>>();
+        }
+        template <typename F>
+        auto and_then(F&& f) const&&
+        {
+            if (*this)
+            {
+                // using std::invoke to avoid circular dependencies
+                return std::invoke(HPX_FORWARD(F, f), HPX_MOVE(value()));
+            }
+
+            using result_type =
+                std::invoke_result_t<F, decltype(HPX_MOVE(value()))>;
+            return std::remove_cv_t<std::remove_reference_t<result_type>>();
+        }
+
+        template <typename F>
+        auto transform(F&& f) &
+        {
+            using result_type = std::invoke_result_t<F, decltype(value())>;
+            if (*this)
+            {
+                // using std::invoke to avoid circular dependencies
+                return optional<result_type>(
+                    std::invoke(HPX_FORWARD(F, f), value()));
+            }
+            return optional<result_type>();
+        }
+        template <typename F>
+        constexpr auto transform(F&& f) const&
+        {
+            using result_type = std::invoke_result_t<F, decltype(value())>;
+            if (*this)
+            {
+                // using std::invoke to avoid circular dependencies
+                return optional<result_type>(
+                    std::invoke(HPX_FORWARD(F, f), value()));
+            }
+            return optional<result_type>();
+        }
+        template <typename F>
+        auto transform(F&& f) &&
+        {
+            using result_type =
+                std::invoke_result_t<F, decltype(HPX_MOVE(value()))>;
+            if (*this)
+            {
+                // using std::invoke to avoid circular dependencies
+                return optional<result_type>(
+                    std::invoke(HPX_FORWARD(F, f), HPX_MOVE(value())));
+            }
+            return optional<result_type>();
+        }
+        template <typename F>
+        auto transform(F&& f) const&&
+        {
+            using result_type =
+                std::invoke_result_t<F, decltype(HPX_MOVE(value()))>;
+            if (*this)
+            {
+                // using std::invoke to avoid circular dependencies
+                return optional<result_type>(
+                    std::invoke(HPX_FORWARD(F, f), HPX_MOVE(value())));
+            }
+            return optional<result_type>();
+        }
+
+        template <typename F,
+            typename = std::enable_if_t<std::is_invocable_v<F> &&
+                std::is_copy_constructible_v<T>>>
+        constexpr optional or_else(F&& f) const&
+        {
+            if (*this)
+            {
+                return *this;
+            }
+            return {HPX_FORWARD(F, f)()};
+        }
+        template <typename F,
+            typename = std::enable_if_t<std::is_invocable_v<F> &&
+                std::is_move_constructible_v<T>>>
+        optional or_else(F&& f) &&
+        {
+            if (*this)
+            {
+                return HPX_MOVE(*this);
+            }
+            return {HPX_FORWARD(F, f)()};
+        }
+
     private:
-        typename std::aligned_storage<sizeof(T), alignof(T)>::type storage_;
+        typename std::aligned_storage_t<sizeof(T), alignof(T)> storage_;
         bool empty_;
     };
 
@@ -514,31 +702,56 @@ namespace hpx { namespace util {
     {
         x.swap(y);
     }
+}    // namespace hpx
+
+namespace hpx::util {
+
+    using nullopt_t HPX_DEPRECATED_V(1, 8,
+        "hpx::util::nullopt_t is deprecated. Please use hpx::nullopt_t "
+        "instead.") = hpx::nullopt_t;
+
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::util::nullopt is deprecated. Please use hpx::nullopt instead.")
+    constexpr hpx::nullopt_t nullopt{hpx::nullopt_t::init()};
+
+    template <typename T>
+    using optional HPX_DEPRECATED_V(1, 8,
+        "hpx::util::optional is deprecated. Please use hpx::optional "
+        "instead.") = hpx::optional<T>;
+
+    using bad_optional_access HPX_DEPRECATED_V(1, 8,
+        "hpx::util::bad_optional_access is deprecated. Please use "
+        "hpx::bad_optional_access instead.") = hpx::bad_optional_access;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    constexpr optional<typename std::decay<T>::type> make_optional(T&& v)
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::util::make_optional is deprecated. Please use hpx::optional "
+        "instead.")
+    constexpr hpx::optional<std::decay_t<T>> make_optional(T&& v)
     {
-        return optional<typename std::decay<T>::type>(HPX_FORWARD(T, v));
+        return hpx::optional<std::decay_t<T>>(HPX_FORWARD(T, v));
     }
 
     template <typename T, typename... Ts>
-    constexpr optional<T> make_optional(Ts&&... ts)
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::util::make_optional is deprecated. Please use hpx::optional "
+        "instead.")
+    constexpr hpx::optional<T> make_optional(Ts&&... ts)
     {
-        return optional<T>(in_place, HPX_FORWARD(Ts, ts)...);
+        return hpx::optional<T>(std::in_place, HPX_FORWARD(Ts, ts)...);
     }
 
     template <typename T, typename U, typename... Ts>
-    constexpr optional<T> make_optional(std::initializer_list<U> il, Ts&&... ts)
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::util::make_optional is deprecated. Please use hpx::optional "
+        "instead.")
+    constexpr hpx::optional<T> make_optional(
+        std::initializer_list<U> il, Ts&&... ts)
     {
-        return optional<T>(in_place, il, HPX_FORWARD(Ts, ts)...);
+        return hpx::optional<T>(std::in_place, il, HPX_FORWARD(Ts, ts)...);
     }
-}}    // namespace hpx::util
-
-namespace hpx {
-
-    using util::optional;
-}    // namespace hpx
+}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace std {
