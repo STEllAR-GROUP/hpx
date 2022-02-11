@@ -4,7 +4,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 
-
 #include <hpx/local/algorithm.hpp>
 #include <hpx/local/execution.hpp>
 #include <hpx/local/init.hpp>
