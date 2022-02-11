@@ -45,9 +45,12 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         using executor_parameters_type = hpx::execution::static_chunk_size;
 
         service_executor(hpx::util::io_service_pool* pool)
+#if defined(HPX_COMPUTE_HOST_CODE)
           : pool_(pool)
+#endif
         {
-            HPX_ASSERT(pool_);
+            (void) pool;
+            HPX_ASSERT(pool);
         }
 
         template <typename F, typename... Ts>
@@ -208,7 +211,9 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             F f_;
         };
 
+#if defined(HPX_COMPUTE_HOST_CODE)
     private:
         hpx::util::io_service_pool* pool_;
+#endif
     };
 }}}}    // namespace hpx::parallel::execution::detail
