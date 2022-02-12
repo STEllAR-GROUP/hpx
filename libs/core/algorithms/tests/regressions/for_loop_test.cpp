@@ -14,8 +14,8 @@
 
 int hpx_main(int argc, char *argv[])
 {
-    int start = 3;
-    int end = 7;
+    int start = 7;
+    int end = 3;
 
     hpx::for_loop(hpx::execution::seq, start, end, [&](int){
         std::cout << "loop running \n";
