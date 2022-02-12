@@ -69,10 +69,14 @@ namespace hpx { namespace cuda { namespace experimental {
             case HIPBLAS_STATUS_INVALID_ENUM:
                 return "HIPBLAS_STATUS_INVALID_ENUM";
 #endif
+            case HIPBLAS_STATUS_UNKNOWN:
+                return "HIPBLAS_STATUS_UNKNOWN";
 #else
             case CUBLAS_STATUS_LICENSE_ERROR:
                 return "CUBLAS_STATUS_LICENSE_ERROR";
 #endif
+            default:
+                break;
             }
             return "<unknown>";
         }
