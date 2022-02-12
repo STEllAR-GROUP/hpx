@@ -21,6 +21,7 @@ set(tests
     transform_inclusive_scan_4786
     transform_inclusive_scan_4787
     ranges_facilities
+    for_loop_test
 )
 
 if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
