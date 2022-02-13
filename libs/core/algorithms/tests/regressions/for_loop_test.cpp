@@ -18,15 +18,15 @@ int hpx_main()
     int start = 7;
     int end = 3;
 
-    hpx::experimental::for_loop(hpx::execution::par, start, end,
+    hpx::for_loop(hpx::execution::par, start, end,
         [&](int) { std::cout << "loop running \n"; });
 
-    return hpx::local::finalize();
+    return hpx::finalize();
 }
 
-int main(int argc, char* argv[])
+int main()
 {
-    hpx::local::init_params init_args;
+    hpx::init_params init_args;
 
-    return hpx::util::report_errors();
+    return hpx::init();
 }
