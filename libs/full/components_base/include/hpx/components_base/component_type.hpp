@@ -12,7 +12,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/components_base/components_base_fwd.hpp>
 #include <hpx/components_base/traits/component_type_database.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 #include <hpx/naming_base/naming_base.hpp>
@@ -95,7 +95,7 @@ namespace hpx { namespace components {
     HPX_EXPORT component_deleter_type& deleter(component_type type);
 
     HPX_EXPORT bool enumerate_instance_counts(
-        util::unique_function_nonser<bool(component_type)> const& f);
+        hpx::move_only_function<bool(component_type)> const& f);
 
     /// \brief Return the string representation for a given component type id
     HPX_EXPORT std::string const get_component_type_name(component_type type);

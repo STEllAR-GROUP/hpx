@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace server {
 
     public:
         typedef util::spinlock mutex_type;
-        typedef util::function_nonser<void(std::string const&)> sink_type;
+        typedef hpx::function<void(std::string const&)> sink_type;
 
         console_error_dispatcher()
           : mtx_()

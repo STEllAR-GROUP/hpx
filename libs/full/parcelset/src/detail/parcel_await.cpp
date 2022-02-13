@@ -31,7 +31,7 @@ namespace hpx::parcelset::detail {
     struct parcel_await_base : std::enable_shared_from_this<Derived>
     {
         using put_parcel_type =
-            hpx::util::unique_function_nonser<void(Parcel&&, Handler&&)>;
+            hpx::move_only_function<void(Parcel&&, Handler&&)>;
 
         parcel_await_base(Parcel&& parcel, Handler&& handler,
             std::uint32_t archive_flags, put_parcel_type pp) noexcept

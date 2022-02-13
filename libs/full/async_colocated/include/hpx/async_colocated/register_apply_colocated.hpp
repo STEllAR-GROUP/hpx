@@ -11,7 +11,7 @@
 #include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/type_support/pack.hpp>
 

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,43 +19,47 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig, bool Serializable = true>
-    class unique_function;
+    template <typename Sig, bool Serializable = false>
+    class move_only_function;
 
     template <typename R, typename... Ts, bool Serializable>
-    class unique_function<R(Ts...), Serializable>
-      : public detail::basic_function<R(Ts...), false, Serializable>
+    class move_only_function<R(Ts...), Serializable>
+      : public util::detail::basic_function<R(Ts...), false, Serializable>
     {
-        using base_type = detail::basic_function<R(Ts...), false, Serializable>;
+        using base_type =
+            util::detail::basic_function<R(Ts...), false, Serializable>;
 
     public:
-        typedef R result_type;
+        using result_type = R;
 
-        constexpr unique_function(std::nullptr_t = nullptr) noexcept {}
+        constexpr move_only_function(std::nullptr_t = nullptr) noexcept {}
 
-        unique_function(unique_function&&) noexcept = default;
-        unique_function& operator=(unique_function&&) noexcept = default;
+        move_only_function(move_only_function const&) = delete;
+        move_only_function(move_only_function&&) noexcept = default;
+        move_only_function& operator=(move_only_function const&) = delete;
+        move_only_function& operator=(move_only_function&&) noexcept = default;
 
         // the split SFINAE prevents MSVC from eagerly instantiating things
-        template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable1 = typename std::enable_if<
-                !std::is_same<FD, unique_function>::value>::type,
+        template <typename F, typename FD = std::decay_t<F>,
+            typename Enable1 =
+                std::enable_if_t<!std::is_same_v<FD, move_only_function>>,
             typename Enable2 =
-                typename std::enable_if<is_invocable_r_v<R, FD&, Ts...>>::type>
-        unique_function(F&& f)
+                std::enable_if_t<is_invocable_r_v<R, FD&, Ts...>>>
+        move_only_function(F&& f)
         {
             assign(HPX_FORWARD(F, f));
         }
 
         // the split SFINAE prevents MSVC from eagerly instantiating things
-        template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable1 = typename std::enable_if<
-                !std::is_same<FD, unique_function>::value>::type,
+        template <typename F, typename FD = std::decay_t<F>,
+            typename Enable1 =
+                std::enable_if_t<!std::is_same_v<FD, move_only_function>>,
             typename Enable2 =
-                typename std::enable_if<is_invocable_r_v<R, FD&, Ts...>>::type>
-        unique_function& operator=(F&& f)
+                std::enable_if_t<is_invocable_r_v<R, FD&, Ts...>>>
+        move_only_function& operator=(F&& f)
         {
             assign(HPX_FORWARD(F, f));
             return *this;
@@ -67,29 +71,41 @@ namespace hpx { namespace util {
         using base_type::reset;
         using base_type::target;
     };
+}    // namespace hpx
+
+namespace hpx::util {
+
+    template <typename Sig, bool Serializable = true>
+    using unique_function HPX_DEPRECATED_V(1, 8,
+        "hpx::util::unique_function is deprecated. Please use "
+        "hpx::move_only_function instead.") =
+        hpx::move_only_function<Sig, Serializable>;
 
     template <typename Sig>
-    using unique_function_nonser = unique_function<Sig, false>;
-}}    // namespace hpx::util
+    using unique_function_nonser HPX_DEPRECATED_V(1, 8,
+        "hpx::util::unique_function_nonser is deprecated. Please use "
+        "hpx::move_only_function instead.") = hpx::move_only_function<Sig>;
+}    // namespace hpx::util
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits {
+
     template <typename Sig, bool Serializable>
-    struct get_function_address<util::unique_function<Sig, Serializable>>
+    struct get_function_address<hpx::move_only_function<Sig, Serializable>>
     {
         static constexpr std::size_t call(
-            util::unique_function<Sig, Serializable> const& f) noexcept
+            hpx::move_only_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_address();
         }
     };
 
     template <typename Sig, bool Serializable>
-    struct get_function_annotation<util::unique_function<Sig, Serializable>>
+    struct get_function_annotation<hpx::move_only_function<Sig, Serializable>>
     {
         static constexpr char const* call(
-            util::unique_function<Sig, Serializable> const& f) noexcept
+            hpx::move_only_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation();
         }
@@ -97,10 +113,11 @@ namespace hpx { namespace traits {
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
     template <typename Sig, bool Serializable>
-    struct get_function_annotation_itt<util::unique_function<Sig, Serializable>>
+    struct get_function_annotation_itt<
+        hpx::move_only_function<Sig, Serializable>>
     {
         static util::itt::string_handle call(
-            util::unique_function<Sig, Serializable> const& f) noexcept
+            hpx::move_only_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation_itt();
         }

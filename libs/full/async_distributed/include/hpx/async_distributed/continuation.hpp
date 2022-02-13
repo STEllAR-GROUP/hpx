@@ -16,7 +16,7 @@
 #include <hpx/async_distributed/continuation_fwd.hpp>
 #include <hpx/async_distributed/trigger_lco_fwd.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/functional/serialization/serializable_unique_function.hpp>
+#include <hpx/functional/serialization/serializable_move_only_function.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
@@ -82,7 +82,7 @@ namespace hpx { namespace actions {
     {
     private:
         using function_type =
-            util::unique_function<void(naming::id_type, Result)>;
+            hpx::move_only_function<void(naming::id_type, Result), true>;
 
     public:
         using result_type = Result;
@@ -202,7 +202,7 @@ namespace hpx { namespace actions {
     private:
         using base_type = typed_continuation<RemoteResult>;
         using function_type =
-            util::unique_function<void(naming::id_type, RemoteResult)>;
+            hpx::move_only_function<void(naming::id_type, RemoteResult), true>;
 
     public:
         typed_continuation() = default;
@@ -308,7 +308,8 @@ namespace hpx { namespace actions {
     struct typed_continuation<void, util::unused_type> : continuation
     {
     private:
-        using function_type = util::unique_function<void(naming::id_type)>;
+        using function_type =
+            hpx::move_only_function<void(naming::id_type), true>;
 
     public:
         using result_type = void;

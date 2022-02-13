@@ -90,8 +90,7 @@ namespace hpx::serialization {
 #if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
             if (ar.disable_array_optimization() || ar.endianess_differs())
             {
-                ar << t.first;
-                ar << t.second;
+                ar << t.first << t.second;
                 return;
             }
 #else
@@ -102,8 +101,7 @@ namespace hpx::serialization {
         }
         else
         {
-            ar << t.first;
-            ar << t.second;
+            ar << t.first << t.second;
         }
     }
 

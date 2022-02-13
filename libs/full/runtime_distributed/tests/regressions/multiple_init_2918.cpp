@@ -24,17 +24,17 @@ int main(int argc, char* argv[])
     using hpx::util::placeholders::_2;
 
     expected = "first";
-    hpx::util::function_nonser<int(int, char**)> callback1 =
+    hpx::function<int(int, char**)> callback1 =
         hpx::util::bind(&hpx_init_test, expected, _1, _2);
     hpx::init(callback1, argc, argv);
 
     expected = "second";
-    hpx::util::function_nonser<int(int, char**)> callback2 =
+    hpx::function<int(int, char**)> callback2 =
         hpx::util::bind(&hpx_init_test, expected, _1, _2);
     hpx::init(callback2, argc, argv);
 
     expected = "third";
-    hpx::util::function_nonser<int(int, char**)> callback3 =
+    hpx::function<int(int, char**)> callback3 =
         hpx::util::bind(&hpx_init_test, expected, _1, _2);
     hpx::init(callback3, argc, argv);
 

@@ -13,7 +13,7 @@
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>

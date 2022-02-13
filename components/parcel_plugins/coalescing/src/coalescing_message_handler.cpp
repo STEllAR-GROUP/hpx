@@ -405,7 +405,7 @@ namespace hpx::plugins::parcel {
     void coalescing_message_handler::get_time_between_parcels_histogram_creator(
         std::int64_t min_boundary, std::int64_t max_boundary,
         std::int64_t num_buckets,
-        util::function_nonser<std::vector<std::int64_t>(bool)>& result)
+        hpx::function<std::vector<std::int64_t>(bool)>& result)
     {
         std::lock_guard<mutex_type> l(mtx_);
         if (time_between_parcels_)

@@ -446,7 +446,7 @@ namespace hpx { namespace performance_counters {
     ///   /<objectname>{locality#<locality_id>/total}/<instancename>
     ///
     naming::gid_type locality_raw_counter_creator(counter_info const& info,
-        hpx::util::function_nonser<std::int64_t(bool)> const& f, error_code& ec)
+        hpx::function<std::int64_t(bool)> const& f, error_code& ec)
     {
         // verify the validity of the counter instance name
         counter_path_elements paths;
@@ -473,8 +473,7 @@ namespace hpx { namespace performance_counters {
 
     naming::gid_type locality_raw_values_counter_creator(
         counter_info const& info,
-        hpx::util::function_nonser<std::vector<std::int64_t>(bool)> const& f,
-        error_code& ec)
+        hpx::function<std::vector<std::int64_t>(bool)> const& f, error_code& ec)
     {
         // verify the validity of the counter instance name
         counter_path_elements paths;

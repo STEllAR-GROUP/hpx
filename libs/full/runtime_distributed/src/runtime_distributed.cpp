@@ -333,8 +333,7 @@ namespace hpx {
     }
 
     threads::thread_result_type runtime_distributed::run_helper(
-        util::function_nonser<runtime::hpx_main_function_type> const& func,
-        int& result)
+        hpx::function<runtime::hpx_main_function_type> const& func, int& result)
     {
         bool caught_exception = false;
         try
@@ -409,8 +408,7 @@ namespace hpx {
     }
 
     int runtime_distributed::start(
-        util::function_nonser<hpx_main_function_type> const& func,
-        bool blocking)
+        hpx::function<hpx_main_function_type> const& func, bool blocking)
     {
 #if defined(_WIN64) && defined(HPX_DEBUG) &&                                   \
     !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
@@ -495,7 +493,7 @@ namespace hpx {
 
     int runtime_distributed::start(bool blocking)
     {
-        util::function_nonser<hpx_main_function_type> empty_main;
+        hpx::function<hpx_main_function_type> empty_main;
         return start(empty_main, blocking);
     }
 
@@ -767,7 +765,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     int runtime_distributed::run(
-        util::function_nonser<hpx_main_function_type> const& func)
+        hpx::function<hpx_main_function_type> const& func)
     {
         // start the main thread function
         start(func);

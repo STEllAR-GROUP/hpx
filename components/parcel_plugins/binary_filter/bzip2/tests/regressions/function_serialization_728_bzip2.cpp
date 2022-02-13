@@ -32,7 +32,7 @@ struct functor
     }
 };
 
-int pass_functor(hpx::util::function<int()> const& f)
+int pass_functor(hpx::function<int(), true> const& f)
 {
     return f();
 }
@@ -41,7 +41,7 @@ HPX_DECLARE_PLAIN_ACTION(pass_functor, pass_functor_action)
 HPX_ACTION_USES_BZIP2_COMPRESSION(pass_functor_action)
 HPX_PLAIN_ACTION(pass_functor, pass_functor_action)
 
-void worker(hpx::util::function<int()> const& f)
+void worker(hpx::function<int(), true> const& f)
 {
     pass_functor_action act;
 
@@ -63,7 +63,7 @@ int hpx_main()
 
     {
         functor g;
-        hpx::util::function<int()> f(g);
+        hpx::function<int(), true> f(g);
 
         std::vector<hpx::future<void>> futures;
 

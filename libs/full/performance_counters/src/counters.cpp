@@ -651,7 +651,7 @@ namespace hpx { namespace performance_counters {
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            hpx::util::function_nonser<std::int64_t()> const& f, error_code& ec)
+            hpx::function<std::int64_t()> const& f, error_code& ec)
         {
             HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             naming::gid_type gid;
@@ -660,8 +660,7 @@ namespace hpx { namespace performance_counters {
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            hpx::util::function_nonser<std::int64_t(bool)> const& f,
-            error_code& ec)
+            hpx::function<std::int64_t(bool)> const& f, error_code& ec)
         {
             HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             naming::gid_type gid;
@@ -670,8 +669,7 @@ namespace hpx { namespace performance_counters {
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            hpx::util::function_nonser<std::vector<std::int64_t>()> const& f,
-            error_code& ec)
+            hpx::function<std::vector<std::int64_t>()> const& f, error_code& ec)
         {
             HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             naming::gid_type gid;
@@ -680,8 +678,7 @@ namespace hpx { namespace performance_counters {
         }
 
         naming::gid_type create_raw_counter(counter_info const& info,
-            hpx::util::function_nonser<std::vector<std::int64_t>(bool)> const&
-                f,
+            hpx::function<std::vector<std::int64_t>(bool)> const& f,
             error_code& ec)
         {
             HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);

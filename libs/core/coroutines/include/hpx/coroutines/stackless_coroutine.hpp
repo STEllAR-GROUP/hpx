@@ -15,7 +15,7 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/functional/detail/reset_function.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -54,8 +54,7 @@ namespace hpx { namespace threads { namespace coroutines {
         using result_type = std::pair<thread_schedule_state, thread_id_type>;
         using arg_type = thread_restart_state;
 
-        using functor_type =
-            util::unique_function_nonser<result_type(arg_type)>;
+        using functor_type = hpx::move_only_function<result_type(arg_type)>;
 
         stackless_coroutine(functor_type&& f, thread_id_type id,
             std::ptrdiff_t /*stack_size*/ = default_stack_size)

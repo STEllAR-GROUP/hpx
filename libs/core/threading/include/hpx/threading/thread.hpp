@@ -10,7 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -33,7 +33,7 @@
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     using thread_termination_handler_type =
-        util::function_nonser<void(std::exception_ptr const& e)>;
+        hpx::function<void(std::exception_ptr const& e)>;
     HPX_CORE_EXPORT void set_thread_termination_handler(
         thread_termination_handler_type f);
 
@@ -141,9 +141,9 @@ namespace hpx {
             id_ = threads::invalid_thread_id;
         }
         void start_thread(threads::thread_pool_base* pool,
-            util::unique_function_nonser<void()>&& func);
+            hpx::move_only_function<void()>&& func);
         static threads::thread_result_type thread_function_nullary(
-            util::unique_function_nonser<void()> const& func);
+            hpx::move_only_function<void()> const& func);
 
         mutable mutex_type mtx_;
         threads::thread_id_ref_type id_;

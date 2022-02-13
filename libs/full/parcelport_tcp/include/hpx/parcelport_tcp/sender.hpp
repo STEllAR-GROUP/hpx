@@ -52,7 +52,7 @@ namespace hpx::parcelset::policies::tcp {
       : public parcelset::parcelport_connection<sender, std::vector<char>>
     {
         using postprocess_handler_type =
-            util::unique_function_nonser<void(std::error_code const&)>;
+            hpx::move_only_function<void(std::error_code const&)>;
 
     public:
         // Construct a sending parcelport_connection with the given io_context.
@@ -221,7 +221,7 @@ namespace hpx::parcelset::policies::tcp {
             if (e)
             {
                 // inform post-processing handler of error as well
-                util::unique_function_nonser<void(std::error_code const&,
+                hpx::move_only_function<void(std::error_code const&,
                     parcelset::locality const&, std::shared_ptr<sender>)>
                     postprocess_handler;
                 std::swap(postprocess_handler, postprocess_handler_);
@@ -258,7 +258,7 @@ namespace hpx::parcelset::policies::tcp {
             // Call post-processing handler, which will send remaining pending
             // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
-            util::unique_function_nonser<void(std::error_code const&,
+            hpx::move_only_function<void(std::error_code const&,
                 parcelset::locality const&, std::shared_ptr<sender>)>
                 postprocess_handler;
             std::swap(postprocess_handler, postprocess_handler_);
@@ -278,7 +278,7 @@ namespace hpx::parcelset::policies::tcp {
         parcelset::parcelport* pp_;
 
         postprocess_handler_type handler_;
-        util::unique_function_nonser<void(std::error_code const&,
+        hpx::move_only_function<void(std::error_code const&,
             parcelset::locality const&, std::shared_ptr<sender>)>
             postprocess_handler_;
     };

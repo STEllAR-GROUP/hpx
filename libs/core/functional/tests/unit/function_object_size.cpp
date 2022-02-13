@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <iostream>
 
-using hpx::util::function;
+using hpx::function;
 
 ///////////////////////////////////////////////////////////////////////////////
 struct small_object

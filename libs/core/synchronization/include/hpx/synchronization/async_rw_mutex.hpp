@@ -13,7 +13,7 @@
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/synchronization/mutex.hpp>
 
 #include <exception>
@@ -39,8 +39,7 @@ namespace hpx { namespace experimental {
             shared_state_ptr_type next_state;
             hpx::lcos::local::mutex mtx;
             hpx::detail::small_vector<
-                hpx::util::unique_function_nonser<void(shared_state_ptr_type)>,
-                1>
+                hpx::move_only_function<void(shared_state_ptr_type)>, 1>
                 continuations;
 
             async_rw_mutex_shared_state() = default;
@@ -108,8 +107,7 @@ namespace hpx { namespace experimental {
             shared_state_ptr_type next_state;
             hpx::lcos::local::mutex mtx;
             hpx::detail::small_vector<
-                hpx::util::unique_function_nonser<void(shared_state_ptr_type)>,
-                1>
+                hpx::move_only_function<void(shared_state_ptr_type)>, 1>
                 continuations;
 
             async_rw_mutex_shared_state() = default;

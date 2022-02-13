@@ -41,7 +41,7 @@ namespace hpx { namespace threads {
     }
 
     void resume_processing_unit_cb(thread_pool_base& pool,
-        util::function_nonser<void(void)> callback, std::size_t virt_core,
+        hpx::function<void(void)> callback, std::size_t virt_core,
         error_code& ec)
     {
         if (!pool.get_scheduler()->has_scheduler_mode(
@@ -102,7 +102,7 @@ namespace hpx { namespace threads {
     }
 
     void suspend_processing_unit_cb(thread_pool_base& pool,
-        util::function_nonser<void(void)> callback, std::size_t virt_core,
+        hpx::function<void(void)> callback, std::size_t virt_core,
         error_code& ec)
     {
         if (!pool.get_scheduler()->has_scheduler_mode(
@@ -156,7 +156,7 @@ namespace hpx { namespace threads {
     }
 
     void resume_pool_cb(thread_pool_base& pool,
-        util::function_nonser<void(void)> callback, error_code& /* ec */)
+        hpx::function<void(void)> callback, error_code& /* ec */)
     {
         auto resume_direct_wrapper =
             [&pool, callback = HPX_MOVE(callback)]() -> void {
@@ -196,7 +196,7 @@ namespace hpx { namespace threads {
     }
 
     void suspend_pool_cb(thread_pool_base& pool,
-        util::function_nonser<void(void)> callback, error_code& ec)
+        hpx::function<void(void)> callback, error_code& ec)
     {
         if (threads::get_self_ptr() && hpx::this_thread::get_pool() == &pool)
         {

@@ -13,7 +13,7 @@
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/thread_support.hpp>
 
@@ -289,8 +289,7 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename R, typename... Ts>
         struct never_blocking_oneway_vtable<R(Ts...)>
         {
-            using post_function_type =
-                hpx::util::unique_function_nonser<R(Ts...)>;
+            using post_function_type = hpx::move_only_function<R(Ts...)>;
 
             // post
             template <typename T>
@@ -328,7 +327,7 @@ namespace hpx { namespace parallel { namespace execution {
         struct oneway_vtable<R(Ts...)>
         {
             using sync_execute_function_type =
-                hpx::util::unique_function_nonser<R(Ts...)>;
+                hpx::move_only_function<R(Ts...)>;
 
             // sync_execute
             template <typename T>
@@ -369,10 +368,9 @@ namespace hpx { namespace parallel { namespace execution {
         struct twoway_vtable<R(Ts...)>
         {
             using async_execute_function_type =
-                hpx::util::unique_function_nonser<R(Ts...)>;
-            using then_execute_function_type =
-                hpx::util::unique_function_nonser<R(
-                    hpx::shared_future<void> const&, Ts...)>;
+                hpx::move_only_function<R(Ts...)>;
+            using then_execute_function_type = hpx::move_only_function<R(
+                hpx::shared_future<void> const&, Ts...)>;
 
             // async_execute
             template <typename T>
@@ -436,7 +434,7 @@ namespace hpx { namespace parallel { namespace execution {
         struct bulk_oneway_vtable<R(Ts...)>
         {
             using bulk_sync_execute_function_type =
-                hpx::util::function_nonser<R(std::size_t, Ts...)>;
+                hpx::function<R(std::size_t, Ts...)>;
 
             // bulk_sync_execute
             template <typename T>
@@ -481,10 +479,9 @@ namespace hpx { namespace parallel { namespace execution {
         struct bulk_twoway_vtable<R(Ts...)>
         {
             using bulk_async_execute_function_type =
-                hpx::util::function_nonser<R(std::size_t, Ts...)>;
-            using bulk_then_execute_function_type =
-                hpx::util::function_nonser<R(
-                    std::size_t, hpx::shared_future<void> const&, Ts...)>;
+                hpx::function<R(std::size_t, Ts...)>;
+            using bulk_then_execute_function_type = hpx::function<R(
+                std::size_t, hpx::shared_future<void> const&, Ts...)>;
 
             // bulk_async_execute
             template <typename T>

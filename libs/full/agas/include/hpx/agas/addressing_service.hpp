@@ -56,8 +56,9 @@ namespace hpx { namespace agas {
         using iterate_names_return_type =
             std::map<std::string, naming::id_type>;
 
-        using iterate_types_function_type = hpx::util::function<void(
-            std::string const&, components::component_type)>;
+        using iterate_types_function_type =
+            hpx::function<void(std::string const&, components::component_type),
+                true>;
 
         using mutex_type = hpx::lcos::local::spinlock;
 
@@ -952,7 +953,7 @@ namespace hpx { namespace agas {
         ///                   before the parcel has been delivered to its
         ///                   destination.
         void route(parcelset::parcel p,
-            util::function_nonser<void(
+            hpx::function<void(
                 std::error_code const&, parcelset::parcel const&)>&&,
             threads::thread_priority local_priority =
                 threads::thread_priority::default_);
@@ -1182,13 +1183,12 @@ namespace hpx { namespace agas {
         /// Maintain list of migrated objects
         std::pair<bool, components::pinned_ptr> was_object_migrated(
             naming::gid_type const& gid,
-            util::unique_function_nonser<components::pinned_ptr()>&& f);
+            hpx::move_only_function<components::pinned_ptr()>&& f);
 
         /// Mark the given object as being migrated (if the object is unpinned).
         /// Delay migration until the object is unpinned otherwise.
         hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
-            util::unique_function_nonser<std::pair<bool, hpx::future<void>>()>&&
-                f,
+            hpx::move_only_function<std::pair<bool, hpx::future<void>>()>&& f,
             bool expect_to_be_marked_as_migrating);
 
         /// Remove the given object from the table of migrated objects

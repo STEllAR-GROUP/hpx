@@ -58,8 +58,8 @@ namespace hpx { namespace performance_counters {
     // Creation function for per-action parcel data counters
     naming::gid_type per_action_data_counter_creator(counter_info const& info,
         hpx::actions::detail::per_action_data_counter_registry& registry,
-        hpx::util::function_nonser<std::int64_t(
-            std::string const&, bool)> const& counter_func,
+        hpx::function<std::int64_t(std::string const&, bool)> const&
+            counter_func,
         error_code& ec)
     {
         switch (info.type_)
@@ -93,7 +93,7 @@ namespace hpx { namespace performance_counters {
             }
 
             // ask registry
-            hpx::util::function_nonser<std::int64_t(bool)> f =
+            hpx::function<std::int64_t(bool)> f =
                 registry.get_counter(paths.parameters_, counter_func);
 
             return detail::create_raw_counter(info, HPX_MOVE(f), ec);
@@ -108,8 +108,7 @@ namespace hpx { namespace performance_counters {
     }
 
     naming::gid_type per_action_data_counter_creator(counter_info const& info,
-        hpx::util::function_nonser<std::int64_t(
-            std::string const&, bool)> const& f,
+        hpx::function<std::int64_t(std::string const&, bool)> const& f,
         error_code& ec)
     {
         using hpx::actions::detail::per_action_data_counter_registry;

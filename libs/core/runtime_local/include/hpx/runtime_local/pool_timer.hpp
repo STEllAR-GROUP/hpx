@@ -30,8 +30,8 @@ namespace hpx { namespace util {
     public:
         pool_timer();
 
-        pool_timer(util::function_nonser<bool()> const& f,
-            util::function_nonser<void()> const& on_term,
+        pool_timer(hpx::function<bool()> const& f,
+            hpx::function<void()> const& on_term,
             std::string const& description = "", bool pre_shutdown = true);
 
         ~pool_timer();

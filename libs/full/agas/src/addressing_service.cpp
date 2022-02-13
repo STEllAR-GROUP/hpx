@@ -1217,15 +1217,15 @@ namespace hpx { namespace agas {
 #if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     void addressing_service::route(parcelset::parcel p,
-        util::function_nonser<void(
-            std::error_code const&, parcelset::parcel const&)>&& f,
+        hpx::function<void(std::error_code const&, parcelset::parcel const&)>&&
+            f,
         threads::thread_priority local_priority)
     {
         if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
         {
             // reschedule this call as an HPX thread
             void (addressing_service::*route_ptr)(parcelset::parcel,
-                util::function_nonser<void(
+                hpx::function<void(
                     std::error_code const&, parcelset::parcel const&)>&&,
                 threads::thread_priority) = &addressing_service::route;
 
@@ -2130,9 +2130,7 @@ namespace hpx { namespace agas {
     ///////////////////////////////////////////////////////////////////////////
     hpx::future<void> addressing_service::mark_as_migrated(
         naming::gid_type const& gid_,
-        util::unique_function_nonser<std::pair<bool, hpx::future<void>>()>&&
-            f    //-V669
-        ,
+        hpx::move_only_function<std::pair<bool, hpx::future<void>>()>&& f,
         bool expect_to_be_marked_as_migrating)
     {
         HPX_UNUSED(expect_to_be_marked_as_migrating);
@@ -2272,7 +2270,7 @@ namespace hpx { namespace agas {
 
     std::pair<bool, components::pinned_ptr>
     addressing_service::was_object_migrated(naming::gid_type const& gid,
-        util::unique_function_nonser<components::pinned_ptr()>&& f    //-V669
+        hpx::move_only_function<components::pinned_ptr()>&& f    //-V669
     )
     {
         if (!gid)

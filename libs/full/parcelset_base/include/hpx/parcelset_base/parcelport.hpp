@@ -57,7 +57,7 @@ namespace hpx::parcelset {
     public:
         using write_handler_type = parcel_write_handler_type;
 
-        using read_handler_type = util::function_nonser<void(parcelport& pp,
+        using read_handler_type = hpx::function<void(parcelport& pp,
             std::shared_ptr<std::vector<char>>, threads::thread_priority)>;
 
         /// Construct the parcelport on the given locality.

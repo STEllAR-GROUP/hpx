@@ -200,12 +200,12 @@ namespace hpx { namespace agas { namespace detail {
     bool (*end_migration)(hpx::id_type const& id) = nullptr;
 
     hpx::future<void> (*mark_as_migrated)(naming::gid_type const& gid,
-        util::unique_function_nonser<std::pair<bool, hpx::future<void>>()>&& f,
+        hpx::move_only_function<std::pair<bool, hpx::future<void>>()>&& f,
         bool expect_to_be_marked_as_migrating) = nullptr;
 
     std::pair<bool, components::pinned_ptr> (*was_object_migrated)(
         naming::gid_type const& gid,
-        util::unique_function_nonser<components::pinned_ptr()>&& f) = nullptr;
+        hpx::move_only_function<components::pinned_ptr()>&& f) = nullptr;
 
     void (*unmark_as_migrated)(naming::gid_type const& gid) = nullptr;
 
@@ -230,8 +230,7 @@ namespace hpx { namespace agas { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_NETWORKING)
     void (*route)(parcelset::parcel&& p,
-        util::function_nonser<void(
-            std::error_code const&, parcelset::parcel const&)>&&,
+        hpx::function<void(std::error_code const&, parcelset::parcel const&)>&&,
         threads::thread_priority local_priority) = nullptr;
 #endif
 

@@ -45,7 +45,7 @@ namespace hpx::parcelset::policies::mpi {
         using sender_type = sender;
 
         using write_handler_type =
-            util::function_nonser<void(std::error_code const&, parcel const&)>;
+            hpx::function<void(std::error_code const&, parcel const&)>;
 
         using data_type = std::vector<char>;
 
@@ -289,8 +289,8 @@ namespace hpx::parcelset::policies::mpi {
         sender_type* sender_;
         int tag_;
         int dst_;
-        util::unique_function_nonser<void(error_code const&)> handler_;
-        util::unique_function_nonser<void(error_code const&,
+        hpx::move_only_function<void(error_code const&)> handler_;
+        hpx::move_only_function<void(error_code const&,
             parcelset::locality const&, std::shared_ptr<sender_connection>)>
             postprocess_handler_;
 

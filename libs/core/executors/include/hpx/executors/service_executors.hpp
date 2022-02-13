@@ -59,7 +59,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             typedef typename hpx::util::detail::invoke_deferred_result<F,
                 Ts...>::type result_type;
 
-            hpx::util::unique_function_nonser<result_type()> f_wrapper =
+            hpx::move_only_function<result_type()> f_wrapper =
                 hpx::util::deferred_call(
                     HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             auto t = std::make_shared<post_wrapper_helper<decltype(f_wrapper)>>(
@@ -82,7 +82,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             typedef typename hpx::util::detail::invoke_deferred_result<F,
                 Ts...>::type result_type;
 
-            hpx::util::unique_function_nonser<result_type()> f_wrapper =
+            hpx::move_only_function<result_type()> f_wrapper =
                 hpx::util::deferred_call(
                     HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             auto t = std::make_shared<

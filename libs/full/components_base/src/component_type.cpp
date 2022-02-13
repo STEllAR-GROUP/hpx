@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
@@ -84,7 +84,7 @@ namespace hpx { namespace components {
             }
 
             static bool enumerate_instance_counts(
-                util::unique_function_nonser<bool(component_type)> const& f)
+                hpx::move_only_function<bool(component_type)> const& f)
             {
                 std::vector<component_type> types;
 
@@ -125,7 +125,7 @@ namespace hpx { namespace components {
     }
 
     bool enumerate_instance_counts(
-        util::unique_function_nonser<bool(component_type)> const& f)
+        hpx::move_only_function<bool(component_type)> const& f)
     {
         return detail::component_database::enumerate_instance_counts(f);
     }

@@ -10,12 +10,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 
 namespace hpx {
     /// The type of a function which is registered to be executed as a
     /// shutdown or pre-shutdown function.
-    typedef util::unique_function_nonser<void()> shutdown_function_type;
+    typedef hpx::move_only_function<void()> shutdown_function_type;
 
     /// \brief Add a function to be executed by a HPX thread during
     /// \a hpx::finalize() but guaranteed before any shutdown function is

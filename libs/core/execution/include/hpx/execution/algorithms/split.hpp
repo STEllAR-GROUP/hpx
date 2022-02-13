@@ -23,7 +23,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
@@ -131,8 +131,7 @@ namespace hpx { namespace execution { namespace experimental {
                 hpx::variant<hpx::monostate, done_type, error_type, value_type>
                     v;
 
-                using continuation_type =
-                    hpx::util::unique_function_nonser<void()>;
+                using continuation_type = hpx::move_only_function<void()>;
                 hpx::detail::small_vector<continuation_type, 1> continuations;
 
                 struct split_receiver

@@ -28,7 +28,7 @@ namespace hpx { namespace actions { namespace detail {
         HPX_NON_COPYABLE(per_action_data_counter_registry);
 
     public:
-        using counter_function_type = util::function_nonser<std::int64_t(bool)>;
+        using counter_function_type = hpx::function<std::int64_t(bool)>;
         using map_type =
             std::unordered_set<std::string, hpx::util::jenkins_hash>;
 
@@ -50,8 +50,8 @@ namespace hpx { namespace actions { namespace detail {
         void register_class(std::string action);
 
         counter_function_type get_counter(std::string const& action,
-            hpx::util::function_nonser<std::int64_t(
-                std::string const&, bool)> const& f) const;
+            hpx::function<std::int64_t(std::string const&, bool)> const& f)
+            const;
 
         map_type const& registered_counters() const
         {

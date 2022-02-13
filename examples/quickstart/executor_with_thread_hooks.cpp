@@ -154,7 +154,7 @@ namespace executor_example {
         }
 
     private:
-        using thread_hook = hpx::util::function_nonser<void()>;
+        using thread_hook = hpx::function<void()>;
 
         BaseExecutor& exec_;
         thread_hook on_start_;

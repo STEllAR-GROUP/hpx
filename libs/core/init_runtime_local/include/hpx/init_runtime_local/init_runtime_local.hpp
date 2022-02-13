@@ -54,7 +54,7 @@ extern char** environ;
 namespace hpx {
     namespace detail {
         HPX_CORE_EXPORT int init_helper(hpx::program_options::variables_map&,
-            util::function_nonser<int(int, char**)> const&);
+            hpx::function<int(int, char**)> const&);
     }
 
     namespace local {
@@ -91,7 +91,7 @@ namespace hpx {
 
             // Utilities to init the thread_pools of the resource partitioner
             using rp_callback_type =
-                hpx::util::function_nonser<void(hpx::resource::partitioner&,
+                hpx::function<void(hpx::resource::partitioner&,
                     hpx::program_options::variables_map const&)>;
         }    // namespace detail
 
@@ -110,14 +110,13 @@ namespace hpx {
 
         namespace detail {
             HPX_CORE_EXPORT int run_or_start(
-                util::function_nonser<int(
+                hpx::function<int(
                     hpx::program_options::variables_map& vm)> const& f,
                 int argc, char** argv, init_params const& params,
                 bool blocking);
 
             inline int init_start_impl(
-                util::function_nonser<int(hpx::program_options::variables_map&)>
-                    f,
+                hpx::function<int(hpx::program_options::variables_map&)> f,
                 int argc, char** argv, init_params const& params, bool blocking)
             {
                 if (argc == 0 || argv == nullptr)
@@ -151,8 +150,8 @@ namespace hpx {
         inline int init(std::function<int(int, char**)> f, int argc,
             char** argv, init_params const& params = init_params())
         {
-            util::function_nonser<int(hpx::program_options::variables_map&)>
-                main_f = hpx::util::bind_back(hpx::detail::init_helper, f);
+            hpx::function<int(hpx::program_options::variables_map&)> main_f =
+                hpx::util::bind_back(hpx::detail::init_helper, f);
             return detail::init_start_impl(
                 HPX_MOVE(main_f), argc, argv, params, true);
         }
@@ -160,8 +159,8 @@ namespace hpx {
         inline int init(std::function<int()> f, int argc, char** argv,
             init_params const& params = init_params())
         {
-            util::function_nonser<int(hpx::program_options::variables_map&)>
-                main_f = hpx::util::bind(f);
+            hpx::function<int(hpx::program_options::variables_map&)> main_f =
+                hpx::util::bind(f);
             return detail::init_start_impl(
                 HPX_MOVE(main_f), argc, argv, params, true);
         }
@@ -169,8 +168,7 @@ namespace hpx {
         inline int init(std::nullptr_t, int argc, char** argv,
             init_params const& params = init_params())
         {
-            util::function_nonser<int(hpx::program_options::variables_map&)>
-                main_f;
+            hpx::function<int(hpx::program_options::variables_map&)> main_f;
             return detail::init_start_impl(
                 HPX_MOVE(main_f), argc, argv, params, true);
         }
@@ -186,8 +184,8 @@ namespace hpx {
         inline bool start(std::function<int(int, char**)> f, int argc,
             char** argv, init_params const& params = init_params())
         {
-            util::function_nonser<int(hpx::program_options::variables_map&)>
-                main_f = hpx::util::bind_back(hpx::detail::init_helper, f);
+            hpx::function<int(hpx::program_options::variables_map&)> main_f =
+                hpx::util::bind_back(hpx::detail::init_helper, f);
             return 0 ==
                 detail::init_start_impl(
                     HPX_MOVE(main_f), argc, argv, params, false);
@@ -196,8 +194,8 @@ namespace hpx {
         inline bool start(std::function<int()> f, int argc, char** argv,
             init_params const& params = init_params())
         {
-            util::function_nonser<int(hpx::program_options::variables_map&)>
-                main_f = hpx::util::bind(f);
+            hpx::function<int(hpx::program_options::variables_map&)> main_f =
+                hpx::util::bind(f);
             return 0 ==
                 detail::init_start_impl(
                     HPX_MOVE(main_f), argc, argv, params, false);
@@ -206,8 +204,7 @@ namespace hpx {
         inline bool start(std::nullptr_t, int argc, char** argv,
             init_params const& params = init_params())
         {
-            util::function_nonser<int(hpx::program_options::variables_map&)>
-                main_f;
+            hpx::function<int(hpx::program_options::variables_map&)> main_f;
             return 0 ==
                 detail::init_start_impl(
                     HPX_MOVE(main_f), argc, argv, params, false);

@@ -456,10 +456,10 @@ namespace hpx { namespace threads { namespace policies {
         bool steal_by_function(std::size_t domain, std::size_t q_index,
             bool steal_numa, bool steal_core, thread_holder_type* origin,
             T& var, const char* prefix,
-            util::function_nonser<bool(
+            hpx::function<bool(
                 std::size_t, std::size_t, thread_holder_type*, T&, bool, bool)>
                 operation_HP,
-            util::function_nonser<bool(
+            hpx::function<bool(
                 std::size_t, std::size_t, thread_holder_type*, T&, bool, bool)>
                 operation)
         {
@@ -932,8 +932,7 @@ namespace hpx { namespace threads { namespace policies {
 
         //---------------------------------------------------------------------
         // Enumerate matching threads from all queues
-        bool enumerate_threads(
-            util::function_nonser<bool(thread_id_type)> const& f,
+        bool enumerate_threads(hpx::function<bool(thread_id_type)> const& f,
             thread_schedule_state state =
                 thread_schedule_state::unknown) const override
         {

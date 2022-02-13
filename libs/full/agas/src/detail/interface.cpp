@@ -12,7 +12,7 @@
 #include <hpx/components_base/generate_unique_ids.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 
 #include <algorithm>
@@ -447,7 +447,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
     }
 
     hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
-        util::unique_function_nonser<std::pair<bool, hpx::future<void>>()>&& f,
+        hpx::move_only_function<std::pair<bool, hpx::future<void>>()>&& f,
         bool expect_to_be_marked_as_migrating)
     {
         return naming::get_agas_client().mark_as_migrated(
@@ -456,7 +456,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
 
     std::pair<bool, components::pinned_ptr> was_object_migrated(
         naming::gid_type const& gid,
-        util::unique_function_nonser<components::pinned_ptr()>&& f)
+        hpx::move_only_function<components::pinned_ptr()>&& f)
     {
         return naming::get_agas_client().was_object_migrated(gid, HPX_MOVE(f));
     }
@@ -494,8 +494,8 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
 #if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     void route(parcelset::parcel&& p,
-        util::function_nonser<void(
-            std::error_code const&, parcelset::parcel const&)>&& f,
+        hpx::function<void(std::error_code const&, parcelset::parcel const&)>&&
+            f,
         threads::thread_priority local_priority)
     {
         return naming::get_agas_client().route(

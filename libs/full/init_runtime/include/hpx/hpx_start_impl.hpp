@@ -45,8 +45,7 @@ namespace apex {
 namespace hpx {
     namespace detail {
         inline bool start_impl(
-            util::function_nonser<int(
-                hpx::program_options::variables_map&)> const& f,
+            hpx::function<int(hpx::program_options::variables_map&)> const& f,
             int argc, char** argv, init_params const& params)
         {
             if (argc == 0 || argv == nullptr)
@@ -103,8 +102,8 @@ namespace hpx {
     inline bool start(std::function<int(int, char**)> f, int argc, char** argv,
         init_params const& params)
     {
-        util::function_nonser<int(hpx::program_options::variables_map&)>
-            main_f = util::bind_back(detail::init_helper, HPX_MOVE(f));
+        hpx::function<int(hpx::program_options::variables_map&)> main_f =
+            util::bind_back(detail::init_helper, HPX_MOVE(f));
         return detail::start_impl(HPX_MOVE(main_f), argc, argv, params);
     }
 
@@ -118,8 +117,8 @@ namespace hpx {
     /// with the runtime system's execution.
     inline bool start(int argc, char** argv, init_params const& params)
     {
-        util::function_nonser<int(hpx::program_options::variables_map&)>
-            main_f = static_cast<hpx_main_type>(::hpx_main);
+        hpx::function<int(hpx::program_options::variables_map&)> main_f =
+            static_cast<hpx_main_type>(::hpx_main);
         return detail::start_impl(HPX_MOVE(main_f), argc, argv, params);
     }
 
@@ -134,7 +133,7 @@ namespace hpx {
     inline bool start(
         std::nullptr_t, int argc, char** argv, init_params const& params)
     {
-        util::function_nonser<int(hpx::program_options::variables_map&)> main_f;
+        hpx::function<int(hpx::program_options::variables_map&)> main_f;
         return detail::start_impl(HPX_MOVE(main_f), argc, argv, params);
     }
 
@@ -148,8 +147,8 @@ namespace hpx {
     /// with the runtime system's execution.
     inline bool start(init_params const& params)
     {
-        util::function_nonser<int(hpx::program_options::variables_map&)>
-            main_f = static_cast<hpx_main_type>(::hpx_main);
+        hpx::function<int(hpx::program_options::variables_map&)> main_f =
+            static_cast<hpx_main_type>(::hpx_main);
         return detail::start_impl(
             HPX_MOVE(main_f), detail::dummy_argc, detail::dummy_argv, params);
     }

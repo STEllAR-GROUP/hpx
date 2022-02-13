@@ -634,8 +634,7 @@ namespace hpx { namespace threads { namespace policies {
 
         ///////////////////////////////////////////////////////////////////////
         // Enumerate matching threads from all queues
-        bool enumerate_threads(
-            util::function_nonser<bool(thread_id_type)> const& f,
+        bool enumerate_threads(hpx::function<bool(thread_id_type)> const& f,
             thread_schedule_state state =
                 thread_schedule_state::unknown) const override
         {

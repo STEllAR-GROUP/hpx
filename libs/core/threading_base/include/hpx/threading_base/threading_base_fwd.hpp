@@ -13,7 +13,7 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/modules/errors.hpp>
 
 #include <cstddef>
@@ -50,8 +50,7 @@ namespace hpx { namespace threads {
     using thread_arg_type = thread_restart_state;
 
     using thread_function_sig = thread_result_type(thread_arg_type);
-    using thread_function_type =
-        util::unique_function_nonser<thread_function_sig>;
+    using thread_function_type = hpx::move_only_function<thread_function_sig>;
 
     using thread_self = coroutines::detail::coroutine_self;
     using thread_self_impl_type = coroutines::detail::coroutine_impl;

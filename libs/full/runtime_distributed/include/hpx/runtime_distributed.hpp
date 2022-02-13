@@ -76,7 +76,7 @@ namespace hpx {
         ///                   return the value as returned as the result of the
         ///                   invocation of the function object given by the
         ///                   parameter \p func. Otherwise it will return zero.
-        int start(util::function_nonser<hpx_main_function_type> const& func,
+        int start(hpx::function<hpx_main_function_type> const& func,
             bool blocking = false) override;
 
         ///  \brief Start the runtime system
@@ -179,8 +179,7 @@ namespace hpx {
         /// \returns          This function will return the value as returned
         ///                   as the result of the invocation of the function
         ///                   object given by the parameter \p func.
-        int run(
-            util::function_nonser<hpx_main_function_type> const& func) override;
+        int run(hpx::function<hpx_main_function_type> const& func) override;
 
         /// \brief Run the HPX runtime system, initially use the given number
         ///        of (OS) threads in the thread-manager and block waiting for
@@ -368,7 +367,7 @@ namespace hpx {
 
     private:
         threads::thread_result_type run_helper(
-            util::function_nonser<runtime::hpx_main_function_type> const& func,
+            hpx::function<runtime::hpx_main_function_type> const& func,
             int& result);
 
         void init_global_data();

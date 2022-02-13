@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -66,14 +66,14 @@ namespace hpx { namespace util { namespace detail {
         HPX_ALWAYS_EXPORT char const* get_function_name<VTable,                \
             std::decay<HPX_PP_STRIP_PARENS(F)>::type>()                        \
         {                                                                      \
-            /*If you encounter this assert while compiling code, that means    \
-         that you have a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION macro             \
-         somewhere in a source file, but the header in which the function      \
-         is defined misses a HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION_DECLARATION*/ \
+        /* If you encounter this assert while compiling code, that means that */ \
+        /* you have a HPX_UTIL_REGISTER_[MOVE_ONLY_]FUNCTION macro somewhere  */ \
+        /* in a source file, but the header in which the function is defined  */ \
+        /* misses a HPX_UTIL_REGISTER_[MOVE_ONLY_]FUNCTION_DECLARATION        */ \
              static_assert(                                                    \
                  get_function_name_declared<VTable,                            \
                      std::decay<HPX_PP_STRIP_PARENS(F)>::type>::value,         \
-                 "HPX_UTIL_REGISTER_[UNIQUE_]FUNCTION_DECLARATION "            \
+                 "HPX_UTIL_REGISTER_[MOVE_ONLY_]FUNCTION_DECLARATION "         \
                  "missing for " HPX_PP_STRINGIZE(Name));                       \
              return HPX_PP_STRINGIZE(Name);                                    \
         }                                                                      \

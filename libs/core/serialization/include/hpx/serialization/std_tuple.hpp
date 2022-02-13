@@ -1,5 +1,4 @@
 //  Copyright (c) 2011-2013 Thomas Heller
-//  Copyright (c) 2011-2020 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //  Copyright (c) 2019 Mikael Simberg
 //  Copyright (c) 2020-2021 Hartmut Kaiser

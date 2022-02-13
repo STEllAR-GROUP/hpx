@@ -56,7 +56,7 @@ struct Seventeen
 
 static void target_test()
 {
-    hpx::util::function_nonser<int()> f;
+    hpx::function<int()> f;
 
     f = &forty_two;
     HPX_TEST_EQ(*f.target<int (*)()>(), &forty_two);
@@ -74,7 +74,7 @@ static void target_test()
 
 //static void equal_test()
 //{
-//    hpx::util::function_nonser<int()> f;
+//    hpx::function<int()> f;
 //
 //    f = &forty_two;
 //    HPX_TEST(f == &forty_two);
@@ -104,7 +104,7 @@ static void target_test()
 //
 //    HPX_TEST(f.contains(contain_test::ReturnIntFE(17)));
 //
-//    hpx::util::function_nonser<int(void)> g;
+//    hpx::function<int(void)> g;
 //
 //    g = &forty_two;
 //    HPX_TEST(g == &forty_two);
@@ -125,7 +125,7 @@ static void target_test()
 //{
 //    {
 //        ReturnInt ri(17);
-//        hpx::util::function_nonser0<int> f = std::ref(ri);
+//        hpx::function0<int> f = std::ref(ri);
 //
 //        // References and values are equal
 //        HPX_TEST(f == std::ref(ri));
@@ -151,7 +151,7 @@ static void target_test()
 //
 //    {
 //        ReturnInt ri(17);
-//        hpx::util::function_nonser<int(void)> f = std::ref(ri);
+//        hpx::function<int(void)> f = std::ref(ri);
 //
 //        // References and values are equal
 //        HPX_TEST(f == std::ref(ri));

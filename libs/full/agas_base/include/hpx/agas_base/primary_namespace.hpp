@@ -68,7 +68,7 @@ namespace hpx { namespace agas {
 
 #if defined(HPX_HAVE_NETWORKING)
         void route(parcelset::parcel&& p,
-            util::function_nonser<void(
+            hpx::function<void(
                 std::error_code const&, parcelset::parcel const&)>&& f);
 #endif
 

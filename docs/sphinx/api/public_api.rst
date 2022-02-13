@@ -381,7 +381,7 @@ Header ``hpx/local/functional.hpp``
 ===================================
 
 Corresponds to the C++ standard library header
-:cppreference-header:`functional`. :cpp:class:`hpx::util::function` is a more
+:cppreference-header:`functional`. :cpp:class:`hpx::function` is a more
 efficient and serializable replacement for ``std::function``.
 
 Constants
@@ -398,11 +398,9 @@ top-level ``hpx`` namespace.
 Classes
 -------
 
-- :cpp:class:`hpx::util::function`
-- :cpp:class:`hpx::util::function_nonser`
-- :cpp:class:`hpx::util::function_ref`
-- :cpp:class:`hpx::util::unique_function`
-- :cpp:class:`hpx::util::unique_function_nonser`
+- :cpp:class:`hpx::function`
+- :cpp:class:`hpx::function_ref`
+- :cpp:class:`hpx::move_only_function`
 - :cpp:struct:`hpx::traits::is_bind_expression`
 - :cpp:struct:`hpx::traits::is_placeholder`
 - :cpp:struct:`hpx::scoped_annotation`

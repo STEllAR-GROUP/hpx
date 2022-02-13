@@ -38,9 +38,7 @@ struct hpx_driver : htts2::driver
             "hpx.os_threads=" + std::to_string(osthreads_),
             "hpx.run_hpx_main!=0", "hpx.commandline.allow_unknown!=1"};
 
-        hpx::util::function_nonser<int(
-            hpx::program_options::variables_map & vm)>
-            f;
+        hpx::function<int(hpx::program_options::variables_map & vm)> f;
         hpx::program_options::options_description desc;
 
         hpx::local::init_params init_args;

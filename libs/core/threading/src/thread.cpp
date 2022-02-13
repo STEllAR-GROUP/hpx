@@ -7,7 +7,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
@@ -114,7 +114,7 @@ namespace hpx {
     }
 
     threads::thread_result_type thread::thread_function_nullary(
-        util::unique_function_nonser<void()> const& func)
+        hpx::move_only_function<void()> const& func)
     {
         try
         {
@@ -161,8 +161,8 @@ namespace hpx {
         return hpx::threads::hardware_concurrency();
     }
 
-    void thread::start_thread(threads::thread_pool_base* pool,
-        util::unique_function_nonser<void()>&& func)
+    void thread::start_thread(
+        threads::thread_pool_base* pool, hpx::move_only_function<void()>&& func)
     {
         HPX_ASSERT(pool);
 

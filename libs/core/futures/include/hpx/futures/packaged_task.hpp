@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
-#include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/promise.hpp>
 #include <hpx/modules/errors.hpp>
@@ -29,7 +29,7 @@ namespace hpx { namespace lcos { namespace local {
     template <typename R, typename... Ts>
     class packaged_task<R(Ts...)>
     {
-        using function_type = util::unique_function_nonser<R(Ts...)>;
+        using function_type = hpx::move_only_function<R(Ts...)>;
 
     public:
         // construction and destruction

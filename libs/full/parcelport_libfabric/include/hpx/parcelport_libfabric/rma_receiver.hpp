@@ -39,8 +39,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
             header_type::header_block_size;
 
         typedef serialization::serialization_chunk chunk_struct;
-        typedef hpx::util::function_nonser<void(rma_receiver*)>
-            completion_handler;
+        typedef hpx::function<void(rma_receiver*)> completion_handler;
 
         rma_receiver(parcelport* pp, fid_ep* endpoint,
             memory_pool_type* memory_pool, completion_handler&& handler);

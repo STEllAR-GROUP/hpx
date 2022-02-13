@@ -262,8 +262,7 @@ namespace hpx::parcelset {
     }
 
     bool parcelhandler::enum_parcelports(
-        hpx::util::unique_function_nonser<bool(std::string const&)> const& f)
-        const
+        hpx::move_only_function<bool(std::string const&)> const& f) const
     {
         for (pports_type::value_type const& pp : pports_)
         {

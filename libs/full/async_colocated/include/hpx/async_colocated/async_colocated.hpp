@@ -20,7 +20,7 @@
 #include <hpx/async_local/async_fwd.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
