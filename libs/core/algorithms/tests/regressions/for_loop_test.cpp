@@ -18,7 +18,7 @@ int hpx_main()
     int start = 7;
     int end = 3;
 
-    hpx::for_loop(hpx::execution::par, start, end,
+    hpx::experimental::for_loop(hpx::execution::par, start, end,
         [&](int) { std::cout << "loop running \n"; });
 
     return hpx::local::finalize();
