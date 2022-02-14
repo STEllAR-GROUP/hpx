@@ -685,7 +685,7 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     // Enumerate all matching threads
     bool threadmanager::enumerate_threads(
-        util::function_nonser<bool(thread_id_type)> const& f,
+        hpx::function<bool(thread_id_type)> const& f,
         thread_schedule_state state) const
     {
         std::lock_guard<mutex_type> lk(mtx_);

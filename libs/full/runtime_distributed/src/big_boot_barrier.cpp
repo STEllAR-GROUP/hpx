@@ -546,8 +546,8 @@ namespace hpx { namespace agas {
             // synchronization.
 
             // delay the final response until the runtime system is up and running
-            util::unique_function_nonser<void()>* thunk =
-                new util::unique_function_nonser<void()>(util::one_shot(
+            hpx::move_only_function<void()>* thunk =
+                new hpx::move_only_function<void()>(util::one_shot(
                     util::bind_front(&big_boot_barrier::apply_notification,
                         &get_big_boot_barrier(), 0,
                         naming::get_locality_id_from_gid(prefix), dest,
@@ -787,7 +787,7 @@ namespace hpx { namespace agas {
     {
         if (service_mode_bootstrap == service_type)
         {
-            util::unique_function_nonser<void()>* p;
+            hpx::move_only_function<void()>* p;
 
             while (thunks.pop(p))
             {
@@ -805,7 +805,7 @@ namespace hpx { namespace agas {
         }
     }
 
-    void big_boot_barrier::add_thunk(util::unique_function_nonser<void()>* f)
+    void big_boot_barrier::add_thunk(hpx::move_only_function<void()>* f)
     {
         std::size_t k = 0;
         while (!thunks.push(f))

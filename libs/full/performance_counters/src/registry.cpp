@@ -399,35 +399,35 @@ namespace hpx { namespace performance_counters {
     counter_status registry::create_raw_counter_value(counter_info const& info,
         std::int64_t* countervalue, naming::gid_type& id, error_code& ec)
     {
-        hpx::util::function_nonser<std::int64_t(bool)> func(
+        hpx::function<std::int64_t(bool)> func(
             util::bind_front(wrap_counter, countervalue));
         return create_raw_counter(info, func, id, ec);
     }
 
     static std::int64_t wrap_raw_counter(
-        hpx::util::function_nonser<std::int64_t()> const& f, bool)
+        hpx::function<std::int64_t()> const& f, bool)
     {
         return f();
     }
 
     static std::vector<std::int64_t> wrap_raw_values_counter(
-        hpx::util::function_nonser<std::vector<std::int64_t>()> const& f, bool)
+        hpx::function<std::vector<std::int64_t>()> const& f, bool)
     {
         return f();
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        hpx::util::function_nonser<std::int64_t()> const& f,
-        naming::gid_type& id, error_code& ec)
+        hpx::function<std::int64_t()> const& f, naming::gid_type& id,
+        error_code& ec)
     {
-        hpx::util::function_nonser<std::int64_t(bool)> func(
+        hpx::function<std::int64_t(bool)> func(
             util::bind_front(&wrap_raw_counter, f));
         return create_raw_counter(info, func, id, ec);
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        hpx::util::function_nonser<std::int64_t(bool)> const& f,
-        naming::gid_type& id, error_code& ec)
+        hpx::function<std::int64_t(bool)> const& f, naming::gid_type& id,
+        error_code& ec)
     {
         // create canonical type name
         std::string type_name;
@@ -498,16 +498,16 @@ namespace hpx { namespace performance_counters {
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        hpx::util::function_nonser<std::vector<std::int64_t>()> const& f,
+        hpx::function<std::vector<std::int64_t>()> const& f,
         naming::gid_type& id, error_code& ec)
     {
-        hpx::util::function_nonser<std::vector<std::int64_t>(bool)> func(
+        hpx::function<std::vector<std::int64_t>(bool)> func(
             util::bind_front(&wrap_raw_values_counter, f));
         return create_raw_counter(info, func, id, ec);
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        hpx::util::function_nonser<std::vector<std::int64_t>(bool)> const& f,
+        hpx::function<std::vector<std::int64_t>(bool)> const& f,
         naming::gid_type& id, error_code& ec)
     {
         // create canonical type name

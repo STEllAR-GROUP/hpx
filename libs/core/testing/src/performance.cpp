@@ -30,7 +30,7 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     void perftests_report(std::string const& name, std::string const& exec,
-        const std::size_t steps, function_nonser<void(void)>&& test)
+        const std::size_t steps, hpx::function<void(void)>&& test)
     {
         if (steps == 0)
             return;

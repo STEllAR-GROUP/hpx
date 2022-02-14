@@ -178,8 +178,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
 #endif
 
-        using exception_list_termination_handler_type =
-            hpx::util::function_nonser<void()>;
+        using exception_list_termination_handler_type = hpx::function<void()>;
 
         HPX_CORE_EXPORT void set_exception_list_termination_handler(
             exception_list_termination_handler_type f);

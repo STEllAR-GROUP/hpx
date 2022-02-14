@@ -80,7 +80,7 @@ namespace hpx { namespace util {
 
     HPX_CORE_EXPORT void perftests_report(std::string const& name,
         std::string const& exec, const std::size_t steps,
-        function_nonser<void(void)>&& test);
+        hpx::function<void(void)>&& test);
 
     HPX_CORE_EXPORT void perftests_print_times();
 

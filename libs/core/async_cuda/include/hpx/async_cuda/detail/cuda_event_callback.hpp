@@ -16,14 +16,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <string>
 
 namespace hpx { namespace cuda { namespace experimental { namespace detail {
     using event_callback_function_type =
-        hpx::util::unique_function_nonser<void(cudaError_t)>;
+        hpx::move_only_function<void(cudaError_t)>;
 
     HPX_CORE_EXPORT void add_event_callback(
         event_callback_function_type&& f, cudaStream_t stream);

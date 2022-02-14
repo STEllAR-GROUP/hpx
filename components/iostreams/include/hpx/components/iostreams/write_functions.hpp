@@ -23,7 +23,7 @@
 namespace hpx { namespace iostreams
 {
 
-typedef util::function_nonser<void(std::vector<char> const&)> write_function_type;
+typedef hpx::function<void(std::vector<char> const&)> write_function_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Write function that works on STL OutputIterators

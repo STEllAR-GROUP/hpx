@@ -44,8 +44,7 @@ namespace hpx { namespace actions { namespace detail {
 
     per_action_data_counter_registry::counter_function_type
     per_action_data_counter_registry::get_counter(std::string const& name,
-        hpx::util::function_nonser<std::int64_t(
-            std::string const&, bool)> const& f) const
+        hpx::function<std::int64_t(std::string const&, bool)> const& f) const
     {
         map_type::const_iterator it = map_.find(name);
         if (it == map_.end())

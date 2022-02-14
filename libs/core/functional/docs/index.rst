@@ -14,9 +14,9 @@ functional
 This module provides function wrappers and helpers for managing functions and
 their arguments.
 
-* :cpp:class:`hpx::util::function`
-* :cpp:class:`hpx::util::function_ref`
-* :cpp:class:`hpx::util::unique_function`
+* :cpp:class:`hpx::function`
+* :cpp:class:`hpx::function_ref_`
+* :cpp:class:`hpx::move_only_function`
 * :cpp:func:`hpx::util::bind`
 * :cpp:func:`hpx::util::bind_back`
 * :cpp:func:`hpx::util::bind_front`

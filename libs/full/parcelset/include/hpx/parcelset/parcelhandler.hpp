@@ -374,8 +374,7 @@ namespace hpx::parcelset {
         write_handler_type set_write_handler(write_handler_type f);
 
         bool enum_parcelports(
-            hpx::util::unique_function_nonser<bool(std::string const&)> const&
-                f) const;
+            hpx::move_only_function<bool(std::string const&)> const& f) const;
 
         std::int64_t get_incoming_queue_length(bool /*reset*/) const
         {

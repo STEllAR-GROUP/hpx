@@ -35,11 +35,11 @@ namespace hpx::plugins::parcel {
     public:
         coalescing_counter_registry() {}
 
-        using get_counter_type = util::function_nonser<std::int64_t(bool)>;
+        using get_counter_type = hpx::function<std::int64_t(bool)>;
         using get_counter_values_type =
-            util::function_nonser<std::vector<std::int64_t>(bool)>;
+            hpx::function<std::vector<std::int64_t>(bool)>;
         using get_counter_values_creator_type =
-            util::function_nonser<void(std::int64_t, std::int64_t, std::int64_t,
+            hpx::function<void(std::int64_t, std::int64_t, std::int64_t,
                 get_counter_values_type&)>;
 
         struct counter_functions

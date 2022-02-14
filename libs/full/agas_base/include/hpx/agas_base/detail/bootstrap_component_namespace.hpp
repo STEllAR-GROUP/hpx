@@ -22,8 +22,8 @@ namespace hpx { namespace agas { namespace detail {
 
     struct bootstrap_component_namespace : component_namespace
     {
-        typedef hpx::util::function<void(
-            std::string const&, components::component_type)>
+        typedef hpx::function<
+            void(std::string const&, components::component_type), true>
             iterate_types_function_type;
 
         naming::address::address_type ptr() const

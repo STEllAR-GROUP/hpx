@@ -86,9 +86,8 @@ namespace hpx { namespace components {
         }
 
     protected:
-        using yield_decorator_type =
-            util::function_nonser<threads::thread_arg_type(
-                threads::thread_result_type)>;
+        using yield_decorator_type = hpx::function<threads::thread_arg_type(
+            threads::thread_result_type)>;
 
         struct decorate_wrapper
         {

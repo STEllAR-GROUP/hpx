@@ -744,9 +744,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
 
         // types we need for connection and disconnection callback functions
         // into the main parcelport code.
-        typedef util::function_nonser<void(fid_ep* endpoint, uint32_t ipaddr)>
+        typedef hpx::function<void(fid_ep* endpoint, uint32_t ipaddr)>
             ConnectionFunction;
-        typedef util::function_nonser<void(fid_ep* endpoint, uint32_t ipaddr)>
+        typedef hpx::function<void(fid_ep* endpoint, uint32_t ipaddr)>
             DisconnectionFunction;
 
         // --------------------------------------------------------------------

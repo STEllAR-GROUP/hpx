@@ -28,8 +28,8 @@ namespace hpx { namespace performance_counters { namespace server {
 
         raw_counter();
 
-        raw_counter(counter_info const& info,
-            hpx::util::function_nonser<std::int64_t(bool)> f);
+        raw_counter(
+            counter_info const& info, hpx::function<std::int64_t(bool)> f);
 
         hpx::performance_counters::counter_value get_counter_value(
             bool reset = false) override;
@@ -41,7 +41,7 @@ namespace hpx { namespace performance_counters { namespace server {
         naming::address get_current_address() const;
 
     private:
-        hpx::util::function_nonser<std::int64_t(bool)> f_;
+        hpx::function<std::int64_t(bool)> f_;
         bool reset_;
     };
 }}}    // namespace hpx::performance_counters::server

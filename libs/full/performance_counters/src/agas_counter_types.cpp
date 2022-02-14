@@ -26,48 +26,43 @@ namespace hpx { namespace performance_counters {
     void register_agas_counter_types(agas::addressing_service& client)
     {
         // install
-        util::function_nonser<std::int64_t(bool)> cache_entries(
-            util::bind_front(
-                &agas::addressing_service::get_cache_entries, &client));
-        util::function_nonser<std::int64_t(bool)> cache_hits(util::bind_front(
+        hpx::function<std::int64_t(bool)> cache_entries(util::bind_front(
+            &agas::addressing_service::get_cache_entries, &client));
+        hpx::function<std::int64_t(bool)> cache_hits(util::bind_front(
             &agas::addressing_service::get_cache_hits, &client));
-        util::function_nonser<std::int64_t(bool)> cache_misses(util::bind_front(
+        hpx::function<std::int64_t(bool)> cache_misses(util::bind_front(
             &agas::addressing_service::get_cache_misses, &client));
-        util::function_nonser<std::int64_t(bool)> cache_evictions(
-            util::bind_front(
-                &agas::addressing_service::get_cache_evictions, &client));
-        util::function_nonser<std::int64_t(bool)> cache_insertions(
-            util::bind_front(
-                &agas::addressing_service::get_cache_insertions, &client));
+        hpx::function<std::int64_t(bool)> cache_evictions(util::bind_front(
+            &agas::addressing_service::get_cache_evictions, &client));
+        hpx::function<std::int64_t(bool)> cache_insertions(util::bind_front(
+            &agas::addressing_service::get_cache_insertions, &client));
 
-        util::function_nonser<std::int64_t(bool)> cache_get_entry_count(
+        hpx::function<std::int64_t(bool)> cache_get_entry_count(
             util::bind_front(
                 &agas::addressing_service::get_cache_get_entry_count, &client));
-        util::function_nonser<std::int64_t(bool)> cache_insertion_count(
+        hpx::function<std::int64_t(bool)> cache_insertion_count(
             util::bind_front(
                 &agas::addressing_service::get_cache_insertion_entry_count,
                 &client));
-        util::function_nonser<std::int64_t(bool)> cache_update_entry_count(
+        hpx::function<std::int64_t(bool)> cache_update_entry_count(
             util::bind_front(
                 &agas::addressing_service::get_cache_update_entry_count,
                 &client));
-        util::function_nonser<std::int64_t(bool)> cache_erase_entry_count(
+        hpx::function<std::int64_t(bool)> cache_erase_entry_count(
             util::bind_front(
                 &agas::addressing_service::get_cache_erase_entry_count,
                 &client));
 
-        util::function_nonser<std::int64_t(bool)> cache_get_entry_time(
-            util::bind_front(
-                &agas::addressing_service::get_cache_get_entry_time, &client));
-        util::function_nonser<std::int64_t(bool)> cache_insertion_time(
-            util::bind_front(
-                &agas::addressing_service::get_cache_insertion_entry_time,
-                &client));
-        util::function_nonser<std::int64_t(bool)> cache_update_entry_time(
+        hpx::function<std::int64_t(bool)> cache_get_entry_time(util::bind_front(
+            &agas::addressing_service::get_cache_get_entry_time, &client));
+        hpx::function<std::int64_t(bool)> cache_insertion_time(util::bind_front(
+            &agas::addressing_service::get_cache_insertion_entry_time,
+            &client));
+        hpx::function<std::int64_t(bool)> cache_update_entry_time(
             util::bind_front(
                 &agas::addressing_service::get_cache_update_entry_time,
                 &client));
-        util::function_nonser<std::int64_t(bool)> cache_erase_entry_time(
+        hpx::function<std::int64_t(bool)> cache_erase_entry_time(
             util::bind_front(
                 &agas::addressing_service::get_cache_erase_entry_time,
                 &client));

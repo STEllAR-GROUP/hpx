@@ -936,8 +936,7 @@ namespace hpx { namespace threads { namespace policies {
             }
         }
 
-        bool enumerate_threads(
-            util::function_nonser<bool(thread_id_type)> const& f,
+        bool enumerate_threads(hpx::function<bool(thread_id_type)> const& f,
             thread_schedule_state state = thread_schedule_state::unknown) const
         {
             std::uint64_t count = thread_map_count_;

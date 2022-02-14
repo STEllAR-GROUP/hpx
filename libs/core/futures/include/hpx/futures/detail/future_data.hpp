@@ -65,7 +65,7 @@ namespace hpx {
 namespace hpx { namespace lcos { namespace detail {
 
     using run_on_completed_error_handler_type =
-        util::function_nonser<void(std::exception_ptr const& e)>;
+        hpx::function<void(std::exception_ptr const& e)>;
     HPX_CORE_EXPORT void set_run_on_completed_error_handler(
         run_on_completed_error_handler_type f);
 
@@ -90,7 +90,7 @@ namespace hpx { namespace lcos { namespace detail {
         future_data_refcnt_base& operator=(future_data_refcnt_base&&) = delete;
 
     public:
-        using completed_callback_type = util::unique_function_nonser<void()>;
+        using completed_callback_type = hpx::move_only_function<void()>;
         using completed_callback_vector_type =
             hpx::detail::small_vector<completed_callback_type, 1>;
 

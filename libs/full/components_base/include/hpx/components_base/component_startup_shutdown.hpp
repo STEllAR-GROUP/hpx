@@ -60,9 +60,9 @@ namespace hpx { namespace components {
                 bool HPX_PP_CAT(HPX_PLUGIN_COMPONENT_PREFIX, _startup)(        \
                     startup_function_type & startup_func, bool& pre_startup)   \
                 {                                                              \
-                    util::function_nonser<bool(startup_function_type&, bool&)> \
-                        tmp = static_cast<bool (*)(                            \
-                            startup_function_type&, bool&)>(startup_);         \
+                    hpx::function<bool(startup_function_type&, bool&)> tmp =   \
+                        static_cast<bool (*)(startup_function_type&, bool&)>(  \
+                            startup_);                                         \
                     if (!!tmp)                                                 \
                     {                                                          \
                         return tmp(startup_func, pre_startup);                 \
@@ -73,10 +73,9 @@ namespace hpx { namespace components {
                     shutdown_function_type & shutdown_func,                    \
                     bool& pre_shutdown)                                        \
                 {                                                              \
-                    util::function_nonser<bool(                                \
-                        shutdown_function_type&, bool&)>                       \
-                        tmp = static_cast<bool (*)(                            \
-                            shutdown_function_type&, bool&)>(shutdown_);       \
+                    hpx::function<bool(shutdown_function_type&, bool&)> tmp =  \
+                        static_cast<bool (*)(shutdown_function_type&, bool&)>( \
+                            shutdown_);                                        \
                     if (!!tmp)                                                 \
                     {                                                          \
                         return tmp(shutdown_func, pre_shutdown);               \

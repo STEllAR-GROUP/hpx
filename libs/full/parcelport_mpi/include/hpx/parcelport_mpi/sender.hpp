@@ -68,7 +68,7 @@ namespace hpx::parcelset::policies::mpi {
             if (connection->send())
             {
                 error_code ec(lightweight);
-                util::unique_function_nonser<void(error_code const&,
+                hpx::move_only_function<void(error_code const&,
                     parcelset::locality const&, connection_ptr)>
                     postprocess_handler;
                 std::swap(

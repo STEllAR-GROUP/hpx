@@ -50,7 +50,7 @@ namespace hpx { namespace resource {
     };
 
     using scheduler_function =
-        util::function_nonser<std::unique_ptr<hpx::threads::thread_pool_base>(
+        hpx::function<std::unique_ptr<hpx::threads::thread_pool_base>(
             hpx::threads::thread_pool_init_parameters,
             hpx::threads::policies::thread_queue_init_parameters)>;
 

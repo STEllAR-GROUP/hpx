@@ -35,75 +35,70 @@ namespace hpx::performance_counters {
         using parcelset::parcelhandler;
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-        util::function_nonser<std::int64_t(std::string const&, bool)>
-            num_parcel_sends(util::bind_front(
+        hpx::function<std::int64_t(std::string const&, bool)> num_parcel_sends(
+            util::bind_front(
                 &parcelhandler::get_action_parcel_send_count, &ph, pp_type));
-        util::function_nonser<std::int64_t(std::string const&, bool)>
+        hpx::function<std::int64_t(std::string const&, bool)>
             num_parcel_receives(util::bind_front(
                 &parcelhandler::get_action_parcel_receive_count, &ph, pp_type));
 #else
-        util::function_nonser<std::int64_t(bool)> num_parcel_sends(
-            util::bind_front(
-                &parcelhandler::get_parcel_send_count, &ph, pp_type));
-        util::function_nonser<std::int64_t(bool)> num_parcel_receives(
-            util::bind_front(
-                &parcelhandler::get_parcel_receive_count, &ph, pp_type));
+        hpx::function<std::int64_t(bool)> num_parcel_sends(util::bind_front(
+            &parcelhandler::get_parcel_send_count, &ph, pp_type));
+        hpx::function<std::int64_t(bool)> num_parcel_receives(util::bind_front(
+            &parcelhandler::get_parcel_receive_count, &ph, pp_type));
 #endif
 
-        util::function_nonser<std::int64_t(bool)> num_message_sends(
-            util::bind_front(
-                &parcelhandler::get_message_send_count, &ph, pp_type));
-        util::function_nonser<std::int64_t(bool)> num_message_receives(
-            util::bind_front(
-                &parcelhandler::get_message_receive_count, &ph, pp_type));
+        hpx::function<std::int64_t(bool)> num_message_sends(util::bind_front(
+            &parcelhandler::get_message_send_count, &ph, pp_type));
+        hpx::function<std::int64_t(bool)> num_message_receives(util::bind_front(
+            &parcelhandler::get_message_receive_count, &ph, pp_type));
 
-        util::function_nonser<std::int64_t(bool)> sending_time(
+        hpx::function<std::int64_t(bool)> sending_time(
             util::bind_front(&parcelhandler::get_sending_time, &ph, pp_type));
-        util::function_nonser<std::int64_t(bool)> receiving_time(
+        hpx::function<std::int64_t(bool)> receiving_time(
             util::bind_front(&parcelhandler::get_receiving_time, &ph, pp_type));
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-        util::function_nonser<std::int64_t(std::string const&, bool)>
+        hpx::function<std::int64_t(std::string const&, bool)>
             sending_serialization_time(util::bind_front(
                 &parcelhandler::get_action_sending_serialization_time, &ph,
                 pp_type));
-        util::function_nonser<std::int64_t(std::string const&, bool)>
+        hpx::function<std::int64_t(std::string const&, bool)>
             receiving_serialization_time(util::bind_front(
                 &parcelhandler::get_action_receiving_serialization_time, &ph,
                 pp_type));
 #else
-        util::function_nonser<std::int64_t(bool)> sending_serialization_time(
+        hpx::function<std::int64_t(bool)> sending_serialization_time(
             util::bind_front(
                 &parcelhandler::get_sending_serialization_time, &ph, pp_type));
-        util::function_nonser<std::int64_t(bool)> receiving_serialization_time(
+        hpx::function<std::int64_t(bool)> receiving_serialization_time(
             util::bind_front(&parcelhandler::get_receiving_serialization_time,
                 &ph, pp_type));
 #endif
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-        util::function_nonser<std::int64_t(std::string const&, bool)> data_sent(
+        hpx::function<std::int64_t(std::string const&, bool)> data_sent(
             util::bind_front(
                 &parcelhandler::get_action_data_sent, &ph, pp_type));
-        util::function_nonser<std::int64_t(std::string const&, bool)>
-            data_received(util::bind_front(
+        hpx::function<std::int64_t(std::string const&, bool)> data_received(
+            util::bind_front(
                 &parcelhandler::get_action_data_received, &ph, pp_type));
 #else
-        util::function_nonser<std::int64_t(bool)> data_sent(
+        hpx::function<std::int64_t(bool)> data_sent(
             util::bind_front(&parcelhandler::get_data_sent, &ph, pp_type));
-        util::function_nonser<std::int64_t(bool)> data_received(
+        hpx::function<std::int64_t(bool)> data_received(
             util::bind_front(&parcelhandler::get_data_received, &ph, pp_type));
 #endif
 
-        util::function_nonser<std::int64_t(bool)> data_raw_sent(
+        hpx::function<std::int64_t(bool)> data_raw_sent(
             util::bind_front(&parcelhandler::get_raw_data_sent, &ph, pp_type));
-        util::function_nonser<std::int64_t(bool)> data_raw_received(
-            util::bind_front(
-                &parcelhandler::get_raw_data_received, &ph, pp_type));
+        hpx::function<std::int64_t(bool)> data_raw_received(util::bind_front(
+            &parcelhandler::get_raw_data_received, &ph, pp_type));
 
-        util::function_nonser<std::int64_t(bool)> buffer_allocate_time_sent(
+        hpx::function<std::int64_t(bool)> buffer_allocate_time_sent(
             util::bind_front(
                 &parcelhandler::get_buffer_allocate_time_sent, &ph, pp_type));
-        util::function_nonser<std::int64_t(bool)> buffer_allocate_time_received(
+        hpx::function<std::int64_t(bool)> buffer_allocate_time_received(
             util::bind_front(&parcelhandler::get_buffer_allocate_time_received,
                 &ph, pp_type));
 
@@ -350,19 +345,19 @@ namespace hpx::performance_counters {
         using parcelset::parcelhandler;
         using parcelset::parcelport;
 
-        util::function_nonser<std::int64_t(bool)> cache_insertions(
+        hpx::function<std::int64_t(bool)> cache_insertions(
             util::bind_front(&parcelhandler::get_connection_cache_statistics,
                 &ph, pp_type, parcelport::connection_cache_insertions));
-        util::function_nonser<std::int64_t(bool)> cache_evictions(
+        hpx::function<std::int64_t(bool)> cache_evictions(
             util::bind_front(&parcelhandler::get_connection_cache_statistics,
                 &ph, pp_type, parcelport::connection_cache_evictions));
-        util::function_nonser<std::int64_t(bool)> cache_hits(
+        hpx::function<std::int64_t(bool)> cache_hits(
             util::bind_front(&parcelhandler::get_connection_cache_statistics,
                 &ph, pp_type, parcelport::connection_cache_hits));
-        util::function_nonser<std::int64_t(bool)> cache_misses(
+        hpx::function<std::int64_t(bool)> cache_misses(
             util::bind_front(&parcelhandler::get_connection_cache_statistics,
                 &ph, pp_type, parcelport::connection_cache_misses));
-        util::function_nonser<std::int64_t(bool)> cache_reclaims(
+        hpx::function<std::int64_t(bool)> cache_reclaims(
             util::bind_front(&parcelhandler::get_connection_cache_statistics,
                 &ph, pp_type, parcelport::connection_cache_reclaims));
 
@@ -453,11 +448,11 @@ namespace hpx::performance_counters {
         using parcelset::parcelhandler;
 
         // register common counters
-        util::function_nonser<std::int64_t(bool)> incoming_queue_length(
+        hpx::function<std::int64_t(bool)> incoming_queue_length(
             util::bind_front(&parcelhandler::get_incoming_queue_length, &ph));
-        util::function_nonser<std::int64_t(bool)> outgoing_queue_length(
+        hpx::function<std::int64_t(bool)> outgoing_queue_length(
             util::bind_front(&parcelhandler::get_outgoing_queue_length, &ph));
-        util::function_nonser<std::int64_t(bool)> outgoing_routed_count(
+        hpx::function<std::int64_t(bool)> outgoing_routed_count(
             util::bind_front(&parcelhandler::get_parcel_routed_count, &ph));
 
         performance_counters::generic_counter_type_data const counter_types[] =

@@ -116,8 +116,7 @@ namespace hpx { namespace threads { namespace detail {
             return sched_->Scheduler::get_background_thread_count();
         }
 
-        bool enumerate_threads(
-            util::function_nonser<bool(thread_id_type)> const& f,
+        bool enumerate_threads(hpx::function<bool(thread_id_type)> const& f,
             thread_schedule_state state) const override
         {
             return sched_->Scheduler::enumerate_threads(f, state);

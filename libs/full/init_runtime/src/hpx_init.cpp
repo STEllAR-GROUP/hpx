@@ -606,8 +606,8 @@ namespace hpx {
 
         ///////////////////////////////////////////////////////////////////////
         int run(hpx::runtime& rt,
-            util::function_nonser<int(
-                hpx::program_options::variables_map& vm)> const& f,
+            hpx::function<int(hpx::program_options::variables_map& vm)> const&
+                f,
             hpx::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type startup, shutdown_function_type shutdown)
         {
@@ -625,8 +625,8 @@ namespace hpx {
         }
 
         int start(hpx::runtime& rt,
-            util::function_nonser<int(
-                hpx::program_options::variables_map& vm)> const& f,
+            hpx::function<int(hpx::program_options::variables_map& vm)> const&
+                f,
             hpx::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type startup, shutdown_function_type shutdown)
         {
@@ -759,8 +759,9 @@ namespace hpx {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        int run_or_start(util::function_nonser<int(
-                             hpx::program_options::variables_map& vm)> const& f,
+        int run_or_start(
+            hpx::function<int(hpx::program_options::variables_map& vm)> const&
+                f,
             int argc, char** argv, init_params const& params, bool blocking)
         {
             init_environment();

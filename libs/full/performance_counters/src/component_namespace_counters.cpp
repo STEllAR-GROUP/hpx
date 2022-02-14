@@ -172,7 +172,7 @@ namespace hpx { namespace agas { namespace server {
 
         typedef component_namespace::counter_data cd;
 
-        util::function_nonser<std::int64_t(bool)> get_data_func;
+        hpx::function<std::int64_t(bool)> get_data_func;
         if (target == detail::counter_target_count)
         {
             switch (code)

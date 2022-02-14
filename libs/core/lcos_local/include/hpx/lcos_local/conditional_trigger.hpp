@@ -64,6 +64,6 @@ namespace hpx { namespace lcos { namespace local {
 
     private:
         lcos::local::promise<void> promise_;
-        util::function_nonser<bool()> cond_;
+        hpx::function<bool()> cond_;
     };
 }}}    // namespace hpx::lcos::local

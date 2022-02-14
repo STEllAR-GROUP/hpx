@@ -15,7 +15,7 @@
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/errors.hpp>
@@ -44,7 +44,7 @@ namespace hpx {
             {
             }
 
-            void set_task(util::unique_function_nonser<void()>&& f)
+            void set_task(hpx::move_only_function<void()>&& f)
             {
                 f_ = HPX_MOVE(f);
             }
@@ -71,7 +71,7 @@ namespace hpx {
                     });
             }
 
-            util::unique_function_nonser<void()> f_;
+            hpx::move_only_function<void()> f_;
         };
 
         template <typename Result, typename Allocator>

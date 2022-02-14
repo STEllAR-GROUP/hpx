@@ -47,9 +47,8 @@ namespace hpx {
     /// \cond NOINTERNAL
     namespace resource {
         // Utilities to init the thread_pools of the resource partitioner
-        using rp_callback_type =
-            hpx::util::function_nonser<void(hpx::resource::partitioner&,
-                hpx::program_options::variables_map const&)>;
+        using rp_callback_type = hpx::function<void(hpx::resource::partitioner&,
+            hpx::program_options::variables_map const&)>;
     }    // namespace resource
     /// \endcond
 

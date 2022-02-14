@@ -20,7 +20,7 @@ namespace hpx { namespace util {
 
 #ifdef HPX_HAVE_APEX
 
-    using enable_parent_task_handler_type = util::function_nonser<bool()>;
+    using enable_parent_task_handler_type = hpx::function<bool()>;
 
     HPX_CORE_EXPORT void set_enable_parent_task_handler(
         enable_parent_task_handler_type f);

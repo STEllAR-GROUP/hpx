@@ -81,7 +81,7 @@ namespace hpx { namespace performance_counters { namespace detail {
         {
             // overall counter
             using detail::create_raw_counter;
-            util::function_nonser<std::int64_t(bool)> f =
+            hpx::function<std::int64_t(bool)> f =
                 util::bind_front(total_func, tm);
             return create_raw_counter(info, HPX_MOVE(f), ec);
         }
@@ -96,7 +96,7 @@ namespace hpx { namespace performance_counters { namespace detail {
                     hpx::resource::get_thread_pool(paths.instanceindex_);
 
                 using detail::create_raw_counter;
-                util::function_nonser<std::int64_t(bool)> f =
+                hpx::function<std::int64_t(bool)> f =
                     util::bind_front(pool_func, &pool_instance,
                         static_cast<std::size_t>(paths.subinstanceindex_));
                 return create_raw_counter(info, HPX_MOVE(f), ec);
@@ -108,9 +108,8 @@ namespace hpx { namespace performance_counters { namespace detail {
         {
             // specific counter from default
             using detail::create_raw_counter;
-            util::function_nonser<std::int64_t(bool)> f =
-                util::bind_front(pool_func, &pool,
-                    static_cast<std::size_t>(paths.instanceindex_));
+            hpx::function<std::int64_t(bool)> f = util::bind_front(pool_func,
+                &pool, static_cast<std::size_t>(paths.instanceindex_));
             return create_raw_counter(info, HPX_MOVE(f), ec);
         }
 
@@ -146,7 +145,7 @@ namespace hpx { namespace performance_counters { namespace detail {
         if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
         {
             // counter for default pool
-            util::function_nonser<std::int64_t()> f = util::bind_back(
+            hpx::function<std::int64_t()> f = util::bind_back(
                 &threads::thread_pool_base::get_scheduler_utilization, &pool);
             return create_raw_counter(info, HPX_MOVE(f), ec);
         }
@@ -155,7 +154,7 @@ namespace hpx { namespace performance_counters { namespace detail {
             if (paths.instanceindex_ < 0)
             {
                 // counter for default pool
-                util::function_nonser<std::int64_t()> f = util::bind_back(
+                hpx::function<std::int64_t()> f = util::bind_back(
                     &threads::thread_pool_base::get_scheduler_utilization,
                     &pool);
                 return create_raw_counter(info, HPX_MOVE(f), ec);
@@ -167,7 +166,7 @@ namespace hpx { namespace performance_counters { namespace detail {
                 threads::thread_pool_base& pool_instance =
                     hpx::resource::get_thread_pool(paths.instanceindex_);
 
-                util::function_nonser<std::int64_t()> f = util::bind_back(
+                hpx::function<std::int64_t()> f = util::bind_back(
                     &threads::thread_pool_base::get_scheduler_utilization,
                     &pool_instance);
                 return create_raw_counter(info, HPX_MOVE(f), ec);
@@ -223,7 +222,7 @@ namespace hpx { namespace performance_counters { namespace detail {
                     hpx::resource::get_thread_pool(paths.instanceindex_);
 
                 using detail::create_raw_counter;
-                util::function_nonser<std::int64_t(bool)> f =
+                hpx::function<std::int64_t(bool)> f =
                     util::bind_front(pool_func, &pool_instance,
                         static_cast<std::size_t>(paths.subinstanceindex_));
                 return create_raw_counter(info, HPX_MOVE(f), ec);
@@ -235,9 +234,8 @@ namespace hpx { namespace performance_counters { namespace detail {
         {
             // specific counter
             using detail::create_raw_counter;
-            util::function_nonser<std::int64_t(bool)> f =
-                util::bind_front(pool_func, &pool,
-                    static_cast<std::size_t>(paths.instanceindex_));
+            hpx::function<std::int64_t(bool)> f = util::bind_front(pool_func,
+                &pool, static_cast<std::size_t>(paths.instanceindex_));
             return create_raw_counter(info, HPX_MOVE(f), ec);
         }
 
@@ -343,8 +341,8 @@ namespace hpx { namespace performance_counters { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     naming::gid_type counter_creator(counter_info const& info,
         counter_path_elements const& paths,
-        util::function_nonser<std::int64_t(bool)> const& total_creator,
-        util::function_nonser<std::int64_t(bool)> const& individual_creator,
+        hpx::function<std::int64_t(bool)> const& total_creator,
+        hpx::function<std::int64_t(bool)> const& individual_creator,
         char const* individual_name, std::size_t individual_count,
         error_code& ec)
     {
@@ -395,8 +393,8 @@ namespace hpx { namespace performance_counters { namespace detail {
         struct creator_data
         {
             char const* const countername;
-            util::function_nonser<std::int64_t(bool)> total_func;
-            util::function_nonser<std::int64_t(bool)> individual_func;
+            hpx::function<std::int64_t(bool)> total_func;
+            hpx::function<std::int64_t(bool)> individual_func;
             char const* const individual_name;
             std::size_t individual_count;
         };
@@ -406,13 +404,13 @@ namespace hpx { namespace performance_counters { namespace detail {
             {"count/stack-recycles",
                 util::bind_front(&threads::coroutine_type::impl_type::
                                      get_stack_recycle_count),
-                util::function_nonser<std::uint64_t(bool)>(), "", 0},
+                hpx::function<std::uint64_t(bool)>(), "", 0},
 #if !defined(HPX_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
             // /threads{locality#%d/total}/count/stack-unbinds
             {"count/stack-unbinds",
                 util::bind_front(&threads::coroutine_type::impl_type::
                                      get_stack_unbind_count),
-                util::function_nonser<std::uint64_t(bool)>(), "", 0},
+                hpx::function<std::uint64_t(bool)>(), "", 0},
 #endif
         };
         std::size_t const data_size = sizeof(data) / sizeof(data[0]);

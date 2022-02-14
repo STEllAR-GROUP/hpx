@@ -110,7 +110,7 @@ struct add_to_obj
 
 static void test_zero_args()
 {
-    typedef hpx::util::function_ref<void()> func_void_type;
+    typedef hpx::function_ref<void()> func_void_type;
 
     write_five_obj five;
     write_three_obj three;
@@ -405,8 +405,8 @@ static void test_zero_args()
 
     // Const vs. non-const
     write_const_1_nonconst_2 one_or_two;
-    const hpx::util::function_ref<void()> v7(one_or_two);
-    hpx::util::function_ref<void()> v8(one_or_two);
+    const hpx::function_ref<void()> v7(one_or_two);
+    hpx::function_ref<void()> v8(one_or_two);
 
     global_int = 0;
     v7();
@@ -417,7 +417,7 @@ static void test_zero_args()
     HPX_TEST_EQ(global_int, 2);
 
     // Test return values
-    typedef hpx::util::function_ref<int()> func_int_type;
+    typedef hpx::function_ref<int()> func_int_type;
     generate_five_obj gen_five;
     generate_three_obj gen_three;
 
@@ -432,7 +432,7 @@ static void test_zero_args()
     HPX_TEST_EQ(i0(), 3);
 
     // Test return values with compatible types
-    typedef hpx::util::function_ref<long()> func_long_type;
+    typedef hpx::function_ref<long()> func_long_type;
     func_long_type i1(gen_five);
 
     HPX_TEST_EQ(i1(), 5);
@@ -448,30 +448,29 @@ static void test_one_arg()
 {
     std::negate<int> neg;
 
-    hpx::util::function_ref<int(int)> f1(neg);
+    hpx::function_ref<int(int)> f1(neg);
     HPX_TEST_EQ(f1(5), -5);
 
-    hpx::util::function_ref<string(string)> id(&identity_str);
+    hpx::function_ref<string(string)> id(&identity_str);
     HPX_TEST_EQ(id("str"), "str");
 
-    hpx::util::function_ref<string(const char*)> id2(&identity_str);
+    hpx::function_ref<string(const char*)> id2(&identity_str);
     HPX_TEST_EQ(id2("foo"), "foo");
 
     add_to_obj add_to(5);
-    hpx::util::function_ref<int(int)> f2(add_to);
+    hpx::function_ref<int(int)> f2(add_to);
     HPX_TEST_EQ(f2(3), 8);
 
-    const hpx::util::function_ref<int(int)> cf2(add_to);
+    const hpx::function_ref<int(int)> cf2(add_to);
     HPX_TEST_EQ(cf2(3), 8);
 }
 
 static void test_two_args()
 {
-    hpx::util::function_ref<string(const string&, const string&)> cat(
-        &string_cat);
+    hpx::function_ref<string(const string&, const string&)> cat(&string_cat);
     HPX_TEST_EQ(cat("str", "ing"), "string");
 
-    hpx::util::function_ref<int(short, short)> sum(&sum_ints);
+    hpx::function_ref<int(short, short)> sum(&sum_ints);
     HPX_TEST_EQ(sum(2, 3), 5);
 }
 
@@ -500,7 +499,7 @@ static void test_ref()
     add_with_throw_on_copy atc;
     try
     {
-        hpx::util::function_ref<int(int, int)> f(std::ref(atc));
+        hpx::function_ref<int(int, int)> f(std::ref(atc));
         HPX_TEST_EQ(f(1, 3), 4);
     }
     catch (std::runtime_error const& /*e*/)
@@ -511,8 +510,8 @@ static void test_ref()
 
 static void test_ptr_ref()
 {
-    typedef hpx::util::function_ref<void()> func_void_type;
-    typedef hpx::util::function_ref<int()> func_int_type;
+    typedef hpx::function_ref<void()> func_void_type;
+    typedef hpx::function_ref<int()> func_int_type;
 
     // Invocation of a function
     void (*void_ptr)() = &write_five;
@@ -575,7 +574,7 @@ struct big_aggregating_structure
 
 static void test_copy_semantics()
 {
-    typedef hpx::util::function_ref<void()> f1_type;
+    typedef hpx::function_ref<void()> f1_type;
 
     big_aggregating_structure obj;
 

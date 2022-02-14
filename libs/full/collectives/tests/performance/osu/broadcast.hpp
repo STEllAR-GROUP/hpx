@@ -29,7 +29,7 @@
 namespace hpx { namespace lcos {
     namespace detail {
         void broadcast_impl(std::vector<hpx::id_type> ids,
-            hpx::util::function<void(hpx::id_type)> fun,
+            hpx::function<void(hpx::id_type), true> fun,
             std::size_t fan_out = 2);
         HPX_DEFINE_PLAIN_ACTION(broadcast_impl, broadcast_impl_action);
     }    // namespace detail
@@ -132,7 +132,7 @@ namespace hpx { namespace lcos {
 
     namespace detail {
         void broadcast_impl(std::vector<hpx::id_type> ids,
-            hpx::util::function<void(hpx::id_type)> fun, std::size_t fan_out)
+            hpx::function<void(hpx::id_type), true> fun, std::size_t fan_out)
         {
             // Call some action for the fan_out first ids here ...
             std::vector<hpx::future<void>> broadcast_futures;

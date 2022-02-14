@@ -138,8 +138,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
         performance_counter<unsigned int> sends_deleted_;
         performance_counter<unsigned int> acks_received_;
         //
-        util::unique_function_nonser<void(error_code const&)> handler_;
-        util::function_nonser<void(sender*)> postprocess_handler_;
+        hpx::move_only_function<void(error_code const&)> handler_;
+        hpx::function<void(sender*)> postprocess_handler_;
         //
         struct iovec region_list_[2];
         void* desc_[2];

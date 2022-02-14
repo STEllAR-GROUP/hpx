@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
@@ -398,8 +398,8 @@ namespace hpx { namespace threads { namespace detail {
 
     struct scheduling_callbacks
     {
-        using callback_type = util::unique_function_nonser<void()>;
-        using background_callback_type = util::unique_function_nonser<bool()>;
+        using callback_type = hpx::move_only_function<void()>;
+        using background_callback_type = hpx::move_only_function<bool()>;
 
         explicit scheduling_callbacks(callback_type&& outer,
             callback_type&& inner = callback_type(),

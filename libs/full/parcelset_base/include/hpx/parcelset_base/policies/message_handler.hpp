@@ -26,7 +26,7 @@ namespace hpx::parcelset::policies {
             flush_mode_buffer_full = 2
         };
 
-        using write_handler_type = util::function_nonser<void(
+        using write_handler_type = hpx::function<void(
             std::error_code const&, parcelset::parcel const&)>;
 
         virtual ~message_handler() = default;

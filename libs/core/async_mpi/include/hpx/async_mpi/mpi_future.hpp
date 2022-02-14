@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_mpi/mpi_exception.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/execution_base.hpp>
@@ -31,7 +31,7 @@ namespace hpx { namespace mpi { namespace experimental {
     namespace detail {
 
         using request_callback_function_type =
-            hpx::util::unique_function_nonser<void(int)>;
+            hpx::move_only_function<void(int)>;
 
         HPX_CORE_EXPORT void add_request_callback(
             request_callback_function_type&& f, MPI_Request req);

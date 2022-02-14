@@ -7,14 +7,13 @@
 #include <hpx/config.hpp>
 
 // The following implementation has been divided for Linux and Mac OSX
-#if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) && \
-    (defined(__linux) || defined(__linux__) || defined(linux) || \
-    defined(__APPLE__))
+#if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) &&                                      \
+    (defined(__linux) || defined(__linux__) || defined(linux) ||               \
+        defined(__APPLE__))
 
 #include <string>
 
-namespace hpx_start
-{
+namespace hpx_start {
     // include_libhpx_wrap is a weak symbol which helps to determine the course
     // of function calls at runtime. It has a default value of `false` which
     // corresponds to the program's entry point being main().
@@ -32,23 +31,22 @@ namespace hpx_start
     // trying to register thread when not linked to libhpx_wrap and using
     // hpx_main.hpp functionality.
     HPX_SYMBOL_EXPORT bool is_linked = true;
-}
+}    // namespace hpx_start
 
+#include <hpx/functional/function.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
-#include <hpx/functional/function.hpp>
 
 #include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Function declarations
 //
-namespace hpx_start
-{
+namespace hpx_start {
     // Main entry point of HPX runtime system
     extern int hpx_entry(int argc, char* argv[]);
-}
+}    // namespace hpx_start
 
 // Program's entry point depending upon Operating System.
 // For Mac OSX it is the program's entry point. In case of Linux
@@ -68,8 +66,7 @@ extern "C" int __wrap_main(int argc, char** argv);
 extern "C" int main(int argc, char** argv);
 #endif
 
-namespace hpx_start
-{
+namespace hpx_start {
     // main entry point of the HPX runtime system
     int hpx_entry(int argc, char* argv[])
     {
@@ -85,8 +82,7 @@ namespace hpx_start
         hpx::finalize();
         return return_value;
     }
-}
-
+}    // namespace hpx_start
 
 // This is the main entry point of C runtime system.
 // The HPX runtime system is initialized here, which
@@ -95,7 +91,7 @@ namespace hpx_start
 extern "C" int initialize_main(int argc, char** argv)
 {
 #if defined(__APPLE__)
-    if(hpx_start::include_libhpx_wrap)
+    if (hpx_start::include_libhpx_wrap)
     {
 #endif
         // Configuring HPX system before runtime
@@ -103,11 +99,10 @@ extern "C" int initialize_main(int argc, char** argv)
             "hpx.commandline.allow_unknown!=1",
             "hpx.commandline.aliasing=0",
         };
-        hpx::util::function_nonser<int(int, char**)> start_function =
-            &hpx_start::hpx_entry;
+        hpx::function<int(int, char**)> start_function = &hpx_start::hpx_entry;
         using hpx::program_options::options_description;
-        options_description desc = options_description(
-            std::string("Usage: ") + ::hpx_start::app_name_libhpx_wrap + " [options]");
+        options_description desc = options_description(std::string("Usage: ") +
+            ::hpx_start::app_name_libhpx_wrap + " [options]");
         // Create the init_params struct
         hpx::init_params iparams;
         iparams.desc_cmdline = desc;
@@ -134,7 +129,7 @@ extern "C" int __wrap_main(int argc, char** argv)
     // from the value of include_libhpx_wrap. If hpx_main
     // is included include_libhpx_wrap is set to 1
     // due to override variable.
-    if(hpx_start::include_libhpx_wrap)
+    if (hpx_start::include_libhpx_wrap)
         return initialize_main(argc, argv);
 
     // call main() since hpx_main.hpp is not included

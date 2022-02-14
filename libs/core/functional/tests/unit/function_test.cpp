@@ -11,8 +11,8 @@
 
 // For more information, see http://www.boost.org
 
-// NOTE: Warning caused by assignment of hpx::util::function_nonser<float()> to
-// hpx::util::function_nonser<double()> in test_emptiness. Triggered in
+// NOTE: Warning caused by assignment of hpx::function<float()> to
+// hpx::function<double()> in test_emptiness. Triggered in
 // hpx/functional/function.hpp which is included latest by hpx/include/util.hpp.
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -125,7 +125,7 @@ struct add_to_obj
 
 static void test_zero_args()
 {
-    typedef hpx::util::function_nonser<void()> func_void_type;
+    typedef hpx::function<void()> func_void_type;
 
     write_five_obj five;
     write_three_obj three;
@@ -572,8 +572,8 @@ static void test_zero_args()
 
     // Const vs. non-const
     write_const_1_nonconst_2 one_or_two;
-    const hpx::util::function_nonser<void()> v7(one_or_two);
-    hpx::util::function_nonser<void()> v8(one_or_two);
+    const hpx::function<void()> v7(one_or_two);
+    hpx::function<void()> v8(one_or_two);
 
     global_int = 0;
     v7();
@@ -593,7 +593,7 @@ static void test_zero_args()
     HPX_TEST(v9np.empty());
 
     // Test return values
-    typedef hpx::util::function_nonser<int()> func_int_type;
+    typedef hpx::function<int()> func_int_type;
     generate_five_obj gen_five;
     generate_three_obj gen_three;
 
@@ -611,7 +611,7 @@ static void test_zero_args()
     HPX_TEST(!i0);
 
     // Test return values with compatible types
-    typedef hpx::util::function_nonser<long()> func_long_type;
+    typedef hpx::function<long()> func_long_type;
     func_long_type i1(gen_five);
 
     HPX_TEST_EQ(i1(), 5);
@@ -630,43 +630,42 @@ static void test_one_arg()
 {
     std::negate<int> neg;
 
-    hpx::util::function_nonser<int(int)> f1(neg);
+    hpx::function<int(int)> f1(neg);
     HPX_TEST_EQ(f1(5), -5);
 
-    hpx::util::function_nonser<string(string)> id(&identity_str);
+    hpx::function<string(string)> id(&identity_str);
     HPX_TEST_EQ(id("str"), "str");
 
-    hpx::util::function_nonser<string(const char*)> id2(&identity_str);
+    hpx::function<string(const char*)> id2(&identity_str);
     HPX_TEST_EQ(id2("foo"), "foo");
 
     add_to_obj add_to(5);
-    hpx::util::function_nonser<int(int)> f2(add_to);
+    hpx::function<int(int)> f2(add_to);
     HPX_TEST_EQ(f2(3), 8);
 
-    const hpx::util::function_nonser<int(int)> cf2(add_to);
+    const hpx::function<int(int)> cf2(add_to);
     HPX_TEST_EQ(cf2(3), 8);
 }
 
 static void test_two_args()
 {
-    hpx::util::function_nonser<string(const string&, const string&)> cat(
-        &string_cat);
+    hpx::function<string(const string&, const string&)> cat(&string_cat);
     HPX_TEST_EQ(cat("str", "ing"), "string");
 
-    hpx::util::function_nonser<int(short, short)> sum(&sum_ints);
+    hpx::function<int(short, short)> sum(&sum_ints);
     HPX_TEST_EQ(sum(2, 3), 5);
 }
 
 static void test_emptiness()
 {
-    hpx::util::function_nonser<float()> f1;
+    hpx::function<float()> f1;
     HPX_TEST(f1.empty());
 
-    hpx::util::function_nonser<float()> f2;
+    hpx::function<float()> f2;
     f2 = f1;
     HPX_TEST(f2.empty());
 
-    hpx::util::function_nonser<double()> f3;
+    hpx::function<double()> f3;
     f3 = f2;
     HPX_TEST(f3.empty());
 }
@@ -692,7 +691,7 @@ struct X
 
 static void test_member_functions()
 {
-    hpx::util::function_nonser<int(X*)> f1(&X::twice);
+    hpx::function<int(X*)> f1(&X::twice);
 
     X one(1);
     X five(5);
@@ -700,13 +699,13 @@ static void test_member_functions()
     HPX_TEST_EQ(f1(&one), 2);
     HPX_TEST_EQ(f1(&five), 10);
 
-    hpx::util::function_nonser<int(X*)> f1_2;
+    hpx::function<int(X*)> f1_2;
     f1_2 = &X::twice;
 
     HPX_TEST_EQ(f1_2(&one), 2);
     HPX_TEST_EQ(f1_2(&five), 10);
 
-    hpx::util::function_nonser<int(X&, int)> f2(&X::plus);
+    hpx::function<int(X&, int)> f2(&X::plus);
     HPX_TEST_EQ(f2(one, 3), 4);
     HPX_TEST_EQ(f2(five, 4), 9);
 }
@@ -736,7 +735,7 @@ static void test_ref()
     add_with_throw_on_copy atc;
     try
     {
-        hpx::util::function_nonser<int(int, int)> f(std::ref(atc));
+        hpx::function<int(int, int)> f(std::ref(atc));
         HPX_TEST_EQ(f(1, 3), 4);
     }
     catch (std::runtime_error const& /*e*/)
@@ -749,8 +748,8 @@ static void dummy() {}
 
 static void test_empty_ref()
 {
-    hpx::util::function_nonser<void()> f1;
-    hpx::util::function_nonser<void()> f2(std::ref(f1));
+    hpx::function<void()> f1;
+    hpx::function<void()> f2(std::ref(f1));
 
     try
     {
@@ -776,7 +775,7 @@ static void test_empty_ref()
 
 static void test_exception()
 {
-    hpx::util::function_nonser<int(int, int)> f;
+    hpx::function<int(int, int)> f;
     try
     {
         f(5, 4);
@@ -788,7 +787,7 @@ static void test_exception()
     }
 }
 
-typedef hpx::util::function_nonser<void*(void* reader)> reader_type;
+typedef hpx::function<void*(void* reader)> reader_type;
 typedef std::pair<int, reader_type> mapped_type;
 
 static void test_implicit()
@@ -797,12 +796,12 @@ static void test_implicit()
     m = mapped_type();
 }
 
-static void test_call_obj(hpx::util::function_nonser<int(int, int)> f)
+static void test_call_obj(hpx::function<int(int, int)> f)
 {
     HPX_TEST(!f.empty());
 }
 
-static void test_call_cref(const hpx::util::function_nonser<int(int, int)>& f)
+static void test_call_cref(const hpx::function<int(int, int)>& f)
 {
     HPX_TEST(!f.empty());
 }
@@ -912,7 +911,7 @@ int main(int, char*[])
     test_exception();
     test_implicit();
     test_call();
-    test_move_semantics<hpx::util::function_nonser<void()>>();
+    test_move_semantics<hpx::function<void()>>();
 
     return hpx::util::report_errors();
 }

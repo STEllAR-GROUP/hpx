@@ -134,7 +134,7 @@ namespace hpx { namespace performance_counters {
     // provide the data in a way, which will uninstall it automatically during
     // shutdown.
     counter_status install_counter_type(std::string const& name,
-        hpx::util::function_nonser<std::int64_t(bool)> const& counter_value,
+        hpx::function<std::int64_t(bool)> const& counter_value,
         std::string const& helptext, std::string const& uom, counter_type type,
         error_code& ec)
     {
@@ -148,8 +148,7 @@ namespace hpx { namespace performance_counters {
     }
 
     counter_status install_counter_type(std::string const& name,
-        hpx::util::function_nonser<std::vector<std::int64_t>(bool)> const&
-            counter_value,
+        hpx::function<std::vector<std::int64_t>(bool)> const& counter_value,
         std::string const& helptext, std::string const& uom, error_code& ec)
     {
         using hpx::util::placeholders::_1;

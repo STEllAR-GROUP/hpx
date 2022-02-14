@@ -88,11 +88,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
     compare<int, 8>(repeat, size);
     compare<int, 16>(repeat, size);
 
-    compare<hpx::util::unique_function_nonser<void()>, 1>(repeat, size);
-    compare<hpx::util::unique_function_nonser<void()>, 2>(repeat, size);
-    compare<hpx::util::unique_function_nonser<void()>, 4>(repeat, size);
-    compare<hpx::util::unique_function_nonser<void()>, 8>(repeat, size);
-    compare<hpx::util::unique_function_nonser<void()>, 16>(repeat, size);
+    compare<hpx::move_only_function<void()>, 1>(repeat, size);
+    compare<hpx::move_only_function<void()>, 2>(repeat, size);
+    compare<hpx::move_only_function<void()>, 4>(repeat, size);
+    compare<hpx::move_only_function<void()>, 8>(repeat, size);
+    compare<hpx::move_only_function<void()>, 16>(repeat, size);
 
     return hpx::local::finalize();
 }

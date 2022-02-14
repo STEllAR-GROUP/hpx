@@ -23,7 +23,7 @@ namespace hpx { namespace local { namespace detail {
     {
         command_line_handling(hpx::util::runtime_configuration rtcfg,
             std::vector<std::string> ini_config,
-            util::function_nonser<int(hpx::program_options::variables_map& vm)>
+            hpx::function<int(hpx::program_options::variables_map& vm)>
                 hpx_main_f)
           : rtcfg_(rtcfg)
           , ini_config_(ini_config)
@@ -47,8 +47,7 @@ namespace hpx { namespace local { namespace detail {
         hpx::util::runtime_configuration rtcfg_;
 
         std::vector<std::string> ini_config_;
-        util::function_nonser<int(hpx::program_options::variables_map& vm)>
-            hpx_main_f_;
+        hpx::function<int(hpx::program_options::variables_map& vm)> hpx_main_f_;
 
         std::size_t num_threads_;
         std::size_t num_cores_;

@@ -29,7 +29,7 @@ struct int_div
 
 int main()
 {
-    hpx::util::function_nonser<double(int x, int y)> f;
+    hpx::function<double(int x, int y)> f;
 
     f = int_div();
     HPX_TEST(f);

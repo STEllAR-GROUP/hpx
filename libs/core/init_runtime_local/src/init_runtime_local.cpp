@@ -72,7 +72,7 @@ namespace hpx {
     namespace detail {
 
         int init_helper(hpx::program_options::variables_map& /*vm*/,
-            util::function_nonser<int(int, char**)> const& f)
+            hpx::function<int(int, char**)> const& f)
         {
             std::string cmdline(
                 hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
@@ -298,7 +298,7 @@ namespace hpx {
 
             ///////////////////////////////////////////////////////////////////////
             int run(hpx::runtime& rt,
-                util::function_nonser<int(
+                hpx::function<int(
                     hpx::program_options::variables_map& vm)> const& f,
                 hpx::program_options::variables_map& vm,
                 startup_function_type startup, shutdown_function_type shutdown)
@@ -317,7 +317,7 @@ namespace hpx {
             }
 
             int start(hpx::runtime& rt,
-                util::function_nonser<int(
+                hpx::function<int(
                     hpx::program_options::variables_map& vm)> const& f,
                 hpx::program_options::variables_map& vm,
                 startup_function_type startup, shutdown_function_type shutdown)
@@ -433,7 +433,7 @@ namespace hpx {
 
             ///////////////////////////////////////////////////////////////////////
             int run_or_start(
-                util::function_nonser<int(
+                hpx::function<int(
                     hpx::program_options::variables_map& vm)> const& f,
                 int argc, char** argv, init_params const& params, bool blocking)
             {

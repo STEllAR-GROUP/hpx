@@ -59,8 +59,7 @@ namespace hpx { namespace threads { namespace coroutines {
         using result_type = impl_type::result_type;
         using arg_type = impl_type::arg_type;
 
-        using functor_type =
-            util::unique_function_nonser<result_type(arg_type)>;
+        using functor_type = hpx::move_only_function<result_type(arg_type)>;
 
         coroutine(functor_type&& f, thread_id_type id,
             std::ptrdiff_t stack_size = detail::default_stack_size)

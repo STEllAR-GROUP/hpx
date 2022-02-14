@@ -83,7 +83,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/packaged_task.hpp>
 
 #include <atomic>
@@ -128,7 +128,7 @@ namespace hpx { namespace lcos { namespace local {
 
         HPX_CORE_EXPORT void free(guard_task* task);
 
-        typedef util::unique_function_nonser<void()> guard_function;
+        typedef hpx::move_only_function<void()> guard_function;
     }    // namespace detail
 
     class guard : public detail::debug_object

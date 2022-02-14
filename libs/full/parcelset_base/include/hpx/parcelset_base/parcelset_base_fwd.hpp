@@ -24,8 +24,8 @@ namespace hpx::parcelset {
     ///       parcel layer whenever a parcel has been sent by the underlying
     ///       networking library and if no explicit parcel handler function was
     ///       specified for the parcel.
-    using parcel_write_handler_type = util::function_nonser<void(
-        std::error_code const&, parcelset::parcel const&)>;
+    using parcel_write_handler_type =
+        hpx::function<void(std::error_code const&, parcelset::parcel const&)>;
 
     ////////////////////////////////////////////////////////////////////////
     /// Type of background work to perform

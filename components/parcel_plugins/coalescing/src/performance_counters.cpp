@@ -82,7 +82,7 @@ namespace hpx::plugins::parcel {
             return counter_(reset);
         }
 
-        hpx::util::function_nonser<std::int64_t(bool)> counter_;
+        hpx::function<std::int64_t(bool)> counter_;
         std::string parameters_;
     };
 
@@ -118,7 +118,7 @@ namespace hpx::plugins::parcel {
             }
 
             // ask registry
-            hpx::util::function_nonser<std::int64_t(bool)> f =
+            hpx::function<std::int64_t(bool)> f =
                 coalescing_counter_registry::instance().get_parcels_counter(
                     paths.parameters_);
 
@@ -163,7 +163,7 @@ namespace hpx::plugins::parcel {
             return counter_(reset);
         }
 
-        hpx::util::function_nonser<std::int64_t(bool)> counter_;
+        hpx::function<std::int64_t(bool)> counter_;
         std::string parameters_;
     };
 
@@ -199,7 +199,7 @@ namespace hpx::plugins::parcel {
             }
 
             // ask registry
-            hpx::util::function_nonser<std::int64_t(bool)> f =
+            hpx::function<std::int64_t(bool)> f =
                 coalescing_counter_registry::instance().get_messages_counter(
                     paths.parameters_);
 
@@ -245,7 +245,7 @@ namespace hpx::plugins::parcel {
             return counter_(reset);
         }
 
-        hpx::util::function_nonser<std::int64_t(bool)> counter_;
+        hpx::function<std::int64_t(bool)> counter_;
         std::string parameters_;
     };
 
@@ -283,7 +283,7 @@ namespace hpx::plugins::parcel {
             }
 
             // ask registry
-            hpx::util::function_nonser<std::int64_t(bool)> f =
+            hpx::function<std::int64_t(bool)> f =
                 coalescing_counter_registry::instance()
                     .get_parcels_per_message_counter(paths.parameters_);
 
@@ -332,7 +332,7 @@ namespace hpx::plugins::parcel {
             return counter_(reset);
         }
 
-        hpx::util::function_nonser<std::int64_t(bool)> counter_;
+        hpx::function<std::int64_t(bool)> counter_;
         std::string parameters_;
     };
 
@@ -369,7 +369,7 @@ namespace hpx::plugins::parcel {
             }
 
             // ask registry
-            hpx::util::function_nonser<std::int64_t(bool)> f =
+            hpx::function<std::int64_t(bool)> f =
                 coalescing_counter_registry::instance()
                     .get_average_time_between_parcels_counter(
                         paths.parameters_);
@@ -441,7 +441,7 @@ namespace hpx::plugins::parcel {
         }
 
         hpx::lcos::local::spinlock mtx_;
-        hpx::util::function_nonser<std::vector<std::int64_t>(bool)> counter_;
+        hpx::function<std::vector<std::int64_t>(bool)> counter_;
         std::string action_name_;
         std::int64_t min_boundary_;
         std::int64_t max_boundary_;
@@ -510,7 +510,7 @@ namespace hpx::plugins::parcel {
                 num_buckets = util::from_string<std::int64_t>(params[3]);
 
             // ask registry
-            hpx::util::function_nonser<std::vector<std::int64_t>(bool)> f =
+            hpx::function<std::vector<std::int64_t>(bool)> f =
                 coalescing_counter_registry::instance()
                     .get_time_between_parcels_histogram_counter(
                         params[0], min_boundary, max_boundary, num_buckets);

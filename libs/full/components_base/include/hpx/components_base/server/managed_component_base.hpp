@@ -18,7 +18,7 @@
 #include <hpx/components_base/server/wrapper_heap_list.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/components_base/traits/managed_component_policies.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/modules/errors.hpp>
 
 #include <cstddef>

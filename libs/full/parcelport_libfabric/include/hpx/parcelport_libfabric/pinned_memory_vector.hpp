@@ -41,7 +41,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
         typedef pinned_memory_vector<T, Offset, region_type, allocator_type>
             vector_type;
 
-        typedef util::function_nonser<void()> deleter_callback;
+        typedef hpx::function<void()> deleter_callback;
 
         // internal vars
         T* m_array_;
