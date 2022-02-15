@@ -454,7 +454,7 @@ namespace hpx { namespace execution { namespace experimental {
                         set_state(data.state_, thread_state::active);
 
                         // Process local items first.
-                        hpx::util::optional<std::uint32_t> index;
+                        hpx::optional<std::uint32_t> index;
                         while ((index = local_queue.pop_left()))
                         {
                             auto it = std::next(

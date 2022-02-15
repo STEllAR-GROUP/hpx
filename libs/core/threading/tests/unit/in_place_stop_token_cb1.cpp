@@ -204,7 +204,7 @@ void test_concurrent_callback_registration()
 void test_callback_deregistered_from_within_callback_does_not_deadlock()
 {
     hpx::experimental::in_place_stop_source src;
-    hpx::util::optional<
+    hpx::optional<
         hpx::experimental::in_place_stop_callback<std::function<void()>>>
         cb;
 
@@ -228,9 +228,9 @@ void test_callback_deregistration_doesnt_wait_for_others_to_finish_executing()
 
     auto dummy_callback = [] {};
 
-    hpx::util::optional<
+    hpx::optional<
         hpx::experimental::in_place_stop_callback<decltype(dummy_callback)&>>
-        cb1(hpx::util::in_place, src.get_token(), dummy_callback);
+        cb1(std::in_place, src.get_token(), dummy_callback);
 
     // Register a first callback that will signal when it starts executing
     // and then block until it receives a signal.
@@ -243,9 +243,9 @@ void test_callback_deregistration_doesnt_wait_for_others_to_finish_executing()
     hpx::experimental::in_place_stop_callback<decltype(f)> blocking_callback(
         src.get_token(), std::move(f));
 
-    hpx::util::optional<
+    hpx::optional<
         hpx::experimental::in_place_stop_callback<decltype(dummy_callback)&>>
-        cb2{hpx::util::in_place, src.get_token(), dummy_callback};
+        cb2{std::in_place, src.get_token(), dummy_callback};
 
     hpx::thread signalling_thread{[&] { src.request_stop(); }};
 

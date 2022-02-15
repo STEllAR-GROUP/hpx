@@ -113,7 +113,7 @@ namespace hpx { namespace execution { namespace experimental {
                     connect_result_t<typename hpx::util::invoke_result<
                                          schedule_t, Scheduler>::type,
                         scheduler_sender_receiver>;
-                hpx::util::optional<scheduler_operation_state_type>
+                hpx::optional<scheduler_operation_state_type>
                     scheduler_op_state;
 
                 template <typename Sender_, typename Scheduler_,

@@ -15,7 +15,7 @@
 namespace hpx::serialization {
 
     template <typename T>
-    void save(output_archive& ar, hpx::util::optional<T> const& o, unsigned)
+    void save(output_archive& ar, hpx::optional<T> const& o, unsigned)
     {
         bool const valid = bool(o);
         ar << valid;
@@ -26,7 +26,7 @@ namespace hpx::serialization {
     }
 
     template <typename T>
-    void load(input_archive& ar, hpx::util::optional<T>& o, unsigned)
+    void load(input_archive& ar, hpx::optional<T>& o, unsigned)
     {
         bool valid = false;
         ar >> valid;
@@ -42,5 +42,5 @@ namespace hpx::serialization {
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (template <typename T>), (hpx::util::optional<T>) )
+        (template <typename T>), (hpx::optional<T>) )
 }    // namespace hpx::serialization

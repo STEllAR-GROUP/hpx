@@ -7,11 +7,3 @@
 #pragma once
 
 #include <hpx/datastructures/optional.hpp>
-
-namespace hpx {
-    using hpx::util::bad_optional_access;
-    using hpx::util::make_optional;
-    using hpx::util::nullopt;
-    using hpx::util::nullopt_t;
-    using hpx::util::optional;
-}    // namespace hpx

@@ -196,7 +196,7 @@ namespace hpx { namespace execution { namespace experimental {
                                 op_state->queues[task_f->worker_thread].data_;
 
                             // Handle local queue first
-                            hpx::util::optional<std::uint32_t> index;
+                            hpx::optional<std::uint32_t> index;
                             while ((index = local_queue.pop_left()))
                             {
                                 do_work_chunk(ts, index.value());

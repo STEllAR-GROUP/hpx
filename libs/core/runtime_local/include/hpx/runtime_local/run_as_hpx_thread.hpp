@@ -45,7 +45,7 @@ namespace hpx { namespace threads {
             // Using the optional for storing the returned result value
             // allows to support non-default-constructible and move-only
             // types.
-            hpx::util::optional<result_type> result;
+            hpx::optional<result_type> result;
             std::exception_ptr exception;
 
             // Create the HPX thread
