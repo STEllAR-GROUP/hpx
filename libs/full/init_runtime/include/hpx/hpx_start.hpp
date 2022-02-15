@@ -10,7 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
+#include <functional>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_init_params.hpp>
 #include <hpx/modules/program_options.hpp>
@@ -60,8 +60,7 @@ namespace hpx {
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
     inline bool start(
-        util::function_nonser<int(hpx::program_options::variables_map&)> const&
-            f,
+        std::function<int(hpx::program_options::variables_map&)> f,
         int argc, char** argv, init_params const& params = init_params());
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -98,7 +97,7 @@ namespace hpx {
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline bool start(util::function_nonser<int(int, char**)> const& f,
+    inline bool start(std::function<int(int, char**)> f,
         int argc, char** argv, init_params const& params = init_params());
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -256,8 +255,8 @@ namespace hpx {
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline bool start(util::function_nonser<int(
-                          hpx::program_options::variables_map& vm)> const& f,
+    inline bool start(std::function<int(
+                          hpx::program_options::variables_map& vm)> f,
         hpx::program_options::options_description const& desc_cmdline, int argc,
         char** argv, std::vector<std::string> const& cfg,
         startup_function_type startup = startup_function_type(),
@@ -733,7 +732,7 @@ namespace hpx {
     /// \note               The created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    inline bool start(util::function_nonser<int(int, char**)> const& f,
+    inline bool start(std::function<int(int, char**)> f,
         std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode = hpx::runtime_mode::default_);
 
@@ -780,7 +779,7 @@ namespace hpx {
     /// \note               The created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    inline bool start(util::function_nonser<int(int, char**)> const& f,
+    inline bool start(std::function<int(int, char**)> f,
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode::default_);
 
@@ -821,7 +820,7 @@ namespace hpx {
     /// \note               The created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     configuration passed in `cfg`.
-    inline bool start(util::function_nonser<int(int, char**)> const& f,
+    inline bool start(std::function<int(int, char**)> f,
         std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode::default_);
 
