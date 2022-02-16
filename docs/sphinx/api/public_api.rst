@@ -1,4 +1,5 @@
 ..
+    Copyright (C) 2021 Dimitra Karatza
     Copyright (C) 2020 ETH Zurich
 
     SPDX-License-Identifier: BSL-1.0
@@ -17,216 +18,248 @@ needed. All names below are also available in the top-level ``hpx`` namespace un
 otherwise noted. The names in ``hpx`` should be preferred. The names in
 sub-namespaces will eventually be removed.
 
-Header ``hpx/algorithm.hpp``
-============================
+``hpx/algorithm.hpp``
+=====================
 
-The header :hpx-header:`libs/full/include/include,hpx/algorithm.hpp` includes :ref:`public_api_header_hpx_local_algorithm` and contains
-overloads of the algorithms for segmented iterators.
+The header :hpx-header:`libs/full/include/include,hpx/algorithm.hpp` includes 
+:ref:`public_api_header_hpx_local_algorithm` and contains overloads of the algorithms for segmented 
+iterators.
 
 .. _public_api_header_hpx_local_algorithm:
 
-Header ``hpx/local/algorithm.hpp``
-==================================
+``hpx/local/algorithm.hpp``
+===========================
 
-The header :hpx-header:`libs/core/include_local/include,hpx/local/algorithm.hpp` corresponds to the C++ standard library header :cppreference-header:`algorithm`.
-See :ref:`parallel_algorithms` for more information about the parallel
-algorithms.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/algorithm.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`algorithm`. See :ref:`parallel_algorithms` for 
+more information about the parallel algorithms.
 
 Classes
 -------
 
-- :cpp:class:`hpx::experimental::reduction`
-- :cpp:class:`hpx::experimental::induction`
+.. table:: Classes of header ``hpx/local/algorithm.hpp``
+
+   =========================================  ==============
+   Class                                      C++ standard
+   =========================================  ==============
+   :cpp:class:`hpx::experimental::reduction`  |cpp19_n4808|_
+   :cpp:class:`hpx::experimental::induction`  |cpp19_n4808|_
+   =========================================  ==============
 
 Functions
 ---------
 
-`hpx` functions
-...............
+.. table:: `hpx` functions of header ``hpx/local/algorithm.hpp``
 
-- :cpp:func:`hpx::adjacent_find` corresponding to the C++ standard :cppreference-generic:`algorithm,adjacent_find`
-- :cpp:func:`hpx::all_of` corresponding to the C++ standard :cppreference-generic:`algorithm,all_any_none_of`
-- :cpp:func:`hpx::any_of` corresponding to the C++ standard :cppreference-generic:`algorithm,all_any_none_of`
-- :cpp:func:`hpx::copy` corresponding to the C++ standard :cppreference-generic:`algorithm,copy`
-- :cpp:func:`hpx::copy_if` corresponding to the C++ standard :cppreference-generic:`algorithm,copy`
-- :cpp:func:`hpx::copy_n` corresponding to the C++ standard :cppreference-generic:`algorithm,copy_n`
-- :cpp:func:`hpx::count` corresponding to the C++ standard :cppreference-generic:`algorithm,count`
-- :cpp:func:`hpx::count_if` corresponding to the C++ standard :cppreference-generic:`algorithm,count`
-- :cpp:func:`hpx::ends_with` 
-- :cpp:func:`hpx::equal` corresponding to the C++ standard :cppreference-generic:`algorithm,equal`
-- :cpp:func:`hpx::fill` corresponding to the C++ standard :cppreference-generic:`algorithm,fill`
-- :cpp:func:`hpx::fill_n` corresponding to the C++ standard :cppreference-generic:`algorithm,fill_n`
-- :cpp:func:`hpx::find` corresponding to the C++ standard :cppreference-generic:`algorithm,find`
-- :cpp:func:`hpx::find_end` corresponding to the C++ standard :cppreference-generic:`algorithm,find_end`
-- :cpp:func:`hpx::find_first_of` corresponding to the C++ standard :cppreference-generic:`algorithm,find_first_of`
-- :cpp:func:`hpx::find_if` corresponding to the C++ standard :cppreference-generic:`algorithm,find`
-- :cpp:func:`hpx::find_if_not` corresponding to the C++ standard :cppreference-generic:`algorithm,find`
-- :cpp:func:`hpx::for_each` corresponding to the C++ standard :cppreference-generic:`algorithm,for_each`
-- :cpp:func:`hpx::for_each_n` corresponding to the C++ standard :cppreference-generic:`algorithm,for_each_n`
-- :cpp:func:`hpx::generate` corresponding to the C++ standard :cppreference-generic:`algorithm,generate`
-- :cpp:func:`hpx::generate_n` corresponding to the C++ standard :cppreference-generic:`algorithm,generate_n`
-- :cpp:func:`hpx::includes` corresponding to the C++ standard :cppreference-generic:`algorithm,includes`
-- :cpp:func:`hpx::inplace_merge` corresponding to the C++ standard :cppreference-generic:`algorithm,inplace_merge`
-- :cpp:func:`hpx::is_heap` corresponding to the C++ standard :cppreference-generic:`algorithm,is_heap`
-- :cpp:func:`hpx::is_heap_until` corresponding to the C++ standard :cppreference-generic:`algorithm,is_heap_until`
-- :cpp:func:`hpx::is_partitioned` corresponding to the C++ standard :cppreference-generic:`algorithm,is_partitioned`
-- :cpp:func:`hpx::is_sorted` corresponding to the C++ standard :cppreference-generic:`algorithm,is_sorted`
-- :cpp:func:`hpx::is_sorted_until` corresponding to the C++ standard :cppreference-generic:`algorithm,is_sorted_until`
-- :cpp:func:`hpx::lexicographical_compare` corresponding to the C++ standard :cppreference-generic:`algorithm,lexicographical_compare`
-- :cpp:func:`hpx::make_heap` corresponding to the C++ standard :cppreference-generic:`algorithm,make_heap`
-- :cpp:func:`hpx::max_element` corresponding to the C++ standard :cppreference-generic:`algorithm,max_element`
-- :cpp:func:`hpx::merge` corresponding to the C++ standard :cppreference-generic:`algorithm,merge`
-- :cpp:func:`hpx::min_element` corresponding to the C++ standard :cppreference-generic:`algorithm,min_element`
-- :cpp:func:`hpx::minmax_element` corresponding to the C++ standard :cppreference-generic:`algorithm,minmax_element`
-- :cpp:func:`hpx::mismatch` corresponding to the C++ standard :cppreference-generic:`algorithm,mismatch`
-- :cpp:func:`hpx::move` corresponding to the C++ standard :cppreference-generic:`algorithm,move`
-- :cpp:func:`hpx::none_of` corresponding to the C++ standard :cppreference-generic:`algorithm,all_any_none_of`
-- :cpp:func:`hpx::nth_element` corresponding to the C++ standard :cppreference-generic:`algorithm,nth_element`
-- :cpp:func:`hpx::partial_sort` corresponding to the C++ standard :cppreference-generic:`algorithm,partial_sort`
-- :cpp:func:`hpx::partial_sort_copy` corresponding to the C++ standard :cppreference-generic:`algorithm,partial_sort_copy`
-- :cpp:func:`hpx::partition` corresponding to the C++ standard :cppreference-generic:`algorithm,partition`
-- :cpp:func:`hpx::partition_copy` corresponding to the C++ standard :cppreference-generic:`algorithm,partition_copy`
-- :cpp:func:`hpx::remove` corresponding to the C++ standard :cppreference-generic:`algorithm,remove`
-- :cpp:func:`hpx::remove_copy` corresponding to the C++ standard :cppreference-generic:`algorithm,remove_copy`
-- :cpp:func:`hpx::remove_copy_if` corresponding to the C++ standard :cppreference-generic:`algorithm,remove_copy`
-- :cpp:func:`hpx::remove_if` corresponding to the C++ standard :cppreference-generic:`algorithm,remove`
-- :cpp:func:`hpx::replace` corresponding to the C++ standard :cppreference-generic:`algorithm,replace`
-- :cpp:func:`hpx::replace_copy` corresponding to the C++ standard :cppreference-generic:`algorithm,replace_copy`
-- :cpp:func:`hpx::replace_copy_if` corresponding to the C++ standard :cppreference-generic:`algorithm,replace_copy`
-- :cpp:func:`hpx::replace_if` corresponding to the C++ standard :cppreference-generic:`algorithm,replace`
-- :cpp:func:`hpx::reverse` corresponding to the C++ standard :cppreference-generic:`algorithm,reverse`
-- :cpp:func:`hpx::reverse_copy` corresponding to the C++ standard :cppreference-generic:`algorithm,reverse_copy`
-- :cpp:func:`hpx::rotate` corresponding to the C++ standard :cppreference-generic:`algorithm,rotate`
-- :cpp:func:`hpx::rotate_copy` corresponding to the C++ standard :cppreference-generic:`algorithm,rotate_copy`
-- :cpp:func:`hpx::search` corresponding to the C++ standard :cppreference-generic:`algorithm,search`
-- :cpp:func:`hpx::search_n` corresponding to the C++ standard :cppreference-generic:`algorithm,search_n`
-- :cpp:func:`hpx::set_difference` corresponding to the C++ standard :cppreference-generic:`algorithm,set_difference`
-- :cpp:func:`hpx::set_intersection` corresponding to the C++ standard :cppreference-generic:`algorithm,set_intersection`
-- :cpp:func:`hpx::set_symmetric_difference` corresponding to the C++ standard :cppreference-generic:`algorithm,set_symmetric_difference`
-- :cpp:func:`hpx::set_union` corresponding to the C++ standard :cppreference-generic:`algorithm,set_union`
-- :cpp:func:`hpx::shift_left` corresponding to the C++ standard :cppreference-generic:`algorithm,shift`
-- :cpp:func:`hpx::shift_right` corresponding to the C++ standard :cppreference-generic:`algorithm,shift`
-- :cpp:func:`hpx::sort` corresponding to the C++ standard :cppreference-generic:`algorithm,sort`
-- 
-- :cpp:func:`hpx::stable_partition` corresponding to the C++ standard :cppreference-generic:`algorithm,stable_partition`
-- :cpp:func:`hpx::stable_sort` corresponding to the C++ standard :cppreference-generic:`algorithm,stable_sort`
-- :cpp:func:`hpx::starts_with` corresponding to the C++ standard :cppreference-generic:`string/basic_string,starts_with`
-- :cpp:func:`hpx::swap_ranges` corresponding to the C++ standard :cppreference-generic:`algorithm,swap_ranges`
-- :cpp:func:`hpx::transform` corresponding to the C++ standard :cppreference-generic:`algorithm,transform`
-- :cpp:func:`hpx::unique` corresponding to the C++ standard :cppreference-generic:`algorithm,unique`
-- :cpp:func:`hpx::unique_copy` corresponding to the C++ standard :cppreference-generic:`algorithm,unique_copy`
+   =================================================  =================================================
+   `hpx` function                                     C++ standard
+   =================================================  =================================================
+   :cpp:func:`hpx::adjacent_find`                     :cppreference-generic:`algorithm,adjacent_find`
+   :cpp:func:`hpx::all_of`                            :cppreference-generic:`algorithm,all_any_none_of`
+   :cpp:func:`hpx::any_of`                            :cppreference-generic:`algorithm,all_any_none_of`
+   :cpp:func:`hpx::copy`                              :cppreference-generic:`algorithm,copy`
+   :cpp:func:`hpx::copy_if`                           :cppreference-generic:`algorithm,copy`
+   :cpp:func:`hpx::copy_n`                            :cppreference-generic:`algorithm,copy_n`
+   :cpp:func:`hpx::count`                             :cppreference-generic:`algorithm,count`
+   :cpp:func:`hpx::count_if`                          :cppreference-generic:`algorithm,count`
+   :cpp:func:`hpx::ends_with` 
+   :cpp:func:`hpx::equal`                             :cppreference-generic:`algorithm,equal`
+   :cpp:func:`hpx::fill`                              :cppreference-generic:`algorithm,fill`
+   :cpp:func:`hpx::fill_n`                            :cppreference-generic:`algorithm,fill_n`
+   :cpp:func:`hpx::find`                              :cppreference-generic:`algorithm,find`
+   :cpp:func:`hpx::find_end`                          :cppreference-generic:`algorithm,find_end`
+   :cpp:func:`hpx::find_first_of`                     :cppreference-generic:`algorithm,find_first_of`
+   :cpp:func:`hpx::find_if`                           :cppreference-generic:`algorithm,find`
+   :cpp:func:`hpx::find_if_not`                       :cppreference-generic:`algorithm,find`
+   :cpp:func:`hpx::for_each`                          :cppreference-generic:`algorithm,for_each`
+   :cpp:func:`hpx::for_each_n`                        :cppreference-generic:`algorithm,for_each_n`
+   :cpp:func:`hpx::generate`                          :cppreference-generic:`algorithm,generate`
+   :cpp:func:`hpx::generate_n`                        :cppreference-generic:`algorithm,generate_n`
+   :cpp:func:`hpx::includes`                          :cppreference-generic:`algorithm,includes`
+   :cpp:func:`hpx::inplace_merge`                     :cppreference-generic:`algorithm,inplace_merge`
+   :cpp:func:`hpx::is_heap`                           :cppreference-generic:`algorithm,is_heap`
+   :cpp:func:`hpx::is_heap_until`                     :cppreference-generic:`algorithm,is_heap_until`
+   :cpp:func:`hpx::is_partitioned`                    :cppreference-generic:`algorithm,is_partitioned`
+   :cpp:func:`hpx::is_sorted`                         :cppreference-generic:`algorithm,is_sorted`
+   :cpp:func:`hpx::is_sorted_until`                   :cppreference-generic:`algorithm,is_sorted_until`
+   :cpp:func:`hpx::lexicographical_compare`           :cppreference-generic:`algorithm,lexicographical_compare`
+   :cpp:func:`hpx::make_heap`                         :cppreference-generic:`algorithm,make_heap`
+   :cpp:func:`hpx::max_element`                       :cppreference-generic:`algorithm,max_element`
+   :cpp:func:`hpx::merge`                             :cppreference-generic:`algorithm,merge`
+   :cpp:func:`hpx::min_element`                       :cppreference-generic:`algorithm,min_element`
+   :cpp:func:`hpx::minmax_element`                    :cppreference-generic:`algorithm,minmax_element`
+   :cpp:func:`hpx::mismatch`                          :cppreference-generic:`algorithm,mismatch`
+   :cpp:func:`hpx::move`                              :cppreference-generic:`algorithm,move`
+   :cpp:func:`hpx::none_of`                           :cppreference-generic:`algorithm,all_any_none_of`
+   :cpp:func:`hpx::nth_element`                       :cppreference-generic:`algorithm,nth_element`
+   :cpp:func:`hpx::partial_sort`                      :cppreference-generic:`algorithm,partial_sort`
+   :cpp:func:`hpx::partial_sort_copy`                 :cppreference-generic:`algorithm,partial_sort_copy`
+   :cpp:func:`hpx::partition`                         :cppreference-generic:`algorithm,partition`
+   :cpp:func:`hpx::partition_copy`                    :cppreference-generic:`algorithm,partition_copy`
+   :cpp:func:`hpx::remove`                            :cppreference-generic:`algorithm,remove`
+   :cpp:func:`hpx::remove_copy`                       :cppreference-generic:`algorithm,remove_copy`
+   :cpp:func:`hpx::remove_copy_if`                    :cppreference-generic:`algorithm,remove_copy`
+   :cpp:func:`hpx::remove_if`                         :cppreference-generic:`algorithm,remove`
+   :cpp:func:`hpx::replace`                           :cppreference-generic:`algorithm,replace`
+   :cpp:func:`hpx::replace_copy`                      :cppreference-generic:`algorithm,replace_copy`
+   :cpp:func:`hpx::replace_copy_if`                   :cppreference-generic:`algorithm,replace_copy`
+   :cpp:func:`hpx::replace_if`                        :cppreference-generic:`algorithm,replace`
+   :cpp:func:`hpx::reverse`                           :cppreference-generic:`algorithm,reverse`
+   :cpp:func:`hpx::reverse_copy`                      :cppreference-generic:`algorithm,reverse_copy`
+   :cpp:func:`hpx::rotate`                            :cppreference-generic:`algorithm,rotate`
+   :cpp:func:`hpx::rotate_copy`                       :cppreference-generic:`algorithm,rotate_copy`
+   :cpp:func:`hpx::search`                            :cppreference-generic:`algorithm,search`
+   :cpp:func:`hpx::search_n`                          :cppreference-generic:`algorithm,search_n`
+   :cpp:func:`hpx::set_difference`                    :cppreference-generic:`algorithm,set_difference`
+   :cpp:func:`hpx::set_intersection`                  :cppreference-generic:`algorithm,set_intersection`
+   :cpp:func:`hpx::set_symmetric_difference`          :cppreference-generic:`algorithm,set_symmetric_difference`
+   :cpp:func:`hpx::set_union`                         :cppreference-generic:`algorithm,set_union`
+   :cpp:func:`hpx::shift_left`                        :cppreference-generic:`algorithm,shift`
+   :cpp:func:`hpx::shift_right`                       :cppreference-generic:`algorithm,shift`
+   :cpp:func:`hpx::sort`                              :cppreference-generic:`algorithm,sort`
+   :cpp:func:`hpx::stable_partition`                  :cppreference-generic:`algorithm,stable_partition`
+   :cpp:func:`hpx::stable_sort`                       :cppreference-generic:`algorithm,stable_sort`
+   :cpp:func:`hpx::starts_with`                       :cppreference-generic:`string/basic_string,starts_with`
+   :cpp:func:`hpx::swap_ranges`                       :cppreference-generic:`algorithm,swap_ranges`
+   :cpp:func:`hpx::transform`                         :cppreference-generic:`algorithm,transform`
+   :cpp:func:`hpx::unique`                            :cppreference-generic:`algorithm,unique`
+   :cpp:func:`hpx::unique_copy`                       :cppreference-generic:`algorithm,unique_copy`
+   :cpp:func:`hpx::experimental::for_loop`            |cpp19_n4808|_
+   :cpp:func:`hpx::experimental::for_loop_strided`    |cpp19_n4808|_
+   :cpp:func:`hpx::experimental::for_loop_n`          |cpp19_n4808|_
+   :cpp:func:`hpx::experimental::for_loop_n_strided`  |cpp19_n4808|_
+   =================================================  =================================================
 
-- :cpp:func:`hpx::experimental::for_loop`
-- :cpp:func:`hpx::experimental::for_loop_strided`
-- :cpp:func:`hpx::experimental::for_loop_n`
-- :cpp:func:`hpx::experimental::for_loop_n_strided`
+.. table:: `hpx::ranges` functions of header ``hpx/local/algorithm.hpp``
 
-`hpx::ranges` functions
-.......................
+   =======================================================  =================================================================
+   `hpx::ranges` function                                   C++ standard
+   =======================================================  =================================================================
+   :cpp:func:`hpx::ranges::adjacent_find`                   :cppreference-generic:`algorithm/ranges,adjacent_find`
+   :cpp:func:`hpx::ranges::all_of`                          :cppreference-generic:`algorithm/ranges,all_any_none_of`
+   :cpp:func:`hpx::ranges::any_of`                          :cppreference-generic:`algorithm/ranges,all_any_none_of`
+   :cpp:func:`hpx::ranges::copy`                            :cppreference-generic:`algorithm/ranges,copy`
+   :cpp:func:`hpx::ranges::copy_if`                         :cppreference-generic:`algorithm/ranges,copy`
+   :cpp:func:`hpx::ranges::copy_n`                          :cppreference-generic:`algorithm/ranges,copy_n`
+   :cpp:func:`hpx::ranges::count`                           :cppreference-generic:`algorithm/ranges,count`
+   :cpp:func:`hpx::ranges::count_if`                        :cppreference-generic:`algorithm/ranges,count`
+   :cpp:func:`hpx::ranges::ends_with`                       :cppreference-generic:`algorithm/ranges,ends_with`
+   :cpp:func:`hpx::ranges::equal`                           :cppreference-generic:`algorithm/ranges,equal`
+   :cpp:func:`hpx::ranges::fill`                            :cppreference-generic:`algorithm/ranges,fill`
+   :cpp:func:`hpx::ranges::fill_n`                          :cppreference-generic:`algorithm/ranges,fill_n`
+   :cpp:func:`hpx::ranges::find`                            :cppreference-generic:`algorithm/ranges,find`
+   :cpp:func:`hpx::ranges::find_end`                        :cppreference-generic:`algorithm/ranges,find_end`
+   :cpp:func:`hpx::ranges::find_first_of`                   :cppreference-generic:`algorithm/ranges,find_first_of`
+   :cpp:func:`hpx::ranges::find_if`                         :cppreference-generic:`algorithm/ranges,find`
+   :cpp:func:`hpx::ranges::find_if_not`                     :cppreference-generic:`algorithm/ranges,find`
+   :cpp:func:`hpx::ranges::for_each`                        :cppreference-generic:`algorithm/ranges,for_each`
+   :cpp:func:`hpx::ranges::for_each_n`                      :cppreference-generic:`algorithm/ranges,for_each_n`
+   :cpp:func:`hpx::ranges::generate`                        :cppreference-generic:`algorithm/ranges,generate`
+   :cpp:func:`hpx::ranges::generate_n`                      :cppreference-generic:`algorithm/ranges,generate_n`
+   :cpp:func:`hpx::ranges::includes`                        :cppreference-generic:`algorithm/ranges,includes`
+   :cpp:func:`hpx::ranges::inplace_merge`                   :cppreference-generic:`algorithm/ranges,inplace_merge`
+   :cpp:func:`hpx::ranges::is_heap`                         :cppreference-generic:`algorithm/ranges,is_heap`
+   :cpp:func:`hpx::ranges::is_heap_until`                   :cppreference-generic:`algorithm/ranges,is_heap_until`
+   :cpp:func:`hpx::ranges::is_partitioned`                  :cppreference-generic:`algorithm/ranges,is_partitioned`
+   :cpp:func:`hpx::ranges::is_sorted`                       :cppreference-generic:`algorithm/ranges,is_sorted`
+   :cpp:func:`hpx::ranges::is_sorted_until`                 :cppreference-generic:`algorithm/ranges,is_sorted_until`
+   :cpp:func:`hpx::ranges::make_heap`                       :cppreference-generic:`algorithm/ranges,make_heap`
+   :cpp:func:`hpx::ranges::merge`                           :cppreference-generic:`algorithm/ranges,merge`
+   :cpp:func:`hpx::ranges::move`                            :cppreference-generic:`algorithm/ranges,move`
+   :cpp:func:`hpx::ranges::none_of`                         :cppreference-generic:`algorithm/ranges,all_any_none_of`
+   :cpp:func:`hpx::ranges::nth_element`                     :cppreference-generic:`algorithm/ranges,nth_element`
+   :cpp:func:`hpx::ranges::partial_sort`                    :cppreference-generic:`algorithm/ranges,partial_sort`
+   :cpp:func:`hpx::ranges::partial_sort_copy`               :cppreference-generic:`algorithm/ranges,partial_sort_copy`
+   :cpp:func:`hpx::ranges::partition`                       :cppreference-generic:`algorithm/ranges,partition`
+   :cpp:func:`hpx::ranges::partition_copy`                  :cppreference-generic:`algorithm/ranges,partition_copy`
+   :cpp:func:`hpx::ranges::set_difference`                  :cppreference-generic:`algorithm/ranges,set_difference`
+   :cpp:func:`hpx::ranges::set_intersection`                :cppreference-generic:`algorithm/ranges,set_intersection`
+   :cpp:func:`hpx::ranges::set_symmetric_difference`        :cppreference-generic:`algorithm/ranges,set_symmetric_difference`
+   :cpp:func:`hpx::ranges::set_union`                       :cppreference-generic:`algorithm/ranges,set_union`
+   :cpp:func:`hpx::ranges::shift_left`
+   :cpp:func:`hpx::ranges::shift_right`
+   :cpp:func:`hpx::ranges::sort`                            :cppreference-generic:`algorithm/ranges,sort`
+   :cpp:func:`hpx::ranges::stable_partition`                :cppreference-generic:`algorithm/ranges,stable_partition`
+   :cpp:func:`hpx::ranges::stable_sort`                     :cppreference-generic:`algorithm/ranges,stable_sort`
+   :cpp:func:`hpx::ranges::starts_with`                     :cppreference-generic:`algorithm/ranges,starts_with`
+   :cpp:func:`hpx::ranges::swap_ranges`                     :cppreference-generic:`algorithm/ranges,swap_ranges`
+   :cpp:func:`hpx::ranges::unique`                          :cppreference-generic:`algorithm/ranges,unique`
+   :cpp:func:`hpx::ranges::unique_copy`                     :cppreference-generic:`algorithm/ranges,unique_copy`
+   :cpp:func:`hpx::ranges::experimental::for_loop`          |cpp19_n4808|_
+   :cpp:func:`hpx::ranges::experimental::for_loop_strided`  |cpp19_n4808|_
+   =======================================================  =================================================================
 
-- :cpp:func:`hpx::ranges::adjacent_find` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,adjacent_find`
-- :cpp:func:`hpx::ranges::all_of` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,all_any_none_of`
-- :cpp:func:`hpx::ranges::any_of` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,all_any_none_of`
-- :cpp:func:`hpx::ranges::copy` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,copy`
-- :cpp:func:`hpx::ranges::copy_if` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,copy`
-- :cpp:func:`hpx::ranges::copy_n` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,copy_n`
-- :cpp:func:`hpx::ranges::count` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,count`
-- :cpp:func:`hpx::ranges::count_if` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,count`
-- :cpp:func:`hpx::ranges::ends_with` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,ends_with`
-- :cpp:func:`hpx::ranges::equal` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,equal`
-- :cpp:func:`hpx::ranges::fill` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,fill`
-- :cpp:func:`hpx::ranges::fill_n` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,fill_n`
-- :cpp:func:`hpx::ranges::find` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,find`
-- :cpp:func:`hpx::ranges::find_end` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,find_end`
-- :cpp:func:`hpx::ranges::find_first_of` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,find_first_of`
-- :cpp:func:`hpx::ranges::find_if` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,find`
-- :cpp:func:`hpx::ranges::find_if_not` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,find`
-- :cpp:func:`hpx::ranges::for_each` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,for_each`
-- :cpp:func:`hpx::ranges::for_each_n` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,for_each_n`
-- :cpp:func:`hpx::ranges::generate` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,generate`
-- :cpp:func:`hpx::ranges::generate_n` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,generate_n`
-- :cpp:func:`hpx::ranges::includes` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,includes`
-- :cpp:func:`hpx::ranges::inplace_merge` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,inplace_merge`
-- :cpp:func:`hpx::ranges::is_heap` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,is_heap`
-- :cpp:func:`hpx::ranges::is_heap_until` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,is_heap_until`
-- :cpp:func:`hpx::ranges::is_partitioned` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,is_partitioned`
-- :cpp:func:`hpx::ranges::is_sorted` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,is_sorted`
-- :cpp:func:`hpx::ranges::is_sorted_until` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,is_sorted_until`
-- :cpp:func:`hpx::ranges::make_heap` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,make_heap`
-- :cpp:func:`hpx::ranges::merge` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,merge`
-- :cpp:func:`hpx::ranges::move` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,move`
-- :cpp:func:`hpx::ranges::none_of` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,all_any_none_of`
-- :cpp:func:`hpx::ranges::nth_element` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,nth_element`
-- :cpp:func:`hpx::ranges::partial_sort` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,partial_sort`
-- :cpp:func:`hpx::ranges::partial_sort_copy` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,partial_sort_copy`
-- :cpp:func:`hpx::ranges::partition` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,partition`
-- :cpp:func:`hpx::ranges::partition_copy` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,partition_copy`
-- :cpp:func:`hpx::ranges::set_difference` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,set_difference`
-- :cpp:func:`hpx::ranges::set_intersection` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,set_intersection`
-- :cpp:func:`hpx::ranges::set_symmetric_difference` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,set_symmetric_difference`
-- :cpp:func:`hpx::ranges::set_union` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,set_union`
-- :cpp:func:`hpx::ranges::shift_left`
-- :cpp:func:`hpx::ranges::shift_right`
-- :cpp:func:`hpx::ranges::sort` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,sort`
-- :cpp:func:`hpx::ranges::stable_partition` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,stable_partition`
-- :cpp:func:`hpx::ranges::stable_sort` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,stable_sort`
-- :cpp:func:`hpx::ranges::starts_with` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,starts_with`
-- :cpp:func:`hpx::ranges::swap_ranges` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,swap_ranges`
-- :cpp:func:`hpx::ranges::unique` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,unique`
-- :cpp:func:`hpx::ranges::unique_copy` corresponding to the C++ standard :cppreference-generic:`algorithm/ranges,unique_copy`
+``hpx/any.hpp``
+===============
 
-- :cpp:func:`hpx::ranges::experimental::for_loop`
-- :cpp:func:`hpx::ranges::experimental::for_loop_strided`
-
-Header ``hpx/any.hpp``
-======================
-
-This header includes :ref:`public_api_header_hpx_local_any`.
+The header :hpx-header:`libs/full/include/include,hpx/any.hpp` includes :ref:`public_api_header_hpx_local_any`.
 
 .. _public_api_header_hpx_local_any:
 
-Header ``hpx/local/any.hpp``
-============================
+``hpx/local/any.hpp``
+=====================
 
-Corresponds to the C++ standard library header :cppreference-header:`any`.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/any.hpp` corresponds to the C++ 
+standard library header :cppreference-header:`any`.
+
 :cpp:type:`hpx::any` is compatible with ``std::any``.
 
 Classes
 -------
 
-- :cpp:type:`hpx::any` corresponding to the C++ standard :cppreference-generic:`utility,any`
-- :cpp:type:`hpx::any_nonser`
-- :cpp:type:`hpx::bad_any_cast` corresponding to the C++ standard :cppreference-generic:`utility/any,bad_any_cast`
-- :cpp:type:`hpx::unique_any_nonser`
+.. table:: Classes of header ``hpx/local/any.hpp``
+
+   ==================================  ================================================
+   Class                               C++ standard
+   ==================================  ================================================
+   :cpp:type:`hpx::any`                :cppreference-generic:`utility,any`
+   :cpp:type:`hpx::any_nonser`
+   :cpp:type:`hpx::bad_any_cast`       :cppreference-generic:`utility/any,bad_any_cast`
+   :cpp:type:`hpx::unique_any_nonser`
+   ==================================  ================================================
 
 Functions
 ---------
 
-- :cpp:func:`hpx::any_cast` corresponding to the C++ standard :cppreference-generic:`utility/any,any_cast`
-- :cpp:func:`hpx::make_any` corresponding to the C++ standard :cppreference-generic:`utility/any,make_any`
-- :cpp:func:`hpx::make_any_nonser`
-- :cpp:func:`hpx::make_unique_any_nonser`
+.. table:: Functions of header ``hpx/local/any.hpp``
 
-Header ``hpx/assert.hpp``
-=========================
+   =======================================  ================================================
+   Function                                 C++ standard
+   =======================================  ================================================
+   :cpp:func:`hpx::any_cast`                :cppreference-generic:`utility/any,any_cast`
+   :cpp:func:`hpx::make_any`                :cppreference-generic:`utility/any,make_any`
+   :cpp:func:`hpx::make_any_nonser`
+   :cpp:func:`hpx::make_unique_any_nonser`
+   =======================================  ================================================
 
-Corresponds to the C++ standard library header :cppreference-header:`cassert`.
+``hpx/assert.hpp``
+==================
+
+The header :hpx-header:`libs/core/assertion/include,hpx/assert.hpp` corresponds to the C++ standard 
+library header :cppreference-header:`cassert`.
+
 :c:macro:`HPX_ASSERT` is the |hpx| equivalent to ``assert`` in ``cassert``.
 :c:macro:`HPX_ASSERT` can also be used in CUDA device code.
 
 Macros
 ------
 
-- :c:macro:`HPX_ASSERT`
-- :c:macro:`HPX_ASSERT_MSG`
+.. table:: Macros of header ``hpx/assert.hpp``
 
-Header ``hpx/barrier.hpp``
-==========================
+   =========================
+   Macro              
+   =========================
+   :c:macro:`HPX_ASSERT`
+   :c:macro:`HPX_ASSERT_MSG`
+   =========================
 
-This header includes :ref:`public_api_header_hpx_local_barrier` and contains a
-distributed barrier implementation. This functionality is also exposed through
-the ``hpx::distributed`` namespace. The name in ``hpx::distributed`` should be
-preferred.
+``hpx/barrier.hpp``
+===================
+
+The header :hpx-header:`libs/full/include/include,hpx/barrier.hpp` includes 
+:ref:`public_api_header_hpx_local_barrier` and contains a distributed barrier implementation. This 
+functionality is also exposed through the ``hpx::distributed`` namespace. The name in 
+``hpx::distributed`` should be preferred.
 
 Classes
 -------
@@ -235,23 +268,30 @@ Classes
 
 .. _public_api_header_hpx_local_barrier:
 
-Header ``hpx/local/barrier.hpp``
-================================
+``hpx/local/barrier.hpp``
+=========================
 
-Corresponds to the C++ standard library header :cppreference-header:`barrier`.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/barrier.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`barrier`.
 
 Classes
 -------
 
-- :cpp:class:`hpx::barrier` corresponding to the C++ standard :cppreference-generic:`thread,barrier`
+.. table:: Classes of header ``hpx/local/barrier.hpp``
 
-Header ``hpx/channel.hpp``
-==========================
+   =========================  ======================================
+   Class                      C++ standard
+   =========================  ======================================
+   :cpp:class:`hpx::barrier`  :cppreference-generic:`thread,barrier`
+   =========================  ======================================
 
-This header includes :ref:`public_api_header_hpx_local_channel` and contains a
-distributed channel implementation. This functionality is also exposed through
-the ``hpx::distributed`` namespace. The name in ``hpx::distributed`` should be
-preferred.
+``hpx/channel.hpp``
+===================
+
+The header :hpx-header:`libs/full/include/include,hpx/channel.hpp` includes 
+:ref:`public_api_header_hpx_local_channel` and contains a distributed channel implementation. This 
+functionality is also exposed through the ``hpx::distributed`` namespace. The name in 
+``hpx::distributed`` should be preferred.
 
 Classes
 -------
@@ -260,72 +300,88 @@ Classes
 
 .. _public_api_header_hpx_local_channel:
 
-Header ``hpx/local/channel.hpp``
-================================
+``hpx/local/channel.hpp``
+=========================
 
-Contains a local channel implementation.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/channel.hpp` contains a local 
+channel implementation.
 
 Classes
 -------
 
 - :cpp:class:`hpx::channel`
 
-Header ``hpx/chrono.hpp``
-=========================
+``hpx/chrono.hpp``
+==================
 
-This header includes :ref:`public_api_header_hpx_local_chrono`.
+The header :hpx-header:`libs/full/include/include,hpx/chrono.hpp` includes 
+:ref:`public_api_header_hpx_local_chrono`.
 
 .. _public_api_header_hpx_local_chrono:
 
-Header ``hpx/local/chrono.hpp``
-===============================
+``hpx/local/chrono.hpp``
+========================
 
-Corresponds to the C++ standard library header :cppreference-header:`chrono`.
-The following replacements and extensions are provided compared to
-:cppreference-header:`chrono`. The classes below are also available in the
-``hpx::chrono`` namespace, not in the top-level ``hpx`` namespace.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/chrono.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`chrono`. The following replacements and 
+extensions are provided compared to :cppreference-header:`chrono`. 
 
 Classes
 -------
 
-- :cpp:class:`hpx::chrono::high_resolution_clock` corresponding to the C++ standard :cppreference-generic:`chrono,high_resolution_clock`
-- :cpp:class:`hpx::chrono::high_resolution_timer`
-- :cpp:class:`hpx::chrono::steady_time_point`
+.. table:: Classes of header ``hpx/local/chrono.hpp``
 
-Header ``hpx/condition_variable.hpp``
-=====================================
+   ===============================================  ====================================================
+   Class                                            C++ standard
+   ===============================================  ====================================================
+   :cpp:class:`hpx::chrono::high_resolution_clock`  :cppreference-generic:`chrono,high_resolution_clock`
+   :cpp:class:`hpx::chrono::high_resolution_timer`
+   :cpp:class:`hpx::chrono::steady_time_point`
+   ===============================================  ====================================================
 
-This header includes :ref:`public_api_header_hpx_local_condition_variable`.
+``hpx/condition_variable.hpp``
+==============================
+
+The header :hpx-header:`libs/full/include/include,hpx/condition_variable.hpp` includes 
+:ref:`public_api_header_hpx_local_condition_variable`.
 
 .. _public_api_header_hpx_local_condition_variable:
 
-Header ``hpx/local/condition_variable.hpp``
-===========================================
+``hpx/local/condition_variable.hpp``
+====================================
 
-Corresponds to the C++ standard library header
-:cppreference-header:`condition_variable`.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/condition_variable.hpp` 
+corresponds to the C++ standard library header :cppreference-header:`condition_variable`.
 
 Classes
 -------
 
-- :cpp:class:`hpx::condition_variable` corresponding to the C++ standard :cppreference-generic:`thread,condition_variable`
-- :cpp:class:`hpx::condition_variable_any` corresponding to the C++ standard :cppreference-generic:`thread,condition_variable_any`
-- :cpp:class:`hpx::cv_status` corresponding to the C++ standard :cppreference-generic:`thread,cv_status`
+.. table:: Classes of header ``hpx/local/condition_variable.hpp``
 
-Header ``hpx/exception.hpp``
-============================
+   ========================================  =====================================================
+   Class                                     C++ standard
+   ========================================  =====================================================
+   :cpp:class:`hpx::condition_variable`      :cppreference-generic:`thread,condition_variable`
+   :cpp:class:`hpx::condition_variable_any`  :cppreference-generic:`thread,condition_variable_any`
+   :cpp:class:`hpx::cv_status`               :cppreference-generic:`thread,cv_status`
+   ========================================  =====================================================
 
-This header includes :ref:`public_api_header_hpx_local_exception`.
+``hpx/exception.hpp``
+=====================
+
+The header :hpx-header:`libs/full/include/include,hpx/exception.hpp` includes
+ :ref:`public_api_header_hpx_local_exception`.
 
 .. _public_api_header_hpx_local_exception:
 
-Header ``hpx/local/exception.hpp``
-==================================
+``hpx/local/exception.hpp``
+===========================
 
-Corresponds to the C++ standard library header :cppreference-header:`exception`.
-:cpp:class:`hpx::exception` extends ``std::exception`` and is the base class for
-all exceptions thrown in |hpx|. :c:macro:`HPX_THROW_EXCEPTION` can be used to
-throw |hpx| exceptions with file and line information attached to the exception.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/exception.hpp` corresponds to 
+the C++ standard library header :cppreference-header:`exception`. :cpp:class:`hpx::exception` 
+extends ``std::exception`` and is the base class for all exceptions thrown in |hpx|. 
+:c:macro:`HPX_THROW_EXCEPTION` can be used to throw |hpx| exceptions with file and line information 
+attached to the exception.
 
 Macros
 ------
@@ -335,21 +391,29 @@ Macros
 Classes
 -------
 
-- :cpp:class:`hpx::exception` corresponding to the C++ standard :cppreference-generic:`error,exception`
+.. table:: Classes of header ``hpx/local/exception.hpp``
 
-Header ``hpx/execution.hpp``
-============================
+   ===========================  =======================================
+   Class                        C++ standard
+   ===========================  =======================================
+   :cpp:class:`hpx::exception`  :cppreference-generic:`error,exception`
+   ===========================  =======================================
 
-This header includes :ref:`public_api_header_hpx_local_execution`.
+``hpx/execution.hpp``
+=====================
+
+The header :hpx-header:`libs/full/include/include,hpx/execution.hpp` includes 
+:ref:`public_api_header_hpx_local_execution`.
 
 .. _public_api_header_hpx_local_execution:
 
-Header ``hpx/local/execution.hpp``
-==================================
+``hpx/local/execution.hpp``
+===========================
 
-Corresponds to the C++ standard library header :cppreference-header:`execution`.
-See :ref:`parallel`, :ref:`parallel_algorithms` and :ref:`executor_parameters`
-for more information about execution policies and executor parameters.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/execution.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`execution`. See :ref:`parallel`, 
+:ref:`parallel_algorithms` and :ref:`executor_parameters` for more information about execution 
+policies and executor parameters.
 
 .. note::
 
@@ -359,37 +423,49 @@ for more information about execution policies and executor parameters.
 Constants
 ---------
 
-- :cpp:var:`hpx::execution::seq` corresponding to the C++ standard :cppreference-generic:`algorithm,execution_policy_tag`
-- :cpp:var:`hpx::execution::par` corresponding to the C++ standard :cppreference-generic:`algorithm,execution_policy_tag`
-- :cpp:var:`hpx::execution::par_unseq` corresponding to the C++ standard :cppreference-generic:`algorithm,execution_policy_tag`
-- :cpp:var:`hpx::execution::task`
+.. table:: Constants of header ``hpx/local/execution.hpp``
+
+   ====================================  ======================================================
+   Constant                              C++ standard
+   ====================================  ======================================================
+   :cpp:var:`hpx::execution::seq`        :cppreference-generic:`algorithm,execution_policy_tag`
+   :cpp:var:`hpx::execution::par`        :cppreference-generic:`algorithm,execution_policy_tag`
+   :cpp:var:`hpx::execution::par_unseq`  :cppreference-generic:`algorithm,execution_policy_tag`
+   :cpp:var:`hpx::execution::task`
+   ====================================  ======================================================
 
 Classes
 -------
 
-- :cpp:class:`hpx::execution::sequenced_policy` corresponding to the C++ standard :cppreference-generic:`algorithm,execution_policy_tag_t`
-- :cpp:class:`hpx::execution::parallel_policy`corresponding to the C++ standard :cppreference-generic:`algorithm,execution_policy_tag_t`
-- :cpp:class:`hpx::execution::parallel_unsequenced_policy`corresponding to the C++ standard :cppreference-generic:`algorithm,execution_policy_tag_t`
-- :cpp:class:`hpx::execution::sequenced_task_policy`
-- :cpp:class:`hpx::execution::parallel_task_policy`
-- :cpp:class:`hpx::execution::auto_chunk_size`
-- :cpp:class:`hpx::execution::dynamic_chunk_size`
-- :cpp:class:`hpx::execution::guided_chunk_size`
-- :cpp:class:`hpx::execution::persistent_auto_chunk_size`
-- :cpp:class:`hpx::execution::static_chunk_size`
+.. table:: Classes of header ``hpx/local/execution.hpp``
 
-Header ``hpx/functional.hpp``
-=============================
+   ========================================================  ========================================================
+   Class                                                     C++ standard
+   ========================================================  ========================================================
+   :cpp:class:`hpx::execution::sequenced_policy`             :cppreference-generic:`algorithm,execution_policy_tag_t`
+   :cpp:class:`hpx::execution::parallel_policy`              :cppreference-generic:`algorithm,execution_policy_tag_t`
+   :cpp:class:`hpx::execution::parallel_unsequenced_policy`  :cppreference-generic:`algorithm,execution_policy_tag_t`
+   :cpp:class:`hpx::execution::sequenced_task_policy`
+   :cpp:class:`hpx::execution::parallel_task_policy`
+   :cpp:class:`hpx::execution::auto_chunk_size`
+   :cpp:class:`hpx::execution::dynamic_chunk_size`
+   :cpp:class:`hpx::execution::guided_chunk_size`
+   :cpp:class:`hpx::execution::persistent_auto_chunk_size`
+   :cpp:class:`hpx::execution::static_chunk_size`
+   ========================================================  ========================================================
 
-This header includes :ref:`public_api_header_hpx_local_functional`.
+``hpx/functional.hpp``
+======================
+
+The header :hpx-header:`libs/full/include/include,hpx/functional.hpp` includes :ref:`public_api_header_hpx_local_functional`.
 
 .. _public_api_header_hpx_local_functional:
 
-Header ``hpx/local/functional.hpp``
-===================================
+``hpx/local/functional.hpp``
+============================
 
-Corresponds to the C++ standard library header
-:cppreference-header:`functional`. :cpp:class:`hpx::function` is a more
+The header :hpx-header:`libs/core/include_local/include,hpx/local/functional.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`functional`. :cpp:class:`hpx::function` is a more 
 efficient and serializable replacement for ``std::function``.
 
 Constants
@@ -397,40 +473,58 @@ Constants
 
 The following constants correspond to the C++ standard :cppreference-generic:`utility/functional,placeholders`
 
-- :cpp:var:`hpx::placeholders::_1` 
-- :cpp:var:`hpx::placeholders::_2`
-- ...
-- :cpp:var:`hpx::placeholders::_9`
+.. table:: Constants of header ``hpx/local/functional.hpp``
+
+   ================================
+   Constant                               
+   ================================
+   :cpp:var:`hpx::placeholders::_1` 
+   :cpp:var:`hpx::placeholders::_2`
+   ...
+   :cpp:var:`hpx::placeholders::_9`
+   ================================
+
 
 Classes
 -------
 
-- :cpp:class:`hpx::function` corresponding to the C++ standard :cppreference-generic:`utility/functional,function`
-- :cpp:class:`hpx::function_ref`
-- :cpp:class:`hpx::move_only_function` corresponding to the C++ standard :cppreference-generic:`utility/functional,move_only_function`
-- :cpp:struct:`hpx::traits::is_bind_expression` corresponding to the C++ standard :cppreference-generic:`utility/functional,is_bind_expression`
-- :cpp:struct:`hpx::traits::is_placeholder`
-- :cpp:struct:`hpx::scoped_annotation`
+.. table:: Classes of header ``hpx/local/functional.hpp``
+
+   =============================================  =============================================================
+   Class                                          C++ standard
+   =============================================  =============================================================
+   :cpp:class:`hpx::function`                     :cppreference-generic:`utility/functional,function`
+   :cpp:class:`hpx::function_ref`
+   :cpp:class:`hpx::move_only_function`           :cppreference-generic:`utility/functional,move_only_function`
+   :cpp:struct:`hpx::traits::is_bind_expression`  :cppreference-generic:`utility/functional,is_bind_expression`
+   :cpp:struct:`hpx::traits::is_placeholder`      :cppreference-generic:`utility/functional,is_placeholder`
+   :cpp:struct:`hpx::scoped_annotation`
+   =============================================  =============================================================
 
 Functions
 ---------
 
-- :cpp:func:`hpx::annotated_function`
-- :cpp:func:`hpx::bind` corresponding to the C++ standard :cppreference-generic:`utility/functional,bind`
-- :cpp:func:`hpx::experimental::bind_back`
-- :cpp:func:`hpx::bind_front` corresponding to the C++ standard :cppreference-generic:`utility/functional,bind_front`
-- :cpp:func:`hpx::invoke` corresponding to the C++ standard :cppreference-generic:`utility/functional,invoke`
-- :cpp:func:`hpx::util::invoke_fused`
-- :cpp:func:`hpx::mem_fn` corresponding to the C++ standard :cppreference-generic:`utility/functional,mem_fn`
+.. table:: Functions of header ``hpx/local/functional.hpp``
 
-Header ``hpx/future.hpp``
-=========================
+   ========================================  =====================================================
+   Function                                  C++ standard
+   ========================================  =====================================================
+   :cpp:func:`hpx::annotated_function`
+   :cpp:func:`hpx::bind`                     :cppreference-generic:`utility/functional,bind`
+   :cpp:func:`hpx::experimental::bind_back`
+   :cpp:func:`hpx::bind_front`               :cppreference-generic:`utility/functional,bind_front`
+   :cpp:func:`hpx::invoke`                   :cppreference-generic:`utility/functional,invoke`
+   :cpp:func:`hpx::util::invoke_fused`
+   :cpp:func:`hpx::mem_fn`                   :cppreference-generic:`utility/functional,mem_fn`
+   ========================================  =====================================================
 
-This header includes :ref:`public_api_header_hpx_local_future` and contains
-overloads of :cpp:func:`hpx::async`, :cpp:func:`hpx::apply`,
-:cpp:func:`hpx::sync`, and :cpp:func:`hpx::dataflow` that can be used with
-actions. See :ref:`action_invocation` for more information about invoking
-actions.
+``hpx/future.hpp``
+==================
+
+The header :hpx-header:`libs/full/include/include,hpx/future.hpp` includes 
+:ref:`public_api_header_hpx_local_future` and contains overloads of :cpp:func:`hpx::async`, 
+:cpp:func:`hpx::apply`, :cpp:func:`hpx::sync`, and :cpp:func:`hpx::dataflow` that can be used with 
+actions. See :ref:`action_invocation` for more information about invoking actions.
 
 .. note::
 
@@ -446,19 +540,25 @@ Classes
 Functions
 ---------
 
-- :cpp:func:`hpx::async` corresponding to the C++ standard :cppreference-generic:`thread,async`
-- :cpp:func:`hpx::apply` corresponding to the C++ standard :cppreference-generic:`utility,apply`
-- :cpp:func:`hpx::sync`
-- :cpp:func:`hpx::dataflow`
+.. table:: Functions of header ``hpx/future.hpp``
+
+   =========================  =====================================
+   Function                   C++ standard
+   =========================  =====================================
+   :cpp:func:`hpx::async`     :cppreference-generic:`thread,async`
+   :cpp:func:`hpx::apply`     :cppreference-generic:`utility,apply`
+   :cpp:func:`hpx::sync`
+   :cpp:func:`hpx::dataflow`
+   =========================  =====================================
 
 .. _public_api_header_hpx_local_future:
 
-Header ``hpx/local/future.hpp``
-===============================
+``hpx/local/future.hpp``
+========================
 
-Corresponds to the C++ standard library header :cppreference-header:`future`.
-See :ref:`extend_futures` for more information about extensions to futures
-compared to the C++ standard library.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/future.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`future`. See :ref:`extend_futures` for more 
+information about extensions to futures compared to the C++ standard library.
 
 .. note::
 
@@ -471,33 +571,45 @@ compared to the C++ standard library.
 Classes
 -------
 
-- :cpp:class:`hpx::future` corresponding to the C++ standard :cppreference-generic:`thread,future`
-- :cpp:class:`hpx::shared_future` corresponding to the C++ standard :cppreference-generic:`thread,shared_future`
-- :cpp:class:`hpx::promise` corresponding to the C++ standard :cppreference-generic:`thread,promise`
-- :cpp:class:`hpx::launch` corresponding to the C++ standard :cppreference-generic:`thread,launch`
+.. table:: Classes of header ``hpx/local/future.hpp``
+
+   ===============================  ============================================
+   Class                            C++ standard
+   ===============================  ============================================
+   :cpp:class:`hpx::future`         :cppreference-generic:`thread,future`
+   :cpp:class:`hpx::shared_future`  :cppreference-generic:`thread,shared_future`
+   :cpp:class:`hpx::promise`        :cppreference-generic:`thread,promise`
+   :cpp:class:`hpx::launch`         :cppreference-generic:`thread,launch`
+   ===============================  ============================================
 
 Functions
 ---------
 
-- :cpp:func:`hpx::make_future`
-- :cpp:func:`hpx::make_shared_future`
-- :cpp:func:`hpx::make_ready_future`
-- :cpp:func:`hpx::make_ready_future_alloc`
-- :cpp:func:`hpx::make_ready_future_at`
-- :cpp:func:`hpx::make_ready_future_after`
-- :cpp:func:`hpx::make_exceptional_future`
-- :cpp:func:`hpx::async`
-- :cpp:func:`hpx::apply`
-- :cpp:func:`hpx::sync`
-- :cpp:func:`hpx::dataflow`
-- :cpp:func:`hpx::when_all`
-- :cpp:func:`hpx::when_any`
-- :cpp:func:`hpx::when_some`
-- :cpp:func:`hpx::when_each`
-- :cpp:func:`hpx::wait_all`
-- :cpp:func:`hpx::wait_any`
-- :cpp:func:`hpx::wait_some`
-- :cpp:func:`hpx::wait_each`
+.. table:: Functions of header ``hpx/local/future.hpp``
+
+   =======================================
+   Function                            
+   =======================================
+   :cpp:func:`hpx::make_future`
+   :cpp:func:`hpx::make_shared_future`
+   :cpp:func:`hpx::make_ready_future`
+   :cpp:func:`hpx::make_ready_future_alloc`
+   :cpp:func:`hpx::make_ready_future_at`
+   :cpp:func:`hpx::make_ready_future_after`
+   :cpp:func:`hpx::make_exceptional_future`
+   :cpp:func:`hpx::async`
+   :cpp:func:`hpx::apply`
+   :cpp:func:`hpx::sync`
+   :cpp:func:`hpx::dataflow`
+   :cpp:func:`hpx::when_all`
+   :cpp:func:`hpx::when_any`
+   :cpp:func:`hpx::when_some`
+   :cpp:func:`hpx::when_each`
+   :cpp:func:`hpx::wait_all`
+   :cpp:func:`hpx::wait_any`
+   :cpp:func:`hpx::wait_some`
+   :cpp:func:`hpx::wait_each`
+   =======================================
 
 Examples
 --------
@@ -506,36 +618,49 @@ Examples
    :language: c++
    :lines: 7-
 
-Header ``hpx/init.hpp``
-=======================
+``hpx/init.hpp``
+================
 
-This header contains functionality for starting, stopping, suspending, and
-resuming the |hpx| runtime. This is the main way to explicitly start the |hpx|
-runtime. See :ref:`starting_hpx` for more details on starting the |hpx| runtime.
+The header :hpx-header:`libs/full/init_runtime/include,hpx/init.hpp` contains functionality for 
+starting, stopping, suspending, and resuming the |hpx| runtime. This is the main way to explicitly 
+start the |hpx| runtime. See :ref:`starting_hpx` for more details on starting the |hpx| runtime.
 
 Classes
 -------
 
-- :cpp:class:`hpx::init_params`
-- :cpp:enum:`hpx::runtime_mode`
+.. table:: Classes of header ``hpx/init.hpp``
+
+   =============================
+   Class                        
+   =============================
+   :cpp:class:`hpx::init_params`
+   :cpp:enum:`hpx::runtime_mode`
+   =============================
+
 
 Functions
 ---------
 
-- :cpp:func:`hpx::init`
-- :cpp:func:`hpx::start`
-- :cpp:func:`hpx::finalize`
-- :cpp:func:`hpx::disconnect`
-- :cpp:func:`hpx::suspend`
-- :cpp:func:`hpx::resume`
+.. table:: Functions of header ``hpx/init.hpp``
 
-Header ``hpx/latch.hpp``
-========================
+   ===========================
+   Function                        
+   ===========================
+   :cpp:func:`hpx::init`
+   :cpp:func:`hpx::start`
+   :cpp:func:`hpx::finalize`
+   :cpp:func:`hpx::disconnect`
+   :cpp:func:`hpx::suspend`
+   :cpp:func:`hpx::resume`
+   ===========================
 
-This header includes :ref:`public_api_header_hpx_local_latch` and contains a
-distributed latch implementation. This functionality is also exposed through the
-``hpx::distributed`` namespace. The name in ``hpx::distributed`` should be
-preferred.
+``hpx/latch.hpp``
+=================
+
+The header :hpx-header:`libs/full/include/include,hpx/latch.hpp` includes 
+:ref:`public_api_header_hpx_local_latch` and contains a distributed latch implementation. This 
+functionality is also exposed through the ``hpx::distributed`` namespace. The name in 
+``hpx::distributed`` should be preferred.
 
 Classes
 -------
@@ -544,126 +669,171 @@ Classes
 
 .. _public_api_header_hpx_local_latch:
 
-Header ``hpx/local/latch.hpp``
-==============================
+``hpx/local/latch.hpp``
+=======================
 
-Corresponds to the C++ standard library header :cppreference-header:`latch`.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/latch.hpp` corresponds to the C++ 
+standard library header :cppreference-header:`latch`.
 
 Classes
 -------
 
-- :cpp:class:`hpx::cpp20_latch` corresponding to the C++ standard :cppreference-generic:`thread,latch`
+.. table:: Classes of header ``hpx/local/latch.hpp``
 
-Header ``hpx/mutex.hpp``
-========================
+   =============================  ====================================
+   Class                          C++ standard
+   =============================  ====================================
+   :cpp:class:`hpx::cpp20_latch`  :cppreference-generic:`thread,latch`
+   =============================  ====================================
 
-This header includes :ref:`public_api_header_hpx_local_mutex`.
+``hpx/mutex.hpp``
+=================
+
+The header :hpx-header:`libs/full/include/include,hpx/mutex.hpp` includes :ref:`public_api_header_hpx_local_mutex`.
 
 .. _public_api_header_hpx_local_mutex:
 
-Header ``hpx/local/mutex.hpp``
-==============================
+``hpx/local/mutex.hpp``
+=======================
 
-Corresponds to the C++ standard library header :cppreference-header:`mutex`.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/mutex.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`mutex`.
 
 Classes
 -------
 
-- :cpp:class:`hpx::mutex` corresponding to the C++ standard :cppreference-generic:`thread,mutex`
-- :cpp:class:`hpx::no_mutex`
-- :cpp:class:`hpx::once_flag` corresponding to the C++ standard :cppreference-generic:`thread,once_flag`
-- :cpp:class:`hpx::recursive_mutex` corresponding to the C++ standard :cppreference-generic:`thread,recursive_mutex`
-- :cpp:class:`hpx::spinlock`
-- :cpp:class:`hpx::timed_mutex` corresponding to the C++ standard :cppreference-generic:`thread,timed_mutex`
-- :cpp:class:`hpx::unlock_guard`
+.. table:: Classes of header ``hpx/local/mutex.hpp``
+
+   =================================  ==============================================
+   Class                              C++ standard
+   =================================  ==============================================
+   :cpp:class:`hpx::mutex`            :cppreference-generic:`thread,mutex`
+   :cpp:class:`hpx::no_mutex`
+   :cpp:class:`hpx::once_flag`        :cppreference-generic:`thread,once_flag`
+   :cpp:class:`hpx::recursive_mutex`  :cppreference-generic:`thread,recursive_mutex`
+   :cpp:class:`hpx::spinlock`
+   :cpp:class:`hpx::timed_mutex`      :cppreference-generic:`thread,timed_mutex`
+   :cpp:class:`hpx::unlock_guard`
+   =================================  ==============================================
 
 Functions
 ---------
 
-- :cpp:func:`hpx::call_once` corresponding to the C++ standard :cppreference-generic:`thread,call_once`
+.. table:: Functions of header ``hpx/local/mutex.hpp``
 
-Header ``hpx/memory.hpp``
-=========================
+   ==========================  ========================================
+   Function                    C++ standard
+   ==========================  ========================================
+   :cpp:func:`hpx::call_once`  :cppreference-generic:`thread,call_once`
+   ==========================  ========================================
 
-This header includes :ref:`public_api_header_hpx_local_memory`.
+``hpx/memory.hpp``
+==================
+
+The header :hpx-header:`libs/full/include/include,hpx/memory.hpp` includes :ref:`public_api_header_hpx_local_memory`.
 
 .. _public_api_header_hpx_local_memory:
 
-Header ``hpx/local/memory.hpp``
-===============================
+``hpx/local/memory.hpp``
+========================
 
-Corresponds to the C++ standard library header :cppreference-header:`memory`. It
-contains parallel versions of the copy, fill, move, and construct helper
-functions in :cppreference-header:`memory`. See :ref:`parallel_algorithms` for
-more information about the parallel algorithms.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/memory.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`memory`. It contains parallel versions of the 
+copy, fill, move, and construct helper functions in :cppreference-header:`memory`. See 
+:ref:`parallel_algorithms` for more information about the parallel algorithms.
 
 Functions
 ---------
 
-- :cpp:func:`hpx::uninitialized_copy` corresponding to the C++ standard :cppreference-generic:`memory,uninitialized_copy`
-- :cpp:func:`hpx::uninitialized_copy_n` corresponding to the C++ standard :cppreference-generic:`memory,uninitialized_copy_n`
-- :cpp:func:`hpx::uninitialized_default_construct` corresponding to the C++ standard :cppreference-generic:`memory,uninitialized_default_construct`
-- :cpp:func:`hpx::uninitialized_default_construct_n` corresponding to the C++ standard :cppreference-generic:`memory,uninitialized_default_construct_n`
-- :cpp:func:`hpx::uninitialized_fill` corresponding to the C++ standard :cppreference-generic:`memory,uninitialized_fill`
-- :cpp:func:`hpx::uninitialized_fill_n` corresponding to the C++ standard :cppreference-generic:`memory,uninitialized_fill_n`
-- :cpp:func:`hpx::uninitialized_move` corresponding to the C++ standard :cppreference-generic:`memory,uninitialized_move`
-- :cpp:func:`hpx::uninitialized_move_n` corresponding to the C++ standard :cppreference-generic:`memory,uninitialized_move_n`
-- :cpp:func:`hpx::uninitialized_value_construct` corresponding to the C++ standard :cppreference-generic:`memory,uninitialized_value_construct`
-- :cpp:func:`hpx::uninitialized_value_construct_n` corresponding to the C++ standard :cppreference-generic:`memory,uninitialized_value_construct_n`
+.. table:: `hpx` functions of header ``hpx/local/memory.hpp``
 
-- :cpp:func:`hpx::ranges::uninitialized_copy` corresponding to the C++ standard :cppreference-generic:`memory/ranges,uninitialized_copy`
-- :cpp:func:`hpx::ranges::uninitialized_copy_n` corresponding to the C++ standard :cppreference-generic:`memory/ranges,uninitialized_copy_n`
-- :cpp:func:`hpx::ranges::uninitialized_default_construct` corresponding to the C++ standard :cppreference-generic:`memory/ranges,uninitialized_default_construct`
-- :cpp:func:`hpx::ranges::uninitialized_default_construct_n` corresponding to the C++ standard :cppreference-generic:`memory/ranges,uninitialized_default_construct_n`
-- :cpp:func:`hpx::ranges::uninitialized_fill` corresponding to the C++ standard :cppreference-generic:`memory/ranges,uninitialized_fill`
-- :cpp:func:`hpx::ranges::uninitialized_fill_n` corresponding to the C++ standard :cppreference-generic:`memory/ranges,uninitialized_fill_n`
-- :cpp:func:`hpx::ranges::uninitialized_move` corresponding to the C++ standard :cppreference-generic:`memory/ranges,uninitialized_move`
-- :cpp:func:`hpx::ranges::uninitialized_move_n` corresponding to the C++ standard :cppreference-generic:`memory/ranges,uninitialized_move_n`
-- :cpp:func:`hpx::ranges::uninitialized_value_construct` corresponding to the C++ standard :cppreference-generic:`memory/ranges,uninitialized_value_construct`
-- :cpp:func:`hpx::ranges::uninitialized_value_construct_n` corresponding to the C++ standard :cppreference-generic:`memory/ranges,uninitialized_value_construct_n`
+   ================================================== ================================================================
+   `hpx` function                                     C++ standard
+   ================================================== ================================================================
+   :cpp:func:`hpx::uninitialized_copy`                :cppreference-generic:`memory,uninitialized_copy`
+   :cpp:func:`hpx::uninitialized_copy_n`              :cppreference-generic:`memory,uninitialized_copy_n`
+   :cpp:func:`hpx::uninitialized_default_construct`   :cppreference-generic:`memory,uninitialized_default_construct`
+   :cpp:func:`hpx::uninitialized_default_construct_n` :cppreference-generic:`memory,uninitialized_default_construct_n`
+   :cpp:func:`hpx::uninitialized_fill`                :cppreference-generic:`memory,uninitialized_fill`
+   :cpp:func:`hpx::uninitialized_fill_n`              :cppreference-generic:`memory,uninitialized_fill_n`
+   :cpp:func:`hpx::uninitialized_move`                :cppreference-generic:`memory,uninitialized_move`
+   :cpp:func:`hpx::uninitialized_move_n`              :cppreference-generic:`memory,uninitialized_move_n`
+   :cpp:func:`hpx::uninitialized_value_construct`     :cppreference-generic:`memory,uninitialized_value_construct`
+   :cpp:func:`hpx::uninitialized_value_construct_n`   :cppreference-generic:`memory,uninitialized_value_construct_n`
+   ================================================== ================================================================
 
-Header ``hpx/numeric.hpp``
-==========================
+.. table:: `hpx::ranges` functions of header ``hpx/local/memory.hpp``
 
-This header includes :ref:`public_api_header_hpx_local_numeric`.
+   ========================================================== =======================================================================
+   `hpx::ranges` function                                     C++ standard
+   ========================================================== =======================================================================
+   :cpp:func:`hpx::ranges::uninitialized_copy`                :cppreference-generic:`memory/ranges,uninitialized_copy`
+   :cpp:func:`hpx::ranges::uninitialized_copy_n`              :cppreference-generic:`memory/ranges,uninitialized_copy_n`
+   :cpp:func:`hpx::ranges::uninitialized_default_construct`   :cppreference-generic:`memory/ranges,uninitialized_default_construct`
+   :cpp:func:`hpx::ranges::uninitialized_default_construct_n` :cppreference-generic:`memory/ranges,uninitialized_default_construct_n`
+   :cpp:func:`hpx::ranges::uninitialized_fill`                :cppreference-generic:`memory/ranges,uninitialized_fill`
+   :cpp:func:`hpx::ranges::uninitialized_fill_n`              :cppreference-generic:`memory/ranges,uninitialized_fill_n`
+   :cpp:func:`hpx::ranges::uninitialized_move`                :cppreference-generic:`memory/ranges,uninitialized_move`
+   :cpp:func:`hpx::ranges::uninitialized_move_n`              :cppreference-generic:`memory/ranges,uninitialized_move_n`
+   :cpp:func:`hpx::ranges::uninitialized_value_construct`     :cppreference-generic:`memory/ranges,uninitialized_value_construct`
+   :cpp:func:`hpx::ranges::uninitialized_value_construct_n`   :cppreference-generic:`memory/ranges,uninitialized_value_construct_n`
+   ========================================================== =======================================================================
+
+``hpx/numeric.hpp``
+===================
+
+The header :hpx-header:`libs/full/include/include,hpx/numeric.hpp` includes :ref:`public_api_header_hpx_local_numeric`.
 
 .. _public_api_header_hpx_local_numeric:
 
-Header ``hpx/local/numeric.hpp``
-================================
+``hpx/local/numeric.hpp``
+=========================
 
-Corresponds to the C++ standard library header :cppreference-header:`numeric`.
-See :ref:`parallel_algorithms` for more information about the parallel
-algorithms.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/numeric.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`numeric`. See :ref:`parallel_algorithms` for more 
+information about the parallel algorithms.
 
 Functions
 ---------
 
-- :cpp:func:`hpx::adjacent_difference` corresponding to the C++ standard :cppreference-generic:`algorithm,adjacent_difference`
-- :cpp:func:`hpx::exclusive_scan` corresponding to the C++ standard :cppreference-generic:`algorithm,exclusive_scan`
-- :cpp:func:`hpx::inclusive_scan` corresponding to the C++ standard :cppreference-generic:`algorithm,inclusive_scan`
-- :cpp:func:`hpx::reduce` corresponding to the C++ standard :cppreference-generic:`algorithm,reduce`
-- :cpp:func:`hpx::transform_exclusive_scan` corresponding to the C++ standard :cppreference-generic:`algorithm,transform_exclusive_scan`
-- :cpp:func:`hpx::transform_inclusive_scan` corresponding to the C++ standard :cppreference-generic:`algorithm,transform_inclusive_scan`
-- :cpp:func:`hpx::transform_reduce` corresponding to the C++ standard :cppreference-generic:`algorithm,transform_reduce`
+.. table:: `hpx` functions of header ``hpx/local/numeric.hpp``
 
-- :cpp:func:`hpx::ranges::exclusive_scan`
-- :cpp:func:`hpx::ranges::inclusive_scan`
-- :cpp:func:`hpx::ranges::transform_exclusive_scan`
-- :cpp:func:`hpx::ranges::transform_inclusive_scan`
+   ========================================= ==========================================================
+   `hpx` function                                     C++ standard
+   ========================================= ==========================================================
+   :cpp:func:`hpx::adjacent_difference`      :cppreference-generic:`algorithm,adjacent_difference`
+   :cpp:func:`hpx::exclusive_scan`           :cppreference-generic:`algorithm,exclusive_scan`
+   :cpp:func:`hpx::inclusive_scan`           :cppreference-generic:`algorithm,inclusive_scan`
+   :cpp:func:`hpx::reduce`                   :cppreference-generic:`algorithm,reduce`
+   :cpp:func:`hpx::transform_exclusive_scan` :cppreference-generic:`algorithm,transform_exclusive_scan`
+   :cpp:func:`hpx::transform_inclusive_scan` :cppreference-generic:`algorithm,transform_inclusive_scan`
+   :cpp:func:`hpx::transform_reduce`         :cppreference-generic:`algorithm,transform_reduce`
+   ========================================= ==========================================================
 
-Header ``hpx/optional.hpp``
-===========================
+.. table:: `hpx::ranges` functions of header ``hpx/local/numeric.hpp``
 
-This header includes :ref:`public_api_header_hpx_local_optional`.
+   =================================================
+   `hpx::ranges` function                      
+   =================================================
+   :cpp:func:`hpx::ranges::exclusive_scan`
+   :cpp:func:`hpx::ranges::inclusive_scan`
+   :cpp:func:`hpx::ranges::transform_exclusive_scan`
+   :cpp:func:`hpx::ranges::transform_inclusive_scan`
+   ================================================= 
+
+``hpx/optional.hpp``
+====================
+
+The header :hpx-header:`libs/full/include/include,hpx/optional.hpp` includes :ref:`public_api_header_hpx_local_optional`.
 
 .. _public_api_header_hpx_local_optional:
 
-Header ``hpx/local/optional.hpp``
-=================================
+``hpx/local/optional.hpp``
+==========================
 
-Corresponds to the C++ standard library header :cppreference-header:`optional`.
-:cpp:type:`hpx::optional` is compatible with ``std::optional``.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/optional.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`optional`. :cpp:type:`hpx::optional` is compatible 
+with ``std::optional``.
 
 Constants
 ---------
@@ -673,302 +843,442 @@ Constants
 Classes
 -------
 
-- :cpp:class:`hpx::optional` corresponding to the C++ standard :cppreference-generic:`utility,optional`
-- :cpp:class:`hpx::nullopt_t` corresponding to the C++ standard :cppreference-generic:`utility,nullopt_t`
-- :cpp:class:`hpx::bad_optional_access`
+.. table:: Classes of header ``hpx/local/optional.hpp``
 
+   =====================================  ============================================================
+   Class                                  C++ standard
+   =====================================  ============================================================
+   :cpp:class:`hpx::optional`             :cppreference-generic:`utility,optional`
+   :cpp:class:`hpx::nullopt_t`            :cppreference-generic:`utility,nullopt_t`
+   :cpp:class:`hpx::bad_optional_access`  :cppreference-generic:`utility/optional,bad_optional_access`
+   =====================================  ============================================================
 
-Header ``hpx/runtime.hpp``
-==========================
+``hpx/packaged_task.hpp``
+=========================
 
-This header includes :ref:`public_api_header_hpx_local_runtime` and contains
-functions for accessing distributed runtime information.
+The header :hpx-header:`libs/core/futures/include,hpx/futures/packaged_task.hpp` corresponds to the 
+C++ standard library header :cppreference-generic:`thread,packaged_task`.
+
+``hpx/runtime.hpp``
+===================
+
+The header :hpx-header:`libs/full/include/include,hpx/runtime.hpp` includes 
+:ref:`public_api_header_hpx_local_runtime` and contains functions for accessing distributed runtime 
+information.
 
 Functions
 ---------
 
-- :cpp:func:`hpx::find_root_locality`
-- :cpp:func:`hpx::find_all_localities`
-- :cpp:func:`hpx::find_remote_localities`
-- :cpp:func:`hpx::find_locality`
-- :cpp:func:`hpx::get_colocation_id`
-- :cpp:func:`hpx::get_locality_id`
+.. table:: Functions of header ``hpx/runtime.hpp``
+
+   =======================================
+   Function                      
+   =======================================
+   :cpp:func:`hpx::find_root_locality`
+   :cpp:func:`hpx::find_all_localities`
+   :cpp:func:`hpx::find_remote_localities`
+   :cpp:func:`hpx::find_locality`
+   :cpp:func:`hpx::get_colocation_id`
+   :cpp:func:`hpx::get_locality_id`
+   =======================================
 
 .. _public_api_header_hpx_local_runtime:
 
-Header ``hpx/local/runtime.hpp``
-================================
+``hpx/local/runtime.hpp``
+=========================
 
-This header contains functions for accessing local runtime information.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/runtime.hpp` contains functions 
+for accessing local runtime information.
 
 Typedefs
 --------
 
-- :cpp:type:`hpx::startup_function_type`
-- :cpp:type:`hpx::shutdown_function_type`
+.. table:: Typedefs of header ``hpx/local/runtime.hpp``
+
+   =======================================
+   Typedef                      
+   =======================================
+   :cpp:type:`hpx::startup_function_type`
+   :cpp:type:`hpx::shutdown_function_type`
+   =======================================
 
 Functions
 ---------
 
-- :cpp:func:`hpx::get_num_worker_threads`
-- :cpp:func:`hpx::get_worker_thread_num`
-- :cpp:func:`hpx::get_thread_name`
-- :cpp:func:`hpx::register_pre_startup_function`
-- :cpp:func:`hpx::register_startup_function`
-- :cpp:func:`hpx::register_pre_shutdown_function`
-- :cpp:func:`hpx::register_shutdown_function`
-- :cpp:func:`hpx::get_num_localities`
-- :cpp:func:`hpx::get_locality_name`
+.. table:: Functions of header ``hpx/local/runtime.hpp``
 
-Header ``hpx/system_error.hpp``
-===============================
+   ===============================================
+   Function                      
+   ===============================================
+   :cpp:func:`hpx::get_num_worker_threads`
+   :cpp:func:`hpx::get_worker_thread_num`
+   :cpp:func:`hpx::get_thread_name`
+   :cpp:func:`hpx::register_pre_startup_function`
+   :cpp:func:`hpx::register_startup_function`
+   :cpp:func:`hpx::register_pre_shutdown_function`
+   :cpp:func:`hpx::register_shutdown_function`
+   :cpp:func:`hpx::get_num_localities`
+   :cpp:func:`hpx::get_locality_name`
+   ===============================================
 
-This header includes :ref:`public_api_header_hpx_local_system_error`.
+``hpx/system_error.hpp``
+========================
+
+The header :hpx-header:`libs/full/include/include,hpx/system_error.hpp` includes :ref:`public_api_header_hpx_local_system_error`.
 
 .. _public_api_header_hpx_local_system_error:
 
-Header ``hpx/local/system_error.hpp``
-=====================================
+``hpx/local/system_error.hpp``
+==============================
 
-Corresponds to the C++ standard library header
-:cppreference-header:`system_error`.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/system_error.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`system_error`.
 
 Classes
 -------
 
-- :cpp:class:`hpx::error_code` corresponding to the C++ standard :cppreference-generic:`error,error_code`
+.. table:: Classes of header ``hpx/local/system_error.hpp``
 
-Header ``hpx/task_block.hpp``
-=============================
+   ============================  ========================================
+   Class                         C++ standard
+   ============================  ========================================
+   :cpp:class:`hpx::error_code`  :cppreference-generic:`error,error_code`
+   ============================  ========================================
 
-This header includes :ref:`public_api_header_hpx_local_task_block`.
+``hpx/task_block.hpp``
+======================
+
+The header :hpx-header:`libs/full/include/include,hpx/task_block.hpp` includes 
+:ref:`public_api_header_hpx_local_task_block`.
 
 .. _public_api_header_hpx_local_task_block:
 
-Header ``hpx/local/task_black.hpp``
-===================================
+``hpx/local/task_black.hpp``
+============================
 
-Corresponds to the ``task_block`` feature in |cpp11_n4088|_. See
-:ref:`using_task_block` for more details on using task blocks.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/task_block.hpp` corresponds to the 
+``task_block`` feature in |cpp11_n4088|_. See :ref:`using_task_block` for more details on using task 
+blocks.
 
 Classes
 -------
 
-- :cpp:class:`hpx::parallel::v2::task_canceled_exception`
-- :cpp:class:`hpx::parallel::v2::task_block`
+.. table:: Classes of header ``hpx/local/task_black.hpp``
+
+   =======================================================
+   Class              
+   =======================================================
+   :cpp:class:`hpx::parallel::v2::task_canceled_exception`
+   :cpp:class:`hpx::parallel::v2::task_block`
+   =======================================================
 
 Functions
 ---------
 
-- :cpp:func:`hpx::parallel::v2::define_task_block`
-- :cpp:func:`hpx::parallel::v2::define_task_block_restore_thread`
+.. table:: Functions of header ``hpx/local/task_black.hpp``
 
-Header ``hpx/thread.hpp``
-=========================
+   ===============================================================
+   Function              
+   ===============================================================
+   :cpp:func:`hpx::parallel::v2::define_task_block`
+   :cpp:func:`hpx::parallel::v2::define_task_block_restore_thread`
+   ===============================================================
 
-This header includes :ref:`public_api_header_hpx_local_thread`.
+``hpx/thread.hpp``
+==================
+
+The header :hpx-header:`libs/full/include/include,hpx/thread.hpp` includes :ref:`public_api_header_hpx_local_thread`.
 
 .. _public_api_header_hpx_local_thread:
 
-Header ``hpx/local/thread.hpp``
-===============================
+``hpx/local/thread.hpp``
+========================
 
-Corresponds to the C++ standard library header :cppreference-header:`thread`.
-The functionality in this header is equivalent to the standard library thread
-functionality, with the exception that the |hpx| equivalents are implemented on
-top of lightweight threads and the |hpx| runtime.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/thread.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`thread`. The functionality in this header is 
+equivalent to the standard library thread functionality, with the exception that the |hpx| 
+equivalents are implemented on top of lightweight threads and the |hpx| runtime.
 
 Classes
 -------
 
-- :cpp:class:`hpx::thread` corresponding to the C++ standard :cppreference-generic:`thread,thread`
-- :cpp:class:`hpx::jthread` corresponding to the C++ standard :cppreference-generic:`thread,jthread`
+.. table:: Classes of header ``hpx/local/thread.hpp``
+
+   =========================  ======================================
+   Class                      C++ standard
+   =========================  ======================================
+   :cpp:class:`hpx::thread`   :cppreference-generic:`thread,thread`
+   :cpp:class:`hpx::jthread`  :cppreference-generic:`thread,jthread`
+   =========================  ======================================
 
 Functions
 ---------
 
-- :cpp:func:`hpx::this_thread::yield`
-- :cpp:func:`hpx::this_thread::get_id`
-- :cpp:func:`hpx::this_thread::sleep_for`
-- :cpp:func:`hpx::this_thread::sleep_until`
+.. table:: Functions of header ``hpx/local/thread.hpp``
 
-Header ``hpx/semaphore.hpp``
-============================
+   =========================================
+   Function              
+   =========================================
+   :cpp:func:`hpx::this_thread::yield`
+   :cpp:func:`hpx::this_thread::get_id`
+   :cpp:func:`hpx::this_thread::sleep_for`
+   :cpp:func:`hpx::this_thread::sleep_until`
+   =========================================
 
-This header includes :ref:`public_api_header_hpx_local_semaphore`.
+``hpx/semaphore.hpp``
+=====================
+
+The header :hpx-header:`libs/full/include/include,hpx/semaphore.hpp` includes 
+:ref:`public_api_header_hpx_local_semaphore`.
 
 .. _public_api_header_hpx_local_semaphore:
 
-Header ``hpx/local/semaphore.hpp``
-==================================
+``hpx/local/semaphore.hpp``
+===========================
 
-Corresponds to the C++ standard library header
-:cppreference-header:`semaphore`.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/semaphore.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`semaphore`.
 
 Classes
 -------
 
-- :cpp:class:`hpx::cpp20_binary_semaphore` corresponding to the C++ standard :cppreference-generic:`thread,counting_semaphore`
-- :cpp:class:`hpx::cpp20_counting_semaphore` corresponding to the C++ standard :cppreference-generic:`thread,counting_semaphore`
+.. table:: Classes of header ``hpx/local/semaphore.hpp``
 
-Header ``hpx/shared_mutex.hpp``
-===============================
+   ==========================================  =================================================
+   Class                                       C++ standard
+   ==========================================  =================================================
+   :cpp:class:`hpx::cpp20_binary_semaphore`    :cppreference-generic:`thread,counting_semaphore`
+   :cpp:class:`hpx::cpp20_counting_semaphore`  :cppreference-generic:`thread,counting_semaphore`
+   ==========================================  =================================================
 
-This header includes :ref:`public_api_header_hpx_local_shared_mutex`.
+``hpx/shared_mutex.hpp``
+========================
+
+The header :hpx-header:`libs/full/include/include,hpx/shared_mutex.hpp` includes 
+:ref:`public_api_header_hpx_local_shared_mutex`.
 
 .. _public_api_header_hpx_local_shared_mutex:
 
-Header ``hpx/local/shared_mutex.hpp``
-=====================================
+``hpx/local/shared_mutex.hpp``
+==============================
 
-Corresponds to the C++ standard library header
-:cppreference-header:`shared_mutex`.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/shared_mutex.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`shared_mutex`.
 
 Classes
 -------
 
-- :cpp:class:`hpx::shared_mutex` corresponding to the C++ standard :cppreference-generic:`thread,shared_mutex`
+.. table:: Classes of header ``hpx/local/shared_mutex.hpp``
 
-Header ``hpx/stop_token.hpp``
-=============================
+   ==============================  ===========================================
+   Class                           C++ standard
+   ==============================  ===========================================
+   :cpp:class:`hpx::shared_mutex`  :cppreference-generic:`thread,shared_mutex`
+   ==============================  ===========================================
 
-This header includes :ref:`public_api_header_hpx_local_stop_token`.
+``hpx/stop_token.hpp``
+======================
+
+The header :hpx-header:`libs/full/include/include,hpx/stop_token.hpp` includes :ref:`public_api_header_hpx_local_stop_token`.
 
 .. _public_api_header_hpx_local_stop_token:
 
-Header ``hpx/local/stop_token.hpp``
-===================================
+``hpx/local/stop_token.hpp``
+============================
 
-Corresponds to the C++ standard library header
-:cppreference-header:`stop_token`.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/stop_token.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`stop_token`.
 
 Constants
 ---------
 
-- :cpp:var:`hpx::nostopstate` corresponding to the C++ standard :cppreference-generic:`thread/stop_source,nostopstate`
+.. table:: Constants of header ``hpx/local/stop_token.hpp``
+
+   ===========================  ======================================================
+   Constant                     C++ standard
+   ===========================  ======================================================
+   :cpp:var:`hpx::nostopstate`  :cppreference-generic:`thread/stop_source,nostopstate`
+   ===========================  ======================================================
 
 Classes
 -------
 
-- :cpp:class:`hpx::stop_callback` corresponding to the C++ standard :cppreference-generic:`thread,stop_callback`
-- :cpp:class:`hpx::stop_source` corresponding to the C++ standard :cppreference-generic:`thread,stop_source`
-- :cpp:class:`hpx::stop_token` corresponding to the C++ standard :cppreference-generic:`thread,stop_token`
-- :cpp:struct:`hpx::nostopstate_t` corresponding to the C++ standard :cppreference-generic:`thread/stop_source,nostopstate_t`
+.. table:: Classes of header ``hpx/local/stop_token.hpp``
 
-Header ``hpx/tuple.hpp``
-========================
+   ================================  ========================================================
+   Class                             C++ standard
+   ================================  ========================================================
+   :cpp:class:`hpx::stop_callback`   :cppreference-generic:`thread,stop_callback`
+   :cpp:class:`hpx::stop_source`     :cppreference-generic:`thread,stop_source`
+   :cpp:class:`hpx::stop_token`      :cppreference-generic:`thread,stop_token`
+   :cpp:struct:`hpx::nostopstate_t`  :cppreference-generic:`thread/stop_source,nostopstate_t`
+   ================================  ========================================================
 
-This header includes :ref:`public_api_header_hpx_local_tuple`.
+``hpx/tuple.hpp``
+=================
+
+The header :hpx-header:`libs/full/include/include,hpx/tuple.hpp` includes :ref:`public_api_header_hpx_local_tuple`.
 
 .. _public_api_header_hpx_local_tuple:
 
-Header ``hpx/local/tuple.hpp``
-==============================
+``hpx/local/tuple.hpp``
+=======================
 
-Corresponds to the C++ standard library header :cppreference-header:`tuple`.
-:cpp:class:`hpx::tuple` can be used in CUDA device code, unlike ``std::tuple``.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/tuple.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`tuple`. :cpp:class:`hpx::tuple` can be used in 
+CUDA device code, unlike ``std::tuple``.
 
 Constants
 ---------
 
-- :cpp:var:`hpx::ignore` corresponding to the C++ standard :cppreference-generic:`utility/tuple,ignore`
+.. table:: Constants of header ``hpx/local/tuple.hpp``
+
+   ======================  ============================================
+   Constant                C++ standard
+   ======================  ============================================
+   :cpp:var:`hpx::ignore`  :cppreference-generic:`utility/tuple,ignore`
+   ======================  ============================================
 
 Classes
 -------
 
-- :cpp:struct:`hpx::tuple` corresponding to the C++ standard :cppreference-generic:`utility/tuple,tuple`
-- :cpp:struct:`hpx::tuple_size` corresponding to the C++ standard :cppreference-generic:`utility/tuple,tuple_size`
-- :cpp:struct:`hpx::tuple_element` corresponding to the C++ standard :cppreference-generic:`utility/tuple,tuple_element`
+.. table:: Classes of header ``hpx/local/tuple.hpp``
+
+   ================================  ===================================================
+   Class                             C++ standard
+   ================================  ===================================================
+   :cpp:struct:`hpx::tuple`          :cppreference-generic:`utility/tuple,tuple`
+   :cpp:struct:`hpx::tuple_size`     :cppreference-generic:`utility/tuple,tuple_size`
+   :cpp:struct:`hpx::tuple_element`  :cppreference-generic:`utility/tuple,tuple_element`
+   ================================  ===================================================
 
 Functions
 ---------
 
-- :cpp:func:`hpx::make_tuple` corresponding to the C++ standard :cppreference-generic:`utility/tuple,tuple_element`
-- :cpp:func:`hpx::tie` corresponding to the C++ standard :cppreference-generic:`utility/tuple,tie`
-- :cpp:func:`hpx::forward_as_tuple` corresponding to the C++ standard :cppreference-generic:`utility/tuple,forward_as_tuple`
-- :cpp:func:`hpx::tuple_cat` corresponding to the C++ standard :cppreference-generic:`utility/tuple,tuple_cat`
-- :cpp:func:`hpx::get` corresponding to the C++ standard :cppreference-generic:`utility/tuple,get`
+.. table:: Functions of header ``hpx/local/tuple.hpp``
 
-Header ``hpx/type_traits.hpp``
-==============================
+   =================================  ======================================================
+   Function                           C++ standard
+   =================================  ======================================================
+   :cpp:func:`hpx::make_tuple`        :cppreference-generic:`utility/tuple,tuple_element`
+   :cpp:func:`hpx::tie`               :cppreference-generic:`utility/tuple,tie`
+   :cpp:func:`hpx::forward_as_tuple`  :cppreference-generic:`utility/tuple,forward_as_tuple`
+   :cpp:func:`hpx::tuple_cat`         :cppreference-generic:`utility/tuple,tuple_cat`
+   :cpp:func:`hpx::get`               :cppreference-generic:`utility/tuple,get`
+   =================================  ======================================================
 
-This header includes :ref:`public_api_header_hpx_local_type_traits`.
+``hpx/type_traits.hpp``
+=======================
+
+The header :hpx-header:`libs/full/include/include,hpx/type_traits.hpp` includes :ref:`public_api_header_hpx_local_type_traits`.
 
 .. _public_api_header_hpx_local_type_traits:
 
-Header ``hpx/local/type_traits.hpp``
-====================================
+``hpx/local/type_traits.hpp``
+=============================
 
-Corresponds to the C++ standard library header
-:cppreference-header:`type_traits`.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/type_traits.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`type_traits`.
 
 Classes
 -------
 
-- :cpp:struct:`hpx::is_invocable` corresponding to the C++ standard :cppreference-generic:`types,is_invocable`
-- :cpp:struct:`hpx::is_invocable_r` corresponding to the C++ standard :cppreference-generic:`types,is_invocable`
+.. table:: Classes of header ``hpx/local/type_traits.hpp``
 
-Header ``hpx/unwrap.hpp``
-=========================
+   =================================  ==========================================
+   Class                              C++ standard
+   =================================  ==========================================
+   :cpp:struct:`hpx::is_invocable`    :cppreference-generic:`types,is_invocable`
+   :cpp:struct:`hpx::is_invocable_r`  :cppreference-generic:`types,is_invocable`
+   =================================  ==========================================
 
-This header includes :ref:`public_api_header_hpx_local_unwrap`.
+``hpx/unwrap.hpp``
+==================
+
+The header :hpx-header:`libs/full/include/include,hpx/unwrap.hpp` includes :ref:`public_api_header_hpx_local_unwrap`.
 
 .. _public_api_header_hpx_local_unwrap:
 
-Header ``hpx/local/unwrap.hpp``
-===============================
+``hpx/local/unwrap.hpp``
+========================
 
-Contains utilities for unwrapping futures.
+The header :hpx-header:`libs/core/include_local/include,hpx/local/unwrap.hpp` contains utilities for 
+unwrapping futures.
 
 Classes
 -------
 
-- :cpp:struct:`hpx::functional::unwrap`
-- :cpp:struct:`hpx::functional::unwrap_n`
-- :cpp:struct:`hpx::functional::unwrap_all`
+.. table:: Classes of header ``hpx/local/unwrap.hpp``
+
+   =========================================
+   Class              
+   =========================================
+   :cpp:struct:`hpx::functional::unwrap`
+   :cpp:struct:`hpx::functional::unwrap_n`
+   :cpp:struct:`hpx::functional::unwrap_all`
+   =========================================
 
 Functions
 ---------
 
-- :cpp:func:`hpx::unwrap`
-- :cpp:func:`hpx::unwrap_n`
-- :cpp:func:`hpx::unwrap_all`
-- :cpp:func:`hpx::unwrapping`
-- :cpp:func:`hpx::unwrapping_n`
-- :cpp:func:`hpx::unwrapping_all`
+.. table:: Functions of header ``hpx/local/unwrap.hpp``
 
-Header ``hpx/version.hpp``
-==========================
+   ===============================
+   Function              
+   ===============================
+   :cpp:func:`hpx::unwrap`
+   :cpp:func:`hpx::unwrap_n`
+   :cpp:func:`hpx::unwrap_all`
+   :cpp:func:`hpx::unwrapping`
+   :cpp:func:`hpx::unwrapping_n`
+   :cpp:func:`hpx::unwrapping_all`
+   ===============================
 
-This header provides version information about |hpx|.
+``hpx/version.hpp``
+===================
+
+The header :hpx-header:`libs/core/version/include,hpx/version.hpp` provides version information 
+about |hpx|.
 
 Macros
 ------
 
-- :c:macro:`HPX_VERSION_MAJOR`
-- :c:macro:`HPX_VERSION_MINOR`
-- :c:macro:`HPX_VERSION_SUBMINOR`
-- :c:macro:`HPX_VERSION_FULL`
-- :c:macro:`HPX_VERSION_DATE`
-- :c:macro:`HPX_VERSION_TAG`
-- :c:macro:`HPX_AGAS_VERSION`
+.. table:: Macros of header ``hpx/version.hpp``
+
+   ===============================
+   Macro              
+   ===============================
+   :c:macro:`HPX_VERSION_MAJOR`
+   :c:macro:`HPX_VERSION_MINOR`
+   :c:macro:`HPX_VERSION_SUBMINOR`
+   :c:macro:`HPX_VERSION_FULL`
+   :c:macro:`HPX_VERSION_DATE`
+   :c:macro:`HPX_VERSION_TAG`
+   :c:macro:`HPX_AGAS_VERSION`
+   ===============================
 
 Functions
 ---------
 
-- :cpp:func:`hpx::major_version`
-- :cpp:func:`hpx::minor_version`
-- :cpp:func:`hpx::subminor_version`
-- :cpp:func:`hpx::full_version`
-- :cpp:func:`hpx::full_version_as_string`
-- :cpp:func:`hpx::tag`
-- :cpp:func:`hpx::agas_version`
-- :cpp:func:`hpx::build_type`
-- :cpp:func:`hpx::build_date_time`
+.. table:: Functions of header ``hpx/version.hpp``
 
-Header ``hpx/wrap_main.hpp``
-============================
+   =======================================
+   Function              
+   =======================================
+   :cpp:func:`hpx::major_version`
+   :cpp:func:`hpx::minor_version`
+   :cpp:func:`hpx::subminor_version`
+   :cpp:func:`hpx::full_version`
+   :cpp:func:`hpx::full_version_as_string`
+   :cpp:func:`hpx::tag`
+   :cpp:func:`hpx::agas_version`
+   :cpp:func:`hpx::build_type`
+   :cpp:func:`hpx::build_date_time`
+   =======================================
 
-This header does not provide any direct functionality but is used for implicitly
-using ``main`` as the runtime entry point. See :ref:`minimal` for more details
-on implicitly starting the |hpx| runtime.
+``hpx/wrap_main.hpp``
+=====================
+
+The header :hpx-header:`wrap/include,hpx/wrap_main.hpp` does not provide any direct functionality 
+but is used for implicitly using ``main`` as the runtime entry point. See :ref:`minimal` for more 
+details on implicitly starting the |hpx| runtime.
