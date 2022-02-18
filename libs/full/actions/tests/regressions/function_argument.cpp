@@ -26,7 +26,7 @@ using hpx::naming::id_type;
 bool invoked_f = false;
 bool invoked_g = false;
 
-bool f(hpx::function<bool(), true> func)
+bool f(hpx::distributed::function<bool()> func)
 {
     HPX_TEST(!invoked_f);
     invoked_f = true;
@@ -63,7 +63,7 @@ struct g
 int hpx_main(variables_map&)
 {
     {
-        hpx::function<bool(), true> f = g();
+        hpx::distributed::function<bool()> f = g();
         std::vector<id_type> prefixes = hpx::find_all_localities();
 
         for (id_type const& prefix : prefixes)

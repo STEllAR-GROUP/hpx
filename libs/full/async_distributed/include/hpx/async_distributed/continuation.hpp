@@ -82,7 +82,7 @@ namespace hpx { namespace actions {
     {
     private:
         using function_type =
-            hpx::move_only_function<void(naming::id_type, Result), true>;
+            hpx::distributed::move_only_function<void(naming::id_type, Result)>;
 
     public:
         using result_type = Result;
@@ -201,8 +201,8 @@ namespace hpx { namespace actions {
     {
     private:
         using base_type = typed_continuation<RemoteResult>;
-        using function_type =
-            hpx::move_only_function<void(naming::id_type, RemoteResult), true>;
+        using function_type = hpx::distributed::move_only_function<void(
+            naming::id_type, RemoteResult)>;
 
     public:
         typed_continuation() = default;
@@ -309,7 +309,7 @@ namespace hpx { namespace actions {
     {
     private:
         using function_type =
-            hpx::move_only_function<void(naming::id_type), true>;
+            hpx::distributed::move_only_function<void(naming::id_type)>;
 
     public:
         using result_type = void;

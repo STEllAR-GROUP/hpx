@@ -216,7 +216,7 @@ void function_bind_test2(hpx::naming::id_type id)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int test2(hpx::function<int(hpx::naming::id_type), true> f)
+int test2(hpx::distributed::function<int(hpx::naming::id_type)> f)
 {
     return f(hpx::find_here());
 }
@@ -227,7 +227,7 @@ void function_bind_test3(hpx::naming::id_type id)
     using hpx::util::placeholders::_1;
     test1_action do_test1;
 
-    hpx::function<int(hpx::naming::id_type), true> f1 =
+    hpx::distributed::function<int(hpx::naming::id_type)> f1 =
         hpx::util::bind(do_test1, _1, 42);
 
     test2_action do_test2;
@@ -240,7 +240,7 @@ void function_bind_test4(hpx::naming::id_type id)
 {
     using hpx::util::placeholders::_1;
 
-    hpx::function<int(hpx::naming::id_type), true> f1 =
+    hpx::distributed::function<int(hpx::naming::id_type)> f1 =
         hpx::util::bind<test1_action>(_1, 42);
 
     hpx::function<int()> f2 = hpx::util::bind<test2_action>(id, f1);
@@ -249,7 +249,7 @@ void function_bind_test4(hpx::naming::id_type id)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int test3(hpx::function<int(), true> f)
+int test3(hpx::distributed::function<int()> f)
 {
     return f();
 }
@@ -257,7 +257,7 @@ HPX_PLAIN_ACTION(test3, test3_action)
 
 void function_bind_test5(hpx::naming::id_type id)
 {
-    hpx::function<int(), true> f1 =
+    hpx::distributed::function<int()> f1 =
         hpx::util::bind<test1_action>(hpx::find_here(), 42);
 
     hpx::function<int()> f2 = hpx::util::bind<test3_action>(id, f1);
@@ -268,7 +268,7 @@ void function_bind_test5(hpx::naming::id_type id)
 void function_bind_test6(hpx::naming::id_type id)
 {
     test1_action do_test1;
-    hpx::function<int(), true> f1 =
+    hpx::distributed::function<int()> f1 =
         hpx::util::bind(do_test1, hpx::find_here(), 42);
 
     test3_action do_test3;

@@ -71,6 +71,14 @@ namespace hpx {
         using base_type::reset;
         using base_type::target;
     };
+
+    namespace distributed {
+
+        // serializable move_only_function is equivalent to
+        // hpx::distributed::move_only_function
+        template <typename Sig>
+        using move_only_function = hpx::move_only_function<Sig, true>;
+    }    // namespace distributed
 }    // namespace hpx
 
 namespace hpx::util {

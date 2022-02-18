@@ -32,7 +32,7 @@ struct functor
     }
 };
 
-int pass_functor(hpx::function<int(), true> const& f)
+int pass_functor(hpx::distributed::function<int()> const& f)
 {
     return f();
 }
@@ -41,7 +41,7 @@ HPX_DECLARE_PLAIN_ACTION(pass_functor, pass_functor_action)
 HPX_ACTION_USES_ZLIB_COMPRESSION(pass_functor_action)
 HPX_PLAIN_ACTION(pass_functor, pass_functor_action)
 
-void worker(hpx::function<int(), true> const& f)
+void worker(hpx::distributed::function<int()> const& f)
 {
     pass_functor_action act;
 
@@ -63,7 +63,7 @@ int hpx_main()
 
     {
         functor g;
-        hpx::function<int(), true> f(g);
+        hpx::distributed::function<int()> f(g);
 
         std::vector<hpx::future<void>> futures;
 

@@ -69,6 +69,13 @@ namespace hpx {
         using base_type::reset;
         using base_type::target;
     };
+
+    namespace distributed {
+
+        // serializable function is equivalent to hpx::distributed::function
+        template <typename Sig>
+        using function = hpx::function<Sig, true>;
+    }    // namespace distributed
 }    // namespace hpx
 
 namespace hpx::util {
