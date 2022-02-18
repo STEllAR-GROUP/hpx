@@ -41,7 +41,7 @@ At this point the module exposes the following collective primitives:
 
 * :cpp:func:`hpx::lcos::broadcast`: performs a given action on all given global
   identifiers.
-* :cpp:class:`hpx::lcos::barrier`: distributed barrier.
+* :cpp:class:`hpx::distributed::barrier`: distributed barrier.
 * :cpp:func:`hpx::lcos::fold`: performs a fold with a given action on all given
   global identifiers.
 * :cpp:class:`hpx::lcos::latch`: distributed latch.

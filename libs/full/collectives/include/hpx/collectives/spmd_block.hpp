@@ -49,7 +49,7 @@ namespace hpx { namespace lcos {
     struct spmd_block
     {
     private:
-        using barrier_type = hpx::lcos::barrier;
+        using barrier_type = hpx::distributed::barrier;
         using table_type =
             std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
 
@@ -63,7 +63,7 @@ namespace hpx { namespace lcos {
           , images_per_locality_(images_per_locality)
           , num_images_(num_images)
           , image_id_(image_id)
-          , barrier_(std::make_shared<hpx::lcos::barrier>(
+          , barrier_(std::make_shared<hpx::distributed::barrier>(
                 name_ + "_barrier", num_images_, image_id_))
         {
         }
@@ -223,10 +223,10 @@ namespace hpx { namespace lcos {
         std::size_t image_id_;
         hpx::util::jenkins_hash hash_;
 
-        // Note : barrier is stored as a pointer because hpx::lcos::barrier
-        // default constructor does not exist (Needed by
-        // spmd_block::spmd_block())
-        mutable std::shared_ptr<hpx::lcos::barrier> barrier_;
+        // Note : barrier is stored as a pointer because
+        // hpx::distributed::barrier default constructor does not exist (Needed
+        // by spmd_block::spmd_block())
+        mutable std::shared_ptr<hpx::distributed::barrier> barrier_;
         mutable table_type barriers_;
 
     private:

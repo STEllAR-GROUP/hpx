@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -115,7 +116,7 @@ private:
         }
     }
 
-    void wait_for_tasks(hpx::lcos::local::barrier& finished)
+    void wait_for_tasks(std::shared_ptr<hpx::barrier<>> finished)
     {
         std::uint64_t const pending_count =
             get_thread_count(hpx::threads::thread_priority::normal,
@@ -138,7 +139,7 @@ private:
             }
         }
 
-        finished.wait();
+        finished->arrive_and_wait();
     }
 
     typedef double results_type;
@@ -165,11 +166,9 @@ private:
             hpx::threads::thread_init_data data(
                 hpx::threads::make_thread_function_nullary(hpx::util::bind(
                     &hpx_driver::stage_tasks, std::ref(*this), i)),
-                nullptr    // No HPX-thread name.
-                ,
-                hpx::threads::thread_priority::normal
+                nullptr,    // No HPX-thread name.
                 // Place in the target OS-thread's queue.
-                ,
+                hpx::threads::thread_priority::normal,
                 hpx::threads::thread_schedule_hint(i));
             hpx::threads::register_work(data);
         }
@@ -191,16 +190,16 @@ private:
         // Schedule a low-priority thread; when it is executed, it checks to
         // make sure all the tasks (which are normal priority) have been
         // executed, and then it
-        hpx::lcos::local::barrier finished(2);
+        std::shared_ptr<hpx::barrier<>> finished =
+            std::make_shared<hpx::barrier<>>(2);
 
         hpx::threads::thread_init_data data(
-            hpx::threads::make_thread_function_nullary(
-                hpx::util::bind(&hpx_driver::wait_for_tasks, std::ref(*this),
-                    std::ref(finished))),
+            hpx::threads::make_thread_function_nullary(hpx::util::bind(
+                &hpx_driver::wait_for_tasks, std::ref(*this), finished)),
             nullptr, hpx::threads::thread_priority::low);
         register_work(data);
 
-        finished.wait();
+        finished->arrive_and_wait();
 
         // w_M [nanoseconds]
         results = static_cast<double>(t.elapsed());

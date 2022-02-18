@@ -24,7 +24,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos {
+namespace hpx { namespace distributed {
+
     barrier::barrier(std::string const& base_name)
       : node_(new (hpx::components::component_heap<wrapping_type>().alloc())
                 wrapping_type(new wrapped_type(base_name,
@@ -196,4 +197,4 @@ namespace hpx { namespace lcos {
         HPX_ASSERT(b.node_);
         b.wait();
     }
-}}    // namespace hpx::lcos
+}}    // namespace hpx::distributed

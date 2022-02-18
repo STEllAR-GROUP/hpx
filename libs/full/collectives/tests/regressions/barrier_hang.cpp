@@ -31,7 +31,8 @@ struct spmd_block_helper
     void operator()(std::size_t image_id, Ts&&...) const
     {
         // Ensure that other images reaches that point
-        hpx::lcos::barrier barrier(name_ + "_barrier", num_images_, image_id);
+        hpx::distributed::barrier barrier(
+            name_ + "_barrier", num_images_, image_id);
         barrier.wait();
 
         ++local_count;

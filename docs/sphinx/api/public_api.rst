@@ -223,7 +223,7 @@ preferred.
 Classes
 -------
 
-- :cpp:class:`hpx::lcos::barrier`
+- :cpp:class:`hpx::distributed::barrier`
 
 .. _public_api_header_hpx_local_barrier:
 
@@ -235,7 +235,7 @@ Corresponds to the C++ standard library header :cppreference-header:`barrier`.
 Classes
 -------
 
-- :cpp:class:`hpx::lcos::local::cpp20_barrier`
+- :cpp:class:`hpx::barrier`
 
 Header ``hpx/channel.hpp``
 ==========================

@@ -155,7 +155,7 @@ void print_results(std::uint64_t cores, double walltime, double warmup_estimate,
 
 ///////////////////////////////////////////////////////////////////////////////
 void wait_for_tasks(
-    hpx::lcos::local::barrier& finished, std::uint64_t suspended_tasks)
+    std::shared_ptr<hpx::barrier<>> finished, std::uint64_t suspended_tasks)
 {
     std::uint64_t const pending_count =
         get_thread_count(hpx::threads::thread_priority::normal,
@@ -177,7 +177,7 @@ void wait_for_tasks(
         }
     }
 
-    finished.wait();
+    finished->arrive_and_wait();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -483,15 +483,16 @@ int hpx_main(variables_map& vm)
         // Schedule a low-priority thread; when it is executed, it checks to
         // make sure all the tasks (which are normal priority) have been
         // executed, and then it
-        hpx::lcos::local::barrier finished(2);
+        std::shared_ptr<hpx::barrier<>> finished =
+            std::make_shared<hpx::barrier<>>(2);
 
         thread_init_data data(
             make_thread_function_nullary(hpx::util::bind(
-                &wait_for_tasks, std::ref(finished), total_suspended_tasks)),
+                &wait_for_tasks, finished, total_suspended_tasks)),
             "wait_for_tasks", hpx::threads::thread_priority::low);
         register_work(data);
 
-        finished.wait();
+        finished->arrive_and_wait();
 
         // Stop the clock
         double time_elapsed = t.elapsed();

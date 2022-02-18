@@ -159,13 +159,13 @@ namespace hpx { namespace detail {
             }
 
             // create our global barrier...
-            hpx::lcos::barrier::get_global_barrier() =
-                hpx::lcos::barrier::create_global_barrier();
+            hpx::distributed::barrier::get_global_barrier() =
+                hpx::distributed::barrier::create_global_barrier();
 
             // Second stage bootstrap synchronizes component loading across all
             // localities, ensuring that the component namespace tables are fully
             // populated before user code is executed.
-            lcos::barrier::synchronize();
+            distributed::barrier::synchronize();
             lbt_ << "(2nd stage) pre_main: passed 2nd stage boot barrier";
 
             // Work on registration requests for message handler plugins
@@ -178,14 +178,14 @@ namespace hpx { namespace detail {
 
             // Second stage bootstrap synchronizes performance counter loading
             // across all localities.
-            lcos::barrier::synchronize();
+            distributed::barrier::synchronize();
             lbt_ << "(3rd stage) pre_main: passed 3rd stage boot barrier";
 
             runtime_support::call_startup_functions(find_here(), true);
             lbt_ << "(3rd stage) pre_main: ran pre-startup functions";
 
             // Third stage separates pre-startup and startup function phase.
-            lcos::barrier::synchronize();
+            distributed::barrier::synchronize();
             lbt_ << "(4th stage) pre_main: passed 4th stage boot barrier";
 
             runtime_support::call_startup_functions(find_here(), false);
@@ -195,7 +195,7 @@ namespace hpx { namespace detail {
             // localities. This is done after component loading to guarantee that
             // all user code, including startup functions, are only run after the
             // component tables are populated.
-            lcos::barrier::synchronize();
+            distributed::barrier::synchronize();
             lbt_ << "(5th stage) pre_main: passed 4th stage boot barrier";
         }
 
@@ -240,7 +240,7 @@ namespace hpx { namespace detail {
     void post_main()
     {
         // simply destroy global barrier
-        hpx::lcos::barrier::get_global_barrier().detach();
+        hpx::distributed::barrier::get_global_barrier().detach();
     }
 }}    // namespace hpx::detail
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2013 Hartmut Kaiser
+// Copyright (C) 2013-2022 Hartmut Kaiser
 // Copyright (C) 2007 Anthony Williams
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,16 +12,18 @@
 #include <hpx/modules/testing.hpp>
 
 #include <functional>
+#include <memory>
 
 using hpx::program_options::options_description;
 using hpx::program_options::variables_map;
 
 ///////////////////////////////////////////////////////////////////////////////
-void do_nothing(hpx::lcos::local::barrier& b1, hpx::lcos::local::barrier& b2)
+void do_nothing(
+    std::shared_ptr<hpx::barrier<>> b1, std::shared_ptr<hpx::barrier<>> b2)
 {
-    b1.wait();
+    b1->arrive_and_wait();
     hpx::this_thread::suspend(100);    // wait for 100 ms
-    b2.wait();
+    b2->arrive_and_wait();
 }
 
 void test_thread_id_for_default_constructed_thread_is_default_constructed_id()
@@ -32,42 +34,43 @@ void test_thread_id_for_default_constructed_thread_is_default_constructed_id()
 
 void test_thread_id_for_running_thread_is_not_default_constructed_id()
 {
-    hpx::lcos::local::barrier b1(2);
-    hpx::lcos::local::barrier b2(2);
-    hpx::thread t(&do_nothing, std::ref(b1), std::ref(b2));
-    b1.wait();
+    std::shared_ptr<hpx::barrier<>> b1 = std::make_shared<hpx::barrier<>>(2);
+    std::shared_ptr<hpx::barrier<>> b2 = std::make_shared<hpx::barrier<>>(2);
+
+    hpx::thread t(&do_nothing, b1, b2);
+    b1->arrive_and_wait();
 
     HPX_TEST_NEQ(t.get_id(), hpx::thread::id());
 
-    b2.wait();
+    b2->arrive_and_wait();
     t.join();
 }
 
 void test_different_threads_have_different_ids()
 {
-    hpx::lcos::local::barrier b1(3);
-    hpx::lcos::local::barrier b2(3);
+    std::shared_ptr<hpx::barrier<>> b1 = std::make_shared<hpx::barrier<>>(3);
+    std::shared_ptr<hpx::barrier<>> b2 = std::make_shared<hpx::barrier<>>(3);
 
-    hpx::thread t(&do_nothing, std::ref(b1), std::ref(b2));
-    hpx::thread t2(&do_nothing, std::ref(b1), std::ref(b2));
-    b1.wait();
+    hpx::thread t(&do_nothing, b1, b2);
+    hpx::thread t2(&do_nothing, b1, b2);
+    b1->arrive_and_wait();
 
     HPX_TEST_NEQ(t.get_id(), t2.get_id());
 
-    b2.wait();
+    b2->arrive_and_wait();
     t.join();
     t2.join();
 }
 
 void test_thread_ids_have_a_total_order()
 {
-    hpx::lcos::local::barrier b1(4);
-    hpx::lcos::local::barrier b2(4);
+    std::shared_ptr<hpx::barrier<>> b1 = std::make_shared<hpx::barrier<>>(4);
+    std::shared_ptr<hpx::barrier<>> b2 = std::make_shared<hpx::barrier<>>(4);
 
-    hpx::thread t1(&do_nothing, std::ref(b1), std::ref(b2));
-    hpx::thread t2(&do_nothing, std::ref(b1), std::ref(b2));
-    hpx::thread t3(&do_nothing, std::ref(b1), std::ref(b2));
-    b1.wait();
+    hpx::thread t1(&do_nothing, b1, b2);
+    hpx::thread t2(&do_nothing, b1, b2);
+    hpx::thread t3(&do_nothing, b1, b2);
+    b1->arrive_and_wait();
 
     hpx::thread::id t1_id = t1.get_id();
     hpx::thread::id t2_id = t2.get_id();
@@ -153,7 +156,7 @@ void test_thread_ids_have_a_total_order()
     HPX_TEST(!(default_id >= t2_id));
     HPX_TEST(!(default_id >= t3_id));
 
-    b2.wait();
+    b2->arrive_and_wait();
 
     t1.join();
     t2.join();
