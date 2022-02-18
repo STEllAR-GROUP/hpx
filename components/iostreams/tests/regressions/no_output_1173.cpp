@@ -50,7 +50,7 @@ int hpx_main()
         expected += "hello!\n";
     }
 
-    hpx::register_shutdown_function(hpx::util::bind(&on_shutdown, expected));
+    hpx::register_shutdown_function(hpx::bind(&on_shutdown, expected));
     hpx::wait_all(futures);
 
     HPX_TEST_EQ(hpx::finalize(), 0);

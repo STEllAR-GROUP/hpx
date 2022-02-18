@@ -465,7 +465,7 @@ namespace hpx {
                 "HPX thread";
 
         threads::thread_init_data data(
-            util::bind(&runtime_distributed::run_helper, this, func,
+            hpx::bind(&runtime_distributed::run_helper, this, func,
                 std::ref(result_)),
             "run_helper", threads::thread_priority::normal,
             threads::thread_schedule_hint(0), threads::thread_stacksize::large);
@@ -557,7 +557,7 @@ namespace hpx {
         std::condition_variable cond;
         bool running = false;
 
-        std::thread t(util::bind(&runtime_distributed::wait_helper, this,
+        std::thread t(hpx::bind(&runtime_distributed::wait_helper, this,
             std::ref(mtx), std::ref(cond), std::ref(running)));
 
         // wait for the thread to run
@@ -608,7 +608,7 @@ namespace hpx {
             std::condition_variable cond;
             std::unique_lock<std::mutex> l(mtx);
 
-            std::thread t(util::bind(&runtime_distributed::stop_helper, this,
+            std::thread t(hpx::bind(&runtime_distributed::stop_helper, this,
                 blocking, std::ref(cond), std::ref(mtx)));
             cond.wait(l);
 
@@ -1308,19 +1308,19 @@ namespace hpx {
         typedef bool (runtime_distributed::*report_error_t)(
             std::size_t, std::exception_ptr const&, bool);
 
-        using util::placeholders::_1;
-        using util::placeholders::_2;
-        using util::placeholders::_3;
-        using util::placeholders::_4;
+        using placeholders::_1;
+        using placeholders::_2;
+        using placeholders::_3;
+        using placeholders::_4;
 
         notification_policy_type notifier;
 
         notifier.add_on_start_thread_callback(
-            util::bind(&runtime_distributed::init_tss_helper, this, prefix,
-                type, _1, _2, _3, _4, false));
-        notifier.add_on_stop_thread_callback(util::bind(
+            hpx::bind(&runtime_distributed::init_tss_helper, this, prefix, type,
+                _1, _2, _3, _4, false));
+        notifier.add_on_stop_thread_callback(hpx::bind(
             &runtime_distributed::deinit_tss_helper, this, prefix, _1));
-        notifier.set_on_error_callback(util::bind(
+        notifier.set_on_error_callback(hpx::bind(
             static_cast<report_error_t>(&runtime_distributed::report_error),
             this, _1, _2, true));
 

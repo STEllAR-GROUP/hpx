@@ -100,7 +100,7 @@ namespace hpx {
         init_params const& params)
     {
         std::function<int(hpx::program_options::variables_map&)> main_f =
-            util::bind_back(detail::init_helper, HPX_MOVE(f));
+            hpx::bind_back(detail::init_helper, HPX_MOVE(f));
         return detail::init_impl(HPX_MOVE(main_f), argc, argv, params);
     }
 

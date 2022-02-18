@@ -591,7 +591,7 @@ namespace hpx::parcelset {
         }
 
         write_handler_type wrapped_f =
-            util::bind_front(&detail::parcel_sent_handler, HPX_MOVE(f));
+            hpx::bind_front(&detail::parcel_sent_handler, HPX_MOVE(f));
 
         // If we were able to resolve the address(es) locally we send the
         // parcel directly to the destination.
@@ -724,7 +724,7 @@ namespace hpx::parcelset {
                 resolved_locally = agas::resolve_local(p.destination(), addr);
             }
 
-            write_handler_type f = util::bind_front(
+            write_handler_type f = hpx::bind_front(
                 &detail::parcel_sent_handler, HPX_MOVE(handlers[i]));
 
             // make sure all parcels go to the same locality

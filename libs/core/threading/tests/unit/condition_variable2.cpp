@@ -503,7 +503,7 @@ void test_many_cvs(bool call_notify, bool call_interrupt)
             arr_ready_cv{};
         std::vector<hpx::jthread> vthreads_deferred;
 
-        hpx::jthread t0(hpx::util::bind_back(cv_wait, 0, std::ref(ready),
+        hpx::jthread t0(hpx::bind_back(cv_wait, 0, std::ref(ready),
             std::ref(ready_mtx), std::ref(ready_cv), call_notify));
         {
             auto t0ssource = t0.get_stop_source();

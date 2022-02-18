@@ -41,8 +41,8 @@ int hpx_main()
         test_action do_test;
 
         future<int> f = async(do_test, hpx::find_here());
-        future<int> p = f.then(
-            hpx::util::bind(future_callback, hpx::util::placeholders::_1));
+        future<int> p =
+            f.then(hpx::bind(future_callback, hpx::placeholders::_1));
 
         HPX_TEST_EQ(p.get(), 42);
     }

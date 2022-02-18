@@ -21,7 +21,7 @@
 
 #include <hpx/functional/bind.hpp>
 
-namespace placeholders = hpx::util::placeholders;
+namespace placeholders = hpx::placeholders;
 
 #include <functional>
 #include <iostream>
@@ -44,24 +44,24 @@ int main()
     X x = {0};
     X* px = &x;
 
-    hpx::util::bind(&X::m, placeholders::_1)(px) = 42;
+    hpx::bind(&X::m, placeholders::_1)(px) = 42;
 
     HPX_TEST_EQ(x.m, 42);
 
-    hpx::util::bind(&X::m, std::ref(x))() = 17041;
+    hpx::bind(&X::m, std::ref(x))() = 17041;
 
     HPX_TEST_EQ(x.m, 17041);
 
     X const* pcx = &x;
 
-    HPX_TEST_EQ(hpx::util::bind(&X::m, placeholders::_1)(pcx), 17041L);
-    HPX_TEST_EQ(hpx::util::bind(&X::m, pcx)(), 17041L);
+    HPX_TEST_EQ(hpx::bind(&X::m, placeholders::_1)(pcx), 17041L);
+    HPX_TEST_EQ(hpx::bind(&X::m, pcx)(), 17041L);
 
     Y y = {"test"};
     std::string v("test");
 
-    HPX_TEST_EQ(hpx::util::bind(&Y::m, &y)(), v);
-    HPX_TEST_EQ(hpx::util::bind(&Y::m, &y)(), v);
+    HPX_TEST_EQ(hpx::bind(&Y::m, &y)(), v);
+    HPX_TEST_EQ(hpx::bind(&Y::m, &y)(), v);
 
     return hpx::util::report_errors();
 }

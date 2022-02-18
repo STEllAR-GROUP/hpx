@@ -135,9 +135,9 @@ void thread_affinity_foreman()
         // is the index of the future in the vector, and the second is the
         // return value of the future. hpx::wait_each doesn't return until
         // all the futures in the vector have returned.
-        using hpx::util::placeholders::_1;
-        hpx::wait_each(hpx::unwrapping(hpx::util::bind(
-                           &check_in, std::ref(attendance), _1)),
+        using hpx::placeholders::_1;
+        hpx::wait_each(
+            hpx::unwrapping(hpx::bind(&check_in, std::ref(attendance), _1)),
             futures);
     }
 }

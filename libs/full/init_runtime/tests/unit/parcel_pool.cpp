@@ -74,11 +74,11 @@ void test_bulk_sync(Executor& exec)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     hpx::parallel::execution::bulk_sync_execute(
-        exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
+        exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42);
     hpx::parallel::execution::bulk_sync_execute(exec, &bulk_test, v, tid, 42);
 }
 
@@ -90,11 +90,11 @@ void test_bulk_async(Executor& exec)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-                      exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42))
+                      exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42))
         .get();
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
                       exec, &bulk_test, v, tid, 42))
@@ -121,14 +121,14 @@ void test_bulk_then(Executor& exec)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    using hpx::util::placeholders::_3;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
+    using hpx::placeholders::_3;
 
     hpx::shared_future<void> f = hpx::make_ready_future();
 
     hpx::parallel::execution::bulk_then_execute(
-        exec, hpx::util::bind(&bulk_test_f, _1, _2, tid, _3), v, f, 42)
+        exec, hpx::bind(&bulk_test_f, _1, _2, tid, _3), v, f, 42)
         .get();
     hpx::parallel::execution::bulk_then_execute(
         exec, &bulk_test_f, v, f, tid, 42)

@@ -21,7 +21,7 @@
 
 #include <hpx/functional/bind.hpp>
 
-namespace placeholders = hpx::util::placeholders;
+namespace placeholders = hpx::placeholders;
 
 #include <iostream>
 
@@ -36,24 +36,23 @@ int f(int x)
 
 int main()
 {
-    HPX_TEST(hpx::util::bind(f, placeholders::_1)(1) == 1);
+    HPX_TEST(hpx::bind(f, placeholders::_1)(1) == 1);
 
-    HPX_TEST(hpx::util::bind(f, placeholders::_2)(1, 2) == 2);
+    HPX_TEST(hpx::bind(f, placeholders::_2)(1, 2) == 2);
 
-    HPX_TEST(hpx::util::bind(f, placeholders::_3)(1, 2, 3) == 3);
+    HPX_TEST(hpx::bind(f, placeholders::_3)(1, 2, 3) == 3);
 
-    HPX_TEST(hpx::util::bind(f, placeholders::_4)(1, 2, 3, 4) == 4);
+    HPX_TEST(hpx::bind(f, placeholders::_4)(1, 2, 3, 4) == 4);
 
-    HPX_TEST(hpx::util::bind(f, placeholders::_5)(1, 2, 3, 4, 5) == 5);
+    HPX_TEST(hpx::bind(f, placeholders::_5)(1, 2, 3, 4, 5) == 5);
 
-    HPX_TEST(hpx::util::bind(f, placeholders::_6)(1, 2, 3, 4, 5, 6) == 6);
+    HPX_TEST(hpx::bind(f, placeholders::_6)(1, 2, 3, 4, 5, 6) == 6);
 
-    HPX_TEST(hpx::util::bind(f, placeholders::_7)(1, 2, 3, 4, 5, 6, 7) == 7);
+    HPX_TEST(hpx::bind(f, placeholders::_7)(1, 2, 3, 4, 5, 6, 7) == 7);
 
-    HPX_TEST(hpx::util::bind(f, placeholders::_8)(1, 2, 3, 4, 5, 6, 7, 8) == 8);
+    HPX_TEST(hpx::bind(f, placeholders::_8)(1, 2, 3, 4, 5, 6, 7, 8) == 8);
 
-    HPX_TEST(
-        hpx::util::bind(f, placeholders::_9)(1, 2, 3, 4, 5, 6, 7, 8, 9) == 9);
+    HPX_TEST(hpx::bind(f, placeholders::_9)(1, 2, 3, 4, 5, 6, 7, 8, 9) == 9);
 
     return hpx::util::report_errors();
 }

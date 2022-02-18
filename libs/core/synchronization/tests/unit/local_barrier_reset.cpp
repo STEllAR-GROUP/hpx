@@ -68,8 +68,8 @@ int hpx_main(variables_map& vm)
             //call count_up to increase number of threads waiting when create a new thread
             b.count_up();
             thread_init_data data(
-                make_thread_function_nullary(hpx::util::bind(
-                    &local_barrier_test, std::ref(b), std::ref(c))),
+                make_thread_function_nullary(
+                    hpx::bind(&local_barrier_test, std::ref(b), std::ref(c))),
                 "local_barrier_test");
             register_work(data);
         }
@@ -85,8 +85,8 @@ int hpx_main(variables_map& vm)
             //call count_up to increase number of threads waiting when create a new thread
             b.count_up();
             thread_init_data data(
-                make_thread_function_nullary(hpx::util::bind(
-                    &local_barrier_test, std::ref(b), std::ref(c))),
+                make_thread_function_nullary(
+                    hpx::bind(&local_barrier_test, std::ref(b), std::ref(c))),
                 "local_barrier_test");
             register_work(data);
         }
@@ -101,8 +101,8 @@ int hpx_main(variables_map& vm)
         {
             // create the threads which will wait on the barrier
             thread_init_data data(
-                make_thread_function_nullary(hpx::util::bind(
-                    &local_barrier_test, std::ref(b), std::ref(c))),
+                make_thread_function_nullary(
+                    hpx::bind(&local_barrier_test, std::ref(b), std::ref(c))),
                 "local_barrier_test");
             register_work(data);
         }
@@ -121,8 +121,8 @@ int hpx_main(variables_map& vm)
         {
             // create the threads which will wait on the barrier
             thread_init_data data(
-                make_thread_function_nullary(hpx::util::bind(
-                    &local_barrier_test, std::ref(b), std::ref(c))),
+                make_thread_function_nullary(
+                    hpx::bind(&local_barrier_test, std::ref(b), std::ref(c))),
                 "local_barrier_test");
             register_work(data);
         }

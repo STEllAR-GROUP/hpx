@@ -121,9 +121,9 @@ namespace hpx::parcelset::policies::tcp {
                     Handler) = &receiver::handle_read_header<Handler>;
 
                 asio::async_read(socket_, buffers,
-                    util::bind(f, shared_from_this(),
-                        util::placeholders::_1,    // error
-                        util::placeholders::_2,    // bytes_transferred
+                    hpx::bind(f, shared_from_this(),
+                        placeholders::_1,    // error
+                        placeholders::_2,    // bytes_transferred
                         util::protect(handler)));
             }
         }
@@ -242,8 +242,8 @@ namespace hpx::parcelset::policies::tcp {
                     socket_.set_option(quickack);
 #endif
                     asio::async_read(socket_, buffers,
-                        util::bind(f, shared_from_this(),
-                            util::placeholders::_1,    // error,
+                        hpx::bind(f, shared_from_this(),
+                            placeholders::_1,    // error,
                             util::protect(handler)));
                 }
             }
@@ -303,8 +303,8 @@ namespace hpx::parcelset::policies::tcp {
                     socket_.set_option(quickack);
 #endif
                     asio::async_read(socket_, buffers,
-                        util::bind(f, shared_from_this(),
-                            util::placeholders::_1,    // error,
+                        hpx::bind(f, shared_from_this(),
+                            placeholders::_1,    // error,
                             util::protect(handler)));
                 }
             }
@@ -351,8 +351,8 @@ namespace hpx::parcelset::policies::tcp {
 
                     asio::async_write(socket_,
                         asio::buffer(&ack_, sizeof(ack_)),
-                        util::bind(f, shared_from_this(),
-                            util::placeholders::_1,    // error,
+                        hpx::bind(f, shared_from_this(),
+                            placeholders::_1,    // error,
                             util::protect(handler)));
                 }
             }

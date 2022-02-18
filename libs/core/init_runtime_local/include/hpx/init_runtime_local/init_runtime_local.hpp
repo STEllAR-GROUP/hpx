@@ -151,7 +151,7 @@ namespace hpx {
             char** argv, init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f =
-                hpx::util::bind_back(hpx::detail::init_helper, f);
+                hpx::bind_back(hpx::detail::init_helper, f);
             return detail::init_start_impl(
                 HPX_MOVE(main_f), argc, argv, params, true);
         }
@@ -160,7 +160,7 @@ namespace hpx {
             init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f =
-                hpx::util::bind(f);
+                hpx::bind(f);
             return detail::init_start_impl(
                 HPX_MOVE(main_f), argc, argv, params, true);
         }
@@ -185,7 +185,7 @@ namespace hpx {
             char** argv, init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f =
-                hpx::util::bind_back(hpx::detail::init_helper, f);
+                hpx::bind_back(hpx::detail::init_helper, f);
             return 0 ==
                 detail::init_start_impl(
                     HPX_MOVE(main_f), argc, argv, params, false);
@@ -195,7 +195,7 @@ namespace hpx {
             init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f =
-                hpx::util::bind(f);
+                hpx::bind(f);
             return 0 ==
                 detail::init_start_impl(
                     HPX_MOVE(main_f), argc, argv, params, false);

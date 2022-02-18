@@ -73,8 +73,8 @@ int hpx_main(variables_map& vm)
         for (std::size_t i = 0; i < pxthreads; ++i)
         {
             hpx::threads::thread_init_data data(
-                hpx::threads::make_thread_function_nullary(hpx::util::bind(
-                    &suspend_test, b, iterations, suspend_duration)),
+                hpx::threads::make_thread_function_nullary(
+                    hpx::bind(&suspend_test, b, iterations, suspend_duration)),
                 "suspend_test");
             register_work(data);
         }

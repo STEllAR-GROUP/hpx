@@ -168,7 +168,7 @@ namespace hpx {
 
         threads::thread_init_data data(
             util::one_shot(
-                util::bind(&thread::thread_function_nullary, HPX_MOVE(func))),
+                hpx::bind(&thread::thread_function_nullary, HPX_MOVE(func))),
             "thread::thread_function_nullary",
             threads::thread_priority::default_, threads::thread_schedule_hint(),
             threads::thread_stacksize::default_,
@@ -216,7 +216,7 @@ namespace hpx {
 
         // register callback function to be called when thread exits
         if (threads::add_thread_exit_callback(id_.noref(),
-                util::bind_front(&resume_thread, HPX_MOVE(this_id))))
+                hpx::bind_front(&resume_thread, HPX_MOVE(this_id))))
         {
             // wait for thread to be terminated
             util::unlock_guard ul(l);
@@ -299,8 +299,7 @@ namespace hpx {
             thread_task_base(threads::thread_id_ref_type const& id)
             {
                 if (threads::add_thread_exit_callback(id.noref(),
-                        util::bind_front(
-                            &thread_task_base::thread_exit_function,
+                        hpx::bind_front(&thread_task_base::thread_exit_function,
                             future_base_type(this))))
                 {
                     id_ = id;

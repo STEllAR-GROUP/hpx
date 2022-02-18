@@ -161,8 +161,8 @@ namespace hpx { namespace parallel { namespace execution {
                     hpx::util::detail::invoke_deferred_result_t<F, Future,
                         Ts...>;
 
-                auto func = hpx::util::one_shot(hpx::util::bind_back(
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+                auto func = hpx::util::one_shot(
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 hpx::traits::detail::shared_state_ptr_t<result_type> p =
                     lcos::detail::make_continuation_exec<result_type>(
@@ -382,8 +382,8 @@ namespace hpx { namespace parallel { namespace execution {
                     hpx::util::detail::invoke_deferred_result_t<F, Future,
                         Ts...>;
 
-                auto func = hpx::util::one_shot(hpx::util::bind_back(
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+                auto func = hpx::util::one_shot(
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 hpx::traits::detail::shared_state_ptr_t<result_type> p =
                     lcos::detail::make_continuation_exec<result_type>(

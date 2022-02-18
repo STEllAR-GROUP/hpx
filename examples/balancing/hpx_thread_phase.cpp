@@ -125,7 +125,7 @@ int hpx_main(variables_map& vm)
             const std::size_t index = j % mutex_count;
 
             thread_init_data data(
-                make_thread_function_nullary(hpx::util::bind(&lock_and_wait,
+                make_thread_function_nullary(hpx::bind(&lock_and_wait,
                     std::ref(m[index]), b0, b1, std::ref(hpxthreads[j]), wait)),
                 "lock_and_wait");
             ids.push_back(register_thread(data));

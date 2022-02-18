@@ -147,7 +147,7 @@ void test_remote_async_colocated(test_client const& target)
     {
         increment_with_future_action inc;
         hpx::shared_future<std::int32_t> f =
-            hpx::async(hpx::launch::deferred, hpx::util::bind(&increment, 42));
+            hpx::async(hpx::launch::deferred, hpx::bind(&increment, 42));
 
         hpx::future<std::int32_t> f1 =
             hpx::async(inc, hpx::colocated(target), f);

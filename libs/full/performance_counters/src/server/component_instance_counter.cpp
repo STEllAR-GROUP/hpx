@@ -83,7 +83,7 @@ namespace hpx { namespace performance_counters { namespace detail {
             }
 
             hpx::function<std::int64_t()> f =
-                util::bind_front(&get_instance_count, type);
+                hpx::bind_front(&get_instance_count, type);
             return create_raw_counter(info, HPX_MOVE(f), ec);
         }
         break;

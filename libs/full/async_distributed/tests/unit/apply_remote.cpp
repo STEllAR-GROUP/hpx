@@ -85,11 +85,11 @@ int hpx_main()
     {
         increment_action inc;
 
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
         hpx::apply(inc, there, here, 1);
-        hpx::apply(hpx::util::bind(inc, there, here, 1));
-        hpx::apply(hpx::util::bind(inc, there, here, _1), 1);
+        hpx::apply(hpx::bind(inc, there, here, 1));
+        hpx::apply(hpx::bind(inc, there, here, _1), 1);
     }
 
     {
@@ -97,11 +97,11 @@ int hpx_main()
         hpx::lcos::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
         hpx::apply(inc, there, here, f);
-        hpx::apply(hpx::util::bind(inc, there, here, f));
-        hpx::apply(hpx::util::bind(inc, there, here, _1), f);
+        hpx::apply(hpx::bind(inc, there, here, f));
+        hpx::apply(hpx::bind(inc, there, here, _1), f);
 
         p.set_value(1);
     }
@@ -111,17 +111,17 @@ int hpx_main()
             hpx::components::new_<increment_server>(there);
         hpx::id_type inc = inc_f.get();
 
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
-        using hpx::util::placeholders::_3;
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
+        using hpx::placeholders::_3;
 
         call_action call;
         hpx::apply(call, inc, here, 1);
-        hpx::apply(hpx::util::bind(call, inc, here, 1));
-        hpx::apply(hpx::util::bind(call, inc, here, _1), 1);
-        hpx::apply(hpx::util::bind(call, _1, here, 1), inc);
-        hpx::apply(hpx::util::bind(call, _1, _2, 1), inc, here);
-        hpx::apply(hpx::util::bind(call, _1, _2, _3), inc, here, 1);
+        hpx::apply(hpx::bind(call, inc, here, 1));
+        hpx::apply(hpx::bind(call, inc, here, _1), 1);
+        hpx::apply(hpx::bind(call, _1, here, 1), inc);
+        hpx::apply(hpx::bind(call, _1, _2, 1), inc, here);
+        hpx::apply(hpx::bind(call, _1, _2, _3), inc, here, 1);
     }
 
     {

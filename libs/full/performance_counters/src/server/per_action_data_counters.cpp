@@ -87,7 +87,7 @@ namespace hpx { namespace performance_counters {
                 // if no parameters (action name) is given assume that this
                 // counter should report the overall value for all actions
                 auto const& f =
-                    util::bind_front(counter_func, paths.parameters_);
+                    hpx::bind_front(counter_func, paths.parameters_);
                 return performance_counters::locality_raw_counter_creator(
                     info, f, ec);
             }

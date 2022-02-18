@@ -93,8 +93,8 @@ int hpx_main(hpx::program_options::variables_map&)
 
         hpx::shared_future<int> f = hpx::async<test_action>(hpx::find_here());
         hpx::future<int> p =
-            f.then(hpx::util::bind(future_callback, std::ref(data_cb_called),
-                std::ref(error_cb_called), hpx::util::placeholders::_1));
+            f.then(hpx::bind(future_callback, std::ref(data_cb_called),
+                std::ref(error_cb_called), hpx::placeholders::_1));
 
         HPX_TEST_EQ(p.get(), 42);
         HPX_TEST(data_cb_called);
@@ -109,8 +109,8 @@ int hpx_main(hpx::program_options::variables_map&)
         hpx::shared_future<int> f = hpx::async(do_test, hpx::find_here());
 
         hpx::future<int> p =
-            f.then(hpx::util::bind(future_callback, std::ref(data_cb_called),
-                std::ref(error_cb_called), hpx::util::placeholders::_1));
+            f.then(hpx::bind(future_callback, std::ref(data_cb_called),
+                std::ref(error_cb_called), hpx::placeholders::_1));
 
         HPX_TEST_EQ(p.get(), 42);
         HPX_TEST(data_cb_called);
@@ -171,8 +171,8 @@ int hpx_main(hpx::program_options::variables_map&)
         hpx::shared_future<int> f =
             hpx::async<test_error_action>(hpx::find_here());
         hpx::future<int> p =
-            f.then(hpx::util::bind(future_callback, std::ref(data_cb_called),
-                std::ref(error_cb_called), hpx::util::placeholders::_1));
+            f.then(hpx::bind(future_callback, std::ref(data_cb_called),
+                std::ref(error_cb_called), hpx::placeholders::_1));
 
         std::string what_msg;
         bool caught_exception = false;
@@ -207,8 +207,8 @@ int hpx_main(hpx::program_options::variables_map&)
         hpx::shared_future<int> f = hpx::async(do_test_error, hpx::find_here());
 
         hpx::future<int> p =
-            f.then(hpx::util::bind(future_callback, std::ref(data_cb_called),
-                std::ref(error_cb_called), hpx::util::placeholders::_1));
+            f.then(hpx::bind(future_callback, std::ref(data_cb_called),
+                std::ref(error_cb_called), hpx::placeholders::_1));
 
         std::string what_msg;
         bool caught_exception = false;

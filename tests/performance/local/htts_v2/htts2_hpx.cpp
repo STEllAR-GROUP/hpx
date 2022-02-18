@@ -46,11 +46,11 @@ struct hpx_driver : htts2::driver
         init_args.cfg = cfg;
         init_args.desc_cmdline = desc;
 
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
         hpx::local::init(
             std::function<int(hpx::program_options::variables_map&)>(
-                hpx::util::bind(&hpx_driver::run_impl, std::ref(*this), _1)),
+                hpx::bind(&hpx_driver::run_impl, std::ref(*this), _1)),
             argc_, argv_, init_args);
     }
 
@@ -89,7 +89,7 @@ private:
             // Reschedule in an attempt to correct.
             hpx::threads::thread_init_data data(
                 hpx::threads::make_thread_function_nullary(
-                    hpx::util::bind(&hpx_driver::stage_tasks, std::ref(*this),
+                    hpx::bind(&hpx_driver::stage_tasks, std::ref(*this),
                         target_osthread)),
                 nullptr    // No HPX-thread name.
                 ,
@@ -102,9 +102,9 @@ private:
 
         for (std::uint64_t i = 0; i < this->tasks_; ++i)
         {
-            using hpx::util::placeholders::_1;
+            using hpx::placeholders::_1;
             hpx::threads::thread_init_data data(
-                hpx::util::bind(
+                hpx::bind(
                     &hpx_driver::payload_thread_function, std::ref(*this), _1),
                 nullptr    // No HPX-thread name.
                 ,
@@ -131,8 +131,8 @@ private:
             {
                 hpx::threads::thread_init_data data(
                     hpx::threads::make_thread_function_nullary(
-                        hpx::util::bind(&hpx_driver::wait_for_tasks,
-                            std::ref(*this), std::ref(finished))),
+                        hpx::bind(&hpx_driver::wait_for_tasks, std::ref(*this),
+                            std::ref(finished))),
                     nullptr, hpx::threads::thread_priority::low);
                 register_work(data);
                 return;
@@ -164,8 +164,8 @@ private:
                 continue;
 
             hpx::threads::thread_init_data data(
-                hpx::threads::make_thread_function_nullary(hpx::util::bind(
-                    &hpx_driver::stage_tasks, std::ref(*this), i)),
+                hpx::threads::make_thread_function_nullary(
+                    hpx::bind(&hpx_driver::stage_tasks, std::ref(*this), i)),
                 nullptr,    // No HPX-thread name.
                 // Place in the target OS-thread's queue.
                 hpx::threads::thread_priority::normal,
@@ -194,7 +194,7 @@ private:
             std::make_shared<hpx::barrier<>>(2);
 
         hpx::threads::thread_init_data data(
-            hpx::threads::make_thread_function_nullary(hpx::util::bind(
+            hpx::threads::make_thread_function_nullary(hpx::bind(
                 &hpx_driver::wait_for_tasks, std::ref(*this), finished)),
             nullptr, hpx::threads::thread_priority::low);
         register_work(data);

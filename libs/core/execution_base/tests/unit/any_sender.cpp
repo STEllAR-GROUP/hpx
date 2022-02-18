@@ -76,7 +76,7 @@ struct non_copyable_sender
             hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
             hpx::util::invoke_fused(
-                hpx::util::bind_front(
+                hpx::bind_front(
                     hpx::execution::experimental::set_value, std::move(os.r)),
                 std::move(os.ts));
         };
@@ -128,7 +128,7 @@ struct sender
             hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
             hpx::util::invoke_fused(
-                hpx::util::bind_front(
+                hpx::bind_front(
                     hpx::execution::experimental::set_value, std::move(os.r)),
                 std::move(os.ts));
         };

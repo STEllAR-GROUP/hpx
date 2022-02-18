@@ -118,9 +118,9 @@ HPX_PLAIN_ACTION_ID(hpx::detail::console_print, console_print_action,
 HPX_PLAIN_ACTION_ID(hpx::detail::list_component_type,
     list_component_type_action, hpx::actions::list_component_type_action_id)
 
-typedef hpx::util::detail::bound_action<list_component_type_action,
+typedef hpx::detail::bound_action<list_component_type_action,
     hpx::util::index_pack<0, 1, 2>, hpx::naming::id_type,
-    hpx::util::detail::placeholder<1>, hpx::util::detail::placeholder<2>>
+    hpx::detail::placeholder<1>, hpx::detail::placeholder<2>>
     bound_list_component_type_action;
 
 HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
@@ -281,12 +281,12 @@ namespace hpx { namespace detail {
         print(std::string("List of all registered component types:"));
         print(std::string("---------------------------------------"));
 
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
 
         naming::id_type console(agas::get_console_locality());
         naming::get_agas_client().iterate_types(
-            hpx::util::bind<list_component_type_action>(console, _1, _2));
+            hpx::bind<list_component_type_action>(console, _1, _2));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -512,13 +512,13 @@ namespace hpx {
                 if (get_config_entry("hpx.print_counter.shutdown", "0") == "1")
                 {
                     // schedule to run at shutdown
-                    rt.add_pre_shutdown_function(util::bind_front(
+                    rt.add_pre_shutdown_function(hpx::bind_front(
                         &util::query_counters::evaluate, qc, true));
                 }
 
                 // schedule to start all counters
 
-                rt.add_startup_function(util::bind_front(&start_counters, qc));
+                rt.add_startup_function(hpx::bind_front(&start_counters, qc));
 
                 // register the query_counters object with the runtime system
                 rtd->register_query_counters(qc);
@@ -618,7 +618,7 @@ namespace hpx {
 
             // Run this runtime instance using the given function f.
             if (!f.empty())
-                return rt.run(util::bind_front(f, vm));
+                return rt.run(hpx::bind_front(f, vm));
 
             // Run this runtime instance without an hpx_main
             return rt.run();
@@ -638,7 +638,7 @@ namespace hpx {
             if (!f.empty())
             {
                 // Run this runtime instance using the given function f.
-                return rt.start(util::bind_front(f, vm));
+                return rt.start(hpx::bind_front(f, vm));
             }
 
             // Run this runtime instance without an hpx_main

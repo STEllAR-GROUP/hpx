@@ -874,7 +874,7 @@ namespace hpx::parcelset {
                 // send all of the parcels
                 sender_connection->async_write(
                     call_for_each(HPX_MOVE(handlers), HPX_MOVE(parcels)),
-                    util::bind_front(
+                    hpx::bind_front(
                         &parcelport_impl::send_pending_parcels_trampoline,
                         this));
             }
@@ -901,7 +901,7 @@ namespace hpx::parcelset {
                 sender_connection->async_write(
                     call_for_each(
                         HPX_MOVE(handled_handlers), HPX_MOVE(handled_parcels)),
-                    util::bind_front(
+                    hpx::bind_front(
                         &parcelport_impl::send_pending_parcels_trampoline,
                         this));
 

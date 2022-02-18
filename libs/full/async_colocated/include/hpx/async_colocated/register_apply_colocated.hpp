@@ -23,11 +23,11 @@ namespace hpx { namespace detail {
     template <typename Action, typename... Ts>
     struct apply_colocated_bound_action<Action, hpx::tuple<Ts...>>
     {
-        using type = hpx::util::detail::bound_action<Action,
+        using type = hpx::detail::bound_action<Action,
             hpx::util::make_index_pack<1 + sizeof...(Ts)>,
-            hpx::util::detail::bound<hpx::util::functional::extract_locality,
-                hpx::util::index_pack<0, 1>,
-                hpx::util::detail::placeholder<2ul>, hpx::id_type>,
+            hpx::detail::bound<hpx::util::functional::extract_locality,
+                hpx::util::index_pack<0, 1>, hpx::detail::placeholder<2ul>,
+                hpx::id_type>,
             Ts...>;
     };
 }}    // namespace hpx::detail

@@ -234,7 +234,7 @@ namespace hpx { namespace components {
             // which will also unpin it once the thread runs to completion (the
             // bound object goes out of scope).
             return util::one_shot(
-                util::bind_front(&migration_support::thread_function,
+                hpx::bind_front(&migration_support::thread_function,
                     get_lva<this_component_type>::call(lva),
                     traits::component_decorate_function<base_type>::call(
                         lva, HPX_FORWARD(F, f)),

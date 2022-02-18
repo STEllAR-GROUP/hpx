@@ -20,22 +20,22 @@ int hpx_init_test(std::string s, int, char**)
 
 int main(int argc, char* argv[])
 {
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     expected = "first";
     hpx::function<int(int, char**)> callback1 =
-        hpx::util::bind(&hpx_init_test, expected, _1, _2);
+        hpx::bind(&hpx_init_test, expected, _1, _2);
     hpx::init(callback1, argc, argv);
 
     expected = "second";
     hpx::function<int(int, char**)> callback2 =
-        hpx::util::bind(&hpx_init_test, expected, _1, _2);
+        hpx::bind(&hpx_init_test, expected, _1, _2);
     hpx::init(callback2, argc, argv);
 
     expected = "third";
     hpx::function<int(int, char**)> callback3 =
-        hpx::util::bind(&hpx_init_test, expected, _1, _2);
+        hpx::bind(&hpx_init_test, expected, _1, _2);
     hpx::init(callback3, argc, argv);
 
     return 0;

@@ -44,10 +44,10 @@ namespace hpx { namespace detail {
             remote_result_type;
         typedef agas::server::primary_namespace::colocate_action action_type;
 
-        using util::placeholders::_2;
+        using placeholders::_2;
         return detail::async_continue_r_cb<action_type, remote_result_type>(
-            util::functional::async_continuation(util::bind<Action>(
-                util::bind(util::functional::extract_locality(), _2, gid),
+            util::functional::async_continuation(hpx::bind<Action>(
+                hpx::bind(util::functional::extract_locality(), _2, gid),
                 HPX_FORWARD(Ts, vs)...)),
             service_target, HPX_FORWARD(Callback, cb), gid.get_gid());
 #endif
@@ -58,8 +58,7 @@ namespace hpx { namespace detail {
     hpx::future<typename traits::promise_local_result<typename hpx::traits::
             extract_action<Derived>::remote_result_type>::type>
     async_colocated_cb(
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-        ,
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return async_colocated_cb<Derived>(
@@ -95,11 +94,11 @@ namespace hpx { namespace detail {
             remote_result_type;
         typedef agas::server::primary_namespace::colocate_action action_type;
 
-        using util::placeholders::_2;
+        using placeholders::_2;
         return detail::async_continue_r_cb<action_type, remote_result_type>(
             util::functional::async_continuation(
-                util::bind<Action>(
-                    util::bind(util::functional::extract_locality(), _2, gid),
+                hpx::bind<Action>(
+                    hpx::bind(util::functional::extract_locality(), _2, gid),
                     HPX_FORWARD(Ts, vs)...),
                 HPX_FORWARD(Continuation, cont)),
             service_target, HPX_FORWARD(Callback, cb), gid.get_gid());
@@ -111,8 +110,7 @@ namespace hpx { namespace detail {
     hpx::future<typename traits::promise_local_result<typename hpx::traits::
             extract_action<Derived>::remote_result_type>::type>
     async_colocated_cb(Continuation&& cont,
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-        ,
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return async_colocated_cb<Derived>(HPX_FORWARD(Continuation, cont), gid,

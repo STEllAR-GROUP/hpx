@@ -181,8 +181,8 @@ namespace hpx::parcelset::policies::tcp {
                 &sender::handle_write;
 
             asio::async_write(socket_, buffers,
-                util::bind(f, shared_from_this(), util::placeholders::_1,
-                    util::placeholders::_2));
+                hpx::bind(
+                    f, shared_from_this(), placeholders::_1, placeholders::_2));
         }
 
     private:
@@ -245,7 +245,7 @@ namespace hpx::parcelset::policies::tcp {
                 &sender::handle_read_ack;
 
             asio::async_read(socket_, asio::buffer(&ack_, sizeof(ack_)),
-                util::bind(f, shared_from_this(), util::placeholders::_1));
+                hpx::bind(f, shared_from_this(), placeholders::_1));
         }
 
         void handle_read_ack(std::error_code const& e)

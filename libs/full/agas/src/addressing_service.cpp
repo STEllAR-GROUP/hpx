@@ -701,7 +701,7 @@ namespace hpx { namespace agas {
         future<bool> f = primary_ns_.bind_gid_async(g, id, locality);
 
         return f.then(hpx::launch::sync,
-            util::one_shot(util::bind_front(
+            util::one_shot(hpx::bind_front(
                 &addressing_service::bind_postproc, this, id, g)));
     }
 
@@ -1108,7 +1108,7 @@ namespace hpx { namespace agas {
             primary_ns_.resolve_full(gid);
 
         return f.then(hpx::launch::sync,
-            util::one_shot(util::bind_front(
+            util::one_shot(hpx::bind_front(
                 &addressing_service::resolve_full_postproc, this, gid)));
     }
 
@@ -1355,10 +1355,10 @@ namespace hpx { namespace agas {
             pending_incref.second, e_lower, e_lower);
 
         // pass the amount of compensated decrefs to the callback
-        using util::placeholders::_1;
+        using placeholders::_1;
         return f.then(hpx::launch::sync,
             util::one_shot(
-                util::bind(&addressing_service::synchronize_with_async_incref,
+                hpx::bind(&addressing_service::synchronize_with_async_incref,
                     this, _1, keep_alive, pending_decrefs)));
     }    // }}}
 
@@ -1496,7 +1496,7 @@ namespace hpx { namespace agas {
         if (new_credit != 0)
         {
             return f.then(hpx::launch::sync,
-                util::one_shot(util::bind_back(&correct_credit_on_failure, id,
+                util::one_shot(hpx::bind_back(&correct_credit_on_failure, id,
                     std::int64_t(HPX_GLOBALCREDIT_INITIAL), new_credit)));
         }
 
@@ -1571,7 +1571,7 @@ namespace hpx { namespace agas {
             symbol_ns_.on_event(name, call_for_past_events, p.get_id());
 
         return f.then(hpx::launch::sync,
-            util::one_shot(util::bind_back(
+            util::one_shot(hpx::bind_back(
                 &detail::on_register_event, HPX_MOVE(result_f))));
     }
 

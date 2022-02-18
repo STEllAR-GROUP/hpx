@@ -22,15 +22,7 @@
 
 namespace hpx {
 
-    using hpx::traits::is_bind_expression;
-    using hpx::traits::is_placeholder;
-    using hpx::util::bind_back;
-    using hpx::util::bind_front;
     using hpx::util::invoke;
     using hpx::util::invoke_fused;
     using hpx::util::mem_fn;
-
-    namespace placeholders {
-        using namespace hpx::util::placeholders;
-    }
 }    // namespace hpx

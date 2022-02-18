@@ -55,7 +55,7 @@ namespace hpx::execution::experimental {
                        t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
                        auto i, auto&& predecessor, auto& v) mutable {
                 v[i] = hpx::util::invoke_fused(
-                    hpx::util::bind_front(HPX_FORWARD(F, f), i,
+                    hpx::bind_front(HPX_FORWARD(F, f), i,
                         HPX_FORWARD(decltype(predecessor), predecessor)),
                     HPX_MOVE(t));
             };
@@ -238,8 +238,7 @@ namespace hpx::execution::experimental {
                 transfer(keep_future(HPX_FORWARD(Future, predecessor)), sched_);
 
             return make_future(then(HPX_MOVE(predecessor_transfer_sched),
-                hpx::util::bind_back(
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
+                hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
         // BulkTwoWayExecutor interface
@@ -256,7 +255,7 @@ namespace hpx::execution::experimental {
                 std::vector<hpx::future<void>> results;
                 results.reserve(1);
                 results.emplace_back(make_future(bulk(schedule(sched_), shape,
-                    hpx::util::bind_back(
+                    hpx::bind_back(
                         HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))));
                 return results;
             }
@@ -307,8 +306,7 @@ namespace hpx::execution::experimental {
         {
             hpx::this_thread::experimental::sync_wait(
                 bulk(schedule(sched_), shape,
-                    hpx::util::bind_back(
-                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
@@ -326,8 +324,7 @@ namespace hpx::execution::experimental {
                     when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
                 auto loop = bulk(transfer(HPX_MOVE(prereq), sched_), shape,
-                    hpx::util::bind_back(
-                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 return make_future(HPX_MOVE(loop));
             }

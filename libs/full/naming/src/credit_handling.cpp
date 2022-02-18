@@ -285,7 +285,7 @@ namespace hpx { namespace naming {
                     HPX_ASSERT(new_gid != invalid_gid);
                     return agas::incref(new_gid, new_credit)
                         .then(hpx::launch::sync,
-                            hpx::util::bind(postprocess_incref, std::ref(gid)));
+                            hpx::bind(postprocess_incref, std::ref(gid)));
                 }
 
                 HPX_ASSERT(src_log2credits > 1);

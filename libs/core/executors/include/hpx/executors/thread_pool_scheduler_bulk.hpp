@@ -188,8 +188,7 @@ namespace hpx::execution::experimental {
                             for (std::uint32_t i = i_begin; i < i_end; ++i)
                             {
                                 hpx::util::invoke_fused(
-                                    hpx::util::bind_front(op_state->f, *it),
-                                    ts);
+                                    hpx::bind_front(op_state->f, *it), ts);
                                 ++it;
                             }
                         }
@@ -252,7 +251,7 @@ namespace hpx::execution::experimental {
                         void operator()(Ts&& ts) const
                         {
                             hpx::util::invoke_fused(
-                                hpx::util::bind_front(
+                                hpx::bind_front(
                                     hpx::execution::experimental::set_value,
                                     HPX_MOVE(op_state->receiver)),
                                 HPX_FORWARD(Ts, ts));

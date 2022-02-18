@@ -102,7 +102,7 @@ namespace hpx { namespace detail {
             // defer invocation otherwise
             return c
                 .then(util::one_shot(
-                    util::bind_back(sync_action_client_dispatch<Action>(),
+                    hpx::bind_back(sync_action_client_dispatch<Action>(),
                         HPX_FORWARD(Policy_, launch_policy),
                         HPX_FORWARD(Ts, ts)...)))
                 .get();
@@ -237,14 +237,14 @@ namespace hpx { namespace detail {
 }}    // namespace hpx::detail
 
 namespace hpx { namespace detail {
+
     // bound action
     template <typename Bound>
-    struct sync_dispatch<Bound,
-        std::enable_if_t<traits::is_bound_action_v<Bound>>>
+    struct sync_dispatch<Bound, std::enable_if_t<hpx::is_bound_action_v<Bound>>>
     {
         template <typename Action, typename Is, typename... Ts, typename... Us>
         HPX_FORCEINLINE static decltype(auto) call(
-            hpx::util::detail::bound_action<Action, Is, Ts...> const& bound,
+            hpx::detail::bound_action<Action, Is, Ts...> const& bound,
             Us&&... vs)
         {
             return bound(HPX_FORWARD(Us, vs)...);

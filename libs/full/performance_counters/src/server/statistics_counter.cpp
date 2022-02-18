@@ -390,8 +390,8 @@ namespace hpx { namespace performance_counters { namespace server {
         std::string const& base_counter_name, std::size_t parameter1,
         std::size_t parameter2, bool reset_base_counter)
       : base_type_holder(info)
-      , timer_(util::bind_front(&statistics_counter::evaluate, this_()),
-            util::bind_front(&statistics_counter::on_terminate, this_()),
+      , timer_(hpx::bind_front(&statistics_counter::evaluate, this_()),
+            hpx::bind_front(&statistics_counter::on_terminate, this_()),
             1000 * parameter1, info.fullname_, true)
       , base_counter_name_(ensure_counter_prefix(base_counter_name))
       , value_(new detail::counter_type_from_statistic<Statistic>(parameter2))

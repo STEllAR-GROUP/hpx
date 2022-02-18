@@ -274,7 +274,7 @@ namespace hpx { namespace execution {
                 typename hpx::util::detail::invoke_deferred_result<F, Future,
                     Ts...>::type;
 
-            auto&& func = hpx::util::one_shot(hpx::util::bind_back(
+            auto&& func = hpx::util::one_shot(hpx::bind_back(
                 hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
                 HPX_FORWARD(Ts, ts)...));
 

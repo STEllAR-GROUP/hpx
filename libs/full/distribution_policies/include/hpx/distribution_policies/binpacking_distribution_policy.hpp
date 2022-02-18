@@ -249,9 +249,9 @@ namespace hpx { namespace components {
                 detail::get_counter_values(get_component_name<Component>(),
                     counter_name_, localities_);
 
-            return values.then(hpx::util::bind_back(
-                detail::create_helper<Component>(localities_),
-                HPX_FORWARD(Ts, vs)...));
+            return values.then(
+                hpx::bind_back(detail::create_helper<Component>(localities_),
+                    HPX_FORWARD(Ts, vs)...));
         }
 
         /// \cond NOINTERNAL
@@ -280,7 +280,7 @@ namespace hpx { namespace components {
                     detail::get_counter_values(get_component_name<Component>(),
                         counter_name_, localities_);
 
-                return values.then(hpx::util::bind_back(
+                return values.then(hpx::bind_back(
                     detail::create_bulk_helper<Component>(localities_), count,
                     HPX_FORWARD(Ts, vs)...));
             }

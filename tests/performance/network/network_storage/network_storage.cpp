@@ -596,15 +596,15 @@ void test_write(
                     std::make_shared<general_buffer_type>(
                         static_cast<char*>(buffer), options.transfer_size_B,
                         general_buffer_type::reference);
-                using hpx::util::placeholders::_1;
-                using hpx::util::placeholders::_2;
+                using hpx::placeholders::_1;
+                using hpx::placeholders::_2;
                 {
                     scoped_lock lock(keep_alive_mutex);
                     keep_alive_buffers[buffer_index] = temp_buffer;
                 }
                 auto temp_future =
                     hpx::async_cb(hpx::launch::fork, actWrite, locality,
-                            hpx::util::bind(&async_callback, buffer_index, _1, _2),
+                            hpx::bind(&async_callback, buffer_index, _1, _2),
                             *temp_buffer,
                             memory_offset, options.transfer_size_B
                     ).then(

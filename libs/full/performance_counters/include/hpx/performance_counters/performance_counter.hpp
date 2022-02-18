@@ -106,7 +106,7 @@ namespace hpx { namespace performance_counters {
         future<T> get_value(bool reset = false)
         {
             return get_counter_value(reset).then(hpx::launch::sync,
-                util::bind_front(&performance_counter::extract_value<T>));
+                hpx::bind_front(&performance_counter::extract_value<T>));
         }
         template <typename T>
         T get_value(
@@ -119,7 +119,7 @@ namespace hpx { namespace performance_counters {
         future<T> get_value() const
         {
             return get_counter_value().then(hpx::launch::sync,
-                util::bind_front(&performance_counter::extract_value<T>));
+                hpx::bind_front(&performance_counter::extract_value<T>));
         }
         template <typename T>
         T get_value(launch::sync_policy, error_code& ec = throws) const

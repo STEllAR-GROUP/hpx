@@ -105,8 +105,8 @@ namespace hpx::parcelset::policies::tcp {
                 acceptor_->bind(ep);
                 acceptor_->listen();
                 acceptor_->async_accept(receiver_conn->socket(),
-                    util::bind(&connection_handler::handle_accept, this,
-                        util::placeholders::_1, receiver_conn));
+                    hpx::bind(&connection_handler::handle_accept, this,
+                        placeholders::_1, receiver_conn));
             }
             catch (std::system_error const&)
             {
@@ -289,8 +289,8 @@ namespace hpx::parcelset::policies::tcp {
             receiver_conn.reset(new receiver(
                 io_service, get_max_inbound_message_size(), *this));
             acceptor_->async_accept(receiver_conn->socket(),
-                util::bind(&connection_handler::handle_accept, this,
-                    util::placeholders::_1, receiver_conn));
+                hpx::bind(&connection_handler::handle_accept, this,
+                    placeholders::_1, receiver_conn));
 
             {
                 // keep track of all accepted connections
@@ -305,9 +305,8 @@ namespace hpx::parcelset::policies::tcp {
 
             // now accept the incoming connection by starting to read from the
             // socket
-            c->async_read(
-                util::bind(&connection_handler::handle_read_completion, this,
-                    util::placeholders::_1, c));
+            c->async_read(hpx::bind(&connection_handler::handle_read_completion,
+                this, placeholders::_1, c));
         }
         else
         {

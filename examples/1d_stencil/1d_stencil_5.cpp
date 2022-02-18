@@ -279,10 +279,10 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
     for (std::size_t i = 0; i != np; ++i)
         U[0][i] = partition(hpx::find_here(), nx, double(i));
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    using hpx::util::placeholders::_3;
-    auto Op = hpx::util::bind(heat_part_action(), hpx::find_here(), _1, _2, _3);
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
+    using hpx::placeholders::_3;
+    auto Op = hpx::bind(heat_part_action(), hpx::find_here(), _1, _2, _3);
 
     // Actual time step loop
     for (std::size_t t = 0; t != nt; ++t)

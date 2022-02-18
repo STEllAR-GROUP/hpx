@@ -55,8 +55,8 @@ namespace hpx { namespace util {
       , csv_header_(csv_header)
       , print_counters_locally_(print_counters_locally)
       , counter_types_(counter_types)
-      , timer_(util::bind_front(&query_counters::evaluate, this_(), false),
-            util::bind_front(&query_counters::terminate, this_()),
+      , timer_(hpx::bind_front(&query_counters::evaluate, this_(), false),
+            hpx::bind_front(&query_counters::terminate, this_()),
             interval * 1000, "query_counters", true)
     {
         // add counter prefix, if necessary

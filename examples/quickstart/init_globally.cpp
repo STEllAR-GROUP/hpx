@@ -86,9 +86,9 @@ public:
             // disable HPX' short options
             "hpx.commandline.aliasing!=0"};
 
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
-        hpx::function<int(int, char**)> start_function = hpx::util::bind(
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
+        hpx::function<int(int, char**)> start_function = hpx::bind(
             &manage_global_runtime_impl::hpx_main, this, _1, _2);
         hpx::init_params init_args;
         init_args.cfg = cfg;

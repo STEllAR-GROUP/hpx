@@ -98,7 +98,7 @@ namespace hpx { namespace detail {
             }
 
             // defer invocation otherwise
-            return c.then(util::one_shot(util::bind_back(
+            return c.then(util::one_shot(hpx::bind_back(
                 async_action_client_dispatch<Action>(),
                 HPX_FORWARD(Policy_, launch_policy), HPX_FORWARD(Ts, ts)...)));
         }
@@ -311,12 +311,12 @@ namespace hpx { namespace detail {
     // bound action
     template <typename Bound>
     struct async_dispatch<Bound,
-        typename std::enable_if<traits::is_bound_action<Bound>::value>::type>
+        std::enable_if_t<hpx::is_bound_action_v<Bound>>>
     {
         template <typename Action, typename Is, typename... Ts, typename... Us>
-        HPX_FORCEINLINE static hpx::future<typename hpx::util::detail::
-                bound_action<Action, Is, Ts...>::result_type>
-        call(hpx::util::detail::bound_action<Action, Is, Ts...> const& bound,
+        HPX_FORCEINLINE static hpx::future<
+            typename hpx::detail::bound_action<Action, Is, Ts...>::result_type>
+        call(hpx::detail::bound_action<Action, Is, Ts...> const& bound,
             Us&&... vs)
         {
             return bound.async(HPX_FORWARD(Us, vs)...);

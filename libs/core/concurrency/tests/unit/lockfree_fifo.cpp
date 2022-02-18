@@ -120,7 +120,7 @@ int main(int argc, char** argv)
         std::vector<std::thread> tg;
 
         for (std::uint64_t i = 0; i != threads; ++i)
-            tg.push_back(std::thread(hpx::util::bind(&worker_thread, i)));
+            tg.push_back(std::thread(hpx::bind(&worker_thread, i)));
 
         for (std::thread& t : tg)
         {

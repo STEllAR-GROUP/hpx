@@ -462,8 +462,8 @@ namespace hpx { namespace compute { namespace host {
                 nba_deb.debug("Launching First-Touch task for domain ",
                     debug::dec<2>(domain), " ", nodesets[i]);
                 auto f1 = hpx::async(numa_executor,
-                    util::bind(&numa_binding_allocator::touch_pages, this, p, n,
-                        binding_helper_, util::placeholders::_1, nodesets),
+                    hpx::bind(&numa_binding_allocator::touch_pages, this, p, n,
+                        binding_helper_, placeholders::_1, nodesets),
                     domain);
                 nba_deb.debug(debug::str<>("First-Touch"),
                     "add task future to vector for domain ",

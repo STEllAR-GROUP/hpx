@@ -194,7 +194,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         // register the communicator's id using the given basename
         return id.then(hpx::launch::sync,
-            util::bind_back(&detail::register_communication_set_name,
+            hpx::bind_back(&detail::register_communication_set_name,
                 HPX_MOVE(name), this_site));
     }
 }}}    // namespace hpx::lcos::detail

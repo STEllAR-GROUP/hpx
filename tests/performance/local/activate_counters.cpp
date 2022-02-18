@@ -71,7 +71,7 @@ namespace hpx { namespace util {
         if (ids_.empty())
         {
             performance_counters::discover_counter_func func(
-                util::bind_front(&activate_counters::find_counter, this));
+                hpx::bind_front(&activate_counters::find_counter, this));
 
             ids_.reserve(names.size());
             uoms_.reserve(names.size());

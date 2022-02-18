@@ -86,8 +86,7 @@ namespace hpx { namespace lcos {
 
                     bcast_future = hpx::async<detail::broadcast_impl_action>(
                         locality, std::move(bcast_ids),
-                        hpx::util::bind(act, hpx::util::placeholders::_1, a0),
-                        fan_out);
+                        hpx::bind(act, hpx::placeholders::_1, a0), fan_out);
                 }
                 return hpx::make_ready_future(a0);
             }
@@ -102,7 +101,7 @@ namespace hpx { namespace lcos {
                 }
 
                 return bcast_future.then(
-                    hpx::util::bind(&broadcast::when_dst<A0>, this));
+                    hpx::bind(&broadcast::when_dst<A0>, this));
             }
         }
 
