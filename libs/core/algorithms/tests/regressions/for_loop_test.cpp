@@ -9,8 +9,6 @@
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <iostream>
-#include <string>
-#include <vector>
 
 #include "hpx/hpx.hpp"
 #include "hpx/hpx_init.hpp"
@@ -28,11 +26,5 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> const cfg = {"hpx.run_hpx_main!=1",
-        "--hpx:ini=hpx.commandline.allow_unknown!=1",
-        "--hpx:ini=hpx.commandline.aliasing!=0"};
-    hpx::init_params init_args;
-    init_args.cfg = cfg;
-
-    return hpx::init(argc, argv, init_args);
+    return hpx::init(argc, argv);
 }
