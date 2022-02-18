@@ -1136,11 +1136,12 @@ namespace hpx::parallel { inline namespace v2 {
             // stride shall not be zero
             HPX_ASSERT(stride != 0);
 
-            if constexpr (std::is_integral<B>::value &&
-                std::is_signed<B>::value && std::is_integral<E>::value &&
-                std::is_signed<E>::value)
+            if constexpr (std::is_integral_v<B>::value &&
+                std::is_signed_v<B>::value && std::is_integral_v<E>::value &&
+                std::is_signed_v<E>::value)
             {
                 if (first >= last)
+
                     return util::detail::algorithm_result<ExPolicy>::get();
             }
 
