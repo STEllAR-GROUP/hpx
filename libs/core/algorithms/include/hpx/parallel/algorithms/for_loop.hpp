@@ -1136,6 +1136,14 @@ namespace hpx::parallel { inline namespace v2 {
             // stride shall not be zero
             HPX_ASSERT(stride != 0);
 
+            if constexpr (std::is_integral_v<B> && std::is_signed_v<B> &&
+                std::is_integral_v<E> && std::is_signed_v<E>)
+            {
+                if (first >= last)
+
+                    return util::detail::algorithm_result<ExPolicy>::get();
+            }
+
             // stride should be negative only if E is an integral type or at
             // least a bidirectional iterator
             if (stride < 0)
