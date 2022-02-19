@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2016-2021 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,6 +23,7 @@
 #include <utility>
 
 namespace hpx { namespace util {
+
     ///////////////////////////////////////////////////////////////////////////
     // Helper class to gain access to the implementation functions in the
     // derived (user-defined) iterator classes.
@@ -30,48 +31,67 @@ namespace hpx { namespace util {
     {
     public:
         template <typename Iterator1, typename Iterator2>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static bool equal(
-            Iterator1 const& lhs, Iterator2 const& rhs)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr bool
+        equal(Iterator1 const& lhs, Iterator2 const& rhs) noexcept(noexcept(
+            std::declval<Iterator1>().equal(std::declval<Iterator2>())))
         {
             return lhs.equal(rhs);
         }
 
         template <typename Iterator>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static void increment(Iterator& it)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr void increment(
+            Iterator& it)
+#if !defined(HPX_MSVC)
+            // MSVC has issues with this
+            noexcept(noexcept(std::declval<Iterator&>().increment()))
+#endif
         {
             it.increment();
         }
 
         template <typename Iterator>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static void decrement(Iterator& it)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr void decrement(
+            Iterator& it)
+#if !defined(HPX_MSVC)
+            // MSVC has issues with this
+            noexcept(noexcept(std::declval<Iterator&>().decrement()))
+#endif
         {
             it.decrement();
         }
 
         template <typename Reference, typename Iterator>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static Reference dereference(
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Reference dereference(
             Iterator const& it)
+#if !defined(HPX_MSVC)
+            // MSVC has issues with this
+            noexcept(noexcept(std::declval<Iterator>().dereference()))
+#endif
         {
             return it.dereference();
         }
 
         template <typename Iterator, typename Distance>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static void advance(
-            Iterator& it, Distance n)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr void
+        advance(Iterator& it, Distance n) noexcept(noexcept(
+            std::declval<Iterator&>().advance(std::declval<Distance>())))
         {
             it.advance(n);
         }
 
         template <typename Iterator1, typename Iterator2>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr
             typename std::iterator_traits<Iterator1>::difference_type
-            distance_to(Iterator1 const& lhs, Iterator2 const& rhs)
+            distance_to(Iterator1 const& lhs, Iterator2 const& rhs) noexcept(
+                noexcept(std::declval<Iterator1>().distance_to(
+                    std::declval<Iterator2>())))
         {
             return lhs.distance_to(rhs);
         }
     };
 
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Reference>
         struct arrow_dispatch    // proxy references
@@ -79,11 +99,12 @@ namespace hpx { namespace util {
             struct proxy
             {
                 HPX_HOST_DEVICE
-                explicit proxy(Reference const& x)
+                explicit constexpr proxy(Reference const& x) noexcept
                   : ref_(x)
                 {
                 }
-                HPX_HOST_DEVICE HPX_FORCEINLINE Reference* operator->()
+                HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Reference*
+                operator->() noexcept
                 {
                     return std::addressof(ref_);
                 }
@@ -92,7 +113,8 @@ namespace hpx { namespace util {
 
             using type = proxy;
 
-            HPX_HOST_DEVICE HPX_FORCEINLINE static type call(Reference const& x)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr type call(
+                Reference const& x) noexcept
             {
                 return type(x);
             }
@@ -103,7 +125,8 @@ namespace hpx { namespace util {
         {
             using type = T*;
 
-            HPX_HOST_DEVICE HPX_FORCEINLINE static type call(T& x)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr type call(
+                T& x) noexcept
             {
                 return std::addressof(x);
             }
@@ -129,29 +152,34 @@ namespace hpx { namespace util {
             HPX_HOST_DEVICE iterator_facade_base() = default;
 
         protected:
-            HPX_HOST_DEVICE Derived& derived()
+            HPX_HOST_DEVICE Derived& derived() noexcept
             {
                 return *static_cast<Derived*>(this);
             }
 
-            HPX_HOST_DEVICE Derived const& derived() const
+            HPX_HOST_DEVICE constexpr Derived const& derived() const noexcept
             {
                 return *static_cast<Derived const*>(this);
             }
 
         public:
-            HPX_HOST_DEVICE reference operator*() const
+            HPX_HOST_DEVICE constexpr reference operator*() const noexcept(
+                noexcept(iterator_core_access::template dereference<reference>(
+                    std::declval<Derived>())))
             {
                 return iterator_core_access::template dereference<reference>(
                     this->derived());
             }
 
-            HPX_HOST_DEVICE pointer operator->() const
+            HPX_HOST_DEVICE constexpr pointer operator->() const noexcept(
+                noexcept(iterator_core_access::template dereference<reference>(
+                    std::declval<Derived>())))
             {
                 return arrow_dispatch<Reference>::call(*this->derived());
             }
 
-            HPX_HOST_DEVICE Derived& operator++()
+            HPX_HOST_DEVICE Derived& operator++() noexcept(noexcept(
+                iterator_core_access::increment(std::declval<Derived&>())))
             {
                 Derived& this_ = this->derived();
                 iterator_core_access::increment(this_);
@@ -181,14 +209,16 @@ namespace hpx { namespace util {
 
             HPX_HOST_DEVICE iterator_facade_base() = default;
 
-            HPX_HOST_DEVICE Derived& operator--()
+            HPX_HOST_DEVICE Derived& operator--() noexcept(noexcept(
+                iterator_core_access::decrement(std::declval<Derived&>())))
             {
                 Derived& this_ = this->derived();
                 iterator_core_access::decrement(this_);
                 return this_;
             }
 
-            HPX_HOST_DEVICE Derived operator--(int)
+            HPX_HOST_DEVICE Derived operator--(int) noexcept(noexcept(
+                iterator_core_access::decrement(std::declval<Derived&>())))
             {
                 Derived result(this->derived());
                 --*this;
@@ -211,13 +241,14 @@ namespace hpx { namespace util {
             using value_type = typename Iterator::value_type;
 
         public:
-            HPX_HOST_DEVICE explicit operator_brackets_proxy(
+            HPX_HOST_DEVICE explicit constexpr operator_brackets_proxy(
                 Iterator const& iter) noexcept
               : iter_(iter)
             {
             }
 
-            HPX_HOST_DEVICE operator reference() const
+            HPX_HOST_DEVICE constexpr operator reference() const
+                noexcept(noexcept(*std::declval<Iterator>()))
             {
                 return *iter_;
             }
@@ -285,9 +316,9 @@ namespace hpx { namespace util {
 
             HPX_HOST_DEVICE iterator_facade_base() = default;
 
-            HPX_HOST_DEVICE
-            typename operator_brackets_result<Derived, T>::type operator[](
-                difference_type n) const
+            HPX_HOST_DEVICE constexpr
+                typename operator_brackets_result<Derived, T>::type
+                operator[](difference_type n) const
             {
                 using use_proxy = use_operator_brackets_proxy<T>;
 
@@ -295,27 +326,36 @@ namespace hpx { namespace util {
                     this->derived() + n, use_proxy{});
             }
 
-            HPX_HOST_DEVICE Derived& operator+=(difference_type n)
+            HPX_HOST_DEVICE Derived& operator+=(difference_type n) noexcept(
+                noexcept(iterator_core_access::advance(
+                    std::declval<Derived&>(), std::declval<difference_type>())))
             {
                 Derived& this_ = this->derived();
                 iterator_core_access::advance(this_, n);
                 return this_;
             }
 
-            HPX_HOST_DEVICE Derived operator+(difference_type n) const
+            HPX_HOST_DEVICE constexpr Derived operator+(difference_type n) const
+                noexcept(noexcept(iterator_core_access::advance(
+                    std::declval<Derived&>(), std::declval<difference_type>())))
             {
                 Derived result(this->derived());
                 return result += n;
             }
 
-            HPX_HOST_DEVICE Derived& operator-=(difference_type n)
+            HPX_HOST_DEVICE Derived& operator-=(difference_type n) noexcept(
+                noexcept(iterator_core_access::advance(std::declval<Derived&>(),
+                    -std::declval<difference_type>())))
             {
                 Derived& this_ = this->derived();
                 iterator_core_access::advance(this_, -n);
                 return this_;
             }
 
-            HPX_HOST_DEVICE Derived operator-(difference_type n) const
+            HPX_HOST_DEVICE constexpr Derived operator-(difference_type n) const
+                noexcept(noexcept(
+                    iterator_core_access::advance(std::declval<Derived&>(),
+                        -std::declval<difference_type>())))
             {
                 Derived result(this->derived());
                 return result -= n;
@@ -560,13 +600,13 @@ namespace hpx { namespace util {
             iterator_facade<Derived2, T2, Category2, Reference2, Distance2,    \
                 Pointer2> const& rhs) /**/
 
-    HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, ==, bool)
+    HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline constexpr, ==, bool)
     {
         return iterator_core_access::equal(static_cast<Derived1 const&>(lhs),
             static_cast<Derived2 const&>(rhs));
     }
 
-    HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, !=, bool)
+    HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline constexpr, !=, bool)
     {
         return !iterator_core_access::equal(static_cast<Derived1 const&>(lhs),
             static_cast<Derived2 const&>(rhs));
@@ -584,7 +624,7 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(
-        inline, <, bool, detail::enable_random_access_operations)
+        inline constexpr, <, bool, detail::enable_random_access_operations)
     {
         return 0 <
             iterator_core_access::distance_to(static_cast<Derived1 const&>(lhs),
@@ -592,7 +632,7 @@ namespace hpx { namespace util {
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(
-        inline, >, bool, detail::enable_random_access_operations)
+        inline constexpr, >, bool, detail::enable_random_access_operations)
     {
         return 0 >
             iterator_core_access::distance_to(static_cast<Derived1 const&>(lhs),
@@ -600,7 +640,7 @@ namespace hpx { namespace util {
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(
-        inline, <=, bool, detail::enable_random_access_operations)
+        inline constexpr, <=, bool, detail::enable_random_access_operations)
     {
         return 0 <=
             iterator_core_access::distance_to(static_cast<Derived1 const&>(lhs),
@@ -608,14 +648,14 @@ namespace hpx { namespace util {
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(
-        inline, >=, bool, detail::enable_random_access_operations)
+        inline constexpr, >=, bool, detail::enable_random_access_operations)
     {
         return 0 >=
             iterator_core_access::distance_to(static_cast<Derived1 const&>(lhs),
                 static_cast<Derived2 const&>(rhs));
     }
 
-    HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(inline, -,
+    HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(inline constexpr, -,
         typename std::iterator_traits<Derived2>::difference_type,
         detail::enable_random_access_operations)
     {
@@ -629,13 +669,15 @@ namespace hpx { namespace util {
 
     template <typename Derived, typename T, typename Category,
         typename Reference, typename Distance, typename Pointer>
-    HPX_HOST_DEVICE inline std::enable_if_t<
+    HPX_HOST_DEVICE inline constexpr std::enable_if_t<
         std::is_same_v<typename Derived::iterator_category,
             std::random_access_iterator_tag>,
         Derived>
     operator+(iterator_facade<Derived, T, Category, Reference, Distance,
                   Pointer> const& it,
-        typename Derived::difference_type n)
+        typename Derived::difference_type
+            n) noexcept(noexcept(std::declval<Derived>() +=
+        std::declval<typename Derived::difference_type>()))
     {
         Derived tmp(static_cast<Derived const&>(it));
         return tmp += n;
@@ -643,13 +685,14 @@ namespace hpx { namespace util {
 
     template <typename Derived, typename T, typename Category,
         typename Reference, typename Distance, typename Pointer>
-    HPX_HOST_DEVICE inline std::enable_if_t<
+    HPX_HOST_DEVICE inline constexpr std::enable_if_t<
         std::is_same_v<typename Derived::iterator_category,
             std::random_access_iterator_tag>,
         Derived>
     operator+(typename Derived::difference_type n,
         iterator_facade<Derived, T, Category, Reference, Distance,
-            Pointer> const& it)
+            Pointer> const& it) noexcept(noexcept(std::declval<Derived>() +=
+        std::declval<typename Derived::difference_type>()))
     {
         Derived tmp(static_cast<Derived const&>(it));
         return tmp += n;

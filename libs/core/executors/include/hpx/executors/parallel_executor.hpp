@@ -216,6 +216,23 @@ namespace hpx { namespace execution {
             return exec.annotation_;
         }
 
+        friend constexpr parallel_policy_executor tag_invoke(
+            hpx::parallel::execution::with_processing_units_count_t,
+            parallel_policy_executor const& exec, std::size_t num_cores)
+        {
+            auto exec_with_num_cores = exec;
+            exec_with_num_cores.num_cores_ = num_cores;
+            return exec_with_num_cores;
+        }
+
+        template <typename Parameters>
+        friend constexpr std::size_t tag_invoke(
+            hpx::parallel::execution::processing_units_count_t, Parameters&&,
+            parallel_policy_executor const& exec)
+        {
+            return exec.get_num_cores();
+        }
+
         /// \cond NOINTERNAL
         constexpr bool operator==(
             parallel_policy_executor const& rhs) const noexcept
@@ -309,8 +326,8 @@ namespace hpx { namespace execution {
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
             return parallel::execution::detail::
                 hierarchical_bulk_async_execute_helper(desc, pool, 0,
-                    pool->get_os_thread_count(), hierarchical_threshold_,
-                    policy_, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+                    get_num_cores(), hierarchical_threshold_, policy_,
+                    HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
@@ -329,13 +346,23 @@ namespace hpx { namespace execution {
 
     private:
         /// \cond NOINTERNAL
+        std::size_t get_num_cores() const
+        {
+            if (num_cores_ != 0)
+                return num_cores_;
+
+            auto pool =
+                pool_ ? pool_ : threads::detail::get_self_or_default_pool();
+            return pool->get_os_thread_count();
+        }
+
         friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int /* version */)
         {
             // clang-format off
-            ar & policy_ & hierarchical_threshold_;
+            ar & policy_ & hierarchical_threshold_ & num_cores_;
             // clang-format on
         }
         /// \endcond
@@ -347,6 +374,7 @@ namespace hpx { namespace execution {
         threads::thread_pool_base* pool_;
         Policy policy_;
         std::size_t hierarchical_threshold_ = hierarchical_threshold_default_;
+        std::size_t num_cores_ = 0;
         char const* annotation_ = nullptr;
         /// \endcond
     };

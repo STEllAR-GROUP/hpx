@@ -26,12 +26,20 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         // we add this since passing in random access iterators
         // as begin and end might not pass the sized sentinel check
-        if constexpr (std::is_same_v<Iter, Sent> &&
-            hpx::traits::is_random_access_iterator_v<Iter>)
+        if constexpr (std::is_same_v<Iter, Sent>)
         {
-            difference_type offset = last - first;
-            first = last;
-            return offset;
+            if constexpr (hpx::traits::is_random_access_iterator_v<Iter>)
+            {
+                difference_type offset = last - first;
+                first = last;
+                return offset;
+            }
+            else
+            {
+                difference_type offset = detail::distance(first, last);
+                first = last;
+                return offset;
+            }
         }
 
         if constexpr (hpx::traits::is_sized_sentinel_for_v<Sent, Iter>)

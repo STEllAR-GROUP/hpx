@@ -20,6 +20,7 @@ set(executors_headers
     hpx/executors/exception_list.hpp
     hpx/executors/execution_policy_annotation.hpp
     hpx/executors/execution_policy_fwd.hpp
+    hpx/executors/execution_policy_parameters.hpp
     hpx/executors/execution_policy.hpp
     hpx/executors/fork_join_executor.hpp
     hpx/executors/limiting_executor.hpp
@@ -77,6 +78,7 @@ add_hpx_module(
   COMPAT_HEADERS ${executors_compat_headers}
   MODULE_DEPENDENCIES
     hpx_async_base
+    hpx_concepts
     hpx_config
     hpx_execution
     hpx_futures

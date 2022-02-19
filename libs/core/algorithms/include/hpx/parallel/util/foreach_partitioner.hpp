@@ -217,6 +217,7 @@ namespace hpx { namespace parallel { namespace util {
                 //       shared state and may reference data that has gone
                 //       out of scope.
                 return hpx::dataflow(
+                    hpx::launch::sync,
                     [last, errors = HPX_MOVE(errors),
                         scoped_params = HPX_MOVE(scoped_params),
                         f = HPX_FORWARD(F, f)](

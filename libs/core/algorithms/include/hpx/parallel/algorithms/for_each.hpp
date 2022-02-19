@@ -455,10 +455,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIter, typename F,
                 typename Proj = util::projection_identity>
-            static constexpr
-                typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-                parallel(ExPolicy&& policy, FwdIter first, std::size_t count,
-                    F&& f, Proj&& proj /* = Proj()*/)
+            static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
+                ExPolicy&& policy, FwdIter first, std::size_t count, F&& f,
+                Proj&& proj /* = Proj()*/)
             {
                 if (count != 0)
                 {
