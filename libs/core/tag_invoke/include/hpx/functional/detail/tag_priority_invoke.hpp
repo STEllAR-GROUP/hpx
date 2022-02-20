@@ -13,7 +13,7 @@ namespace hpx::functional::detail {
     inline namespace unspecified {
         /// The `hpx::functional::detail::tag_override_invoke` name defines a constexpr object
         /// that is invocable with one or more arguments. The first argument
-        /// is a 'tag' (typically a DPO). It is only invocable if an overload
+        /// is a 'tag' (typically a CPO). It is only invocable if an overload
         /// of tag_override_invoke() that accepts the same arguments could be
         /// found via ADL.
         ///
@@ -168,7 +168,7 @@ namespace hpx::functional::detail {
     inline constexpr bool is_tag_override_invocable_v =
         is_tag_override_invocable<Tag, Args...>::value;
 
-    template <typename Sig, bool Dispatchable>
+    template <typename Sig, bool Invocable>
     struct is_nothrow_tag_override_invocable_impl;
 
     template <typename Sig>
@@ -221,11 +221,13 @@ namespace hpx::functional::detail {
     ///////////////////////////////////////////////////////////////////////////////
     namespace tag_base_ns {
 
-        // poison pill
+        // poison pills
+        void tag_invoke();
+        void tag_fallback_invoke();
         void tag_override_invoke();
 
         ///////////////////////////////////////////////////////////////////////////
-        /// Helper base class implementing the tag_invoke logic for DPOs that allow
+        /// Helper base class implementing the tag_invoke logic for CPOs that allow
         /// overriding user-defined tag_invoke overloads with tag_override_invoke,
         /// and that allow setting a fallback with tag_fallback_invoke.
         ///
@@ -240,7 +242,7 @@ namespace hpx::functional::detail {
         template <typename Tag>
         struct tag_priority
         {
-            // Is tag-override-dispatchable
+            // Is tag-override-invocable
             template <typename... Args,
                 typename Enable = std::enable_if_t<
                     is_tag_override_invocable_v<Tag, Args&&...>>>
@@ -253,7 +255,7 @@ namespace hpx::functional::detail {
                     static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
 
-            // Is not tag-override-dispatchable, but tag-dispatchable
+            // Is not tag-override-invocable, but tag-invocable
             template <typename... Args,
                 typename Enable = std::enable_if_t<
                     !is_tag_override_invocable_v<Tag, Args&&...> &&
@@ -267,8 +269,8 @@ namespace hpx::functional::detail {
                     static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
 
-            // Is not tag-override-dispatchable, not tag-dispatchable, but
-            // tag-fallback-dispatchable
+            // Is not tag-override-invocable, not tag-invocable, but
+            // tag-fallback-invocable
             template <typename... Args,
                 typename Enable = std::enable_if_t<
                     !is_tag_override_invocable_v<Tag, Args&&...> &&
@@ -285,14 +287,14 @@ namespace hpx::functional::detail {
         };
 
         ///////////////////////////////////////////////////////////////////////////
-        // Helper base class implementing the tag_invoke logic for noexcept DPOs
+        // Helper base class implementing the tag_invoke logic for noexcept CPOs
         // that allow overriding user-defined tag_invoke overloads with
         // tag_override_invoke, and that allow setting a fallback with
         // tag_fallback_invoke.
         template <typename Tag>
         struct tag_priority_noexcept
         {
-            // Is nothrow tag-override-dispatchable
+            // Is nothrow tag-override-invocable
             template <typename... Args,
                 typename Enable = std::enable_if_t<
                     is_nothrow_tag_override_invocable_v<Tag, Args&&...>>>
@@ -304,8 +306,8 @@ namespace hpx::functional::detail {
                     static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
 
-            // Is not nothrow tag-override-dispatchable, but nothrow
-            // tag-dispatchable
+            // Is not nothrow tag-override-invocable, but nothrow
+            // tag-invocable
             template <typename... Args,
                 typename Enable = std::enable_if_t<
                     !is_nothrow_tag_override_invocable_v<Tag, Args&&...> &&
@@ -318,8 +320,8 @@ namespace hpx::functional::detail {
                     static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
 
-            // Is not nothrow tag-override-dispatchable, not nothrow
-            // tag-dispatchable, but nothrow tag-fallback-dispatchable
+            // Is not nothrow tag-override-invocable, not nothrow
+            // tag-invocable, but nothrow tag-fallback-invocable
             template <typename... Args,
                 typename Enable = std::enable_if_t<
                     !is_nothrow_tag_override_invocable_v<Tag, Args&&...> &&

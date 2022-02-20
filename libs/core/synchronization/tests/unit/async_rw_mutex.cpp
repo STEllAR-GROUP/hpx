@@ -19,11 +19,11 @@
 #include <vector>
 
 using hpx::execution::experimental::execute;
-using hpx::execution::experimental::sync_wait;
 using hpx::execution::experimental::then;
 using hpx::execution::experimental::thread_pool_scheduler;
 using hpx::execution::experimental::transfer;
 using hpx::experimental::async_rw_mutex;
+using hpx::this_thread::experimental::sync_wait;
 
 unsigned int seed = std::random_device{}();
 

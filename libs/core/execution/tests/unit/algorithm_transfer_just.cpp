@@ -1,4 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +11,7 @@
 #include "algorithm_test_utils.hpp"
 
 #include <atomic>
+#include <exception>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -36,6 +38,13 @@ int main()
         std::atomic<bool> tag_invoke_overload_called{false};
         auto s = ex::transfer_just(scheduler{scheduler_schedule_called,
             scheduler_execute_called, tag_invoke_overload_called});
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<hpx::variant<hpx::tuple<>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
@@ -55,6 +64,13 @@ int main()
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             3);
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<hpx::variant<hpx::tuple<int>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
@@ -75,6 +91,13 @@ int main()
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             x);
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<hpx::variant<hpx::tuple<int&>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
@@ -94,6 +117,14 @@ int main()
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             custom_type_non_default_constructible{42});
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<
+            hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
@@ -114,6 +145,15 @@ int main()
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             x);
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<
+            hpx::variant<hpx::tuple<custom_type_non_default_constructible&>>>(
+            s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
@@ -133,6 +173,14 @@ int main()
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             custom_type_non_default_constructible_non_copyable{42});
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<hpx::variant<
+            hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
@@ -153,6 +201,14 @@ int main()
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             std::move(x));
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<hpx::variant<
+            hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
@@ -172,6 +228,13 @@ int main()
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             std::string("hello"), 3);
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<hpx::variant<hpx::tuple<std::string, int>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
         auto f = [](std::string s, int x) {
             HPX_TEST_EQ(s, std::string("hello"));
             HPX_TEST_EQ(x, 3);
@@ -196,6 +259,13 @@ int main()
             scheduler{scheduler_schedule_called, scheduler_execute_called,
                 tag_invoke_overload_called},
             str, x);
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<hpx::variant<hpx::tuple<std::string&, int&>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
         auto f = [](std::string str, int x) {
             HPX_TEST_EQ(str, std::string("hello"));
             HPX_TEST_EQ(x, 3);
@@ -219,6 +289,13 @@ int main()
             scheduler2{scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called}},
             3);
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<hpx::variant<hpx::tuple<int>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
@@ -239,6 +316,13 @@ int main()
             scheduler2{scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called}},
             x);
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<hpx::variant<hpx::tuple<int&>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));

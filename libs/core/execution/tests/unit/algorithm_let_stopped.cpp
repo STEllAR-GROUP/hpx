@@ -22,7 +22,7 @@ namespace ex = hpx::execution::experimental;
 // This overload is only used to check dispatching. It is not a useful
 // implementation.
 template <typename F>
-auto tag_invoke(ex::let_error_t, custom_sender_tag_invoke s, F&&)
+auto tag_invoke(ex::let_stopped_t, custom_sender_tag_invoke s, F&&)
 {
     s.tag_invoke_overload_called = true;
     return void_sender{};
@@ -30,14 +30,13 @@ auto tag_invoke(ex::let_error_t, custom_sender_tag_invoke s, F&&)
 
 int main()
 {
-    // "Success" path, i.e. let_error gets to handle the error
+    // "Success" path, i.e. let_stopped gets to handle the error
     {
         std::atomic<bool> set_value_called{false};
-        std::atomic<bool> let_error_callback_called{false};
-        auto s1 = error_sender{};
-        auto s2 = ex::let_error(std::move(s1), [&](std::exception_ptr ep) {
-            check_exception_ptr{}(ep);
-            let_error_callback_called = true;
+        std::atomic<bool> let_stopped_callback_called{false};
+        auto s1 = stopped_sender{};
+        auto s2 = ex::let_stopped(std::move(s1), [&]() {
+            let_stopped_callback_called = true;
             return void_sender();
         });
 
@@ -53,23 +52,45 @@ int main()
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
-        HPX_TEST(let_error_callback_called);
+        HPX_TEST(let_stopped_callback_called);
+    }
+
+    {
+        std::atomic<bool> set_stopped_called{false};
+        std::atomic<bool> let_stopped_callback_called{false};
+        auto s1 = stopped_sender{};
+        auto s2 = ex::let_stopped(std::move(s1), [&]() {
+            let_stopped_callback_called = true;
+            return stopped_sender();
+        });
+
+        static_assert(ex::is_sender_v<decltype(s2)>);
+        static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
+
+        check_value_types<hpx::variant<>>(s2);
+        check_error_types<hpx::variant<std::exception_ptr>>(s2);
+        check_sends_stopped<true>(s2);
+
+        auto r = expect_stopped_receiver{set_stopped_called};
+        auto os = ex::connect(std::move(s2), std::move(r));
+        ex::start(os);
+        HPX_TEST(set_stopped_called);
+        HPX_TEST(let_stopped_callback_called);
     }
 
     {
         std::atomic<bool> set_value_called{false};
-        std::atomic<bool> let_error_callback_called{false};
-        auto s1 = error_sender{};
-        auto s2 = ex::let_error(std::move(s1), [&](std::exception_ptr ep) {
-            check_exception_ptr{}(ep);
-            let_error_callback_called = true;
+        std::atomic<bool> let_stopped_callback_called{false};
+        auto s1 = stopped_sender{};
+        auto s2 = ex::let_stopped(std::move(s1), [&]() {
+            let_stopped_callback_called = true;
             return ex::just(42);
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
 
-        check_value_types<hpx::variant<hpx::tuple<int>, hpx::tuple<>>>(s2);
+        check_value_types<hpx::variant<hpx::tuple<int>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
         check_sends_stopped<false>(s2);
 
@@ -79,24 +100,23 @@ int main()
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
-        HPX_TEST(let_error_callback_called);
+        HPX_TEST(let_stopped_callback_called);
     }
 
     {
         std::atomic<bool> set_value_called{false};
-        std::atomic<bool> let_error_callback_called{false};
-        auto s1 = error_sender{};
-        auto s2 = ex::let_error(std::move(s1), [&](std::exception_ptr ep) {
-            check_exception_ptr{}(ep);
-            let_error_callback_called = true;
+        std::atomic<bool> let_stopped_callback_called{false};
+        auto s1 = stopped_sender{};
+        auto s2 = ex::let_stopped(std::move(s1), [&]() {
+            let_stopped_callback_called = true;
             return ex::just(custom_type_non_default_constructible{42});
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
 
-        check_value_types<hpx::variant<
-            hpx::tuple<custom_type_non_default_constructible>, hpx::tuple<>>>(
+        check_value_types<
+            hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(
             s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
         check_sends_stopped<false>(s2);
@@ -107,16 +127,15 @@ int main()
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
-        HPX_TEST(let_error_callback_called);
+        HPX_TEST(let_stopped_callback_called);
     }
 
     {
         std::atomic<bool> set_value_called{false};
-        std::atomic<bool> let_error_callback_called{false};
-        auto s1 = error_sender{};
-        auto s2 = ex::let_error(std::move(s1), [&](std::exception_ptr ep) {
-            check_exception_ptr{}(ep);
-            let_error_callback_called = true;
+        std::atomic<bool> let_stopped_callback_called{false};
+        auto s1 = stopped_sender{};
+        auto s2 = ex::let_stopped(std::move(s1), [&]() {
+            let_stopped_callback_called = true;
             return ex::just(
                 custom_type_non_default_constructible_non_copyable{42});
         });
@@ -125,8 +144,8 @@ int main()
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
 
         check_value_types<hpx::variant<
-            hpx::tuple<custom_type_non_default_constructible_non_copyable>,
-            hpx::tuple<>>>(s2);
+            hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(
+            s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
         check_sends_stopped<false>(s2);
 
@@ -136,16 +155,15 @@ int main()
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
-        HPX_TEST(let_error_callback_called);
+        HPX_TEST(let_stopped_callback_called);
     }
 
     // operator| overload
     {
         std::atomic<bool> set_value_called{false};
-        std::atomic<bool> let_error_callback_called{false};
-        auto s = error_sender{} | ex::let_error([&](std::exception_ptr ep) {
-            check_exception_ptr{}(ep);
-            let_error_callback_called = true;
+        std::atomic<bool> let_stopped_callback_called{false};
+        auto s = stopped_sender{} | ex::let_stopped([&]() {
+            let_stopped_callback_called = true;
             return void_sender();
         });
 
@@ -161,22 +179,21 @@ int main()
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
-        HPX_TEST(let_error_callback_called);
+        HPX_TEST(let_stopped_callback_called);
     }
 
     {
         std::atomic<bool> set_value_called{false};
-        std::atomic<bool> let_error_callback_called{false};
-        auto s = error_sender{} | ex::let_error([&](std::exception_ptr ep) {
-            check_exception_ptr{}(ep);
-            let_error_callback_called = true;
+        std::atomic<bool> let_stopped_callback_called{false};
+        auto s = stopped_sender{} | ex::let_stopped([&]() {
+            let_stopped_callback_called = true;
             return ex::just(42);
         });
 
         static_assert(ex::is_sender_v<decltype(s)>);
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
-        check_value_types<hpx::variant<hpx::tuple<int>, hpx::tuple<>>>(s);
+        check_value_types<hpx::variant<hpx::tuple<int>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
         check_sends_stopped<false>(s);
 
@@ -186,14 +203,14 @@ int main()
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
-        HPX_TEST(let_error_callback_called);
+        HPX_TEST(let_stopped_callback_called);
     }
 
     // tag_invoke overload
     {
         std::atomic<bool> tag_invoke_overload_called{false};
         auto s = custom_sender_tag_invoke{tag_invoke_overload_called} |
-            ex::let_error([&](std::exception_ptr) { return ex::just(); });
+            ex::let_stopped([&](std::exception_ptr) { return ex::just(); });
         HPX_TEST(tag_invoke_overload_called);
 
         static_assert(ex::is_sender_v<decltype(s)>);
@@ -204,12 +221,12 @@ int main()
         check_sends_stopped<false>(s);
     }
 
-    // "Failure" path, i.e. let_error has no error to handle
+    // "Failure" path, i.e. let_stopped has no error to handle
     {
         std::atomic<bool> set_value_called{false};
-        std::atomic<bool> let_error_callback_called{false};
+        std::atomic<bool> let_stopped_callback_called{false};
         auto s1 = ex::just(42);
-        auto s2 = ex::let_error(std::move(s1), [&](std::exception_ptr) {
+        auto s2 = ex::let_stopped(std::move(s1), [&]() {
             HPX_TEST(false);
             return ex::just(43);
         });
@@ -227,14 +244,14 @@ int main()
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
-        HPX_TEST(!let_error_callback_called);
+        HPX_TEST(!let_stopped_callback_called);
     }
 
     {
         std::atomic<bool> set_value_called{false};
-        std::atomic<bool> let_error_callback_called{false};
+        std::atomic<bool> let_stopped_callback_called{false};
         auto s1 = ex::just(custom_type_non_default_constructible{42});
-        auto s2 = ex::let_error(std::move(s1), [&](std::exception_ptr) {
+        auto s2 = ex::let_stopped(std::move(s1), [&]() {
             HPX_TEST(false);
             return ex::just(custom_type_non_default_constructible{43});
         });
@@ -254,15 +271,15 @@ int main()
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
-        HPX_TEST(!let_error_callback_called);
+        HPX_TEST(!let_stopped_callback_called);
     }
 
     {
         std::atomic<bool> set_value_called{false};
-        std::atomic<bool> let_error_callback_called{false};
+        std::atomic<bool> let_stopped_callback_called{false};
         auto s1 =
             ex::just(custom_type_non_default_constructible_non_copyable{42});
-        auto s2 = ex::let_error(std::move(s1), [&](std::exception_ptr) {
+        auto s2 = ex::let_stopped(std::move(s1), [&]() {
             HPX_TEST(false);
             return ex::just(
                 custom_type_non_default_constructible_non_copyable{43});
@@ -283,7 +300,7 @@ int main()
         auto os = ex::connect(std::move(s2), std::move(r));
         ex::start(os);
         HPX_TEST(set_value_called);
-        HPX_TEST(!let_error_callback_called);
+        HPX_TEST(!let_stopped_callback_called);
     }
 
     return hpx::util::report_errors();

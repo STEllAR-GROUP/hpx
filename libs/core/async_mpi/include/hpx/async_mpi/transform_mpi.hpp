@@ -1,11 +1,11 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/algorithms/transform_xxx.hpp
+/// \file hpx/async_mpi/transform_mpi.hpp
 
 #pragma once
 
@@ -14,6 +14,7 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
@@ -75,8 +76,8 @@ namespace hpx { namespace mpi { namespace experimental {
         template <typename R, typename F>
         struct transform_mpi_receiver
         {
-            std::decay_t<R> r;
-            std::decay_t<F> f;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<R> r;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
             template <typename R_, typename F_>
             transform_mpi_receiver(R_&& r, F_&& f)
@@ -142,40 +143,50 @@ namespace hpx { namespace mpi { namespace experimental {
         template <typename Sender, typename F>
         struct transform_mpi_sender
         {
-            std::decay_t<Sender> s;
-            std::decay_t<F> f;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> s;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
-            template <typename Tuple>
-            struct invoke_result_helper;
-
-            template <template <typename...> class Tuple, typename... Ts>
-            struct invoke_result_helper<Tuple<Ts...>>
+            template <typename Env>
+            struct generate_completion_signatures
             {
-                static_assert(hpx::is_invocable_v<F, Ts..., MPI_Request*>,
-                    "F not invocable with the value_types specified.");
-                using result_type =
-                    hpx::util::invoke_result_t<F, Ts..., MPI_Request*>;
-                using type =
-                    std::conditional_t<std::is_void<result_type>::value,
-                        Tuple<>, Tuple<result_type>>;
+                template <typename Tuple>
+                struct invoke_result_helper;
+
+                template <template <typename...> class Tuple, typename... Ts>
+                struct invoke_result_helper<Tuple<Ts...>>
+                {
+                    static_assert(hpx::is_invocable_v<F, Ts..., MPI_Request*>,
+                        "F not invocable with the value_types specified.");
+                    using result_type =
+                        hpx::util::invoke_result_t<F, Ts..., MPI_Request*>;
+                    using type =
+                        std::conditional_t<std::is_void<result_type>::value,
+                            Tuple<>, Tuple<result_type>>;
+                };
+
+                template <template <typename...> class Tuple,
+                    template <typename...> class Variant>
+                using value_types =
+                    hpx::util::detail::unique_t<hpx::util::detail::transform_t<
+                        hpx::execution::experimental::value_types_of_t<Sender,
+                            Env, Tuple, Variant>,
+                        invoke_result_helper>>;
+
+                template <template <typename...> class Variant>
+                using error_types =
+                    hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
+                        hpx::execution::experimental::error_types_of_t<Sender,
+                            Env, Variant>,
+                        std::exception_ptr>>;
+
+                static constexpr bool sends_stopped = false;
             };
 
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types =
-                hpx::util::detail::unique_t<hpx::util::detail::transform_t<
-                    typename hpx::execution::experimental::sender_traits<
-                        Sender>::template value_types<Tuple, Variant>,
-                    invoke_result_helper>>;
-
-            template <template <typename...> class Variant>
-            using error_types =
-                hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
-                    typename hpx::execution::experimental::sender_traits<
-                        Sender>::template error_types<Variant>,
-                    std::exception_ptr>>;
-
-            static constexpr bool sends_done = false;
+            template <typename Env>
+            friend auto tag_invoke(
+                hpx::execution::experimental::get_completion_signatures_t,
+                transform_mpi_sender const&, Env)
+                -> generate_completion_signatures<Env>;
 
             template <typename R>
             friend constexpr auto tag_invoke(

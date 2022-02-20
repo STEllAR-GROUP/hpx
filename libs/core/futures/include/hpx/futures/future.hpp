@@ -14,6 +14,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -544,15 +545,29 @@ namespace hpx { namespace lcos { namespace detail {
             future_data_base<traits::detail::shared_state_ptr_result_t<R>>;
 
         // Sender compatibility
-        template <template <typename...> class Tuple,
-            template <typename...> class Variant>
-        using value_types = std::conditional_t<std::is_void_v<result_type>,
-            Variant<Tuple<>>, Variant<Tuple<result_type>>>;
+        template <typename, typename T>
+        struct completion_signatures_base
+        {
+            template <template <typename...> typename Tuple,
+                template <typename...> typename Variant>
+            using value_types = Variant<Tuple<result_type>>;
+        };
 
-        template <template <typename...> class Variant>
-        using error_types = Variant<std::exception_ptr>;
+        template <typename T>
+        struct completion_signatures_base<T, void>
+        {
+            template <template <typename...> typename Tuple,
+                template <typename...> typename Variant>
+            using value_types = Variant<Tuple<>>;
+        };
 
-        static constexpr bool sends_done = false;
+        struct completion_signatures : completion_signatures_base<void, R>
+        {
+            template <template <typename...> typename Variant>
+            using error_types = Variant<std::exception_ptr>;
+
+            static constexpr bool sends_stopped = false;
+        };
 
     private:
         template <typename F>
@@ -822,9 +837,7 @@ namespace hpx {
         using shared_state_type = typename base_type::shared_state_type;
 
         // Sender compatibility
-        using base_type::error_types;
-        using base_type::sends_done;
-        using base_type::value_types;
+        using completion_signatures = typename base_type::completion_signatures;
 
         template <typename Receiver>
         friend lcos::detail::operation_state<Receiver, future> tag_invoke(
@@ -1023,8 +1036,10 @@ namespace hpx {
             // "error: cannot use an entity undefined in device code" without
             // specifying what entity it refers to.
             HPX_ASSERT(false);
+            // clang-format off
             using future_type = decltype(
                 base_type::then(HPX_MOVE(*this), HPX_FORWARD(F, f), ec));
+            // clang-format on
             return future_type{};
 #else
             invalidate on_exit(*this);
@@ -1127,9 +1142,7 @@ namespace hpx {
         using shared_state_type = typename base_type::shared_state_type;
 
         // Sender compatibility
-        using base_type::error_types;
-        using base_type::sends_done;
-        using base_type::value_types;
+        using completion_signatures = typename base_type::completion_signatures;
 
         template <typename Receiver>
         friend lcos::detail::operation_state<Receiver, shared_future>
@@ -1314,8 +1327,10 @@ namespace hpx {
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
+            // clang-format off
             using future_type = decltype(
                 base_type::then(shared_future(*this), HPX_FORWARD(F, f), ec));
+            // clang-format on
             return future_type{};
 #else
             return base_type::then(shared_future(*this), HPX_FORWARD(F, f), ec);

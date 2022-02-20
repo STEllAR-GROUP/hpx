@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,7 @@
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_priority_invoke.hpp>
@@ -27,7 +28,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -38,29 +39,35 @@ namespace hpx { namespace execution { namespace experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types =
-                typename hpx::execution::experimental::sender_traits<
-                    Sender>::template value_types<Tuple, Variant>;
+            template <typename Env>
+            struct generate_completion_signatures
+            {
+                template <template <typename...> typename Tuple,
+                    template <typename...> typename Variant>
+                using value_types =
+                    value_types_of_t<Sender, Env, Tuple, Variant>;
 
-            template <template <typename...> class Variant>
-            using error_types =
-                hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
-                    typename hpx::execution::experimental::sender_traits<
-                        Sender>::template error_types<Variant>,
-                    std::exception_ptr>>;
+                template <template <typename...> typename Variant>
+                using error_types = hpx::util::detail::unique_concat_t<
+                    error_types_of_t<Sender, Env, Variant>,
+                    Variant<std::exception_ptr>>;
 
-            static constexpr bool sends_done = false;
+                static constexpr bool sends_stopped = false;
+            };
 
+            template <typename Env>
+            friend auto tag_invoke(
+                get_completion_signatures_t, bulk_sender const&, Env) noexcept
+                -> generate_completion_signatures<Env>;
+
+            // clang-format off
             template <typename CPO,
-                // clang-format off
                 HPX_CONCEPT_REQUIRES_(
                     hpx::execution::experimental::detail::is_receiver_cpo_v<CPO> &&
                     hpx::execution::experimental::detail::has_completion_scheduler_v<
-                        CPO, std::decay_t<Sender>>)
-                // clang-format on
-                >
+                        CPO, std::decay_t<Sender>>
+                )>
+            // clang-format on
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
                 bulk_sender const& sender)
@@ -154,6 +161,31 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
+    //
+    // execution::bulk is used to run a task repeatedly for every index in an
+    // index space.
+    //
+    // Returns a sender describing the task of invoking the provided function
+    // with every index in the provided shape along with the values sent by the
+    // input sender. The returned sender completes once all invocations have
+    // completed, or an error has occurred. If it completes by sending values,
+    // they are equivalent to those sent by the input sender.
+    //
+    // No instance of function will begin executing until the returned sender is
+    // started. Each invocation of function runs in an execution agent whose
+    // forward progress guarantees are determined by the scheduler on which they
+    // are run. All agents created by a single use of bulk execute with the same
+    // guarantee. This allows, for instance, a scheduler to execute all
+    // invocations of the function in parallel.
+    //
+    // The bulk operation is intended to be used at the point where the number
+    // of agents to be created is known and provided to bulk via its shape
+    // parameter. For some parallel computations, the number of agents to be
+    // created may be a function of the input data or dynamic conditions of the
+    // execution environment. In such cases, bulk can be combined with
+    // additional operations such as let_value to deliver dynamic shape
+    // information to the bulk operation.
+    //
     inline constexpr struct bulk_t final
       : hpx::functional::detail::tag_priority<bulk_t>
     {
@@ -162,10 +194,11 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Sender, typename Shape, typename F,
             HPX_CONCEPT_REQUIRES_(
                 is_sender_v<Sender> &&
-                hpx::execution::experimental::detail::
-                    is_completion_scheduler_tag_invocable_v<
-                        hpx::execution::experimental::set_value_t, Sender,
-                        bulk_t, Shape, F>)>
+                experimental::detail::is_completion_scheduler_tag_invocable_v<
+                    hpx::execution::experimental::set_value_t, Sender,
+                    bulk_t, Shape, F
+                >
+            )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
             bulk_t, Sender&& sender, Shape const& shape, F&& f)
@@ -173,6 +206,7 @@ namespace hpx { namespace execution { namespace experimental {
             auto scheduler =
                 hpx::execution::experimental::get_completion_scheduler<
                     hpx::execution::experimental::set_value_t>(sender);
+
             return hpx::functional::tag_invoke(bulk_t{}, HPX_MOVE(scheduler),
                 HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f));
         }
@@ -181,7 +215,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Sender, typename Shape, typename F,
             HPX_CONCEPT_REQUIRES_(
                 is_sender_v<Sender> &&
-                std::is_integral<Shape>::value
+                std::is_integral_v<Shape>
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
@@ -198,7 +232,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Sender, typename Shape, typename F,
             HPX_CONCEPT_REQUIRES_(
                 is_sender_v<Sender> &&
-                !std::is_integral<std::decay_t<Shape>>::value
+                !std::is_integral_v<std::decay_t<Shape>>
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
@@ -217,4 +251,4 @@ namespace hpx { namespace execution { namespace experimental {
                 HPX_FORWARD(Shape, shape), HPX_FORWARD(F, f)};
         }
     } bulk{};
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

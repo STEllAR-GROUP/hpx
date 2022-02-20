@@ -84,6 +84,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         namespace ex = hpx::execution::experimental;
         namespace cu = hpx::cuda::experimental;
+        namespace tt = hpx::this_thread::experimental;
 
         auto const f = [](cudaStream_t cuda_stream) {
             dummy<<<1, 1, 0, cuda_stream>>>();
@@ -92,7 +93,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::chrono::high_resolution_timer timer;
         for (std::size_t i = 0; i != iterations; ++i)
         {
-            cu::transform_stream(ex::just(), f, cuda_stream) | ex::sync_wait();
+            cu::transform_stream(ex::just(), f, cuda_stream) | tt::sync_wait();
         }
         double elapsed = timer.elapsed();
         std::cout
@@ -105,6 +106,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         namespace ex = hpx::execution::experimental;
         namespace cu = hpx::cuda::experimental;
+        namespace tt = hpx::this_thread::experimental;
 
         auto const f = [](cudaStream_t cuda_stream) {
             dummy<<<1, 1, 0, cuda_stream>>>();
@@ -125,12 +127,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 cu::transform_stream(f, cuda_stream) |
                 cu::transform_stream(f, cuda_stream) |
                 cu::transform_stream(f, cuda_stream) |
-                cu::transform_stream(f, cuda_stream) | ex::sync_wait();
+                cu::transform_stream(f, cuda_stream) | tt::sync_wait();
         }
         // Do the remainder one-by-one
         for (std::size_t i = 0; i < non_batch_iterations; ++i)
         {
-            cu::transform_stream(ex::just(), f, cuda_stream) | ex::sync_wait();
+            cu::transform_stream(ex::just(), f, cuda_stream) | tt::sync_wait();
         }
         double elapsed = timer.elapsed();
         std::cout
@@ -143,6 +145,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         namespace ex = hpx::execution::experimental;
         namespace cu = hpx::cuda::experimental;
+        namespace tt = hpx::this_thread::experimental;
 
         auto const f = [](cudaStream_t cuda_stream) {
             dummy<<<1, 1, 0, cuda_stream>>>();
@@ -166,12 +169,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 cu::transform_stream(f, cuda_stream) | ex::then([] {}) |
                 cu::transform_stream(f, cuda_stream) | ex::then([] {}) |
                 cu::transform_stream(f, cuda_stream) | ex::then([] {}) |
-                cu::transform_stream(f, cuda_stream) | ex::sync_wait();
+                cu::transform_stream(f, cuda_stream) | tt::sync_wait();
         }
         // Do the remainder one-by-one
         for (std::size_t i = 0; i < non_batch_iterations; ++i)
         {
-            cu::transform_stream(ex::just(), f, cuda_stream) | ex::sync_wait();
+            cu::transform_stream(ex::just(), f, cuda_stream) | tt::sync_wait();
         }
         double elapsed = timer.elapsed();
         std::cout
@@ -184,6 +187,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         namespace ex = hpx::execution::experimental;
         namespace cu = hpx::cuda::experimental;
+        namespace tt = hpx::this_thread::experimental;
 
         auto const f = [](cudaStream_t cuda_stream) {
             dummy<<<1, 1, 0, cuda_stream>>>();
@@ -193,7 +197,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         for (std::size_t i = 0; i != iterations; ++i)
         {
             cu::transform_stream(ex::just(), f, cuda_stream) |
-                ex::transfer(ex::thread_pool_scheduler{}) | ex::sync_wait();
+                ex::transfer(ex::thread_pool_scheduler{}) | tt::sync_wait();
         }
         double elapsed = timer.elapsed();
         std::cout
@@ -206,6 +210,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         namespace ex = hpx::execution::experimental;
         namespace cu = hpx::cuda::experimental;
+        namespace tt = hpx::this_thread::experimental;
 
         auto const f = [](cudaStream_t cuda_stream) {
             dummy<<<1, 1, 0, cuda_stream>>>();
@@ -227,13 +232,13 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 cu::transform_stream(f, cuda_stream) |
                 cu::transform_stream(f, cuda_stream) |
                 cu::transform_stream(f, cuda_stream) |
-                ex::transfer(ex::thread_pool_scheduler{}) | ex::sync_wait();
+                ex::transfer(ex::thread_pool_scheduler{}) | tt::sync_wait();
         }
         // Do the remainder one-by-one
         for (std::size_t i = 0; i < non_batch_iterations; ++i)
         {
             cu::transform_stream(ex::just(), f, cuda_stream) |
-                ex::transfer(ex::thread_pool_scheduler{}) | ex::sync_wait();
+                ex::transfer(ex::thread_pool_scheduler{}) | tt::sync_wait();
         }
         double elapsed = timer.elapsed();
         std::cout

@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -164,8 +164,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename Executor, typename T>
         struct exposes_future_type<Executor, T,
-            typename hpx::util::always_void<
-                typename Executor::template future_type<T>>::type>
+            std::void_t<typename Executor::template future_type<T>>>
           : std::true_type
         {
         };

@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +12,8 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/execution_base/completion_scheduler.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
@@ -22,7 +25,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
     struct thread_pool_scheduler
     {
         constexpr thread_pool_scheduler() = default;
@@ -185,14 +189,22 @@ namespace hpx { namespace execution { namespace experimental {
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
 
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types = Variant<Tuple<>>;
+            template <typename Env>
+            struct generate_completion_signatures
+            {
+                template <template <typename...> typename Tuple,
+                    template <typename...> typename Variant>
+                using value_types = Variant<Tuple<>>;
 
-            template <template <typename...> class Variant>
-            using error_types = Variant<std::exception_ptr>;
+                template <template <typename...> typename Variant>
+                using error_types = Variant<std::exception_ptr>;
 
-            static constexpr bool sends_done = false;
+                static constexpr bool sends_stopped = false;
+            };
+
+            template <typename Env>
+            friend auto tag_invoke(get_completion_signatures_t, sender const&,
+                Env) noexcept -> generate_completion_signatures<Env>;
 
             template <typename Receiver>
             friend operation_state<Scheduler, Receiver> tag_invoke(
@@ -244,4 +256,4 @@ namespace hpx { namespace execution { namespace experimental {
         char const* annotation_ = nullptr;
         /// \endcond
     };
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

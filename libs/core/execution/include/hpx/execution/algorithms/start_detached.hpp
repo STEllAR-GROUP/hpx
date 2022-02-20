@@ -1,4 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,12 +14,16 @@
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
+#include <hpx/execution_base/completion_scheduler.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/operation_state.hpp>
+#include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/functional/detail/tag_priority_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <atomic>
@@ -28,8 +33,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
     namespace detail {
+
         template <typename Sender, typename Allocator>
         struct operation_state_holder
         {
@@ -75,9 +82,12 @@ namespace hpx { namespace execution { namespace experimental {
             std::decay_t<operation_state_type> op_state;
 
         public:
+            // clang-format off
             template <typename Sender_,
-                typename = std::enable_if_t<!std::is_same<std::decay_t<Sender_>,
-                    operation_state_holder>::value>>
+                HPX_CONCEPT_REQUIRES_(
+                    meta::value<meta::none_of<operation_state_holder, Sender_>>
+                )>
+            // clang-format on
             explicit operation_state_holder(
                 Sender_&& sender, allocator_type const& alloc)
               : alloc(alloc)
@@ -88,12 +98,14 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
         private:
-            friend void intrusive_ptr_add_ref(operation_state_holder* p)
+            friend void intrusive_ptr_add_ref(
+                operation_state_holder* p) noexcept
             {
                 ++p->count;
             }
 
-            friend void intrusive_ptr_release(operation_state_holder* p)
+            friend void intrusive_ptr_release(
+                operation_state_holder* p) noexcept
             {
                 if (--p->count == 0)
                 {
@@ -107,10 +119,38 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
+    // execution::start_detached is used to eagerly start a sender without the
+    // caller needing to manage the lifetimes of any objects.
+    //
+    // Like ensure_started, but does not return a value; if the provided sender
+    // sends an error instead of a value, std::terminate is called.
     inline constexpr struct start_detached_t final
-      : hpx::functional::detail::tag_fallback<start_detached_t>
+      : hpx::functional::detail::tag_priority<start_detached_t>
     {
     private:
+        // clang-format off
+        template <typename Sender,
+            typename Allocator = hpx::util::internal_allocator<>,
+            HPX_CONCEPT_REQUIRES_(
+                is_sender_v<Sender> &&
+                hpx::traits::is_allocator_v<Allocator> &&
+                experimental::detail::is_completion_scheduler_tag_invocable_v<
+                    hpx::execution::experimental::set_value_t,
+                    start_detached_t, Sender, Allocator
+                >
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
+            start_detached_t, Sender&& sender,
+            Allocator const& allocator = Allocator{})
+        {
+            auto scheduler = get_completion_scheduler<
+                hpx::execution::experimental::set_value_t>(sender);
+
+            return hpx::functional::tag_invoke(start_detached_t{},
+                HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender), allocator);
+        }
+
         // clang-format off
         template <typename Sender,
             typename Allocator = hpx::util::internal_allocator<>,
@@ -136,8 +176,8 @@ namespace hpx { namespace execution { namespace experimental {
             unique_ptr p(allocator_traits::allocate(alloc, 1),
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
-            new (p.get())
-                operation_state_type{HPX_FORWARD(Sender, sender), alloc};
+            allocator_traits::construct(
+                alloc, p.get(), HPX_FORWARD(Sender, sender), alloc);
             HPX_UNUSED(p.release());
         }
 
@@ -154,4 +194,4 @@ namespace hpx { namespace execution { namespace experimental {
                 allocator};
         }
     } start_detached{};
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

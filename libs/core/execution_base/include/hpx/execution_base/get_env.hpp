@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/type_support/hide_from_adl.hpp>
+#include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/unwrap_ref.hpp>
 
 #include <type_traits>
@@ -50,10 +50,10 @@ namespace hpx::execution::experimental {
         };
 
         template <typename Tag, typename Value,
-            typename BaseEnvId = util::hide_from_adl<empty_env>>
+            typename BaseEnvId = meta::hidden<empty_env>>
         struct env
         {
-            using BaseEnv = util::hidden_from_adl_t<BaseEnvId>;
+            using BaseEnv = meta::type<BaseEnvId>;
 
             HPX_NO_UNIQUE_ADDRESS util::unwrap_reference_t<Value> value_;
             HPX_NO_UNIQUE_ADDRESS BaseEnv base_env_{};
@@ -97,7 +97,7 @@ namespace hpx::execution::experimental {
             template <typename Value, typename BaseEnv>
             constexpr auto operator()(Value&& value, BaseEnv&& base_env) const
                 -> env<Tag, std::decay_t<Value>,
-                    util::hide_from_adl<std::decay_t<BaseEnv>>>
+                    meta::hidden<std::decay_t<BaseEnv>>>
             {
                 return {
                     HPX_FORWARD(Value, value), HPX_FORWARD(BaseEnv, base_env)};

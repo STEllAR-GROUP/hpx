@@ -12,11 +12,11 @@ set(type_support_headers
     hpx/type_support/detected.hpp
     hpx/type_support/empty_function.hpp
     hpx/type_support/equality.hpp
-    hpx/type_support/hide_from_adl.hpp
     hpx/type_support/identity.hpp
     hpx/type_support/lazy_conditional.hpp
     hpx/type_support/lazy_enable_if.hpp
     hpx/type_support/pack.hpp
+    hpx/type_support/meta.hpp
     hpx/type_support/static.hpp
     hpx/type_support/unwrap_ref.hpp
     hpx/type_support/unused.hpp
@@ -48,6 +48,6 @@ add_hpx_module(
   SOURCES ${type_support_sources}
   HEADERS ${type_support_headers}
   COMPAT_HEADERS ${type_support_compat_headers}
-  MODULE_DEPENDENCIES hpx_assertion hpx_config
+  MODULE_DEPENDENCIES hpx_assertion hpx_concepts hpx_config
   CMAKE_SUBDIRS examples tests
 )

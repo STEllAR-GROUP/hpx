@@ -144,7 +144,7 @@ namespace hpx { namespace util {
 
     template <typename... Ts>
     using member_pack_for =
-        member_pack<typename util::make_index_pack<sizeof...(Ts)>::type, Ts...>;
+        member_pack<util::make_index_pack_t<sizeof...(Ts)>, Ts...>;
 
 }}    // namespace hpx::util
 

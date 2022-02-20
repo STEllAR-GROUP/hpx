@@ -16,14 +16,14 @@ namespace hpx { namespace util {
     template <typename... Ts>
     struct pack
     {
-        typedef pack type;
+        using type = pack;
         static constexpr std::size_t size = sizeof...(Ts);
     };
 
     template <typename T, T... Vs>
     struct pack_c
     {
-        typedef pack_c type;
+        using type = pack_c;
         static constexpr std::size_t size = sizeof...(Vs);
     };
 
@@ -303,10 +303,16 @@ namespace hpx { namespace util {
         template <typename Pack>
         struct concat_inner_packs;
 
-        template <template <typename...> class Pack, typename... Ts>
-        struct concat_inner_packs<Pack<Ts...>>
+        template <template <typename...> class Pack>
+        struct concat_inner_packs<Pack<>>
         {
-            using type = Pack<typename concat<Ts...>::type>;
+            using type = Pack<>;
+        };
+
+        template <template <typename...> class Pack, typename T, typename... Ts>
+        struct concat_inner_packs<Pack<T, Ts...>>
+        {
+            using type = Pack<typename concat<T, Ts...>::type>;
         };
 
         /// Concatenate the packs in the given pack into a single pack. The

@@ -1,10 +1,12 @@
 //  Copyright (c) 2021 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/modules/execution.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
@@ -16,17 +18,41 @@
 
 #pragma once
 
+// Check that the value_types of a sender matches the expected type
+template <typename ExpectedValType,
+    typename Env = hpx::execution::experimental::empty_env, typename Sender>
+inline void check_value_types(Sender&&)
+{
+    namespace ex = hpx::execution::experimental;
+    using value_types = ex::value_types_of_t<Sender, Env, hpx::tuple,
+        ex::detail::unique_variant<hpx::variant>::template apply>;
+    static_assert(std::is_same_v<value_types, ExpectedValType>);
+}
+
+// Check that the error_types of a sender matches the expected type
+template <typename ExpectedErrorType,
+    typename Env = hpx::execution::experimental::empty_env, typename Sender>
+inline void check_error_types(Sender&&)
+{
+    namespace ex = hpx::execution::experimental;
+    using error_types = ex::error_types_of_t<Sender, Env,
+        ex::detail::unique_variant<hpx::variant>::template apply>;
+    static_assert(std::is_same_v<error_types, ExpectedErrorType>);
+}
+
+//! Check that the sends_stopped of a sender matches the expected value
+template <bool Expected, typename Env = hpx::execution::experimental::empty_env,
+    typename Sender>
+inline void check_sends_stopped(Sender&&)
+{
+    constexpr bool sends_stopped =
+        hpx::execution::experimental::completion_signatures_of_t<Sender,
+            Env>::sends_stopped;
+    static_assert(sends_stopped == Expected);
+}
+
 struct void_sender
 {
-    template <template <typename...> class Tuple,
-        template <typename...> class Variant>
-    using value_types = Variant<Tuple<>>;
-
-    template <template <typename...> class Variant>
-    using error_types = Variant<>;
-
-    static constexpr bool sends_done = false;
-
     template <typename R>
     struct operation_state
     {
@@ -44,20 +70,18 @@ struct void_sender
     {
         return {std::forward<R>(r)};
     }
+
+    template <typename Env>
+    friend auto tag_invoke(
+        hpx::execution::experimental::get_completion_signatures_t,
+        void_sender const&, Env)
+        -> hpx::execution::experimental::completion_signatures<
+            hpx::execution::experimental::set_value_t()>;
 };
 
 template <typename... Ts>
 struct error_sender
 {
-    template <template <typename...> class Tuple,
-        template <typename...> class Variant>
-    using value_types = Variant<Tuple<Ts...>>;
-
-    template <template <typename...> class Variant>
-    using error_types = Variant<std::exception_ptr>;
-
-    static constexpr bool sends_done = false;
-
     template <typename R>
     struct operation_state
     {
@@ -83,6 +107,42 @@ struct error_sender
     {
         return {std::forward<R>(r)};
     }
+
+    template <typename Env>
+    friend auto tag_invoke(
+        hpx::execution::experimental::get_completion_signatures_t,
+        error_sender const&, Env)
+        -> hpx::execution::experimental::completion_signatures<
+            hpx::execution::experimental::set_value_t(Ts...),
+            hpx::execution::experimental::set_error_t(std::exception_ptr)>;
+};
+
+struct stopped_sender
+{
+    template <typename R>
+    struct operation_state
+    {
+        std::decay_t<R> r;
+        friend void tag_invoke(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
+        {
+            hpx::execution::experimental::set_stopped(std::move(os.r));
+        }
+    };
+
+    template <typename R>
+    friend operation_state<R> tag_invoke(
+        hpx::execution::experimental::connect_t, stopped_sender, R&& r)
+    {
+        return {std::forward<R>(r)};
+    }
+
+    template <typename Env>
+    friend auto tag_invoke(
+        hpx::execution::experimental::get_completion_signatures_t,
+        stopped_sender const&, Env)
+        -> hpx::execution::experimental::completion_signatures<
+            hpx::execution::experimental::set_stopped_t()>;
 };
 
 template <typename F>
@@ -143,6 +203,28 @@ struct error_callback_receiver
     }
 };
 
+struct expect_stopped_receiver
+{
+    std::atomic<bool>& set_stopped_called;
+
+    template <typename... Ts>
+    friend void tag_invoke(hpx::execution::experimental::set_value_t,
+        expect_stopped_receiver&&, Ts...) noexcept
+    {
+        HPX_TEST(false);    // should not be called
+    }
+    friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
+        expect_stopped_receiver&& r) noexcept
+    {
+        r.set_stopped_called = true;
+    }
+    friend void tag_invoke(hpx::execution::experimental::set_error_t,
+        expect_stopped_receiver&&, std::exception_ptr) noexcept
+    {
+        HPX_TEST(false);    // should not be called
+    }
+};
+
 template <typename F>
 struct void_callback_helper
 {
@@ -165,15 +247,6 @@ struct void_callback_helper
 template <typename T>
 struct error_typed_sender
 {
-    template <template <class...> class Tuple,
-        template <class...> class Variant>
-    using value_types = Variant<Tuple<T>>;
-
-    template <template <class...> class Variant>
-    using error_types = Variant<std::exception_ptr>;
-
-    static constexpr bool sends_done = false;
-
     template <typename R>
     struct operation_state
     {
@@ -200,32 +273,39 @@ struct error_typed_sender
     {
         return operation_state<R>{std::forward<R>(r)};
     }
+
+    template <typename Env>
+    friend auto tag_invoke(
+        hpx::execution::experimental::get_completion_signatures_t,
+        error_typed_sender const&, Env)
+        -> hpx::execution::experimental::completion_signatures<
+            hpx::execution::experimental::set_value_t(T),
+            hpx::execution::experimental::set_error_t(std::exception_ptr)>;
 };
 
-void check_exception_ptr(std::exception_ptr eptr)
+struct check_exception_ptr
 {
-    try
+    void operator()(std::exception_ptr eptr) const
     {
-        std::rethrow_exception(eptr);
+        try
+        {
+            std::rethrow_exception(eptr);
+        }
+        catch (std::runtime_error const& e)
+        {
+            HPX_TEST_EQ(std::string(e.what()), std::string("error"));
+        }
     }
-    catch (const std::runtime_error& e)
+
+    void operator()(std::runtime_error const& e) const
     {
         HPX_TEST_EQ(std::string(e.what()), std::string("error"));
     }
-}
+};
 
 struct custom_sender_tag_invoke
 {
     std::atomic<bool>& tag_invoke_overload_called;
-
-    template <template <typename...> class Tuple,
-        template <typename...> class Variant>
-    using value_types = Variant<Tuple<>>;
-
-    template <template <typename...> class Variant>
-    using error_types = Variant<>;
-
-    static constexpr bool sends_done = false;
 
     template <typename R>
     struct operation_state
@@ -238,10 +318,19 @@ struct custom_sender_tag_invoke
     };
 
     template <typename R>
-    operation_state<R> connect(R&& r)
+    friend operation_state<R> tag_invoke(
+        hpx::execution::experimental::connect_t, custom_sender_tag_invoke&&,
+        R&& r)
     {
         return {std::forward<R>(r)};
     }
+
+    template <typename Env>
+    friend auto tag_invoke(
+        hpx::execution::experimental::get_completion_signatures_t,
+        custom_sender_tag_invoke const&, Env)
+        -> hpx::execution::experimental::completion_signatures<
+            hpx::execution::experimental::set_value_t()>;
 };
 
 struct custom_sender
@@ -257,7 +346,7 @@ struct custom_sender
     template <template <class...> class Variant>
     using error_types = Variant<std::exception_ptr>;
 
-    static constexpr bool sends_done = false;
+    static constexpr bool sends_stopped = false;
 
     template <typename R>
     struct operation_state
@@ -279,6 +368,14 @@ struct custom_sender
         s.connect_called = true;
         return operation_state<R>{s.start_called, std::forward<R>(r)};
     }
+
+    template <typename Env>
+    friend auto tag_invoke(
+        hpx::execution::experimental::get_completion_signatures_t,
+        custom_sender const&, Env)
+        -> hpx::execution::experimental::completion_signatures<
+            hpx::execution::experimental::set_value_t(),
+            hpx::execution::experimental::set_error_t(std::exception_ptr)>;
 };
 
 template <typename T>
@@ -289,15 +386,6 @@ struct custom_typed_sender
     std::atomic<bool>& start_called;
     std::atomic<bool>& connect_called;
     std::atomic<bool>& tag_invoke_overload_called;
-
-    template <template <class...> class Tuple,
-        template <class...> class Variant>
-    using value_types = Variant<Tuple<>>;
-
-    template <template <class...> class Variant>
-    using error_types = Variant<std::exception_ptr>;
-
-    static constexpr bool sends_done = false;
 
     template <typename R>
     struct operation_state
@@ -322,6 +410,14 @@ struct custom_typed_sender
         return operation_state<R>{
             std::move(s.x), s.start_called, std::forward<R>(r)};
     }
+
+    template <typename Env>
+    friend auto tag_invoke(
+        hpx::execution::experimental::get_completion_signatures_t,
+        custom_typed_sender const&, Env)
+        -> hpx::execution::experimental::completion_signatures<
+            hpx::execution::experimental::set_value_t(T),
+            hpx::execution::experimental::set_error_t(std::exception_ptr)>;
 };
 
 struct custom_sender2 : custom_sender
@@ -387,15 +483,6 @@ struct scheduler
 
     struct sender
     {
-        template <template <class...> class Tuple,
-            template <class...> class Variant>
-        using value_types = Variant<Tuple<>>;
-
-        template <template <class...> class Variant>
-        using error_types = Variant<std::exception_ptr>;
-
-        static constexpr bool sends_done = false;
-
         template <typename R>
         struct operation_state
         {
@@ -414,6 +501,14 @@ struct scheduler
         {
             return operation_state<R>{std::forward<R>(r)};
         }
+
+        template <typename Env>
+        friend auto tag_invoke(
+            hpx::execution::experimental::get_completion_signatures_t,
+            sender const&, Env)
+            -> hpx::execution::experimental::completion_signatures<
+                hpx::execution::experimental::set_value_t(),
+                hpx::execution::experimental::set_error_t(std::exception_ptr)>;
     };
 
     friend sender tag_invoke(

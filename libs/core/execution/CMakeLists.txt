@@ -17,6 +17,7 @@ set(execution_headers
     hpx/execution/algorithms/just.hpp
     hpx/execution/algorithms/keep_future.hpp
     hpx/execution/algorithms/let_error.hpp
+    hpx/execution/algorithms/let_stopped.hpp
     hpx/execution/algorithms/let_value.hpp
     hpx/execution/algorithms/make_future.hpp
     hpx/execution/algorithms/schedule_from.hpp

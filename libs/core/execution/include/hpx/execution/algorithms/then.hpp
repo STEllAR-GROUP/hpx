@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,17 +12,21 @@
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/functional/detail/tag_priority_invoke.hpp>
+#include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <exception>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
     namespace detail {
+
         template <typename Receiver, typename F>
         struct then_receiver
         {
@@ -43,34 +48,23 @@ namespace hpx { namespace execution { namespace experimental {
 
         private:
             template <typename... Ts>
-            void set_value_helper(Ts&&... ts) noexcept
+            void set_value_helper(Ts&&... ts) && noexcept
             {
+                using result_type = hpx::util::invoke_result_t<F, Ts...>;
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        if constexpr (std::is_void_v<
-                                          hpx::util::invoke_result_t<F, Ts...>>)
-                        {
                         // Certain versions of GCC with optimizations fail on
-                        // the move with an internal compiler error.
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION < 100000)
+                        // the HPX_MOVE with an internal compiler error.
+                        if constexpr (std::is_void_v<result_type>)
+                        {
                             HPX_INVOKE(std::move(f), HPX_FORWARD(Ts, ts)...);
-#else
-                            HPX_INVOKE(HPX_MOVE(f), HPX_FORWARD(Ts, ts)...);
-#endif
                             hpx::execution::experimental::set_value(
                                 HPX_MOVE(receiver));
                         }
                         else
                         {
-                        // Certain versions of GCC with optimizations fail on
-                        // the move with an internal compiler error.
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION < 100000)
                             auto&& result = HPX_INVOKE(
                                 std::move(f), HPX_FORWARD(Ts, ts)...);
-#else
-                            auto&& result =
-                                HPX_INVOKE(HPX_MOVE(f), HPX_FORWARD(Ts, ts)...);
-#endif
                             hpx::execution::experimental::set_value(
                                 HPX_MOVE(receiver), HPX_MOVE(result));
                         }
@@ -81,14 +75,18 @@ namespace hpx { namespace execution { namespace experimental {
                     });
             }
 
+            // clang-format off
             template <typename... Ts,
-                typename = std::enable_if_t<hpx::is_invocable_v<F, Ts...>>>
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::is_invocable_v<F, Ts...>
+                )>
+            // clang-format on
             friend void tag_invoke(
                 set_value_t, then_receiver&& r, Ts&&... ts) noexcept
             {
                 // GCC 7 fails with an internal compiler error unless the actual
                 // body is in a helper function.
-                r.set_value_helper(HPX_FORWARD(Ts, ts)...);
+                HPX_MOVE(r).set_value_helper(HPX_FORWARD(Ts, ts)...);
             }
         };
 
@@ -98,43 +96,59 @@ namespace hpx { namespace execution { namespace experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
-            template <typename Tuple>
-            struct invoke_result_helper;
+            template <typename Pack, typename Enable = void>
+            struct generate_set_value_signature;
 
-            template <template <typename...> class Tuple, typename... Ts>
-            struct invoke_result_helper<Tuple<Ts...>>
+            template <template <typename...> typename Pack, typename... Ts>
+            struct generate_set_value_signature<Pack<Ts...>,
+                std::enable_if_t<hpx::is_invocable_v<F, Ts...>>>
             {
                 using result_type = hpx::util::invoke_result_t<F, Ts...>;
-                using type =
-                    std::conditional_t<std::is_void<result_type>::value,
-                        Tuple<>, Tuple<result_type>>;
+                using type = std::conditional_t<std::is_void_v<result_type>,
+                    Pack<>, Pack<result_type>>;
             };
 
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types =
-                hpx::util::detail::unique_t<hpx::util::detail::transform_t<
-                    typename hpx::execution::experimental::sender_traits<
-                        Sender>::template value_types<Tuple, Variant>,
-                    invoke_result_helper>>;
+            template <typename Pack>
+            using gen_value_signature = generate_set_value_signature<Pack>;
 
-            template <template <typename...> class Variant>
-            using error_types =
-                hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
-                    typename hpx::execution::experimental::sender_traits<
-                        Sender>::template error_types<Variant>,
-                    std::exception_ptr>>;
+            template <typename Env>
+            struct generate_completion_signatures
+            {
+                template <template <typename...> typename Tuple,
+                    template <typename...> typename Variant>
+                using value_types = hpx::util::detail::concat_inner_packs_t<
+                    hpx::util::detail::transform_t<
+                        value_types_of_t<Sender, Env, Tuple, Variant>,
+                        gen_value_signature>>;
 
-            static constexpr bool sends_done = false;
+                template <template <typename...> typename Variant>
+                using error_types = hpx::util::detail::unique_concat_t<
+                    error_types_of_t<Sender, Env, Variant>,
+                    Variant<std::exception_ptr>>;
 
+                static constexpr bool sends_stopped = false;
+            };
+
+            template <typename Env>
+            friend auto tag_invoke(get_completion_signatures_t,
+                then_sender const&, Env) -> generate_completion_signatures<Env>;
+
+            //using signatures = hpx::util::detail::concat_inner_packs_t<
+            //    hpx::util::detail::concat_t<hpx::tuple<
+            //        std::size_t, double, std::string>>>;
+
+            //using signatures = typename completion_signatures_of_t<Sender,
+            //    empty_env>::template value_types<gen_value_signature,
+            //    hpx::variant>;
+
+            // clang-format off
             template <typename CPO,
-                // clang-format off
                 HPX_CONCEPT_REQUIRES_(
-                    hpx::execution::experimental::detail::is_receiver_cpo_v<CPO> &&
-                    hpx::execution::experimental::detail::has_completion_scheduler_v<
-                        CPO, std::decay_t<Sender>>)
-                // clang-format on
-                >
+                    meta::value<meta::one_of<
+                        std::decay_t<CPO>, set_value_t, set_stopped_t>> &&
+                    detail::has_completion_scheduler_v<CPO, Sender>
+                )>
+            // clang-format on
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
                 then_sender const& sender)
@@ -154,19 +168,49 @@ namespace hpx { namespace execution { namespace experimental {
 
             template <typename Receiver>
             friend auto tag_invoke(
-                connect_t, then_sender& r, Receiver&& receiver)
+                connect_t, then_sender& s, Receiver&& receiver)
             {
-                return hpx::execution::experimental::connect(r.sender,
+                return hpx::execution::experimental::connect(s.sender,
                     then_receiver<Receiver, F>{
-                        HPX_FORWARD(Receiver, receiver), r.f});
+                        HPX_FORWARD(Receiver, receiver), s.f});
             }
         };
     }    // namespace detail
 
+    // execution::then is used to attach an invocable as a continuation for the
+    // successful completion of the input sender.
+    //
+    // then returns a sender describing the task graph described by the input
+    // sender, with an added node of invoking the provided function with the
+    // values sent by the input sender as arguments.
+    //
+    // execution::then is guaranteed to not begin executing the function before
+    // the returned sender is started.
     inline constexpr struct then_t final
-      : hpx::functional::detail::tag_fallback<then_t>
+      : hpx::functional::detail::tag_priority<then_t>
     {
     private:
+        // clang-format off
+        template <typename Sender, typename F,
+            HPX_CONCEPT_REQUIRES_(
+                is_sender_v<Sender> &&
+                experimental::detail::is_completion_scheduler_tag_invocable_v<
+                    hpx::execution::experimental::set_value_t,
+                    Sender, then_t, F
+                >
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
+            then_t, Sender&& sender, F&& f)
+        {
+            auto scheduler =
+                hpx::execution::experimental::get_completion_scheduler<
+                    hpx::execution::experimental::set_value_t>(sender);
+
+            return hpx::functional::tag_invoke(then_t{}, HPX_MOVE(scheduler),
+                HPX_FORWARD(Sender, sender), HPX_FORWARD(F, f));
+        }
+
         // clang-format off
         template <typename Sender, typename F,
             HPX_CONCEPT_REQUIRES_(
@@ -186,4 +230,4 @@ namespace hpx { namespace execution { namespace experimental {
             return detail::partial_algorithm<then_t, F>{HPX_FORWARD(F, f)};
         }
     } then{};
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

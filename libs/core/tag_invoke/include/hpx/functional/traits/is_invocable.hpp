@@ -11,12 +11,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/invoke.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <type_traits>
 #include <utility>
 
 namespace hpx {
+
     namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable = void>
@@ -28,8 +28,8 @@ namespace hpx {
 
         template <typename F, typename... Ts>
         struct is_invocable_impl<F(Ts...),
-            typename util::always_void<decltype(HPX_INVOKE(std::declval<F>(),
-                std::declval<Ts>()...))>::type> : std::true_type
+            std::void_t<decltype(HPX_INVOKE(
+                std::declval<F>(), std::declval<Ts>()...))>> : std::true_type
         {
         };
 
@@ -41,13 +41,13 @@ namespace hpx {
 
         template <typename F, typename... Ts, typename R>
         struct is_invocable_r_impl<F(Ts...), R,
-            typename util::always_void<decltype(
-                HPX_INVOKE(std::declval<F>(), std::declval<Ts>()...))>::type>
+            std::void_t<decltype(
+                HPX_INVOKE(std::declval<F>(), std::declval<Ts>()...))>>
           : std::integral_constant<bool,
-                std::is_void<R>::value ||
-                    std::is_convertible<decltype(HPX_INVOKE(std::declval<F>(),
-                                            std::declval<Ts>()...)),
-                        R>::value>
+                std::is_void_v<R> ||
+                    std::is_convertible_v<decltype(HPX_INVOKE(std::declval<F>(),
+                                              std::declval<Ts>()...)),
+                        R>>
         {
         };
     }    // namespace detail

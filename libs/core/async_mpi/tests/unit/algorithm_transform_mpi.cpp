@@ -19,6 +19,7 @@
 
 namespace ex = hpx::execution::experimental;
 namespace mpi = hpx::mpi::experimental;
+namespace tt = hpx::this_thread::experimental;
 
 // This overload is only used to check dispatching. It is not a useful
 // implementation.
@@ -56,7 +57,7 @@ int hpx_main()
                 }
                 auto s = mpi::transform_mpi(
                     ex::just(&data, count, datatype, 0, comm), MPI_Ibcast);
-                auto result = ex::sync_wait(HPX_MOVE(s));
+                auto result = tt::sync_wait(HPX_MOVE(s));
                 if (rank != 0)
                 {
                     HPX_TEST_EQ(data, 42);
@@ -81,7 +82,7 @@ int hpx_main()
                         return MPI_Ibcast(
                             data, count, datatype, i, comm, request);
                     });
-                auto result = ex::sync_wait(HPX_MOVE(s));
+                auto result = tt::sync_wait(HPX_MOVE(s));
                 if (rank != 0)
                 {
                     HPX_TEST_EQ(data, 42);
@@ -105,7 +106,7 @@ int hpx_main()
                         MPI_Comm comm, MPI_Request* request) {
                         MPI_Ibcast(data, count, datatype, i, comm, request);
                     });
-                ex::sync_wait(HPX_MOVE(s));
+                tt::sync_wait(HPX_MOVE(s));
                 if (rank != 0)
                 {
                     HPX_TEST_EQ(data, 42);
@@ -121,7 +122,7 @@ int hpx_main()
                     c.x = 3;
                 }
                 auto s = mpi::transform_mpi(c);
-                ex::sync_wait(s);
+                tt::sync_wait(s);
                 if (rank == 0)
                 {
                     HPX_TEST_EQ(c.x, 3);
@@ -138,7 +139,7 @@ int hpx_main()
                     data = 42;
                 }
                 auto result = ex::just(&data, count, datatype, 0, comm) |
-                    mpi::transform_mpi(MPI_Ibcast) | ex::sync_wait();
+                    mpi::transform_mpi(MPI_Ibcast) | tt::sync_wait();
                 if (rank != 0)
                 {
                     HPX_TEST_EQ(data, 42);
@@ -158,7 +159,7 @@ int hpx_main()
                     mpi::transform_mpi(
                         error_sender<int*, int, MPI_Datatype, int, MPI_Comm>{},
                         MPI_Ibcast) |
-                        ex::sync_wait();
+                        tt::sync_wait();
                     HPX_TEST(false);
                 }
                 catch (std::runtime_error const& e)
@@ -182,7 +183,7 @@ int hpx_main()
                     });
                 try
                 {
-                    ex::sync_wait(HPX_MOVE(s));
+                    tt::sync_wait(HPX_MOVE(s));
                 }
                 catch (std::runtime_error const& e)
                 {
@@ -204,7 +205,7 @@ int hpx_main()
                 {
                     mpi::transform_mpi(
                         ex::just(data, count, datatype, -1, comm), MPI_Ibcast) |
-                        ex::sync_wait();
+                        tt::sync_wait();
                     HPX_TEST(false);
                 }
                 catch (std::runtime_error const& e)
@@ -229,7 +230,7 @@ int hpx_main()
                 {
                     mpi::transform_mpi(
                         ex::just(data, count, datatype, -1, comm), MPI_Ibcast) |
-                        ex::sync_wait();
+                        tt::sync_wait();
                     HPX_TEST(false);
                 }
                 catch (std::runtime_error const&)

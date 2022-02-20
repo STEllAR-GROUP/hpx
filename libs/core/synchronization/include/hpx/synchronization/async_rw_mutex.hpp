@@ -10,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/datastructures/optional.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -424,14 +425,24 @@ namespace hpx { namespace experimental {
             using access_type =
                 detail::async_rw_mutex_access_wrapper<readwrite_type, read_type,
                     AccessType>;
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types = Variant<Tuple<access_type>>;
 
-            template <template <typename...> class Variant>
-            using error_types = Variant<std::exception_ptr>;
+            template <typename Env>
+            struct generate_completion_signatures
+            {
+                template <template <typename...> typename Tuple,
+                    template <typename...> typename Variant>
+                using value_types = Variant<Tuple<access_type>>;
 
-            static constexpr bool sends_done = false;
+                template <template <typename...> typename Variant>
+                using error_types = Variant<std::exception_ptr>;
+
+                static constexpr bool sends_stopped = false;
+            };
+
+            template <typename Env>
+            friend auto tag_invoke(
+                hpx::execution::experimental::get_completion_signatures_t,
+                sender const&, Env) -> generate_completion_signatures<Env>;
 
             template <typename R>
             struct operation_state
@@ -616,14 +627,24 @@ namespace hpx { namespace experimental {
             using access_type =
                 detail::async_rw_mutex_access_wrapper<readwrite_type, read_type,
                     AccessType>;
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types = Variant<Tuple<access_type>>;
 
-            template <template <typename...> class Variant>
-            using error_types = Variant<std::exception_ptr>;
+            template <typename Env>
+            struct generate_completion_signatures
+            {
+                template <template <typename...> typename Tuple,
+                    template <typename...> typename Variant>
+                using value_types = Variant<Tuple<access_type>>;
 
-            static constexpr bool sends_done = false;
+                template <template <typename...> typename Variant>
+                using error_types = Variant<std::exception_ptr>;
+
+                static constexpr bool sends_stopped = false;
+            };
+
+            template <typename Env>
+            friend auto tag_invoke(
+                hpx::execution::experimental::get_completion_signatures_t,
+                sender const&, Env) -> generate_completion_signatures<Env>;
 
             template <typename R>
             struct operation_state
