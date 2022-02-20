@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Taeguk Kwon
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -273,39 +273,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename RandIter,
-        typename Comp = detail::less, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<RandIter>::value &&
-            traits::is_projected<Proj, RandIter>::value &&
-            traits::is_indirect_callable<ExPolicy, Comp,
-                traits::projected<Proj, RandIter>,
-                traits::projected<Proj, RandIter>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::parallel::is_heap is deprecated, use hpx::is_heap instead")
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        is_heap(ExPolicy&& policy, RandIter first, RandIter last,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_random_access_iterator<RandIter>::value),
-            "Requires a random access iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::is_heap<RandIter>().call(HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // is_heap_until
     namespace detail {
@@ -422,42 +389,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename RandIter,
-        typename Comp = detail::less, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<RandIter>::value &&
-            traits::is_projected<Proj, RandIter>::value &&
-            traits::is_indirect_callable<ExPolicy, Comp,
-                traits::projected<Proj, RandIter>,
-                traits::projected<Proj, RandIter>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::is_heap_until is deprecated, use hpx::is_heap_until "
-        "instead")
-        typename util::detail::algorithm_result<ExPolicy, RandIter>::type
-        is_heap_until(ExPolicy&& policy, RandIter first, RandIter last,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_random_access_iterator<RandIter>::value),
-            "Requires a random access iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::is_heap_until<RandIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(Comp, comp),
-            HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 

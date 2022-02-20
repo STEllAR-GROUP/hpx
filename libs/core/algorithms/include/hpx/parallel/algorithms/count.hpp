@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -304,40 +304,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-        typename T, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            traits::is_projected<Proj, FwdIterB>::value &&
-            hpx::traits::is_iterator<FwdIterB>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::parallel::count is deprecated, use hpx::count instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIterB>::difference_type>::type
-        count(ExPolicy&& policy, FwdIterB first, FwdIterE last, T const& value,
-            Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIterB>::value),
-            "Required at least forward iterator.");
-
-        using difference_type =
-            typename std::iterator_traits<FwdIterB>::difference_type;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return hpx::parallel::v1::detail::count<difference_type>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, value,
-            HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // count_if
     namespace detail {
@@ -396,49 +362,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-        typename F, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIterB>::value &&
-            traits::is_projected<Proj, FwdIterB>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected<Proj, FwdIterB>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::parallel::count is deprecated, use hpx::count instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIterB>::difference_type>::type
-        count_if(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
-            Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIterB>::value),
-            "Required at least forward iterator.");
-
-        using difference_type =
-            typename std::iterator_traits<FwdIterB>::difference_type;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return hpx::parallel::v1::detail::count_if<difference_type>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-            HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::count
+    // CPO for hpx::count
     inline constexpr struct count_t final
       : hpx::detail::tag_parallel_algorithm<count_t>
     {
@@ -490,7 +419,7 @@ namespace hpx {
     } count{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::count_if
+    // CPO for hpx::count_if
     inline constexpr struct count_if_t final
       : hpx::detail::tag_parallel_algorithm<count_if_t>
     {

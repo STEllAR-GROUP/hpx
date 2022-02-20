@@ -178,29 +178,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value)>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::parallel::move is deprecated, use hpx::move instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<FwdIter1, FwdIter2>>::type
-        move(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
-    {
-        return detail::transfer<detail::move<FwdIter1, FwdIter2>>(
-            HPX_FORWARD(ExPolicy, policy), first, last, dest);
-    }
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::move
+    // CPO for hpx::move
     inline constexpr struct move_t final
       : hpx::detail::tag_parallel_algorithm<move_t>
     {

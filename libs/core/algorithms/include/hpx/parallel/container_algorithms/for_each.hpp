@@ -389,30 +389,8 @@ namespace hpx { namespace ranges {
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-            hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
-                hpx::parallel::traits::projected_range<Proj, Rng>>::value)>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::for_each is deprecated, use "
-        "hpx::ranges::for_each instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_iterator<Rng>::type>::type
-        for_each(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
-    {
-        return for_each(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            hpx::util::end(rng), HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
-    }
-}}}    // namespace hpx::parallel::v1
-
 namespace hpx { namespace ranges {
+
     template <typename I, typename F>
     using for_each_result = in_fun_result<I, F>;
 
@@ -420,7 +398,7 @@ namespace hpx { namespace ranges {
     using for_each_n_result = in_fun_result<I, F>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::for_each
+    // CPO for hpx::ranges::for_each
     inline constexpr struct for_each_t final
       : hpx::detail::tag_parallel_algorithm<for_each_t>
     {
@@ -529,7 +507,7 @@ namespace hpx { namespace ranges {
     } for_each{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::for_each_n
+    // CPO for hpx::ranges::for_each_n
     inline constexpr struct for_each_n_t final
       : hpx::detail::tag_parallel_algorithm<for_each_n_t>
     {

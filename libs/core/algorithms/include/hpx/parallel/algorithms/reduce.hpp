@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -289,101 +289,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-        typename T, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::reduce is deprecated, use hpx::ranges::reduce "
-        "instead") typename util::detail::algorithm_result<ExPolicy, T>::type
-        reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIterB>::value,
-            "Requires at least forward iterator.");
-
-        static_assert(hpx::traits::is_forward_iterator<FwdIterE>::value,
-            "Requires at least forward iterator.");
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::reduce<T>().call(HPX_FORWARD(ExPolicy, policy), first,
-            last, HPX_MOVE(init), HPX_FORWARD(F, f));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-        typename T,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::reduce is deprecated, use hpx::ranges::reduce instead")
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-        reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIterB>::value,
-            "Requires at least forward iterator.");
-
-        static_assert(hpx::traits::is_forward_iterator<FwdIterE>::value,
-            "Requires at least forward iterator.");
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::reduce<T>().call(HPX_FORWARD(ExPolicy, policy), first,
-            last, HPX_MOVE(init), std::plus<T>());
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::reduce is deprecated, use hpx::ranges::reduce instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIterB>::value_type>::type
-        reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIterB>::value,
-            "Requires at least forward iterator.");
-
-        static_assert(hpx::traits::is_forward_iterator<FwdIterE>::value,
-            "Requires at least forward iterator.");
-
-        using value_type = typename std::iterator_traits<FwdIterB>::value_type;
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::reduce<value_type>().call(HPX_FORWARD(ExPolicy, policy),
-            first, last, value_type{}, std::plus<value_type>());
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::reduce
+    // CPO for hpx::reduce
     inline constexpr struct reduce_t final
       : hpx::detail::tag_parallel_algorithm<reduce_t>
     {

@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2017-2020 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -196,32 +196,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::generate is deprecated, use hpx::generate instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        generate(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-            "Required at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::generate<FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // generate_n
     namespace detail {
@@ -264,44 +238,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename Size, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::generate_n is deprecated, use hpx::generate_n instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        generate_n(ExPolicy&& policy, FwdIter first, Size count, F&& f)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-            "Required at least forward iterator.");
-
-        if (detail::is_negative(count))
-        {
-            return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                HPX_MOVE(first));
-        }
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::generate_n<FwdIter>().call(HPX_FORWARD(ExPolicy, policy),
-            first, std::size_t(count), HPX_FORWARD(F, f));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::generate
+    // CPO for hpx::generate
     inline constexpr struct generate_t final
       : hpx::detail::tag_parallel_algorithm<generate_t>
     {
@@ -343,7 +285,7 @@ namespace hpx {
     } generate{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::generate_n
+    // CPO for hpx::generate_n
     inline constexpr struct generate_n_t final
       : hpx::detail::tag_parallel_algorithm<generate_n_t>
     {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -200,32 +200,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::parallel::destroy is deprecated, use hpx::destroy instead")
-        typename util::detail::algorithm_result<ExPolicy>::type
-        destroy(ExPolicy&& policy, FwdIter first, FwdIter last)
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Required at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::destroy<FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last);
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // destroy_n
     namespace detail {
@@ -271,45 +245,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename Size,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::destroy_n is deprecated, use hpx::destroy_n instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        destroy_n(ExPolicy&& policy, FwdIter first, Size count)
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        // if count is representing a negative value, we do nothing
-        if (detail::is_negative(count))
-        {
-            return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                HPX_MOVE(first));
-        }
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::destroy_n<FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, std::size_t(count));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::destroy
+    // CPO for hpx::destroy
     inline constexpr struct destroy_t final
       : hpx::detail::tag_parallel_algorithm<destroy_t>
     {
@@ -351,7 +292,7 @@ namespace hpx {
     } destroy{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::destroy_n
+    // CPO for hpx::destroy_n
     inline constexpr struct destroy_n_t final
       : hpx::detail::tag_parallel_algorithm<destroy_n_t>
     {

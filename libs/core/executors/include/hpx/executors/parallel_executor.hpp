@@ -383,18 +383,6 @@ namespace hpx { namespace execution {
 }}    // namespace hpx::execution
 
 namespace hpx { namespace parallel { namespace execution {
-    using parallel_executor HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_executor is deprecated. Use "
-        "hpx::execution::parallel_executor instead.") =
-        hpx::execution::parallel_executor;
-    template <typename Policy>
-    using parallel_policy_executor HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_policy_executor is deprecated. Use "
-        "hpx::execution::parallel_policy_executor instead.") =
-        hpx::execution::parallel_policy_executor<Policy>;
-}}}    // namespace hpx::parallel::execution
-
-namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <typename Policy>
     struct is_one_way_executor<hpx::execution::parallel_policy_executor<Policy>>

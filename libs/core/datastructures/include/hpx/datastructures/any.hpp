@@ -58,12 +58,6 @@ namespace hpx {
     };
 }    // namespace hpx
 
-namespace hpx { namespace util {
-    using bad_any_cast HPX_DEPRECATED_V(1, 6,
-        "hpx::util::bad_any_cast is deprecated. Use hpx::bad_any_cast "
-        "instead.") = hpx::bad_any_cast;
-}}    // namespace hpx::util
-
 namespace hpx { namespace util { namespace detail { namespace any {
 
     ////////////////////////////////////////////////////////////////////////
@@ -1578,29 +1572,9 @@ namespace hpx {
 }    // namespace hpx
 
 namespace hpx { namespace util {
+
     ////////////////////////////////////////////////////////////////////////////
     // make copyable any
-    template <typename T, typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::make_any_nonser is deprecated. Please use "
-        "hpx::make_any_nonser instead.")
-    basic_any<void, void, void, std::true_type> make_any_nonser(Ts&&... ts)
-    {
-        return basic_any<void, void, void, std::true_type>(
-            std::in_place_type<T>, HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <typename T, typename U, typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::make_any_nonser is deprecated. Please use "
-        "hpx::make_any_nonser instead.")
-    basic_any<void, void, void, std::true_type> make_any_nonser(
-        std::initializer_list<U> il, Ts&&... ts)
-    {
-        return basic_any<void, void, void, std::true_type>(
-            std::in_place_type<T>, il, HPX_FORWARD(Ts, ts)...);
-    }
-
     template <typename T, typename Char, typename... Ts>
     basic_any<void, void, Char, std::true_type> make_streamable_any_nonser(
         Ts&&... ts)
@@ -1619,28 +1593,6 @@ namespace hpx { namespace util {
 
     ////////////////////////////////////////////////////////////////////////////
     // make unique_any
-    template <typename T, typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::make_unique_any_nonser is deprecated. Please use "
-        "hpx::make_unique_any_nonser instead.")
-    basic_any<void, void, void, std::false_type> make_unique_any_nonser(
-        Ts&&... ts)
-    {
-        return basic_any<void, void, void, std::false_type>(
-            std::in_place_type<T>, HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <typename T, typename U, typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::make_unique_any_nonser is deprecated. Please use "
-        "hpx::make_unique_any_nonser instead.")
-    basic_any<void, void, void, std::false_type> make_unique_any_nonser(
-        std::initializer_list<U> il, Ts&&... ts)
-    {
-        return basic_any<void, void, void, std::false_type>(
-            std::in_place_type<T>, il, HPX_FORWARD(Ts, ts)...);
-    }
-
     template <typename T, typename Char, typename... Ts>
     basic_any<void, void, Char, std::false_type>
     make_streamable_unique_any_nonser(Ts&&... ts)
@@ -1658,30 +1610,11 @@ namespace hpx { namespace util {
     }
 
     // make copyable any
-    template <typename T>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::make_any_nonser is deprecated. Please use "
-        "hpx::make_any_nonser instead.")
-    basic_any<void, void, void, std::true_type> make_any_nonser(T&& t)
-    {
-        return basic_any<void, void, void, std::true_type>(HPX_FORWARD(T, t));
-    }
-
     template <typename T, typename Char>
     basic_any<void, void, Char, std::true_type> make_streamable_any_nonser(
         T&& t)
     {
         return basic_any<void, void, Char, std::true_type>(HPX_FORWARD(T, t));
-    }
-
-    // make unique_any
-    template <typename T>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::make_unique_any_nonser is deprecated. Please use "
-        "hpx::make_unique_any_nonser instead.")
-    basic_any<void, void, void, std::false_type> make_unique_any_nonser(T&& t)
-    {
-        return basic_any<void, void, void, std::false_type>(HPX_FORWARD(T, t));
     }
 
     template <typename T, typename Char>
@@ -1693,21 +1626,12 @@ namespace hpx { namespace util {
 
     ////////////////////////////////////////////////////////////////////////////
     // better names for copyable any
-    using any_nonser HPX_DEPRECATED_V(1, 6,
-        "hpx::util::any_nonser is deprecated. Please use hpx::any_nonser "
-        "instead.") = basic_any<void, void, void, std::true_type>;
-
     using streamable_any_nonser = basic_any<void, void, char, std::true_type>;
     using streamable_wany_nonser =
         basic_any<void, void, wchar_t, std::true_type>;
 
     ////////////////////////////////////////////////////////////////////////////
     // better names for unique_any
-    using unique_any_nonser HPX_DEPRECATED_V(1, 6,
-        "hpx::util::unique_any_nonser is deprecated. Please use "
-        "hpx::unique_any_nonser instead.") =
-        basic_any<void, void, void, std::false_type>;
-
     using streamable_unique_any_nonser =
         basic_any<void, void, char, std::false_type>;
     using streamable_unique_wany_nonser =

@@ -139,13 +139,6 @@ namespace hpx { namespace execution {
 }}    // namespace hpx::execution
 
 namespace hpx { namespace parallel { namespace execution {
-    using sequenced_executor HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::sequenced_executor is deprecated. Use "
-        "hpx::execution::sequenced_executor instead.") =
-        hpx::execution::sequenced_executor;
-}}}    // namespace hpx::parallel::execution
-
-namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <>
     struct is_one_way_executor<hpx::execution::sequenced_executor>

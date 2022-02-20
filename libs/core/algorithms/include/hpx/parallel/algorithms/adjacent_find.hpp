@@ -1,5 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -220,27 +221,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    template <typename ExPolicy, typename FwdIter,
-        typename Pred = detail::equal_to>
-    HPX_DEPRECATED_V(1, 6, "Please use hpx::adjacent_find instead.")
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type>::type
-        adjacent_find(ExPolicy&& policy, FwdIter first, FwdIter last,
-            Pred&& pred = Pred())
-    {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::adjacent_find<FwdIter, FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(Pred, pred),
-            hpx::parallel::util::projection_identity{});
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
     inline constexpr struct adjacent_find_t final

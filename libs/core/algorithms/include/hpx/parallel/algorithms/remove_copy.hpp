@@ -1,5 +1,6 @@
 //  Copyright (c) 2015 Daniel Bourgeois
 //  Copyright (c) 2021 Giannis Gonidelis
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -328,36 +329,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_iterator<FwdIter1>::value&&
-            hpx::traits::is_iterator<FwdIter2>::value&&
-            traits::is_projected<Proj,FwdIter1>::value&&
-            traits::is_indirect_callable<ExPolicy,
-                std::equal_to<T>, traits::projected<Proj, FwdIter1>,
-                traits::projected<Proj, T const*>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::remove_if is deprecated, use hpx::remove_if instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<FwdIter1, FwdIter2>>::type
-        remove_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, T const& val, Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least forward iterator.");
-
-        return detail::remove_copy<util::in_out_result<FwdIter1, FwdIter2>>()
-            .call(HPX_FORWARD(ExPolicy, policy), first, last, dest, val,
-                HPX_FORWARD(Proj, proj));
-    }
-
     /////////////////////////////////////////////////////////////////////////////
     // remove_copy_if
     namespace detail {
@@ -417,40 +388,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename F, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_iterator<FwdIter1>::value&&
-            traits::is_projected<Proj, FwdIter1>::value&&
-                traits::is_indirect_callable<ExPolicy, F,
-                    traits::projected<Proj, FwdIter1>>::value&&
-            hpx::traits::is_iterator<FwdIter2>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::remove_if is deprecated, use hpx::remove_if instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<FwdIter1, FwdIter2>>::type
-        remove_copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, F&& f, Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least forward iterator.");
-
-        return detail::remove_copy_if<util::in_out_result<FwdIter1, FwdIter2>>()
-            .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::remove_copy_if
+    // CPO for hpx::remove_copy_if
     inline constexpr struct remove_copy_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_copy_if_t>
     {
@@ -515,7 +457,7 @@ namespace hpx {
     } remove_copy_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::remove_copy
+    // CPO for hpx::remove_copy
     inline constexpr struct remove_copy_t final
       : hpx::detail::tag_parallel_algorithm<remove_copy_t>
     {
