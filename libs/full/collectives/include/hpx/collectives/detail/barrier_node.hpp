@@ -75,8 +75,7 @@ namespace hpx { namespace distributed { namespace detail {
         hpx::lcos::local::promise<void> broadcast_promise_;
         hpx::barrier<> local_barrier_;
 
-        template <typename This>
-        hpx::future<void> do_wait(This this_, hpx::future<void> future);
+        hpx::future<void> do_wait(hpx::future<void> future);
 
         template <typename>
         friend struct components::detail_adl_barrier::init;
