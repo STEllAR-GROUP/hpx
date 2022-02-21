@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -101,13 +101,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             return hpx::make_ready_future();
         }
 
-        static type get(hpx::future<void>&& t)
+        static type get(hpx::future<void>&& t) noexcept
         {
             return HPX_MOVE(t);
         }
 
         template <typename T>
-        static type get(hpx::future<T>&& t)
+        static type get(hpx::future<T>&& t) noexcept
         {
             return hpx::future<void>(HPX_MOVE(t));
         }
@@ -125,7 +125,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             return hpx::make_ready_future(HPX_MOVE(t));
         }
 
-        static type get(hpx::future<T>&& t)
+        static type get(hpx::future<T>&& t) noexcept
         {
             return HPX_MOVE(t);
         }
@@ -148,13 +148,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             return hpx::make_ready_future();
         }
 
-        static type get(hpx::future<void>&& t)
+        static type get(hpx::future<void>&& t) noexcept
         {
             return HPX_MOVE(t);
         }
 
         template <typename T>
-        static type get(hpx::future<T>&& t)
+        static type get(hpx::future<T>&& t) noexcept
         {
             return hpx::future<void>(HPX_MOVE(t));
         }

@@ -18,8 +18,8 @@
 
 namespace hpx::execution {
 
-    ///Control number of cores in executors which need a functionality
-    ///for setting the number of cores to be used by an algorithm directly
+    /// Control number of cores in executors which need a functionality
+    /// for setting the number of cores to be used by an algorithm directly
     ///
     struct num_cores
     {

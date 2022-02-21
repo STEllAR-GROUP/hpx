@@ -307,7 +307,7 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename T>
     struct future_value<T&> : future_data_result<T&>
     {
-        HPX_FORCEINLINE static T& get(T* u)
+        HPX_FORCEINLINE static T& get(T* u) noexcept
         {
             return *u;
         }
@@ -322,9 +322,9 @@ namespace hpx { namespace lcos { namespace detail {
     template <>
     struct future_value<void> : future_data_result<void>
     {
-        HPX_FORCEINLINE static void get(hpx::util::unused_type) {}
+        HPX_FORCEINLINE static void get(hpx::util::unused_type) noexcept {}
 
-        static void get_default() {}
+        static void get_default() noexcept {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -446,7 +446,7 @@ namespace hpx { namespace lcos { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     inline traits::detail::shared_state_ptr_t<void> downcast_to_void(
-        Future& future, bool addref)
+        Future& future, bool addref) noexcept
     {
         using shared_state_type = traits::detail::shared_state_ptr_t<void>;
         using element_type = typename shared_state_type::element_type;
@@ -934,7 +934,7 @@ namespace hpx {
         template <typename T>
         future(future<T>&& other,
             std::enable_if_t<std::is_void_v<R> && !traits::is_future_v<T>, T>* =
-                nullptr)
+                nullptr) noexcept
           : base_type(other.valid() ?
                     lcos::detail::downcast_to_void(other, false) :
                     nullptr)

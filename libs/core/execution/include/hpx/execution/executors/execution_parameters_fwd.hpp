@@ -198,6 +198,13 @@ namespace hpx { namespace parallel { namespace execution {
         }
     } processing_units_count{};
 
+    /// Generate a policy that supports setting the number of cores for
+    /// execution.
+    inline constexpr struct with_processing_units_count_t final
+      : hpx::functional::detail::tag_fallback<with_processing_units_count_t>
+    {
+    } with_processing_units_count{};
+
     /// Mark the begin of a parallel algorithm execution
     ///
     /// \param params [in] The executor parameters object to use as a

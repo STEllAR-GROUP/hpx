@@ -45,8 +45,8 @@ namespace hpx { namespace execution { namespace experimental {
             HPX_CORE_EXPORT explicit on_exit(task_group& tg);
             HPX_CORE_EXPORT ~on_exit();
 
-            HPX_CORE_EXPORT on_exit(on_exit const& rhs) = delete;
-            HPX_CORE_EXPORT on_exit& operator=(on_exit const& rhs) = delete;
+            on_exit(on_exit const& rhs) = delete;
+            on_exit& operator=(on_exit const& rhs) = delete;
 
             HPX_CORE_EXPORT on_exit(on_exit&& rhs) noexcept;
             HPX_CORE_EXPORT on_exit& operator=(on_exit&& rhs) noexcept;

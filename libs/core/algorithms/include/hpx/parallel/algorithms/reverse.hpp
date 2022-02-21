@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -185,6 +185,7 @@ namespace hpx {
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
@@ -207,7 +208,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Iter>
         struct reverse : public detail::algorithm<reverse<Iter>, Iter>
         {
-            reverse()
+            constexpr reverse() noexcept
               : reverse::algorithm("reverse")
             {
             }
@@ -216,8 +217,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             constexpr static BidirIter sequential(
                 ExPolicy, BidirIter first, Sent last)
             {
-                auto last2{hpx::ranges::next(first, last)};
-                for (auto tail{last2}; !(first == tail || first == --tail);
+                auto last2 = detail::advance_to_sentinel(first, last);
+                for (auto tail = last2; !(first == tail || first == --tail);
                      ++first)
                 {
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
@@ -234,18 +235,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 BidirIter>::type
             parallel(ExPolicy&& policy, BidirIter first, Sent last)
             {
-                auto last2{hpx::ranges::next(first, last)};
-                typedef std::reverse_iterator<BidirIter> destination_iterator;
-                typedef hpx::util::zip_iterator<BidirIter, destination_iterator>
-                    zip_iterator;
-                typedef typename zip_iterator::reference reference;
+                using destination_iterator = std::reverse_iterator<BidirIter>;
+                using zip_iterator =
+                    hpx::util::zip_iterator<BidirIter, destination_iterator>;
+                using reference = typename zip_iterator::reference;
+
+                auto last2 = first;
+                auto size = detail::advance_and_get_distance(last2, last);
 
                 return util::detail::convert_to_result(
                     for_each_n<zip_iterator>().call(
                         HPX_FORWARD(ExPolicy, policy),
                         hpx::util::make_zip_iterator(
                             first, destination_iterator(last2)),
-                        detail::distance(first, last2) / 2,
+                        size / 2,
                         [](reference t) -> void {
                             using hpx::get;
                             std::swap(get<0>(t), get<1>(t));
