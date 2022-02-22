@@ -17,7 +17,10 @@ information on how to build and use |hpx| in different scenarios.
 .. toctree::
    :maxdepth: 2
 
+   manual/prerequisites
+   manual/getting_hpx
    manual/building_hpx
+   manual/cmake_variables
    manual/creating_hpx_projects
    manual/starting_the_hpx_runtime
    manual/launching_and_configuring_hpx_applications
