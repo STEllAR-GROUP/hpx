@@ -36,13 +36,12 @@ namespace hpx { namespace detail {
     template <typename Action, typename... Ts>
     struct async_colocated_bound_action<Action, hpx::tuple<Ts...>>
     {
-        typedef hpx::util::detail::bound_action<Action,
+        using type = hpx::detail::bound_action<Action,
             hpx::util::make_index_pack<1 + sizeof...(Ts)>,
-            hpx::util::detail::bound<hpx::util::functional::extract_locality,
-                hpx::util::index_pack<0, 1>,
-                hpx::util::detail::placeholder<2ul>, hpx::id_type>,
-            Ts...>
-            type;
+            hpx::detail::bound<hpx::util::functional::extract_locality,
+                hpx::util::index_pack<0, 1>, hpx::detail::placeholder<2ul>,
+                hpx::id_type>,
+            Ts...>;
     };
 }}    // namespace hpx::detail
 
@@ -83,14 +82,14 @@ namespace hpx { namespace detail {
             naming::id_type::unmanaged);
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        typedef typename hpx::traits::extract_action<Action>::remote_result_type
-            remote_result_type;
-        typedef agas::server::primary_namespace::colocate_action action_type;
+        using remote_result_type =
+            typename hpx::traits::extract_action<Action>::remote_result_type;
+        using action_type = agas::server::primary_namespace::colocate_action;
 
-        using util::placeholders::_2;
+        using placeholders::_2;
         return detail::async_continue_r<action_type, remote_result_type>(
-            util::functional::async_continuation(util::bind<Action>(
-                util::bind(util::functional::extract_locality(), _2, gid),
+            util::functional::async_continuation(hpx::bind<Action>(
+                hpx::bind(util::functional::extract_locality(), _2, gid),
                 HPX_FORWARD(Ts, vs)...)),
             service_target, gid.get_gid());
 #else
@@ -105,8 +104,7 @@ namespace hpx { namespace detail {
     hpx::future<typename traits::promise_local_result<typename hpx::traits::
             extract_action<Derived>::remote_result_type>::type>
     async_colocated(
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-        ,
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& gid, Ts&&... vs)
     {
         return async_colocated<Derived>(gid, HPX_FORWARD(Ts, vs)...);
@@ -114,9 +112,9 @@ namespace hpx { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Continuation, typename... Ts>
-    typename std::enable_if<traits::is_continuation<Continuation>::value,
-        hpx::future<typename traits::promise_local_result<typename hpx::traits::
-                extract_action<Action>::remote_result_type>::type>>::type
+    std::enable_if_t<traits::is_continuation_v<Continuation>,
+        hpx::future<traits::promise_local_result_t<
+            typename hpx::traits::extract_action<Action>::remote_result_type>>>
     async_colocated(Continuation&& cont, naming::id_type const& gid,
         Ts&&...
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -135,15 +133,15 @@ namespace hpx { namespace detail {
             agas::primary_namespace::get_service_instance(gid.get_gid()),
             naming::id_type::unmanaged);
 
-        typedef typename hpx::traits::extract_action<Action>::remote_result_type
-            remote_result_type;
-        typedef agas::server::primary_namespace::colocate_action action_type;
+        using remote_result_type =
+            typename hpx::traits::extract_action<Action>::remote_result_type;
+        using action_type = agas::server::primary_namespace::colocate_action;
 
-        using util::placeholders::_2;
+        using placeholders::_2;
         return detail::async_continue_r<action_type, remote_result_type>(
             util::functional::async_continuation(
-                util::bind<Action>(
-                    util::bind(util::functional::extract_locality(), _2, gid),
+                hpx::bind<Action>(
+                    hpx::bind(util::functional::extract_locality(), _2, gid),
                     HPX_FORWARD(Ts, vs)...),
                 HPX_FORWARD(Continuation, cont)),
             service_target, gid.get_gid());
@@ -152,12 +150,11 @@ namespace hpx { namespace detail {
 
     template <typename Continuation, typename Component, typename Signature,
         typename Derived, typename... Ts>
-    typename std::enable_if<traits::is_continuation<Continuation>::value,
-        hpx::future<typename traits::promise_local_result<typename hpx::traits::
-                extract_action<Derived>::remote_result_type>::type>>::type
+    std::enable_if_t<traits::is_continuation_v<Continuation>,
+        hpx::future<traits::promise_local_result_t<
+            typename hpx::traits::extract_action<Derived>::remote_result_type>>>
     async_colocated(Continuation&& cont,
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-        ,
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& gid, Ts&&... vs)
     {
         return async_colocated<Derived>(

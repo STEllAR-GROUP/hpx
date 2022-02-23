@@ -390,10 +390,10 @@ Constants
 The following constants are also available in ``hpx::placeholders``, not the
 top-level ``hpx`` namespace.
 
-- :cpp:var:`hpx::util::placeholders::_1`
-- :cpp:var:`hpx::util::placeholders::_2`
+- :cpp:var:`hpx::placeholders::_1`
+- :cpp:var:`hpx::placeholders::_2`
 - ...
-- :cpp:var:`hpx::util::placeholders::_9`
+- :cpp:var:`hpx::placeholders::_9`
 
 Classes
 -------
@@ -401,17 +401,17 @@ Classes
 - :cpp:class:`hpx::function`
 - :cpp:class:`hpx::function_ref`
 - :cpp:class:`hpx::move_only_function`
-- :cpp:struct:`hpx::traits::is_bind_expression`
-- :cpp:struct:`hpx::traits::is_placeholder`
+- :cpp:struct:`hpx::is_bind_expression`
+- :cpp:struct:`hpx::is_placeholder`
 - :cpp:struct:`hpx::scoped_annotation`
 
 Functions
 ---------
 
 - :cpp:func:`hpx::annotated_function`
-- :cpp:func:`hpx::util::bind`
-- :cpp:func:`hpx::util::bind_back`
-- :cpp:func:`hpx::util::bind_front`
+- :cpp:func:`hpx::bind`
+- :cpp:func:`hpx::bind_back`
+- :cpp:func:`hpx::bind_front`
 - :cpp:func:`hpx::util::invoke`
 - :cpp:func:`hpx::util::invoke_fused`
 - :cpp:func:`hpx::util::mem_fn`

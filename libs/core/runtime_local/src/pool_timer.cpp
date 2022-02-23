@@ -147,7 +147,7 @@ namespace hpx { namespace util { namespace detail {
 
             HPX_ASSERT(timer_ != nullptr);
             timer_->expires_from_now(time_duration.value());
-            timer_->async_wait(util::bind_front(
+            timer_->async_wait(hpx::bind_front(
                 &pool_timer::timer_handler, this->shared_from_this()));
 
             return true;

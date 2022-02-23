@@ -54,7 +54,7 @@ namespace hpx { namespace actions { namespace detail {
                 "unknown action type");
             return nullptr;
         }
-        return util::bind_front(f, name);
+        return hpx::bind_front(f, name);
     }
 }}}    // namespace hpx::actions::detail
 

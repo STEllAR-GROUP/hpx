@@ -118,7 +118,7 @@ namespace hpx { namespace components { namespace server {
             return hpx::async<action_type>(
                 target_storage, HPX_MOVE(data), to_migrate, addr)
                 .then(
-                    util::bind_back(&migrate_to_storage_here_cleanup<Component>,
+                    hpx::bind_back(&migrate_to_storage_here_cleanup<Component>,
                         ptr, to_migrate));
 #else
             HPX_ASSERT(false);

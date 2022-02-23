@@ -65,8 +65,8 @@ namespace hpx { namespace iostreams { namespace server {
         // enough.
         hpx::id_type this_id = this->get_id();
         hpx::get_thread_pool("io_pool")->get_io_service().post(
-            util::bind_front(&output_stream::call_write_async, this,
-                locality_id, count, HPX_MOVE(in), HPX_MOVE(this_id)));
+            hpx::bind_front(&output_stream::call_write_async, this, locality_id,
+                count, HPX_MOVE(in), HPX_MOVE(this_id)));
     }    // }}}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ namespace hpx { namespace iostreams { namespace server {
     {    // {{{
         // Perform the IO in another OS thread.
         detail::buffer in(buf_in);
-        hpx::get_thread_pool("io_pool")->get_io_service().post(util::bind_front(
+        hpx::get_thread_pool("io_pool")->get_io_service().post(hpx::bind_front(
             &output_stream::call_write_sync, this, locality_id, count,
             std::ref(in), threads::thread_id_ref_type(threads::get_self_id())));
 

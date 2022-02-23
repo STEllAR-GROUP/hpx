@@ -22,7 +22,7 @@
 
 #include <hpx/functional/bind.hpp>
 
-namespace placeholders = hpx::util::placeholders;
+namespace placeholders = hpx::placeholders;
 
 #include <functional>
 #include <iostream>
@@ -144,41 +144,36 @@ void function_test()
 {
     int const i = 1;
 
-    HPX_TEST(hpx::util::bind(f_0)(i) == 17041L);
-    HPX_TEST(hpx::util::bind(f_1, placeholders::_1)(i) == 1L);
-    HPX_TEST(hpx::util::bind(f_2, placeholders::_1, 2)(i) == 21L);
-    HPX_TEST(hpx::util::bind(f_3, placeholders::_1, 2, 3)(i) == 321L);
-    HPX_TEST(hpx::util::bind(f_4, placeholders::_1, 2, 3, 4)(i) == 4321L);
-    HPX_TEST(hpx::util::bind(f_5, placeholders::_1, 2, 3, 4, 5)(i) == 54321L);
+    HPX_TEST(hpx::bind(f_0)(i) == 17041L);
+    HPX_TEST(hpx::bind(f_1, placeholders::_1)(i) == 1L);
+    HPX_TEST(hpx::bind(f_2, placeholders::_1, 2)(i) == 21L);
+    HPX_TEST(hpx::bind(f_3, placeholders::_1, 2, 3)(i) == 321L);
+    HPX_TEST(hpx::bind(f_4, placeholders::_1, 2, 3, 4)(i) == 4321L);
+    HPX_TEST(hpx::bind(f_5, placeholders::_1, 2, 3, 4, 5)(i) == 54321L);
+    HPX_TEST(hpx::bind(f_6, placeholders::_1, 2, 3, 4, 5, 6)(i) == 654321L);
+    HPX_TEST(hpx::bind(f_7, placeholders::_1, 2, 3, 4, 5, 6, 7)(i) == 7654321L);
     HPX_TEST(
-        hpx::util::bind(f_6, placeholders::_1, 2, 3, 4, 5, 6)(i) == 654321L);
-    HPX_TEST(hpx::util::bind(f_7, placeholders::_1, 2, 3, 4, 5, 6, 7)(i) ==
-        7654321L);
-    HPX_TEST(hpx::util::bind(f_8, placeholders::_1, 2, 3, 4, 5, 6, 7, 8)(i) ==
-        87654321L);
-    HPX_TEST(hpx::util::bind(f_9, placeholders::_1, 2, 3, 4, 5, 6, 7, 8, 9)(
-                 i) == 987654321L);
+        hpx::bind(f_8, placeholders::_1, 2, 3, 4, 5, 6, 7, 8)(i) == 87654321L);
+    HPX_TEST(hpx::bind(f_9, placeholders::_1, 2, 3, 4, 5, 6, 7, 8, 9)(i) ==
+        987654321L);
 
-    HPX_TEST((hpx::util::bind(fv_0)(i), (global_result == 17041L)));
+    HPX_TEST((hpx::bind(fv_0)(i), (global_result == 17041L)));
+    HPX_TEST((hpx::bind(fv_1, placeholders::_1)(i), (global_result == 1L)));
+    HPX_TEST((hpx::bind(fv_2, placeholders::_1, 2)(i), (global_result == 21L)));
     HPX_TEST(
-        (hpx::util::bind(fv_1, placeholders::_1)(i), (global_result == 1L)));
-    HPX_TEST((
-        hpx::util::bind(fv_2, placeholders::_1, 2)(i), (global_result == 21L)));
-    HPX_TEST((hpx::util::bind(fv_3, placeholders::_1, 2, 3)(i),
-        (global_result == 321L)));
-    HPX_TEST((hpx::util::bind(fv_4, placeholders::_1, 2, 3, 4)(i),
+        (hpx::bind(fv_3, placeholders::_1, 2, 3)(i), (global_result == 321L)));
+    HPX_TEST((hpx::bind(fv_4, placeholders::_1, 2, 3, 4)(i),
         (global_result == 4321L)));
-    HPX_TEST((hpx::util::bind(fv_5, placeholders::_1, 2, 3, 4, 5)(i),
+    HPX_TEST((hpx::bind(fv_5, placeholders::_1, 2, 3, 4, 5)(i),
         (global_result == 54321L)));
-    HPX_TEST((hpx::util::bind(fv_6, placeholders::_1, 2, 3, 4, 5, 6)(i),
+    HPX_TEST((hpx::bind(fv_6, placeholders::_1, 2, 3, 4, 5, 6)(i),
         (global_result == 654321L)));
-    HPX_TEST((hpx::util::bind(fv_7, placeholders::_1, 2, 3, 4, 5, 6, 7)(i),
+    HPX_TEST((hpx::bind(fv_7, placeholders::_1, 2, 3, 4, 5, 6, 7)(i),
         (global_result == 7654321L)));
-    HPX_TEST((hpx::util::bind(fv_8, placeholders::_1, 2, 3, 4, 5, 6, 7, 8)(i),
+    HPX_TEST((hpx::bind(fv_8, placeholders::_1, 2, 3, 4, 5, 6, 7, 8)(i),
         (global_result == 87654321L)));
-    HPX_TEST(
-        (hpx::util::bind(fv_9, placeholders::_1, 2, 3, 4, 5, 6, 7, 8, 9)(i),
-            (global_result == 987654321L)));
+    HPX_TEST((hpx::bind(fv_9, placeholders::_1, 2, 3, 4, 5, 6, 7, 8, 9)(i),
+        (global_result == 987654321L)));
 }
 
 //
@@ -211,16 +206,16 @@ void function_object_test()
 
     int const k = 3;
 
-    HPX_TEST(hpx::util::bind(Y(), ref(i))() == 7);
-    HPX_TEST(hpx::util::bind(Y(), ref(i))() == 8);
-    HPX_TEST(hpx::util::bind(Y(), i, placeholders::_1)(k) == 38);
-    HPX_TEST(hpx::util::bind(Y(), i, placeholders::_1, 9)(k) == 938);
+    HPX_TEST(hpx::bind(Y(), ref(i))() == 7);
+    HPX_TEST(hpx::bind(Y(), ref(i))() == 8);
+    HPX_TEST(hpx::bind(Y(), i, placeholders::_1)(k) == 38);
+    HPX_TEST(hpx::bind(Y(), i, placeholders::_1, 9)(k) == 938);
 
 #if !defined(__MWERKS__) || (__MWERKS__ > 0x2407)
     // Fails for this version of the compiler.
 
     global_result = 0;
-    hpx::util::bind(Y(), i, placeholders::_1, 9, 4)(k);
+    hpx::bind(Y(), i, placeholders::_1, 9, 4)(k);
     HPX_TEST_EQ(global_result, 4938);
 
 #endif
@@ -234,13 +229,13 @@ void function_object_test2()
 
     int const k = 3;
 
-    HPX_TEST(hpx::util::bind(Y(), ref(i))() == 7);
-    HPX_TEST(hpx::util::bind(Y(), ref(i))() == 8);
-    HPX_TEST(hpx::util::bind(Y(), i, placeholders::_1)(k) == 38);
-    HPX_TEST(hpx::util::bind(Y(), i, placeholders::_1, 9)(k) == 938);
+    HPX_TEST(hpx::bind(Y(), ref(i))() == 7);
+    HPX_TEST(hpx::bind(Y(), ref(i))() == 8);
+    HPX_TEST(hpx::bind(Y(), i, placeholders::_1)(k) == 38);
+    HPX_TEST(hpx::bind(Y(), i, placeholders::_1, 9)(k) == 938);
 
     global_result = 0;
-    hpx::util::bind(Y(), i, placeholders::_1, 9, 4)(k);
+    hpx::bind(Y(), i, placeholders::_1, 9, 4)(k);
     HPX_TEST_EQ(global_result, 4938);
 }
 
@@ -259,7 +254,7 @@ struct Z
 
 void adaptable_function_object_test()
 {
-    HPX_TEST_EQ(hpx::util::bind(Z(), 7, 4)(), 47);
+    HPX_TEST_EQ(hpx::bind(Z(), 7, 4)(), 47);
 }
 
 #endif
@@ -503,84 +498,84 @@ void member_function_test()
 
     // 0
 
-    hpx::util::bind(&X::f0, &x)();
-    hpx::util::bind(&X::f0, ref(x))();
+    hpx::bind(&X::f0, &x)();
+    hpx::bind(&X::f0, ref(x))();
 
-    hpx::util::bind(&X::g0, &x)();
-    hpx::util::bind(&X::g0, x)();
-    hpx::util::bind(&X::g0, ref(x))();
+    hpx::bind(&X::g0, &x)();
+    hpx::bind(&X::g0, x)();
+    hpx::bind(&X::g0, ref(x))();
 
     // 1
 
-    hpx::util::bind(&X::f1, &x, 1)();
-    hpx::util::bind(&X::f1, ref(x), 1)();
+    hpx::bind(&X::f1, &x, 1)();
+    hpx::bind(&X::f1, ref(x), 1)();
 
-    hpx::util::bind(&X::g1, &x, 1)();
-    hpx::util::bind(&X::g1, x, 1)();
-    hpx::util::bind(&X::g1, ref(x), 1)();
+    hpx::bind(&X::g1, &x, 1)();
+    hpx::bind(&X::g1, x, 1)();
+    hpx::bind(&X::g1, ref(x), 1)();
 
     // 2
 
-    hpx::util::bind(&X::f2, &x, 1, 2)();
-    hpx::util::bind(&X::f2, ref(x), 1, 2)();
+    hpx::bind(&X::f2, &x, 1, 2)();
+    hpx::bind(&X::f2, ref(x), 1, 2)();
 
-    hpx::util::bind(&X::g2, &x, 1, 2)();
-    hpx::util::bind(&X::g2, x, 1, 2)();
-    hpx::util::bind(&X::g2, ref(x), 1, 2)();
+    hpx::bind(&X::g2, &x, 1, 2)();
+    hpx::bind(&X::g2, x, 1, 2)();
+    hpx::bind(&X::g2, ref(x), 1, 2)();
 
     // 3
 
-    hpx::util::bind(&X::f3, &x, 1, 2, 3)();
-    hpx::util::bind(&X::f3, ref(x), 1, 2, 3)();
+    hpx::bind(&X::f3, &x, 1, 2, 3)();
+    hpx::bind(&X::f3, ref(x), 1, 2, 3)();
 
-    hpx::util::bind(&X::g3, &x, 1, 2, 3)();
-    hpx::util::bind(&X::g3, x, 1, 2, 3)();
-    hpx::util::bind(&X::g3, ref(x), 1, 2, 3)();
+    hpx::bind(&X::g3, &x, 1, 2, 3)();
+    hpx::bind(&X::g3, x, 1, 2, 3)();
+    hpx::bind(&X::g3, ref(x), 1, 2, 3)();
 
     // 4
 
-    hpx::util::bind(&X::f4, &x, 1, 2, 3, 4)();
-    hpx::util::bind(&X::f4, ref(x), 1, 2, 3, 4)();
+    hpx::bind(&X::f4, &x, 1, 2, 3, 4)();
+    hpx::bind(&X::f4, ref(x), 1, 2, 3, 4)();
 
-    hpx::util::bind(&X::g4, &x, 1, 2, 3, 4)();
-    hpx::util::bind(&X::g4, x, 1, 2, 3, 4)();
-    hpx::util::bind(&X::g4, ref(x), 1, 2, 3, 4)();
+    hpx::bind(&X::g4, &x, 1, 2, 3, 4)();
+    hpx::bind(&X::g4, x, 1, 2, 3, 4)();
+    hpx::bind(&X::g4, ref(x), 1, 2, 3, 4)();
 
     // 5
 
-    hpx::util::bind(&X::f5, &x, 1, 2, 3, 4, 5)();
-    hpx::util::bind(&X::f5, ref(x), 1, 2, 3, 4, 5)();
+    hpx::bind(&X::f5, &x, 1, 2, 3, 4, 5)();
+    hpx::bind(&X::f5, ref(x), 1, 2, 3, 4, 5)();
 
-    hpx::util::bind(&X::g5, &x, 1, 2, 3, 4, 5)();
-    hpx::util::bind(&X::g5, x, 1, 2, 3, 4, 5)();
-    hpx::util::bind(&X::g5, ref(x), 1, 2, 3, 4, 5)();
+    hpx::bind(&X::g5, &x, 1, 2, 3, 4, 5)();
+    hpx::bind(&X::g5, x, 1, 2, 3, 4, 5)();
+    hpx::bind(&X::g5, ref(x), 1, 2, 3, 4, 5)();
 
     // 6
 
-    hpx::util::bind(&X::f6, &x, 1, 2, 3, 4, 5, 6)();
-    hpx::util::bind(&X::f6, ref(x), 1, 2, 3, 4, 5, 6)();
+    hpx::bind(&X::f6, &x, 1, 2, 3, 4, 5, 6)();
+    hpx::bind(&X::f6, ref(x), 1, 2, 3, 4, 5, 6)();
 
-    hpx::util::bind(&X::g6, &x, 1, 2, 3, 4, 5, 6)();
-    hpx::util::bind(&X::g6, x, 1, 2, 3, 4, 5, 6)();
-    hpx::util::bind(&X::g6, ref(x), 1, 2, 3, 4, 5, 6)();
+    hpx::bind(&X::g6, &x, 1, 2, 3, 4, 5, 6)();
+    hpx::bind(&X::g6, x, 1, 2, 3, 4, 5, 6)();
+    hpx::bind(&X::g6, ref(x), 1, 2, 3, 4, 5, 6)();
 
     // 7
 
-    hpx::util::bind(&X::f7, &x, 1, 2, 3, 4, 5, 6, 7)();
-    hpx::util::bind(&X::f7, ref(x), 1, 2, 3, 4, 5, 6, 7)();
+    hpx::bind(&X::f7, &x, 1, 2, 3, 4, 5, 6, 7)();
+    hpx::bind(&X::f7, ref(x), 1, 2, 3, 4, 5, 6, 7)();
 
-    hpx::util::bind(&X::g7, &x, 1, 2, 3, 4, 5, 6, 7)();
-    hpx::util::bind(&X::g7, x, 1, 2, 3, 4, 5, 6, 7)();
-    hpx::util::bind(&X::g7, ref(x), 1, 2, 3, 4, 5, 6, 7)();
+    hpx::bind(&X::g7, &x, 1, 2, 3, 4, 5, 6, 7)();
+    hpx::bind(&X::g7, x, 1, 2, 3, 4, 5, 6, 7)();
+    hpx::bind(&X::g7, ref(x), 1, 2, 3, 4, 5, 6, 7)();
 
     // 8
 
-    hpx::util::bind(&X::f8, &x, 1, 2, 3, 4, 5, 6, 7, 8)();
-    hpx::util::bind(&X::f8, ref(x), 1, 2, 3, 4, 5, 6, 7, 8)();
+    hpx::bind(&X::f8, &x, 1, 2, 3, 4, 5, 6, 7, 8)();
+    hpx::bind(&X::f8, ref(x), 1, 2, 3, 4, 5, 6, 7, 8)();
 
-    hpx::util::bind(&X::g8, &x, 1, 2, 3, 4, 5, 6, 7, 8)();
-    hpx::util::bind(&X::g8, x, 1, 2, 3, 4, 5, 6, 7, 8)();
-    hpx::util::bind(&X::g8, ref(x), 1, 2, 3, 4, 5, 6, 7, 8)();
+    hpx::bind(&X::g8, &x, 1, 2, 3, 4, 5, 6, 7, 8)();
+    hpx::bind(&X::g8, x, 1, 2, 3, 4, 5, 6, 7, 8)();
+    hpx::bind(&X::g8, ref(x), 1, 2, 3, 4, 5, 6, 7, 8)();
 
     HPX_TEST_EQ(x.hash, static_cast<unsigned int>(23558));
 }
@@ -593,84 +588,84 @@ void member_function_void_test()
 
     // 0
 
-    hpx::util::bind(&V::f0, &v)();
-    hpx::util::bind(&V::f0, ref(v))();
+    hpx::bind(&V::f0, &v)();
+    hpx::bind(&V::f0, ref(v))();
 
-    hpx::util::bind(&V::g0, &v)();
-    hpx::util::bind(&V::g0, v)();
-    hpx::util::bind(&V::g0, ref(v))();
+    hpx::bind(&V::g0, &v)();
+    hpx::bind(&V::g0, v)();
+    hpx::bind(&V::g0, ref(v))();
 
     // 1
 
-    hpx::util::bind(&V::f1, &v, 1)();
-    hpx::util::bind(&V::f1, ref(v), 1)();
+    hpx::bind(&V::f1, &v, 1)();
+    hpx::bind(&V::f1, ref(v), 1)();
 
-    hpx::util::bind(&V::g1, &v, 1)();
-    hpx::util::bind(&V::g1, v, 1)();
-    hpx::util::bind(&V::g1, ref(v), 1)();
+    hpx::bind(&V::g1, &v, 1)();
+    hpx::bind(&V::g1, v, 1)();
+    hpx::bind(&V::g1, ref(v), 1)();
 
     // 2
 
-    hpx::util::bind(&V::f2, &v, 1, 2)();
-    hpx::util::bind(&V::f2, ref(v), 1, 2)();
+    hpx::bind(&V::f2, &v, 1, 2)();
+    hpx::bind(&V::f2, ref(v), 1, 2)();
 
-    hpx::util::bind(&V::g2, &v, 1, 2)();
-    hpx::util::bind(&V::g2, v, 1, 2)();
-    hpx::util::bind(&V::g2, ref(v), 1, 2)();
+    hpx::bind(&V::g2, &v, 1, 2)();
+    hpx::bind(&V::g2, v, 1, 2)();
+    hpx::bind(&V::g2, ref(v), 1, 2)();
 
     // 3
 
-    hpx::util::bind(&V::f3, &v, 1, 2, 3)();
-    hpx::util::bind(&V::f3, ref(v), 1, 2, 3)();
+    hpx::bind(&V::f3, &v, 1, 2, 3)();
+    hpx::bind(&V::f3, ref(v), 1, 2, 3)();
 
-    hpx::util::bind(&V::g3, &v, 1, 2, 3)();
-    hpx::util::bind(&V::g3, v, 1, 2, 3)();
-    hpx::util::bind(&V::g3, ref(v), 1, 2, 3)();
+    hpx::bind(&V::g3, &v, 1, 2, 3)();
+    hpx::bind(&V::g3, v, 1, 2, 3)();
+    hpx::bind(&V::g3, ref(v), 1, 2, 3)();
 
     // 4
 
-    hpx::util::bind(&V::f4, &v, 1, 2, 3, 4)();
-    hpx::util::bind(&V::f4, ref(v), 1, 2, 3, 4)();
+    hpx::bind(&V::f4, &v, 1, 2, 3, 4)();
+    hpx::bind(&V::f4, ref(v), 1, 2, 3, 4)();
 
-    hpx::util::bind(&V::g4, &v, 1, 2, 3, 4)();
-    hpx::util::bind(&V::g4, v, 1, 2, 3, 4)();
-    hpx::util::bind(&V::g4, ref(v), 1, 2, 3, 4)();
+    hpx::bind(&V::g4, &v, 1, 2, 3, 4)();
+    hpx::bind(&V::g4, v, 1, 2, 3, 4)();
+    hpx::bind(&V::g4, ref(v), 1, 2, 3, 4)();
 
     // 5
 
-    hpx::util::bind(&V::f5, &v, 1, 2, 3, 4, 5)();
-    hpx::util::bind(&V::f5, ref(v), 1, 2, 3, 4, 5)();
+    hpx::bind(&V::f5, &v, 1, 2, 3, 4, 5)();
+    hpx::bind(&V::f5, ref(v), 1, 2, 3, 4, 5)();
 
-    hpx::util::bind(&V::g5, &v, 1, 2, 3, 4, 5)();
-    hpx::util::bind(&V::g5, v, 1, 2, 3, 4, 5)();
-    hpx::util::bind(&V::g5, ref(v), 1, 2, 3, 4, 5)();
+    hpx::bind(&V::g5, &v, 1, 2, 3, 4, 5)();
+    hpx::bind(&V::g5, v, 1, 2, 3, 4, 5)();
+    hpx::bind(&V::g5, ref(v), 1, 2, 3, 4, 5)();
 
     // 6
 
-    hpx::util::bind(&V::f6, &v, 1, 2, 3, 4, 5, 6)();
-    hpx::util::bind(&V::f6, ref(v), 1, 2, 3, 4, 5, 6)();
+    hpx::bind(&V::f6, &v, 1, 2, 3, 4, 5, 6)();
+    hpx::bind(&V::f6, ref(v), 1, 2, 3, 4, 5, 6)();
 
-    hpx::util::bind(&V::g6, &v, 1, 2, 3, 4, 5, 6)();
-    hpx::util::bind(&V::g6, v, 1, 2, 3, 4, 5, 6)();
-    hpx::util::bind(&V::g6, ref(v), 1, 2, 3, 4, 5, 6)();
+    hpx::bind(&V::g6, &v, 1, 2, 3, 4, 5, 6)();
+    hpx::bind(&V::g6, v, 1, 2, 3, 4, 5, 6)();
+    hpx::bind(&V::g6, ref(v), 1, 2, 3, 4, 5, 6)();
 
     // 7
 
-    hpx::util::bind(&V::f7, &v, 1, 2, 3, 4, 5, 6, 7)();
-    hpx::util::bind(&V::f7, ref(v), 1, 2, 3, 4, 5, 6, 7)();
+    hpx::bind(&V::f7, &v, 1, 2, 3, 4, 5, 6, 7)();
+    hpx::bind(&V::f7, ref(v), 1, 2, 3, 4, 5, 6, 7)();
 
-    hpx::util::bind(&V::g7, &v, 1, 2, 3, 4, 5, 6, 7)();
-    hpx::util::bind(&V::g7, v, 1, 2, 3, 4, 5, 6, 7)();
-    hpx::util::bind(&V::g7, ref(v), 1, 2, 3, 4, 5, 6, 7)();
+    hpx::bind(&V::g7, &v, 1, 2, 3, 4, 5, 6, 7)();
+    hpx::bind(&V::g7, v, 1, 2, 3, 4, 5, 6, 7)();
+    hpx::bind(&V::g7, ref(v), 1, 2, 3, 4, 5, 6, 7)();
 
     // 8
 
-    hpx::util::bind(&V::f8, &v, 1, 2, 3, 4, 5, 6, 7, 8)();
-    hpx::util::bind(&V::f8, ref(v), 1, 2, 3, 4, 5, 6, 7, 8)();
+    hpx::bind(&V::f8, &v, 1, 2, 3, 4, 5, 6, 7, 8)();
+    hpx::bind(&V::f8, ref(v), 1, 2, 3, 4, 5, 6, 7, 8)();
 
-    hpx::util::bind(&V::g8, &v, 1, 2, 3, 4, 5, 6, 7, 8)();
-    hpx::util::bind(&V::g8, v, 1, 2, 3, 4, 5, 6, 7, 8)();
-    hpx::util::bind(&V::g8, ref(v), 1, 2, 3, 4, 5, 6, 7, 8)();
+    hpx::bind(&V::g8, &v, 1, 2, 3, 4, 5, 6, 7, 8)();
+    hpx::bind(&V::g8, v, 1, 2, 3, 4, 5, 6, 7, 8)();
+    hpx::bind(&V::g8, ref(v), 1, 2, 3, 4, 5, 6, 7, 8)();
 
     HPX_TEST_EQ(v.hash, static_cast<unsigned int>(23558));
 }
@@ -680,31 +675,27 @@ void nested_bind_test()
     int const x = 1;
     int const y = 2;
 
-    HPX_TEST(
-        hpx::util::bind(f_1, hpx::util::bind(f_1, placeholders::_1))(x) == 1L);
-    HPX_TEST(hpx::util::bind(
-                 f_1, hpx::util::bind(f_2, placeholders::_1, placeholders::_2))(
+    HPX_TEST(hpx::bind(f_1, hpx::bind(f_1, placeholders::_1))(x) == 1L);
+    HPX_TEST(hpx::bind(f_1, hpx::bind(f_2, placeholders::_1, placeholders::_2))(
                  x, y) == 21L);
-    HPX_TEST(hpx::util::bind(f_2, hpx::util::bind(f_1, placeholders::_1),
-                 hpx::util::bind(f_1, placeholders::_1))(x) == 11L);
-    HPX_TEST(hpx::util::bind(f_2, hpx::util::bind(f_1, placeholders::_1),
-                 hpx::util::bind(f_1, placeholders::_2))(x, y) == 21L);
-    HPX_TEST(hpx::util::bind(f_1, hpx::util::bind(f_0))() == 17041L);
+    HPX_TEST(hpx::bind(f_2, hpx::bind(f_1, placeholders::_1),
+                 hpx::bind(f_1, placeholders::_1))(x) == 11L);
+    HPX_TEST(hpx::bind(f_2, hpx::bind(f_1, placeholders::_1),
+                 hpx::bind(f_1, placeholders::_2))(x, y) == 21L);
+    HPX_TEST(hpx::bind(f_1, hpx::bind(f_0))() == 17041L);
 
-    HPX_TEST((hpx::util::bind(fv_1, hpx::util::bind(f_1, placeholders::_1))(x),
+    HPX_TEST((hpx::bind(fv_1, hpx::bind(f_1, placeholders::_1))(x),
         (global_result == 1L)));
-    HPX_TEST(
-        (hpx::util::bind(fv_1,
-             hpx::util::bind(f_2, placeholders::_1, placeholders::_2))(x, y),
-            (global_result == 21L)));
-    HPX_TEST((hpx::util::bind(fv_2, hpx::util::bind(f_1, placeholders::_1),
-                  hpx::util::bind(f_1, placeholders::_1))(x),
-        (global_result == 11L)));
-    HPX_TEST((hpx::util::bind(fv_2, hpx::util::bind(f_1, placeholders::_1),
-                  hpx::util::bind(f_1, placeholders::_2))(x, y),
+    HPX_TEST((hpx::bind(fv_1,
+                  hpx::bind(f_2, placeholders::_1, placeholders::_2))(x, y),
         (global_result == 21L)));
-    HPX_TEST((hpx::util::bind(fv_1, hpx::util::bind(f_0))(),
-        (global_result == 17041L)));
+    HPX_TEST((hpx::bind(fv_2, hpx::bind(f_1, placeholders::_1),
+                  hpx::bind(f_1, placeholders::_1))(x),
+        (global_result == 11L)));
+    HPX_TEST((hpx::bind(fv_2, hpx::bind(f_1, placeholders::_1),
+                  hpx::bind(f_1, placeholders::_2))(x, y),
+        (global_result == 21L)));
+    HPX_TEST((hpx::bind(fv_1, hpx::bind(f_0))(), (global_result == 17041L)));
 }
 
 int main()

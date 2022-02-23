@@ -6,10 +6,10 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx_init.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/functional/bind.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
 
 #include <atomic>
 #include <string>
@@ -36,8 +36,8 @@ int hpx_main()
     HPX_TEST(!val.empty());
     HPX_TEST_EQ(val, std::string("test"));
 
-    hpx::set_config_entry_callback("hpx.config.entry.test",
-        hpx::util::bind(&config_entry_callback));
+    hpx::set_config_entry_callback(
+        "hpx.config.entry.test", hpx::bind(&config_entry_callback));
 
     hpx::set_config_entry("hpx.config.entry.test", "test1");
     HPX_TEST(invoked_callback.load());

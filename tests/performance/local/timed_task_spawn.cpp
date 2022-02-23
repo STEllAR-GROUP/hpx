@@ -169,7 +169,7 @@ void wait_for_tasks(
         if (all_count != suspended_tasks + 1)
         {
             thread_init_data data(
-                make_thread_function_nullary(hpx::util::bind(
+                make_thread_function_nullary(hpx::bind(
                     &wait_for_tasks, std::ref(finished), suspended_tasks)),
                 "wait_for_tasks", hpx::threads::thread_priority::low);
             register_work(data);
@@ -301,7 +301,7 @@ void stage_workers(std::uint64_t target_thread, std::uint64_t local_tasks,
     if (num_thread != target_thread)
     {
         thread_init_data data(
-            make_thread_function_nullary(hpx::util::bind(
+            make_thread_function_nullary(hpx::bind(
                 &stage_workers, target_thread, local_tasks, stage_worker)),
             "stage_workers", hpx::threads::thread_priority::normal,
             hpx::threads::thread_schedule_hint(
@@ -468,7 +468,7 @@ int hpx_main(variables_map& vm)
                 continue;
 
             thread_init_data data(
-                make_thread_function_nullary(hpx::util::bind(
+                make_thread_function_nullary(hpx::bind(
                     &stage_workers, i, tasks_per_feeder, stage_worker)),
                 "stage_workers", hpx::threads::thread_priority::normal,
                 hpx::threads::thread_schedule_hint(
@@ -487,8 +487,8 @@ int hpx_main(variables_map& vm)
             std::make_shared<hpx::barrier<>>(2);
 
         thread_init_data data(
-            make_thread_function_nullary(hpx::util::bind(
-                &wait_for_tasks, finished, total_suspended_tasks)),
+            make_thread_function_nullary(
+                hpx::bind(&wait_for_tasks, finished, total_suspended_tasks)),
             "wait_for_tasks", hpx::threads::thread_priority::low);
         register_work(data);
 

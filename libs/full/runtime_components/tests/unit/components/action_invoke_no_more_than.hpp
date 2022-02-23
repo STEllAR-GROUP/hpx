@@ -102,7 +102,7 @@ namespace hpx { namespace actions { namespace detail {
             naming::address::address_type lva, F&& f, std::false_type)
         {
             return util::one_shot(
-                util::bind_back(&action_decorate_function::thread_function,
+                hpx::bind_back(&action_decorate_function::thread_function,
                     traits::action_decorate_function<action_wrapper>::call(
                         lva, HPX_FORWARD(F, f))));
         }
@@ -121,7 +121,7 @@ namespace hpx { namespace actions { namespace detail {
         static threads::thread_function_type call(
             naming::address::address_type lva, F&& f, std::true_type)
         {
-            return util::one_shot(util::bind_back(
+            return util::one_shot(hpx::bind_back(
                 &action_decorate_function::thread_function_future,
                 traits::action_decorate_function<action_wrapper>::call(
                     lva, HPX_FORWARD(F, f))));

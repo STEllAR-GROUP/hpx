@@ -302,7 +302,7 @@ namespace hpx { namespace util { namespace detail {
             // at shutdown.
             //util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
             hpx::threads::thread_init_data data(
-                hpx::threads::make_thread_function(util::bind_front(
+                hpx::threads::make_thread_function(hpx::bind_front(
                     &interval_timer::evaluate, this->shared_from_this())),
                 description_.c_str(), threads::thread_priority::boost,
                 threads::thread_schedule_hint(),

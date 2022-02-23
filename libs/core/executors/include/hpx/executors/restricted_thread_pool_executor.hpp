@@ -124,8 +124,8 @@ namespace hpx { namespace parallel { namespace execution {
                 typename hpx::util::detail::invoke_deferred_result<F, Future,
                     Ts...>::type;
 
-            auto&& func = hpx::util::one_shot(hpx::util::bind_back(
-                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+            auto&& func = hpx::util::one_shot(
+                hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
             typename hpx::traits::detail::shared_state_ptr<result_type>::type
                 p = hpx::lcos::detail::make_continuation_exec<result_type>(

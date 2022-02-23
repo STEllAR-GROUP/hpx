@@ -308,7 +308,7 @@ namespace hpx { namespace lcos { namespace local {
                 conditional_trigger c;
                 manage_condition cond(*this, c);
 
-                hpx::future<void> f = cond.get_future(util::bind(
+                hpx::future<void> f = cond.get_future(hpx::bind(
                     &base_and_gate::test_condition, this, generation_value));
 
                 {

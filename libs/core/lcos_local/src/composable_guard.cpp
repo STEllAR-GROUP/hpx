@@ -160,7 +160,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             std::size_t k = i + 1;
             detail::guard_task* stage = sd->stages[k];
-            stage->run = util::bind_front(stage_task, sd, k, n);
+            stage->run = hpx::bind_front(stage_task, sd, k, n);
             HPX_ASSERT(!stage->single_guard);
             run_guarded(*sd->gs.get(k), stage);
         }
@@ -183,7 +183,7 @@ namespace hpx { namespace lcos { namespace local {
         guards.sort();
         stage_data* sd = new stage_data(HPX_MOVE(task), guards.guards);
         int k = 0;
-        sd->stages[k]->run = util::bind_front(stage_task, sd, k, n);
+        sd->stages[k]->run = hpx::bind_front(stage_task, sd, k, n);
         sd->gs = guards;
         detail::guard_task* stage = sd->stages[k];    //-V108
         run_guarded(*sd->gs.get(k), stage);           //-V106

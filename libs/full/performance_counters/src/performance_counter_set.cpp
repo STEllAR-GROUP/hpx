@@ -111,10 +111,10 @@ namespace hpx { namespace performance_counters {
     void performance_counter_set::add_counters(
         std::string const& name, bool reset, error_code& ec)
     {
-        using util::placeholders::_1;
-        using util::placeholders::_2;
+        using placeholders::_1;
+        using placeholders::_2;
 
-        discover_counter_func func = util::bind(
+        discover_counter_func func = hpx::bind(
             &performance_counter_set::find_counter, this, _1, reset, _2);
 
         // do INI expansion on counter name
@@ -132,10 +132,10 @@ namespace hpx { namespace performance_counters {
     void performance_counter_set::add_counters(
         std::vector<std::string> const& names, bool reset, error_code& ec)
     {
-        using util::placeholders::_1;
-        using util::placeholders::_2;
+        using placeholders::_1;
+        using placeholders::_2;
 
-        discover_counter_func func = util::bind(
+        discover_counter_func func = hpx::bind(
             &performance_counter_set::find_counter, this, _1, reset, _2);
 
         for (std::string const& name : names)

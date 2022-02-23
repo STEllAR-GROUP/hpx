@@ -84,7 +84,7 @@ int hpx_main(variables_map& vm)
             for (std::size_t j = 0; j < pxthreads; ++j)
             {
                 thread_init_data data(
-                    hpx::threads::make_thread_function_nullary(hpx::util::bind(
+                    hpx::threads::make_thread_function_nullary(hpx::bind(
                         &get_os_thread_num, barr, std::ref(os_threads))),
                     "get_os_thread_num", hpx::threads::thread_priority::normal,
                     hpx::threads::thread_schedule_hint(0));

@@ -21,7 +21,7 @@
 
 #include <hpx/functional/bind.hpp>
 
-namespace placeholders = hpx::util::placeholders;
+namespace placeholders = hpx::placeholders;
 
 #include <functional>
 #include <iostream>
@@ -158,55 +158,53 @@ void test(F f, int a, int b)
 
 void stateful_function_object_test()
 {
-    test(hpx::util::bind(X()), 0, 17041);
-    test(hpx::util::bind(X(), 1), 0, 1);
-    test(hpx::util::bind(X(), 1, 2), 0, 1 + 2);
-    test(hpx::util::bind(X(), 1, 2, 3), 0, 1 + 2 + 3);
-    test(hpx::util::bind(X(), 1, 2, 3, 4), 0, 1 + 2 + 3 + 4);
-    test(hpx::util::bind(X(), 1, 2, 3, 4, 5), 0, 1 + 2 + 3 + 4 + 5);
-    test(hpx::util::bind(X(), 1, 2, 3, 4, 5, 6), 0, 1 + 2 + 3 + 4 + 5 + 6);
-    test(hpx::util::bind(X(), 1, 2, 3, 4, 5, 6, 7), 0,
-        1 + 2 + 3 + 4 + 5 + 6 + 7);
-    test(hpx::util::bind(X(), 1, 2, 3, 4, 5, 6, 7, 8), 0,
+    test(hpx::bind(X()), 0, 17041);
+    test(hpx::bind(X(), 1), 0, 1);
+    test(hpx::bind(X(), 1, 2), 0, 1 + 2);
+    test(hpx::bind(X(), 1, 2, 3), 0, 1 + 2 + 3);
+    test(hpx::bind(X(), 1, 2, 3, 4), 0, 1 + 2 + 3 + 4);
+    test(hpx::bind(X(), 1, 2, 3, 4, 5), 0, 1 + 2 + 3 + 4 + 5);
+    test(hpx::bind(X(), 1, 2, 3, 4, 5, 6), 0, 1 + 2 + 3 + 4 + 5 + 6);
+    test(hpx::bind(X(), 1, 2, 3, 4, 5, 6, 7), 0, 1 + 2 + 3 + 4 + 5 + 6 + 7);
+    test(hpx::bind(X(), 1, 2, 3, 4, 5, 6, 7, 8), 0,
         1 + 2 + 3 + 4 + 5 + 6 + 7 + 8);
-    test(hpx::util::bind(X(), 1, 2, 3, 4, 5, 6, 7, 8, 9), 0,
+    test(hpx::bind(X(), 1, 2, 3, 4, 5, 6, 7, 8, 9), 0,
         1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9);
 
     X x;
 
     int n = x.state();
 
-    test(hpx::util::bind(std::ref(x)), n, 17041);
+    test(hpx::bind(std::ref(x)), n, 17041);
     n += 3 * 17041;
 
-    test(hpx::util::bind(std::ref(x), 1), n, 1);
+    test(hpx::bind(std::ref(x), 1), n, 1);
     n += 3 * 1;
 
-    test(hpx::util::bind(std::ref(x), 1, 2), n, 1 + 2);
+    test(hpx::bind(std::ref(x), 1, 2), n, 1 + 2);
     n += 3 * (1 + 2);
 
-    test(hpx::util::bind(std::ref(x), 1, 2, 3), n, 1 + 2 + 3);
+    test(hpx::bind(std::ref(x), 1, 2, 3), n, 1 + 2 + 3);
     n += 3 * (1 + 2 + 3);
 
-    test(hpx::util::bind(std::ref(x), 1, 2, 3, 4), n, 1 + 2 + 3 + 4);
+    test(hpx::bind(std::ref(x), 1, 2, 3, 4), n, 1 + 2 + 3 + 4);
     n += 3 * (1 + 2 + 3 + 4);
 
-    test(hpx::util::bind(std::ref(x), 1, 2, 3, 4, 5), n, 1 + 2 + 3 + 4 + 5);
+    test(hpx::bind(std::ref(x), 1, 2, 3, 4, 5), n, 1 + 2 + 3 + 4 + 5);
     n += 3 * (1 + 2 + 3 + 4 + 5);
 
-    test(hpx::util::bind(std::ref(x), 1, 2, 3, 4, 5, 6), n,
-        1 + 2 + 3 + 4 + 5 + 6);
+    test(hpx::bind(std::ref(x), 1, 2, 3, 4, 5, 6), n, 1 + 2 + 3 + 4 + 5 + 6);
     n += 3 * (1 + 2 + 3 + 4 + 5 + 6);
 
-    test(hpx::util::bind(std::ref(x), 1, 2, 3, 4, 5, 6, 7), n,
+    test(hpx::bind(std::ref(x), 1, 2, 3, 4, 5, 6, 7), n,
         1 + 2 + 3 + 4 + 5 + 6 + 7);
     n += 3 * (1 + 2 + 3 + 4 + 5 + 6 + 7);
 
-    test(hpx::util::bind(std::ref(x), 1, 2, 3, 4, 5, 6, 7, 8), n,
+    test(hpx::bind(std::ref(x), 1, 2, 3, 4, 5, 6, 7, 8), n,
         1 + 2 + 3 + 4 + 5 + 6 + 7 + 8);
     n += 3 * (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8);
 
-    test(hpx::util::bind(std::ref(x), 1, 2, 3, 4, 5, 6, 7, 8, 9), n,
+    test(hpx::bind(std::ref(x), 1, 2, 3, 4, 5, 6, 7, 8, 9), n,
         1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9);
     n += 3 * (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9);
 
@@ -215,16 +213,15 @@ void stateful_function_object_test()
 
 void stateful_function_test()
 {
-    test(hpx::util::bind(f0, 0), 0, 17041);
-    test(hpx::util::bind(f1, 0, 1), 0, 1);
-    test(hpx::util::bind(f2, 0, 1, 2), 0, 1 + 2);
-    test(hpx::util::bind(f3, 0, 1, 2, 3), 0, 1 + 2 + 3);
-    test(hpx::util::bind(f4, 0, 1, 2, 3, 4), 0, 1 + 2 + 3 + 4);
-    test(hpx::util::bind(f5, 0, 1, 2, 3, 4, 5), 0, 1 + 2 + 3 + 4 + 5);
-    test(hpx::util::bind(f6, 0, 1, 2, 3, 4, 5, 6), 0, 1 + 2 + 3 + 4 + 5 + 6);
-    test(hpx::util::bind(f7, 0, 1, 2, 3, 4, 5, 6, 7), 0,
-        1 + 2 + 3 + 4 + 5 + 6 + 7);
-    test(hpx::util::bind(f8, 0, 1, 2, 3, 4, 5, 6, 7, 8), 0,
+    test(hpx::bind(f0, 0), 0, 17041);
+    test(hpx::bind(f1, 0, 1), 0, 1);
+    test(hpx::bind(f2, 0, 1, 2), 0, 1 + 2);
+    test(hpx::bind(f3, 0, 1, 2, 3), 0, 1 + 2 + 3);
+    test(hpx::bind(f4, 0, 1, 2, 3, 4), 0, 1 + 2 + 3 + 4);
+    test(hpx::bind(f5, 0, 1, 2, 3, 4, 5), 0, 1 + 2 + 3 + 4 + 5);
+    test(hpx::bind(f6, 0, 1, 2, 3, 4, 5, 6), 0, 1 + 2 + 3 + 4 + 5 + 6);
+    test(hpx::bind(f7, 0, 1, 2, 3, 4, 5, 6, 7), 0, 1 + 2 + 3 + 4 + 5 + 6 + 7);
+    test(hpx::bind(f8, 0, 1, 2, 3, 4, 5, 6, 7, 8), 0,
         1 + 2 + 3 + 4 + 5 + 6 + 7 + 8);
 }
 

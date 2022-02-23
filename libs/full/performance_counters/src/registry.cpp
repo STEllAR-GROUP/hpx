@@ -152,8 +152,8 @@ namespace hpx { namespace performance_counters {
 
             if (mode == discover_counters_full)
             {
-                using hpx::util::placeholders::_1;
-                discover_counter = hpx::util::bind(
+                using hpx::placeholders::_1;
+                discover_counter = hpx::bind(
                     &expand_counter_info, _1, discover_counter, std::ref(ec));
             }
 
@@ -175,8 +175,8 @@ namespace hpx { namespace performance_counters {
 
             if (mode == discover_counters_full)
             {
-                using hpx::util::placeholders::_1;
-                discover_counter = hpx::util::bind(
+                using hpx::placeholders::_1;
+                discover_counter = hpx::bind(
                     &expand_counter_info, _1, discover_counter, std::ref(ec));
             }
 
@@ -248,8 +248,8 @@ namespace hpx { namespace performance_counters {
         discover_counter_func discover_counter_;
         if (mode == discover_counters_full)
         {
-            using hpx::util::placeholders::_1;
-            discover_counter_ = hpx::util::bind(&expand_counter_info, _1,
+            using hpx::placeholders::_1;
+            discover_counter_ = hpx::bind(&expand_counter_info, _1,
                 HPX_MOVE(discover_counter), std::ref(ec));
         }
         else
@@ -400,7 +400,7 @@ namespace hpx { namespace performance_counters {
         std::int64_t* countervalue, naming::gid_type& id, error_code& ec)
     {
         hpx::function<std::int64_t(bool)> func(
-            util::bind_front(wrap_counter, countervalue));
+            hpx::bind_front(wrap_counter, countervalue));
         return create_raw_counter(info, func, id, ec);
     }
 
@@ -421,7 +421,7 @@ namespace hpx { namespace performance_counters {
         error_code& ec)
     {
         hpx::function<std::int64_t(bool)> func(
-            util::bind_front(&wrap_raw_counter, f));
+            hpx::bind_front(&wrap_raw_counter, f));
         return create_raw_counter(info, func, id, ec);
     }
 
@@ -502,7 +502,7 @@ namespace hpx { namespace performance_counters {
         naming::gid_type& id, error_code& ec)
     {
         hpx::function<std::vector<std::int64_t>(bool)> func(
-            util::bind_front(&wrap_raw_values_counter, f));
+            hpx::bind_front(&wrap_raw_values_counter, f));
         return create_raw_counter(info, func, id, ec);
     }
 

@@ -167,7 +167,7 @@ void test_remote_async_cb(hpx::id_type const& target)
     {
         increment_with_future_action inc;
         hpx::shared_future<std::int32_t> f =
-            hpx::async(hpx::launch::deferred, hpx::util::bind(&increment, 42));
+            hpx::async(hpx::launch::deferred, hpx::bind(&increment, 42));
 
         callback_called.store(0);
         hpx::future<std::int32_t> f1 = hpx::async_cb(inc, target, &cb, f);

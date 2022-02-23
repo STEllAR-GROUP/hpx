@@ -103,7 +103,7 @@ namespace hpx { namespace performance_counters {
 
         // Register the shutdown function which will clean up this counter type.
         get_runtime().add_shutdown_function(
-            util::bind_front(&counter_type_shutdown, p));
+            hpx::bind_front(&counter_type_shutdown, p));
         return status_valid_data;
     }
 
@@ -126,7 +126,7 @@ namespace hpx { namespace performance_counters {
 
         // Register the shutdown function which will clean up this counter type.
         get_runtime().add_shutdown_function(
-            util::bind_front(&counter_type_shutdown, p));
+            hpx::bind_front(&counter_type_shutdown, p));
         return status_valid_data;
     }
 
@@ -138,10 +138,10 @@ namespace hpx { namespace performance_counters {
         std::string const& helptext, std::string const& uom, counter_type type,
         error_code& ec)
     {
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
         return install_counter_type(name, type, helptext,
-            util::bind(&hpx::performance_counters::locality_raw_counter_creator,
+            hpx::bind(&hpx::performance_counters::locality_raw_counter_creator,
                 _1, counter_value, _2),
             &hpx::performance_counters::locality_counter_discoverer,
             HPX_PERFORMANCE_COUNTER_V1, uom, ec);
@@ -151,10 +151,10 @@ namespace hpx { namespace performance_counters {
         hpx::function<std::vector<std::int64_t>(bool)> const& counter_value,
         std::string const& helptext, std::string const& uom, error_code& ec)
     {
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
         return install_counter_type(name, counter_raw_values, helptext,
-            util::bind(
+            hpx::bind(
                 &hpx::performance_counters::locality_raw_values_counter_creator,
                 _1, counter_value, _2),
             &hpx::performance_counters::locality_counter_discoverer,

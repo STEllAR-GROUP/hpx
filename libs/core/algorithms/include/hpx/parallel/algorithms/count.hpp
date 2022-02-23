@@ -233,7 +233,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 typename std::iterator_traits<Iter>::difference_type ret = 0;
                 util::loop_n<execution_policy_type>(part_begin, part_size,
-                    hpx::util::bind_back(*this, std::ref(ret)));
+                    hpx::bind_back(*this, std::ref(ret)));
                 return ret;
             }
 
@@ -269,7 +269,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typename std::iterator_traits<InIterB>::difference_type ret = 0;
 
                 util::loop(HPX_FORWARD(ExPolicy, policy), first, last,
-                    hpx::util::bind_back(HPX_MOVE(f1), std::ref(ret)));
+                    hpx::bind_back(HPX_MOVE(f1), std::ref(ret)));
 
                 return ret;
             }
@@ -363,7 +363,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typename std::iterator_traits<InIterB>::difference_type ret = 0;
 
                 util::loop(HPX_FORWARD(ExPolicy, policy), first, last,
-                    hpx::util::bind_back(HPX_MOVE(f1), std::ref(ret)));
+                    hpx::bind_back(HPX_MOVE(f1), std::ref(ret)));
 
                 return ret;
             }

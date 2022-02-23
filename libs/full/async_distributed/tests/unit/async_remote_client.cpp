@@ -60,19 +60,18 @@ void test_remote_async(hpx::id_type const& target)
 
         call_action call;
 
-        hpx::future<std::int32_t> f1 =
-            hpx::async(hpx::util::bind(call, dec_f, 42));
+        hpx::future<std::int32_t> f1 = hpx::async(hpx::bind(call, dec_f, 42));
         HPX_TEST_EQ(f1.get(), 41);
 
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
 
         hpx::future<std::int32_t> f2 =
-            hpx::async(hpx::util::bind(call, _1, 42), dec_f);
+            hpx::async(hpx::bind(call, _1, 42), dec_f);
         HPX_TEST_EQ(f2.get(), 41);
 
         hpx::future<std::int32_t> f3 =
-            hpx::async(hpx::util::bind(call, _1, _2), dec_f, 42);
+            hpx::async(hpx::bind(call, _1, _2), dec_f, 42);
         HPX_TEST_EQ(f3.get(), 41);
     }
 

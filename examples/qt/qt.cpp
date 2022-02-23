@@ -49,9 +49,9 @@ void qt_main(int argc, char** argv)
 {
     QApplication app(argc, argv);
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    widget main(hpx::util::bind(run, _1, _2));
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
+    widget main(hpx::bind(run, _1, _2));
     main.show();
 
     app.exec();

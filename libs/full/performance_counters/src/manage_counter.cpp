@@ -85,6 +85,6 @@ namespace hpx { namespace performance_counters {
 
         // Register the shutdown function which will clean up this counter.
         get_runtime().add_shutdown_function(
-            util::bind_front(&counter_shutdown, p));
+            hpx::bind_front(&counter_shutdown, p));
     }
 }}    // namespace hpx::performance_counters

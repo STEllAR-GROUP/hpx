@@ -95,13 +95,12 @@ void test_bulk_sync(bool sync)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     executor exec;
     hpx::parallel::execution::bulk_sync_execute(exec,
-        hpx::util::bind(sync ? &bulk_test_s : &bulk_test_a, _1, tid, _2), v,
-        42);
+        hpx::bind(sync ? &bulk_test_s : &bulk_test_a, _1, tid, _2), v, 42);
     hpx::parallel::execution::bulk_sync_execute(
         exec, sync ? &bulk_test_s : &bulk_test_a, v, tid, 42);
 }
@@ -117,14 +116,13 @@ void test_bulk_async(bool sync)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     executor exec;
     hpx::when_all(
         hpx::parallel::execution::bulk_async_execute(exec,
-            hpx::util::bind(sync ? &bulk_test_s : &bulk_test_a, _1, tid, _2), v,
-            42))
+            hpx::bind(sync ? &bulk_test_s : &bulk_test_a, _1, tid, _2), v, 42))
         .get();
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
                       exec, sync ? &bulk_test_s : &bulk_test_a, v, tid, 42))
@@ -164,17 +162,16 @@ void test_bulk_then(bool sync)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    using hpx::util::placeholders::_3;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
+    using hpx::placeholders::_3;
 
     hpx::shared_future<void> f = hpx::make_ready_future();
 
     executor exec;
     hpx::parallel::execution::bulk_then_execute(exec,
-        hpx::util::bind(
-            sync ? &bulk_test_f_s : &bulk_test_f_a, _1, _2, tid, _3),
-        v, f, 42)
+        hpx::bind(sync ? &bulk_test_f_s : &bulk_test_f_a, _1, _2, tid, _3), v,
+        f, 42)
         .get();
     hpx::parallel::execution::bulk_then_execute(
         exec, sync ? &bulk_test_f_s : &bulk_test_f_a, v, f, tid, 42)

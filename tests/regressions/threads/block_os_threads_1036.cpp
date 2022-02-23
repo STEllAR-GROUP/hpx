@@ -33,7 +33,7 @@ void blocker(std::shared_ptr<hpx::barrier<>> exit_barrier,
     {
         hpx::threads::thread_init_data data(
             hpx::threads::make_thread_function_nullary(
-                hpx::util::bind(&blocker, exit_barrier, std::ref(entered),
+                hpx::bind(&blocker, exit_barrier, std::ref(entered),
                     std::ref(started), std::ref(blocked_threads), worker)),
             "blocker", hpx::threads::thread_priority::normal,
             hpx::threads::thread_schedule_hint(worker));
@@ -83,7 +83,7 @@ int hpx_main()
 
             hpx::threads::thread_init_data data(
                 hpx::threads::make_thread_function_nullary(
-                    hpx::util::bind(&blocker, exit_barrier, std::ref(entered),
+                    hpx::bind(&blocker, exit_barrier, std::ref(entered),
                         std::ref(started), std::ref(blocked_threads), i)),
                 "blocker", hpx::threads::thread_priority::normal,
                 hpx::threads::thread_schedule_hint(i));

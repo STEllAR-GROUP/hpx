@@ -96,7 +96,7 @@ namespace hpx { namespace threads { namespace detail {
             std::make_shared<std::atomic<bool>>(false));
 
         thread_init_data data(
-            util::bind_front(&wake_timer_thread, thrd, newstate, newstate_ex,
+            hpx::bind_front(&wake_timer_thread, thrd, newstate, newstate_ex,
                 priority, self_id.noref(), triggered, retry_on_active),
             "wake_timer", priority, thread_schedule_hint(),
             thread_stacksize::small_, thread_schedule_state::suspended, true);
@@ -182,7 +182,7 @@ namespace hpx { namespace threads { namespace detail {
         // this creates a new thread which creates the timer and handles the
         // requested actions
         thread_init_data data(
-            util::bind(&at_timer, scheduler, abs_time.value(),
+            hpx::bind(&at_timer, scheduler, abs_time.value(),
                 thread_id_ref_type(thrd), newstate, newstate_ex, priority,
                 started, retry_on_active),
             "at_timer (expire at)", priority, schedulehint,

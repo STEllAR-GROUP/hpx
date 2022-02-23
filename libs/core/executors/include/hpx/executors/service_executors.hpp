@@ -65,7 +65,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             auto t = std::make_shared<post_wrapper_helper<decltype(f_wrapper)>>(
                 HPX_MOVE(f_wrapper));
 #if defined(HPX_COMPUTE_HOST_CODE)
-            pool_->get_io_service().post(hpx::util::bind_front(
+            pool_->get_io_service().post(hpx::bind_front(
                 &post_wrapper_helper<decltype(f_wrapper)>::invoke,
                 HPX_MOVE(t)));
 #else
@@ -89,7 +89,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 async_execute_wrapper_helper<decltype(f_wrapper), result_type>>(
                 HPX_MOVE(f_wrapper));
 #if defined(HPX_COMPUTE_HOST_CODE)
-            pool_->get_io_service().post(hpx::util::bind_front(
+            pool_->get_io_service().post(hpx::bind_front(
                 &async_execute_wrapper_helper<decltype(f_wrapper),
                     result_type>::invoke,
                 t));

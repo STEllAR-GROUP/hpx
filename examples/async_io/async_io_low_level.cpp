@@ -11,15 +11,15 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/iostream.hpp>
 
 #include <iostream>
 #include <memory>
 
 // this function will be executed by a dedicated OS thread
 void do_async_io(char const* string_to_write,
-    std::shared_ptr<hpx::lcos::local::promise<int> > p)
+    std::shared_ptr<hpx::lcos::local::promise<int>> p)
 {
     // This IO operation will possibly block the IO thread in the
     // kernel.
@@ -31,16 +31,15 @@ void do_async_io(char const* string_to_write,
 // This function will be executed by an HPX thread
 hpx::future<int> async_io(char const* string_to_write)
 {
-    std::shared_ptr<hpx::lcos::local::promise<int> > p =
-        std::make_shared<hpx::lcos::local::promise<int> >();
+    std::shared_ptr<hpx::lcos::local::promise<int>> p =
+        std::make_shared<hpx::lcos::local::promise<int>>();
 
     // Get a reference to one of the IO specific HPX io_service objects ...
     hpx::util::io_service_pool* pool =
         hpx::get_runtime().get_thread_pool("io_pool");
 
     // ... and schedule the handler to run on one of its OS-threads.
-    pool->get_io_service().post(
-        hpx::util::bind(&do_async_io, string_to_write, p));
+    pool->get_io_service().post(hpx::bind(&do_async_io, string_to_write, p));
 
     return p->get_future();
 }
@@ -58,13 +57,14 @@ int hpx_main()
 
         // Print the returned result.
         hpx::cout << "HPX-thread: The asynchronous IO operation returned: "
-                  << result << "\n" << hpx::flush;
+                  << result << "\n"
+                  << hpx::flush;
     }
 
-    return hpx::finalize(); // Initiate shutdown of the runtime system.
+    return hpx::finalize();    // Initiate shutdown of the runtime system.
 }
 
 int main(int argc, char* argv[])
 {
-    return hpx::init(argc, argv); // Initialize and run HPX.
+    return hpx::init(argc, argv);    // Initialize and run HPX.
 }

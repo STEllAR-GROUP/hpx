@@ -282,7 +282,7 @@ namespace hpx::execution::experimental {
                     void operator()(Ts&& ts)
                     {
                         hpx::util::invoke_fused(
-                            hpx::util::bind_front(
+                            hpx::bind_front(
                                 hpx::execution::experimental::set_value,
                                 HPX_MOVE(receiver)),
                             HPX_FORWARD(Ts, ts));

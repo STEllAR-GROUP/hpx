@@ -44,10 +44,10 @@ namespace hpx { namespace detail {
 
         typedef agas::server::primary_namespace::colocate_action action_type;
 
-        using util::placeholders::_2;
+        using placeholders::_2;
         return apply_continue_cb<action_type>(
-            util::functional::apply_continuation(util::bind<Action>(
-                util::bind(util::functional::extract_locality(), _2, gid),
+            util::functional::apply_continuation(hpx::bind<Action>(
+                hpx::bind(util::functional::extract_locality(), _2, gid),
                 HPX_FORWARD(Ts, vs)...)),
             service_target, HPX_FORWARD(Callback, cb), gid.get_gid());
     }
@@ -84,11 +84,11 @@ namespace hpx { namespace detail {
 
         typedef agas::server::primary_namespace::colocate_action action_type;
 
-        using util::placeholders::_2;
+        using placeholders::_2;
         return apply_continue_cb<action_type>(
             util::functional::apply_continuation(
-                util::bind<Action>(
-                    util::bind(util::functional::extract_locality(), _2, gid),
+                hpx::bind<Action>(
+                    hpx::bind(util::functional::extract_locality(), _2, gid),
                     HPX_FORWARD(Ts, vs)...),
                 HPX_FORWARD(Continuation, cont)),
             service_target, HPX_FORWARD(Callback, cb), gid.get_gid());

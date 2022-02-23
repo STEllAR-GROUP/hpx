@@ -52,7 +52,7 @@ int main(int argc, char** argv)
     hpx::lcos::local::condition_variable_any cond;
 
     hpx::function<int(int, char**)> start_function =
-        hpx::util::bind(&start_func, std::ref(mtx), std::ref(cond));
+        hpx::bind(&start_func, std::ref(mtx), std::ref(cond));
 
     hpx::start(start_function, argc, argv);
 

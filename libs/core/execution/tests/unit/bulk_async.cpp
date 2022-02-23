@@ -32,11 +32,11 @@ void test_bulk_sync(Executor& exec)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), 0);
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     std::vector<int> results = hpx::parallel::execution::bulk_sync_execute(
-        exec, hpx::util::bind(&bulk_test, tid, _1, false, _2), v, 42);
+        exec, hpx::bind(&bulk_test, tid, _1, false, _2), v, 42);
 
     HPX_TEST(std::equal(std::begin(results), std::end(results), std::begin(v)));
 }
@@ -49,12 +49,12 @@ void test_bulk_async(Executor& exec)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), 0);
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     std::vector<hpx::future<int>> results =
         hpx::parallel::execution::bulk_async_execute(
-            exec, hpx::util::bind(&bulk_test, tid, _1, true, _2), v, 42);
+            exec, hpx::bind(&bulk_test, tid, _1, true, _2), v, 42);
 
     HPX_TEST(std::equal(std::begin(results), std::end(results), std::begin(v),
         [](hpx::future<int>& lhs, const int& rhs) {

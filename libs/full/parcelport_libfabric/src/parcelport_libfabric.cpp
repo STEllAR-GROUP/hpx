@@ -170,7 +170,7 @@ namespace hpx::parcelset::policies::libfabric {
             for (std::size_t i = 0; i != io_service_pool_.size(); ++i)
             {
                 io_service_pool_.get_io_service(int(i)).post(
-                    hpx::util::bind(&parcelport::io_service_work, this));
+                    hpx::bind(&parcelport::io_service_work, this));
             }
         }
         return true;

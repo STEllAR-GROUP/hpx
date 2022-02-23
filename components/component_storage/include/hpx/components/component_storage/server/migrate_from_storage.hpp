@@ -156,7 +156,7 @@ namespace hpx { namespace components { namespace server
         typedef typename server::component_storage::migrate_from_here_action
             action_type;
         return async<action_type>(r.first, to_resurrect.get_gid())
-            .then(util::bind_back(
+            .then(hpx::bind_back(
                 &detail::migrate_from_storage_here<Component>,
                 to_resurrect, r.second, target_locality))
             .then(

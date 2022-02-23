@@ -194,8 +194,8 @@ void bulk_test(int seq, int passed_through)    //-V813
 template <typename Executor>
 void test_bulk_sync(Executor&& executor)
 {
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     std::string desc("test_bulk_sync");
     {
@@ -203,7 +203,7 @@ void test_bulk_sync(Executor&& executor)
             hpx::execution::experimental::with_annotation, executor, desc);
 
         hpx::parallel::execution::bulk_sync_execute(
-            exec, hpx::util::bind(&bulk_test, _1, _2), 107, 42);
+            exec, hpx::bind(&bulk_test, _1, _2), 107, 42);
 
         HPX_TEST_EQ(annotation, desc);
         HPX_TEST_EQ(annotation,
@@ -223,7 +223,7 @@ void test_bulk_sync(Executor&& executor)
 
         annotation.clear();
         hpx::parallel::execution::bulk_sync_execute(
-            exec, hpx::util::bind(&bulk_test, _1, _2), 107, 42);
+            exec, hpx::bind(&bulk_test, _1, _2), 107, 42);
 
         HPX_TEST_EQ(annotation, desc);
         HPX_TEST_EQ(annotation,
@@ -242,8 +242,8 @@ void test_bulk_sync(Executor&& executor)
 template <typename Executor>
 void test_bulk_async(Executor&& executor)
 {
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     std::string desc("test_bulk_async");
     {
@@ -251,7 +251,7 @@ void test_bulk_async(Executor&& executor)
             hpx::execution::experimental::with_annotation, executor, desc);
 
         hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-                          exec, hpx::util::bind(&bulk_test, _1, _2), 107, 42))
+                          exec, hpx::bind(&bulk_test, _1, _2), 107, 42))
             .get();
 
         HPX_TEST_EQ(annotation, desc);
@@ -274,7 +274,7 @@ void test_bulk_async(Executor&& executor)
 
         annotation.clear();
         hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-                          exec, hpx::util::bind(&bulk_test, _1, _2), 107, 42))
+                          exec, hpx::bind(&bulk_test, _1, _2), 107, 42))
             .get();
 
         HPX_TEST_EQ(annotation, desc);
@@ -313,9 +313,9 @@ void bulk_test_f(int seq, hpx::shared_future<void> f,
 template <typename Executor>
 void test_bulk_then(Executor&& executor)
 {
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    using hpx::util::placeholders::_3;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
+    using hpx::placeholders::_3;
 
     hpx::shared_future<void> f = hpx::make_ready_future();
 
@@ -325,7 +325,7 @@ void test_bulk_then(Executor&& executor)
             hpx::execution::experimental::with_annotation, executor, desc);
 
         hpx::parallel::execution::bulk_then_execute(
-            exec, hpx::util::bind(&bulk_test_f, _1, _2, _3), 107, f, 42)
+            exec, hpx::bind(&bulk_test_f, _1, _2, _3), 107, f, 42)
             .get();
 
         HPX_TEST_EQ(annotation, desc);
@@ -348,7 +348,7 @@ void test_bulk_then(Executor&& executor)
 
         annotation.clear();
         hpx::parallel::execution::bulk_then_execute(
-            exec, hpx::util::bind(&bulk_test_f, _1, _2, _3), 107, f, 42)
+            exec, hpx::bind(&bulk_test_f, _1, _2, _3), 107, f, 42)
             .get();
 
         HPX_TEST_EQ(annotation, desc);

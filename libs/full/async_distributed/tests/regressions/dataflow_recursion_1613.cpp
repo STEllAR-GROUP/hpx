@@ -62,9 +62,8 @@ void make_ready_continue(std::size_t i,
 
     ++executed_continuations;
     promises[i].set_value();
-    futures[i].then(
-        hpx::util::bind(&make_ready_continue, i + 1, std::ref(promises),
-            std::ref(futures), std::ref(executed_continuations)));
+    futures[i].then(hpx::bind(&make_ready_continue, i + 1, std::ref(promises),
+        std::ref(futures), std::ref(executed_continuations)));
 }
 
 void force_recursion_test2()

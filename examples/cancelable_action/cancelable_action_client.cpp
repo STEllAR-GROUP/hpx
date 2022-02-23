@@ -28,7 +28,7 @@ void handle_interruption_using_exception(hpx::id_type const& id)
 
     // start a separate thread which will wait for a while and interrupt
     // the 'do_it' operation
-    hpx::thread t(hpx::util::bind(interrupt_do_it, ca));
+    hpx::thread t(hpx::bind(interrupt_do_it, ca));
 
     try {
         // start some lengthy action, to be interrupted
@@ -52,7 +52,7 @@ void handle_interruption_using_error_code(hpx::id_type const& id)
 
     // start a separate thread which will wait for a while and interrupt
     // the 'do_it' operation
-    hpx::thread t(hpx::util::bind(interrupt_do_it, ca));
+    hpx::thread t(hpx::bind(interrupt_do_it, ca));
 
     // start some lengthy action, to be interrupted
     hpx::error_code ec(hpx::lightweight);

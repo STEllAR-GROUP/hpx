@@ -26,7 +26,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
@@ -35,12 +36,11 @@ namespace hpx { namespace util {
         class bound_action;
 
         template <typename Action, std::size_t... Is, typename... Ts>
-        class bound_action<Action, index_pack<Is...>, Ts...>
+        class bound_action<Action, util::index_pack<Is...>, Ts...>
         {
         public:
-            using result_type =
-                typename traits::promise_local_result<typename hpx::traits::
-                        extract_action<Action>::remote_result_type>::type;
+            using result_type = traits::promise_local_result_t<typename hpx::
+                    traits::extract_action<Action>::remote_result_type>;
 
         public:
             // default constructor is needed for serialization
@@ -87,9 +87,9 @@ namespace hpx { namespace util {
             }
 
             template <typename Continuation, typename... Us>
-            HPX_FORCEINLINE typename std::enable_if<
-                traits::is_continuation<Continuation>::value, bool>::type
-            apply_c(Continuation&& cont, Us&&... vs) const
+            HPX_FORCEINLINE
+                std::enable_if_t<traits::is_continuation_v<Continuation>, bool>
+                apply_c(Continuation&& cont, Us&&... vs) const
             {
                 return hpx::apply<Action>(HPX_FORWARD(Continuation, cont),
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
@@ -125,62 +125,69 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts,
-        typename Enable = typename std::enable_if<
-            traits::is_action<typename std::decay<Action>::type>::value>::type>
-    detail::bound_action<typename std::decay<Action>::type,
-        typename util::make_index_pack<sizeof...(Ts)>::type,
-        typename std::decay<Ts>::type...>
+        typename Enable =
+            std::enable_if_t<traits::is_action_v<std::decay_t<Action>>>>
+    detail::bound_action<std::decay_t<Action>,
+        util::make_index_pack_t<sizeof...(Ts)>, std::decay_t<Ts>...>
     bind(Ts&&... vs)
     {
-        using result_type =
-            detail::bound_action<typename std::decay<Action>::type,
-                typename util::make_index_pack<sizeof...(Ts)>::type,
-                typename std::decay<Ts>::type...>;
+        using result_type = detail::bound_action<std::decay_t<Action>,
+            util::make_index_pack_t<sizeof...(Ts)>, std::decay_t<Ts>...>;
 
         return result_type(Action(), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Component, typename Signature, typename Derived,
         typename... Ts>
-    detail::bound_action<Derived,
-        typename util::make_index_pack<sizeof...(Ts)>::type,
-        typename std::decay<Ts>::type...>
+    detail::bound_action<Derived, util::make_index_pack_t<sizeof...(Ts)>,
+        std::decay_t<Ts>...>
     bind(hpx::actions::basic_action<Component, Signature, Derived> action,
         Ts&&... vs)
     {
         using result_type = detail::bound_action<Derived,
-            typename util::make_index_pack<sizeof...(Ts)>::type,
-            typename std::decay<Ts>::type...>;
+            util::make_index_pack_t<sizeof...(Ts)>, std::decay_t<Ts>...>;
 
         return result_type(
             static_cast<Derived const&>(action), HPX_FORWARD(Ts, vs)...);
     }
-}}    // namespace hpx::util
+}    // namespace hpx
+
+namespace hpx::util {
+
+    template <typename Action, typename... Ts,
+        typename Enable =
+            std::enable_if_t<traits::is_action_v<std::decay_t<Action>>>>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::util::bind is deprecated, use hpx::bind instead")
+    decltype(auto) bind(Ts&&... vs)
+    {
+        return hpx::bind<Action>(Action(), HPX_FORWARD(Ts, vs)...);
+    }
+}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Is, typename... Ts>
-    struct is_bind_expression<util::detail::bound_action<Action, Is, Ts...>>
+    struct is_bind_expression<hpx::detail::bound_action<Action, Is, Ts...>>
       : std::true_type
     {
     };
 
     template <typename Action, typename Is, typename... Ts>
-    struct is_bound_action<util::detail::bound_action<Action, Is, Ts...>>
+    struct is_bound_action<hpx::detail::bound_action<Action, Is, Ts...>>
       : std::true_type
     {
     };
-}}    // namespace hpx::traits
+}    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace serialization {
 
     // serialization of the bound action object
     template <typename Archive, typename F, typename... Ts>
-    void serialize(Archive& ar,
-        ::hpx::util::detail::bound_action<F, Ts...>& bound,
+    void serialize(Archive& ar, ::hpx::detail::bound_action<F, Ts...>& bound,
         unsigned int const version = 0)
     {
         bound.serialize(ar, version);

@@ -548,7 +548,7 @@ namespace hpx { namespace agas {
             // delay the final response until the runtime system is up and running
             hpx::move_only_function<void()>* thunk =
                 new hpx::move_only_function<void()>(util::one_shot(
-                    util::bind_front(&big_boot_barrier::apply_notification,
+                    hpx::bind_front(&big_boot_barrier::apply_notification,
                         &get_big_boot_barrier(), 0,
                         naming::get_locality_id_from_gid(prefix), dest,
                         HPX_MOVE(hdr))));

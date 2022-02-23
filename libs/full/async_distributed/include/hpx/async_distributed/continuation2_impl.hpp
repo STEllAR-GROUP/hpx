@@ -45,9 +45,9 @@ namespace hpx { namespace actions {
                 T>::type>::type
         operator()(hpx::id_type const& lco, T&& t) const
         {
-            using hpx::util::placeholders::_2;
-            hpx::apply_continue(cont_, hpx::util::bind(f_, lco, _2), target_,
-                HPX_FORWARD(T, t));
+            using hpx::placeholders::_2;
+            hpx::apply_continue(
+                cont_, hpx::bind(f_, lco, _2), target_, HPX_FORWARD(T, t));
 
             // Unfortunately we need to default construct the return value,
             // this possibly imposes an additional restriction of return types.

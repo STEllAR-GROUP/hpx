@@ -60,7 +60,7 @@ namespace hpx { namespace components {
             // Make sure we pin the component at construction of the bound object
             // which will also unpin it once the thread runs to completion (the
             // bound object goes out of scope).
-            return util::one_shot(util::bind_front(
+            return util::one_shot(hpx::bind_front(
                 &abstract_base_migration_support::thread_function,
                 get_lva<this_component_type>::call(lva),
                 traits::component_decorate_function<base_type>::call(

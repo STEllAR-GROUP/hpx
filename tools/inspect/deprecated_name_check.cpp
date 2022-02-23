@@ -60,7 +60,7 @@ namespace boost
       { "(\\bboost\\s*::\\s*make_shared\\b)", "std::make_shared" },
       { "(\\bboost\\s*::\\s*enable_shared_from_this\\b)",
         "std::enable_shared_from_this" },
-      { "(\\bboost\\s*::\\s*bind\\b)", "hpx::util::bind" },
+      { "(\\bboost\\s*::\\s*bind\\b)", "hpx::bind" },
       { "(\\bboost\\s*::\\s*unique_lock\\b)", "std::unique_lock" },
       { "(\\bboost\\s*::\\s*chrono\\b)", "std::chrono" },
       { "(\\bboost\\s*::\\s*reference_wrapper\\b)", "std::reference_wrapper" },

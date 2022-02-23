@@ -23,7 +23,7 @@
 
 #include <hpx/functional/bind.hpp>
 
-namespace placeholders = hpx::util::placeholders;
+namespace placeholders = hpx::placeholders;
 
 #include <iostream>
 
@@ -42,7 +42,7 @@ struct custom_placeholder
 {
 };
 
-namespace hpx { namespace traits {
+namespace hpx {
 
     template <int I>
     struct is_placeholder<custom_placeholder<I>>
@@ -52,8 +52,7 @@ namespace hpx { namespace traits {
             value = I
         };
     };
-
-}}    // namespace hpx::traits
+}    // namespace hpx
 
 int main()
 {
@@ -77,7 +76,7 @@ int main()
     custom_placeholder<8> p8;
     custom_placeholder<9> p9;
 
-    HPX_TEST(hpx::util::bind(f, p1, p2, p3, p4, p5, p6, p7, p8, p9)(
+    HPX_TEST(hpx::bind(f, p1, p2, p3, p4, p5, p6, p7, p8, p9)(
                  x1, x2, x3, x4, x5, x6, x7, x8, x9) == 987654321L);
 
     return hpx::util::report_errors();

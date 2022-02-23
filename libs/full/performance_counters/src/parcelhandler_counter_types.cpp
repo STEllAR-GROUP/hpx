@@ -29,77 +29,77 @@ namespace hpx::performance_counters {
             return;
         }
 
-        using util::placeholders::_1;
-        using util::placeholders::_2;
+        using placeholders::_1;
+        using placeholders::_2;
 
         using parcelset::parcelhandler;
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
         hpx::function<std::int64_t(std::string const&, bool)> num_parcel_sends(
-            util::bind_front(
+            hpx::bind_front(
                 &parcelhandler::get_action_parcel_send_count, &ph, pp_type));
         hpx::function<std::int64_t(std::string const&, bool)>
-            num_parcel_receives(util::bind_front(
+            num_parcel_receives(hpx::bind_front(
                 &parcelhandler::get_action_parcel_receive_count, &ph, pp_type));
 #else
-        hpx::function<std::int64_t(bool)> num_parcel_sends(util::bind_front(
+        hpx::function<std::int64_t(bool)> num_parcel_sends(hpx::bind_front(
             &parcelhandler::get_parcel_send_count, &ph, pp_type));
-        hpx::function<std::int64_t(bool)> num_parcel_receives(util::bind_front(
+        hpx::function<std::int64_t(bool)> num_parcel_receives(hpx::bind_front(
             &parcelhandler::get_parcel_receive_count, &ph, pp_type));
 #endif
 
-        hpx::function<std::int64_t(bool)> num_message_sends(util::bind_front(
+        hpx::function<std::int64_t(bool)> num_message_sends(hpx::bind_front(
             &parcelhandler::get_message_send_count, &ph, pp_type));
-        hpx::function<std::int64_t(bool)> num_message_receives(util::bind_front(
+        hpx::function<std::int64_t(bool)> num_message_receives(hpx::bind_front(
             &parcelhandler::get_message_receive_count, &ph, pp_type));
 
         hpx::function<std::int64_t(bool)> sending_time(
-            util::bind_front(&parcelhandler::get_sending_time, &ph, pp_type));
+            hpx::bind_front(&parcelhandler::get_sending_time, &ph, pp_type));
         hpx::function<std::int64_t(bool)> receiving_time(
-            util::bind_front(&parcelhandler::get_receiving_time, &ph, pp_type));
+            hpx::bind_front(&parcelhandler::get_receiving_time, &ph, pp_type));
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
         hpx::function<std::int64_t(std::string const&, bool)>
-            sending_serialization_time(util::bind_front(
+            sending_serialization_time(hpx::bind_front(
                 &parcelhandler::get_action_sending_serialization_time, &ph,
                 pp_type));
         hpx::function<std::int64_t(std::string const&, bool)>
-            receiving_serialization_time(util::bind_front(
+            receiving_serialization_time(hpx::bind_front(
                 &parcelhandler::get_action_receiving_serialization_time, &ph,
                 pp_type));
 #else
         hpx::function<std::int64_t(bool)> sending_serialization_time(
-            util::bind_front(
+            hpx::bind_front(
                 &parcelhandler::get_sending_serialization_time, &ph, pp_type));
         hpx::function<std::int64_t(bool)> receiving_serialization_time(
-            util::bind_front(&parcelhandler::get_receiving_serialization_time,
+            hpx::bind_front(&parcelhandler::get_receiving_serialization_time,
                 &ph, pp_type));
 #endif
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
         hpx::function<std::int64_t(std::string const&, bool)> data_sent(
-            util::bind_front(
+            hpx::bind_front(
                 &parcelhandler::get_action_data_sent, &ph, pp_type));
         hpx::function<std::int64_t(std::string const&, bool)> data_received(
-            util::bind_front(
+            hpx::bind_front(
                 &parcelhandler::get_action_data_received, &ph, pp_type));
 #else
         hpx::function<std::int64_t(bool)> data_sent(
-            util::bind_front(&parcelhandler::get_data_sent, &ph, pp_type));
+            hpx::bind_front(&parcelhandler::get_data_sent, &ph, pp_type));
         hpx::function<std::int64_t(bool)> data_received(
-            util::bind_front(&parcelhandler::get_data_received, &ph, pp_type));
+            hpx::bind_front(&parcelhandler::get_data_received, &ph, pp_type));
 #endif
 
         hpx::function<std::int64_t(bool)> data_raw_sent(
-            util::bind_front(&parcelhandler::get_raw_data_sent, &ph, pp_type));
-        hpx::function<std::int64_t(bool)> data_raw_received(util::bind_front(
+            hpx::bind_front(&parcelhandler::get_raw_data_sent, &ph, pp_type));
+        hpx::function<std::int64_t(bool)> data_raw_received(hpx::bind_front(
             &parcelhandler::get_raw_data_received, &ph, pp_type));
 
         hpx::function<std::int64_t(bool)> buffer_allocate_time_sent(
-            util::bind_front(
+            hpx::bind_front(
                 &parcelhandler::get_buffer_allocate_time_sent, &ph, pp_type));
         hpx::function<std::int64_t(bool)> buffer_allocate_time_received(
-            util::bind_front(&parcelhandler::get_buffer_allocate_time_received,
+            hpx::bind_front(&parcelhandler::get_buffer_allocate_time_received,
                 &ph, pp_type));
 
         performance_counters::generic_counter_type_data const counter_types[] =
@@ -112,12 +112,12 @@ namespace hpx::performance_counters {
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::per_action_data_counter_creator,
                         _1, HPX_MOVE(num_parcel_sends), _2),
                     &performance_counters::per_action_data_counter_discoverer,
 #else
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(num_parcel_sends), _2),
                     &performance_counters::locality_counter_discoverer,
@@ -131,12 +131,12 @@ namespace hpx::performance_counters {
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::per_action_data_counter_creator,
                         _1, HPX_MOVE(num_parcel_receives), _2),
                     &performance_counters::per_action_data_counter_discoverer,
 #else
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(num_parcel_receives), _2),
                     &performance_counters::locality_counter_discoverer,
@@ -149,7 +149,7 @@ namespace hpx::performance_counters {
                         "connection type for the referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(num_message_sends), _2),
                     &performance_counters::locality_counter_discoverer, ""},
@@ -160,7 +160,7 @@ namespace hpx::performance_counters {
                         "connection type for the referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(num_message_receives), _2),
                     &performance_counters::locality_counter_discoverer, ""},
@@ -174,7 +174,7 @@ namespace hpx::performance_counters {
                         "referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(sending_time), _2),
                     &performance_counters::locality_counter_discoverer, "ns"},
@@ -187,7 +187,7 @@ namespace hpx::performance_counters {
                         "referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(receiving_time), _2),
                     &performance_counters::locality_counter_discoverer, "ns"},
@@ -200,12 +200,12 @@ namespace hpx::performance_counters {
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::per_action_data_counter_creator,
                         _1, HPX_MOVE(sending_serialization_time), _2),
                     &performance_counters::per_action_data_counter_discoverer,
 #else
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(sending_serialization_time), _2),
                     &performance_counters::locality_counter_discoverer,
@@ -220,12 +220,12 @@ namespace hpx::performance_counters {
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::per_action_data_counter_creator,
                         _1, HPX_MOVE(receiving_serialization_time), _2),
                     &performance_counters::per_action_data_counter_discoverer,
 #else
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(receiving_serialization_time), _2),
                     &performance_counters::locality_counter_discoverer,
@@ -240,7 +240,7 @@ namespace hpx::performance_counters {
                         "referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(data_raw_sent), _2),
                     &performance_counters::locality_counter_discoverer,
@@ -253,7 +253,7 @@ namespace hpx::performance_counters {
                         "referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(data_raw_received), _2),
                     &performance_counters::locality_counter_discoverer,
@@ -267,12 +267,12 @@ namespace hpx::performance_counters {
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::per_action_data_counter_creator,
                         _1, HPX_MOVE(data_sent), _2),
                     &performance_counters::per_action_data_counter_discoverer,
 #else
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(data_sent), _2),
                     &performance_counters::locality_counter_discoverer,
@@ -287,12 +287,12 @@ namespace hpx::performance_counters {
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::per_action_data_counter_creator,
                         _1, HPX_MOVE(data_received), _2),
                     &performance_counters::per_action_data_counter_discoverer,
 #else
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(data_received), _2),
                     &performance_counters::locality_counter_discoverer,
@@ -306,7 +306,7 @@ namespace hpx::performance_counters {
                         "serializing using the {} connection type",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(buffer_allocate_time_received), _2),
                     &performance_counters::locality_counter_discoverer, "ns"},
@@ -318,7 +318,7 @@ namespace hpx::performance_counters {
                         "serializing using the {} connection type",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(buffer_allocate_time_sent), _2),
                     &performance_counters::locality_counter_discoverer, "ns"},
@@ -339,26 +339,26 @@ namespace hpx::performance_counters {
             return;
         }
 
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
 
         using parcelset::parcelhandler;
         using parcelset::parcelport;
 
         hpx::function<std::int64_t(bool)> cache_insertions(
-            util::bind_front(&parcelhandler::get_connection_cache_statistics,
+            hpx::bind_front(&parcelhandler::get_connection_cache_statistics,
                 &ph, pp_type, parcelport::connection_cache_insertions));
         hpx::function<std::int64_t(bool)> cache_evictions(
-            util::bind_front(&parcelhandler::get_connection_cache_statistics,
+            hpx::bind_front(&parcelhandler::get_connection_cache_statistics,
                 &ph, pp_type, parcelport::connection_cache_evictions));
         hpx::function<std::int64_t(bool)> cache_hits(
-            util::bind_front(&parcelhandler::get_connection_cache_statistics,
+            hpx::bind_front(&parcelhandler::get_connection_cache_statistics,
                 &ph, pp_type, parcelport::connection_cache_hits));
         hpx::function<std::int64_t(bool)> cache_misses(
-            util::bind_front(&parcelhandler::get_connection_cache_statistics,
+            hpx::bind_front(&parcelhandler::get_connection_cache_statistics,
                 &ph, pp_type, parcelport::connection_cache_misses));
         hpx::function<std::int64_t(bool)> cache_reclaims(
-            util::bind_front(&parcelhandler::get_connection_cache_statistics,
+            hpx::bind_front(&parcelhandler::get_connection_cache_statistics,
                 &ph, pp_type, parcelport::connection_cache_reclaims));
 
         performance_counters::generic_counter_type_data const
@@ -372,7 +372,7 @@ namespace hpx::performance_counters {
                         "type on the referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(cache_insertions), _2),
                     &performance_counters::locality_counter_discoverer, ""},
@@ -385,7 +385,7 @@ namespace hpx::performance_counters {
                         "the referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(cache_evictions), _2),
                     &performance_counters::locality_counter_discoverer, ""},
@@ -397,7 +397,7 @@ namespace hpx::performance_counters {
                         "referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(cache_hits), _2),
                     &performance_counters::locality_counter_discoverer, ""},
@@ -410,7 +410,7 @@ namespace hpx::performance_counters {
                         "the referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(cache_misses), _2),
                     &performance_counters::locality_counter_discoverer, ""},
@@ -423,7 +423,7 @@ namespace hpx::performance_counters {
                         "the referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(cache_reclaims), _2),
                     &performance_counters::locality_counter_discoverer, ""}};
@@ -442,32 +442,32 @@ namespace hpx::performance_counters {
             return true;
         });
 
-        using util::placeholders::_1;
-        using util::placeholders::_2;
+        using placeholders::_1;
+        using placeholders::_2;
 
         using parcelset::parcelhandler;
 
         // register common counters
         hpx::function<std::int64_t(bool)> incoming_queue_length(
-            util::bind_front(&parcelhandler::get_incoming_queue_length, &ph));
+            hpx::bind_front(&parcelhandler::get_incoming_queue_length, &ph));
         hpx::function<std::int64_t(bool)> outgoing_queue_length(
-            util::bind_front(&parcelhandler::get_outgoing_queue_length, &ph));
+            hpx::bind_front(&parcelhandler::get_outgoing_queue_length, &ph));
         hpx::function<std::int64_t(bool)> outgoing_routed_count(
-            util::bind_front(&parcelhandler::get_parcel_routed_count, &ph));
+            hpx::bind_front(&parcelhandler::get_parcel_routed_count, &ph));
 
         performance_counters::generic_counter_type_data const counter_types[] =
             {{"/parcelqueue/length/receive", performance_counters::counter_raw,
                  "returns the number current length of the queue of incoming "
                  "parcels",
                  HPX_PERFORMANCE_COUNTER_V1,
-                 util::bind(&performance_counters::locality_raw_counter_creator,
+                 hpx::bind(&performance_counters::locality_raw_counter_creator,
                      _1, incoming_queue_length, _2),
                  &performance_counters::locality_counter_discoverer, ""},
                 {"/parcelqueue/length/send", performance_counters::counter_raw,
                     "returns the number current length of the queue of "
                     "outgoing parcels",
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         outgoing_queue_length, _2),
                     &performance_counters::locality_counter_discoverer, ""},
@@ -476,7 +476,7 @@ namespace hpx::performance_counters {
                     "returns the number of (outbound) parcel routed through "
                     "the responsible AGAS service",
                     HPX_PERFORMANCE_COUNTER_V1,
-                    util::bind(
+                    hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         outgoing_routed_count, _2),
                     &performance_counters::locality_counter_discoverer, ""}};

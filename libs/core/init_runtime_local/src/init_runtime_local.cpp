@@ -310,7 +310,7 @@ namespace hpx {
 
                 // Run this runtime instance using the given function f.
                 if (!f.empty())
-                    return rt.run(util::bind_front(f, vm));
+                    return rt.run(hpx::bind_front(f, vm));
 
                 // Run this runtime instance without an hpx_main
                 return rt.run();
@@ -330,7 +330,7 @@ namespace hpx {
                 if (!f.empty())
                 {
                     // Run this runtime instance using the given function f.
-                    return rt.start(util::bind_front(f, vm));
+                    return rt.start(hpx::bind_front(f, vm));
                 }
 
                 // Run this runtime instance without an hpx_main

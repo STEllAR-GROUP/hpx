@@ -73,17 +73,17 @@ int hpx_main()
     {
         increment_client inc = hpx::components::new_<increment_client>(there);
 
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
-        using hpx::util::placeholders::_3;
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
+        using hpx::placeholders::_3;
 
         call_action call;
         hpx::apply(call, inc, here, 1);
-        hpx::apply(hpx::util::bind(call, inc, here, 1));
-        hpx::apply(hpx::util::bind(call, inc, here, _1), 1);
-        hpx::apply(hpx::util::bind(call, _1, here, 1), inc);
-        hpx::apply(hpx::util::bind(call, _1, _2, 1), inc, here);
-        hpx::apply(hpx::util::bind(call, _1, _2, _3), inc, here, 1);
+        hpx::apply(hpx::bind(call, inc, here, 1));
+        hpx::apply(hpx::bind(call, inc, here, _1), 1);
+        hpx::apply(hpx::bind(call, _1, here, 1), inc);
+        hpx::apply(hpx::bind(call, _1, _2, 1), inc, here);
+        hpx::apply(hpx::bind(call, _1, _2, _3), inc, here, 1);
     }
 
     {
