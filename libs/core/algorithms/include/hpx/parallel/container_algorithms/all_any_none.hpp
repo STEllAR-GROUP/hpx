@@ -234,123 +234,10 @@ namespace hpx { namespace ranges {
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
-    ///////////////////////////////////////////////////////////////////////////
-    // none_of
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            traits::is_projected_range<Proj, Rng>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj, Rng>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::none_of is deprecated, use "
-        "hpx::ranges::none_of instead")
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        none_of(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
-    {
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
-
-        static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
-            "Required at least forward iterator.");
-
-        return none_of(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            hpx::util::end(rng), HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // any_of
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            traits::is_projected_range<Proj, Rng>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj, Rng>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::any_of is deprecated, use hpx::ranges::any_of instead")
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        any_of(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
-    {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
-
-        static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
-            "Required at least forward iterator.");
-
-        return any_of(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            hpx::util::end(rng), HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // all_of
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            traits::is_projected_range<Proj, Rng>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj, Rng>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::all_of is deprecated, use hpx::ranges::all_of instead")
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        all_of(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
-    {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
-
-        static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
-            "Required at least forward iterator.");
-
-        return all_of(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            hpx::util::end(rng), HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-}}}    // namespace hpx::parallel::v1
-
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::none_of
+    // CPO for hpx::ranges::none_of
     inline constexpr struct none_of_t final
       : hpx::detail::tag_parallel_algorithm<none_of_t>
     {
@@ -463,7 +350,7 @@ namespace hpx { namespace ranges {
     } none_of{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::any_of
+    // CPO for hpx::ranges::any_of
     inline constexpr struct any_of_t final
       : hpx::detail::tag_parallel_algorithm<any_of_t>
     {
@@ -575,7 +462,7 @@ namespace hpx { namespace ranges {
     } any_of{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::all_of
+    // CPO for hpx::ranges::all_of
     inline constexpr struct all_of_t final
       : hpx::detail::tag_parallel_algorithm<all_of_t>
     {

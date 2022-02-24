@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -320,44 +320,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::equal_to,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<FwdIter1> &&
-            hpx::traits::is_iterator_v<FwdIter2> &&
-            hpx::is_invocable_v<Pred,
-                typename std::iterator_traits<FwdIter1>::value_type,
-                typename std::iterator_traits<FwdIter2>::value_type
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::mismatch is deprecated, use hpx::mismatch instead")
-        util::detail::algorithm_result_t<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>> mismatch(ExPolicy&& policy,
-            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
-            Pred&& op = Pred())
-    {
-        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
-            "Requires at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::get_pair(
-            detail::mismatch_binary<util::in_in_result<FwdIter1, FwdIter2>>()
-                .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
-                    last2, HPX_FORWARD(Pred, op)));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // mismatch
     namespace detail {
@@ -432,47 +394,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::equal_to,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<FwdIter1> &&
-            hpx::traits::is_iterator_v<FwdIter2> &&
-            hpx::is_invocable_v<Pred,
-                typename std::iterator_traits<FwdIter1>::value_type,
-                typename std::iterator_traits<FwdIter2>::value_type
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::mismatch is deprecated, use hpx::mismatch instead")
-        util::detail::algorithm_result_t<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>> mismatch(ExPolicy&& policy,
-            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
-            Pred&& op = Pred())
-    {
-        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
-            "Requires at least forward iterator.");
-
-        using result_type = std::pair<FwdIter1, FwdIter2>;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::mismatch<result_type>().call(
-            HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
-            HPX_FORWARD(Pred, op));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 

@@ -76,13 +76,3 @@ namespace hpx { namespace chrono {
         value_type _rel_time;
     };
 }}    // namespace hpx::chrono
-
-namespace hpx { namespace util {
-    using steady_time_point HPX_DEPRECATED_V(1, 6,
-        "hpx::util::steady_time_point is deprecated. Use "
-        "hpx::chrono::steady_time_point instead.") =
-        hpx::chrono::steady_time_point;
-    using steady_duration HPX_DEPRECATED_V(1, 6,
-        "hpx::util::steady_duration is deprecated. Use "
-        "hpx::chrono::steady_duration instead.") = hpx::chrono::steady_duration;
-}}    // namespace hpx::util

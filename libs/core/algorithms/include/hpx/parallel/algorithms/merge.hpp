@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Taeguk Kwon
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -463,61 +464,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    // TODO: Support forward and bidirectional iterator. (#2826)
-    // For now, only support random access iterator.
-
-    // clang-format off
-    template <typename ExPolicy, typename RandIter1, typename RandIter2,
-        typename RandIter3, typename Comp = detail::less,
-        typename Proj1 = util::projection_identity,
-        typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<RandIter1>::value &&
-            hpx::traits::is_iterator<RandIter2>::value &&
-            hpx::traits::is_iterator<RandIter3>::value &&
-            traits::is_projected<Proj1, RandIter1>::value &&
-            traits::is_projected<Proj2, RandIter2>::value &&
-            traits::is_indirect_callable<ExPolicy, Comp,
-                traits::projected<Proj1, RandIter1>,
-                traits::projected<Proj2, RandIter2>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::parallel::merge is deprecated, use hpx::merge instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_in_out_result<RandIter1, RandIter2, RandIter3>>::type
-        merge(ExPolicy&& policy, RandIter1 first1, RandIter1 last1,
-            RandIter2 first2, RandIter2 last2, RandIter3 dest,
-            Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
-    {
-        static_assert(
-            (hpx::traits::is_random_access_iterator<RandIter1>::value),
-            "Required at least random access iterator.");
-        static_assert(
-            (hpx::traits::is_random_access_iterator<RandIter2>::value),
-            "Requires at least random access iterator.");
-        static_assert(
-            (hpx::traits::is_random_access_iterator<RandIter3>::value),
-            "Requires at least random access iterator.");
-
-        using result_type =
-            util::in_in_out_result<RandIter1, RandIter2, RandIter3>;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::merge<result_type>().call(HPX_FORWARD(ExPolicy, policy),
-            first1, last1, first2, last2, dest, HPX_FORWARD(Comp, comp),
-            HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     /////////////////////////////////////////////////////////////////////////////
     // inplace_merge
     namespace detail {
@@ -746,50 +692,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return hpx::future<void>(HPX_MOVE(f));
         }
     }    // namespace detail
-
-    // TODO: Support bidirectional iterator. (#2826)
-    // For now, only support random access iterator.
-
-    // clang-format off
-    template <typename ExPolicy, typename RandIter,
-        typename Comp = detail::less, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<RandIter>::value &&
-            traits::is_projected<Proj, RandIter>::value &&
-            traits::is_indirect_callable<ExPolicy, Comp,
-                traits::projected<Proj, RandIter>,
-                traits::projected<Proj, RandIter>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::inplace_merge is deprecated, use hpx::inplace_merge "
-        "instead")
-        typename util::detail::algorithm_result<ExPolicy, RandIter>::type
-        inplace_merge(ExPolicy&& policy, RandIter first, RandIter middle,
-            RandIter last, Comp&& comp = Comp(), Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_random_access_iterator<RandIter>::value),
-            "Required at least random access iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::inplace_merge<RandIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, middle, last,
-            HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::merge
+    // CPO for hpx::merge
     inline constexpr struct merge_t final
       : hpx::detail::tag_parallel_algorithm<merge_t>
     {
@@ -875,7 +783,7 @@ namespace hpx {
     } merge{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::inplace_merge
+    // CPO for hpx::inplace_merge
     inline constexpr struct inplace_merge_t final
       : hpx::detail::tag_parallel_algorithm<inplace_merge_t>
     {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -552,85 +552,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename Size, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_iterator<FwdIter>::value&&
-            hpx::parallel::traits::is_projected<Proj, FwdIter>::value&&
-            hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
-            hpx::parallel::traits::projected<Proj,
-            FwdIter>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::for_each_n is deprecated, use hpx::for_each_n "
-        "instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        for_each_n(ExPolicy&& policy, FwdIter first, Size count, F&& f,
-            Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        // if count is representing a negative value or zero, we do nothing
-        if (detail::is_negative(count) || count == 0)
-        {
-            using result = util::detail::algorithm_result<ExPolicy, FwdIter>;
-            return result::get(HPX_MOVE(first));
-        }
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return parallel::v1::detail::for_each_n<FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
-            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-        typename F, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIterB>::value &&
-            hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value &&
-            hpx::parallel::traits::is_projected<Proj, FwdIterB>::value
-        )
-#if (!defined(__NVCC__) && !defined(__CUDACC__)) || defined(__CUDA_ARCH__)
-            ,
-        HPX_CONCEPT_REQUIRES_(hpx::parallel::traits::is_indirect_callable<ExPolicy,
-            F, traits::projected<Proj, FwdIterB>>::value)
-#endif
-        >
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::for_each is deprecated, use hpx::for_each instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIterB>::type
-        for_each(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
-            Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIterB>::value),
-            "Requires at least forward iterator.");
-
-        if (first == last)
-        {
-            using result =
-                parallel::util::detail::algorithm_result<ExPolicy, FwdIterB>;
-            return result::get(HPX_MOVE(first));
-        }
-
-        return parallel::v1::detail::for_each<FwdIterB>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-            HPX_FORWARD(Proj, proj));
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 

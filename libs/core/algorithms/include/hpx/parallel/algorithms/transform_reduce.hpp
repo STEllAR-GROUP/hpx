@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2017-2020 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -401,47 +401,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename T, typename Reduce,
-        typename Convert,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value &&
-            hpx::is_invocable_v<Convert,
-                typename std::iterator_traits<FwdIter>::value_type> &&
-            hpx::is_invocable_v<Reduce,
-                typename hpx::util::invoke_result<
-                    Convert, typename std::iterator_traits<FwdIter>::value_type
-                >::type,
-                typename hpx::util::invoke_result<
-                    Convert, typename std::iterator_traits<FwdIter>::value_type
-                >::type
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::transform_reduce is deprecated, use "
-        "hpx::transform_reduce instead")
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce(ExPolicy&& policy, FwdIter first, FwdIter last, T init,
-            Reduce&& red_op, Convert&& conv_op)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-            "Requires at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::transform_reduce<T>().call(HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(T, init), HPX_FORWARD(Reduce, red_op),
-            HPX_FORWARD(Convert, conv_op));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // transform_reduce_binary
     namespace detail {
@@ -631,75 +590,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::transform_reduce is deprecated, use "
-        "hpx::transform_reduce instead")
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, T init)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
-            "Requires at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
-            "Requires at least forward iterator.");
-
-        return detail::transform_reduce_binary<T>().call(
-            HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
-            HPX_MOVE(init), detail::plus(), detail::multiplies());
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T, typename Reduce, typename Convert,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
-            hpx::is_invocable_v<Convert,
-                typename std::iterator_traits<FwdIter1>::value_type,
-                typename std::iterator_traits<FwdIter2>::value_type
-            > &&
-            hpx::is_invocable_v<Reduce,
-                typename hpx::util::invoke_result<Convert,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type
-                >::type,
-                typename hpx::util::invoke_result<Convert,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type
-                >::type
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::transform_reduce is deprecated, use "
-        "hpx::transform_reduce instead")
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
-            "Requires at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
-            "Requires at least forward iterator.");
-
-        return detail::transform_reduce_binary<T>().call(
-            HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
-            HPX_MOVE(init), HPX_FORWARD(Reduce, red_op),
-            HPX_FORWARD(Convert, conv_op));
-    }
-
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #include <hpx/functional/traits/get_function_address.hpp>
@@ -766,7 +657,7 @@ namespace hpx { namespace traits {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::transform_reduce
+    // CPO for hpx::transform_reduce
     inline constexpr struct transform_reduce_t final
       : hpx::detail::tag_parallel_algorithm<transform_reduce_t>
     {

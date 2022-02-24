@@ -301,71 +301,6 @@ namespace hpx {
 
 #else
 
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    template <typename ExPolicy, typename FwdIter, typename FwdIter2,
-        typename Pred = detail::equal_to,
-        typename Proj1 = parallel::util::projection_identity,
-        typename Proj2 = parallel::util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<
-            ExPolicy>::value&& hpx::traits::is_iterator<FwdIter>::value&&
-                parallel::traits::is_projected<Proj1, FwdIter>::value&&
-                    hpx::traits::is_iterator<FwdIter2>::value&&
-                        parallel::traits::is_projected<Proj2, FwdIter2>::value&&
-                            parallel::traits::is_indirect_callable<ExPolicy,
-                                Pred,
-                                parallel::traits::projected<Proj1, FwdIter>,
-                                parallel::traits::projected<Proj2,
-                                    FwdIter2>>::value)>
-    HPX_DEPRECATED_V(1, 6, "Please use hpx::search instead.")
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        search(ExPolicy&& policy, FwdIter first, FwdIter last, FwdIter2 s_first,
-            FwdIter2 s_last, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Subsequence requires at least forward iterator.");
-
-        return hpx::parallel::v1::detail::search<FwdIter, FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, s_first, s_last,
-            HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
-            HPX_FORWARD(Proj2, proj2));
-    }
-
-    template <typename ExPolicy, typename FwdIter, typename FwdIter2,
-        typename Pred = parallel::v1::detail::equal_to,
-        typename Proj1 = parallel::util::projection_identity,
-        typename Proj2 = parallel::util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<
-            ExPolicy>::value&& hpx::traits::is_iterator<FwdIter>::value&&
-                parallel::traits::is_projected<Proj1, FwdIter>::value&&
-                    hpx::traits::is_iterator<FwdIter2>::value&&
-                        parallel::traits::is_projected<Proj2, FwdIter2>::value&&
-                            parallel::traits::is_indirect_callable<ExPolicy,
-                                Pred,
-                                parallel::traits::projected<Proj1, FwdIter>,
-                                parallel::traits::projected<Proj2,
-                                    FwdIter2>>::value)>
-    HPX_DEPRECATED_V(1, 6, "Please use hpx::search_n instead.")
-    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        search_n(ExPolicy&& policy, FwdIter first, std::size_t count,
-            FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Subsequence requires at least forward iterator.");
-
-        return detail::search_n<FwdIter, FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, count, s_first, s_last,
-            HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
-            HPX_FORWARD(Proj2, proj2));
-    }
-}}}    // namespace hpx::parallel::v1
-
 namespace hpx {
 
     inline constexpr struct search_t final
@@ -418,7 +353,6 @@ namespace hpx {
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }
-
     } search{};
 
     inline constexpr struct search_n_t final
@@ -473,9 +407,7 @@ namespace hpx {
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }
-
     } search_n{};
-
 }    // namespace hpx
 
 #endif

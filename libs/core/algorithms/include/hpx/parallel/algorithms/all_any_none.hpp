@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -316,39 +316,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value &&
-            traits::is_projected<Proj, FwdIter>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected<Proj, FwdIter>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::parallel::none_of is deprecated, use hpx::none_of instead")
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        none_of(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-            Proj&& proj = Proj())
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-            "Required at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return hpx::parallel::v1::detail::none_of().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-            HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // any_of
     namespace detail {
@@ -411,39 +378,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value &&
-            traits::is_projected<Proj, FwdIter>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected<Proj, FwdIter>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::parallel::any_of is deprecated, use hpx::any_of instead")
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        any_of(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-            Proj&& proj = Proj())
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-            "Required at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return hpx::parallel::v1::detail::any_of().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-            HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // all_of
     namespace detail {
@@ -504,45 +438,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_iterator<FwdIter>::value&&
-            traits::is_projected<Proj, FwdIter>::value&&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected<Proj, FwdIter>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::parallel::all_of is deprecated, use hpx::all_of instead")
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        all_of(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-            Proj&& proj = Proj())
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-            "Required at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return hpx::parallel::v1::detail::all_of().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-            HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::none_of
+    // CPO for hpx::none_of
     inline constexpr struct none_of_t final
       : hpx::detail::tag_parallel_algorithm<none_of_t>
     {
@@ -586,7 +487,7 @@ namespace hpx {
     } none_of{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::any_of
+    // CPO for hpx::any_of
     inline constexpr struct any_of_t final
       : hpx::detail::tag_parallel_algorithm<any_of_t>
     {
@@ -630,7 +531,7 @@ namespace hpx {
     } any_of{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::all_of
+    // CPO for hpx::all_of
     inline constexpr struct all_of_t final
       : hpx::detail::tag_parallel_algorithm<all_of_t>
     {

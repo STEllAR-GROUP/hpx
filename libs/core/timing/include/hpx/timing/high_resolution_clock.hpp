@@ -51,10 +51,3 @@ namespace hpx { namespace chrono {
         }
     };
 }}    // namespace hpx::chrono
-
-namespace hpx { namespace util {
-    using high_resolution_clock HPX_DEPRECATED_V(1, 6,
-        "hpx::util::high_resolution_clock is deprecated. Use "
-        "hpx::chrono::high_resolution_clock instead.") =
-        hpx::chrono::high_resolution_clock;
-}}    // namespace hpx::util

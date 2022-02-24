@@ -69,16 +69,4 @@ namespace hpx {
 
     template <typename R, typename F, typename... Ts>
     inline constexpr bool is_invocable_r_v = is_invocable_r<R, F, Ts...>::value;
-
-    namespace traits {
-        template <typename F, typename... Ts>
-        using is_invocable HPX_DEPRECATED_V(1, 6,
-            "hpx::traits::is_invocable is deprecated, use hpx::is_invocable "
-            "instead") = hpx::is_invocable<F, Ts...>;
-
-        template <typename R, typename F, typename... Ts>
-        using is_invocable_r HPX_DEPRECATED_V(1, 6,
-            "hpx::traits::is_invocable_r is deprecated, use "
-            "hpx::is_invocable_r instead") = hpx::is_invocable_r<R, F, Ts...>;
-    }    // namespace traits
 }    // namespace hpx

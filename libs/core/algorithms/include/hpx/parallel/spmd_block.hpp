@@ -170,13 +170,12 @@ namespace hpx { namespace lcos { namespace local {
 
     // Asynchronous version
     template <typename ExPolicy, typename F, typename... Args,
-        typename = typename std::enable_if<hpx::parallel::execution::
-                is_async_execution_policy<ExPolicy>::value>::type>
+        typename = std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
     std::vector<hpx::future<void>> define_spmd_block(
         ExPolicy&& policy, std::size_t num_images, F&& f, Args&&... args)
     {
-        static_assert(hpx::is_async_execution_policy<ExPolicy>::value,
-            "hpx::is_async_execution_policy<ExPolicy>::value");
+        static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+            "hpx::is_async_execution_policy<ExPolicy>");
 
         using ftype = typename std::decay<F>::type;
         using first_type = typename hpx::util::first_argument<ftype>::type;
@@ -258,8 +257,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
     // Asynchronous version
     template <typename ExPolicy, typename F, typename... Args,
-        typename = typename std::enable_if<hpx::parallel::execution::
-                is_async_execution_policy<ExPolicy>::value>::type>
+        typename = std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
     std::vector<hpx::future<void>> define_spmd_block(
         ExPolicy&& policy, std::size_t num_images, F&& f, Args&&... args)
     {

@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2017-2018 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -476,29 +476,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename T,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::parallel::find is deprecated, use hpx::find instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        find(ExPolicy&& policy, FwdIter first, FwdIter last, T const& val)
-    {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::find<FwdIter>().call(HPX_FORWARD(ExPolicy, policy),
-            first, last, val, util::projection_identity());
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // find_if
     namespace detail {
@@ -574,34 +551,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value &&
-            hpx::is_invocable_v<F,
-                typename std::iterator_traits<FwdIter>::value_type
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::parallel::find_if is deprecated, use hpx::find_If instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        find_if(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-            "Requires at least forward iterator.");
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::find_if<FwdIter>().call(HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(F, f), util::projection_identity());
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     // find_if_not
@@ -679,36 +628,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value &&
-            hpx::is_invocable_v<F,
-                typename std::iterator_traits<FwdIter>::value_type
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::find_if_not is deprecated, use hpx::find_if_not "
-        "instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        find_if_not(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-            "Requires at least forward iterator.");
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::find_if_not<FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-            util::projection_identity{});
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     // find_end
@@ -801,40 +720,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::equal_to,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::find_end is deprecated, use hpx::find_end instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
-        find_end(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred(),
-            Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::find_end<FwdIter1>().call(HPX_FORWARD(ExPolicy, policy),
-            first1, last1, first2, last2, HPX_FORWARD(Pred, op),
-            HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // find_first_of
     namespace detail {
@@ -921,44 +806,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::equal_to,
-        typename Proj1 = util::projection_identity,
-        typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::find_first_of is deprecated, use hpx::find_first_of "
-        "instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
-        find_first_of(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Subsequence requires at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::find_first_of<FwdIter1>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, s_first, s_last,
-            HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
-            HPX_FORWARD(Proj2, proj2));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 

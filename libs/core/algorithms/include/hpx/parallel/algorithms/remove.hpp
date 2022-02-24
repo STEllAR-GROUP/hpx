@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Taeguk Kwon
 //  Copyright (c) 2021 Giannis Gonidelis
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -411,67 +412,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename Pred,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value &&
-            traits::is_projected<Proj,FwdIter>::value &&
-            traits::is_indirect_callable<ExPolicy,
-                Pred, traits::projected<Proj, FwdIter>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::remove_if is deprecated, use hpx::remove_if instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        remove_if(ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred,
-            Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Required at least forward iterator.");
-
-        return detail::remove_if<FwdIter>().call(HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename T,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value &&
-            traits::is_projected<Proj, FwdIter>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::parallel::remove is deprecated, use hpx::remove instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        remove(ExPolicy&& policy, FwdIter first, FwdIter last, T const& value,
-            Proj&& proj = Proj())
-    {
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        using value_type = typename std::iterator_traits<FwdIter>::value_type;
-
-        // Just utilize existing parallel remove_if.
-        return detail::remove_if<FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last,
-            [value](value_type const& a) -> bool { return value == a; },
-            HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::remove_if
+    // CPO for hpx::remove_if
     inline constexpr struct remove_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_if_t>
     {
@@ -523,7 +468,7 @@ namespace hpx {
     } remove_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::remove
+    // CPO for hpx::remove
     inline constexpr struct remove_t final
       : hpx::detail::tag_parallel_algorithm<remove_t>
     {

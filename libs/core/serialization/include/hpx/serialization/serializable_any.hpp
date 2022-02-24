@@ -398,23 +398,8 @@ namespace hpx { namespace util {
             std::in_place_type<T>, il, HPX_FORWARD(Ts, ts)...);
     }
 
-    template <typename T, typename Char>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::make_any is deprecated. Please use hpx::make_any instead.")
-    basic_any<serialization::input_archive, serialization::output_archive,
-        Char> make_any(T&& t)
-    {
-        return basic_any<serialization::input_archive,
-            serialization::output_archive, Char, std::true_type>(
-            HPX_FORWARD(T, t));
-    }
-
     ////////////////////////////////////////////////////////////////////////////
     // backwards compatibility
-    using any HPX_DEPRECATED_V(
-        1, 6, "hpx::util::any is deprecated. Please use hpx::any instead.") =
-        basic_any<serialization::input_archive, serialization::output_archive,
-            char, std::true_type>;
     using wany = basic_any<serialization::input_archive,
         serialization::output_archive, wchar_t, std::true_type>;
 

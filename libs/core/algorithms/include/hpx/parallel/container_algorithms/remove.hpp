@@ -484,59 +484,9 @@ namespace hpx { namespace ranges {
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename T,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_range<Rng>::value&&
-            traits::is_projected_range<Proj, Rng>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::remove is deprecated, use hpx::ranges::remove "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_iterator<Rng>::type>::type
-        remove(
-            ExPolicy&& policy, Rng&& rng, T const& value, Proj&& proj = Proj())
-    {
-        return hpx::parallel::v1::detail::remove_if<
-            typename hpx::traits::range_iterator<Rng>::type>()
-            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), value, HPX_FORWARD(Proj, proj));
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename Pred,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value&&
-            hpx::traits::is_range<Rng>::value&&
-            traits::is_projected_range<Proj, Rng>::value&&
-            traits::is_indirect_callable<ExPolicy,
-                Pred, traits::projected_range<Proj, Rng>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::remove is deprecated, use hpx::ranges::remove "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_iterator<Rng>::type>::type
-        remove_if(
-            ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
-    {
-        return hpx::parallel::v1::detail::remove_if<
-            typename hpx::traits::range_iterator<Rng>::type>()
-            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), HPX_FORWARD(Pred, pred),
-                HPX_FORWARD(Proj, proj));
-    }
-}}}    // namespace hpx::parallel::v1
-
 namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::remove_if
+    // CPO for hpx::ranges::remove_if
     inline constexpr struct remove_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_if_t>
     {
@@ -661,7 +611,7 @@ namespace hpx { namespace ranges {
     } remove_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::remove
+    // CPO for hpx::ranges::remove
     inline constexpr struct remove_t final
       : hpx::detail::tag_parallel_algorithm<remove_t>
     {

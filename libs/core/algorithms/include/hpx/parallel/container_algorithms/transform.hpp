@@ -406,139 +406,6 @@ namespace hpx { namespace ranges {
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename OutIter, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            hpx::traits::is_iterator<OutIter>::value &&
-            traits::is_projected_range<Proj, Rng>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj, Rng>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::transform is deprecated, use hpx::ranges::transform "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        util::in_out_result<typename hpx::traits::range_iterator<Rng>::type,
-            OutIter>>::type transform(ExPolicy&& policy, Rng&& rng,
-        OutIter dest, F&& f, Proj&& proj = Proj())
-    {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        using iterator_type =
-            typename hpx::traits::range_traits<Rng>::iterator_type;
-
-        static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
-            "Requires at least forward iterator.");
-
-        return transform(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            hpx::util::end(rng), HPX_MOVE(dest), HPX_FORWARD(F, f),
-            HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename InIter2,
-        typename OutIter, typename F,
-        typename Proj1 = util::projection_identity,
-        typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
-                InIter2>::value &&
-            hpx::traits::is_iterator<OutIter>::value &&
-            traits::is_projected_range<Proj1, Rng>::value &&
-            traits::is_projected<Proj2, InIter2>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj1, Rng>,
-                traits::projected<Proj2, InIter2>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::transform is deprecated, use hpx::ranges::transform "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        util::in_in_out_result<typename hpx::traits::range_iterator<Rng>::type,
-            InIter2, OutIter>>::type
-        transform(ExPolicy&& policy, Rng&& rng, InIter2 first2, OutIter dest,
-            F&& f, Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
-    {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        using iterator_type =
-            typename hpx::traits::range_traits<Rng>::iterator_type;
-
-        static_assert(hpx::traits::is_forward_iterator<iterator_type>::value &&
-                hpx::traits::is_forward_iterator<InIter2>::value,
-            "Requires at least forward iterator.");
-
-        return transform(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            hpx::util::end(rng), HPX_MOVE(first2), HPX_MOVE(dest),
-            HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
-            HPX_FORWARD(Proj2, proj2));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng1, typename Rng2, typename OutIter,
-        typename F, typename Proj1 = util::projection_identity,
-        typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng1>::value &&
-            hpx::traits::is_range<Rng2>::value &&
-            hpx::traits::is_iterator<OutIter>::value &&
-            traits::is_projected_range<Proj1, Rng1>::value &&
-            traits::is_projected_range<Proj2, Rng2>::value &&
-                traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj1, Rng1>,
-                traits::projected_range<Proj2, Rng2>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::transform is deprecated, use hpx::ranges::transform "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        util::in_in_out_result<typename hpx::traits::range_iterator<Rng1>::type,
-            typename hpx::traits::range_iterator<Rng2>::type, OutIter>>::type
-        transform(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, OutIter dest,
-            F&& f, Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
-    {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        using iterator_type1 =
-            typename hpx::traits::range_traits<Rng1>::iterator_type;
-
-        using iterator_type2 =
-            typename hpx::traits::range_traits<Rng2>::iterator_type;
-
-        static_assert(hpx::traits::is_forward_iterator<iterator_type1>::value &&
-                hpx::traits::is_forward_iterator<iterator_type2>::value,
-            "Requires at least forward iterator.");
-
-        return transform(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
-            hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
-            HPX_MOVE(dest), HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
-            HPX_FORWARD(Proj2, proj2));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
-
 namespace hpx { namespace ranges {
 
     template <typename I, typename O>
@@ -548,7 +415,7 @@ namespace hpx { namespace ranges {
     using binary_transform_result = parallel::util::in_in_out_result<I1, I2, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::transform
+    // a for hpx::ranges::transform
     inline constexpr struct transform_t final
       : hpx::detail::tag_parallel_algorithm<transform_t>
     {

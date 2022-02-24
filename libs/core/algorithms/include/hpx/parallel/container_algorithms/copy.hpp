@@ -376,7 +376,7 @@ namespace hpx { namespace ranges {
     using copy_if_result = parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::copy
+    // CPO for hpx::ranges::copy
     inline constexpr struct copy_t final
       : hpx::detail::tag_parallel_algorithm<copy_t>
     {
@@ -467,7 +467,7 @@ namespace hpx { namespace ranges {
     } copy{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::copy_n
+    // CPO for hpx::ranges::copy_n
     inline constexpr struct copy_n_t final
       : hpx::detail::tag_parallel_algorithm<copy_n_t>
     {
@@ -534,7 +534,7 @@ namespace hpx { namespace ranges {
     } copy_n{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::copy_if
+    // CPO for hpx::ranges::copy_if
     inline constexpr struct copy_if_t final
       : hpx::detail::tag_parallel_algorithm<copy_if_t>
     {
@@ -669,96 +669,7 @@ namespace hpx { namespace ranges {
                     hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
                     HPX_FORWARD(Proj, proj));
         }
-
     } copy_if{};
-
 }}    // namespace hpx::ranges
-
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::copy is deprecated, use hpx::ranges::copy instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            hpx::ranges::copy_result<FwdIter1, FwdIter>>::type
-        copy(ExPolicy&& policy, FwdIter1 iter, Sent1 sent, FwdIter dest)
-    {
-        using copy_iter_t = detail::copy_iter<FwdIter1, FwdIter>;
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::transfer<copy_iter_t>(
-            HPX_FORWARD(ExPolicy, policy), iter, sent, dest);
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename FwdIter,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            hpx::traits::is_iterator<FwdIter>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::copy is deprecated, use hpx::ranges::copy instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            ranges::copy_result<
-                typename hpx::traits::range_traits<Rng>::iterator_type,
-                FwdIter>>::type copy(ExPolicy&& policy, Rng&& rng, FwdIter dest)
-    {
-        using copy_iter_t = detail::copy_iter<
-            typename hpx::traits::range_traits<Rng>::iterator_type, FwdIter>;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::transfer<copy_iter_t>(HPX_FORWARD(ExPolicy, policy),
-            hpx::util::begin(rng), hpx::util::end(rng), dest);
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename OutIter, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            traits::is_projected_range<Proj, Rng>::value &&
-            hpx::traits::is_iterator<OutIter>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj, Rng>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::copy_if is deprecated, use "
-        "hpx::ranges::copy_if instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            ranges::copy_if_result<
-                typename hpx::traits::range_traits<Rng>::iterator_type,
-                OutIter>>::type copy_if(ExPolicy&& policy, Rng&& rng,
-            OutIter dest, F&& f, Proj&& proj = Proj())
-    {
-        return copy_if(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            hpx::util::end(rng), dest, HPX_FORWARD(F, f),
-            HPX_FORWARD(Proj, proj));
-    }
-}}}    // namespace hpx::parallel::v1
 
 #endif    // DOXYGEN

@@ -1021,68 +1021,6 @@ namespace hpx {
 #endif
 }    // namespace hpx
 
-namespace hpx { namespace util {
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::util::ignore is deprecated. Use hpx::ignore instead.")
-    inline constexpr hpx::detail::ignore_type ignore = {};
-
-    template <typename... Ts>
-    using tuple HPX_DEPRECATED_V(
-        1, 6, "hpx::util::tuple is deprecated. Use hpx::tuple instead.") =
-        hpx::tuple<Ts...>;
-    template <typename T>
-    using tuple_size HPX_DEPRECATED_V(1, 6,
-        "hpx::util::tuple_size is deprecated. Use hpx::tuple_size instead.") =
-        hpx::tuple_size<T>;
-    template <std::size_t I, typename T>
-    using tuple_element HPX_DEPRECATED_V(1, 6,
-        "hpx::util::tuple_element is deprecated. Use hpx::tuple_size "
-        "instead.") = hpx::tuple_element<I, T>;
-
-    template <typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::make_tuple is deprecated. Use hpx::make_tuple instead.")
-    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto make_tuple(Ts&&... vs)
-    {
-        return hpx::make_tuple(HPX_FORWARD(Ts, vs)...);
-    }
-
-    template <typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::util::tie is deprecated. Use hpx::tie instead.")
-    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tie(Ts&&... vs) noexcept
-    {
-        return hpx::tie(HPX_FORWARD(Ts, vs)...);
-    }
-
-    template <typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::forward_as_tuple is deprecated. Use hpx::forward_as_tuple "
-        "instead.")
-    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-        auto forward_as_tuple(Ts&&... vs) noexcept
-    {
-        return hpx::forward_as_tuple(HPX_FORWARD(Ts, vs)...);
-    }
-
-    template <typename... Ts>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::tuple_cat is deprecated. Use hpx::tuple_cat "
-        "instead.")
-    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(Ts&&... vs)
-    {
-        return hpx::tuple_cat(HPX_FORWARD(Ts, vs)...);
-    }
-
-    template <std::size_t I, typename Tuple>
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::util::get is deprecated. Use hpx::get instead.")
-    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto get(Tuple&& tuple) noexcept
-    {
-        return hpx::get<I>(HPX_FORWARD(Tuple, tuple));
-    }
-}}    // namespace hpx::util
-
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif

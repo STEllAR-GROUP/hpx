@@ -158,92 +158,10 @@ namespace hpx { namespace ranges {
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
-    ///////////////////////////////////////////////////////////////////////////
-    // count
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename T,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            traits::is_projected_range<Proj, Rng>::value &&
-            hpx::traits::is_range<Rng>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::count is deprecated, use hpx::ranges::count instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<typename hpx::traits::range_traits<
-                Rng>::iterator_type>::difference_type>::type
-        count(
-            ExPolicy&& policy, Rng&& rng, T const& value, Proj&& proj = Proj())
-    {
-        using iterator_type =
-            typename hpx::traits::range_traits<Rng>::iterator_type;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        static_assert((hpx::traits::is_forward_iterator<iterator_type>::value),
-            "Required at least forward iterator.");
-
-        using difference_type =
-            typename std::iterator_traits<iterator_type>::difference_type;
-        return hpx::parallel::v1::detail::count<difference_type>().call(
-            HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            hpx::util::end(rng), value, HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            traits::is_projected_range<Proj, Rng>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj, Rng>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::count_if is deprecated, use "
-        "hpx::ranges::count_if instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<typename hpx::traits::range_traits<
-                Rng>::iterator_type>::difference_type>::type
-        count_if(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
-    {
-        using iterator_type =
-            typename hpx::traits::range_traits<Rng>::iterator_type;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        static_assert((hpx::traits::is_forward_iterator<iterator_type>::value),
-            "Required at least forward iterator.");
-
-        using difference_type =
-            typename std::iterator_traits<iterator_type>::difference_type;
-        return hpx::parallel::v1::detail::count_if<difference_type>().call(
-            HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            hpx::util::end(rng), HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
-
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::count
+    // CPO for hpx::ranges::count
     inline constexpr struct count_t final
       : hpx::detail::tag_parallel_algorithm<count_t>
     {
@@ -362,7 +280,7 @@ namespace hpx { namespace ranges {
     } count{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::count_if
+    // CPO for hpx::ranges::count_if
     inline constexpr struct count_if_t final
       : hpx::detail::tag_parallel_algorithm<count_if_t>
     {
