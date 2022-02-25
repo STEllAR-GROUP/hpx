@@ -74,6 +74,15 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
     target_link_options(APEX::apex INTERFACE "-Wl,-no-as-needed")
   endif()
 
+  if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
+    # APEX now depends on MPI itself
+    if(NOT TARGET Mpi::mpi)
+      include(HPX_SetupMPI)
+      hpx_setup_mpi()
+    endif()
+    target_link_libraries(APEX::apex INTERFACE Mpi::mpi)
+  endif()
+
   # handle optional ITTNotify library (private dependency, skip when called in
   # find_package(HPX))
   if(HPX_WITH_ITTNOTIFY AND NOT HPX_FIND_PACKAGE)
