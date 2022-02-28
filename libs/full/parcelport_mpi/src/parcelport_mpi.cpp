@@ -101,12 +101,21 @@ namespace hpx::parcelset {
                     HPX_PARCEL_MAX_CONNECTIONS);
             }
 
+            static std::size_t background_threads(
+                util::runtime_configuration const& ini)
+            {
+                return hpx::util::get_entry_as<std::size_t>(ini,
+                    "hpx.parcel.mpi.background_threads",
+                    HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS);
+            }
+
         public:
             parcelport(util::runtime_configuration const& ini,
                 threads::policies::callback_notifier const& notifier)
               : base_type(ini, here(), notifier)
               , stopped_(false)
               , receiver_(*this)
+              , background_threads_(background_threads(ini))
             {
             }
 
@@ -169,9 +178,9 @@ namespace hpx::parcelset {
             }
 
             bool background_work(
-                std::size_t /* num_thread */, parcelport_background_mode mode)
+                std::size_t num_thread, parcelport_background_mode mode)
             {
-                if (stopped_)
+                if (stopped_ || num_thread >= background_threads_)
                 {
                     return false;
                 }
@@ -232,6 +241,8 @@ namespace hpx::parcelset {
                     hpx::report_error(exception);
                 }
             }
+
+            std::size_t background_threads_;
         };
     }    // namespace policies::mpi
 }    // namespace hpx::parcelset
@@ -289,7 +300,11 @@ namespace hpx::traits {
                 "multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:0}\n"
 #endif
                 "max_connections = "
-                "${HPX_HAVE_PARCELPORT_MPI_MAX_CONNECTIONS:8192}\n";
+                "${HPX_HAVE_PARCELPORT_MPI_MAX_CONNECTIONS:8192}\n"
+
+                // number of cores that do background work, default: all
+                "background_threads = "
+                "${HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS:-1}\n";
         }
     };
 }    // namespace hpx::traits
