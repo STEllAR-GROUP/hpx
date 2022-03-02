@@ -38,14 +38,20 @@ def autolink_hpx_file(pattern):
     return role
 
 # The text in the rst file should be:
-# :cppreference-generic:`base_path,typename`, for instance `thread,barrier`
+# :cppreference-generic:`base_path,typename[,shown]`, for instance `thread,barrier`
 def autolink_generic(pattern):
     def role(name, rawtext, text, lineno, inliner, options={}, content=[]):
         text_parts = [p.strip() for p in text.split(',')]
-        if len(text_parts) >= 2:
+        shown_text = None
+        if len(text_parts) >= 3:
+            shown_text = text_parts[2]
+            url = pattern % (text_parts[0], text_parts[1])
+        elif len(text_parts) == 2:
+            shown_text = text_parts[1]
             url = pattern % (text_parts[0], text_parts[1])
         else:
+            shown_text = text_parts[0]
             url = pattern % (text_parts[0], text_parts[0])
-        node = nodes.reference(rawtext, "std::" + text_parts[1], refuri=url, **options)
+        node = nodes.reference(rawtext, "std::" + shown_text, refuri=url, **options)
         return [node], []
     return role
