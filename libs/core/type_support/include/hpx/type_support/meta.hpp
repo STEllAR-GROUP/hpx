@@ -51,28 +51,28 @@ namespace hpx { namespace meta {
     inline constexpr bool value<std::is_same<T, T>> = true;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <template <typename...> typename F>
+    template <template <class...> typename F>
     struct func
     {
         template <typename... Ts>
         using apply = F<Ts...>;
     };
 
-    template <template <typename> typename F>
+    template <template <class> typename F>
     struct func1
     {
         template <typename T1>
         using apply = F<T1>;
     };
 
-    template <template <typename, typename> typename F>
+    template <template <class, class> typename F>
     struct func2
     {
         template <typename T1, typename T2>
         using apply = F<T1, T2>;
     };
 
-    template <template <typename, typename, typename> typename F>
+    template <template <class, class, class> typename F>
     struct func3
     {
         template <typename T1, typename T2, typename T3>
@@ -100,17 +100,17 @@ namespace hpx { namespace meta {
     using invoke3 = typename F::template apply<T1, T2, T3>;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <template <typename...> typename T, typename... Ts>
+    template <template <class...> typename T, typename... Ts>
     using is_valid = util::is_detected<T, Ts...>;
 
-    template <template <typename> typename T, typename T1>
+    template <template <class> typename T, typename T1>
     using is_valid1 = util::is_detected<T, T1>;
 
-    template <template <typename, typename> typename T, typename T1,
+    template <template <class, class> typename T, typename T1,
         typename T2>
     using is_valid2 = util::is_detected<T, T1, T2>;
 
-    template <template <typename, typename, typename> typename T, typename T1,
+    template <template <class, class, class> typename T, typename T1,
         typename T2, typename T3>
     using is_valid3 = util::is_detected<T, T1, T2, T3>;
 
@@ -132,28 +132,28 @@ namespace hpx { namespace meta {
     template <typename... Ts>
     struct pack;
 
-    template <template <typename...> typename F, typename... Front>
+    template <template <class...> typename F, typename... Front>
     struct bind_front_func
     {
         template <typename... Ts>
         using apply = F<Front..., Ts...>;
     };
 
-    template <template <typename...> typename F, typename... Front>
+    template <template <class...> typename F, typename... Front>
     struct bind_front1_func
     {
         template <typename A>
         using apply = F<Front..., A>;
     };
 
-    template <template <typename...> typename F, typename... Front>
+    template <template <class...> typename F, typename... Front>
     struct bind_front2_func
     {
         template <typename A, typename B>
         using apply = F<Front..., A, B>;
     };
 
-    template <template <typename...> typename F, typename... Front>
+    template <template <class...> typename F, typename... Front>
     struct bind_front3_func
     {
         template <typename A, typename B, typename C>
@@ -172,28 +172,28 @@ namespace hpx { namespace meta {
     template <typename F, typename... Back>
     using bind_front3 = bind_front3_func<F::template apply, Back...>;
 
-    template <template <typename...> typename F, typename... Back>
+    template <template <class...> typename F, typename... Back>
     struct bind_back_func
     {
         template <typename... Ts>
         using apply = F<Ts..., Back...>;
     };
 
-    template <template <typename...> typename F, typename... Back>
+    template <template <class...> typename F, typename... Back>
     struct bind_back1_func
     {
         template <typename A>
         using apply = F<A, Back...>;
     };
 
-    template <template <typename...> typename F, typename... Back>
+    template <template <class...> typename F, typename... Back>
     struct bind_back2_func
     {
         template <typename A, typename B>
         using apply = F<A, B, Back...>;
     };
 
-    template <template <typename...> typename F, typename... Back>
+    template <template <class...> typename F, typename... Back>
     struct bind_back3_func
     {
         template <typename A, typename B, typename C>
@@ -234,73 +234,82 @@ namespace hpx { namespace meta {
     using if_ = invoke2<detail::if_<value<Cond>>, TrueCase, FalseCase>;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F = func<pack>>
-    struct compose_args
-    {
-        template <typename, typename Pack, typename Enable = void>
-        struct helper
+    namespace detail {
+
+        template <typename F, typename Pack, typename Enable = void>
+        struct compose_args_helper
         {
         };
 
-        template <template <typename...> typename A, typename... As>
-        struct helper<void, pack<A<As...>>,
+        template <typename F, template <class...> typename A, typename... As>
+        struct compose_args_helper<F, pack<A<As...>>,
             std::enable_if_t<value<is_invocable<F, As...>>>>
         {
             using type = invoke<F, As...>;
         };
 
-        template <template <typename...> typename A, typename... As,
+        template <typename F, template <class...> typename A, typename... As,
             template <typename...> typename B, typename... Bs, typename... Rest>
-        struct helper<void, pack<A<As...>, B<Bs...>, Rest...>>
-          : helper<void, pack<pack<As..., Bs...>, Rest...>>
+        struct compose_args_helper<F, pack<A<As...>, B<Bs...>, Rest...>>
+          : compose_args_helper<F, pack<pack<As..., Bs...>, Rest...>>
         {
         };
 
-        template <template <typename...> typename A, typename... As,
-            template <typename...> typename B, typename... Bs,
-            template <typename...> typename C, typename... Cs, typename... Rest>
-        struct helper<void, pack<A<As...>, B<Bs...>, C<Cs...>, Rest...>>
-          : helper<void, pack<pack<As..., Bs..., Cs...>, Rest...>>
+        template <typename F, template <class...> typename A, typename... As,
+            template <class...> typename B, typename... Bs,
+            template <class...> typename C, typename... Cs, typename... Rest>
+        struct compose_args_helper<F,
+            pack<A<As...>, B<Bs...>, C<Cs...>, Rest...>>
+          : compose_args_helper<F, pack<pack<As..., Bs..., Cs...>, Rest...>>
         {
         };
 
-        template <template <typename...> typename A, typename... As,
-            template <typename...> typename B, typename... Bs,
-            template <typename...> typename C, typename... Cs,
-            template <typename...> typename D, typename... Ds, typename... Rest>
-        struct helper<void,
+        template <typename F, template <class...> typename A, typename... As,
+            template <class...> typename B, typename... Bs,
+            template <class...> typename C, typename... Cs,
+            template <class...> typename D, typename... Ds, typename... Rest>
+        struct compose_args_helper<F,
             pack<A<As...>, B<Bs...>, C<Cs...>, D<Ds...>, Rest...>>
-          : helper<void, pack<pack<As..., Bs..., Cs..., Ds...>, Rest...>>
+          : compose_args_helper<F,
+                pack<pack<As..., Bs..., Cs..., Ds...>, Rest...>>
         {
         };
 
-        // T is a dummy argument to avoid having explicit specialization in
-        // non-namespace scope
-        template <typename T>
-        struct helper<T, pack<>> : helper<void, pack<pack<>>>
+        template <typename F>
+        struct compose_args_helper<F, pack<>>
+          : compose_args_helper<F, pack<pack<>>>
         {
         };
+    }    // namespace detail
 
+    template <typename F = func<pack>>
+    struct compose_args
+    {
         template <typename... Ts>
-        using apply = type<helper<void, pack<Ts...>>>;
+        using apply = type<detail::compose_args_helper<F, pack<Ts...>>>;
     };
 
-    template <template <typename...> typename F>
-    struct defer
-    {
-        template <typename Pack, typename Enable = void>
-        struct helper
+    namespace detail {
+
+        template <template <class...> typename F, typename Pack,
+            typename Enable = void>
+        struct defer_helper
         {
         };
 
-        template <typename... Ts>
-        struct helper<pack<Ts...>, std::enable_if_t<value<is_valid<F, Ts...>>>>
+        template <template <class...> typename F, typename... Ts>
+        struct defer_helper<F, pack<Ts...>,
+            std::enable_if_t<value<is_valid<F, Ts...>>>>
         {
             using type = F<Ts...>;
         };
+    }    // namespace detail
 
+    template <template <class...> typename F>
+    struct defer
+    {
         template <typename... Ts>
-        using apply = type<helper<pack<Ts...>>>;
+        using apply = type<detail::defer_helper<F, pack<Ts...>>>;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -390,29 +399,32 @@ namespace hpx { namespace meta {
     };
     // clang-format on
 
-    template <typename Init, typename F>
-    struct right_fold
-    {
-        template <typename, typename...>
-        struct helper
+    namespace detail {
+
+        template <typename F, typename Pack, typename Enable = void>
+        struct right_fold_helper
         {
         };
 
-        template <typename State, typename Head, typename... Tail>
-        struct helper<std::enable_if_t<value<is_invocable2<F, State, Head>>>,
-            State, Head, Tail...>
-          : helper<void, invoke2<F, State, Head>, Tail...>
+        template <typename F, typename State, typename Head, typename... Tail>
+        struct right_fold_helper<F, pack<State, Head, Tail...>,
+            std::enable_if_t<value<is_invocable2<F, State, Head>>>>
+          : right_fold_helper<F, pack<invoke2<F, State, Head>, Tail...>>
         {
         };
 
-        template <typename State>
-        struct helper<void, State>
+        template <typename F, typename State>
+        struct right_fold_helper<F, pack<State>>
         {
             using type = State;
         };
+    }    // namespace detail
 
+    template <typename Init, typename F>
+    struct right_fold
+    {
         template <typename... Ts>
-        using apply = type<helper<void, Init, Ts...>>;
+        using apply = type<detail::right_fold_helper<F, pack<Init, Ts...>>>;
     };
 
     template <typename Continuation = func<pack>>
