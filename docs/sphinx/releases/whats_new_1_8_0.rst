@@ -38,13 +38,268 @@ Closed issues
 Closed pull requests
 ====================
 
-* :hpx-pr:`5776` - Revert 1 deepaksuresh1411 for loop patch
+* :hpx-pr:`5803` - Attempt to fix CUDA related OctoTiger problems
+* :hpx-pr:`5800` - Add option to restrict MPI background work to subset of cores
+* :hpx-pr:`5798` - Adding MPI as a dependency to APEX
+* :hpx-pr:`5797` - Extend Sphinx role to support arbitrary text to display on a link
+* :hpx-pr:`5796` - Disable CUDA tests that cause NVCC to silently fail without error messages
+* :hpx-pr:`5795` - Avoid writing path and directories into HPXCacheVariables.cmake
+* :hpx-pr:`5793` - Remove features that are deprecated since V1.6
+* :hpx-pr:`5792` - Making sure num_cores is properly handled by parallel_executor
+* :hpx-pr:`5791` - Moving bind, bind_front, bind_back to namespace hpx
+* :hpx-pr:`5790` - Moving serializable function/move_only_function into namespace hpx::distributed
+* :hpx-pr:`5787` - Remove unneeded (and commented) tests
+* :hpx-pr:`5786` - Attempting to fix hangs in distributed barrier
+* :hpx-pr:`5785` - add cmake code to detect arm64 on macOS
+* :hpx-pr:`5783` - Moving function and function_ref into namespace hpx
+* :hpx-pr:`5781` - Updating used version of Visual Studio
+* :hpx-pr:`5780` - Update Piz Daint Jenkins configurations from gcc/clang 7 to 8
+* :hpx-pr:`5778` - Updated for_loop.hpp
+* :hpx-pr:`5777` - Update reference for foreach benchmark
+* :hpx-pr:`5775` - Move optional into namespace hpx
+* :hpx-pr:`5773` - Moving barrier to consolidated namespaces
+* :hpx-pr:`5772` - Adding missing docs for ranges::find_if and find_if_not algorithms
+* :hpx-pr:`5771` - Moving for_loop into namespace hpx::experimental
+* :hpx-pr:`5770` - Fixing HIP issues
+* :hpx-pr:`5769` - Slight improvement of small_vector performance
+* :hpx-pr:`5766` - Fixing a integral conversion warning
+* :hpx-pr:`5765` - Adding a sphinx role allowing to link to a file directly in github
+* :hpx-pr:`5763` - add num_cores facility
+* :hpx-pr:`5761` - Add missing inline to mpi_exception.hpp error_message function
+* :hpx-pr:`5760` - Update cdash build url
+* :hpx-pr:`5759` - Switch to use generic rostam SLURM partitions
+* :hpx-pr:`5758` - Adding support for P2300 completion signatures
+* :hpx-pr:`5757` - Fix missing links in Public API 
+* :hpx-pr:`5756` - Add stop support to when_all
 * :hpx-pr:`5755` - Support for data-parallelism for mismatch algorithm
-* :hpx-pr:`5730` - fix returning non default constructable objects from action
-* :hpx-pr:`5708` - Use `/dev/shm` for Jenkins checkout on Piz Daint
-* :hpx-pr:`5705` - Update and add tests for `transfer/schedule_from`
+* :hpx-pr:`5754` - Support for data-parallelism for equal algorithm
+* :hpx-pr:`5751` - Propagate MPI dependencies to command line handling
+* :hpx-pr:`5750` - Make sure required MPI initialization flags are properly applied and supported
+* :hpx-pr:`5749` - P2300 stop token
+* :hpx-pr:`5748` - Adding environmental query CPOs
+* :hpx-pr:`5747` - Renaming set_done to set_stopped (as per P2300)
+* :hpx-pr:`5745` - Modernize serialization module
+* :hpx-pr:`5743` - Add check for MPICH and set the correct env to suport multi-threaded
+* :hpx-pr:`5742` - Remove obsolete files related to cpuid, etc.
+* :hpx-pr:`5741` - Support for data-parallelism for adjacent find
+* :hpx-pr:`5740` - Support for data-parallelism for find algorithms
+* :hpx-pr:`5739` - Enable the option to attach a debugger on a segmentation fault (linux)
+* :hpx-pr:`5738` - Fixing spell-checking errors
+* :hpx-pr:`5737` - Attempt to fix migrate_component issue
+* :hpx-pr:`5736` - Set commit status from Jenkins also for special branches 
+* :hpx-pr:`5734` - Revert #5586
+* :hpx-pr:`5732` - Attempt to improve build-id reporting to cdash
+* :hpx-pr:`5731` - Randomly delay execution of bash scripts launched by Jenkins
+* :hpx-pr:`5729` - Workaround for CMake/Ninja generator OOM problem
+* :hpx-pr:`5727` - Moving compression plugins to components directory
+* :hpx-pr:`5726` - Moving/consolidating parcel coalescing plugin sources
+* :hpx-pr:`5725` - Making sure headers for serialization filters are being installed
+* :hpx-pr:`5723` - Moving more tests to modules
+* :hpx-pr:`5722` - Removing superfluous semicolons
+* :hpx-pr:`5720` - Moving parcelports into modules
+* :hpx-pr:`5719` - Moving more files to parcelset module
+* :hpx-pr:`5718` - build: refactor sphinx config file 
+* :hpx-pr:`5717` - Creating parcelset modules
+* :hpx-pr:`5716` - Avoid duplicate definition error
+* :hpx-pr:`5714` - Refine propagation of HPX_WITH_... options
+* :hpx-pr:`5713` - Significantly reduce CI jobs run on Piz Daint
+* :hpx-pr:`5712` - Updating jenkins configuration for Rostam2.2
+* :hpx-pr:`5711` - Refactor manual sections
+* :hpx-pr:`5710` - Making task_group serializable
+* :hpx-pr:`5707` - Better diagnose parcel bootstrap problems
+* :hpx-pr:`5704` - Test with hwloc 2.7.0 with GCC 11
 * :hpx-pr:`5703` - Fix `counting_iterator` container tests
-* :hpx-pr:`5689` - Enable LTO in CI
+* :hpx-pr:`5702` - Attempting to fix CircleCI timeouts
+* :hpx-pr:`5699` - Update CI to use Boost 1.78.0
+* :hpx-pr:`5697` - Adding fork_join_executor to foreach_benchmark
+* :hpx-pr:`5696` - Modernize when_all and friends (when_any, when_some, when_each)
+* :hpx-pr:`5693` - Fix test errors with `_GLIBCXX_DEBUG` defined
+* :hpx-pr:`5691` - Rename `annotate_function` to `scoped_annotation`
+* :hpx-pr:`5690` - Replace tag_dispatch with tag_invoke in minmax segmented
+* :hpx-pr:`5688` - Remove more deprecated macros
+* :hpx-pr:`5687` - Add most important CMake options
+* :hpx-pr:`5685` - Fix future API
+* :hpx-pr:`5684` - Move lock registration to separate module and remove global lock registration
+* :hpx-pr:`5683` - Make hpx::wait_all etc. throw exceptions when waited futures hold exceptions and deprecate hpx::lcos::wait_all[_n] in favor of hpx::wait_all[_n]
+* :hpx-pr:`5682` - Fix macOS test exceptions
+* :hpx-pr:`5681` - docs: add links to hpx recepies
+* :hpx-pr:`5680` - Embed base execution policies to datapar execution policies
+* :hpx-pr:`5679` - Fix `fork_join_executor` with dynamic schedule
+* :hpx-pr:`5678` - Fix compilation of service executors with nvcc
+* :hpx-pr:`5677` - Remove compute_cuda module
+* :hpx-pr:`5676` - Don't require up-to-date approvals for bors
+* :hpx-pr:`5675` - Add default template type parameters for algorithms
+* :hpx-pr:`5674` - Allow using  `any_sender` in global variables
+* :hpx-pr:`5671` - Making sure task_group can be reused
+* :hpx-pr:`5670` - Relax constraints on `execution::when_all`
+* :hpx-pr:`5669` - Use HPX_WITH_CXX_STANDARD for controlling C++ version 
+* :hpx-pr:`5667` - Attempt to fix compilation issues with Boost V1.76
+* :hpx-pr:`5664` - Change logging errors to warnings in schedulers
+* :hpx-pr:`5663` - Use dynamic bitsets by default for CPU masks
+* :hpx-pr:`5662` - Disambiguate namespace for MSVC
+* :hpx-pr:`5660` - Replacing remaining std::forward and std::move with HPX_FORWARD and HPX_MOVE
+* :hpx-pr:`5659` - Modernize hpx::future and related facilities
+* :hpx-pr:`5658` - Replace HPX_INLINE_CONSTEXPR_VARIABLE with inline constexpr
+* :hpx-pr:`5657` - Remove tagged, tagged_pair and tagged_tuple, remove tuple/pair specializations
+* :hpx-pr:`5656` - Rename on execution::schedule_from, rename just_on to just_transfer, and add transfer
+* :hpx-pr:`5655` - Avoid for module lists to grow indefinitely in cmake cache
+* :hpx-pr:`5649` - build: replace usage of Python's reserved words and functions as variable names
+* :hpx-pr:`5648` - Modernize action modules and related code
+* :hpx-pr:`5646` - Fix ends_with test
 * :hpx-pr:`5645` - Add matrix multiplication example
-* :hpx-pr:`5625` - Revert "Use advance_and_get_distance where required"
-* :hpx-pr:`5578` - Remove distributed functionality
+* :hpx-pr:`5644` - Rename execution::transform to execution::then and execution::detach to execution::start_detached
+* :hpx-pr:`5643` - Update performance test references
+* :hpx-pr:`5642` - Adapting adjacent_difference to work with proxy iterators
+* :hpx-pr:`5641` - Factorize perftests scripts
+* :hpx-pr:`5640` - Fixed links to sources in Sphinx documentation
+* :hpx-pr:`5639` - Fix generate datapar tests for Vc
+* :hpx-pr:`5638` - Simd all any none
+* :hpx-pr:`5637` - Use bors for merging pull requests
+* :hpx-pr:`5636` - Fix leftover std::holds_alternative usage
+* :hpx-pr:`5635` - Update container image tag in GitHub actions HIP configuration
+* :hpx-pr:`5633` - Moving packaged_task to module futures
+* :hpx-pr:`5632` - Tell Asio to use std::aligned_new only if available
+* :hpx-pr:`5631` - Adding tag parameter to channel communicator get/set
+* :hpx-pr:`5630` - Add partial_sort_copy and adapt partial sort to c++ 20
+* :hpx-pr:`5629` - Set HPX_WITH_FETCH_ASIO to OFF as available in the docker image
+* :hpx-pr:`5628` - Add Clang 13 CI configuration
+* :hpx-pr:`5627` - Replace alternative keyword
+* :hpx-pr:`5626` - docs: add support for BibTeX references in Sphinx docs
+* :hpx-pr:`5624` - Fix pkgconfig replacements involving CMAKE_INSTALL_PREFIX
+* :hpx-pr:`5623` - build: remove unused import from conf.py.in
+* :hpx-pr:`5622` - Remove HPX_WITH_VCPKG CMake option
+* :hpx-pr:`5621` - Replacing boost::container::small_vector
+* :hpx-pr:`5620` - Update Asio tag from 1.18.2 to 1.20.0
+* :hpx-pr:`5619` - Fix block_os_threads_1036 test
+* :hpx-pr:`5618` - Make sure condition variables are notified under a lock in the thread_pool_scheduler test
+* :hpx-pr:`5617` - Use advance_and_get_distance where required
+* :hpx-pr:`5616` - Remove separately building segmented algorithms on CircleCI
+* :hpx-pr:`5613` - Fix Vc datapar adjacent_difference
+* :hpx-pr:`5609` - docs: add anchor links to performance counter tables
+* :hpx-pr:`5608` - Fix header test error by adding missing numeric
+* :hpx-pr:`5607` - Fix simd adj diff
+* :hpx-pr:`5605` - Fix usage of HPX_INVOKE macro
+* :hpx-pr:`5604` - Make use of shell-session to allow non-copyable $
+* :hpx-pr:`5603` - Suppress some MSVC warnings in C++20 mode
+* :hpx-pr:`5602` - Test HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE=OFF to one CI configuration
+* :hpx-pr:`5601` - Test case for any_sender should use hpx::tuple
+* :hpx-pr:`5600` - Rename tag_dispatch back to tag_invoke
+* :hpx-pr:`5599` - Change theme, fix Quickstart & Examples
+* :hpx-pr:`5596` - Use precompiled headers in tests
+* :hpx-pr:`5595` - Drop semicolons for macro calls
+* :hpx-pr:`5594` - Adapt datapar generate
+* :hpx-pr:`5593` - Update any_sender to use tag_dispatch for execution customizations
+* :hpx-pr:`5592` - Add nth_element
+* :hpx-pr:`5591` - Remove unnecessary checks for C++17 for tests
+* :hpx-pr:`5589` - Add HPX_FORWARD/HPX_MOVE macros
+* :hpx-pr:`5588` - Fixing the output formatting for id_types
+* :hpx-pr:`5586` - Remove local functionality
+* :hpx-pr:`5585` - Delete GitExternal.cmake
+* :hpx-pr:`5584` - Serialization of hpx::tuple must use hpx::get
+* :hpx-pr:`5583` - fix coroutine_traits allocate calls, add unhandled_exception() implementation.
+* :hpx-pr:`5582` - Make more examples work with local runtime
+* :hpx-pr:`5581` - Add support for several performance tests in CI
+* :hpx-pr:`5580` - Adapt simd adj diff
+* :hpx-pr:`5579` - Split absolute paths for generated pkg-config files into -L/-l parts
+* :hpx-pr:`5577` - fix unit fill test for datapar with Vc
+* :hpx-pr:`5576` - Update forgotten "Full" names
+* :hpx-pr:`5575` - Change scan partitioner implementation
+* :hpx-pr:`5574` - Remove a few deprecated and unused CMake options
+* :hpx-pr:`5572` - Remove more guards for the distributed runtime
+* :hpx-pr:`5571` - Add workaround for libstc++ in string_util trim
+* :hpx-pr:`5569` - Use no_unique_address in sender adaptors
+* :hpx-pr:`5568` - Change try catch block to try_catch_exception_ptr
+* :hpx-pr:`5567` - Make default_agent::yield actually yield
+* :hpx-pr:`5564` - Adjacent
+* :hpx-pr:`5562` - More changes to overcome build problems on Windows after recent module rearrangements
+* :hpx-pr:`5560` - Update tests and examples
+* :hpx-pr:`5559` - Fixing cmake folder names after module restructuring
+* :hpx-pr:`5558` - Fixing wrong module dependencies
+* :hpx-pr:`5557` - Adding an example for the new channel_communicator API
+* :hpx-pr:`5556` - Remove leftover thread pool os executor tests
+* :hpx-pr:`5555` - Add option enabling serializing raw pointers
+* :hpx-pr:`5554` - Make sure command line aliasing is properly handled
+* :hpx-pr:`5552` - Modernizing some of the async facilities
+* :hpx-pr:`5551` - Fixing for local executions of actions to properly set task names
+* :hpx-pr:`5550` - Update CUDA module in clang-cuda configuration
+* :hpx-pr:`5549` - Fixing agent_ref::yield_k to actually call yield_k
+* :hpx-pr:`5548` - Making get_action_name() noexcept
+* :hpx-pr:`5547` - Fixing communication set
+* :hpx-pr:`5546` - Fixing shutdown problems caused by missing ref-counting
+* :hpx-pr:`5545` - Remove wrong move in thread_pool_scheduler_bulk.hpp
+* :hpx-pr:`5543` - Extend launch policy to carry stack size and scheduling hint in addition to priority
+* :hpx-pr:`5542` - Simplify execution CPOs
+* :hpx-pr:`5540` - Adapt partition, partition_copy and stable_partition to C++ 20
+* :hpx-pr:`5539` - Adapt mismatch to support sentinels
+* :hpx-pr:`5538` - Document specific sphinx version required for the documentation
+* :hpx-pr:`5537` - Test release and debug builds on Piz Daint
+* :hpx-pr:`5536` - This fixes referencing stale iterators during the execution of binary mismatch
+* :hpx-pr:`5535` - Rename simdpar to par_simd
+* :hpx-pr:`5534` - Fix Quick start & Manual Docs
+* :hpx-pr:`5533` - Fix `annotate_function` for `std::string`
+* :hpx-pr:`5532` - Update two remaining apex links from khuck to UO-OACISS
+* :hpx-pr:`5531` - Use contiguous_index_queue in thread_pool_scheduler
+* :hpx-pr:`5530` - Eagerly initialize a configurable number of threads on scheduler/thread queue init
+* :hpx-pr:`5529` - Update benchmarks and add support for scheduler_executor
+* :hpx-pr:`5528` - Add missing properties to executors/schedulers
+* :hpx-pr:`5527` - Set local thread/pool number in local/static_queue_scheduler
+* :hpx-pr:`5526` - Update Rostam HIP configuration to use 4.3.0
+* :hpx-pr:`5525` - Fix Building HPX in Quick start
+* :hpx-pr:`5524` - Upload image on cdash
+* :hpx-pr:`5523` - Modernize facilities related to hpx::sync
+* :hpx-pr:`5522` - Add sender overloads for remaining algorithms
+* :hpx-pr:`5521` - Minor changes that improve performance
+* :hpx-pr:`5520` - Update reference as perftests failing regularly
+* :hpx-pr:`5519` - Add transform_mpi sender adapter
+* :hpx-pr:`5518` - Add sender overloads to rotate/rotate_copy
+* :hpx-pr:`5517` - Fix coroutine integration
+* :hpx-pr:`5515` - Avoid deadlock in ignore_while_locked_1485 test
+* :hpx-pr:`5514` - Add split sender adapter
+* :hpx-pr:`5512` - Update Rostam HIP configuration
+* :hpx-pr:`5511` - Fix Asio target name for precompiled headers
+* :hpx-pr:`5510` - Add any_sender and unique_any_sender
+* :hpx-pr:`5509` - Test with Boost 1.77 on gcc/clang-newest configurations
+* :hpx-pr:`5508` - Minor release changes from 1.7.1
+* :hpx-pr:`5507` - Add missing commits from scheduler_executor PR
+* :hpx-pr:`5506` - Fix condition for checking if we should use our own variant
+* :hpx-pr:`5501` - Attempt to fix thread_pool_scheduler test
+* :hpx-pr:`5493` - Update Jenkins GitHub token to use StellarBot GitHub account
+* :hpx-pr:`5490` - Fix clang-format error on master
+* :hpx-pr:`5487` - Add get_completion_scheduler CPO and customize bulk for thread_pool_scheduler
+* :hpx-pr:`5484` - Add missing header to jacobi_component/server/solver.hpp
+* :hpx-pr:`5481` - Changing the APEX repository to the new location
+* :hpx-pr:`5479` - Fix version check for CUDA noexcept/result_of bug
+* :hpx-pr:`5477` - Require cxx17 minor comments
+* :hpx-pr:`5476` - Fix cmake format error
+* :hpx-pr:`5475` - Require CMake 3.18 as it is already a requirement for CUDA
+* :hpx-pr:`5474` - Make the cuda parameters of try_compile optional
+* :hpx-pr:`5473` - Update cuda arch and change cuda version
+* :hpx-pr:`5471` - Add corrected citation.cff
+* :hpx-pr:`5470` - Adapt stable_sort to C++ 20
+* :hpx-pr:`5468` - Experimentation to make the perftest report public
+* :hpx-pr:`5466` - Add shift_left and shift_right algorithms
+* :hpx-pr:`5465` - Adapt datapar fill
+* :hpx-pr:`5464` - Moving tag_dispatch to separate module
+* :hpx-pr:`5461` - Rename HPX_WITH_CUDA_COMPUTE with HPX_WITH_COMPUTE_CUDA
+* :hpx-pr:`5460` - Adapt sort to C++ 20
+* :hpx-pr:`5459` - Adapt rotate/rotate_copy to C++20
+* :hpx-pr:`5458` - Adapt unique and unique_copy to C++ 20
+* :hpx-pr:`5455` - Remove and clean up fallback sender implementations
+* :hpx-pr:`5454` - Make performance plot show even if similar performance
+* :hpx-pr:`5453` - Post 1.7.0 version bump
+* :hpx-pr:`5452` - Fix find_end parallel overload
+* :hpx-pr:`5450` - Change the print-bind output to be more precise
+* :hpx-pr:`5449` - Adapt swap_ranges to C++ 20
+* :hpx-pr:`5446` - Use more verbose names in sender algorithms
+* :hpx-pr:`5443` - Properly support ASAN with MSVC
+* :hpx-pr:`5441` - Adding reference counting to thread_data
+* :hpx-pr:`5429` - Scheduler executor
+* :hpx-pr:`5428` - Adapt datapar copy
+* :hpx-pr:`5421` - Update CI base image to use clang-format 11
+* :hpx-pr:`5410` - Add ranges starts_with and ends_with algorithms
+* :hpx-pr:`5383` - Tentatively remove runtime_registration_wrapper from cuda futures
+* :hpx-pr:`5377` - Fewer Asio includes and more precompiled headers
+* :hpx-pr:`5329` - Sender overloads for parallel algorithms
+* :hpx-pr:`5313` - Rearrange modules between libraries
+* :hpx-pr:`5283` - Require minimum C++17 and change CUDA handling
+* :hpx-pr:`5241` - Adapt min_element, max_element and minmax_element to C++20
