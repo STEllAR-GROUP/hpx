@@ -13,24 +13,24 @@
 
 int main()
 {
-    // hpx::lcos::local::promise
-    static_assert(std::uses_allocator<hpx::lcos::local::promise<int>,
-                      test_allocator<int>>::value,
-        "std::uses_allocator<local::promise<int>, test_allocator<int> "
+    // hpx::promise
+    static_assert(
+        std::uses_allocator<hpx::promise<int>, test_allocator<int>>::value,
+        "std::uses_allocator<hpx::promise<int>, test_allocator<int> "
         ">::value");
-    static_assert(std::uses_allocator<hpx::lcos::local::promise<int&>,
-                      test_allocator<int>>::value,
-        "std::uses_allocator<local::promise<int&>, test_allocator<int> "
+    static_assert(
+        std::uses_allocator<hpx::promise<int&>, test_allocator<int>>::value,
+        "std::uses_allocator<hpx::promise<int&>, test_allocator<int> "
         ">::value");
-    static_assert(std::uses_allocator<hpx::lcos::local::promise<void>,
-                      test_allocator<void>>::value,
-        "std::uses_allocator<local::promise<void>, test_allocator<void> "
+    static_assert(
+        std::uses_allocator<hpx::promise<void>, test_allocator<void>>::value,
+        "std::uses_allocator<hpx::promise<void>, test_allocator<void> "
         ">::value");
 
     // hpx::lcos::local::packaged_task
-    static_assert(std::uses_allocator<hpx::lcos::local::packaged_task<int()>,
+    static_assert(std::uses_allocator<hpx::packaged_task<int()>,
                       test_allocator<int>>::value,
-        "std::uses_allocator<local::packaged_task<int()>, "
+        "std::uses_allocator<hpx::packaged_task<int()>, "
         "test_allocator<int> >::value");
 
     return 0;

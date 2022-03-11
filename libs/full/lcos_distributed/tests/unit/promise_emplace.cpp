@@ -16,7 +16,7 @@ void test_nullary_void()
 {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     {
-        hpx::lcos::promise<void> p;
+        hpx::distributed::promise<void> p;
         hpx::future<void> f = p.get_future();
         p.set_value();
         HPX_TEST(f.is_ready());
@@ -24,7 +24,7 @@ void test_nullary_void()
 #endif
 
     {
-        hpx::lcos::local::promise<void> p;
+        hpx::promise<void> p;
         hpx::future<void> f = p.get_future();
         p.set_value();
         HPX_TEST(f.is_ready());
@@ -49,7 +49,7 @@ void test_nullary()
 {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     {
-        hpx::lcos::promise<A> p;
+        hpx::distributed::promise<A> p;
         hpx::future<A> f = p.get_future();
         p.set_value();
         HPX_TEST(f.is_ready());
@@ -58,7 +58,7 @@ void test_nullary()
 #endif
 
     {
-        hpx::lcos::local::promise<A> p;
+        hpx::promise<A> p;
         hpx::future<A> f = p.get_future();
         p.set_value();
         HPX_TEST(f.is_ready());
@@ -70,13 +70,13 @@ void test_unary()
 {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     {
-        hpx::lcos::promise<A> p1;
+        hpx::distributed::promise<A> p1;
         hpx::future<A> f1 = p1.get_future();
         p1.set_value(A(42));
         HPX_TEST(f1.is_ready());
         HPX_TEST_EQ(f1.get().i_, 42);
 
-        hpx::lcos::promise<A> p2;
+        hpx::distributed::promise<A> p2;
         hpx::future<A> f2 = p2.get_future();
         p2.set_value(42);
         HPX_TEST(f2.is_ready());
@@ -85,13 +85,13 @@ void test_unary()
 #endif
 
     {
-        hpx::lcos::local::promise<A> p1;
+        hpx::promise<A> p1;
         hpx::future<A> f1 = p1.get_future();
         p1.set_value(A(42));
         HPX_TEST(f1.is_ready());
         HPX_TEST_EQ(f1.get().i_, 42);
 
-        hpx::lcos::local::promise<A> p2;
+        hpx::promise<A> p2;
         hpx::future<A> f2 = p2.get_future();
         p2.set_value(42);
         HPX_TEST(f2.is_ready());
@@ -127,7 +127,7 @@ void test_variadic()
 {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     {
-        hpx::lcos::promise<B> p1;
+        hpx::distributed::promise<B> p1;
         hpx::future<B> f1 = p1.get_future();
         p1.set_value(B(42));
         HPX_TEST(f1.is_ready());
@@ -135,7 +135,7 @@ void test_variadic()
         HPX_TEST_EQ(r1.i_, 42);
         HPX_TEST_EQ(r1.j_, 0);
 
-        hpx::lcos::promise<B> p2;
+        hpx::distributed::promise<B> p2;
         hpx::future<B> f2 = p2.get_future();
         p2.set_value(42);
         HPX_TEST(f2.is_ready());
@@ -143,7 +143,7 @@ void test_variadic()
         HPX_TEST_EQ(r2.i_, 42);
         HPX_TEST_EQ(r2.j_, 0);
 
-        hpx::lcos::promise<B> p3;
+        hpx::distributed::promise<B> p3;
         hpx::future<B> f3 = p3.get_future();
         p3.set_value(B(42, 43));
         HPX_TEST(f3.is_ready());
@@ -151,7 +151,7 @@ void test_variadic()
         HPX_TEST_EQ(r3.i_, 42);
         HPX_TEST_EQ(r3.j_, 43);
 
-        hpx::lcos::promise<B> p4;
+        hpx::distributed::promise<B> p4;
         hpx::future<B> f4 = p4.get_future();
         p4.set_value(42, 43);
         HPX_TEST(f4.is_ready());
@@ -162,7 +162,7 @@ void test_variadic()
 #endif
 
     {
-        hpx::lcos::local::promise<B> p1;
+        hpx::promise<B> p1;
         hpx::future<B> f1 = p1.get_future();
         p1.set_value(B(42));
         HPX_TEST(f1.is_ready());
@@ -170,7 +170,7 @@ void test_variadic()
         HPX_TEST_EQ(r1.i_, 42);
         HPX_TEST_EQ(r1.j_, 0);
 
-        hpx::lcos::local::promise<B> p2;
+        hpx::promise<B> p2;
         hpx::future<B> f2 = p2.get_future();
         p2.set_value(42);
         HPX_TEST(f2.is_ready());
@@ -178,7 +178,7 @@ void test_variadic()
         HPX_TEST_EQ(r2.i_, 42);
         HPX_TEST_EQ(r2.j_, 0);
 
-        hpx::lcos::local::promise<B> p3;
+        hpx::promise<B> p3;
         hpx::future<B> f3 = p3.get_future();
         p3.set_value(B(42, 43));
         HPX_TEST(f3.is_ready());
@@ -186,7 +186,7 @@ void test_variadic()
         HPX_TEST_EQ(r3.i_, 42);
         HPX_TEST_EQ(r3.j_, 43);
 
-        hpx::lcos::local::promise<B> p4;
+        hpx::promise<B> p4;
         hpx::future<B> f4 = p4.get_future();
         p4.set_value(42, 43);
         HPX_TEST(f4.is_ready());

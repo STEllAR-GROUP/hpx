@@ -39,7 +39,7 @@ struct registration_wrapper
 };
 
 // this function will be executed by an HPX thread
-void set_value(std::shared_ptr<hpx::lcos::local::promise<int>> p, int result)
+void set_value(std::shared_ptr<hpx::promise<int>> p, int result)
 {
     // notify the waiting HPX thread and return a value
     p->set_value(result);
@@ -47,7 +47,7 @@ void set_value(std::shared_ptr<hpx::lcos::local::promise<int>> p, int result)
 
 // this function will be executed by a dedicated OS thread
 void do_async_io(char const* string_to_write,
-    std::shared_ptr<hpx::lcos::local::promise<int>> p, hpx::runtime* rt)
+    std::shared_ptr<hpx::promise<int>> p, hpx::runtime* rt)
 {
     // register this thread in order to be able to call HPX functionality
     registration_wrapper wrap(rt, "external-io");
@@ -67,8 +67,8 @@ void do_async_io(char const* string_to_write,
 // This function will be executed by an HPX thread
 int io(char const* string_to_write)
 {
-    std::shared_ptr<hpx::lcos::local::promise<int>> p =
-        std::make_shared<hpx::lcos::local::promise<int>>();
+    std::shared_ptr<hpx::promise<int>> p =
+        std::make_shared<hpx::promise<int>>();
 
     // Create a new external OS-thread and schedule the handler to
     // run on one of its OS-threads.

@@ -275,16 +275,15 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             template <typename T1>
-            local::packaged_task<void()> push_pt(T1&& val)
+            hpx::packaged_task<void()> push_pt(T1&& val)
             {
-                return local::packaged_task<void()>(
+                return hpx::packaged_task<void()>(
                     util::deferred_call(&one_element_queue_async::set_deferred,
                         this, HPX_FORWARD(T1, val)));
             }
-            local::packaged_task<T()> pop_pt()
+            hpx::packaged_task<T()> pop_pt()
             {
-                return local::packaged_task<T()>(
-                    [this]() -> T { return get(); });
+                return hpx::packaged_task<T()>([this]() -> T { return get(); });
             }
 
         public:
@@ -390,8 +389,8 @@ namespace hpx { namespace lcos { namespace local {
 
         private:
             T val_;
-            local::packaged_task<void()> push_;
-            local::packaged_task<T()> pop_;
+            hpx::packaged_task<void()> push_;
+            hpx::packaged_task<T()> pop_;
             bool empty_;
             bool push_active_;
             bool pop_active_;

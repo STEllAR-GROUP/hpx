@@ -218,7 +218,7 @@ namespace hpx { namespace lcos { namespace local {
             if (received_segments_.count() == received_segments_.size())
             {
                 // we have received the last missing segment
-                promise<void> p;
+                hpx::promise<void> p;
                 std::swap(p, promise_);
                 received_segments_.reset();    // reset data store
 
@@ -365,7 +365,7 @@ namespace hpx { namespace lcos { namespace local {
     private:
         mutable mutex_type mtx_;
         boost::dynamic_bitset<> received_segments_;
-        lcos::local::promise<void> promise_;
+        hpx::promise<void> promise_;
         std::size_t generation_;
         condition_list_type conditions_;
     };

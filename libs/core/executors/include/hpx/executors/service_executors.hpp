@@ -192,7 +192,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             }
 
             F f_;
-            hpx::lcos::local::promise<Result> p_;
+            hpx::promise<Result> p_;
         };
 
         template <typename F>

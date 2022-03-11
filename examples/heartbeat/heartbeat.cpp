@@ -32,7 +32,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-void stop_monitor(std::shared_ptr<hpx::lcos::promise<void>> p)
+void stop_monitor(std::shared_ptr<hpx::distributed::promise<void>> p)
 {
     p->set_value();    // Kill the monitor.
 }
@@ -64,8 +64,8 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
         return 1;
     }
 
-    std::shared_ptr<hpx::lcos::promise<void>> stop_flag =
-        std::make_shared<hpx::lcos::promise<void>>();
+    std::shared_ptr<hpx::distributed::promise<void>> stop_flag =
+        std::make_shared<hpx::distributed::promise<void>>();
     hpx::future<void> f = stop_flag->get_future();
 
     hpx::register_shutdown_function(hpx::bind(&stop_monitor, stop_flag));

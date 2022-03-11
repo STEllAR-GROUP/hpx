@@ -17,8 +17,7 @@ int hpx_main()
 {
     HPX_TEST_EQ(test_alloc_base::count, 0);
     {
-        hpx::lcos::local::promise<int> p(
-            std::allocator_arg, test_allocator<int>());
+        hpx::promise<int> p(std::allocator_arg, test_allocator<int>());
         HPX_TEST_EQ(test_alloc_base::count, 1);
         hpx::future<int> f = p.get_future();
         HPX_TEST_EQ(test_alloc_base::count, 1);
@@ -26,8 +25,7 @@ int hpx_main()
     }
     HPX_TEST_EQ(test_alloc_base::count, 0);
     {
-        hpx::lcos::local::promise<int&> p(
-            std::allocator_arg, test_allocator<int>());
+        hpx::promise<int&> p(std::allocator_arg, test_allocator<int>());
         HPX_TEST_EQ(test_alloc_base::count, 1);
         hpx::future<int&> f = p.get_future();
         HPX_TEST_EQ(test_alloc_base::count, 1);
@@ -35,8 +33,7 @@ int hpx_main()
     }
     HPX_TEST_EQ(test_alloc_base::count, 0);
     {
-        hpx::lcos::local::promise<void> p(
-            std::allocator_arg, test_allocator<void>());
+        hpx::promise<void> p(std::allocator_arg, test_allocator<void>());
         HPX_TEST_EQ(test_alloc_base::count, 1);
         hpx::future<void> f = p.get_future();
         HPX_TEST_EQ(test_alloc_base::count, 1);

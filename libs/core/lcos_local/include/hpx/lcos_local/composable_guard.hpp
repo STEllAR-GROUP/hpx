@@ -84,7 +84,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/move_only_function.hpp>
-#include <hpx/futures/packaged_task.hpp>
 
 #include <atomic>
 #include <cstddef>

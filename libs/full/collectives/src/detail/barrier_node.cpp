@@ -235,8 +235,8 @@ namespace hpx { namespace distributed { namespace detail {
                 // Once the non-roots are ready to leave the barrier, we
                 // need to reset our promises such that the barrier can be
                 // reused.
-                this_->broadcast_promise_ = hpx::lcos::local::promise<void>();
-                this_->gather_promise_ = hpx::lcos::local::promise<void>();
+                this_->broadcast_promise_ = hpx::promise<void>();
+                this_->gather_promise_ = hpx::promise<void>();
             });
 
         // keep everything alive until future has become ready

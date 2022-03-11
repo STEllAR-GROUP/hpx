@@ -21,7 +21,7 @@ int make_int_slowly()
 
 hpx::future<int> make_future()
 {
-    hpx::lcos::local::packaged_task<int()> task(make_int_slowly);
+    hpx::packaged_task<int()> task(make_int_slowly);
     return task.get_future();
 }
 

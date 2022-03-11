@@ -48,7 +48,7 @@ int throw_runtime_error()
     throw std::runtime_error("42");
 }
 
-void set_promise_thread(hpx::lcos::local::promise<int>* p)
+void set_promise_thread(hpx::promise<int>* p)
 {
     p->set_value(42);
 }
@@ -57,7 +57,7 @@ struct my_exception
 {
 };
 
-void set_promise_exception_thread(hpx::lcos::local::promise<int>* p)
+void set_promise_exception_thread(hpx::promise<int>* p)
 {
     p->set_exception(std::make_exception_ptr(my_exception()));
 }
@@ -65,7 +65,7 @@ void set_promise_exception_thread(hpx::lcos::local::promise<int>* p)
 ///////////////////////////////////////////////////////////////////////////////
 void test_store_value_from_thread()
 {
-    hpx::lcos::local::promise<int> pi2;
+    hpx::promise<int> pi2;
     hpx::future<int> fi2(pi2.get_future());
     hpx::thread t(&set_promise_thread, &pi2);
     fi2.wait();
@@ -80,7 +80,7 @@ void test_store_value_from_thread()
 ///////////////////////////////////////////////////////////////////////////////
 void test_store_exception()
 {
-    hpx::lcos::local::promise<int> pi3;
+    hpx::promise<int> pi3;
     hpx::future<int> fi3 = pi3.get_future();
     hpx::thread t(&set_promise_exception_thread, &pi3);
     fi3.wait();
@@ -125,7 +125,7 @@ void test_initial_state()
 ///////////////////////////////////////////////////////////////////////////////
 void test_waiting_future()
 {
-    hpx::lcos::local::promise<int> pi;
+    hpx::promise<int> pi;
     hpx::future<int> fi;
     fi = pi.get_future();
 
@@ -140,7 +140,7 @@ void test_waiting_future()
 ///////////////////////////////////////////////////////////////////////////////
 void test_cannot_get_future_twice()
 {
-    hpx::lcos::local::promise<int> pi;
+    hpx::promise<int> pi;
     pi.get_future();
 
     try
@@ -161,7 +161,7 @@ void test_cannot_get_future_twice()
 ///////////////////////////////////////////////////////////////////////////////
 void test_set_value_updates_future_status()
 {
-    hpx::lcos::local::promise<int> pi;
+    hpx::promise<int> pi;
     hpx::future<int> fi;
     fi = pi.get_future();
 
@@ -175,7 +175,7 @@ void test_set_value_updates_future_status()
 ///////////////////////////////////////////////////////////////////////////////
 void test_set_value_can_be_retrieved()
 {
-    hpx::lcos::local::promise<int> pi;
+    hpx::promise<int> pi;
     hpx::future<int> fi;
     fi = pi.get_future();
 
@@ -192,7 +192,7 @@ void test_set_value_can_be_retrieved()
 ///////////////////////////////////////////////////////////////////////////////
 void test_set_value_can_be_moved()
 {
-    hpx::lcos::local::promise<int> pi;
+    hpx::promise<int> pi;
     hpx::future<int> fi;
     fi = pi.get_future();
 
@@ -210,7 +210,7 @@ void test_set_value_can_be_moved()
 ///////////////////////////////////////////////////////////////////////////////
 void test_future_from_packaged_task_is_waiting()
 {
-    hpx::lcos::local::packaged_task<int()> pt(make_int);
+    hpx::packaged_task<int()> pt(make_int);
     hpx::future<int> fi = pt.get_future();
 
     HPX_TEST(!fi.is_ready());
@@ -221,7 +221,7 @@ void test_future_from_packaged_task_is_waiting()
 ///////////////////////////////////////////////////////////////////////////////
 void test_invoking_a_packaged_task_populates_future()
 {
-    hpx::lcos::local::packaged_task<int()> pt(make_int);
+    hpx::packaged_task<int()> pt(make_int);
     hpx::future<int> fi = pt.get_future();
 
     pt();
@@ -237,7 +237,7 @@ void test_invoking_a_packaged_task_populates_future()
 ///////////////////////////////////////////////////////////////////////////////
 void test_invoking_a_packaged_task_twice_throws()
 {
-    hpx::lcos::local::packaged_task<int()> pt(make_int);
+    hpx::packaged_task<int()> pt(make_int);
 
     pt();
     try
@@ -263,7 +263,7 @@ void test_invoking_a_packaged_task_twice_throws()
 ///////////////////////////////////////////////////////////////////////////////
 void test_cannot_get_future_twice_from_task()
 {
-    hpx::lcos::local::packaged_task<int()> pt(make_int);
+    hpx::packaged_task<int()> pt(make_int);
     pt.get_future();
     try
     {
@@ -282,7 +282,7 @@ void test_cannot_get_future_twice_from_task()
 
 void test_task_stores_exception_if_function_throws()
 {
-    hpx::lcos::local::packaged_task<int()> pt(throw_runtime_error);
+    hpx::packaged_task<int()> pt(throw_runtime_error);
     hpx::future<int> fi = pt.get_future();
 
     pt();
@@ -307,7 +307,7 @@ void test_task_stores_exception_if_function_throws()
 
 void test_void_promise()
 {
-    hpx::lcos::local::promise<void> p;
+    hpx::promise<void> p;
     hpx::future<void> f = p.get_future();
 
     p.set_value();
@@ -318,7 +318,7 @@ void test_void_promise()
 
 void test_reference_promise()
 {
-    hpx::lcos::local::promise<int&> p;
+    hpx::promise<int&> p;
     hpx::future<int&> f = p.get_future();
     int i = 42;
     p.set_value(i);
@@ -332,7 +332,7 @@ void do_nothing() {}
 
 void test_task_returning_void()
 {
-    hpx::lcos::local::packaged_task<void()> pt(do_nothing);
+    hpx::packaged_task<void()> pt(do_nothing);
     hpx::future<void> fi = pt.get_future();
 
     pt();
@@ -351,7 +351,7 @@ int& return_ref()
 
 void test_task_returning_reference()
 {
-    hpx::lcos::local::packaged_task<int&()> pt(return_ref);
+    hpx::packaged_task<int&()> pt(return_ref);
     hpx::future<int&> fi = pt.get_future();
 
     pt();
@@ -365,7 +365,7 @@ void test_task_returning_reference()
 
 void test_future_for_move_only_udt()
 {
-    hpx::lcos::local::promise<X> pt;
+    hpx::promise<X> pt;
     hpx::future<X> fi = pt.get_future();
 
     pt.set_value(X());
@@ -375,14 +375,14 @@ void test_future_for_move_only_udt()
 
 void test_future_for_string()
 {
-    hpx::lcos::local::promise<std::string> pt;
+    hpx::promise<std::string> pt;
     hpx::future<std::string> fi1 = pt.get_future();
 
     pt.set_value(std::string("hello"));
     std::string res(fi1.get());
     HPX_TEST_EQ(res, "hello");
 
-    hpx::lcos::local::promise<std::string> pt2;
+    hpx::promise<std::string> pt2;
     fi1 = pt2.get_future();
 
     std::string const s = "goodbye";
@@ -391,7 +391,7 @@ void test_future_for_string()
     res = fi1.get();
     HPX_TEST_EQ(res, "goodbye");
 
-    hpx::lcos::local::promise<std::string> pt3;
+    hpx::promise<std::string> pt3;
     fi1 = pt3.get_future();
 
     std::string s2 = "foo";
@@ -410,7 +410,7 @@ void wait_callback(hpx::future<int>)
     ++callback_called;
 }
 
-void promise_set_value(hpx::lcos::local::promise<int>& pi)
+void promise_set_value(hpx::promise<int>& pi)
 {
     try
     {
@@ -424,7 +424,7 @@ void promise_set_value(hpx::lcos::local::promise<int>& pi)
 void test_wait_callback()
 {
     callback_called = 0;
-    hpx::lcos::local::promise<int> pi;
+    hpx::promise<int> pi;
     hpx::future<int> fi = pi.get_future();
 
     hpx::future<void> ft = fi.then(&wait_callback);
@@ -441,7 +441,7 @@ void test_wait_callback()
     HPX_TEST_EQ(callback_called, 1U);
 }
 
-void do_nothing_callback(hpx::lcos::local::promise<int>& /*pi*/)
+void do_nothing_callback(hpx::promise<int>& /*pi*/)
 {
     std::lock_guard<hpx::lcos::local::spinlock> lk(callback_mutex);
     ++callback_called;
@@ -450,7 +450,7 @@ void do_nothing_callback(hpx::lcos::local::promise<int>& /*pi*/)
 void test_wait_callback_with_timed_wait()
 {
     callback_called = 0;
-    hpx::lcos::local::promise<int> pi;
+    hpx::promise<int> pi;
     hpx::future<int> fi = pi.get_future();
 
     hpx::future<void> fv =
@@ -476,11 +476,11 @@ void test_wait_callback_with_timed_wait()
 
 void test_packaged_task_can_be_moved()
 {
-    hpx::lcos::local::packaged_task<int()> pt(make_int);
+    hpx::packaged_task<int()> pt(make_int);
     hpx::future<int> fi = pt.get_future();
     HPX_TEST(!fi.is_ready());
 
-    hpx::lcos::local::packaged_task<int()> pt2(std::move(pt));
+    hpx::packaged_task<int()> pt2(std::move(pt));
     HPX_TEST(!fi.is_ready());
 
     try
@@ -509,7 +509,7 @@ void test_destroying_a_promise_stores_broken_promise()
     hpx::future<int> f;
 
     {
-        hpx::lcos::local::promise<int> p;
+        hpx::promise<int> p;
         f = p.get_future();
     }
 
@@ -535,7 +535,7 @@ void test_destroying_a_packaged_task_stores_broken_task()
     hpx::future<int> f;
 
     {
-        hpx::lcos::local::packaged_task<int()> p(make_int);
+        hpx::packaged_task<int()> p(make_int);
         f = p.get_future();
     }
 

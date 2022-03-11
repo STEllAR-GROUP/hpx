@@ -71,8 +71,8 @@ namespace hpx { namespace distributed { namespace detail {
         std::size_t cut_off_;
 
     private:
-        hpx::lcos::local::promise<void> gather_promise_;
-        hpx::lcos::local::promise<void> broadcast_promise_;
+        hpx::promise<void> gather_promise_;
+        hpx::promise<void> broadcast_promise_;
         hpx::barrier<> local_barrier_;
 
         hpx::future<void> do_wait(hpx::future<void> future);

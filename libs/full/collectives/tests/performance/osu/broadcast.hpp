@@ -123,7 +123,7 @@ namespace hpx { namespace lcos {
         std::size_t fan_out;
 
         hpx::lcos::local::and_gate bcast_gate;
-        hpx::lcos::local::promise<void> ready_promise;
+        hpx::promise<void> ready_promise;
         hpx::future<void> ready_future;
         hpx::any recv_value;
         hpx::future<void> bcast_future;

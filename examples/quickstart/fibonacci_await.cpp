@@ -52,7 +52,7 @@ struct _fibonacci_frame
 {
     int state_;
     hpx::future<std::uint64_t> result_;
-    hpx::lcos::local::promise<std::uint64_t> result_promise_;
+    hpx::promise<std::uint64_t> result_promise_;
 
     _fibonacci_frame(std::uint64_t n)
       : state_(0)

@@ -16,7 +16,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace lcos {
+namespace hpx::distributed {
 
     ///////////////////////////////////////////////////////////////////////////
     /// A promise can be used by a single \a thread to invoke a
@@ -59,11 +59,11 @@ namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult>
     class promise
-      : public detail::promise_base<Result, RemoteResult,
-            detail::promise_data<Result>>
+      : public lcos::detail::promise_base<Result, RemoteResult,
+            lcos::detail::promise_data<Result>>
     {
-        using base_type = detail::promise_base<Result, RemoteResult,
-            detail::promise_data<Result>>;
+        using base_type = lcos::detail::promise_base<Result, RemoteResult,
+            lcos::detail::promise_data<Result>>;
 
     public:
         /// \brief constructs a promise object and a shared state.
@@ -146,11 +146,11 @@ namespace hpx { namespace lcos {
 
     template <>
     class promise<void, hpx::util::unused_type>
-      : public detail::promise_base<void, hpx::util::unused_type,
-            detail::promise_data<void>>
+      : public lcos::detail::promise_base<void, hpx::util::unused_type,
+            lcos::detail::promise_data<void>>
     {
-        using base_type = detail::promise_base<void, hpx::util::unused_type,
-            detail::promise_data<void>>;
+        using base_type = lcos::detail::promise_base<void,
+            hpx::util::unused_type, lcos::detail::promise_data<void>>;
 
     public:
         /// \brief constructs a promise object and a shared state.
@@ -241,13 +241,14 @@ namespace hpx { namespace lcos {
     {
         x.swap(y);
     }
-}}    // namespace hpx::lcos
+}    // namespace hpx::distributed
 
 namespace std {
 
     /// Requires: Allocator shall be an allocator (17.6.3.5)
     template <typename R, typename Allocator>
-    struct uses_allocator<hpx::lcos::promise<R>, Allocator> : std::true_type
+    struct uses_allocator<hpx::distributed::promise<R>, Allocator>
+      : std::true_type
     {
     };
 }    // namespace std

@@ -31,7 +31,7 @@ namespace hpx { namespace test {
             base_type;
 
     private:
-        lcos::promise<void> flag_promise_;
+        hpx::distributed::promise<void> flag_promise_;
         hpx::future<void> flag_;
         naming::id_type const locality_;
 

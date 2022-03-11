@@ -28,9 +28,9 @@ int make_int_slowly()
 void test_wait_for_either_of_two_futures_list()
 {
     std::array<hpx::future<int>, 2> futures;
-    hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
+    hpx::packaged_task<int()> pt1(make_int_slowly);
     futures[0] = pt1.get_future();
-    hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
+    hpx::packaged_task<int()> pt2(make_int_slowly);
     futures[1] = pt2.get_future();
 
     pt1();

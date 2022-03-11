@@ -130,7 +130,7 @@ namespace hpx { namespace serialization { namespace detail {
             done_ = true;
             num_futures_ = 0;
             triggered_futures_ = 0;
-            promise_ = hpx::lcos::local::promise<void>();
+            promise_ = hpx::promise<void>();
         }
 
         bool has_futures() const
@@ -181,7 +181,7 @@ namespace hpx { namespace serialization { namespace detail {
         bool done_;
         std::size_t num_futures_;
         std::size_t triggered_futures_;
-        hpx::lcos::local::promise<void> promise_;
+        hpx::promise<void> promise_;
     };
 
     // This is explicitly instantiated to ensure that the id is stable across

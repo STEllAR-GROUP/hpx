@@ -13,11 +13,13 @@
 
 int main()
 {
-    // hpx::lcos::promise
-    static_assert(std::uses_allocator<hpx::lcos::promise<int>,
+    // hpx::distributed::promise
+    static_assert(std::uses_allocator<hpx::distributed::promise<int>,
                       test_allocator<int>>::value,
-        "std::uses_allocator<promise<int>, test_allocator<int> >::value");
-    static_assert(std::uses_allocator<hpx::lcos::promise<void>,
+        "std::uses_allocator<hpx::distributed::promise<int>, "
+        "test_allocator<int> >::value");
+    static_assert(std::uses_allocator<hpx::distributed::promise<void>,
                       test_allocator<void>>::value,
-        "std::uses_allocator<promise<void>, test_allocator<void> >::value");
+        "std::uses_allocator<hpx::distributed::promise<void>, "
+        "test_allocator<void> >::value");
 }

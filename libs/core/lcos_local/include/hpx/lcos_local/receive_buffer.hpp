@@ -28,7 +28,7 @@ namespace hpx { namespace lcos { namespace local {
     {
     protected:
         typedef Mutex mutex_type;
-        typedef hpx::lcos::local::promise<T> buffer_promise_type;
+        typedef hpx::promise<T> buffer_promise_type;
 
         struct entry_data
         {
@@ -253,7 +253,7 @@ namespace hpx { namespace lcos { namespace local {
     {
     protected:
         typedef Mutex mutex_type;
-        typedef hpx::lcos::local::promise<void> buffer_promise_type;
+        typedef hpx::promise<void> buffer_promise_type;
 
         struct entry_data
         {

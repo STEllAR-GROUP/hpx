@@ -21,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx {
 
     template <typename Sig>
     class packaged_task;
@@ -122,7 +122,7 @@ namespace hpx { namespace lcos { namespace local {
                     "this packaged_task has no valid shared state");
                 return;
             }
-            promise_ = local::promise<R>();
+            promise_ = hpx::promise<R>();
         }
 
         // extension
@@ -133,21 +133,28 @@ namespace hpx { namespace lcos { namespace local {
 
     private:
         function_type function_;
-        local::promise<R> promise_;
+        hpx::promise<R> promise_;
     };
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx
+
+namespace hpx::lcos::local {
+
+    template <typename Sig>
+    using packaged_task HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::packaged_task is deprecated, use hpx::packaged_task "
+        "instead") = hpx::packaged_task<Sig>;
+}
 
 namespace std {
+
     // Requires: Allocator shall be an allocator (17.6.3.5)
     template <typename Sig, typename Allocator>
-    struct uses_allocator<hpx::lcos::local::packaged_task<Sig>, Allocator>
-      : std::true_type
+    struct uses_allocator<hpx::packaged_task<Sig>, Allocator> : std::true_type
     {
     };
 
     template <typename Sig>
-    void swap(hpx::lcos::local::packaged_task<Sig>& lhs,
-        hpx::lcos::local::packaged_task<Sig>& rhs)
+    void swap(hpx::packaged_task<Sig>& lhs, hpx::packaged_task<Sig>& rhs)
     {
         lhs.swap(rhs);
     }

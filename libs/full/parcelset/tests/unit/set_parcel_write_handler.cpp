@@ -46,7 +46,7 @@ void write_handler(std::error_code const&, hpx::parcelset::parcel const& p)
 // working around non-copy-ability of packaged_task
 struct indirect_packaged_task
 {
-    using packaged_task_type = hpx::lcos::local::packaged_task<void()>;
+    using packaged_task_type = hpx::packaged_task<void()>;
 
     indirect_packaged_task()
       : pt(std::make_shared<packaged_task_type>([]() {}))
@@ -83,7 +83,7 @@ int main()
         std::vector<hpx::future<void>> wait_for;
         for (hpx::id_type const& id : localities)
         {
-            hpx::lcos::promise<void> p_remote;
+            hpx::distributed::promise<void> p_remote;
             auto f_remote = p_remote.get_future();
 
             indirect_packaged_task p_local;
@@ -107,7 +107,7 @@ int main()
         std::vector<hpx::future<void>> wait_for;
         for (hpx::id_type const& id : localities)
         {
-            hpx::lcos::promise<void> p_remote;
+            hpx::distributed::promise<void> p_remote;
             auto f_remote = p_remote.get_future();
 
             indirect_packaged_task p_local;

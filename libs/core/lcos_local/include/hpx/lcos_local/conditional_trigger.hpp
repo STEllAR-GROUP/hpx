@@ -55,7 +55,7 @@ namespace hpx { namespace lcos { namespace local {
             if (cond_ && cond_())
             {
                 promise_.set_value();    // fire event
-                promise_ = promise<void>();
+                promise_ = hpx::promise<void>();
                 return true;
             }
 
@@ -63,7 +63,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
     private:
-        lcos::local::promise<void> promise_;
+        hpx::promise<void> promise_;
         hpx::function<bool()> cond_;
     };
 }}}    // namespace hpx::lcos::local

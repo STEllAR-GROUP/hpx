@@ -67,7 +67,7 @@ void test_async_with_executor(Executor& exec)
     }
 
     {
-        hpx::lcos::local::promise<std::int32_t> p;
+        hpx::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<std::int32_t> f1 =
