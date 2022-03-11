@@ -181,11 +181,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
         overall_time += timings[i].get();
 
     if (print_header)
-        hpx::cout << "datasize,testcount,average_time[s]\n" << hpx::flush;
+        hpx::cout << "datasize,testcount,average_time[s]\n" << std::flush;
 
     hpx::util::format_to(hpx::cout, "{},{},{}\n", data_size, iterations,
         overall_time / concurrency)
-        << hpx::flush;
+        << std::flush;
     hpx::util::print_cdash_timing("Serialization", overall_time / concurrency);
 
     return hpx::finalize();

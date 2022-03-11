@@ -59,7 +59,8 @@ namespace hpx { namespace test { namespace server {
         std::string const str = strm.str();
 
         if (!str.empty())
-            cout << str << flush;
+            cout << str << std::flush;
     }
 }}}    // namespace hpx::test::server
+
 #endif

@@ -48,13 +48,11 @@ using hpx::naming::invalid_id;
 using hpx::async;
 using hpx::future;
 
-
 using hpx::chrono::high_resolution_timer;
 
 using hpx::find_here;
 
 using hpx::cout;
-using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Globals.
@@ -213,14 +211,14 @@ int hpx_main(variables_map& vm)
     {
         cout << (("alpha^2 = (c*dt/dx)^2 should be less than 0.25 for "
                   "stability!\n"))
-             << flush;
+             << std::flush;
     }
 
     u = std::vector<std::vector<data>>(nt, std::vector<data>(nx));
 
-    hpx::util::format_to(cout, "dt = {1}\n", dt) << flush;
-    hpx::util::format_to(cout, "dx = {1}\n", dx) << flush;
-    hpx::util::format_to(cout, "alpha^2 = {1}\n", alpha_squared) << flush;
+    hpx::util::format_to(cout, "dt = {1}\n", dt) << std::flush;
+    hpx::util::format_to(cout, "dx = {1}\n", dx) << std::flush;
+    hpx::util::format_to(cout, "alpha^2 = {1}\n", alpha_squared) << std::flush;
 
     {
         // Keep track of the time required to execute.
@@ -236,7 +234,8 @@ int hpx_main(variables_map& vm)
 
         auto f = [&](std::size_t i, hpx::future<double>&& f) {
             double x_here = i * dx;
-            hpx::util::format_to(outfile, "{1} {2}\n", x_here, f.get()) << flush;
+            hpx::util::format_to(outfile, "{1} {2}\n", x_here, f.get())
+                << std::flush;
         };
         hpx::wait_each(f, futures);
 

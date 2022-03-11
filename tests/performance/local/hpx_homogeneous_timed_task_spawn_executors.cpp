@@ -31,7 +31,6 @@ using hpx::threads::get_thread_count;
 using hpx::chrono::high_resolution_timer;
 
 using hpx::cout;
-using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables.
@@ -45,7 +44,7 @@ void print_results(std::uint64_t cores, double walltime)
     if (header)
         cout << "OS-threads,Tasks,Delay (iterations),"
                 "Total Walltime (seconds),Walltime per Task (seconds)\n"
-             << flush;
+             << std::flush;
 
     std::string const cores_str = hpx::util::format("{},", cores);
     std::string const tasks_str = hpx::util::format("{},", tasks);
@@ -53,7 +52,7 @@ void print_results(std::uint64_t cores, double walltime)
 
     hpx::util::format_to(cout, "{:-21} {:-21} {:-21} {:10.12}, {:10.12}\n",
         cores_str, tasks_str, delay_str, walltime, walltime / tasks)
-        << flush;
+        << std::flush;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

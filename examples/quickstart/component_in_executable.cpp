@@ -23,11 +23,10 @@ using hpx::find_here;
 using hpx::async;
 
 using hpx::cout;
-using hpx::flush;
 
 struct hello_world_server : component_base<hello_world_server>
 {
-    void print() const { cout << "hello world\n" << flush; }
+    void print() const { cout << "hello world\n" << std::flush; }
 
     HPX_DEFINE_COMPONENT_ACTION(hello_world_server, print, print_action)
 };

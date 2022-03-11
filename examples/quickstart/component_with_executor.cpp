@@ -32,7 +32,7 @@ struct hello_world_server
 
     void print() const
     {
-        hpx::cout << "hello world\n" << hpx::flush;
+        hpx::cout << "hello world\n" << std::flush;
     }
 
     HPX_DEFINE_COMPONENT_ACTION(hello_world_server, print, print_action)

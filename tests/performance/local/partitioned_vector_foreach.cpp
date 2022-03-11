@@ -72,11 +72,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // verify that input is within domain of program
     if (test_count == 0 || test_count < 0)
     {
-        hpx::cout << "test_count cannot be zero or negative...\n" << hpx::flush;
+        hpx::cout << "test_count cannot be zero or negative...\n" << std::flush;
     }
     else if (delay < 0)
     {
-        hpx::cout << "delay cannot be a negative number...\n" << hpx::flush;
+        hpx::cout << "delay cannot be a negative number...\n" << std::flush;
     }
     else
     {

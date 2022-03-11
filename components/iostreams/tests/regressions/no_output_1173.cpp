@@ -23,7 +23,7 @@ std::uint32_t locality_id = std::uint32_t(-1);
 void worker()
 {
     locality_id = hpx::get_locality_id();
-    hpx::consolestream << "hello!" << hpx::endl;
+    hpx::consolestream << "hello!" << std::endl;
 }
 HPX_PLAIN_ACTION(worker, worker_action)
 

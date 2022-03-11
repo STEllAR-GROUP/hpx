@@ -17,7 +17,7 @@
 int hpx_main(int argc, char* argv[])
 {
     for (int i = 0; i != argc; ++i)
-        hpx::cout << "arg(" << i << "): " << argv[i] << hpx::endl;
+        hpx::cout << "arg(" << i << "): " << argv[i] << std::endl;
 
     return hpx::finalize();
 }

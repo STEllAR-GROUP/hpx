@@ -561,7 +561,7 @@ functions of the created client component instance should be called::
     // print the current number of threads created on locality 0
     hpx::performance_counters::performance_counter count(
         "/threads{locality#0/total}/count/cumulative");
-    hpx::cout << count.get_value<int>().get() << hpx::endl;
+    hpx::cout << count.get_value<int>().get() << std::endl;
 
 For more information about the client component type, see
 :cpp:class:`hpx::performance_counters::performance_counter`
@@ -576,7 +576,7 @@ For more information about the client component type, see
        hpx::performance_counters::performance_counter count(
            "/threads{locality#0/total}/count/cumulative");
        hpx::future<int> result = count.get_value<int>();
-       hpx::cout << result.get() << hpx::endl;
+       hpx::cout << result.get() << std::endl;
 
 .. _providing:
 
@@ -766,7 +766,7 @@ system and application performance.
    
        .. _agas-count-agas-service: 
 
-       :ref:`🔗<agas-count-agas-service>`
+       :ref:`??<agas-count-agas-service>`
 
        where:
 
@@ -808,7 +808,7 @@ system and application performance.
 
        .. _agas-agas-service-category-count: 
 
-       :ref:`🔗<agas-agas-service-category-count>`
+       :ref:`??<agas-agas-service-category-count>`
 
        where:
 
@@ -835,7 +835,7 @@ system and application performance.
 
        .. _agas-time-agas-service: 
 
-       :ref:`🔗<agas-time-agas-service>`
+       :ref:`??<agas-time-agas-service>`
 
        where:
 
@@ -879,7 +879,7 @@ system and application performance.
 
        .. _agas-agas-service-category-time: 
 
-       :ref:`🔗<agas-agas-service-category-time>`
+       :ref:`??<agas-agas-service-category-time>`
 
        where:
 
@@ -905,7 +905,7 @@ system and application performance.
        
        .. _agas-count-entries: 
 
-       :ref:`🔗<agas-count-entries>`
+       :ref:`??<agas-count-entries>`
      
      * ``locality#*/total``
 
@@ -921,7 +921,7 @@ system and application performance.
 
        .. _agas-count-cache-statistics: 
 
-       :ref:`🔗<agas-count-cache-statistics>`
+       :ref:`??<agas-count-cache-statistics>`
 
        where:
 
@@ -942,7 +942,7 @@ system and application performance.
 
        .. _agas-count-full-cache-statistics: 
 
-       :ref:`🔗<agas-count-full-cache-statistics>`
+       :ref:`??<agas-count-full-cache-statistics>`
 
        where:
 
@@ -962,7 +962,7 @@ system and application performance.
 
        .. _agas-time-full-cache-statistics:
 
-       :ref:`🔗<agas-time-full-cache-statistics>`
+       :ref:`??<agas-time-full-cache-statistics>`
 
        where:
 
@@ -990,7 +990,7 @@ system and application performance.
 
        .. _data-count-connection-type-operation:
 
-       :ref:`🔗<data-count-connection-type-operation>`
+       :ref:`??<data-count-connection-type-operation>`
 
        where:
 
@@ -1020,7 +1020,7 @@ system and application performance.
 
        .. _data-time-connection-type-operation:
 
-       :ref:`🔗<data-time-connection-type-operation>`
+       :ref:`??<data-time-connection-type-operation>`
 
        where:
 
@@ -1051,7 +1051,7 @@ system and application performance.
 
        .. _serialize-count-connection-type-operation:
 
-       :ref:`🔗<serialize-count-connection-type-operation>`
+       :ref:`??<serialize-count-connection-type-operation>`
 
        where:
 
@@ -1084,7 +1084,7 @@ system and application performance.
 
        .. _serialize-time-connection-type-operation:
 
-       :ref:`🔗<serialize-time-connection-type-operation>`
+       :ref:`??<serialize-time-connection-type-operation>`
 
        where:
 
@@ -1117,7 +1117,7 @@ system and application performance.
 
        .. _parcels-count-routed:
 
-       :ref:`🔗<parcels-count-routed>`
+       :ref:`??<parcels-count-routed>`
 
      * ``locality#*/total``
 
@@ -1144,7 +1144,7 @@ system and application performance.
 
        .. _parcels-count-connection-type-operation:
 
-       :ref:`🔗<parcels-count-connection-type-operation>`
+       :ref:`??<parcels-count-connection-type-operation>`
 
        where:
 
@@ -1174,7 +1174,7 @@ system and application performance.
 
        .. _messages-count-connection-type-operation:
 
-       :ref:`🔗<messages-count-connection-type-operation>`
+       :ref:`??<messages-count-connection-type-operation>`
 
        where:
 
@@ -1204,7 +1204,7 @@ system and application performance.
 
        .. _parcelport-count-connection-type-cache-statistics:
 
-       :ref:`🔗<parcelport-count-connection-type-cache-statistics>`
+       :ref:`??<parcelport-count-connection-type-cache-statistics>`
 
        where:
 
@@ -1237,7 +1237,7 @@ system and application performance.
 
        .. _parcelqueue-length-operation:
 
-       :ref:`🔗<parcelqueue-length-operation>`
+       :ref:`??<parcelqueue-length-operation>`
 
        where:
 
@@ -1263,7 +1263,7 @@ system and application performance.
 
        .. _threads-count-cumulative:
 
-       :ref:`🔗<threads-count-cumulative>`
+       :ref:`??<threads-count-cumulative>`
 
      * ``locality#*/total`` or
 
@@ -1302,7 +1302,7 @@ system and application performance.
 
        .. _threads-time-average:
 
-       :ref:`🔗<threads-time-average>`
+       :ref:`??<threads-time-average>`
 
      * ``locality#*/total`` or
 
@@ -1344,7 +1344,7 @@ system and application performance.
        
        .. _threads-time-average-overhead:
 
-       :ref:`🔗<threads-time-average-overhead>`
+       :ref:`??<threads-time-average-overhead>`
 
      * ``locality#*/total`` or
 
@@ -1385,7 +1385,7 @@ system and application performance.
 
        .. _threads-count-cumulative-phases:
 
-       :ref:`🔗<threads-count-cumulative-phases>`
+       :ref:`??<threads-count-cumulative-phases>`
 
      * ``locality#*/total`` or
 
@@ -1425,7 +1425,7 @@ system and application performance.
 
        .. _threads-time-average-phase:
 
-       :ref:`🔗<threads-time-average-phase>`
+       :ref:`??<threads-time-average-phase>`
 
      * ``locality#*/total`` or
 
@@ -1466,7 +1466,7 @@ system and application performance.
 
        .. _threads-time-average-phase-overhead:
 
-       :ref:`🔗<threads-time-average-phase-overhead>`
+       :ref:`??<threads-time-average-phase-overhead>`
 
      * ``locality#*/total`` or
 
@@ -1508,7 +1508,7 @@ system and application performance.
 
        .. _threads-time-overall:
 
-       :ref:`🔗<threads-time-overall>`
+       :ref:`??<threads-time-overall>`
 
      * ``locality#*/total`` or
 
@@ -1547,7 +1547,7 @@ system and application performance.
 
        .. _threads-time-cumulative:
 
-       :ref:`🔗<threads-time-cumulative>`
+       :ref:`??<threads-time-cumulative>`
 
      * ``locality#*/total`` or
 
@@ -1586,7 +1586,7 @@ system and application performance.
 
        .. _threads-time-cumulative-overheads:
 
-       :ref:`🔗<threads-time-cumulative-overheads>`
+       :ref:`??<threads-time-cumulative-overheads>`
 
      * ``locality#*/total`` or
 
@@ -1627,7 +1627,7 @@ system and application performance.
 
        .. _threads-count-instantaneous-thread-state:
 
-       :ref:`🔗<threads-count-instantaneous-thread-state>`
+       :ref:`??<threads-count-instantaneous-thread-state>`
 
        where:
 
@@ -1670,7 +1670,7 @@ system and application performance.
 
        .. _threads-wait-time-thread-state:
 
-       :ref:`🔗<threads-wait-time-thread-state>`
+       :ref:`??<threads-wait-time-thread-state>`
 
        where:
 
@@ -1721,7 +1721,7 @@ system and application performance.
 
        .. _threads-idle-rate:
 
-       :ref:`🔗<threads-idle-rate>`
+       :ref:`??<threads-idle-rate>`
 
      * ``locality#*/total`` or
 
@@ -1756,7 +1756,7 @@ system and application performance.
 
        .. _threads-creation-idle-rate:
 
-       :ref:`🔗<threads-creation-idle-rate>`
+       :ref:`??<threads-creation-idle-rate>`
 
      * ``locality#*/total`` or
 
@@ -1792,7 +1792,7 @@ system and application performance.
 
        .. _threads-cleanup-idle-rate:
 
-       :ref:`🔗<threads-cleanup-idle-rate>`
+       :ref:`??<threads-cleanup-idle-rate>`
 
      * ``locality#*/total`` or
 
@@ -1830,7 +1830,7 @@ system and application performance.
 
        .. _threadqueue-length:
 
-       :ref:`🔗<threadqueue-length>`
+       :ref:`??<threadqueue-length>`
 
      * ``locality#*/total`` or
 
@@ -1862,7 +1862,7 @@ system and application performance.
 
        .. _threads-count-stack-unbinds:
 
-       :ref:`🔗<threads-count-stack-unbinds>`
+       :ref:`??<threads-count-stack-unbinds>`
 
      * ``locality#*/total``
 
@@ -1879,7 +1879,7 @@ system and application performance.
 
        .. _threads-count-stack-recycles:
 
-       :ref:`🔗<threads-count-stack-recycles>`
+       :ref:`??<threads-count-stack-recycles>`
 
      * ``locality#*/total``
 
@@ -1894,7 +1894,7 @@ system and application performance.
 
        .. _threads-count-stolen-from-pending:
 
-       :ref:`🔗<threads-count-stolen-from-pending>`
+       :ref:`??<threads-count-stolen-from-pending>`
 
      * ``locality#*/total``
 
@@ -1913,7 +1913,7 @@ system and application performance.
 
        .. _threads-count-pending-misses:
 
-       :ref:`🔗<threads-count-pending-misses>`
+       :ref:`??<threads-count-pending-misses>`
 
      * ``locality#*/total`` or
 
@@ -1948,7 +1948,7 @@ system and application performance.
  
        .. _threads-count-pending-accesses:
 
-       :ref:`🔗<threads-count-pending-accesses>`
+       :ref:`??<threads-count-pending-accesses>`
 
      * ``locality#*/total`` or
 
@@ -1983,7 +1983,7 @@ system and application performance.
 
        .. _threads-count-stolen-from-staged:
 
-       :ref:`🔗<threads-count-stolen-from-staged>`
+       :ref:`??<threads-count-stolen-from-staged>`
 
      * ``locality#*/total`` or
 
@@ -2018,7 +2018,7 @@ system and application performance.
 
        .. _threads-count-stolen-to-pending:
 
-       :ref:`🔗<threads-count-stolen-to-pending>`
+       :ref:`??<threads-count-stolen-to-pending>`
 
      * ``locality#*/total`` or
 
@@ -2053,7 +2053,7 @@ system and application performance.
 
        .. _threads-count-stolen-to-staged:
 
-       :ref:`🔗<threads-count-stolen-to-staged>`
+       :ref:`??<threads-count-stolen-to-staged>`
 
      * ``locality#*/total`` or
 
@@ -2089,7 +2089,7 @@ system and application performance.
 
        .. _threads-count-objects:
 
-       :ref:`🔗<threads-count-objects>`
+       :ref:`??<threads-count-objects>`
 
      * ``locality#*/total`` or
 
@@ -2116,7 +2116,7 @@ system and application performance.
 
        .. _scheduler-utilization-instantaneous:
 
-       :ref:`🔗<scheduler-utilization-instantaneous>`
+       :ref:`??<scheduler-utilization-instantaneous>`
 
      * ``locality#*/total``
 
@@ -2133,7 +2133,7 @@ system and application performance.
 
        .. _threads-idle-loop-count-instantaneous:
 
-       :ref:`🔗<threads-idle-loop-count-instantaneous>`
+       :ref:`??<threads-idle-loop-count-instantaneous>`
        
      * ``locality#*/worker-thread#*`` or
 
@@ -2163,7 +2163,7 @@ system and application performance.
 
        .. _threads-busy-loop-count-instantaneous:
 
-       :ref:`🔗<threads-busy-loop-count-instantaneous>`
+       :ref:`??<threads-busy-loop-count-instantaneous>`
        
      * ``locality#*/worker-thread#*`` or
 
@@ -2193,7 +2193,7 @@ system and application performance.
 
        .. _threads-time-background-work-duration:
 
-       :ref:`🔗<threads-time-background-work-duration>`
+       :ref:`??<threads-time-background-work-duration>`
        
      * ``locality#*/total`` or
 
@@ -2228,7 +2228,7 @@ system and application performance.
 
        .. _threads-background-overhead:
 
-       :ref:`🔗<threads-background-overhead>`
+       :ref:`??<threads-background-overhead>`
 
      * ``locality#*/total`` or
 
@@ -2260,7 +2260,7 @@ system and application performance.
 
        .. _threads-time-background-send-duration:
 
-       :ref:`🔗<threads-time-background-send-duration>`
+       :ref:`??<threads-time-background-send-duration>`
 
      * ``locality#*/total`` or
 
@@ -2299,7 +2299,7 @@ system and application performance.
 
        .. _threads-background-send-overhead:
 
-       :ref:`🔗<threads-background-send-overhead>`
+       :ref:`??<threads-background-send-overhead>`
 
      * ``locality#*/total`` or
 
@@ -2334,7 +2334,7 @@ system and application performance.
 
        .. _threads-time-background-receive-duration:
 
-       :ref:`🔗<threads-time-background-receive-duration>`
+       :ref:`??<threads-time-background-receive-duration>`
 
      * ``locality#*/total`` or
 
@@ -2372,7 +2372,7 @@ system and application performance.
 
        .. _threads-background-receive-overhead:
        
-       :ref:`🔗<threads-background-receive-overhead>`
+       :ref:`??<threads-background-receive-overhead>`
 
      * ``locality#*/total`` or
 
@@ -2414,7 +2414,7 @@ system and application performance.
 
        .. _runtime-count-component: 
 
-       :ref:`🔗<runtime-count-component>`
+       :ref:`??<runtime-count-component>`
 
      * ``locality#*/total``
 
@@ -2432,7 +2432,7 @@ system and application performance.
 
        .. _runtime-count-action-invocation: 
 
-       :ref:`🔗<runtime-count-action-invocation>`
+       :ref:`??<runtime-count-action-invocation>`
 
      * ``locality#*/total``
 
@@ -2451,7 +2451,7 @@ system and application performance.
 
        .. _runtime-count-remote-action-invocation:
 
-       :ref:`🔗<runtime-count-remote-action-invocation>`
+       :ref:`??<runtime-count-remote-action-invocation>`
 
      * ``locality#*/total``
 
@@ -2470,7 +2470,7 @@ system and application performance.
 
        .. _runtime-uptime:
 
-       :ref:`🔗<runtime-uptime>`
+       :ref:`??<runtime-uptime>`
 
      * ``locality#*/total``
 
@@ -2486,7 +2486,7 @@ system and application performance.
 
        .. _runtime-memory-virtual:
 
-       :ref:`🔗<runtime-memory-virtual>`
+       :ref:`??<runtime-memory-virtual>`
 
      * ``locality#*/total``
 
@@ -2502,7 +2502,7 @@ system and application performance.
 
        .. _runtime-memory-resident:
 
-       :ref:`🔗<runtime-memory-resident>`
+       :ref:`??<runtime-memory-resident>`
 
      * ``locality#*/total``
 
@@ -2518,7 +2518,7 @@ system and application performance.
 
        .. _runtime-memory-total:
 
-       :ref:`🔗<runtime-memory-total>`
+       :ref:`??<runtime-memory-total>`
 
      * ``locality#*/total``
 
@@ -2536,7 +2536,7 @@ system and application performance.
 
        .. _runtime-io-read-bytes-issued:
 
-       :ref:`🔗<runtime-io-read-bytes-issued>`
+       :ref:`??<runtime-io-read-bytes-issued>`
 
      * ``locality#*/total``
 
@@ -2554,7 +2554,7 @@ system and application performance.
 
        .. _runtime-io-write-bytes-issued:
 
-       :ref:`🔗<runtime-io-write-bytes-issued>`
+       :ref:`??<runtime-io-write-bytes-issued>`
 
      * ``locality#*/total``
 
@@ -2572,7 +2572,7 @@ system and application performance.
 
        .. _runtime-io-read-syscalls:
 
-       :ref:`🔗<runtime-io-read-syscalls>`
+       :ref:`??<runtime-io-read-syscalls>`
 
      * ``locality#*/total``
 
@@ -2589,7 +2589,7 @@ system and application performance.
 
        .. _runtime-io-write-syscalls:
 
-       :ref:`🔗<runtime-io-write-syscalls>`
+       :ref:`??<runtime-io-write-syscalls>`
 
      * ``locality#*/total``
 
@@ -2606,7 +2606,7 @@ system and application performance.
 
        .. _runtime-io-read-bytes-transferred:
 
-       :ref:`🔗<runtime-io-read-bytes-transferred>`
+       :ref:`??<runtime-io-read-bytes-transferred>`
 
      * ``locality#*/total``
 
@@ -2623,7 +2623,7 @@ system and application performance.
 
        .. _runtime-io-write-bytes-transferred:
 
-       :ref:`🔗<runtime-io-write-bytes-transferred>`
+       :ref:`??<runtime-io-write-bytes-transferred>`
 
      * ``locality#*/total``
 
@@ -2640,7 +2640,7 @@ system and application performance.
 
        .. _runtime-io-write-bytes-cancelled:
 
-       :ref:`🔗<runtime-io-write-bytes-cancelled>`
+       :ref:`??<runtime-io-write-bytes-cancelled>`
 
      * ``locality#*/total``
 
@@ -2665,7 +2665,7 @@ system and application performance.
 
        .. _papi-papi-event:
 
-       :ref:`🔗<papi-papi-event>`
+       :ref:`??<papi-papi-event>`
 
        where:
 
@@ -2710,7 +2710,7 @@ system and application performance.
 
        .. _statistics-average:
 
-       :ref:`🔗<statistics-average>`
+       :ref:`??<statistics-average>`
 
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
@@ -2729,7 +2729,7 @@ system and application performance.
 
        .. _statistics-rolling-average:
 
-       :ref:`🔗<statistics-rolling-average>`
+       :ref:`??<statistics-rolling-average>`
 
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
@@ -2750,7 +2750,7 @@ system and application performance.
 
        .. _statistics-stddev:
 
-       :ref:`🔗<statistics-stddev>`
+       :ref:`??<statistics-stddev>`
 
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
@@ -2769,7 +2769,7 @@ system and application performance.
 
        .. _statistics-rolling-stddev:
 
-       :ref:`🔗<statistics-rolling-stddev>`
+       :ref:`??<statistics-rolling-stddev>`
 
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
@@ -2790,7 +2790,7 @@ system and application performance.
 
        .. _statistics-median:
 
-       :ref:`🔗<statistics-median>`
+       :ref:`??<statistics-median>`
 
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
@@ -2809,7 +2809,7 @@ system and application performance.
 
        .. _statistics-max:
 
-       :ref:`🔗<statistics-max>`
+       :ref:`??<statistics-max>`
 
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
@@ -2827,7 +2827,7 @@ system and application performance.
 
        .. _statistics-rolling-max:
 
-       :ref:`🔗<statistics-rolling-max>`
+       :ref:`??<statistics-rolling-max>`
 
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
@@ -2848,7 +2848,7 @@ system and application performance.
 
        .. _statistics-min:
 
-       :ref:`🔗<statistics-min>`
+       :ref:`??<statistics-min>`
 
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
@@ -2866,7 +2866,7 @@ system and application performance.
 
        .. _statistics-rolling-min:
 
-       :ref:`🔗<statistics-rolling-min>`
+       :ref:`??<statistics-rolling-min>`
 
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
@@ -2893,7 +2893,7 @@ system and application performance.
 
        .. _arithmetics-add:
 
-       :ref:`🔗<arithmetics-add>`
+       :ref:`??<arithmetics-add>`
    
      * None
      * Returns the sum calculated based on the values queried from the
@@ -2905,7 +2905,7 @@ system and application performance.
 
        .. _arithmetics-subtract:
 
-       :ref:`🔗<arithmetics-subtract>`
+       :ref:`??<arithmetics-subtract>`
 
      * None
      * Returns the difference calculated based on the values queried from the
@@ -2917,7 +2917,7 @@ system and application performance.
 
        .. _arithmetics-multiply:
 
-       :ref:`🔗<arithmetics-multiply>`
+       :ref:`??<arithmetics-multiply>`
 
      * None
      * Returns the product calculated based on the values queried from the
@@ -2929,7 +2929,7 @@ system and application performance.
 
           .. _arithmetics-divide:
 
-       :ref:`🔗<arithmetics-divide>`
+       :ref:`??<arithmetics-divide>`
 
      * None
      * Returns the result of division of the values queried from the
@@ -2941,7 +2941,7 @@ system and application performance.
 
        .. _arithmetics-mean:
 
-       :ref:`🔗<arithmetics-mean>`
+       :ref:`??<arithmetics-mean>`
 
      * None
      * Returns the average value of all values queried from the
@@ -2953,7 +2953,7 @@ system and application performance.
 
        .. _arithmetics-variance:
 
-       :ref:`🔗<arithmetics-variance>`
+       :ref:`??<arithmetics-variance>`
 
      * None
      * Returns the standard deviation of all values queried from the underlying
@@ -2965,7 +2965,7 @@ system and application performance.
 
        .. _arithmetics-median:
 
-       :ref:`🔗<arithmetics-median>`
+       :ref:`??<arithmetics-median>`
 
      * None
      * Returns the median value of all values queried from the underlying
@@ -2977,7 +2977,7 @@ system and application performance.
 
        .. _arithmetics-min:
 
-       :ref:`🔗<arithmetics-min>`
+       :ref:`??<arithmetics-min>`
 
      * None
      * Returns the minimum value of all values queried from the underlying
@@ -2989,7 +2989,7 @@ system and application performance.
 
        .. _arithmetics-max:
 
-       :ref:`🔗<arithmetics-max>`
+       :ref:`??<arithmetics-max>`
 
      * None
      * Returns the maximum value of all values queried from the
@@ -3001,7 +3001,7 @@ system and application performance.
 
        .. _arithmetics-count:
 
-       :ref:`🔗<arithmetics-count>`
+       :ref:`??<arithmetics-count>`
 
      * None
      * Returns the count value of all values queried from the underlying
@@ -3049,7 +3049,7 @@ system and application performance.
 
        .. _coalescing-count-parcels:
 
-       :ref:`🔗<coalescing-count-parcels>`
+       :ref:`??<coalescing-count-parcels>`
 
      * ``locality#*/total``
 
@@ -3069,7 +3069,7 @@ system and application performance.
 
        .. _coalescing-count-messages:
 
-       :ref:`🔗<coalescing-count-messages>`
+       :ref:`??<coalescing-count-messages>`
 
      * ``locality#*/total``
 
@@ -3089,7 +3089,7 @@ system and application performance.
 
        .. _coalescing-count-average-parcels-per-message:
 
-       :ref:`🔗<coalescing-count-average-parcels-per-message>`
+       :ref:`??<coalescing-count-average-parcels-per-message>`
 
      * ``locality#*/total``
 
@@ -3110,7 +3110,7 @@ system and application performance.
 
        .. _coalescing-time-average-parcel-arrival:
 
-       :ref:`🔗<coalescing-time-average-parcel-arrival>`
+       :ref:`??<coalescing-time-average-parcel-arrival>`
 
      * ``locality#*/total``
 
@@ -3131,7 +3131,7 @@ system and application performance.
 
        .. _coalescing-time-parcel-arrival-histogram:
 
-       :ref:`🔗<coalescing-time-parcel-arrival-histogram>`
+       :ref:`??<coalescing-time-parcel-arrival-histogram>`
 
      * ``locality#*/total``
 

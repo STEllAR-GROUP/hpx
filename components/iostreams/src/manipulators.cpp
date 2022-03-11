@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2013-2014 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,11 +7,14 @@
 
 #include <hpx/components/iostreams/manipulators.hpp>
 
-namespace hpx { namespace iostreams
+namespace hpx
 {
-    flush_type flush = flush_type();                      // hpx::flush
-    endl_type endl = endl_type();                         // hpx::endl
-    async_flush_type async_flush = async_flush_type();    // hpx::async_flush
-    async_endl_type async_endl = async_endl_type();       // hpx::async_endl
-}}
-
+    // hpx::flush
+    iostreams::flush_type flush = iostreams::flush_type();
+    // hpx::endl
+    iostreams::endl_type endl = iostreams::endl_type();
+    // hpx::async_flush
+    iostreams::async_flush_type async_flush = iostreams::async_flush_type();
+    // hpx::async_endl
+    iostreams::async_endl_type async_endl = iostreams::async_endl_type();
+}

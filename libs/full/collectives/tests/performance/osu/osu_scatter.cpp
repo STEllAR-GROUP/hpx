@@ -73,8 +73,8 @@ void run_benchmark(params const& p)
     if (localities.size() < 2)
     {
         hpx::cout << "This benchmark must be run with at least 2 localities"
-                  << hpx::endl
-                  << hpx::flush;
+                  << std::endl
+                  << std::flush;
         return;
     }
 

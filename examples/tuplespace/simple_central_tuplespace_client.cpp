@@ -49,7 +49,7 @@ void simple_central_tuplespace_test(
     if (!central_tuplespace.connect(tuplespace_symbol_name))
     {
         hpx::cerr << "locality " << hpx::get_locality_id() << ": "
-                  << "FAIL to connect " << tuplespace_symbol_name << hpx::endl;
+                  << "FAIL to connect " << tuplespace_symbol_name << std::endl;
         return;
     }
 
@@ -57,7 +57,7 @@ void simple_central_tuplespace_test(
     hpx::cout << "locality " << hpx::get_locality_id() << ": "
               << "write_sync ";
     print_tuple(tuple);
-    hpx::cout << " returns " << ret << hpx::endl;
+    hpx::cout << " returns " << ret << std::endl;
 
     tuple_type partial_tuple;
 
@@ -77,7 +77,7 @@ void simple_central_tuplespace_test(
     print_tuple(partial_tuple);
     hpx::cout << " returns ";
     print_tuple(return_tuple);
-    hpx::cout << hpx::endl;
+    hpx::cout << std::endl;
 
     return_tuple = central_tuplespace.take(hpx::launch::sync, partial_tuple, 0);
     hpx::cout << "locality " << hpx::get_locality_id() << ": "
@@ -85,7 +85,7 @@ void simple_central_tuplespace_test(
     print_tuple(partial_tuple);
     hpx::cout << " (1st) returns ";
     print_tuple(return_tuple);
-    hpx::cout << hpx::endl;
+    hpx::cout << std::endl;
 
     return_tuple = central_tuplespace.take(hpx::launch::sync, partial_tuple, 0);
     hpx::cout << "locality " << hpx::get_locality_id() << ": "
@@ -93,7 +93,7 @@ void simple_central_tuplespace_test(
     print_tuple(partial_tuple);
     hpx::cout << " (2nd) returns ";
     print_tuple(return_tuple);
-    hpx::cout << hpx::endl << hpx::flush;
+    hpx::cout << std::endl << std::flush;
 }
 
 HPX_PLAIN_ACTION(
@@ -114,7 +114,7 @@ int hpx_main()
         {
             hpx::cerr << "locality " << hpx::get_locality_id() << ": "
                       << "FAIL to create " << tuplespace_symbol_name
-                      << hpx::endl;
+                      << std::endl;
 
             return hpx::finalize();
         }
@@ -128,7 +128,7 @@ int hpx_main()
         hpx::cout << "locality " << hpx::get_locality_id() << ": "
                   << "created tuple1: ";
         print_tuple(tuple1);
-        hpx::cout << hpx::endl;
+        hpx::cout << std::endl;
 
         tuple_type tuple2;
         tuple2.push_back(std::string("second"))
@@ -139,7 +139,7 @@ int hpx_main()
         hpx::cout << "locality " << hpx::get_locality_id() << ": "
                   << "created tuple2: ";
         print_tuple(tuple2);
-        hpx::cout << hpx::endl;
+        hpx::cout << std::endl;
 
         std::vector<hpx::future<void>> futures;
 

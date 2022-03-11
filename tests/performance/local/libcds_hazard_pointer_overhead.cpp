@@ -49,7 +49,6 @@ using hpx::future;
 using hpx::chrono::high_resolution_timer;
 
 using hpx::cout;
-using hpx::flush;
 
 // global vars we stick here to make printouts easy for plotting
 static std::string queuing = "default";

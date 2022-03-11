@@ -15,7 +15,7 @@
 int hpx_main(int, char**)
 {
     // Say hello to the world!
-    hpx::cout << "Hello World!\n" << hpx::flush;
+    hpx::cout << "Hello World!\n" << std::flush;
     return hpx::finalize();
 }
 
