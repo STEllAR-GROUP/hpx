@@ -23,6 +23,7 @@ set(include_local_headers
     hpx/local/runtime.hpp
     hpx/local/semaphore.hpp
     hpx/local/shared_mutex.hpp
+    hpx/local/source_location.hpp
     hpx/local/stop_token.hpp
     hpx/local/system_error.hpp
     hpx/local/task_block.hpp

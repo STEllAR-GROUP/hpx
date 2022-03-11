@@ -106,8 +106,7 @@ namespace hpx { namespace meta {
     template <template <class> typename T, typename T1>
     using is_valid1 = util::is_detected<T, T1>;
 
-    template <template <class, class> typename T, typename T1,
-        typename T2>
+    template <template <class, class> typename T, typename T1, typename T2>
     using is_valid2 = util::is_detected<T, T1, T2>;
 
     template <template <class, class, class> typename T, typename T1,

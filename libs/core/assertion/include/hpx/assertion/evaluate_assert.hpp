@@ -15,7 +15,7 @@
 
 namespace hpx { namespace assertion { namespace detail {
     /// \cond NOINTERNAL
-    HPX_CORE_EXPORT void handle_assert(source_location const& loc,
+    HPX_CORE_EXPORT void handle_assert(hpx::source_location const& loc,
         const char* expr, std::string const& msg) noexcept;
     /// \endcond
 }}}    // namespace hpx::assertion::detail
