@@ -21,7 +21,7 @@
 
 namespace hpx { namespace detail {
     HPX_NORETURN HPX_CORE_EXPORT void assertion_handler(
-        hpx::assertion::source_location const& loc, const char* expr,
+        hpx::source_location const& loc, const char* expr,
         std::string const& msg);
 #if defined(HPX_HAVE_APEX)
     HPX_CORE_EXPORT bool enable_parent_task_handler();

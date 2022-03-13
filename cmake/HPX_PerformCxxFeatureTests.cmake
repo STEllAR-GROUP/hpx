@@ -73,6 +73,10 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX20_LAMBDA_CAPTURE
     )
 
+    hpx_check_for_cxx20_source_location(
+      DEFINITIONS HPX_HAVE_CXX20_SOURCE_LOCATION
+    )
+
     hpx_check_for_cxx20_perfect_pack_capture(
       DEFINITIONS HPX_HAVE_CXX20_PERFECT_PACK_CAPTURE
     )

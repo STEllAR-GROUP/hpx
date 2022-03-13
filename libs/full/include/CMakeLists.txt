@@ -111,6 +111,7 @@ set(include_headers
     hpx/runtime.hpp
     hpx/semaphore.hpp
     hpx/shared_mutex.hpp
+    hpx/source_location.hpp
     hpx/stop_token.hpp
     hpx/system_error.hpp
     hpx/task_block.hpp

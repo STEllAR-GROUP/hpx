@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,18 +8,70 @@
 #pragma once
 
 #include <hpx/config/export_definitions.hpp>
+#include <hpx/assertion/current_function.hpp>
 
+#include <cstdint>
 #include <iosfwd>
 
-namespace hpx { namespace assertion {
+#if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
+#include <source_location>
+#endif
+
+namespace hpx {
+
     /// This contains the location information where \a HPX_ASSERT has been
     /// called
+#if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
+    using std::source_location;
+#else
     struct source_location
     {
-        const char* file_name;
-        unsigned line_number;
-        const char* function_name;
+        const char* filename;
+        std::uint_least32_t line_number;
+        const char* functionname;
+
+        // compatibility with C++20 std::source_location
+        constexpr std::uint_least32_t line() const noexcept
+        {
+            return line_number;
+        }
+
+        constexpr std::uint_least32_t column() const noexcept
+        {
+            return 0;
+        }
+
+        constexpr const char* file_name() const noexcept
+        {
+            return filename;
+        }
+
+        constexpr const char* function_name() const noexcept
+        {
+            return functionname;
+        }
     };
+#endif
+
     HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, source_location const& loc);
-}}    // namespace hpx::assertion
+}    // namespace hpx
+
+namespace hpx::assertion {
+
+    using source_location HPX_DEPRECATED_V(1, 8,
+        "hpx::assertion::source_location is deprecated, use "
+        "hpx::source_location "
+        "instead") = hpx::source_location;
+}
+
+#if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
+#define HPX_CURRENT_SOURCE_LOCATION() ::hpx::source_location::current()
+#else
+#define HPX_CURRENT_SOURCE_LOCATION()                                          \
+    ::hpx::source_location                                                     \
+    {                                                                          \
+        __FILE__, static_cast<std::uint_least32_t>(__LINE__),                  \
+            HPX_ASSERT_CURRENT_FUNCTION                                        \
+    }
+#endif
