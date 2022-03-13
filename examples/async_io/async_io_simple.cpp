@@ -56,7 +56,7 @@ int hpx_main()
         // Print the returned result.
         hpx::cout << "HPX-thread: The asynchronous IO operation returned: "
                   << result << "\n"
-                  << hpx::flush;
+                  << std::flush;
     }
 
     return hpx::finalize();    // Initiate shutdown of the runtime system.

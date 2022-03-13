@@ -23,11 +23,11 @@ struct A : hpx::components::abstract_component_base<A>
 {
     A()
     {
-        hpx::cout << "A::A\n" << hpx::flush;
+        hpx::cout << "A::A\n" << std::flush;
     }
     virtual ~A()
     {
-        hpx::cout << "A::~A\n" << hpx::flush;
+        hpx::cout << "A::~A\n" << std::flush;
     }
 
     virtual void print() const = 0;
@@ -73,18 +73,18 @@ struct B
     B()
       : value_(0)
     {
-        hpx::cout << "B::B\n" << hpx::flush;
+        hpx::cout << "B::B\n" << std::flush;
     }
 
     B(int i)
       : value_(i)
     {
-        hpx::cout << "B::B(int) " << i << "\n" << hpx::flush;
+        hpx::cout << "B::B(int) " << i << "\n" << std::flush;
     }
 
     ~B()
     {
-        hpx::cout << "B::~B\n" << hpx::flush;
+        hpx::cout << "B::~B\n" << std::flush;
     }
 
     // Overload this function to allow to extract the proper base address
@@ -100,7 +100,7 @@ struct B
     {
         hpx::cout << "B::print from locality: " << hpx::find_here()
                   << ", value: " << value_ << "\n"
-                  << hpx::flush;
+                  << std::flush;
     }
 
     int value_;

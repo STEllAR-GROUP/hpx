@@ -90,8 +90,8 @@ void run_benchmark(params const& p)
     if (ids.size() < 2)
     {
         hpx::cout << "This benchmark must be run with at least 2 threads"
-                  << hpx::endl
-                  << hpx::flush;
+                  << std::endl
+                  << std::flush;
         return;
     }
 

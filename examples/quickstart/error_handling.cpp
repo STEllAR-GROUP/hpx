@@ -43,7 +43,7 @@ int hpx_main()
             hpx::cout << "diagnostic information:"
                 << hpx::diagnostic_information(e) << "\n";
         }
-        hpx::cout << hpx::flush;
+        hpx::cout << std::flush;
         //]
 
         // Detailed error reporting using exceptions
@@ -73,7 +73,7 @@ int hpx_main()
             hpx::cout << "{stack-trace}: " << hpx::get_error_backtrace(e) << "\n";
             hpx::cout << "{env}: "         << hpx::get_error_env(e) << "\n";
         }
-        hpx::cout << hpx::flush;
+        hpx::cout << std::flush;
         //]
 
         ///////////////////////////////////////////////////////////////////////
@@ -101,7 +101,7 @@ int hpx_main()
                     << hpx::diagnostic_information(ec) << "\n";
             }
 
-            hpx::cout << hpx::flush;
+            hpx::cout << std::flush;
             //]
         }
 
@@ -140,7 +140,7 @@ int hpx_main()
                 hpx::cout << "{env}: "         << hpx::get_error_env(ec) << "\n";
             }
 
-            hpx::cout << hpx::flush;
+            hpx::cout << std::flush;
             //]
         }
 
@@ -167,7 +167,7 @@ int hpx_main()
                 hpx::cout << "error code:" << ec.value() << "\n";
             }
 
-            hpx::cout << hpx::flush;
+            hpx::cout << std::flush;
             //]
         }
     }

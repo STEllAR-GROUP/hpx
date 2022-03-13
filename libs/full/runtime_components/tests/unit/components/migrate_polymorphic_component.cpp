@@ -317,13 +317,13 @@ bool test_migrate_polymorphic_component(
 
     try
     {
-        hpx::cout << "Migrating..." << hpx::endl;
+        hpx::cout << "Migrating..." << std::endl;
         // migrate t1 to the target
         test_client t2(hpx::components::migrate<test_server>(t1, target));
 
         // wait for migration to be done
         HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
-        hpx::cout << "...completed migrating..." << hpx::endl;
+        hpx::cout << "...completed migrating..." << std::endl;
 
         // the migrated object should have the same id as before
         HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -333,7 +333,7 @@ bool test_migrate_polymorphic_component(
         HPX_TEST_EQ(t2.get_data(), 42);
         HPX_TEST_EQ(t2.get_base_data(), 7);
 
-        hpx::cout << "...pass all tests!" << hpx::endl;
+        hpx::cout << "...pass all tests!" << std::endl;
     }
     catch (hpx::exception const& e)
     {

@@ -20,7 +20,6 @@ using hpx::program_options::value;
 using hpx::find_here;
 
 using hpx::cout;
-using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
@@ -37,7 +36,7 @@ int hpx_main(
              << HPX_SIZEOF(hpx::naming::id_type)
              << HPX_SIZEOF(hpx::naming::address)
              << HPX_SIZEOF(hpx::threads::thread_data)
-             << flush;
+             << std::flush;
 
 #       undef HPX_SIZEOF
     }

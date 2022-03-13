@@ -70,13 +70,13 @@ int hpx_main()
             f = p.get_future();
             {
                 auto local_promise_id = p.get_id();
-                hpx::cout << local_promise_id << hpx::endl;
+                hpx::cout << local_promise_id << std::endl;
             }
 
             hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
 
             promise_id = p.get_id();
-            hpx::cout << promise_id << hpx::endl;
+            hpx::cout << promise_id << std::endl;
         }
 
         hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -95,13 +95,13 @@ int hpx_main()
             p.get_future();
             {
                 auto local_promise_id = p.get_id();
-                hpx::cout << local_promise_id << hpx::endl;
+                hpx::cout << local_promise_id << std::endl;
             }
 
             hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
 
             promise_id = p.get_id();
-            hpx::cout << promise_id << hpx::endl;
+            hpx::cout << promise_id << std::endl;
         }
 
         hpx::this_thread::sleep_for(std::chrono::milliseconds(100));

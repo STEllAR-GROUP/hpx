@@ -128,7 +128,7 @@ namespace jacobi { namespace server {
                       << ((double((nx - 2) * (ny - 2) * max_iterations) / 1e6) /
                              time_elapsed)
                       << " MLUPS\n"
-                      << hpx::flush;
+                      << std::flush;
         }
 
         HPX_DEFINE_COMPONENT_ACTION(solver, run, run_action)

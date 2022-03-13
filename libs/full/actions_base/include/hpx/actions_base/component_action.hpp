@@ -231,7 +231,7 @@ namespace hpx { namespace actions {
 ///           {
 ///               void print_greeting() const
 ///               {
-///                   hpx::cout << "Hey, how are you?\n" << hpx::flush;
+///                   hpx::cout << "Hey, how are you?\n" << std::flush;
 ///               }
 ///
 ///               // Component actions need to be declared, this also defines the

@@ -111,10 +111,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
         get_sierpinski_action s;
         sierpinski ans = s(hpx::find_here(), n, (double)len);
 
-        hpx::cout << "After iteration: " << n << hpx::endl;
-        hpx::cout << "Black triangles: " << ans.black_triangles << hpx::endl;
-        hpx::cout << "White triangles: " << ans.white_triangles << hpx::endl;
-        hpx::cout << "Area: " << ans.area << hpx::endl;
+        hpx::cout << "After iteration: " << n << std::endl;
+        hpx::cout << "Black triangles: " << ans.black_triangles << std::endl;
+        hpx::cout << "White triangles: " << ans.white_triangles << std::endl;
+        hpx::cout << "Area: " << ans.area << std::endl;
     }
 
     return hpx::finalize();

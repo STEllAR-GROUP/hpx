@@ -46,7 +46,6 @@ using hpx::test::simple_refcnt_monitor;
 using hpx::util::report_errors;
 
 using hpx::cout;
-using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Client>
@@ -82,7 +81,7 @@ void hpx_test_main(variables_map& vm)
              << get_management_type_name(
                     monitor_local.get_id().get_management_type())
              << "\n"
-             << flush;
+             << std::flush;
 
         {
             // Have the remote object store a reference to the local object.
@@ -118,14 +117,14 @@ int hpx_main(variables_map& vm)
         cout << std::string(80, '#') << "\n"
              << "simple component test\n"
              << std::string(80, '#') << "\n"
-             << flush;
+             << std::flush;
 
         hpx_test_main<simple_refcnt_monitor>(vm);
 
         cout << std::string(80, '#') << "\n"
              << "managed component test\n"
              << std::string(80, '#') << "\n"
-             << flush;
+             << std::flush;
 
         hpx_test_main<managed_refcnt_monitor>(vm);
     }

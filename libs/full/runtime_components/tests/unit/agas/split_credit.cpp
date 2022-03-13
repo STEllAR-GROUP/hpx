@@ -48,7 +48,6 @@ using hpx::util::report_errors;
 
 using hpx::cout;
 using hpx::find_here;
-using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 // helper functions
@@ -118,7 +117,7 @@ void hpx_test_main(variables_map&, hpx::id_type const& locality)
              << "  " << g3 << " : " << get_credit(g3) << "\n"
              << "  " << g4 << " : " << get_credit(g4) << "\n"
              << "  " << g5 << " : " << get_credit(g5) << "\n"
-             << flush;
+             << std::flush;
     }
 }
 
@@ -130,14 +129,14 @@ int hpx_main(variables_map& vm)
         cout << std::string(80, '#') << "\n"
              << "simple component test: " << l << "\n"
              << std::string(80, '#') << "\n"
-             << flush;
+             << std::flush;
 
         hpx_test_main<simple_object>(vm, l);
 
         cout << std::string(80, '#') << "\n"
              << "managed component test: " << l << "\n"
              << std::string(80, '#') << "\n"
-             << flush;
+             << std::flush;
 
         hpx_test_main<managed_object>(vm, l);
     }

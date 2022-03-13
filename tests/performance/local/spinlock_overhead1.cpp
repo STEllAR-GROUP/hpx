@@ -40,7 +40,6 @@ using hpx::future;
 using hpx::chrono::high_resolution_timer;
 
 using hpx::cout;
-using hpx::flush;
 
 #define N 100
 
@@ -236,13 +235,13 @@ int hpx_main(variables_map& vm)
                 if (vm.count("csv"))
                     hpx::util::format_to(
                         cout, "{3},{4},{2}\n", count, duration, k1, k2)
-                        << flush;
+                        << std::flush;
                 else
                     hpx::util::format_to(cout,
                         "invoked {1} futures in {2} seconds "
                         "(k1 = {3}, k2 = {4})\n",
                         count, duration, k1, k2)
-                        << flush;
+                        << std::flush;
                 hpx::util::print_cdash_timing("Spinlock1", duration);
             }
         }

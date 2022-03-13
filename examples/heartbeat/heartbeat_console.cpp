@@ -23,18 +23,18 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     hpx::cout << "Heartbeat Console, waiting for";
     if (runfor > 0)
-        hpx::cout << " " << runfor << "[s].\n" << hpx::flush;
+        hpx::cout << " " << runfor << "[s].\n" << std::flush;
     else
-        hpx::cout << "ever.\n" << hpx::flush;
+        hpx::cout << "ever.\n" << std::flush;
 
     hpx::chrono::high_resolution_timer t;
     while (runfor <= 0 || t.elapsed() < runfor)
     {
         hpx::this_thread::suspend(1000);
-        hpx::cout << "." << hpx::flush;
+        hpx::cout << "." << std::flush;
     }
 
-    hpx::cout << "\n" << hpx::flush;
+    hpx::cout << "\n" << std::flush;
     return hpx::finalize();
 }
 

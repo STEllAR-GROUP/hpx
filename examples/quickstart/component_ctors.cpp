@@ -25,7 +25,6 @@ using hpx::find_here;
 using hpx::async;
 
 using hpx::cout;
-using hpx::flush;
 
 struct message_server : component_base<message_server>
 {
@@ -35,7 +34,7 @@ struct message_server : component_base<message_server>
 
     message_server(std::string const& msg_) : msg(msg_) {}
 
-    void print() const { cout << msg << flush; }
+    void print() const { cout << msg << std::flush; }
 
     HPX_DEFINE_COMPONENT_ACTION(message_server, print, print_action)
 };

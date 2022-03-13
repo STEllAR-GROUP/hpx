@@ -39,7 +39,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     if (0 == hpx::get_locality_id())
     {
-        hpx::cout << "Running With nparcel = " << n << "\n" << hpx::flush;
+        hpx::cout << "Running With nparcel = " << n << "\n" << std::flush;
     }
 
     //Create instance of the actions
@@ -68,7 +68,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             }
             hpx::evaluate_active_counters(false, " All Futures Done");
             hpx::cout << "Now Done With Lambda and the last received value is "
-                      <<received[n-1]<< "\n" << hpx::flush;
+                      <<received[n-1]<< "\n" << std::flush;
         }
     ).get();
     return hpx::finalize();
