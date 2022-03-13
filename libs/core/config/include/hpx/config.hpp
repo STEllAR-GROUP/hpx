@@ -45,6 +45,8 @@
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 
+#include <cstddef>
+
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 // On Windows, make sure winsock.h is not included even if windows.h is
 // included before winsock2.h
