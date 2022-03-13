@@ -210,7 +210,7 @@ namespace hpx { namespace resource { namespace detail {
       , first_core_(std::size_t(-1))
       , mode_(mode_default)
       , topo_(threads::create_topology())
-      , default_scheduler_mode_(threads::policies::scheduler_mode::default_mode)
+      , default_scheduler_mode_(threads::policies::scheduler_mode::default_)
     {
         // allow only one partitioner instance
         if (++instance_number_counter_ > 1)

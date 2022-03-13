@@ -157,14 +157,14 @@ void measure_function_futures_create_thread_hierarchical_placement(
         sched->get_description())
     {
         sched->add_remove_scheduler_mode(
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::assign_work_thread_parent),
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::enable_stealing |
-                hpx::threads::policies::enable_stealing_numa |
-                hpx::threads::policies::assign_work_round_robin |
-                hpx::threads::policies::steal_after_local |
-                hpx::threads::policies::steal_high_priority_first));
+            hpx::threads::policies::scheduler_mode::assign_work_thread_parent,
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::enable_stealing_numa |
+                hpx::threads::policies::scheduler_mode::
+                    assign_work_round_robin |
+                hpx::threads::policies::scheduler_mode::steal_after_local |
+                hpx::threads::policies::scheduler_mode::
+                    steal_high_priority_first);
     }
     auto const func = [&]() {
         null_function(uselibcds);

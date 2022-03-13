@@ -173,7 +173,7 @@ namespace hpx { namespace threads { namespace policies {
           , debug_init_(false)
           , thread_init_counter_(0)
         {
-            set_scheduler_mode(scheduler_mode::default_mode);
+            set_scheduler_mode(scheduler_mode::default_);
             HPX_ASSERT(num_workers_ != 0);
         }
 
@@ -188,19 +188,17 @@ namespace hpx { namespace threads { namespace policies {
         void set_scheduler_mode(scheduler_mode mode) override
         {
             // clang-format off
-                    scheduler_base::set_scheduler_mode(mode);
-                    round_robin_ = mode & policies::assign_work_round_robin;
-                    steal_hp_first_ = mode & policies::steal_high_priority_first;
-                    core_stealing_ = mode & policies::enable_stealing;
-                    numa_stealing_ = mode & policies::enable_stealing_numa;
-                    spq_deb.debug(debug::str<>("scheduler_mode")
-                        , round_robin_ ? "round_robin" : "thread parent"
-                        , ','
-                        , steal_hp_first_ ? "steal_hp_first" : "steal after local"
-                        , ','
-                        , core_stealing_ ? "stealing" : "no stealing"
-                        , ','
-                        , numa_stealing_ ? "numa stealing" : "no numa stealing");
+            scheduler_base::set_scheduler_mode(mode);
+            round_robin_ = mode & policies::scheduler_mode::assign_work_round_robin;
+            steal_hp_first_ =
+                mode & policies::scheduler_mode::steal_high_priority_first;
+            core_stealing_ = mode & policies::scheduler_mode::enable_stealing;
+            numa_stealing_ = mode & policies::scheduler_mode::enable_stealing_numa;
+            spq_deb.debug(debug::str<>("scheduler_mode")
+                , round_robin_ ? "round_robin" : "thread parent", ','
+                , steal_hp_first_ ? "steal_hp_first" : "steal after local", ','
+                , core_stealing_ ? "stealing" : "no stealing", ','
+                , numa_stealing_ ? "numa stealing" : "no numa stealing");
             // clang-format on
         }
 

@@ -57,8 +57,8 @@ int main(int argc, char* argv[])
         rp.create_thread_pool("default",
             hpx::resource::scheduling_policy::local_priority_fifo,
             hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::default_mode &
-                ~hpx::threads::policies::enable_elasticity));
+                hpx::threads::policies::scheduler_mode::default_ &
+                ~hpx::threads::policies::scheduler_mode::enable_elasticity));
     };
 
     HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);

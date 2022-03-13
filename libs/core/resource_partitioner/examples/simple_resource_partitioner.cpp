@@ -222,8 +222,7 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
     {
         // we use unspecified as the scheduler type and it will be set according to
         // the --hpx:queuing=xxx option or default.
-        std::uint32_t deft =
-            hpx::threads::policies::scheduler_mode::default_mode;
+        std::uint32_t deft = hpx::threads::policies::scheduler_mode::default_;
         rp.create_thread_pool(pool_name,
             hpx::resource::scheduling_policy::shared_priority,
             hpx::threads::policies::scheduler_mode(deft));

@@ -52,14 +52,14 @@ namespace executor_example {
         static void mark_begin_execution(Parameters&&)
         {
             hpx::threads::remove_scheduler_mode(
-                hpx::threads::policies::enable_stealing);
+                hpx::threads::policies::scheduler_mode::enable_stealing);
         }
 
         template <typename Parameters>
         static void mark_end_execution(Parameters&&)
         {
             hpx::threads::add_scheduler_mode(
-                hpx::threads::policies::enable_stealing);
+                hpx::threads::policies::scheduler_mode::enable_stealing);
         }
     };
 

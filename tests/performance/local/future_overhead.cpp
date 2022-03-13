@@ -218,15 +218,16 @@ void measure_function_futures_limiting_executor(
     {
         sched->add_remove_scheduler_mode(
             // add these flags
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::enable_stealing |
-                hpx::threads::policies::assign_work_round_robin |
-                hpx::threads::policies::steal_after_local),
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::
+                    assign_work_round_robin |
+                hpx::threads::policies::scheduler_mode::steal_after_local,
             // remove these flags
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::enable_stealing_numa |
-                hpx::threads::policies::assign_work_thread_parent |
-                hpx::threads::policies::steal_high_priority_first));
+            hpx::threads::policies::scheduler_mode::enable_stealing_numa |
+                hpx::threads::policies::scheduler_mode::
+                    assign_work_thread_parent |
+                hpx::threads::policies::scheduler_mode::
+                    steal_high_priority_first);
     }
 
     // test a parallel algorithm on custom pool with high priority
@@ -384,14 +385,14 @@ void measure_function_futures_create_thread_hierarchical_placement(
         sched->get_description())
     {
         sched->add_remove_scheduler_mode(
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::assign_work_thread_parent),
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::enable_stealing |
-                hpx::threads::policies::enable_stealing_numa |
-                hpx::threads::policies::assign_work_round_robin |
-                hpx::threads::policies::steal_after_local |
-                hpx::threads::policies::steal_high_priority_first));
+            hpx::threads::policies::scheduler_mode::assign_work_thread_parent,
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::enable_stealing_numa |
+                hpx::threads::policies::scheduler_mode::
+                    assign_work_round_robin |
+                hpx::threads::policies::scheduler_mode::steal_after_local |
+                hpx::threads::policies::scheduler_mode::
+                    steal_high_priority_first);
     }
     auto const func = [&l]() {
         null_function();

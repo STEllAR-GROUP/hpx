@@ -458,7 +458,7 @@ namespace hpx { namespace threads { namespace detail {
         // be done in order to give the parcel pool threads higher
         // priority
         if (get_scheduler()->has_scheduler_mode(
-                policies::reduce_thread_priority))
+                policies::scheduler_mode::reduce_thread_priority))
         {
             topo.reduce_thread_priority(ec);
             if (ec)
@@ -526,7 +526,7 @@ namespace hpx { namespace threads { namespace detail {
                     max_idle_loop_count_, max_busy_loop_count_);
 
                 if (get_scheduler()->has_scheduler_mode(
-                        policies::do_background_work) &&
+                        policies::scheduler_mode::do_background_work) &&
                     network_background_callback_)
                 {
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \

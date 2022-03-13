@@ -59,20 +59,20 @@ int hpx_main(variables_map& vm)
         std::cout << "Setting shared-priority mode flags" << std::endl;
         sched->add_remove_scheduler_mode(
             // add these flags
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::enable_stealing |
-                hpx::threads::policies::enable_stealing_numa |
-                hpx::threads::policies::assign_work_round_robin |
-                hpx::threads::policies::steal_high_priority_first),
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::enable_stealing_numa |
+                hpx::threads::policies::scheduler_mode::
+                    assign_work_round_robin |
+                hpx::threads::policies::scheduler_mode::
+                    steal_high_priority_first,
             // remove these flags
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::assign_work_thread_parent |
-                hpx::threads::policies::steal_after_local |
-                hpx::threads::policies::do_background_work |
-                hpx::threads::policies::reduce_thread_priority |
-                hpx::threads::policies::delay_exit |
-                hpx::threads::policies::fast_idle_mode |
-                hpx::threads::policies::enable_elasticity));
+            hpx::threads::policies::scheduler_mode::assign_work_thread_parent |
+                hpx::threads::policies::scheduler_mode::steal_after_local |
+                hpx::threads::policies::scheduler_mode::do_background_work |
+                hpx::threads::policies::scheduler_mode::reduce_thread_priority |
+                hpx::threads::policies::scheduler_mode::delay_exit |
+                hpx::threads::policies::scheduler_mode::fast_idle_mode |
+                hpx::threads::policies::scheduler_mode::enable_elasticity);
     }
 
     // setup executors for different task priorities on the pools
