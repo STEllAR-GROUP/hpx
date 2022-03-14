@@ -50,7 +50,7 @@ int hpx_main()
     // destructor being called late in the coroutine call operator.
     for (int i = 0; i < 1000; ++i)
     {
-        hpx::lcos::local::promise<yielder> p;
+        hpx::promise<yielder> p;
         hpx::future<yielder> f = p.get_future();
         hpx::dataflow([](auto&&) {}, f);
         p.set_value(yielder{});
@@ -61,7 +61,7 @@ int hpx_main()
     // these cases should never fail, even when the above two cases may fail.
     for (int i = 0; i < 1000; ++i)
     {
-        hpx::lcos::local::promise<yielder> p;
+        hpx::promise<yielder> p;
         hpx::future<yielder> f = p.get_future();
         f.then([](auto&&) {});
         p.set_value(yielder{});

@@ -210,7 +210,7 @@ namespace hpx { namespace lcos { namespace local {
 
     private:
         mutable mutex_type mtx_;
-        lcos::local::promise<void> promise_;
+        hpx::promise<void> promise_;
         std::size_t generation_;
         condition_list_type conditions_;
     };

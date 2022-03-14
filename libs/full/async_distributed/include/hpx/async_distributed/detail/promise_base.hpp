@@ -164,10 +164,9 @@ namespace hpx {
         // state is set.
         template <typename Result, typename RemoteResult, typename SharedState>
         class promise_base
-          : public hpx::lcos::local::detail::promise_base<Result, SharedState>
+          : public hpx::detail::promise_base<Result, SharedState>
         {
-            using base_type =
-                hpx::lcos::local::detail::promise_base<Result, SharedState>;
+            using base_type = hpx::detail::promise_base<Result, SharedState>;
 
         protected:
             using result_type = Result;
@@ -204,7 +203,7 @@ namespace hpx {
             ~promise_base()
             {
                 check_abandon_shared_state(
-                    "lcos::detail::promise_base<R>::~promise_base()");
+                    "hpx::detail::promise_base<R>::~promise_base()");
                 this->shared_state_.reset();
             }
 

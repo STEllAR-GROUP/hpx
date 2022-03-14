@@ -19,7 +19,7 @@
 
 void test_exception_from_continuation1()
 {
-    hpx::lcos::local::promise<void> p;
+    hpx::promise<void> p;
     hpx::future<void> f1 = p.get_future();
 
     hpx::future<void> f2 = f1.then([](hpx::future<void>&& f1) {
@@ -36,7 +36,7 @@ void test_exception_from_continuation1()
 
 void test_exception_from_continuation2()
 {
-    hpx::lcos::local::promise<void> p;
+    hpx::promise<void> p;
 
     std::vector<hpx::shared_future<void>> results;
     results.reserve(NUM_FUTURES + 1);

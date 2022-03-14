@@ -21,7 +21,7 @@ int main()
     hpx::future<int> f3 =
         f2.then([](hpx::shared_future<int>&& f) { return f.get() * 3; });
 
-    hpx::lcos::local::promise<double> p;
+    hpx::promise<double> p;
     auto f4 = p.get_future();
     HPX_ASSERT(!f4.is_ready());
     p.set_value(123.45);

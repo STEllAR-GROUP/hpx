@@ -78,7 +78,7 @@ namespace hpx { namespace components { namespace stubs {
         // back-parcel is sent explicitly (and synchronously).
         typedef server::runtime_support::shutdown_action action_type;
 
-        lcos::promise<void> value;
+        hpx::distributed::promise<void> value;
         auto f = value.get_future();
 
         // We need to make it unmanaged to avoid late refcnt requests
@@ -142,7 +142,7 @@ namespace hpx { namespace components { namespace stubs {
         // back-parcel is sent explicitly (and synchronously).
         typedef server::runtime_support::terminate_action action_type;
 
-        lcos::promise<void> value;
+        hpx::distributed::promise<void> value;
         auto f = value.get_future();
 
         hpx::apply<action_type>(targetgid, value.get_id());

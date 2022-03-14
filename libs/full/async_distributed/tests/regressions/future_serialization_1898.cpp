@@ -71,7 +71,7 @@ int main()
             }
 
             {
-                hpx::lcos::local::promise<hpx::id_type> pid;
+                hpx::promise<hpx::id_type> pid;
 
                 hpx::future<hpx::id_type> test_fid = pid.get_future();
                 hpx::future<hpx::id_type> fid =

@@ -97,8 +97,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
         // we need a promise/future for each endpoint so that we can set the new
         // endpoint when the connection completes and is ready
         // Note - only used during connection, then deleted
-        typedef std::tuple<hpx::lcos::local::promise<fid_ep*>,
-            hpx::shared_future<fid_ep*>>
+        typedef std::tuple<hpx::promise<fid_ep*>, hpx::shared_future<fid_ep*>>
             promise_tuple_type;
 
         // lock types for maps
@@ -1179,7 +1178,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
                 << " )");
 
             //
-            hpx::lcos::local::promise<struct fid_ep*> new_endpoint_promise;
+            hpx::promise<struct fid_ep*> new_endpoint_promise;
             hpx::future<struct fid_ep*> new_endpoint_future =
                 new_endpoint_promise.get_future();
             //

@@ -128,13 +128,13 @@ namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class packaged_action<Action, Result, /*DirectExecute=*/false>
-      : public promise<Result,
+      : public hpx::distributed::promise<Result,
             typename hpx::traits::extract_action<Action>::remote_result_type>
     {
     protected:
         using action_type = typename hpx::traits::extract_action<Action>::type;
         using remote_result_type = typename action_type::remote_result_type;
-        using base_type = promise<Result, remote_result_type>;
+        using base_type = hpx::distributed::promise<Result, remote_result_type>;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts>

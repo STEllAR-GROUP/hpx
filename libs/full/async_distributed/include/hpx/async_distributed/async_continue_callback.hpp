@@ -37,7 +37,7 @@ namespace hpx {
                 typename hpx::traits::extract_action<Action>::remote_result_type
                     continuation_result_type;
 
-            lcos::promise<result_type, RemoteResult> p;
+            hpx::distributed::promise<result_type, RemoteResult> p;
             auto f = p.get_future();
 
             apply_cb<Action>(hpx::actions::typed_continuation<result_type,

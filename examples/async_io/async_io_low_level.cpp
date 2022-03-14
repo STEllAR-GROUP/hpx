@@ -18,8 +18,8 @@
 #include <memory>
 
 // this function will be executed by a dedicated OS thread
-void do_async_io(char const* string_to_write,
-    std::shared_ptr<hpx::lcos::local::promise<int>> p)
+void do_async_io(
+    char const* string_to_write, std::shared_ptr<hpx::promise<int>> p)
 {
     // This IO operation will possibly block the IO thread in the
     // kernel.
@@ -31,8 +31,8 @@ void do_async_io(char const* string_to_write,
 // This function will be executed by an HPX thread
 hpx::future<int> async_io(char const* string_to_write)
 {
-    std::shared_ptr<hpx::lcos::local::promise<int>> p =
-        std::make_shared<hpx::lcos::local::promise<int>>();
+    std::shared_ptr<hpx::promise<int>> p =
+        std::make_shared<hpx::promise<int>>();
 
     // Get a reference to one of the IO specific HPX io_service objects ...
     hpx::util::io_service_pool* pool =

@@ -1564,7 +1564,7 @@ namespace hpx { namespace agas {
     future<hpx::id_type> addressing_service::on_symbol_namespace_event(
         std::string const& name, bool call_for_past_events)
     {
-        lcos::promise<naming::id_type, naming::gid_type> p;
+        hpx::distributed::promise<naming::id_type, naming::gid_type> p;
         auto result_f = p.get_future();
 
         hpx::future<bool> f =

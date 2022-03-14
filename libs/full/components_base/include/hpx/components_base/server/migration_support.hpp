@@ -144,7 +144,7 @@ namespace hpx { namespace components {
                             {
                                 was_marked_for_migration_ = false;
 
-                                hpx::lcos::local::promise<void> p;
+                                hpx::promise<void> p;
                                 std::swap(p, trigger_migration_);
 
                                 l.unlock();
@@ -266,7 +266,7 @@ namespace hpx { namespace components {
     private:
         mutable mutex_type mtx_;
         std::uint32_t pin_count_;
-        hpx::lcos::local::promise<void> trigger_migration_;
+        hpx::promise<void> trigger_migration_;
         bool was_marked_for_migration_;
     };
 }}    // namespace hpx::components

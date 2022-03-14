@@ -434,7 +434,7 @@ actions.
 Classes
 -------
 
-- :cpp:class:`hpx::lcos::promise`
+- :cpp:class:`hpx::distributed::promise`
 
 Functions
 ---------
@@ -455,18 +455,15 @@ compared to the C++ standard library.
 
 .. note::
 
-   All names except :cpp:class:`hpx::lcos::local::promise` are also available in
-   the top-level ``hpx`` namespace. ``hpx::promise`` refers to
-   :cpp:class:`hpx::lcos::promise`, a distributed variant of
-   :cpp:class:`hpx::lcos::local::promise`, but will eventually refer to
-   :cpp:class:`hpx::lcos::local::promise` after a deprecation period.
+   All names except :cpp:class:`hpx::promise` are also available in
+   the top-level ``hpx`` namespace.
 
 Classes
 -------
 
 - :cpp:class:`hpx::future`
 - :cpp:class:`hpx::shared_future`
-- :cpp:class:`hpx::lcos::local::promise`
+- :cpp:class:`hpx::promise`
 - :cpp:class:`hpx::launch`
 
 Functions

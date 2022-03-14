@@ -71,7 +71,7 @@ namespace hpx::parcelset {
     // This function is synchronous.
     void parcelhandler::sync_put_parcel(parcel p)    //-V669
     {
-        lcos::local::promise<void> promise;
+        hpx::promise<void> promise;
         future<void> sent_future = promise.get_future();
         put_parcel(
             HPX_MOVE(p), [&promise](std::error_code const&, parcel const&) {

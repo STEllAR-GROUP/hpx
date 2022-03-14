@@ -12,7 +12,3 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/lcos_local.hpp>
-
-namespace hpx {
-    using hpx::lcos::local::packaged_task;
-}

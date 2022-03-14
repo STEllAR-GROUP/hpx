@@ -849,7 +849,7 @@ namespace hpx { namespace components { namespace server {
     // working around non-copy-ability of packaged_task
     struct indirect_packaged_task
     {
-        typedef lcos::local::packaged_task<void()> packaged_task_type;
+        typedef hpx::packaged_task<void()> packaged_task_type;
 
         indirect_packaged_task()
           : pt(std::make_shared<packaged_task_type>([]() {}))

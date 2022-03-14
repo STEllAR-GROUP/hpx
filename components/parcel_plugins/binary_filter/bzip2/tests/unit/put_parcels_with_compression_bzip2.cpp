@@ -81,7 +81,7 @@ void test_plain_argument(hpx::id_type const& id)
     std::vector<hpx::parcelset::parcel> parcels;
     for (std::size_t i = 0; i != numparcels_default; ++i)
     {
-        hpx::lcos::promise<hpx::id_type> p;
+        hpx::distributed::promise<hpx::id_type> p;
         auto f = p.get_future();
 
         parcels.push_back(
@@ -115,7 +115,7 @@ HPX_PLAIN_ACTION(test2, test2_action)
 
 void test_future_argument(hpx::id_type const& id)
 {
-    std::vector<hpx::lcos::local::promise<double>> args;
+    std::vector<hpx::promise<double>> args;
     args.reserve(numparcels_default);
 
     std::vector<hpx::future<hpx::id_type>> results;
@@ -125,8 +125,8 @@ void test_future_argument(hpx::id_type const& id)
     std::vector<hpx::parcelset::parcel> parcels;
     for (std::size_t i = 0; i != numparcels_default; ++i)
     {
-        hpx::lcos::local::promise<double> p_arg;
-        hpx::lcos::promise<hpx::id_type> p_cont;
+        hpx::promise<double> p_arg;
+        hpx::distributed::promise<hpx::id_type> p_cont;
         auto f_cont = p_cont.get_future();
 
         parcels.push_back(generate_parcel<test2_action>(
@@ -141,7 +141,7 @@ void test_future_argument(hpx::id_type const& id)
         std::move(parcels));
 
     // now make the futures ready
-    for (hpx::lcos::local::promise<double>& arg : args)
+    for (hpx::promise<double>& arg : args)
     {
         arg.set_value(42.0);
     }
@@ -160,7 +160,7 @@ void test_mixed_arguments(hpx::id_type const& id)
     std::vector<double> data(vsize_default);
     std::generate(data.begin(), data.end(), std::rand);
 
-    std::vector<hpx::lcos::local::promise<double>> args;
+    std::vector<hpx::promise<double>> args;
     args.reserve(numparcels_default);
 
     std::vector<hpx::future<hpx::id_type>> results;
@@ -172,7 +172,7 @@ void test_mixed_arguments(hpx::id_type const& id)
     std::vector<hpx::parcelset::parcel> parcels;
     for (std::size_t i = 0; i != numparcels_default; ++i)
     {
-        hpx::lcos::promise<hpx::id_type> p_cont;
+        hpx::distributed::promise<hpx::id_type> p_cont;
         auto f_cont = p_cont.get_future();
 
         if (std::rand() % 2)
@@ -182,7 +182,7 @@ void test_mixed_arguments(hpx::id_type const& id)
         }
         else
         {
-            hpx::lcos::local::promise<double> p_arg;
+            hpx::promise<double> p_arg;
 
             parcels.push_back(generate_parcel<test2_action>(
                 id, p_cont.get_id(), p_arg.get_future()));
@@ -198,7 +198,7 @@ void test_mixed_arguments(hpx::id_type const& id)
         std::move(parcels));
 
     // now make the futures ready
-    for (hpx::lcos::local::promise<double>& arg : args)
+    for (hpx::promise<double>& arg : args)
     {
         arg.set_value(42.0);
     }

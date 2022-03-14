@@ -30,11 +30,6 @@ namespace hpx {
         template <typename ComponentType>
         class base_lco_with_value<void, void, ComponentType>;
 
-        template <typename Result,
-            typename RemoteResult =
-                typename traits::promise_remote_result<Result>::type>
-        class promise;
-
         template <typename Action,
             typename Result = typename traits::promise_local_result<
                 typename Action::remote_result_type>::type,
@@ -48,12 +43,23 @@ namespace hpx {
             template <typename ValueType>
             struct object_semaphore;
         }
+    }    // namespace lcos
 
-        namespace local {
-            class barrier;
+    namespace distributed {
 
-            template <typename R>
-            class promise;
-        }    // namespace local
-    }        // namespace lcos
+        template <typename Result,
+            typename RemoteResult =
+                typename traits::promise_remote_result<Result>::type>
+        class promise;
+    }
+
+    namespace lcos {
+
+        template <typename Result,
+            typename RemoteResult =
+                typename traits::promise_remote_result<Result>::type>
+        using promise HPX_DEPRECATED_V(1, 8,
+            "hpx::lcos::promise is deprecated, use hpx::distributed::promise "
+            "instead") = hpx::distributed::promise<Result, RemoteResult>;
+    }
 }    // namespace hpx

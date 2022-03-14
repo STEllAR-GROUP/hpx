@@ -262,7 +262,7 @@ namespace hpx::execution::experimental {
             else
             {
                 using promise_vector_type =
-                    std::vector<hpx::lcos::local::promise<result_type>>;
+                    std::vector<hpx::promise<result_type>>;
                 using result_vector_type =
                     std::vector<hpx::future<result_type>>;
 
