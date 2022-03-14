@@ -46,23 +46,23 @@ struct disable_stealing_parameter
     void mark_begin_execution(Executor&&)
     {
         hpx::threads::add_remove_scheduler_mode(
-            hpx::threads::policies::enable_stealing,
-            hpx::threads::policies::enable_idle_backoff);
+            hpx::threads::policies::scheduler_mode::enable_stealing,
+            hpx::threads::policies::scheduler_mode::enable_idle_backoff);
     }
 
     template <typename Executor>
     void mark_end_of_scheduling(Executor&&)
     {
         hpx::threads::remove_scheduler_mode(
-            hpx::threads::policies::enable_stealing);
+            hpx::threads::policies::scheduler_mode::enable_stealing);
     }
 
     template <typename Executor>
     void mark_end_execution(Executor&&)
     {
         hpx::threads::add_remove_scheduler_mode(
-            hpx::threads::policies::enable_idle_backoff,
-            hpx::threads::policies::enable_stealing);
+            hpx::threads::policies::scheduler_mode::enable_idle_backoff,
+            hpx::threads::policies::scheduler_mode::enable_stealing);
     }
 };
 

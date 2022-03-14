@@ -130,7 +130,7 @@ namespace hpx { namespace agas {
       , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
       , action_priority_(threads::thread_priority::boost)
       , rts_lva_(0)
-      , state_(state_starting)
+      , state_(hpx::state::starting)
       , locality_()
     {
         if (caching_)
@@ -150,7 +150,7 @@ namespace hpx { namespace agas {
     void addressing_service::initialize(std::uint64_t rts_lva)
     {    // {{{
         rts_lva_ = rts_lva;
-        set_status(state_running);
+        set_status(hpx::state::running);
     }    // }}}
 
     namespace detail {
@@ -357,7 +357,7 @@ namespace hpx { namespace agas {
     {    // {{{
         try
         {
-            if (get_status() != state_running)
+            if (get_status() != hpx::state::running)
             {
                 if (&ec != &throws)
                     ec = make_success_code();

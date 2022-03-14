@@ -158,7 +158,7 @@ namespace hpx { namespace util {
 
     void one_size_heap_list::free(void* p, std::size_t count)
     {
-        if (nullptr == p || !threads::threadmanager_is(state_running))
+        if (nullptr == p || !threads::threadmanager_is(hpx::state::running))
         {
             return;
         }

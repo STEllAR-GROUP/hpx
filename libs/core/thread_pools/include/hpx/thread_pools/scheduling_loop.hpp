@@ -605,7 +605,7 @@ namespace hpx { namespace threads { namespace detail {
         thread_id_ref_type background_thread;
 
         if (scheduler.SchedulingPolicy::has_scheduler_mode(
-                policies::do_background_work) &&
+                policies::scheduler_mode::do_background_work) &&
             num_thread < params.max_background_threads_ &&
             !params.background_.empty())
         {
@@ -626,13 +626,13 @@ namespace hpx { namespace threads { namespace detail {
             thread_id_ref_type thrd = HPX_MOVE(next_thrd);
 
             // Get the next HPX thread from the queue
-            bool running =
-                this_state.load(std::memory_order_relaxed) < state_pre_sleep;
+            bool running = this_state.load(std::memory_order_relaxed) <
+                hpx::state::pre_sleep;
 
             // extract the stealing mode once per loop iteration
             bool enable_stealing =
                 scheduler.SchedulingPolicy::has_scheduler_mode(
-                    policies::enable_stealing);
+                    policies::scheduler_mode::enable_stealing);
 
             // stealing staged threads is enabled if:
             // - fast idle mode is on: same as normal stealing
@@ -640,7 +640,7 @@ namespace hpx { namespace threads { namespace detail {
             //                       a while
             bool enable_stealing_staged = enable_stealing;
             if (!scheduler.SchedulingPolicy::has_scheduler_mode(
-                    policies::fast_idle_mode))
+                    policies::scheduler_mode::fast_idle_mode))
             {
                 enable_stealing_staged = enable_stealing_staged &&
                     idle_loop_count > params.max_idle_loop_count_ / 2;
@@ -894,7 +894,7 @@ namespace hpx { namespace threads { namespace detail {
                         scheduler.SchedulingPolicy::get_queue_length(
                             num_thread) == 0;
 
-                    if (this_state.load() == state_pre_sleep)
+                    if (this_state.load() == hpx::state::pre_sleep)
                     {
                         if (can_exit)
                         {
@@ -911,7 +911,7 @@ namespace hpx { namespace threads { namespace detail {
                         if (can_exit)
                         {
                             if (!scheduler.SchedulingPolicy::has_scheduler_mode(
-                                    policies::delay_exit))
+                                    policies::scheduler_mode::delay_exit))
                             {
                                 // If this is an inner scheduler, try to exit immediately
                                 if (background_thread != nullptr)
@@ -938,7 +938,7 @@ namespace hpx { namespace threads { namespace detail {
                                 }
                                 else
                                 {
-                                    this_state.store(state_stopped);
+                                    this_state.store(hpx::state::stopped);
                                     break;
                                 }
                             }
@@ -954,7 +954,7 @@ namespace hpx { namespace threads { namespace detail {
                 }
                 else if (!may_exit && added == 0 &&
                     (scheduler.SchedulingPolicy::has_scheduler_mode(
-                        policies::fast_idle_mode)))
+                        policies::scheduler_mode::fast_idle_mode)))
                 {
                     // speed up idle suspend if no work was stolen
                     idle_loop_count += params.max_idle_loop_count_ / 1024;
@@ -1005,7 +1005,7 @@ namespace hpx { namespace threads { namespace detail {
             }
 
             // something went badly wrong, give up
-            if (HPX_UNLIKELY(this_state.load() == state_terminating))
+            if (HPX_UNLIKELY(this_state.load() == hpx::state::terminating))
                 break;
 
             if (busy_loop_count > params.max_busy_loop_count_)
@@ -1058,7 +1058,7 @@ namespace hpx { namespace threads { namespace detail {
                 // break if we were idling after 'may_exit'
                 if (may_exit)
                 {
-                    HPX_ASSERT(this_state.load() != state_pre_sleep);
+                    HPX_ASSERT(this_state.load() != hpx::state::pre_sleep);
 
                     if (background_thread)
                     {
@@ -1092,7 +1092,7 @@ namespace hpx { namespace threads { namespace detail {
 
                         if (can_exit)
                         {
-                            this_state.store(state_stopped);
+                            this_state.store(hpx::state::stopped);
                             break;
                         }
                     }

@@ -87,7 +87,7 @@ namespace hpx { namespace resource { namespace detail {
         void create_thread_pool(std::string const& name,
             scheduling_policy sched = scheduling_policy::unspecified,
             hpx::threads::policies::scheduler_mode =
-                hpx::threads::policies::scheduler_mode::default_mode);
+                hpx::threads::policies::scheduler_mode::default_);
 
         // create a thread_pool with a callback function for creating a custom
         // scheduler

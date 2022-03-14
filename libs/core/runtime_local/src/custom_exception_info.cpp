@@ -408,7 +408,7 @@ namespace hpx { namespace detail {
             state rts_state = rt->get_state();
             state_name = get_runtime_state_name(rts_state);
 
-            if (rts_state >= state_initialized && rts_state < state_stopped)
+            if (rts_state >= state::initialized && rts_state < state::stopped)
             {
                 hostname = get_runtime().here();
             }
@@ -426,7 +426,7 @@ namespace hpx { namespace detail {
         threads::thread_self* self = threads::get_self_ptr();
         if (nullptr != self)
         {
-            if (threads::threadmanager_is(state_running))
+            if (threads::threadmanager_is(hpx::state::running))
                 shepherd = hpx::get_worker_thread_num();
 
             thread_id = threads::get_self_id();

@@ -229,7 +229,8 @@ namespace hpx { namespace threads {
                 sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
-                    policies::enable_stealing_numa, !numa_sensitive);
+                    policies::scheduler_mode::enable_stealing_numa,
+                    !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -267,7 +268,8 @@ namespace hpx { namespace threads {
                 sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
-                    policies::enable_stealing_numa, !numa_sensitive);
+                    policies::scheduler_mode::enable_stealing_numa,
+                    !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -307,7 +309,8 @@ namespace hpx { namespace threads {
                 sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
-                    policies::enable_stealing_numa, !numa_sensitive);
+                    policies::scheduler_mode::enable_stealing_numa,
+                    !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -341,7 +344,8 @@ namespace hpx { namespace threads {
                 sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
-                    policies::enable_stealing_numa, !numa_sensitive);
+                    policies::scheduler_mode::enable_stealing_numa,
+                    !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -378,7 +382,8 @@ namespace hpx { namespace threads {
                 sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
-                    policies::enable_stealing_numa, !numa_sensitive);
+                    policies::scheduler_mode::enable_stealing_numa,
+                    !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -418,7 +423,8 @@ namespace hpx { namespace threads {
                 sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
-                    policies::enable_stealing_numa, !numa_sensitive);
+                    policies::scheduler_mode::enable_stealing_numa,
+                    !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -464,7 +470,8 @@ namespace hpx { namespace threads {
                 sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
-                    policies::enable_stealing_numa, !numa_sensitive);
+                    policies::scheduler_mode::enable_stealing_numa,
+                    !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -498,7 +505,8 @@ namespace hpx { namespace threads {
                 sched->set_scheduler_mode(thread_pool_init.mode_);
                 // conditionally set/unset this flag
                 sched->update_scheduler_mode(
-                    policies::enable_stealing_numa, !numa_sensitive);
+                    policies::scheduler_mode::enable_stealing_numa,
+                    !numa_sensitive);
 
                 // instantiate the pool
                 std::unique_ptr<thread_pool_base> pool(
@@ -1028,7 +1036,7 @@ namespace hpx { namespace threads {
                 rp.get_num_threads(pool_iter->get_pool_name());
 
             if (pool_iter->get_os_thread_count() != 0 ||
-                pool_iter->has_reached_state(state_running))
+                pool_iter->has_reached_state(hpx::state::running))
             {
                 return true;    // do nothing if already running
             }
@@ -1044,7 +1052,7 @@ namespace hpx { namespace threads {
             // set all states of all schedulers to "running"
             policies::scheduler_base* sched = pool_iter->get_scheduler();
             if (sched)
-                sched->set_all_states(state_running);
+                sched->set_all_states(hpx::state::running);
         }
 
         LTM_(info).format("run: running");

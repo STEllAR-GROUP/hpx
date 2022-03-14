@@ -153,7 +153,7 @@ namespace hpx { namespace threads {
         //! least advanced thread pool
         state status() const
         {
-            hpx::state result(last_valid_runtime_state);
+            hpx::state result(hpx::state::last_valid_runtime_state);
 
             for (auto& pool_iter : pools_)
             {

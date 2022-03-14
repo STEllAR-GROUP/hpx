@@ -242,12 +242,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
         if (disable_stealing)
         {
             hpx::threads::remove_scheduler_mode(
-                hpx::threads::policies::enable_stealing);
+                hpx::threads::policies::scheduler_mode::enable_stealing);
         }
         if (fast_idle_mode)
         {
             hpx::threads::add_scheduler_mode(
-                hpx::threads::policies::fast_idle_mode);
+                hpx::threads::policies::scheduler_mode::fast_idle_mode);
         }
 
         // results
@@ -405,12 +405,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
         if (disable_stealing)
         {
             hpx::threads::add_scheduler_mode(
-                hpx::threads::policies::enable_stealing);
+                hpx::threads::policies::scheduler_mode::enable_stealing);
         }
         if (fast_idle_mode)
         {
             hpx::threads::remove_scheduler_mode(
-                hpx::threads::policies::fast_idle_mode);
+                hpx::threads::policies::scheduler_mode::fast_idle_mode);
         }
 
         if (csvoutput)

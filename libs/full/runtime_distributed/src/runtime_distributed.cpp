@@ -362,7 +362,7 @@ namespace hpx {
 
             lbt_ << "(4th stage) runtime_distributed::run_helper: bootstrap "
                     "complete";
-            set_state(state_running);
+            set_state(hpx::state::running);
 
 #if defined(HPX_HAVE_NETWORKING)
             parcel_handler_.enable_alternative_parcelports();
@@ -483,8 +483,9 @@ namespace hpx {
         }
         else
         {
-            // wait for at least state_running
-            util::yield_while([this]() { return get_state() < state_running; },
+            // wait for at least hpx::state::running
+            util::yield_while(
+                [this]() { return get_state() < hpx::state::running; },
                 "runtime_impl::start");
         }
 
@@ -709,7 +710,7 @@ namespace hpx {
 
         // Early and late exceptions, errors outside of HPX-threads
         if (!threads::get_self_ptr() ||
-            !threads::threadmanager_is(state_running))
+            !threads::threadmanager_is(hpx::state::running))
         {
             // report the error to the local console
             if (report_exception)

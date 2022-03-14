@@ -26,13 +26,13 @@ namespace hpx { namespace threads { namespace detail {
 
     hpx::state io_service_thread_pool::get_state() const
     {
-        return state_stopped;
+        return hpx::state::stopped;
     }
 
     hpx::state io_service_thread_pool::get_state(
         std::size_t /* num_thread */) const
     {
-        return state_stopped;
+        return hpx::state::stopped;
     }
 
     bool io_service_thread_pool::has_reached_state(hpx::state /* s */) const

@@ -61,15 +61,18 @@ namespace hpx { namespace threads { namespace policies {
           : base_type(init, deferred_initialization)
         {
             // disable thread stealing to begin with
-            this->remove_scheduler_mode(scheduler_mode(
-                policies::enable_stealing | policies::enable_stealing_numa));
+            this->remove_scheduler_mode(
+                policies::scheduler_mode::enable_stealing |
+                policies::scheduler_mode::enable_stealing_numa);
         }
 
         void set_scheduler_mode(scheduler_mode mode) override
         {
             // this scheduler does not support stealing or numa stealing
-            mode = scheduler_mode(mode & ~scheduler_mode::enable_stealing);
-            mode = scheduler_mode(mode & ~scheduler_mode::enable_stealing_numa);
+            mode = policies::scheduler_mode(
+                mode & ~policies::scheduler_mode::enable_stealing);
+            mode = policies::scheduler_mode(
+                mode & ~policies::scheduler_mode::enable_stealing_numa);
             scheduler_base::set_scheduler_mode(mode);
         }
 

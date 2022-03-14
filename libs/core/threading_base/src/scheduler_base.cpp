@@ -65,14 +65,14 @@ namespace hpx { namespace threads { namespace policies {
 #endif
 
         for (std::size_t i = 0; i != num_threads; ++i)
-            states_[i].store(state_initialized);
+            states_[i].store(hpx::state::initialized);
     }
 
     void scheduler_base::idle_callback(std::size_t num_thread)
     {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         if (mode_.data_.load(std::memory_order_relaxed) &
-            policies::enable_idle_backoff)
+            policies::scheduler_mode::enable_idle_backoff)
         {
             // Put this thread to sleep for some time, additionally it gets
             // woken up on new work.
@@ -107,7 +107,7 @@ namespace hpx { namespace threads { namespace policies {
     {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         if (mode_.data_.load(std::memory_order_relaxed) &
-            policies::enable_idle_backoff)
+            policies::scheduler_mode::enable_idle_backoff)
         {
             cond_.notify_all();
         }
@@ -118,18 +118,20 @@ namespace hpx { namespace threads { namespace policies {
     {
         HPX_ASSERT(num_thread < suspend_conds_.size());
 
-        states_[num_thread].store(state_sleeping);
+        states_[num_thread].store(hpx::state::sleeping);
         std::unique_lock<pu_mutex_type> l(suspend_mtxs_[num_thread]);
         suspend_conds_[num_thread].wait(l);
 
-        // Only set running if still in state_sleeping. Can be set with
-        // non-blocking/locking functions to stopping or terminating, in
-        // which case the state is left untouched.
-        hpx::state expected = state_sleeping;
-        states_[num_thread].compare_exchange_strong(expected, state_running);
+        // Only set running if still in hpx::state::sleeping. Can be set with
+        // non-blocking/locking functions to stopping or terminating, in which
+        // case the state is left untouched.
+        hpx::state expected = hpx::state::sleeping;
+        states_[num_thread].compare_exchange_strong(
+            expected, hpx::state::running);
 
-        HPX_ASSERT(expected == state_sleeping || expected == state_stopping ||
-            expected == state_terminating);
+        HPX_ASSERT(expected == hpx::state::sleeping ||
+            expected == hpx::state::stopping ||
+            expected == hpx::state::terminating);
     }
 
     void scheduler_base::resume(std::size_t num_thread)
@@ -153,7 +155,7 @@ namespace hpx { namespace threads { namespace policies {
         bool allow_fallback)
     {
         if (mode_.data_.load(std::memory_order_relaxed) &
-            threads::policies::enable_elasticity)
+            threads::policies::scheduler_mode::enable_elasticity)
         {
             std::size_t states_size = states_.size();
 
@@ -162,7 +164,7 @@ namespace hpx { namespace threads { namespace policies {
                 // Try indefinitely as long as at least one thread is
                 // available for scheduling. Increase allowed state if no
                 // threads are available for scheduling.
-                auto max_allowed_state = state_suspended;
+                auto max_allowed_state = hpx::state::suspended;
 
                 hpx::util::yield_while([this, states_size, &l, &num_thread,
                                            &max_allowed_state]() {
@@ -195,13 +197,13 @@ namespace hpx { namespace threads { namespace policies {
 
                     if (0 == num_allowed_threads)
                     {
-                        if (max_allowed_state <= state_suspended)
+                        if (max_allowed_state <= hpx::state::suspended)
                         {
-                            max_allowed_state = state_sleeping;
+                            max_allowed_state = hpx::state::sleeping;
                         }
-                        else if (max_allowed_state <= state_sleeping)
+                        else if (max_allowed_state <= hpx::state::sleeping)
                         {
-                            max_allowed_state = state_stopping;
+                            max_allowed_state = hpx::state::stopping;
                         }
                         else
                         {
@@ -230,7 +232,7 @@ namespace hpx { namespace threads { namespace policies {
                     pu_mtxs_[num_thread_local], std::try_to_lock);
 
                 if (l.owns_lock() &&
-                    states_[num_thread_local] <= state_suspended)
+                    states_[num_thread_local] <= hpx::state::suspended)
                 {
                     return num_thread_local;
                 }
@@ -300,7 +302,8 @@ namespace hpx { namespace threads { namespace policies {
     std::pair<hpx::state, hpx::state> scheduler_base::get_minmax_state() const
     {
         std::pair<hpx::state, hpx::state> result(
-            last_valid_runtime_state, first_valid_runtime_state);
+            hpx::state::last_valid_runtime_state,
+            hpx::state::first_valid_runtime_state);
 
         typedef std::atomic<hpx::state> state_type;
         for (state_type const& state_iter : states_)

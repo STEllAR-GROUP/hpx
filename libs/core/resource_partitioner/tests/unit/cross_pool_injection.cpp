@@ -66,19 +66,20 @@ int hpx_main()
     {
         sched->add_remove_scheduler_mode(
             // add these flags
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::enable_stealing |
-                hpx::threads::policies::enable_stealing_numa |
-                hpx::threads::policies::assign_work_thread_parent |
-                hpx::threads::policies::steal_after_local),
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::enable_stealing_numa |
+                hpx::threads::policies::scheduler_mode::
+                    assign_work_thread_parent |
+                hpx::threads::policies::scheduler_mode::steal_after_local,
             // remove these flags
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::assign_work_round_robin |
-                hpx::threads::policies::steal_high_priority_first));
+            hpx::threads::policies::scheduler_mode::assign_work_round_robin |
+                hpx::threads::policies::scheduler_mode::
+                    steal_high_priority_first);
         sched->update_scheduler_mode(
-            hpx::threads::policies::enable_stealing, false);
+            hpx::threads::policies::scheduler_mode::enable_stealing, false);
         sched->update_scheduler_mode(
-            hpx::threads::policies::enable_stealing_numa, false);
+            hpx::threads::policies::scheduler_mode::enable_stealing_numa,
+            false);
     }
 
     // setup executors for different task priorities on the pools

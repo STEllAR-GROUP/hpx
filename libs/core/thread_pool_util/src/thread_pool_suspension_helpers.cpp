@@ -27,7 +27,7 @@ namespace hpx { namespace threads {
                 "resume_processing_unit_cb instead");
         }
         else if (!pool.get_scheduler()->has_scheduler_mode(
-                     policies::enable_elasticity))
+                     policies::scheduler_mode::enable_elasticity))
         {
             return hpx::make_exceptional_future<void>(
                 HPX_GET_EXCEPTION(invalid_status, "resume_processing_unit",
@@ -45,7 +45,7 @@ namespace hpx { namespace threads {
         error_code& ec)
     {
         if (!pool.get_scheduler()->has_scheduler_mode(
-                policies::enable_elasticity))
+                policies::scheduler_mode::enable_elasticity))
         {
             HPX_THROWS_IF(ec, invalid_status, "resume_processing_unit_cb",
                 "this thread pool does not support suspending "
@@ -79,7 +79,7 @@ namespace hpx { namespace threads {
                 "suspend_processing_unit_cb instead");
         }
         if (!pool.get_scheduler()->has_scheduler_mode(
-                policies::enable_elasticity))
+                policies::scheduler_mode::enable_elasticity))
         {
             return hpx::make_exceptional_future<void>(
                 HPX_GET_EXCEPTION(invalid_status, "suspend_processing_unit",
@@ -87,7 +87,7 @@ namespace hpx { namespace threads {
                     "processing units"));
         }
         if (!pool.get_scheduler()->has_scheduler_mode(
-                policies::enable_stealing) &&
+                policies::scheduler_mode::enable_stealing) &&
             hpx::this_thread::get_pool() == &pool)
         {
             return hpx::make_exceptional_future<void>(
@@ -106,7 +106,7 @@ namespace hpx { namespace threads {
         error_code& ec)
     {
         if (!pool.get_scheduler()->has_scheduler_mode(
-                policies::enable_elasticity))
+                policies::scheduler_mode::enable_elasticity))
         {
             HPX_THROWS_IF(ec, invalid_status, "suspend_processing_unit_cb",
                 "this thread pool does not support suspending processing "
@@ -123,12 +123,11 @@ namespace hpx { namespace threads {
         if (threads::get_self_ptr())
         {
             if (!pool.get_scheduler()->has_scheduler_mode(
-                    policies::enable_stealing) &&
+                    policies::scheduler_mode::enable_stealing) &&
                 hpx::this_thread::get_pool() == &pool)
             {
                 HPX_THROW_EXCEPTION(invalid_status,
-                    "suspend_processing_unit_"
-                    "cb",
+                    "suspend_processing_unit_cb",
                     "this thread pool does not support suspending "
                     "processing units from itself (no thread stealing)");
             }

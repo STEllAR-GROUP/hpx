@@ -124,7 +124,7 @@ namespace hpx { namespace distributed {
         if (node_)
         {
             if (hpx::get_runtime_ptr() != nullptr &&
-                hpx::threads::threadmanager_is(state_running) &&
+                hpx::threads::threadmanager_is(hpx::state::running) &&
                 !hpx::is_stopped_or_shutting_down())
             {
                 // make sure this runs as an HPX thread
@@ -162,7 +162,7 @@ namespace hpx { namespace distributed {
         if (node_)
         {
             if (hpx::get_runtime_ptr() != nullptr &&
-                hpx::threads::threadmanager_is(state_running) &&
+                hpx::threads::threadmanager_is(hpx::state::running) &&
                 !hpx::is_stopped_or_shutting_down())
             {
                 if ((*node_)->num_ >= (*node_)->cut_off_ ||
