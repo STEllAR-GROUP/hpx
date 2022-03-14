@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -1223,11 +1223,12 @@ namespace hpx { namespace parallel { namespace util {
         struct accumulate_n
         {
             template <typename Iter, typename T, typename Pred>
-            static T call(Iter it, std::size_t count, T init, Pred&& f)
+            static constexpr T call(
+                Iter it, std::size_t count, T init, Pred&& f)
             {
                 for (/**/; count != 0; (void) --count, ++it)
                 {
-                    init = HPX_INVOKE(f, init, *it);
+                    init = HPX_INVOKE(f, HPX_MOVE(init), *it);
                 }
                 return init;
             }
@@ -1236,39 +1237,41 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename T, typename Pred>
-    HPX_FORCEINLINE T accumulate_n(Iter it, std::size_t count, T init, Pred&& f)
+    HPX_FORCEINLINE constexpr T accumulate_n(
+        Iter it, std::size_t count, T init, Pred&& f)
     {
         using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::accumulate_n<cat>::call(
             it, count, HPX_MOVE(init), HPX_FORWARD(Pred, f));
     }
 
-    template <typename T, typename Iter, typename Reduce,
+    template <typename T, typename Iter, typename Sent, typename Reduce,
         typename Conv = util::projection_identity>
-    HPX_FORCEINLINE T accumulate(
-        Iter first, Iter last, Reduce&& r, Conv&& conv = Conv())
+    HPX_FORCEINLINE constexpr T accumulate(
+        Iter first, Sent last, Reduce&& r, Conv&& conv = Conv())
     {
         T val = HPX_INVOKE(conv, *first);
         ++first;
-        while (last != first)
+        while (first != last)
         {
-            val = HPX_INVOKE(r, val, *first);
+            val = HPX_INVOKE(r, HPX_MOVE(val), HPX_INVOKE(conv, *first));
             ++first;
         }
         return val;
     }
 
-    template <typename T, typename Iter1, typename Iter2, typename Reduce,
-        typename Conv>
-    HPX_FORCEINLINE T accumulate(
-        Iter1 first1, Iter1 last1, Iter2 first2, Reduce&& r, Conv&& conv)
+    template <typename T, typename Iter1, typename Sent1, typename Iter2,
+        typename Reduce, typename Conv>
+    HPX_FORCEINLINE constexpr T accumulate(
+        Iter1 first1, Sent1 last1, Iter2 first2, Reduce&& r, Conv&& conv)
     {
         T val = HPX_INVOKE(conv, *first1, *first2);
         ++first1;
         ++first2;
-        while (last1 != first1)
+        while (first1 != last1)
         {
-            val = HPX_INVOKE(r, val, HPX_INVOKE(conv, *first1, *first2));
+            val = HPX_INVOKE(
+                r, HPX_MOVE(val), HPX_INVOKE(conv, *first1, *first2));
             ++first1;
             ++first2;
         }

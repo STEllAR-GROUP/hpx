@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Ajai V George
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -179,8 +180,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     // VS2015RC bails out if red_op is capture by ref
                     return detail::accumulate(r.begin(), r.end(), init,
-                        [=](T const& val, shared_future<T>& curr) mutable {
-                            return HPX_INVOKE(red_op, val, curr.get());
+                        [=](T val, shared_future<T>& curr) mutable {
+                            return HPX_INVOKE(
+                                red_op, HPX_MOVE(val), curr.get());
                         });
                 },
                 HPX_MOVE(segments)));
