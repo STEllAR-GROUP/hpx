@@ -626,8 +626,8 @@ namespace hpx { namespace threads { namespace detail {
             thread_id_ref_type thrd = HPX_MOVE(next_thrd);
 
             // Get the next HPX thread from the queue
-            bool running =
-                this_state.load(std::memory_order_relaxed) < state_pre_sleep;
+            bool running = this_state.load(std::memory_order_relaxed) <
+                hpx::state::pre_sleep;
 
             // extract the stealing mode once per loop iteration
             bool enable_stealing =
@@ -894,7 +894,7 @@ namespace hpx { namespace threads { namespace detail {
                         scheduler.SchedulingPolicy::get_queue_length(
                             num_thread) == 0;
 
-                    if (this_state.load() == state_pre_sleep)
+                    if (this_state.load() == hpx::state::pre_sleep)
                     {
                         if (can_exit)
                         {
@@ -938,7 +938,7 @@ namespace hpx { namespace threads { namespace detail {
                                 }
                                 else
                                 {
-                                    this_state.store(state_stopped);
+                                    this_state.store(hpx::state::stopped);
                                     break;
                                 }
                             }
@@ -1005,7 +1005,7 @@ namespace hpx { namespace threads { namespace detail {
             }
 
             // something went badly wrong, give up
-            if (HPX_UNLIKELY(this_state.load() == state_terminating))
+            if (HPX_UNLIKELY(this_state.load() == hpx::state::terminating))
                 break;
 
             if (busy_loop_count > params.max_busy_loop_count_)
@@ -1058,7 +1058,7 @@ namespace hpx { namespace threads { namespace detail {
                 // break if we were idling after 'may_exit'
                 if (may_exit)
                 {
-                    HPX_ASSERT(this_state.load() != state_pre_sleep);
+                    HPX_ASSERT(this_state.load() != hpx::state::pre_sleep);
 
                     if (background_thread)
                     {
@@ -1092,7 +1092,7 @@ namespace hpx { namespace threads { namespace detail {
 
                         if (can_exit)
                         {
-                            this_state.store(state_stopped);
+                            this_state.store(hpx::state::stopped);
                             break;
                         }
                     }

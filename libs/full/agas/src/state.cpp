@@ -18,7 +18,7 @@ namespace hpx { namespace agas {
         if (nullptr == agas_client)
         {
             // we're probably either starting or stopping
-            return st == state_starting || st == state_stopping;
+            return st == hpx::state::starting || st == hpx::state::stopping;
         }
         return (agas_client->get_status() == st);
     }

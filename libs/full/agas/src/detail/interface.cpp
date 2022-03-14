@@ -289,7 +289,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
     naming::id_type get_console_locality(error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (rt == nullptr || rt->get_state() == state_invalid)
+        if (rt == nullptr || rt->get_state() == state::invalid)
         {
             return naming::invalid_id;
         }
@@ -307,7 +307,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
     std::uint32_t get_locality_id(error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (rt == nullptr || rt->get_state() == state_invalid)
+        if (rt == nullptr || rt->get_state() == state::invalid)
         {
             return naming::invalid_locality_id;
         }
@@ -362,7 +362,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         }
 
         // during bootstrap we use the id pool
-        if (rt->get_state() == state_invalid)
+        if (rt->get_state() == state::invalid)
         {
             return hpx::detail::get_next_id(count);
         }

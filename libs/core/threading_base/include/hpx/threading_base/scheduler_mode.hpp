@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <cstdint>
 
 namespace hpx { namespace threads { namespace policies {
@@ -182,4 +184,6 @@ namespace hpx { namespace threads { namespace policies {
     HPX_DEPRECATED_V(1, 8, HPX_SCHEDULER_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static inline constexpr scheduler_mode all_flags =
         scheduler_mode::all_flags;
+
+#undef HPX_SCHEDULER_MODE_UNSCOPED_ENUM_DEPRECATION_MSG
 }}}    // namespace hpx::threads::policies

@@ -795,7 +795,7 @@ namespace hpx { namespace components { namespace server {
     {
         if (pre_startup)
         {
-            get_runtime().set_state(state_pre_startup);
+            get_runtime().set_state(hpx::state::pre_startup);
             for (startup_function_type& f : pre_startup_functions_)
             {
                 f();
@@ -803,7 +803,7 @@ namespace hpx { namespace components { namespace server {
         }
         else
         {
-            get_runtime().set_state(state_startup);
+            get_runtime().set_state(hpx::state::startup);
             for (startup_function_type& f : startup_functions_)
             {
                 f();
@@ -816,7 +816,7 @@ namespace hpx { namespace components { namespace server {
         runtime& rt = get_runtime();
         if (pre_shutdown)
         {
-            rt.set_state(state_pre_shutdown);
+            rt.set_state(hpx::state::pre_shutdown);
             for (shutdown_function_type& f : pre_shutdown_functions_)
             {
                 try
@@ -831,7 +831,7 @@ namespace hpx { namespace components { namespace server {
         }
         else
         {
-            rt.set_state(state_shutdown);
+            rt.set_state(hpx::state::shutdown);
             for (shutdown_function_type& f : shutdown_functions_)
             {
                 try

@@ -47,7 +47,7 @@ namespace hpx { namespace threads {
         for (std::size_t thread_num = 0; thread_num < get_os_thread_count();
              ++thread_num)
         {
-            if (sched->get_state(thread_num).load() <= state_suspended)
+            if (sched->get_state(thread_num).load() <= hpx::state::suspended)
             {
                 used_processing_units |= affinity_data_.get_pu_mask(
                     topo, thread_num + get_thread_offset());
@@ -72,7 +72,7 @@ namespace hpx { namespace threads {
              ++thread_num)
         {
             if (get_scheduler()->get_state(thread_num).load() <=
-                state_suspended)
+                hpx::state::suspended)
             {
                 ++active_os_thread_count;
             }

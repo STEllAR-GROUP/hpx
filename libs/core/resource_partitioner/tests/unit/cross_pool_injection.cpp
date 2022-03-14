@@ -78,7 +78,8 @@ int hpx_main()
         sched->update_scheduler_mode(
             hpx::threads::policies::scheduler_mode::enable_stealing, false);
         sched->update_scheduler_mode(
-            hpx::threads::policies::scheduler_mode::enable_stealing_numa, false);
+            hpx::threads::policies::scheduler_mode::enable_stealing_numa,
+            false);
     }
 
     // setup executors for different task priorities on the pools

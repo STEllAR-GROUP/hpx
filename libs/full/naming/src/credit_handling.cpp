@@ -173,7 +173,7 @@ namespace hpx { namespace naming {
                     // was already stopped. We ignore the request if that's the
                     // case.
                     if (e.get_error() != invalid_status ||
-                        !threads::threadmanager_is(hpx::state_stopping))
+                        !threads::threadmanager_is(hpx::state::stopping))
                     {
                         // delete local gid representation in any case
                         delete p;

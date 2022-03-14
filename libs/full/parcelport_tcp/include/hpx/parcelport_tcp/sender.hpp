@@ -101,7 +101,7 @@ namespace hpx::parcelset::policies::tcp {
 
             // We just ignore failures here. Those are the reason for
             // remote endpoint not connected errors which occur
-            // when the runtime is in state_shutdown
+            // when the runtime is in hpx::state::shutdown
             if (!ec)
             {
                 HPX_ASSERT(hpx::util::cleanup_ip_address(impl.address()) ==
@@ -203,7 +203,7 @@ namespace hpx::parcelset::policies::tcp {
             postprocess_handler_type handler;
             std::swap(handler, handler_);
 
-            if (threads::threadmanager_is(state_running))
+            if (threads::threadmanager_is(hpx::state::running))
             {
                 // the handler needs to be reset on an HPX thread (it destroys
                 // the parcel, which in turn might invoke HPX functions)

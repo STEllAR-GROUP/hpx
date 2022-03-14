@@ -122,11 +122,11 @@ namespace hpx { namespace detail {
             // executed.
             register_counter_types();
 
-            rt.set_state(state_pre_startup);
+            rt.set_state(hpx::state::pre_startup);
             runtime_support::call_startup_functions(find_here(), true);
             lbt_ << "(3rd stage) pre_main: ran pre-startup functions";
 
-            rt.set_state(state_startup);
+            rt.set_state(hpx::state::startup);
             runtime_support::call_startup_functions(find_here(), false);
             lbt_ << "(4th stage) pre_main: ran startup functions";
         }

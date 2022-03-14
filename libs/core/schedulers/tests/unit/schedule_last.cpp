@@ -57,7 +57,8 @@ void test_scheduler(int argc, char* argv[])
 
                 thread_pool_init.mode_ = hpx::threads::policies::scheduler_mode(
                     hpx::threads::policies::scheduler_mode::do_background_work |
-                    hpx::threads::policies::scheduler_mode::reduce_thread_priority |
+                    hpx::threads::policies::scheduler_mode::
+                        reduce_thread_priority |
                     hpx::threads::policies::scheduler_mode::delay_exit);
 
                 std::unique_ptr<hpx::threads::thread_pool_base> pool(

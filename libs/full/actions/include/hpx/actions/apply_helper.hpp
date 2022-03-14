@@ -76,7 +76,7 @@ namespace hpx { namespace applier { namespace detail {
         data.priority = fix_priority<Action>(priority);
         data.stacksize = traits::action_stacksize<Action>::value;
 
-        while (!threads::threadmanager_is_at_least(state_running))
+        while (!threads::threadmanager_is_at_least(hpx::state::running))
         {
             std::this_thread::sleep_for(
                 std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
@@ -112,7 +112,7 @@ namespace hpx { namespace applier { namespace detail {
         data.stacksize = static_cast<threads::thread_stacksize>(
             traits::action_stacksize<Action>::value);
 
-        while (!threads::threadmanager_is_at_least(state_running))
+        while (!threads::threadmanager_is_at_least(hpx::state::running))
         {
             std::this_thread::sleep_for(
                 std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
@@ -211,7 +211,7 @@ namespace hpx { namespace applier { namespace detail {
             // Direct actions should be able to be executed from a
             // non-HPX thread as well
             if (this_thread::has_sufficient_stack_space() ||
-                !threads::threadmanager_is_at_least(state_running))
+                !threads::threadmanager_is_at_least(hpx::state::running))
             {
                 call_sync<Action>(lva, comptype, HPX_FORWARD(Ts, vs)...);
             }
@@ -232,7 +232,7 @@ namespace hpx { namespace applier { namespace detail {
             // Direct actions should be able to be executed from a
             // non-HPX thread as well
             if (this_thread::has_sufficient_stack_space() ||
-                !threads::threadmanager_is_at_least(state_running))
+                !threads::threadmanager_is_at_least(hpx::state::running))
             {
                 call_sync<Action>(HPX_FORWARD(Continuation, cont), lva,
                     comptype, HPX_FORWARD(Ts, vs)...);

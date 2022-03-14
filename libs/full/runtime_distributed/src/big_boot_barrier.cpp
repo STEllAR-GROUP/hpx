@@ -531,7 +531,7 @@ namespace hpx { namespace agas {
 
         // TODO: Handle cases where localities try to connect to AGAS while it's
         // shutting down.
-        if (agas_client.get_status() != state_starting)
+        if (agas_client.get_status() != hpx::state::starting)
         {
             // We can just send the parcel now, the connecting locality isn't a part
             // of startup synchronization.
@@ -569,7 +569,7 @@ namespace hpx { namespace agas {
         runtime_distributed& rt = get_runtime_distributed();
         naming::resolver_client& agas_client = naming::get_agas_client();
 
-        if (HPX_UNLIKELY(agas_client.get_status() != state_starting))
+        if (HPX_UNLIKELY(agas_client.get_status() != hpx::state::starting))
         {
             HPX_THROW_EXCEPTION(internal_server_error, "agas::notify_worker",
                 "locality {} has launched early", rt.here());
@@ -769,7 +769,7 @@ namespace hpx { namespace agas {
         bool notify = false;
         {
             std::lock_guard<std::mutex> lk(mtx, std::adopt_lock);
-            if (agas_client.get_status() == state_starting)
+            if (agas_client.get_status() == hpx::state::starting)
             {
                 --connected;
                 if (connected == 0)

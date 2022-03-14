@@ -560,7 +560,7 @@ namespace hpx::parcelset {
 
         // if this isn't an HPX thread, the stack space check will return false
         if (!this_thread::has_sufficient_stack_space() &&
-            hpx::threads::threadmanager_is(hpx::state::state_running))
+            hpx::threads::threadmanager_is(hpx::state::running))
         {
             {
                 // reschedule request as an HPX thread to avoid hangs
@@ -672,7 +672,7 @@ namespace hpx::parcelset {
 
         // if this isn't an HPX thread, the stack space check will return false
         if (!this_thread::has_sufficient_stack_space() &&
-            hpx::threads::threadmanager_is(hpx::state::state_running))
+            hpx::threads::threadmanager_is(hpx::state::running))
         {
             // reschedule request as an HPX thread to avoid hangs
             void (parcelhandler::*put_parcels_ptr)(std::vector<parcel>,

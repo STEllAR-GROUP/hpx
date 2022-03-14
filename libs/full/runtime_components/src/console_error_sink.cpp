@@ -24,7 +24,7 @@ namespace hpx { namespace components {
         naming::id_type const& dst, std::exception_ptr const& e)
     {
         // Report the error only if the thread-manager is up.
-        if (threads::threadmanager_is(state_running))
+        if (threads::threadmanager_is(hpx::state::running))
         {
             if (threads::get_self_ptr())
             {
@@ -51,7 +51,7 @@ namespace hpx { namespace components {
         }
 
         // Report the error only if the thread-manager is up.
-        if (threads::threadmanager_is(state_running))
+        if (threads::threadmanager_is(hpx::state::running))
         {
             // retrieve console locality
             naming::gid_type console_gid;

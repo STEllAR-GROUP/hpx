@@ -113,7 +113,7 @@ namespace hpx::agas::server {
         }
 
         runtime& rt = get_runtime();
-        if (rt.get_state() < state_pre_shutdown)
+        if (rt.get_state() < hpx::state::pre_shutdown)
         {
             // asynchronously update cache on source locality
             // update remote cache if the id is not flagged otherwise

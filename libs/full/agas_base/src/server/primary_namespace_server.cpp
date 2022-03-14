@@ -948,7 +948,7 @@ namespace hpx { namespace agas { namespace server {
         for (free_entry const& e : free_list)
         {
             // Bail if we're in late shutdown and non-local.
-            if (HPX_UNLIKELY(!threads::threadmanager_is(state_running)) &&
+            if (HPX_UNLIKELY(!threads::threadmanager_is(hpx::state::running)) &&
                 e.locality_ != locality_)
             {
                 LAGAS_(info).format(

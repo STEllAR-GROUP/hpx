@@ -234,10 +234,10 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
     {
         // we use unspecified as the scheduler type and it will be set according to
         // the --hpx:queuing=xxx option or default.
-        std::uint32_t deft = hpx::threads::policies::scheduler_mode::default_;
-        rp.create_thread_pool(pool_name,
-            hpx::resource::scheduling_policy::shared_priority,
-            hpx::threads::policies::scheduler_mode(deft));
+        hpx::threads::policies::scheduler_mode deft =
+            hpx::threads::policies::scheduler_mode::default_;
+        rp.create_thread_pool(
+            pool_name, hpx::resource::scheduling_policy::shared_priority, deft);
         // add N pus to network pool
         int count = 0;
         for (hpx::resource::numa_domain const& d : rp.numa_domains())
@@ -256,9 +256,8 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
             }
         }
 
-        rp.create_thread_pool("default",
-            hpx::resource::scheduling_policy::unspecified,
-            hpx::threads::policies::scheduler_mode(deft));
+        rp.create_thread_pool(
+            "default", hpx::resource::scheduling_policy::unspecified, deft);
     }
 }
 
