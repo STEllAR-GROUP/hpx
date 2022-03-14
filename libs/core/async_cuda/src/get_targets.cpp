@@ -29,6 +29,13 @@ namespace hpx { namespace cuda { namespace experimental {
                     cudaGetErrorString(error));
         }
 
+        if (device_count == 0)
+        {
+            HPX_THROW_EXCEPTION(kernel_error,
+                "cuda::experimental::get_local_targets()",
+                "cudaGetDeviceCount failed: could not find any devices");
+        }
+
         std::vector<target> targets;
         targets.reserve(device_count);
 
@@ -47,8 +54,7 @@ namespace hpx { namespace cuda { namespace experimental {
         {
             std::cout << "GPU Device " << target.native_handle().get_device()
                       << ": \"" << target.native_handle().processor_name()
-                      << "\" "
-                      << "with compute capability "
+                      << "\" with compute capability "
                       << target.native_handle().processor_family() << "\n";
         }
     }
