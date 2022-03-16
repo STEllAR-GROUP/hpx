@@ -139,7 +139,7 @@ namespace hpx::execution::experimental::detail {
         {
             std::unique_lock<mutex_type> l(state.mtx);
             state.set_called = true;
-            hpx::util::ignore_while_checking il(&l);
+            hpx::util::ignore_while_checking<decltype(l)> il(&l);
             HPX_UNUSED(il);
 
             state.cond_var.notify_one();
