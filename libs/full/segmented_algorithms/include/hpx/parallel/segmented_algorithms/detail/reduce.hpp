@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Ajai V George
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -76,12 +77,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         static T sequential(
             ExPolicy, FwdIter first, FwdIter last, Reduce&& r, Convert&& conv)
         {
-            typedef typename std::iterator_traits<FwdIter>::reference reference;
-            return util::accumulate<T>(
-                first, last,
-                [=](T const& res, reference next) mutable -> T {
-                    return HPX_INVOKE(r, res, HPX_INVOKE(conv, next));
-                },
+            return util::accumulate<T>(first, last, HPX_FORWARD(Reduce, r),
                 HPX_FORWARD(Convert, conv));
         }
 
@@ -91,8 +87,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         parallel(ExPolicy&& policy, FwdIter first, FwdIter last, Reduce&& r,
             Convert&& conv)
         {
-            typedef typename std::iterator_traits<FwdIter>::reference reference;
-
             return util::partitioner<ExPolicy, T>::call(
                 HPX_FORWARD(ExPolicy, policy), first,
                 std::distance(first, last),
@@ -103,8 +97,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                         HPX_MOVE(val),
                         // MSVC14 bails out if r and conv are captured by
                         // reference
-                        [=](T const& res, reference next) mutable -> T {
-                            return HPX_INVOKE(r, res, HPX_INVOKE(conv, next));
+                        [=](T res, auto const& next) mutable -> T {
+                            return HPX_INVOKE(
+                                r, HPX_MOVE(res), HPX_INVOKE(conv, next));
                         });
                 },
                 hpx::unwrapping([r](std::vector<T>&& results) -> T {
