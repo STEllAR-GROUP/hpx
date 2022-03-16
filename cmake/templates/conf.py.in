@@ -139,19 +139,19 @@ for lib in hpx_libs.keys():
         module_sources = breathe_projects_source[module]
         if len(module_sources[1]) == 0:
             continue
-        basedir = os.path.abspath('.') + '/libs/' + lib + '/' + module
+        basedir = os.path.abspath('.') + '/libs/' + lib + '/' + module + '/api'
         if not os.path.exists(basedir):
             os.makedirs(basedir)
-        module_api_ref = open(basedir + '/api.rst', 'w')
+        module_api_ref = open(basedir + '/full_api.rst', 'w')
         module_api_ref.write(api_ref_header.format(module))
         for source in module_sources[1]:
             header = source[len('include/'):]
             module_api_ref.write(api_ref_file.format(header, module))
         module_api_ref.close()
-        api_refs += '   /libs/' + lib + '/' + module + '/api.rst\n'
+        api_refs += '   /libs/' + lib + '/' + module + '/api/full_api.rst\n'
 
-api_rst = open(os.path.abspath('.') + '/api.rst', 'w')
-for line in open(hpx_source_dir + '/docs/sphinx/api.rst').readlines():
+api_rst = open(os.path.abspath('.') + '/api/full_api.rst', 'w')
+for line in open(hpx_source_dir + '/docs/sphinx/api/full_api.rst').readlines():
     api_rst.write(line.format(api_refs))
 api_rst.close()
 

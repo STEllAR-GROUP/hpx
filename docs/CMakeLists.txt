@@ -145,7 +145,7 @@ file(
 )
 
 # exclude api.rst...
-list(FILTER sphinx_source_files EXCLUDE REGEX "sphinx/api.rst")
+list(FILTER sphinx_source_files EXCLUDE REGEX "sphinx/api/full_api.rst")
 
 foreach(sphinx_source_file ${sphinx_source_files})
   add_custom_command(

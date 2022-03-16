@@ -59,22 +59,7 @@ a heading brings in the features listed under that heading.
 
    api/public_api.rst
 
-Full API
-========
-
-The full API of |hpx| is presented below. The listings for the public API above
-refer to the full documentation below.
-
-.. note::
-
-   Most names listed in the full API reference are implementation details or
-   considered unstable. They are listed mostly for completeness. If there is a
-   particular feature you think deserves being in the public API we may consider
-   promoting it. In general we prioritize making sure features corresponding to
-   C++ standard library features are stable and complete.
-
 .. toctree::
    :maxdepth: 1
 
    api/full_api.rst
-{}
