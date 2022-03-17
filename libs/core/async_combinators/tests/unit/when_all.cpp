@@ -1,4 +1,4 @@
-//  Copyright (C) 2012 Hartmut Kaiser
+//  Copyright (C) 2012-2022 Hartmut Kaiser
 //  (C) Copyright 2008-10 Anthony Williams
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -27,7 +27,7 @@ int make_int_slowly()
 }
 
 template <class Container>
-void test_wait_for_all_from_list()
+void test_when_all_from_list()
 {
     unsigned const count = 10;
     Container futures;
@@ -50,7 +50,7 @@ void test_wait_for_all_from_list()
 }
 
 template <class Container>
-void test_wait_for_all_from_list_iterators()
+void test_when_all_from_list_iterators()
 {
     unsigned const count = 10;
 
@@ -75,7 +75,7 @@ void test_wait_for_all_from_list_iterators()
         HPX_TEST(r.is_ready());
 }
 
-void test_wait_for_all_one_future()
+void test_when_all_one_future()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::future<int> f1 = pt1.get_future();
@@ -91,7 +91,7 @@ void test_wait_for_all_one_future()
     HPX_TEST(hpx::get<0>(result).is_ready());
 }
 
-void test_wait_for_all_two_futures()
+void test_when_all_two_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::future<int> f1 = pt1.get_future();
@@ -112,7 +112,7 @@ void test_wait_for_all_two_futures()
     HPX_TEST(hpx::get<1>(result).is_ready());
 }
 
-void test_wait_for_all_three_futures()
+void test_when_all_three_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::future<int> f1 = pt1.get_future();
@@ -139,7 +139,7 @@ void test_wait_for_all_three_futures()
     HPX_TEST(hpx::get<2>(result).is_ready());
 }
 
-void test_wait_for_all_four_futures()
+void test_when_all_four_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::future<int> f1 = pt1.get_future();
@@ -172,7 +172,7 @@ void test_wait_for_all_four_futures()
     HPX_TEST(hpx::get<3>(result).is_ready());
 }
 
-void test_wait_for_all_five_futures()
+void test_when_all_five_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::future<int> f1 = pt1.get_future();
@@ -210,7 +210,7 @@ void test_wait_for_all_five_futures()
     HPX_TEST(hpx::get<4>(result).is_ready());
 }
 
-void test_wait_for_all_late_futures()
+void test_when_all_late_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::future<int> f1 = pt1.get_future();
@@ -232,7 +232,7 @@ void test_wait_for_all_late_futures()
     HPX_TEST(hpx::get<1>(result).is_ready());
 }
 
-void test_wait_for_all_deferred_futures()
+void test_when_all_deferred_futures()
 {
     hpx::future<int> f1 = hpx::async(hpx::launch::deferred, &make_int_slowly);
     hpx::future<int> f2 = hpx::async(hpx::launch::deferred, &make_int_slowly);
@@ -258,19 +258,19 @@ using hpx::future;
 int hpx_main(variables_map&)
 {
     {
-        test_wait_for_all_from_list<std::vector<future<int>>>();
-        test_wait_for_all_from_list<std::list<future<int>>>();
-        test_wait_for_all_from_list<std::deque<future<int>>>();
-        test_wait_for_all_from_list_iterators<std::vector<future<int>>>();
-        test_wait_for_all_from_list_iterators<std::list<future<int>>>();
-        test_wait_for_all_from_list_iterators<std::deque<future<int>>>();
-        test_wait_for_all_one_future();
-        test_wait_for_all_two_futures();
-        test_wait_for_all_three_futures();
-        test_wait_for_all_four_futures();
-        test_wait_for_all_five_futures();
-        test_wait_for_all_late_futures();
-        test_wait_for_all_deferred_futures();
+        test_when_all_from_list<std::vector<future<int>>>();
+        test_when_all_from_list<std::list<future<int>>>();
+        test_when_all_from_list<std::deque<future<int>>>();
+        test_when_all_from_list_iterators<std::vector<future<int>>>();
+        test_when_all_from_list_iterators<std::list<future<int>>>();
+        test_when_all_from_list_iterators<std::deque<future<int>>>();
+        test_when_all_one_future();
+        test_when_all_two_futures();
+        test_when_all_three_futures();
+        test_when_all_four_futures();
+        test_when_all_five_futures();
+        test_when_all_late_futures();
+        test_when_all_deferred_futures();
     }
 
     hpx::local::finalize();

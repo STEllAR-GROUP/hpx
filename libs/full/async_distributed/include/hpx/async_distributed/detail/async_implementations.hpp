@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -383,7 +383,7 @@ namespace hpx { namespace detail {
         if (hpx::detail::has_async_policy(policy))
         {
             return keep_alive(
-                hpx::async(action_invoker<action_type>(), addr.address_,
+                hpx::async(policy, action_invoker<action_type>(), addr.address_,
                     addr.type_, HPX_FORWARD(Ts, vs)...),
                 id, HPX_MOVE(r.second));
         }

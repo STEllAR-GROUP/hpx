@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -713,7 +713,8 @@ namespace hpx { namespace threads { namespace policies {
                     thrdptr->get_thread_id(), priority,
                     thrdptr->get_description());
 
-                high_priority_queues_[num].data_->schedule_thread(thrd);
+                high_priority_queues_[num].data_->schedule_thread(
+                    HPX_MOVE(thrd));
             }
             else if (priority == thread_priority::low)
             {
@@ -725,7 +726,7 @@ namespace hpx { namespace threads { namespace policies {
                     *this->get_parent_pool(), *this, thrdptr->get_thread_id(),
                     priority, thrdptr->get_description());
 
-                low_priority_queue_.schedule_thread(thrd);
+                low_priority_queue_.schedule_thread(HPX_MOVE(thrd));
             }
             else
             {
@@ -740,7 +741,7 @@ namespace hpx { namespace threads { namespace policies {
                     thrdptr->get_thread_id(), priority,
                     thrdptr->get_description());
 
-                queues_[num_thread].data_->schedule_thread(thrd);
+                queues_[num_thread].data_->schedule_thread(HPX_MOVE(thrd));
             }
         }
 
@@ -781,12 +782,13 @@ namespace hpx { namespace threads { namespace policies {
             }
             else if (priority == thread_priority::low)
             {
-                low_priority_queue_.schedule_thread(thrd, true);
+                low_priority_queue_.schedule_thread(HPX_MOVE(thrd), true);
             }
             else
             {
                 HPX_ASSERT(num_thread < num_queues_);
-                queues_[num_thread].data_->schedule_thread(thrd, true);
+                queues_[num_thread].data_->schedule_thread(
+                    HPX_MOVE(thrd), true);
             }
         }
 

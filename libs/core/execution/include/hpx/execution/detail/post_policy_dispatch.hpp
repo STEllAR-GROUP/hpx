@@ -126,29 +126,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         static void call(Policy const& policy,
             hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
         {
-            if (policy == launch::sync)
-            {
-                hpx::detail::call_sync(
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-                return;
-            }
-            else if (policy == launch::fork)
-            {
-                auto fork_policy = launch::fork_policy(
-                    policy.priority(), policy.stacksize(), policy.hint());
-
-                post_policy_dispatch<launch::fork_policy>::call(fork_policy,
-                    desc, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-                return;
-            }
-
-            threads::thread_init_data data(
-                threads::make_thread_function_nullary(hpx::util::deferred_call(
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)),
-                desc, policy.priority(), policy.hint(), policy.stacksize(),
-                threads::thread_schedule_state::pending);
-
-            threads::register_work(data);
+            call(policy, desc, threads::detail::get_self_or_default_pool(),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     };
 }}}}    // namespace hpx::parallel::execution::detail

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -57,6 +58,15 @@ namespace hpx { namespace traits {
 
     template <typename R>
     inline constexpr bool is_future_v = is_future<R>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename... Ts>
+    struct is_future_any : hpx::util::any_of<is_future<Ts>...>
+    {
+    };
+
+    template <typename... Ts>
+    inline constexpr bool is_future_any_v = is_future_any<Ts...>::value;
 
     template <typename Future>
     struct is_ref_wrapped_future : std::false_type
