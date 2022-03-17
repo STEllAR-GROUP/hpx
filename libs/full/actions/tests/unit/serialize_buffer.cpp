@@ -136,7 +136,7 @@ void test_initialization_from_vector(std::size_t max_size)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    std::size_t const max_size = 1 << 22;
+    std::size_t const max_size = 1 << 20;
     std::unique_ptr<char[]> send_buffer(new char[max_size]);
 
     for (hpx::id_type const& loc : hpx::find_all_localities())
