@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,9 +10,12 @@
 #include <hpx/cache/entries/entry.hpp>
 
 #include <chrono>
+#include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache { namespace entries {
+namespace hpx::util::cache::entries {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \class lru_entry lru_entry.hpp hpx/cache/entries/lru_entry.hpp
     ///
@@ -33,7 +36,8 @@ namespace hpx { namespace util { namespace cache { namespace entries {
     class lru_entry : public entry<Value, lru_entry<Value>>
     {
     private:
-        typedef entry<Value, lru_entry<Value>> base_type;
+        using base_type = entry<Value, lru_entry<Value>>;
+        using time_point = std::chrono::steady_clock::time_point;
 
     public:
         /// \brief Any cache entry has to be default constructible
@@ -44,8 +48,17 @@ namespace hpx { namespace util { namespace cache { namespace entries {
 
         /// \brief Construct a new instance of a cache entry holding the given
         ///        value.
-        explicit lru_entry(Value const& val)
+        explicit lru_entry(Value const& val) noexcept(
+            std::is_nothrow_constructible_v<base_type, Value const&>)
           : base_type(val)
+          , access_time_(std::chrono::steady_clock::now())
+        {
+        }
+
+        /// \brief Construct a new instance of a cache entry holding the given
+        ///        value.
+        explicit lru_entry(Value&& val) noexcept
+          : base_type(HPX_MOVE(val))
           , access_time_(std::chrono::steady_clock::now())
         {
         }
@@ -68,19 +81,22 @@ namespace hpx { namespace util { namespace cache { namespace entries {
         }
 
         /// \brief Returns the last access time of the entry.
-        std::chrono::steady_clock::time_point const& get_access_time() const
+        constexpr time_point const& get_access_time() const noexcept
         {
             return access_time_;
         }
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has been accessed less recently (LRU).
-        friend bool operator<(lru_entry const& lhs, lru_entry const& rhs)
+        friend bool
+        operator<(lru_entry const& lhs, lru_entry const& rhs) noexcept(
+            noexcept(std::declval<time_point const&>() <
+                std::declval<time_point const&>()))
         {
             return lhs.get_access_time() > rhs.get_access_time();
         }
 
     private:
-        std::chrono::steady_clock::time_point access_time_;
+        time_point access_time_;
     };
-}}}}    // namespace hpx::util::cache::entries
+}    // namespace hpx::util::cache::entries

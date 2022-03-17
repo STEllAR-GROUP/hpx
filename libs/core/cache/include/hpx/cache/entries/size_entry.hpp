@@ -12,23 +12,25 @@
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache { namespace entries {
+namespace hpx::util::cache::entries {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Value, typename Derived = void>
     class size_entry;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Value, typename Derived>
         struct size_derived
         {
-            typedef Derived type;
+            using type = Derived;
         };
 
         template <typename Value>
         struct size_derived<Value, void>
         {
-            typedef size_entry<Value> type;
+            using type = size_entry<Value>;
         };
     }    // namespace detail
 
@@ -56,39 +58,46 @@ namespace hpx { namespace util { namespace cache { namespace entries {
       : public entry<Value, typename detail::size_derived<Value, Derived>::type>
     {
     private:
-        typedef
-            typename detail::size_derived<Value, Derived>::type derived_type;
-        typedef entry<Value, derived_type> base_type;
+        using derived_type =
+            typename detail::size_derived<Value, Derived>::type;
+        using base_type = entry<Value, derived_type>;
 
     public:
         /// \brief Any cache entry has to be default constructible
-        size_entry()
-          : size_(0)
-        {
-        }
+        size_entry() = default;
 
         /// \brief Construct a new instance of a cache entry holding the given
         ///        value.
-        explicit size_entry(Value const& val, std::size_t size)
+        explicit size_entry(Value const& val, std::size_t size = 0) noexcept(
+            std::is_nothrow_constructible_v<base_type, Value const&>)
           : base_type(val)
           , size_(size)
         {
         }
 
+        /// \brief Construct a new instance of a cache entry holding the given
+        ///        value.
+        explicit size_entry(Value&& val, std::size_t size = 0) noexcept
+          : base_type(HPX_MOVE(val))
+          , size_(size)
+        {
+        }
+
         /// \brief    Return the 'size' of this entry.
-        std::size_t get_size() const
+        constexpr std::size_t get_size() const noexcept
         {
             return size_;
         }
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has a bigger size.
-        friend bool operator<(size_entry const& lhs, size_entry const& rhs)
+        friend constexpr bool operator<(
+            size_entry const& lhs, size_entry const& rhs) noexcept
         {
             return lhs.get_size() > rhs.get_size();
         }
 
     private:
-        std::size_t size_;    // the 'size' of the entry
+        std::size_t size_ = 0;    // the 'size' of the entry
     };
-}}}}    // namespace hpx::util::cache::entries
+}    // namespace hpx::util::cache::entries
