@@ -1,6 +1,6 @@
 ..
     Copyright (C) 2022      Giannis Gonidelis
-    Copyright (C) 2007-2020 Hartmut Kaiser
+    Copyright (C) 2007-2022 Hartmut Kaiser
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,32 +12,209 @@
 |hpx| V1.8.0 (Feb 15, 2022)
 ===========================
 
-The new release comes with a renovated documentation! On top of that all
-Hpx parallel algorithms have now been adapted in C++20. Much work has been
+With HPX parallel algorithms been fully adapted in C++20 the new release achieves
+full conformance with C++20 concurrency and parallelism facilities. Much work has been
 done towards implementing P2300 ("std::execution") and implementing the
-underlying senders and receivers facilities.
+underlying senders/receivers facilities.
+Finally, The new release comes with a brand new documentation interface!
 
 General changes
 ===============
 
+- With the new vectorization registers introduced in recent hardware arhcitectures
+  HPX now provides new data-parallel vector types that record significant speed-up
+  using Single Instruction Multiple Data execution policies. The following
+  datapar algorithms now support SIMD execution.:
+  - ``copy``,
+  - ``generate``,
+  - ``adjacent_difference``,
+  - ``all_of``,
+  - ``any_of``,
+  - ``none_of``,
+  - ``mismatch``,
+  - ``adjacent_find``,
+  - ``find``,
+  - ``find_end``,
+  - ``find_first_of``,
+  - ``find_if``,
+  - ``find_if_not``.
+
 - The new documentation can now be found on our webpage: https://hpx-docs.stellar-group.org.
-    This includes a completely new and user-friendly interface environment along with
-    restructuring of certain components. The content in the "Quick start", "Manual" and
-    "Examples" was improved, while the "Build system" page was adapted to include necessary
-    information for newcommers.
+  This includes a completely new and user-friendly interface environment along with
+  restructuring of certain components. The content in the "Quick start", "Manual" and
+  "Examples" was improved, while the "Build system" page was adapted to include necessary
+  information for newcommers.
+- Based on top of [P2300](wg21.link/p2300) the HPX parallel algorithms now support
+  the pipeline syntax towards an effort to unify their usage along with senders/receivers.
+  The HPX parallel algorithms can now bind with senders/receivers using the pipeline operator. 
+- Several changes took place on the executors provided by HPX:
+- The executors now support the ``num_cores`` options in order for the user
+  to be able to specify the desired number of cores to be used in the correspodning
+  execution.
+- The ``scheduler`` executor was implemented on top of senders/receivers 
+  and can be used with all HPX facilities that schedule new work, such as
+  parallel algorithms, hpx::async, hpx::dataflow, etc.
+- The performance of ``fork_join_executor`` was improved.
 
+- The following algorithms have been added/adapted to be C++20 conformant:
 
-- The following algorithms have been adapted to be C++20 conformant:
+  - ``min_element``,
+  - ``max_element``,
+  - ``minmax_element``,
+  - ``starts_with``,
+  - ``ends_with``,
+  - ``swap_ranges``,
+  - ``unique``,
+  - ``unique_copy``,
+  - ``rotate``,
+  - ``rotate_copy``,
+  - ``sort``,
+  - ``shift_left``,
+  - ``shift_right``,
+  - ``stable_sort``,
+  - ``partition``,
+  - ``partition_copy``,
+  - ``stable_partition``,
+  - ``adjacent_difference``,
+  - ``nth_element``,
+  - ``partial_sort``,
+  - ``partial_sort_copy``.
+
+- The following CMake flags were added:
+  HPX_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION.
+- ``HPX_FORWARD``/``HPX_MOVE`` macros were introduced and
+  replaced the ``std::move`` and ``std::forward`` facilities.
+- Hangs on distributed barrier were fixed.
+- The performance of ``scan_partitioner`` was improved.
+- Regarding senders/receivers and the P2300 proposal various actions
+  took place. Support was added for ``thread_priority`` to the 
+  ``parallel_execution_policy`` .``stop_token`` was adapted to the recent proposal
+  version. Also hint, annotation, priority and stacksize properties were added
+  to the scheduler executor. Stop support was added to ``when_all``. Support for 
+  completion signatures was added. The following schedulers and algorithms were added:
+  - ``get_completion_scheduler``.
+  - ``any_sender``/``unique_any_sender``.
+  - ``split`` sender.
+  - ``transform_mpi`` sender.
+  - ``transfer`` sender.
+- Several namespaces were altered towards conformance with C++20. Compatibility layers
+  have been added and the old versions will be removed in next releases. The namespace
+  changes are the following:
+  - ``hpx::parallel::induction/reduction`` were movied into namespace ``hpx::experimental``
+  - ``for_loop`` and friends were moved into namespace ``hpx::experimental``.
+  - ``hpx::util::optional`` and friends were moved into namespace ``hpx``.
+  - ``hpx::lcos::barrier`` has been moved into the ``hpx::distributed`` namespace and
+    ``hpx::lcos::local::cpp20_barrier`` has been ranamed to ``barrier`` and moved into
+    the ``hpx`` namespace.
+  - ``unique_function`` has been renames to ``move_only_function`` and moved into 
+    namespace ``hpx``. ``function`` and ``function_ref`` have been moved into namespace
+    ``hpx``.
+
 
 Breaking changes
 ================
 
+- Support for GCC 7 and Clang 8.0.0 and below has been removed.
+- CUDA  version required updated to 11.4.
+- CMake version required updated to 3.18.
+- Asio version requires updated to 1.20.0.
+- ``tagged_pair`` and ``tagged_tuple`` were removed.
+- The HPX Customization Point Obejects (CPOs) were updated according to P2300. Namely,
+  ``schedule``, ``set_value``, ``set_error``, ``set_done``, ``start`` and ``connect``
+  inherit ``hpx::functional::tag`. 
+- ``tag_dispatch`` was renamed to ``tag_invoke``.
+- The following CMake flags were removed after last release deprecation:
+ HPX_SCHEDULER_MAX_TERMINATED_THREADS 
+ HPX_WITH_GOOGLE_PERFTOOLS
+ HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY 
+ HPX_HAVE_{COROUTINE,PLUGIN}_GCC_HIDDEN_VISIBILITY
+ HPX_TOP_LEVEL
+ HPX_WITH_COMPUTE_CUDA 
+ HPX_WITH_ASYNC_CUDA
+- ``annotate_function`` was renamed to ``scoped_annotation``.
+- ``execution::transform`` was renamed to ``execution::then``.
+- ``execution::detach`` was renamed to ``execution::start_detached``.
+- ``execution::on_sender`` was renamed to ``execution::schedule_on``.
+- ``execution::just_on`` was renamed to ``execution::just_transfer``.
+- ``set_done`` was renamed to ``set_stopped``.
+
 Closed issues
 =============
+
+* :hpx-issue:`5812` - OctoTiger does not compile with HPX master and CUDA 11.5
+* :hpx-issue:`5784` - HPX failing with co_await and hpx::when_all(futures)
+* :hpx-issue:`5774` - CMake can't find HPXCacheVariables.cmake 
+* :hpx-issue:`5764` - Fix HIP problem 
+* :hpx-issue:`5724` - Missing binary filter compression header
+* :hpx-issue:`5721` - Cleanup after repository split
+* :hpx-issue:`5701` - It seems that the tcp parcelport is running, and the MPI parcelport is ignored
+* :hpx-issue:`5692` - Kokkos compilation fails when using both HPX and CUDA execution spaces with gcc 9.3.0
+* :hpx-issue:`5686` - Rename `annotate_function`
+* :hpx-issue:`5668` - HPX does not detect the C++ 20 standard using gcc 11.2
+* :hpx-issue:`5666` - Compilation error using boost 1.76 and gcc 11.2.1
+* :hpx-issue:`5653` - Implement P2248 for our algorithms
+* :hpx-issue:`5647` - [User input needed] Remove (CUDA) compute functionality?
+* :hpx-issue:`5590` - hello_world_distributed fails on startup with HPX stable, MPICH 3.3.2, on Deep Bayou
+* :hpx-issue:`5570` - Rename tag_dispatch to tag_invoke
+* :hpx-issue:`5566` - can't build simple example: "Cannot use the dummy implementation of future_then_dispatch"
+* :hpx-issue:`5565` - build failure: hpx::string_util::trim()
+* :hpx-issue:`5553` - Github action to validate the cff file refs #5471
+* :hpx-issue:`5504` - CMake does not work for HPX 1.7.0 on Piz Daint
+* :hpx-issue:`5503` - Use contiguous index queue in bulk execution to reduce number of spawned tasks
+* :hpx-issue:`5502` - C++20 std::coroutine cmake detection
+* :hpx-issue:`5478` - hpx.dll built with vcpkg got functions pointing to the same location
+* :hpx-issue:`5472` - Compilation error with cuda/11.3 
+* :hpx-issue:`5469` - Compiler warning about HPX_NODISCARD when building with APEX
+* :hpx-issue:`5463` - Address minor comments of the C++17 PR bump 
+* :hpx-issue:`5456` - Use `std::ranges::iter_swap` where available
+* :hpx-issue:`5404` - Build fails with error "Cannot open include file asio/io_context.hpp"
+* :hpx-issue:`5381` - Add starts_with and ends_with algorithms
+* :hpx-issue:`5344` - Further simplify tag_invoke helpers
+* :hpx-issue:`5269` - Allow setting a label on executors/policies
+* :hpx-issue:`5219` - (Re-)Implement executor API on top of sender/receiver infrastructure
+* :hpx-issue:`5162` - Require C++17 support
+* :hpx-issue:`5156` - Disentangle segmented algorithms
+* :hpx-issue:`5118` - Lock held while suspending
+* :hpx-issue:`5111` - Tests fail to build with binary_filter plugins enabled
+* :hpx-issue:`5110` - Tests don't get built
+* :hpx-issue:`5105` - PAPI performance counters not available
+* :hpx-issue:`5002` - hpx::lcos::barrier() results in deadlock
+* :hpx-issue:`4987` - Use std::function in public APIs
+* :hpx-issue:`4871` - HEP: conformance to C++20
+* :hpx-issue:`4822` - Adapt parallel algorithms to C++20
+* :hpx-issue:`4736` - Deprecate hpx::flush and hpx::endl
+* :hpx-issue:`4495` - Add anchor links to table rows in documentation
+* :hpx-issue:`4469` - New thread state: `pending_low`
+* :hpx-issue:`4321` - After the modularization the libfabric parcelport does not compile 
+* :hpx-issue:`4308` - Using APEX on multinode jobs when HPX_WITH_NETWORKING = OFF
+* :hpx-issue:`3995` - Use C++20 std::source_location where available, adapt ours to conform
+* :hpx-issue:`3861` - Selected processor does not support 'yield' in ARM mode
+* :hpx-issue:`3706` - Add shift_left and shift_right algorithms
+* :hpx-issue:`3646` - Parallel algorithms should accept iterator/sentinel pairs
+* :hpx-issue:`3636` - HPX Modularization
+* :hpx-issue:`3546` - Modularization of HPX
+* :hpx-issue:`3474` - Modernize CMake used in HPX
+* :hpx-issue:`1836` - hpx::parallel does not have a sort implementation
+* :hpx-issue:`1668` - Adapt all parallel algorithms to Ranges TS
+* :hpx-issue:`1141` - Implement N4409 on top of HPX
 
 Closed pull requests
 ====================
 
+* :hpx-pr:`5821` - Enable permissive- flag on Windows GitHub actions builders
+* :hpx-pr:`5818` - Unconditionally use C++17 attributes
+* :hpx-pr:`5817` - Modernize naming modules
+* :hpx-pr:`5816` - Modernize cache module
+* :hpx-pr:`5815` - Reapply flyby changes from #5467
+* :hpx-pr:`5814` - Avoid test timeouts by reducing test sizes
+* :hpx-pr:`5813` - The CUDA problem is not fixed in V11.5 yet...
+* :hpx-pr:`5811` - Make sure reduction value is properly moved, when possible
+* :hpx-pr:`5810` - Improve error reporting during device initialization in HIP environments
+* :hpx-pr:`5809` - Converting scheduler enums into enum class
+* :hpx-pr:`5808` - Deprecate hpx::flush and friends
+* :hpx-pr:`5807` - Use C++20 std::source_location, if available
+* :hpx-pr:`5806` - Moving promise and packaged_task to new namespaces
+* :hpx-pr:`5805` - Attempting to fix a test failure when using the LCI parcelpor
 * :hpx-pr:`5803` - Attempt to fix CUDA related OctoTiger problems
 * :hpx-pr:`5800` - Add option to restrict MPI background work to subset of cores
 * :hpx-pr:`5798` - Adding MPI as a dependency to APEX
@@ -65,6 +242,7 @@ Closed pull requests
 * :hpx-pr:`5766` - Fixing a integral conversion warning
 * :hpx-pr:`5765` - Adding a sphinx role allowing to link to a file directly in github
 * :hpx-pr:`5763` - add num_cores facility
+* :hpx-pr:`5762` - Fix Public API main page
 * :hpx-pr:`5761` - Add missing inline to mpi_exception.hpp error_message function
 * :hpx-pr:`5760` - Update cdash build url
 * :hpx-pr:`5759` - Switch to use generic rostam SLURM partitions
@@ -79,7 +257,7 @@ Closed pull requests
 * :hpx-pr:`5748` - Adding environmental query CPOs
 * :hpx-pr:`5747` - Renaming set_done to set_stopped (as per P2300)
 * :hpx-pr:`5745` - Modernize serialization module
-* :hpx-pr:`5743` - Add check for MPICH and set the correct env to suport multi-threaded
+* :hpx-pr:`5743` - Add check for MPICH and set the correct env to support multi-threaded
 * :hpx-pr:`5742` - Remove obsolete files related to cpuid, etc.
 * :hpx-pr:`5741` - Support for data-parallelism for adjacent find
 * :hpx-pr:`5740` - Support for data-parallelism for find algorithms
@@ -106,6 +284,7 @@ Closed pull requests
 * :hpx-pr:`5712` - Updating jenkins configuration for Rostam2.2
 * :hpx-pr:`5711` - Refactor manual sections
 * :hpx-pr:`5710` - Making task_group serializable
+* :hpx-pr:`5709` - Update the MPI cmake setup
 * :hpx-pr:`5707` - Better diagnose parcel bootstrap problems
 * :hpx-pr:`5704` - Test with hwloc 2.7.0 with GCC 11
 * :hpx-pr:`5703` - Fix `counting_iterator` container tests
