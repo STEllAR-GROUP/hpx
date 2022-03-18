@@ -79,7 +79,7 @@ namespace hpx {
 
             template <typename... Us>
             HPX_FORCEINLINE bool apply_c(
-                naming::id_type const& cont, Us&&... vs) const
+                hpx::id_type const& cont, Us&&... vs) const
             {
                 return hpx::apply_c<Action>(cont,
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(

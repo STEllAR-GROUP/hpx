@@ -24,14 +24,14 @@ namespace hpx { namespace serialization {
         extra_archive_data_id_type
         extra_archive_data_helper<input_pointer_tracker>::id() noexcept
         {
-            static std::uint8_t id;
+            static std::uint8_t id = 0;
             return &id;
         }
 
         extra_archive_data_id_type
         extra_archive_data_helper<output_pointer_tracker>::id() noexcept
         {
-            static std::uint8_t id;
+            static std::uint8_t id = 0;
             return &id;
         }
 

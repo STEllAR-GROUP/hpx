@@ -37,15 +37,14 @@ namespace hpx { namespace agas {
         static naming::gid_type get_service_instance(
             naming::gid_type const& dest, error_code& ec = throws);
 
-        static naming::gid_type get_service_instance(
-            naming::id_type const& dest)
+        static naming::gid_type get_service_instance(hpx::id_type const& dest)
         {
             return get_service_instance(dest.get_gid());
         }
 
         static bool is_service_instance(naming::gid_type const& gid);
 
-        static bool is_service_instance(naming::id_type const& id)
+        static bool is_service_instance(hpx::id_type const& id)
         {
             return is_service_instance(id.get_gid());
         }
@@ -55,10 +54,10 @@ namespace hpx { namespace agas {
 
         naming::address::address_type ptr() const;
         naming::address addr() const;
-        naming::id_type gid() const;
+        hpx::id_type gid() const;
 
-        hpx::future<std::pair<naming::id_type, naming::address>>
-        begin_migration(naming::gid_type const& id);
+        hpx::future<std::pair<hpx::id_type, naming::address>> begin_migration(
+            naming::gid_type const& id);
         bool end_migration(naming::gid_type const& id);
 
         bool bind_gid(gva const& g, naming::gid_type const& id,

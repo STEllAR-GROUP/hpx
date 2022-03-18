@@ -36,7 +36,7 @@ namespace examples
 
         /// Create a client side representation of an object which is newly
         /// created on the given locality
-        explicit cancelable_action(hpx::naming::id_type const& target_gid)
+        explicit cancelable_action(hpx::id_type const& target_gid)
           : base_type(hpx::new_<cancelable_action>(target_gid))
         {}
 

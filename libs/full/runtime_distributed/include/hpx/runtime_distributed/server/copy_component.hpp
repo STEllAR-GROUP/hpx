@@ -24,7 +24,7 @@ namespace hpx { namespace components { namespace server {
         // If we know that the new component has to be created local to the old
         // one, we can avoid doing serialization.
         template <typename Component>
-        naming::id_type copy_component_here_postproc(
+        hpx::id_type copy_component_here_postproc(
             std::shared_ptr<Component> ptr)
         {
             // This is executed on the locality where the component lives.
@@ -36,8 +36,8 @@ namespace hpx { namespace components { namespace server {
         }
 
         template <typename Component>
-        naming::id_type copy_component_postproc(std::shared_ptr<Component> ptr,
-            naming::id_type const& target_locality)
+        hpx::id_type copy_component_postproc(
+            std::shared_ptr<Component> ptr, hpx::id_type const& target_locality)
         {
             using stubs::runtime_support;
 
@@ -60,22 +60,22 @@ namespace hpx { namespace components { namespace server {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    future<naming::id_type> copy_component_here(naming::id_type const& to_copy)
+    future<hpx::id_type> copy_component_here(hpx::id_type const& to_copy)
     {
         future<std::shared_ptr<Component>> f = get_ptr<Component>(to_copy);
         return f.then(
-            [=](future<std::shared_ptr<Component>> f) -> naming::id_type {
+            [=](future<std::shared_ptr<Component>> f) -> hpx::id_type {
                 return detail::copy_component_here_postproc(f.get());
             });
     }
 
     template <typename Component>
-    future<naming::id_type> copy_component(
-        naming::id_type const& to_copy, naming::id_type const& target_locality)
+    future<hpx::id_type> copy_component(
+        hpx::id_type const& to_copy, hpx::id_type const& target_locality)
     {
         future<std::shared_ptr<Component>> f = get_ptr<Component>(to_copy);
         return f.then(
-            [=](future<std::shared_ptr<Component>> f) -> naming::id_type {
+            [=](future<std::shared_ptr<Component>> f) -> hpx::id_type {
                 return detail::copy_component_postproc(
                     f.get(), target_locality);
             });
@@ -83,8 +83,7 @@ namespace hpx { namespace components { namespace server {
 
     template <typename Component>
     struct copy_component_action_here
-      : ::hpx::actions::action<future<naming::id_type> (*)(
-                                   naming::id_type const&),
+      : ::hpx::actions::action<future<hpx::id_type> (*)(hpx::id_type const&),
             &copy_component_here<Component>,
             copy_component_action_here<Component>>
     {
@@ -92,9 +91,8 @@ namespace hpx { namespace components { namespace server {
 
     template <typename Component>
     struct copy_component_action
-      : ::hpx::actions::action<future<naming::id_type> (*)(
-                                   naming::id_type const&,
-                                   naming::id_type const&),
+      : ::hpx::actions::action<future<hpx::id_type> (*)(
+                                   hpx::id_type const&, hpx::id_type const&),
             &copy_component<Component>, copy_component_action<Component>>
     {
     };

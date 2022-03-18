@@ -264,7 +264,7 @@ bool test_migrate_component(hpx::id_type source, hpx::id_type target)
 {
     // create component on given locality
     test_client t1 = hpx::new_<test_client>(source, 42);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -276,7 +276,7 @@ bool test_migrate_component(hpx::id_type source, hpx::id_type target)
         test_client t2(hpx::components::migrate(t1, target));
 
         // wait for migration to be done
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
         // the migrated object should have the same id as before
         HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -298,7 +298,7 @@ bool test_migrate_lazy_component(hpx::id_type source, hpx::id_type target)
 {
     // create component on given locality
     test_client t1 = hpx::new_<test_client>(source, 42);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -310,7 +310,7 @@ bool test_migrate_lazy_component(hpx::id_type source, hpx::id_type target)
         test_client t2(hpx::components::migrate(t1, target));
 
         // wait for migration to be done
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
         // the migrated object should have the same id as before
         HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -333,7 +333,7 @@ bool test_migrate_lazy_component_client(
 {
     // create component on given locality
     test_client t1 = hpx::new_<test_client>(source, 42);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -345,7 +345,7 @@ bool test_migrate_lazy_component_client(
         test_client t2(hpx::components::migrate(t1, target));
 
         // wait for migration to be done
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
         // the migrated object should have the same id as before
         HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -368,7 +368,7 @@ bool test_migrate_busy_component(hpx::id_type source, hpx::id_type target)
 {
     // create component on given locality
     test_client t1 = hpx::new_<test_client>(source, 42);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -385,7 +385,7 @@ bool test_migrate_busy_component(hpx::id_type source, hpx::id_type target)
         HPX_TEST_EQ(t1.get_data(), 42);
 
         // wait for migration to be done
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
         // the migrated object should have the same id as before
         HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -411,7 +411,7 @@ bool test_migrate_lazy_busy_component(hpx::id_type source, hpx::id_type target)
 {
     // create component on given locality
     test_client t1 = hpx::new_<test_client>(source, 42);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -428,7 +428,7 @@ bool test_migrate_lazy_busy_component(hpx::id_type source, hpx::id_type target)
         HPX_TEST_EQ(t1.lazy_get_data(), 42);
 
         // wait for migration to be done
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
         // the migrated object should have the same id as before
         HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -454,7 +454,7 @@ bool test_migrate_lazy_busy_component_client(
 {
     // create component on given locality
     test_client t1 = hpx::new_<test_client>(source, 42);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -471,7 +471,7 @@ bool test_migrate_lazy_busy_component_client(
         HPX_TEST_EQ(t1.lazy_get_client(target).call(), target);
 
         // wait for migration to be done
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
         // the migrated object should have the same id as before
         HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -496,7 +496,7 @@ bool test_migrate_lazy_busy_component_client(
 bool test_migrate_component2(hpx::id_type source, hpx::id_type target)
 {
     test_client t1 = hpx::new_<test_client>(source, 42);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -516,7 +516,7 @@ bool test_migrate_component2(hpx::id_type source, hpx::id_type target)
             HPX_TEST_EQ(t1.get_data(), 42);
 
             // wait for migration to be done
-            HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+            HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
             // the migrated object should have the same id as before
             HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -544,7 +544,7 @@ bool test_migrate_component2(hpx::id_type source, hpx::id_type target)
 bool test_migrate_lazy_component2(hpx::id_type source, hpx::id_type target)
 {
     test_client t1 = hpx::new_<test_client>(source, 42);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -564,7 +564,7 @@ bool test_migrate_lazy_component2(hpx::id_type source, hpx::id_type target)
             HPX_TEST_EQ(t1.lazy_get_data(), 42);
 
             // wait for migration to be done
-            HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+            HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
             // the migrated object should have the same id as before
             HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -593,7 +593,7 @@ bool test_migrate_lazy_component_client2(
     hpx::id_type source, hpx::id_type target)
 {
     test_client t1 = hpx::new_<test_client>(source, 42);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -613,7 +613,7 @@ bool test_migrate_lazy_component_client2(
             HPX_TEST_EQ(t1.lazy_get_client(target).call(), target);
 
             // wait for migration to be done
-            HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+            HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
             // the migrated object should have the same id as before
             HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -642,7 +642,7 @@ bool test_migrate_lazy_component_client2(
 bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
 {
     test_client t1 = hpx::new_<test_client>(source, 42);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -662,7 +662,7 @@ bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
                 HPX_TEST_EQ(t1.get_data(), 42);
 
                 // wait for migration to be done
-                HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+                HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
                 // the migrated object should have the same id as before
                 HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -712,7 +712,7 @@ bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
 bool test_migrate_lazy_busy_component2(hpx::id_type source, hpx::id_type target)
 {
     test_client t1 = hpx::new_<test_client>(source, 42);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -732,7 +732,7 @@ bool test_migrate_lazy_busy_component2(hpx::id_type source, hpx::id_type target)
                 HPX_TEST_EQ(t1.lazy_get_data(), 42);
 
                 // wait for migration to be done
-                HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+                HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
                 // the migrated object should have the same id as before
                 HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -783,7 +783,7 @@ bool test_migrate_lazy_busy_component_client2(
     hpx::id_type source, hpx::id_type target)
 {
     test_client t1 = hpx::new_<test_client>(source, 42);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -803,7 +803,7 @@ bool test_migrate_lazy_busy_component_client2(
                 HPX_TEST_EQ(t1.lazy_get_client(target).call(), target);
 
                 // wait for migration to be done
-                HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+                HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
                 // the migrated object should have the same id as before
                 HPX_TEST_EQ(t1.get_id(), t2.get_id());

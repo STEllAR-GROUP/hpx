@@ -63,7 +63,7 @@ void test_find_all_ids_from_basename()
     test_client t1 = hpx::new_<test_client>(hpx::find_here());
     hpx::id_type client_id = t1.get_id();
 
-    HPX_TEST_NEQ(hpx::naming::invalid_id, client_id);
+    HPX_TEST_NEQ(hpx::invalid_id, client_id);
 
     // register our component with AGAS
     HPX_TEST((hpx::register_with_basename(basename, client_id).get()));
@@ -102,7 +102,7 @@ void test_find_ids_from_basename()
     test_client t1 = hpx::new_<test_client>(hpx::find_here());
     hpx::id_type client_id = t1.get_id();
 
-    HPX_TEST_NEQ(hpx::naming::invalid_id, client_id);
+    HPX_TEST_NEQ(hpx::invalid_id, client_id);
 
     // register our component with AGAS
     HPX_TEST((hpx::register_with_basename(basename, client_id).get()));
@@ -149,7 +149,7 @@ void test_find_id_from_basename()
     test_client t1 = hpx::new_<test_client>(hpx::find_here());
     hpx::id_type client_id = t1.get_id();
 
-    HPX_TEST_NEQ(hpx::naming::invalid_id, client_id);
+    HPX_TEST_NEQ(hpx::invalid_id, client_id);
 
     // register our component with AGAS
     HPX_TEST((hpx::register_with_basename(basename, client_id).get()));

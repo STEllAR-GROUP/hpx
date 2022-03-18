@@ -27,7 +27,7 @@ using hpx::program_options::options_description;
 using hpx::program_options::value;
 using hpx::program_options::variables_map;
 
-using hpx::naming::id_type;
+using hpx::id_type;
 
 using hpx::actions::action;
 using hpx::actions::direct_action;

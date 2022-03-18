@@ -76,8 +76,8 @@ namespace gc {
 
         // ctors
         collector_data()
-          : parent(hpx::naming::invalid_id)
-          , cid(hpx::naming::invalid_id)
+          : parent(hpx::invalid_id)
+          , cid(hpx::invalid_id)
           , minor_id(0)
           , phantom_count(0)
           , rcc(0)
@@ -128,7 +128,7 @@ namespace gc {
             {
                 // use a mutex here?
                 int n = out_refs.size();
-                if (id != hpx::naming::invalid_id)
+                if (id != hpx::invalid_id)
                 {
                     out_refs.push_back(id);
                     incref_(weight, id);
@@ -137,15 +137,15 @@ namespace gc {
             }
             HPX_DEFINE_COMPONENT_ACTION(collectable, add_ref)
 
-            void set_ref(unsigned int index, hpx::naming::id_type id)
+            void set_ref(unsigned int index, hpx::id_type id)
             {
-                hpx::naming::id_type old_id = out_refs.at(index);
+                hpx::id_type old_id = out_refs.at(index);
                 if (id == old_id)
                     return;
                 out_refs[index] = id;
-                if (old_id != hpx::naming::invalid_id)
+                if (old_id != hpx::invalid_id)
                     decref_(weight, old_id);
-                if (id != hpx::naming::invalid_id)
+                if (id != hpx::invalid_id)
                     incref_(weight, id);
             }
             HPX_DEFINE_COMPONENT_ACTION(collectable, set_ref)
@@ -155,10 +155,10 @@ namespace gc {
             HPX_DEFINE_COMPONENT_ACTION(collectable, phantomize_ref)
             void incref(unsigned int weight);
             HPX_DEFINE_COMPONENT_ACTION(collectable, incref)
-            void incref_(unsigned int weight, hpx::naming::id_type id);
+            void incref_(unsigned int weight, hpx::id_type id);
             void decref(unsigned int weight);
             HPX_DEFINE_COMPONENT_ACTION(collectable, decref)
-            void decref_(unsigned int weight, hpx::naming::id_type id);
+            void decref_(unsigned int weight, hpx::id_type id);
 
             void phantom_wait_complete();
 
@@ -339,7 +339,7 @@ namespace gc { namespace server {
             cd->recovered = true;
             for (auto i : out_refs)
             {
-                if (i != hpx::naming::invalid_id)
+                if (i != hpx::invalid_id)
                 {
                     hpx::apply<collectable::recover_action>(i, cd->cid);
                     cd->wc++;
@@ -444,7 +444,7 @@ namespace gc { namespace server {
             cd->phantomized = true;
             for (auto i = out_refs.begin(); i != out_refs.end(); ++i)
             {
-                if (*i != hpx::naming::invalid_id)
+                if (*i != hpx::invalid_id)
                 {
                     cd->wc++;
                     hpx::async<collectable::phantomize_ref_action>(
@@ -464,16 +464,16 @@ namespace gc { namespace server {
         int n = out_refs.size();
         for (int i = 0; i < n; i++)
         {
-            set_ref(i, hpx::naming::invalid_id);
+            set_ref(i, hpx::invalid_id);
         }
     }
 
-    void collectable::incref_(unsigned int weight, hpx::naming::id_type id)
+    void collectable::incref_(unsigned int weight, hpx::id_type id)
     {
         hpx::async<server::collectable::incref_action>(id, weight).wait();
         state();
     }
-    void collectable::decref_(unsigned int weight, hpx::naming::id_type id)
+    void collectable::decref_(unsigned int weight, hpx::id_type id)
     {
         hpx::async<server::collectable::decref_action>(id, weight).wait();
         state();

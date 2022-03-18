@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -101,15 +101,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace naming { namespace detail {
+namespace hpx::naming::detail {
 
     struct gid_serialization_data;
-}}}    // namespace hpx::naming::detail
+}    // namespace hpx::naming::detail
 
 HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::detail::gid_serialization_data)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace naming {
+namespace hpx::naming {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -430,8 +430,8 @@ namespace hpx { namespace naming {
     namespace detail {
 
         // custom deleter for managed gid_types, will be called when the last
-        // copy of the corresponding naming::id_type goes out of scope
-        void gid_managed_deleter(id_type_impl* p)
+        // copy of the corresponding hpx::id_type goes out of scope
+        void gid_managed_deleter(id_type_impl* p) noexcept
         {
             // a credit of zero means the component is not (globally) reference
             // counted
@@ -448,8 +448,8 @@ namespace hpx { namespace naming {
         }
 
         // custom deleter for unmanaged gid_types, will be called when the last
-        // copy of the corresponding naming::id_type goes out of scope
-        void gid_unmanaged_deleter(id_type_impl* p)
+        // copy of the corresponding hpx::id_type goes out of scope
+        void gid_unmanaged_deleter(id_type_impl* p) noexcept
         {
             delete p;    // delete local gid representation only
         }
@@ -485,8 +485,10 @@ namespace hpx { namespace naming {
         {
             // unmanaged gids do not require any special handling
             // check-pointing does not require any special handling here neither
-            if (id_type::unmanaged == id_impl.get_management_type() ||
-                id_type::managed_move_credit == id_impl.get_management_type())
+            if (hpx::id_type::management_type::unmanaged ==
+                    id_impl.get_management_type() ||
+                hpx::id_type::management_type::managed_move_credit ==
+                    id_impl.get_management_type())
             {
                 return;
             }
@@ -515,7 +517,8 @@ namespace hpx { namespace naming {
 
             // Request new credits from AGAS if needed (i.e. the remainder
             // of the credit splitting is equal to one).
-            HPX_ASSERT(id_type::managed == id_impl.get_management_type());
+            HPX_ASSERT(hpx::id_type::management_type::managed ==
+                id_impl.get_management_type());
 
             handle_credit_splitting(
                 ar, const_cast<id_type_impl&>(id_impl), split_gids);
@@ -525,7 +528,7 @@ namespace hpx { namespace naming {
         struct gid_serialization_data
         {
             gid_type gid_;
-            id_type::management_type type_;
+            hpx::id_type::management_type type_;
 
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
@@ -542,7 +545,7 @@ namespace hpx { namespace naming {
         {
             // Avoid performing side effects if the archive is not saving the
             // data.
-            id_type::management_type type = id_impl.get_management_type();
+            hpx::id_type::management_type type = id_impl.get_management_type();
             if (ar.is_preprocessing())
             {
                 preprocess_gid(id_impl, ar);
@@ -552,7 +555,7 @@ namespace hpx { namespace naming {
                 return;
             }
 
-            if (id_type::unmanaged != type &&
+            if (hpx::id_type::management_type::unmanaged != type &&
                 ar.try_get_extra_data<util::checkpointing_tag>() != nullptr)
             {
                 // this is a check-pointing operation, we do not support this
@@ -562,15 +565,15 @@ namespace hpx { namespace naming {
             }
 
             gid_type new_gid;
-            if (id_type::unmanaged == type)
+            if (hpx::id_type::management_type::unmanaged == type)
             {
                 new_gid = id_impl;
             }
-            else if (id_type::managed_move_credit == type)
+            else if (hpx::id_type::management_type::managed_move_credit == type)
             {
                 // all credits will be moved to the returned gid
                 new_gid = move_gid(const_cast<id_type_impl&>(id_impl));
-                type = id_type::managed;
+                type = hpx::id_type::management_type::managed;
             }
             else
             {
@@ -597,8 +600,8 @@ namespace hpx { namespace naming {
             gid_serialization_data data;
             ar >> data;
 
-            if (id_type::unmanaged != data.type_ &&
-                id_type::managed != data.type_)
+            if (hpx::id_type::management_type::unmanaged != data.type_ &&
+                hpx::id_type::management_type::managed != data.type_)
             {
                 HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
                     "trying to load id_type with unknown deleter");
@@ -608,21 +611,6 @@ namespace hpx { namespace naming {
             id_impl.set_management_type(data.type_);
         }
     }    // namespace detail
-
-    ///////////////////////////////////////////////////////////////////////////
-    void save(
-        serialization::output_archive& ar, id_type const& id, unsigned int)
-    {
-        // We serialize the intrusive ptr and use pointer tracking here. This
-        // avoids multiple credit splitting if we need multiple future await
-        // passes (they all work on the same archive).
-        ar << id.impl();
-    }
-
-    void load(serialization::input_archive& ar, id_type& id, unsigned int)
-    {
-        ar >> id.impl();
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     // initialize AGAS interface function pointers in components_base module
@@ -636,4 +624,22 @@ namespace hpx { namespace naming {
 
     credit_interface_function credit_init;
 
-}}    // namespace hpx::naming
+}    // namespace hpx::naming
+
+namespace hpx {
+
+    ///////////////////////////////////////////////////////////////////////////
+    void save(
+        serialization::output_archive& ar, hpx::id_type const& id, unsigned int)
+    {
+        // We serialize the intrusive ptr and use pointer tracking here. This
+        // avoids multiple credit splitting if we need multiple future await
+        // passes (they all work on the same archive).
+        ar << id.impl();
+    }
+
+    void load(serialization::input_archive& ar, hpx::id_type& id, unsigned int)
+    {
+        ar >> id.impl();
+    }
+}    // namespace hpx

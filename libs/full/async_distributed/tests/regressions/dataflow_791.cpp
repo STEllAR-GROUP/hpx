@@ -129,7 +129,7 @@ int main(int argc, char* argv[])
 void LU(int numBlocks)
 {
     printf("LU\n");
-    hpx::naming::id_type here = hpx::find_here();
+    hpx::id_type here = hpx::find_here();
     vector<vector<block>> blockList;
     getBlockList(blockList, numBlocks);
     vector<vector<vector<shared_future<block>>>> dfArray(numBlocks);

@@ -38,7 +38,7 @@ namespace throttle
           : base_type(id)
         {}
 
-        throttle(hpx::future<hpx::naming::id_type> && gid)
+        throttle(hpx::future<hpx::id_type> && gid)
           : base_type(std::move(gid))
         {}
 

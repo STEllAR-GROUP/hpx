@@ -141,19 +141,19 @@ namespace hpx { namespace components { namespace detail {
         return gid;
     }
 
-    naming::id_type base_component::get_id(naming::gid_type gid) const
+    hpx::id_type base_component::get_id(naming::gid_type gid) const
     {
         // all credits should have been taken already
         HPX_ASSERT(!naming::detail::has_credits(gid));
 
         // any (subsequent) invocation causes the credits to be replenished
         agas::replenish_credits(gid);
-        return naming::id_type(gid, naming::id_type::managed);
+        return hpx::id_type(gid, hpx::id_type::management_type::managed);
     }
 
-    naming::id_type base_component::get_unmanaged_id(
+    hpx::id_type base_component::get_unmanaged_id(
         naming::gid_type const& gid) const
     {
-        return naming::id_type(gid, naming::id_type::managed);
+        return hpx::id_type(gid, hpx::id_type::management_type::managed);
     }
 }}}    // namespace hpx::components::detail

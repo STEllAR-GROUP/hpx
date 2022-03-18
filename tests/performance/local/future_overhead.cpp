@@ -134,7 +134,7 @@ HPX_PLAIN_ACTION(null_function, null_action)
 // Time async action execution using wait each on futures vector
 void measure_action_futures_wait_each(std::uint64_t count, bool csv)
 {
-    const hpx::naming::id_type here = hpx::find_here();
+    const hpx::id_type here = hpx::find_here();
     std::vector<future<double>> futures;
     futures.reserve(count);
 
@@ -152,7 +152,7 @@ void measure_action_futures_wait_each(std::uint64_t count, bool csv)
 // Time async action execution using wait each on futures vector
 void measure_action_futures_wait_all(std::uint64_t count, bool csv)
 {
-    const hpx::naming::id_type here = hpx::find_here();
+    const hpx::id_type here = hpx::find_here();
     std::vector<future<double>> futures;
     futures.reserve(count);
 

@@ -54,7 +54,7 @@ namespace hpx { namespace util {
             return names_[i];
         }
 
-        naming::id_type id(std::size_t i) const
+        hpx::id_type id(std::size_t i) const
         {
             return ids_[i];
         }
@@ -65,9 +65,9 @@ namespace hpx { namespace util {
         }
 
     private:
-        std::vector<std::string> names_;      // counter instance names
-        std::vector<naming::id_type> ids_;    // gids of counter instances
-        std::vector<std::string> uoms_;       // units of measure
+        std::vector<std::string> names_;    // counter instance names
+        std::vector<hpx::id_type> ids_;     // gids of counter instances
+        std::vector<std::string> uoms_;     // units of measure
     };
 }}    // namespace hpx::util
 

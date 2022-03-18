@@ -55,9 +55,8 @@ namespace hpx {
         }
 
         template <typename Action, typename... Ts>
-        inline bool put_parcel(naming::id_type const& id,
-            naming::address&& addr, threads::thread_priority priority,
-            Ts&&... vs)
+        inline bool put_parcel(hpx::id_type const& id, naming::address&& addr,
+            threads::thread_priority priority, Ts&&... vs)
         {
             typedef
                 typename hpx::traits::extract_action<Action>::type action_type;
@@ -70,7 +69,7 @@ namespace hpx {
         }
 
         template <typename Action, typename Continuation, typename... Ts>
-        inline bool put_parcel_cont(naming::id_type const& id,
+        inline bool put_parcel_cont(hpx::id_type const& id,
             naming::address&& addr, threads::thread_priority priority,
             Continuation&& cont, Ts&&... vs)
         {
@@ -86,7 +85,7 @@ namespace hpx {
         }
 
         template <typename Action, typename... Ts>
-        inline bool put_parcel_cb(naming::id_type const& id,
+        inline bool put_parcel_cb(hpx::id_type const& id,
             naming::address&& addr, threads::thread_priority priority,
             parcelset::write_handler_type const& cb, Ts&&... vs)
         {
@@ -101,7 +100,7 @@ namespace hpx {
         }
 
         template <typename Action, typename... Ts>
-        inline bool put_parcel_cb(naming::id_type const& id,
+        inline bool put_parcel_cb(hpx::id_type const& id,
             naming::address&& addr, threads::thread_priority priority,
             parcelset::write_handler_type&& cb, Ts&&... vs)
         {
@@ -117,7 +116,7 @@ namespace hpx {
         }
 
         template <typename Action, typename Continuation, typename... Ts>
-        inline bool put_parcel_cont_cb(naming::id_type const& id,
+        inline bool put_parcel_cont_cb(hpx::id_type const& id,
             naming::address&& addr, threads::thread_priority priority,
             Continuation&& cont, parcelset::write_handler_type const& cb,
             Ts&&... vs)
@@ -134,7 +133,7 @@ namespace hpx {
         }
 
         template <typename Action, typename Continuation, typename... Ts>
-        inline bool put_parcel_cont_cb(naming::id_type const& id,
+        inline bool put_parcel_cont_cb(hpx::id_type const& id,
             naming::address&& addr, threads::thread_priority priority,
             Continuation&& cont, parcelset::write_handler_type&& cb, Ts&&... vs)
         {
@@ -152,7 +151,7 @@ namespace hpx {
 
         // We know it is remote.
         template <typename Action, typename... Ts>
-        inline bool apply_r_p(naming::address&& addr, naming::id_type const& id,
+        inline bool apply_r_p(naming::address&& addr, hpx::id_type const& id,
             threads::thread_priority priority, Ts&&... vs)
         {
             // If remote, create a new parcel to be sent to the destination
@@ -163,7 +162,7 @@ namespace hpx {
 
         template <typename Action, typename... Ts>
         inline bool apply_r(
-            naming::address&& addr, naming::id_type const& gid, Ts&&... vs)
+            naming::address&& addr, hpx::id_type const& gid, Ts&&... vs)
         {
             return apply_r_p<Action>(HPX_MOVE(addr), gid,
                 actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
@@ -172,7 +171,7 @@ namespace hpx {
 
         // We know it is local and has to be directly executed.
         template <typename Action, typename... Ts>
-        inline bool apply_l_p(naming::id_type const& target,
+        inline bool apply_l_p(hpx::id_type const& target,
             naming::address&& addr, threads::thread_priority priority,
             Ts&&... vs)
         {
@@ -201,7 +200,7 @@ namespace hpx {
 
         // same as above, but taking all arguments by value
         template <typename Action, typename... Ts>
-        inline bool apply_l_p_val(naming::id_type const& target,
+        inline bool apply_l_p_val(hpx::id_type const& target,
             naming::address&& addr, threads::thread_priority priority, Ts... vs)
         {
             typedef
@@ -229,7 +228,7 @@ namespace hpx {
 
         template <typename Action, typename... Ts>
         inline bool apply_l(
-            naming::id_type const& target, naming::address&& addr, Ts&&... vs)
+            hpx::id_type const& target, naming::address&& addr, Ts&&... vs)
         {
             return apply_l_p<Action>(target, HPX_MOVE(addr),
                 actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
@@ -238,8 +237,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
-    inline bool apply_p(naming::id_type const& id,
-        threads::thread_priority priority, Ts&&... vs)
+    inline bool apply_p(
+        hpx::id_type const& id, threads::thread_priority priority, Ts&&... vs)
     {
         return hpx::detail::apply_impl<Action>(
             id, priority, HPX_FORWARD(Ts, vs)...);
@@ -279,7 +278,7 @@ namespace hpx {
                 typename... Ts>
             HPX_FORCEINLINE static bool call(
                 hpx::actions::basic_action<Component, Signature, Derived>,
-                naming::id_type const& id, Ts&&... ts)
+                hpx::id_type const& id, Ts&&... ts)
             {
                 return apply_p<Derived>(id, actions::action_priority<Derived>(),
                     HPX_FORWARD(Ts, ts)...);
@@ -320,7 +319,7 @@ namespace hpx {
     }    // namespace detail
 
     template <typename Action, typename... Ts>
-    inline bool apply(naming::id_type const& id, Ts&&... vs)
+    inline bool apply(hpx::id_type const& id, Ts&&... vs)
     {
         return apply_p<Action>(
             id, actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
@@ -356,7 +355,7 @@ namespace hpx {
 #if defined(HPX_HAVE_NETWORKING)
         template <typename Action, typename Continuation, typename... Ts>
         inline bool apply_r_p(naming::address&& addr, Continuation&& c,
-            naming::id_type const& id, threads::thread_priority priority,
+            hpx::id_type const& id, threads::thread_priority priority,
             Ts&&... vs)
         {
             // If remote, create a new parcel to be sent to the destination
@@ -369,7 +368,7 @@ namespace hpx {
         inline typename std::enable_if<
             traits::is_continuation<Continuation>::value, bool>::type
         apply_r(naming::address&& addr, Continuation&& c,
-            naming::id_type const& gid, Ts&&... vs)
+            hpx::id_type const& gid, Ts&&... vs)
         {
             return apply_r_p<Action>(HPX_MOVE(addr),
                 HPX_FORWARD(Continuation, c), gid,
@@ -378,7 +377,7 @@ namespace hpx {
 
         template <typename Action>
         inline bool apply_r_sync_p(naming::address&& addr,
-            naming::id_type const& id, threads::thread_priority priority)
+            hpx::id_type const& id, threads::thread_priority priority)
         {
             typedef
                 typename hpx::traits::extract_action<Action>::type action_type_;
@@ -386,7 +385,8 @@ namespace hpx {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             // Send the parcel through the parcel handler
-            HPX_ASSERT(id.get_management_type() == naming::id_type::unmanaged);
+            HPX_ASSERT(id.get_management_type() ==
+                hpx::id_type::management_type::unmanaged);
             naming::gid_type gid = id.get_gid();
             parcelset::parcel p = parcelset::detail::create_parcel::call(
                 HPX_MOVE(gid), complement_addr<action_type_>(addr),
@@ -403,7 +403,7 @@ namespace hpx {
 
         template <typename Action>
         inline bool apply_r_sync(
-            naming::address&& addr, naming::id_type const& gid)
+            naming::address&& addr, hpx::id_type const& gid)
         {
             return apply_r_sync_p<Action>(
                 HPX_MOVE(addr), gid, actions::action_priority<Action>());
@@ -412,9 +412,9 @@ namespace hpx {
 
         // We know it is local and has to be directly executed.
         template <typename Action, typename Continuation, typename... Ts>
-        inline bool apply_l_p(Continuation&& cont,
-            naming::id_type const& target, naming::address&& addr,
-            threads::thread_priority priority, Ts&&... vs)
+        inline bool apply_l_p(Continuation&& cont, hpx::id_type const& target,
+            naming::address&& addr, threads::thread_priority priority,
+            Ts&&... vs)
         {
             typedef
                 typename hpx::traits::extract_action<Action>::type action_type;
@@ -443,7 +443,7 @@ namespace hpx {
         template <typename Action, typename Continuation, typename... Ts>
         inline typename std::enable_if<
             traits::is_continuation<Continuation>::value, bool>::type
-        apply_l(Continuation&& c, naming::id_type const& target,
+        apply_l(Continuation&& c, hpx::id_type const& target,
             naming::address& addr, Ts&&... vs)
         {
             return apply_l_p<Action>(HPX_FORWARD(Continuation, c), target,
@@ -456,7 +456,7 @@ namespace hpx {
     template <typename Action, typename Continuation, typename... Ts>
     inline typename std::enable_if<traits::is_continuation<Continuation>::value,
         bool>::type
-    apply_p(Continuation&& c, naming::id_type const& gid,
+    apply_p(Continuation&& c, hpx::id_type const& gid,
         threads::thread_priority priority, Ts&&... vs)
     {
         return hpx::detail::apply_impl<Action>(HPX_FORWARD(Continuation, c),
@@ -505,7 +505,7 @@ namespace hpx {
                 typename... Ts>
             HPX_FORCEINLINE static bool call(Continuation&& c,
                 hpx::actions::basic_action<Component, Signature, Derived>,
-                naming::id_type const& id, Ts&&... ts)
+                hpx::id_type const& id, Ts&&... ts)
             {
                 return apply_p<Derived>(HPX_FORWARD(Continuation, c), id,
                     actions::action_priority<Derived>(),
@@ -551,7 +551,7 @@ namespace hpx {
     template <typename Action, typename Continuation, typename... Ts>
     inline typename std::enable_if<traits::is_continuation<Continuation>::value,
         bool>::type
-    apply(Continuation&& c, naming::id_type const& gid, Ts&&... vs)
+    apply(Continuation&& c, hpx::id_type const& gid, Ts&&... vs)
     {
         return apply_p<Action>(HPX_FORWARD(Continuation, c), gid,
             actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
@@ -593,7 +593,7 @@ namespace hpx {
     namespace applier { namespace detail {
         template <typename Action, typename... Ts>
         inline bool apply_c_p(naming::address&& addr,
-            naming::id_type const& contgid, naming::id_type const& gid,
+            hpx::id_type const& contgid, hpx::id_type const& gid,
             threads::thread_priority priority, Ts&&... vs)
         {
             typedef
@@ -610,9 +610,8 @@ namespace hpx {
         }
 
         template <typename Action, typename... Ts>
-        inline bool apply_c(naming::address&& addr,
-            naming::id_type const& contgid, naming::id_type const& gid,
-            Ts&&... vs)
+        inline bool apply_c(naming::address&& addr, hpx::id_type const& contgid,
+            hpx::id_type const& gid, Ts&&... vs)
         {
             typedef
                 typename hpx::traits::extract_action<Action>::local_result_type
@@ -632,9 +631,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
-    inline bool apply_c_p(naming::id_type const& contgid,
-        naming::id_type const& gid, threads::thread_priority priority,
-        Ts&&... vs)
+    inline bool apply_c_p(hpx::id_type const& contgid, hpx::id_type const& gid,
+        threads::thread_priority priority, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::local_result_type
             local_result_type;
@@ -649,7 +647,7 @@ namespace hpx {
 
     template <typename Action, typename... Ts>
     inline bool apply_c(
-        naming::id_type const& contgid, naming::id_type const& gid, Ts&&... vs)
+        hpx::id_type const& contgid, hpx::id_type const& gid, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::local_result_type
             local_result_type;
@@ -666,7 +664,7 @@ namespace hpx {
         typename... Ts>
     inline bool apply_c(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& contgid, naming::id_type const& gid, Ts&&... vs)
+        hpx::id_type const& contgid, hpx::id_type const& gid, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Derived>::local_result_type
             local_result_type;

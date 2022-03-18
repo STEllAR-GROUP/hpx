@@ -37,7 +37,7 @@ using hpx::future;
 
 using hpx::find_here;
 
-using hpx::naming::id_type;
+using hpx::id_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 struct callback

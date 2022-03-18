@@ -23,7 +23,7 @@ int test0()
 }
 HPX_PLAIN_ACTION(test0, test0_action)
 
-void bind_test0(hpx::naming::id_type id)
+void bind_test0(hpx::id_type id)
 {
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
@@ -34,7 +34,7 @@ void bind_test0(hpx::naming::id_type id)
     HPX_TEST_EQ(hpx::bind<test0_action>(_2)(41, id), 42);
 }
 
-void bind_test1(hpx::naming::id_type id)
+void bind_test1(hpx::id_type id)
 {
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
@@ -46,7 +46,7 @@ void bind_test1(hpx::naming::id_type id)
     HPX_TEST_EQ(hpx::bind(do_test0, _2)(41, id), 42);
 }
 
-void async_test0(hpx::naming::id_type id)
+void async_test0(hpx::id_type id)
 {
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
@@ -68,7 +68,7 @@ void async_test0(hpx::naming::id_type id)
     HPX_TEST_EQ(hpx::async<test0_action>(id).get(), 42);
 }
 
-void async_test1(hpx::naming::id_type id)
+void async_test1(hpx::id_type id)
 {
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
@@ -94,7 +94,7 @@ int test1(int i)
 }
 HPX_PLAIN_ACTION(test1, test1_action)
 
-void bind_test2(hpx::naming::id_type id)
+void bind_test2(hpx::id_type id)
 {
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
@@ -106,7 +106,7 @@ void bind_test2(hpx::naming::id_type id)
     HPX_TEST_EQ(hpx::bind<test1_action>(_2, _1)(42, id), 42);
 }
 
-void bind_test3(hpx::naming::id_type id)
+void bind_test3(hpx::id_type id)
 {
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
@@ -119,7 +119,7 @@ void bind_test3(hpx::naming::id_type id)
     HPX_TEST_EQ(hpx::bind(do_test1, _2, _1)(42, id), 42);
 }
 
-void async_test2(hpx::naming::id_type id)
+void async_test2(hpx::id_type id)
 {
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
@@ -144,7 +144,7 @@ void async_test2(hpx::naming::id_type id)
     HPX_TEST_EQ(hpx::async<test1_action>(id, 42).get(), 42);
 }
 
-void async_test3(hpx::naming::id_type id)
+void async_test3(hpx::id_type id)
 {
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
@@ -165,7 +165,7 @@ void async_test3(hpx::naming::id_type id)
     HPX_TEST_EQ(hpx::async(do_test1, id, 42).get(), 42);
 }
 
-void function_bind_test1(hpx::naming::id_type id)
+void function_bind_test1(hpx::id_type id)
 {
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
@@ -173,19 +173,17 @@ void function_bind_test1(hpx::naming::id_type id)
     hpx::function<int()> f1 = hpx::bind<test1_action>(id, 42);
     HPX_TEST_EQ(f1(), 42);
 
-    hpx::function<int(hpx::naming::id_type)> f2 =
-        hpx::bind<test1_action>(_1, 42);
+    hpx::function<int(hpx::id_type)> f2 = hpx::bind<test1_action>(_1, 42);
     HPX_TEST_EQ(f2(id), 42);
 
     hpx::function<int(int)> f3 = hpx::bind<test1_action>(id, _1);
     HPX_TEST_EQ(f3(42), 42);
 
-    hpx::function<int(hpx::naming::id_type, int)> f4 =
-        hpx::bind<test1_action>(_1, _2);
+    hpx::function<int(hpx::id_type, int)> f4 = hpx::bind<test1_action>(_1, _2);
     HPX_TEST_EQ(f4(id, 42), 42);
 }
 
-void function_bind_test2(hpx::naming::id_type id)
+void function_bind_test2(hpx::id_type id)
 {
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
@@ -194,30 +192,29 @@ void function_bind_test2(hpx::naming::id_type id)
     hpx::function<int()> f1 = hpx::bind(do_test1, id, 42);
     HPX_TEST_EQ(f1(), 42);
 
-    hpx::function<int(hpx::naming::id_type)> f2 = hpx::bind(do_test1, _1, 42);
+    hpx::function<int(hpx::id_type)> f2 = hpx::bind(do_test1, _1, 42);
     HPX_TEST_EQ(f2(id), 42);
 
     hpx::function<int(int)> f3 = hpx::bind(do_test1, id, _1);
     HPX_TEST_EQ(f3(42), 42);
 
-    hpx::function<int(hpx::naming::id_type, int)> f4 =
-        hpx::bind(do_test1, _1, _2);
+    hpx::function<int(hpx::id_type, int)> f4 = hpx::bind(do_test1, _1, _2);
     HPX_TEST_EQ(f4(id, 42), 42);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int test2(hpx::distributed::function<int(hpx::naming::id_type)> f)
+int test2(hpx::distributed::function<int(hpx::id_type)> f)
 {
     return f(hpx::find_here());
 }
 HPX_PLAIN_ACTION(test2, test2_action)
 
-void function_bind_test3(hpx::naming::id_type id)
+void function_bind_test3(hpx::id_type id)
 {
     using hpx::placeholders::_1;
     test1_action do_test1;
 
-    hpx::distributed::function<int(hpx::naming::id_type)> f1 =
+    hpx::distributed::function<int(hpx::id_type)> f1 =
         hpx::bind(do_test1, _1, 42);
 
     test2_action do_test2;
@@ -226,11 +223,11 @@ void function_bind_test3(hpx::naming::id_type id)
     HPX_TEST_EQ(f2(), 42);
 }
 
-void function_bind_test4(hpx::naming::id_type id)
+void function_bind_test4(hpx::id_type id)
 {
     using hpx::placeholders::_1;
 
-    hpx::distributed::function<int(hpx::naming::id_type)> f1 =
+    hpx::distributed::function<int(hpx::id_type)> f1 =
         hpx::bind<test1_action>(_1, 42);
 
     hpx::function<int()> f2 = hpx::bind<test2_action>(id, f1);
@@ -245,7 +242,7 @@ int test3(hpx::distributed::function<int()> f)
 }
 HPX_PLAIN_ACTION(test3, test3_action)
 
-void function_bind_test5(hpx::naming::id_type id)
+void function_bind_test5(hpx::id_type id)
 {
     hpx::distributed::function<int()> f1 =
         hpx::bind<test1_action>(hpx::find_here(), 42);
@@ -255,7 +252,7 @@ void function_bind_test5(hpx::naming::id_type id)
     HPX_TEST_EQ(f2(), 42);
 }
 
-void function_bind_test6(hpx::naming::id_type id)
+void function_bind_test6(hpx::id_type id)
 {
     test1_action do_test1;
     hpx::distributed::function<int()> f1 =
@@ -316,7 +313,7 @@ void member_bind_test1()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void run_tests(hpx::naming::id_type id)
+void run_tests(hpx::id_type id)
 {
     bind_test0(id);
     bind_test1(id);
@@ -346,8 +343,8 @@ void run_local_tests()
 int hpx_main(hpx::program_options::variables_map&)
 {
     // run the test on all localities
-    std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
-    for (hpx::naming::id_type const& id : localities)
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    for (hpx::id_type const& id : localities)
         run_tests(id);
 
     // run local tests

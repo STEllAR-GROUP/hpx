@@ -45,7 +45,7 @@ struct inc
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    std::vector<hpx::naming::id_type> localities = hpx::find_remote_localities();
+    std::vector<hpx::id_type> localities = hpx::find_remote_localities();
 
     if (localities.empty())
     {

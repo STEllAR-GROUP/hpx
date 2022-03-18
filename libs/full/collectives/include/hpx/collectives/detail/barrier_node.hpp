@@ -61,7 +61,7 @@ namespace hpx { namespace distributed { namespace detail {
     private:
         hpx::util::atomic_count count_;
 
-        std::vector<naming::id_type> children_;
+        std::vector<hpx::id_type> children_;
 
     public:
         std::string base_name_;

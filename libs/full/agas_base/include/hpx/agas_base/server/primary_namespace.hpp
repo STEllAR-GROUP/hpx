@@ -40,7 +40,7 @@
 namespace hpx { namespace agas {
 
     HPX_EXPORT naming::gid_type bootstrap_primary_namespace_gid();
-    HPX_EXPORT naming::id_type bootstrap_primary_namespace_id();
+    HPX_EXPORT hpx::id_type bootstrap_primary_namespace_id();
 }}    // namespace hpx::agas
 
 /// \brief AGAS's primary namespace maps 128-bit global identifiers (GIDs) to
@@ -270,13 +270,13 @@ namespace hpx::agas::server {
             naming::gid_type const& locality);
 
         // API
-        std::pair<naming::id_type, naming::address> begin_migration(
+        std::pair<hpx::id_type, naming::address> begin_migration(
             naming::gid_type id);
         bool end_migration(naming::gid_type const& id);
 
         resolved_type resolve_gid(naming::gid_type const& id);
 
-        naming::id_type colocate(naming::gid_type const& id);
+        hpx::id_type colocate(naming::gid_type const& id);
 
         naming::address unbind_gid(std::uint64_t count, naming::gid_type id);
 
@@ -424,8 +424,7 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
 typedef hpx::tuple<hpx::naming::gid_type, hpx::agas::gva, hpx::naming::gid_type>
     gva_tuple_type;
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(gva_tuple_type, gva_tuple)
-typedef std::pair<hpx::naming::id_type, hpx::naming::address>
-    std_pair_address_id_type;
+typedef std::pair<hpx::id_type, hpx::naming::address> std_pair_address_id_type;
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std_pair_address_id_type, std_pair_address_id_type)
 typedef std::pair<hpx::naming::gid_type, hpx::naming::gid_type>

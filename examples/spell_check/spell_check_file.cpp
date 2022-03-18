@@ -211,7 +211,7 @@ int hpx_main()
             {
                 string& single = strs[i];
                 int start = 0;
-                hpx::naming::id_type const locality_id = hpx::find_here();
+                hpx::id_type const locality_id = hpx::find_here();
                 search_action temp;
                 wordRun.push_back(async(temp, locality_id, start, wordcount, single));
                 sAct.push_back(temp);

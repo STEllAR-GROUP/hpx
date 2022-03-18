@@ -70,7 +70,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // Keep track of the time required to execute.
     hpx::chrono::high_resolution_timer t;
 
-    std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
     std::vector<double> probabilities(localities.size());
     probabilities[0] = 1.0;
 

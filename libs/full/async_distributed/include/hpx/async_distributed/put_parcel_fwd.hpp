@@ -39,7 +39,7 @@ namespace hpx::parcelset {
         struct put_parcel_cont
         {
             std::decay_t<PutParcel> pp;
-            naming::id_type dest;
+            hpx::id_type dest;
             naming::address addr;
             std::unique_ptr<actions::base_action> action;
 
@@ -47,17 +47,17 @@ namespace hpx::parcelset {
         };
 
         template <typename PutParcel>
-        void put_parcel_impl(PutParcel&& pp, naming::id_type dest,
+        void put_parcel_impl(PutParcel&& pp, hpx::id_type dest,
             naming::address&& addr,
             std::unique_ptr<actions::base_action>&& action);
     }    // namespace detail
 
     template <typename... Args>
     void put_parcel(
-        naming::id_type const& dest, naming::address&& addr, Args&&... args);
+        hpx::id_type const& dest, naming::address&& addr, Args&&... args);
 
     template <typename Callback, typename... Args>
-    void put_parcel_cb(Callback&& cb, naming::id_type const& dest,
+    void put_parcel_cb(Callback&& cb, hpx::id_type const& dest,
         naming::address&& addr, Args&&... args);
 }    // namespace hpx::parcelset
 

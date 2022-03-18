@@ -70,7 +70,7 @@ HPX_PLAIN_DIRECT_ACTION(message_double)
 
 ///////////////////////////////////////////////////////////////////////////////
 double receive_double(
-    hpx::naming::id_type dest, std::size_t loop, std::size_t window_size)
+    hpx::id_type dest, std::size_t loop, std::size_t window_size)
 {
     std::size_t skip = SKIP_LARGE;
 
@@ -98,7 +98,7 @@ double receive_double(
     double elapsed = t.elapsed();
     return (elapsed * 1e6) / static_cast<double>(2 * loop * window_size);
 }
-double receive(hpx::naming::id_type dest, char* send_buffer, std::size_t size,
+double receive(hpx::id_type dest, char* send_buffer, std::size_t size,
     std::size_t loop, std::size_t window_size)
 {
     std::size_t skip = SKIP_LARGE;

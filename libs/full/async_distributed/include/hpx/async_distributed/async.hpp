@@ -66,7 +66,7 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename hpx::traits::
                     extract_action<Action>::remote_result_type>::type>
-        call(Policy_&& launch_policy, naming::id_type const& id, Ts&&... ts)
+        call(Policy_&& launch_policy, hpx::id_type const& id, Ts&&... ts)
         {
             return hpx::detail::async_impl<Action>(
                 HPX_FORWARD(Policy_, launch_policy), id,
@@ -115,15 +115,15 @@ namespace hpx { namespace detail {
         }
     };
 
-    // naming::id_type
+    // hpx::id_type
     template <typename Action>
-    struct async_action_dispatch<Action, naming::id_type>
+    struct async_action_dispatch<Action, hpx::id_type>
     {
         template <typename... Ts>
         HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename hpx::traits::
                     extract_action<Action>::remote_result_type>::type>
-        call(naming::id_type const& id, Ts&&... ts)
+        call(hpx::id_type const& id, Ts&&... ts)
         {
             return async_action_dispatch<Action,
                 hpx::detail::async_policy>::call(launch::async, id,
@@ -215,7 +215,7 @@ namespace hpx { namespace detail {
             typename traits::promise_local_result<typename hpx::traits::
                     extract_action<Derived>::remote_result_type>::type>
         call(hpx::actions::basic_action<Component, Signature, Derived> const&,
-            naming::id_type const& id, Ts&&... vs)
+            hpx::id_type const& id, Ts&&... vs)
         {
             return async<Derived>(launch::async, id, HPX_FORWARD(Ts, vs)...);
         }

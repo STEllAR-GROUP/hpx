@@ -94,7 +94,7 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
     {
         // create component on given locality
         test_client t1(source);
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
         // the new object should live on the source locality
         HPX_TEST_EQ(t1.call(), source);
@@ -106,7 +106,7 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
         {
             // migrate of t1 to the target storage
             test_client t2(hpx::components::migrate_to_storage(t1, storage));
-            HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_id());
+            HPX_TEST_EQ(hpx::invalid_id, t2.get_id());
         }
         catch (hpx::exception const&)
         {
@@ -115,7 +115,8 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
 
         HPX_TEST_EQ(storage.size(hpx::launch::sync), std::size_t(1));
 
-        // make sure all local references go out of scope if t == unmanaged
+        // make sure all local references go out of scope if t ==
+        // management_type::unmanaged
     }
 
     HPX_TEST_EQ(storage.size(hpx::launch::sync), std::size_t(1));
@@ -145,7 +146,7 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
     {
         // create component on given locality
         test_client t1(source);
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
         // the new object should live on the source locality
         HPX_TEST_EQ(t1.call(), source);
@@ -157,7 +158,7 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
         {
             // migrate of t1 to the target storage
             test_client t2(hpx::components::migrate_to_storage(t1, storage));
-            HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_id());
+            HPX_TEST_EQ(hpx::invalid_id, t2.get_id());
         }
         catch (hpx::exception const&)
         {
@@ -166,7 +167,8 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
 
         HPX_TEST_EQ(storage.size(hpx::launch::sync), std::size_t(1));
 
-        // make sure all local references go out of scope if t == unmanaged
+        // make sure all local references go out of scope if t ==
+        // management_type::unmanaged
     }
 
     HPX_TEST_EQ(storage.size(hpx::launch::sync), std::size_t(1));
@@ -196,7 +198,7 @@ bool test_migrate_component_from_storage(
     {
         // create component on given locality
         test_client t1(source);
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
         // the new object should live on the source locality
         HPX_TEST_EQ(t1.call(), source);
@@ -208,7 +210,7 @@ bool test_migrate_component_from_storage(
         {
             // migrate of t1 to the target storage
             test_client t2(hpx::components::migrate_to_storage(t1, storage));
-            HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_id());
+            HPX_TEST_EQ(hpx::invalid_id, t2.get_id());
         }
         catch (hpx::exception const&)
         {
@@ -240,17 +242,17 @@ void test_storage(hpx::id_type const& here, hpx::id_type const& there)
 {
     // create a new storage instance
     hpx::components::component_storage storage(here);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, storage.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, storage.get_id());
 
     HPX_TEST(test_migrate_component_to_storage(
-        here, storage, hpx::id_type::unmanaged));
+        here, storage, hpx::id_type::management_type::unmanaged));
     HPX_TEST(test_migrate_component_to_storage(
-        here, storage, hpx::id_type::managed));
+        here, storage, hpx::id_type::management_type::managed));
 
     HPX_TEST(test_migrate_component_to_storage(
-        here, there, storage, hpx::id_type::unmanaged));
+        here, there, storage, hpx::id_type::management_type::unmanaged));
     HPX_TEST(test_migrate_component_to_storage(
-        here, there, storage, hpx::id_type::managed));
+        here, there, storage, hpx::id_type::management_type::managed));
 
     //     HPX_TEST(test_migrate_component_from_storage(here, storage));
 }

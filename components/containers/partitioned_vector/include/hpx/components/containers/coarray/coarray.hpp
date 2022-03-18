@@ -124,17 +124,16 @@ namespace hpx {
         using base_type = partitioned_vector_view<T, N, Data>;
         using indices = typename hpx::util::make_index_pack<N>::type;
 
-        std::vector<hpx::naming::id_type> get_unrolled_localities(
-            std::vector<hpx::naming::id_type> const& in,
-            std::size_t num_segments, std::size_t unroll)
+        std::vector<hpx::id_type> get_unrolled_localities(
+            std::vector<hpx::id_type> const& in, std::size_t num_segments,
+            std::size_t unroll)
         {
-            using iterator =
-                typename std::vector<hpx::naming::id_type>::iterator;
+            using iterator = typename std::vector<hpx::id_type>::iterator;
 
             using const_iterator =
-                typename std::vector<hpx::naming::id_type>::const_iterator;
+                typename std::vector<hpx::id_type>::const_iterator;
 
-            std::vector<hpx::naming::id_type> out(num_segments);
+            std::vector<hpx::id_type> out(num_segments);
 
             iterator o_end = out.end();
             const_iterator i_begin = in.cbegin();

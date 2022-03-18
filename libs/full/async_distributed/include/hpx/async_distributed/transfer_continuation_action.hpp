@@ -88,12 +88,12 @@ namespace hpx { namespace actions {
         ///       continuations.
         template <std::size_t... Is>
         threads::thread_function_type get_thread_function(
-            util::index_pack<Is...>, naming::id_type&& target,
+            util::index_pack<Is...>, hpx::id_type&& target,
             naming::address::address_type lva,
             naming::address::component_type comptype);
 
-        threads::thread_function_type get_thread_function(
-            naming::id_type&& target, naming::address::address_type lva,
+        threads::thread_function_type get_thread_function(hpx::id_type&& target,
+            naming::address::address_type lva,
             naming::address::component_type comptype) override;
 
         template <std::size_t... Is>
@@ -153,7 +153,7 @@ namespace hpx { namespace actions {
     template <std::size_t... Is>
     threads::thread_function_type
     transfer_continuation_action<Action>::get_thread_function(
-        util::index_pack<Is...>, naming::id_type&& target,
+        util::index_pack<Is...>, hpx::id_type&& target,
         naming::address::address_type lva,
         naming::address::component_type comptype)
     {
@@ -165,7 +165,7 @@ namespace hpx { namespace actions {
     template <typename Action>
     threads::thread_function_type
     transfer_continuation_action<Action>::get_thread_function(
-        naming::id_type&& target, naming::address::address_type lva,
+        hpx::id_type&& target, naming::address::address_type lva,
         naming::address::component_type comptype)
     {
         return get_thread_function(
@@ -180,10 +180,11 @@ namespace hpx { namespace actions {
         naming::address::address_type lva,
         naming::address::component_type comptype, std::size_t /*num_thread*/)
     {
-        naming::id_type target;
+        hpx::id_type target;
         if (naming::detail::has_credits(target_gid))
         {
-            target = naming::id_type(target_gid, naming::id_type::managed);
+            target = hpx::id_type(
+                target_gid, hpx::id_type::management_type::managed);
         }
 
         threads::thread_init_data data;

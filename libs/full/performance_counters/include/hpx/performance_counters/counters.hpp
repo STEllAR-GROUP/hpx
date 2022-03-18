@@ -392,20 +392,20 @@ namespace hpx { namespace performance_counters {
             info, create_counter_func(), discover_counters_func(), ec);
     }
 
-    inline naming::id_type get_counter(std::string const& name, error_code& ec)
+    inline hpx::id_type get_counter(std::string const& name, error_code& ec)
     {
-        hpx::future<naming::id_type> f = get_counter_async(name, ec);
+        hpx::future<hpx::id_type> f = get_counter_async(name, ec);
         if (ec)
-            return naming::invalid_id;
+            return hpx::invalid_id;
 
         return f.get(ec);
     }
 
-    inline naming::id_type get_counter(counter_info const& info, error_code& ec)
+    inline hpx::id_type get_counter(counter_info const& info, error_code& ec)
     {
-        hpx::future<naming::id_type> f = get_counter_async(info, ec);
+        hpx::future<hpx::id_type> f = get_counter_async(info, ec);
         if (ec)
-            return naming::invalid_id;
+            return hpx::invalid_id;
 
         return f.get(ec);
     }

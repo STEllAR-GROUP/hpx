@@ -31,10 +31,10 @@ namespace hpx::distributed {
     ///
     /// \code
     ///     // Create the promise (the expected result is a id_type)
-    ///     lcos::promise<naming::id_type> p;
+    ///     hpx::distributed::promise<hpx::id_type> p;
     ///
     ///     // Get the associated future
-    ///     future<naming::id_type> f = p.get_future();
+    ///     future<hpx::id_type> f = p.get_future();
     ///
     ///     // initiate the action supplying the promise as a
     ///     // continuation
@@ -42,7 +42,7 @@ namespace hpx::distributed {
     ///
     ///     // Wait for the result to be returned, yielding control
     ///     // in the meantime.
-    ///     naming::id_type result = f.get();
+    ///     hpx::id_type result = f.get();
     ///     // ...
     /// \endcode
     ///

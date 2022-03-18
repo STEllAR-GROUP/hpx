@@ -11,7 +11,7 @@
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace naming {
+namespace hpx::naming {
 
     template <typename Archive>
     void address::save(Archive& ar, unsigned int /* version */) const
@@ -37,4 +37,4 @@ namespace hpx { namespace naming {
 
     template HPX_EXPORT void address::load(
         serialization::input_archive&, unsigned int);
-}}    // namespace hpx::naming
+}    // namespace hpx::naming

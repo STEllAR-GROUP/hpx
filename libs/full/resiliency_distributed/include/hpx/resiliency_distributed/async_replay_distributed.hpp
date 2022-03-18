@@ -49,14 +49,13 @@ namespace hpx { namespace resiliency { namespace experimental {
 
             template <std::size_t... Is>
             hpx::future<Result> invoke_distributed(
-                hpx::naming::id_type id, hpx::util::index_pack<Is...>)
+                hpx::id_type id, hpx::util::index_pack<Is...>)
             {
                 return hpx::async(action_, id, std::get<Is>(t_)...);
             }
 
             hpx::future<Result> call(
-                const std::vector<hpx::naming::id_type>& ids,
-                std::size_t iteration = 0)
+                const std::vector<hpx::id_type>& ids, std::size_t iteration = 0)
             {
                 hpx::future<Result> f = invoke_distributed(ids.at(iteration),
                     hpx::util::make_index_pack<
@@ -143,15 +142,15 @@ namespace hpx { namespace resiliency { namespace experimental {
     // abort_replay_exception is thrown).
     template <typename Action, typename... Ts>
     hpx::future<typename hpx::util::detail::invoke_deferred_result<Action,
-        hpx::naming::id_type, Ts...>::type>
-    tag_invoke(async_replay_t, const std::vector<hpx::naming::id_type>& ids,
+        hpx::id_type, Ts...>::type>
+    tag_invoke(async_replay_t, const std::vector<hpx::id_type>& ids,
         Action&& action, Ts&&... ts)
     {
         HPX_ASSERT(ids.size() > 0);
 
         using result_type =
             typename hpx::util::detail::invoke_deferred_result<Action,
-                hpx::naming::id_type, Ts...>::type;
+                hpx::id_type, Ts...>::type;
 
         auto helper = detail::make_distributed_async_replay_helper<result_type>(
             detail::replay_validator{}, HPX_FORWARD(Action, action),
@@ -166,16 +165,15 @@ namespace hpx { namespace resiliency { namespace experimental {
     // abort_replay_exception is thrown).
     template <typename Pred, typename Action, typename... Ts>
     hpx::future<typename hpx::util::detail::invoke_deferred_result<Action,
-        hpx::naming::id_type, Ts...>::type>
-    tag_invoke(async_replay_validate_t,
-        const std::vector<hpx::naming::id_type>& ids, Pred&& pred,
-        Action&& action, Ts&&... ts)
+        hpx::id_type, Ts...>::type>
+    tag_invoke(async_replay_validate_t, const std::vector<hpx::id_type>& ids,
+        Pred&& pred, Action&& action, Ts&&... ts)
     {
         HPX_ASSERT(ids.size() > 0);
 
         using result_type =
             typename hpx::util::detail::invoke_deferred_result<Action,
-                hpx::naming::id_type, Ts...>::type;
+                hpx::id_type, Ts...>::type;
 
         auto helper = detail::make_distributed_async_replay_helper<result_type>(
             HPX_FORWARD(Pred, pred), HPX_FORWARD(Action, action),

@@ -99,11 +99,12 @@ namespace hpx::parcelset {
         }
 
         template <typename PutParcel>
-        void put_parcel_impl(PutParcel&& pp, naming::id_type dest,
+        void put_parcel_impl(PutParcel&& pp, hpx::id_type dest,
             naming::address&& addr,
             std::unique_ptr<actions::base_action>&& action)
         {
-            if (dest.get_management_type() == naming::id_type::unmanaged)
+            if (dest.get_management_type() ==
+                hpx::id_type::management_type::unmanaged)
             {
                 naming::gid_type gid = dest.get_gid();
                 naming::detail::strip_credits_from_gid(gid);
@@ -115,7 +116,7 @@ namespace hpx::parcelset {
                     HPX_MOVE(gid), HPX_MOVE(addr), HPX_MOVE(action)));
             }
             else if (dest.get_management_type() ==
-                naming::id_type::managed_move_credit)
+                hpx::id_type::management_type::managed_move_credit)
             {
                 naming::gid_type gid = naming::detail::move_gid(dest.get_gid());
 
@@ -166,7 +167,7 @@ namespace hpx::parcelset {
 
     template <typename... Args>
     void put_parcel(
-        naming::id_type const& dest, naming::address&& addr, Args&&... args)
+        hpx::id_type const& dest, naming::address&& addr, Args&&... args)
     {
         detail::put_parcel_impl(detail::put_parcel_handler(), dest,
             HPX_MOVE(addr),
@@ -174,7 +175,7 @@ namespace hpx::parcelset {
     }
 
     template <typename Callback, typename... Args>
-    void put_parcel_cb(Callback&& cb, naming::id_type const& dest,
+    void put_parcel_cb(Callback&& cb, hpx::id_type const& dest,
         naming::address&& addr, Args&&... args)
     {
         detail::put_parcel_impl(

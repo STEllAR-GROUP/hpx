@@ -60,7 +60,7 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 bool test_get_ptr1(hpx::id_type id)
 {
     test_client t = hpx::new_<test_client>(id);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t.get_id());
 
     try
     {
@@ -83,7 +83,7 @@ bool test_get_ptr1(hpx::id_type id)
 bool test_get_ptr2(hpx::id_type id)
 {
     test_client t = hpx::new_<test_client>(id);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t.get_id());
 
     hpx::future<std::shared_ptr<test_server>> f =
         hpx::get_ptr<test_server>(t.get_id());
@@ -110,7 +110,7 @@ bool test_get_ptr2(hpx::id_type id)
 bool test_get_ptr3(hpx::id_type id)
 {
     test_client t = hpx::new_<test_client>(id);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t.get_id());
 
     try
     {
@@ -131,7 +131,7 @@ bool test_get_ptr3(hpx::id_type id)
 bool test_get_ptr4(hpx::id_type id)
 {
     test_client t = hpx::new_<test_client>(id);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t.get_id());
 
     hpx::future<std::shared_ptr<test_server>> f = hpx::get_ptr(t);
     f.wait();

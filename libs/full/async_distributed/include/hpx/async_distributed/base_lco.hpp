@@ -34,10 +34,10 @@ namespace hpx { namespace lcos {
         virtual void set_exception(std::exception_ptr const& e);
 
         // noop by default
-        virtual void connect(naming::id_type const&);
+        virtual void connect(hpx::id_type const&);
 
         // noop by default
-        virtual void disconnect(naming::id_type const&);
+        virtual void disconnect(hpx::id_type const&);
 
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this
@@ -77,7 +77,7 @@ namespace hpx { namespace lcos {
         /// overloaded by the derived concrete LCO.
         ///
         /// \param id [in] target id
-        void connect_nonvirt(naming::id_type const& id);
+        void connect_nonvirt(hpx::id_type const& id);
 
         /// The \a function disconnect_nonvirt is called whenever a
         /// \a disconnect_action is applied on a instance of a LCO. This function
@@ -85,7 +85,7 @@ namespace hpx { namespace lcos {
         /// overloaded by the derived concrete LCO.
         ///
         /// \param id [in] target id
-        void disconnect_nonvirt(naming::id_type const& id);
+        void disconnect_nonvirt(hpx::id_type const& id);
 
     public:
         /// Each of the exposed functions needs to be encapsulated into an action

@@ -58,8 +58,8 @@ namespace hpx { namespace components { namespace server {
         }
 
         // apply remotely (only if runtime is not stopping)
-        naming::id_type id = get_colocation_id(
-            launch::sync, naming::id_type(gid, naming::id_type::unmanaged));
+        hpx::id_type id = get_colocation_id(launch::sync,
+            hpx::id_type(gid, hpx::id_type::management_type::unmanaged));
 
         hpx_destroy_component_action()(id, gid, addr);
     }

@@ -24,9 +24,9 @@ using hpx::finalize;
 using hpx::find_here;
 using hpx::init;
 
+using hpx::id_type;
 using hpx::naming::address;
 using hpx::naming::gid_type;
-using hpx::naming::id_type;
 using hpx::naming::detail::get_stripped_gid;
 
 using hpx::util::report_errors;

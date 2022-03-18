@@ -70,7 +70,7 @@ namespace hpx { namespace detail {
         // id_type
         template <typename Policy_, typename... Ts>
         HPX_FORCEINLINE static sync_result_t<Action> call(
-            Policy_&& launch_policy, naming::id_type const& id, Ts&&... ts)
+            Policy_&& launch_policy, hpx::id_type const& id, Ts&&... ts)
         {
             return hpx::detail::sync_impl<Action>(
                 HPX_FORWARD(Policy_, launch_policy), id,
@@ -109,13 +109,13 @@ namespace hpx { namespace detail {
         }
     };
 
-    // naming::id_type
+    // hpx::id_type
     template <typename Action>
-    struct sync_action_dispatch<Action, naming::id_type>
+    struct sync_action_dispatch<Action, hpx::id_type>
     {
         template <typename... Ts>
         HPX_FORCEINLINE static decltype(auto) call(
-            naming::id_type const& id, Ts&&... ts)
+            hpx::id_type const& id, Ts&&... ts)
         {
             return sync_action_dispatch<Action, hpx::detail::sync_policy>::call(
                 launch::sync, id, HPX_FORWARD(Ts, ts)...);
@@ -176,7 +176,7 @@ namespace hpx { namespace detail {
             typename... Ts>
         HPX_FORCEINLINE static decltype(auto) call(
             hpx::actions::basic_action<Component, Signature, Derived> const&,
-            naming::id_type const& id, Ts&&... vs)
+            hpx::id_type const& id, Ts&&... vs)
         {
             return sync<Derived>(launch::sync, id, HPX_FORWARD(Ts, vs)...);
         }

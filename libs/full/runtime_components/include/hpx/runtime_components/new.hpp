@@ -323,7 +323,7 @@ namespace hpx { namespace components {
 
                 hpx::id_type id(components::server::create<component_type>(
                                     HPX_FORWARD(Ts, ts)...),
-                    hpx::id_type::managed);
+                    hpx::id_type::management_type::managed);
                 return hpx::make_ready_future(HPX_MOVE(id));
             }
         };
@@ -345,7 +345,7 @@ namespace hpx { namespace components {
                 {
                     result.push_back(hpx::id_type(
                         components::server::create<component_type>(ts...),
-                        hpx::id_type::managed));
+                        hpx::id_type::management_type::managed));
                 }
 
                 return hpx::make_ready_future(result);
@@ -365,7 +365,7 @@ namespace hpx { namespace components {
 
                 hpx::id_type id(components::server::create<component_type>(
                                     HPX_FORWARD(Ts, ts)...),
-                    hpx::id_type::managed);
+                    hpx::id_type::management_type::managed);
 
                 return id;
             }
@@ -388,7 +388,7 @@ namespace hpx { namespace components {
                 {
                     result.push_back(hpx::id_type(
                         components::server::create<component_type>(ts...),
-                        hpx::id_type::managed));
+                        hpx::id_type::management_type::managed));
                 }
 
                 return result;
@@ -485,7 +485,7 @@ namespace hpx { namespace components {
             {
                 hpx::id_type id(components::server::create<component_type>(
                                     HPX_FORWARD(Ts, ts)...),
-                    hpx::id_type::managed);
+                    hpx::id_type::management_type::managed);
                 return make_client<Client>(HPX_MOVE(id));
             }
         };

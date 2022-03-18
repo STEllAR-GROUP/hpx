@@ -25,7 +25,7 @@ using hpx::test::non_movable_object;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename Object>
-std::size_t pass_object(hpx::naming::id_type id)
+std::size_t pass_object(hpx::id_type id)
 {
     using hpx::test::action_move_semantics;
 
@@ -39,7 +39,7 @@ std::size_t pass_object(hpx::naming::id_type id)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename Object>
-std::size_t move_object(hpx::naming::id_type id)
+std::size_t move_object(hpx::id_type id)
 {
     using hpx::test::action_move_semantics;
 
@@ -53,7 +53,7 @@ std::size_t move_object(hpx::naming::id_type id)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename Object>
-std::size_t return_object(hpx::naming::id_type id)
+std::size_t return_object(hpx::id_type id)
 {
     using hpx::test::action_move_semantics;
 
@@ -65,7 +65,7 @@ std::size_t return_object(hpx::naming::id_type id)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename Object>
-std::size_t return_move_object(hpx::naming::id_type id)
+std::size_t return_move_object(hpx::id_type id)
 {
     using hpx::test::action_move_semantics;
 
@@ -80,8 +80,8 @@ void test_actions()
 {
     using hpx::test::server::action_move_semantics;
 
-    std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
-    for (hpx::naming::id_type const& id : localities)
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    for (hpx::id_type const& id : localities)
     {
         bool is_local = id == hpx::find_here();
 
@@ -185,8 +185,8 @@ void test_direct_actions()
 {
     using hpx::test::server::action_move_semantics;
 
-    std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
-    for (hpx::naming::id_type const& id : localities)
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    for (hpx::id_type const& id : localities)
     {
         bool is_local = id == hpx::find_here();
 

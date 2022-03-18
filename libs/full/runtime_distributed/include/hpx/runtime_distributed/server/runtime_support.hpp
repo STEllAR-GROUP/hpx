@@ -110,7 +110,7 @@ namespace hpx { namespace components { namespace server {
 
         // This component type requires valid locality id for its actions to
         // be invoked
-        static bool is_target_valid(naming::id_type const& id)
+        static bool is_target_valid(hpx::id_type const& id)
         {
             return naming::is_locality(id);
         }
@@ -138,18 +138,18 @@ namespace hpx { namespace components { namespace server {
 
         template <typename Component>
         naming::gid_type migrate_component_to_here(
-            std::shared_ptr<Component> const& p, naming::id_type);
+            std::shared_ptr<Component> const& p, hpx::id_type);
 
         /// \brief Gracefully shutdown this runtime system instance
-        void shutdown(double timeout, naming::id_type const& respond_to);
+        void shutdown(double timeout, hpx::id_type const& respond_to);
 
         /// \brief Gracefully shutdown runtime system instances on all localities
         void shutdown_all(double timeout);
 
         /// \brief Shutdown this runtime system instance
-        [[noreturn]] void terminate(naming::id_type const& respond_to);
+        [[noreturn]] void terminate(hpx::id_type const& respond_to);
 
-        void terminate_act(naming::id_type const& id)
+        void terminate_act(hpx::id_type const& id)
         {
             terminate(id);
         }
@@ -234,7 +234,7 @@ namespace hpx { namespace components { namespace server {
         ///        be properly stopped.
         ///
         /// \note      This function can be called from any thread.
-        void stop(double timeout, naming::id_type const& respond_to,
+        void stop(double timeout, hpx::id_type const& respond_to,
             bool remove_from_remote_caches);
 
         /// called locally only
@@ -329,7 +329,7 @@ namespace hpx { namespace components { namespace server {
 
         // the name says it all
         std::size_t dijkstra_termination_detection(
-            std::vector<naming::id_type> const& locality_ids);
+            std::vector<hpx::id_type> const& locality_ids);
 
 #if defined(HPX_HAVE_NETWORKING)
         void send_dijkstra_termination_token(std::uint32_t target_locality_id,
@@ -490,7 +490,7 @@ namespace hpx { namespace components { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     naming::gid_type runtime_support::migrate_component_to_here(
-        std::shared_ptr<Component> const& p, naming::id_type to_migrate)
+        std::shared_ptr<Component> const& p, hpx::id_type to_migrate)
     {
         components::component_type const type =
             components::get_component_type<typename Component::wrapped_type>();
@@ -685,7 +685,7 @@ namespace hpx { namespace components { namespace server {
     struct migrate_component_here_action
       : ::hpx::actions::action<naming::gid_type (runtime_support::*)(
                                    std::shared_ptr<Component> const&,
-                                   naming::id_type),
+                                   hpx::id_type),
             &runtime_support::migrate_component_to_here<Component>,
             migrate_component_here_action<Component>>
     {

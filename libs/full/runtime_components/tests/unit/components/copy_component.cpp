@@ -84,13 +84,13 @@ bool test_copy_component(hpx::id_type id)
 {
     // create component on given locality
     test_client t1 = hpx::new_<test_client>(id);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     try
     {
         // create a copy of t1 on same locality
         test_client t2(hpx::components::copy<test_server>(t1.get_id()));
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
         // the new object should life on id
         HPX_TEST_EQ(t2.call(), id);
@@ -110,14 +110,14 @@ bool test_copy_component_here(hpx::id_type id)
 {
     // create component on given locality
     test_client t1 = hpx::new_<test_client>(id);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     try
     {
         // create a copy of t1 here
         test_client t2(
             hpx::components::copy<test_server>(t1.get_id(), hpx::find_here()));
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
         // the new object should life here
         HPX_TEST_EQ(t2.call(), hpx::find_here());
@@ -137,13 +137,13 @@ bool test_copy_component_there(hpx::id_type id)
 {
     // create component on given locality
     test_client t1 = hpx::new_<test_client>(hpx::find_here());
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     try
     {
         // create a copy of t1 on given locality
         test_client t2(hpx::components::copy<test_server>(t1.get_id(), id));
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
         // the new object should life there
         HPX_TEST_EQ(t2.call(), id);

@@ -494,19 +494,19 @@ namespace hpx { namespace performance_counters {
     /// \brief Get the global id of an existing performance counter, if the
     ///        counter does not exist yet, the function attempts to create the
     ///        counter based on the given counter name.
-    HPX_EXPORT hpx::future<naming::id_type> get_counter_async(
+    HPX_EXPORT hpx::future<hpx::id_type> get_counter_async(
         std::string name, error_code& ec = throws);
 
-    inline naming::id_type get_counter(
+    inline hpx::id_type get_counter(
         std::string const& name, error_code& ec = throws);
 
     /// \brief Get the global id of an existing performance counter, if the
     ///        counter does not exist yet, the function attempts to create the
     ///        counter based on the given counter info.
-    HPX_EXPORT hpx::future<naming::id_type> get_counter_async(
+    HPX_EXPORT hpx::future<hpx::id_type> get_counter_async(
         counter_info const& info, error_code& ec = throws);
 
-    inline naming::id_type get_counter(
+    inline hpx::id_type get_counter(
         counter_info const& info, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -522,13 +522,13 @@ namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         /// \brief Add an existing performance counter instance to the registry
-        HPX_EXPORT counter_status add_counter(naming::id_type const& id,
+        HPX_EXPORT counter_status add_counter(hpx::id_type const& id,
             counter_info const& info, error_code& ec = throws);
 
         /// \brief Remove an existing performance counter instance with the
         ///        given id (as returned from \a create_counter)
         HPX_EXPORT counter_status remove_counter(counter_info const& info,
-            naming::id_type const& id, error_code& ec = throws);
+            hpx::id_type const& id, error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
         // Helper function for creating counters encapsulating a function

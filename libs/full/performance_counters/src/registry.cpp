@@ -1119,7 +1119,7 @@ namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Add an existing performance counter instance to the registry
     counter_status registry::add_counter(
-        naming::id_type const& id, counter_info const& info, error_code& ec)
+        hpx::id_type const& id, counter_info const& info, error_code& ec)
     {
         // complement counter info data
         counter_info complemented_info = info;
@@ -1156,8 +1156,8 @@ namespace hpx { namespace performance_counters {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    counter_status registry::remove_counter(counter_info const& info,
-        naming::id_type const& /* id */, error_code& ec)
+    counter_status registry::remove_counter(
+        counter_info const& info, hpx::id_type const& /* id */, error_code& ec)
     {
         // make sure parent instance name is set properly
         counter_info complemented_info = info;

@@ -85,7 +85,7 @@ namespace hpx { namespace performance_counters {
             }
         }
 
-        naming::id_type id = get_counter(info.fullname_, ec);
+        hpx::id_type id = get_counter(info.fullname_, ec);
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROWS_IF(ec, bad_parameter,

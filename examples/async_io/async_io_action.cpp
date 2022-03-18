@@ -69,10 +69,9 @@ int hpx_main()
         // example is run on one locality, we perform the IO operation
         // locally, otherwise we choose one of the remote localities to
         // invoke the async_io_action.
-        hpx::naming::id_type id = hpx::find_here();    // default: local
+        hpx::id_type id = hpx::find_here();    // default: local
 
-        std::vector<hpx::naming::id_type> localities =
-            hpx::find_remote_localities();
+        std::vector<hpx::id_type> localities = hpx::find_remote_localities();
         if (!localities.empty())
             id = localities[0];    // choose the first remote locality
 

@@ -428,13 +428,12 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::naming::gid_type, gid_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<hpx::naming::gid_type>, vector_gid_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    hpx::naming::id_type, hpx::naming::gid_type, id_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    hpx::naming::id_type, naming_id_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::vector<hpx::naming::id_type>,
+    hpx::id_type, hpx::naming::gid_type, id_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::id_type, naming_id_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::vector<hpx::id_type>,
     std::vector<hpx::naming::gid_type>, vector_id_gid_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    std::vector<hpx::naming::id_type>, vector_id_type)
+    std::vector<hpx::id_type>, vector_id_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::util::unused_type, hpx_unused_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(float)

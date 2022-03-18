@@ -18,7 +18,7 @@ namespace hpx { namespace actions {
     struct set_lco_value_continuation
     {
         template <typename T>
-        HPX_FORCEINLINE T operator()(naming::id_type const& lco, T&& t) const
+        HPX_FORCEINLINE T operator()(hpx::id_type const& lco, T&& t) const
         {
             hpx::set_lco_value(lco, HPX_FORWARD(T, t));
 
@@ -32,7 +32,7 @@ namespace hpx { namespace actions {
     struct set_lco_value_unmanaged_continuation
     {
         template <typename T>
-        HPX_FORCEINLINE T operator()(naming::id_type const& lco, T&& t) const
+        HPX_FORCEINLINE T operator()(hpx::id_type const& lco, T&& t) const
         {
             hpx::set_lco_value_unmanaged(lco, HPX_FORWARD(T, t));
 

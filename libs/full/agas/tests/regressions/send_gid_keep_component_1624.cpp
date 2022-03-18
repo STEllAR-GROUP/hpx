@@ -19,7 +19,7 @@ namespace server {
     struct view_registry
       : hpx::components::managed_component_base<view_registry>
     {
-        int register_view(const hpx::naming::id_type& gid)
+        int register_view(const hpx::id_type& gid)
         {
             hpx::util::format_to(std::cout, "register view at {1} by {2}",
                 this->get_unmanaged_id(), gid)
@@ -33,7 +33,7 @@ namespace server {
         HPX_DEFINE_COMPONENT_ACTION(view_registry, register_view)
         HPX_DEFINE_COMPONENT_ACTION(view_registry, update)
 
-        std::vector<hpx::naming::id_type> registered_regions_;
+        std::vector<hpx::id_type> registered_regions_;
     };
 }    // namespace server
 
@@ -45,12 +45,12 @@ HPX_REGISTER_ACTION_DECLARATION(server::view_registry::update_action,
 namespace client {
     struct view_registry
     {
-        view_registry(hpx::naming::id_type gid)
+        view_registry(hpx::id_type gid)
           : gid_(gid)
         {
         }
 
-        void register_view(const hpx::naming::id_type& viewerId)
+        void register_view(const hpx::id_type& viewerId)
         {
             hpx::async<server::view_registry::register_view_action>(
                 gid_, viewerId)
@@ -62,7 +62,7 @@ namespace client {
             hpx::async<server::view_registry::update_action>(gid_).get();
         }
 
-        hpx::naming::id_type gid_;
+        hpx::id_type gid_;
     };
 }    // namespace client
 
@@ -88,7 +88,7 @@ namespace server {
 
         // This function does a broadcast to all writers to register a certain
         // region
-        void register_region(const std::vector<hpx::naming::id_type>& writers)
+        void register_region(const std::vector<hpx::id_type>& writers)
         {
             for (const auto& id : writers)
             {
@@ -121,12 +121,12 @@ HPX_REGISTER_ACTION_DECLARATION(
 namespace client {
     struct viewer
     {
-        viewer(const hpx::naming::id_type& gid)
+        viewer(const hpx::id_type& gid)
           : gid_(gid)
         {
         }
 
-        void register_region(const std::vector<hpx::naming::id_type>& writers)
+        void register_region(const std::vector<hpx::id_type>& writers)
         {
             hpx::async<server::viewer::register_region_action>(gid_, writers)
                 .get();
@@ -137,7 +137,7 @@ namespace client {
             hpx::async<server::viewer::update_action>(gid_);
         }
 
-        hpx::naming::id_type gid_;
+        hpx::id_type gid_;
     };
 }    // namespace client
 

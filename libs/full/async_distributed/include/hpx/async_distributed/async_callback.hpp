@@ -35,7 +35,7 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Action>::remote_result_type>::type>
-        call(Policy_&& launch_policy, naming::id_type const& id, Callback&& cb,
+        call(Policy_&& launch_policy, hpx::id_type const& id, Callback&& cb,
             Ts&&... ts)
         {
             return hpx::detail::async_cb_impl<Action>(
@@ -80,15 +80,15 @@ namespace hpx { namespace detail {
         }
     };
 
-    // naming::id_type
+    // hpx::id_type
     template <typename Action>
-    struct async_cb_action_dispatch<Action, naming::id_type>
+    struct async_cb_action_dispatch<Action, hpx::id_type>
     {
         template <typename Callback, typename... Ts>
         HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Action>::remote_result_type>::type>
-        call(naming::id_type const& id, Callback&& cb, Ts&&... ts)
+        call(hpx::id_type const& id, Callback&& cb, Ts&&... ts)
         {
             return async_cb_action_dispatch<Action,
                 hpx::detail::async_policy>::call(launch::async, id,
@@ -167,7 +167,7 @@ namespace hpx { namespace detail {
             typename traits::promise_local_result<typename traits::
                     extract_action<Derived>::remote_result_type>::type>
         call(hpx::actions::basic_action<Component, Signature, Derived> const&,
-            naming::id_type const& id, Callback&& cb, Ts&&... ts)
+            hpx::id_type const& id, Callback&& cb, Ts&&... ts)
         {
             return async_cb<Derived>(
                 id, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, ts)...);
@@ -217,7 +217,7 @@ namespace hpx { namespace detail {
                     extract_action<Derived>::remote_result_type>::type>
         call(Policy_&& launch_policy,
             hpx::actions::basic_action<Component, Signature, Derived> const&,
-            naming::id_type const& id, Callback&& cb, Ts&&... ts)
+            hpx::id_type const& id, Callback&& cb, Ts&&... ts)
         {
             return async_cb<Derived>(HPX_FORWARD(Policy_, launch_policy), id,
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, ts)...);

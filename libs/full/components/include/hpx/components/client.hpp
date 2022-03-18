@@ -24,11 +24,11 @@ namespace hpx { namespace components {
         // construction
         client() = default;
 
-        explicit client(naming::id_type const& id)
+        explicit client(hpx::id_type const& id)
           : base_type(id)
         {
         }
-        explicit client(naming::id_type&& id)
+        explicit client(hpx::id_type&& id)
           : base_type(HPX_MOVE(id))
         {
         }
@@ -41,7 +41,7 @@ namespace hpx { namespace components {
           : base_type(HPX_MOVE(f))
         {
         }
-        client(future<naming::id_type>&& f) noexcept
+        client(future<hpx::id_type>&& f) noexcept
           : base_type(HPX_MOVE(f))
         {
         }
@@ -60,12 +60,12 @@ namespace hpx { namespace components {
         }
 
         // copy assignment and move assignment
-        client& operator=(naming::id_type const& id)
+        client& operator=(hpx::id_type const& id)
         {
             base_type::operator=(id);
             return *this;
         }
-        client& operator=(naming::id_type&& id)
+        client& operator=(hpx::id_type&& id)
         {
             base_type::operator=(HPX_MOVE(id));
             return *this;
@@ -81,7 +81,7 @@ namespace hpx { namespace components {
             base_type::operator=(HPX_MOVE(f));
             return *this;
         }
-        client& operator=(future<naming::id_type>&& f) noexcept
+        client& operator=(future<hpx::id_type>&& f) noexcept
         {
             base_type::operator=(HPX_MOVE(f));
             return *this;

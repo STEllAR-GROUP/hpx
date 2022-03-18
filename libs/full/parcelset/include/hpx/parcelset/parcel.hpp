@@ -88,8 +88,8 @@ namespace hpx::parcelset::detail {
         int get_component_type() const override;
         int get_action_type() const override;
 
-        naming::id_type source_id() const override;
-        void set_source_id(naming::id_type const& source_id) override;
+        hpx::id_type source_id() const override;
+        void set_source_id(hpx::id_type const& source_id) override;
 
         void set_destination_id(naming::gid_type&& dest) override;
         naming::gid_type const& destination() const override;

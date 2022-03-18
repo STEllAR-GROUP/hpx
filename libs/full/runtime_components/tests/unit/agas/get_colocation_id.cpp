@@ -63,7 +63,7 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 void test(hpx::id_type there)
 {
     test_client t1 = hpx::new_<test_client>(there);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), there);

@@ -134,13 +134,13 @@ HPX_PLAIN_ACTION(hello_world_foreman, hello_world_foreman_action)
 int main()
 {
     // Get a list of all available localities.
-    std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
     // Reserve storage space for futures, one for each locality.
     std::vector<hpx::future<void>> futures;
     futures.reserve(localities.size());
 
-    for (hpx::naming::id_type const& node : localities)
+    for (hpx::id_type const& node : localities)
     {
         // Asynchronously start a new task. The task is encapsulated in a
         // future, which we can query to determine if the task has

@@ -29,9 +29,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail {
         template <typename Action, typename Callback, typename... Ts>
-        inline bool apply_r_p_cb(naming::address&& addr,
-            naming::id_type const& id, threads::thread_priority priority,
-            Callback&& cb, Ts&&... vs)
+        inline bool apply_r_p_cb(naming::address&& addr, hpx::id_type const& id,
+            threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
@@ -40,8 +39,8 @@ namespace hpx {
         }
 
         template <typename Action, typename Callback, typename... Ts>
-        inline bool apply_r_cb(naming::address&& addr,
-            naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+        inline bool apply_r_cb(naming::address&& addr, hpx::id_type const& gid,
+            Callback&& cb, Ts&&... vs)
         {
             return apply_r_p_cb<Action>(HPX_MOVE(addr), gid,
                 actions::action_priority<Action>(), HPX_FORWARD(Callback, cb),
@@ -52,7 +51,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename... Ts>
-    inline bool apply_p_cb(naming::id_type const& gid,
+    inline bool apply_p_cb(hpx::id_type const& gid,
         threads::thread_priority priority, Callback&& cb, Ts&&... vs)
     {
         return hpx::detail::apply_cb_impl<Action>(
@@ -60,7 +59,7 @@ namespace hpx {
     }
 
     template <typename Action, typename Callback, typename... Ts>
-    inline bool apply_cb(naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+    inline bool apply_cb(hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return apply_p_cb<Action>(gid, actions::action_priority<Action>(),
             HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
@@ -70,7 +69,7 @@ namespace hpx {
         typename Callback, typename... Ts>
     inline bool apply_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+        hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return apply_p_cb<Derived>(gid, actions::action_priority<Derived>(),
             HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
@@ -114,7 +113,7 @@ namespace hpx {
         template <typename Action, typename Continuation, typename Callback,
             typename... Ts>
         inline bool apply_r_p_cb(naming::address&& addr, Continuation&& c,
-            naming::id_type const& id, threads::thread_priority priority,
+            hpx::id_type const& id, threads::thread_priority priority,
             Callback&& cb, Ts&&... vs)
         {
             // If remote, create a new parcel to be sent to the destination
@@ -127,7 +126,7 @@ namespace hpx {
         template <typename Action, typename Continuation, typename Callback,
             typename... Ts>
         inline bool apply_r_cb(naming::address&& addr, Continuation&& c,
-            naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+            hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
         {
             return apply_r_p_cb<Action>(HPX_MOVE(addr),
                 HPX_FORWARD(Continuation, c), gid,
@@ -141,7 +140,7 @@ namespace hpx {
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
     inline bool apply_p_cb(Continuation&& c, naming::address&& addr,
-        naming::id_type const& gid, threads::thread_priority priority,
+        hpx::id_type const& gid, threads::thread_priority priority,
         Callback&& cb, Ts&&... vs)
     {
         if (!traits::action_is_target_valid<Action>::call(gid))
@@ -183,7 +182,7 @@ namespace hpx {
 
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
-    inline bool apply_p_cb(Continuation&& c, naming::id_type const& gid,
+    inline bool apply_p_cb(Continuation&& c, hpx::id_type const& gid,
         threads::thread_priority priority, Callback&& cb, Ts&&... vs)
     {
         return hpx::detail::apply_cb_impl<Action>(HPX_FORWARD(Continuation, c),
@@ -193,7 +192,7 @@ namespace hpx {
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
     inline bool apply_cb(
-        Continuation&& c, naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+        Continuation&& c, hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return apply_p_cb<Action>(HPX_FORWARD(Continuation, c), gid,
             actions::action_priority<Action>(), HPX_FORWARD(Callback, cb),
@@ -204,7 +203,7 @@ namespace hpx {
         typename Derived, typename Callback, typename... Ts>
     inline bool apply_cb(Continuation&& c,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+        hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return apply_p<Derived>(HPX_FORWARD(Continuation, c), gid,
             actions::action_priority<Derived>(), HPX_FORWARD(Callback, cb),
@@ -257,7 +256,7 @@ namespace hpx {
     namespace applier { namespace detail {
         template <typename Action, typename Callback, typename... Ts>
         inline bool apply_c_p_cb(naming::address&& addr,
-            naming::id_type const& contgid, naming::id_type const& gid,
+            hpx::id_type const& contgid, hpx::id_type const& gid,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
             typedef
@@ -276,8 +275,8 @@ namespace hpx {
 
         template <typename Action, typename Callback, typename... Ts>
         inline bool apply_c_cb(naming::address&& addr,
-            naming::id_type const& contgid, naming::id_type const& gid,
-            Callback&& cb, Ts&&... vs)
+            hpx::id_type const& contgid, hpx::id_type const& gid, Callback&& cb,
+            Ts&&... vs)
         {
             typedef
                 typename hpx::traits::extract_action<Action>::remote_result_type
@@ -297,8 +296,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename... Ts>
-    inline bool apply_c_p_cb(naming::id_type const& contgid,
-        naming::id_type const& gid, threads::thread_priority priority,
+    inline bool apply_c_p_cb(hpx::id_type const& contgid,
+        hpx::id_type const& gid, threads::thread_priority priority,
         Callback&& cb, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::remote_result_type
@@ -313,8 +312,8 @@ namespace hpx {
     }
 
     template <typename Action, typename Callback, typename... Ts>
-    inline bool apply_c_cb(naming::id_type const& contgid,
-        naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+    inline bool apply_c_cb(hpx::id_type const& contgid, hpx::id_type const& gid,
+        Callback&& cb, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::remote_result_type
             remote_result_type;
@@ -329,8 +328,8 @@ namespace hpx {
     }
 
     template <typename Action, typename Callback, typename... Ts>
-    inline bool apply_c_p_cb(naming::id_type const& contgid,
-        naming::address&& addr, naming::id_type const& gid,
+    inline bool apply_c_p_cb(hpx::id_type const& contgid,
+        naming::address&& addr, hpx::id_type const& gid,
         threads::thread_priority priority, Callback&& cb, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::remote_result_type
@@ -346,9 +345,8 @@ namespace hpx {
     }
 
     template <typename Action, typename Callback, typename... Ts>
-    inline bool apply_c_cb(naming::id_type const& contgid,
-        naming::address&& addr, naming::id_type const& gid, Callback&& cb,
-        Ts&&... vs)
+    inline bool apply_c_cb(hpx::id_type const& contgid, naming::address&& addr,
+        hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::remote_result_type
             remote_result_type;
@@ -370,8 +368,8 @@ namespace hpx {
             typedef hpx::tuple<Ts...> tuple_type;
 
             template <typename... Ts_>
-            apply_c_p_cb_impl(naming::id_type const& contid,
-                naming::address&& addr, naming::id_type const& id,
+            apply_c_p_cb_impl(hpx::id_type const& contid,
+                naming::address&& addr, hpx::id_type const& id,
                 threads::thread_priority p, Callback&& cb, Ts_&&... vs)
               : contid_(contid)
               , addr_(HPX_MOVE(addr))
@@ -427,9 +425,9 @@ namespace hpx {
             }
 
         private:
-            naming::id_type contid_;
+            hpx::id_type contid_;
             naming::address addr_;
-            naming::id_type id_;
+            hpx::id_type id_;
             threads::thread_priority p_;
             Callback cb_;
             tuple_type args_;
@@ -438,9 +436,9 @@ namespace hpx {
         template <typename Action, typename Callback, typename... Ts>
         apply_c_p_cb_impl<Action, typename std::decay<Callback>::type,
             typename std::decay<Ts>::type...>
-        apply_c_p_cb(naming::id_type const& contid, naming::address&& addr,
-            naming::id_type const& id, threads::thread_priority p,
-            Callback&& cb, Ts&&... vs)
+        apply_c_p_cb(hpx::id_type const& contid, naming::address&& addr,
+            hpx::id_type const& id, threads::thread_priority p, Callback&& cb,
+            Ts&&... vs)
         {
             typedef apply_c_p_cb_impl<Action,
                 typename std::decay<Callback>::type,

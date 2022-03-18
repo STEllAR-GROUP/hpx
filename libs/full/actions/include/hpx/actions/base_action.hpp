@@ -74,7 +74,7 @@ namespace hpx { namespace actions {
         /// \returns      This function returns a proper thread function usable
         ///               for a \a thread.
         virtual threads::thread_function_type get_thread_function(
-            naming::id_type&& target, naming::address_type lva,
+            hpx::id_type&& target, naming::address_type lva,
             naming::component_type comptype) = 0;
 
         /// return the id of the locality of the parent thread

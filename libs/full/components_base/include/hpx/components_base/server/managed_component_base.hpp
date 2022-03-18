@@ -237,8 +237,8 @@ namespace hpx { namespace components {
         using wrapping_type = managed_component<Component, Wrapper>;
         using base_type_holder = Component;
 
-        naming::id_type get_unmanaged_id() const;
-        naming::id_type get_id() const;
+        hpx::id_type get_unmanaged_id() const;
+        hpx::id_type get_id() const;
 
     protected:
         naming::gid_type get_base_gid() const;
@@ -432,9 +432,10 @@ namespace hpx { namespace components {
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Return the global id of this \a future instance
-        naming::id_type get_unmanaged_id() const
+        hpx::id_type get_unmanaged_id() const
         {
-            return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+            return hpx::id_type(
+                get_base_gid(), hpx::id_type::management_type::unmanaged);
         }
 
     public:
@@ -468,8 +469,8 @@ namespace hpx { namespace components {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Wrapper, typename CtorPolicy,
         typename DtorPolicy>
-    inline naming::id_type managed_component_base<Component, Wrapper,
-        CtorPolicy, DtorPolicy>::get_unmanaged_id() const
+    inline hpx::id_type managed_component_base<Component, Wrapper, CtorPolicy,
+        DtorPolicy>::get_unmanaged_id() const
     {
         HPX_ASSERT(back_ptr_);
         return back_ptr_->get_unmanaged_id();
@@ -477,8 +478,8 @@ namespace hpx { namespace components {
 
     template <typename Component, typename Wrapper, typename CtorPolicy,
         typename DtorPolicy>
-    inline naming::id_type managed_component_base<Component, Wrapper,
-        CtorPolicy, DtorPolicy>::get_id() const
+    inline hpx::id_type managed_component_base<Component, Wrapper, CtorPolicy,
+        DtorPolicy>::get_id() const
     {
         // all credits should have been taken already
         naming::gid_type gid =
@@ -491,7 +492,7 @@ namespace hpx { namespace components {
 
         // any invocation causes the credits to be replenished
         agas::replenish_credits(gid);
-        return naming::id_type(gid, naming::id_type::managed);
+        return hpx::id_type(gid, hpx::id_type::management_type::managed);
     }
 
     template <typename Component, typename Wrapper, typename CtorPolicy,

@@ -22,7 +22,7 @@ namespace hpx { namespace agas { namespace detail {
 
     hosted_component_namespace::hosted_component_namespace(naming::address addr)
       : gid_(naming::gid_type(agas::component_ns_msb, agas::component_ns_lsb),
-            naming::id_type::unmanaged)
+            hpx::id_type::management_type::unmanaged)
       , addr_(addr)
     {
     }

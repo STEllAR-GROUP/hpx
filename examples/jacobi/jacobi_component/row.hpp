@@ -28,7 +28,7 @@ namespace jacobi
             return hpx::async<server::row::init_action>(id, nx, value);
         }
 
-        hpx::naming::id_type id;
+        hpx::id_type id;
 
         hpx::future<row_range> get(std::size_t begin, std::size_t end)
         {

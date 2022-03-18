@@ -148,12 +148,12 @@ namespace hpx { namespace performance_counters {
             naming::gid_type& id, error_code& ec = throws);
 
         /// \brief Add an existing performance counter instance to the registry
-        counter_status add_counter(naming::id_type const& id,
+        counter_status add_counter(hpx::id_type const& id,
             counter_info const& info, error_code& ec = throws);
 
         /// \brief remove the existing performance counter from the registry
         counter_status remove_counter(counter_info const& info,
-            naming::id_type const& id, error_code& ec = throws);
+            hpx::id_type const& id, error_code& ec = throws);
 
         /// \brief Retrieve counter type information for given counter name
         counter_status get_counter_type(std::string const& name,

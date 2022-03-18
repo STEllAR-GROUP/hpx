@@ -23,7 +23,7 @@ using hpx::program_options::variables_map;
 
 using std::chrono::milliseconds;
 
-using hpx::naming::id_type;
+using hpx::id_type;
 
 using hpx::threads::register_thread;
 

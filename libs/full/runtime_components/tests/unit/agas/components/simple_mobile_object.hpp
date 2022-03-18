@@ -32,7 +32,7 @@ namespace hpx { namespace test {
         typedef server::simple_mobile_object server_type;
 
         /// Create a new component on the target locality.
-        explicit simple_mobile_object(naming::id_type const& id)
+        explicit simple_mobile_object(hpx::id_type const& id)
           : base_type(id)
         {
         }

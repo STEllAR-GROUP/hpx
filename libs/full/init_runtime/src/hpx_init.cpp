@@ -119,8 +119,8 @@ HPX_PLAIN_ACTION_ID(hpx::detail::list_component_type,
     list_component_type_action, hpx::actions::list_component_type_action_id)
 
 typedef hpx::detail::bound_action<list_component_type_action,
-    hpx::util::index_pack<0, 1, 2>, hpx::naming::id_type,
-    hpx::detail::placeholder<1>, hpx::detail::placeholder<2>>
+    hpx::util::index_pack<0, 1, 2>, hpx::id_type, hpx::detail::placeholder<1>,
+    hpx::detail::placeholder<2>>
     bound_list_component_type_action;
 
 HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
@@ -143,7 +143,7 @@ namespace hpx { namespace detail {
     inline void print(std::string const& name, error_code& ec = throws)
     {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-        naming::id_type console(agas::get_console_locality(ec));
+        hpx::id_type console(agas::get_console_locality(ec));
         if (ec)
             return;
 
@@ -249,8 +249,9 @@ namespace hpx { namespace detail {
     void list_symbolic_name(std::string const& name, hpx::id_type const& id)
     {
         std::string str = hpx::util::format("{}, {}, {}", name, id,
-            (id.get_management_type() == id_type::managed ? "managed" :
-                                                            "unmanaged"));
+            (id.get_management_type() == id_type::management_type::managed ?
+                    "management_type::managed" :
+                    "management_type::unmanaged"));
         print(str);
     }
 
@@ -284,7 +285,7 @@ namespace hpx { namespace detail {
         using hpx::placeholders::_1;
         using hpx::placeholders::_2;
 
-        naming::id_type console(agas::get_console_locality());
+        hpx::id_type console(agas::get_console_locality());
         naming::get_agas_client().iterate_types(
             hpx::bind<list_component_type_action>(console, _1, _2));
     }
@@ -1027,7 +1028,7 @@ namespace hpx {
         p->call_shutdown_functions(true);
         p->call_shutdown_functions(false);
 
-        p->stop(shutdown_timeout, naming::invalid_id, true);
+        p->stop(shutdown_timeout, hpx::invalid_id, true);
 #else
         HPX_UNUSED(shutdown_timeout);
         HPX_UNUSED(localwait);

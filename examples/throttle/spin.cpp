@@ -19,7 +19,7 @@ using hpx::init;
 using hpx::finalize;
 
 using hpx::naming::address;
-using hpx::naming::id_type;
+using hpx::id_type;
 using hpx::naming::get_locality_id_from_gid;
 
 ///////////////////////////////////////////////////////////////////////////////

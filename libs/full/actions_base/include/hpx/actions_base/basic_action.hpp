@@ -89,7 +89,7 @@ namespace hpx { namespace actions {
         {
         public:
             template <typename... Ts>
-            explicit thread_function(naming::id_type&& target,
+            explicit thread_function(hpx::id_type&& target,
                 naming::address_type lva, naming::component_type comptype,
                 Ts&&... vs)
               : target_(HPX_MOVE(target))
@@ -145,7 +145,7 @@ namespace hpx { namespace actions {
 
         private:
             // This holds the target alive, if necessary.
-            naming::id_type target_;
+            hpx::id_type target_;
             naming::address_type lva_;
             naming::component_type comptype_;
             typename Action::arguments_type args_;
@@ -157,7 +157,7 @@ namespace hpx { namespace actions {
         {
         public:
             template <typename... Ts>
-            explicit continuation_thread_function(naming::id_type&& target,
+            explicit continuation_thread_function(hpx::id_type&& target,
                 typename Action::continuation_type&& cont,
                 naming::address_type lva, naming::component_type comptype,
                 Ts&&... vs)
@@ -189,7 +189,7 @@ namespace hpx { namespace actions {
 
         private:
             // This holds the target alive, if necessary.
-            naming::id_type target_;
+            hpx::id_type target_;
             typename Action::continuation_type cont_;
             naming::address_type lva_;
             naming::component_type comptype_;
@@ -290,11 +290,12 @@ namespace hpx { namespace actions {
         // case no continuation has been supplied.
         template <typename... Ts>
         static threads::thread_function_type construct_thread_function(
-            naming::id_type target, naming::address_type lva,
+            hpx::id_type target, naming::address_type lva,
             naming::component_type comptype, Ts&&... vs)
         {
             if (target &&
-                target.get_management_type() == naming::id_type::unmanaged)
+                target.get_management_type() ==
+                    hpx::id_type::management_type::unmanaged)
             {
                 target = {};
             }
@@ -311,12 +312,13 @@ namespace hpx { namespace actions {
         // case a continuation has been supplied
         template <typename... Ts>
         static threads::thread_function_type construct_thread_function(
-            naming::id_type target, continuation_type&& cont,
+            hpx::id_type target, continuation_type&& cont,
             naming::address_type lva, naming::component_type comptype,
             Ts&&... vs)
         {
             if (target &&
-                target.get_management_type() == naming::id_type::unmanaged)
+                target.get_management_type() ==
+                    hpx::id_type::management_type::unmanaged)
             {
                 target = {};
             }
@@ -354,28 +356,28 @@ namespace hpx { namespace actions {
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts>
         HPX_FORCEINLINE result_type operator()(launch policy,
-            naming::id_type const& id, error_code& ec, Ts&&... vs) const
+            hpx::id_type const& id, error_code& ec, Ts&&... vs) const
         {
             return sync_invoke(policy, id, ec, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
         HPX_FORCEINLINE result_type operator()(
-            naming::id_type const& id, error_code& ec, Ts&&... vs) const
+            hpx::id_type const& id, error_code& ec, Ts&&... vs) const
         {
             return sync_invoke(launch::sync, id, ec, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
         HPX_FORCEINLINE result_type operator()(
-            launch policy, naming::id_type const& id, Ts&&... vs) const
+            launch policy, hpx::id_type const& id, Ts&&... vs) const
         {
             return sync_invoke(policy, id, throws, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
         HPX_FORCEINLINE result_type operator()(
-            naming::id_type const& id, Ts&&... vs) const
+            hpx::id_type const& id, Ts&&... vs) const
         {
             return sync_invoke(
                 launch::sync, id, throws, HPX_FORWARD(Ts, vs)...);

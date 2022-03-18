@@ -32,7 +32,7 @@ using hpx::program_options::variables_map;
 
 using hpx::find_here;
 
-using hpx::naming::id_type;
+using hpx::id_type;
 
 using hpx::async;
 using hpx::future;

@@ -743,7 +743,9 @@ namespace hpx {
             if (agas_client_.get_local_locality() != console_id)
             {
                 components::console_error_sink(
-                    naming::id_type(console_id, naming::id_type::unmanaged), e);
+                    hpx::id_type(
+                        console_id, hpx::id_type::management_type::unmanaged),
+                    e);
             }
         }
 
@@ -1671,29 +1673,29 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // Helpers
-    naming::id_type find_here(error_code& ec)
+    hpx::id_type find_here(error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_here",
                 "the runtime system is not available at this time");
-            return naming::invalid_id;
+            return hpx::invalid_id;
         }
 
-        static naming::id_type here =
+        static hpx::id_type here =
             naming::get_id_from_locality_id(rt->get_locality_id(ec));
         return here;
     }
 
-    naming::id_type find_root_locality(error_code& ec)
+    hpx::id_type find_root_locality(error_code& ec)
     {
         runtime_distributed* rt = hpx::get_runtime_distributed_ptr();
         if (nullptr == rt)
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_root_locality",
                 "the runtime system is not available at this time");
-            return naming::invalid_id;
+            return hpx::invalid_id;
         }
 
         naming::gid_type console_locality;
@@ -1701,19 +1703,20 @@ namespace hpx {
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_root_locality",
                 "the root locality is not available at this time");
-            return naming::invalid_id;
+            return hpx::invalid_id;
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
-        return naming::id_type(console_locality, naming::id_type::unmanaged);
+        return hpx::id_type(
+            console_locality, hpx::id_type::management_type::unmanaged);
     }
 
-    std::vector<naming::id_type> find_all_localities(
+    std::vector<hpx::id_type> find_all_localities(
         components::component_type type, error_code& ec)
     {
-        std::vector<naming::id_type> locality_ids;
+        std::vector<hpx::id_type> locality_ids;
         if (nullptr == hpx::applier::get_applier_ptr())
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_all_localities",
@@ -1725,9 +1728,9 @@ namespace hpx {
         return locality_ids;
     }
 
-    std::vector<naming::id_type> find_all_localities(error_code& ec)
+    std::vector<hpx::id_type> find_all_localities(error_code& ec)
     {
-        std::vector<naming::id_type> locality_ids;
+        std::vector<hpx::id_type> locality_ids;
         if (nullptr == hpx::applier::get_applier_ptr())
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_all_localities",
@@ -1739,10 +1742,10 @@ namespace hpx {
         return locality_ids;
     }
 
-    std::vector<naming::id_type> find_remote_localities(
+    std::vector<hpx::id_type> find_remote_localities(
         components::component_type type, error_code& ec)
     {
-        std::vector<naming::id_type> locality_ids;
+        std::vector<hpx::id_type> locality_ids;
         if (nullptr == hpx::applier::get_applier_ptr())
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_remote_localities",
@@ -1755,9 +1758,9 @@ namespace hpx {
         return locality_ids;
     }
 
-    std::vector<naming::id_type> find_remote_localities(error_code& ec)
+    std::vector<hpx::id_type> find_remote_localities(error_code& ec)
     {
-        std::vector<naming::id_type> locality_ids;
+        std::vector<hpx::id_type> locality_ids;
         if (nullptr == hpx::applier::get_applier_ptr())
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_remote_localities",
@@ -1772,21 +1775,20 @@ namespace hpx {
     }
 
     // find a locality supporting the given component
-    naming::id_type find_locality(
-        components::component_type type, error_code& ec)
+    hpx::id_type find_locality(components::component_type type, error_code& ec)
     {
         if (nullptr == hpx::applier::get_applier_ptr())
         {
             HPX_THROWS_IF(ec, invalid_status, "hpx::find_locality",
                 "the runtime system is not available at this time");
-            return naming::invalid_id;
+            return hpx::invalid_id;
         }
 
-        std::vector<naming::id_type> locality_ids;
+        std::vector<hpx::id_type> locality_ids;
         hpx::applier::get_applier().get_localities(locality_ids, type, ec);
 
         if (ec || locality_ids.empty())
-            return naming::invalid_id;
+            return hpx::invalid_id;
 
         // chose first locality to host the object
         return locality_ids.front();
