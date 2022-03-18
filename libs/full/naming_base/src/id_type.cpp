@@ -30,7 +30,7 @@ namespace hpx { namespace naming {
                 return &detail::gid_unmanaged_deleter;
 
             case id_type::managed:
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             case id_type::managed_move_credit:
                 return &detail::gid_managed_deleter;
 

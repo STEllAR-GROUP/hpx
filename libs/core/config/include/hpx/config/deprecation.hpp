@@ -24,7 +24,7 @@
     "in the future. You can define HPX_HAVE_DEPRECATION_WARNINGS_V1_7=0 to "   \
     "acknowledge that you have received this warning."
 #define HPX_DEPRECATED_V1_7(x)                                                 \
-    HPX_DEPRECATED(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V1_7) ")")
+    [[deprecated(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V1_7) ")")]]
 #endif
 
 #if !defined(HPX_DEPRECATED_V1_7)
@@ -43,7 +43,7 @@
     "in the future. You can define HPX_HAVE_DEPRECATION_WARNINGS_V1_8=0 to "   \
     "acknowledge that you have received this warning."
 #define HPX_DEPRECATED_V1_8(x)                                                 \
-    HPX_DEPRECATED(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V1_8) ")")
+    [[deprecated(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V1_8) ")")]]
 #endif
 
 #if !defined(HPX_DEPRECATED_V1_8)
@@ -62,7 +62,7 @@
     "in the future. You can define HPX_HAVE_DEPRECATION_WARNINGS_V1_9=0 to "   \
     "acknowledge that you have received this warning."
 #define HPX_DEPRECATED_V1_9(x)                                                 \
-    HPX_DEPRECATED(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V1_9) ")")
+    [[deprecated(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V1_9) ")")]]
 #endif
 
 #if !defined(HPX_DEPRECATED_V1_9)

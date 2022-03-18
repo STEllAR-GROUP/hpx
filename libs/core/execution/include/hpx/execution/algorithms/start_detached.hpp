@@ -45,7 +45,7 @@ namespace hpx::execution::experimental {
                 hpx::intrusive_ptr<operation_state_holder> op_state;
 
                 template <typename Error>
-                HPX_NORETURN friend void tag_invoke(
+                [[noreturn]] friend void tag_invoke(
                     set_error_t, start_detached_receiver&&, Error&&) noexcept
                 {
                     HPX_ASSERT_MSG(false,

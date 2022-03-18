@@ -32,13 +32,13 @@
 
 namespace hpx { namespace resource { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_NORETURN void throw_runtime_error(
+    [[noreturn]] void throw_runtime_error(
         std::string const& func, std::string const& message)
     {
         HPX_THROW_EXCEPTION(invalid_status, func, message);
     }
 
-    HPX_NORETURN void throw_invalid_argument(
+    [[noreturn]] void throw_invalid_argument(
         std::string const& func, std::string const& message)
     {
         HPX_THROW_EXCEPTION(bad_parameter, func, message);

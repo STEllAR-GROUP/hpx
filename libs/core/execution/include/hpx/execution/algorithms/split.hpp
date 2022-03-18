@@ -250,7 +250,7 @@ namespace hpx::execution::experimental {
                 {
                     HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
-                    HPX_NORETURN void operator()(hpx::monostate) const
+                    [[noreturn]] void operator()(hpx::monostate) const
                     {
                         HPX_UNREACHABLE;
                     }

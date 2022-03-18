@@ -203,10 +203,10 @@ namespace hpx { namespace parallel { namespace execution {
         {
         };    // must be trivial and empty
 
-        HPX_NORETURN HPX_CORE_EXPORT void throw_bad_polymorphic_executor();
+        [[noreturn]] HPX_CORE_EXPORT void throw_bad_polymorphic_executor();
 
         template <typename R>
-        HPX_NORETURN inline R throw_bad_polymorphic_executor()
+        [[noreturn]] inline R throw_bad_polymorphic_executor()
         {
             throw_bad_polymorphic_executor();
 #if defined(HPX_INTEL_VERSION)

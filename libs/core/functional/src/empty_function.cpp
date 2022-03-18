@@ -11,7 +11,7 @@
 #include <hpx/modules/errors.hpp>
 
 namespace hpx { namespace util { namespace detail {
-    HPX_NORETURN void throw_bad_function_call()
+    [[noreturn]] void throw_bad_function_call()
     {
         hpx::throw_exception(bad_function_call,
             "empty function object should not be used",

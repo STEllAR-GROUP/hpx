@@ -187,7 +187,7 @@ namespace hpx::plugins::parcel {
         switch (s)
         {
         case detail::message_buffer::first_message:
-            HPX_FALLTHROUGH;
+            [[fallthrough]];
         case detail::message_buffer::normal:
             // start deadline timer to flush buffer
             l.unlock();

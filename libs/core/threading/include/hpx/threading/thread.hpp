@@ -109,7 +109,7 @@ namespace hpx {
             return id_.noref();
         }
 
-        HPX_NODISCARD static unsigned int hardware_concurrency() noexcept;
+        [[nodiscard]] static unsigned int hardware_concurrency() noexcept;
 
         // extensions
         void interrupt(bool flag = true);

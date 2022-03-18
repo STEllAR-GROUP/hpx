@@ -26,11 +26,11 @@ namespace hpx { namespace threads { namespace detail {
         {
         // NOLINTNEXTLINE(bugprone-branch-clone)
         case thread_schedule_state::pending:
-            HPX_FALLTHROUGH;
+            [[fallthrough]];
         case thread_schedule_state::pending_do_not_schedule:
-            HPX_FALLTHROUGH;
+            [[fallthrough]];
         case thread_schedule_state::pending_boost:
-            HPX_FALLTHROUGH;
+            [[fallthrough]];
         case thread_schedule_state::suspended:
             break;
 

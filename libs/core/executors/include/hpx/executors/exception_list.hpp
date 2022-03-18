@@ -26,7 +26,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             using type = Result;
 
-            HPX_NORETURN static Result call()
+            [[noreturn]] static Result call()
             {
                 try
                 {
@@ -53,7 +53,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return f.get();
             }
 
-            HPX_NORETURN static Result call(std::exception_ptr const& e)
+            [[noreturn]] static Result call(std::exception_ptr const& e)
             {
                 try
                 {
@@ -183,7 +183,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         HPX_CORE_EXPORT void set_exception_list_termination_handler(
             exception_list_termination_handler_type f);
 
-        HPX_NORETURN HPX_CORE_EXPORT void exception_list_termination_handler();
+        [[noreturn]] HPX_CORE_EXPORT void exception_list_termination_handler();
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
@@ -192,21 +192,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             using type = Result;
 
-            HPX_NORETURN static Result call()
+            [[noreturn]] static Result call()
             {
                 // any exceptions thrown by algorithms executed with the
                 // parallel_unsequenced_policy are to call terminate.
                 exception_list_termination_handler();
             }
 
-            HPX_NORETURN
-            static hpx::future<Result> call(hpx::future<Result>&&)
+            [[noreturn]] static hpx::future<Result> call(hpx::future<Result>&&)
             {
                 exception_list_termination_handler();
             }
 
-            HPX_NORETURN
-            static hpx::future<Result> call(std::exception_ptr const&)
+            [[noreturn]] static hpx::future<Result> call(
+                std::exception_ptr const&)
             {
                 exception_list_termination_handler();
             }
@@ -217,21 +216,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             using type = Result;
 
-            HPX_NORETURN static Result call()
+            [[noreturn]] static Result call()
             {
                 // any exceptions thrown by algorithms executed with the
                 // unsequenced_policy are to call terminate.
                 exception_list_termination_handler();
             }
 
-            HPX_NORETURN
-            static hpx::future<Result> call(hpx::future<Result>&&)
+            [[noreturn]] static hpx::future<Result> call(hpx::future<Result>&&)
             {
                 exception_list_termination_handler();
             }
 
-            HPX_NORETURN
-            static hpx::future<Result> call(std::exception_ptr const&)
+            [[noreturn]] static hpx::future<Result> call(
+                std::exception_ptr const&)
             {
                 exception_list_termination_handler();
             }
