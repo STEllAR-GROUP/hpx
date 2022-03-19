@@ -1404,7 +1404,6 @@ namespace hpx {
         this->runtime::starting();
         threads::thread_id_ref_type id = threads::invalid_thread_id;
         thread_manager_->register_thread(data, id);
-
         // }}}
 
         // block if required

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -211,8 +211,8 @@ namespace hpx { namespace lcos { namespace detail {
 
     private:
         ///////////////////////////////////////////////////////////////////////
-        /// Passes the futures into the evaluation function and
-        /// sets the result future.
+        // Passes the futures into the evaluation function and
+        // sets the result future.
         template <typename Futures_>
         HPX_FORCEINLINE void execute(std::false_type, Futures_&& futures)
         {
@@ -226,8 +226,8 @@ namespace hpx { namespace lcos { namespace detail {
                 });
         }
 
-        /// Passes the futures into the evaluation function and
-        /// sets the result future.
+        // Passes the futures into the evaluation function and
+        // sets the result future.
         template <typename Futures_>
         HPX_FORCEINLINE void execute(std::true_type, Futures_&& futures)
         {

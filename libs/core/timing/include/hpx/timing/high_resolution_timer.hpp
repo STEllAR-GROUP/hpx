@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2021 Hartmut Kaiser
+//  Copyright (c) 2005-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,7 +26,17 @@ namespace hpx { namespace chrono {
         {
         }
 
-        constexpr high_resolution_timer(double t) noexcept
+        enum class init
+        {
+            no_init
+        };
+
+        explicit constexpr high_resolution_timer(init) noexcept
+          : start_time_(0)
+        {
+        }
+
+        explicit constexpr high_resolution_timer(double t) noexcept
           : start_time_(static_cast<std::uint64_t>(t * 1e9))
         {
         }

@@ -461,8 +461,7 @@ namespace hpx {
         // {{{ launch main
         // register the given main function with the thread manager
         lbt_ << "(1st stage) runtime_distributed::start: launching "
-                "run_helper "
-                "HPX thread";
+                "run_helper HPX thread";
 
         threads::thread_init_data data(
             hpx::bind(&runtime_distributed::run_helper, this, func,
@@ -473,7 +472,6 @@ namespace hpx {
         this->runtime::starting();
         threads::thread_id_ref_type id = threads::invalid_thread_id;
         thread_manager_->register_thread(data, id);
-
         // }}}
 
         // block if required

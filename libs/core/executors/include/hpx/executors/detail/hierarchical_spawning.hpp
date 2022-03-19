@@ -1,5 +1,5 @@
 //  Copyright (c) 2019-2020 ETH Zurich
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -37,8 +37,7 @@
 namespace hpx { namespace parallel { namespace execution { namespace detail {
 
     template <typename Launch, typename F, typename S, typename... Ts>
-    std::vector<
-        hpx::future<typename detail::bulk_function_result<F, S, Ts...>::type>>
+    std::vector<hpx::future<detail::bulk_function_result_t<F, S, Ts...>>>
     hierarchical_bulk_async_execute_helper(
         hpx::util::thread_description const& desc,
         threads::thread_pool_base* pool, std::size_t first_thread,
@@ -47,9 +46,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     {
         HPX_ASSERT(pool);
 
-        typedef std::vector<hpx::future<
-            typename detail::bulk_function_result<F, S, Ts...>::type>>
-            result_type;
+        using result_type = std::vector<
+            hpx::future<typename detail::bulk_function_result_t<F, S, Ts...>>>;
 
         result_type results;
         std::size_t const size = hpx::util::size(shape);
@@ -111,8 +109,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     }
 
     template <typename Launch, typename F, typename S, typename... Ts>
-    std::vector<
-        hpx::future<typename detail::bulk_function_result<F, S, Ts...>::type>>
+    std::vector<hpx::future<detail::bulk_function_result_t<F, S, Ts...>>>
     hierarchical_bulk_async_execute_helper(threads::thread_pool_base* pool,
         std::size_t first_thread, std::size_t num_threads,
         std::size_t hierarchical_threshold, Launch policy, F&& f,
@@ -129,8 +126,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
     template <typename Executor, typename Launch, typename F, typename S,
         typename Future, typename... Ts>
-    hpx::future<
-        typename detail::bulk_then_execute_result<F, S, Future, Ts...>::type>
+    hpx::future<detail::bulk_then_execute_result_t<F, S, Future, Ts...>>
     hierarchical_bulk_then_execute_helper(Executor&& executor, Launch policy,
         F&& f, S const& shape, Future&& predecessor, Ts&&... ts)
     {
@@ -145,17 +141,16 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             hpx::make_tuple(HPX_FORWARD(Ts, ts)...));
 
         // void or std::vector<func_result_type>
-        using vector_result_type = typename detail::bulk_then_execute_result<F,
-            S, Future, Ts...>::type;
+        using vector_result_type =
+            detail::bulk_then_execute_result_t<F, S, Future, Ts...>;
 
         // future<vector_result_type>
         using result_future_type = hpx::future<vector_result_type>;
 
         using shared_state_type =
-            typename hpx::traits::detail::shared_state_ptr<
-                vector_result_type>::type;
+            hpx::traits::detail::shared_state_ptr_t<vector_result_type>;
 
-        using future_type = typename std::decay<Future>::type;
+        using future_type = std::decay_t<Future>;
 
         // vector<future<func_result_type>> -> vector<func_result_type>
         shared_state_type p = hpx::lcos::detail::make_continuation_exec_policy<
