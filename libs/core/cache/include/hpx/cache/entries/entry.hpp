@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,41 +9,54 @@
 #include <hpx/config.hpp>
 
 #include <cstddef>
+#include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache { namespace entries {
+namespace hpx::util::cache::entries {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Value, typename Derived = void>
     class entry;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Value, typename Derived>
         struct derived
         {
-            typedef Derived type;
+            using type = Derived;
         };
 
         template <typename Value>
         struct derived<Value, void>
         {
-            typedef entry<Value> type;
+            using type = entry<Value>;
         };
 
         template <typename Derived>
         struct less_than_comparable
         {
-            friend bool operator>(Derived const& lhs, Derived const& rhs)
+            friend bool
+            operator>(Derived const& lhs, Derived const& rhs) noexcept(
+                noexcept(std::declval<Derived const&>() <
+                    std::declval<Derived const&>()))
             {
                 return rhs < lhs;
             }
 
-            friend bool operator<=(Derived const& lhs, Derived const& rhs)
+            friend bool
+            operator<=(Derived const& lhs, Derived const& rhs) noexcept(
+                noexcept(std::declval<Derived const&>() <
+                    std::declval<Derived const&>()))
             {
                 return !(rhs < lhs);
             }
 
-            friend bool operator>=(Derived const& lhs, Derived const& rhs)
+            friend bool
+            operator>=(Derived const& lhs, Derived const& rhs) noexcept(
+                noexcept(std::declval<Derived const&>() <
+                    std::declval<Derived const&>()))
             {
                 return !(lhs < rhs);
             }
@@ -65,7 +78,7 @@ namespace hpx { namespace util { namespace cache { namespace entries {
             typename detail::derived<Value, Derived>::type>
     {
     public:
-        typedef Value value_type;
+        using value_type = Value;
 
     public:
         /// \brief Any cache entry has to be default constructible
@@ -73,8 +86,16 @@ namespace hpx { namespace util { namespace cache { namespace entries {
 
         /// \brief Construct a new instance of a cache entry holding the given
         ///        value.
-        explicit entry(value_type const& val)
+        explicit entry(value_type const& val) noexcept(
+            std::is_nothrow_copy_constructible_v<value_type>)
           : value_(val)
+        {
+        }
+
+        /// \brief Construct a new instance of a cache entry holding the given
+        ///        value.
+        explicit entry(value_type&& val) noexcept
+          : value_(HPX_MOVE(val))
         {
         }
 
@@ -91,7 +112,7 @@ namespace hpx { namespace util { namespace cache { namespace entries {
         ///           update it's internal heap. Usually this is needed if the
         ///           entry has been changed by touch() in a way influencing
         ///           the sort order as mandated by the cache's UpdatePolicy
-        bool touch()
+        constexpr bool touch() const noexcept
         {
             return false;
         }
@@ -104,7 +125,7 @@ namespace hpx { namespace util { namespace cache { namespace entries {
         /// \returns  This function should return \a true if the entry should
         ///           be added to the cache, otherwise it should return
         ///           \a false.
-        bool insert()
+        constexpr bool insert() const noexcept
         {
             return true;
         }
@@ -119,7 +140,7 @@ namespace hpx { namespace util { namespace cache { namespace entries {
         ///           instance from the cache. If the value is \a true it is
         ///           ok to remove the entry, other wise it will stay in the
         ///           cache.
-        bool remove()
+        constexpr bool remove() const noexcept
         {
             return true;
         }
@@ -128,14 +149,16 @@ namespace hpx { namespace util { namespace cache { namespace entries {
         ///           each entry is just one (1), which is sensible if the
         ///           cache has a limit (capacity) measured in number of
         ///           entries.
-        std::size_t get_size() const
+        constexpr std::size_t get_size() const noexcept
         {
             return 1;
         }
 
         /// \brief    Forwarding operator< allowing to compare entries instead
         ///           of the values.
-        friend bool operator<(entry const& lhs, entry const& rhs)
+        friend bool operator<(entry const& lhs, entry const& rhs) noexcept(
+            noexcept(std::declval<value_type const&>() <
+                std::declval<value_type const&>()))
         {
             return lhs.value_ < rhs.value_;
         }
@@ -143,11 +166,11 @@ namespace hpx { namespace util { namespace cache { namespace entries {
         /// \brief Get a reference to the stored data value
         ///
         /// \note This function is part of the CacheEntry concept
-        value_type& get()
+        value_type& get() noexcept
         {
             return value_;
         }
-        value_type const& get() const
+        constexpr value_type const& get() const noexcept
         {
             return value_;
         }
@@ -155,4 +178,4 @@ namespace hpx { namespace util { namespace cache { namespace entries {
     private:
         value_type value_;
     };
-}}}}    // namespace hpx::util::cache::entries
+}    // namespace hpx::util::cache::entries

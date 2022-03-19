@@ -1,4 +1,4 @@
-//  Copyright (c) 2008-2016 Hartmut Kaiser
+//  Copyright (c) 2008-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 struct data
 {
-    data(char const* const k, char const* const v)
+    constexpr data(char const* const k, char const* const v) noexcept
       : key(k)
       , value(v)
     {
@@ -37,11 +37,10 @@ void test_statistics_insert()
 {
     using namespace hpx::util::cache;
 
-    typedef entries::lru_entry<std::string> entry_type;
-    typedef local_cache<std::string, entry_type, std::less<entry_type>,
-        policies::always<entry_type>, std::map<std::string, entry_type>,
-        statistics::local_statistics>
-        cache_type;
+    using entry_type = entries::lru_entry<std::string>;
+    using cache_type = local_cache<std::string, entry_type,
+        std::less<entry_type>, policies::always<entry_type>,
+        std::map<std::string, entry_type>, statistics::local_statistics>;
 
     cache_type c(3);
 
@@ -70,11 +69,10 @@ void test_statistics_insert_with_touch()
 {
     using namespace hpx::util::cache;
 
-    typedef entries::lru_entry<std::string> entry_type;
-    typedef local_cache<std::string, entry_type, std::less<entry_type>,
-        policies::always<entry_type>, std::map<std::string, entry_type>,
-        statistics::local_statistics>
-        cache_type;
+    using entry_type = entries::lru_entry<std::string>;
+    using cache_type = local_cache<std::string, entry_type,
+        std::less<entry_type>, policies::always<entry_type>,
+        std::map<std::string, entry_type>, statistics::local_statistics>;
 
     cache_type c(3);
 
@@ -125,11 +123,10 @@ void test_statistics_update()
 {
     using namespace hpx::util::cache;
 
-    typedef entries::lru_entry<std::string> entry_type;
-    typedef local_cache<std::string, entry_type, std::less<entry_type>,
-        policies::always<entry_type>, std::map<std::string, entry_type>,
-        statistics::local_statistics>
-        cache_type;
+    using entry_type = entries::lru_entry<std::string>;
+    using cache_type = local_cache<std::string, entry_type,
+        std::less<entry_type>, policies::always<entry_type>,
+        std::map<std::string, entry_type>, statistics::local_statistics>;
 
     cache_type c(4);    // this time we can hold 4 items
 
@@ -188,11 +185,10 @@ void test_statistics_erase_one()
 {
     using namespace hpx::util::cache;
 
-    typedef entries::lru_entry<std::string> entry_type;
-    typedef local_cache<std::string, entry_type, std::less<entry_type>,
-        policies::always<entry_type>, std::map<std::string, entry_type>,
-        statistics::local_statistics>
-        cache_type;
+    using entry_type = entries::lru_entry<std::string>;
+    using cache_type = local_cache<std::string, entry_type,
+        std::less<entry_type>, policies::always<entry_type>,
+        std::map<std::string, entry_type>, statistics::local_statistics>;
 
     cache_type c(3);
 

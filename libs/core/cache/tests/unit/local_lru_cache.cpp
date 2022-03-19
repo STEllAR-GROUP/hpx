@@ -1,4 +1,4 @@
-//  Copyright (c) 2008-2016 Hartmut Kaiser
+//  Copyright (c) 2008-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +14,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 struct data
 {
-    data(char const* const k, char const* const v)
+    constexpr data(char const* const k, char const* const v) noexcept
       : key(k)
       , value(v)
     {
@@ -32,8 +32,8 @@ data cache_entries[] = {data("white", "255,255,255"),
 ///////////////////////////////////////////////////////////////////////////////
 void test_lru_insert()
 {
-    typedef hpx::util::cache::entries::lru_entry<std::string> entry_type;
-    typedef hpx::util::cache::local_cache<std::string, entry_type> cache_type;
+    using entry_type = hpx::util::cache::entries::lru_entry<std::string>;
+    using cache_type = hpx::util::cache::local_cache<std::string, entry_type>;
 
     cache_type c(3);
 
@@ -53,8 +53,8 @@ void test_lru_insert()
 ///////////////////////////////////////////////////////////////////////////////
 void test_lru_insert_with_touch()
 {
-    typedef hpx::util::cache::entries::lru_entry<std::string> entry_type;
-    typedef hpx::util::cache::local_cache<std::string, entry_type> cache_type;
+    using entry_type = hpx::util::cache::entries::lru_entry<std::string>;
+    using cache_type = hpx::util::cache::local_cache<std::string, entry_type>;
 
     cache_type c(3);
 
@@ -92,8 +92,8 @@ void test_lru_insert_with_touch()
 ///////////////////////////////////////////////////////////////////////////////
 void test_lru_clear()
 {
-    typedef hpx::util::cache::entries::lru_entry<std::string> entry_type;
-    typedef hpx::util::cache::local_cache<std::string, entry_type> cache_type;
+    using entry_type = hpx::util::cache::entries::lru_entry<std::string>;
+    using cache_type = hpx::util::cache::local_cache<std::string, entry_type>;
 
     cache_type c(3);
 
@@ -131,8 +131,8 @@ struct erase_func
 
 void test_lru_erase_one()
 {
-    typedef hpx::util::cache::entries::lru_entry<std::string> entry_type;
-    typedef hpx::util::cache::local_cache<std::string, entry_type> cache_type;
+    using entry_type = hpx::util::cache::entries::lru_entry<std::string>;
+    using cache_type = hpx::util::cache::local_cache<std::string, entry_type>;
 
     cache_type c(3);
 
@@ -158,8 +158,8 @@ void test_lru_erase_one()
 ///////////////////////////////////////////////////////////////////////////////
 void test_lru_update()
 {
-    typedef hpx::util::cache::entries::lru_entry<std::string> entry_type;
-    typedef hpx::util::cache::local_cache<std::string, entry_type> cache_type;
+    using entry_type = hpx::util::cache::entries::lru_entry<std::string>;
+    using cache_type = hpx::util::cache::local_cache<std::string, entry_type>;
 
     cache_type c(4);    // this time we can hold 4 items
 
