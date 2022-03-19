@@ -109,6 +109,9 @@ include(HPX_SetupPapi)
 include(HPX_SetupCUDA)
 
 include(HPX_SetupMPI)
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
+  hpx_setup_mpi()
+endif()
 
 # APEX
 set(APEX_WITH_MSR "@APEX_WITH_MSR@")

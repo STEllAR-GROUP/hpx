@@ -1,11 +1,8 @@
-# Copyright (c) 2019 Ste||ar Group
+# Copyright (c) 2019-2022 Ste||ar Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-# FIXME : in the future put it directly inside the cmake directory of the
-# corresponding plugin
 
 include(HPX_Message)
 
@@ -13,7 +10,7 @@ macro(hpx_setup_mpi)
 
   if(NOT TARGET Mpi::mpi)
 
-    find_package(MPI REQUIRED COMPONENTS CXX)
+    find_package(MPI REQUIRED QUIET COMPONENTS CXX)
     add_library(Mpi::mpi INTERFACE IMPORTED)
     target_link_libraries(Mpi::mpi INTERFACE MPI::MPI_CXX)
 
@@ -30,10 +27,3 @@ macro(hpx_setup_mpi)
   endif()
 
 endmacro()
-
-# FIXME : not sure if this comment is still up-to-date If we compile with the
-# MPI parcelport enabled, we need to additionally add the MPI include path here,
-# because for the main library, it's only added for the plugin.
-if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
-  hpx_setup_mpi()
-endif()
