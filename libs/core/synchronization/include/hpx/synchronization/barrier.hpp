@@ -137,8 +137,7 @@ namespace hpx {
 
     private:
         /// \cond NOINTERNAL
-        HPX_NODISCARD
-        arrival_token arrive_locked(
+        [[nodiscard]] arrival_token arrive_locked(
             std::unique_lock<mutex_type>& l, std::ptrdiff_t update = 1)
         {
             HPX_ASSERT_OWNS_LOCK(l);
@@ -180,8 +179,7 @@ namespace hpx {
         ///                 types([thread.mutex.requirements.mutex]).
         /// [Note: This call can cause the completion step for the current phase
         ///        to start.- end note]
-        HPX_NODISCARD
-        arrival_token arrive(std::ptrdiff_t update = 1)
+        [[nodiscard]] arrival_token arrive(std::ptrdiff_t update = 1)
         {
             std::unique_lock<mutex_type> l(mtx_);
             return arrive_locked(l, update);

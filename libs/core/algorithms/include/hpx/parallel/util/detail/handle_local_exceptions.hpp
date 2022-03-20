@@ -34,7 +34,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_ASSERT(false);
         }
 #else
-        HPX_NORETURN static void call(std::exception_ptr const& e)
+        [[noreturn]] static void call(std::exception_ptr const& e)
         {
             try
             {
@@ -232,7 +232,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_ASSERT(false);
         }
 #else
-        HPX_NORETURN static void call(std::exception_ptr const&)
+        [[noreturn]] static void call(std::exception_ptr const&)
         {
             parallel_exception_termination_handler();
         }
@@ -245,7 +245,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_ASSERT(false);
         }
 #else
-        HPX_NORETURN static void call(
+        [[noreturn]] static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)
         {
             parallel_exception_termination_handler();
@@ -318,7 +318,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_ASSERT(false);
         }
 #else
-        HPX_NORETURN static void call(std::exception_ptr const&)
+        [[noreturn]] static void call(std::exception_ptr const&)
         {
             parallel_exception_termination_handler();
         }
@@ -331,7 +331,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_ASSERT(false);
         }
 #else
-        HPX_NORETURN static void call(
+        [[noreturn]] static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)
         {
             parallel_exception_termination_handler();

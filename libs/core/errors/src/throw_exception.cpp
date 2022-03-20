@@ -15,7 +15,7 @@
 #include <system_error>
 
 namespace hpx { namespace detail {
-    HPX_NORETURN void throw_exception(error errcode, std::string const& msg,
+    [[noreturn]] void throw_exception(error errcode, std::string const& msg,
         std::string const& func, std::string const& file, long line)
     {
         filesystem::path p(file);
@@ -23,7 +23,7 @@ namespace hpx { namespace detail {
             hpx::exception(errcode, msg, hpx::plain), func, p.string(), line);
     }
 
-    HPX_NORETURN void rethrow_exception(
+    [[noreturn]] void rethrow_exception(
         exception const& e, std::string const& func)
     {
         hpx::detail::throw_exception(
@@ -84,7 +84,7 @@ namespace hpx { namespace detail {
         }
     }
 
-    HPX_NORETURN void throw_thread_interrupted_exception()
+    [[noreturn]] void throw_thread_interrupted_exception()
     {
         throw hpx::thread_interrupted();
     }

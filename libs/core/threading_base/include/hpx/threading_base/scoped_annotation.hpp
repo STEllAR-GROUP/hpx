@@ -30,7 +30,7 @@ namespace hpx {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-    struct HPX_NODISCARD scoped_annotation
+    struct [[nodiscard]] scoped_annotation
     {
         HPX_NON_COPYABLE(scoped_annotation);
 
@@ -45,7 +45,7 @@ namespace hpx {
         HPX_HOST_DEVICE ~scoped_annotation() {}
     };
 #elif HPX_HAVE_ITTNOTIFY != 0
-    struct HPX_NODISCARD scoped_annotation
+    struct [[nodiscard]] scoped_annotation
     {
         HPX_NON_COPYABLE(scoped_annotation);
 
@@ -66,7 +66,7 @@ namespace hpx {
         hpx::util::itt::task task_;
     };
 #else
-    struct HPX_NODISCARD scoped_annotation
+    struct [[nodiscard]] scoped_annotation
     {
         HPX_NON_COPYABLE(scoped_annotation);
 
@@ -142,7 +142,7 @@ namespace hpx {
 
 #else
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_NODISCARD scoped_annotation
+    struct [[nodiscard]] scoped_annotation
     {
         HPX_NON_COPYABLE(scoped_annotation);
 

@@ -134,7 +134,7 @@ namespace hpx {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_NORETURN HPX_CORE_EXPORT void termination_handler(int signum)
+    [[noreturn]] HPX_CORE_EXPORT void termination_handler(int signum)
     {
         if (signum != SIGINT &&
             hpx::threads::coroutines::attach_debugger_on_sigv)

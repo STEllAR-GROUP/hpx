@@ -379,7 +379,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    HPX_NORETURN HPX_CORE_EXPORT void throw_bad_any_call(
+    [[noreturn]] HPX_CORE_EXPORT void throw_bad_any_call(
         char const* class_name, char const* function_name);
 
     template <typename... Ts>
@@ -400,12 +400,12 @@ namespace hpx::execution::experimental::detail {
             throw_bad_any_call("any_receiver", "set_value");
         }
 
-        HPX_NORETURN void set_error(std::exception_ptr) && noexcept override
+        [[noreturn]] void set_error(std::exception_ptr) && noexcept override
         {
             throw_bad_any_call("any_receiver", "set_error");
         }
 
-        HPX_NORETURN void set_stopped() && noexcept override
+        [[noreturn]] void set_stopped() && noexcept override
         {
             throw_bad_any_call("any_receiver", "set_stopped");
         }
@@ -566,7 +566,7 @@ namespace hpx::execution::experimental::detail {
             return true;
         }
 
-        HPX_NORETURN any_operation_state connect(any_receiver<Ts...>&&) &&
+        [[noreturn]] any_operation_state connect(any_receiver<Ts...>&&) &&
             override
         {
             throw_bad_any_call("unique_any_sender", "connect");
@@ -596,13 +596,13 @@ namespace hpx::execution::experimental::detail {
             return true;
         }
 
-        HPX_NORETURN any_operation_state connect(any_receiver<Ts...>&&) &
+        [[noreturn]] any_operation_state connect(any_receiver<Ts...>&&) &
             override
         {
             throw_bad_any_call("any_sender", "connect");
         }
 
-        HPX_NORETURN any_operation_state connect(any_receiver<Ts...>&&) &&
+        [[noreturn]] any_operation_state connect(any_receiver<Ts...>&&) &&
             override
         {
             throw_bad_any_call("any_sender", "connect");

@@ -156,7 +156,7 @@ namespace hpx::execution::experimental {
 
                     struct start_visitor
                     {
-                        HPX_NORETURN void operator()(hpx::monostate) const
+                        [[noreturn]] void operator()(hpx::monostate) const
                         {
                             HPX_UNREACHABLE;
                         }
@@ -176,7 +176,7 @@ namespace hpx::execution::experimental {
                         HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
                         operation_state& op_state;
 
-                        HPX_NORETURN void operator()(hpx::monostate) const
+                        [[noreturn]] void operator()(hpx::monostate) const
                         {
                             HPX_UNREACHABLE;
                         }

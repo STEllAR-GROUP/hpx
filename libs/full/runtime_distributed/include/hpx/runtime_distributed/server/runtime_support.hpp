@@ -147,7 +147,7 @@ namespace hpx { namespace components { namespace server {
         void shutdown_all(double timeout);
 
         /// \brief Shutdown this runtime system instance
-        HPX_NORETURN void terminate(naming::id_type const& respond_to);
+        [[noreturn]] void terminate(naming::id_type const& respond_to);
 
         void terminate_act(naming::id_type const& id)
         {
@@ -155,7 +155,7 @@ namespace hpx { namespace components { namespace server {
         }
 
         /// \brief Shutdown runtime system instances on all localities
-        HPX_NORETURN void terminate_all();
+        [[noreturn]] void terminate_all();
 
         void terminate_all_act()
         {

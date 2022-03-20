@@ -412,7 +412,7 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT topology& create_topology();
 
-    HPX_NODISCARD HPX_CORE_EXPORT unsigned int hardware_concurrency();
+    [[nodiscard]] HPX_CORE_EXPORT unsigned int hardware_concurrency();
 
     ///////////////////////////////////////////////////////////////////////////
     // abstract away memory page size, calls to system functions are

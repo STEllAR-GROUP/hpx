@@ -105,14 +105,14 @@ namespace hpx {
                                stop_state::locked_flag) == 0);
             }
 
-            HPX_NODISCARD bool stop_requested() const noexcept
+            [[nodiscard]] bool stop_requested() const noexcept
             {
                 return stop_requested(state_.load(std::memory_order_acquire));
             }
 
             // Returns: false if a stop request was not made and there are no
             //      associated stop_source objects; otherwise, true.
-            HPX_NODISCARD bool stop_possible() const noexcept
+            [[nodiscard]] bool stop_possible() const noexcept
             {
                 return stop_possible(state_.load(std::memory_order_acquire));
             }
@@ -136,18 +136,18 @@ namespace hpx {
                 stop_callback_base* cb) noexcept;
 
         private:
-            HPX_NODISCARD static bool is_locked(std::uint64_t state) noexcept
+            [[nodiscard]] static bool is_locked(std::uint64_t state) noexcept
             {
                 return (state & stop_state::locked_flag) != 0;
             }
 
-            HPX_NODISCARD static bool stop_requested(
+            [[nodiscard]] static bool stop_requested(
                 std::uint64_t state) noexcept
             {
                 return (state & stop_state::stop_requested_flag) != 0;
             }
 
-            HPX_NODISCARD static bool stop_possible(
+            [[nodiscard]] static bool stop_possible(
                 std::uint64_t state) noexcept
             {
                 // Stop may happen, if it has already been requested or if
@@ -195,7 +195,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Callback>
-    class HPX_NODISCARD stop_callback;
+    class [[nodiscard]] stop_callback;
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -252,7 +252,7 @@ namespace hpx {
 
         // Returns: true if *this has ownership of a stop state that has
         //      received a stop request; otherwise, false.
-        HPX_NODISCARD bool stop_requested() const noexcept
+        [[nodiscard]] bool stop_requested() const noexcept
         {
             return !!state_ && state_->stop_requested();
         }
@@ -261,7 +261,7 @@ namespace hpx {
         //      (2.1) *this does not have ownership of a stop state, or
         //      (2.2) a stop request was not made and there are no associated
         //            stop_source objects; otherwise, true.
-        HPX_NODISCARD bool stop_possible() const noexcept
+        [[nodiscard]] bool stop_possible() const noexcept
         {
             return !!state_ && state_->stop_possible();
         }
@@ -271,14 +271,14 @@ namespace hpx {
         // Returns: true if lhs and rhs have ownership of the same stop state or
         //      if both lhs and rhs do not have ownership of a stop state;
         //      otherwise false.
-        HPX_NODISCARD friend bool operator==(
+        [[nodiscard]] friend bool operator==(
             stop_token const& lhs, stop_token const& rhs) noexcept
         {
             return lhs.state_ == rhs.state_;
         }
 
         // Returns: !(lhs==rhs).
-        HPX_NODISCARD friend bool operator!=(
+        [[nodiscard]] friend bool operator!=(
             stop_token const& lhs, stop_token const& rhs) noexcept
         {
             return !(lhs == rhs);
@@ -368,7 +368,7 @@ namespace hpx {
 
         // Returns: stop_token() if stop_possible() is false; otherwise a new
         //      associated stop_token object.
-        HPX_NODISCARD stop_token get_token() const noexcept
+        [[nodiscard]] stop_token get_token() const noexcept
         {
             if (!stop_possible())
             {
@@ -378,14 +378,14 @@ namespace hpx {
         }
 
         // Returns: true if *this has ownership of a stop state; otherwise, false.
-        HPX_NODISCARD bool stop_possible() const noexcept
+        [[nodiscard]] bool stop_possible() const noexcept
         {
             return !!state_;
         }
 
         // Returns: true if *this has ownership of a stop state that has
         //      received a stop request; otherwise, false.
-        HPX_NODISCARD bool stop_requested() const noexcept
+        [[nodiscard]] bool stop_requested() const noexcept
         {
             return !!state_ && state_->stop_requested();
         }
@@ -416,13 +416,13 @@ namespace hpx {
         // Returns: true if lhs and rhs have ownership of the same stop state or
         //      if both lhs and rhs do not have ownership of a stop state;
         //      otherwise false.
-        HPX_NODISCARD friend bool operator==(
+        [[nodiscard]] friend bool operator==(
             stop_source const& lhs, stop_source const& rhs) noexcept
         {
             return lhs.state_ == rhs.state_;
         }
 
-        HPX_NODISCARD friend bool operator!=(
+        [[nodiscard]] friend bool operator!=(
             stop_source const& lhs, stop_source const& rhs) noexcept
         {
             return !(lhs == rhs);
@@ -437,7 +437,7 @@ namespace hpx {
     // 32.3.5, class stop_callback
     //
     template <typename Callback>
-    class HPX_NODISCARD stop_callback : private detail::stop_callback_base
+    class [[nodiscard]] stop_callback : private detail::stop_callback_base
     {
     public:
         using callback_type = Callback;
@@ -561,7 +561,7 @@ namespace hpx::p2300_stop_token {
 
     // [stopcallback.inplace], class template in_place_stop_callback
     template <typename Callback>
-    class HPX_NODISCARD in_place_stop_callback;
+    class [[nodiscard]] in_place_stop_callback;
 
     // [stoptoken.never], class never_stop_token
     //
@@ -586,17 +586,17 @@ namespace hpx::p2300_stop_token {
         template <typename>
         using callback_type = callback_impl;
 
-        HPX_NODISCARD static constexpr bool stop_requested() noexcept
+        [[nodiscard]] static constexpr bool stop_requested() noexcept
         {
             return false;
         }
 
-        HPX_NODISCARD static constexpr bool stop_possible() noexcept
+        [[nodiscard]] static constexpr bool stop_possible() noexcept
         {
             return false;
         }
 
-        HPX_NODISCARD friend constexpr bool operator==(
+        [[nodiscard]] friend constexpr bool operator==(
             never_stop_token const&, never_stop_token const&) noexcept
         {
             return true;
@@ -633,7 +633,7 @@ namespace hpx::p2300_stop_token {
         in_place_stop_source& operator=(
             in_place_stop_source&&) noexcept = delete;
 
-        HPX_NODISCARD in_place_stop_token get_token() const noexcept;
+        [[nodiscard]] in_place_stop_token get_token() const noexcept;
 
         // Effects: Atomically determines whether the stop state inside *this
         // has received a stop request, and if not, makes a stop request.
@@ -654,14 +654,14 @@ namespace hpx::p2300_stop_token {
 
         // Returns: true if the stop state inside *this has not yet received
         // a stop request; otherwise, false.
-        HPX_NODISCARD bool stop_requested() const noexcept
+        [[nodiscard]] bool stop_requested() const noexcept
         {
             return state_.stop_requested();
         }
 
         // Returns: true if the stop state inside *this has not yet received
         // a stop request; otherwise, false.
-        HPX_NODISCARD bool stop_possible() const noexcept
+        [[nodiscard]] bool stop_possible() const noexcept
         {
             return state_.stop_possible();
         }
@@ -730,7 +730,7 @@ namespace hpx::p2300_stop_token {
         // must strongly happen before the beginning of invocation of the
         // destructor of *source_.
         //
-        HPX_NODISCARD bool stop_requested() const noexcept
+        [[nodiscard]] bool stop_requested() const noexcept
         {
             return source_ != nullptr && source_->stop_requested();
         }
@@ -741,7 +741,7 @@ namespace hpx::p2300_stop_token {
         // must strongly happen before the beginning of invocation of the
         // destructor of *source_.
         //
-        HPX_NODISCARD bool stop_possible() const noexcept
+        [[nodiscard]] bool stop_possible() const noexcept
         {
             return source_ != nullptr && source_->stop_possible();
         }
@@ -752,7 +752,7 @@ namespace hpx::p2300_stop_token {
             std::swap(source_, rhs.source_);
         }
 
-        HPX_NODISCARD friend constexpr bool operator==(
+        [[nodiscard]] friend constexpr bool operator==(
             in_place_stop_token const& lhs,
             in_place_stop_token const& rhs) noexcept
         {
@@ -801,7 +801,7 @@ namespace hpx::p2300_stop_token {
     // association with an in_place_stop_source object.
     //
     template <typename Callback>
-    class HPX_NODISCARD in_place_stop_callback
+    class [[nodiscard]] in_place_stop_callback
       : private hpx::detail::stop_callback_base
     {
     public:

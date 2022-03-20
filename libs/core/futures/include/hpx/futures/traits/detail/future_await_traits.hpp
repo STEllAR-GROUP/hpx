@@ -40,7 +40,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
         }
 
-        HPX_NODISCARD constexpr bool await_ready() const noexcept
+        [[nodiscard]] constexpr bool await_ready() const noexcept
         {
             return is_ready_;
         }
@@ -166,7 +166,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         // allocator support for shared coroutine state
-        HPX_NODISCARD static void* allocate(std::size_t size)
+        [[nodiscard]] static void* allocate(std::size_t size)
         {
             using char_allocator = typename std::allocator_traits<
                 allocator_type>::template rebind_alloc<char>;
@@ -220,7 +220,7 @@ namespace std {
                 this->base_type::set_exception(std::current_exception());
             }
 
-            HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
+            [[nodiscard]] HPX_FORCEINLINE static void* operator new(
                 std::size_t size)
             {
                 return base_type::allocate(size);
@@ -257,7 +257,7 @@ namespace std {
                 this->base_type::set_exception(std::current_exception());
             }
 
-            HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
+            [[nodiscard]] HPX_FORCEINLINE static void* operator new(
                 std::size_t size)
             {
                 return base_type::allocate(size);
@@ -297,7 +297,7 @@ namespace std {
                 this->base_type::set_exception(std::current_exception());
             }
 
-            HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
+            [[nodiscard]] HPX_FORCEINLINE static void* operator new(
                 std::size_t size)
             {
                 return base_type::allocate(size);
@@ -334,7 +334,7 @@ namespace std {
                 this->base_type::set_exception(std::current_exception());
             }
 
-            HPX_NODISCARD HPX_FORCEINLINE static void* operator new(
+            [[nodiscard]] HPX_FORCEINLINE static void* operator new(
                 std::size_t size)
             {
                 return base_type::allocate(size);
