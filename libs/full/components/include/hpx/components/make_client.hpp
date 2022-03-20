@@ -76,7 +76,8 @@ namespace hpx { namespace components {
         return result;
     }
 
-#if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION > 1104)
+    // this is broken at least up until CUDA V11.5
+#if !defined(HPX_CUDA_VERSION)
     template <typename Client>
     inline std::enable_if_t<traits::is_client_v<Client>, std::vector<Client>>
     make_clients(std::vector<hpx::id_type>&& ids)
@@ -104,7 +105,8 @@ namespace hpx { namespace components {
         return result;
     }
 
-#if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION > 1104)
+    // this is broken at least up until CUDA V11.5
+#if !defined(HPX_CUDA_VERSION)
     template <typename Client>
     inline std::enable_if_t<traits::is_client_v<Client>, std::vector<Client>>
     make_clients(std::vector<hpx::future<hpx::id_type>>&& ids)
@@ -132,7 +134,8 @@ namespace hpx { namespace components {
         return result;
     }
 
-#if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION > 1104)
+    // this is broken at least up until CUDA V11.5
+#if !defined(HPX_CUDA_VERSION)
     template <typename Client>
     inline std::enable_if_t<traits::is_client_v<Client>, std::vector<Client>>
     make_clients(std::vector<hpx::shared_future<hpx::id_type>>&& ids)
