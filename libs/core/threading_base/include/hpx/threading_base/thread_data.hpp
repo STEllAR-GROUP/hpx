@@ -606,7 +606,7 @@ namespace hpx { namespace threads {
             thread_id_addref addref = thread_id_addref::yes);
 
         virtual ~thread_data() override;
-        virtual void destroy() = 0;
+        virtual void destroy() noexcept = 0;
 
     protected:
         void rebind_base(thread_init_data& init_data);

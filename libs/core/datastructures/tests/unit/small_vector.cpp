@@ -44,7 +44,7 @@ namespace test {
             return reinterpret_cast<T*>(::new char[sizeof(T) * n]);
         }
 
-        void deallocate(T* p, std::size_t)
+        void deallocate(T* p, std::size_t) noexcept
         {
             delete[](reinterpret_cast<char*>(p));
         }

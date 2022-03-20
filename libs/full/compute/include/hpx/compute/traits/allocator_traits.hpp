@@ -233,7 +233,8 @@ namespace hpx { namespace compute { namespace traits {
             return alloc.allocate(n, hint);
         }
 
-        static void deallocate(Allocator& alloc, pointer p, size_type n)
+        static void deallocate(
+            Allocator& alloc, pointer p, size_type n) noexcept
         {
             alloc.deallocate(p, n);
         }

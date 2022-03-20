@@ -250,12 +250,12 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void intrusive_ptr_add_ref(condition_variable_data* p)
+    void intrusive_ptr_add_ref(condition_variable_data* p) noexcept
     {
         ++p->count_;
     }
 
-    void intrusive_ptr_release(condition_variable_data* p)
+    void intrusive_ptr_release(condition_variable_data* p) noexcept
     {
         if (0 == --p->count_)
         {

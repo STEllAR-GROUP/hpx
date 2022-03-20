@@ -167,8 +167,8 @@ namespace hpx { namespace threads {
 
         struct thread_data_reference_counting;
 
-        void intrusive_ptr_add_ref(thread_data_reference_counting* p);
-        void intrusive_ptr_release(thread_data_reference_counting* p);
+        void intrusive_ptr_add_ref(thread_data_reference_counting* p) noexcept;
+        void intrusive_ptr_release(thread_data_reference_counting* p) noexcept;
 
         struct thread_data_reference_counting
         {
@@ -185,12 +185,14 @@ namespace hpx { namespace threads {
             virtual void destroy_thread() = 0;
 
             // reference counting
-            friend void intrusive_ptr_add_ref(thread_data_reference_counting* p)
+            friend void intrusive_ptr_add_ref(
+                thread_data_reference_counting* p) noexcept
             {
                 ++p->count_;
             }
 
-            friend void intrusive_ptr_release(thread_data_reference_counting* p)
+            friend void intrusive_ptr_release(
+                thread_data_reference_counting* p) noexcept
             {
                 HPX_ASSERT(p->count_ != 0);
                 if (--p->count_ == 0)

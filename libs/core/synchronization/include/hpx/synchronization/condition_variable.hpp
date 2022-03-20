@@ -37,8 +37,7 @@ namespace hpx { namespace lcos { namespace local {
     {
     private:
         using mutex_type = detail::condition_variable_data::mutex_type;
-        using data_type =
-            hpx::memory::intrusive_ptr<detail::condition_variable_data>;
+        using data_type = hpx::intrusive_ptr<detail::condition_variable_data>;
 
     public:
         condition_variable()
@@ -183,8 +182,7 @@ namespace hpx { namespace lcos { namespace local {
     {
     private:
         using mutex_type = detail::condition_variable_data::mutex_type;
-        using data_type =
-            hpx::memory::intrusive_ptr<detail::condition_variable_data>;
+        using data_type = hpx::intrusive_ptr<detail::condition_variable_data>;
 
     public:
         condition_variable_any()

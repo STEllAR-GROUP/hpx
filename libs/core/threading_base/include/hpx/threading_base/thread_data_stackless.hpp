@@ -146,7 +146,7 @@ namespace hpx { namespace threads {
             std::ptrdiff_t stacksize,
             thread_id_addref addref = thread_id_addref::yes);
 
-        void destroy() override
+        void destroy() noexcept override
         {
             this->~thread_data_stackless();
             thread_alloc_.deallocate(this, 1);

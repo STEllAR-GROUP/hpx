@@ -141,7 +141,7 @@ namespace hpx { namespace parallel { namespace util {
             return p;
         }
 
-        void deallocate(pointer p, size_type cnt)
+        void deallocate(pointer p, size_type cnt) noexcept
         {
             topo_.deallocate(p, cnt * sizeof(T));
         }

@@ -41,7 +41,7 @@ struct counting_allocator : public std::allocator<T>
         return std::allocator<T>::allocate(n);
     }
 
-    void deallocate(T* p, std::size_t n)
+    void deallocate(T* p, std::size_t n) noexcept
     {
         dealloc_count++;
         std::allocator<T>::deallocate(p, n);

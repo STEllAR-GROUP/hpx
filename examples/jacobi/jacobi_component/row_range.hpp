@@ -46,11 +46,11 @@ namespace jacobi
         std::vector<double> v_;
         hpx::util::atomic_count count_;
 
-        friend void intrusive_ptr_add_ref(value_holder * p)
+        friend void intrusive_ptr_add_ref(value_holder * p) noexcept
         {
             ++p->count_;
         }
-        friend void intrusive_ptr_release(value_holder * p)
+        friend void intrusive_ptr_release(value_holder * p) noexcept
         {
             if (0 == --p->count_)
                 delete p;

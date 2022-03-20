@@ -170,8 +170,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     struct condition_variable_data;
 
-    HPX_CORE_EXPORT void intrusive_ptr_add_ref(condition_variable_data* p);
-    HPX_CORE_EXPORT void intrusive_ptr_release(condition_variable_data* p);
+    HPX_CORE_EXPORT void intrusive_ptr_add_ref(
+        condition_variable_data* p) noexcept;
+    HPX_CORE_EXPORT void intrusive_ptr_release(
+        condition_variable_data* p) noexcept;
 
     struct condition_variable_data
     {
@@ -187,9 +189,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
     private:
         friend HPX_CORE_EXPORT void intrusive_ptr_add_ref(
-            condition_variable_data*);
+            condition_variable_data*) noexcept;
         friend HPX_CORE_EXPORT void intrusive_ptr_release(
-            condition_variable_data*);
+            condition_variable_data*) noexcept;
 
         hpx::util::atomic_count count_;
     };

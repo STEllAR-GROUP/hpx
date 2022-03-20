@@ -249,7 +249,7 @@ namespace hpx {
                 return alloc_.allocate(1);
             }
 
-            static void operator delete(void* p, std::size_t size)
+            static void operator delete(void* p, std::size_t size) noexcept
             {
                 if (p == nullptr)
                 {

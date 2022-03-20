@@ -87,13 +87,13 @@ namespace hpx { namespace distributed { namespace detail {
         }
 
         // intrusive reference counting
-        friend void intrusive_ptr_add_ref(barrier_node* p)
+        friend void intrusive_ptr_add_ref(barrier_node* p) noexcept
         {
             ++p->count_;
         }
 
         // intrusive reference counting
-        friend void intrusive_ptr_release(barrier_node* p)
+        friend void intrusive_ptr_release(barrier_node* p) noexcept
         {
             if (p && --p->count_ == 0)
             {

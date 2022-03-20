@@ -158,7 +158,7 @@ namespace hpx { namespace util {
             return p;
         }
 
-        void deallocate(pointer p, size_type)
+        void deallocate(pointer p, size_type) noexcept
         {
             __aligned_free(p);
         }

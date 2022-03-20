@@ -88,11 +88,11 @@ namespace hpx { namespace lcos { namespace detail {
     private:
         // intrusive reference counting, noop since we don't require
         // reference counting here.
-        friend void intrusive_ptr_add_ref(promise_lco_base* /*p*/) {}
+        friend void intrusive_ptr_add_ref(promise_lco_base* /*p*/) noexcept {}
 
         // intrusive reference counting, noop since we don't require
         // reference counting here.
-        friend void intrusive_ptr_release(promise_lco_base* /*p*/) {}
+        friend void intrusive_ptr_release(promise_lco_base* /*p*/) noexcept {}
     };
 
     template <typename Result, typename RemoteResult>

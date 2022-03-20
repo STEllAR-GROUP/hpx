@@ -270,7 +270,7 @@ namespace boost { namespace lockfree {
             return chunk;
         }
 
-        void dealloc_node(node* n)
+        void dealloc_node(node* n) noexcept
         {
             if (n != nullptr)
             {

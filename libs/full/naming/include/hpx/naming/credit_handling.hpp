@@ -58,7 +58,7 @@ namespace hpx::naming {
             std::unique_lock<gid_type::mutex_type>& l, gid_type& id);
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT void decrement_refcnt(id_type_impl* gid);
+        HPX_EXPORT void decrement_refcnt(id_type_impl* gid) noexcept;
 
         ///////////////////////////////////////////////////////////////////////
         // credit management (called during serialization), this function

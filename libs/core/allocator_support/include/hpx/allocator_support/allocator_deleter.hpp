@@ -18,7 +18,7 @@ namespace hpx { namespace util {
     struct allocator_deleter
     {
         template <typename SharedState>
-        void operator()(SharedState* state)
+        void operator()(SharedState* state) noexcept
         {
             using traits = std::allocator_traits<Allocator>;
             traits::deallocate(alloc_, state, 1);
