@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2019 Hartmut Kaiser
+# Copyright (c) 2007-2022 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
@@ -74,7 +74,7 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
     target_link_options(APEX::apex INTERFACE "-Wl,-no-as-needed")
   endif()
 
-  if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
+  if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
     # APEX now depends on MPI itself
     if(NOT TARGET Mpi::mpi)
       include(HPX_SetupMPI)

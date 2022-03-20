@@ -1,5 +1,5 @@
 # Copyright (c)      2020 Mikael Simberg
-# Copyright (c) 2007-2021 Hartmut Kaiser
+# Copyright (c) 2007-2022 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
@@ -2005,6 +2005,9 @@ add_hpx_library_headers_noglob(hpx_external)
 # Setup plugins (set here cause if we include it inside plugins, it will not be
 # defined in src/CMakeLists.txt where we call add_static_parcelports)
 include(HPX_SetupMPI) # must come before APEX
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
+  hpx_setup_mpi()
+endif()
 
 # Setup packages and subprojects
 include(HPX_SetupHIP)
