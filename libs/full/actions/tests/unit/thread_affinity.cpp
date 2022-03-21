@@ -99,7 +99,7 @@ void thread_affinity_foreman()
     std::size_t const os_threads = hpx::get_os_thread_count();
 
     // Find the global name of the current locality.
-    hpx::naming::id_type const here = hpx::find_here();
+    hpx::id_type const here = hpx::find_here();
 
     // Populate a set with the OS-thread numbers of all OS-threads on this
     // locality. When the hello world message has been printed on a particular
@@ -149,14 +149,13 @@ int hpx_main(hpx::program_options::variables_map& /*vm*/)
 {
     {
         // Get a list of all available localities.
-        std::vector<hpx::naming::id_type> localities =
-            hpx::find_all_localities();
+        std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
         // Reserve storage space for futures, one for each locality.
         std::vector<hpx::future<void>> futures;
         futures.reserve(localities.size());
 
-        for (hpx::naming::id_type const& node : localities)
+        for (hpx::id_type const& node : localities)
         {
             // Asynchronously start a new task. The task is encapsulated in a
             // future, which we can query to determine if the task has

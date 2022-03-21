@@ -63,12 +63,12 @@ namespace hpx::parcelset {
         return data_->get_action_type();
     }
 
-    naming::id_type parcel::source_id() const
+    hpx::id_type parcel::source_id() const
     {
         return data_->source_id();
     }
 
-    void parcel::set_source_id(naming::id_type const& source_id)
+    void parcel::set_source_id(hpx::id_type const& source_id)
     {
         data_->set_source_id(source_id);
     }

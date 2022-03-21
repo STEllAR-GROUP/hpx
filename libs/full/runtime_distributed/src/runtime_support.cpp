@@ -60,8 +60,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
 
     /// \brief Invoke an asynchronous garbage collection step on the given target
     ///        locality.
-    void garbage_collect_non_blocking_id(
-        naming::id_type const& id, error_code& ec)
+    void garbage_collect_non_blocking_id(hpx::id_type const& id, error_code& ec)
     {
         try
         {
@@ -78,7 +77,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
 
     /// \brief Invoke a synchronous garbage collection step on the given target
     ///        locality.
-    void garbage_collect_id(naming::id_type const& id, error_code& ec)
+    void garbage_collect_id(hpx::id_type const& id, error_code& ec)
     {
         try
         {

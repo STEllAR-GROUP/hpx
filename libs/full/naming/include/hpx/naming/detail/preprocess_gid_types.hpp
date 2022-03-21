@@ -23,7 +23,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // This class allows to handle credit splitting for gid_types during
@@ -133,4 +133,4 @@ namespace hpx { namespace serialization { namespace detail {
         HPX_EXPORT static extra_archive_data_id_type id() noexcept;
         static constexpr void reset(preprocess_gid_types*) noexcept {}
     };
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail

@@ -12,22 +12,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
     template <typename Action, typename Cont, typename... Ts>
-    bool apply_continue(Cont&& cont, naming::id_type const& gid, Ts&&... vs);
+    bool apply_continue(Cont&& cont, hpx::id_type const& gid, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename Cont, typename... Ts>
     bool apply_continue(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        Cont&& cont, naming::id_type const& gid, Ts&&... vs);
+        Cont&& cont, hpx::id_type const& gid, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
     bool apply_continue(
-        naming::id_type const& cont, naming::id_type const& gid, Ts&&... vs);
+        hpx::id_type const& cont, hpx::id_type const& gid, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename... Ts>
     bool apply_continue(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& cont, naming::id_type const& gid, Ts&&... vs);
+        hpx::id_type const& cont, hpx::id_type const& gid, Ts&&... vs);
 }    // namespace hpx

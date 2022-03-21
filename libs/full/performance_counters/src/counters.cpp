@@ -741,14 +741,14 @@ namespace hpx { namespace performance_counters {
 
         ///////////////////////////////////////////////////////////////////////
         counter_status add_counter(
-            naming::id_type const& id, counter_info const& info, error_code& ec)
+            hpx::id_type const& id, counter_info const& info, error_code& ec)
         {
             HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             return registry::instance().add_counter(id, info, ec);
         }
 
         counter_status remove_counter(
-            counter_info const& info, naming::id_type const& id, error_code& ec)
+            counter_info const& info, hpx::id_type const& id, error_code& ec)
         {
             HPX_ASSERT(hpx::get_runtime_ptr() != nullptr);
             return registry::instance().remove_counter(info, id, ec);
@@ -1101,20 +1101,20 @@ namespace hpx { namespace performance_counters {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static naming::id_type register_with_agas(
-        std::string const& fullname, hpx::future<naming::id_type> f)
+    static hpx::id_type register_with_agas(
+        std::string const& fullname, hpx::future<hpx::id_type> f)
     {
         // register the canonical name with AGAS
-        naming::id_type id = f.get();
+        hpx::id_type id = f.get();
         agas::register_name(launch::sync, fullname, id);
         return id;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::id_type> get_counter_async(
+    hpx::future<hpx::id_type> get_counter_async(
         counter_info const& info, error_code& ec)
     {
-        typedef hpx::future<naming::id_type> result_type;
+        typedef hpx::future<hpx::id_type> result_type;
 
         // complement counter info data
         counter_info complemented_info = info;
@@ -1126,9 +1126,9 @@ namespace hpx { namespace performance_counters {
         // pre-pend prefix, if necessary
 
         // ask AGAS for the id of the given counter
-        naming::id_type id =
+        hpx::id_type id =
             agas::resolve_name(launch::sync, complemented_info.fullname_, ec);
-        if (id == naming::invalid_id)
+        if (id == hpx::invalid_id)
         {
             try
             {
@@ -1160,7 +1160,7 @@ namespace hpx { namespace performance_counters {
 
                 // use the runtime_support component of the target locality to
                 // create the new performance counter
-                hpx::future<naming::id_type> f;
+                hpx::future<hpx::id_type> f;
                 if (p.parentinstanceindex_ >= 0)
                 {
                     f = create_performance_counter_async(
@@ -1189,7 +1189,7 @@ namespace hpx { namespace performance_counters {
                 LPCS_(warning).format("failed to create counter {} ({})",
                     remove_counter_prefix(complemented_info.fullname_),
                     e.what());
-                return hpx::future<naming::id_type>();
+                return hpx::future<hpx::id_type>();
             }
         }
         if (ec)
@@ -1198,7 +1198,7 @@ namespace hpx { namespace performance_counters {
         return hpx::make_ready_future(id);
     }
 
-    hpx::future<naming::id_type> get_counter_async(
+    hpx::future<hpx::id_type> get_counter_async(
         std::string name, error_code& ec)
     {
         ensure_counter_prefix(name);    // prepend prefix, if necessary

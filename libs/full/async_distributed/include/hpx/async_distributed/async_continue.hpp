@@ -55,7 +55,7 @@ namespace hpx {
     template <typename Action, typename Cont, typename... Ts>
     hpx::future<typename traits::promise_local_result<
         typename detail::result_of_async_continue<Action, Cont>::type>::type>
-    async_continue(Cont&& cont, naming::id_type const& gid, Ts&&... vs)
+    async_continue(Cont&& cont, hpx::id_type const& gid, Ts&&... vs)
     {
         typedef typename traits::promise_remote_result<
             typename detail::result_of_async_continue<Action, Cont>::type>::type
@@ -72,7 +72,7 @@ namespace hpx {
     async_continue(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
         ,
-        Cont&& cont, naming::id_type const& gid, Ts&&... vs)
+        Cont&& cont, hpx::id_type const& gid, Ts&&... vs)
     {
         return async_continue<Derived>(
             HPX_FORWARD(Cont, cont), gid, HPX_FORWARD(Ts, vs)...);

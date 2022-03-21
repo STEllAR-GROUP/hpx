@@ -26,8 +26,7 @@
 namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename... Ts>
-    bool apply_colocated_cb(
-        naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+    bool apply_colocated_cb(hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         // shortcut co-location code if target already is a locality
         if (naming::is_locality(gid))
@@ -38,9 +37,9 @@ namespace hpx { namespace detail {
 
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
-        naming::id_type service_target(
+        hpx::id_type service_target(
             agas::primary_namespace::get_service_instance(gid.get_gid()),
-            naming::id_type::unmanaged);
+            hpx::id_type::management_type::unmanaged);
 
         typedef agas::server::primary_namespace::colocate_action action_type;
 
@@ -56,7 +55,7 @@ namespace hpx { namespace detail {
         typename Callback, typename... Ts>
     bool apply_colocated_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+        hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return apply_colocated_cb<Derived>(
             gid, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
@@ -65,8 +64,8 @@ namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
-    bool apply_colocated_cb(Continuation&& cont, naming::id_type const& gid,
-        Callback&& cb, Ts&&... vs)
+    bool apply_colocated_cb(
+        Continuation&& cont, hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         // shortcut co-location code if target already is a locality
         if (naming::is_locality(gid))
@@ -78,9 +77,9 @@ namespace hpx { namespace detail {
 
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
-        naming::id_type service_target(
+        hpx::id_type service_target(
             agas::primary_namespace::get_service_instance(gid.get_gid()),
-            naming::id_type::unmanaged);
+            hpx::id_type::management_type::unmanaged);
 
         typedef agas::server::primary_namespace::colocate_action action_type;
 
@@ -98,7 +97,7 @@ namespace hpx { namespace detail {
         typename Derived, typename Callback, typename... Ts>
     bool apply_colocated_cb(Continuation&& cont,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+        hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return apply_colocated_cb<Derived>(HPX_FORWARD(Continuation, cont), gid,
             HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);

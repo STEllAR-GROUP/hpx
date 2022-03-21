@@ -45,7 +45,7 @@ int vote(std::vector<int>&& results)
 
 int hpx_main()
 {
-    std::vector<hpx::naming::id_type> locals = hpx::find_all_localities();
+    std::vector<hpx::id_type> locals = hpx::find_all_localities();
 
     // Allow a task to replicate on the same locality if there is only 1 locality
     if (locals.size() == 1)

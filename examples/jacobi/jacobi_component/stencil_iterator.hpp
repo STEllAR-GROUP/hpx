@@ -44,7 +44,7 @@ namespace jacobi
             ar & id;
         }
 
-        hpx::naming::id_type id;
+        hpx::id_type id;
     };
 }
 

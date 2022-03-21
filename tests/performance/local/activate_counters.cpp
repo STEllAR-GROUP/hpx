@@ -46,8 +46,7 @@ namespace hpx { namespace util {
     bool activate_counters::find_counter(
         performance_counters::counter_info const& info, error_code& ec)
     {
-        naming::id_type id =
-            performance_counters::get_counter(info.fullname_, ec);
+        hpx::id_type id = performance_counters::get_counter(info.fullname_, ec);
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROWS_IF(ec, bad_parameter, "activate_counters::find_counter",

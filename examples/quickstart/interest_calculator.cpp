@@ -53,7 +53,7 @@ int hpx_main(variables_map & vm)
         using hpx::make_ready_future;
         using hpx::shared_future;
         using hpx::unwrapping;
-        hpx::naming::id_type here = hpx::find_here();
+        hpx::id_type here = hpx::find_here();
 
         double init_principal=vm["principal"].as<double>(); //Initial principal
         double init_rate=vm["rate"].as<double>(); //Interest rate

@@ -134,7 +134,7 @@ namespace hpx { namespace traits {
 
         // Extract the base id for the segment referenced by the given segment
         // iterator.
-        static naming::id_type get_id(segment_iterator const& iter)
+        static hpx::id_type get_id(segment_iterator const& iter)
         {
             typedef typename hpx::tuple_element<0,
                 typename iterator::iterator_tuple_type>::type

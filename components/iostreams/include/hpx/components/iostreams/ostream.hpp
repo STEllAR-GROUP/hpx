@@ -133,11 +133,11 @@ namespace hpx { namespace iostreams {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::future<naming::id_type> create_ostream(
+        hpx::future<hpx::id_type> create_ostream(
             char const* name, std::ostream& strm);
 
         template <typename Tag>
-        hpx::future<naming::id_type> create_ostream(Tag tag)
+        hpx::future<hpx::id_type> create_ostream(Tag tag)
         {
             return create_ostream(
                 get_outstream_name(tag), detail::get_outstream(tag));
@@ -145,10 +145,10 @@ namespace hpx { namespace iostreams {
 
         ///////////////////////////////////////////////////////////////////////
         HPX_IOSTREAMS_EXPORT void release_ostream(
-            char const* name, naming::id_type const& id);
+            char const* name, hpx::id_type const& id);
 
         template <typename Tag>
-        void release_ostream(Tag tag, naming::id_type const& id)
+        void release_ostream(Tag tag, hpx::id_type const& id)
         {
             release_ostream(get_outstream_name(tag), id);
         }

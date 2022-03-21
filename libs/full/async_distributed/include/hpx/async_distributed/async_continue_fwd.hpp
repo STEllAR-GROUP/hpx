@@ -26,7 +26,7 @@ namespace hpx {
         template <typename Action, typename Cont>
         struct result_of_async_continue
           : traits::action_remote_result<typename util::invoke_result<
-                typename std::decay<Cont>::type, naming::id_type,
+                typename std::decay<Cont>::type, hpx::id_type,
                 typename hpx::traits::extract_action<
                     Action>::remote_result_type>::type>
         {
@@ -43,7 +43,7 @@ namespace hpx {
     template <typename Action, typename Cont, typename... Ts>
     hpx::future<typename traits::promise_local_result<
         typename detail::result_of_async_continue<Action, Cont>::type>::type>
-    async_continue(Cont&& cont, naming::id_type const& gid, Ts&&... vs);
+    async_continue(Cont&& cont, hpx::id_type const& gid, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename Cont, typename... Ts>
@@ -52,7 +52,7 @@ namespace hpx {
     async_continue(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
         ,
-        Cont&& cont, naming::id_type const& gid, Ts&&... vs);
+        Cont&& cont, hpx::id_type const& gid, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
     // MSVC complains about ambiguities if it sees this forward declaration

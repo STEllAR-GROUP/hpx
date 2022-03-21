@@ -216,14 +216,15 @@ namespace hpx::parcelset::detail {
         return static_cast<int>(action_->get_action_type());
     }
 
-    naming::id_type parcel::source_id() const
+    hpx::id_type parcel::source_id() const
     {
-        return naming::id_type(data_.source_id_, naming::id_type::unmanaged);
+        return hpx::id_type(
+            data_.source_id_, hpx::id_type::management_type::unmanaged);
     }
 
-    void parcel::set_source_id(naming::id_type const& source_id)
+    void parcel::set_source_id(hpx::id_type const& source_id)
     {
-        if (source_id != naming::invalid_id)
+        if (source_id != hpx::invalid_id)
         {
             data_.source_id_ = source_id.get_gid();
         }

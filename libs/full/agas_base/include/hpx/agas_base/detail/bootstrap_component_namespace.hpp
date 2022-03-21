@@ -31,7 +31,7 @@ namespace hpx { namespace agas { namespace detail {
             return const_cast<server::component_namespace*>(&server_);
         }
         naming::address addr() const;
-        naming::id_type gid() const;
+        hpx::id_type gid() const;
 
         components::component_type bind_prefix(
             std::string const& key, std::uint32_t prefix);

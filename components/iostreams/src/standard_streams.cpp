@@ -44,14 +44,14 @@ namespace hpx { namespace iostreams { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type return_id_type(future<bool> f, naming::id_type id)
+    hpx::id_type return_id_type(future<bool> f, hpx::id_type id)
     {
         f.get();    //re-throw any errors
         return id;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::id_type> create_ostream(
+    hpx::future<hpx::id_type> create_ostream(
         char const* cout_name, std::ostream& strm)
     {
         LRT_(info).format(
@@ -61,9 +61,9 @@ namespace hpx { namespace iostreams { namespace detail {
         {
             typedef components::component<server::output_stream> ostream_type;
 
-            naming::id_type cout_id(
+            hpx::id_type cout_id(
                 components::server::construct<ostream_type>(std::ref(strm)),
-                naming::id_type::managed);
+                hpx::id_type::management_type::managed);
 
             return agas::register_name(cout_name, cout_id)
                 .then(hpx::launch::sync,
@@ -75,7 +75,7 @@ namespace hpx { namespace iostreams { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void release_ostream(char const* name, naming::id_type const& /* id */)
+    void release_ostream(char const* name, hpx::id_type const& /* id */)
     {
         LRT_(info).format(
             "detail::release_ostream: destroying '{}' stream object", name);

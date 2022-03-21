@@ -66,8 +66,7 @@ hpx::serialization::serialize_buffer<char> isend(
 HPX_PLAIN_ACTION(isend)
 
 ///////////////////////////////////////////////////////////////////////////////
-double ireceive(
-    hpx::naming::id_type dest, std::size_t size, std::size_t window_size)
+double ireceive(hpx::id_type dest, std::size_t size, std::size_t window_size)
 {
     int loop = LOOP_SMALL;
     int skip = SKIP_SMALL;

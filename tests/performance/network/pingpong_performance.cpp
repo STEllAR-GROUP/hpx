@@ -49,8 +49,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     vec.reserve(n);
     received.reserve(n);
     //Find the other locality
-    std::vector<hpx::naming::id_type> dummy = hpx::find_remote_localities();
-    hpx::naming::id_type other_locality = dummy[0];
+    std::vector<hpx::id_type> dummy = hpx::find_remote_localities();
+    hpx::id_type other_locality = dummy[0];
 
 
     for(std::size_t i=0; i<n; ++i)

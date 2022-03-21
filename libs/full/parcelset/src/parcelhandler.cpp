@@ -1264,8 +1264,8 @@ namespace hpx::parcelset {
         // ensure the source locality id is set (if no component id is given)
         if (!p.source_id())
         {
-            p.set_source_id(naming::id_type(
-                agas::get_locality(), naming::id_type::unmanaged));
+            p.set_source_id(hpx::id_type(agas::get_locality(),
+                hpx::id_type::management_type::unmanaged));
         }
 
 #if defined(HPX_HAVE_PARCEL_PROFILING)

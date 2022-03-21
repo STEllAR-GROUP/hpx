@@ -14,26 +14,25 @@
 namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename... Ts>
-    bool apply_colocated_cb(
-        naming::id_type const& gid, Callback&& cb, Ts&&... vs);
+    bool apply_colocated_cb(hpx::id_type const& gid, Callback&& cb, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename Callback, typename... Ts>
     bool apply_colocated_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Callback&& cb, Ts&&... vs);
+        hpx::id_type const& gid, Callback&& cb, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
-    bool apply_colocated_cb(Continuation&& cont, naming::id_type const& gid,
+    bool apply_colocated_cb(Continuation&& cont, hpx::id_type const& gid,
         Callback&& cb, Ts&&... vs);
 
     template <typename Continuation, typename Component, typename Signature,
         typename Derived, typename Callback, typename... Ts>
     bool apply_colocated_cb(Continuation&& cont,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Callback&& cb, Ts&&... vs);
+        hpx::id_type const& gid, Callback&& cb, Ts&&... vs);
 }}    // namespace hpx::detail
 
 #if defined(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)

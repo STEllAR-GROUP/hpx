@@ -37,7 +37,7 @@ std::uint64_t fibonacci(std::uint64_t n)
         return n;
 
     // We restrict ourselves to execute the Fibonacci function locally.
-    hpx::naming::id_type const locality_id = hpx::find_here();
+    hpx::id_type const locality_id = hpx::find_here();
 
     // Invoking the Fibonacci algorithm twice is inefficient.
     // However, we intentionally demonstrate it this way to create some

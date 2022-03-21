@@ -154,14 +154,14 @@ namespace hpx { namespace components { namespace server {
     // function to be called during shutdown
     // Action: shut down this runtime system instance
     void runtime_support::shutdown(
-        double timeout, naming::id_type const& respond_to)
+        double timeout, hpx::id_type const& respond_to)
     {
         // initiate system shutdown
         stop(timeout, respond_to, false);
     }
 
     // function to be called to terminate this locality immediately
-    void runtime_support::terminate(naming::id_type const& respond_to)
+    void runtime_support::terminate(hpx::id_type const& respond_to)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // push pending logs
@@ -203,7 +203,7 @@ namespace hpx { namespace components { namespace server {
 
     // initiate system shutdown for all localities
     void invoke_shutdown_functions(
-        std::vector<naming::id_type> const& localities, bool pre_shutdown)
+        std::vector<hpx::id_type> const& localities, bool pre_shutdown)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         std::vector<hpx::future<void>> results;
@@ -264,7 +264,7 @@ namespace hpx { namespace components { namespace server {
         }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        naming::id_type id(naming::get_id_from_locality_id(target_locality_id));
+        hpx::id_type id(naming::get_id_from_locality_id(target_locality_id));
         apply<dijkstra_termination_action>(
             id, initiating_locality_id, num_localities, dijkstra_token);
 #else
@@ -315,7 +315,7 @@ namespace hpx { namespace components { namespace server {
     // Kick off termination detection, this is modeled after Dijkstra's paper:
     // http://www.cs.mcgill.ca/~lli22/575/termination3.pdf.
     std::size_t runtime_support::dijkstra_termination_detection(
-        std::vector<naming::id_type> const& locality_ids)
+        std::vector<hpx::id_type> const& locality_ids)
     {
 #if defined(HPX_HAVE_NETWORKING)
         std::uint32_t num_localities =
@@ -428,7 +428,7 @@ namespace hpx { namespace components { namespace server {
         threads::threadmanager& tm = appl.get_thread_manager();
         tm.resume();
 
-        std::vector<naming::id_type> locality_ids = find_all_localities();
+        std::vector<hpx::id_type> locality_ids = find_all_localities();
         std::size_t count = dijkstra_termination_detection(locality_ids);
 
         LRT_(info).format("runtime_support::shutdown_all: passed first "
@@ -458,7 +458,7 @@ namespace hpx { namespace components { namespace server {
         std::uint32_t locality_id = get_locality_id();
         std::vector<hpx::future<void>> lazy_actions;
 
-        for (naming::id_type const& id : locality_ids)
+        for (hpx::id_type const& id : locality_ids)
         {
             if (locality_id != naming::get_locality_id_from_id(id))
             {
@@ -476,7 +476,7 @@ namespace hpx { namespace components { namespace server {
 
         // Now make sure this local locality gets shut down as well.
         // There is no need to respond...
-        stop(timeout, naming::invalid_id, false);
+        stop(timeout, hpx::invalid_id, false);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -499,7 +499,8 @@ namespace hpx { namespace components { namespace server {
                 if (locality_id != naming::get_locality_id_from_gid(gid))
                 {
                     using components::stubs::runtime_support;
-                    naming::id_type id(gid, naming::id_type::unmanaged);
+                    hpx::id_type id(
+                        gid, hpx::id_type::management_type::unmanaged);
                     lazy_actions.push_back(
                         runtime_support::terminate_async(id));
                 }
@@ -510,7 +511,7 @@ namespace hpx { namespace components { namespace server {
         }
 
         // now make sure this local locality gets terminated as well.
-        terminate(naming::invalid_id);    //good night
+        terminate(hpx::invalid_id);    //good night
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -591,8 +592,8 @@ namespace hpx { namespace components { namespace server {
         }
     }
 
-    void runtime_support::stop(double timeout,
-        naming::id_type const& respond_to, bool remove_from_remote_caches)
+    void runtime_support::stop(double timeout, hpx::id_type const& respond_to,
+        bool remove_from_remote_caches)
     {
         std::unique_lock<std::mutex> l(mtx_);
         if (!stop_called_)
@@ -880,7 +881,7 @@ namespace hpx { namespace components { namespace server {
         if (rtd == nullptr)
             return;
 
-        std::vector<naming::id_type> locality_ids = find_remote_localities();
+        std::vector<hpx::id_type> locality_ids = find_remote_localities();
 
         typedef server::runtime_support::remove_from_connection_cache_action
             action_type;
@@ -889,7 +890,7 @@ namespace hpx { namespace components { namespace server {
         callbacks.reserve(locality_ids.size());
 
         action_type act;
-        for (naming::id_type const& id : locality_ids)
+        for (hpx::id_type const& id : locality_ids)
         {
             // console is handled separately
             if (naming::get_locality_id_from_id(id) == 0)

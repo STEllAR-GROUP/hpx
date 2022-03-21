@@ -47,7 +47,7 @@ namespace hpx { namespace detail {
 
 #define HPX_REGISTER_ASYNC_COLOCATED_DECLARATION(Action, Name)                 \
     HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(                             \
-        void(hpx::naming::id_type, hpx::naming::id_type),                      \
+        void(hpx::id_type, hpx::id_type),                                      \
         (hpx::util::functional::detail::async_continuation_impl<               \
             typename hpx::detail::async_colocated_bound_action<Action>::type,  \
             hpx::util::unused_type>),                                          \
@@ -55,8 +55,7 @@ namespace hpx { namespace detail {
     /**/
 
 #define HPX_REGISTER_ASYNC_COLOCATED(Action, Name)                             \
-    HPX_UTIL_REGISTER_UNIQUE_FUNCTION(                                         \
-        void(hpx::naming::id_type, hpx::naming::id_type),                      \
+    HPX_UTIL_REGISTER_UNIQUE_FUNCTION(void(hpx::id_type, hpx::id_type),        \
         (hpx::util::functional::detail::async_continuation_impl<               \
             typename hpx::detail::async_colocated_bound_action<Action>::type,  \
             hpx::util::unused_type>),                                          \
@@ -68,7 +67,7 @@ namespace hpx { namespace detail {
     template <typename Action, typename... Ts>
     hpx::future<typename traits::promise_local_result<
         typename hpx::traits::extract_action<Action>::remote_result_type>::type>
-    async_colocated(naming::id_type const& gid,
+    async_colocated(hpx::id_type const& gid,
         Ts&&...
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         vs
@@ -77,9 +76,9 @@ namespace hpx { namespace detail {
     {
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
-        naming::id_type service_target(
+        hpx::id_type service_target(
             agas::primary_namespace::get_service_instance(gid.get_gid()),
-            naming::id_type::unmanaged);
+            hpx::id_type::management_type::unmanaged);
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using remote_result_type =
@@ -105,7 +104,7 @@ namespace hpx { namespace detail {
             extract_action<Derived>::remote_result_type>::type>
     async_colocated(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Ts&&... vs)
+        hpx::id_type const& gid, Ts&&... vs)
     {
         return async_colocated<Derived>(gid, HPX_FORWARD(Ts, vs)...);
     }
@@ -115,7 +114,7 @@ namespace hpx { namespace detail {
     std::enable_if_t<traits::is_continuation_v<Continuation>,
         hpx::future<traits::promise_local_result_t<
             typename hpx::traits::extract_action<Action>::remote_result_type>>>
-    async_colocated(Continuation&& cont, naming::id_type const& gid,
+    async_colocated(Continuation&& cont, hpx::id_type const& gid,
         Ts&&...
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         vs
@@ -129,9 +128,9 @@ namespace hpx { namespace detail {
 #else
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
-        naming::id_type service_target(
+        hpx::id_type service_target(
             agas::primary_namespace::get_service_instance(gid.get_gid()),
-            naming::id_type::unmanaged);
+            hpx::id_type::management_type::unmanaged);
 
         using remote_result_type =
             typename hpx::traits::extract_action<Action>::remote_result_type;
@@ -155,7 +154,7 @@ namespace hpx { namespace detail {
             typename hpx::traits::extract_action<Derived>::remote_result_type>>>
     async_colocated(Continuation&& cont,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Ts&&... vs)
+        hpx::id_type const& gid, Ts&&... vs)
     {
         return async_colocated<Derived>(
             HPX_FORWARD(Continuation, cont), gid, HPX_FORWARD(Ts, vs)...);

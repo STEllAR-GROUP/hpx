@@ -46,7 +46,7 @@ namespace hpx { namespace applier { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
     void call_async(threads::thread_init_data&& data,
-        naming::id_type const& target, naming::address::address_type lva,
+        hpx::id_type const& target, naming::address::address_type lva,
         naming::address::component_type comptype,
         threads::thread_priority priority, Ts&&... vs)
     {
@@ -87,7 +87,7 @@ namespace hpx { namespace applier { namespace detail {
 
     template <typename Action, typename Continuation, typename... Ts>
     void call_async(threads::thread_init_data&& data, Continuation&& cont,
-        naming::id_type const& target, naming::address::address_type lva,
+        hpx::id_type const& target, naming::address::address_type lva,
         naming::address::component_type comptype,
         threads::thread_priority priority, Ts&&... vs)
     {
@@ -152,7 +152,7 @@ namespace hpx { namespace applier { namespace detail {
     {
         template <typename... Ts>
         static void call(threads::thread_init_data&& data,
-            naming::id_type const& target, naming::address::address_type lva,
+            hpx::id_type const& target, naming::address::address_type lva,
             naming::address::component_type comptype,
             threads::thread_priority priority, Ts&&... vs)
         {
@@ -174,7 +174,7 @@ namespace hpx { namespace applier { namespace detail {
 
         template <typename Continuation, typename... Ts>
         static void call(threads::thread_init_data&& data, Continuation&& cont,
-            naming::id_type const& target, naming::address::address_type lva,
+            hpx::id_type const& target, naming::address::address_type lva,
             naming::address::component_type comptype,
             threads::thread_priority priority, Ts&&... vs)
         {
@@ -204,7 +204,7 @@ namespace hpx { namespace applier { namespace detail {
         // If local and to be directly executed, just call the function
         template <typename... Ts>
         HPX_FORCEINLINE static void call(threads::thread_init_data&& data,
-            naming::id_type const& target, naming::address::address_type lva,
+            hpx::id_type const& target, naming::address::address_type lva,
             naming::address::component_type comptype,
             threads::thread_priority priority, Ts&&... vs)
         {
@@ -224,7 +224,7 @@ namespace hpx { namespace applier { namespace detail {
 
         template <typename Continuation, typename... Ts>
         HPX_FORCEINLINE static void call(threads::thread_init_data&& data,
-            Continuation&& cont, naming::id_type const& target,
+            Continuation&& cont, hpx::id_type const& target,
             naming::address::address_type lva,
             naming::address::component_type comptype,
             threads::thread_priority priority, Ts&&... vs)

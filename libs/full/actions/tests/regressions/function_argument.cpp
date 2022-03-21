@@ -20,7 +20,7 @@ using hpx::program_options::options_description;
 using hpx::program_options::variables_map;
 
 using hpx::async;
-using hpx::naming::id_type;
+using hpx::id_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 bool invoked_f = false;

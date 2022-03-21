@@ -18,7 +18,7 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     naming::gid_type component_storage::migrate_to_here(
-        std::vector<char> const& data, naming::id_type id,
+        std::vector<char> const& data, hpx::id_type id,
         naming::address const& current_lva)
     {
         naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));

@@ -42,7 +42,7 @@ namespace hpx { namespace actions {
         struct plain_function
         {
             // Only localities are valid targets for a plain action
-            static bool is_target_valid(naming::id_type const& id) noexcept
+            static bool is_target_valid(hpx::id_type const& id) noexcept
             {
                 return naming::is_locality(id);
             }

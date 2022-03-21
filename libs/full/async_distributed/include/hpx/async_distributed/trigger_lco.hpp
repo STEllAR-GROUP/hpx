@@ -32,19 +32,19 @@ namespace hpx {
     //////////////////////////////////////////////////////////////////////////
     // forward declare the required overload of apply.
     template <typename Action, typename... Ts>
-    bool apply(naming::id_type const& gid, Ts&&... vs);
+    bool apply(hpx::id_type const& gid, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename Cont, typename... Ts>
     bool apply_continue(
         hpx::actions::basic_action<Component, Signature, Derived>, Cont&& cont,
-        naming::id_type const& gid, Ts&&... vs);
+        hpx::id_type const& gid, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename... Ts>
     inline bool apply_c(
         hpx::actions::basic_action<Component, Signature, Derived>,
-        naming::id_type const& contgid, naming::id_type const& gid, Ts&&... vs);
+        hpx::id_type const& contgid, hpx::id_type const& gid, Ts&&... vs);
     /// \endcond
 
     /// \cond NOINTERNAL
@@ -111,14 +111,15 @@ namespace hpx {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Action, typename Result>
-        void set_lco_value(naming::id_type const& id, naming::address&& addr,
+        void set_lco_value(hpx::id_type const& id, naming::address&& addr,
             Result&& t, bool move_credits)
         {
             if (move_credits &&
-                id.get_management_type() != naming::id_type::unmanaged)
+                id.get_management_type() !=
+                    hpx::id_type::management_type::unmanaged)
             {
-                naming::id_type target(
-                    id.get_gid(), naming::id_type::managed_move_credit);
+                hpx::id_type target(id.get_gid(),
+                    hpx::id_type::management_type::managed_move_credit);
                 id.make_unmanaged();
 
                 detail::apply_impl<Action>(target, HPX_MOVE(addr),
@@ -136,14 +137,15 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////
         template <typename LocalResult, typename RemoteResult, typename Action,
             typename Result>
-        void set_lco_value(naming::id_type const& id, naming::address&& addr,
-            Result&& t, naming::id_type const& cont, bool move_credits)
+        void set_lco_value(hpx::id_type const& id, naming::address&& addr,
+            Result&& t, hpx::id_type const& cont, bool move_credits)
         {
             if (move_credits &&
-                id.get_management_type() != naming::id_type::unmanaged)
+                id.get_management_type() !=
+                    hpx::id_type::management_type::unmanaged)
             {
-                naming::id_type target(
-                    id.get_gid(), naming::id_type::managed_move_credit);
+                hpx::id_type target(id.get_gid(),
+                    hpx::id_type::management_type::managed_move_credit);
                 id.make_unmanaged();
 
                 detail::apply_impl<Action>(
@@ -164,7 +166,7 @@ namespace hpx {
 
     /// \cond NOINTERNAL
     template <typename Result>
-    void set_lco_value(naming::id_type const& id, naming::address&& addr,
+    void set_lco_value(hpx::id_type const& id, naming::address&& addr,
         Result&& t, bool move_credits)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -208,8 +210,8 @@ namespace hpx {
     }
 
     template <typename Result>
-    void set_lco_value(naming::id_type const& id, naming::address&& addr,
-        Result&& t, naming::id_type const& cont, bool move_credits)
+    void set_lco_value(hpx::id_type const& id, naming::address&& addr,
+        Result&& t, hpx::id_type const& cont, bool move_credits)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef typename std::decay<Result>::type remote_result_type;

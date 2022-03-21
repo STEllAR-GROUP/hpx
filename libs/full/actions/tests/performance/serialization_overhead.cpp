@@ -49,7 +49,7 @@ std::size_t get_archive_size(hpx::parcelset::parcel const& p,
 double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     bool continuation, bool zerocopy)
 {
-    hpx::naming::id_type const here = hpx::find_here();
+    hpx::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid, (void*) &test_function);
 

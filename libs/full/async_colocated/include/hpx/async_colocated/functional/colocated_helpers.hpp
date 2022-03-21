@@ -27,15 +27,15 @@ namespace hpx { namespace util { namespace functional {
     ///////////////////////////////////////////////////////////////////////////
     struct extract_locality
     {
-        naming::id_type operator()(
-            naming::id_type const& locality_id, naming::id_type const& id) const
+        hpx::id_type operator()(
+            hpx::id_type const& locality_id, hpx::id_type const& id) const
         {
-            if (locality_id == naming::invalid_id)
+            if (locality_id == hpx::invalid_id)
             {
                 HPX_THROW_EXCEPTION(hpx::no_success,
                     "extract_locality::operator()",
                     "could not resolve colocated locality for id({1})", id);
-                return naming::invalid_id;
+                return hpx::invalid_id;
             }
             return locality_id;
         }
@@ -65,11 +65,11 @@ namespace hpx { namespace util { namespace functional {
                 apply_continuation_impl&& o) = default;
 
             template <typename T>
-            typename util::invoke_result<bound_type, naming::id_type, T>::type
-            operator()(naming::id_type lco, T&& t)
+            typename util::invoke_result<bound_type, hpx::id_type, T>::type
+            operator()(hpx::id_type lco, T&& t)
             {
-                typedef typename util::invoke_result<bound_type,
-                    naming::id_type, T>::type result_type;
+                typedef typename util::invoke_result<bound_type, hpx::id_type,
+                    T>::type result_type;
 
                 bound_.apply_c(HPX_MOVE(cont_), lco, HPX_FORWARD(T, t));
                 return result_type();
@@ -113,11 +113,11 @@ namespace hpx { namespace util { namespace functional {
                 apply_continuation_impl&& o) = default;
 
             template <typename T>
-            typename util::invoke_result<bound_type, naming::id_type, T>::type
-            operator()(naming::id_type lco, T&& t)
+            typename util::invoke_result<bound_type, hpx::id_type, T>::type
+            operator()(hpx::id_type lco, T&& t)
             {
-                typedef typename util::invoke_result<bound_type,
-                    naming::id_type, T>::type result_type;
+                typedef typename util::invoke_result<bound_type, hpx::id_type,
+                    T>::type result_type;
 
                 bound_.apply(lco, HPX_FORWARD(T, t));
                 return result_type();
@@ -186,11 +186,11 @@ namespace hpx { namespace util { namespace functional {
             }
 
             template <typename T>
-            typename util::invoke_result<bound_type, naming::id_type, T>::type
-            operator()(naming::id_type lco, T&& t)
+            typename util::invoke_result<bound_type, hpx::id_type, T>::type
+            operator()(hpx::id_type lco, T&& t)
             {
-                typedef typename util::invoke_result<bound_type,
-                    naming::id_type, T>::type result_type;
+                typedef typename util::invoke_result<bound_type, hpx::id_type,
+                    T>::type result_type;
 
                 bound_.apply_c(HPX_MOVE(cont_), lco, HPX_FORWARD(T, t));
                 return result_type();
@@ -240,11 +240,11 @@ namespace hpx { namespace util { namespace functional {
             }
 
             template <typename T>
-            typename util::invoke_result<bound_type, naming::id_type, T>::type
-            operator()(naming::id_type lco, T&& t)
+            typename util::invoke_result<bound_type, hpx::id_type, T>::type
+            operator()(hpx::id_type lco, T&& t)
             {
-                typedef typename util::invoke_result<bound_type,
-                    naming::id_type, T>::type result_type;
+                typedef typename util::invoke_result<bound_type, hpx::id_type,
+                    T>::type result_type;
 
                 bound_.apply_c(lco, lco, HPX_FORWARD(T, t));
                 return result_type();

@@ -33,7 +33,7 @@
 namespace hpx { namespace agas {
 
     HPX_EXPORT naming::gid_type bootstrap_component_namespace_gid();
-    HPX_EXPORT naming::id_type bootstrap_component_namespace_id();
+    HPX_EXPORT hpx::id_type bootstrap_component_namespace_id();
 }}    // namespace hpx::agas
 
 namespace hpx { namespace agas { namespace server {

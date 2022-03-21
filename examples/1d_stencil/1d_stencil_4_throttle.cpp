@@ -38,7 +38,7 @@
 
 #include <apex_api.hpp>
 
-using hpx::naming::id_type;
+using hpx::id_type;
 using hpx::performance_counters::counter_value;
 using hpx::performance_counters::get_counter;
 using hpx::performance_counters::performance_counter;

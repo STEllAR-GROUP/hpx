@@ -17,7 +17,7 @@
 
 namespace hpx {
 
-    /// \fn future<std::string> get_locality_name(naming::id_type const& id)
+    /// \fn future<std::string> get_locality_name(hpx::id_type const& id)
     ///
     /// \brief Return the name of the referenced locality.
     ///
@@ -32,5 +32,5 @@ namespace hpx {
     ///           and may be different for different parcel ports.
     ///
     /// \see      \a std::string get_locality_name()
-    HPX_EXPORT future<std::string> get_locality_name(naming::id_type const& id);
+    HPX_EXPORT future<std::string> get_locality_name(hpx::id_type const& id);
 }    // namespace hpx

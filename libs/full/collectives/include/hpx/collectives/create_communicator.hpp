@@ -74,7 +74,7 @@ namespace hpx { namespace collectives {
         // construction
         communicator() = default;
 
-        explicit communicator(naming::id_type&& id)
+        explicit communicator(hpx::id_type&& id)
           : base_type(HPX_MOVE(id))
         {
         }

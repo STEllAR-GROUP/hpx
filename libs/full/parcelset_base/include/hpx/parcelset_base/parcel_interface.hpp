@@ -49,8 +49,8 @@ namespace hpx::parcelset::detail {
         virtual int get_component_type() const = 0;
         virtual int get_action_type() const = 0;
 
-        virtual naming::id_type source_id() const = 0;
-        virtual void set_source_id(naming::id_type const& source_id) = 0;
+        virtual hpx::id_type source_id() const = 0;
+        virtual void set_source_id(hpx::id_type const& source_id) = 0;
 
         virtual void set_destination_id(naming::gid_type&& dest) = 0;
         virtual naming::gid_type const& destination() const = 0;
@@ -130,8 +130,8 @@ namespace hpx::parcelset {
         int get_component_type() const;
         int get_action_type() const;
 
-        naming::id_type source_id() const;
-        void set_source_id(naming::id_type const& source_id);
+        hpx::id_type source_id() const;
+        void set_source_id(hpx::id_type const& source_id);
         void set_destination_id(naming::gid_type&& dest);
 
         naming::address const& addr() const;

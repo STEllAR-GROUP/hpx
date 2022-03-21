@@ -84,7 +84,7 @@ namespace hpx { namespace agas {
             agas::symbol_ns_msb;
     }
 
-    naming::id_type symbol_namespace::symbol_namespace_locality(
+    hpx::id_type symbol_namespace::symbol_namespace_locality(
         std::string const& key)
     {
         std::uint32_t hash_value = 0;
@@ -94,8 +94,8 @@ namespace hpx { namespace agas {
             util::jenkins_hash hash;
             hash_value = hash(key) % get_initial_num_localities();
         }
-        return naming::id_type(
-            get_service_instance(hash_value), naming::id_type::unmanaged);
+        return hpx::id_type(get_service_instance(hash_value),
+            hpx::id_type::management_type::unmanaged);
     }
 
     symbol_namespace::symbol_namespace()
@@ -114,17 +114,17 @@ namespace hpx { namespace agas {
             components::component_agas_symbol_namespace, this->ptr());
     }
 
-    naming::id_type symbol_namespace::gid() const
+    hpx::id_type symbol_namespace::gid() const
     {
-        return naming::id_type(get_service_instance(agas::get_locality()),
-            naming::id_type::unmanaged);
+        return hpx::id_type(get_service_instance(agas::get_locality()),
+            hpx::id_type::management_type::unmanaged);
     }
 
     hpx::future<bool> symbol_namespace::bind_async(
         std::string key, naming::gid_type gid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        naming::id_type dest = symbol_namespace_locality(key);
+        hpx::id_type dest = symbol_namespace_locality(key);
 
         if (naming::get_locality_id_from_id(dest) == agas::get_locality_id())
         {
@@ -143,7 +143,7 @@ namespace hpx { namespace agas {
 
     bool symbol_namespace::bind(std::string key, naming::gid_type gid)
     {
-        naming::id_type dest = symbol_namespace_locality(key);
+        hpx::id_type dest = symbol_namespace_locality(key);
 
         if (naming::get_locality_id_from_id(dest) == agas::get_locality_id())
         {
@@ -161,61 +161,61 @@ namespace hpx { namespace agas {
 #endif
     }
 
-    hpx::future<naming::id_type> symbol_namespace::resolve_async(
+    hpx::future<hpx::id_type> symbol_namespace::resolve_async(
         std::string key) const
     {
-        naming::id_type dest = symbol_namespace_locality(key);
+        hpx::id_type dest = symbol_namespace_locality(key);
 
         if (naming::get_locality_id_from_id(dest) == agas::get_locality_id())
         {
             naming::gid_type raw_gid = server_->resolve(HPX_MOVE(key));
 
             if (naming::detail::has_credits(raw_gid))
-                return hpx::make_ready_future(
-                    naming::id_type(raw_gid, naming::id_type::managed));
+                return hpx::make_ready_future(hpx::id_type(
+                    raw_gid, hpx::id_type::management_type::managed));
 
-            return hpx::make_ready_future(
-                naming::id_type(raw_gid, naming::id_type::unmanaged));
+            return hpx::make_ready_future(hpx::id_type(
+                raw_gid, hpx::id_type::management_type::unmanaged));
         }
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::symbol_namespace::resolve_action action;
         return hpx::async(action, HPX_MOVE(dest), HPX_MOVE(key));
 #else
         HPX_ASSERT(false);
-        return hpx::make_ready_future(naming::id_type{});
+        return hpx::make_ready_future(hpx::id_type{});
 #endif
     }
 
-    naming::id_type symbol_namespace::resolve(std::string key) const
+    hpx::id_type symbol_namespace::resolve(std::string key) const
     {
         return resolve_async(HPX_MOVE(key)).get();
     }
 
-    hpx::future<naming::id_type> symbol_namespace::unbind_async(std::string key)
+    hpx::future<hpx::id_type> symbol_namespace::unbind_async(std::string key)
     {
-        naming::id_type dest = symbol_namespace_locality(key);
+        hpx::id_type dest = symbol_namespace_locality(key);
 
         if (naming::get_locality_id_from_id(dest) == agas::get_locality_id())
         {
             naming::gid_type raw_gid = server_->unbind(HPX_MOVE(key));
 
             if (naming::detail::has_credits(raw_gid))
-                return hpx::make_ready_future(
-                    naming::id_type(raw_gid, naming::id_type::managed));
+                return hpx::make_ready_future(hpx::id_type(
+                    raw_gid, hpx::id_type::management_type::managed));
 
-            return hpx::make_ready_future(
-                naming::id_type(raw_gid, naming::id_type::unmanaged));
+            return hpx::make_ready_future(hpx::id_type(
+                raw_gid, hpx::id_type::management_type::unmanaged));
         }
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::symbol_namespace::unbind_action action;
         return hpx::async(action, HPX_MOVE(dest), HPX_MOVE(key));
 #else
         HPX_ASSERT(false);
-        return hpx::make_ready_future(naming::id_type{});
+        return hpx::make_ready_future(hpx::id_type{});
 #endif
     }
 
-    naming::id_type symbol_namespace::unbind(std::string key)
+    hpx::id_type symbol_namespace::unbind(std::string key)
     {
         return unbind_async(HPX_MOVE(key)).get();
     }
@@ -223,7 +223,7 @@ namespace hpx { namespace agas {
     hpx::future<bool> symbol_namespace::on_event(
         std::string const& name, bool call_for_past_events, hpx::id_type lco)
     {
-        naming::id_type dest = symbol_namespace_locality(name);
+        hpx::id_type dest = symbol_namespace_locality(name);
 
         if (naming::get_locality_id_from_id(dest) == agas::get_locality_id())
         {
@@ -254,8 +254,8 @@ namespace hpx { namespace agas {
         results.reserve(ids.size());
         for (auto id : ids)
         {
-            hpx::id_type target(
-                get_service_instance(id), hpx::id_type::unmanaged);
+            hpx::id_type target(get_service_instance(id),
+                hpx::id_type::management_type::unmanaged);
 
             using iterate_action = server::symbol_namespace::iterate_action;
             results.push_back(
@@ -273,8 +273,9 @@ namespace hpx { namespace agas {
                             naming::detail::has_credits(e.second);
                         result[HPX_MOVE(e.first)] =
                             hpx::id_type(HPX_MOVE(e.second),
-                                has_credits ? naming::id_type::managed :
-                                              naming::id_type::unmanaged);
+                                has_credits ?
+                                    hpx::id_type::management_type::managed :
+                                    hpx::id_type::management_type::unmanaged);
                     }
                 }
                 return result;

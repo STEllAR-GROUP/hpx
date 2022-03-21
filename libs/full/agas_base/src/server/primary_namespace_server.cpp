@@ -40,10 +40,10 @@ namespace hpx { namespace agas {
         return naming::gid_type(agas::primary_ns_msb, agas::primary_ns_lsb);
     }
 
-    naming::id_type bootstrap_primary_namespace_id()
+    hpx::id_type bootstrap_primary_namespace_id()
     {
-        return naming::id_type(agas::primary_ns_msb, agas::primary_ns_lsb,
-            naming::id_type::unmanaged);
+        return hpx::id_type(agas::primary_ns_msb, agas::primary_ns_lsb,
+            hpx::id_type::management_type::unmanaged);
     }
 }}    // namespace hpx::agas
 
@@ -85,8 +85,8 @@ namespace hpx { namespace agas { namespace server {
     }
 
     // start migration of the given object
-    std::pair<naming::id_type, naming::address>
-    primary_namespace::begin_migration(naming::gid_type id)
+    std::pair<hpx::id_type, naming::address> primary_namespace::begin_migration(
+        naming::gid_type id)
     {
         util::scoped_timer<std::atomic<std::int64_t>> update(
             counter_data_.begin_migration_.time_,
@@ -106,7 +106,7 @@ namespace hpx { namespace agas { namespace server {
                                 "response(no_success)",
                 id);
 
-            return std::make_pair(naming::invalid_id, naming::address());
+            return std::make_pair(hpx::invalid_id, naming::address());
         }
 
         migration_table_type::iterator it = migrating_objects_.find(id);
@@ -128,7 +128,8 @@ namespace hpx { namespace agas { namespace server {
 
         gva const& g(hpx::get<1>(r));
         naming::address addr(g.prefix, g.type, g.lva());
-        naming::id_type loc(hpx::get<2>(r), id_type::unmanaged);
+        hpx::id_type loc(
+            hpx::get<2>(r), hpx::id_type::management_type::unmanaged);
         return std::make_pair(loc, addr);
     }
 
@@ -414,10 +415,10 @@ namespace hpx { namespace agas { namespace server {
         return r;
     }    // }}}
 
-    naming::id_type primary_namespace::colocate(naming::gid_type const& id)
+    hpx::id_type primary_namespace::colocate(naming::gid_type const& id)
     {
-        return naming::id_type(
-            hpx::get<2>(resolve_gid(id)), naming::id_type::unmanaged);
+        return hpx::id_type(hpx::get<2>(resolve_gid(id)),
+            hpx::id_type::management_type::unmanaged);
     }
 
     naming::address primary_namespace::unbind_gid(

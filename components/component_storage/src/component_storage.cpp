@@ -22,14 +22,14 @@ namespace hpx { namespace components {
     {
     }
 
-    component_storage::component_storage(hpx::future<naming::id_type>&& f)
+    component_storage::component_storage(hpx::future<hpx::id_type>&& f)
       : base_type(HPX_MOVE(f))
     {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::id_type> component_storage::migrate_to_here(
-        std::vector<char> const& data, naming::id_type const& id,
+    hpx::future<hpx::id_type> component_storage::migrate_to_here(
+        std::vector<char> const& data, hpx::id_type const& id,
         naming::address const& addr)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -40,12 +40,12 @@ namespace hpx { namespace components {
         HPX_UNUSED(data);
         HPX_UNUSED(id);
         HPX_UNUSED(addr);
-        return hpx::make_ready_future(naming::id_type{});
+        return hpx::make_ready_future(hpx::id_type{});
 #endif
     }
 
-    naming::id_type component_storage::migrate_to_here(launch::sync_policy,
-        std::vector<char> const& data, naming::id_type const& id,
+    hpx::id_type component_storage::migrate_to_here(launch::sync_policy,
+        std::vector<char> const& data, hpx::id_type const& id,
         naming::address const& addr)
     {
         return migrate_to_here(data, id, addr).get();

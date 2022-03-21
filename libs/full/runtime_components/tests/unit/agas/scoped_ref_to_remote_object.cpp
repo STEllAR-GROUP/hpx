@@ -29,8 +29,8 @@ using hpx::init;
 
 using std::chrono::milliseconds;
 
+using hpx::id_type;
 using hpx::naming::get_management_type_name;
-using hpx::naming::id_type;
 
 using hpx::components::component_type;
 using hpx::components::get_component_type;

@@ -47,13 +47,13 @@ namespace hpx { namespace components {
     ///
     template <typename Component, typename DistPolicy>
 #if defined(DOXYGEN)
-    future<naming::id_type>
+    future<hpx::id_type>
 #else
     inline typename std::enable_if<traits::is_component<Component>::value &&
             traits::is_distribution_policy<DistPolicy>::value,
-        future<naming::id_type>>::type
+        future<hpx::id_type>>::type
 #endif
-    migrate(naming::id_type const& to_migrate, DistPolicy const& policy)
+    migrate(hpx::id_type const& to_migrate, DistPolicy const& policy)
     {
         typedef server::perform_migrate_component_action<Component, DistPolicy>
             action_type;
@@ -132,13 +132,12 @@ namespace hpx { namespace components {
     ///
     template <typename Component>
 #if defined(DOXYGEN)
-    future<naming::id_type>
+    future<hpx::id_type>
 #else
     inline typename std::enable_if<traits::is_component<Component>::value,
-        future<naming::id_type>>::type
+        future<hpx::id_type>>::type
 #endif
-    migrate(naming::id_type const& to_migrate,
-        naming::id_type const& target_locality)
+    migrate(hpx::id_type const& to_migrate, hpx::id_type const& target_locality)
     {
         return migrate<Component>(to_migrate, hpx::target(target_locality));
     }
@@ -163,7 +162,7 @@ namespace hpx { namespace components {
     ///
     template <typename Derived, typename Stub>
     inline Derived migrate(client_base<Derived, Stub> const& to_migrate,
-        naming::id_type const& target_locality)
+        hpx::id_type const& target_locality)
     {
         typedef typename client_base<Derived, Stub>::server_component_type
             component_type;
@@ -175,7 +174,7 @@ namespace hpx { namespace components {
     // overload to be used for polymorphic objects
     template <typename Component, typename Derived, typename Stub>
     inline Derived migrate(client_base<Derived, Stub> const& to_migrate,
-        naming::id_type const& target_locality)
+        hpx::id_type const& target_locality)
     {
         return Derived(
             migrate<Component>(to_migrate.get_id(), target_locality));

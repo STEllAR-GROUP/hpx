@@ -60,7 +60,7 @@ namespace jacobi { namespace server {
             std::vector<hpx::shared_future<void>> init_futures;
             init_futures.reserve(ny);
             std::size_t y = 0;
-            for (hpx::naming::id_type const& id : ids)
+            for (hpx::id_type const& id : ids)
             {
                 //std::cout << y << " " << id << "\n";
                 jacobi::stencil_iterator r;

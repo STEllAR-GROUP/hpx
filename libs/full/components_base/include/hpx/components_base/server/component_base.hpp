@@ -45,8 +45,8 @@ namespace hpx { namespace components {
             // finalize() will be called just before the instance gets destructed
             static constexpr void finalize() noexcept {}
 
-            HPX_EXPORT naming::id_type get_id(naming::gid_type gid) const;
-            HPX_EXPORT naming::id_type get_unmanaged_id(
+            HPX_EXPORT hpx::id_type get_id(naming::gid_type gid) const;
+            HPX_EXPORT hpx::id_type get_unmanaged_id(
                 naming::gid_type const& gid) const;
 
             static void mark_as_migrated() noexcept
@@ -119,14 +119,14 @@ namespace hpx { namespace components {
                 const_cast<component_base*>(this));
         }
 
-        naming::id_type get_id() const
+        hpx::id_type get_id() const
         {
             // all credits should have been taken already
             return this->detail::base_component::get_id(
                 static_cast<Component const&>(*this).get_base_gid());
         }
 
-        naming::id_type get_unmanaged_id() const
+        hpx::id_type get_unmanaged_id() const
         {
             return this->detail::base_component::get_unmanaged_id(
                 static_cast<Component const&>(*this).get_base_gid());

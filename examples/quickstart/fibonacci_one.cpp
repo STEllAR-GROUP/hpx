@@ -39,7 +39,7 @@ std::uint64_t fibonacci(std::uint64_t n)
         return n;
 
     // We restrict ourselves to execute the Fibonacci function locally.
-    hpx::naming::id_type const locality_id = hpx::find_here();
+    hpx::id_type const locality_id = hpx::find_here();
 
     // Run one branch of the Fibonacci calculation on this thread, while the
     // other branch is scheduled in a separate thread.

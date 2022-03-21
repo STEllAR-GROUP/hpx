@@ -143,7 +143,7 @@ int hpx_main()
 
         std::vector<hpx::future<void>> futures;
 
-        for (hpx::naming::id_type const& node : localities)
+        for (hpx::id_type const& node : localities)
         {
             // Asynchronously start a new task. The task is encapsulated in a
             // future, which we can query to determine if the task has

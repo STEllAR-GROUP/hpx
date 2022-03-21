@@ -387,7 +387,7 @@ namespace hpx { namespace agas {
             std::string key("/0/locality#console");
 
             hpx::id_type resolved_prefix = resolve_name(key);
-            if (resolved_prefix != naming::invalid_id)
+            if (resolved_prefix != hpx::invalid_id)
             {
                 std::uint32_t console =
                     naming::get_locality_id_from_id(resolved_prefix);
@@ -1032,15 +1032,15 @@ namespace hpx { namespace agas {
         return resolve_full_async(gid);
     }
 
-    hpx::future<naming::id_type> addressing_service::get_colocation_id_async(
-        naming::id_type const& id)
+    hpx::future<hpx::id_type> addressing_service::get_colocation_id_async(
+        hpx::id_type const& id)
     {
         if (!id)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "addressing_service::get_colocation_id_async",
                 "invalid reference id");
-            return make_ready_future(naming::invalid_id);
+            return make_ready_future(hpx::invalid_id);
         }
 
         return primary_ns_.colocate(id.get_gid());
@@ -1250,8 +1250,7 @@ namespace hpx { namespace agas {
     // if there was a pending decref request at the point when the incref was sent.
     // The pending decref was subtracted from the amount of credits to incref.
     std::int64_t addressing_service::synchronize_with_async_incref(
-        hpx::future<std::int64_t> fut, naming::id_type const& /* id */
-        ,
+        hpx::future<std::int64_t> fut, hpx::id_type const&,
         std::int64_t compensated_credit)
     {
         return fut.get() + compensated_credit;
@@ -1259,7 +1258,7 @@ namespace hpx { namespace agas {
 
     hpx::future<std::int64_t> addressing_service::incref_async(
         naming::gid_type const& id, std::int64_t credit,
-        naming::id_type const& keep_alive)
+        hpx::id_type const& keep_alive)
     {    // {{{ incref implementation
         naming::gid_type raw(naming::detail::get_stripped_gid(id));
 
@@ -1267,7 +1266,7 @@ namespace hpx { namespace agas {
         {
             // reschedule this call as an HPX thread
             hpx::future<std::int64_t> (addressing_service::*incref_async_ptr)(
-                naming::gid_type const&, std::int64_t, naming::id_type const&) =
+                naming::gid_type const&, std::int64_t, hpx::id_type const&) =
                 &addressing_service::incref_async;
 
             return async(incref_async_ptr, this, raw, credit, keep_alive);
@@ -1281,7 +1280,7 @@ namespace hpx { namespace agas {
             return hpx::future<std::int64_t>();
         }
 
-        HPX_ASSERT(keep_alive != naming::invalid_id);
+        HPX_ASSERT(keep_alive != hpx::invalid_id);
 
         using mapping = refcnt_requests_type::value_type;
 
@@ -1430,7 +1429,7 @@ namespace hpx { namespace agas {
     }    // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    static bool correct_credit_on_failure(future<bool> f, naming::id_type id,
+    static bool correct_credit_on_failure(future<bool> f, hpx::id_type id,
         std::int64_t mutable_gid_credit, std::int64_t new_gid_credit)
     {
         // Return the credit to the GID if the operation failed
@@ -1457,11 +1456,10 @@ namespace hpx { namespace agas {
     }    // }}}
 
     bool addressing_service::register_name(
-        std::string const& name, naming::id_type const& id, error_code& ec)
+        std::string const& name, hpx::id_type const& id, error_code& ec)
     {
         // We need to modify the reference count.
-        naming::gid_type& mutable_gid =
-            const_cast<naming::id_type&>(id).get_gid();
+        naming::gid_type& mutable_gid = const_cast<hpx::id_type&>(id).get_gid();
         naming::gid_type new_gid =
             naming::detail::split_gid_if_needed(mutable_gid).get();
         std::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
@@ -1482,11 +1480,10 @@ namespace hpx { namespace agas {
     }
 
     hpx::future<bool> addressing_service::register_name_async(
-        std::string const& name, naming::id_type const& id)
+        std::string const& name, hpx::id_type const& id)
     {    // {{{
         // We need to modify the reference count.
-        naming::gid_type& mutable_gid =
-            const_cast<naming::id_type&>(id).get_gid();
+        naming::gid_type& mutable_gid = const_cast<hpx::id_type&>(id).get_gid();
         naming::gid_type new_gid =
             naming::detail::split_gid_if_needed(mutable_gid).get();
 
@@ -1504,7 +1501,7 @@ namespace hpx { namespace agas {
     }    // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type addressing_service::unregister_name(
+    hpx::id_type addressing_service::unregister_name(
         std::string const& name, error_code& ec)
     {    // {{{
         try
@@ -1514,18 +1511,18 @@ namespace hpx { namespace agas {
         catch (hpx::exception const& e)
         {
             HPX_RETHROWS_IF(ec, e, "addressing_service::unregister_name");
-            return naming::invalid_id;
+            return hpx::invalid_id;
         }
     }    // }}}
 
-    hpx::future<naming::id_type> addressing_service::unregister_name_async(
+    hpx::future<hpx::id_type> addressing_service::unregister_name_async(
         std::string const& name)
     {    // {{{
         return symbol_ns_.unbind_async(name);
     }    // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type addressing_service::resolve_name(
+    hpx::id_type addressing_service::resolve_name(
         std::string const& name, error_code& ec)
     {    // {{{
         try
@@ -1535,11 +1532,11 @@ namespace hpx { namespace agas {
         catch (hpx::exception const& e)
         {
             HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_name");
-            return naming::invalid_id;
+            return hpx::invalid_id;
         }
     }    // }}}
 
-    hpx::future<naming::id_type> addressing_service::resolve_name_async(
+    hpx::future<hpx::id_type> addressing_service::resolve_name_async(
         std::string const& name)
     {    // {{{
         return symbol_ns_.resolve_async(name);
@@ -1564,7 +1561,7 @@ namespace hpx { namespace agas {
     future<hpx::id_type> addressing_service::on_symbol_namespace_event(
         std::string const& name, bool call_for_past_events)
     {
-        hpx::distributed::promise<naming::id_type, naming::gid_type> p;
+        hpx::distributed::promise<hpx::id_type, naming::gid_type> p;
         auto result_f = p.get_future();
 
         hpx::future<bool> f =
@@ -2005,7 +2002,7 @@ namespace hpx { namespace agas {
 #endif
 
             // collect all requests for each locality
-            using requests_type = std::map<naming::id_type,
+            using requests_type = std::map<hpx::id_type,
                 std::vector<hpx::tuple<std::int64_t, naming::gid_type,
                     naming::gid_type>>>;
             requests_type requests;
@@ -2016,9 +2013,9 @@ namespace hpx { namespace agas {
 
                 naming::gid_type raw(e.first);
 
-                naming::id_type target(
+                hpx::id_type target(
                     primary_namespace::get_service_instance(raw),
-                    naming::id_type::unmanaged);
+                    hpx::id_type::management_type::unmanaged);
 
                 requests[target].push_back(hpx::make_tuple(e.second, raw, raw));
             }
@@ -2078,7 +2075,7 @@ namespace hpx { namespace agas {
 #endif
 
         // collect all requests for each locality
-        using requests_type = std::map<naming::id_type,
+        using requests_type = std::map<hpx::id_type,
             std::vector<
                 hpx::tuple<std::int64_t, naming::gid_type, naming::gid_type>>>;
         requests_type requests;
@@ -2090,8 +2087,8 @@ namespace hpx { namespace agas {
 
             naming::gid_type raw(e.first);
 
-            naming::id_type target(primary_namespace::get_service_instance(raw),
-                naming::id_type::unmanaged);
+            hpx::id_type target(primary_namespace::get_service_instance(raw),
+                hpx::id_type::management_type::unmanaged);
 
             requests[target].push_back(hpx::make_tuple(e.second, raw, raw));
         }
@@ -2228,8 +2225,8 @@ namespace hpx { namespace agas {
         }
     }
 
-    hpx::future<std::pair<naming::id_type, naming::address>>
-    addressing_service::begin_migration(naming::id_type const& id)
+    hpx::future<std::pair<hpx::id_type, naming::address>>
+    addressing_service::begin_migration(hpx::id_type const& id)
     {
         if (!id)
         {
@@ -2244,7 +2241,7 @@ namespace hpx { namespace agas {
         return primary_ns_.begin_migration(gid);
     }
 
-    bool addressing_service::end_migration(naming::id_type const& id)
+    bool addressing_service::end_migration(hpx::id_type const& id)
     {
         if (!id)
         {

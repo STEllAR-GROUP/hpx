@@ -23,7 +23,7 @@ namespace hpx { namespace actions {
 
     continuation::continuation() = default;
 
-    continuation::continuation(naming::id_type const& id)
+    continuation::continuation(hpx::id_type const& id)
       : id_(id)
     {
         // Try to resolve the address locally ...
@@ -33,7 +33,7 @@ namespace hpx { namespace actions {
         }
     }
 
-    continuation::continuation(naming::id_type&& id)
+    continuation::continuation(hpx::id_type&& id)
       : id_(HPX_MOVE(id))
     {
         // Try to resolve the address locally ...
@@ -43,15 +43,14 @@ namespace hpx { namespace actions {
         }
     }
 
-    continuation::continuation(
-        naming::id_type const& id, naming::address&& addr)
+    continuation::continuation(hpx::id_type const& id, naming::address&& addr)
       : id_(id)
       , addr_(HPX_MOVE(addr))
     {
     }
 
     continuation::continuation(
-        naming::id_type&& id, naming::address&& addr) noexcept
+        hpx::id_type&& id, naming::address&& addr) noexcept
       : id_(HPX_MOVE(id))
       , addr_(HPX_MOVE(addr))
     {

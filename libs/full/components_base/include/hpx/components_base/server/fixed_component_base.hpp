@@ -110,20 +110,20 @@ namespace hpx { namespace components {
         }
 
     public:
-        naming::id_type get_id() const
+        hpx::id_type get_id() const
         {
             // fixed_address components are created without any credits
             naming::gid_type gid = derived().get_base_gid();
             HPX_ASSERT(!naming::detail::has_credits(gid));
 
             agas::replenish_credits(gid);
-            return naming::id_type(gid, naming::id_type::managed);
+            return hpx::id_type(gid, hpx::id_type::management_type::managed);
         }
 
-        naming::id_type get_unmanaged_id() const
+        hpx::id_type get_unmanaged_id() const
         {
-            return naming::id_type(
-                derived().get_base_gid(), naming::id_type::unmanaged);
+            return hpx::id_type(derived().get_base_gid(),
+                hpx::id_type::management_type::unmanaged);
         }
 
         void set_locality_id(std::uint32_t locality_id, error_code& ec = throws)

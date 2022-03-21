@@ -26,7 +26,7 @@ namespace hpx { namespace agas {
 
         virtual naming::address::address_type ptr() const = 0;
         virtual naming::address addr() const = 0;
-        virtual naming::id_type gid() const = 0;
+        virtual hpx::id_type gid() const = 0;
 
         virtual components::component_type bind_prefix(
             std::string const& key, std::uint32_t prefix) = 0;

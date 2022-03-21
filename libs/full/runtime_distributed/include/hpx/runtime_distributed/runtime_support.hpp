@@ -28,11 +28,11 @@ namespace hpx { namespace components {
     public:
         /// Create a client side representation for the existing
         /// \a server#runtime_support instance with the given global id \a gid.
-        runtime_support(naming::id_type const& gid = naming::invalid_id)
-          : gid_(naming::invalid_id == gid ?
-                    naming::id_type(
+        runtime_support(hpx::id_type const& gid = hpx::invalid_id)
+          : gid_(hpx::invalid_id == gid ?
+                    hpx::id_type(
                         applier::get_applier().get_runtime_support_raw_gid(),
-                        naming::id_type::unmanaged) :
+                        hpx::id_type::management_type::unmanaged) :
                     gid)
         {
         }
@@ -42,7 +42,7 @@ namespace hpx { namespace components {
 
         /// Create a new component type using the runtime_support
         template <typename Component, typename... Ts>
-        naming::id_type create_component(Ts&&... vs)
+        hpx::id_type create_component(Ts&&... vs)
         {
             return this->base_type::template create_component<Component>(
                 gid_, HPX_FORWARD(Ts, vs)...);
@@ -50,7 +50,7 @@ namespace hpx { namespace components {
 
         /// Asynchronously create a new component using the runtime_support
         template <typename Component, typename... Ts>
-        hpx::future<naming::id_type> create_component_async(Ts&&... vs)
+        hpx::future<hpx::id_type> create_component_async(Ts&&... vs)
         {
             return this->base_type::template create_component_async<Component>(
                 gid_, HPX_FORWARD(Ts, vs)...);
@@ -59,7 +59,7 @@ namespace hpx { namespace components {
         /// Asynchronously create N new default constructed components using
         /// the runtime_support
         template <typename Component, typename... Ts>
-        std::vector<naming::id_type> bulk_create_component(
+        std::vector<hpx::id_type> bulk_create_component(
             std::size_t /* count */, Ts&&... vs)
         {
             return this->base_type::template bulk_create_component<Component>(
@@ -68,7 +68,7 @@ namespace hpx { namespace components {
 
         /// Asynchronously create a new component using the runtime_support
         template <typename Component, typename... Ts>
-        hpx::future<std::vector<naming::id_type>> bulk_create_components_async(
+        hpx::future<std::vector<hpx::id_type>> bulk_create_components_async(
             std::size_t /* count */, Ts&&... vs)
         {
             return this->base_type::template bulk_create_component<Component>(
@@ -138,7 +138,7 @@ namespace hpx { namespace components {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        naming::id_type const& get_id() const
+        hpx::id_type const& get_id() const
         {
             return gid_;
         }
@@ -149,6 +149,6 @@ namespace hpx { namespace components {
         }
 
     private:
-        naming::id_type gid_;
+        hpx::id_type gid_;
     };
 }}    // namespace hpx::components

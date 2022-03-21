@@ -22,7 +22,7 @@
 #define HPX_ADDRESS_VERSION 0x20
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace naming {
+namespace hpx::naming {
 
     struct address
     {
@@ -93,7 +93,7 @@ namespace hpx { namespace naming {
     };
 
     HPX_EXPORT std::ostream& operator<<(std::ostream& os, address const& addr);
-}}    // namespace hpx::naming
+}    // namespace hpx::naming
 
 HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::address)
 

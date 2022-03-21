@@ -41,36 +41,36 @@ namespace hpx { namespace agas {
     }
 
     bool register_name(launch::sync_policy, std::string const& name,
-        naming::id_type const& id, error_code& ec)
+        hpx::id_type const& id, error_code& ec)
     {
         return detail::register_name_id(name, id, ec);
     }
 
     hpx::future<bool> register_name(
-        std::string const& name, naming::id_type const& id)
+        std::string const& name, hpx::id_type const& id)
     {
         return detail::register_name_async(name, id);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type unregister_name(
+    hpx::id_type unregister_name(
         launch::sync_policy, std::string const& name, error_code& ec)
     {
         return detail::unregister_name(name, ec);
     }
 
-    hpx::future<naming::id_type> unregister_name(std::string const& name)
+    hpx::future<hpx::id_type> unregister_name(std::string const& name)
     {
         return detail::unregister_name_async(name);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::id_type> resolve_name(std::string const& name)
+    hpx::future<hpx::id_type> resolve_name(std::string const& name)
     {
         return detail::resolve_name_async(name);
     }
 
-    naming::id_type resolve_name(
+    hpx::id_type resolve_name(
         launch::sync_policy, std::string const& name, error_code& ec)
     {
         return detail::resolve_name(name, ec);
@@ -140,13 +140,13 @@ namespace hpx { namespace agas {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::address> resolve(naming::id_type const& id)
+    hpx::future<naming::address> resolve(hpx::id_type const& id)
     {
         return detail::resolve_async(id);
     }
 
     naming::address resolve(
-        launch::sync_policy, naming::id_type const& id, error_code& ec)
+        launch::sync_policy, hpx::id_type const& id, error_code& ec)
     {
         return detail::resolve(id, ec);
     }
@@ -236,20 +236,20 @@ namespace hpx { namespace agas {
 
     /// \brief Invoke an asynchronous garbage collection step on the given target
     ///        locality.
-    void garbage_collect_non_blocking(naming::id_type const& id, error_code& ec)
+    void garbage_collect_non_blocking(hpx::id_type const& id, error_code& ec)
     {
         detail::garbage_collect_non_blocking_id(id, ec);
     }
 
     /// \brief Invoke a synchronous garbage collection step on the given target
     ///        locality.
-    void garbage_collect(naming::id_type const& id, error_code& ec)
+    void garbage_collect(hpx::id_type const& id, error_code& ec)
     {
         detail::garbage_collect_id(id, ec);
     }
 
     /// \brief Return an id_type referring to the console locality.
-    naming::id_type get_console_locality(error_code& ec)
+    hpx::id_type get_console_locality(error_code& ec)
     {
         return detail::get_console_locality(ec);
     }
@@ -294,13 +294,13 @@ namespace hpx { namespace agas {
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::future<std::int64_t> incref(naming::gid_type const& gid,
-        std::int64_t credits, naming::id_type const& keep_alive)
+        std::int64_t credits, hpx::id_type const& keep_alive)
     {
         return detail::incref_async(gid, credits, keep_alive);
     }
 
     std::int64_t incref(launch::sync_policy, naming::gid_type const& gid,
-        std::int64_t credits, naming::id_type const& keep_alive, error_code& ec)
+        std::int64_t credits, hpx::id_type const& keep_alive, error_code& ec)
     {
         return detail::incref(gid, credits, keep_alive, ec);
     }
@@ -312,13 +312,13 @@ namespace hpx { namespace agas {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::id_type> get_colocation_id(naming::id_type const& id)
+    hpx::future<hpx::id_type> get_colocation_id(hpx::id_type const& id)
     {
         return detail::get_colocation_id_async(id);
     }
 
-    naming::id_type get_colocation_id(
-        launch::sync_policy, naming::id_type const& id, error_code& ec)
+    hpx::id_type get_colocation_id(
+        launch::sync_policy, hpx::id_type const& id, error_code& ec)
     {
         return detail::get_colocation_id(id, ec);
     }
@@ -331,13 +331,13 @@ namespace hpx { namespace agas {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<std::pair<naming::id_type, naming::address>> begin_migration(
-        naming::id_type const& id)
+    hpx::future<std::pair<hpx::id_type, naming::address>> begin_migration(
+        hpx::id_type const& id)
     {
         return detail::begin_migration(id);
     }
 
-    bool end_migration(naming::id_type const& id)
+    bool end_migration(hpx::id_type const& id)
     {
         return detail::end_migration(id);
     }
@@ -362,13 +362,13 @@ namespace hpx { namespace agas {
         return detail::unmark_as_migrated(gid);
     }
 
-    hpx::future<std::map<std::string, naming::id_type>> find_symbols(
+    hpx::future<std::map<std::string, hpx::id_type>> find_symbols(
         std::string const& pattern)
     {
         return detail::find_symbols_async(pattern);
     }
 
-    std::map<std::string, naming::id_type> find_symbols(
+    std::map<std::string, hpx::id_type> find_symbols(
         hpx::launch::sync_policy, std::string const& pattern)
     {
         return detail::find_symbols(pattern);

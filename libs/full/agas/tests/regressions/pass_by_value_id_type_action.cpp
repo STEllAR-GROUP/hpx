@@ -15,10 +15,10 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-void test(hpx::naming::id_type) {}
+void test(hpx::id_type) {}
 HPX_PLAIN_ACTION(test, test_action)
 
-hpx::naming::id_type test_return()
+hpx::id_type test_return()
 {
     return hpx::find_here();
 }
@@ -27,12 +27,12 @@ HPX_PLAIN_ACTION(test_return, test_return_action)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map&)
 {
-    std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-    for (hpx::naming::id_type const& id : localities)
+    for (hpx::id_type const& id : localities)
     {
         {
-            hpx::naming::id_type a = id;
+            hpx::id_type a = id;
 
             test_action act;
             hpx::future<void> f = hpx::async(act, id, a);
@@ -42,7 +42,7 @@ int hpx_main(hpx::program_options::variables_map&)
         }
 
         {
-            hpx::naming::id_type a = id;
+            hpx::id_type a = id;
 
             test_action act;
             act(id, a);
@@ -52,7 +52,7 @@ int hpx_main(hpx::program_options::variables_map&)
 
         {
             test_return_action act;
-            hpx::future<hpx::naming::id_type> f = hpx::async(act, id);
+            hpx::future<hpx::id_type> f = hpx::async(act, id);
 
             HPX_TEST_EQ(id, f.get());
         }

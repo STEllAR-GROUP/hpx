@@ -92,7 +92,7 @@ namespace hpx { namespace performance_counters { namespace server {
 
         // name of base counter to be queried
         std::string base_counter_name_;
-        naming::id_type base_counter_id_;
+        hpx::id_type base_counter_id_;
 
         std::unique_ptr<detail::counter_type_from_statistic_base> value_;
         counter_value prev_value_;

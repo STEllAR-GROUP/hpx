@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 int hpx_main()
 {
     // find locality info
-    std::vector<hpx::naming::id_type> locs = hpx::find_all_localities();
+    std::vector<hpx::id_type> locs = hpx::find_all_localities();
 
     // create data
     std::vector<unsigned int> vec;

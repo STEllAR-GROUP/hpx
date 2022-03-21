@@ -75,13 +75,13 @@ namespace tests { namespace client {
             server::ViewRegistrationListener>
             base_type;
 
-        ViewRegistrationListener(hpx::future<hpx::naming::id_type> gid)
+        ViewRegistrationListener(hpx::future<hpx::id_type> gid)
           : base_type(move(gid))
         {
             cout << "constructed listener client by future" << endl;
         }
 
-        ViewRegistrationListener(hpx::naming::id_type gid)
+        ViewRegistrationListener(hpx::id_type gid)
           : base_type(gid)
         {
             cout << "constructed listener client by gid" << endl;

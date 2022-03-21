@@ -30,16 +30,15 @@ namespace hpx {
     hpx::future<typename traits::promise_local_result<
         typename detail::result_of_async_continue<Action, Cont>::type>::type>
     async_continue_cb(
-        Cont&& cont, naming::id_type const& gid, Callback&& cb, Ts&&... vs);
+        Cont&& cont, hpx::id_type const& gid, Callback&& cb, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename Cont, typename Callback, typename... Ts>
     hpx::future<typename traits::promise_local_result<
         typename detail::result_of_async_continue<Derived, Cont>::type>::type>
     async_continue_cb(
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-        ,
-        Cont&& cont, naming::id_type const& gid, Callback&& cb, Ts&&... vs);
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
+        Cont&& cont, hpx::id_type const& gid, Callback&& cb, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
     // MSVC complains about ambiguities if it sees this forward declaration

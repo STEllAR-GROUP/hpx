@@ -62,9 +62,8 @@ namespace hpx { namespace lcos { namespace detail {
             typename Signature, typename Derived, typename... Ts>
         HPX_FORCEINLINE static decltype(auto) call(Allocator const& alloc,
             Policy_&& policy,
-            hpx::actions::basic_action<Component, Signature, Derived> const&
-            /* act */,
-            naming::id_type const& id, Ts&&... ts)
+            hpx::actions::basic_action<Component, Signature, Derived> const&,
+            hpx::id_type const& id, Ts&&... ts)
         {
             return detail::create_dataflow_alloc(alloc,
                 HPX_FORWARD(Policy_, policy), Derived{}, id,
@@ -83,7 +82,7 @@ namespace hpx { namespace lcos { namespace detail {
         HPX_FORCEINLINE static decltype(auto) call(Allocator const& alloc,
             hpx::actions::basic_action<Component, Signature, Derived> const&
                 act,
-            naming::id_type const& id, Ts&&... ts)
+            hpx::id_type const& id, Ts&&... ts)
         {
             return dataflow_dispatch_impl<true, launch>::call(
                 alloc, launch::async, act, id, HPX_FORWARD(Ts, ts)...);
@@ -98,7 +97,7 @@ namespace hpx { namespace lcos { namespace detail {
         HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename hpx::traits::
                     extract_action<Action>::remote_result_type>::type>
-        call(Allocator const& alloc, naming::id_type const& id, Ts&&... ts)
+        call(Allocator const& alloc, hpx::id_type const& id, Ts&&... ts)
         {
             return dataflow_dispatch_impl<true, Action>::call(
                 alloc, Action(), id, HPX_FORWARD(Ts, ts)...);
@@ -114,7 +113,7 @@ namespace hpx { namespace lcos { namespace detail {
         HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename hpx::traits::
                     extract_action<Action>::remote_result_type>::type>
-        call(Allocator const& alloc, Policy&& policy, naming::id_type const& id,
+        call(Allocator const& alloc, Policy&& policy, hpx::id_type const& id,
             Ts&&... ts)
         {
             return dataflow_dispatch_impl<true,

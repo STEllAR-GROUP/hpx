@@ -36,20 +36,20 @@ namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     struct keep_id_alive
     {
-        explicit keep_id_alive(naming::id_type const& id)
+        explicit keep_id_alive(hpx::id_type const& id)
           : id_(id)
         {
         }
 
         void operator()() const {}
 
-        naming::id_type id_;
+        hpx::id_type id_;
     };
 
     template <typename T>
     future<T> keep_alive(future<T>&& f, id_type const& id)
     {
-        if (id.get_management_type() == naming::id_type::managed)
+        if (id.get_management_type() == hpx::id_type::management_type::managed)
         {
             traits::detail::get_shared_state(f)->set_on_completed(
                 hpx::detail::keep_id_alive(id));
@@ -60,7 +60,7 @@ namespace hpx { namespace detail {
     struct keep_id_and_ptr_alive
     {
         explicit keep_id_and_ptr_alive(
-            naming::id_type const& id, components::pinned_ptr&& p)
+            hpx::id_type const& id, components::pinned_ptr&& p)
           : id_(id)
           , p_(HPX_MOVE(p))
         {
@@ -68,7 +68,7 @@ namespace hpx { namespace detail {
 
         void operator()() const {}
 
-        naming::id_type id_;
+        hpx::id_type id_;
         components::pinned_ptr p_;
     };
 
@@ -76,7 +76,7 @@ namespace hpx { namespace detail {
     future<T> keep_alive(
         future<T>&& f, id_type const& id, components::pinned_ptr&& p)
     {
-        if (id.get_management_type() == naming::id_type::managed)
+        if (id.get_management_type() == hpx::id_type::management_type::managed)
         {
             traits::detail::get_shared_state(f)->set_on_completed(
                 hpx::detail::keep_id_and_ptr_alive(id, HPX_MOVE(p)));
@@ -96,10 +96,11 @@ namespace hpx { namespace detail {
           , id_(id)
           , f_(f)
         {
-            if (id.get_management_type() == naming::id_type::managed)
+            if (id.get_management_type() ==
+                hpx::id_type::management_type::managed)
             {
-                unmanaged_id_ =
-                    naming::id_type(id.get_gid(), naming::id_type::unmanaged);
+                unmanaged_id_ = hpx::id_type(
+                    id.get_gid(), hpx::id_type::management_type::unmanaged);
                 target_is_managed_ = true;
             }
         }
@@ -130,8 +131,8 @@ namespace hpx { namespace detail {
         }
 
         bool target_is_managed_;
-        naming::id_type const& id_;
-        naming::id_type unmanaged_id_;
+        hpx::id_type const& id_;
+        hpx::id_type unmanaged_id_;
         future<Result>& f_;
     };
 
@@ -141,7 +142,7 @@ namespace hpx { namespace detail {
     {
         template <typename... Ts>
         static hpx::future<Result> call(
-            naming::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
+            hpx::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
         {
             try
             {
@@ -178,7 +179,7 @@ namespace hpx { namespace detail {
     {
         template <typename... Ts>
         static hpx::future<void> call(
-            naming::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
+            hpx::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
         {
             try
             {
@@ -199,7 +200,7 @@ namespace hpx { namespace detail {
     struct sync_local_invoke_cb
     {
         template <typename Callback, typename... Ts>
-        static hpx::future<Result> call(naming::id_type const& id,
+        static hpx::future<Result> call(hpx::id_type const& id,
             naming::address&& addr, Callback&& cb, Ts&&... vs)
         {
             future<Result> f;

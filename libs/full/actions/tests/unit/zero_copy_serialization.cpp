@@ -175,7 +175,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
 template <typename Action, typename T>
 void test_normal_serialization(T& arg)
 {
-    hpx::naming::id_type const here = hpx::find_here();
+    hpx::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid, (void*) &test_function1);
 
@@ -208,7 +208,7 @@ void test_normal_serialization(T& arg)
 template <typename T1, typename T2>
 void test_normal_serialization(T1& arg1, T2& arg2)
 {
-    hpx::naming::id_type const here = hpx::find_here();
+    hpx::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid, (void*) &test_function2);
 
@@ -242,7 +242,7 @@ template <typename T1, typename T2>
 void test_normal_serialization(
     double d, T1& arg1, std::string const& s, int i, T2& arg2)
 {
-    hpx::naming::id_type const here = hpx::find_here();
+    hpx::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid, (void*) &test_function2);
 
@@ -276,7 +276,7 @@ void test_normal_serialization(
 template <typename Action, typename T>
 void test_zero_copy_serialization(T& arg)
 {
-    hpx::naming::id_type const here = hpx::find_here();
+    hpx::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid, (void*) &test_function1);
 
@@ -308,7 +308,7 @@ void test_zero_copy_serialization(T& arg)
 template <typename T1, typename T2>
 void test_zero_copy_serialization(T1& arg1, T2& arg2)
 {
-    hpx::naming::id_type const here = hpx::find_here();
+    hpx::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid, (void*) &test_function2);
 
@@ -341,7 +341,7 @@ template <typename T1, typename T2>
 void test_zero_copy_serialization(
     double d, T1& arg1, std::string const& s, int i, T2& arg2)
 {
-    hpx::naming::id_type const here = hpx::find_here();
+    hpx::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid, (void*) &test_function2);
 

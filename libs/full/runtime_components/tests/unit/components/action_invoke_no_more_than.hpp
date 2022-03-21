@@ -148,7 +148,7 @@ namespace hpx { namespace actions { namespace detail {
         naming::address addr_;
 
         template <typename T>
-        void operator()(naming::id_type const& id, T&& t)
+        void operator()(hpx::id_type const& id, T&& t)
         {
             if (id)
             {
@@ -157,7 +157,7 @@ namespace hpx { namespace actions { namespace detail {
             construct_semaphore_type::get_sem().signal();
         }
 
-        void operator()(naming::id_type const& id)
+        void operator()(hpx::id_type const& id)
         {
             if (id)
             {

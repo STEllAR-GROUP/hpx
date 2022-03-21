@@ -22,14 +22,16 @@
 namespace hpx {
 
     void trigger_lco_event(
-        naming::id_type const& id, naming::address&& addr, bool move_credits)
+        hpx::id_type const& id, naming::address&& addr, bool move_credits)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef lcos::base_lco::set_event_action set_action;
         if (move_credits &&
-            id.get_management_type() != naming::id_type::unmanaged)
+            id.get_management_type() !=
+                hpx::id_type::management_type::unmanaged)
         {
-            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            hpx::id_type target(
+                id.get_gid(), id_type::management_type::managed_move_credit);
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(
@@ -48,8 +50,8 @@ namespace hpx {
 #endif
     }
 
-    void trigger_lco_event(naming::id_type const& id, naming::address&& addr,
-        naming::id_type const& cont, bool move_credits)
+    void trigger_lco_event(hpx::id_type const& id, naming::address&& addr,
+        hpx::id_type const& cont, bool move_credits)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef lcos::base_lco::set_event_action set_action;
@@ -58,9 +60,11 @@ namespace hpx {
         typedef hpx::traits::extract_action<set_action>::remote_result_type
             remote_result_type;
         if (move_credits &&
-            id.get_management_type() != naming::id_type::unmanaged)
+            id.get_management_type() !=
+                hpx::id_type::management_type::unmanaged)
         {
-            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            hpx::id_type target(
+                id.get_gid(), id_type::management_type::managed_move_credit);
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(
@@ -84,15 +88,17 @@ namespace hpx {
 #endif
     }
 
-    void set_lco_error(naming::id_type const& id, naming::address&& addr,
+    void set_lco_error(hpx::id_type const& id, naming::address&& addr,
         std::exception_ptr const& e, bool move_credits)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef lcos::base_lco::set_exception_action set_action;
         if (move_credits &&
-            id.get_management_type() != naming::id_type::unmanaged)
+            id.get_management_type() !=
+                hpx::id_type::management_type::unmanaged)
         {
-            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            hpx::id_type target(
+                id.get_gid(), id_type::management_type::managed_move_credit);
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(target, HPX_MOVE(addr),
@@ -112,16 +118,18 @@ namespace hpx {
 #endif
     }
 
-    void set_lco_error(naming::id_type const& id,
+    void set_lco_error(hpx::id_type const& id,
         naming::address&& addr,    //-V659
         std::exception_ptr&& e, bool move_credits)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef lcos::base_lco::set_exception_action set_action;
         if (move_credits &&
-            id.get_management_type() != naming::id_type::unmanaged)
+            id.get_management_type() !=
+                hpx::id_type::management_type::unmanaged)
         {
-            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            hpx::id_type target(
+                id.get_gid(), id_type::management_type::managed_move_credit);
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(target, HPX_MOVE(addr),
@@ -141,8 +149,8 @@ namespace hpx {
 #endif
     }
 
-    void set_lco_error(naming::id_type const& id, naming::address&& addr,
-        std::exception_ptr const& e, naming::id_type const& cont,
+    void set_lco_error(hpx::id_type const& id, naming::address&& addr,
+        std::exception_ptr const& e, hpx::id_type const& cont,
         bool move_credits)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -152,9 +160,11 @@ namespace hpx {
         typedef hpx::traits::extract_action<set_action>::remote_result_type
             remote_result_type;
         if (move_credits &&
-            id.get_management_type() != naming::id_type::unmanaged)
+            id.get_management_type() !=
+                hpx::id_type::management_type::unmanaged)
         {
-            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            hpx::id_type target(
+                id.get_gid(), id_type::management_type::managed_move_credit);
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(
@@ -180,9 +190,9 @@ namespace hpx {
 #endif
     }
 
-    void set_lco_error(naming::id_type const& id,
+    void set_lco_error(hpx::id_type const& id,
         naming::address&& addr,    //-V659
-        std::exception_ptr&& e, naming::id_type const& cont, bool move_credits)
+        std::exception_ptr&& e, hpx::id_type const& cont, bool move_credits)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef lcos::base_lco::set_exception_action set_action;
@@ -191,9 +201,11 @@ namespace hpx {
         typedef hpx::traits::extract_action<set_action>::remote_result_type
             remote_result_type;
         if (move_credits &&
-            id.get_management_type() != naming::id_type::unmanaged)
+            id.get_management_type() !=
+                hpx::id_type::management_type::unmanaged)
         {
-            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            hpx::id_type target(
+                id.get_gid(), id_type::management_type::managed_move_credit);
             id.make_unmanaged();
 
             detail::apply_impl<set_action>(
@@ -226,6 +238,6 @@ namespace hpx {
     // (in release mode only, leads to missing symbols otherwise).
     template bool apply<lcos::base_lco_with_value<util::unused_type,
                             util::unused_type>::set_value_action,
-        util::unused_type>(naming::id_type const&, util::unused_type&&);
+        util::unused_type>(hpx::id_type const&, util::unused_type&&);
 #endif
 }    // namespace hpx

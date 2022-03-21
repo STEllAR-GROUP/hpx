@@ -91,7 +91,7 @@ namespace hpx::agas::server {
             addr.address_ = g.lva();
         }
 
-        naming::id_type source = p.source_id();
+        hpx::id_type source = p.source_id();
 
         // either send the parcel on its way or execute actions locally
         if (naming::get_locality_id_from_gid(addr.locality_) ==

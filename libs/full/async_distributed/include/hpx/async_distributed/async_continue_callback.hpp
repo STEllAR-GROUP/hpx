@@ -54,7 +54,7 @@ namespace hpx {
     hpx::future<typename traits::promise_local_result<
         typename detail::result_of_async_continue<Action, Cont>::type>::type>
     async_continue_cb(
-        Cont&& cont, naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+        Cont&& cont, hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         typedef typename traits::promise_remote_result<
             typename detail::result_of_async_continue<Action, Cont>::type>::type
@@ -70,9 +70,8 @@ namespace hpx {
     hpx::future<typename traits::promise_local_result<
         typename detail::result_of_async_continue<Derived, Cont>::type>::type>
     async_continue_cb(
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-        ,
-        Cont&& cont, naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
+        Cont&& cont, hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return async_continue_cb<Derived>(HPX_FORWARD(Cont, cont), gid,
             HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
@@ -102,8 +101,7 @@ namespace hpx {
         hpx::future<typename traits::promise_local_result<typename detail::
                 result_of_async_continue<Derived, Cont>::type>::type>>::type
     async_continue_cb(
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-        ,
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         Cont&& cont, DistPolicy const& policy, Callback&& cb, Ts&&... vs)
     {
         return async_continue_cb<Derived>(HPX_FORWARD(Cont, cont), policy,

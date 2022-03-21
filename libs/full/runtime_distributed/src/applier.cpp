@@ -63,8 +63,8 @@ namespace hpx { namespace applier {
     {
         naming::resolver_client& agas_client = naming::get_agas_client();
         runtime_support_id_ =
-            naming::id_type(agas_client.get_local_locality().get_msb(), rts,
-                naming::id_type::unmanaged);
+            hpx::id_type(agas_client.get_local_locality().get_msb(), rts,
+                hpx::id_type::management_type::unmanaged);
     }
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -103,7 +103,7 @@ namespace hpx { namespace applier {
 #endif
     }
 
-    bool applier::get_remote_localities(std::vector<naming::id_type>& prefixes,
+    bool applier::get_remote_localities(std::vector<hpx::id_type>& prefixes,
         components::component_type type, error_code& ec) const
     {
 #if defined(HPX_HAVE_NETWORKING)
@@ -112,7 +112,8 @@ namespace hpx { namespace applier {
             return false;
 
         for (naming::gid_type& gid : raw_prefixes)
-            prefixes.emplace_back(gid, naming::id_type::unmanaged);
+            prefixes.emplace_back(
+                gid, hpx::id_type::management_type::unmanaged);
 #endif
         HPX_UNUSED(prefixes);
         HPX_UNUSED(type);
@@ -136,7 +137,7 @@ namespace hpx { namespace applier {
     }
 
     bool applier::get_localities(
-        std::vector<naming::id_type>& prefixes, error_code& ec) const
+        std::vector<hpx::id_type>& prefixes, error_code& ec) const
     {
         std::vector<naming::gid_type> raw_prefixes;
 #if defined(HPX_HAVE_NETWORKING)
@@ -145,7 +146,8 @@ namespace hpx { namespace applier {
             return false;
 
         for (naming::gid_type& gid : raw_prefixes)
-            prefixes.emplace_back(gid, naming::id_type::unmanaged);
+            prefixes.emplace_back(
+                gid, hpx::id_type::management_type::unmanaged);
 #else
         prefixes.emplace_back(agas::get_console_locality());
 #endif
@@ -154,7 +156,7 @@ namespace hpx { namespace applier {
         return true;
     }
 
-    bool applier::get_localities(std::vector<naming::id_type>& prefixes,
+    bool applier::get_localities(std::vector<hpx::id_type>& prefixes,
         components::component_type type, error_code& ec) const
     {
 #if defined(HPX_HAVE_NETWORKING)
@@ -163,7 +165,8 @@ namespace hpx { namespace applier {
             return false;
 
         for (naming::gid_type& gid : raw_prefixes)
-            prefixes.emplace_back(gid, naming::id_type::unmanaged);
+            prefixes.emplace_back(
+                gid, hpx::id_type::management_type::unmanaged);
 #else
         prefixes.emplace_back(agas::get_console_locality());
 #endif

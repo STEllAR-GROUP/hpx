@@ -29,7 +29,7 @@ int hpx_main(hpx::program_options::variables_map&)
 
     std::size_t soln_count_total = 0;
 
-    hpx::naming::id_type locality_ = hpx::find_here();
+    hpx::id_type locality_ = hpx::find_here();
 
     std::cout << "Enter size of board. Default size is 8." << std::endl;
     std::cout << "Command Options: size[value] | default | print | quit"

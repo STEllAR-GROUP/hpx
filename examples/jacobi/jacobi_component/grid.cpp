@@ -29,7 +29,7 @@ namespace jacobi
         rows.reserve(ny);
         std::vector<hpx::future<void> > init_futures;
         init_futures.reserve(ny);
-        for (hpx::naming::id_type const& id : ids)
+        for (hpx::id_type const& id : ids)
         {
             row r; r.id = id;
             init_futures.push_back(r.init(nx, value));

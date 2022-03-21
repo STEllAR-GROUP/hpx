@@ -177,22 +177,22 @@ namespace hpx { namespace lcos {
         channel() = default;
 
         // create a new instance of a channel component
-        explicit channel(naming::id_type const& loc)
+        explicit channel(hpx::id_type const& loc)
           : base_type(hpx::new_<lcos::server::channel<T>>(loc))
         {
         }
 
-        explicit channel(hpx::future<naming::id_type>&& id)
+        explicit channel(hpx::future<hpx::id_type>&& id)
           : base_type(HPX_MOVE(id))
         {
         }
 
-        explicit channel(hpx::shared_future<naming::id_type>&& id)
+        explicit channel(hpx::shared_future<hpx::id_type>&& id)
           : base_type(HPX_MOVE(id))
         {
         }
 
-        explicit channel(hpx::shared_future<naming::id_type> const& id)
+        explicit channel(hpx::shared_future<hpx::id_type> const& id)
           : base_type(id)
         {
         }
@@ -362,17 +362,17 @@ namespace hpx { namespace lcos {
         {
         }
 
-        explicit receive_channel(hpx::future<naming::id_type>&& id)
+        explicit receive_channel(hpx::future<hpx::id_type>&& id)
           : base_type(HPX_MOVE(id))
         {
         }
 
-        explicit receive_channel(hpx::shared_future<naming::id_type>&& id)
+        explicit receive_channel(hpx::shared_future<hpx::id_type>&& id)
           : base_type(HPX_MOVE(id))
         {
         }
 
-        explicit receive_channel(hpx::shared_future<naming::id_type> const& id)
+        explicit receive_channel(hpx::shared_future<hpx::id_type> const& id)
           : base_type(id)
         {
         }
@@ -445,17 +445,17 @@ namespace hpx { namespace lcos {
         {
         }
 
-        explicit send_channel(hpx::future<naming::id_type>&& id)
+        explicit send_channel(hpx::future<hpx::id_type>&& id)
           : base_type(HPX_MOVE(id))
         {
         }
 
-        explicit send_channel(hpx::shared_future<naming::id_type>&& id)
+        explicit send_channel(hpx::shared_future<hpx::id_type>&& id)
           : base_type(HPX_MOVE(id))
         {
         }
 
-        explicit send_channel(hpx::shared_future<naming::id_type> const& id)
+        explicit send_channel(hpx::shared_future<hpx::id_type> const& id)
           : base_type(id)
         {
         }

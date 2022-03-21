@@ -30,9 +30,9 @@ using hpx::init;
 
 using std::chrono::milliseconds;
 
+using hpx::id_type;
 using hpx::naming::get_management_type_name;
 using hpx::naming::gid_type;
-using hpx::naming::id_type;
 using hpx::naming::detail::get_stripped_gid;
 
 using hpx::components::component_type;

@@ -46,7 +46,7 @@
 
 #include <boost/shared_array.hpp>
 
-using hpx::naming::id_type;
+using hpx::id_type;
 using hpx::performance_counters::counter_value;
 using hpx::performance_counters::get_counter;
 using hpx::performance_counters::performance_counter;
@@ -55,7 +55,7 @@ using hpx::performance_counters::status_is_valid;
 static bool counters_initialized = false;
 static std::string counter_name = "";
 static apex_event_type end_iteration_event = APEX_CUSTOM_EVENT_1;
-static hpx::naming::id_type counter_id;
+static hpx::id_type counter_id;
 
 void setup_counters()
 {
@@ -79,7 +79,7 @@ void setup_counters()
     {
         std::cerr << "1d_stencil_4_repart: caught exception: " << e.what()
                   << std::endl;
-        counter_id = hpx::naming::invalid_id;
+        counter_id = hpx::invalid_id;
         return;
     }
 }

@@ -29,9 +29,7 @@ namespace hpx {
 
         struct HPX_EXPORT address;
         struct HPX_EXPORT gid_type;
-        struct HPX_EXPORT id_type;
     }    // namespace naming
 
-    // Pulling important types into the main namespace
-    using naming::id_type;
+    struct HPX_EXPORT id_type;
 }    // namespace hpx

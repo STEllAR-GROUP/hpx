@@ -271,9 +271,9 @@ namespace hpx { namespace agas {
         naming::address addr(
             naming::get_gid_from_locality_id(target_locality_id));
 
-        parcelset::put_parcel(naming::id_type(naming::get_gid_from_locality_id(
-                                                  target_locality_id),
-                                  naming::id_type::unmanaged),
+        parcelset::put_parcel(
+            hpx::id_type(naming::get_gid_from_locality_id(target_locality_id),
+                hpx::id_type::management_type::unmanaged),
             HPX_MOVE(addr), act, HPX_FORWARD(Args, args)...);
     }    // }}}
 

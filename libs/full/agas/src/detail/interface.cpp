@@ -39,13 +39,13 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
     }
 
     future<bool> register_name_async(
-        std::string const& name, naming::id_type const& id)
+        std::string const& name, hpx::id_type const& id)
     {
         return naming::get_agas_client().register_name_async(name, id);
     }
 
     bool register_name_id(
-        std::string const& name, naming::id_type const& id, error_code& ec)
+        std::string const& name, hpx::id_type const& id, error_code& ec)
     {
         if (&ec == &throws)
         {
@@ -55,27 +55,27 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type unregister_name(std::string const& name, error_code&)
+    hpx::id_type unregister_name(std::string const& name, error_code&)
     {
         if (!hpx::is_stopped())
         {
             return naming::get_agas_client().unregister_name(name);
         }
-        return naming::invalid_id;
+        return hpx::invalid_id;
     }
 
-    future<naming::id_type> unregister_name_async(std::string const& name)
+    future<hpx::id_type> unregister_name_async(std::string const& name)
     {
         return naming::get_agas_client().unregister_name_async(name);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    future<naming::id_type> resolve_name_async(std::string const& name)
+    future<hpx::id_type> resolve_name_async(std::string const& name)
     {
         return naming::get_agas_client().resolve_name_async(name);
     }
 
-    naming::id_type resolve_name(std::string const& name, error_code& ec)
+    hpx::id_type resolve_name(std::string const& name, error_code& ec)
     {
         return naming::get_agas_client().resolve_name(name, ec);
     }
@@ -145,12 +145,12 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::address> resolve_async(naming::id_type const& id)
+    hpx::future<naming::address> resolve_async(hpx::id_type const& id)
     {
         return naming::get_agas_client().resolve_async(id);
     }
 
-    naming::address resolve(naming::id_type const& id, error_code& ec)
+    naming::address resolve(hpx::id_type const& id, error_code& ec)
     {
         return naming::get_agas_client().resolve_async(id).get(ec);
     }
@@ -286,22 +286,22 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
     }
 
     /// \brief Return an id_type referring to the console locality.
-    naming::id_type get_console_locality(error_code& ec)
+    hpx::id_type get_console_locality(error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
         if (rt == nullptr || rt->get_state() == state::invalid)
         {
-            return naming::invalid_id;
+            return hpx::invalid_id;
         }
 
         naming::gid_type console;
         naming::get_agas_client().get_console_locality(console, ec);
         if (ec)
         {
-            return naming::invalid_id;
+            return hpx::invalid_id;
         }
 
-        return naming::id_type(console, naming::id_type::unmanaged);
+        return hpx::id_type(console, hpx::id_type::management_type::unmanaged);
     }
 
     std::uint32_t get_locality_id(error_code& ec)
@@ -386,7 +386,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::future<std::int64_t> incref_async(naming::gid_type const& gid,
-        std::int64_t credits, naming::id_type const& keep_alive_)
+        std::int64_t credits, hpx::id_type const& keep_alive_)
     {
         HPX_ASSERT(!naming::detail::is_locked(gid));
 
@@ -395,12 +395,13 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         if (keep_alive_)
             return resolver.incref_async(gid, credits, keep_alive_);
 
-        naming::id_type keep_alive = naming::id_type(gid, id_type::unmanaged);
+        hpx::id_type keep_alive =
+            hpx::id_type(gid, hpx::id_type::management_type::unmanaged);
         return resolver.incref_async(gid, credits, keep_alive);
     }
 
     std::int64_t incref(naming::gid_type const& gid, std::int64_t credits,
-        naming::id_type const& keep_alive_, error_code&)
+        hpx::id_type const& keep_alive_, error_code&)
     {
         HPX_ASSERT(!naming::detail::is_locked(gid));
 
@@ -410,18 +411,18 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         {
             return resolver.incref_async(gid, credits, keep_alive_).get();
         }
-        naming::id_type keep_alive = naming::id_type(gid, id_type::unmanaged);
+        hpx::id_type keep_alive =
+            hpx::id_type(gid, hpx::id_type::management_type::unmanaged);
         return resolver.incref_async(gid, credits, keep_alive).get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::id_type> get_colocation_id_async(
-        naming::id_type const& id)
+    hpx::future<hpx::id_type> get_colocation_id_async(hpx::id_type const& id)
     {
         return naming::get_agas_client().get_colocation_id_async(id);
     }
 
-    naming::id_type get_colocation_id(naming::id_type const& id, error_code& ec)
+    hpx::id_type get_colocation_id(hpx::id_type const& id, error_code& ec)
     {
         return get_colocation_id_async(id).get(ec);
     }
@@ -435,13 +436,13 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<std::pair<naming::id_type, naming::address>> begin_migration(
-        naming::id_type const& id)
+    hpx::future<std::pair<hpx::id_type, naming::address>> begin_migration(
+        hpx::id_type const& id)
     {
         return naming::get_agas_client().begin_migration(id);
     }
 
-    bool end_migration(naming::id_type const& id)
+    bool end_migration(hpx::id_type const& id)
     {
         return naming::get_agas_client().end_migration(id);
     }

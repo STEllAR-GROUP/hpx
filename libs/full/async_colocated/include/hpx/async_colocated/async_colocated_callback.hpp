@@ -22,7 +22,7 @@ namespace hpx { namespace detail {
     template <typename Action, typename Callback, typename... Ts>
     hpx::future<typename traits::promise_local_result<
         typename hpx::traits::extract_action<Action>::remote_result_type>::type>
-    async_colocated_cb(naming::id_type const& gid, Callback&& cb,
+    async_colocated_cb(hpx::id_type const& gid, Callback&& cb,
         Ts&&...
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         vs
@@ -36,9 +36,9 @@ namespace hpx { namespace detail {
 #else
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
-        naming::id_type service_target(
+        hpx::id_type service_target(
             agas::primary_namespace::get_service_instance(gid.get_gid()),
-            naming::id_type::unmanaged);
+            hpx::id_type::management_type::unmanaged);
 
         typedef typename hpx::traits::extract_action<Action>::remote_result_type
             remote_result_type;
@@ -59,7 +59,7 @@ namespace hpx { namespace detail {
             extract_action<Derived>::remote_result_type>::type>
     async_colocated_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+        hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return async_colocated_cb<Derived>(
             gid, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
@@ -71,7 +71,7 @@ namespace hpx { namespace detail {
     hpx::future<typename traits::promise_local_result<
         typename hpx::traits::extract_action<Action>::remote_result_type>::type>
     async_colocated_cb(
-        Continuation&& cont, naming::id_type const& gid, Callback&& cb,
+        Continuation&& cont, hpx::id_type const& gid, Callback&& cb,
         Ts&&...
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         vs
@@ -86,9 +86,9 @@ namespace hpx { namespace detail {
 #else
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
-        naming::id_type service_target(
+        hpx::id_type service_target(
             agas::primary_namespace::get_service_instance(gid.get_gid()),
-            naming::id_type::unmanaged);
+            hpx::id_type::management_type::unmanaged);
 
         typedef typename hpx::traits::extract_action<Action>::remote_result_type
             remote_result_type;
@@ -111,7 +111,7 @@ namespace hpx { namespace detail {
             extract_action<Derived>::remote_result_type>::type>
     async_colocated_cb(Continuation&& cont,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+        hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return async_colocated_cb<Derived>(HPX_FORWARD(Continuation, cont), gid,
             HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);

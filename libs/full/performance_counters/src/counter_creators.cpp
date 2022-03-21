@@ -504,7 +504,7 @@ namespace hpx { namespace performance_counters {
     namespace detail {
 
         naming::gid_type retrieve_agas_counter(std::string const& name,
-            naming::id_type const& agas_id, error_code& ec)
+            hpx::id_type const& agas_id, error_code& ec)
         {
             naming::gid_type id;
 
@@ -602,8 +602,8 @@ namespace hpx { namespace performance_counters {
             service += "/";
             service += service_name;
 
-            naming::id_type id = agas::resolve_name(launch::sync, service, ec);
-            if (id == naming::invalid_id)
+            hpx::id_type id = agas::resolve_name(launch::sync, service, ec);
+            if (id == hpx::invalid_id)
             {
                 HPX_THROWS_IF(ec, not_implemented, "agas_raw_counter_creator",
                     "invalid counter name: " +
