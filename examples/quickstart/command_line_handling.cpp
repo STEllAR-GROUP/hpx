@@ -16,15 +16,13 @@ int hpx_main(hpx::program_options::variables_map& vm)
 {
     // extract value of application specific command line option
     int test = vm["test"].as<int>();
-    hpx::cout
-        << "value for command line option --test: "
-        << test << "\n";
+    hpx::cout << "value for command line option --test: " << test << "\n";
 
     // extract all positional command line argument
     if (vm.count("hpx:positional"))
     {
         std::vector<std::string> positional =
-            vm["hpx:positional"].as<std::vector<std::string> >();
+            vm["hpx:positional"].as<std::vector<std::string>>();
         hpx::cout << "positional command line options:\n";
         for (std::string const& arg : positional)
             hpx::cout << arg << "\n";
@@ -42,11 +40,9 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     hpx::program_options::options_description desc_commandline;
 
-    desc_commandline.add_options()
-        ("test",
-         hpx::program_options::value<int>()->default_value(42),
-         "additional, application-specific option")
-    ;
+    desc_commandline.add_options()("test",
+        hpx::program_options::value<int>()->default_value(42),
+        "additional, application-specific option");
 
     hpx::init_params init_args;
     init_args.desc_cmdline = desc_commandline;

@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/iostream.hpp>
 
 #include <utility>
 
@@ -19,14 +19,17 @@ using hpx::components::client_base;
 using hpx::components::component;
 using hpx::components::component_base;
 
-using hpx::find_here;
 using hpx::async;
+using hpx::find_here;
 
 using hpx::cout;
 
 struct hello_world_server : component_base<hello_world_server>
 {
-    void print() const { cout << "hello world\n" << std::flush; }
+    void print() const
+    {
+        cout << "hello world\n" << std::flush;
+    }
 
     HPX_DEFINE_COMPONENT_ACTION(hello_world_server, print, print_action)
 };
@@ -43,10 +46,19 @@ struct hello_world : client_base<hello_world, hello_world_server>
     typedef client_base<hello_world, hello_world_server> base_type;
 
     hello_world() = default;
-    explicit hello_world(hpx::id_type const& id) : base_type(id) {}
-    hello_world(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
+    explicit hello_world(hpx::id_type const& id)
+      : base_type(id)
+    {
+    }
+    hello_world(hpx::future<hpx::id_type>&& id)
+      : base_type(std::move(id))
+    {
+    }
 
-    void print() { async<print_action>(this->get_id()).get(); }
+    void print()
+    {
+        async<print_action>(this->get_id()).get();
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -15,7 +15,8 @@
 template <typename T>
 struct communicator
 {
-    enum neighbor {
+    enum neighbor
+    {
         left = 0,
         right = 1,
     };
@@ -38,8 +39,8 @@ struct communicator
                 // Retrieve the channel from our leftper neighbor from which
                 // we receive the row we need to leftdate the first row in our
                 // partition.
-                recv[left] = hpx::find_from_basename<
-                                channel_type>(right_name, rank - 1);
+                recv[left] =
+                    hpx::find_from_basename<channel_type>(right_name, rank - 1);
 
                 // Create the channel we use to send our first row to our
                 // left neighbor
@@ -53,8 +54,8 @@ struct communicator
                 // Retrieve the channel from our neighbor below from which we
                 // receive the row we need to leftdate the last row in our
                 // partition.
-                recv[right] = hpx::find_from_basename<
-                                channel_type>(left_name, rank + 1);
+                recv[right] =
+                    hpx::find_from_basename<channel_type>(left_name, rank + 1);
                 // Create the channel we use to send our last row to our
                 // neighbor below
                 send[right] = channel_type(hpx::find_here());

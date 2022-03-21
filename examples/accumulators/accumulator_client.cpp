@@ -55,36 +55,44 @@ int hpx_main()
             if (!cmd.empty() && !cmd[0].empty())
             {
                 // try to interpret the entered command
-                if (cmd[0] == "reset") {
+                if (cmd[0] == "reset")
+                {
                     accu.reset();
                 }
-                else if (cmd[0] == "add") {
-                    if (cmd.size() == 2) {
+                else if (cmd[0] == "add")
+                {
+                    if (cmd.size() == 2)
+                    {
                         accu.add(hpx::util::from_string<argument_type>(cmd[1]));
                     }
-                    else {
-                        std::cout << "error: invalid command '"
-                                  << line << "'" << std::endl
+                    else
+                    {
+                        std::cout << "error: invalid command '" << line << "'"
+                                  << std::endl
                                   << help << std::endl;
                     }
                 }
-                else if (cmd[0] == "query") {
+                else if (cmd[0] == "query")
+                {
                     std::cout << accu.query() << std::endl;
                 }
-                else if (cmd[0] == "help") {
+                else if (cmd[0] == "help")
+                {
                     std::cout << help << std::endl;
                 }
-                else if (cmd[0] == "quit") {
+                else if (cmd[0] == "quit")
+                {
                     break;
                 }
-                else {
-                    std::cout << "error: invalid command '"
-                              << line << "'" << std::endl
+                else
+                {
+                    std::cout << "error: invalid command '" << line << "'"
+                              << std::endl
                               << help << std::endl;
                 }
             }
 
-            std:: cout << "> ";
+            std::cout << "> ";
         }
     }
 
@@ -97,9 +105,7 @@ int main(int argc, char* argv[])
 {
     // We force this example to use 2 threads by default as one of the threads
     // will be sitting most of the time in the kernel waiting for user input.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=2"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=2"};
 
     // Initialize and run HPX.
     hpx::init_params init_args;

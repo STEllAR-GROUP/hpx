@@ -6,25 +6,23 @@
 
 #pragma once
 
-#include <hpx/include/runtime.hpp>
 #include <hpx/include/client.hpp>
+#include <hpx/include/runtime.hpp>
 
 #include "server/random_mem_access.hpp"
 
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace components
-{
+namespace hpx { namespace components {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a random_mem_access class is the client side representation of a
     /// specific \a server#random_mem_access component
     class random_mem_access
       : public client_base<random_mem_access, server::random_mem_access>
     {
-        typedef
-            client_base<random_mem_access, server::random_mem_access>
-        base_type;
+        typedef client_base<random_mem_access, server::random_mem_access>
+            base_type;
 
     public:
         random_mem_access() = default;
@@ -33,7 +31,8 @@ namespace hpx { namespace components
         /// \a server#random_mem_access instance with the given global \a id.
         random_mem_access(id_type id)
           : base_type(std::move(id))
-        {}
+        {
+        }
 
         ~random_mem_access() = default;
 
@@ -65,7 +64,7 @@ namespace hpx { namespace components
             print_async().get();
         }
         /// Asynchronously query the current value of the random_mem_access
-        hpx::future<void> print_async ()
+        hpx::future<void> print_async()
         {
             typedef server::random_mem_access::print_action action_type;
             return hpx::async<action_type>(this->get_id());
@@ -84,5 +83,4 @@ namespace hpx { namespace components
             return hpx::async<action_type>(this->get_id());
         }
     };
-}}
-
+}}    // namespace hpx::components

@@ -22,11 +22,11 @@ HPX_REGISTER_ACTION(board_type::wrapped_type::init_action, board_init_action)
 
 HPX_REGISTER_ACTION(board_type::wrapped_type::check_action, board_check_action)
 
-HPX_REGISTER_ACTION(board_type::wrapped_type::access_action,
-    board_access_action)
+HPX_REGISTER_ACTION(
+    board_type::wrapped_type::access_action, board_access_action)
 
-HPX_REGISTER_ACTION(board_type::wrapped_type::update_action,
-    board_update_action)
+HPX_REGISTER_ACTION(
+    board_type::wrapped_type::update_action, board_update_action)
 
 HPX_REGISTER_ACTION(board_type::wrapped_type::solve_action, board_solve_action)
 

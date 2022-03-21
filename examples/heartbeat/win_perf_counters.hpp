@@ -28,5 +28,4 @@ void uninstall_windows_counters();
 
 #endif
 
-
 #endif

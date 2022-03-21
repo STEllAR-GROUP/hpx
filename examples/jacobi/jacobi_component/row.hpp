@@ -12,13 +12,12 @@
 #include "row_range.hpp"
 #include "server/row.hpp"
 
-#include <hpx/include/naming.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/naming.hpp>
 
 #include <cstddef>
 
-namespace jacobi
-{
+namespace jacobi {
     struct row
     {
         row() {}
@@ -36,11 +35,11 @@ namespace jacobi
         }
 
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        void serialize(Archive& ar, unsigned)
         {
-            ar & id;
+            ar& id;
         }
     };
-}
+}    // namespace jacobi
 
 #endif

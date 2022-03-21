@@ -61,14 +61,13 @@ int monitor(std::uint64_t pause, std::uint64_t values)
 
     using hpx::performance_counters::performance_counter;
     performance_counter sine_explicit(hpx::util::format(
-        "/sine{{locality#{}/instance#{}}}/immediate/explicit",
-        prefix, 0));
+        "/sine{{locality#{}/instance#{}}}/immediate/explicit", prefix, 0));
     performance_counter sine_implicit(hpx::util::format(
-        "/sine{{locality#{}/total}}/immediate/implicit",
-        prefix));
-    performance_counter sine_average(hpx::util::format(
-        "/statistics{{/sine{{locality#{}/instance#{}}}/immediate/explicit}}/average@100",
-        prefix, 1));
+        "/sine{{locality#{}/total}}/immediate/implicit", prefix));
+    performance_counter sine_average(
+        hpx::util::format("/statistics{{/sine{{locality#{}/instance#{}}}/"
+                          "immediate/explicit}}/average@100",
+            prefix, 1));
 
     // We need to explicitly start all counters before we can use them. For
     // certain counters this could be a no-op, in which case start will return
@@ -86,9 +85,12 @@ int monitor(std::uint64_t pause, std::uint64_t values)
         using hpx::performance_counters::counter_value;
         using hpx::performance_counters::status_is_valid;
 
-        counter_value value1 = sine_explicit.get_counter_value(hpx::launch::sync);
-        counter_value value2 = sine_implicit.get_counter_value(hpx::launch::sync);
-        counter_value value3 = sine_average.get_counter_value(hpx::launch::sync);
+        counter_value value1 =
+            sine_explicit.get_counter_value(hpx::launch::sync);
+        counter_value value2 =
+            sine_implicit.get_counter_value(hpx::launch::sync);
+        counter_value value3 =
+            sine_average.get_counter_value(hpx::launch::sync);
 
         if (status_is_valid(value1.status_))
         {
@@ -110,11 +112,13 @@ int monitor(std::uint64_t pause, std::uint64_t values)
             0;
         if (should_run == started)
         {
-            if (started) {
+            if (started)
+            {
                 sine_explicit.stop();
                 started = false;
             }
-            else {
+            else
+            {
                 sine_explicit.start();
                 started = true;
             }
@@ -138,10 +142,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "starting sine monitoring..." << std::endl;
 
     int result = 0;
-    try {
+    try
+    {
         result = monitor(pause, values);
     }
-    catch(hpx::exception const& e) {
+    catch (hpx::exception const& e)
+    {
         std::cerr << "sine_client: caught exception: " << e.what() << std::endl;
         std::cerr << "Have you specified the command line option "
                      "--sine to enable the sine component?"
@@ -161,16 +167,13 @@ int main(int argc, char* argv[])
 
     // Configure application-specific options.
     options_description desc_commandline("usage: sine_client [options]");
-    desc_commandline.add_options()
-            ("pause", value<std::uint64_t>()->default_value(500),
-             "milliseconds between each performance counter query")
-            ("values", value<std::uint64_t>()->default_value(100),
-             "number of performance counter queries to perform")
-        ;
+    desc_commandline.add_options()("pause",
+        value<std::uint64_t>()->default_value(500),
+        "milliseconds between each performance counter query")("values",
+        value<std::uint64_t>()->default_value(100),
+        "number of performance counter queries to perform");
 
-    std::vector<std::string> cfg = {
-        "hpx.components.sine.enabled! = 1"
-    };
+    std::vector<std::string> cfg = {"hpx.components.sine.enabled! = 1"};
 
     // Initialize and run HPX.
     hpx::init_params init_args;

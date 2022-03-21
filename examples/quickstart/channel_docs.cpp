@@ -11,8 +11,8 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/apply.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/iostream.hpp>
 
 #include <numeric>
 #include <string>

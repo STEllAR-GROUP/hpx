@@ -28,7 +28,10 @@ public:
     typedef hpx::components::client_base<foo, foo_server> base_type;
 
     foo() {}
-    foo(hpx::future<hpx::id_type>&& id) : base_type(std::move(id)) {}
+    foo(hpx::future<hpx::id_type>&& id)
+      : base_type(std::move(id))
+    {
+    }
 };
 
 foo get_foo()

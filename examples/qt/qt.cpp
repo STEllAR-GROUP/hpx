@@ -38,9 +38,7 @@ void run(widget* w, std::size_t num_threads)
     }
 
     hpx::wait_each(
-        [w](std::size_t i, auto&& f) {
-            w->threadsafe_add_label(i, f.get());
-        },
+        [w](std::size_t i, auto&& f) { w->threadsafe_add_label(i, f.get()); },
         futures);
     w->threadsafe_run_finished();
 }

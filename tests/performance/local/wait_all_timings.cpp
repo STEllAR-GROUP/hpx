@@ -155,11 +155,11 @@ int main(int argc, char* argv[])
         po::value<std::size_t>()->default_value(1000),
         "number of tasks to concurrently wait for (default: 1000)")("futures,f",
         po::value<std::size_t>()->default_value(100),
-        "number of tasks to concurrently wait for (default: 100)") ("chunks,c",
+        "number of tasks to concurrently wait for (default: 100)")("chunks,c",
         po::value<std::size_t>()->default_value(1),
-        "number of chunks to split tasks into (default: 1)") ("delay,d",
+        "number of chunks to split tasks into (default: 1)")("delay,d",
         po::value<std::size_t>()->default_value(0),
-        "number of iterations in the delay loop") ("no-header,n",
+        "number of iterations in the delay loop")("no-header,n",
         po::value<bool>()->default_value(true),
         "do not print out the csv header row");
 

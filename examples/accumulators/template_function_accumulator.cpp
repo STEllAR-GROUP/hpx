@@ -19,18 +19,16 @@ HPX_REGISTER_COMPONENT_MODULE()
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::component<
-    examples::server::template_function_accumulator
-> accumulator_type;
+    examples::server::template_function_accumulator>
+    accumulator_type;
 
 HPX_REGISTER_COMPONENT(accumulator_type, template_function_accumulator)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for managed_accumulator actions.
-HPX_REGISTER_ACTION(
-    accumulator_type::wrapped_type::reset_action,
+HPX_REGISTER_ACTION(accumulator_type::wrapped_type::reset_action,
     managed_accumulator_reset_action)
-HPX_REGISTER_ACTION(
-    accumulator_type::wrapped_type::query_action,
+HPX_REGISTER_ACTION(accumulator_type::wrapped_type::query_action,
     managed_accumulator_query_action)
 
 #endif

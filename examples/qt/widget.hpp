@@ -9,8 +9,8 @@
 #include <QtGui/QDialog>
 
 #if !defined(Q_MOC_RUN)
-#include <hpx/include/threads.hpp>
 #include <hpx/include/lcos_local.hpp>
+#include <hpx/include/threads.hpp>
 #include <cstddef>
 #include <functional>
 #endif
@@ -19,30 +19,29 @@ class QWidget;
 class QListWidget;
 class QPushButton;
 
-class widget
-    : public QDialog
+class widget : public QDialog
 {
     Q_OBJECT
 
-    public:
-        widget(std::function<void(widget *, std::size_t)> callback,
-            QWidget *parent = nullptr);
+public:
+    widget(std::function<void(widget*, std::size_t)> callback,
+        QWidget* parent = nullptr);
 
-        void threadsafe_add_label(std::size_t i, double t);
+    void threadsafe_add_label(std::size_t i, double t);
 
-        void threadsafe_run_finished();
+    void threadsafe_run_finished();
 
-    public slots:
-        void set_threads(int no);
+public slots:
+    void set_threads(int no);
 
-        void run_clicked(bool);
+    void run_clicked(bool);
 
-        void add_label(const QString& text);
+    void add_label(const QString& text);
 
-    private:
-        std::size_t no_threads;
-        hpx::lcos::local::spinlock mutex;
-        QListWidget *list;
-        QPushButton * run_button;
-        std::function<void(widget *, std::size_t)> callback_;
+private:
+    std::size_t no_threads;
+    hpx::lcos::local::spinlock mutex;
+    QListWidget* list;
+    QPushButton* run_button;
+    std::function<void(widget*, std::size_t)> callback_;
 };

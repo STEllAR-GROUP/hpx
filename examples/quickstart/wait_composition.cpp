@@ -15,8 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 struct cout_continuation
 {
-    typedef hpx::tuple<hpx::future<int>, hpx::future<int>,
-        hpx::future<int>>
+    typedef hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>>
         data_type;
 
     void operator()(hpx::future<data_type> data) const

@@ -42,8 +42,8 @@ int main(int, char*[])
         using action_type = hpx::components::server::invoke_function_action<
             decltype(&void_call_me), int>;
 
-        hpx::future<void> result = hpx::async<action_type>(hpx::find_here(),
-            reinterpret_cast<std::size_t>(&void_call_me), 42);
+        hpx::future<void> result = hpx::async<action_type>(
+            hpx::find_here(), reinterpret_cast<std::size_t>(&void_call_me), 42);
 
         result.get();
     }

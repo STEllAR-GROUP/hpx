@@ -7,8 +7,8 @@
 
 // make inspect happy: hpxinspect:nodeprecatedinclude hpxinspect:nodeprecatedname
 
-#include <hpx/hpx.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/modules/program_options.hpp>
@@ -19,12 +19,12 @@
 
 #include "worker_timed.hpp"
 
-using hpx::program_options::variables_map;
-using hpx::program_options::options_description;
-using hpx::program_options::value;
-using hpx::program_options::store;
 using hpx::program_options::command_line_parser;
 using hpx::program_options::notify;
+using hpx::program_options::options_description;
+using hpx::program_options::store;
+using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 std::uint64_t iterations = 500000;
 std::uint64_t delay = 5;
@@ -36,11 +36,14 @@ struct foo
         worker_timed(delay * 1000);
     }
 
-    template <typename Archive> void serialize(Archive&, unsigned int) {}
+    template <typename Archive>
+    void serialize(Archive&, unsigned int)
+    {
+    }
 };
 
 template <typename F>
-void run(F const & f, std::uint64_t local_iterations)
+void run(F const& f, std::uint64_t local_iterations)
 {
     std::uint64_t i = 0;
     hpx::chrono::high_resolution_timer t;
@@ -49,13 +52,10 @@ void run(F const & f, std::uint64_t local_iterations)
         f();
 
     double elapsed = t.elapsed();
-    std::cout << " walltime/iteration: "
-              << ((elapsed/i)*1e9) << " ns\n";
+    std::cout << " walltime/iteration: " << ((elapsed / i) * 1e9) << " ns\n";
 }
 
-int app_main(
-    variables_map& vm
-    )
+int app_main(variables_map& vm)
 {
     {
         foo f;
@@ -82,10 +82,7 @@ int app_main(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(
-    int argc
-  , char* argv[]
-    )
+int main(int argc, char* argv[])
 {
     ///////////////////////////////////////////////////////////////////////////
     // Parse command line.
@@ -93,18 +90,13 @@ int main(
 
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()
-        ( "help,h"
-        , "print out program usage (this message)")
+    cmdline.add_options()("help,h", "print out program usage (this message)")
 
-        ( "iterations"
-        , value<std::uint64_t>(&iterations)->default_value(500000)
-        , "number of iterations to invoke for each test")
+        ("iterations", value<std::uint64_t>(&iterations)->default_value(500000),
+            "number of iterations to invoke for each test")
 
-        ( "delay"
-        , value<std::uint64_t>(&delay)->default_value(5)
-        , "duration of delay in microseconds")
-        ;
+            ("delay", value<std::uint64_t>(&delay)->default_value(5),
+                "duration of delay in microseconds");
 
     store(command_line_parser(argc, argv).options(cmdline).run(), vm);
 
@@ -119,4 +111,3 @@ int main(
 
     return app_main(vm);
 }
-

@@ -22,8 +22,8 @@
 #include <hpx/local/execution.hpp>
 #include <hpx/local/thread.hpp>
 #include <hpx/modules/compute.hpp>
-#include <hpx/modules/testing.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/version.hpp>
 
@@ -44,42 +44,44 @@ bool header = false;
 ///////////////////////////////////////////////////////////////////////////////
 std::string get_executor_name(std::size_t executor)
 {
-    switch(executor) {
-        case 0:
-            return "parallel_executor";
-        case 1:
-            return "block_executor";
-        case 2:
-            return "parallel_executor";
-        case 3:
-            return "fork_join_executor";
-        case 4:
-            return "scheduler_executor";
-        case 5:
-            return "concurrent_executor";
-        default:
-            return "no-executor";
+    switch (executor)
+    {
+    case 0:
+        return "parallel_executor";
+    case 1:
+        return "block_executor";
+    case 2:
+        return "parallel_executor";
+    case 3:
+        return "fork_join_executor";
+    case 4:
+        return "scheduler_executor";
+    case 5:
+        return "concurrent_executor";
+    default:
+        return "no-executor";
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 std::string get_allocator_name(std::size_t allocator)
 {
-    switch(allocator) {
-        case 0:
-            return "std_allocator";
-        case 1:
-            return "block_allocator";
-        case 2:
-            return "default_parallel_policy_allocator";
-        case 3:
-            return "default_fork_join_policy_allocator";
-        case 4:
-            return "default_scheduler_executor_allocator";
-        case 5:
-            return "gpu allocator";
-        default:
-            return "no-allocator";
+    switch (allocator)
+    {
+    case 0:
+        return "std_allocator";
+    case 1:
+        return "block_allocator";
+    case 2:
+        return "default_parallel_policy_allocator";
+    case 3:
+        return "default_fork_join_policy_allocator";
+    case 4:
+        return "default_scheduler_executor_allocator";
+    case 5:
+        return "gpu allocator";
+    default:
+        return "no-allocator";
     }
 }
 
@@ -361,9 +363,8 @@ struct triad_step
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Allocator, typename Policy>
-auto run_benchmark(std::size_t warmup_iterations,
-    std::size_t iterations, std::size_t size, Allocator&& alloc,
-    Policy&& policy, std::size_t executor)
+auto run_benchmark(std::size_t warmup_iterations, std::size_t iterations,
+    std::size_t size, Allocator&& alloc, Policy&& policy, std::size_t executor)
 {
     std::string exec_name = get_executor_name(executor);
     std::string alloc_name = get_allocator_name(executor);
@@ -407,32 +408,27 @@ auto run_benchmark(std::size_t warmup_iterations,
     hpx::fill(policy, c.begin(), c.end(), 0.0);
 
     // Copy
-    hpx::util::perftests_report(
-            "stream benchmark - Copy", exec_name + "_" + alloc_name,
-            iterations, [&]() -> void {
-        hpx::copy(policy, a.begin(), a.end(), c.begin());
-    });
+    hpx::util::perftests_report("stream benchmark - Copy",
+        exec_name + "_" + alloc_name, iterations,
+        [&]() -> void { hpx::copy(policy, a.begin(), a.end(), c.begin()); });
     // Scale
-    hpx::util::perftests_report(
-            "Stream benchmark - Scale", exec_name + "_" + alloc_name,
-            iterations, [&]() -> void {
-        hpx::transform(policy, c.begin(), c.end(), b.begin(),
-            multiply_step<STREAM_TYPE>(scalar));
-    });
+    hpx::util::perftests_report("Stream benchmark - Scale",
+        exec_name + "_" + alloc_name, iterations, [&]() -> void {
+            hpx::transform(policy, c.begin(), c.end(), b.begin(),
+                multiply_step<STREAM_TYPE>(scalar));
+        });
     // Add
-    hpx::util::perftests_report(
-            "Stream benchmark - Add", exec_name + "_" + alloc_name,
-            iterations, [&]() -> void {
-        hpx::ranges::transform(policy, a.begin(), a.end(), b.begin(), b.end(),
-            c.begin(), add_step<STREAM_TYPE>());
-    });
+    hpx::util::perftests_report("Stream benchmark - Add",
+        exec_name + "_" + alloc_name, iterations, [&]() -> void {
+            hpx::ranges::transform(policy, a.begin(), a.end(), b.begin(),
+                b.end(), c.begin(), add_step<STREAM_TYPE>());
+        });
     // Triad
-    hpx::util::perftests_report(
-            "Stream benchmark - Triad", exec_name + "_" + alloc_name,
-            iterations, [&]() -> void {
-        hpx::ranges::transform(policy, b.begin(), b.end(), c.begin(), c.end(),
-            a.begin(), triad_step<STREAM_TYPE>(scalar));
-    });
+    hpx::util::perftests_report("Stream benchmark - Triad",
+        exec_name + "_" + alloc_name, iterations, [&]() -> void {
+            hpx::ranges::transform(policy, b.begin(), b.end(), c.begin(),
+                c.end(), a.begin(), triad_step<STREAM_TYPE>(scalar));
+        });
 
     // TODO: adapt the check result to work with the new version
     //// Check Results ...
@@ -504,7 +500,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 alloc(policy);
 
             run_benchmark<>(warmup_iterations, iterations, vector_size,
-               std::move(alloc), std::move(policy), executor);
+                std::move(alloc), std::move(policy), executor);
         }
     }
 

@@ -13,34 +13,36 @@
 
 #include "widget.hpp"
 
-#include <QtGui/QLabel>
 #include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QSpinBox>
-#include <QtGui/QPushButton>
+#include <QtGui/QLabel>
 #include <QtGui/QListWidget>
+#include <QtGui/QPushButton>
+#include <QtGui/QSpinBox>
+#include <QtGui/QVBoxLayout>
 
-widget::widget(std::function<void(widget *, std::size_t)> callback, QWidget *parent)
-    : QDialog(parent)
-    , no_threads(50)
-    , callback_(callback)
+widget::widget(
+    std::function<void(widget*, std::size_t)> callback, QWidget* parent)
+  : QDialog(parent)
+  , no_threads(50)
+  , callback_(callback)
 {
-    QHBoxLayout * layout = new QHBoxLayout;
+    QHBoxLayout* layout = new QHBoxLayout;
 
-    QSpinBox * thread_number_widget = new QSpinBox;
+    QSpinBox* thread_number_widget = new QSpinBox;
     thread_number_widget->setValue(50);
     thread_number_widget->setRange(1, 100000);
-    QObject::connect(thread_number_widget, SIGNAL(valueChanged(int)),
-        this, SLOT(set_threads(int)));
+    QObject::connect(thread_number_widget, SIGNAL(valueChanged(int)), this,
+        SLOT(set_threads(int)));
 
     run_button = new QPushButton("Run");
-    QObject::connect(run_button, SIGNAL(clicked(bool)), this, SLOT(run_clicked(bool)));
+    QObject::connect(
+        run_button, SIGNAL(clicked(bool)), this, SLOT(run_clicked(bool)));
 
     layout->addWidget(new QLabel("Number of threads: "));
     layout->addWidget(thread_number_widget);
     layout->addWidget(run_button);
 
-    QVBoxLayout * main_layout = new QVBoxLayout;
+    QVBoxLayout* main_layout = new QVBoxLayout;
     main_layout->addLayout(layout);
 
     list = new QListWidget;
@@ -54,9 +56,9 @@ void widget::threadsafe_add_label(std::size_t i, double t)
     // may be called from any thread, doesn't interact directly with GUI objects
     QString txt("Thread ");
     txt.append(QString::number(i))
-       .append(" finished in ")
-       .append(QString::number(t))
-       .append(" seconds");
+        .append(" finished in ")
+        .append(QString::number(t))
+        .append(" seconds");
 
     QGenericArgument arg("const QString&", &txt);
     // Qt::QueuedConnection makes sure 'add_label' is called in the GUI thread
@@ -67,10 +69,10 @@ void widget::threadsafe_run_finished()
 {
     // may be called from any thread, does not interact directly with GUI objects
     bool value = true;
-    QGenericArgument arg("bool",&value);
+    QGenericArgument arg("bool", &value);
     // Qt::QueuedConnection makes sure 'setEnabled' is called in the GUI thread
     QMetaObject::invokeMethod(
-                run_button, "setEnabled", Qt::QueuedConnection, arg);
+        run_button, "setEnabled", Qt::QueuedConnection, arg);
 }
 
 void widget::set_threads(int no)
@@ -85,7 +87,7 @@ void widget::run_clicked(bool)
     hpx::apply(callback_, this, no_threads);
 }
 
-void widget::add_label(const QString &text)
+void widget::add_label(const QString& text)
 {
     list->addItem(text);
 }

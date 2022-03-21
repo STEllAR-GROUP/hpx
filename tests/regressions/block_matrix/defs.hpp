@@ -16,25 +16,26 @@
 #include <string>
 #include <vector>
 
-
-template<typename T>
+template <typename T>
 std::ostream& operator<<(std::ostream& os, std::vector<T> const& v)
 {
-  os << "[";
-  for (std::size_t i=0; i<v.size(); ++i) {
-    if (i != 0) os << ",";
-    os << v[i];
-  }
-  os << "]";
-  return os;
+    os << "[";
+    for (std::size_t i = 0; i < v.size(); ++i)
+    {
+        if (i != 0)
+            os << ",";
+        os << v[i];
+    }
+    os << "]";
+    return os;
 }
 
-template<typename T>
+template <typename T>
 std::string mkstr(const T& x)
 {
-  std::ostringstream os;
-  os << x;
-  return os.str();
+    std::ostringstream os;
+    os << x;
+    return os.str();
 }
 
 #endif

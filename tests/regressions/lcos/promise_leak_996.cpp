@@ -12,7 +12,10 @@
 
 struct test
 {
-    test() { ++count; }
+    test()
+    {
+        ++count;
+    }
     test(test const&)
     {
         ++count;
@@ -22,7 +25,10 @@ struct test
         ++count;
         return *this;
     }
-    ~test() { --count; }
+    ~test()
+    {
+        --count;
+    }
 
     static int count;
 };
@@ -50,7 +56,7 @@ int hpx_main()
     return hpx::util::report_errors();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     return hpx::init(argc, argv);
 }
