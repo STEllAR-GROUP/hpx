@@ -14,59 +14,60 @@
 #include "crlf_check.hpp"
 #include "function_hyper.hpp"
 
-namespace boost
-{
-  namespace inspect
-  {
-   crlf_check::crlf_check() : m_files_with_errors(0)
-   {
-   }
-
-   void crlf_check::inspect(
-      const string & library_name,
-      const path & full_path,   // example: c:/foo/boost/filesystem/path.hpp
-      const string & contents )     // contents of file to be inspected
+namespace boost { namespace inspect {
+    crlf_check::crlf_check()
+      : m_files_with_errors(0)
     {
-      if (contents.find( "hpxinspect:" "nocrlf" ) != string::npos) return;
+    }
 
-      // this file deliberately contains errors
-      const char test_file_name[] = "wrong_line_ends_test.cpp";
+    void crlf_check::inspect(const string& library_name,
+        const path& full_path,     // example: c:/foo/boost/filesystem/path.hpp
+        const string& contents)    // contents of file to be inspected
+    {
+        if (contents.find("hpxinspect:"
+                          "nocrlf") != string::npos)
+            return;
 
-      bool failed = false;
-      // The understanding on line endings, as I remember it, was that
-      // either "\n" or "\r\n" is OK, and they can be mixed, but "\r" alone
-      // is not acceptable. Mixed line endings are allowed because Boost files
-      // are commonly edited in both Windows and UNIX environments, and editors
-      // in those environments generally accept either ending. Even Mac people
-      // agreed with this policy. --Beman
+        // this file deliberately contains errors
+        const char test_file_name[] = "wrong_line_ends_test.cpp";
 
-      // Joerg's original implementation is saved below,
-      // in case we change our minds!
+        bool failed = false;
+        // The understanding on line endings, as I remember it, was that
+        // either "\n" or "\r\n" is OK, and they can be mixed, but "\r" alone
+        // is not acceptable. Mixed line endings are allowed because Boost files
+        // are commonly edited in both Windows and UNIX environments, and editors
+        // in those environments generally accept either ending. Even Mac people
+        // agreed with this policy. --Beman
 
-      for ( std::string::const_iterator itr ( contents.begin() );
-        itr != contents.end(); ++itr )
-      {
-        if ( *itr == '\r' && ((itr+1) == contents.end() || *(itr+1) != '\n') )
+        // Joerg's original implementation is saved below,
+        // in case we change our minds!
+
+        for (std::string::const_iterator itr(contents.begin());
+             itr != contents.end(); ++itr)
         {
-          failed = true;
-          break;
+            if (*itr == '\r' &&
+                ((itr + 1) == contents.end() || *(itr + 1) != '\n'))
+            {
+                failed = true;
+                break;
+            }
         }
-      }
 
-      if (failed && full_path.filename() != test_file_name)
-      {
-        ++m_files_with_errors;
-        error( library_name, full_path, name() );
-      }
+        if (failed && full_path.filename() != test_file_name)
+        {
+            ++m_files_with_errors;
+            error(library_name, full_path, name());
+        }
 
-      if (!failed && full_path.filename() == test_file_name)
-      {
-        ++m_files_with_errors;
-        error( library_name, full_path, loclink(full_path,
-            string(name()) + " should have cr-only line endings" ));
-      }
+        if (!failed && full_path.filename() == test_file_name)
+        {
+            ++m_files_with_errors;
+            error(library_name, full_path,
+                loclink(full_path,
+                    string(name()) + " should have cr-only line endings"));
+        }
 
-/*
+        /*
       size_t cr_count = 0;
       size_t lf_count = 0;
       size_t crlf_count = 0;
@@ -96,7 +97,4 @@ namespace boost
       }
 */
     }
-  } // namespace inspect
-} // namespace boost
-
-
+}}    // namespace boost::inspect

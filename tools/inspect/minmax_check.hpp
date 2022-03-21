@@ -13,35 +13,34 @@
 
 #include "inspector.hpp"
 
-namespace boost
-{
-  namespace inspect
-  {
+namespace boost { namespace inspect {
     class minmax_check : public inspector
     {
-      long m_errors;
+        long m_errors;
 
     public:
+        minmax_check();
+        virtual const char* name() const
+        {
+            return "*M*";
+        }
+        virtual const char* desc() const
+        {
+            return "uses of min or max that"
+                   " have not been protected from the min/max macros,"
+                   " or unallowed #undef-s";
+        }
 
-      minmax_check();
-      virtual const char * name() const { return "*M*"; }
-      virtual const char * desc() const { return "uses of min or max that"
-          " have not been protected from the min/max macros,"
-          " or unallowed #undef-s"; }
+        virtual void inspect(const std::string& library_name,
+            const path& full_path, const std::string& contents);
 
-      virtual void inspect(
-        const std::string & library_name,
-        const path & full_path,
-        const std::string & contents);
+        virtual void print_summary(std::ostream& out)
+        {
+            out << "  " << m_errors
+                << " violations of the Boost min/max guidelines"
+                << line_break();
+        }
 
-      virtual void print_summary(std::ostream& out)
-      {
-        out << "  " << m_errors << " violations of the Boost min/max guidelines"
-            << line_break();
-      }
-
-      virtual ~minmax_check() {}
+        virtual ~minmax_check() {}
     };
-  }
-}
-
+}}    // namespace boost::inspect

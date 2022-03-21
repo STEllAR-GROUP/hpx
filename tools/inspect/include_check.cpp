@@ -13,19 +13,18 @@
 
 #include <algorithm>
 
-#include "include_check.hpp"
 #include "boost/regex.hpp"
 #include "function_hyper.hpp"
+#include "include_check.hpp"
 
-namespace boost
-{
-  namespace inspect
-  {
-    boost::regex include_regex(
-      "^\\s*#\\s*include\\s*<([^\n>]*)>(\\s|//[^\\n]*|/\\*.*?\\*/)*$"     // # include <foobar>
-      "|"
-      "^\\s*#\\s*include\\s*\"([^\n\"]*)\"(\\s|//[^\\n]*|/\\*.*?\\*/)*$"  // # include "foobar"
-      , boost::regex::normal);
+namespace boost { namespace inspect {
+    boost::regex include_regex("^\\s*#\\s*include\\s*<([^\n>]*)>(\\s|//"
+                               "[^\\n]*|/\\*.*?\\*/)*$"    // # include <foobar>
+                               "|"
+                               "^\\s*#\\s*include\\s*\"([^\n\"]*)\"(\\s|//"
+                               "[^\\n]*|/\\*.*?\\*/)*$"    // # include "foobar"
+        ,
+        boost::regex::normal);
 
     names_includes const names[] = {
         {"(\\bstd\\s*::\\s*make_shared\\b)", "std::make_shared", {"memory"}},
@@ -64,14 +63,16 @@ namespace boost
         {"(\\bstd\\s*::\\s*is_void\\b)", "std::is_void", {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_null_pointer\\b)", "std::is_null_pointer",
             {"type_traits"}},
-        {"(\\bstd\\s*::\\s*is_integral\\b)", "std::is_integral", {"type_traits"}},
+        {"(\\bstd\\s*::\\s*is_integral\\b)", "std::is_integral",
+            {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_floating_point\\b)", "std::is_floating_point",
             {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_array\\b)", "std::is_array", {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_enum\\b)", "std::is_enum", {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_union\\b)", "std::is_union", {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_class\\b)", "std::is_class", {"type_traits"}},
-        {"(\\bstd\\s*::\\s*is_function\\b)", "std::is_function", {"type_traits"}},
+        {"(\\bstd\\s*::\\s*is_function\\b)", "std::is_function",
+            {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_pointer\\b)", "std::is_pointer", {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_lvalue_reference\\b)", "std::is_lvalue_reference",
             {"type_traits"}},
@@ -87,13 +88,15 @@ namespace boost
             {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_scalar\\b)", "std::is_scalar", {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_object\\b)", "std::is_object", {"type_traits"}},
-        {"(\\bstd\\s*::\\s*is_compound\\b)", "std::is_compound", {"type_traits"}},
+        {"(\\bstd\\s*::\\s*is_compound\\b)", "std::is_compound",
+            {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_reference\\b)", "std::is_reference",
             {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_member_pointer\\b)", "std::is_member_pointer",
             {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_const\\b)", "std::is_const", {"type_traits"}},
-        {"(\\bstd\\s*::\\s*is_volatile\\b)", "std::is_volatile", {"type_traits"}},
+        {"(\\bstd\\s*::\\s*is_volatile\\b)", "std::is_volatile",
+            {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_trivial\\b)", "std::is_trivial", {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_trivially_copyable\\b)",
             "std::is_trivially_copyable", {"type_traits"}},
@@ -105,9 +108,11 @@ namespace boost
         {"(\\bstd\\s*::\\s*is_empty\\b)", "std::is_empty", {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_polymorphic\\b)", "std::is_polymorphic",
             {"type_traits"}},
-        {"(\\bstd\\s*::\\s*is_abstract\\b)", "std::is_abstract", {"type_traits"}},
+        {"(\\bstd\\s*::\\s*is_abstract\\b)", "std::is_abstract",
+            {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_signed\\b)", "std::is_signed", {"type_traits"}},
-        {"(\\bstd\\s*::\\s*is_unsigned\\b)", "std::is_unsigned", {"type_traits"}},
+        {"(\\bstd\\s*::\\s*is_unsigned\\b)", "std::is_unsigned",
+            {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_constructible\\b)", "std::is_constructible",
             {"type_traits"}},
         {"(\\bstd\\s*::\\s*is_trivially_constructible\\b)",
@@ -170,14 +175,16 @@ namespace boost
         {"(\\bstd\\s*::\\s*extent\\b)", "std::extent", {"type_traits"}},
         {"(\\bstd\\s*::\\s*add_cv\\b)", "std::add_cv", {"type_traits"}},
         {"(\\bstd\\s*::\\s*add_const\\b)", "std::add_const", {"type_traits"}},
-        {"(\\bstd\\s*::\\s*add_pointer\\b)", "std::add_pointer", {"type_traits"}},
+        {"(\\bstd\\s*::\\s*add_pointer\\b)", "std::add_pointer",
+            {"type_traits"}},
         {"(\\bstd\\s*::\\s*add_volatile\\b)", "std::add_volatile",
             {"type_traits"}},
         {"(\\bstd\\s*::\\s*add_lvalue_reference\\b)",
             "std::add_lvalue_reference", {"type_traits"}},
         {"(\\bstd\\s*::\\s*add_rvalue_reference\\b)",
             "std::add_rvalue_reference", {"type_traits"}},
-        {"(\\bstd\\s*::\\s*make_signed\\b)", "std::make_signed", {"type_traits"}},
+        {"(\\bstd\\s*::\\s*make_signed\\b)", "std::make_signed",
+            {"type_traits"}},
         {"(\\bstd\\s*::\\s*make_unsigned\\b)", "std::make_unsigned",
             {"type_traits"}},
         {"(\\bstd\\s*::\\s*remove_cv\\b)", "std::remove_cv", {"type_traits"}},
@@ -195,10 +202,12 @@ namespace boost
             {"type_traits"}},
         {"(\\bstd\\s*::\\s*decay\\b)", "std::decay", {"type_traits"}},
         {"(\\bstd\\s*::\\s*enable_if\\b)", "std::enable_if", {"type_traits"}},
-        {"(\\bstd\\s*::\\s*conditional\\b)", "std::conditional", {"type_traits"}},
+        {"(\\bstd\\s*::\\s*conditional\\b)", "std::conditional",
+            {"type_traits"}},
         {"(\\bstd\\s*::\\s*integral_constant\\b)", "std::integral_constant",
             {"type_traits"}},
-        {"(\\bstd\\s*::\\s*common_type\\b)", "std::common_type", {"type_traits"}},
+        {"(\\bstd\\s*::\\s*common_type\\b)", "std::common_type",
+            {"type_traits"}},
         {"(\\bstd\\s*::\\s*underlying_type\\b)", "std::underlying_type",
             {"type_traits"}},
         {"(\\bstd\\s*::\\s*result_of\\b)", "std::result_of", {"type_traits"}},
@@ -225,7 +234,8 @@ namespace boost
         // random
         {"(\\bstd\\s*::\\s*(minstd_rand(0)?)\\b)", "std::\\2", {"random"}},
         {"(\\bstd\\s*::\\s*(mt19937(_64)?)\\b)", "std::\\2", {"random"}},
-        {"(\\bstd\\s*::\\s*random_device\\b)", "std::random_device", {"random"}},
+        {"(\\bstd\\s*::\\s*random_device\\b)", "std::random_device",
+            {"random"}},
         {"(\\bstd\\s*::\\s*uniform_int_distribution\\b)",
             "std::uniform_int_distribution", {"random"}},
         {"(\\bstd\\s*::\\s*uniform_real_distribution\\b)",
@@ -233,7 +243,8 @@ namespace boost
         {"(\\bstd\\s*::\\s*exponential_distribution\\b)",
             "std::exponential_distribution", {"random"}},
         // system_error
-        {"(\\bstd\\s*::\\s*error_code\\b)", "std::error_code", {"system_error"}},
+        {"(\\bstd\\s*::\\s*error_code\\b)", "std::error_code",
+            {"system_error"}},
         {"(\\bstd\\s*::\\s*error_condition\\b)", "std::error_condition",
             {"system_error"}},
         {"(\\bstd\\s*::\\s*error_category\\b)", "std::error_category",
@@ -245,8 +256,8 @@ namespace boost
             {"hpx/modules/memory.hpp"}},
         {"(\\bhpx\\s*::\\s*util\\s*::\\s*from_string\\b)",
             "hpx::util::from_string", {"hpx/util/from_string.hpp"}},
-        {"(\\bhpx\\s*::\\s*util\\s*::\\s*to_string\\b)",
-            "hpx::util::to_string", {"hpx/util/to_string.hpp"}},
+        {"(\\bhpx\\s*::\\s*util\\s*::\\s*to_string\\b)", "hpx::util::to_string",
+            {"hpx/util/to_string.hpp"}},
         // macros
         {"(\\bHPX_PP_CAT\\b)", "HPX_PP_CAT",
             {"hpx/modules/preprocessor.hpp", "hpx/preprocessor/cat.hpp"}},
@@ -257,7 +268,8 @@ namespace boost
         {"(\\bHPX_PP_STRINGIZE\\b)", "HPX_PP_STRINGIZE",
             {"hpx/modules/preprocessor.hpp", "hpx/preprocessor/stringize.hpp"}},
         {"(\\bHPX_PP_STRIP_PARENS\\b)", "HPX_PP_STRIP_PARENS",
-            {"hpx/modules/preprocessor.hpp", "hpx/preprocessor/strip_parens.hpp"}},
+            {"hpx/modules/preprocessor.hpp",
+                "hpx/preprocessor/strip_parens.hpp"}},
         //
         {"(\\HPX_ASSERT\\b)", "HPX_ASSERT", {"hpx/assert.hpp"}},
         {"(\\HPX_ASSERT_MSG\\b)", "HPX_ASSERT_MSG", {"hpx/assert.hpp"}},
@@ -268,141 +280,143 @@ namespace boost
     include_check::include_check()
       : m_errors(0)
     {
-      // C/C++ source code...
-      register_signature( ".c" );
-      register_signature( ".cpp" );
-      register_signature( ".cu" );
-      register_signature( ".cxx" );
-      register_signature( ".h" );
-      register_signature( ".hpp" );
-      register_signature( ".hxx" );
-      register_signature( ".inc" );
-      register_signature( ".ipp" );
+        // C/C++ source code...
+        register_signature(".c");
+        register_signature(".cpp");
+        register_signature(".cu");
+        register_signature(".cxx");
+        register_signature(".h");
+        register_signature(".hpp");
+        register_signature(".hxx");
+        register_signature(".inc");
+        register_signature(".ipp");
 
-      for (names_includes const* names_it = &names[0];
-           names_it->name_regex != nullptr;
-           ++names_it)
-      {
-        std::string rx(names_it->name_regex);
-        rx +=
-          "|"                   // or (ignored)
-          "("
-          "//[^\\n]*"           // single line comments (//)
-          "|"
-          "/\\*.*?\\*/"         // multi line comments (/**/)
-          "|"
-          "\"([^\"\\\\]|\\\\.)*\"" // string literals
-          ")";
-        regex_data.push_back(names_regex_data(names_it, rx));
-      }
+        for (names_includes const* names_it = &names[0];
+             names_it->name_regex != nullptr; ++names_it)
+        {
+            std::string rx(names_it->name_regex);
+            rx += "|"    // or (ignored)
+                  "("
+                  "//[^\\n]*"    // single line comments (//)
+                  "|"
+                  "/\\*.*?\\*/"    // multi line comments (/**/)
+                  "|"
+                  "\"([^\"\\\\]|\\\\.)*\""    // string literals
+                  ")";
+            regex_data.push_back(names_regex_data(names_it, rx));
+        }
     }
 
     //  inspect ( C++ source files )  ---------------------------------------//
 
-    void include_check::inspect(
-      const string & library_name,
-      const path & full_path,      // example: c:/foo/boost/filesystem/path.hpp
-      const string & contents)     // contents of file to be inspected
+    void include_check::inspect(const string& library_name,
+        const path& full_path,     // example: c:/foo/boost/filesystem/path.hpp
+        const string& contents)    // contents of file to be inspected
     {
-      std::string::size_type p = contents.find( "hpxinspect:" "noinclude" );
-      if (p != string::npos)
-      {
-        // ignore this directive here (it is handled below) if it is followed
-        // by a ':'
-        if (p == contents.size() - 20 ||
-            (contents.size() > p + 20 && contents[p + 20] != ':'))
+        std::string::size_type p = contents.find("hpxinspect:"
+                                                 "noinclude");
+        if (p != string::npos)
         {
-          return;
-        }
-      }
-
-      // first, collect all #includes in this file
-      std::set<std::string> includes;
-
-      boost::sregex_iterator cur(contents.begin(), contents.end(), include_regex), end;
-
-      for( ; cur != end; ++cur /*, ++m_errors*/ )
-      {
-        auto m = *cur;
-        if (m[1].matched)
-          includes.insert(std::string(m[1].first, m[1].second));
-        else if (m[2].matched)
-          includes.insert(std::string(m[2].first, m[2].second));
-      }
-
-      // if one of the includes is <hpx/hpx.hpp> assume all is well
-      if (includes.find("hpx/hpx.hpp") != includes.end())
-        return;
-
-      // for all given names, check whether corresponding include was found
-      std::set<std::string> checked_includes;
-      std::set<std::string> found_names;
-      for (names_regex_data const& d : regex_data)
-      {
-        boost::sregex_iterator cur(contents.begin(), contents.end(), d.pattern), end;
-        for(/**/; cur != end; ++cur)
-        {
-          auto m = *cur;
-          if (m[1].matched)
-          {
-            // avoid checking the same include twice
-            auto checked_includes_it =
-                checked_includes.find(m.format(d.data->include[0]));
-            if (checked_includes_it != checked_includes.end())
-               continue;
-
-            // avoid errors to be reported twice
-            std::string found_name(m[1].first, m[1].second);
-            if (found_names.find(found_name) != found_names.end())
-                continue;
-            found_names.insert(found_name);
-
-            std::string tag("hpxinspect:" "noinclude:" + found_name);
-            if (contents.find(tag) != string::npos)
-                continue;
-
-            bool found = false;
-            for (auto const& inc : d.data->include)
+            // ignore this directive here (it is handled below) if it is followed
+            // by a ':'
+            if (p == contents.size() - 20 ||
+                (contents.size() > p + 20 && contents[p + 20] != ':'))
             {
-              auto include_it = includes.find(m.format(inc));
-              if (include_it != includes.end())
-              {
-                found = true;
-                break;
-              }
+                return;
             }
+        }
 
-            if (!found)
+        // first, collect all #includes in this file
+        std::set<std::string> includes;
+
+        boost::sregex_iterator cur(
+            contents.begin(), contents.end(), include_regex),
+            end;
+
+        for (; cur != end; ++cur /*, ++m_errors*/)
+        {
+            auto m = *cur;
+            if (m[1].matched)
+                includes.insert(std::string(m[1].first, m[1].second));
+            else if (m[2].matched)
+                includes.insert(std::string(m[2].first, m[2].second));
+        }
+
+        // if one of the includes is <hpx/hpx.hpp> assume all is well
+        if (includes.find("hpx/hpx.hpp") != includes.end())
+            return;
+
+        // for all given names, check whether corresponding include was found
+        std::set<std::string> checked_includes;
+        std::set<std::string> found_names;
+        for (names_regex_data const& d : regex_data)
+        {
+            boost::sregex_iterator cur(
+                contents.begin(), contents.end(), d.pattern),
+                end;
+            for (/**/; cur != end; ++cur)
             {
-              // include is missing
-              auto it = contents.begin();
-              auto match_it = m[1].first;
-              auto line_start = it;
-
-              string::size_type line_number = 1;
-              for (/**/; it != match_it; ++it)
-              {
-                if (string::traits_type::eq(*it, '\n'))
+                auto m = *cur;
+                if (m[1].matched)
                 {
-                  ++line_number;
-                  line_start = it + 1; // could be end()
-                }
-              }
+                    // avoid checking the same include twice
+                    auto checked_includes_it =
+                        checked_includes.find(m.format(d.data->include[0]));
+                    if (checked_includes_it != checked_includes.end())
+                        continue;
 
-              ++m_errors;
-              error(library_name, full_path, string(name())
-                  + " missing #include ("
-                  + m.format(d.data->include[0])
-                  + ") for symbol "
-                  + m.format(d.data->name) + " on line "
-                  + linelink(full_path, hpx::util::to_string(line_number)));
+                    // avoid errors to be reported twice
+                    std::string found_name(m[1].first, m[1].second);
+                    if (found_names.find(found_name) != found_names.end())
+                        continue;
+                    found_names.insert(found_name);
+
+                    std::string tag("hpxinspect:"
+                                    "noinclude:" +
+                        found_name);
+                    if (contents.find(tag) != string::npos)
+                        continue;
+
+                    bool found = false;
+                    for (auto const& inc : d.data->include)
+                    {
+                        auto include_it = includes.find(m.format(inc));
+                        if (include_it != includes.end())
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        // include is missing
+                        auto it = contents.begin();
+                        auto match_it = m[1].first;
+                        auto line_start = it;
+
+                        string::size_type line_number = 1;
+                        for (/**/; it != match_it; ++it)
+                        {
+                            if (string::traits_type::eq(*it, '\n'))
+                            {
+                                ++line_number;
+                                line_start = it + 1;    // could be end()
+                            }
+                        }
+
+                        ++m_errors;
+                        error(library_name, full_path,
+                            string(name()) + " missing #include (" +
+                                m.format(d.data->include[0]) + ") for symbol " +
+                                m.format(d.data->name) + " on line " +
+                                linelink(full_path,
+                                    hpx::util::to_string(line_number)));
+                    }
+                    checked_includes.insert(m.format(d.data->include[0]));
+                }
             }
-            checked_includes.insert(m.format(d.data->include[0]));
-          }
         }
-      }
     }
 
-  } // namespace inspect
-} // namespace boost
-
+}}    // namespace boost::inspect

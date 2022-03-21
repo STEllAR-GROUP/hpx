@@ -131,7 +131,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
         // Synchronous execution, use as reference only.
         r = fibonacci_serial(n);
 
-        //        double d = double(hpx::chrono::high_resolution_clock::now() - start) / 1.e9;
         std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_serial({1}) == {2},"
                           "elapsed time:,{3},[s]\n";
@@ -152,7 +151,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci_future(n).get();
         }
 
-        //        double d = double(hpx::chrono::high_resolution_clock::now() - start) / 1.e9;
         std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt =
             "fibonacci_future({1}) == {2},elapsed time:,{3},[s],{4}\n";

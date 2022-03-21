@@ -53,7 +53,7 @@ int main()
             .then(hpx::launch::sync,
                 // when the message completes, increment our semaphore count
                 // so that N are always in flight
-                [&, parcel_count](hpx::future<double> &&) -> void {
+                [&, parcel_count](hpx::future<double>&&) -> void {
                     ++signal_count;
                     sem.signal(parcel_count);
                 });

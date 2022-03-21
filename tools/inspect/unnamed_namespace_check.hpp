@@ -11,32 +11,33 @@
 
 #include "inspector.hpp"
 
-namespace boost
-{
-  namespace inspect
-  {
+namespace boost { namespace inspect {
     class unnamed_namespace_check : public inspector
     {
-      long m_errors;
+        long m_errors;
+
     public:
+        unnamed_namespace_check();
+        virtual const char* name() const
+        {
+            return "*U*";
+        }
+        virtual const char* desc() const
+        {
+            return "unnamed namespace in header";
+        }
 
-      unnamed_namespace_check();
-      virtual const char * name() const { return "*U*"; }
-      virtual const char * desc() const { return "unnamed namespace in header"; }
+        virtual void inspect(const std::string& library_name,
+            const path& full_path, const std::string& contents);
 
-      virtual void inspect(
-        const std::string & library_name,
-        const path & full_path,
-        const std::string & contents );
+        virtual void print_summary(std::ostream& out)
+        {
+            out << "  " << m_errors
+                << " usages of unnamed namespaces in headers (including .ipp "
+                   "files)"
+                << line_break();
+        }
 
-      virtual void print_summary(std::ostream& out)
-        { out << "  " << m_errors
-            << " usages of unnamed namespaces in headers (including .ipp files)"
-            << line_break(); }
-
-      virtual ~unnamed_namespace_check() {}
+        virtual ~unnamed_namespace_check() {}
     };
-  }
-}
-
-
+}}    // namespace boost::inspect

@@ -11,31 +11,32 @@
 
 #include "inspector.hpp"
 
-
-namespace boost
-{
-  namespace inspect
-  {
+namespace boost { namespace inspect {
     class assert_macro_check : public inspector
     {
-      long m_files_with_errors;
+        long m_files_with_errors;
+
     public:
+        assert_macro_check();
+        virtual const char* name() const
+        {
+            return "*ASSERT-MACROS*";
+        }
+        virtual const char* desc() const
+        {
+            return "presence of C-style assert macro in file (use HPX_ASSERT "
+                   "instead)";
+        }
 
-      assert_macro_check();
-      virtual const char * name() const { return "*ASSERT-MACROS*"; }
-      virtual const char * desc() const
-        { return "presence of C-style assert macro in file (use HPX_ASSERT instead)"; }
+        virtual void inspect(const std::string& library_name,
+            const path& full_path, const std::string& contents);
 
-      virtual void inspect(
-        const std::string & library_name,
-        const path & full_path,
-        const std::string & contents );
+        virtual void print_summary(std::ostream& out)
+        {
+            out << "  " << m_files_with_errors
+                << " files with a C-style assert macro" << line_break();
+        }
 
-      virtual void print_summary(std::ostream& out)
-        { out << "  " << m_files_with_errors << " files with a C-style assert macro" << line_break(); }
-
-      virtual ~assert_macro_check() {}
+        virtual ~assert_macro_check() {}
     };
-  }
-}
-
+}}    // namespace boost::inspect
