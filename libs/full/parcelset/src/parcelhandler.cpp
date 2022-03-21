@@ -900,7 +900,8 @@ namespace hpx::parcelset {
                     if ((*it).second.get())
                         ec = make_success_code();
                     else
-                        ec = make_error_code(bad_parameter, lightweight);
+                        ec = make_error_code(
+                            bad_parameter, throwmode::lightweight);
                 }
                 return (*it).second.get();
             }
@@ -942,7 +943,7 @@ namespace hpx::parcelset {
             l.unlock();
             if (&ec != &throws)
             {
-                ec = make_error_code(bad_parameter, lightweight);
+                ec = make_error_code(bad_parameter, throwmode::lightweight);
             }
             else
             {
@@ -981,7 +982,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_parcel_send_count(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_parcel_send_count(reset) : 0;
     }
@@ -996,7 +997,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_message_send_count(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_message_send_count(reset) : 0;
     }
@@ -1005,7 +1006,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_parcel_receive_count(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_parcel_receive_count(reset) : 0;
     }
@@ -1014,7 +1015,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_message_receive_count(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_message_receive_count(reset) : 0;
     }
@@ -1024,7 +1025,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_sending_time(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_sending_time(reset) : 0;
     }
@@ -1034,7 +1035,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_receiving_time(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_receiving_time(reset) : 0;
     }
@@ -1044,7 +1045,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_sending_serialization_time(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_sending_serialization_time(reset) : 0;
     }
@@ -1054,7 +1055,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_receiving_serialization_time(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_receiving_serialization_time(reset) : 0;
     }
@@ -1063,7 +1064,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_data_sent(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_data_sent(reset) : 0;
     }
@@ -1072,7 +1073,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_raw_data_sent(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_raw_data_sent(reset) : 0;
     }
@@ -1081,7 +1082,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_data_received(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_data_received(reset) : 0;
     }
@@ -1090,7 +1091,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_raw_data_received(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_raw_data_received(reset) : 0;
     }
@@ -1098,14 +1099,14 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_buffer_allocate_time_sent(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_buffer_allocate_time_sent(reset) : 0;
     }
     std::int64_t parcelhandler::get_buffer_allocate_time_received(
         std::string const& pp_type, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_buffer_allocate_time_received(reset) : 0;
     }
@@ -1116,7 +1117,7 @@ namespace hpx::parcelset {
         parcelport::connection_cache_statistics_type stat_type,
         bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_connection_cache_statistics(stat_type, reset) : 0;
     }
@@ -1127,7 +1128,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_action_parcel_send_count(
         std::string const& pp_type, std::string const& action, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_action_parcel_send_count(action, reset) : 0;
     }
@@ -1136,7 +1137,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_action_parcel_receive_count(
         std::string const& pp_type, std::string const& action, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_action_parcel_receive_count(action, reset) : 0;
     }
@@ -1146,7 +1147,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_action_sending_serialization_time(
         std::string const& pp_type, std::string const& action, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_action_sending_serialization_time(action, reset) :
                     0;
@@ -1157,7 +1158,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_action_receiving_serialization_time(
         std::string const& pp_type, std::string const& action, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_action_receiving_serialization_time(action, reset) :
                     0;
@@ -1167,7 +1168,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_action_data_sent(
         std::string const& pp_type, std::string const& action, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_action_data_sent(action, reset) : 0;
     }
@@ -1176,7 +1177,7 @@ namespace hpx::parcelset {
     std::int64_t parcelhandler::get_action_data_received(
         std::string const& pp_type, std::string const& action, bool reset) const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_action_data_received(action, reset) : 0;
     }
@@ -1274,7 +1275,7 @@ namespace hpx::parcelset {
 
         if (!p.parcel_id())
         {
-            error_code ec(lightweight);    // ignore all errors
+            error_code ec(throwmode::lightweight);    // ignore all errors
             std::uint32_t locality_id = agas::get_locality_id(ec);
             p.parcel_id() = parcelset::parcel::generate_unique_id(locality_id);
         }

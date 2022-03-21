@@ -606,7 +606,7 @@ namespace hpx { namespace components { namespace server {
             threads::threadmanager& tm = appl.get_thread_manager();
             naming::resolver_client& agas_client = naming::get_agas_client();
 
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
 
             stop_called_ = true;
 
@@ -1148,11 +1148,11 @@ namespace hpx { namespace components { namespace server {
             // module, same for plugins
             if (startup_handled.find(component) == startup_handled.end())
             {
-                error_code ec(lightweight);
+                error_code ec(throwmode::lightweight);
                 startup_handled.insert(component);
                 load_commandline_options_static(component, options, ec);
                 if (ec)
-                    ec = error_code(lightweight);
+                    ec = error_code(throwmode::lightweight);
                 load_startup_shutdown_functions_static(component, ec);
             }
         }
@@ -1477,7 +1477,7 @@ namespace hpx { namespace components { namespace server {
         }
 
         // first, try using the path as the full path to the library
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
         d.load_library(ec);
         if (ec)
@@ -1651,11 +1651,11 @@ namespace hpx { namespace components { namespace server {
             // module, same for plugins
             if (startup_handled.find(d.get_name()) == startup_handled.end())
             {
-                error_code ec(lightweight);
+                error_code ec(throwmode::lightweight);
                 startup_handled.insert(d.get_name());
                 load_commandline_options(d, options, ec);
                 if (ec)
-                    ec = error_code(lightweight);
+                    ec = error_code(throwmode::lightweight);
                 load_startup_shutdown_functions(d, ec);
             }
         }
@@ -1829,7 +1829,7 @@ namespace hpx { namespace components { namespace server {
             if (ini.has_section(plugin_section))
                 plugin_ini = ini.get_section(plugin_section);
 
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             if (nullptr == plugin_ini ||
                 "0" == plugin_ini->get_entry("no_factory", "0"))
             {
@@ -1873,7 +1873,7 @@ namespace hpx { namespace components { namespace server {
                 startup_handled.insert(d.get_name());
                 load_commandline_options(d, options, ec);
                 if (ec)
-                    ec = error_code(lightweight);
+                    ec = error_code(throwmode::lightweight);
                 load_startup_shutdown_functions(d, ec);
             }
         }
@@ -1912,7 +1912,7 @@ namespace hpx { namespace components { namespace server {
         }
 
         // get the handle of the library
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(plugin));
         d.load_library(ec);
         if (ec)

@@ -374,7 +374,7 @@ namespace hpx {
                 if (get_config_entry("hpx.print_counter.reset", "0") == "1")
                     reset = true;
 
-                error_code ec(lightweight);    // ignore errors
+                error_code ec(throwmode::lightweight);    // ignore errors
                 evaluate_active_counters(reset, "startup", ec);
             }
         }
@@ -1334,7 +1334,7 @@ namespace hpx {
         // prefix thread name with locality number, if needed
         std::string locality = locality_prefix(get_config());
 
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         return init_tss_ex(locality, context, type, local_thread_num,
             global_thread_num, pool_name, postfix, service_thread, ec);
     }
@@ -1532,7 +1532,7 @@ namespace hpx {
 
     std::size_t runtime_distributed::get_num_worker_threads() const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         return static_cast<std::size_t>(
             agas_client_.get_num_overall_threads(ec));
     }

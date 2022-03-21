@@ -39,7 +39,7 @@ namespace hpx {
     /// \param e    The parameter \p e holds the hpx::error code the new
     ///             exception should encapsulate.
     exception::exception(error e)
-      : std::system_error(make_error_code(e, plain))
+      : std::system_error(make_error_code(e, throwmode::plain))
     {
         HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
         if (e != success)
@@ -71,9 +71,9 @@ namespace hpx {
     ///               exception should encapsulate.
     /// \param mode   The parameter \p mode specifies whether the returned
     ///               hpx::error_code belongs to the error category
-    ///               \a hpx_category (if mode is \a plain, this is the
+    ///               \a hpx_category (if mode is \a throwmode::plain, this is the
     ///               default) or to the category \a hpx_category_rethrow
-    ///               (if mode is \a rethrow).
+    ///               (if mode is \a throwmode::rethrow).
     exception::exception(error e, char const* msg, throwmode mode)
       : std::system_error(make_system_error_code(e, mode), msg)
     {
@@ -92,9 +92,9 @@ namespace hpx {
     ///               exception should encapsulate.
     /// \param mode   The parameter \p mode specifies whether the returned
     ///               hpx::error_code belongs to the error category
-    ///               \a hpx_category (if mode is \a plain, this is the
+    ///               \a hpx_category (if mode is \a throwmode::plain, this is the
     ///               default) or to the category \a hpx_category_rethrow
-    ///               (if mode is \a rethrow).
+    ///               (if mode is \a throwmode::rethrow).
     exception::exception(error e, std::string const& msg, throwmode mode)
       : std::system_error(make_system_error_code(e, mode), msg)
     {
@@ -126,9 +126,9 @@ namespace hpx {
     ///
     /// \param mode   The parameter \p mode specifies whether the returned
     ///               hpx::error_code belongs to the error category
-    ///               \a hpx_category (if mode is \a plain, this is the
+    ///               \a hpx_category (if mode is \a throwmode::plain, this is the
     ///               default) or to the category \a hpx_category_rethrow
-    ///               (if mode is \a rethrow).
+    ///               (if mode is \a throwmode::rethrow).
     error_code exception::get_error_code(throwmode mode) const noexcept
     {
         (void) mode;

@@ -327,7 +327,7 @@ namespace hpx::parcelset {
         {
             if (operations_in_flight_ != 0)
             {
-                error_code ec(lightweight);
+                error_code ec(throwmode::lightweight);
                 hpx::threads::thread_init_data data(
                     hpx::threads::make_thread_function_nullary(
                         util::deferred_call(
@@ -349,7 +349,7 @@ namespace hpx::parcelset {
 
         void remove_from_connection_cache(locality const& loc) override
         {
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             hpx::threads::thread_init_data data(
                 hpx::threads::make_thread_function_nullary(util::deferred_call(
                     &parcelport_impl::remove_from_connection_cache_delayed,

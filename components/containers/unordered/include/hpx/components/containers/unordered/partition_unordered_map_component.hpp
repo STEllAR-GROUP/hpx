@@ -495,7 +495,7 @@ namespace hpx {
         std::shared_ptr<server::partition_unordered_map<Key, T, Hash, KeyEqual>>
         get_ptr() const
         {
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             return hpx::get_ptr<server_type>(this->get_id()).get(ec);
         }
 

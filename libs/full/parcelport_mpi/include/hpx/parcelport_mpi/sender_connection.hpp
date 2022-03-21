@@ -246,7 +246,7 @@ namespace hpx::parcelset::policies::mpi {
                 return false;
             }
 
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             handler_(ec);
             handler_.reset();
             buffer_.data_point_.time_ =

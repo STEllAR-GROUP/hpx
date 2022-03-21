@@ -62,7 +62,7 @@ namespace hpx { namespace performance_counters {
     {
         if (counter_)
         {
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             detail::remove_counter(info_, counter_, ec);
             counter_ = naming::invalid_id;
         }

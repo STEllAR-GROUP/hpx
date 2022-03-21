@@ -166,7 +166,7 @@ namespace hpx { namespace util {
         std::string const& name = info.fullname_;
         std::string const& uom = info.unit_of_measure_;
 
-        error_code ec(lightweight);    // do not throw
+        error_code ec(throwmode::lightweight);    // do not throw
         double val = value.get_value<double>(ec);
 
         if (!ec)
@@ -221,7 +221,7 @@ namespace hpx { namespace util {
         std::string const& name = info.fullname_;
         std::string const& uom = info.unit_of_measure_;
 
-        error_code ec(lightweight);    // do not throw
+        error_code ec(throwmode::lightweight);    // do not throw
 
         print_name_csv(*out, name);
         *out << "," << value.count_ << ",";
@@ -255,7 +255,7 @@ namespace hpx { namespace util {
         performance_counters::counter_info const& info,
         performance_counters::counter_value const& value)
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         double val = value.get_value<double>(ec);
 
         if (!ec)

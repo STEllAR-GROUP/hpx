@@ -66,7 +66,7 @@ namespace hpx { namespace lcos { namespace local {
         bool trigger_conditions(error_code& ec = throws)
         {
             bool triggered = false;
-            error_code rc(lightweight);
+            error_code rc(throwmode::lightweight);
             for (conditional_trigger* c : conditions_)
             {
                 triggered |= c->set(rc);

@@ -158,7 +158,8 @@ namespace hpx { namespace util { namespace detail {
 
             if (timerid_)
             {
-                error_code ec(lightweight);    // avoid throwing on error
+                error_code ec(
+                    throwmode::lightweight);    // avoid throwing on error
                 threads::set_thread_state(timerid_.noref(),
                     threads::thread_schedule_state::pending,
                     threads::thread_restart_state::abort,
@@ -167,7 +168,8 @@ namespace hpx { namespace util { namespace detail {
             }
             if (id_)
             {
-                error_code ec(lightweight);    // avoid throwing on error
+                error_code ec(
+                    throwmode::lightweight);    // avoid throwing on error
                 threads::set_thread_state(id_.noref(),
                     threads::thread_schedule_state::pending,
                     threads::thread_restart_state::abort,

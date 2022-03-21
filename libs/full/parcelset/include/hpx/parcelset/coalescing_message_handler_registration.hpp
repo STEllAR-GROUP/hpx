@@ -37,7 +37,7 @@ namespace hpx::parcelset {
         register_coalescing_for_action()
         {
             // ignore all errors as the module might not be available
-            hpx::error_code ec(hpx::lightweight);
+            hpx::error_code ec(hpx::throwmode::lightweight);
             hpx::register_message_handler("coalescing_message_handler",
                 get_action_coalescing_name<Action>(), ec);
         }
@@ -152,7 +152,7 @@ namespace hpx::parcelset {
             static parcelset::policies::message_handler* call(                 \
                 parcelset::locality const& loc)                                \
             {                                                                  \
-                error_code ec(lightweight);                                    \
+                error_code ec(throwmode::lightweight);                         \
                 return parcelset::get_message_handler(action_name,             \
                     "coalescing_message_handler", num, interval, loc, ec);     \
             }                                                                  \

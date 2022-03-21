@@ -84,7 +84,7 @@ namespace hpx { namespace performance_counters {
     static void counter_type_shutdown(
         std::shared_ptr<manage_counter_type> const& p)
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         p->uninstall(ec);
     }
 

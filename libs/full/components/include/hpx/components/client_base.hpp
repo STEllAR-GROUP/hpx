@@ -206,7 +206,7 @@ namespace hpx { namespace lcos { namespace detail {
             if (!registered_name_.empty())
             {
                 std::string name = HPX_MOVE(registered_name_);
-                error_code ec(lightweight);
+                error_code ec(throwmode::lightweight);
                 agas::unregister_name(launch::sync, name, ec);
             }
         }
@@ -508,7 +508,7 @@ namespace hpx { namespace components {
                     "this client has no valid shared state");
             }
 
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             this->shared_state_->get_result(ec);
             if (!ec)
                 return std::exception_ptr();

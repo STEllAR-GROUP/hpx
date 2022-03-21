@@ -188,7 +188,7 @@ namespace hpx { namespace util {
         lcos::local::futures_factory<std::string()> p(
             [&bt]() { return bt.trace(); });
 
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         threads::thread_id_ref_type tid =
             p.apply("hpx::util::trace_on_new_stack",
                 launch::fork_policy(threads::thread_priority::default_,
@@ -416,7 +416,7 @@ namespace hpx { namespace detail {
 
         // if this is not a HPX thread we do not need to query neither for
         // the shepherd thread nor for the thread id
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         std::uint32_t node = get_locality_id(ec);
 
         std::size_t shepherd = std::size_t(-1);

@@ -570,7 +570,7 @@ namespace hpx { namespace this_thread {
             {
                 HPX_ASSERT(statex == threads::thread_restart_state::abort ||
                     statex == threads::thread_restart_state::signaled);
-                error_code ec1(lightweight);    // do not throw
+                error_code ec1(throwmode::lightweight);    // do not throw
                 hpx::util::yield_while(
                     [&timer_started]() { return !timer_started.load(); },
                     "set_thread_state_timed");

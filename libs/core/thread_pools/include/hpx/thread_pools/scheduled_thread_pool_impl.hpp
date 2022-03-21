@@ -435,7 +435,7 @@ namespace hpx { namespace threads { namespace detail {
         if (LHPX_ENABLED(debug))
             topo.write_to_log();
 
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         if (any(mask))
         {
             topo.set_thread_affinity_mask(mask, ec);

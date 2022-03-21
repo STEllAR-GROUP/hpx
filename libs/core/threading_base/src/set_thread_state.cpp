@@ -58,7 +58,7 @@ namespace hpx { namespace threads { namespace detail {
         }
 
         // just retry, set_state will create new thread if target is still active
-        error_code ec(lightweight);    // do not throw
+        error_code ec(throwmode::lightweight);    // do not throw
         detail::set_thread_state(thrd.noref(), newstate, newstate_ex, priority,
             thread_schedule_hint(), true, ec);
 

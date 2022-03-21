@@ -112,7 +112,7 @@ std::pair<int, bool> dispatched_work(
 
     while (true)
     {
-        hpx::error_code ec(hpx::lightweight);
+        hpx::error_code ec(hpx::throwmode::lightweight);
         int job = jobs.get(hpx::launch::sync, ec);
         (void) job;
 

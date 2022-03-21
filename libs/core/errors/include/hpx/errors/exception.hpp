@@ -64,7 +64,7 @@ namespace hpx {
         ///               \a hpx_category (if mode is \a plain, this is the
         ///               default) or to the category \a hpx_category_rethrow
         ///               (if mode is \a rethrow).
-        exception(error e, char const* msg, throwmode mode = plain);
+        exception(error e, char const* msg, throwmode mode = throwmode::plain);
 
         /// Construct a hpx::exception from a \a hpx::error and an error message.
         ///
@@ -77,7 +77,8 @@ namespace hpx {
         ///               \a hpx_category (if mode is \a plain, this is the
         ///               default) or to the category \a hpx_category_rethrow
         ///               (if mode is \a rethrow).
-        exception(error e, std::string const& msg, throwmode mode = plain);
+        exception(
+            error e, std::string const& msg, throwmode mode = throwmode::plain);
 
         /// Destruct a hpx::exception
         ///
@@ -97,10 +98,11 @@ namespace hpx {
         ///
         /// \param mode   The parameter \p mode specifies whether the returned
         ///               hpx::error_code belongs to the error category
-        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               \a hpx_category (if mode is \a throwmode::plain, this is the
         ///               default) or to the category \a hpx_category_rethrow
         ///               (if mode is \a rethrow).
-        error_code get_error_code(throwmode mode = plain) const noexcept;
+        error_code get_error_code(
+            throwmode mode = throwmode::plain) const noexcept;
     };
 
     using custom_exception_info_handler_type =

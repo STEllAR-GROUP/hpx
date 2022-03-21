@@ -150,7 +150,7 @@ int hpx_main()
             hpx::cout << "Error reporting using an lightweight error code\n";
 
             // Create a new error_code instance.
-            hpx::error_code ec(hpx::lightweight);
+            hpx::error_code ec(hpx::throwmode::lightweight);
 
             // If an instance of an error_code is passed as the last argument while
             // invoking the action, the function will not throw in case of an error

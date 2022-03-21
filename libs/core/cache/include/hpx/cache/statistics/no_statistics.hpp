@@ -27,13 +27,13 @@ namespace hpx::util::cache::statistics {
     "scheduler_mode::state instead."
 
     HPX_DEPRECATED_V(1, 8, HPX_CACHE_METHOD_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr method method_get_entry = method::get_entry;
+    inline constexpr method method_get_entry = method::get_entry;
     HPX_DEPRECATED_V(1, 8, HPX_CACHE_METHOD_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr method method_insert_entry = method::insert_entry;
+    inline constexpr method method_insert_entry = method::insert_entry;
     HPX_DEPRECATED_V(1, 8, HPX_CACHE_METHOD_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr method method_update_entry = method::update_entry;
+    inline constexpr method method_update_entry = method::update_entry;
     HPX_DEPRECATED_V(1, 8, HPX_CACHE_METHOD_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr method method_erase_entry = method::erase_entry;
+    inline constexpr method method_erase_entry = method::erase_entry;
 
 #undef HPX_CACHE_METHOD_UNSCOPED_ENUM_DEPRECATION_MSG
 
