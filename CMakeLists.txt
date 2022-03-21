@@ -2135,8 +2135,6 @@ add_hpx_pseudo_target(core)
 # ##############################################################################
 # Add libraries
 # ##############################################################################
-add_subdirectory(src)
-
 # collect names of static parcelports
 set(HPX_STATIC_PARCELPORT_PLUGINS
     ""
@@ -2145,11 +2143,8 @@ set(HPX_STATIC_PARCELPORT_PLUGINS
 add_subdirectory(libs)
 
 # ##############################################################################
-# Configure compression and other plugins
+# Configure parcelports
 # ##############################################################################
-add_hpx_pseudo_target(plugins)
-add_subdirectory(plugins)
-
 include(HPX_ParcelPorts)
 
 # ##############################################################################
