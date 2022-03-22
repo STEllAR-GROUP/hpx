@@ -12,6 +12,7 @@ set(subdirs
     async_io
     balancing
     cancelable_action
+    fast_fourier_transformation
     future_reduce
     heartbeat
     jacobi
@@ -27,7 +28,6 @@ set(subdirs
     throttle
     tuplespace
     transpose
-    fast_fourier_transformation
 )
 
 if(HPX_WITH_EXAMPLES_HDF5)
