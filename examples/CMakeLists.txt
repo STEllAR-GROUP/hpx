@@ -27,6 +27,7 @@ set(subdirs
     throttle
     tuplespace
     transpose
+    fast_fourier_transformation
 )
 
 if(HPX_WITH_EXAMPLES_HDF5)
