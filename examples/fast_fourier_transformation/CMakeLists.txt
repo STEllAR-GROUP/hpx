@@ -27,10 +27,4 @@ foreach(example_program ${example_programs})
 
 add_hpx_example_target_dependencies("fft" ${example_program})
 
-if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-add_hpx_example_test(
-  "fft" ${example_program} ${${example_program}_PARAMETERS}
-)
-endif()
-
 endforeach()
