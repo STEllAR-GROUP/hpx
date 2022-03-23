@@ -18,7 +18,7 @@
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     {
-        hpx::cout << "Hello World!\n" << hpx::flush;
+        hpx::cout << "Hello World!\n" << std::flush;
 
         hpx::id_type id = hpx::new_<test_server>(hpx::find_here()).get();
         hpx::future<void> f = hpx::async(call_action(), id);

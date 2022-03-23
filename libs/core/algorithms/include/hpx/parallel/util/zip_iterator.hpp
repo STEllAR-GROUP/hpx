@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,7 +19,7 @@
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <int N, typename R, typename ZipIter>
-    R get_iter(ZipIter&& zipiter)
+    constexpr R get_iter(ZipIter&& zipiter)
     {
         return hpx::get<N>(zipiter.get_iterator_tuple());
     }
@@ -38,7 +38,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ZipIter>
-    typename ZipIter::iterator_tuple_type get_iter_tuple(ZipIter&& zipiter)
+    constexpr typename ZipIter::iterator_tuple_type get_iter_tuple(
+        ZipIter&& zipiter)
     {
         return zipiter.get_iterator_tuple();
     }
@@ -54,8 +55,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ZipIter>
-    std::pair<typename hpx::tuple_element<0,
-                  typename ZipIter::iterator_tuple_type>::type,
+    constexpr std::pair<typename hpx::tuple_element<0,
+                            typename ZipIter::iterator_tuple_type>::type,
         typename hpx::tuple_element<1,
             typename ZipIter::iterator_tuple_type>::type>
     get_iter_pair(ZipIter&& zipiter)
@@ -86,8 +87,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ZipIter>
-    util::in_in_result<typename hpx::tuple_element<0,
-                           typename ZipIter::iterator_tuple_type>::type,
+    constexpr util::in_in_result<
+        typename hpx::tuple_element<0,
+            typename ZipIter::iterator_tuple_type>::type,
         typename hpx::tuple_element<1,
             typename ZipIter::iterator_tuple_type>::type>
     get_iter_in_in_result(ZipIter&& zipiter)

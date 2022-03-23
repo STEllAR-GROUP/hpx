@@ -39,20 +39,22 @@ namespace hpx { namespace traits {
         struct is_future_customization_point : std::false_type
         {
         };
+
+        template <typename R>
+        struct is_future_customization_point<hpx::future<R>> : std::true_type
+        {
+        };
+
+        template <typename R>
+        struct is_future_customization_point<hpx::shared_future<R>>
+          : std::true_type
+        {
+        };
     }    // namespace detail
 
     template <typename Future>
-    struct is_future : detail::is_future_customization_point<Future>
-    {
-    };
-
-    template <typename R>
-    struct is_future<hpx::future<R>> : std::true_type
-    {
-    };
-
-    template <typename R>
-    struct is_future<hpx::shared_future<R>> : std::true_type
+    struct is_future
+      : detail::is_future_customization_point<std::decay_t<Future>>
     {
     };
 

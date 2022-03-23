@@ -287,7 +287,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return !tok.was_cancelled();
                 };
 
-                auto f2 = [](std::vector<hpx::future<bool>>&& results) {
+                auto f2 = [](auto&& results) {
                     return std::all_of(hpx::util::begin(results),
                         hpx::util::end(results),
                         [](hpx::future<bool>& val) { return val.get(); });

@@ -335,8 +335,9 @@ namespace hpx {
 
         struct sync_policy : policy_holder<sync_policy>
         {
-            constexpr sync_policy(threads::thread_priority priority =
-                                      threads::thread_priority::default_,
+            constexpr explicit sync_policy(
+                threads::thread_priority priority =
+                    threads::thread_priority::default_,
                 threads::thread_stacksize stacksize =
                     threads::thread_stacksize::default_,
                 threads::thread_schedule_hint hint = {}) noexcept
@@ -397,8 +398,9 @@ namespace hpx {
 
         struct deferred_policy : policy_holder<deferred_policy>
         {
-            constexpr deferred_policy(threads::thread_priority priority =
-                                          threads::thread_priority::default_,
+            constexpr explicit deferred_policy(
+                threads::thread_priority priority =
+                    threads::thread_priority::default_,
                 threads::thread_stacksize stacksize =
                     threads::thread_stacksize::default_,
                 threads::thread_schedule_hint hint = {}) noexcept
@@ -461,8 +463,9 @@ namespace hpx {
 
         struct apply_policy : policy_holder<apply_policy>
         {
-            constexpr apply_policy(threads::thread_priority priority =
-                                       threads::thread_priority::default_,
+            constexpr explicit apply_policy(
+                threads::thread_priority priority =
+                    threads::thread_priority::default_,
                 threads::thread_stacksize stacksize =
                     threads::thread_stacksize::default_,
                 threads::thread_schedule_hint hint = {}) noexcept

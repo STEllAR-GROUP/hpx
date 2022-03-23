@@ -83,5 +83,25 @@ namespace hpx { namespace detail {
                 throw exception_list(std::current_exception());
             }
         }
+
+        // launch::deferred execute inline
+        template <typename F, typename... Ts>
+        HPX_FORCEINLINE static hpx::util::detail::invoke_deferred_result_t<F,
+            Ts...>
+        call(launch::deferred_policy, F&& f, Ts&&... ts)
+        {
+            try
+            {
+                return HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
+            catch (std::bad_alloc const& ba)
+            {
+                throw ba;
+            }
+            catch (...)
+            {
+                throw exception_list(std::current_exception());
+            }
+        }
     };
 }}    // namespace hpx::detail

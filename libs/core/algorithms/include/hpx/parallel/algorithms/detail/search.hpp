@@ -17,6 +17,7 @@
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
@@ -138,11 +139,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                     });
             };
 
-            auto f2 =
-                [=](std::vector<hpx::future<void>>&& data) mutable -> FwdIter {
+            auto f2 = [=](auto&& data) mutable -> FwdIter {
                 // make sure iterators embedded in function object that is
                 // attached to futures are invalidated
-                data.clear();
+                util::detail::clear_container(data);
                 difference_type search_res = tok.get_data();
                 if (search_res != count)
                     std::advance(first, search_res);
@@ -240,11 +240,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                     });
             };
 
-            auto f2 =
-                [=](std::vector<hpx::future<void>>&& data) mutable -> FwdIter {
+            auto f2 = [=](auto&& data) mutable -> FwdIter {
                 // make sure iterators embedded in function object that is
                 // attached to futures are invalidated
-                data.clear();
+                util::detail::clear_container(data);
                 difference_type search_res = tok.get_data();
                 if (search_res != s_difference_type(count))
                     std::advance(first, search_res);

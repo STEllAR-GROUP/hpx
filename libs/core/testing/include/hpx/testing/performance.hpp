@@ -9,16 +9,17 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
 
-#include <chrono>
 #include <cstddef>
 #include <map>
 #include <ostream>
 #include <string>
+#include <tuple>
 #include <vector>
 
 namespace hpx { namespace util {
 
     namespace detail {
+
         // Json output for performance reports
         class json_perf_times
         {
@@ -28,40 +29,8 @@ namespace hpx { namespace util {
 
             map_t m_map;
 
-            friend std::ostream& operator<<(
-                std::ostream& strm, json_perf_times const& obj)
-            {
-                strm << "{\n";
-                strm << "  \"outputs\" : [";
-                int outputs = 0;
-                for (auto&& item : obj.m_map)
-                {
-                    if (outputs)
-                        strm << ",";
-                    strm << "\n    {\n";
-                    strm << "      \"name\" : \"" << std::get<0>(item.first)
-                         << "\",\n";
-                    strm << "      \"executor\" : \"" << std::get<1>(item.first)
-                         << "\",\n";
-                    strm << "      \"series\" : [";
-                    int series = 0;
-                    for (auto val : item.second)
-                    {
-                        if (series)
-                            strm << ", ";
-                        strm << val;
-                        ++series;
-                    }
-                    strm << "]\n";
-                    strm << "    }";
-                    ++outputs;
-                }
-                if (outputs)
-                    strm << "\n  ";
-                strm << "]\n";
-                strm << "}\n";
-                return strm;
-            }
+            HPX_CORE_EXPORT friend std::ostream& operator<<(
+                std::ostream& strm, json_perf_times const& obj);
 
         public:
             void add(std::string const& name, std::string const& executor,

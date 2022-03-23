@@ -224,6 +224,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/find.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -390,8 +391,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    items.clear();
-                    data.clear();
+                    util::detail::clear_container(items);
+                    util::detail::clear_container(data);
 
                     return *dest_ptr;
                 };

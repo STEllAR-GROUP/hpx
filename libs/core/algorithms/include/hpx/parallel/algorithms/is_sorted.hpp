@@ -232,6 +232,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -316,7 +317,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return !tok.was_cancelled();
                 };
 
-                auto f2 = [](std::vector<hpx::future<bool>>&& results) {
+                auto f2 = [](auto&& results) {
                     return std::all_of(hpx::util::begin(results),
                         hpx::util::end(results),
                         [](hpx::future<bool>& val) -> bool {
@@ -406,12 +407,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         }
                     }
                 };
-                auto f2 = [first, tok](
-                              std::vector<hpx::future<void>>&& data) mutable
-                    -> FwdIter {
+                auto f2 = [first, tok](auto&& data) mutable -> FwdIter {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
 
                     difference_type loc = tok.get_data();
                     std::advance(first, loc);

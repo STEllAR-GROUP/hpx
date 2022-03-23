@@ -178,6 +178,7 @@ set(algorithms_headers
     hpx/parallel/util/detail/algorithm_result.hpp
     hpx/parallel/util/detail/chunk_size.hpp
     hpx/parallel/util/detail/chunk_size_iterator.hpp
+    hpx/parallel/util/detail/clear_container.hpp
     hpx/parallel/util/detail/handle_exception_termination_handler.hpp
     hpx/parallel/util/detail/handle_local_exceptions.hpp
     hpx/parallel/util/detail/handle_remote_exceptions.hpp

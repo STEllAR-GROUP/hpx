@@ -171,9 +171,17 @@ namespace hpx { namespace compute { namespace host {
                         executors_[i], HPX_FORWARD(F, f),
                         util::make_iterator_range(part_begin, part_end),
                         HPX_FORWARD(Ts, ts)...);
-                    results.insert(results.end(),
-                        std::make_move_iterator(futures.begin()),
-                        std::make_move_iterator(futures.end()));
+
+                    if constexpr (hpx::traits::is_future_v<decltype(futures)>)
+                    {
+                        results.push_back(HPX_MOVE(futures));
+                    }
+                    else
+                    {
+                        results.insert(results.end(),
+                            std::make_move_iterator(futures.begin()),
+                            std::make_move_iterator(futures.end()));
+                    }
                 }
                 return results;
             }

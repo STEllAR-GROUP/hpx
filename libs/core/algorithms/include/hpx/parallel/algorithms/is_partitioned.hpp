@@ -217,8 +217,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return fst_bool;
                 };
 
-                auto f2 =
-                    [tok](std::vector<hpx::future<bool>>&& results) -> bool {
+                auto f2 = [tok](auto&& results) -> bool {
                     if (tok.was_cancelled())
                         return false;
                     return sequential_is_partitioned(HPX_MOVE(results));

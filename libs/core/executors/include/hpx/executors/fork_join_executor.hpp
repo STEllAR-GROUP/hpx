@@ -570,17 +570,12 @@ namespace hpx { namespace execution { namespace experimental {
             }
 
             template <typename F, typename S, typename... Ts>
-            std::vector<hpx::future<hpx::parallel::execution::detail::
-                    bulk_function_result_t<F, S, Ts...>>>
-            bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
+            hpx::future<void> bulk_async_execute(
+                F&& f, S const& shape, Ts&&... ts)
             {
                 // Forward to the synchronous version as we can't create
                 // futures to the completion of the parallel region (this HPX
                 // thread participates in computation).
-                using result_type =
-                    hpx::parallel::execution::detail::bulk_function_result_t<F,
-                        S, Ts...>;
-                std::vector<hpx::future<result_type>> v;
                 try
                 {
                     bulk_sync_execute(
@@ -588,10 +583,12 @@ namespace hpx { namespace execution { namespace experimental {
                 }
                 catch (...)
                 {
-                    v.push_back(hpx::make_exceptional_future<result_type>(
-                        std::current_exception()));
+                    using result_type = hpx::parallel::execution::detail::
+                        bulk_function_result_t<F, S, Ts...>;
+                    return hpx::make_exceptional_future<result_type>(
+                        std::current_exception());
                 }
-                return v;
+                return hpx::make_ready_future();
             }
         };
 

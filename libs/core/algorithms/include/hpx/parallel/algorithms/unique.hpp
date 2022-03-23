@@ -473,6 +473,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -655,8 +656,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     -> FwdIter {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    items.clear();
-                    data.clear();
+                    util::detail::clear_container(items);
+                    util::detail::clear_container(data);
 
                     if (!flags[count - 1])
                     {
@@ -906,7 +907,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
 
                     return unique_copy_result<FwdIter1, FwdIter2>{
                         HPX_MOVE(last_iter), HPX_MOVE(dest)};

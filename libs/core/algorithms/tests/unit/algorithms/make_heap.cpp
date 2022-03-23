@@ -186,7 +186,7 @@ void test_make_heap_exception(IteratorTag)
             decorated_iterator(hpx::util::end(c)));
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_exception = true;
     }
@@ -219,7 +219,7 @@ void test_make_heap_exception(ExPolicy&& policy, IteratorTag)
             decorated_iterator(hpx::util::end(c)));
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_exception = true;
     }
@@ -254,7 +254,7 @@ void test_make_heap_exception_async(ExPolicy&& p, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_exception = true;
     }

@@ -1114,7 +1114,7 @@ namespace hpx::parallel { inline namespace v2 {
                         first, size, stride,
                         part_iterations<ExPolicy, F, S, args_type>{
                             HPX_FORWARD(F, f), stride, args},
-                        [=](std::vector<hpx::future<void>>&&) mutable -> void {
+                        [=](auto&&) mutable -> void {
                             auto pack =
                                 typename hpx::util::make_index_pack<sizeof...(
                                     Ts)>::type();
