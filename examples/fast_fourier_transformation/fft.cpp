@@ -15,7 +15,7 @@
 using cd = std::complex<double>;
 
 // Function for fast fourier transformation
-std::vector<cd> fft(const std::vector<cd>& a)
+std::vector<cd> fft(std::vector<cd> const& a)
 {
     uint64_t n = a.size();
 
