@@ -168,6 +168,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -252,22 +253,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         [&pred, &tok, &proj1, &proj2](
                             reference t, std::size_t i) mutable -> void {
                             using hpx::get;
-                            if (HPX_INVOKE(pred, HPX_INVOKE(proj1, get<0>(t)),
-                                    HPX_INVOKE(proj2, get<1>(t))) ||
-                                HPX_INVOKE(pred, HPX_INVOKE(proj2, get<1>(t)),
-                                    HPX_INVOKE(proj1, get<0>(t))))
+                            using hpx::util::invoke;
+                            // gcc10/cuda11 complains about using HPX_INVOKE here
+                            if (invoke(pred, invoke(proj1, get<0>(t)),
+                                    invoke(proj2, get<1>(t))) ||
+                                invoke(pred, invoke(proj2, get<1>(t)),
+                                    invoke(proj1, get<0>(t))))
                             {
                                 tok.cancel(i);
                             }
                         });
                 };
 
-                auto f2 =
-                    [tok, first1, first2, last1, last2, pred, proj1, proj2](
-                        std::vector<hpx::future<void>>&& data) mutable -> bool {
+                auto f2 = [tok, first1, first2, last1, last2, pred, proj1,
+                              proj2](auto&& data) mutable -> bool {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
 
                     std::size_t mismatched = tok.get_data();
 

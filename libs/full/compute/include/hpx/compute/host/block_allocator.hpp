@@ -173,7 +173,7 @@ namespace hpx { namespace compute { namespace host {
                         return std::make_pair(it, last);
                     },
                     // finalize, called once if no error occurred
-                    [](std::vector<hpx::future<partition_result_type>>&&) {
+                    [](auto&&) {
                         // do nothing
                     },
                     // cleanup function, called for each partition which

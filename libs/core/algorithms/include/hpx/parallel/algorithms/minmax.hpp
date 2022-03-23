@@ -513,7 +513,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
                 auto f2 = [policy, f = HPX_FORWARD(F, f),
                               proj = HPX_FORWARD(Proj, proj)](
-                              std::vector<FwdIter>&& positions) -> FwdIter {
+                              auto&& positions) -> FwdIter {
                     return min_element::sequential_minmax_element_ind(
                         policy, positions.begin(), positions.size(), f, proj);
                 };
@@ -676,7 +676,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
                 auto f2 = [policy, f = HPX_FORWARD(F, f),
                               proj = HPX_FORWARD(Proj, proj)](
-                              std::vector<FwdIter>&& positions) -> FwdIter {
+                              auto&& positions) -> FwdIter {
                     return max_element::sequential_minmax_element_ind(
                         policy, positions.begin(), positions.size(), f, proj);
                 };
@@ -866,10 +866,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return sequential_minmax_element(
                         policy, it, part_count, f, proj);
                 };
-                auto f2 =
-                    [policy, f = HPX_FORWARD(F, f),
-                        proj = HPX_FORWARD(Proj, proj)](
-                        std::vector<result_type>&& positions) -> result_type {
+                auto f2 = [policy, f = HPX_FORWARD(F, f),
+                              proj = HPX_FORWARD(Proj, proj)](
+                              auto&& positions) -> result_type {
                     return minmax_element::sequential_minmax_element_ind(
                         policy, positions.begin(), positions.size(), f, proj);
                 };

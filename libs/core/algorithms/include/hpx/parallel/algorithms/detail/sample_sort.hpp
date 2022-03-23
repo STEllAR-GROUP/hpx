@@ -115,11 +115,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 hpx::util::make_counting_iterator(std::uint32_t(0)),
                 hpx::util::make_counting_iterator(nthreads));
 
-            hpx::when_all(
-                execution::bulk_async_execute(
-                    exec, [this](std::uint32_t) { this->execute_first(); },
-                    shape))
-                .get();
+            hpx::wait_all(execution::bulk_async_execute(
+                exec, [this](std::uint32_t) { this->execute_first(); }, shape));
 
             construct = true;
         }
@@ -137,10 +134,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 hpx::util::make_counting_iterator(std::uint32_t(0)),
                 hpx::util::make_counting_iterator(nthreads));
 
-            hpx::when_all(
-                execution::bulk_async_execute(
-                    exec, [this](std::uint32_t) { this->execute(); }, shape))
-                .get();
+            hpx::wait_all(execution::bulk_async_execute(
+                exec, [this](std::uint32_t) { this->execute(); }, shape));
         }
     };
 
@@ -288,14 +283,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             hpx::util::make_counting_iterator(std::uint32_t(0)),
             hpx::util::make_counting_iterator(nthreads));
 
-        hpx::when_all(execution::bulk_async_execute(
-                          exec,
-                          [&, this](std::uint32_t i) {
-                              spin_sort(vmem_thread[i].begin(),
-                                  vmem_thread[i].end(), comp, vbuf_thread[i]);
-                          },
-                          shape))
-            .get();
+        hpx::wait_all(execution::bulk_async_execute(
+            exec,
+            [&, this](std::uint32_t i) {
+                spin_sort(vmem_thread[i].begin(), vmem_thread[i].end(), comp,
+                    vbuf_thread[i]);
+            },
+            shape));
 
         // Obtain the vector of milestones
         std::vector<Iter> vsample;

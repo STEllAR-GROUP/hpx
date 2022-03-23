@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -110,7 +110,7 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::util::thread_description desc(
                 f, "parallel_executor_aggregated::post");
 
-            detail::post_policy_dispatch<Policy>::call(
+            hpx::detail::post_policy_dispatch<Policy>::call(
                 Policy{}, desc, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
@@ -324,7 +324,7 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::util::thread_description desc(
                 f, "parallel_executor_aggregated::post");
 
-            detail::post_policy_dispatch<hpx::launch>::call(
+            hpx::detail::post_policy_dispatch<hpx::launch>::call(
                 policy_, desc, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
@@ -384,7 +384,7 @@ namespace hpx { namespace parallel { namespace execution {
 
                 for (std::size_t i = 0; i != size; ++i, ++it)
                 {
-                    detail::post_policy_dispatch<hpx::launch>::call(
+                    hpx::detail::post_policy_dispatch<hpx::launch>::call(
                         policy_, desc, [&, it]() -> void {
                             // properly handle all exceptions thrown from 'f'
                             try
@@ -421,7 +421,7 @@ namespace hpx { namespace parallel { namespace execution {
 
                     while (size > chunk_size)
                     {
-                        detail::post_policy_dispatch<hpx::launch>::call(
+                        hpx::detail::post_policy_dispatch<hpx::launch>::call(
                             policy_, desc, [&, chunk_size, num_tasks, it] {
                                 spawn_hierarchical(l, chunk_size, num_tasks, f,
                                     it, e, mtx_e, ts...);
@@ -445,16 +445,10 @@ namespace hpx { namespace parallel { namespace execution {
     public:
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
-        std::vector<hpx::future<void>> bulk_async_execute(
-            F&& f, S const& shape, Ts&&... ts) const
+        auto bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
         {
-            // for now, wrap single future in a vector to avoid having to
-            // change the executor and algorithm infrastructure
-            std::vector<hpx::future<void>> result;
-            result.push_back(
-                async_execute(sync_exec{policy_, num_spread_, num_tasks_},
-                    HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
-            return result;
+            return async_execute(sync_exec{policy_, num_spread_, num_tasks_},
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
     private:

@@ -331,23 +331,21 @@ namespace hpx { namespace execution {
             hpx::util::thread_description desc(f, annotation_);
             auto pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
-            parallel::execution::detail::post_policy_dispatch<Policy>::call(
+            hpx::detail::post_policy_dispatch<Policy>::call(
                 policy_, desc, pool, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
-        std::vector<hpx::future<typename parallel::execution::detail::
-                bulk_function_result<F, S, Ts...>::type>>
-        bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
+        decltype(auto) bulk_async_execute(
+            F&& f, S const& shape, Ts&&... ts) const
         {
             hpx::util::thread_description desc(f, annotation_);
             auto pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
-            return parallel::execution::detail::
-                hierarchical_bulk_async_execute_helper(desc, pool, 0,
-                    get_num_cores(), hierarchical_threshold_, policy_,
-                    HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+            return parallel::execution::detail::hierarchical_bulk_async_execute(
+                desc, pool, 0, get_num_cores(), hierarchical_threshold_,
+                policy_, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename Future, typename... Ts>

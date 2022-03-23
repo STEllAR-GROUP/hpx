@@ -271,7 +271,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 scoped_executor_parameters scoped_params(
                     policy.parameters(), policy.executor());
 
-                std::vector<hpx::future<void>> workitems;
                 std::list<std::exception_ptr> errors;
 
                 using tuple_type = hpx::tuple<RndIter, std::size_t>;
@@ -341,7 +340,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             }
 
                             // Reserve items/chunk_size spaces for async calls
-                            workitems = execution::bulk_async_execute(
+                            auto&& workitems = execution::bulk_async_execute(
                                 policy.executor(), op, shapes);
 
                             // Required synchronization per level
@@ -350,7 +349,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             // collect exceptions
                             util::detail::handle_local_exceptions<
                                 ExPolicy>::call(workitems, errors, false);
-                            workitems.clear();
                         }
 
                         if (!errors.empty())
@@ -372,8 +370,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 // rethrow exceptions, if any
-                util::detail::handle_local_exceptions<ExPolicy>::call(
-                    workitems, errors);
+                util::detail::handle_local_exceptions<ExPolicy>::call(errors);
 
                 std::advance(first, n);
                 return util::detail::algorithm_result<ExPolicy, RndIter>::get(

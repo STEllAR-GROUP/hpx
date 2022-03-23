@@ -183,6 +183,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/mismatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/result_types.hpp>
@@ -274,11 +275,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
                 };
 
-                auto f2 = [=](std::vector<hpx::future<void>>&& data) mutable
+                auto f2 = [=](auto&& data) mutable
                     -> util::in_in_result<Iter1, Iter2> {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
                     difference_type1 mismatched =
                         static_cast<difference_type1>(tok.get_data());
                     if (mismatched != count1)
@@ -371,11 +372,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         base_idx, it, part_count, tok, HPX_FORWARD(F, f));
                 };
 
-                auto f2 = [=](std::vector<hpx::future<void>>&& data) mutable
-                    -> std::pair<FwdIter1, FwdIter2> {
+                auto f2 =
+                    [=](auto&& data) mutable -> std::pair<FwdIter1, FwdIter2> {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
                     difference_type mismatched =
                         static_cast<difference_type>(tok.get_data());
                     if (mismatched != count)

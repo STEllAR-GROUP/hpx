@@ -104,22 +104,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         }
                         return ret;
                     },
-                    hpx::unwrapping(
-                        [op](std::vector<T>&& results) mutable -> T {
-                            T ret = *results.begin();
-                            if (results.size() > 1)
-                            {
-                                // MSVC complains if 'op' is captured by reference
-                                util::loop_n<execution_policy_type>(
-                                    results.begin() + 1, results.size() - 1,
-                                    [&ret, op](
-                                        typename std::vector<T>::iterator const&
-                                            curr) mutable {
-                                        ret = HPX_INVOKE(op, ret, *curr);
-                                    });
-                            }
-                            return ret;
-                        }));
+                    hpx::unwrapping([op](auto&& results) mutable -> T {
+                        T ret = *results.begin();
+                        if (results.size() > 1)
+                        {
+                            // MSVC complains if 'op' is captured by reference
+                            util::loop_n<execution_policy_type>(
+                                results.begin() + 1, results.size() - 1,
+                                [&ret, op](
+                                    typename std::vector<T>::iterator const&
+                                        curr) mutable {
+                                    ret = HPX_INVOKE(op, ret, *curr);
+                                });
+                        }
+                        return ret;
+                    }));
             }
         };
 

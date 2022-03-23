@@ -204,6 +204,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
@@ -308,13 +309,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                     get<0>(iters), part_size, dest, tok)));
                     },
                     // finalize, called once if no error occurred
-                    [first, dest, count](
-                        std::vector<hpx::future<partition_result_type>>&&
-                            data) mutable
+                    [first, dest, count](auto&& data) mutable
                     -> util::in_out_result<Iter, FwdIter2> {
                         // make sure iterators embedded in function object that is
                         // attached to futures are invalidated
-                        data.clear();
+                        util::detail::clear_container(data);
 
                         std::advance(first, count);
                         std::advance(dest, count);

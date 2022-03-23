@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -60,6 +60,10 @@ namespace hpx { namespace execution {
         }
 
         /// \cond NOINTERNAL
+        // This executor parameters type synchronously invokes the provided
+        // testing function in order to approximate the chunk-size.
+        using invokes_testing_function = std::true_type;
+
         // Estimate a chunk size based on number of cores used.
         template <typename Executor, typename F>
         std::size_t get_chunk_size(

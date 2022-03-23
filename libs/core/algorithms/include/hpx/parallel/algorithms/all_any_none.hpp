@@ -302,7 +302,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy, bool>::call(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
-                    [](std::vector<hpx::future<bool>>&& results) {
+                    [](auto&& results) {
                         return detail::sequential_find_if_not<
                                    hpx::execution::sequenced_policy>(
                                    hpx::util::begin(results),
@@ -364,7 +364,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy, bool>::call(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
-                    [](std::vector<hpx::future<bool>>&& results) {
+                    [](auto&& results) {
                         return detail::sequential_find_if<
                                    hpx::execution::sequenced_policy>(
                                    hpx::util::begin(results),
@@ -425,7 +425,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy, bool>::call(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
-                    [](std::vector<hpx::future<bool>>&& results) {
+                    [](auto&& results) {
                         return detail::sequential_find_if_not<
                                    hpx::execution::sequenced_policy>(
                                    hpx::util::begin(results),

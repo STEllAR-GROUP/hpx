@@ -135,8 +135,7 @@ void test_bulk_async_exception(ExecutorArgs&&... args)
     {
         auto r = hpx::parallel::execution::bulk_async_execute(
             exec, &bulk_test_exception, v, 42);
-        HPX_TEST_EQ(r.size(), std::size_t(1));
-        r[0].get();
+        r.get();
 
         HPX_TEST(false);
     }

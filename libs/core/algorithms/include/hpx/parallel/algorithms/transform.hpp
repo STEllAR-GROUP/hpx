@@ -212,8 +212,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename F, typename Proj>
         struct transform_projected
         {
-            typename std::decay<F>::type& f_;
-            typename std::decay<Proj>::type& proj_;
+            std::decay_t<F>& f_;
+            std::decay_t<Proj>& proj_;
 
             HPX_HOST_DEVICE constexpr transform_projected(
                 F& f, Proj& proj) noexcept
@@ -233,7 +233,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename F>
         struct transform_projected<F, util::projection_identity>
         {
-            typename std::decay<F>::type& f_;
+            std::decay_t<F>& f_;
 
             HPX_HOST_DEVICE constexpr transform_projected(
                 F& f, util::projection_identity) noexcept
@@ -382,8 +382,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
                 typename FwdIter2, typename F, typename Proj>
-            static typename util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<FwdIter1B, FwdIter2>>::type
+            static util::detail::algorithm_result_t<ExPolicy,
+                util::in_out_result<FwdIter1B, FwdIter2>>
             parallel(ExPolicy&& policy, FwdIter1B first, FwdIter1E last,
                 FwdIter2 dest, F&& f, Proj&& proj)
             {
@@ -590,8 +590,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
                 typename FwdIter2, typename FwdIter3, typename F,
                 typename Proj1, typename Proj2>
-            static typename util::detail::algorithm_result<ExPolicy,
-                util::in_in_out_result<FwdIter1B, FwdIter2, FwdIter3>>::type
+            static util::detail::algorithm_result_t<ExPolicy,
+                util::in_in_out_result<FwdIter1B, FwdIter2, FwdIter3>>
             parallel(ExPolicy&& policy, FwdIter1B first1, FwdIter1E last1,
                 FwdIter2 first2, FwdIter3 dest, F&& f, Proj1&& proj1,
                 Proj2&& proj2)
@@ -665,8 +665,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
                 typename FwdIter2B, typename FwdIter2E, typename FwdIter3,
                 typename F, typename Proj1, typename Proj2>
-            static typename util::detail::algorithm_result<ExPolicy,
-                util::in_in_out_result<FwdIter1B, FwdIter2B, FwdIter3>>::type
+            static util::detail::algorithm_result_t<ExPolicy,
+                util::in_in_out_result<FwdIter1B, FwdIter2B, FwdIter3>>
             parallel(ExPolicy&& policy, FwdIter1B first1, FwdIter1E last1,
                 FwdIter2B first2, FwdIter2E last2, FwdIter3 dest, F&& f,
                 Proj1&& proj1, Proj2&& proj2)
@@ -798,7 +798,7 @@ namespace hpx {
         friend FwdIter2 tag_fallback_invoke(hpx::transform_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, F&& f)
         {
-            static_assert(hpx::traits::is_input_iterator<FwdIter1>::value,
+            static_assert(hpx::traits::is_input_iterator_v<FwdIter1>,
                 "Requires at least input iterator.");
 
             return parallel::util::get_second_element(
@@ -818,12 +818,11 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
         tag_fallback_invoke(hpx::transform_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, F&& f)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
 
             return parallel::util::get_second_element(
@@ -846,8 +845,8 @@ namespace hpx {
         friend FwdIter3 tag_fallback_invoke(hpx::transform_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter3 dest, F&& f)
         {
-            static_assert(hpx::traits::is_input_iterator<FwdIter1>::value &&
-                    hpx::traits::is_input_iterator<FwdIter2>::value,
+            static_assert(hpx::traits::is_input_iterator_v<FwdIter1> &&
+                    hpx::traits::is_input_iterator_v<FwdIter2>,
                 "Requires at least input iterator.");
 
             using proj_id = hpx::parallel::util::projection_identity;
@@ -871,14 +870,13 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter3>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter3>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter3>
         tag_fallback_invoke(hpx::transform_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter3 dest,
             F&& f)
         {
-            static_assert(hpx::traits::is_input_iterator<FwdIter1>::value &&
-                    hpx::traits::is_input_iterator<FwdIter2>::value,
+            static_assert(hpx::traits::is_input_iterator_v<FwdIter1> &&
+                    hpx::traits::is_input_iterator_v<FwdIter2>,
                 "Requires at least input iterator.");
 
             using proj_id = hpx::parallel::util::projection_identity;

@@ -64,28 +64,27 @@ namespace hpx { namespace parallel { namespace util {
                 scoped_executor_parameters scoped_params(
                     policy.parameters(), policy.executor());
 
-                std::vector<hpx::future<Result>> workitems;
                 std::list<std::exception_ptr> errors;
                 try
                 {
-                    workitems = detail::partition<Result>(
+                    auto&& items = detail::partition<Result>(
                         HPX_FORWARD(ExPolicy_, policy), first, count,
                         HPX_FORWARD(F1, f1));
 
                     scoped_params.mark_end_of_scheduling();
+
+                    return reduce(HPX_MOVE(items), HPX_MOVE(errors),
+                        HPX_FORWARD(F2, f2), HPX_FORWARD(Cleanup, cleanup));
                 }
                 catch (...)
                 {
-                    handle_local_exceptions::call(
-                        std::current_exception(), errors);
+                    handle_local_exceptions::call(std::current_exception());
                 }
-                return reduce(HPX_MOVE(workitems), HPX_MOVE(errors),
-                    HPX_FORWARD(F2, f2), HPX_FORWARD(Cleanup, cleanup));
             }
 
         private:
-            template <typename F, typename Cleanup>
-            static R reduce(std::vector<hpx::future<Result>>&& workitems,
+            template <typename Items, typename F, typename Cleanup>
+            static R reduce(Items&& workitems,
                 std::list<std::exception_ptr>&& errors, F&& f,
                 Cleanup&& cleanup)
             {
@@ -108,6 +107,25 @@ namespace hpx { namespace parallel { namespace util {
                     HPX_ASSERT(false);
                     return f(HPX_MOVE(workitems));
                 }
+            }
+
+            template <typename Items1, typename Items2, typename F,
+                typename Cleanup>
+            static R reduce(std::pair<Items1, Items2>&& items,
+                std::list<std::exception_ptr>&& errors, F&& f,
+                Cleanup&& cleanup)
+            {
+                if (items.first.empty())
+                {
+                    return reduce(HPX_MOVE(items.second), HPX_MOVE(errors),
+                        HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
+                }
+
+                items.first.insert(items.first.end(),
+                    std::make_move_iterator(items.second.begin()),
+                    std::make_move_iterator(items.second.end()));
+                return reduce(HPX_MOVE(items.first), HPX_MOVE(errors),
+                    HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
             }
         };
 
@@ -135,38 +153,57 @@ namespace hpx { namespace parallel { namespace util {
                     std::make_shared<scoped_executor_parameters>(
                         policy.parameters(), policy.executor());
 
-                std::vector<hpx::future<Result>> workitems;
+                hpx::future<R> result;
                 std::list<std::exception_ptr> errors;
                 try
                 {
-                    workitems = detail::partition<Result>(
+                    auto&& items = detail::partition<Result>(
                         HPX_FORWARD(ExPolicy_, policy), first, count,
                         HPX_FORWARD(F1, f1));
 
                     scoped_params->mark_end_of_scheduling();
+
+                    result = reduce(HPX_MOVE(scoped_params), HPX_MOVE(items),
+                        HPX_MOVE(errors), HPX_FORWARD(F2, f2),
+                        HPX_FORWARD(Cleanup, cleanup));
                 }
                 catch (std::bad_alloc const&)
                 {
                     return hpx::make_exceptional_future<R>(
                         std::current_exception());
                 }
-                catch (...)
-                {
-                    handle_local_exceptions::call(
-                        std::current_exception(), errors);
-                }
-                return reduce(HPX_MOVE(scoped_params), HPX_MOVE(workitems),
-                    HPX_MOVE(errors), HPX_FORWARD(F2, f2),
-                    HPX_FORWARD(Cleanup, cleanup));
+                return result;
             }
 
         private:
-            template <typename F, typename Cleanup>
+            template <typename Items1, typename Items2, typename F,
+                typename Cleanup>
             static hpx::future<R> reduce(
                 std::shared_ptr<scoped_executor_parameters>&& scoped_params,
-                std::vector<hpx::future<Result>>&& workitems,
+                std::pair<Items1, Items2>&& items,
                 std::list<std::exception_ptr>&& errors, F&& f,
                 Cleanup&& cleanup)
+            {
+                if (items.first.empty())
+                {
+                    return reduce(HPX_MOVE(scoped_params),
+                        HPX_MOVE(items.second), HPX_MOVE(errors),
+                        HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
+                }
+
+                items.first.insert(items.first.end(),
+                    std::make_move_iterator(items.second.begin()),
+                    std::make_move_iterator(items.second.end()));
+                return reduce(HPX_MOVE(scoped_params), HPX_MOVE(items.first),
+                    HPX_MOVE(errors), HPX_FORWARD(F, f),
+                    HPX_FORWARD(Cleanup, cleanup));
+            }
+
+            template <typename Items, typename F, typename Cleanup>
+            static hpx::future<R> reduce(
+                std::shared_ptr<scoped_executor_parameters>&& scoped_params,
+                Items&& workitems, std::list<std::exception_ptr>&& errors,
+                F&& f, Cleanup&& cleanup)
             {
                 // wait for all tasks to finish
 #if defined(HPX_COMPUTE_DEVICE_CODE)

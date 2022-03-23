@@ -48,7 +48,7 @@ namespace hpx { namespace execution {
         /// \cond NOINTERNAL
         // This executor parameters type provides variable chunk sizes and
         // needs to be invoked for each of the chunks to be combined.
-        typedef std::true_type has_variable_chunk_size;
+        using has_variable_chunk_size = std::true_type;
 
         //         template <typename Executor>
         //         static std::size_t get_maximal_number_of_chunks(

@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2018-2020 Hartmut Kaiser
+//  Copyright (c) 2018-2022 Hartmut Kaiser
 //  Copyright (c) 2018-2019 Adrian Serio
 //  Copyright (c) 2019 Nikunj Gupta
 //
@@ -56,9 +56,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                     return hpx::util::invoke_fused(f, t);
                 };
 
-                std::vector<future_type> results =
-                    hpx::parallel::execution::bulk_async_execute(
-                        HPX_FORWARD(Executor, exec), HPX_MOVE(func), n);
+                auto&& results = hpx::parallel::execution::bulk_async_execute(
+                    HPX_FORWARD(Executor, exec), HPX_MOVE(func), n);
 
                 // wait for all threads to finish executing and return the first
                 // result that passes the predicate, properly handle exceptions
@@ -67,28 +66,51 @@ namespace hpx { namespace resiliency { namespace experimental {
                     hpx::launch::sync,
                     [pred = HPX_FORWARD(Pred, pred),
                         vote = HPX_FORWARD(Vote, vote),
-                        n](std::vector<future_type>&& results) mutable
-                    -> result_type {
+                        n](auto&& results) mutable -> result_type {
                         // Store all valid results
                         std::vector<result_type> valid_results;
                         valid_results.reserve(n);
 
                         std::exception_ptr ex;
 
-                        for (auto&& f : HPX_MOVE(results))
+                        // clang-format off
+                        if constexpr (hpx::traits::is_future_v<
+                                          decltype(results)>)
+                        // clang-format on
                         {
-                            if (f.has_exception())
+                            if (results.has_exception())
                             {
                                 // rethrow abort_replicate_exception, if caught
-                                ex = detail::rethrow_on_abort_replicate(f);
+                                ex =
+                                    detail::rethrow_on_abort_replicate(results);
                             }
                             else
                             {
-                                auto&& result = f.get();
+                                auto&& result = results.get();
                                 if (HPX_INVOKE(pred, result))
                                 {
                                     valid_results.emplace_back(
                                         HPX_MOVE(result));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (auto&& f : HPX_MOVE(results))
+                            {
+                                if (f.has_exception())
+                                {
+                                    // rethrow abort_replicate_exception, if caught
+                                    ex = detail::rethrow_on_abort_replicate(f);
+                                }
+                                else
+                                {
+                                    auto&& result = f.get();
+                                    if (HPX_INVOKE(pred, result))
+                                    {
+                                        valid_results.emplace_back(
+                                            HPX_MOVE(result));
+                                    }
                                 }
                             }
                         }
@@ -132,29 +154,47 @@ namespace hpx { namespace resiliency { namespace experimental {
                     hpx::util::invoke_fused(f, t);
                 };
 
-                std::vector<future_type> results =
-                    hpx::parallel::execution::bulk_async_execute(
-                        HPX_FORWARD(Executor, exec), HPX_MOVE(func), n);
+                auto&& results = hpx::parallel::execution::bulk_async_execute(
+                    HPX_FORWARD(Executor, exec), HPX_MOVE(func), n);
 
                 // wait for all threads to finish executing and return the first
                 // result that passes the predicate, properly handle exceptions
                 // do not schedule new thread for the lambda
                 return hpx::dataflow(
                     hpx::launch::sync,
-                    [](std::vector<future_type>&& results) mutable -> void {
+                    [](auto&& results) mutable -> void {
                         std::exception_ptr ex;
 
                         std::size_t count = 0;
-                        for (auto&& f : HPX_MOVE(results))
+                        // clang-format off
+                        if constexpr (hpx::traits::is_future_v<
+                                          decltype(results)>)
+                        // clang-format on
                         {
-                            if (f.has_exception())
+                            if (results.has_exception())
                             {
                                 // rethrow abort_replicate_exception, if caught
-                                ex = detail::rethrow_on_abort_replicate(f);
+                                ex =
+                                    detail::rethrow_on_abort_replicate(results);
                             }
                             else
                             {
                                 ++count;
+                            }
+                        }
+                        else
+                        {
+                            for (auto&& f : HPX_MOVE(results))
+                            {
+                                if (f.has_exception())
+                                {
+                                    // rethrow abort_replicate_exception, if caught
+                                    ex = detail::rethrow_on_abort_replicate(f);
+                                }
+                                else
+                                {
+                                    ++count;
+                                }
                             }
                         }
 

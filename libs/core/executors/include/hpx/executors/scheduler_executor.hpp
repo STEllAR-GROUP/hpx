@@ -243,7 +243,7 @@ namespace hpx::execution::experimental {
 
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
-        decltype(auto) bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
+        auto bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
         {
             using shape_element =
                 typename hpx::traits::range_traits<S>::value_type;
@@ -252,12 +252,8 @@ namespace hpx::execution::experimental {
 
             if constexpr (std::is_void_v<result_type>)
             {
-                std::vector<hpx::future<void>> results;
-                results.reserve(1);
-                results.emplace_back(make_future(bulk(schedule(sched_), shape,
-                    hpx::bind_back(
-                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))));
-                return results;
+                return make_future(bulk(schedule(sched_), shape,
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
             }
             else
             {
