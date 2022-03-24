@@ -201,7 +201,10 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`5827` - Add back explicit template parameter to `ignore_while_checking` to compile with nvcc
+* :hpx-pr:`5823` - Remove obsolete directories and adjust build system
 * :hpx-pr:`5821` - Enable permissive- flag on Windows GitHub actions builders
+* :hpx-pr:`5819` - Marking customization points for intrusive_ptr as noexcept
 * :hpx-pr:`5818` - Unconditionally use C++17 attributes
 * :hpx-pr:`5817` - Modernize naming modules
 * :hpx-pr:`5816` - Modernize cache module
