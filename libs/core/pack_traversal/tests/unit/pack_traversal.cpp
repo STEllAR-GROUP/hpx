@@ -192,7 +192,7 @@ struct my_allocator
         return std::allocator<T>{}.allocate(n);
     }
 
-    void deallocate(pointer p, size_type n)
+    void deallocate(pointer p, size_type n) noexcept
     {
         return std::allocator<T>{}.deallocate(p, n);
     }

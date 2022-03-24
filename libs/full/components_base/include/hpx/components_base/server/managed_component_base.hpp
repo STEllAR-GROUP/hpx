@@ -138,7 +138,8 @@ namespace hpx { namespace components {
         struct manage_lifetime<traits::managed_object_controls_lifetime>
         {
             template <typename Component>
-            static void call(Component* component)
+            static void call(Component* component) noexcept(
+                noexcept(component->finalize()))
             {
                 // The managed_component controls the lifetime of the
                 // component implementation.
@@ -261,14 +262,16 @@ namespace hpx { namespace components {
 
     // reference counting
     template <typename Component, typename Derived>
-    void intrusive_ptr_add_ref(managed_component<Component, Derived>* p)
+    void intrusive_ptr_add_ref(
+        managed_component<Component, Derived>* p) noexcept
     {
         detail_adl_barrier::manage_lifetime<
             traits::managed_component_dtor_policy_t<Component>>::
             addref(p->component_);
     }
     template <typename Component, typename Derived>
-    void intrusive_ptr_release(managed_component<Component, Derived>* p)
+    void intrusive_ptr_release(
+        managed_component<Component, Derived>* p) noexcept
     {
         detail_adl_barrier::manage_lifetime<
             traits::managed_component_dtor_policy_t<Component>>::
@@ -457,10 +460,10 @@ namespace hpx { namespace components {
     public:
         // reference counting
         template <typename C, typename D>
-        friend void intrusive_ptr_add_ref(managed_component<C, D>* p);
+        friend void intrusive_ptr_add_ref(managed_component<C, D>* p) noexcept;
 
         template <typename C, typename D>
-        friend void intrusive_ptr_release(managed_component<C, D>* p);
+        friend void intrusive_ptr_release(managed_component<C, D>* p) noexcept;
 
     protected:
         Component* component_;

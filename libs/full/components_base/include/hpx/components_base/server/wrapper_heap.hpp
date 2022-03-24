@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace detail {
             {
                 return alloc_.allocate(size);
             }
-            static void free(void* p, std::size_t count)
+            static void free(void* p, std::size_t count) noexcept
             {
                 alloc_.deallocate(static_cast<char*>(p), count);
             }

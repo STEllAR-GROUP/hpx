@@ -1457,7 +1457,7 @@ namespace hpx { namespace threads {
     }
 
     /// Free memory that was previously allocated by allocate
-    void topology::deallocate(void* addr, std::size_t len) const
+    void topology::deallocate(void* addr, std::size_t len) const noexcept
     {
         hwloc_free(topo, addr, len);
     }

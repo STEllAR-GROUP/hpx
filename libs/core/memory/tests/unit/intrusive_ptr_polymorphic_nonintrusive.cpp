@@ -43,12 +43,12 @@ void save(Archive& ar, const D& d, unsigned)
 }
 HPX_SERIALIZATION_SPLIT_FREE(D)
 
-void intrusive_ptr_add_ref(D* d)
+void intrusive_ptr_add_ref(D* d) noexcept
 {
     ++d->count;
 }
 
-void intrusive_ptr_release(D* d)
+void intrusive_ptr_release(D* d) noexcept
 {
     if (--d->count == 0)
     {

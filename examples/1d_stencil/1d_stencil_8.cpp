@@ -114,7 +114,7 @@ private:
         buffer_type data_;
     };
 
-    static void deallocate(double* p)
+    static void deallocate(double* p) noexcept
     {
         alloc_.deallocate(p);
     }

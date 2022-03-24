@@ -81,7 +81,7 @@ namespace hpx { namespace util {
             return p;
         }
 
-        void deallocate(pointer p, size_type n)
+        void deallocate(pointer p, size_type n) noexcept
         {
             HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
         }

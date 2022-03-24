@@ -569,7 +569,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        static void deallocate(threads::thread_data* p)
+        static void deallocate(threads::thread_data* p) noexcept
         {
             using threads::thread_data;
             p->~thread_data();

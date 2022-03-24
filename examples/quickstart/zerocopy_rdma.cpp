@@ -65,7 +65,7 @@ public:
         return static_cast<T*>(pointer_);
     }
 
-    void deallocate(pointer p, size_type n)
+    void deallocate(pointer p, size_type n) noexcept
     {
         HPX_ASSERT(p == pointer_ && n == size_);
         HPX_UNUSED(p);

@@ -85,8 +85,7 @@ namespace hpx { namespace mpi { namespace experimental {
             void add_callback()
             {
                 add_request_callback(
-                    [fdp = hpx::memory::intrusive_ptr<future_data>(this)](
-                        int status) {
+                    [fdp = hpx::intrusive_ptr<future_data>(this)](int status) {
                         if (status == MPI_SUCCESS)
                         {
                             // mark the future as ready by setting the shared_state
@@ -107,7 +106,7 @@ namespace hpx { namespace mpi { namespace experimental {
 
         // -----------------------------------------------------------------
         // intrusive pointer for future_data
-        using future_data_ptr = memory::intrusive_ptr<future_data>;
+        using future_data_ptr = hpx::intrusive_ptr<future_data>;
 
         // -----------------------------------------------------------------
         // a convenience structure to hold state vars

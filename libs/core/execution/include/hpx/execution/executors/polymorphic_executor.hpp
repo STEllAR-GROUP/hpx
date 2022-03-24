@@ -31,8 +31,10 @@ namespace hpx { namespace parallel { namespace execution {
     namespace detail {
 
         struct shape_iter_impl_base;
-        HPX_CORE_EXPORT void intrusive_ptr_add_ref(shape_iter_impl_base* p);
-        HPX_CORE_EXPORT void intrusive_ptr_release(shape_iter_impl_base* p);
+        HPX_CORE_EXPORT void intrusive_ptr_add_ref(
+            shape_iter_impl_base* p) noexcept;
+        HPX_CORE_EXPORT void intrusive_ptr_release(
+            shape_iter_impl_base* p) noexcept;
 
         struct shape_iter_impl_base
         {
@@ -244,7 +246,7 @@ namespace hpx { namespace parallel { namespace execution {
 
             template <typename T>
             static void _deallocate(
-                void* obj, std::size_t storage_size, bool destroy)
+                void* obj, std::size_t storage_size, bool destroy) noexcept
             {
                 using storage_t =
                     typename std::aligned_storage<sizeof(T), alignof(T)>::type;
@@ -259,7 +261,7 @@ namespace hpx { namespace parallel { namespace execution {
                     delete static_cast<storage_t*>(obj);
                 }
             }
-            void (*deallocate)(void*, std::size_t storage_size, bool);
+            void (*deallocate)(void*, std::size_t storage_size, bool) noexcept;
 
             template <typename T>
             static void* _copy(void* storage, std::size_t storage_size,

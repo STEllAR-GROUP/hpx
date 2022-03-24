@@ -85,7 +85,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         template <typename T>
-        void intrusive_ptr_release(channel_impl_base<T>* p)
+        void intrusive_ptr_release(channel_impl_base<T>* p) noexcept
         {
             if (p->requires_delete())
             {

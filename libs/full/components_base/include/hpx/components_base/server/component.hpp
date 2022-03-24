@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace detail {
             HPX_ASSERT(1 == count);
             return alloc_.allocate(count);
         }
-        void free(void* p, std::size_t count)
+        void free(void* p, std::size_t count) noexcept
         {
             HPX_ASSERT(1 == count);
             alloc_.deallocate(static_cast<Component*>(p), count);

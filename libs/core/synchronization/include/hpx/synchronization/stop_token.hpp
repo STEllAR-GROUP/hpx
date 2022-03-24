@@ -286,13 +286,13 @@ namespace hpx {
 
     private:
         explicit stop_token(
-            memory::intrusive_ptr<detail::stop_state> const& state) noexcept
+            hpx::intrusive_ptr<detail::stop_state> const& state) noexcept
           : state_(state)
         {
         }
 
     private:
-        memory::intrusive_ptr<detail::stop_state> state_;
+        hpx::intrusive_ptr<detail::stop_state> state_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -429,7 +429,7 @@ namespace hpx {
         }
 
     private:
-        hpx::memory::intrusive_ptr<detail::stop_state> state_;
+        hpx::intrusive_ptr<detail::stop_state> state_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -513,7 +513,7 @@ namespace hpx {
 
     private:
         HPX_NO_UNIQUE_ADDRESS Callback callback_;
-        hpx::memory::intrusive_ptr<detail::stop_state> state_;
+        hpx::intrusive_ptr<detail::stop_state> state_;
     };
 
     ////////////////////////////////////////////////////////////////////////////

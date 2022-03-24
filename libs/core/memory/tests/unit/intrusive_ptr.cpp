@@ -65,12 +65,12 @@ namespace N {
             return use_count_;
         }
 
-        inline friend void intrusive_ptr_add_ref(base const* p)
+        inline friend void intrusive_ptr_add_ref(base const* p) noexcept
         {
             ++p->use_count_;
         }
 
-        inline friend void intrusive_ptr_release(base const* p)
+        inline friend void intrusive_ptr_release(base const* p) noexcept
         {
             if (--p->use_count_ == 0)
                 delete p;

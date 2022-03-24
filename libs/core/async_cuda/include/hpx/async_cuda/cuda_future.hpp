@@ -85,7 +85,7 @@ namespace hpx { namespace cuda { namespace experimental {
                     no_addref, alloc)
             {
                 add_event_callback(
-                    [fdp = hpx::memory::intrusive_ptr<future_data>(this)](
+                    [fdp = hpx::intrusive_ptr<future_data>(this)](
                         cudaError_t status) {
                         HPX_ASSERT(status != cudaErrorNotReady);
 

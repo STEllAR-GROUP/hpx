@@ -155,7 +155,7 @@ namespace hpx { namespace threads {
             void* queue, std::ptrdiff_t stacksize,
             thread_id_addref addref = thread_id_addref::yes);
 
-        void destroy() override
+        void destroy() noexcept override
         {
             this->~thread_data_stackful();
             thread_alloc_.deallocate(this, 1);

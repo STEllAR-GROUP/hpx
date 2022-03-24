@@ -101,7 +101,7 @@ namespace hpx { namespace threads { namespace coroutines {
                 return static_cast<char*>(limit) + size;
             }
 
-            void deallocate(void* vp, std::size_t size) const
+            void deallocate(void* vp, std::size_t size) const noexcept
             {
                 HPX_ASSERT(vp);
                 void* limit = static_cast<char*>(vp) - size;
@@ -149,7 +149,7 @@ namespace hpx { namespace threads { namespace coroutines {
                 return static_cast<char*>(limit) + size;
             }
 
-            void deallocate(void* vp, std::size_t size) const
+            void deallocate(void* vp, std::size_t size) const noexcept
             {
                 __splitstack_releasecontext(segments_ctx_);
             }

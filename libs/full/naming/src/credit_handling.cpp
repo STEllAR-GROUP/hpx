@@ -114,7 +114,7 @@ namespace hpx::naming {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        void decrement_refcnt(id_type_impl* p)
+        void decrement_refcnt(id_type_impl* p) noexcept
         {
             // do nothing if it's too late in the game
             if (!get_runtime_ptr())
@@ -124,16 +124,16 @@ namespace hpx::naming {
                 return;
             }
 
-            // Talk to AGAS only if this gid was split at some time in the past,
-            // i.e. if a reference actually left the original locality.
-            // Alternatively we need to go this way if the id has never been
-            // resolved, which means we don't know anything about the component
-            // type.
-            naming::address addr;
-            if (gid_was_split(*p) || !agas::resolve_cached(*p, addr))
+            // guard for wait_abort and other shutdown issues
+            try    // ensure noexcept
             {
-                // guard for wait_abort and other shutdown issues
-                try
+                // Talk to AGAS only if this gid was split at some time in the past,
+                // i.e. if a reference actually left the original locality.
+                // Alternatively we need to go this way if the id has never been
+                // resolved, which means we don't know anything about the component
+                // type.
+                naming::address addr;
+                if (gid_was_split(*p) || !agas::resolve_cached(*p, addr))
                 {
                     // decrement global reference count for the given gid,
                     std::int64_t credits = detail::get_credit_from_gid(*p);
@@ -146,41 +146,34 @@ namespace hpx::naming {
                         agas::decref(*p, credits, ec);
                     }
                 }
-                catch (hpx::exception const& e)
+                else
                 {
-                    LTM_(error).format("Unhandled exception while executing "
-                                       "decrement_refcnt: {}",
-                        e.what());
-                }
-            }
-            else
-            {
-                // If the gid was not split at any point in time we can assume
-                // that the referenced object is fully local.
-                HPX_ASSERT(addr.type_ != naming::address::component_invalid);
+                    // If the gid was not split at any point in time we can assume
+                    // that the referenced object is fully local.
+                    HPX_ASSERT(
+                        addr.type_ != naming::address::component_invalid);
 
-                // Third parameter is the count of how many components to destroy.
-                // FIXME: The address should still be in the cache, but it could
-                // be evicted. It would be nice to have a way to pass the address
-                // directly to destroy_component.
-                try
-                {
+                    // Third parameter is the count of how many components to destroy.
+                    // FIXME: The address should still be in the cache, but it could
+                    // be evicted. It would be nice to have a way to pass the address
+                    // directly to destroy_component.
                     agas::destroy_component(*p, addr);
                 }
-                catch (hpx::exception const& e)
-                {
-                    // This request might come in too late and the thread manager
-                    // was already stopped. We ignore the request if that's the
-                    // case.
-                    if (e.get_error() != invalid_status ||
-                        !threads::threadmanager_is(hpx::state::stopping))
-                    {
-                        // delete local gid representation in any case
-                        delete p;
-                        throw;
-                    }
-                }
             }
+            catch (hpx::exception const& e)
+            {
+                // just fall through
+                LTM_(error).format("Unhandled exception while executing "
+                                   "decrement_refcnt: {}",
+                    e.what());
+            }
+            catch (...)
+            {
+                // just fall through
+                LTM_(error) << "Unhandled exception while executing "
+                               "decrement_refcnt: unknown exception";
+            }
+
             delete p;    // delete local gid representation in any case
         }
 

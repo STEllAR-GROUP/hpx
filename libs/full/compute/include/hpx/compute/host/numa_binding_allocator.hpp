@@ -330,15 +330,22 @@ namespace hpx { namespace compute { namespace host {
         // pointer obtained by an earlier call to allocate(). The argument n
         // must be equal to the first argument of the call to allocate() that
         // originally produced p; otherwise, the behavior is undefined.
-        void deallocate(pointer p, size_type n)
+        void deallocate(pointer p, size_type n) noexcept
         {
-            nba_deb.debug(debug::str<>("deallocate"),
-                "calling membind for size (bytes) ",
-                debug::hex<2>(n * sizeof(T)));
+            try
+            {
+                nba_deb.debug(debug::str<>("deallocate"),
+                    "calling membind for size (bytes) ",
+                    debug::hex<2>(n * sizeof(T)));
 #ifdef NUMA_BINDING_ALLOCATOR_DEBUG_PAGE_BINDING
-            display_binding(p, binding_helper_);
+                display_binding(p, binding_helper_);
 #endif
-            threads::topology().deallocate(p, n * sizeof(T));
+                threads::create_topology().deallocate(p, n * sizeof(T));
+            }
+            catch (...)
+            {
+                ;    // just ignore errors from create_topology
+            }
         }
 
         // Returns the maximum theoretically possible value of n, for which the

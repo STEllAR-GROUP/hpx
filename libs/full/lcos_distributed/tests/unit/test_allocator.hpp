@@ -89,7 +89,7 @@ public:
         return static_cast<pointer>(std::malloc(n * sizeof(T)));
     }
 
-    void deallocate(pointer p, size_type)
+    void deallocate(pointer p, size_type) noexcept
     {
         --count;
         std::free(p);

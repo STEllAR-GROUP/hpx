@@ -485,7 +485,7 @@ namespace hpx { namespace threads { namespace policies {
             work_items_count_.data_ = 0;
         }
 
-        static void deallocate(threads::thread_data* p)
+        static void deallocate(threads::thread_data* p) noexcept
         {
             p->destroy();
         }

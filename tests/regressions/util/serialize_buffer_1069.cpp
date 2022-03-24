@@ -51,7 +51,7 @@ public:
         return std::allocator<T>::allocate(n);
     }
 
-    void deallocate(pointer p, size_type n)
+    void deallocate(pointer p, size_type n) noexcept
     {
         HPX_TEST_EQ(n, static_cast<size_type>(MEMORY_BLOCK_SIZE));
         return std::allocator<T>::deallocate(p, n);
