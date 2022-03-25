@@ -99,7 +99,7 @@ namespace hpx {
         __VA_ARGS__))                                                          \
 /**/
 #define HPX_GET_EXCEPTION_3(errcode, f, msg)                                   \
-    HPX_GET_EXCEPTION_4(errcode, hpx::plain, f, msg)                           \
+    HPX_GET_EXCEPTION_4(errcode, hpx::throwmode::plain, f, msg)                \
 /**/
 #define HPX_GET_EXCEPTION_4(errcode, mode, f, msg)                             \
     hpx::detail::get_exception(errcode, msg, mode, f, __FILE__, __LINE__) /**/

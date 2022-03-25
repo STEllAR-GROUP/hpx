@@ -484,7 +484,7 @@ namespace hpx { namespace performance_counters { namespace server {
         if (!base_counter_id_)
         {
             // get or create the base counter
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             hpx::id_type base_counter_id;
             {
                 // We need to unlock the lock here since get_counter might suspend

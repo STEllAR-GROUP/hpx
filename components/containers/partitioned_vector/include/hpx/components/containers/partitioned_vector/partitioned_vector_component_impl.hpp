@@ -338,7 +338,7 @@ namespace hpx {
         std::shared_ptr<hpx::server::partitioned_vector<T, Data>>
         partitioned_vector_partition<T, Data>::get_ptr() const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         return hpx::get_ptr<server::partitioned_vector<T, Data>>(this->get_id())
             .get(ec);
     }

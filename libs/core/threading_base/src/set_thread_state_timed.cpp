@@ -61,7 +61,7 @@ namespace hpx { namespace threads { namespace detail {
 
         if (!triggered->load())
         {
-            error_code ec(lightweight);    // do not throw
+            error_code ec(throwmode::lightweight);    // do not throw
             set_thread_state(timer_id, thread_schedule_state::pending,
                 my_statex, thread_priority::boost, thread_schedule_hint(),
                 retry_on_active, ec);

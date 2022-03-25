@@ -176,7 +176,7 @@ namespace hpx {
 
         // create the new thread, note that id_ is guaranteed to be valid
         // before the thread function is executed
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         pool->create_thread(data, id_, ec);
         if (ec)
         {

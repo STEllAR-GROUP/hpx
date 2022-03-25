@@ -1166,7 +1166,8 @@ namespace hpx { namespace util {
             // file doesn't exist or is ill-formed
             if (&ec == &throws)
                 throw;
-            ec = make_error_code(e.get_error(), e.what(), hpx::rethrow);
+            ec = make_error_code(
+                e.get_error(), e.what(), hpx::throwmode::rethrow);
             return false;
         }
         return true;

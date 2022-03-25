@@ -81,7 +81,7 @@ namespace hpx { namespace detail {
         for (auto const& t :
             parcelset::detail::get_message_handler_registrations())
         {
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             rtd.register_message_handler(hpx::get<0>(t), hpx::get<1>(t), ec);
         }
         lbt_ << "(3rd stage) pre_main: registered message handlers";

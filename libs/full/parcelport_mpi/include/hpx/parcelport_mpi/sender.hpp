@@ -67,7 +67,7 @@ namespace hpx::parcelset::policies::mpi {
             // Check if sending has been completed....
             if (connection->send())
             {
-                error_code ec(lightweight);
+                error_code ec(throwmode::lightweight);
                 hpx::move_only_function<void(error_code const&,
                     parcelset::locality const&, connection_ptr)>
                     postprocess_handler;

@@ -384,8 +384,8 @@ namespace hpx { namespace runtime_local { namespace detail {
         // hpx::exception
         case hpx::util::hpx_exception:
             e = hpx::detail::construct_exception(
-                hpx::exception(
-                    static_cast<hpx::error>(err_value), what, hpx::rethrow),
+                hpx::exception(static_cast<hpx::error>(err_value), what,
+                    hpx::throwmode::rethrow),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,

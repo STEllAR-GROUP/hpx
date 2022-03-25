@@ -54,7 +54,7 @@ namespace hpx {
     HPX_CORE_EXPORT std::error_category const& get_hpx_category(throwmode mode);
 
     inline std::error_code make_system_error_code(
-        error e, throwmode mode = plain)
+        error e, throwmode mode = throwmode::plain)
     {
         return std::error_code(static_cast<int>(e), get_hpx_category(mode));
     }
@@ -89,7 +89,7 @@ namespace hpx {
         ///               (if mode is \a rethrow).
         ///
         /// \throws nothing
-        explicit error_code(throwmode mode = plain)
+        explicit error_code(throwmode mode = throwmode::plain)
           : std::error_code(make_system_error_code(success, mode))
         {
         }
@@ -105,7 +105,8 @@ namespace hpx {
         ///               (if mode is \a rethrow).
         ///
         /// \throws nothing
-        HPX_CORE_EXPORT explicit error_code(error e, throwmode mode = plain);
+        HPX_CORE_EXPORT explicit error_code(
+            error e, throwmode mode = throwmode::plain);
 
         /// Construct an object of type error_code.
         ///
@@ -123,7 +124,7 @@ namespace hpx {
         ///
         /// \throws nothing
         HPX_CORE_EXPORT error_code(error e, char const* func, char const* file,
-            long line, throwmode mode = plain);
+            long line, throwmode mode = throwmode::plain);
 
         /// Construct an object of type error_code.
         ///
@@ -140,7 +141,7 @@ namespace hpx {
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
         HPX_CORE_EXPORT error_code(
-            error e, char const* msg, throwmode mode = plain);
+            error e, char const* msg, throwmode mode = throwmode::plain);
 
         /// Construct an object of type error_code.
         ///
@@ -161,7 +162,7 @@ namespace hpx {
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
         HPX_CORE_EXPORT error_code(error e, char const* msg, char const* func,
-            char const* file, long line, throwmode mode = plain);
+            char const* file, long line, throwmode mode = throwmode::plain);
 
         /// Construct an object of type error_code.
         ///
@@ -178,7 +179,7 @@ namespace hpx {
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
         HPX_CORE_EXPORT error_code(
-            error e, std::string const& msg, throwmode mode = plain);
+            error e, std::string const& msg, throwmode mode = throwmode::plain);
 
         /// Construct an object of type error_code.
         ///
@@ -200,7 +201,7 @@ namespace hpx {
         ///         the passed string fails).
         HPX_CORE_EXPORT error_code(error e, std::string const& msg,
             char const* func, char const* file, long line,
-            throwmode mode = plain);
+            throwmode mode = throwmode::plain);
 
         /// Return a reference to the error message stored in the hpx::error_code.
         ///
@@ -241,36 +242,39 @@ namespace hpx {
 
     /// @{
     /// \brief Returns a new error_code constructed from the given parameters.
-    inline error_code make_error_code(error e, throwmode mode = plain)
+    inline error_code make_error_code(
+        error e, throwmode mode = throwmode::plain)
     {
         return error_code(e, mode);
     }
     inline error_code make_error_code(error e, char const* func,
-        char const* file, long line, throwmode mode = plain)
+        char const* file, long line, throwmode mode = throwmode::plain)
     {
         return error_code(e, func, file, line, mode);
     }
 
     /// \brief Returns error_code(e, msg, mode).
     inline error_code make_error_code(
-        error e, char const* msg, throwmode mode = plain)
+        error e, char const* msg, throwmode mode = throwmode::plain)
     {
         return error_code(e, msg, mode);
     }
     inline error_code make_error_code(error e, char const* msg,
-        char const* func, char const* file, long line, throwmode mode = plain)
+        char const* func, char const* file, long line,
+        throwmode mode = throwmode::plain)
     {
         return error_code(e, msg, func, file, line, mode);
     }
 
     /// \brief Returns error_code(e, msg, mode).
     inline error_code make_error_code(
-        error e, std::string const& msg, throwmode mode = plain)
+        error e, std::string const& msg, throwmode mode = throwmode::plain)
     {
         return error_code(e, msg, mode);
     }
     inline error_code make_error_code(error e, std::string const& msg,
-        char const* func, char const* file, long line, throwmode mode = plain)
+        char const* func, char const* file, long line,
+        throwmode mode = throwmode::plain)
     {
         return error_code(e, msg, func, file, line, mode);
     }
@@ -281,7 +285,7 @@ namespace hpx {
     ///@}
 
     /// \brief Returns error_code(hpx::success, "success", mode).
-    inline error_code make_success_code(throwmode mode = plain)
+    inline error_code make_success_code(throwmode mode = throwmode::plain)
     {
         return error_code(mode);
     }

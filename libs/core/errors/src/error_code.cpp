@@ -83,14 +83,14 @@ namespace hpx {
     {
         switch (mode)
         {
-        case rethrow:
+        case throwmode::rethrow:
             return get_hpx_rethrow_category();
 
-        case lightweight:
-        case lightweight_rethrow:
+        case throwmode::lightweight:
+        case throwmode::lightweight_rethrow:
             return get_lightweight_hpx_category();
 
-        case plain:
+        case throwmode::plain:
         default:
             break;
         }
@@ -101,7 +101,7 @@ namespace hpx {
     error_code::error_code(error e, throwmode mode)
       : std::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & lightweight))
+        if (e != success && e != no_success && !(mode & throwmode::lightweight))
             exception_ = detail::get_exception(e, "", mode);
     }
 
@@ -109,7 +109,7 @@ namespace hpx {
         error e, char const* func, char const* file, long line, throwmode mode)
       : std::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & lightweight))
+        if (e != success && e != no_success && !(mode & throwmode::lightweight))
         {
             exception_ = detail::get_exception(e, "", mode, func, file, line);
         }
@@ -118,7 +118,7 @@ namespace hpx {
     error_code::error_code(error e, char const* msg, throwmode mode)
       : std::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & lightweight))
+        if (e != success && e != no_success && !(mode & throwmode::lightweight))
             exception_ = detail::get_exception(e, msg, mode);
     }
 
@@ -126,7 +126,7 @@ namespace hpx {
         char const* file, long line, throwmode mode)
       : std::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & lightweight))
+        if (e != success && e != no_success && !(mode & throwmode::lightweight))
         {
             exception_ = detail::get_exception(e, msg, mode, func, file, line);
         }
@@ -135,7 +135,7 @@ namespace hpx {
     error_code::error_code(error e, std::string const& msg, throwmode mode)
       : std::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & lightweight))
+        if (e != success && e != no_success && !(mode & throwmode::lightweight))
             exception_ = detail::get_exception(e, msg, mode);
     }
 
@@ -143,7 +143,7 @@ namespace hpx {
         char const* file, long line, throwmode mode)
       : std::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & lightweight))
+        if (e != success && e != no_success && !(mode & throwmode::lightweight))
         {
             exception_ = detail::get_exception(e, msg, mode, func, file, line);
         }
@@ -156,7 +156,8 @@ namespace hpx {
     }
 
     error_code::error_code(std::exception_ptr const& e)
-      : std::error_code(make_system_error_code(get_error(e), rethrow))
+      : std::error_code(
+            make_system_error_code(get_error(e), throwmode::rethrow))
       , exception_(e)
     {
     }
@@ -183,8 +184,8 @@ namespace hpx {
       : std::error_code(rhs.value() == success ?
                 make_success_code(
                     (category() == get_lightweight_hpx_category()) ?
-                        hpx::lightweight :
-                        hpx::plain) :
+                        hpx::throwmode::lightweight :
+                        hpx::throwmode::plain) :
                 rhs)
       , exception_(rhs.exception_)
     {
@@ -200,8 +201,8 @@ namespace hpx {
                 // if the rhs is a success code, we maintain our throw mode
                 this->std::error_code::operator=(make_success_code(
                     (category() == get_lightweight_hpx_category()) ?
-                        hpx::lightweight :
-                        hpx::plain));
+                        hpx::throwmode::lightweight :
+                        hpx::throwmode::plain));
             }
             else
             {

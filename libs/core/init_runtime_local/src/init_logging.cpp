@@ -35,7 +35,7 @@ namespace hpx { namespace util {
     {
         void operator()(std::ostream& to) const override
         {
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             std::size_t thread_num = hpx::get_worker_thread_num(ec);
 
             if (std::size_t(-1) != thread_num)

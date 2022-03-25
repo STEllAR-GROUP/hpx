@@ -197,7 +197,7 @@ hpx::threads::thread_result_type invoke_worker_timed_suspension(
 {
     worker_timed(delay * 1000);
 
-    hpx::error_code ec(hpx::lightweight);
+    hpx::error_code ec(hpx::throwmode::lightweight);
     hpx::this_thread::suspend(
         hpx::threads::thread_schedule_state::suspended, "suspend", ec);
 

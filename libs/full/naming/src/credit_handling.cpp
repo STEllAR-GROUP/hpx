@@ -142,7 +142,7 @@ namespace hpx::naming {
                     if (get_runtime_ptr())    // -V547
                     {
                         // Fire-and-forget semantics.
-                        error_code ec(lightweight);
+                        error_code ec(throwmode::lightweight);
                         agas::decref(*p, credits, ec);
                     }
                 }
@@ -415,7 +415,7 @@ namespace hpx::naming {
         HPX_ASSERT(0 != credits);
 
         // Fire-and-forget semantics.
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         agas::decref(gid, credits, ec);
     }
 

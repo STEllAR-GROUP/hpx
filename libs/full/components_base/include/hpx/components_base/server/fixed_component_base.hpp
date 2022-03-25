@@ -66,7 +66,7 @@ namespace hpx { namespace components {
             /// is not invalid.
             if (naming::invalid_gid != gid_)
             {
-                error_code ec(lightweight);    // ignore errors
+                error_code ec(throwmode::lightweight);    // ignore errors
                 agas::unbind_gid_local(gid_, ec);
                 gid_ = naming::gid_type();    // invalidate GID
             }

@@ -1252,7 +1252,7 @@ namespace hpx {
                     // Make sure the mask does not contradict the CPU bindings
                     // returned by the system (see #973: Would like option to
                     // report HWLOC bindings).
-                    error_code ec(lightweight);
+                    error_code ec(throwmode::lightweight);
                     std::thread& blob = tm.get_os_thread_handle(i);
                     threads::mask_type boundcpu =
                         top.get_cpubind_mask(blob, ec);
@@ -1789,7 +1789,7 @@ namespace hpx {
         std::size_t global_thread_num, char const* pool_name,
         char const* postfix, bool service_thread)
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         return init_tss_ex(context, type, local_thread_num, global_thread_num,
             pool_name, postfix, service_thread, ec);
     }

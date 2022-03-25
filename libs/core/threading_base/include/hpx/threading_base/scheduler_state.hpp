@@ -60,40 +60,40 @@ namespace hpx {
     "instead."
 
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_invalid = state::invalid;
+    inline constexpr state state_invalid = state::invalid;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_initialized = state::initialized;
+    inline constexpr state state_initialized = state::initialized;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_pre_startup = state::pre_startup;
+    inline constexpr state state_pre_startup = state::pre_startup;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_startup = state::startup;
+    inline constexpr state state_startup = state::startup;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_pre_main = state::pre_main;
+    inline constexpr state state_pre_main = state::pre_main;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_starting = state::starting;
+    inline constexpr state state_starting = state::starting;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_running = state::running;
+    inline constexpr state state_running = state::running;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_suspended = state::suspended;
+    inline constexpr state state_suspended = state::suspended;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_pre_sleep = state::pre_sleep;
+    inline constexpr state state_pre_sleep = state::pre_sleep;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_sleeping = state::sleeping;
+    inline constexpr state state_sleeping = state::sleeping;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_pre_shutdown = state::pre_shutdown;
+    inline constexpr state state_pre_shutdown = state::pre_shutdown;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_shutdown = state::shutdown;
+    inline constexpr state state_shutdown = state::shutdown;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_stopping = state::stopping;
+    inline constexpr state state_stopping = state::stopping;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_terminating = state::terminating;
+    inline constexpr state state_terminating = state::terminating;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_stopped = state::stopped;
+    inline constexpr state state_stopped = state::stopped;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state first_valid_runtime_state =
+    inline constexpr state first_valid_runtime_state =
         state::first_valid_runtime_state;
     HPX_DEPRECATED_V(1, 8, HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    static inline constexpr state state_last_valid_runtime_state =
+    inline constexpr state state_last_valid_runtime_state =
         state::last_valid_runtime_state;
 
 #undef HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG

@@ -106,7 +106,7 @@ void dispatch_work()
     hpx::apply([jobs, done]() mutable {
         while (true)
         {
-            hpx::error_code ec(hpx::lightweight);
+            hpx::error_code ec(hpx::throwmode::lightweight);
             int value = jobs.get(hpx::launch::sync, ec);
             if (!ec)
             {

@@ -503,7 +503,7 @@ namespace hpx { namespace util {
             LRT_(info).format("attempting to load: {}", p.first.string());
 
             // get the handle of the library
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             hpx::util::plugin::dll d(p.first.string(), p.second);
             d.load_library(ec);
             if (ec)
@@ -524,7 +524,7 @@ namespace hpx { namespace util {
                 LRT_(info).format(
                     "skipping (load_component_factory failed): {}: {}",
                     p.first.string(), get_error_what(ec));
-                ec = error_code(lightweight);    // reinit ec
+                ec = error_code(throwmode::lightweight);    // reinit ec
             }
             else
             {

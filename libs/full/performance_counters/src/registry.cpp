@@ -52,7 +52,7 @@ namespace hpx { namespace performance_counters {
         {
             // if the full type is not available, try to locate the object name
             // as a type only
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             counter_path_elements p;
             get_counter_type_path_elements(type_name, p, ec);
             if (!ec)
@@ -70,7 +70,7 @@ namespace hpx { namespace performance_counters {
         {
             // if the full type is not available, try to locate the object name
             // as a type only
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             counter_path_elements p;
             get_counter_type_path_elements(type_name, p, ec);
             if (!ec)

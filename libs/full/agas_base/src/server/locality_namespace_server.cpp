@@ -70,7 +70,7 @@ namespace hpx { namespace agas { namespace server {
     {
         if (!instance_name_.empty())
         {
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             agas::unregister_name(launch::sync, instance_name_, ec);
         }
     }
