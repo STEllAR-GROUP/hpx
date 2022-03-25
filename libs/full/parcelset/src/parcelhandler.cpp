@@ -1250,6 +1250,12 @@ namespace hpx::parcelset {
         ini_defs.emplace_back(
             "message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:0}");
 #endif
+        ini_defs.emplace_back(
+            "zero_copy_serialization_threshold = "
+            "${HPX_PARCEL_ZERO_COPY_SERIALIZATION_THRESHOLD:" HPX_PP_STRINGIZE(
+                HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) "}");
+        ini_defs.emplace_back("max_background_threads = "
+                              "${HPX_PARCEL_MAX_BACKGROUND_THREADS:-1}");
 
         for (plugins::parcelport_factory_base* f :
             parcelhandler::get_parcelport_factories())

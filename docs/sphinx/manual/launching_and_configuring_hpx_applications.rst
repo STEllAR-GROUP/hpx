@@ -504,6 +504,11 @@ The ``hpx.parcel`` configuration section
      * This property defines whether this :term:`locality` is allowed to utilize
        zero copy optimizations during serialization of :term:`parcel` data. The default
        is the same value as set for ``hpx.parcel.array_optimization``.
+   * * ``hpx.parcel.zero_copy_serialization_threshold``
+     * This property defines the threshold value (in bytes) starting at which the
+       serialization layer will apply zero-copy optimizations for serialized
+       entities. The default value is defined by the preprocessor constant
+       ``HPX_ZERO_COPY_SERIALIZATION_THRESHOLD``.
    * * ``hpx.parcel.async_serialization``
      * This property defines whether this :term:`locality` is allowed to spawn a
        new thread for serialization (this is both for encoding and decoding
@@ -511,6 +516,9 @@ The ``hpx.parcel`` configuration section
    * * ``hpx.parcel.message_handlers``
      * This property defines whether message handlers are loaded. The default is
        ``0``.
+   * * ``hpx.parcel.max_background_threads``
+     * This property defines how many cores should be used to perform background
+       operations. The default is ``-1`` (all cores).
 
 The following settings relate to the TCP/IP parcelport.
 
@@ -520,12 +528,14 @@ The following settings relate to the TCP/IP parcelport.
    enable = ${HPX_HAVE_PARCELPORT_TCP:$[hpx.parcel.enabled]}
    array_optimization = ${HPX_PARCEL_TCP_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
    zero_copy_optimization = ${HPX_PARCEL_TCP_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
+   zero_copy_serialization_threshold =  ${HPX_PARCEL_TCP_ZERO_COPY_SERIALIZATION_THRESHOLD:$[hpx.parcel.zero_copy_serialization_threshold]}
    async_serialization = ${HPX_PARCEL_TCP_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
    parcel_pool_size = ${HPX_PARCEL_TCP_PARCEL_POOL_SIZE:$[hpx.threadpools.parcel_pool_size]}
    max_connections =  ${HPX_PARCEL_TCP_MAX_CONNECTIONS:$[hpx.parcel.max_connections]}
    max_connections_per_locality = ${HPX_PARCEL_TCP_MAX_CONNECTIONS_PER_LOCALITY:$[hpx.parcel.max_connections_per_locality]}
    max_message_size =  ${HPX_PARCEL_TCP_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}
    max_outbound_message_size =  ${HPX_PARCEL_TCP_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}
+   max_background_threads =  ${HPX_PARCEL_TCP_MAX_BACKGROUND_THREADS:$[hpx.parcel.max_background_threads]}
 
 .. _ini_hpx_parcel_tcp:
 
@@ -548,6 +558,11 @@ The following settings relate to the TCP/IP parcelport.
        zero copy optimizations in the TCP/IP parcelport during serialization of
        parcel data. The default is the same value as set for
        ``hpx.parcel.zero_copy_optimization``.
+   * * ``hpx.parcel.tcp.zero_copy_serialization_threshold``
+     * This property defines the threshold value (in bytes) starting at which the
+       serialization layer will apply zero-copy optimizations for serialized
+       entities. The default is the same value as set for
+       ``hpx.parcel.zero_copy_serialization_threshold``.
    * * ``hpx.parcel.tcp.async_serialization``
      * This property defines whether this :term:`locality` is allowed to spawn a
        new thread for serialization in the TCP/IP parcelport (this is both for
@@ -573,6 +588,9 @@ The following settings relate to the TCP/IP parcelport.
      * This property defines the maximum allowed outbound coalesced message size
        which will be transferable through the :term:`parcel` layer. The default is
        taken from ``hpx.parcel.max_outbound_connections``.
+   * * ``hpx.parcel.tcp.max_background_threads``
+     * This property defines how many cores should be used to perform background
+       operations. The default is taken from ``hpx.parcel.max_background_threads``.
 
 The following settings relate to the MPI parcelport. These settings take effect
 only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` is set (the
@@ -589,6 +607,7 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
    processor_name = <MPI_processor_name>
    array_optimization = ${HPX_HAVE_PARCEL_MPI_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
    zero_copy_optimization = ${HPX_HAVE_PARCEL_MPI_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
+   zero_copy_serialization_threshold =  ${HPX_PARCEL_MPI_ZERO_COPY_SERIALIZATION_THRESHOLD:$[hpx.parcel.zero_copy_serialization_threshold]}
    use_io_pool = ${HPX_HAVE_PARCEL_MPI_USE_IO_POOL:$1}
    async_serialization = ${HPX_HAVE_PARCEL_MPI_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
    parcel_pool_size = ${HPX_HAVE_PARCEL_MPI_PARCEL_POOL_SIZE:$[hpx.threadpools.parcel_pool_size]}
@@ -596,6 +615,7 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
    max_connections_per_locality = ${HPX_HAVE_PARCEL_MPI_MAX_CONNECTIONS_PER_LOCALITY:$[hpx.parcel.max_connections_per_locality]}
    max_message_size =  ${HPX_HAVE_PARCEL_MPI_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}
    max_outbound_message_size =  ${HPX_HAVE_PARCEL_MPI_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}
+   max_background_threads =  ${HPX_PARCEL_MPI_MAX_BACKGROUND_THREADS:$[hpx.parcel.max_background_threads]}
 
 .. _ini_hpx_parcel_mpi:
 
@@ -634,6 +654,11 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
        zero copy optimizations in the MPI parcelport during serialization of
        parcel data. The default is the same value as set for
        ``hpx.parcel.zero_copy_optimization``.
+   * * ``hpx.parcel.mpi.zero_copy_serialization_threshold``
+     * This property defines the threshold value (in bytes) starting at which the
+       serialization layer will apply zero-copy optimizations for serialized
+       entities. The default is the same value as set for
+       ``hpx.parcel.zero_copy_serialization_threshold``.
    * * ``hpx.parcel.mpi.use_io_pool``
      * This property can be set to run the progress thread inside of HPX threads
        instead of a separate thread pool. The default is ``1``.
@@ -662,6 +687,9 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
      * This property defines the maximum allowed outbound coalesced message size
        which will be transferable through the :term:`parcel` layer. The default is
        taken from ``hpx.parcel.max_outbound_connections``.
+   * * ``hpx.parcel.tcp.max_background_threads``
+     * This property defines how many cores should be used to perform background
+       operations. The default is taken from ``hpx.parcel.max_background_threads``.
 
 The ``hpx.agas`` configuration section
 ......................................

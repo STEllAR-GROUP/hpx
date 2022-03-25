@@ -36,7 +36,8 @@ namespace hpx::serialization {
         template <typename Container>
         inline std::unique_ptr<erased_output_container> create_output_container(
             Container& buffer, std::vector<serialization_chunk>* chunks,
-            binary_filter* filter, std::false_type)
+            binary_filter* filter,
+            std::size_t zero_copy_serialization_threshold, std::false_type)
         {
             std::unique_ptr<erased_output_container> res;
             if (filter == nullptr)
@@ -49,7 +50,7 @@ namespace hpx::serialization {
                 else
                 {
                     res.reset(new output_container<Container, vector_chunker>(
-                        buffer, chunks));
+                        buffer, chunks, zero_copy_serialization_threshold));
                 }
             }
             else
@@ -63,7 +64,8 @@ namespace hpx::serialization {
                 else
                 {
                     res.reset(new filtered_output_container<Container,
-                        vector_chunker>(buffer, chunks));
+                        vector_chunker>(
+                        buffer, chunks, zero_copy_serialization_threshold));
                 }
             }
             return res;
@@ -72,19 +74,20 @@ namespace hpx::serialization {
         template <typename Container>
         inline std::unique_ptr<erased_output_container> create_output_container(
             Container& buffer, std::vector<serialization_chunk>* chunks,
-            binary_filter* filter, std::true_type)
+            binary_filter* filter,
+            std::size_t zero_copy_serialization_threshold, std::true_type)
         {
             std::unique_ptr<erased_output_container> res;
             if (filter == nullptr)
             {
                 res.reset(new output_container<Container, counting_chunker>(
-                    buffer, chunks));
+                    buffer, chunks, zero_copy_serialization_threshold));
             }
             else
             {
                 res.reset(
                     new filtered_output_container<Container, counting_chunker>(
-                        buffer, chunks));
+                        buffer, chunks, zero_copy_serialization_threshold));
             }
             return res;
         }
@@ -109,9 +112,11 @@ namespace hpx::serialization {
         template <typename Container>
         output_archive(Container& buffer, std::uint32_t flags = 0U,
             std::vector<serialization_chunk>* chunks = nullptr,
-            binary_filter* filter = nullptr)
+            binary_filter* filter = nullptr,
+            std::size_t zero_copy_serialization_threshold = 0)
           : base_type(make_flags(flags, chunks))
           , buffer_(detail::create_output_container(buffer, chunks, filter,
+                zero_copy_serialization_threshold,
                 typename traits::serialization_access_data<
                     Container>::preprocessing_only()))
         {
@@ -133,6 +138,9 @@ namespace hpx::serialization {
             // the same assumptions about the archive format
             save(flags_);
 
+            // send the zero-copy limit
+            save(zero_copy_serialization_threshold);
+
             bool has_filter = filter != nullptr;
             save(has_filter);
 
@@ -146,8 +154,10 @@ namespace hpx::serialization {
         template <typename Container>
         output_archive(Container& buffer, archive_flags flags,
             std::vector<serialization_chunk>* chunks = nullptr,
-            binary_filter* filter = nullptr)
-          : output_archive(buffer, std::uint32_t(flags), chunks, filter)
+            binary_filter* filter = nullptr,
+            std::size_t zero_copy_serialization_threshold = 0)
+          : output_archive(buffer, std::uint32_t(flags), chunks, filter,
+                zero_copy_serialization_threshold)
         {
         }
 

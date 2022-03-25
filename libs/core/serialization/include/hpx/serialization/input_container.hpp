@@ -56,6 +56,8 @@ namespace hpx::serialization {
           , current_(0)
           , filter_()
           , decompressed_size_(inbound_data_size)
+          , zero_copy_serialization_threshold_(
+                HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
           , chunks_(nullptr)
           , current_chunk_(std::size_t(-1))
           , current_chunk_size_(0)
@@ -69,6 +71,8 @@ namespace hpx::serialization {
           , current_(0)
           , filter_()
           , decompressed_size_(inbound_data_size)
+          , zero_copy_serialization_threshold_(
+                HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
           , chunks_(nullptr)
           , current_chunk_(std::size_t(-1))
           , current_chunk_size_(0)
@@ -95,6 +99,18 @@ namespace hpx::serialization {
                         "archive data bstream is too short");
                     return;
                 }
+            }
+        }
+
+        void set_zero_copy_serialization_threshold(
+            std::size_t zero_copy_serialization_threshold) override
+        {
+            zero_copy_serialization_threshold_ =
+                zero_copy_serialization_threshold;
+            if (zero_copy_serialization_threshold_ == 0)
+            {
+                zero_copy_serialization_threshold_ =
+                    HPX_ZERO_COPY_SERIALIZATION_THRESHOLD;
             }
         }
 
@@ -150,7 +166,7 @@ namespace hpx::serialization {
             HPX_ASSERT((std::int64_t) count >= 0);
 
             if (chunks_ == nullptr ||
-                count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD ||
+                count < zero_copy_serialization_threshold_ ||
                 filter_ != nullptr)
             {
                 // fall back to serialization_chunk-less archive
@@ -183,6 +199,7 @@ namespace hpx::serialization {
         std::size_t current_;
         std::unique_ptr<binary_filter> filter_;
         std::size_t decompressed_size_;
+        std::size_t zero_copy_serialization_threshold_;
 
         std::vector<serialization_chunk> const* chunks_;
         std::size_t current_chunk_;
