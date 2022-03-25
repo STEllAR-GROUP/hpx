@@ -132,7 +132,7 @@ namespace hpx {
           , completion_(HPX_MOVE(completion))
           , phase_(false)
         {
-            HPX_ASSERT(expected >= 0 && expected <= (max)());
+            HPX_ASSERT(expected >= 0 && expected <= (max) ());
         }
 
     private:
@@ -213,7 +213,13 @@ namespace hpx {
         /// Effects:        Equivalent to: wait(arrive()).
         void arrive_and_wait()
         {
-            wait(arrive());
+            std::unique_lock<mutex_type> l(mtx_);
+            arrival_token old_phase = arrive_locked(l, 1);
+            if (phase_ == old_phase)
+            {
+                cond_.wait(l, "barrier::wait");
+                HPX_ASSERT(phase_ != old_phase);
+            }
         }
 
         /// Preconditions:  The expected count for the current barrier phase is
