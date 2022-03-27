@@ -223,10 +223,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             /*
             add core partition facility:
-                need to deal with 4 cases: 
-                cores >=1 
-                size_right == 0 
-                cores_left>=1 & cores_right >=1 
+                need to deal with 4 cases:
+                cores >=1
+                size_right == 0
+                cores_left>=1 & cores_right >=1
                 cores_left+cores_right = cores;
             */
 
@@ -238,12 +238,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             if (size_right > 0)
             {
                 double partition_size_ratio =
-                    double(size_left) / (+size_left + size_right);
+                    double(size_left) / (size_left + size_right);
                 // avoid cores_left =0 after integer rounding
                 cores_left = std::max(
                     std::size_t(1), std::size_t(partition_size_ratio * cores));
             }
-            // when size_right==0 & cores==1, cores_right =0, but it should be at least 1.
+            // if size_right==0&cores==1,cores_right =0, should be at least 1.
             std::size_t cores_right =
                 std::max(std::size_t(1), cores - cores_left);
 
