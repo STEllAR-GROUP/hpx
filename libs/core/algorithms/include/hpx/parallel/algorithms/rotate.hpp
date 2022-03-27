@@ -186,7 +186,9 @@ namespace hpx {
 #include <hpx/modules/execution.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 
+#include <hpx/execution/executors/num_cores.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/executors/execution_policy_parameters.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/rotate.hpp>
@@ -197,6 +199,7 @@ namespace hpx {
 #include <hpx/parallel/util/transfer.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -211,30 +214,67 @@ namespace hpx { namespace parallel { inline namespace v1 {
             ExPolicy policy, FwdIter first, FwdIter new_first, Sent last)
         {
             using non_seq = std::false_type;
+            // further inprovements:
+            //add core partition facility
+            //remove unneeded asynchronous code
 
-            auto p = hpx::execution::parallel_task_policy()
-                         .on(policy.executor())
-                         .with(policy.parameters());
+            std::ptrdiff_t size_left = std::distance(first, new_first);
+            std::ptrdiff_t size_right = std::distance(new_first, last);
+
+            /*
+            add core partition facility:
+                need to deal with 4 cases: 
+                cores >=1 
+                size_right == 0 
+                cores_left>=1 & cores_right >=1 
+                cores_left+cores_right = cores;
+            */
+
+            // get number of cores currently used
+            std::size_t cores = execution::processing_units_count(
+                policy.parameters(), policy.executor());
+
+            std::size_t cores_left = 1;
+            if (size_right > 0)
+            {
+                double partition_size_ratio =
+                    double(size_left) / (+size_left + size_right);
+                // avoid cores_left =0 after integer rounding
+                cores_left = std::max(
+                    std::size_t(1), std::size_t(partition_size_ratio * cores));
+            }
+            // when size_right==0 & cores==1, cores_right =0, but it should be at least 1.
+            std::size_t cores_right =
+                std::max(std::size_t(1), cores - cores_left);
+
+            auto p = policy(hpx::execution::task);
+
+            // instantiate num_cores
+            hpx::execution::num_cores numcores1(cores_left);
+            hpx::execution::num_cores numcores2(cores_right);
 
             detail::reverse<FwdIter> r;
+
+            //remove unneeded asynchronous code
             return dataflow(
+                hpx::launch::sync,
                 [=](hpx::future<FwdIter>&& f1,
                     hpx::future<FwdIter>&& f2) mutable
-                -> hpx::future<util::in_out_result<FwdIter, Sent>> {
+                -> util::in_out_result<FwdIter, Sent> {
                     // propagate exceptions
                     f1.get();
                     f2.get();
 
-                    hpx::future<FwdIter> f = r.call2(p, non_seq(), first, last);
-                    return f.then([=](hpx::future<FwdIter>&& f) mutable
-                        -> util::in_out_result<FwdIter, Sent> {
-                        f.get();    // propagate exceptions
-                        std::advance(first, detail::distance(new_first, last));
-                        return util::in_out_result<FwdIter, Sent>{first, last};
-                    });
+                    r.call2(
+                        p(hpx::execution::non_task), non_seq(), first, last);
+
+                    std::advance(first, detail::distance(new_first, last));
+                    return util::in_out_result<FwdIter, Sent>{first, last};
                 },
-                r.call2(p, non_seq(), first, new_first),
-                r.call2(p, non_seq(), new_first, last));
+                r.call2(execution::with_processing_units_count(p, numcores1),
+                    non_seq(), first, new_first),
+                r.call2(execution::with_processing_units_count(p, numcores2),
+                    non_seq(), new_first, last));
         }
 
         template <typename IterPair>
