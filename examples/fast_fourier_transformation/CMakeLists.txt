@@ -17,10 +17,9 @@ foreach(example_program ${example_programs})
    add_hpx_executable(
     ${example_program} INTERNAL_FLAGS
     SOURCES ${sources} ${${example_program}_FLAGS}
-    FOLDER "Examples/fast_fourier_transformation/${example_program}"
+    FOLDER "Examples/fast_fourier_transformation"
   )
 
-
-add_hpx_example_target_dependencies("fft" ${example_program})
+  add_hpx_example_target_dependencies("fft" ${example_program})
 
 endforeach()
