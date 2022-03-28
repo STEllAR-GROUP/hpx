@@ -1326,6 +1326,15 @@ namespace hpx { namespace execution {
             return *this;
         }
 
+        /// Create a new task policy from itself
+        ///
+        /// \returns The task parallel unsequenced policy
+        ///
+        constexpr decltype(auto) operator()(task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
     public:
         /// Return the associated executor object.
         executor_type& executor()
@@ -1394,6 +1403,15 @@ namespace hpx { namespace execution {
         /// \returns The non task unsequenced policy
         ///
         constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
+        /// Create a new task policy from itself
+        ///
+        /// \returns The task unsequenced policy
+        ///
+        constexpr decltype(auto) operator()(task_policy_tag /*tag*/) const
         {
             return *this;
         }

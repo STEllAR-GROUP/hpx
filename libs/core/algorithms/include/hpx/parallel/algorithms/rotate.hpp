@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
-//  Copyright (c)      2021 Chuanqiu He
+//  Copyright (c) 2021-2022 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -201,6 +201,7 @@ namespace hpx {
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <limits>
 #include <type_traits>
 #include <utility>
 
@@ -215,14 +216,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             using non_seq = std::false_type;
             // further inprovements:
-            //add core partition facility
+            //add core partition functionability
             //remove unneeded asynchronous code
 
-            std::ptrdiff_t size_left = std::distance(first, new_first);
-            std::ptrdiff_t size_right = std::distance(new_first, last);
+            std::ptrdiff_t size_left = detail::distance(first, new_first);
+            std::ptrdiff_t size_right = detail::distance(new_first, last);
 
             /*
-            add core partition facility:
+            add core partition functionability:
                 need to deal with 4 cases:
                 cores >=1
                 size_right == 0
@@ -237,15 +238,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::size_t cores_left = 1;
             if (size_right > 0)
             {
-                double partition_size_ratio =
-                    double(size_left) / (size_left + size_right);
+                long partition_size_ratio =
+                    long(size_left) / (size_left + size_right);
                 // avoid cores_left =0 after integer rounding
-                cores_left = std::max(
+                cores_left = (std::max)(
                     std::size_t(1), std::size_t(partition_size_ratio * cores));
             }
             // if size_right==0&cores==1,cores_right =0, should be at least 1.
             std::size_t cores_right =
-                std::max(std::size_t(1), cores - cores_left);
+                (std::max)(std::size_t(1), cores - cores_left);
 
             auto p = policy(hpx::execution::task);
 
