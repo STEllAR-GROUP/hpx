@@ -19,3 +19,5 @@ packages
 .clangd
 /out
 .vs
+.idea
+cmake-build*

@@ -551,6 +551,7 @@ if(APPLE
    OR MSVC
    OR HPX_WITH_CUDA
    OR HPX_WITH_HIP
+   OR HPX_WITH_PARCELPORT_LCI
 )
   set(HPX_WITH_PKGCONFIG_DEFAULT OFF)
 endif()
@@ -1110,6 +1111,29 @@ if(HPX_WITH_NETWORKING)
   )
 
   hpx_option(
+    HPX_WITH_PARCELPORT_LCI BOOL "Enable the LCI based parcelport." OFF
+    CATEGORY "Parcelport"
+  )
+  if(HPX_WITH_PARCELPORT_LCI)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_LCI)
+  endif()
+  # Options for automatically fetching LCI
+  hpx_option(
+    HPX_WITH_FETCH_LCI
+    BOOL
+    "Use FetchContent to fetch LCI. By default an installed LCI will be used. (default: OFF)"
+    OFF
+    CATEGORY "Build Targets"
+    ADVANCED
+  )
+  hpx_option(
+    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch"
+    "d0b8aef0b33a9011e02fb3910e968d2a5e089449" # jiakun-dev-v1.7
+    CATEGORY "Build Targets"
+    ADVANCED
+  )
+
+  hpx_option(
     HPX_WITH_PARCELPORT_TCP BOOL "Enable the TCP based parcelport." ON
     CATEGORY "Parcelport"
   )
@@ -1180,6 +1204,31 @@ if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
   endif()
 endif()
 
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
+  # lci parcelport settings
+  hpx_option(
+    HPX_WITH_PARCELPORT_LCI_ENV
+    STRING
+    "List of environment variables checked to detect LCI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID)."
+    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID"
+    CATEGORY "Parcelport"
+    ADVANCED
+  )
+
+  # This list is to detect whether we run inside an lci environment. If one of
+  # those environment variables is set, the LCI parcelport is enabled by
+  # default. PMI_RANK: Intel MPI and MVAPICH2 OMPI_COMM_WORLD_SIZE: OpenMPI
+  # starting at version 1.3
+  if(HPX_WITH_PARCELPORT_LCI_ENV)
+    string(REPLACE ";" "," hpx_parcelport_lci_env_
+                   "${HPX_WITH_PARCELPORT_LCI_ENV}"
+    )
+    hpx_add_config_define(
+      HPX_HAVE_PARCELPORT_LCI_ENV "\"${hpx_parcelport_lci_env_}\""
+    )
+  endif()
+endif()
+
 # External libraries/frameworks used by sme of the examples and benchmarks
 hpx_option(
   HPX_WITH_EXAMPLES_OPENMP BOOL
@@ -1214,6 +1263,7 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
     set(HPX_WITH_EXAMPLES_QTHREADS OFF)
   endif()
 endif()
+
 hpx_option(
   HPX_WITH_EXAMPLES_HDF5 BOOL
   "Enable examples requiring HDF5 support (default: OFF)." OFF
@@ -2007,6 +2057,10 @@ add_hpx_library_headers_noglob(hpx_external)
 include(HPX_SetupMPI) # must come before APEX
 if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
   hpx_setup_mpi()
+endif()
+include(HPX_SetupLCI)
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
+  hpx_setup_lci()
 endif()
 
 # Setup packages and subprojects

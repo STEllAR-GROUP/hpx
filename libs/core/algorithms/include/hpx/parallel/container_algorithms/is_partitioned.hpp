@@ -10,8 +10,6 @@
 
 #if defined(DOXYGEN)
 namespace hpx { namespace ranges {
-    // clang-format off
-
     /// Determines if the range [first, last) is partitioned.
     ///
     /// \note   Complexity: at most (N) predicate evaluations where
@@ -230,8 +228,6 @@ namespace hpx { namespace ranges {
     typename util::detail::algorithm_result<ExPolicy, bool>::type
     is_partitioned(
         ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj());
-
-    // clang-format on
 }}    // namespace hpx::ranges
 #else
 

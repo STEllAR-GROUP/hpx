@@ -21,6 +21,9 @@ configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_MPI=ON"
+configure_extra_options+=" -DHPX_WITH_PARCELPORT_LCI=ON"
+configure_extra_options+=" -DHPX_WITH_FETCH_LCI=ON"
+configure_extra_options+=" -DLCI_SERVER=ibv"
 configure_extra_options+=" -DHPX_WITH_LOGGING=OFF"
 
 # Make sure HWLOC does not report 'cores'. This is purely an option to enable
