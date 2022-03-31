@@ -109,11 +109,19 @@ General changes
   - ``unique_function`` has been renames to ``move_only_function`` and moved into 
     namespace ``hpx``. ``function`` and ``function_ref`` have been moved into namespace
     ``hpx``.
-
+- The new LCI (Lightweight Communication Interface) parcelport was added that supports
+  irregular and asynchronous applications like graph analysis, sparce linear algebra,
+  modern parallel arhcitectures etc. Major features include
+  - Support for advanced communication primitives like two sided send/recv and
+  one sided remote put.
+  - Better multi-threaded performance.
+  - Explicit user control of communication resource.
+  - Flexible signaling mechanisms (synchronizer, completion queue, active message handler). 
 
 Breaking changes
 ================
 
+- Minimum required C++ standard library is C++17.
 - Support for GCC 7 and Clang 8.0.0 and below has been removed.
 - CUDA  version required updated to 11.4.
 - CMake version required updated to 3.18.
@@ -140,6 +148,7 @@ Breaking changes
 
 Closed issues
 =============
+
 
 * :hpx-issue:`5812` - OctoTiger does not compile with HPX master and CUDA 11.5
 * :hpx-issue:`5784` - HPX failing with co_await and hpx::when_all(futures)
@@ -179,6 +188,7 @@ Closed issues
 * :hpx-issue:`5110` - Tests don't get built
 * :hpx-issue:`5105` - PAPI performance counters not available
 * :hpx-issue:`5002` - hpx::lcos::barrier() results in deadlock
+* :hpx-issue:`4992` - Clang-format the rest of the files
 * :hpx-issue:`4987` - Use std::function in public APIs
 * :hpx-issue:`4871` - HEP: conformance to C++20
 * :hpx-issue:`4822` - Adapt parallel algorithms to C++20
@@ -201,9 +211,14 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`5834` - API docs changes 
+* :hpx-pr:`5829` - Attempting to fix failing barrier test
 * :hpx-pr:`5827` - Add back explicit template parameter to `ignore_while_checking` to compile with nvcc
+* :hpx-pr:`5825` - Steal from neighboring NUMA domain only 
 * :hpx-pr:`5823` - Remove obsolete directories and adjust build system
+* :hpx-pr:`5822` - Clang-format remaining files 
 * :hpx-pr:`5821` - Enable permissive- flag on Windows GitHub actions builders
+* :hpx-pr:`5820` - Convert throwmode enum to enum class
 * :hpx-pr:`5819` - Marking customization points for intrusive_ptr as noexcept
 * :hpx-pr:`5818` - Unconditionally use C++17 attributes
 * :hpx-pr:`5817` - Modernize naming modules
@@ -282,6 +297,7 @@ Closed pull requests
 * :hpx-pr:`5718` - build: refactor sphinx config file 
 * :hpx-pr:`5717` - Creating parcelset modules
 * :hpx-pr:`5716` - Avoid duplicate definition error
+* :hpx-pr:`5715` - The new LCI parcelport for HPX
 * :hpx-pr:`5714` - Refine propagation of HPX_WITH_... options
 * :hpx-pr:`5713` - Significantly reduce CI jobs run on Piz Daint
 * :hpx-pr:`5712` - Updating jenkins configuration for Rostam2.2
