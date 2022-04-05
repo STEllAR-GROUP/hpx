@@ -783,7 +783,7 @@ local and distributed runtime information.
 Typedefs
 --------
 
-.. table:: Typedefs of header ``hpxruntime.hpp``
+.. table:: Typedefs of header ``hpx/runtime.hpp``
 
    =======================================
    Typedef                      
@@ -795,7 +795,7 @@ Typedefs
 Functions
 ---------
 
-.. table:: Functions of header ``hpxruntime.hpp``
+.. table:: Functions of header ``hpx/runtime.hpp``
 
    ===============================================
    Function                      
@@ -817,6 +817,25 @@ Functions
    :cpp:func:`hpx::get_locality_name`
    ===============================================
 
+.. _public_api_header_hpx_source_location:
+
+``hpx/source_location.hpp``
+========================
+
+The header :hpx-header:`libs/full/include/include,hpx/source_location.hpp` corresponds to the 
+C++ standard library header :cppreference-header:`source_location`.
+
+Classes
+-------
+
+.. table:: Classes of header ``hpx/system_error.hpp``
+
+   =================================  ===============================================
+   Class                              C++ standard
+   =================================  ===============================================
+   :cpp:class:`hpx::source_location`  :cppreference-generic:`utility,source_location`
+   =================================  ===============================================
+
 .. _public_api_header_hpx_system_error:
 
 ``hpx/system_error.hpp``
@@ -828,7 +847,7 @@ C++ standard library header :cppreference-header:`system_error`.
 Classes
 -------
 
-.. table:: Classes of header ``hpxsystem_error.hpp``
+.. table:: Classes of header ``hpx/system_error.hpp``
 
    ============================  ========================================
    Class                         C++ standard
@@ -848,10 +867,9 @@ blocks.
 Classes
 -------
 
-.. table:: Classes of header ``hpxtask_black.hpp``
-
+.. table:: Classes of header ``hpx/task_black.hpp``
    =======================================================
-   Class              
+   Class                      
    =======================================================
    :cpp:class:`hpx::parallel::v2::task_canceled_exception`
    :cpp:class:`hpx::parallel::v2::task_block`
@@ -860,10 +878,10 @@ Classes
 Functions
 ---------
 
-.. table:: Functions of header ``hpxtask_black.hpp``
+.. table:: Functions of header ``hpx/task_black.hpp``
 
    ===============================================================
-   Function              
+   Function                      
    ===============================================================
    :cpp:func:`hpx::parallel::v2::define_task_block`
    :cpp:func:`hpx::parallel::v2::define_task_block_restore_thread`
@@ -882,7 +900,7 @@ equivalents are implemented on top of lightweight threads and the |hpx| runtime.
 Classes
 -------
 
-.. table:: Classes of header ``hpxthread.hpp``
+.. table:: Classes of header ``hpx/thread.hpp``
 
    =========================  ======================================
    Class                      C++ standard
@@ -894,7 +912,7 @@ Classes
 Functions
 ---------
 
-.. table:: Functions of header ``hpxthread.hpp``
+.. table:: Functions of header ``hpx/thread.hpp``
 
    =========================================
    Function              
@@ -916,7 +934,7 @@ C++ standard library header :cppreference-header:`semaphore`.
 Classes
 -------
 
-.. table:: Classes of header ``hpxsemaphore.hpp``
+.. table:: Classes of header ``hpx/semaphore.hpp``
 
    ==========================================  =================================================
    Class                                       C++ standard
@@ -936,7 +954,7 @@ C++ standard library header :cppreference-header:`shared_mutex`.
 Classes
 -------
 
-.. table:: Classes of header ``hpxshared_mutex.hpp``
+.. table:: Classes of header ``hpx/shared_mutex.hpp``
 
    ==============================  ===========================================
    Class                           C++ standard
@@ -955,7 +973,7 @@ C++ standard library header :cppreference-header:`stop_token`.
 Constants
 ---------
 
-.. table:: Constants of header ``hpxstop_token.hpp``
+.. table:: Constants of header ``hpx/stop_token.hpp``
 
    ===========================  ======================================================
    Constant                     C++ standard
@@ -966,7 +984,7 @@ Constants
 Classes
 -------
 
-.. table:: Classes of header ``hpxstop_token.hpp``
+.. table:: Classes of header ``hpx/stop_token.hpp``
 
    ================================  ========================================================
    Class                             C++ standard
@@ -989,7 +1007,7 @@ CUDA device code, unlike ``std::tuple``.
 Constants
 ---------
 
-.. table:: Constants of header ``hpxtuple.hpp``
+.. table:: Constants of header ``hpx/tuple.hpp``
 
    ======================  ============================================
    Constant                C++ standard
@@ -1000,7 +1018,7 @@ Constants
 Classes
 -------
 
-.. table:: Classes of header ``hpxtuple.hpp``
+.. table:: Classes of header ``hpx/tuple.hpp``
 
    ================================  ===================================================
    Class                             C++ standard
@@ -1013,7 +1031,7 @@ Classes
 Functions
 ---------
 
-.. table:: Functions of header ``hpxtuple.hpp``
+.. table:: Functions of header ``hpx/tuple.hpp``
 
    =================================  ======================================================
    Function                           C++ standard
@@ -1036,7 +1054,7 @@ C++ standard library header :cppreference-header:`type_traits`.
 Classes
 -------
 
-.. table:: Classes of header ``hpxtype_traits.hpp``
+.. table:: Classes of header ``hpx/type_traits.hpp``
 
    =================================  ==========================================
    Class                              C++ standard
@@ -1056,7 +1074,7 @@ unwrapping futures.
 Classes
 -------
 
-.. table:: Classes of header ``hpxunwrap.hpp``
+.. table:: Classes of header ``hpx/unwrap.hpp``
 
    =========================================
    Class              
@@ -1069,7 +1087,7 @@ Classes
 Functions
 ---------
 
-.. table:: Functions of header ``hpxunwrap.hpp``
+.. table:: Functions of header ``hpx/unwrap.hpp``
 
    ===============================
    Function              

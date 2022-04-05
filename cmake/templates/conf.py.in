@@ -569,7 +569,13 @@ html_theme = 'sphinx_book_theme'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {'logo_only': True}
+html_theme_options = {
+    'logo_only': True,
+    "home_page_in_toc": True,
+    "repository_url": "https://github.com/STEllAR-GROUP/hpx",
+    "use_repository_button": True,
+    "use_issues_button": True
+}
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
