@@ -52,9 +52,26 @@ namespace hpx {
             unknown_deleter = -1,
             unmanaged = 0,             ///< unmanaged GID
             managed = 1,               ///< managed GID
-            managed_move_credit = 2    ///< managed GID which will give up all
+            managed_move_credit = 2    ///< managed GID that will give up all
                                        ///< credits when sent
         };
+
+#define HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG                              \
+    "The unscoped id_type::management_type names are deprecated. Please use "  \
+    "id_type::management_type::state instead."
+
+        HPX_DEPRECATED_V(1, 8, HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        static constexpr management_type unknown_deleter =
+            management_type::unknown_deleter;
+        HPX_DEPRECATED_V(1, 8, HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        static constexpr management_type unmanaged = management_type::unmanaged;
+        HPX_DEPRECATED_V(1, 8, HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        static constexpr management_type managed = management_type::managed;
+        HPX_DEPRECATED_V(1, 8, HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        static constexpr management_type managed_move_credit =
+            management_type::managed_move_credit;
+
+#undef HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG
 
         friend constexpr bool operator<(
             management_type lhs, management_type rhs) noexcept
