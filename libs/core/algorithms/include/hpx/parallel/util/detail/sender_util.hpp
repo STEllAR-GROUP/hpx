@@ -54,10 +54,10 @@ namespace hpx { namespace detail {
     template <typename Tag, typename ExPolicy, typename Predecessor>
     auto then_with_bound_algorithm(Predecessor&& predecessor, ExPolicy&& policy)
     {
-        // If the given execution policy can has a task policy, i.e. the
-        // algorithm can return a future, we use the task policy since we can
-        // then directly return the future as a sender and avoid potential
-        // blocking that may happen internally.
+        // If the given execution policy has a task policy, i.e. the algorithm
+        // can return a future, we use the task policy since we can then
+        // directly return the future as a sender and avoid potential blocking
+        // that may happen internally.
         if constexpr (hpx::execution::detail::has_async_execution_policy_v<
                           ExPolicy>)
         {

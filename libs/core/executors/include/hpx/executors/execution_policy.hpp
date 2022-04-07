@@ -30,10 +30,10 @@
 namespace hpx { namespace execution {
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Default sequential execution policy object.
+    /// \cond NOINTERNAL
     inline constexpr task_policy_tag task{};
-
     inline constexpr non_task_policy_tag non_task{};
+    /// \endcond
 
     namespace detail {
         template <typename T, typename Enable = void>
@@ -41,12 +41,20 @@ namespace hpx { namespace execution {
         {
         };
 
+        // some of the executions policies expose a dummy implementation of the
+        // operator()(task_policy_tag), this make sure that the returned policy
+        // is actually supporting asynchronous execution
+
+        // different versions of clang-format disagree
+        // clang-format off
         template <typename T>
         struct has_async_execution_policy<T,
             std::void_t<decltype(std::declval<std::decay_t<T>>()(task))>>
-          : std::true_type
+          : hpx::is_async_execution_policy<
+                decltype(std::declval<std::decay_t<T>>()(task))>
         {
         };
+        // clang-format on
 
         template <typename T>
         inline constexpr bool has_async_execution_policy_v =
@@ -1313,8 +1321,21 @@ namespace hpx { namespace execution {
         /// policy.
         using execution_category = parallel_execution_tag;
 
+        /// Rebind the type of executor used by this execution policy.
+        template <typename Executor, typename Parameters>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            using type = parallel_unsequenced_policy;
+        };
+
         /// \cond NOINTERNAL
         constexpr parallel_unsequenced_policy() = default;
+
+        template <typename Executor, typename Parameters>
+        constexpr parallel_unsequenced_policy(Executor&&, Parameters&&) noexcept
+        {
+        }
         /// \endcond
 
         /// Create a new non task policy from itself
@@ -1394,8 +1415,21 @@ namespace hpx { namespace execution {
         /// policy.
         using execution_category = sequenced_execution_tag;
 
+        /// Rebind the type of executor used by this execution policy.
+        template <typename Executor, typename Parameters>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            using type = unsequenced_policy;
+        };
+
         /// \cond NOINTERNAL
         constexpr unsequenced_policy() = default;
+
+        template <typename Executor, typename Parameters>
+        constexpr unsequenced_policy(Executor&&, Parameters&&) noexcept
+        {
+        }
         /// \endcond
 
         /// Create a new non task policy from itself
@@ -1468,10 +1502,12 @@ namespace hpx { namespace execution {
         return par.on(executor()).with(parameters());
     }
 
+    // different versions of clang-format disagree
+    // clang-format off
     template <typename Executor, typename Parameters>
     constexpr decltype(auto)
-        sequenced_task_policy_shim<Executor, Parameters>::operator()(
-            non_task_policy_tag /*tag*/) const
+    sequenced_task_policy_shim<Executor, Parameters>::operator()(
+        non_task_policy_tag /*tag*/) const
     {
         return sequenced_policy_shim<Executor, Parameters>{}
             .on(executor())
@@ -1480,13 +1516,14 @@ namespace hpx { namespace execution {
 
     template <typename Executor, typename Parameters>
     constexpr decltype(auto)
-        parallel_task_policy_shim<Executor, Parameters>::operator()(
-            non_task_policy_tag /*tag*/) const
+    parallel_task_policy_shim<Executor, Parameters>::operator()(
+        non_task_policy_tag /*tag*/) const
     {
         return parallel_policy_shim<Executor, Parameters>{}
             .on(executor())
             .with(parameters());
     }
+    // clang-format on
 }}    // namespace hpx::execution
 
 namespace hpx { namespace detail {

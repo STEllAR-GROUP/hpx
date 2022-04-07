@@ -182,6 +182,7 @@ namespace hpx {
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
@@ -215,79 +216,70 @@ namespace hpx { namespace parallel { inline namespace v1 {
             ExPolicy policy, FwdIter first, FwdIter new_first, Sent last)
         {
             using non_seq = std::false_type;
-            // further inprovements:
-            //add core partition functionability
-            //remove unneeded asynchronous code
 
             std::ptrdiff_t size_left = detail::distance(first, new_first);
             std::ptrdiff_t size_right = detail::distance(new_first, last);
-
-            /*
-            add core partition functionability:
-                need to deal with 4 cases:
-                cores >=1
-                size_right == 0
-                cores_left>=1 & cores_right >=1
-                cores_left+cores_right = cores;
-            */
 
             // get number of cores currently used
             std::size_t cores = execution::processing_units_count(
                 policy.parameters(), policy.executor());
 
+            // calculate number of cores to be used for left and right section
+            // proportional to the ratio of their sizes
             std::size_t cores_left = 1;
             if (size_right > 0)
             {
-                long partition_size_ratio =
-                    long(size_left) / (size_left + size_right);
-                // avoid cores_left =0 after integer rounding
-                cores_left = (std::max)(
-                    std::size_t(1), std::size_t(partition_size_ratio * cores));
+                std::size_t partition_size_ratio = std::size_t(size_left) /
+                    std::size_t(size_left + size_right);
+
+                // avoid cores_left = 0 after integer rounding
+                cores_left =
+                    (std::max)(std::size_t(1), partition_size_ratio * cores);
             }
-            // if size_right==0&cores==1,cores_right =0, should be at least 1.
+
+            // if size_right == 0 && cores == 1, cores_right = 0, should be at least 1.
             std::size_t cores_right =
                 (std::max)(std::size_t(1), cores - cores_left);
 
+            // invoke the reverse operations on the left and right sections
+            // concurrently
             auto p = policy(hpx::execution::task);
-
-            // instantiate num_cores
-            hpx::execution::num_cores numcores1(cores_left);
-            hpx::execution::num_cores numcores2(cores_right);
 
             detail::reverse<FwdIter> r;
 
-            //remove unneeded asynchronous code
             return dataflow(
                 hpx::launch::sync,
-                [=](hpx::future<FwdIter>&& f1,
-                    hpx::future<FwdIter>&& f2) mutable
-                -> util::in_out_result<FwdIter, Sent> {
-                    // propagate exceptions
-                    f1.get();
-                    f2.get();
+                [=](auto&& f1, auto&& f2) mutable {
+                    // propagate exceptions, if appropriate
+                    if constexpr (hpx::traits::is_future_v<decltype((f1))> &&
+                        hpx::traits::is_future_v<decltype((f2))>)
+                    {
+                        f1.get();
+                        f2.get();
+                    }
 
                     r.call2(
                         p(hpx::execution::non_task), non_seq(), first, last);
 
-                    std::advance(first, detail::distance(new_first, last));
+                    std::advance(first, size_right);
                     return util::in_out_result<FwdIter, Sent>{first, last};
                 },
-                r.call2(execution::with_processing_units_count(p, numcores1),
+                r.call2(execution::with_processing_units_count(p, cores_left),
                     non_seq(), first, new_first),
-                r.call2(execution::with_processing_units_count(p, numcores2),
+                r.call2(execution::with_processing_units_count(p, cores_right),
                     non_seq(), new_first, last));
         }
 
         template <typename IterPair>
         struct rotate : public detail::algorithm<rotate<IterPair>, IterPair>
         {
-            rotate()
+            constexpr rotate() noexcept
               : rotate::algorithm("rotate")
             {
             }
 
             template <typename ExPolicy, typename InIter, typename Sent>
-            static IterPair sequential(
+            static constexpr IterPair sequential(
                 ExPolicy, InIter first, InIter new_first, Sent last)
             {
                 return detail::sequential_rotate(first, new_first, last);
