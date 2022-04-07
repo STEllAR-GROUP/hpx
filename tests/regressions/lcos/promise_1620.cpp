@@ -16,7 +16,10 @@
 
 struct test
 {
-    test() { ++count; }
+    test()
+    {
+        ++count;
+    }
     test(test const&)
     {
         ++count;
@@ -26,14 +29,20 @@ struct test
         ++count;
         return *this;
     }
-    ~test() { --count; }
+    ~test()
+    {
+        --count;
+    }
 
     static std::atomic<int> count;
 };
 
 std::atomic<int> test::count(0);
 
-test call() { return test(); }
+test call()
+{
+    return test();
+}
 HPX_PLAIN_ACTION(call)
 
 void test_leak()

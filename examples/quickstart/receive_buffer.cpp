@@ -12,8 +12,8 @@
 // to use the plain C-main below as the direct main HPX entry point.
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_main.hpp>
 
 #include <cstddef>
 #include <deque>
@@ -50,8 +50,9 @@ struct partition_server : hpx::components::component_base<partition_server>
 
     // Retrieve the neighboring partition
     partition_server(std::size_t partition_num, std::size_t num_elements)
-      : data_(num_elements),
-        left_(hpx::find_from_basename(partition_basename, neighbor(partition_num)))
+      : data_(num_elements)
+      , left_(hpx::find_from_basename(
+            partition_basename, neighbor(partition_num)))
     {
         // fill with some random data
         std::generate(data_.begin(), data_.end(), std::rand);
@@ -78,8 +79,8 @@ public:
     {
         left_.free();
     }
-    HPX_DEFINE_COMPONENT_ACTION(partition_server, release_dependencies,
-        release_dependencies_action)
+    HPX_DEFINE_COMPONENT_ACTION(
+        partition_server, release_dependencies, release_dependencies_action)
 
 public:
     // Other helper functions
@@ -124,7 +125,8 @@ HPX_REGISTER_ACTION(from_right_action)
 typedef partition_server::do_work_action do_work_action;
 HPX_REGISTER_ACTION(do_work_action)
 
-typedef partition_server::release_dependencies_action release_dependencies_action;
+typedef partition_server::release_dependencies_action
+    release_dependencies_action;
 HPX_REGISTER_ACTION(release_dependencies_action)
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -133,23 +135,24 @@ struct partition : hpx::components::client_base<partition, partition_server>
     typedef hpx::components::client_base<partition, partition_server> base_type;
 
     partition(hpx::id_type const& locality, std::size_t partition_num,
-            std::size_t num_elements)
-      : base_type(hpx::new_<partition_server>(
-                locality, partition_num, num_elements
-            )),
-        partition_num_(partition_num),
-        registered_name_(true)
+        std::size_t num_elements)
+      : base_type(
+            hpx::new_<partition_server>(locality, partition_num, num_elements))
+      , partition_num_(partition_num)
+      , registered_name_(true)
     {
         // Register this partition with the runtime so that its neighbor can
         // find it.
-        hpx::register_with_basename(partition_basename, *this, partition_num).get();
+        hpx::register_with_basename(partition_basename, *this, partition_num)
+            .get();
     }
 
-    partition(hpx::future<hpx::id_type> && id)
-      : base_type(std::move(id)),
-        partition_num_(0),
-        registered_name_(false)
-    {}
+    partition(hpx::future<hpx::id_type>&& id)
+      : base_type(std::move(id))
+      , partition_num_(0)
+      , registered_name_(false)
+    {
+    }
 
     ~partition()
     {
@@ -160,10 +163,10 @@ struct partition : hpx::components::client_base<partition, partition_server>
         hpx::future<void> f1 = hpx::async(release_dependencies_action(), *this);
 
         // release the reference held by AGAS
-        hpx::future<void> f2 = hpx::unregister_with_basename(
-            partition_basename, partition_num_);
+        hpx::future<void> f2 =
+            hpx::unregister_with_basename(partition_basename, partition_num_);
 
-        hpx::wait_all(f1, f2);      // ignore exceptions
+        hpx::wait_all(f1, f2);    // ignore exceptions
     }
 
     hpx::future<void> do_work(std::size_t nt)
@@ -198,24 +201,22 @@ hpx::future<void> partition_server::do_work(std::size_t nt)
         //
         // Each timestep depends on a) the previous timestep and b) the
         // received value for the current timestep.
-        result =
-            hpx::dataflow(
-                [this, t, nt](hpx::future<void> result, hpx::future<int> f)
+        result = hpx::dataflow(
+            [this, t, nt](hpx::future<void> result, hpx::future<int> f) {
+                result.get();    // propagate exceptions
+
+                // replace right-most element with received value
+                data_[data_.size() - 1] = f.get();
+
+                // if not last time step, send left-most and rotate left
+                // by one element
+                if (t != nt - 1)
                 {
-                    result.get();       // propagate exceptions
-
-                    // replace right-most element with received value
-                    data_[data_.size()-1] = f.get();
-
-                    // if not last time step, send left-most and rotate left
-                    // by one element
-                    if (t != nt - 1)
-                    {
-                        send_left(t + 1, data_[0]);
-                        std::rotate(data_.begin(), data_.begin() + 1, data_.end());
-                    }
-                },
-                result, receive_right(t));
+                    send_left(t + 1, data_[0]);
+                    std::rotate(data_.begin(), data_.begin() + 1, data_.end());
+                }
+            },
+            result, receive_right(t));
     }
     return result;
 }

@@ -16,13 +16,13 @@
 #include "dimension.hpp"
 
 #if !defined(H5_HAVE_THREADSAFE)
-#error    "This example requires that the HDF5 API is thread-safe. Please provide a suitable version of HDF5."
+#error "This example requires that the HDF5 API is thread-safe." \
+       "Please provide a suitable version of HDF5."
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Interpolation helper functions related to HDF5.
-namespace sheneos
-{
+namespace sheneos {
     ///////////////////////////////////////////////////////////////////////////
     /// Extract the lower and upper bounds of a data range from \a datafilename.
     std::uint64_t extract_data_range(std::string const& datafilename,
@@ -39,6 +39,4 @@ namespace sheneos
     void extract_data(std::string const& datafilename, char const* name,
         double* values, dimension const& dimx, dimension const& dimy,
         dimension const& dimz);
-}
-
-
+}    // namespace sheneos

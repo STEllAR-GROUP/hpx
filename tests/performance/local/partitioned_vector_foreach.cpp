@@ -85,10 +85,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         // retrieve reference time
         std::vector<int> ref(vector_size);
-        std::uint64_t seq_ref =
-            foreach_vector(hpx::execution::seq, ref);
-        std::uint64_t par_ref = foreach_vector(
-            hpx::execution::par.with(cs), ref);    //-V106
+        std::uint64_t seq_ref = foreach_vector(hpx::execution::seq, ref);
+        std::uint64_t par_ref =
+            foreach_vector(hpx::execution::par.with(cs), ref);    //-V106
 
         // sequential hpx::partitioned_vector iteration
         {
@@ -99,8 +98,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                     double(seq_ref)
                       << "\n";
             hpx::cout << "hpx::partitioned_vector<int>(execution::par): "
-                      << foreach_vector(
-                             hpx::execution::par.with(cs), v) /
+                      << foreach_vector(hpx::execution::par.with(cs), v) /
                     double(par_ref)    //-V106
                       << "\n";
         }
@@ -116,8 +114,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                       << "\n";
             hpx::cout << "hpx::partitioned_vector<int>(execution::par, "
                          "container_layout(2)): "
-                      << foreach_vector(
-                             hpx::execution::par.with(cs), v) /
+                      << foreach_vector(hpx::execution::par.with(cs), v) /
                     double(par_ref)    //-V106
                       << "\n";
         }
@@ -133,8 +130,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                       << "\n";
             hpx::cout << "hpx::partitioned_vector<int>(execution::par, "
                          "container_layout(10)): "
-                      << foreach_vector(
-                             hpx::execution::par.with(cs), v) /
+                      << foreach_vector(hpx::execution::par.with(cs), v) /
                     double(par_ref)    //-V106
                       << "\n";
         }

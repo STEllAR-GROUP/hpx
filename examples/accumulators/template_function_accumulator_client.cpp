@@ -63,8 +63,8 @@ int hpx_main()
                 else if (cmd[0] == "addint")
                 {
                     if (cmd.size() != 2)
-                        std::cout << "error: invalid command '"
-                                  << line << "'" << std::endl
+                        std::cout << "error: invalid command '" << line << "'"
+                                  << std::endl
                                   << help << std::endl;
                     else
                         accu.add(hpx::util::from_string<int>(cmd[1]));
@@ -73,8 +73,8 @@ int hpx_main()
                 else if (cmd[0] == "addfloat")
                 {
                     if (cmd.size() != 2)
-                        std::cout << "error: invalid command '"
-                                  << line << "'" << std::endl
+                        std::cout << "error: invalid command '" << line << "'"
+                                  << std::endl
                                   << help << std::endl;
                     else
                         accu.add(hpx::util::from_string<double>(cmd[1]));
@@ -90,8 +90,8 @@ int hpx_main()
                     break;
 
                 else
-                    std::cout << "error: invalid command '"
-                              << line << "'" << std::endl
+                    std::cout << "error: invalid command '" << line << "'"
+                              << std::endl
                               << help << std::endl;
             }
 
@@ -108,9 +108,7 @@ int main(int argc, char* argv[])
 {
     // We force this example to use 2 threads by default as one of the threads
     // will be sitting most of the time in the kernel waiting for user input.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=2"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=2"};
 
     // Initialize and run HPX.
     hpx::init_params init_args;

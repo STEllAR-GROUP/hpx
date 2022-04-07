@@ -7,8 +7,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "htts2.hpp"
 #include <hpx/modules/format.hpp>
+#include "htts2.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -21,7 +21,8 @@ struct omp_driver : htts2::driver
 {
     omp_driver(int argc, char** argv)
       : htts2::driver(argc, argv)
-    {}
+    {
+    }
 
     void run()
     {
@@ -35,7 +36,7 @@ struct omp_driver : htts2::driver
         print_results(results);
     }
 
-  private:
+private:
     typedef double results_type;
 
     results_type kernel()
@@ -46,23 +47,24 @@ struct omp_driver : htts2::driver
 
         htts2::timer<BaseClock> t;
 
-        #pragma omp parallel
-        #pragma omp single
+#pragma omp parallel
+#pragma omp single
         {
             // One stager per OS-thread.
             for (std::uint64_t n = 0; n < this->osthreads_; ++n)
-                #if _OPENMP>=200805
-                #pragma omp task untied
-                #endif
+#if _OPENMP >= 200805
+#pragma omp task untied
+#endif
                 for (std::uint64_t m = 0; m < this->tasks_; ++m)
-                    #if _OPENMP>=200805
-                    #pragma omp task untied
-                    #endif
-                    htts2::payload<BaseClock>(this->payload_duration_ /* = p */);
+#if _OPENMP >= 200805
+#pragma omp task untied
+#endif
+                    htts2::payload<BaseClock>(
+                        this->payload_duration_ /* = p */);
 
-            #if _OPENMP>=200805
-            #pragma omp taskwait
-            #endif
+#if _OPENMP >= 200805
+#pragma omp taskwait
+#endif
 
             // w_M [nanoseconds]
             results = t.elapsed();
@@ -83,12 +85,8 @@ struct omp_driver : htts2::driver
                 << "Total Walltime [nanoseconds]"
                 << "\n";
 
-        hpx::util::format_to(std::cout, "{},{},{},{:.14g}\n",
-            this->osthreads_,
-            this->tasks_,
-            this->payload_duration_,
-            results
-        );
+        hpx::util::format_to(std::cout, "{},{},{},{:.14g}\n", this->osthreads_,
+            this->tasks_, this->payload_duration_, results);
     }
 };
 
@@ -100,4 +98,3 @@ int main(int argc, char** argv)
 
     return 0;
 }
-

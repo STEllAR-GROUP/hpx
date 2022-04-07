@@ -64,14 +64,12 @@ int main(int argc, char* argv[])
     using hpx::program_options::value;
 
     // Configure application-specific options
-    options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ( "n-value"
-        , value<std::uint64_t>()->default_value(10)
-        , "n value for the factorial function")
-        ;
+    desc_commandline.add_options()("n-value",
+        value<std::uint64_t>()->default_value(10),
+        "n value for the factorial function");
 
     // Initialize and run HPX
     hpx::init_params init_args;

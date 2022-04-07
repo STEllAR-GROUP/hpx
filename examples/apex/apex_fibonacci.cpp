@@ -44,12 +44,11 @@ std::uint64_t fibonacci(std::uint64_t n)
     // heavy workload.
 
     fibonacci_action fib;
-    hpx::future<std::uint64_t> n1 =
-        hpx::async(fib, locality_id, n - 1);
-    hpx::future<std::uint64_t> n2 =
-        hpx::async(fib, locality_id, n - 2);
+    hpx::future<std::uint64_t> n1 = hpx::async(fib, locality_id, n - 1);
+    hpx::future<std::uint64_t> n2 = hpx::async(fib, locality_id, n - 2);
 
-    return n1.get() + n2.get();   // wait for the Futures to return their values
+    return n1.get() +
+        n2.get();    // wait for the Futures to return their values
 }
 //]
 
@@ -72,7 +71,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 
-    return hpx::finalize(); // Handles HPX shutdown
+    return hpx::finalize();    // Handles HPX shutdown
 }
 //]
 
@@ -83,50 +82,58 @@ int main(int argc, char* argv[])
     apex::apex_options::use_screen_output(true);
 
     // Configure application-specific options
-    hpx::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    hpx::program_options::options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ( "n-value",
-          hpx::program_options::value<std::uint64_t>()->default_value(10),
-          "n value for the Fibonacci function")
-        ;
+    desc_commandline.add_options()("n-value",
+        hpx::program_options::value<std::uint64_t>()->default_value(10),
+        "n value for the Fibonacci function");
 
-    std::set<apex_event_type> when = {APEX_STARTUP, APEX_SHUTDOWN, APEX_NEW_NODE,
-        APEX_NEW_THREAD, APEX_START_EVENT, APEX_STOP_EVENT, APEX_SAMPLE_VALUE};
-    apex::register_policy(when, [](apex_context const& context)->int{
-        switch(context.event_type) {
-            case APEX_STARTUP: {
-              std::cout << "Startup event" << std::endl;
-              break;
-            }
-            case APEX_SHUTDOWN: {
-              std::cout << "Shutdown event" << std::endl;
-              break;
-            }
-            case APEX_NEW_NODE: {
-              std::cout << "New node event" << std::endl;
-              break;
-            }
-            case APEX_NEW_THREAD: {
-              std::cout << "New thread event" << std::endl;
-              break;
-            }
-            case APEX_START_EVENT: {
-              std::cout << "Start event" << std::endl;
-              break;
-            }
-            case APEX_STOP_EVENT: {
-              std::cout << "Stop event" << std::endl;
-              break;
-            }
-            case APEX_SAMPLE_VALUE: {
-              std::cout << "Sample value event" << std::endl;
-              break;
-            }
-            default: {
-              std::cout << "Unknown event" << std::endl;
-            }
+    std::set<apex_event_type> when = {APEX_STARTUP, APEX_SHUTDOWN,
+        APEX_NEW_NODE, APEX_NEW_THREAD, APEX_START_EVENT, APEX_STOP_EVENT,
+        APEX_SAMPLE_VALUE};
+    apex::register_policy(when, [](apex_context const& context) -> int {
+        switch (context.event_type)
+        {
+        case APEX_STARTUP:
+        {
+            std::cout << "Startup event" << std::endl;
+            break;
+        }
+        case APEX_SHUTDOWN:
+        {
+            std::cout << "Shutdown event" << std::endl;
+            break;
+        }
+        case APEX_NEW_NODE:
+        {
+            std::cout << "New node event" << std::endl;
+            break;
+        }
+        case APEX_NEW_THREAD:
+        {
+            std::cout << "New thread event" << std::endl;
+            break;
+        }
+        case APEX_START_EVENT:
+        {
+            std::cout << "Start event" << std::endl;
+            break;
+        }
+        case APEX_STOP_EVENT:
+        {
+            std::cout << "Stop event" << std::endl;
+            break;
+        }
+        case APEX_SAMPLE_VALUE:
+        {
+            std::cout << "Sample value event" << std::endl;
+            break;
+        }
+        default:
+        {
+            std::cout << "Unknown event" << std::endl;
+        }
         }
         return APEX_NOERROR;
     });

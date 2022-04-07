@@ -516,19 +516,18 @@ partition stepper_server::heat_part(
     hpx::shared_future<partition_data> middle_data =
         middle.get_data(partition_server::middle_partition);
 
-    hpx::future<partition_data> next_middle =
-        middle_data.then(hpx::unwrapping(
-            [middle](partition_data const& m) -> partition_data {
-                HPX_UNUSED(middle);
+    hpx::future<partition_data> next_middle = middle_data.then(
+        hpx::unwrapping([middle](partition_data const& m) -> partition_data {
+            HPX_UNUSED(middle);
 
-                // All local operations are performed once the middle data of
-                // the previous time step becomes available.
-                std::size_t size = m.size();
-                partition_data next(size);
-                for (std::size_t i = 1; i != size - 1; ++i)
-                    next[i] = heat(m[i - 1], m[i], m[i + 1]);
-                return next;
-            }));
+            // All local operations are performed once the middle data of
+            // the previous time step becomes available.
+            std::size_t size = m.size();
+            partition_data next(size);
+            for (std::size_t i = 1; i != size - 1; ++i)
+                next[i] = heat(m[i - 1], m[i], m[i + 1]);
+            return next;
+        }));
 
     return hpx::dataflow(hpx::launch::async,
         hpx::unwrapping(
@@ -747,19 +746,17 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()(
         "results", "print generated results (default: false)")("nx",
         value<std::uint64_t>()->default_value(10),
-        "Local x dimension (of each partition)") ("nt",
+        "Local x dimension (of each partition)")("nt",
         value<std::uint64_t>()->default_value(45),
-        "Number of time steps") ("nd",
+        "Number of time steps")("nd", value<std::uint64_t>()->default_value(10),
+        "Number of time steps to allow the dependency tree to grow to")("np",
         value<std::uint64_t>()->default_value(10),
-        "Number of time steps to allow the dependency tree to grow to") ("np",
-        value<std::uint64_t>()->default_value(10),
-        "Number of partitions") ("k", value<double>(&k)->default_value(0.5),
-        "Heat transfer coefficient (default: 0.5)") ("dt",
+        "Number of partitions")("k", value<double>(&k)->default_value(0.5),
+        "Heat transfer coefficient (default: 0.5)")("dt",
         value<double>(&dt)->default_value(1.0),
-        "Timestep unit (default: 1.0[s])") ("dx",
-        value<double>(&dx)->default_value(1.0),
-        "Local x dimension") ("no-header",
-        "do not print out the csv header row");
+        "Timestep unit (default: 1.0[s])")(
+        "dx", value<double>(&dx)->default_value(1.0), "Local x dimension")(
+        "no-header", "do not print out the csv header row");
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities

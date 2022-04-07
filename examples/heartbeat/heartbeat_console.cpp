@@ -8,8 +8,8 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/iostream.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/iostream.hpp>
 
 #include <string>
 #include <vector>
@@ -41,19 +41,16 @@ int hpx_main(hpx::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    hpx::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    hpx::program_options::options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
     using hpx::program_options::value;
-    desc_commandline.add_options()
-        ( "runfor", value<double>()->default_value(600.0),
-          "time to wait before this application exits ([s], default: 600)")
-        ;
+    desc_commandline.add_options()("runfor",
+        value<double>()->default_value(600.0),
+        "time to wait before this application exits ([s], default: 600)");
 
     // we expect other localities to connect
-    std::vector<std::string> const cfg = {
-        "hpx.expect_connecting_localities=1"
-    };
+    std::vector<std::string> const cfg = {"hpx.expect_connecting_localities=1"};
 
     hpx::init_params init_args;
     init_args.desc_cmdline = desc_commandline;

@@ -8,11 +8,11 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/iostream.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/iostream.hpp>
 
 #include <string>
 #include <vector>

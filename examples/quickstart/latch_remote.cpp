@@ -46,9 +46,7 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // make sure hpx_main will run on all localities
-    std::vector<std::string> const cfg = {
-        "hpx.run_hpx_main!=1"
-    };
+    std::vector<std::string> const cfg = {"hpx.run_hpx_main!=1"};
 
     hpx::init_params init_args;
     init_args.cfg = cfg;

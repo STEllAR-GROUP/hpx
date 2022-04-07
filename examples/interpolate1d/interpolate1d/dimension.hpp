@@ -11,8 +11,7 @@
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace interpolate1d
-{
+namespace interpolate1d {
     struct dimension
     {
         dimension()
@@ -22,19 +21,15 @@ namespace interpolate1d
         {
         }
 
-        std::size_t offset_;   // lower index
-        std::size_t count_;    // upper index
-        std::size_t size_;     // overall size of this dimension
+        std::size_t offset_;    // lower index
+        std::size_t count_;     // upper index
+        std::size_t size_;      // overall size of this dimension
     };
-}
+}    // namespace interpolate1d
 
 ///////////////////////////////////////////////////////////////////////////////
 // non-intrusive serialization
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     template <typename Archive>
     void serialize(Archive&, interpolate1d::dimension&, unsigned int const);
-}}
-
-
-
+}}    // namespace hpx::serialization

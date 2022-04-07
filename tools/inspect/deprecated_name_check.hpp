@@ -18,50 +18,50 @@
 
 #include <vector>
 
-namespace boost
-{
-  namespace inspect
-  {
+namespace boost { namespace inspect {
     struct deprecated_names
     {
-      char const* name_regex;
-      char const* use_instead;
+        char const* name_regex;
+        char const* use_instead;
     };
 
     struct deprecated_names_regex_data
     {
-      deprecated_names_regex_data(deprecated_names const* d,
-            std::string const& rx)
-        : data(d), pattern(rx, boost::regex::normal)
-      {}
+        deprecated_names_regex_data(
+            deprecated_names const* d, std::string const& rx)
+          : data(d)
+          , pattern(rx, boost::regex::normal)
+        {
+        }
 
-      deprecated_names const* data;
-      boost::regex pattern;
+        deprecated_names const* data;
+        boost::regex pattern;
     };
 
     class deprecated_name_check : public inspector
     {
-      long m_errors;
-      std::vector<deprecated_names_regex_data> regex_data;
+        long m_errors;
+        std::vector<deprecated_names_regex_data> regex_data;
 
     public:
+        deprecated_name_check();
+        virtual const char* name() const
+        {
+            return "*DN*";
+        }
+        virtual const char* desc() const
+        {
+            return "uses of deprecated names";
+        }
 
-      deprecated_name_check();
-      virtual const char * name() const { return "*DN*"; }
-      virtual const char * desc() const { return "uses of deprecated names"; }
+        virtual void inspect(const std::string& library_name,
+            const path& full_path, const std::string& contents);
 
-      virtual void inspect(
-        const std::string & library_name,
-        const path & full_path,
-        const std::string & contents);
+        virtual void print_summary(std::ostream& out)
+        {
+            out << "  " << m_errors << " deprecated names" << line_break();
+        }
 
-      virtual void print_summary(std::ostream& out)
-      {
-        out << "  " << m_errors << " deprecated names" << line_break();
-      }
-
-      virtual ~deprecated_name_check() {}
+        virtual ~deprecated_name_check() {}
     };
-  }
-}
-
+}}    // namespace boost::inspect

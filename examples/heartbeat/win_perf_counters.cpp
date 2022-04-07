@@ -12,12 +12,12 @@
 // This is code specific to Windows
 #if defined(HPX_WINDOWS)
 
-#include <windows.h>
 #include <perflib.h>
+#include <windows.h>
 #include <winperf.h>
 
-#include "win_perf_counters.hpp"
 #include "hpx_counters.hpp"
+#include "win_perf_counters.hpp"
 
 #include <cstdint>
 #include <iostream>
@@ -33,24 +33,28 @@ void install_windows_counters()
     // CounterInitialize() is created by ctrpp.exe and is present in ucsCounter.h
     // CounterInitialize starts the provider and initializes the counter sets.
     ULONG status = CounterInitialize(nullptr, nullptr, nullptr, nullptr);
-    if (status != ERROR_SUCCESS) {
+    if (status != ERROR_SUCCESS)
+    {
         std::cerr << "CounterInitialize failed with error code: "
                   << std::to_string(status);
         return;
     }
 
     // Create the instances for multiple instance counter set.
-    queue_counter = PerfCreateInstance(HPXHeartBeat, &QueueLengthGuid, L"Instance_1", 0);
-    if (queue_counter == nullptr) {
+    queue_counter =
+        PerfCreateInstance(HPXHeartBeat, &QueueLengthGuid, L"Instance_1", 0);
+    if (queue_counter == nullptr)
+    {
         std::cerr << "PerfCreateInstance for 'sum_queue_counter' failed "
                      "with error code: "
                   << std::to_string(GetLastError());
         return;
     }
 
-    avg_queue_counter = PerfCreateInstance
-        (HPXHeartBeat, &QueueLengthGuid, L"Instance_2", 0);
-    if (avg_queue_counter == nullptr) {
+    avg_queue_counter =
+        PerfCreateInstance(HPXHeartBeat, &QueueLengthGuid, L"Instance_2", 0);
+    if (avg_queue_counter == nullptr)
+    {
         std::cerr << "PerfCreateInstance for 'avg_queue_counter' failed"
                      "with error code: "
                   << std::to_string(GetLastError());
@@ -62,9 +66,10 @@ void install_windows_counters()
 void update_windows_counters(std::uint64_t value)
 {
     // Set raw counter data for queue length.
-    ULONG status = PerfSetULongCounterValue
-        (HPXHeartBeat, queue_counter, 1, ULONG(value));
-    if (status != ERROR_SUCCESS) {
+    ULONG status =
+        PerfSetULongCounterValue(HPXHeartBeat, queue_counter, 1, ULONG(value));
+    if (status != ERROR_SUCCESS)
+    {
         std::cerr << "PerfSetCounterRefValue for 'sum_queue_counter' failed "
                      "with error code: "
                   << std::to_string(GetLastError());
@@ -72,8 +77,10 @@ void update_windows_counters(std::uint64_t value)
     }
 
     // Set raw counter data for average queue length.
-    status = PerfSetULongCounterValue(HPXHeartBeat, avg_queue_counter, 2, ULONG(value));
-    if (status != ERROR_SUCCESS) {
+    status = PerfSetULongCounterValue(
+        HPXHeartBeat, avg_queue_counter, 2, ULONG(value));
+    if (status != ERROR_SUCCESS)
+    {
         std::cerr << "PerfSetCounterRefValue for 'avg_queue_counter' failed "
                      "with error code: "
                   << std::to_string(GetLastError());
@@ -85,11 +92,13 @@ void update_windows_counters(std::uint64_t value)
 void uninstall_windows_counters()
 {
     // uninstall counter instances
-    if (queue_counter) {
+    if (queue_counter)
+    {
         PerfDeleteInstance(HPXHeartBeat, queue_counter);
         queue_counter = 0;
     }
-    if (avg_queue_counter) {
+    if (avg_queue_counter)
+    {
         PerfDeleteInstance(HPXHeartBeat, avg_queue_counter);
         avg_queue_counter = 0;
     }

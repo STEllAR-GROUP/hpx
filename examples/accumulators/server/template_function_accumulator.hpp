@@ -16,8 +16,7 @@
 #include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace examples { namespace server
-{
+namespace examples { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     /// This class is a very simple example of an HPX component. An HPX
     /// component is a class that:
@@ -44,7 +43,10 @@ namespace examples { namespace server
         typedef hpx::lcos::local::spinlock mutex_type;
 
     public:
-        template_function_accumulator() : value_(0) {}
+        template_function_accumulator()
+          : value_(0)
+        {
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
@@ -87,16 +89,18 @@ namespace examples { namespace server
         // by deriving from the HPX facility make_action.
         template <typename T>
         struct add_action
-          : hpx::actions::make_action<void (template_function_accumulator::*)(T),
+          : hpx::actions::make_action<void (template_function_accumulator::*)(
+                                          T),
                 &template_function_accumulator::template add<T>,
                 add_action<T>>::type
-        {};
+        {
+        };
 
     private:
         mutable mutex_type mtx_;
         double value_;
     };
-}}
+}}    // namespace examples::server
 
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::template_function_accumulator::reset_action,

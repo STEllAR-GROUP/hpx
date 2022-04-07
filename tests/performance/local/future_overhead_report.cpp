@@ -124,8 +124,8 @@ void measure_function_futures_create_thread_hierarchical_placement(
                     }
                 };
                 auto const thread_spawn_func =
-                    hpx::threads::detail::thread_function_nullary<
-                        decltype(spawn_func)>{spawn_func};
+                    hpx::threads::detail::thread_function_nullary<decltype(
+                        spawn_func)>{spawn_func};
 
                 hpx::threads::thread_init_data init(
                     hpx::threads::thread_function_type(thread_spawn_func), desc,

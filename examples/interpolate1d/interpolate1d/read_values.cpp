@@ -14,27 +14,25 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Interpolation helper functions related to hdf5
-namespace interpolate1d
-{
+namespace interpolate1d {
     ///////////////////////////////////////////////////////////////////////////
-    inline void
-    read_values(H5::DataSet& dataset, H5::DataSpace& data_space,
+    inline void read_values(H5::DataSet& dataset, H5::DataSpace& data_space,
         hsize_t offset, hsize_t count, double* values)
     {
         using namespace H5;
 
         // Define hyperslab for file based data
-        hsize_t data_offset[1] = { offset };
-        hsize_t data_count[1] = { count };
+        hsize_t data_offset[1] = {offset};
+        hsize_t data_count[1] = {count};
         data_space.selectHyperslab(H5S_SELECT_SET, data_count, data_offset);
 
         // memory dataspace
-        hsize_t mem_dims[1] = { count };
-        DataSpace mem_space (1, mem_dims);
+        hsize_t mem_dims[1] = {count};
+        DataSpace mem_space(1, mem_dims);
 
         // Define hyperslab for data in memory
-        hsize_t mem_offset[1] = { 0 };
-        hsize_t mem_count[1] = { count };
+        hsize_t mem_offset[1] = {0};
+        hsize_t mem_count[1] = {count};
         mem_space.selectHyperslab(H5S_SELECT_SET, mem_count, mem_offset);
 
         // read data to memory
@@ -42,11 +40,12 @@ namespace interpolate1d
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::uint64_t extract_data_range (std::string const& datafilename,
-        double& minval, double& maxval, double& delta,
-        std::size_t start, std::size_t end)
+    std::uint64_t extract_data_range(std::string const& datafilename,
+        double& minval, double& maxval, double& delta, std::size_t start,
+        std::size_t end)
     {
-        try {
+        try
+        {
             using namespace H5;
 
             // Turn off the auto-printing when failure occurs
@@ -72,31 +71,34 @@ namespace interpolate1d
                 end = dims[0];
 
             read_values(dataset, dataspace, start, 1, &minval);
-            read_values(dataset, dataspace, end-1, 1, &maxval);
-            read_values(dataset, dataspace, start+1, 1, &delta);
+            read_values(dataset, dataspace, end - 1, 1, &maxval);
+            read_values(dataset, dataspace, start + 1, 1, &delta);
 
             delta -= minval;
-            return dims[0];     // return size of dataset
+            return dims[0];    // return size of dataset
         }
-        catch (H5::Exception const& e) {
-            HPX_THROW_EXCEPTION(hpx::no_success, "extract_data_range",
-                e.getDetailMsg());
+        catch (H5::Exception const& e)
+        {
+            HPX_THROW_EXCEPTION(
+                hpx::no_success, "extract_data_range", e.getDetailMsg());
         }
-        return 0;   // keep compiler happy
+        return 0;    // keep compiler happy
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void extract_data(std::string const& datafilename, double* values,
-      std::size_t offset, std::size_t count)
+        std::size_t offset, std::size_t count)
     {
-        try {
+        try
+        {
             using namespace H5;
 
             // Turn off the auto-printing when failure occurs
             Exception::dontPrint();
 
             H5File file(datafilename, H5F_ACC_RDONLY);
-            DataSet dataset = file.openDataSet("sine"); // name of data to read
+            DataSet dataset =
+                file.openDataSet("sine");    // name of data to read
             DataSpace dataspace = dataset.getSpace();
 
             // number of dimensions
@@ -114,10 +116,10 @@ namespace interpolate1d
 
             read_values(dataset, dataspace, offset, count, values);
         }
-        catch (H5::Exception const& e) {
-            HPX_THROW_EXCEPTION(hpx::no_success, "extract_data",
-                e.getDetailMsg());
+        catch (H5::Exception const& e)
+        {
+            HPX_THROW_EXCEPTION(
+                hpx::no_success, "extract_data", e.getDetailMsg());
         }
     }
-}
-
+}    // namespace interpolate1d

@@ -6,11 +6,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/string_util/split.hpp>
 #include <hpx/string_util/classification.hpp>
+#include <hpx/string_util/split.hpp>
 
 #include <chrono>
 #include <cstdint>
@@ -31,10 +31,10 @@ using hpx::threads::coroutine_type;
 using std::cout;
 
 ///////////////////////////////////////////////////////////////////////////////
-std::uint64_t payload    = 0;
-std::uint64_t contexts   = 1000;
+std::uint64_t payload = 0;
+std::uint64_t contexts = 1000;
 std::uint64_t iterations = 100000;
-std::uint64_t seed       = 0;
+std::uint64_t seed = 0;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -46,50 +46,41 @@ std::string format_build_date()
     std::time_t current_time = std::chrono::system_clock::to_time_t(now);
 
     std::string ts = std::ctime(&current_time);
-    ts.resize(ts.size()-1);     // remove trailing '\n'
+    ts.resize(ts.size() - 1);    // remove trailing '\n'
     return ts;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_results(
-    double w_M
-    )
+void print_results(double w_M)
 {
     if (header)
     {
         cout << "# BENCHMARK: " << benchmark_name << "\n";
 
         cout << "# VERSION: " << HPX_HAVE_GIT_COMMIT << " "
-                 << format_build_date() << "\n"
+             << format_build_date() << "\n"
              << "#\n";
 
         // Note that if we change the number of fields above, we have to
         // change the constant that we add when printing out the field # for
         // performance counters below (e.g. the last_index part).
-        cout <<
-                "## 0:PLOAD:Payload [micro-seconds] - Independent Variable\n"
+        cout << "## 0:PLOAD:Payload [micro-seconds] - Independent Variable\n"
                 "## 1:OSTHRDS:OS-Threads - Independent Variable\n"
                 "## 2:CTXS:# of Contexts - Independent Variable\n"
                 "## 3:ITER:# of Iterations - Independent Variable\n"
                 "## 4:SEED:PRNG seed - Independent Variable\n"
-                "## 5:WTIME_CS:Walltime/Context Switch [nano-seconds]\n"
-                ;
+                "## 5:WTIME_CS:Walltime/Context Switch [nano-seconds]\n";
     }
 
     std::uint64_t const os_thread_count = hpx::get_os_thread_count();
 
-    double w_T = iterations*payload*os_thread_count*1e-6;
-//     double E = w_T/w_M;
-    double O = w_M-w_T;
+    double w_T = iterations * payload * os_thread_count * 1e-6;
+    //     double E = w_T/w_M;
+    double O = w_M - w_T;
 
-    hpx::util::format_to(cout, "{} {} {} {} {} {:.14g}",
-        payload,
-        os_thread_count,
-        contexts,
-        iterations,
-        seed,
-        (O/(2*iterations*os_thread_count))*1e9
-    );
+    hpx::util::format_to(cout, "{} {} {} {} {} {:.14g}", payload,
+        os_thread_count, contexts, iterations, seed,
+        (O / (2 * iterations * os_thread_count)) * 1e9);
 
     cout << "\n";
 }
@@ -106,7 +97,10 @@ struct kernel
             hpx::threads::invalid_thread_id);
     }
 
-    bool operator!() const { return true; }
+    bool operator!() const
+    {
+        return true;
+    }
 };
 
 double perform_2n_iterations()
@@ -118,14 +112,14 @@ double perform_2n_iterations()
     indices.reserve(iterations);
 
     std::mt19937_64 prng(seed);
-    std::uniform_int_distribution<std::uint64_t>
-        dist(0, contexts - 1);
+    std::uniform_int_distribution<std::uint64_t> dist(0, contexts - 1);
 
     kernel k;
 
     for (std::uint64_t i = 0; i < contexts; ++i)
     {
-        coroutine_type* c = new coroutine_type(k, hpx::threads::invalid_thread_id);
+        coroutine_type* c =
+            new coroutine_type(k, hpx::threads::invalid_thread_id);
         coroutines.push_back(c);
     }
 
@@ -158,9 +152,7 @@ double perform_2n_iterations()
     return elapsed;
 }
 
-int hpx_main(
-    variables_map& vm
-    )
+int hpx_main(variables_map& vm)
 {
     {
         if (vm.count("no-header"))
@@ -171,13 +163,14 @@ int hpx_main(
 
         std::uint64_t const os_thread_count = hpx::get_os_thread_count();
 
-        std::vector<hpx::shared_future<double> > futures;
+        std::vector<hpx::shared_future<double>> futures;
 
         std::uint64_t num_thread = hpx::get_worker_thread_num();
 
         for (std::uint64_t i = 0; i < os_thread_count; ++i)
         {
-            if (num_thread == i) continue;
+            if (num_thread == i)
+                continue;
 
             futures.push_back(hpx::async(&perform_2n_iterations));
         }
@@ -194,36 +187,30 @@ int hpx_main(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(
-    int argc
-  , char* argv[]
-    )
+int main(int argc, char* argv[])
 {
     // Configure application-specific options.
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()
-        ( "payload"
-        , value<std::uint64_t>(&payload)->default_value(0)
-        , "artificial delay of each coroutine")
+    cmdline.add_options()("payload",
+        value<std::uint64_t>(&payload)->default_value(0),
+        "artificial delay of each coroutine")
 
-        ( "contexts"
-        , value<std::uint64_t>(&contexts)->default_value(100000)
-        , "number of contexts use")
+        ("contexts", value<std::uint64_t>(&contexts)->default_value(100000),
+            "number of contexts use")
 
-        ( "iterations"
-        , value<std::uint64_t>(&iterations)->default_value(100000)
-        , "number of iterations to invoke (2 * iterations context switches "
-          "will occur)")
+            ("iterations",
+                value<std::uint64_t>(&iterations)->default_value(100000),
+                "number of iterations to invoke (2 * iterations context "
+                "switches "
+                "will occur)")
 
-        ( "seed"
-        , value<std::uint64_t>(&seed)->default_value(0)
-        , "seed for the pseudo random number generator (if 0, a seed is "
-          "chosen based on the current system time)")
+                ("seed", value<std::uint64_t>(&seed)->default_value(0),
+                    "seed for the pseudo random number generator (if 0, a seed "
+                    "is "
+                    "chosen based on the current system time)")
 
-        ( "no-header"
-        , "do not print out the header")
-        ;
+                    ("no-header", "do not print out the header");
 
     // Initialize and run HPX.
     hpx::init_params init_args;

@@ -164,6 +164,10 @@ jobs:
               cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
               clang-format-11 --version
               clang-format-11 -i **/*.{cpp,hpp}
+              cd /hpx/source/examples
+              clang-format-11 -i **/*.{cpp,hpp}
+              cd /hpx/source/tests
+              clang-format-11 -i **/*.{cpp,hpp}
               git diff --exit-code > /tmp/modified_clang_format_files.txt
       - store_artifacts:
           path: /tmp/modified_clang_format_files.txt

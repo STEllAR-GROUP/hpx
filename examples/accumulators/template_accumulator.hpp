@@ -16,19 +16,17 @@
 
 #include <utility>
 
-namespace examples
-{
+namespace examples {
     ///////////////////////////////////////////////////////////////////////////
     /// Client for the \a server::accumulator component.
     template <typename T>
     class template_accumulator
-      : public hpx::components::client_base<
-            template_accumulator<T>, server::template_accumulator<T>
-        >
+      : public hpx::components::client_base<template_accumulator<T>,
+            server::template_accumulator<T>>
     {
-        typedef hpx::components::client_base<
-            template_accumulator<T>, server::template_accumulator<T>
-        > base_type;
+        typedef hpx::components::client_base<template_accumulator<T>,
+            server::template_accumulator<T>>
+            base_type;
 
         typedef typename server::template_accumulator<T>::argument_type
             argument_type;
@@ -36,18 +34,19 @@ namespace examples
     public:
         /// Default construct an empty client side representation (not
         /// connected to any existing component).
-        template_accumulator()
-        {}
+        template_accumulator() {}
 
         /// Create a client side representation for the existing
         /// \a server::accumulator instance with the given GID.
-        template_accumulator(hpx::future<hpx::id_type> && id)
+        template_accumulator(hpx::future<hpx::id_type>&& id)
           : base_type(std::move(id))
-        {}
+        {
+        }
 
-        template_accumulator(hpx::id_type && id)
+        template_accumulator(hpx::id_type&& id)
           : base_type(std::move(id))
-        {}
+        {
+        }
 
         ///////////////////////////////////////////////////////////////////////
         /// Reset the accumulator's value to 0.
@@ -132,6 +131,6 @@ namespace examples
             return action_type()(this->get_id());
         }
     };
-}
+}    // namespace examples
 
 #endif

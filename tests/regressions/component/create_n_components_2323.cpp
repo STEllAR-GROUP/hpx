@@ -50,10 +50,10 @@ int hpx_main()
 
     typedef hpx::components::client<component_server> client_type;
 
-    hpx::future<std::vector<client_type> > mass_construct =
+    hpx::future<std::vector<client_type>> mass_construct =
         hpx::new_<client_type[]>(hpx::find_here(), test_num_components, a);
 
-    for (auto const& c: mass_construct.get())
+    for (auto const& c : mass_construct.get())
     {
         c.get();
     }
@@ -63,7 +63,7 @@ int hpx_main()
     return hpx::finalize();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     HPX_TEST_EQ(hpx::init(argc, argv), 0);
     return hpx::util::report_errors();

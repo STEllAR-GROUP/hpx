@@ -16,24 +16,23 @@
 #include <hpx/modules/program_options.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-inline bool
-eval(char const* expr, sheneos::interpolator& shen, double ye,
+inline bool eval(char const* expr, sheneos::interpolator& shen, double ye,
     double temp, double rho, std::vector<double> const& expected)
 {
     std::vector<double> results = shen.interpolate(ye, temp, rho);
     std::cout << expr << std::endl;
     std::cout << std::string(strnlen(expr, 256), '-') << std::endl;
 
-    if (results.size() != expected.size()) {
+    if (results.size() != expected.size())
+    {
         std::cout << "Result size mismatch, got: " << results.size()
                   << ", expected: " << expected.size() << std::endl;
         return false;
     }
 
-    for (std::size_t i = 0; i < results.size(); ++i) {
-        std::cout << results[i]
-                  << ", expected: " << expected[i]
-                  << std::endl;
+    for (std::size_t i = 0; i < results.size(); ++i)
+    {
+        std::cout << results[i] << ", expected: " << expected[i] << std::endl;
     }
 
     return true;
@@ -48,21 +47,22 @@ int hpx_main(hpx::program_options::variables_map& vm)
         char const* shen_symbolic_name = "/sheneos_client/test";
 
         std::vector<double> const expected = {
-            9.809012e+34,       // pressure
-            1.602810e+20,       // energy
-            2.843643e+00,       // entropy
-            4.151515e+01,       // munu
-            3.960476e+20,       // cs2
-            2.052315e+08,       // dedt
-            2.864134e+20,       // dpdrhoe
-            3.556341e+14,       // dpderho
+            9.809012e+34,    // pressure
+            1.602810e+20,    // energy
+            2.843643e+00,    // entropy
+            4.151515e+01,    // munu
+            3.960476e+20,    // cs2
+            2.052315e+08,    // dedt
+            2.864134e+20,    // dpdrhoe
+            3.556341e+14,    // dpderho
         };
 
         // create the distributed interpolation object on num_localities
-        sheneos::interpolator shen(datafilename, shen_symbolic_name, num_partitions);
+        sheneos::interpolator shen(
+            datafilename, shen_symbolic_name, num_partitions);
 
-        eval("shen(0.2660725, 63.0, std::pow(10., 14.74994))", shen,
-            0.2660725, 63.0, std::pow(10., 14.74994), expected);
+        eval("shen(0.2660725, 63.0, std::pow(10., 14.74994))", shen, 0.2660725,
+            63.0, std::pow(10., 14.74994), expected);
 
         std::cout << std::endl << std::endl;
 
@@ -88,11 +88,10 @@ int main(int argc, char* argv[])
     hpx::program_options::options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("file", hpx::program_options::value<std::string>()->default_value(
-                "sheneos_220r_180t_50y_extT_analmu_20100322_SVNr28.h5"),
-            "name of HDF5 data file containing the Shen EOS tables")
-        ;
+    desc_commandline.add_options()("file",
+        hpx::program_options::value<std::string>()->default_value(
+            "sheneos_220r_180t_50y_extT_analmu_20100322_SVNr28.h5"),
+        "name of HDF5 data file containing the Shen EOS tables");
 
     // Initialize and run HPX
     hpx::init_params init_args;
@@ -100,4 +99,3 @@ int main(int argc, char* argv[])
 
     return hpx::init(argc, argv, init_args);
 }
-

@@ -16,8 +16,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace hpx { namespace components { namespace server
-{
+namespace hpx { namespace components { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     /// \class random_mem_access random_mem_access.hpp
     /// hpx/components/random_mem_access.hpp
@@ -35,13 +34,16 @@ namespace hpx { namespace components { namespace server
     ///
     class random_mem_access
       : public hpx::components::locking_hook<
-            hpx::components::component_base<random_mem_access> >
+            hpx::components::component_base<random_mem_access>>
     {
     public:
         // constructor: initialize random_mem_access value
         random_mem_access()
-          : arg_(0), arg_init_(0), prefix_(hpx::get_locality_id())
-        {}
+          : arg_(0)
+          , arg_init_(0)
+          , prefix_(hpx::get_locality_id())
+        {
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -63,8 +65,8 @@ namespace hpx { namespace components { namespace server
         {
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"
-                << " Incrementing count from " << arg_
-                << " to " << (arg_ + 1) << "\n";
+                << " Incrementing count from " << arg_ << " to " << (arg_ + 1)
+                << "\n";
             std::cout << oss.str() << std::flush;
 
             arg_ += 1;
@@ -86,8 +88,8 @@ namespace hpx { namespace components { namespace server
         {
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"
-                << " Initial count was " << arg_init_
-                << ", final count is " << arg_ << "\n";
+                << " Initial count was " << arg_init_ << ", final count is "
+                << arg_ << "\n";
             std::cout << oss.str() << std::flush;
         }
 
@@ -106,7 +108,7 @@ namespace hpx { namespace components { namespace server
         std::uint32_t prefix_;
     };
 
-}}}
+}}}    // namespace hpx::components::server
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::random_mem_access::init_action,
@@ -120,6 +122,5 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::random_mem_access::print_action,
     random_mem_access_print_action)
-
 
 #endif

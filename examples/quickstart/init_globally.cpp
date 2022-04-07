@@ -88,8 +88,8 @@ public:
 
         using hpx::placeholders::_1;
         using hpx::placeholders::_2;
-        hpx::function<int(int, char**)> start_function = hpx::bind(
-            &manage_global_runtime_impl::hpx_main, this, _1, _2);
+        hpx::function<int(int, char**)> start_function =
+            hpx::bind(&manage_global_runtime_impl::hpx_main, this, _1, _2);
         hpx::init_params init_args;
         init_args.cfg = cfg;
         init_args.mode = hpx::runtime_mode::default_;
