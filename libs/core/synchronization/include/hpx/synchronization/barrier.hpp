@@ -132,7 +132,10 @@ namespace hpx {
           , completion_(HPX_MOVE(completion))
           , phase_(false)
         {
-            HPX_ASSERT(expected >= 0 && expected <= (max) ());
+            // different versions of clang-format disagree
+            // clang-format off
+            HPX_ASSERT(expected >= 0 && expected <= (max)());
+            // clang-format on
         }
 
     private:
