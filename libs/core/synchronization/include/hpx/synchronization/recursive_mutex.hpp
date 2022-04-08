@@ -1,12 +1,12 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
-//
-//  Part of this code has been adopted from code published under the BSL by:
-//
-//  (C) Copyright 2006-7 Anthony Williams
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+//  Part of this code has been adopted from code published under the BSL by:
+//
+//  (C) Copyright 2006-7 Anthony Williams
 
 #pragma once
 
@@ -21,11 +21,13 @@
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local {
+namespace hpx {
+
     namespace detail {
+
         /// An exclusive-ownership recursive mutex which implements Boost.Thread's
         /// TimedLockable concept.
-        template <typename Mutex = local::spinlock>
+        template <typename Mutex = hpx::spinlock>
         struct recursive_mutex_impl
         {
         public:
@@ -126,4 +128,11 @@ namespace hpx { namespace lcos { namespace local {
     }    // namespace detail
 
     using recursive_mutex = detail::recursive_mutex_impl<>;
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx
+
+namespace hpx::lcos::local {
+
+    using recursive_mutex HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::recursive_mutex is deprecated, use "
+        "hpx::recursive_mutex instead") = hpx::recursive_mutex;
+}    // namespace hpx::lcos::local

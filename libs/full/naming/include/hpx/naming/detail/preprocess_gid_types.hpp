@@ -30,7 +30,7 @@ namespace hpx::serialization::detail {
     // serialization.
     class preprocess_gid_types
     {
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
     public:
         using split_gids_map =

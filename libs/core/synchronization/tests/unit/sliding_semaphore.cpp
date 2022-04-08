@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,7 +23,7 @@ int const initial_count = 42;
 int const num_tasks = 139;
 std::atomic<int> completed_tasks(0);
 
-void worker(hpx::lcos::local::sliding_semaphore& sem)
+void worker(hpx::sliding_semaphore& sem)
 {
     sem.signal(++count);    // signal main thread
 }
@@ -34,7 +34,7 @@ int hpx_main()
     std::vector<hpx::future<void>> futures;
     futures.reserve(num_tasks);
 
-    hpx::lcos::local::sliding_semaphore sem(initial_count);
+    hpx::sliding_semaphore sem(initial_count);
 
     for (std::size_t i = 0; i != num_tasks; ++i)
     {

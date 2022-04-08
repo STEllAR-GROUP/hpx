@@ -13,7 +13,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    using hpx::lcos::local::mutex;
+    using hpx::mutex;
     mutex m1, m2(std::move(m1));
     return 0;
 }

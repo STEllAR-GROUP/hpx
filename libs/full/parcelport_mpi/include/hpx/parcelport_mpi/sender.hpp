@@ -35,11 +35,14 @@ namespace hpx::parcelset::policies::mpi {
         using connection_ptr = std::shared_ptr<connection_type>;
         using connection_list = std::deque<connection_ptr>;
 
+        // different versions of clang-format disagree
+        // clang-format off
         sender() noexcept
-          : next_free_tag_request_((MPI_Request)(-1))
+          : next_free_tag_request_((MPI_Request) (-1))
           , next_free_tag_(-1)
         {
         }
+        // clang-format on
 
         void run() noexcept
         {
@@ -152,10 +155,10 @@ namespace hpx::parcelset::policies::mpi {
             return next_free;
         }
 
-        hpx::lcos::local::spinlock connections_mtx_;
+        hpx::spinlock connections_mtx_;
         connection_list connections_;
 
-        hpx::lcos::local::spinlock next_free_tag_mtx_;
+        hpx::spinlock next_free_tag_mtx_;
         MPI_Request next_free_tag_request_;
         int next_free_tag_;
     };

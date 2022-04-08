@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@
 
 int hpx_main()
 {
-    typedef hpx::lcos::local::shared_mutex shared_mutex_type;
+    typedef hpx::shared_mutex shared_mutex_type;
 
     int data = 0;
     shared_mutex_type mtx;

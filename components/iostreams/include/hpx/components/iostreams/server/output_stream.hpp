@@ -24,14 +24,13 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace iostreams { namespace server
-{
+namespace hpx { namespace iostreams { namespace server {
     struct HPX_IOSTREAMS_EXPORT output_stream
       : components::component_base<output_stream>
     {
         // {{{ types
         typedef components::component_base<output_stream> base_type;
-        typedef lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
         // }}}
 
     private:
@@ -47,45 +46,46 @@ namespace hpx { namespace iostreams { namespace server
             detail::buffer const& in, threads::thread_id_ref_type caller);
 
     public:
-        explicit output_stream(write_function_type write_f_ = write_function_type())
+        explicit output_stream(
+            write_function_type write_f_ = write_function_type())
           : write_f(write_f_)
-        {}
+        {
+        }
 
         // STL OutputIterator
         template <typename Iterator>
         explicit output_stream(Iterator it)
           : write_f(make_iterator_write_function(it))
-        {}
+        {
+        }
 
         // std::ostream
         explicit output_stream(std::ostream& os)
           : write_f(make_std_ostream_write_function(os))
-        {}
+        {
+        }
 
         explicit output_stream(std::reference_wrapper<std::ostream> const& os)
           : write_f(make_std_ostream_write_function(os.get()))
-        {}
+        {
+        }
 
-        void write_async(std::uint32_t locality_id,
-            std::uint64_t count, detail::buffer const& in);
-        void write_sync(std::uint32_t locality_id,
-            std::uint64_t count, detail::buffer const& in);
+        void write_async(std::uint32_t locality_id, std::uint64_t count,
+            detail::buffer const& in);
+        void write_sync(std::uint32_t locality_id, std::uint64_t count,
+            detail::buffer const& in);
 
         HPX_DEFINE_COMPONENT_ACTION(output_stream, write_async)
         HPX_DEFINE_COMPONENT_ACTION(output_stream, write_sync)
     };
-}}}
+}}}    // namespace hpx::iostreams::server
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::iostreams::server::output_stream::write_async_action
-  , output_stream_write_async_action
-)
+    hpx::iostreams::server::output_stream::write_async_action,
+    output_stream_write_async_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::iostreams::server::output_stream::write_sync_action
-  , output_stream_write_sync_action
-)
+    hpx::iostreams::server::output_stream::write_sync_action,
+    output_stream_write_sync_action)
 
 #include <hpx/config/warnings_suffix.hpp>
-
-

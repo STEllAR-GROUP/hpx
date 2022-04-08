@@ -28,7 +28,7 @@ namespace hpx { namespace util {
         template <typename Tag, std::size_t N>
         struct itt_spinlock_init
         {
-            itt_spinlock_init();
+            itt_spinlock_init() noexcept;
             ~itt_spinlock_init();
         };
 #endif
@@ -44,7 +44,7 @@ namespace hpx { namespace util {
 #endif
 
     public:
-        static detail::spinlock& spinlock_for(void const* pv)
+        static detail::spinlock& spinlock_for(void const* pv) noexcept
         {
             std::size_t i = fibhash<N>(reinterpret_cast<std::size_t>(pv));
             return pool_[i].data_;
@@ -57,14 +57,12 @@ namespace hpx { namespace util {
 #if HPX_HAVE_ITTNOTIFY != 0
     namespace detail {
         template <typename Tag, std::size_t N>
-        itt_spinlock_init<Tag, N>::itt_spinlock_init()
+        itt_spinlock_init<Tag, N>::itt_spinlock_init() noexcept
         {
             for (int i = 0; i < N; ++i)
             {
                 HPX_ITT_SYNC_CREATE((&spinlock_pool<Tag, N>::pool_[i].data_),
-                    "util::detail::spinlock", 0);
-                HPX_ITT_SYNC_RENAME((&spinlock_pool<Tag, N>::pool_[i].data_),
-                    "util::detail::spinlock");
+                    "util::detail::spinlock", nullptr);
             }
         }
 

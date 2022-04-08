@@ -85,13 +85,13 @@ namespace hpx::execution::experimental::detail {
                 predecessor_error_types<hpx::variant>, std::exception_ptr>>;
 
         // We use a spinlock here to allow taking the lock on non-HPX threads.
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
         struct shared_state
         {
             // We use a spinlock here to allow taking the lock on non-HPX
             // threads.
-            hpx::lcos::local::condition_variable cond_var;
+            hpx::condition_variable cond_var;
             mutex_type mtx;
             std::atomic<bool> set_called = false;
             hpx::variant<hpx::monostate, error_type, value_type> value;

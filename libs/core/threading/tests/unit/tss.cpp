@@ -16,8 +16,8 @@
 #include <utility>
 #include <vector>
 
-hpx::lcos::local::spinlock check_mutex;
-hpx::lcos::local::spinlock tss_mutex;
+hpx::spinlock check_mutex;
+hpx::spinlock tss_mutex;
 int tss_instances = 0;
 int tss_total = 0;
 
@@ -26,14 +26,14 @@ struct tss_value_t
     tss_value_t(hpx::promise<void> pp)
       : p(std::move(pp))
     {
-        std::unique_lock<hpx::lcos::local::spinlock> lock(tss_mutex);
+        std::unique_lock<hpx::spinlock> lock(tss_mutex);
         ++tss_instances;
         ++tss_total;
         value = 0;
     }
     ~tss_value_t()
     {
-        std::unique_lock<hpx::lcos::local::spinlock> lock(tss_mutex);
+        std::unique_lock<hpx::spinlock> lock(tss_mutex);
         --tss_instances;
         p.set_value();
     }

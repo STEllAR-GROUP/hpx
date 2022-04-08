@@ -1,7 +1,7 @@
 //  (C) Copyright 2005-7 Anthony Williams
 //  (C) Copyright 2005 John Maddock
 //  (C) Copyright 2011-2012 Vicente J. Botet Escriba
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See
@@ -17,7 +17,8 @@
 #include <atomic>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx {
+
     struct once_flag
     {
     public:
@@ -37,7 +38,7 @@ namespace hpx { namespace lcos { namespace local {
         friend void call_once(once_flag& flag, F&& f, Args&&... args);
     };
 
-#define HPX_ONCE_INIT ::hpx::lcos::local::once_flag()
+#define HPX_ONCE_INIT ::hpx::once_flag()
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Args>
@@ -85,4 +86,21 @@ namespace hpx { namespace lcos { namespace local {
             flag.event_.wait();
         }
     }
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx
+
+namespace hpx::lcos::local {
+
+    using once_flag HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::once_flag is deprecated, use hpx::once_flag "
+        "instead") = hpx::once_flag;
+
+    template <typename F, typename... Args>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::call_once is deprecated, use hpx::call_once "
+        "instead")
+    void call_once(hpx::once_flag& flag, F&& f, Args&&... args)
+    {
+        return hpx::call_once(
+            flag, HPX_FORWARD(F, f), HPX_FORWARD(Args, args)...);
+    }
+}    // namespace hpx::lcos::local

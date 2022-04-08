@@ -43,7 +43,7 @@ namespace hpx { namespace agas { namespace server {
     struct HPX_EXPORT locality_namespace
       : components::fixed_component_base<locality_namespace>
     {
-        using mutex_type = lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
         using base_type = components::fixed_component_base<locality_namespace>;
 
         using component_type = std::int32_t;
@@ -76,7 +76,7 @@ namespace hpx { namespace agas { namespace server {
             HPX_NON_COPYABLE(counter_data);
 
         public:
-            typedef lcos::local::spinlock mutex_type;
+            typedef hpx::spinlock mutex_type;
 
             struct api_counter_data
             {

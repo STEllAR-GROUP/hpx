@@ -32,7 +32,7 @@ namespace hpx::parcelset::policies::lci {
         using connection_ptr = std::shared_ptr<connection_type>;
         using connection_list = std::deque<connection_ptr>;
 
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
         sender() noexcept {}
 

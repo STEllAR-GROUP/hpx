@@ -66,7 +66,7 @@ namespace hpx::parcelset {
         // make sure the parcel has been properly initialized
         void init_parcel(parcel& p);
 
-        using mutex_type = lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
     public:
         using handler_key_type = std::pair<locality, std::string>;

@@ -102,7 +102,7 @@ namespace hpx { namespace collectives { namespace detail {
     private:
         struct locality_data
         {
-            hpx::lcos::local::spinlock mtx_;
+            hpx::spinlock mtx_;
             std::map<std::size_t, channel_type> channels_;
         };
 

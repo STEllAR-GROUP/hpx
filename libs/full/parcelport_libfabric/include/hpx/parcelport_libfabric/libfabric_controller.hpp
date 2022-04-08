@@ -86,7 +86,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
     class libfabric_controller
     {
     public:
-        typedef hpx::lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
         typedef hpx::parcelset::policies::libfabric::unique_lock<mutex_type>
             unique_lock;
         typedef hpx::parcelset::policies::libfabric::scoped_lock<mutex_type>
@@ -459,13 +459,17 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
                 throw fabric_error(ret, "fi_open_ops");
             LOG_DEBUG_MSG("domain ops returned " << hexpointer(gni_domain_ops));
 
+            // different versions of clang-format disagree
+            // clang-format off
             ret = gni_domain_ops->set_val(
-                &fabric_domain_->fid, (dom_ops_val_t)(op), &value);
+                &fabric_domain_->fid, (dom_ops_val_t) (op), &value);
             if (ret)
                 throw fabric_error(ret, "set val (ops)");
 
             ret = gni_domain_ops->get_val(
-                &fabric_domain_->fid, (dom_ops_val_t)(op), &get_val);
+                &fabric_domain_->fid, (dom_ops_val_t) (op), &get_val);
+            // clang-format on
+
             LOG_DEBUG_MSG("Cache mode set to " << get_val);
             if (std::string(value) != std::string(get_val))
                 throw fabric_error(ret, "get val");

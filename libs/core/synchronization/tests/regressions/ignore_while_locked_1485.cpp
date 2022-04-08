@@ -1,4 +1,4 @@
-//  Copyright 2015 (c) Hartmut Kaiser
+//  Copyright 2015-2022 (c) Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,8 +20,8 @@
 
 struct wait_for_flag
 {
-    hpx::lcos::local::spinlock mutex;
-    hpx::lcos::local::condition_variable_any cond_var;
+    hpx::spinlock mutex;
+    hpx::condition_variable_any cond_var;
 
     wait_for_flag()
       : flag(false)
@@ -29,8 +29,8 @@ struct wait_for_flag
     {
     }
 
-    void wait(hpx::lcos::local::spinlock& local_mutex,
-        hpx::lcos::local::condition_variable_any& local_cond_var, bool& running)
+    void wait(hpx::spinlock& local_mutex,
+        hpx::condition_variable_any& local_cond_var, bool& running)
     {
         bool first = true;
         while (!flag)
@@ -39,7 +39,7 @@ struct wait_for_flag
             if (first)
             {
                 {
-                    std::lock_guard<hpx::lcos::local::spinlock> lk(local_mutex);
+                    std::lock_guard<hpx::spinlock> lk(local_mutex);
                     running = true;
                 }
 
@@ -47,7 +47,7 @@ struct wait_for_flag
                 local_cond_var.notify_all();
             }
 
-            std::unique_lock<hpx::lcos::local::spinlock> lk(mutex);
+            std::unique_lock<hpx::spinlock> lk(mutex);
             if (!flag)
             {
                 cond_var.wait(mutex);
@@ -65,15 +65,15 @@ void test_condition_with_mutex()
     wait_for_flag data;
 
     bool running = false;
-    hpx::lcos::local::spinlock local_mutex;
-    hpx::lcos::local::condition_variable_any local_cond_var;
+    hpx::spinlock local_mutex;
+    hpx::condition_variable_any local_cond_var;
 
     hpx::thread thread(&wait_for_flag::wait, std::ref(data),
         std::ref(local_mutex), std::ref(local_cond_var), std::ref(running));
 
     // wait for the thread to run
     {
-        std::unique_lock<hpx::lcos::local::spinlock> lk(local_mutex);
+        std::unique_lock<hpx::spinlock> lk(local_mutex);
         // NOLINTNEXTLINE(bugprone-infinite-loop)
         while (!running)
             local_cond_var.wait(lk);
@@ -83,7 +83,7 @@ void test_condition_with_mutex()
     data.flag.store(true);
 
     {
-        std::lock_guard<hpx::lcos::local::spinlock> lock(data.mutex);
+        std::lock_guard<hpx::spinlock> lock(data.mutex);
         hpx::util::ignore_all_while_checking il;
         HPX_UNUSED(il);
 

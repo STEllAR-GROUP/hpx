@@ -11,23 +11,32 @@
 synchronization
 ===============
 
-This module provides synchronization primitives which should be used rather than
+This module provides synchronization primitives that should be used rather than
 the C++ standard ones in |hpx| threads:
 
 * :cpp:class:`hpx::barrier`
-* :cpp:class:`hpx::lcos::local::condition_variable`
-* :cpp:class:`hpx::lcos::local::counting_semaphore`
+* :cpp:class:`hpx::binary_semaphore`
+* :cpp:class:`hpx::call_once`
+* :cpp:class:`hpx::condition_variable`
+* :cpp:class:`hpx::condition_variable_any`
+* :cpp:class:`hpx::counting_semaphore`
 * :cpp:class:`hpx::lcos::local::event`
 * :cpp:class:`hpx::latch`
-* :cpp:class:`hpx::lcos::local::mutex`
-* :cpp:class:`hpx::lcos::local::no_mutex`
-* :cpp:class:`hpx::lcos::local::once_flag`
-* :cpp:class:`hpx::lcos::local::recursive_mutex`
-* :cpp:class:`hpx::lcos::local::shared_mutex`
-* :cpp:class:`hpx::lcos::local::sliding_semaphore`
-* :cpp:class:`hpx::lcos::local::spinlock` (`std::mutex` compatible spinlock)
-* :cpp:class:`hpx::lcos::local::spinlock_no_backoff` (`boost::mutex` compatible spinlock)
-* :cpp:class:`hpx::lcos::local::spinlock_pool`
+* :cpp:class:`hpx::mutex`
+* :cpp:class:`hpx::no_mutex`
+* :cpp:class:`hpx::once_flag`
+* :cpp:class:`hpx::recursive_mutex`
+* :cpp:class:`hpx::shared_mutex`
+* :cpp:class:`hpx::sliding_semaphore`
+* :cpp:class:`hpx::spinlock` (`std::mutex` compatible spinlock)
+* :cpp:class:`hpx::spinlock_no_backoff` (`boost::mutex` compatible spinlock)
+* :cpp:class:`hpx::spinlock_pool`
+* :cpp:class:`hpx::stop_callback`
+* :cpp:class:`hpx::stop_source`
+* :cpp:class:`hpx::stop_token`
+* :cpp:class:`hpx::timed_mutex`
+* :cpp:class:`hpx::upgrade_to_unique_lock`
+* :cpp:class:`hpx::upgrade_lock`
 
 See :ref:`modules_lcos_local`, :ref:`modules_async_combinators`, and :ref:`modules_async`
 for higher level synchronization facilities.

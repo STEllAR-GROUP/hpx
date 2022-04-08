@@ -38,7 +38,7 @@ struct data
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void worker(std::size_t i, data& d, hpx::lcos::local::counting_semaphore& sem)
+void worker(std::size_t i, data& d, hpx::counting_semaphore_var<>& sem)
 {
     d.init.wait();
     std::cout << d.msg << ": " << i << "\n" << std::flush;
@@ -49,7 +49,7 @@ void worker(std::size_t i, data& d, hpx::lcos::local::counting_semaphore& sem)
 int hpx_main()
 {
     data d;
-    hpx::lcos::local::counting_semaphore sem;
+    hpx::counting_semaphore_var<> sem;
 
     for (std::size_t i = 0; i < 10; ++i)
         hpx::apply(&worker, i, std::ref(d), std::ref(sem));

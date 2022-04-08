@@ -185,7 +185,7 @@ namespace hpx::parcelset {
             }
 
         private:
-            using mutex_type = lcos::local::spinlock;
+            using mutex_type = hpx::spinlock;
 
             std::atomic<bool> stopped_;
 

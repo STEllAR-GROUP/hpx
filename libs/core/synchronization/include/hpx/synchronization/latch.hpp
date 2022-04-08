@@ -34,7 +34,7 @@ namespace hpx {
         HPX_NON_COPYABLE(latch);
 
     protected:
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
     public:
         /// Initialize the latch

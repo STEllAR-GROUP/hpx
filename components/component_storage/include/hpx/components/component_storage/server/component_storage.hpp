@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace server {
     class HPX_MIGRATE_TO_STORAGE_EXPORT component_storage
       : public component_base<component_storage>
     {
-        typedef lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
     public:
         component_storage();

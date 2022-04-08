@@ -1,4 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -38,7 +39,7 @@ namespace hpx { namespace experimental {
                 std::shared_ptr<async_rw_mutex_shared_state>;
             hpx::optional<T> value;
             shared_state_ptr_type next_state;
-            hpx::lcos::local::mutex mtx;
+            hpx::mutex mtx;
             hpx::detail::small_vector<
                 hpx::move_only_function<void(shared_state_ptr_type)>, 1>
                 continuations;
@@ -95,7 +96,7 @@ namespace hpx { namespace experimental {
             template <typename F>
             void add_continuation(F&& continuation)
             {
-                std::lock_guard<hpx::lcos::local::mutex> l(mtx);
+                std::lock_guard<hpx::mutex> l(mtx);
                 continuations.emplace_back(HPX_FORWARD(F, continuation));
             }
         };
@@ -106,7 +107,7 @@ namespace hpx { namespace experimental {
             using shared_state_ptr_type =
                 std::shared_ptr<async_rw_mutex_shared_state>;
             shared_state_ptr_type next_state;
-            hpx::lcos::local::mutex mtx;
+            hpx::mutex mtx;
             hpx::detail::small_vector<
                 hpx::move_only_function<void(shared_state_ptr_type)>, 1>
                 continuations;
@@ -144,7 +145,7 @@ namespace hpx { namespace experimental {
             template <typename F>
             void add_continuation(F&& continuation)
             {
-                std::lock_guard<hpx::lcos::local::mutex> l(mtx);
+                std::lock_guard<hpx::mutex> l(mtx);
                 continuations.emplace_back(HPX_FORWARD(F, continuation));
             }
         };

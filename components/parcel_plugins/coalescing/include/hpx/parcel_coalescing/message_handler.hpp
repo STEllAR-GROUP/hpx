@@ -33,7 +33,7 @@ namespace hpx::plugins::parcel {
     struct HPX_LIBRARY_EXPORT coalescing_message_handler
       : parcelset::policies::message_handler
     {
-        using mutex_type = lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
     public:
         using write_handler_type =

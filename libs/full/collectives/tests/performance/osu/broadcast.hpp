@@ -116,7 +116,7 @@ namespace hpx { namespace lcos {
             }
         }
 
-        typedef hpx::lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
         mutex_type mtx;
 
         hpx::id_type this_id;

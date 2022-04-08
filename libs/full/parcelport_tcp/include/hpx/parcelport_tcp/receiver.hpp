@@ -387,7 +387,7 @@ namespace hpx::parcelset::policies::tcp {
         // Counters and timers for parcels received.
         hpx::chrono::high_resolution_timer timer_;
 
-        hpx::lcos::local::spinlock mtx_;
+        hpx::spinlock mtx_;
         hpx::util::atomic_count operation_in_flight_;
     };
 }    // namespace hpx::parcelset::policies::tcp

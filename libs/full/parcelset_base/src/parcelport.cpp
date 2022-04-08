@@ -214,7 +214,7 @@ namespace hpx::parcelset {
 
     std::int64_t parcelport::get_pending_parcels_count(bool /*reset*/)
     {
-        std::lock_guard<lcos::local::spinlock> l(mtx_);
+        std::lock_guard<hpx::spinlock> l(mtx_);
         std::int64_t count = 0;
         for (auto&& p : pending_parcels_)
         {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,13 +25,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 // helper to call wait()
 void cv_wait(hpx::stop_token stoken, int /* id */, bool& ready,
-    hpx::lcos::local::mutex& ready_mtx,
-    hpx::lcos::local::condition_variable_any& ready_cv, bool notify_called)
+    hpx::mutex& ready_mtx, hpx::condition_variable_any& ready_cv,
+    bool notify_called)
 {
     try
     {
         {
-            std::unique_lock<hpx::lcos::local::mutex> lg{ready_mtx};
+            std::unique_lock<hpx::mutex> lg{ready_mtx};
             ready_cv.wait(lg, stoken, [&ready] { return ready; });
             if (stoken.stop_requested())
             {
@@ -55,14 +55,14 @@ void cv_wait(hpx::stop_token stoken, int /* id */, bool& ready,
 void test_cv(bool call_notify)
 {
     bool ready = false;
-    hpx::lcos::local::mutex ready_mtx;
-    hpx::lcos::local::condition_variable_any ready_cv;
+    hpx::mutex ready_mtx;
+    hpx::condition_variable_any ready_cv;
 
     {
         hpx::jthread t1(
             [&ready, &ready_mtx, &ready_cv, call_notify](hpx::stop_token it) {
                 {
-                    std::unique_lock<hpx::lcos::local::mutex> lg{ready_mtx};
+                    std::unique_lock<hpx::mutex> lg{ready_mtx};
                     while (!it.stop_requested() && !ready)
                     {
                         ready_cv.wait_for(lg, std::chrono::milliseconds(100));
@@ -75,7 +75,7 @@ void test_cv(bool call_notify)
         if (call_notify)
         {
             {
-                std::lock_guard<hpx::lcos::local::mutex> lg(ready_mtx);
+                std::lock_guard<hpx::mutex> lg(ready_mtx);
                 ready = true;
             }    // release lock
 
@@ -89,15 +89,15 @@ void test_cv(bool call_notify)
 void test_cv_pred(bool call_notify)
 {
     bool ready = false;
-    hpx::lcos::local::mutex ready_mtx;
-    hpx::lcos::local::condition_variable_any ready_cv;
+    hpx::mutex ready_mtx;
+    hpx::condition_variable_any ready_cv;
 
     {
         hpx::jthread t1(
             [&ready, &ready_mtx, &ready_cv, call_notify](hpx::stop_token st) {
                 try
                 {
-                    std::unique_lock<hpx::lcos::local::mutex> lg{ready_mtx};
+                    std::unique_lock<hpx::mutex> lg{ready_mtx};
                     ready_cv.wait(lg, st, [&ready] { return ready; });
                     if (st.stop_requested())
                     {
@@ -125,7 +125,7 @@ void test_cv_pred(bool call_notify)
         if (call_notify)
         {
             {
-                std::lock_guard<hpx::lcos::local::mutex> lg(ready_mtx);
+                std::lock_guard<hpx::mutex> lg(ready_mtx);
                 ready = true;
             }    // release lock
 
@@ -139,15 +139,15 @@ void test_cv_pred(bool call_notify)
 void test_cv_thread_no_pred(bool call_notify)
 {
     bool ready = false;
-    hpx::lcos::local::mutex ready_mtx;
-    hpx::lcos::local::condition_variable_any ready_cv;
+    hpx::mutex ready_mtx;
+    hpx::condition_variable_any ready_cv;
 
     hpx::stop_source is;
     {
         hpx::thread t1([&ready, &ready_mtx, &ready_cv, st = is.get_token(),
                            call_notify] {
             {
-                std::unique_lock<hpx::lcos::local::mutex> lg{ready_mtx};
+                std::unique_lock<hpx::mutex> lg{ready_mtx};
                 bool ret = ready_cv.wait(lg, st, [&ready] { return ready; });
                 if (ret)
                 {
@@ -168,7 +168,7 @@ void test_cv_thread_no_pred(bool call_notify)
         if (call_notify)
         {
             {
-                std::lock_guard<hpx::lcos::local::mutex> lg(ready_mtx);
+                std::lock_guard<hpx::mutex> lg(ready_mtx);
                 ready = true;
             }    // release lock
 
@@ -186,8 +186,8 @@ void test_cv_thread_no_pred(bool call_notify)
 void test_cv_thread_pred(bool call_notify)
 {
     bool ready = false;
-    hpx::lcos::local::mutex ready_mtx;
-    hpx::lcos::local::condition_variable_any ready_cv;
+    hpx::mutex ready_mtx;
+    hpx::condition_variable_any ready_cv;
 
     hpx::stop_source is;
     {
@@ -195,7 +195,7 @@ void test_cv_thread_pred(bool call_notify)
             [&ready, &ready_mtx, &ready_cv, st = is.get_token(), call_notify] {
                 bool ret;
                 {
-                    std::unique_lock<hpx::lcos::local::mutex> lg{ready_mtx};
+                    std::unique_lock<hpx::mutex> lg{ready_mtx};
                     ret = ready_cv.wait(lg, st, [&ready] { return ready; });
                     if (ret)
                     {
@@ -216,7 +216,7 @@ void test_cv_thread_pred(bool call_notify)
         if (call_notify)
         {
             {
-                std::lock_guard<hpx::lcos::local::mutex> lg(ready_mtx);
+                std::lock_guard<hpx::mutex> lg(ready_mtx);
                 ready = true;
             }    // release lock
 
@@ -239,27 +239,27 @@ void test_minimal_wait(int sec)
     try
     {
         bool ready = false;
-        hpx::lcos::local::mutex ready_mtx;
-        hpx::lcos::local::condition_variable_any ready_cv;
+        hpx::mutex ready_mtx;
+        hpx::condition_variable_any ready_cv;
 
         {
-            hpx::jthread t1([&ready, &ready_mtx, &ready_cv, duration](
-                                hpx::stop_token st) {
-                try
-                {
-                    auto t0 = std::chrono::steady_clock::now();
+            hpx::jthread t1(
+                [&ready, &ready_mtx, &ready_cv, duration](hpx::stop_token st) {
+                    try
                     {
-                        std::unique_lock<hpx::lcos::local::mutex> lg{ready_mtx};
-                        ready_cv.wait(lg, st, [&ready] { return ready; });
+                        auto t0 = std::chrono::steady_clock::now();
+                        {
+                            std::unique_lock<hpx::mutex> lg{ready_mtx};
+                            ready_cv.wait(lg, st, [&ready] { return ready; });
+                        }
+                        HPX_TEST(std::chrono::steady_clock::now() <
+                            t0 + duration + std::chrono::seconds(1));
                     }
-                    HPX_TEST(std::chrono::steady_clock::now() <
-                        t0 + duration + std::chrono::seconds(1));
-                }
-                catch (...)
-                {
-                    HPX_TEST(false);
-                }
-            });
+                    catch (...)
+                    {
+                        HPX_TEST(false);
+                    }
+                });
 
             hpx::this_thread::sleep_for(duration);
         }    // leave scope of t1 without join() or detach() (signals cancellation)
@@ -280,8 +280,8 @@ void test_minimal_wait_for(int sec1, int sec2)
     try
     {
         bool ready = false;
-        hpx::lcos::local::mutex ready_mtx;
-        hpx::lcos::local::condition_variable_any ready_cv;
+        hpx::mutex ready_mtx;
+        hpx::condition_variable_any ready_cv;
 
         {
             hpx::jthread t1([&ready, &ready_mtx, &ready_cv, dur_int, dur_wait](
@@ -290,7 +290,7 @@ void test_minimal_wait_for(int sec1, int sec2)
                 {
                     auto t0 = std::chrono::steady_clock::now();
                     {
-                        std::unique_lock<hpx::lcos::local::mutex> lg{ready_mtx};
+                        std::unique_lock<hpx::mutex> lg{ready_mtx};
                         ready_cv.wait_for(
                             lg, st, dur_wait, [&ready] { return ready; });
                     }
@@ -321,8 +321,8 @@ void test_timed_cv(
 {
     // test the basic jthread API
     bool ready = false;
-    hpx::lcos::local::mutex ready_mtx;
-    hpx::lcos::local::condition_variable_any ready_cv;
+    hpx::mutex ready_mtx;
+    hpx::condition_variable_any ready_cv;
 
     {
         hpx::jthread t1([&ready, &ready_mtx, &ready_cv, call_notify, duration](
@@ -332,7 +332,7 @@ void test_timed_cv(
             while (times_done < 3)
             {
                 {
-                    std::unique_lock<hpx::lcos::local::mutex> lg{ready_mtx};
+                    std::unique_lock<hpx::mutex> lg{ready_mtx};
                     auto ret = ready_cv.wait_for(
                         lg, st, duration, [&ready] { return ready; });
                     if (duration > std::chrono::seconds(5))
@@ -362,7 +362,7 @@ void test_timed_cv(
         if (call_notify)
         {
             {
-                std::lock_guard<hpx::lcos::local::mutex> lg(ready_mtx);
+                std::lock_guard<hpx::mutex> lg(ready_mtx);
                 ready = true;
             }    // release lock
 
@@ -385,8 +385,8 @@ void test_timed_wait(bool call_notify, bool call_interrupt, Duration duration)
     // ready_ instead of ready to not clash with state::ready and work around
     // potential bug in GCC 10
     bool ready_ = false;
-    hpx::lcos::local::mutex ready_mtx;
-    hpx::lcos::local::condition_variable_any ready_cv;
+    hpx::mutex ready_mtx;
+    hpx::condition_variable_any ready_cv;
 
     enum class state
     {
@@ -405,7 +405,7 @@ void test_timed_wait(bool call_notify, bool call_interrupt, Duration duration)
             {
                 try
                 {
-                    std::unique_lock<hpx::lcos::local::mutex> lg{ready_mtx};
+                    std::unique_lock<hpx::mutex> lg{ready_mtx};
                     auto ret = ready_cv.wait_for(
                         lg, st, duration, [&ready_] { return ready_; });
                     if (st.stop_requested())
@@ -452,7 +452,7 @@ void test_timed_wait(bool call_notify, bool call_interrupt, Duration duration)
         if (call_notify)
         {
             {
-                std::lock_guard<hpx::lcos::local::mutex> lg(ready_mtx);
+                std::lock_guard<hpx::mutex> lg(ready_mtx);
                 ready_ = true;
             }    // release lock
 
@@ -493,14 +493,13 @@ void test_many_cvs(bool call_notify, bool call_interrupt)
     {
         // thread t0 with CV:
         bool ready = false;
-        hpx::lcos::local::mutex ready_mtx;
-        hpx::lcos::local::condition_variable_any ready_cv;
+        hpx::mutex ready_mtx;
+        hpx::condition_variable_any ready_cv;
 
         // don't forget to initialize with {} here !!!
         std::array<bool, NumExtraCV> arr_ready{};
-        std::array<hpx::lcos::local::mutex, NumExtraCV> arr_ready_mtx{};
-        std::array<hpx::lcos::local::condition_variable_any, NumExtraCV>
-            arr_ready_cv{};
+        std::array<hpx::mutex, NumExtraCV> arr_ready_mtx{};
+        std::array<hpx::condition_variable_any, NumExtraCV> arr_ready_cv{};
         std::vector<hpx::jthread> vthreads_deferred;
 
         hpx::jthread t0(hpx::bind_back(cv_wait, 0, std::ref(ready),
@@ -531,7 +530,7 @@ void test_many_cvs(bool call_notify, bool call_interrupt)
             if (call_notify)
             {
                 {
-                    std::lock_guard<hpx::lcos::local::mutex> lg(ready_mtx);
+                    std::lock_guard<hpx::mutex> lg(ready_mtx);
                     ready = true;
                 }    // release lock
 
@@ -541,8 +540,7 @@ void test_many_cvs(bool call_notify, bool call_interrupt)
                 for (int idx = 0; idx < NumExtraCV; ++idx)
                 {
                     {
-                        std::lock_guard<hpx::lcos::local::mutex> lg(
-                            arr_ready_mtx[idx]);
+                        std::lock_guard<hpx::mutex> lg(arr_ready_mtx[idx]);
                         arr_ready[idx] = true;
                         arr_ready_cv[idx].notify_one();
                     }    // release lock

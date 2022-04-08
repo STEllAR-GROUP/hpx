@@ -29,7 +29,7 @@ namespace hpx::parcelset::policies::lci {
     template <typename Parcelport>
     struct receiver
     {
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
         using header_list = std::list<std::pair<int, header>>;
         using handles_header_type = std::set<std::pair<int, int>>;
         using connection_type = receiver_connection<Parcelport>;

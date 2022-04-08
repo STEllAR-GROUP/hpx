@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //  Copyright (c) 2014 Patricia Grubel
 //  Copyright (c) 2018 Adrian Serio
 //
@@ -319,7 +319,7 @@ struct stepper
         print(U);
 
         // limit depth of dependency tree
-        hpx::lcos::local::sliding_semaphore sem(nd);
+        hpx::sliding_semaphore sem(nd);
 
         auto Op = unwrapping(&stepper::heat_part);
 

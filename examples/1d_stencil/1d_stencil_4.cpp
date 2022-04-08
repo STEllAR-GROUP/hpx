@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //  Copyright (c) 2014 Patricia Grubel
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -165,7 +165,7 @@ struct stepper
         });
 
         // limit depth of dependency tree
-        hpx::lcos::local::sliding_semaphore sem(nd);
+        hpx::sliding_semaphore sem(nd);
 
         auto Op = unwrapping(&stepper::heat_part);
 

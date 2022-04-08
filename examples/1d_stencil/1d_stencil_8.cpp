@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -48,7 +48,7 @@ template <typename T>
 struct partition_allocator
 {
 private:
-    typedef hpx::lcos::local::spinlock mutex_type;
+    typedef hpx::spinlock mutex_type;
 
 public:
     explicit partition_allocator(std::size_t max_size = std::size_t(-1))
@@ -575,7 +575,7 @@ stepper_server::space stepper_server::do_work(
     }
 
     // limit depth of dependency tree
-    hpx::lcos::local::sliding_semaphore sem(nd);
+    hpx::sliding_semaphore sem(nd);
 
     for (std::size_t t = 0; t != nt; ++t)
     {

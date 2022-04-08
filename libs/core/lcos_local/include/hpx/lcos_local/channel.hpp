@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -97,7 +97,7 @@ namespace hpx { namespace lcos { namespace local {
         template <typename T>
         class unlimited_channel : public channel_impl_base<T>
         {
-            using mutex_type = hpx::lcos::local::spinlock;
+            using mutex_type = hpx::spinlock;
 
         public:
             HPX_NON_COPYABLE(unlimited_channel);
@@ -231,7 +231,7 @@ namespace hpx { namespace lcos { namespace local {
 
         private:
             mutable mutex_type mtx_;
-            receive_buffer<T, no_mutex> buffer_;
+            receive_buffer<T, hpx::no_mutex> buffer_;
             std::size_t get_generation_;
             std::size_t set_generation_;
             bool closed_;
@@ -400,7 +400,7 @@ namespace hpx { namespace lcos { namespace local {
         template <typename T>
         class one_element_channel : public channel_impl_base<T>
         {
-            using mutex_type = hpx::lcos::local::spinlock;
+            using mutex_type = hpx::spinlock;
 
         public:
             HPX_NON_COPYABLE(one_element_channel);

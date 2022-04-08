@@ -24,7 +24,7 @@ namespace hpx { namespace serialization { namespace detail {
     // to ensure each future is ready before serializing it.
     class preprocess_futures
     {
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
     public:
         preprocess_futures()

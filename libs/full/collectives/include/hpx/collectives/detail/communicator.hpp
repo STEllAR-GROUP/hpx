@@ -41,7 +41,7 @@ namespace hpx { namespace collectives { namespace detail {
     class communicator_server
       : public hpx::components::component_base<communicator_server>
     {
-        using mutex_type = lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
     public:
         communicator_server()    //-V730

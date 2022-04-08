@@ -143,7 +143,7 @@ std::array<std::atomic<int>, MAX_RANKS> FuturesWaiting;
 
 #if defined(USE_CLEANING_THREAD) || defined(USE_PARCELPORT_THREAD)
 std::atomic<bool> FuturesActive;
-hpx::lcos::local::spinlock FuturesMutex;
+hpx::spinlock FuturesMutex;
 #endif
 
 //----------------------------------------------------------------------------
@@ -151,7 +151,7 @@ hpx::lcos::local::spinlock FuturesMutex;
 // Each locality allocates a buffer of memory which is used to host transfers
 //
 char* local_storage = nullptr;
-hpx::lcos::local::spinlock storage_mutex;
+hpx::spinlock storage_mutex;
 
 //
 struct test_options
@@ -309,7 +309,7 @@ typedef hpx::serialization::serialize_buffer<char, PointerAllocator>
     transfer_buffer_type;
 
 typedef std::map<uint64_t, std::shared_ptr<general_buffer_type>> alive_map;
-typedef hpx::lcos::local::spinlock mutex_type;
+typedef hpx::spinlock mutex_type;
 typedef std::lock_guard<mutex_type> scoped_lock;
 //
 mutex_type keep_alive_mutex;
@@ -458,7 +458,7 @@ int RemoveCompletions()
     while (FuturesActive)
     {
         {
-            std::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
+            std::lock_guard<hpx::spinlock> lk(FuturesMutex);
             for (std::vector<hpx::future<int>>& futvec : ActiveFutures)
             {
                 for (std::vector<hpx::future<int>>::iterator fut =
@@ -608,7 +608,7 @@ void test_write(uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
                     5, "Put from rank " << rank << " on rank " << send_rank);
 #ifdef USE_CLEANING_THREAD
                 ++FuturesWaiting[send_rank];
-                std::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
+                std::lock_guard<hpx::spinlock> lk(FuturesMutex);
 #endif
 
                 std::shared_ptr<general_buffer_type> temp_buffer =
@@ -842,7 +842,7 @@ void test_read(uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
             {
 #ifdef USE_CLEANING_THREAD
                 ++FuturesWaiting[send_rank];
-                std::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
+                std::lock_guard<hpx::spinlock> lk(FuturesMutex);
 #endif
                 std::size_t buffer_address =
                     reinterpret_cast<std::size_t>(general_buffer.data());

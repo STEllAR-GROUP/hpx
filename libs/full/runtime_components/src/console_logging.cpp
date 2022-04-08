@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -109,7 +109,7 @@ namespace hpx { namespace components {
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT pending_logs
     {
-        using prefix_mutex_type = lcos::local::mutex;
+        using prefix_mutex_type = hpx::mutex;
         using queue_mutex_type = util::spinlock;
 
         enum

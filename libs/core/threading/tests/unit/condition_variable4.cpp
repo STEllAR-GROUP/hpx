@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,8 +27,8 @@ void producer_consumer(double prod_sec, double cons_sec, bool interrupt)
     auto cons_sleep = std::chrono::duration<double, std::milli>{cons_sec};
 
     std::vector<int> items;
-    hpx::lcos::local::mutex items_mtx;
-    hpx::lcos::local::condition_variable_any items_cv;
+    hpx::mutex items_mtx;
+    hpx::condition_variable_any items_cv;
     hpx::stop_source ssource;
     hpx::stop_token stoken{ssource.get_token()};
     constexpr size_t max_queue_size = 100;
@@ -36,7 +36,7 @@ void producer_consumer(double prod_sec, double cons_sec, bool interrupt)
     hpx::thread producer{[&] {
         auto next_value = [val = 0]() mutable { return ++val; };
 
-        std::unique_lock<hpx::lcos::local::mutex> lock{items_mtx};
+        std::unique_lock<hpx::mutex> lock{items_mtx};
         while (!stoken.stop_requested())
         {
             if (!items_cv.wait(lock, stoken,
@@ -53,8 +53,7 @@ void producer_consumer(double prod_sec, double cons_sec, bool interrupt)
                 int item;
 
                 {
-                    hpx::util::unlock_guard<hpx::lcos::local::mutex> ul(
-                        items_mtx);
+                    hpx::util::unlock_guard<hpx::mutex> ul(items_mtx);
                     item = next_value();
                     if (prod_sec > 0)
                     {
@@ -70,11 +69,11 @@ void producer_consumer(double prod_sec, double cons_sec, bool interrupt)
     }};
 
     hpx::thread consumer{[&] {
-        std::unique_lock<hpx::lcos::local::mutex> lock{items_mtx};
+        std::unique_lock<hpx::mutex> lock{items_mtx};
         for (;;)
         {
             {
-                hpx::util::unlock_guard<hpx::lcos::local::mutex> ul(items_mtx);
+                hpx::util::unlock_guard<hpx::mutex> ul(items_mtx);
                 if (cons_sec > 0)
                 {
                     hpx::this_thread::sleep_for(cons_sleep);

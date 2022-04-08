@@ -156,7 +156,7 @@ public:
 
 private:
     std::vector<double> data_;
-    hpx::lcos::local::spinlock mtx_;
+    hpx::spinlock mtx_;
 };
 
 typedef hpx::components::component<zerocopy_server> server_type;

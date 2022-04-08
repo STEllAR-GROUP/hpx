@@ -23,7 +23,7 @@ namespace hpx { namespace iostreams { namespace detail {
     struct buffer
     {
     protected:
-        typedef lcos::local::recursive_mutex mutex_type;
+        typedef hpx::recursive_mutex mutex_type;
 
     public:
         buffer()

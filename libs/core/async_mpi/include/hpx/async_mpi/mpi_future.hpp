@@ -47,7 +47,7 @@ namespace hpx { namespace mpi { namespace experimental {
 
     namespace detail {
 
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
         // mutex needed to protect mpi request vector, note that the
         // mpi poll function takes place inside the main scheduling loop

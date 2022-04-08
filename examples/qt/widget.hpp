@@ -40,7 +40,7 @@ public slots:
 
 private:
     std::size_t no_threads;
-    hpx::lcos::local::spinlock mutex;
+    hpx::spinlock mutex;
     QListWidget* list;
     QPushButton* run_button;
     std::function<void(widget*, std::size_t)> callback_;

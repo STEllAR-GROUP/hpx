@@ -134,7 +134,7 @@ namespace hpx { namespace parallel { namespace execution {
                     num_tasks_;
 
                 std::exception_ptr e;
-                lcos::local::spinlock mtx_e;
+                hpx::spinlock mtx_e;
 
                 std::size_t size = hpx::util::size(shape);
                 hpx::latch l(size);
@@ -162,7 +162,7 @@ namespace hpx { namespace parallel { namespace execution {
 
             template <typename F, typename Iter, typename... Ts>
             void spawn_sequential(hpx::latch& l, std::size_t size, F&& f,
-                Iter it, std::exception_ptr& e, lcos::local::spinlock& mtx_e,
+                Iter it, std::exception_ptr& e, hpx::spinlock& mtx_e,
                 Ts&&... ts) const
             {
                 // spawn tasks sequentially
@@ -174,7 +174,7 @@ namespace hpx { namespace parallel { namespace execution {
                             [&]() { HPX_INVOKE(f, *it, ts...); },
                             [&](std::exception_ptr ep) {
                                 // store the first caught exception only
-                                std::lock_guard<lcos::local::spinlock> l(mtx_e);
+                                std::lock_guard<hpx::spinlock> l(mtx_e);
                                 if (!e)
                                     e = HPX_MOVE(ep);
                             });
@@ -187,7 +187,7 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename F, typename Iter, typename... Ts>
             void spawn_hierarchical(hpx::latch& l, std::size_t size,
                 std::size_t num_tasks, F&& f, Iter it, std::exception_ptr& e,
-                lcos::local::spinlock& mtx_e, Ts&&... ts) const
+                hpx::spinlock& mtx_e, Ts&&... ts) const
             {
                 if (size > num_tasks)
                 {
@@ -345,7 +345,7 @@ namespace hpx { namespace parallel { namespace execution {
                     num_tasks_;
 
                 std::exception_ptr e;
-                lcos::local::spinlock mtx_e;
+                hpx::spinlock mtx_e;
 
                 std::size_t size = hpx::util::size(shape);
                 hpx::latch l(size);
@@ -373,7 +373,7 @@ namespace hpx { namespace parallel { namespace execution {
 
             template <typename F, typename Iter, typename... Ts>
             void spawn_sequential(hpx::latch& l, std::size_t size, F&& f,
-                Iter it, std::exception_ptr& e, lcos::local::spinlock& mtx_e,
+                Iter it, std::exception_ptr& e, hpx::spinlock& mtx_e,
                 Ts&&... ts) const
             {
                 // spawn tasks sequentially
@@ -389,8 +389,7 @@ namespace hpx { namespace parallel { namespace execution {
                                 [&]() { HPX_INVOKE(f, *it, ts...); },
                                 [&](std::exception_ptr ep) {
                                     // store the first caught exception only
-                                    std::lock_guard<lcos::local::spinlock> l(
-                                        mtx_e);
+                                    std::lock_guard<hpx::spinlock> l(mtx_e);
                                     if (!e)
                                         e = HPX_MOVE(ep);
                                 });
@@ -403,7 +402,7 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename F, typename Iter, typename... Ts>
             void spawn_hierarchical(hpx::latch& l, std::size_t size,
                 std::size_t num_tasks, F&& f, Iter it, std::exception_ptr& e,
-                lcos::local::spinlock& mtx_e, Ts&&... ts) const
+                hpx::spinlock& mtx_e, Ts&&... ts) const
             {
                 if (size > num_tasks)
                 {

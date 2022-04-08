@@ -223,7 +223,7 @@ namespace hpx { namespace lcos { namespace detail {
     struct HPX_CORE_EXPORT future_data_base<traits::detail::future_data_void>
       : future_data_refcnt_base
     {
-        using mutex_type = lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
         future_data_base() noexcept
           : state_(empty)

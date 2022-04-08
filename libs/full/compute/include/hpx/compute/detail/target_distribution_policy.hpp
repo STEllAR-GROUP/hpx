@@ -25,7 +25,7 @@ namespace hpx { namespace compute { namespace detail {
     struct target_distribution_policy
     {
     private:
-        typedef hpx::lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
     public:
         typedef Target target_type;

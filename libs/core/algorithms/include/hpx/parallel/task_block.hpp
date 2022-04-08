@@ -96,7 +96,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     {
     private:
         /// \cond NOINTERNAL
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
         friend struct detail::define_task_block_impl;
 

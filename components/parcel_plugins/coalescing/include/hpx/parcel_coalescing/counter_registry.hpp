@@ -27,7 +27,7 @@ namespace hpx::plugins::parcel {
     ///////////////////////////////////////////////////////////////////////////
     class coalescing_counter_registry
     {
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
     public:
         HPX_NON_COPYABLE(coalescing_counter_registry);
@@ -38,9 +38,8 @@ namespace hpx::plugins::parcel {
         using get_counter_type = hpx::function<std::int64_t(bool)>;
         using get_counter_values_type =
             hpx::function<std::vector<std::int64_t>(bool)>;
-        using get_counter_values_creator_type =
-            hpx::function<void(std::int64_t, std::int64_t, std::int64_t,
-                get_counter_values_type&)>;
+        using get_counter_values_creator_type = hpx::function<void(std::int64_t,
+            std::int64_t, std::int64_t, get_counter_values_type&)>;
 
         struct counter_functions
         {

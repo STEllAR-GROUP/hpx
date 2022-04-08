@@ -54,7 +54,7 @@ namespace hpx { namespace components { namespace server {
     class runtime_support
     {
     private:
-        typedef lcos::local::spinlock plugin_map_mutex_type;
+        typedef hpx::spinlock plugin_map_mutex_type;
 
         struct plugin_factory
         {
@@ -348,9 +348,9 @@ namespace hpx { namespace components { namespace server {
         std::atomic<bool> shutdown_all_invoked_;
 
 #if defined(HPX_HAVE_NETWORKING)
-        typedef hpx::lcos::local::spinlock dijkstra_mtx_type;
+        typedef hpx::spinlock dijkstra_mtx_type;
         dijkstra_mtx_type dijkstra_mtx_;
-        lcos::local::condition_variable_any dijkstra_cond_;
+        hpx::condition_variable_any dijkstra_cond_;
         bool dijkstra_color_;    // false: white, true: black
 #endif
 
@@ -360,7 +360,7 @@ namespace hpx { namespace components { namespace server {
         modules_map_type& modules_;
         static_modules_type static_modules_;
 
-        lcos::local::spinlock globals_mtx_;
+        hpx::spinlock globals_mtx_;
         std::list<startup_function_type> pre_startup_functions_;
         std::list<startup_function_type> startup_functions_;
         std::list<shutdown_function_type> pre_shutdown_functions_;

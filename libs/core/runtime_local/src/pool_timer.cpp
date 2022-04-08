@@ -33,7 +33,7 @@ namespace hpx { namespace util { namespace detail {
     private:
         friend class util::pool_timer;
 
-        using mutex_type = lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
     public:
         pool_timer();

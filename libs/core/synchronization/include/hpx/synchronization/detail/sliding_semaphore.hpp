@@ -25,7 +25,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     class sliding_semaphore
     {
     private:
-        typedef lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
     public:
         HPX_CORE_EXPORT sliding_semaphore(

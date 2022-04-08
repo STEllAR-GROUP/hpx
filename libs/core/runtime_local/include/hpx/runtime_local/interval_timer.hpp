@@ -37,7 +37,7 @@ namespace hpx { namespace util { namespace detail {
     private:
         friend class util::interval_timer;
 
-        typedef lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
     public:
         interval_timer();

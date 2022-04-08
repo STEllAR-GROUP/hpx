@@ -90,7 +90,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
             boost::lockfree::fixed_sized<true>>
             rma_receivers_;
 
-        typedef hpx::lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
         mutex_type active_receivers_mtx_;
         hpx::lcos::local::detail::condition_variable active_receivers_cv_;
         hpx::util::atomic_count active_receivers_;

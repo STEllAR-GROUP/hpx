@@ -32,7 +32,7 @@ namespace hpx { namespace lcos { namespace server {
       : components::managed_component_base<object_semaphore<ValueType>>
     {
         using base_type = components::managed_component_base<object_semaphore>;
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
         // define data structures needed for intrusive slist container used for
         // the queues

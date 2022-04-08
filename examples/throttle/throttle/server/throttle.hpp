@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +25,7 @@ namespace throttle { namespace server {
     {
     private:
         typedef hpx::components::component_base<throttle> base_type;
-        typedef hpx::lcos::local::mutex mutex_type;
+        typedef hpx::mutex mutex_type;
 
     public:
         throttle();

@@ -18,7 +18,7 @@
 namespace hpx::parcelset::policies::lci {
     struct tag_provider
     {
-        using mutex_type = lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
         tag_provider() noexcept
           : next_tag_(2)

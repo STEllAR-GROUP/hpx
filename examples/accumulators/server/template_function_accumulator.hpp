@@ -40,7 +40,7 @@ namespace examples { namespace server {
       : public hpx::components::component_base<template_function_accumulator>
     {
     private:
-        typedef hpx::lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
     public:
         template_function_accumulator()

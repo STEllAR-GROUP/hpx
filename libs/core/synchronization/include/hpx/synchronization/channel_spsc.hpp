@@ -180,8 +180,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
     private:
-        // keep the mutex, the head, and the tail pointer in separate cache
-        // lines
+        // keep the head and the tail pointer in separate cache lines
         mutable hpx::util::cache_aligned_data<std::atomic<std::size_t>> head_;
         hpx::util::cache_aligned_data<std::atomic<std::size_t>> tail_;
 

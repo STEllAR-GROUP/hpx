@@ -1,5 +1,5 @@
 // (C) Copyright 2007-9 Anthony Williams
-// Copyright (c) 2015 Hartmut Kaiser
+// Copyright (c) 2015-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See
@@ -30,7 +30,7 @@ namespace test {
     class thread_group
     {
     private:
-        typedef hpx::lcos::local::shared_mutex mutex_type;
+        typedef hpx::shared_mutex mutex_type;
 
     public:
         thread_group() {}

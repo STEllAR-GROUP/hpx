@@ -421,7 +421,7 @@ namespace hpx::plugins::parcel {
         std::vector<std::int64_t> operator()(bool reset)
         {
             {
-                std::lock_guard<hpx::lcos::local::spinlock> l(mtx_);
+                std::lock_guard<hpx::spinlock> l(mtx_);
                 if (counter_.empty())
                 {
                     counter_ = coalescing_counter_registry::instance()
@@ -440,7 +440,7 @@ namespace hpx::plugins::parcel {
             return counter_(reset);
         }
 
-        hpx::lcos::local::spinlock mtx_;
+        hpx::spinlock mtx_;
         hpx::function<std::vector<std::int64_t>(bool)> counter_;
         std::string action_name_;
         std::int64_t min_boundary_;

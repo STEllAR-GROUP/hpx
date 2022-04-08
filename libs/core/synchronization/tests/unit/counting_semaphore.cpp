@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<int> count(0);
 
-void worker(hpx::lcos::local::counting_semaphore& sem)
+void worker(hpx::counting_semaphore_var<>& sem)
 {
     ++count;
     sem.signal();    // signal main thread
@@ -30,7 +30,7 @@ void worker(hpx::lcos::local::counting_semaphore& sem)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    hpx::lcos::local::counting_semaphore sem;
+    hpx::counting_semaphore_var<> sem;
 
     for (std::size_t i = 0; i != 10; ++i)
         hpx::apply(&worker, std::ref(sem));

@@ -141,8 +141,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                     post_policy, threads::thread_stacksize::small_);
 
                 std::exception_ptr e;
-                lcos::local::spinlock mtx_e;
-                lcos::local::latch l(size);
+                hpx::spinlock mtx_e;
+                hpx::latch l(size);
 
                 auto wrapped = [&, f](auto&&... args) mutable {
                     // properly handle all exceptions thrown from 'f'
@@ -152,7 +152,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                         },
                         [&](std::exception_ptr ep) {
                             // store the first caught exception only
-                            std::lock_guard<lcos::local::spinlock> lg(mtx_e);
+                            std::lock_guard<hpx::spinlock> lg(mtx_e);
                             if (!e)
                                 e = HPX_MOVE(ep);
                         });

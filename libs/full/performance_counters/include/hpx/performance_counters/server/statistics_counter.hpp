@@ -84,7 +84,7 @@ namespace hpx { namespace performance_counters { namespace server {
         bool ensure_base_counter();
 
     private:
-        typedef lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
         mutable mutex_type mtx_;
 
         // base time interval in milliseconds

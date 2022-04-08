@@ -29,7 +29,7 @@
 namespace hpx { namespace cuda { namespace experimental { namespace detail {
     // this code runs on a std::thread, but we will use a spinlock
     // as we never suspend - only ever try_lock, or exit
-    using mutex_type = hpx::lcos::local::spinlock;
+    using mutex_type = hpx::spinlock;
     mutex_type& get_vector_mtx()
     {
         static mutex_type vector_mtx;

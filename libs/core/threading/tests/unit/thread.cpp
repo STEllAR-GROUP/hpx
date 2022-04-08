@@ -120,9 +120,9 @@ void test_id_comparison()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void interruption_point_thread(hpx::lcos::local::spinlock* m, bool* failed)
+void interruption_point_thread(hpx::spinlock* m, bool* failed)
 {
-    std::unique_lock<hpx::lcos::local::spinlock> lk(*m);
+    std::unique_lock<hpx::spinlock> lk(*m);
     hpx::util::ignore_while_checking il(&lk);
     HPX_UNUSED(il);
 
@@ -132,9 +132,9 @@ void interruption_point_thread(hpx::lcos::local::spinlock* m, bool* failed)
 
 void do_test_thread_interrupts_at_interruption_point()
 {
-    hpx::lcos::local::spinlock m;
+    hpx::spinlock m;
     bool failed = false;
-    std::unique_lock<hpx::lcos::local::spinlock> lk(m);
+    std::unique_lock<hpx::spinlock> lk(m);
     hpx::thread thrd(&interruption_point_thread, &m, &failed);
     thrd.interrupt();
     lk.unlock();
@@ -150,13 +150,13 @@ void test_thread_interrupts_at_interruption_point()
 
 ///////////////////////////////////////////////////////////////////////////////
 void disabled_interruption_point_thread(
-    hpx::lcos::local::spinlock* m, hpx::barrier<>* b, bool* failed)
+    hpx::spinlock* m, hpx::barrier<>* b, bool* failed)
 {
     hpx::this_thread::disable_interruption dc;
     b->arrive_and_wait();
     try
     {
-        std::lock_guard<hpx::lcos::local::spinlock> lk(*m);
+        std::lock_guard<hpx::spinlock> lk(*m);
         hpx::this_thread::interruption_point();
         *failed = false;
     }
@@ -170,7 +170,7 @@ void disabled_interruption_point_thread(
 
 void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 {
-    hpx::lcos::local::spinlock m;
+    hpx::spinlock m;
     hpx::barrier<> b(2);
     bool caught = false;
     bool failed = true;
@@ -181,7 +181,7 @@ void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
     b.arrive_and_wait();
     try
     {
-        std::unique_lock<hpx::lcos::local::spinlock> lk(m);
+        std::unique_lock<hpx::spinlock> lk(m);
         hpx::util::ignore_while_checking il(&lk);
         HPX_UNUSED(il);
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,7 +33,7 @@ int hpx_main()
 {
     std::vector<hpx::thread> threads;
     std::atomic<bool> ready(false);
-    hpx::lcos::local::shared_mutex stm;
+    hpx::shared_mutex stm;
 
     for (int i = 0; i < writers; ++i)
     {
@@ -47,7 +47,7 @@ int hpx_main()
 
             for (int j = 0; j < cycles; ++j)
             {
-                std::unique_lock<hpx::lcos::local::shared_mutex> ul(stm);
+                std::unique_lock<hpx::shared_mutex> ul(stm);
 
                 std::cout << "^^^ Writer " << i << " starting..." << std::endl;
                 hpx::this_thread::sleep_for(milliseconds(dist(urng)));
@@ -74,7 +74,7 @@ int hpx_main()
 
             for (int j = 0; j < cycles; ++j)
             {
-                std::shared_lock<hpx::lcos::local::shared_mutex> sl(stm);
+                std::shared_lock<hpx::shared_mutex> sl(stm);
 
                 std::cout << "Reader " << i << " starting..." << std::endl;
                 hpx::this_thread::sleep_for(milliseconds(dist(urng)));

@@ -64,7 +64,7 @@ namespace examples { namespace server {
     public:
         typedef hpx::util::storage::tuple tuple_type;
         typedef hpx::util::storage::tuple::elem_type elem_type;
-        typedef hpx::lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
         typedef examples::server::tuples_warehouse tuples_type;
 

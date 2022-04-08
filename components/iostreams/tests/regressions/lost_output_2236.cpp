@@ -18,7 +18,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 std::string expected_output;
-hpx::lcos::local::spinlock expected_output_mtx;
+hpx::spinlock expected_output_mtx;
 
 template <typename... Ts>
 void generate_output(Ts&&... ts)
@@ -32,7 +32,7 @@ void generate_output(Ts&&... ts)
     std::string str = stream.str();
 
     {
-        std::lock_guard<hpx::lcos::local::spinlock> l(expected_output_mtx);
+        std::lock_guard<hpx::spinlock> l(expected_output_mtx);
         expected_output += str;
     }
 
@@ -53,7 +53,7 @@ void generate_output_no_endl(Ts&&... ts)
     std::string str = stream.str();
 
     {
-        std::lock_guard<hpx::lcos::local::spinlock> l(expected_output_mtx);
+        std::lock_guard<hpx::spinlock> l(expected_output_mtx);
         expected_output += str;
     }
 
