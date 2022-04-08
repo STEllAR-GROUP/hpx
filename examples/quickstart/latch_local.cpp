@@ -1,10 +1,10 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// Demonstrate the use of hpx::lcos::local::latch
+// Demonstrate the use of hpx::latch
 
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
@@ -18,9 +18,9 @@
 std::ptrdiff_t num_threads = 16;
 
 ///////////////////////////////////////////////////////////////////////////////
-void wait_for_latch(hpx::lcos::local::latch& l)
+void wait_for_latch(hpx::latch& l)
 {
-    l.count_down_and_wait();
+    l.arrive_and_wait();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -28,14 +28,14 @@ int hpx_main(hpx::program_options::variables_map& vm)
 {
     num_threads = vm["num-threads"].as<std::ptrdiff_t>();
 
-    hpx::lcos::local::latch l(num_threads + 1);
+    hpx::latch l(num_threads + 1);
 
     std::vector<hpx::future<void>> results;
     for (std::ptrdiff_t i = 0; i != num_threads; ++i)
         results.push_back(hpx::async(&wait_for_latch, std::ref(l)));
 
     // Wait for all threads to reach this point.
-    l.count_down_and_wait();
+    l.arrive_and_wait();
 
     hpx::wait_all(results);
 

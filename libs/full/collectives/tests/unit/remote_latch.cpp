@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,17 +19,18 @@
 static const char* const latch_name = "latch_remote_test";
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::lcos::latch create_latch(std::size_t num_threads, std::size_t generation)
+hpx::distributed::latch create_latch(
+    std::size_t num_threads, std::size_t generation)
 {
     std::string name(latch_name);
     name += std::to_string(generation);
 
-    hpx::lcos::latch l;
+    hpx::distributed::latch l;
     if (hpx::get_locality_id() == 0)
     {
         // Create the latch on locality zero, let it synchronize as many
         // threads as we have localities.
-        l = hpx::lcos::latch(num_threads);
+        l = hpx::distributed::latch(num_threads);
 
         // Register the new instance so that the other localities can connect
         // to it.
@@ -50,31 +51,31 @@ int hpx_main()
 
     // count_down_and_wait
     {
-        hpx::lcos::latch l = create_latch(num_localities, 0);
-        HPX_TEST(!l.is_ready());
+        hpx::distributed::latch l = create_latch(num_localities, 0);
+        HPX_TEST(!l.try_wait());
 
         // Wait for all localities to reach this point.
-        l.count_down_and_wait();
+        l.arrive_and_wait();
 
         HPX_TEST(l.is_ready());
     }
 
     // count_down/wait
     {
-        hpx::lcos::latch l = create_latch(num_localities, 1);
-        HPX_TEST(!l.is_ready());
+        hpx::distributed::latch l = create_latch(num_localities, 1);
+        HPX_TEST(!l.try_wait());
 
         // Wait for all localities to reach this point.
         if (hpx::get_locality_id() == 0)
         {
-            l.count_down_and_wait();
-            HPX_TEST(l.is_ready());
+            l.arrive_and_wait();
+            HPX_TEST(l.try_wait());
         }
         else
         {
             l.count_down(1);
             l.wait();
-            HPX_TEST(l.is_ready());
+            HPX_TEST(l.try_wait());
         }
     }
 

@@ -1,5 +1,5 @@
 ..
-    Copyright (c) 2019 The STE||AR-Group
+    Copyright (c) 2019-2022 The STE||AR-Group
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,11 +14,11 @@ synchronization
 This module provides synchronization primitives which should be used rather than
 the C++ standard ones in |hpx| threads:
 
-* :cpp:class:`hpx::lcos::local::barrier`
+* :cpp:class:`hpx::barrier`
 * :cpp:class:`hpx::lcos::local::condition_variable`
 * :cpp:class:`hpx::lcos::local::counting_semaphore`
 * :cpp:class:`hpx::lcos::local::event`
-* :cpp:class:`hpx::lcos::local::latch`
+* :cpp:class:`hpx::latch`
 * :cpp:class:`hpx::lcos::local::mutex`
 * :cpp:class:`hpx::lcos::local::no_mutex`
 * :cpp:class:`hpx::lcos::local::once_flag`

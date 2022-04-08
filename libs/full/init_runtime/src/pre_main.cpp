@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -225,9 +225,9 @@ namespace hpx { namespace detail {
                  << connect_back_to;
 
             // inform launching process that this locality is up and running
-            hpx::lcos::latch l;
+            hpx::distributed::latch l;
             l.connect_to(connect_back_to);
-            l.count_down_and_wait();
+            l.arrive_and_wait();
 
             lbt_ << "(6th stage) runtime::run_helper: "
                     "synchronized with latch: "

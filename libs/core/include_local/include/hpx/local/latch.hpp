@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,8 +7,3 @@
 #pragma once
 
 #include <hpx/synchronization/latch.hpp>
-
-namespace hpx {
-
-    using latch = hpx::lcos::local::cpp20_latch;
-}

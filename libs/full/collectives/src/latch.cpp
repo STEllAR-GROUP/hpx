@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +25,8 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos {
+namespace hpx::distributed {
+
     latch::latch(std::ptrdiff_t count)
       : base_type(hpx::new_<lcos::server::latch>(hpx::find_here(), count))
     {
@@ -87,7 +88,7 @@ namespace hpx { namespace lcos {
         return hpx::make_ready_future();
 #endif
     }
-}}    // namespace hpx::lcos
+}    // namespace hpx::distributed
 
 ///////////////////////////////////////////////////////////////////////////////
 // latch

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -136,7 +136,7 @@ namespace hpx { namespace parallel { namespace execution {
                 lcos::local::spinlock mtx_e;
 
                 std::size_t size = hpx::util::size(shape);
-                lcos::local::latch l(size);
+                hpx::latch l(size);
                 if (hpx::detail::has_async_policy(Policy{}))
                 {
                     spawn_hierarchical(l, size, num_tasks, f,
@@ -160,9 +160,9 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             template <typename F, typename Iter, typename... Ts>
-            void spawn_sequential(lcos::local::latch& l, std::size_t size,
-                F&& f, Iter it, std::exception_ptr& e,
-                lcos::local::spinlock& mtx_e, Ts&&... ts) const
+            void spawn_sequential(hpx::latch& l, std::size_t size, F&& f,
+                Iter it, std::exception_ptr& e, lcos::local::spinlock& mtx_e,
+                Ts&&... ts) const
             {
                 // spawn tasks sequentially
                 for (std::size_t i = 0; i != size; ++i, ++it)
@@ -187,7 +187,7 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             template <typename F, typename Iter, typename... Ts>
-            void spawn_hierarchical(lcos::local::latch& l, std::size_t size,
+            void spawn_hierarchical(hpx::latch& l, std::size_t size,
                 std::size_t num_tasks, F&& f, Iter it, std::exception_ptr& e,
                 lcos::local::spinlock& mtx_e, Ts&&... ts) const
             {
@@ -350,7 +350,7 @@ namespace hpx { namespace parallel { namespace execution {
                 lcos::local::spinlock mtx_e;
 
                 std::size_t size = hpx::util::size(shape);
-                lcos::local::latch l(size);
+                hpx::latch l(size);
                 if (hpx::detail::has_async_policy(policy_))
                 {
                     spawn_hierarchical(l, size, num_tasks, f,
@@ -374,9 +374,9 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             template <typename F, typename Iter, typename... Ts>
-            void spawn_sequential(lcos::local::latch& l, std::size_t size,
-                F&& f, Iter it, std::exception_ptr& e,
-                lcos::local::spinlock& mtx_e, Ts&&... ts) const
+            void spawn_sequential(hpx::latch& l, std::size_t size, F&& f,
+                Iter it, std::exception_ptr& e, lcos::local::spinlock& mtx_e,
+                Ts&&... ts) const
             {
                 // spawn tasks sequentially
                 hpx::util::thread_description desc(
@@ -405,7 +405,7 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             template <typename F, typename Iter, typename... Ts>
-            void spawn_hierarchical(lcos::local::latch& l, std::size_t size,
+            void spawn_hierarchical(hpx::latch& l, std::size_t size,
                 std::size_t num_tasks, F&& f, Iter it, std::exception_ptr& e,
                 lcos::local::spinlock& mtx_e, Ts&&... ts) const
             {
