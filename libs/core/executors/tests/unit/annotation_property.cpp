@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 std::string annotation;
 
-void test_post_f(int passed_through, hpx::lcos::local::latch& l)
+void test_post_f(int passed_through, hpx::latch& l)
 {
     HPX_TEST_EQ(passed_through, 42);
 
@@ -45,7 +45,7 @@ void test_post()
         auto exec = hpx::experimental::prefer(
             hpx::execution::experimental::with_annotation, executor{}, desc);
 
-        hpx::lcos::local::latch l(2);
+        hpx::latch l(2);
         hpx::parallel::execution::post(exec, &test_post_f, 42, std::ref(l));
         l.arrive_and_wait();
 
@@ -57,7 +57,7 @@ void test_post()
         auto exec =
             hpx::execution::experimental::with_annotation(executor{}, desc);
 
-        hpx::lcos::local::latch l(2);
+        hpx::latch l(2);
         hpx::parallel::execution::post(exec, &test_post_f, 42, std::ref(l));
         l.arrive_and_wait();
 
@@ -344,7 +344,7 @@ void test_post_policy_prefer()
         hpx::experimental::prefer(hpx::execution::experimental::with_annotation,
             hpx::execution::par, desc);
 
-    hpx::lcos::local::latch l(2);
+    hpx::latch l(2);
     hpx::parallel::execution::post(
         policy.executor(), &test_post_f, 42, std::ref(l));
     l.arrive_and_wait();
@@ -358,7 +358,7 @@ void test_post_policy()
     auto policy = hpx::execution::experimental::with_annotation(
         hpx::execution::par, desc);
 
-    hpx::lcos::local::latch l(2);
+    hpx::latch l(2);
     hpx::parallel::execution::post(
         policy.executor(), &test_post_f, 42, std::ref(l));
     l.arrive_and_wait();

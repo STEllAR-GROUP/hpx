@@ -614,7 +614,7 @@ Classes
    =============================  ====================================
    Class                          C++ standard
    =============================  ====================================
-   :cpp:class:`hpx::cpp20_latch`  :cppreference-generic:`thread,latch`
+   :cpp:class:`hpx::latch`        :cppreference-generic:`thread,latch`
    =============================  ====================================
 
 .. table:: Distributed implementation of classes of header ``hpx/latch.hpp``

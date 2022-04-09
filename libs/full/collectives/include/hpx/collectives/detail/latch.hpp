@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -84,10 +84,10 @@ namespace hpx { namespace lcos { namespace server {
         /// releasing all waiting threads as soon as the last \a thread
         /// entered this function.
         ///
-        /// This is invoked whenever the count_down_and_wait() function is called
+        /// This is invoked whenever the arrive_and_wait() function is called
         void set_event()
         {
-            latch_.count_down_and_wait();
+            latch_.arrive_and_wait();
         }
 
         /// This is invoked whenever the count_down() function is called
@@ -99,11 +99,11 @@ namespace hpx { namespace lcos { namespace server {
         /// This is invoked whenever the is_ready() function is called
         bool get_value()
         {
-            return latch_.is_ready();
+            return latch_.try_wait();
         }
         bool get_value(hpx::error_code&)
         {
-            return latch_.is_ready();
+            return latch_.try_wait();
         }
 
         /// The \a function set_exception is called whenever a
@@ -140,7 +140,7 @@ namespace hpx { namespace lcos { namespace server {
         HPX_DEFINE_COMPONENT_ACTION(latch, wait, wait_action)
 
     private:
-        lcos::local::latch latch_;
+        hpx::lcos::local::latch latch_;
     };
 }}}    // namespace hpx::lcos::server
 

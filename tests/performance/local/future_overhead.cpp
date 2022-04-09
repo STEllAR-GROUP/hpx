@@ -319,7 +319,7 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv,
 
 void measure_function_futures_register_work(std::uint64_t count, bool csv)
 {
-    hpx::lcos::local::latch l(count);
+    hpx::latch l(count);
 
     // start the clock
     high_resolution_timer walltime;
@@ -342,7 +342,7 @@ void measure_function_futures_register_work(std::uint64_t count, bool csv)
 
 void measure_function_futures_create_thread(std::uint64_t count, bool csv)
 {
-    hpx::lcos::local::latch l(count);
+    hpx::latch l(count);
 
     auto const sched = hpx::threads::get_self_id_data()->get_scheduler_base();
     auto func = [&l]() {
@@ -377,7 +377,7 @@ void measure_function_futures_create_thread(std::uint64_t count, bool csv)
 void measure_function_futures_create_thread_hierarchical_placement(
     std::uint64_t count, bool csv)
 {
-    hpx::lcos::local::latch l(count);
+    hpx::latch l(count);
 
     auto sched = hpx::threads::get_self_id_data()->get_scheduler_base();
 
@@ -447,7 +447,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
 void measure_function_futures_apply_hierarchical_placement(
     std::uint64_t count, bool csv)
 {
-    hpx::lcos::local::latch l(count);
+    hpx::latch l(count);
 
     auto const func = [&l]() {
         null_function();

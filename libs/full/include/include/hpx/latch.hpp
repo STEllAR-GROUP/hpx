@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2020-2022 ETH Zurich
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,3 @@
 
 #include <hpx/collectives/latch.hpp>
 #include <hpx/local/latch.hpp>
-
-namespace hpx { namespace distributed {
-    using hpx::lcos::latch;
-}}    // namespace hpx::distributed

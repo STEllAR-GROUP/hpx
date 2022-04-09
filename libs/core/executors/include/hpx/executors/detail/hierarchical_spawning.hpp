@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         auto post_policy = policy;
         post_policy.set_stacksize(threads::thread_stacksize::small_);
 
-        lcos::local::latch l(size);
+        hpx::latch l(size);
         std::size_t part_begin = 0;
         auto it = std::begin(shape);
         for (std::size_t t = 0; t < num_threads; ++t)

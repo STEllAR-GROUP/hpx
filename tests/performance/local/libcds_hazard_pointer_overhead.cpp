@@ -149,7 +149,7 @@ struct scratcher
 void measure_function_futures_create_thread_hierarchical_placement(
     std::uint64_t count, bool csv, bool uselibcds)
 {
-    hpx::lcos::local::latch l(count);
+    hpx::latch l(count);
 
     auto sched = hpx::threads::get_self_id_data()->get_scheduler_base();
 

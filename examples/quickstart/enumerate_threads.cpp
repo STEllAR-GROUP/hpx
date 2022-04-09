@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,15 +15,15 @@
 int const num_threads = 10;
 
 ///////////////////////////////////////////////////////////////////////////////
-void wait_for_latch(hpx::lcos::local::latch& l)
+void wait_for_latch(hpx::latch& l)
 {
-    l.count_down_and_wait();
+    l.arrive_and_wait();
 }
 
 int hpx_main()
 {
     // Spawn a couple of threads
-    hpx::lcos::local::latch l(num_threads + 1);
+    hpx::latch l(num_threads + 1);
 
     std::vector<hpx::future<void>> results;
     results.reserve(num_threads);
@@ -46,7 +46,7 @@ int hpx_main()
         hpx::threads::thread_schedule_state::suspended);
 
     // Wait for all threads to reach this point.
-    l.count_down_and_wait();
+    l.arrive_and_wait();
 
     hpx::wait_all(results);
 
