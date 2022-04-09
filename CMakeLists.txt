@@ -1128,7 +1128,7 @@ if(HPX_WITH_NETWORKING)
   )
   hpx_option(
     HPX_WITH_LCI_TAG STRING "LCI repository tag or branch"
-    "d0b8aef0b33a9011e02fb3910e968d2a5e089449" # jiakun-dev-v1.7
+    "v1.7"
     CATEGORY "Build Targets"
     ADVANCED
   )
