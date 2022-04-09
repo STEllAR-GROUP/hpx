@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -137,9 +137,9 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
-    void wait_any_nothrow(std::vector<Future> const& futures)
+    bool wait_any_nothrow(std::vector<Future> const& futures)
     {
-        hpx::wait_some_nothrow(1, futures);
+        return hpx::wait_some_nothrow(1, futures);
     }
 
     template <typename Future>
@@ -149,9 +149,9 @@ namespace hpx {
     }
 
     template <typename Future>
-    void wait_any_nothrow(std::vector<Future>& lazy_values)
+    bool wait_any_nothrow(std::vector<Future>& lazy_values)
     {
-        hpx::wait_any_nothrow(
+        return hpx::wait_any_nothrow(
             const_cast<std::vector<Future> const&>(lazy_values));
     }
 
@@ -162,9 +162,9 @@ namespace hpx {
     }
 
     template <typename Future>
-    void wait_any_nothrow(std::vector<Future>&& lazy_values)
+    bool wait_any_nothrow(std::vector<Future>&& lazy_values)
     {
-        hpx::wait_any_nothrow(
+        return hpx::wait_any_nothrow(
             const_cast<std::vector<Future> const&>(lazy_values));
     }
 
@@ -176,9 +176,9 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, std::size_t N>
-    void wait_any_nothrow(std::array<Future, N> const& futures)
+    bool wait_any_nothrow(std::array<Future, N> const& futures)
     {
-        hpx::wait_some_nothrow(1, futures);
+        return hpx::wait_some_nothrow(1, futures);
     }
 
     template <typename Future, std::size_t N>
@@ -188,9 +188,9 @@ namespace hpx {
     }
 
     template <typename Future, std::size_t N>
-    void wait_any_nothrow(std::array<Future, N>& lazy_values)
+    bool wait_any_nothrow(std::array<Future, N>& lazy_values)
     {
-        hpx::wait_any_nothrow(
+        return hpx::wait_any_nothrow(
             const_cast<std::array<Future, N> const&>(lazy_values));
     }
 
@@ -201,9 +201,9 @@ namespace hpx {
     }
 
     template <typename Future, std::size_t N>
-    void wait_any_nothrow(std::array<Future, N>&& lazy_values)
+    bool wait_any_nothrow(std::array<Future, N>&& lazy_values)
     {
-        hpx::wait_any_nothrow(
+        return hpx::wait_any_nothrow(
             const_cast<std::array<Future, N> const&>(lazy_values));
     }
 
@@ -217,9 +217,9 @@ namespace hpx {
     template <typename Iterator,
         typename Enable =
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    void wait_any_nothrow(Iterator begin, Iterator end)
+    bool wait_any_nothrow(Iterator begin, Iterator end)
     {
-        hpx::wait_some_nothrow(1, begin, end);
+        return hpx::wait_some_nothrow(1, begin, end);
     }
 
     template <typename Iterator,
@@ -230,23 +230,23 @@ namespace hpx {
         hpx::wait_some(1, begin, end);
     }
 
-    inline void wait_any_nothrow()
+    inline bool wait_any_nothrow()
     {
-        hpx::wait_some_nothrow(1);
+        return hpx::wait_some_nothrow(0);
     }
 
     inline void wait_any()
     {
-        hpx::wait_some(1);
+        hpx::wait_some(0);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator,
         typename Enable =
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    void wait_any_n_nothrow(Iterator begin, std::size_t count)
+    bool wait_any_n_nothrow(Iterator begin, std::size_t count)
     {
-        hpx::wait_some_n_nothrow(1, begin, count);
+        return hpx::wait_some_n_nothrow(1, begin, count);
     }
 
     template <typename Iterator,
@@ -259,9 +259,9 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename... Ts>
-    void wait_any_nothrow(Ts&&... ts)
+    bool wait_any_nothrow(Ts&&... ts)
     {
-        hpx::wait_some_nothrow(1, HPX_FORWARD(Ts, ts)...);
+        return hpx::wait_some_nothrow(1, HPX_FORWARD(Ts, ts)...);
     }
 
     template <typename... Ts>
@@ -338,7 +338,7 @@ namespace hpx::lcos {
         1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
     inline void wait_any(error_code& = throws)
     {
-        hpx::wait_some(1);
+        hpx::wait_some(0);
     }
 
     ///////////////////////////////////////////////////////////////////////////

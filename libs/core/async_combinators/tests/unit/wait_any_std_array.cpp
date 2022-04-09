@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,16 +13,9 @@
 #include <chrono>
 #include <stdexcept>
 
-int make_int_slowly()
-{
-    hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-    return 42;
-}
-
 hpx::future<int> make_future()
 {
-    hpx::packaged_task<int()> task(make_int_slowly);
-    return task.get_future();
+    return hpx::make_ready_future_after(std::chrono::milliseconds(100), 42);
 }
 
 void test_wait_any()
@@ -32,7 +25,7 @@ void test_wait_any()
         future_array[0] = make_future();
         future_array[1] = make_future();
 
-        hpx::wait_any_nothrow(future_array);
+        HPX_TEST(!hpx::wait_any_nothrow(future_array));
 
         int count = 0;
         for (auto& f : future_array)
@@ -53,7 +46,7 @@ void test_wait_any()
         bool caught_exception = false;
         try
         {
-            hpx::wait_any_nothrow(future_array);
+            HPX_TEST(hpx::wait_any_nothrow(future_array));
 
             int count = 0;
             for (auto& f : future_array)
@@ -106,7 +99,7 @@ void test_wait_any_n()
         future_array[0] = make_future();
         future_array[1] = make_future();
 
-        hpx::wait_any_n_nothrow(future_array.begin(), 2);
+        HPX_TEST(!hpx::wait_any_n_nothrow(future_array.begin(), 2));
 
         int count = 0;
         for (auto& f : future_array)
@@ -127,7 +120,7 @@ void test_wait_any_n()
         bool caught_exception = false;
         try
         {
-            hpx::wait_any_n_nothrow(future_array.begin(), 2);
+            HPX_TEST(hpx::wait_any_n_nothrow(future_array.begin(), 2));
 
             int count = 0;
             for (auto& f : future_array)

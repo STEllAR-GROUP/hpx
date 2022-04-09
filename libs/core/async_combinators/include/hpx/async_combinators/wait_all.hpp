@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -264,30 +264,41 @@ namespace hpx {
                     auto next_future_data =
                         hpx::traits::detail::get_shared_state(*next);
 
-                    if (next_future_data && !next_future_data->is_ready())
+                    if (next_future_data)
                     {
-                        next_future_data->execute_deferred();
-
-                        // execute_deferred might have made the future ready
                         if (!next_future_data->is_ready())
                         {
-                            // Attach a continuation to this future which will
-                            // re-evaluate it and continue to the next element
-                            // in the sequence (if any).
-                            next_future_data->set_on_completed(
-                                [this_ = HPX_MOVE(this_),
-                                    next = HPX_FORWARD(Iter, next),
-                                    end = HPX_FORWARD(
-                                        Iter, end)]() mutable -> void {
-                                    this_->template await_range<I>(
-                                        HPX_MOVE(next), HPX_MOVE(end));
-                                });
+                            next_future_data->execute_deferred();
 
-                            // explicitly destruct iterators as those might
-                            // become dangling after we make ourselves ready
-                            next = std::decay_t<Iter>{};
-                            end = std::decay_t<Iter>{};
-                            return;
+                            // execute_deferred might have made the future ready
+                            if (!next_future_data->is_ready())
+                            {
+                                // Attach a continuation to this future which will
+                                // re-evaluate it and continue to the next element
+                                // in the sequence (if any).
+                                next_future_data->set_on_completed(
+                                    [this_ = HPX_MOVE(this_),
+                                        next = HPX_FORWARD(Iter, next),
+                                        end = HPX_FORWARD(
+                                            Iter, end)]() mutable -> void {
+                                        this_->template await_range<I>(
+                                            HPX_MOVE(next), HPX_MOVE(end));
+                                    });
+
+                                // explicitly destruct iterators as those might
+                                // become dangling after we make ourselves ready
+                                next = std::decay_t<Iter>{};
+                                end = std::decay_t<Iter>{};
+
+                                return;
+                            }
+                        }
+
+                        // check whether the current future is exceptional
+                        if (!has_exceptional_results_ &&
+                            next_future_data->has_exception())
+                        {
+                            has_exceptional_results_ = true;
                         }
                     }
                 }
@@ -318,22 +329,32 @@ namespace hpx {
                 auto next_future_data =
                     hpx::traits::detail::get_shared_state(hpx::get<I>(t_));
 
-                if (next_future_data && !next_future_data->is_ready())
+                if (next_future_data)
                 {
-                    next_future_data->execute_deferred();
-
-                    // execute_deferred might have made the future ready
                     if (!next_future_data->is_ready())
                     {
-                        // Attach a continuation to this future which will
-                        // re-evaluate it and continue to the next argument
-                        // (if any).
-                        next_future_data->set_on_completed(
-                            [this_ = HPX_MOVE(this_)]() -> void {
-                                this_->template await_future<I>();
-                            });
+                        next_future_data->execute_deferred();
 
-                        return;
+                        // execute_deferred might have made the future ready
+                        if (!next_future_data->is_ready())
+                        {
+                            // Attach a continuation to this future which will
+                            // re-evaluate it and continue to the next argument
+                            // (if any).
+                            next_future_data->set_on_completed(
+                                [this_ = HPX_MOVE(this_)]() -> void {
+                                    this_->template await_future<I>();
+                                });
+
+                            return;
+                        }
+                    }
+
+                    // check whether the current future is exceptional
+                    if (!has_exceptional_results_ &&
+                        next_future_data->has_exception())
+                    {
+                        has_exceptional_results_ = true;
                     }
                 }
 
@@ -369,7 +390,7 @@ namespace hpx {
             }
 
         public:
-            void wait_all()
+            bool wait_all()
             {
                 do_await<0>();
 
@@ -379,16 +400,21 @@ namespace hpx {
                 {
                     this->wait();
                 }
+
+                // return whether at least one of the futures has become
+                // exceptional
+                return has_exceptional_results_;
             }
 
         private:
             Tuple const& t_;
+            bool has_exceptional_results_ = false;
         };
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
-    void wait_all_nothrow(std::vector<Future> const& values)
+    bool wait_all_nothrow(std::vector<Future> const& values)
     {
         if (!values.empty())
         {
@@ -399,38 +425,46 @@ namespace hpx {
 
             // frame is initialized with initial reference count
             hpx::intrusive_ptr<frame_type> frame(new frame_type(data), false);
-            frame->wait_all();
+            return frame->wait_all();
         }
+        return false;
     }
 
     template <typename Future>
     void wait_all(std::vector<Future> const& values)
     {
-        hpx::wait_all_nothrow(values);
-        hpx::detail::throw_if_exceptional(values);
+        if (hpx::wait_all_nothrow(values))
+        {
+            hpx::detail::throw_if_exceptional(values);
+        }
     }
 
     template <typename Future>
-    HPX_FORCEINLINE void wait_all_nothrow(std::vector<Future>& values)
+    HPX_FORCEINLINE bool wait_all_nothrow(std::vector<Future>& values)
     {
-        hpx::wait_all_nothrow(const_cast<std::vector<Future> const&>(values));
+        return hpx::wait_all_nothrow(
+            const_cast<std::vector<Future> const&>(values));
     }
 
     template <typename Future>
     HPX_FORCEINLINE void wait_all(std::vector<Future>& values)
     {
-        hpx::wait_all_nothrow(const_cast<std::vector<Future> const&>(values));
-        hpx::detail::throw_if_exceptional(values);
+        if (hpx::wait_all_nothrow(
+                const_cast<std::vector<Future> const&>(values)))
+        {
+            hpx::detail::throw_if_exceptional(values);
+        }
     }
 
     template <typename Future>
 #if !defined(HPX_INTEL_VERSION)
     HPX_FORCEINLINE
 #endif
-        void
+        bool
         wait_all_nothrow(std::vector<Future>&& values)
     {
-        hpx::wait_all_nothrow(const_cast<std::vector<Future> const&>(values));
+        return hpx::wait_all_nothrow(
+            const_cast<std::vector<Future> const&>(values));
     }
 
     template <typename Future>
@@ -440,13 +474,16 @@ namespace hpx {
         void
         wait_all(std::vector<Future>&& values)
     {
-        hpx::wait_all_nothrow(const_cast<std::vector<Future> const&>(values));
-        hpx::detail::throw_if_exceptional(values);
+        if (hpx::wait_all_nothrow(
+                const_cast<std::vector<Future> const&>(values)))
+        {
+            hpx::detail::throw_if_exceptional(values);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, std::size_t N>
-    void wait_all_nothrow(std::array<Future, N> const& values)
+    bool wait_all_nothrow(std::array<Future, N> const& values)
     {
         using result_type = hpx::tuple<std::array<Future, N> const&>;
         using frame_type = hpx::detail::wait_all_frame<result_type>;
@@ -455,53 +492,64 @@ namespace hpx {
 
         // frame is initialized with initial reference count
         hpx::intrusive_ptr<frame_type> frame(new frame_type(data), false);
-        frame->wait_all();
+        return frame->wait_all();
     }
 
     template <typename Future, std::size_t N>
     void wait_all(std::array<Future, N> const& values)
     {
-        hpx::wait_all_nothrow(values);
-        hpx::detail::throw_if_exceptional(values);
+        if (hpx::wait_all_nothrow(values))
+        {
+            hpx::detail::throw_if_exceptional(values);
+        }
     }
 
     template <typename Future, std::size_t N>
-    HPX_FORCEINLINE void wait_all_nothrow(std::array<Future, N>& values)
+    HPX_FORCEINLINE bool wait_all_nothrow(std::array<Future, N>& values)
     {
-        hpx::wait_all_nothrow(const_cast<std::array<Future, N> const&>(values));
+        return hpx::wait_all_nothrow(
+            const_cast<std::array<Future, N> const&>(values));
     }
 
     template <typename Future, std::size_t N>
     HPX_FORCEINLINE void wait_all(std::array<Future, N>& values)
     {
-        hpx::wait_all_nothrow(const_cast<std::array<Future, N> const&>(values));
-        hpx::detail::throw_if_exceptional(values);
+        if (hpx::wait_all_nothrow(
+                const_cast<std::array<Future, N> const&>(values)))
+        {
+            hpx::detail::throw_if_exceptional(values);
+        }
     }
 
     template <typename Future, std::size_t N>
-    HPX_FORCEINLINE void wait_all_nothrow(std::array<Future, N>&& values)
+    HPX_FORCEINLINE bool wait_all_nothrow(std::array<Future, N>&& values)
     {
-        hpx::wait_all_nothrow(const_cast<std::array<Future, N> const&>(values));
+        return hpx::wait_all_nothrow(
+            const_cast<std::array<Future, N> const&>(values));
     }
 
     template <typename Future, std::size_t N>
     HPX_FORCEINLINE void wait_all(std::array<Future, N>&& values)
     {
-        hpx::wait_all_nothrow(const_cast<std::array<Future, N> const&>(values));
-        hpx::detail::throw_if_exceptional(values);
+        if (hpx::wait_all_nothrow(
+                const_cast<std::array<Future, N> const&>(values)))
+        {
+            hpx::detail::throw_if_exceptional(values);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator,
         typename Enable =
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    void wait_all_nothrow(Iterator begin, Iterator end)
+    bool wait_all_nothrow(Iterator begin, Iterator end)
     {
         if (begin != end)
         {
             auto values = traits::acquire_shared_state<Iterator>()(begin, end);
-            hpx::wait_all_nothrow(values);
+            return hpx::wait_all_nothrow(values);
         }
+        return false;
     }
 
     template <typename Iterator,
@@ -512,8 +560,10 @@ namespace hpx {
         if (begin != end)
         {
             auto values = traits::acquire_shared_state<Iterator>()(begin, end);
-            hpx::wait_all_nothrow(values);
-            hpx::detail::throw_if_exceptional(values);
+            if (hpx::wait_all_nothrow(values))
+            {
+                hpx::detail::throw_if_exceptional(values);
+            }
         }
     }
 
@@ -521,14 +571,15 @@ namespace hpx {
     template <typename Iterator,
         typename Enable =
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    void wait_all_n_nothrow(Iterator begin, std::size_t count)
+    bool wait_all_n_nothrow(Iterator begin, std::size_t count)
     {
         if (count != 0)
         {
             auto values =
                 traits::acquire_shared_state<Iterator>()(begin, count);
-            hpx::wait_all_nothrow(values);
+            return hpx::wait_all_nothrow(values);
         }
+        return false;
     }
 
     template <typename Iterator,
@@ -540,18 +591,23 @@ namespace hpx {
         {
             auto values =
                 traits::acquire_shared_state<Iterator>()(begin, count);
-            hpx::wait_all_nothrow(values);
-            hpx::detail::throw_if_exceptional(values);
+            if (hpx::wait_all_nothrow(values))
+            {
+                hpx::detail::throw_if_exceptional(values);
+            }
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    constexpr inline void wait_all_nothrow() noexcept {}
+    constexpr inline bool wait_all_nothrow() noexcept
+    {
+        return false;
+    }
     constexpr inline void wait_all() noexcept {}
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename... Ts>
-    void wait_all_nothrow(Ts&&... ts)
+    bool wait_all_nothrow(Ts&&... ts)
     {
         if constexpr (sizeof...(Ts) != 0)
         {
@@ -564,15 +620,18 @@ namespace hpx {
 
             // frame is initialized with initial reference count
             hpx::intrusive_ptr<frame_type> frame(new frame_type(values), false);
-            frame->wait_all();
+            return frame->wait_all();
         }
+        return false;
     }
 
     template <typename... Ts>
     void wait_all(Ts&&... ts)
     {
-        hpx::wait_all_nothrow(ts...);
-        hpx::detail::throw_if_exceptional(HPX_FORWARD(Ts, ts)...);
+        if (hpx::wait_all_nothrow(ts...))
+        {
+            hpx::detail::throw_if_exceptional(HPX_FORWARD(Ts, ts)...);
+        }
     }
 }    // namespace hpx
 

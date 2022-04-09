@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,16 +13,9 @@
 #include <stdexcept>
 #include <vector>
 
-int make_int_slowly()
-{
-    hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-    return 42;
-}
-
 hpx::future<int> make_future()
 {
-    hpx::packaged_task<int()> task(make_int_slowly);
-    return task.get_future();
+    return hpx::make_ready_future_after(std::chrono::milliseconds(100), 42);
 }
 
 void test_wait_some()
@@ -32,7 +25,7 @@ void test_wait_some()
         future_array.push_back(make_future());
         future_array.push_back(make_future());
 
-        hpx::wait_some_nothrow(1, future_array);
+        HPX_TEST(!hpx::wait_some_nothrow(1, future_array));
 
         int count = 0;
         for (auto& f : future_array)
@@ -48,7 +41,7 @@ void test_wait_some()
         auto f1 = make_future();
         auto f2 = make_future();
 
-        hpx::wait_some_nothrow(1, f1, f2);
+        HPX_TEST(!hpx::wait_some_nothrow(1, f1, f2));
 
         HPX_TEST(f1.is_ready() || f2.is_ready());
     }
@@ -61,7 +54,7 @@ void test_wait_some()
         bool caught_exception = false;
         try
         {
-            hpx::wait_some_nothrow(1, future_array);
+            HPX_TEST(hpx::wait_some_nothrow(1, future_array));
 
             int count = 0;
             for (auto& f : future_array)
@@ -135,7 +128,8 @@ void test_wait_some_n()
         future_array.push_back(make_future());
         future_array.push_back(make_future());
 
-        hpx::wait_some_n_nothrow(1, future_array.begin(), future_array.size());
+        HPX_TEST(!hpx::wait_some_n_nothrow(
+            1, future_array.begin(), future_array.size()));
 
         int count = 0;
         for (auto& f : future_array)
@@ -156,8 +150,8 @@ void test_wait_some_n()
         bool caught_exception = false;
         try
         {
-            hpx::wait_some_n_nothrow(
-                1, future_array.begin(), future_array.size());
+            HPX_TEST(hpx::wait_some_n_nothrow(
+                1, future_array.begin(), future_array.size()));
 
             int count = 0;
             for (auto& f : future_array)
