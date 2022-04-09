@@ -192,7 +192,8 @@ namespace hpx::parcelset {
                     }
 
                     serialization::output_archive archive(buffer.data_,
-                        archive_flags, &buffer.chunks_, filter.get());
+                        archive_flags, &buffer.chunks_, filter.get(),
+                        pp.get_zero_copy_serialization_threshold());
 
                     if (num_parcels != std::size_t(-1))
                         archive << parcels_sent;    //-V128

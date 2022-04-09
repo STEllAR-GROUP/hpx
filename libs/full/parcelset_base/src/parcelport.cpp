@@ -33,7 +33,8 @@ namespace hpx::parcelset {
 
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::runtime_configuration const& ini,
-        locality const& here, std::string const& type)
+        locality const& here, std::string const& type,
+        std::size_t zero_copy_serialization_threshold)
       : num_parcel_destinations_(0)
       , here_(here)
       , max_inbound_message_size_(ini.get_max_inbound_message_size())
@@ -44,6 +45,7 @@ namespace hpx::parcelset {
       , priority_(hpx::util::get_entry_as<int>(
             ini, "hpx.parcel." + type + ".priority", 0))
       , type_(type)
+      , zero_copy_serialization_threshold_(zero_copy_serialization_threshold)
     {
         std::string key("hpx.parcel.");
         key += type;
@@ -70,17 +72,23 @@ namespace hpx::parcelset {
         }
     }
 
-    int parcelport::priority() const
+    int parcelport::priority() const noexcept
     {
         return priority_;
     }
 
-    std::string const& parcelport::type() const
+    std::string const& parcelport::type() const noexcept
     {
         return type_;
     }
 
-    locality const& parcelport::here() const
+    std::size_t parcelport::get_zero_copy_serialization_threshold()
+        const noexcept
+    {
+        return zero_copy_serialization_threshold_;
+    }
+
+    locality const& parcelport::here() const noexcept
     {
         return here_;
     }
@@ -283,27 +291,27 @@ namespace hpx::parcelset {
         return pp.get_max_inbound_message_size();
     }
 
-    std::int64_t parcelport::get_max_inbound_message_size() const
+    std::int64_t parcelport::get_max_inbound_message_size() const noexcept
     {
         return max_inbound_message_size_;
     }
 
-    std::int64_t parcelport::get_max_outbound_message_size() const
+    std::int64_t parcelport::get_max_outbound_message_size() const noexcept
     {
         return max_outbound_message_size_;
     }
 
-    bool parcelport::allow_array_optimizations() const
+    bool parcelport::allow_array_optimizations() const noexcept
     {
         return allow_array_optimizations_;
     }
 
-    bool parcelport::allow_zero_copy_optimizations() const
+    bool parcelport::allow_zero_copy_optimizations() const noexcept
     {
         return allow_zero_copy_optimizations_;
     }
 
-    bool parcelport::async_serialization() const
+    bool parcelport::async_serialization() const noexcept
     {
         return async_serialization_;
     }

@@ -110,6 +110,14 @@ namespace hpx::plugins {
                 name_uc +
                 "_ZERO_COPY_OPTIMIZATION:"
                 "$[hpx.parcel.zero_copy_optimization]}");
+            fillini.emplace_back(
+                "zero_copy_serialization_threshold = ${HPX_PARCEL_" + name_uc +
+                "_ZERO_COPY_SERIALIZATION_THRESHOLD:"
+                "$[hpx.parcel.zero_copy_serialization_threshold]}");
+            fillini.emplace_back("max_background_threads = ${HPX_PARCEL_" +
+                name_uc +
+                "_MAX_BACKGROUND_THREADS:"
+                "$[hpx.parcel.max_background_threads]}");
             fillini.emplace_back("async_serialization = ${HPX_PARCEL_" +
                 name_uc +
                 "_ASYNC_SERIALIZATION:"

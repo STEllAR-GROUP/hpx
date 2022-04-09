@@ -62,7 +62,8 @@ namespace hpx::parcelset {
 
         /// Construct the parcelport on the given locality.
         parcelport(util::runtime_configuration const& ini, locality const& here,
-            std::string const& type);
+            std::string const& type,
+            std::size_t zero_copy_serialization_threshold);
 
         /// Virtual destructor
         virtual ~parcelport() = default;
@@ -70,14 +71,18 @@ namespace hpx::parcelset {
         virtual bool can_bootstrap() const = 0;
 
         /// Access the parcelport priority (negative if disabled)
-        int priority() const;
+        int priority() const noexcept;
 
         /// Retrieve the type of the locality represented by this parcelport
-        std::string const& type() const;
+        std::string const& type() const noexcept;
 
         /// This accessor returns a reference to the locality this parcelport
         /// is associated with.
-        locality const& here() const;
+        locality const& here() const noexcept;
+
+        /// Return the threshold to use for deciding whether to zero-copy
+        // serialize an entity
+        std::size_t get_zero_copy_serialization_threshold() const noexcept;
 
         /// Start the parcelport I/O thread pool.
         ///
@@ -269,19 +274,19 @@ namespace hpx::parcelset {
 
         /// Return the configured maximal allowed inbound message data
         /// size
-        std::int64_t get_max_inbound_message_size() const;
+        std::int64_t get_max_inbound_message_size() const noexcept;
 
         /// Return the configured maximal allowed outbound message data
         /// size
-        std::int64_t get_max_outbound_message_size() const;
+        std::int64_t get_max_outbound_message_size() const noexcept;
 
         /// Return whether it is allowed to apply array optimizations
-        bool allow_array_optimizations() const;
+        bool allow_array_optimizations() const noexcept;
 
         /// Return whether it is allowed to apply zero copy optimizations
-        bool allow_zero_copy_optimizations() const;
+        bool allow_zero_copy_optimizations() const noexcept;
 
-        bool async_serialization() const;
+        bool async_serialization() const noexcept;
 
         // callback while bootstrap the parcel layer
         void early_pending_parcel_handler(
@@ -328,6 +333,8 @@ namespace hpx::parcelset {
         /// priority of the parcelport
         int priority_;
         std::string type_;
+
+        std::size_t zero_copy_serialization_threshold_;
     };
 }    // namespace hpx::parcelset
 

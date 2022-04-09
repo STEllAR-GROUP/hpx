@@ -107,12 +107,35 @@ namespace hpx::parcelset {
                 HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY);
         }
 
+        static std::size_t zero_copy_serialization_threshold(
+            util::runtime_configuration const& ini)
+        {
+            std::string key("hpx.parcel.");
+            key += connection_handler_type();
+
+            return hpx::util::get_entry_as<std::size_t>(ini,
+                key + ".zero_copy_serialization_threshold",
+                HPX_ZERO_COPY_SERIALIZATION_THRESHOLD);
+        }
+
+        static std::size_t max_background_threads(
+            util::runtime_configuration const& ini)
+        {
+            std::string key("hpx.parcel.");
+            key += connection_handler_type();
+
+            return hpx::util::get_entry_as<std::size_t>(ini,
+                key + ".max_background_threads",
+                (std::numeric_limits<std::size_t>::max)());
+        }
+
     public:
         /// Construct the parcelport on the given locality.
         parcelport_impl(util::runtime_configuration const& ini,
             locality const& here,
             threads::policies::callback_notifier const& notifier)
-          : parcelport(ini, here, connection_handler_type())
+          : parcelport(ini, here, connection_handler_type(),
+                zero_copy_serialization_threshold(ini))
           , io_service_pool_(thread_pool_size(ini), notifier, pool_name(),
                 pool_name_postfix())
           , connection_cache_(
@@ -120,9 +143,7 @@ namespace hpx::parcelset {
           , archive_flags_(0)
           , operations_in_flight_(0)
           , num_thread_(0)
-          , max_background_thread_(hpx::util::from_string<std::size_t>(
-                hpx::get_config_entry("hpx.max_background_threads",
-                    (std::numeric_limits<std::size_t>::max)())))
+          , max_background_thread_(max_background_threads(ini))
         {
             std::string endian_out = get_config_entry("hpx.parcel.endian_out",
                 endian::native == endian::big ? "big" : "little");
@@ -149,14 +170,10 @@ namespace hpx::parcelset {
                 archive_flags_ = archive_flags_ |
                     int(serialization::archive_flags::disable_data_chunking);
             }
-            else
+            else if (!this->allow_zero_copy_optimizations())
             {
-                if (!this->allow_zero_copy_optimizations())
-                {
-                    archive_flags_ = archive_flags_ |
-                        int(serialization::archive_flags::
-                                disable_data_chunking);
-                }
+                archive_flags_ = archive_flags_ |
+                    int(serialization::archive_flags::disable_data_chunking);
             }
         }
 

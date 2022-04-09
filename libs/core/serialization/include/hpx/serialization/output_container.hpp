@@ -169,11 +169,19 @@ namespace hpx::serialization {
         using access_traits = traits::serialization_access_data<Container>;
 
         explicit output_container(Container& cont,
-            std::vector<serialization_chunk>* chunks = nullptr) noexcept
+            std::vector<serialization_chunk>* chunks = nullptr,
+            std::size_t zero_copy_serialization_threshold = 0) noexcept
           : cont_(cont)
           , current_(0)
           , chunker_(chunks)
+          , zero_copy_serialization_threshold_(
+                zero_copy_serialization_threshold)
         {
+            if (zero_copy_serialization_threshold_ == 0)
+            {
+                zero_copy_serialization_threshold_ =
+                    HPX_ZERO_COPY_SERIALIZATION_THRESHOLD;
+            }
             chunker_.reset();
         }
 
@@ -239,7 +247,7 @@ namespace hpx::serialization {
         std::size_t save_binary_chunk(
             void const* address, std::size_t count) override
         {
-            if (count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
+            if (count < zero_copy_serialization_threshold_)
             {
                 // fall back to serialization_chunk-less archive
                 this->output_container::save_binary(address, count);
@@ -280,6 +288,7 @@ namespace hpx::serialization {
         Container& cont_;
         std::size_t current_;
         Chunker chunker_;
+        std::size_t zero_copy_serialization_threshold_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -290,8 +299,9 @@ namespace hpx::serialization {
         using base_type = output_container<Container, Chunker>;
 
         explicit filtered_output_container(Container& cont,
-            std::vector<serialization_chunk>* chunks = nullptr) noexcept
-          : base_type(cont, chunks)
+            std::vector<serialization_chunk>* chunks = nullptr,
+            std::size_t zero_copy_serialization_threshold = 0) noexcept
+          : base_type(cont, chunks, zero_copy_serialization_threshold)
           , start_compressing_at_(0)
           , filter_(nullptr)
         {
@@ -350,7 +360,7 @@ namespace hpx::serialization {
         std::size_t save_binary_chunk(
             void const* address, std::size_t count) override
         {
-            if (count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
+            if (count < this->zero_copy_serialization_threshold_)
             {
                 // fall back to serialization_chunk-less archive
                 HPX_ASSERT(count != 0);

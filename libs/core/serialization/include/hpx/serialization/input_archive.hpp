@@ -73,6 +73,12 @@ namespace hpx::serialization {
             load(flags);
             flags_ = flags;
 
+            // load the zero-copy limit used by the other end
+            std::size_t zero_copy_serialization_threshold;
+            load(zero_copy_serialization_threshold);
+            buffer_->set_zero_copy_serialization_threshold(
+                zero_copy_serialization_threshold);
+
             bool has_filter = false;
             load(has_filter);
 

@@ -41,6 +41,8 @@ namespace hpx::serialization {
             return false;
         }
         virtual void set_filter(binary_filter* filter) = 0;
+        virtual void set_zero_copy_serialization_threshold(
+            std::size_t zero_copy_serialization_threshold) = 0;
         virtual void load_binary(void* address, std::size_t count) = 0;
         virtual void load_binary_chunk(void* address, std::size_t count) = 0;
     };
