@@ -281,7 +281,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         ///////////////////////////////////////////////////////////////////////
         // default property implementation allowing to handle
-        // reset_thread_distribution
+        // processing_units_count_property
         struct processing_units_count_property
         {
             // default implementation
@@ -294,7 +294,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support
-        // reset_thread_distribution
+        // processing_units_count_property
         using get_processing_units_count_target_t =
             get_parameters_property_t<processing_units_count_property,
                 has_processing_units_count_t>;

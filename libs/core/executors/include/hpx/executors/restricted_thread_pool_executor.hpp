@@ -144,20 +144,18 @@ namespace hpx { namespace parallel { namespace execution {
             auto policy = launch::async_policy(priority_, stacksize_,
                 threads::thread_schedule_hint(get_next_thread_num()));
 
-            detail::post_policy_dispatch<launch::async_policy>::call(
+            hpx::detail::post_policy_dispatch<launch::async_policy>::call(
                 policy, desc, pool_, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename... Ts>
-        std::vector<hpx::future<
-            typename detail::bulk_function_result<F, S, Ts...>::type>>
-        bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
+        auto bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
         {
             auto policy =
                 launch::async_policy(priority_, stacksize_, schedulehint_);
 
-            return detail::hierarchical_bulk_async_execute_helper(pool_,
-                first_thread_, num_threads_, hierarchical_threshold_, policy,
+            return detail::hierarchical_bulk_async_execute(pool_, first_thread_,
+                num_threads_, hierarchical_threshold_, policy,
                 HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 

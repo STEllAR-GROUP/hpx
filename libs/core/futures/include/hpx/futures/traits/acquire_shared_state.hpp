@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2016 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,6 +19,7 @@
 #include <hpx/util/detail/reserve.hpp>
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
@@ -84,26 +85,42 @@ namespace hpx { namespace traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Cont>
+        struct is_static_array : std::false_type
+        {
+        };
+
+        template <typename T, std::size_t N>
+        struct is_static_array<std::array<T, N>> : std::true_type
+        {
+        };
+
         template <typename Range>
         struct acquire_shared_state_impl<Range,
             std::enable_if_t<traits::is_future_range_v<Range>>>
         {
-            using future_type =
-                typename traits::future_range_traits<Range>::future_type;
-            using shared_state_ptr =
-                traits::detail::shared_state_ptr_for_t<future_type>;
-            using type = std::vector<shared_state_ptr>;
+            using type = traits::detail::shared_state_ptr_for_t<Range>;
 
             template <typename Range_>
             HPX_FORCEINLINE type operator()(Range_&& futures) const
             {
-                type values;
-                detail::reserve_if_random_access_by_range(values, futures);
+                if constexpr (detail::is_static_array<type>::value)
+                {
+                    type values;
+                    std::transform(util::begin(futures), util::end(futures),
+                        util::begin(values), acquire_shared_state_disp());
+                    return values;
+                }
+                else
+                {
+                    type values;
+                    detail::reserve_if_random_access_by_range(values, futures);
 
-                std::transform(util::begin(futures), util::end(futures),
-                    std::back_inserter(values), acquire_shared_state_disp());
-
-                return values;
+                    std::transform(util::begin(futures), util::end(futures),
+                        std::back_inserter(values),
+                        acquire_shared_state_disp());
+                    return values;
+                }
             }
         };
 

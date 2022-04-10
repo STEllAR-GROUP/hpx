@@ -186,10 +186,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return sequential_generate(
                         HPX_MOVE(policy), part_begin, part_end, HPX_MOVE(f));
                 };
+
                 return util::partitioner<ExPolicy, Iter>::call(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
-                    [first, last](std::vector<hpx::future<Iter>>&&) {
+                    [first, last](auto&&) {
                         return detail::advance_to_sentinel(first, last);
                     });
             }
@@ -230,8 +231,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
                 return util::partitioner<ExPolicy, FwdIter>::call(
                     HPX_FORWARD(ExPolicy, policy), first, count, HPX_MOVE(f1),
-                    [first, count](
-                        std::vector<hpx::future<FwdIter>>&&) mutable {
+                    [first, count](auto&&) mutable {
                         std::advance(first, count);
                         return first;
                     });

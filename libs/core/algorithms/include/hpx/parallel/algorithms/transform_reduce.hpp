@@ -394,7 +394,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     detail::distance(first, last), HPX_MOVE(f1),
                     hpx::unwrapping([init = HPX_FORWARD(T_, init),
                                         r = HPX_FORWARD(Reduce, r)](
-                                        std::vector<T>&& results) mutable -> T {
+                                        auto&& results) mutable -> T {
                         return util::accumulate_n(hpx::util::begin(results),
                             hpx::util::size(results), init, r);
                     }));
@@ -579,7 +579,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     HPX_FORWARD(ExPolicy, policy),
                     make_zip_iterator(first1, first2), count, HPX_MOVE(f1),
                     [init = HPX_FORWARD(T_, init), op1 = HPX_FORWARD(Op1, op1)](
-                        std::vector<hpx::future<T>>&& results) mutable -> T {
+                        auto&& results) mutable -> T {
                         T ret = HPX_MOVE(init);
                         for (auto&& fut : results)
                         {

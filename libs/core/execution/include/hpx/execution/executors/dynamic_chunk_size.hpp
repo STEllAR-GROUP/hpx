@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,7 +33,8 @@ namespace hpx { namespace execution {
         ///                     number of loop iterations to schedule together.
         ///                     The default chunk size is 1.
         ///
-        constexpr explicit dynamic_chunk_size(std::size_t chunk_size = 1)
+        constexpr explicit dynamic_chunk_size(
+            std::size_t chunk_size = 1) noexcept
           : chunk_size_(chunk_size)
         {
         }
@@ -41,7 +42,7 @@ namespace hpx { namespace execution {
         /// \cond NOINTERNAL
         template <typename Executor, typename F>
         constexpr std::size_t get_chunk_size(
-            Executor&, F&&, std::size_t, std::size_t) const
+            Executor&, F&&, std::size_t, std::size_t) const noexcept
         {
             return chunk_size_;
         }
@@ -54,7 +55,9 @@ namespace hpx { namespace execution {
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int /* version */)
         {
-            ar& chunk_size_;
+            // clang-format off
+            ar & chunk_size_;
+            // clang-format on
         }
         /// \endcond
 

@@ -106,10 +106,10 @@ int hpx_main()
 
     hpx::parallel::define_spmd_block(num_images, bulk_test, c1.data());
 
-    std::vector<hpx::future<void>> join = hpx::parallel::define_spmd_block(
+    auto&& join = hpx::parallel::define_spmd_block(
         par(task), num_images, bulk_test, c2.data());
 
-    hpx::wait_all(join);
+    hpx::wait_all(std::move(join));
 
     hpx::parallel::define_spmd_block(num_images, bulk_test_function, c3.data());
 

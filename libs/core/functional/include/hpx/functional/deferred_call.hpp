@@ -81,8 +81,7 @@ namespace hpx { namespace util {
             deferred(deferred const&) = delete;
             deferred& operator=(deferred const&) = delete;
 
-            HPX_HOST_DEVICE HPX_FORCEINLINE util::invoke_result_t<F, Ts...>
-            operator()()
+            HPX_HOST_DEVICE HPX_FORCEINLINE decltype(auto) operator()()
             {
                 return HPX_INVOKE(
                     HPX_MOVE(_f), HPX_MOVE(_args).template get<Is>()...);

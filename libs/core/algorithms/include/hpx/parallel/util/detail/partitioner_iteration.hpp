@@ -20,7 +20,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     template <typename Result, typename F>
     struct partitioner_iteration
     {
-        typename std::decay<F>::type f_;
+        std::decay_t<F> f_;
 
         template <typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE Result operator()(T&& t)
@@ -43,8 +43,7 @@ namespace hpx { namespace traits {
             parallel::util::detail::partitioner_iteration<Result, F> const&
                 f) noexcept
         {
-            return get_function_address<typename std::decay<F>::type>::call(
-                f.f_);
+            return get_function_address<std::decay_t<F>>::call(f.f_);
         }
     };
 
@@ -56,8 +55,7 @@ namespace hpx { namespace traits {
             parallel::util::detail::partitioner_iteration<Result, F> const&
                 f) noexcept
         {
-            return get_function_annotation<typename std::decay<F>::type>::call(
-                f.f_);
+            return get_function_annotation<std::decay_t<F>>::call(f.f_);
         }
     };
 
@@ -70,8 +68,7 @@ namespace hpx { namespace traits {
             parallel::util::detail::partitioner_iteration<Result, F> const&
                 f) noexcept
         {
-            return get_function_annotation_itt<
-                typename std::decay<F>::type>::call(f.f_);
+            return get_function_annotation_itt<std::decay_t<F>>::call(f.f_);
         }
     };
 #endif

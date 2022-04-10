@@ -279,12 +279,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy, T>::call(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
-                    hpx::unwrapping([init = HPX_FORWARD(T_, init),
-                                        r = HPX_FORWARD(Reduce, r)](
-                                        std::vector<T>&& results) -> T {
-                        return util::accumulate_n(hpx::util::begin(results),
-                            hpx::util::size(results), init, r);
-                    }));
+                    hpx::unwrapping(
+                        [init = HPX_FORWARD(T_, init),
+                            r = HPX_FORWARD(Reduce, r)](auto&& results) -> T {
+                            return util::accumulate_n(hpx::util::begin(results),
+                                hpx::util::size(results), init, r);
+                        }));
             }
         };
         /// \endcond

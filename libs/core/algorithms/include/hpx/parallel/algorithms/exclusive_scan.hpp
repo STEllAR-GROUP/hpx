@@ -299,6 +299,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -448,7 +449,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             std::vector<hpx::future<void>>&& data) {
                             // make sure iterators embedded in function object that is
                             // attached to futures are invalidated
-                            data.clear();
+                            util::detail::clear_container(data);
                             return util::in_out_result<FwdIter1, FwdIter2>{
                                 last_iter, final_dest};
                         });

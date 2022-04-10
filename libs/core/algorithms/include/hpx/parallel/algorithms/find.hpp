@@ -388,6 +388,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/find.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -448,12 +449,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         part_size, tok, val, HPX_FORWARD(Proj, proj));
                 };
 
-                auto f2 =
-                    [tok, count, first, last](
-                        std::vector<hpx::future<void>>&& data) mutable -> Iter {
+                auto f2 = [tok, count, first, last](
+                              auto&& data) mutable -> Iter {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
 
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());
@@ -524,12 +524,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         HPX_FORWARD(Proj, proj));
                 };
 
-                auto f2 =
-                    [tok, count, first, last](
-                        std::vector<hpx::future<void>>&& data) mutable -> Iter {
+                auto f2 = [tok, count, first, last](
+                              auto&& data) mutable -> Iter {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
 
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());
@@ -601,12 +600,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         HPX_FORWARD(Proj, proj));
                 };
 
-                auto f2 =
-                    [tok, count, first, last](
-                        std::vector<hpx::future<void>>&& data) mutable -> Iter {
+                auto f2 = [tok, count, first, last](
+                              auto&& data) mutable -> Iter {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
 
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());
@@ -694,11 +692,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 auto f2 = [tok, count, first1, last1](
-                              std::vector<hpx::future<void>>&& data) mutable
-                    -> Iter1 {
+                              auto&& data) mutable -> Iter1 {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
 
                     difference_type find_end_res = tok.get_data();
 
@@ -780,11 +777,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 auto f2 = [tok, count, first, last](
-                              std::vector<hpx::future<void>>&& data) mutable
-                    -> FwdIter {
+                              auto&& data) mutable -> FwdIter {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
 
                     difference_type find_first_of_res = tok.get_data();
 

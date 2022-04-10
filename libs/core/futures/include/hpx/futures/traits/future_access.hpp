@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,8 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/type_support/unused.hpp>
 
+#include <array>
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -96,6 +98,13 @@ namespace hpx { namespace traits {
         {
             using type =
                 std::vector<typename shared_state_ptr_for<Future>::type>;
+        };
+
+        template <typename Future, std::size_t N>
+        struct shared_state_ptr_for<std::array<Future, N>>
+        {
+            using type =
+                std::array<typename shared_state_ptr_for<Future>::type, N>;
         };
 
         template <typename Future>

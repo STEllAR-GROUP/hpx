@@ -1391,7 +1391,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         hpx::future<FwdIter> parallel_partition(ExPolicy&& policy,
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
         {
-            hpx::future<FwdIter> f = execution::async_execute(
+            return execution::async_execute(
                 policy.executor(), [=]() mutable -> FwdIter {
                     try
                     {
@@ -1403,14 +1403,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         util::detail::handle_local_exceptions<ExPolicy>::call(
                             std::current_exception());
                     }
-
-                    // Not reachable.
-                    HPX_ASSERT(false);
-                    return partition_helper::call(
-                        policy, first, last, pred, proj);
                 });
-
-            return f;
         }
 
         template <typename FwdIter>

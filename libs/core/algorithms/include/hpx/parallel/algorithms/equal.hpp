@@ -282,8 +282,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy, bool>::call(
                     HPX_FORWARD(ExPolicy, policy),
                     hpx::util::make_zip_iterator(first1, first2), count1,
-                    HPX_MOVE(f1),
-                    [](std::vector<hpx::future<bool>>&& results) -> bool {
+                    HPX_MOVE(f1), [](auto&& results) -> bool {
                         return std::all_of(hpx::util::begin(results),
                             hpx::util::end(results),
                             [](hpx::future<bool>& val) { return val.get(); });
@@ -343,7 +342,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy, bool>::call(
                     HPX_FORWARD(ExPolicy, policy),
                     hpx::util::make_zip_iterator(first1, first2), count,
-                    HPX_MOVE(f1), [](std::vector<hpx::future<bool>>&& results) {
+                    HPX_MOVE(f1), [](auto&& results) {
                         return std::all_of(hpx::util::begin(results),
                             hpx::util::end(results),
                             [](hpx::future<bool>& val) { return val.get(); });

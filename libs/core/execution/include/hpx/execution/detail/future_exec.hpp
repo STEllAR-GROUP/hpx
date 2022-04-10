@@ -152,9 +152,8 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename F>
         void operator()(F&& f, hpx::util::thread_description desc)
         {
-            parallel::execution::detail::post_policy_dispatch<
-                hpx::launch::async_policy>::call(hpx::launch::async, desc,
-                HPX_FORWARD(F, f));
+            hpx::detail::post_policy_dispatch<hpx::launch::async_policy>::call(
+                hpx::launch::async, desc, HPX_FORWARD(F, f));
         }
     };
 

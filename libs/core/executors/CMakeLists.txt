@@ -80,6 +80,7 @@ add_hpx_module(
     hpx_async_base
     hpx_concepts
     hpx_config
+    hpx_errors
     hpx_execution
     hpx_futures
     hpx_hardware

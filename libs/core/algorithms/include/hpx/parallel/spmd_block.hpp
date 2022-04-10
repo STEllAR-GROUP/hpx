@@ -171,7 +171,7 @@ namespace hpx { namespace lcos { namespace local {
     // Asynchronous version
     template <typename ExPolicy, typename F, typename... Args,
         typename = std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
-    std::vector<hpx::future<void>> define_spmd_block(
+    decltype(auto) define_spmd_block(
         ExPolicy&& policy, std::size_t num_images, F&& f, Args&&... args)
     {
         static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
@@ -258,7 +258,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     // Asynchronous version
     template <typename ExPolicy, typename F, typename... Args,
         typename = std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
-    std::vector<hpx::future<void>> define_spmd_block(
+    decltype(auto) define_spmd_block(
         ExPolicy&& policy, std::size_t num_images, F&& f, Args&&... args)
     {
         return hpx::lcos::local::define_spmd_block(

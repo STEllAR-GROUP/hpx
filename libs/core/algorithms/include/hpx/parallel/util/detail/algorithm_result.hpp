@@ -246,10 +246,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename T = void>
-    struct algorithm_result
-      : algorithm_result_impl<typename std::decay<ExPolicy>::type, T>
+    struct algorithm_result : algorithm_result_impl<std::decay_t<ExPolicy>, T>
     {
-        static_assert(!std::is_lvalue_reference<T>::value,
+        static_assert(!std::is_lvalue_reference_v<T>,
             "T shouldn't be a lvalue reference");
     };
 
@@ -259,18 +258,18 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename U, typename Conv,
         HPX_CONCEPT_REQUIRES_(hpx::is_invocable_v<Conv, U>)>
-    constexpr typename hpx::util::invoke_result<Conv, U>::type
-    convert_to_result(U&& val, Conv&& conv)
+    constexpr hpx::util::invoke_result_t<Conv, U> convert_to_result(
+        U&& val, Conv&& conv)
     {
         return HPX_INVOKE(conv, val);
     }
 
     template <typename U, typename Conv,
         HPX_CONCEPT_REQUIRES_(hpx::is_invocable_v<Conv, U>)>
-    hpx::future<typename hpx::util::invoke_result<Conv, U>::type>
-    convert_to_result(hpx::future<U>&& f, Conv&& conv)
+    hpx::future<hpx::util::invoke_result_t<Conv, U>> convert_to_result(
+        hpx::future<U>&& f, Conv&& conv)
     {
-        using result_type = typename hpx::util::invoke_result<Conv, U>::type;
+        using result_type = hpx::util::invoke_result_t<Conv, U>;
 
         return hpx::make_future<result_type>(
             HPX_MOVE(f), HPX_FORWARD(Conv, conv));

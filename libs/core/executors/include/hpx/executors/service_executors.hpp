@@ -132,15 +132,9 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         bulk_then_execute(
             F&& f, Shape const& shape, Future&& predecessor, Ts&&... ts)
         {
-            using func_result_type =
-                typename parallel::execution::detail::then_bulk_function_result<
-                    F, Shape, Future, Ts...>::type;
-            using result_type = std::vector<hpx::future<func_result_type>>;
-
             auto func = parallel::execution::detail::
-                make_fused_bulk_async_execute_helper<result_type>(*this,
-                    HPX_FORWARD(F, f), shape,
-                    hpx::make_tuple(HPX_FORWARD(Ts, ts)...));
+                make_fused_bulk_async_execute_helper(*this, HPX_FORWARD(F, f),
+                    shape, hpx::make_tuple(HPX_FORWARD(Ts, ts)...));
             using vector_result_type =
                 typename parallel::execution::detail::bulk_then_execute_result<
                     F, Shape, Future, Ts...>::type;

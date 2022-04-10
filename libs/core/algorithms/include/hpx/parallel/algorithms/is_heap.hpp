@@ -148,6 +148,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
@@ -225,12 +226,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             }
                         });
                 };
-                auto f2 =
-                    [tok](
-                        std::vector<hpx::future<void>>&& data) mutable -> bool {
+                auto f2 = [tok](auto&& data) mutable -> bool {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
 
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());
@@ -338,12 +337,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             }
                         });
                 };
-                auto f2 =
-                    [tok, second](
-                        std::vector<hpx::future<void>>&& data) mutable -> Iter {
+                auto f2 = [tok, second](auto&& data) mutable -> Iter {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
 
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());
