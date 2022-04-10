@@ -761,8 +761,7 @@ namespace hpx { namespace lcos { namespace detail {
             error_code ec;
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(
-                    [this_ = HPX_MOVE(this_),
-                        init = HPX_FORWARD(Result_, init)]() {
+                    [this_, init = HPX_FORWARD(Result_, init)]() {
                         this_->set_value(init);
                     }),
                 "timed_future_data<Result>::timed_future_data",
