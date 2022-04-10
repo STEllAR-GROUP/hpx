@@ -283,11 +283,12 @@ namespace hpx { namespace parallel { namespace util {
             static R reduce(Items&& workitems, F&& f)
             {
                 // wait for all tasks to finish
-                hpx::wait_all_nothrow(workitems);
-
-                // always rethrow workitems has at least one exceptional future
-                handle_local_exceptions::call(workitems);
-
+                if (hpx::wait_all_nothrow(workitems))
+                {
+                    // always rethrow workitems has at least one exceptional
+                    // future
+                    handle_local_exceptions::call(workitems);
+                }
                 return f(HPX_MOVE(workitems));
             }
 
@@ -295,10 +296,12 @@ namespace hpx { namespace parallel { namespace util {
             static void reduce(Items&& workitems, hpx::util::empty_function)
             {
                 // wait for all tasks to finish
-                hpx::wait_all_nothrow(workitems);
-
-                // always rethrow workitems has at least one exceptional future
-                handle_local_exceptions::call(workitems);
+                if (hpx::wait_all_nothrow(workitems))
+                {
+                    // always rethrow workitems has at least one exceptional
+                    // future
+                    handle_local_exceptions::call(workitems);
+                }
             }
 
             template <typename Items1, typename Items2, typename F>

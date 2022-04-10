@@ -138,13 +138,14 @@ namespace hpx { namespace parallel { namespace util {
                 std::pair<Items1, Items2>&& items, F&& f, FwdIter last)
             {
                 // wait for all tasks to finish
-                hpx::wait_all_nothrow(hpx::get<0>(items), hpx::get<1>(items));
-
-                // always rethrow if inititems/workitems have at least one
-                // exceptional future
-                handle_local_exceptions::call(hpx::get<0>(items));
-                handle_local_exceptions::call(hpx::get<1>(items));
-
+                if (hpx::wait_all_nothrow(
+                        hpx::get<0>(items), hpx::get<1>(items)))
+                {
+                    // always rethrow if inititems/workitems have at least one
+                    // exceptional future
+                    handle_local_exceptions::call(hpx::get<0>(items));
+                    handle_local_exceptions::call(hpx::get<1>(items));
+                }
                 return f(HPX_MOVE(last));
             }
 
@@ -152,11 +153,12 @@ namespace hpx { namespace parallel { namespace util {
             static FwdIter reduce(Items&& items, F&& f, FwdIter last)
             {
                 // wait for all tasks to finish
-                hpx::wait_all_nothrow(items);
-
-                // always rethrow if items has at least one exceptional future
-                handle_local_exceptions::call(items);
-
+                if (hpx::wait_all_nothrow(items))
+                {
+                    // always rethrow if items has at least one exceptional
+                    // future
+                    handle_local_exceptions::call(items);
+                }
                 return f(HPX_MOVE(last));
             }
         };

@@ -86,13 +86,13 @@ namespace hpx { namespace parallel { namespace util {
             static R reduce(Items&& workitems, F&& f, Cleanup&& cleanup)
             {
                 // wait for all tasks to finish
-                hpx::wait_all_nothrow(workitems);
-
-                // always rethrow if 'errors' is not empty or workitems has
-                // exceptional future
-                handle_local_exceptions::call_with_cleanup(
-                    workitems, HPX_FORWARD(Cleanup, cleanup));
-
+                if (hpx::wait_all_nothrow(workitems))
+                {
+                    // always rethrow if 'errors' is not empty or workitems has
+                    // exceptional future
+                    handle_local_exceptions::call_with_cleanup(
+                        workitems, HPX_FORWARD(Cleanup, cleanup));
+                }
                 return f(HPX_MOVE(workitems));
             }
 

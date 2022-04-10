@@ -148,7 +148,10 @@ namespace hpx { namespace parallel { namespace util {
                     }
 
                     // Wait for all f1 tasks to finish
-                    hpx::wait_all_nothrow(workitems);
+                    if (hpx::wait_all_nothrow(workitems))
+                    {
+                        handle_local_exceptions::call(workitems, errors);
+                    }
 
                     // perform f2 sequentially in one go
                     f2results.resize(workitems.size());
@@ -343,12 +346,14 @@ namespace hpx { namespace parallel { namespace util {
                 return R();
 #else
                 // wait for all tasks to finish
-                hpx::wait_all_nothrow(workitems, finalitems);
-
-                // always rethrow if 'errors' is not empty or 'workitems' or
-                // 'finalitems' have an exceptional future
-                handle_local_exceptions::call(workitems, errors);
-                handle_local_exceptions::call(finalitems, errors);
+                if (hpx::wait_all_nothrow(workitems, finalitems) ||
+                    !errors.empty())
+                {
+                    // always rethrow if 'errors' is not empty or 'workitems' or
+                    // 'finalitems' have an exceptional future
+                    handle_local_exceptions::call(workitems, errors);
+                    handle_local_exceptions::call(finalitems, errors);
+                }
 
                 try
                 {
@@ -376,11 +381,12 @@ namespace hpx { namespace parallel { namespace util {
                 return R();
 #else
                 // wait for all tasks to finish
-                hpx::wait_all_nothrow(finalitems);
-
-                // always rethrow if 'errors' is not empty or
-                // 'finalitems' have an exceptional future
-                handle_local_exceptions::call(finalitems, errors);
+                if (hpx::wait_all_nothrow(finalitems) || !errors.empty())
+                {
+                    // always rethrow if 'errors' is not empty or 'finalitems'
+                    // have an exceptional future
+                    handle_local_exceptions::call(finalitems, errors);
+                }
 
                 try
                 {

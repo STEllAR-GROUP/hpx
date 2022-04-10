@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2021 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -61,7 +61,7 @@ void test_exception_from_continuation2()
 
     // make futures ready in backwards sequence
     hpx::apply([&p]() { p.set_value(); });
-    hpx::wait_all_nothrow(results);
+    HPX_TEST(hpx::wait_all_nothrow(results));
 
     HPX_TEST_EQ(recursion_level.load(), NUM_FUTURES);
     HPX_TEST_EQ(exceptions_thrown.load(), std::size_t(1));
