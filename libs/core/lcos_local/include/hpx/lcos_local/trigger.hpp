@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +24,7 @@
 
 namespace hpx { namespace lcos { namespace local {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Mutex = lcos::local::spinlock>
+    template <typename Mutex = hpx::spinlock>
     struct base_trigger
     {
     protected:
@@ -219,10 +219,10 @@ namespace hpx { namespace lcos { namespace local {
     // Note: This type is not thread-safe. It has to be protected from
     //       concurrent access by different threads by the code using instances
     //       of this type.
-    struct trigger : public base_trigger<no_mutex>
+    struct trigger : public base_trigger<hpx::no_mutex>
     {
     private:
-        typedef base_trigger<no_mutex> base_type;
+        typedef base_trigger<hpx::no_mutex> base_type;
 
     public:
         trigger() {}

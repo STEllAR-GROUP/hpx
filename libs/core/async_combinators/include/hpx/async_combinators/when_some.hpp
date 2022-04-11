@@ -333,7 +333,7 @@ namespace hpx {
         struct when_some
           : std::enable_shared_from_this<when_some<Sequence>>    //-V690
         {
-            using mutex_type = lcos::local::spinlock;
+            using mutex_type = hpx::spinlock;
 
         public:
             void on_future_ready(

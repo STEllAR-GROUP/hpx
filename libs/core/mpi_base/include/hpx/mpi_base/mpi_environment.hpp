@@ -60,7 +60,7 @@ namespace hpx { namespace util {
             bool locked;
         };
 
-        typedef hpx::lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
     private:
         static mutex_type mtx_;

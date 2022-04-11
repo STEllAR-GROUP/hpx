@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,13 +21,14 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     mutex::mutex(char const* const description)
       : owner_id_(threads::invalid_thread_id)
     {
-        HPX_ITT_SYNC_CREATE(this, "lcos::local::mutex", description);
-        HPX_ITT_SYNC_RENAME(this, "lcos::local::mutex");
+        HPX_ITT_SYNC_CREATE(this, "hpx::mutex", description);
+        HPX_ITT_SYNC_RENAME(this, "hpx::mutex");
     }
 
     mutex::~mutex()
@@ -162,4 +163,4 @@ namespace hpx { namespace lcos { namespace local {
         owner_id_ = self_id;
         return true;
     }
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx

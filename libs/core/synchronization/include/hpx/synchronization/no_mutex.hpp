@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,16 +8,24 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx {
+
     struct no_mutex
     {
-        void lock() {}
+        constexpr void lock() noexcept {}
 
-        bool try_lock()
+        constexpr bool try_lock() noexcept
         {
             return true;
-        };
+        }
 
-        void unlock() {}
+        constexpr void unlock() noexcept {}
     };
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx
+
+namespace hpx::lcos::local {
+
+    using no_mutex HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::no_mutex is deprecated, use hpx::no_mutex instead") =
+        hpx::no_mutex;
+}    // namespace hpx::lcos::local

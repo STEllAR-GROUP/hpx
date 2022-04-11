@@ -125,7 +125,7 @@ namespace hpx::execution::experimental {
                     Allocator>::template rebind_alloc<shared_state>;
                 HPX_NO_UNIQUE_ADDRESS allocator_type alloc;
 
-                hpx::lcos::local::spinlock mtx;
+                hpx::spinlock mtx;
                 hpx::util::atomic_count reference_count{0};
                 std::atomic<bool> start_called{false};
                 std::atomic<bool> predecessor_done{false};

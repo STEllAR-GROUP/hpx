@@ -36,7 +36,7 @@ namespace hpx { namespace threads {
             // NOTE: The condition variable needs be able to live past the scope
             // of this function. The mutex and boolean are guaranteed to live
             // long enough because of the lock.
-            hpx::lcos::local::spinlock mtx;
+            hpx::spinlock mtx;
             auto cond = std::make_shared<std::condition_variable_any>();
             bool stopping = false;
 
@@ -66,7 +66,7 @@ namespace hpx { namespace threads {
 
                     // Now signal to the waiting thread that we're done.
                     {
-                        std::lock_guard<hpx::lcos::local::spinlock> lk(mtx);
+                        std::lock_guard<hpx::spinlock> lk(mtx);
                         stopping = true;
                     }
                     cond->notify_all();
@@ -75,7 +75,7 @@ namespace hpx { namespace threads {
             hpx::threads::register_work(data);
 
             // wait for the HPX thread to exit
-            std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);
+            std::unique_lock<hpx::spinlock> lk(mtx);
             cond->wait(lk, [&]() -> bool { return stopping; });
 
             // rethrow exceptions
@@ -92,7 +92,7 @@ namespace hpx { namespace threads {
             // NOTE: The condition variable needs be able to live past the scope
             // of this function. The mutex and boolean are guaranteed to live
             // long enough because of the lock.
-            hpx::lcos::local::spinlock mtx;
+            hpx::spinlock mtx;
             auto cond = std::make_shared<std::condition_variable_any>();
             bool stopping = false;
 
@@ -115,7 +115,7 @@ namespace hpx { namespace threads {
 
                     // Now signal to the waiting thread that we're done.
                     {
-                        std::lock_guard<hpx::lcos::local::spinlock> lk(mtx);
+                        std::lock_guard<hpx::spinlock> lk(mtx);
                         stopping = true;
                     }
                     cond->notify_all();
@@ -124,7 +124,7 @@ namespace hpx { namespace threads {
             hpx::threads::register_work(data);
 
             // wait for the HPX thread to exit
-            std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);
+            std::unique_lock<hpx::spinlock> lk(mtx);
             cond->wait(lk, [&]() -> bool { return stopping; });
 
             // rethrow exceptions

@@ -1,6 +1,6 @@
 ..
     Copyright (C) 2021 Dimitra Karatza
-    Copyright (C) 2020 ETH Zurich
+    Copyright (C) 2020-2022 ETH Zurich
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -939,8 +939,8 @@ Classes
    ==========================================  =================================================
    Class                                       C++ standard
    ==========================================  =================================================
-   :cpp:class:`hpx::cpp20_binary_semaphore`    :cppreference-generic:`thread,counting_semaphore`
-   :cpp:class:`hpx::cpp20_counting_semaphore`  :cppreference-generic:`thread,counting_semaphore`
+   :cpp:class:`hpx::binary_semaphore`          :cppreference-generic:`thread,counting_semaphore`
+   :cpp:class:`hpx::counting_semaphore`        :cppreference-generic:`thread,counting_semaphore`
    ==========================================  =================================================
 
 .. _public_api_header_hpx_shared_mutex:

@@ -1,6 +1,6 @@
 // (C) Copyright 2007 Anthony Williams
 // (C) Copyright 2011-2012 Vicente J. Botet Escriba
-// Copyright (c) 2020 Hartmut Kaiser
+// Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@
 #include <shared_mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx {
 
     template <typename Mutex>
     class upgrade_to_unique_lock;
@@ -250,4 +250,18 @@ namespace hpx { namespace lcos { namespace local {
             return exclusive.mutex();
         }
     };
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx
+
+namespace hpx::lcos::local {
+
+    template <typename Mutex>
+    using upgrade_to_unique_lock HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::upgrade_to_unique_lock is deprecated, use "
+        "hpx::upgrade_to_unique_lock instead") =
+        hpx::upgrade_to_unique_lock<Mutex>;
+
+    template <typename Mutex>
+    using upgrade_lock HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::upgrade_lock is deprecated, use hpx::upgrade_lock "
+        "instead") = hpx::upgrade_lock<Mutex>;
+}    // namespace hpx::lcos::local

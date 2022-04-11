@@ -26,7 +26,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     class counting_semaphore
     {
     private:
-        typedef lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
     public:
         HPX_CORE_EXPORT counting_semaphore(std::ptrdiff_t value = 0);

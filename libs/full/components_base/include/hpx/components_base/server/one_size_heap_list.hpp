@@ -30,7 +30,7 @@ namespace hpx { namespace util {
         using iterator = typename list_type::iterator;
         using const_iterator = typename list_type::const_iterator;
 
-        using mutex_type = lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
         using heap_parameters = wrapper_heap_base::heap_parameters;
 

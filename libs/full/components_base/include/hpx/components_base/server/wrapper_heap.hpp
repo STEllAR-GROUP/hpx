@@ -67,7 +67,7 @@ namespace hpx { namespace components { namespace detail {
 
     public:
         using allocator_type = one_size_heap_allocators::fixed_mallocator;
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
         using heap_parameters = wrapper_heap_base::heap_parameters;
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0

@@ -6,14 +6,14 @@
 
 // This must fail compiling
 
-#include <hpx/synchronization/spinlock_no_backoff.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    using hpx::lcos::local::spinlock_no_backoff;
+    using hpx::spinlock_no_backoff;
     spinlock_no_backoff m1, m2(std::move(m1));
     return 0;
 }

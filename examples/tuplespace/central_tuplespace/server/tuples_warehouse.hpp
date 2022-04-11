@@ -39,7 +39,7 @@ namespace examples { namespace server {
         typedef hpx::util::storage::tuple::compare_elem_functor
             compare_elem_functor;
 
-        typedef hpx::lcos::local::mutex mutex_type;
+        typedef hpx::mutex mutex_type;
         typedef std::uint64_t index_type;
         typedef std::set<index_type> matched_indices_type;
 

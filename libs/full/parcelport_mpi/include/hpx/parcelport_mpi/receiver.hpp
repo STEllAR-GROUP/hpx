@@ -131,14 +131,14 @@ namespace hpx::parcelset::policies::mpi {
 
         Parcelport& pp_;
 
-        hpx::lcos::local::spinlock headers_mtx_;
+        hpx::spinlock headers_mtx_;
         MPI_Request hdr_request_;
         header rcv_header_;
 
-        hpx::lcos::local::spinlock handles_header_mtx_;
+        hpx::spinlock handles_header_mtx_;
         handles_header_type handles_header_;
 
-        hpx::lcos::local::spinlock connections_mtx_;
+        hpx::spinlock connections_mtx_;
         connection_list connections_;
 
         bool request_done_locked(MPI_Request& r, MPI_Status* status) noexcept

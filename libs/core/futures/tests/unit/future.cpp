@@ -401,12 +401,12 @@ void test_future_for_string()
     HPX_TEST_EQ(res, "foo");
 }
 
-hpx::lcos::local::spinlock callback_mutex;
+hpx::spinlock callback_mutex;
 unsigned callback_called = 0;
 
 void wait_callback(hpx::future<int>)
 {
-    std::lock_guard<hpx::lcos::local::spinlock> lk(callback_mutex);
+    std::lock_guard<hpx::spinlock> lk(callback_mutex);
     ++callback_called;
 }
 
@@ -443,7 +443,7 @@ void test_wait_callback()
 
 void do_nothing_callback(hpx::promise<int>& /*pi*/)
 {
-    std::lock_guard<hpx::lcos::local::spinlock> lk(callback_mutex);
+    std::lock_guard<hpx::spinlock> lk(callback_mutex);
     ++callback_called;
 }
 

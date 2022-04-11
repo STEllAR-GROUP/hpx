@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -25,7 +25,8 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local {
+namespace hpx {
+
     enum class cv_status
     {
         no_timeout,
@@ -36,12 +37,15 @@ namespace hpx { namespace lcos { namespace local {
     class condition_variable
     {
     private:
-        using mutex_type = detail::condition_variable_data::mutex_type;
-        using data_type = hpx::intrusive_ptr<detail::condition_variable_data>;
+        using mutex_type =
+            lcos::local::detail::condition_variable_data::mutex_type;
+        using data_type =
+            hpx::intrusive_ptr<lcos::local::detail::condition_variable_data>;
 
     public:
         condition_variable()
-          : data_(data_type(new detail::condition_variable_data, false))
+          : data_(data_type(
+                new lcos::local::detail::condition_variable_data, false))
         {
         }
 
@@ -181,12 +185,15 @@ namespace hpx { namespace lcos { namespace local {
     class condition_variable_any
     {
     private:
-        using mutex_type = detail::condition_variable_data::mutex_type;
-        using data_type = hpx::intrusive_ptr<detail::condition_variable_data>;
+        using mutex_type =
+            lcos::local::detail::condition_variable_data::mutex_type;
+        using data_type =
+            hpx::intrusive_ptr<lcos::local::detail::condition_variable_data>;
 
     public:
         condition_variable_any()
-          : data_(data_type(new detail::condition_variable_data, false))
+          : data_(data_type(
+                new lcos::local::detail::condition_variable_data, false))
         {
         }
 
@@ -431,4 +438,15 @@ namespace hpx { namespace lcos { namespace local {
     private:
         hpx::util::cache_aligned_data_derived<data_type> data_;
     };
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx
+
+namespace hpx::lcos::local {
+
+    using condition_variable HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::condition_variable is deprecated, use "
+        "hpx::condition_variable instead") = hpx::condition_variable;
+
+    using condition_variable_any HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::condition_variable_any is deprecated, use "
+        "hpx::condition_variable_any instead") = hpx::condition_variable_any;
+}    // namespace hpx::lcos::local

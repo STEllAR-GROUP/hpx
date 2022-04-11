@@ -28,7 +28,6 @@ set(synchronization_headers
     hpx/synchronization/shared_mutex.hpp
     hpx/synchronization/sliding_semaphore.hpp
     hpx/synchronization/spinlock.hpp
-    hpx/synchronization/spinlock_no_backoff.hpp
     hpx/synchronization/spinlock_pool.hpp
     hpx/synchronization/stop_token.hpp
 )

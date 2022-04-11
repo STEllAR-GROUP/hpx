@@ -75,7 +75,7 @@ namespace hpx { namespace resource { namespace detail {
     ///////////////////////////////////////////////////////////////////////
     class partitioner
     {
-        typedef lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
     public:
         partitioner();

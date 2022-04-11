@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -359,7 +359,7 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
 
     // limit depth of dependency tree
     std::size_t nd = 3;
-    hpx::lcos::local::sliding_semaphore sem(nd);
+    hpx::sliding_semaphore sem(nd);
 
     heat_part_action act;
     for (std::size_t t = 0; t != nt; ++t)

@@ -1,4 +1,5 @@
 //  Copyright (c) 2011 Katelyn Kufahl
+//  Copyright (c) 2011-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -115,6 +116,6 @@ namespace hpx::parcelset {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    using gatherer = detail::gatherer<lcos::local::spinlock>;
-    using gatherer_nolock = detail::gatherer<lcos::local::no_mutex>;
+    using gatherer = detail::gatherer<hpx::spinlock>;
+    using gatherer_nolock = detail::gatherer<hpx::no_mutex>;
 }    // namespace hpx::parcelset

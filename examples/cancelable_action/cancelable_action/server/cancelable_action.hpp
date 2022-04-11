@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -50,7 +50,7 @@ namespace examples { namespace server {
             explicit reset_id(cancelable_action& this_)
               : outer_(this_)
             {
-                std::lock_guard<hpx::lcos::local::mutex> l(outer_.mtx_);
+                std::lock_guard<hpx::mutex> l(outer_.mtx_);
                 hpx::thread::id old_value = outer_.id_;
                 outer_.id_ = hpx::this_thread::get_id();
                 HPX_ASSERT(old_value == hpx::thread::id());
@@ -89,11 +89,11 @@ namespace examples { namespace server {
         {
             // Make sure id_ has been set
             hpx::util::yield_while([this]() {
-                std::lock_guard<hpx::lcos::local::mutex> l(mtx_);
+                std::lock_guard<hpx::mutex> l(mtx_);
                 return id_ == hpx::thread::id();
             });
 
-            std::lock_guard<hpx::lcos::local::mutex> l(mtx_);
+            std::lock_guard<hpx::mutex> l(mtx_);
             HPX_ASSERT(id_ != hpx::thread::id());
             hpx::thread::interrupt(id_);
         }
@@ -103,7 +103,7 @@ namespace examples { namespace server {
             cancelable_action, cancel_it, cancel_it_action)
 
     private:
-        hpx::lcos::local::mutex mtx_;
+        hpx::mutex mtx_;
         hpx::thread::id id_;
     };
 }}    // namespace examples::server

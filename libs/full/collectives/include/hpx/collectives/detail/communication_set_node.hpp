@@ -61,7 +61,7 @@ namespace hpx { namespace lcos { namespace detail {
     class communication_set_node
       : public hpx::components::component_base<communication_set_node>
     {
-        using mutex_type = lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
     public:
         HPX_EXPORT communication_set_node();

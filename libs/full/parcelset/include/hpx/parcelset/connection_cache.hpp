@@ -47,7 +47,7 @@ namespace hpx { namespace util {
     class connection_cache
     {
     public:
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
         using connection_type = std::shared_ptr<Connection>;
         using value_type = std::deque<connection_type>;

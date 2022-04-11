@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -49,9 +49,7 @@ namespace hpx { namespace actions { namespace detail {
     template <typename Action, int N>
     struct action_decorate_function_semaphore
     {
-        typedef lcos::local::counting_semaphore_var<hpx::lcos::local::spinlock,
-            N>
-            semaphore_type;
+        typedef hpx::counting_semaphore_var<hpx::spinlock, N> semaphore_type;
 
         struct tag
         {

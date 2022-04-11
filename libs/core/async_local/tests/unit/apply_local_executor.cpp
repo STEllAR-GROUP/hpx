@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,7 +20,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<std::int32_t> accumulator;
-hpx::lcos::local::condition_variable_any result_cv;
+hpx::condition_variable_any result_cv;
 
 void increment(std::int32_t i)
 {
@@ -117,8 +117,8 @@ void test_apply_with_executor(Executor& exec)
         hpx::apply(exec, hpx::bind(increment_lambda, _1), 1);
     }
 
-    hpx::lcos::local::no_mutex result_mutex;
-    std::unique_lock<hpx::lcos::local::no_mutex> l(result_mutex);
+    hpx::no_mutex result_mutex;
+    std::unique_lock<hpx::no_mutex> l(result_mutex);
     result_cv.wait_for(l, std::chrono::seconds(1),
         hpx::bind(std::equal_to<std::int32_t>(), std::ref(accumulator), 18));
 

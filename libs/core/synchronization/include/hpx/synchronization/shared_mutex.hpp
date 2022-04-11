@@ -1,5 +1,6 @@
 //  (C) Copyright 2006-2008 Anthony Williams
 //  (C) Copyright      2011 Bryce Lelbach
+//  (C) Copyright 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,9 +14,11 @@
 
 #include <mutex>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx {
+
     namespace detail {
-        template <typename Mutex = lcos::local::mutex>
+
+        template <typename Mutex = hpx::mutex>
         class shared_mutex
         {
         private:
@@ -31,9 +34,9 @@ namespace hpx { namespace lcos { namespace local {
 
             state_data state;
             mutex_type state_change;
-            lcos::local::condition_variable shared_cond;
-            lcos::local::condition_variable exclusive_cond;
-            lcos::local::condition_variable upgrade_cond;
+            hpx::condition_variable shared_cond;
+            hpx::condition_variable exclusive_cond;
+            hpx::condition_variable upgrade_cond;
 
             void release_waiters()
             {
@@ -234,5 +237,12 @@ namespace hpx { namespace lcos { namespace local {
         };
     }    // namespace detail
 
-    typedef detail::shared_mutex<> shared_mutex;
-}}}    // namespace hpx::lcos::local
+    using shared_mutex = detail::shared_mutex<>;
+}    // namespace hpx
+
+namespace hpx::lcos::local {
+
+    using shared_mutex HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::shared_mutex is deprecated, use hpx::shared_mutex "
+        "instead") = hpx::shared_mutex;
+}

@@ -30,7 +30,7 @@ namespace hpx { namespace util { namespace detail {
         HPX_CORE_EXPORT void yield_k(unsigned) noexcept;
 
     public:
-        constexpr spinlock() noexcept
+        spinlock() noexcept
           : m(false)
         {
         }
@@ -46,7 +46,7 @@ namespace hpx { namespace util { namespace detail {
         void lock() noexcept
         {
             // Wait for lock to be released without generating cache misses
-            // Similar implementation to hpx::lcos::local::spinlock
+            // Similar implementation to hpx::spinlock
             unsigned k = 0;
             while (!try_lock())
             {

@@ -1,4 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,7 +31,7 @@ using hpx::program_options::variables_map;
 using std::chrono::milliseconds;
 
 using hpx::barrier;
-using hpx::lcos::local::mutex;
+using hpx::mutex;
 
 using hpx::threads::make_thread_function_nullary;
 using hpx::threads::register_thread;

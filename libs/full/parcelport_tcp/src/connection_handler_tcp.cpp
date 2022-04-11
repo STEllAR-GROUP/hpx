@@ -129,7 +129,7 @@ namespace hpx::parcelset::policies::tcp {
     {
         {
             // cancel all pending read operations, close those sockets
-            std::lock_guard<lcos::local::spinlock> l(connections_mtx_);
+            std::lock_guard<hpx::spinlock> l(connections_mtx_);
             for (std::shared_ptr<receiver> const& c : accepted_connections_)
             {
                 c->shutdown();
@@ -231,7 +231,7 @@ namespace hpx::parcelset::policies::tcp {
 
 #if defined(HPX_HOLDON_TO_OUTGOING_CONNECTIONS)
         {
-            std::lock_guard<lcos::local::spinlock> lock(connections_mtx_);
+            std::lock_guard<hpx::spinlock> lock(connections_mtx_);
             write_connections_.insert(sender_connection);
         }
 #endif
@@ -294,7 +294,7 @@ namespace hpx::parcelset::policies::tcp {
 
             {
                 // keep track of all accepted connections
-                std::lock_guard<lcos::local::spinlock> l(connections_mtx_);
+                std::lock_guard<hpx::spinlock> l(connections_mtx_);
                 accepted_connections_.insert(c);
             }
 
@@ -311,7 +311,7 @@ namespace hpx::parcelset::policies::tcp {
         else
         {
             // remove this connection from the list of known connections
-            std::lock_guard<lcos::local::spinlock> l(mtx_);
+            std::lock_guard<hpx::spinlock> l(mtx_);
             accepted_connections_.erase(receiver_conn);
         }
     }
@@ -333,7 +333,7 @@ namespace hpx::parcelset::policies::tcp {
 
         {
             // remove this connection from the list of known connections
-            std::lock_guard<lcos::local::spinlock> l(connections_mtx_);
+            std::lock_guard<hpx::spinlock> l(connections_mtx_);
             accepted_connections_.erase(receiver_conn);
         }
     }

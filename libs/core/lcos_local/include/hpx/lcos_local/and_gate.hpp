@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +25,7 @@
 
 namespace hpx { namespace lcos { namespace local {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Mutex = lcos::local::spinlock>
+    template <typename Mutex = hpx::spinlock>
     struct base_and_gate
     {
     protected:
@@ -129,8 +129,8 @@ namespace hpx { namespace lcos { namespace local {
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
-            no_mutex mtx;
-            std::unique_lock<no_mutex> lk(mtx);
+            hpx::no_mutex mtx;
+            std::unique_lock<hpx::no_mutex> lk(mtx);
             return get_future(lk, count, generation_value, ec);
         }
 
@@ -176,8 +176,8 @@ namespace hpx { namespace lcos { namespace local {
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
-            no_mutex mtx;
-            std::unique_lock<no_mutex> lk(mtx);
+            hpx::no_mutex mtx;
+            std::unique_lock<hpx::no_mutex> lk(mtx);
             return get_shared_future(lk, count, generation_value, ec);
         }
 
@@ -238,8 +238,8 @@ namespace hpx { namespace lcos { namespace local {
     public:
         bool set(std::size_t which, error_code& ec = throws)
         {
-            no_mutex mtx;
-            std::unique_lock<no_mutex> lk(mtx);
+            hpx::no_mutex mtx;
+            std::unique_lock<hpx::no_mutex> lk(mtx);
             return set(which, HPX_MOVE(lk), ec);
         }
 
@@ -374,10 +374,10 @@ namespace hpx { namespace lcos { namespace local {
     // Note: This type is not thread-safe. It has to be protected from
     //       concurrent access by different threads by the code using instances
     //       of this type.
-    struct and_gate : public base_and_gate<no_mutex>
+    struct and_gate : public base_and_gate<hpx::no_mutex>
     {
     private:
-        typedef base_and_gate<no_mutex> base_type;
+        typedef base_and_gate<hpx::no_mutex> base_type;
 
     public:
         and_gate(std::size_t count = 0)

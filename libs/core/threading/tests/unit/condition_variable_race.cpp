@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -80,8 +80,8 @@
 
 // Original test case from HH:
 //
-// hpx::lcos::local::condition_variable_any* cv = nullptr;
-// hpx::lcos::local::mutex m;
+// hpx::condition_variable_any* cv = nullptr;
+// hpx::mutex m;
 // bool f_ready = false;
 // bool g_ready = false;
 //
@@ -113,8 +113,8 @@
 //     // Writing over the deleted memory is undefined behavior. In particular,
 //     // it can destroy the heap data structure, and cause other problems.
 //     // If you replace new/delete with malloc and free, then it's OK
-//     void* raw = std::malloc(sizeof(hpx::lcos::local::condition_variable_any));
-//     cv = new (raw) hpx::lcos::local::condition_variable_any;
+//     void* raw = std::malloc(sizeof(hpx::condition_variable_any));
+//     cv = new (raw) hpx::condition_variable_any;
 //
 //     hpx::thread th2(g);
 //     m.lock();
@@ -131,16 +131,15 @@
 
 void test_cv_mutex()
 {
-    void* raw = std::malloc(sizeof(hpx::lcos::local::condition_variable));
-    hpx::lcos::local::condition_variable* cv =
-        new (raw) hpx::lcos::local::condition_variable;
+    void* raw = std::malloc(sizeof(hpx::condition_variable));
+    hpx::condition_variable* cv = new (raw) hpx::condition_variable;
 
-    hpx::lcos::local::mutex m;
+    hpx::mutex m;
     std::atomic<bool> f_ready{false};
     std::atomic<bool> g_ready{false};
 
     hpx::thread t2([&] {
-        std::unique_lock<hpx::lcos::local::mutex> ul{m};
+        std::unique_lock<hpx::mutex> ul{m};
         g_ready = true;
         cv->notify_one();
         while (!f_ready)
@@ -150,7 +149,7 @@ void test_cv_mutex()
     });
 
     {
-        std::unique_lock<hpx::lcos::local::mutex> ul{m};
+        std::unique_lock<hpx::mutex> ul{m};
         while (!g_ready)
         {
             cv->wait(ul);
@@ -158,7 +157,7 @@ void test_cv_mutex()
     }
 
     hpx::thread t1([&] {
-        std::unique_lock<hpx::lcos::local::mutex> ul{m};
+        std::unique_lock<hpx::mutex> ul{m};
         f_ready = true;
         cv->notify_one();
         cv->~condition_variable();
@@ -175,16 +174,15 @@ void test_cv_mutex()
 
 void test_cv_any_mutex()
 {
-    void* raw = std::malloc(sizeof(hpx::lcos::local::condition_variable_any));
-    hpx::lcos::local::condition_variable_any* cv =
-        new (raw) hpx::lcos::local::condition_variable_any;
+    void* raw = std::malloc(sizeof(hpx::condition_variable_any));
+    hpx::condition_variable_any* cv = new (raw) hpx::condition_variable_any;
 
-    hpx::lcos::local::mutex m;
+    hpx::mutex m;
     std::atomic<bool> f_ready{false};
     std::atomic<bool> g_ready{false};
 
     hpx::thread t2([&] {
-        std::unique_lock<hpx::lcos::local::mutex> ul{m};
+        std::unique_lock<hpx::mutex> ul{m};
         g_ready = true;
         cv->notify_one();
         while (!f_ready)
@@ -194,7 +192,7 @@ void test_cv_any_mutex()
     });
 
     {
-        std::unique_lock<hpx::lcos::local::mutex> ul{m};
+        std::unique_lock<hpx::mutex> ul{m};
         while (!g_ready)
         {
             cv->wait(ul);
@@ -202,7 +200,7 @@ void test_cv_any_mutex()
     }
 
     hpx::thread t1([&] {
-        std::unique_lock<hpx::lcos::local::mutex> ul{m};
+        std::unique_lock<hpx::mutex> ul{m};
         f_ready = true;
         cv->notify_one();
         cv->~condition_variable_any();

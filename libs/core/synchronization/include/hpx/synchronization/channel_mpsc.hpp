@@ -215,6 +215,6 @@ namespace hpx { namespace lcos { namespace local {
     // Using hpx::util::spinlock as the means of synchronization enables the use
     // of this channel with non-HPX threads.
     template <typename T>
-    using channel_mpsc = base_channel_mpsc<T, hpx::lcos::local::spinlock>;
+    using channel_mpsc = base_channel_mpsc<T, hpx::spinlock>;
 
 }}}    // namespace hpx::lcos::local

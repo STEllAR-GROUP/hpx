@@ -201,7 +201,7 @@ namespace hpx { namespace util { namespace itt {
 
     struct caller_context
     {
-        HPX_CORE_EXPORT caller_context(stack_context& ctx);
+        HPX_CORE_EXPORT explicit caller_context(stack_context& ctx);
         HPX_CORE_EXPORT ~caller_context();
 
         stack_context& ctx_;
@@ -213,7 +213,7 @@ namespace hpx { namespace util { namespace itt {
         HPX_NON_COPYABLE(domain);
 
         domain() = default;
-        HPX_CORE_EXPORT domain(char const*) noexcept;
+        HPX_CORE_EXPORT explicit domain(char const*) noexcept;
 
         ___itt_domain* domain_ = nullptr;
     };
@@ -255,7 +255,7 @@ namespace hpx { namespace util { namespace itt {
     ///////////////////////////////////////////////////////////////////////////
     struct frame_context
     {
-        HPX_CORE_EXPORT frame_context(
+        HPX_CORE_EXPORT explicit frame_context(
             domain const& domain, id* ident = nullptr) noexcept;
         HPX_CORE_EXPORT ~frame_context();
 
@@ -265,7 +265,8 @@ namespace hpx { namespace util { namespace itt {
 
     struct undo_frame_context
     {
-        HPX_CORE_EXPORT undo_frame_context(frame_context& frame) noexcept;
+        HPX_CORE_EXPORT explicit undo_frame_context(
+            frame_context& frame) noexcept;
         HPX_CORE_EXPORT ~undo_frame_context();
 
         frame_context& frame_;
@@ -274,7 +275,7 @@ namespace hpx { namespace util { namespace itt {
     ///////////////////////////////////////////////////////////////////////////
     struct mark_context
     {
-        HPX_CORE_EXPORT mark_context(char const* name) noexcept;
+        HPX_CORE_EXPORT explicit mark_context(char const* name) noexcept;
         HPX_CORE_EXPORT ~mark_context();
 
         int itt_mark_;
@@ -283,7 +284,7 @@ namespace hpx { namespace util { namespace itt {
 
     struct undo_mark_context
     {
-        HPX_CORE_EXPORT undo_mark_context(mark_context& mark) noexcept;
+        HPX_CORE_EXPORT explicit undo_mark_context(mark_context& mark) noexcept;
         HPX_CORE_EXPORT ~undo_mark_context();
 
         mark_context& mark_;
@@ -294,9 +295,9 @@ namespace hpx { namespace util { namespace itt {
     {
         string_handle() noexcept = default;
 
-        HPX_CORE_EXPORT string_handle(char const* s) noexcept;
+        HPX_CORE_EXPORT explicit string_handle(char const* s) noexcept;
 
-        string_handle(___itt_string_handle* h) noexcept
+        explicit string_handle(___itt_string_handle* h) noexcept
           : handle_(h)
         {
         }
@@ -463,7 +464,7 @@ namespace hpx { namespace util { namespace itt {
     ///////////////////////////////////////////////////////////////////////////
     struct event
     {
-        event(char const* name) noexcept
+        explicit event(char const* name) noexcept
           : event_(itt_event_create(name, (int) strnlen(name, 256)))
         {
         }
@@ -484,7 +485,7 @@ namespace hpx { namespace util { namespace itt {
 
     struct mark_event
     {
-        mark_event(event const& e) noexcept
+        explicit mark_event(event const& e) noexcept
           : e_(e)
         {
             e_.start();
@@ -658,7 +659,7 @@ namespace hpx { namespace util { namespace itt {
 
     struct caller_context
     {
-        constexpr caller_context(stack_context&) noexcept {}
+        constexpr explicit caller_context(stack_context&) noexcept {}
         ~caller_context() = default;
     };
 
@@ -667,7 +668,7 @@ namespace hpx { namespace util { namespace itt {
     {
         HPX_NON_COPYABLE(domain);
 
-        constexpr domain(char const*) noexcept {}
+        constexpr explicit domain(char const*) noexcept {}
         domain() = default;
     };
 
@@ -687,33 +688,35 @@ namespace hpx { namespace util { namespace itt {
     ///////////////////////////////////////////////////////////////////////////
     struct frame_context
     {
-        constexpr frame_context(domain const&, id* = nullptr) noexcept {}
+        constexpr explicit frame_context(domain const&, id* = nullptr) noexcept
+        {
+        }
         ~frame_context() = default;
     };
 
     struct undo_frame_context
     {
-        constexpr undo_frame_context(frame_context const&) noexcept {}
+        constexpr explicit undo_frame_context(frame_context const&) noexcept {}
         ~undo_frame_context() = default;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     struct mark_context
     {
-        constexpr mark_context(char const*) noexcept {}
+        constexpr explicit mark_context(char const*) noexcept {}
         ~mark_context() = default;
     };
 
     struct undo_mark_context
     {
-        constexpr undo_mark_context(mark_context const&) noexcept {}
+        constexpr explicit undo_mark_context(mark_context const&) noexcept {}
         ~undo_mark_context() = default;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     struct string_handle
     {
-        constexpr string_handle(char const* = nullptr) noexcept {}
+        constexpr explicit string_handle(char const* = nullptr) noexcept {}
     };
 
     //////////////////////////////////////////////////////////////////////////
@@ -767,12 +770,12 @@ namespace hpx { namespace util { namespace itt {
 
     struct event
     {
-        constexpr event(char const*) noexcept {}
+        constexpr explicit event(char const*) noexcept {}
     };
 
     struct mark_event
     {
-        constexpr mark_event(event const&) noexcept {}
+        constexpr explicit mark_event(event const&) noexcept {}
         ~mark_event() = default;
     };
 

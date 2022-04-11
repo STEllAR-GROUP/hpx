@@ -24,7 +24,7 @@ namespace hpx::parcelset::detail {
     // Per-action based parcel statistics
     struct per_action_data_counter
     {
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
         // add collected data
         void add_data(char const* action, parcelset::data_point const& data);

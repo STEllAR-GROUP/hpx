@@ -85,7 +85,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
         // These are the types used in the parcelport for locking etc
         // Note that spinlock is the only supported mutex that works on HPX+OS threads
         // and condition_variable_any can be used across HPX/OS threads
-        typedef hpx::lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
         typedef hpx::parcelset::policies::libfabric::scoped_lock<mutex_type>
             scoped_lock;
         typedef hpx::parcelset::policies::libfabric::unique_lock<mutex_type>

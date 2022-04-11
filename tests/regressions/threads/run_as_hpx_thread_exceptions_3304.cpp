@@ -1,4 +1,4 @@
-//  Copyright (c) 2018 Hartmut Kaiser
+//  Copyright (c) 2018-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,8 +22,7 @@ std::condition_variable startup_cond;
 bool running = false;
 bool stop_running = false;
 
-int start_func(hpx::lcos::local::spinlock& mtx,
-    hpx::lcos::local::condition_variable_any& cond)
+int start_func(hpx::spinlock& mtx, hpx::condition_variable_any& cond)
 {
     // Signal to constructor that thread has started running.
     {
@@ -32,7 +31,7 @@ int start_func(hpx::lcos::local::spinlock& mtx,
     }
 
     {
-        std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);
+        std::unique_lock<hpx::spinlock> lk(mtx);
         startup_cond.notify_one();
         while (!stop_running)
             cond.wait(lk);
@@ -48,8 +47,8 @@ void hpx_thread_func()
 
 int main(int argc, char** argv)
 {
-    hpx::lcos::local::spinlock mtx;
-    hpx::lcos::local::condition_variable_any cond;
+    hpx::spinlock mtx;
+    hpx::condition_variable_any cond;
 
     hpx::function<int(int, char**)> start_function =
         hpx::bind(&start_func, std::ref(mtx), std::ref(cond));
@@ -76,7 +75,7 @@ int main(int argc, char** argv)
     HPX_TEST(exception_caught);
 
     {
-        std::lock_guard<hpx::lcos::local::spinlock> lk(mtx);
+        std::lock_guard<hpx::spinlock> lk(mtx);
         stop_running = true;
     }
 

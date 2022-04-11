@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //  Copyright (c) 2014 Patricia Grubel
 //  Copyright (c) 2019 Nikunj Gupta
 //
@@ -236,7 +236,7 @@ struct stepper
     hpx::future<space> do_work(std::size_t subdomains,
         std::size_t subdomain_width, std::size_t iterations, std::size_t sti,
         std::uint64_t nd, std::uint64_t n_value, double error,
-        hpx::lcos::local::sliding_semaphore& sem)
+        hpx::sliding_semaphore& sem)
     {
         using hpx::unwrapping;
         using hpx::resiliency::experimental::dataflow_replay_validate;
@@ -329,7 +329,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     {
         // limit depth of dependency tree
-        hpx::lcos::local::sliding_semaphore sem(nd);
+        hpx::sliding_semaphore sem(nd);
 
         hpx::future<stepper::space> result = step.do_work(subdomains,
             subdomain_width, iterations, sti, nd, n_value, error, sem);

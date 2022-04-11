@@ -39,7 +39,7 @@ namespace hpx {
 
     class HPX_CORE_EXPORT thread
     {
-        typedef lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
         void terminate(const char* function, const char* reason) const;
 
     public:

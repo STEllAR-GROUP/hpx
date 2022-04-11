@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,8 +23,8 @@
 void test_cv_callback()
 {
     bool ready{false};
-    hpx::lcos::local::mutex ready_mtx;
-    hpx::lcos::local::condition_variable_any ready_cv;
+    hpx::mutex ready_mtx;
+    hpx::condition_variable_any ready_cv;
 
     bool cb_called{false};
     {
@@ -35,7 +35,7 @@ void test_cv_callback()
             };
             hpx::stop_callback<std::function<void()>> cb(stoken, std::move(f));
 
-            std::unique_lock<hpx::lcos::local::mutex> lg{ready_mtx};
+            std::unique_lock<hpx::mutex> lg{ready_mtx};
             ready_cv.wait(lg, stoken, [&ready] { return ready; });
         }};
 

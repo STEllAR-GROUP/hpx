@@ -52,7 +52,7 @@ namespace hpx::parcelset::policies::mpi {
             free_tags_.push_back(tag);
         }
 
-        hpx::lcos::local::spinlock mtx_;
+        hpx::spinlock mtx_;
         int next_tag_;
         std::deque<int> free_tags_;
     };

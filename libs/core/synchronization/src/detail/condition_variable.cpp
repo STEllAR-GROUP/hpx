@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -35,9 +35,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             LERR_(fatal).format(
                 "~condition_variable: queue is not empty, aborting threads");
 
-            local::no_mutex no_mtx;
-            std::unique_lock<local::no_mutex> lock(no_mtx);
-            abort_all<local::no_mutex>(HPX_MOVE(lock));
+            hpx::no_mutex no_mtx;
+            std::unique_lock<hpx::no_mutex> lock(no_mtx);
+            abort_all<hpx::no_mutex>(HPX_MOVE(lock));
         }
     }
 

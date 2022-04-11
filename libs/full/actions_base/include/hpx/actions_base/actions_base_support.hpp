@@ -134,7 +134,8 @@ namespace hpx { namespace actions { namespace detail {
         ;
 #else
     {
-        static util::itt::string_handle sh = get_action_name<Action>();
+        static util::itt::string_handle sh =
+            util::itt::string_handle(get_action_name<Action>());
         return sh;
     }
 #endif

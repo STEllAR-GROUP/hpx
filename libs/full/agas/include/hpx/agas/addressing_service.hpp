@@ -59,7 +59,7 @@ namespace hpx { namespace agas {
             hpx::function<void(std::string const&, components::component_type),
                 true>;
 
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
         // gva cache
         struct gva_cache_key;

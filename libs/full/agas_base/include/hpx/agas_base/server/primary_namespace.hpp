@@ -114,7 +114,7 @@ namespace hpx::agas::server {
     struct HPX_EXPORT primary_namespace
       : components::fixed_component_base<primary_namespace>
     {
-        using mutex_type = lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
         using base_type = components::fixed_component_base<primary_namespace>;
 
         using component_type = std::int32_t;

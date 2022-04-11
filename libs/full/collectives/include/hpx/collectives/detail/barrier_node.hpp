@@ -46,7 +46,7 @@ namespace hpx { namespace distributed { namespace detail {
     struct barrier_node : hpx::lcos::base_lco
     {
         typedef components::managed_component<barrier_node> wrapping_type;
-        typedef hpx::lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
         barrier_node();
         barrier_node(std::string base_name, std::size_t num, std::size_t rank);

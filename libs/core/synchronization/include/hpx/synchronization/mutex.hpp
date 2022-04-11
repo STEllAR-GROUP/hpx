@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -28,10 +28,10 @@ namespace hpx { namespace threads {
     /// The function \a get_self_ptr returns a pointer to the (OS thread
     /// specific) self reference to the current HPX thread.
     HPX_CORE_EXPORT thread_self* get_self_ptr();
-
 }}    // namespace hpx::threads
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     class mutex
     {
@@ -39,7 +39,7 @@ namespace hpx { namespace lcos { namespace local {
         HPX_NON_COPYABLE(mutex);
 
     protected:
-        typedef lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
     public:
         HPX_CORE_EXPORT mutex(char const* const description = "");
@@ -67,7 +67,7 @@ namespace hpx { namespace lcos { namespace local {
     protected:
         mutable mutex_type mtx_;
         threads::thread_id_type owner_id_;
-        lcos::local::detail::condition_variable cond_;
+        hpx::lcos::local::detail::condition_variable cond_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -107,4 +107,15 @@ namespace hpx { namespace lcos { namespace local {
             return try_lock_for(rel_time, "mutex::try_lock_for", ec);
         }
     };
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx
+
+namespace hpx::lcos::local {
+
+    using mutex HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::local::mutex is deprecated, use hpx::mutex instead") =
+        hpx::mutex;
+
+    using timed_mutex HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::timed_mutex is deprecated, use hpx::timed_mutex "
+        "instead") = hpx::timed_mutex;
+}    // namespace hpx::lcos::local

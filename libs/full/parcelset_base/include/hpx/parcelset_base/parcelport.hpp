@@ -294,7 +294,7 @@ namespace hpx::parcelset {
 
     protected:
         // mutex for all of the member data
-        mutable lcos::local::spinlock mtx_;
+        mutable hpx::spinlock mtx_;
 
         // The cache for pending parcels
         using map_second_type =

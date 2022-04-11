@@ -35,8 +35,8 @@ namespace hpx {
     private:
         /// \cond NOINTERNAL
 
-        // TODO: Does this need to be hpx::lcos::local::spinlock?
-        // typedef hpx::lcos::local::spinlock mutex_type;
+        // TODO: Does this need to be hpx::spinlock?
+        // typedef hpx::spinlock mutex_type;
         // TODO: Add correct initialization of hpx::util::detail spinlock.
         using mutex_type = hpx::util::detail::spinlock;
 

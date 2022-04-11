@@ -44,7 +44,7 @@ namespace hpx { namespace lcos { namespace local {
         using barrier_type = hpx::barrier<>;
         using table_type =
             std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
-        using mutex_type = hpx::lcos::local::mutex;
+        using mutex_type = hpx::mutex;
 
     public:
         explicit spmd_block(std::size_t num_images, std::size_t image_id,
@@ -149,7 +149,7 @@ namespace hpx { namespace lcos { namespace local {
             using barrier_type = hpx::barrier<>;
             using table_type =
                 std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
-            using mutex_type = hpx::lcos::local::mutex;
+            using mutex_type = hpx::mutex;
 
         public:
             std::shared_ptr<barrier_type> barrier_;
@@ -183,7 +183,7 @@ namespace hpx { namespace lcos { namespace local {
         using barrier_type = hpx::barrier<>;
         using table_type =
             std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
-        using mutex_type = hpx::lcos::local::mutex;
+        using mutex_type = hpx::mutex;
 
         static_assert(std::is_same<spmd_block, first_type>::value,
             "define_spmd_block() needs a function or lambda that "
@@ -217,7 +217,7 @@ namespace hpx { namespace lcos { namespace local {
         using barrier_type = hpx::barrier<>;
         using table_type =
             std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
-        using mutex_type = hpx::lcos::local::mutex;
+        using mutex_type = hpx::mutex;
 
         static_assert(std::is_same<spmd_block, first_type>::value,
             "define_spmd_block() needs a lambda that "

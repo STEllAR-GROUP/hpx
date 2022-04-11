@@ -97,7 +97,7 @@ struct data
         return *this;
     }
 
-    hpx::lcos::local::mutex mtx;
+    hpx::mutex mtx;
     double u_value;
     bool computed;
 };
@@ -132,7 +132,7 @@ double calculate_u_tplus_x_1st(
 double wave(std::uint64_t t, std::uint64_t x)
 {
     {
-        std::lock_guard<hpx::lcos::local::mutex> l(u[t][x].mtx);
+        std::lock_guard<hpx::mutex> l(u[t][x].mtx);
         //  hpx::util::format_to(cout, "calling wave... t={1} x={2}\n", t, x);
         if (u[t][x].computed)
         {
@@ -172,7 +172,7 @@ double wave(std::uint64_t t, std::uint64_t x)
 
     if (t == 1)    //second time coordinate handled differently
     {
-        std::lock_guard<hpx::lcos::local::mutex> l(u[t][x].mtx);
+        std::lock_guard<hpx::mutex> l(u[t][x].mtx);
         double u_dot = 0;    // initial du/dt(x)
         u[t][x].u_value =
             calculate_u_tplus_x_1st(u_t_xplus, u_t_x, u_t_xminus, u_dot);
@@ -181,7 +181,7 @@ double wave(std::uint64_t t, std::uint64_t x)
     else
     {
         double u_tminus_x = async<wave_action>(here, t - 2, x).get();
-        std::lock_guard<hpx::lcos::local::mutex> l(u[t][x].mtx);
+        std::lock_guard<hpx::mutex> l(u[t][x].mtx);
         u[t][x].u_value =
             calculate_u_tplus_x(u_t_xplus, u_t_x, u_t_xminus, u_tminus_x);
         return u[t][x].u_value;

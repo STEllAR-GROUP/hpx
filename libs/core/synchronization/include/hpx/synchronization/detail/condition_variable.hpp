@@ -30,7 +30,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         HPX_NON_COPYABLE(condition_variable);
 
     private:
-        using mutex_type = lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
     private:
         // define data structures needed for intrusive slist container used for
@@ -177,7 +177,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
     struct condition_variable_data
     {
-        typedef lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
         condition_variable_data()
           : count_(1)

@@ -115,7 +115,7 @@ namespace hpx::parcelset {
             asio::ip::tcp::acceptor* acceptor_;
 
             /// The list of accepted connections
-            mutable lcos::local::spinlock connections_mtx_;
+            mutable hpx::spinlock connections_mtx_;
 
             using accepted_connections_set =
                 std::set<std::shared_ptr<receiver>>;

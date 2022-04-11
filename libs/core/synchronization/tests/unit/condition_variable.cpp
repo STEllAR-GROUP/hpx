@@ -3,6 +3,7 @@
 // Copyright (C) 2001-2003 William E. Kempf
 // Copyright (C) 2007-2008 Anthony Williams
 // Copyright (C) 2013 Agustin Berge
+// Copyright (C) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,13 +24,14 @@
 #include <vector>
 
 namespace {
-    hpx::lcos::local::mutex multiple_wake_mutex;
-    hpx::lcos::local::condition_variable multiple_wake_cond;
+
+    hpx::mutex multiple_wake_mutex;
+    hpx::condition_variable multiple_wake_cond;
     unsigned multiple_wake_count = 0;
 
     void wait_for_condvar_and_increase_count()
     {
-        std::unique_lock<hpx::lcos::local::mutex> lk(multiple_wake_mutex);
+        std::unique_lock<hpx::mutex> lk(multiple_wake_mutex);
         multiple_wake_cond.wait(lk);
         ++multiple_wake_count;
     }
@@ -45,8 +47,8 @@ namespace {
 ///////////////////////////////////////////////////////////////////////////////
 struct wait_for_flag
 {
-    hpx::lcos::local::mutex mutex;
-    hpx::lcos::local::condition_variable cond_var;
+    hpx::mutex mutex;
+    hpx::condition_variable cond_var;
     bool flag;
     unsigned woken;
 
@@ -73,7 +75,7 @@ struct wait_for_flag
 
     void wait_without_predicate()
     {
-        std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
+        std::unique_lock<hpx::mutex> lock(mutex);
         while (!flag)
         {
             cond_var.wait(lock);
@@ -83,7 +85,7 @@ struct wait_for_flag
 
     void wait_with_predicate()
     {
-        std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
+        std::unique_lock<hpx::mutex> lock(mutex);
         cond_var.wait(lock, check_flag(flag));
         if (flag)
         {
@@ -96,11 +98,10 @@ struct wait_for_flag
         std::chrono::system_clock::time_point const timeout =
             std::chrono::system_clock::now() + std::chrono::milliseconds(5);
 
-        std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
+        std::unique_lock<hpx::mutex> lock(mutex);
         while (!flag)
         {
-            if (cond_var.wait_until(lock, timeout) ==
-                hpx::lcos::local::cv_status::timeout)
+            if (cond_var.wait_until(lock, timeout) == hpx::cv_status::timeout)
             {
                 return;
             }
@@ -113,7 +114,7 @@ struct wait_for_flag
         std::chrono::system_clock::time_point const timeout =
             std::chrono::system_clock::now() + std::chrono::milliseconds(5);
 
-        std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
+        std::unique_lock<hpx::mutex> lock(mutex);
         if (cond_var.wait_until(lock, timeout, check_flag(flag)) && flag)
         {
             ++woken;
@@ -121,7 +122,7 @@ struct wait_for_flag
     }
     void relative_wait_until_with_predicate()
     {
-        std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
+        std::unique_lock<hpx::mutex> lock(mutex);
         if (cond_var.wait_for(
                 lock, std::chrono::milliseconds(5), check_flag(flag)) &&
             flag)
@@ -138,7 +139,7 @@ void test_condition_notify_one_wakes_from_wait()
     hpx::thread thread(&wait_for_flag::wait_without_predicate, std::ref(data));
 
     {
-        std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
+        std::unique_lock<hpx::mutex> lock(data.mutex);
         data.flag = true;
     }
 
@@ -155,7 +156,7 @@ void test_condition_notify_one_wakes_from_wait_with_predicate()
     hpx::thread thread(&wait_for_flag::wait_with_predicate, std::ref(data));
 
     {
-        std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
+        std::unique_lock<hpx::mutex> lock(data.mutex);
         data.flag = true;
     }
 
@@ -173,7 +174,7 @@ void test_condition_notify_one_wakes_from_wait_until()
         &wait_for_flag::wait_until_without_predicate, std::ref(data));
 
     {
-        std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
+        std::unique_lock<hpx::mutex> lock(data.mutex);
         data.flag = true;
     }
 
@@ -191,7 +192,7 @@ void test_condition_notify_one_wakes_from_wait_until_with_predicate()
         &wait_for_flag::wait_until_with_predicate, std::ref(data));
 
     {
-        std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
+        std::unique_lock<hpx::mutex> lock(data.mutex);
         data.flag = true;
     }
 
@@ -209,7 +210,7 @@ void test_condition_notify_one_wakes_from_relative_wait_until_with_predicate()
         &wait_for_flag::relative_wait_until_with_predicate, std::ref(data));
 
     {
-        std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
+        std::unique_lock<hpx::mutex> lock(data.mutex);
         data.flag = true;
     }
 
@@ -237,7 +238,7 @@ void test_multiple_notify_one_calls_wakes_multiple_threads()
     hpx::this_thread::sleep_for(std::chrono::milliseconds(200));
 
     {
-        std::unique_lock<hpx::lcos::local::mutex> lk(multiple_wake_mutex);
+        std::unique_lock<hpx::mutex> lk(multiple_wake_mutex);
         HPX_TEST(multiple_wake_count == 3);
     }
 
@@ -263,7 +264,7 @@ void test_condition_notify_all_wakes_from_wait()
         }
 
         {
-            std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
+            std::unique_lock<hpx::mutex> lock(data.mutex);
             data.flag = true;
         }
 
@@ -294,7 +295,7 @@ void test_condition_notify_all_wakes_from_wait_with_predicate()
         }
 
         {
-            std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
+            std::unique_lock<hpx::mutex> lock(data.mutex);
             data.flag = true;
         }
 
@@ -325,7 +326,7 @@ void test_condition_notify_all_wakes_from_wait_until()
         }
 
         {
-            std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
+            std::unique_lock<hpx::mutex> lock(data.mutex);
             data.flag = true;
         }
 
@@ -356,7 +357,7 @@ void test_condition_notify_all_wakes_from_wait_until_with_predicate()
         }
 
         {
-            std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
+            std::unique_lock<hpx::mutex> lock(data.mutex);
             data.flag = true;
         }
 
@@ -388,7 +389,7 @@ void test_condition_notify_all_wakes_from_relative_wait_until_with_predicate()
         }
 
         {
-            std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
+            std::unique_lock<hpx::mutex> lock(data.mutex);
             data.flag = true;
         }
 
@@ -422,7 +423,7 @@ void test_notify_all_following_notify_one_wakes_all_threads()
     hpx::this_thread::sleep_for(std::chrono::milliseconds(200));
 
     {
-        std::unique_lock<hpx::lcos::local::mutex> lk(multiple_wake_mutex);
+        std::unique_lock<hpx::mutex> lk(multiple_wake_mutex);
         HPX_TEST(multiple_wake_count == 3);
     }
 
@@ -440,15 +441,15 @@ struct condition_test_data
     {
     }
 
-    hpx::lcos::local::mutex mutex;
-    hpx::lcos::local::condition_variable condition;
+    hpx::mutex mutex;
+    hpx::condition_variable condition;
     int notified;
     int awoken;
 };
 
 void condition_test_thread(condition_test_data* data)
 {
-    std::unique_lock<hpx::lcos::local::mutex> lock(data->mutex);
+    std::unique_lock<hpx::mutex> lock(data->mutex);
     HPX_TEST(lock ? true : false);
     while (!(data->notified > 0))
         data->condition.wait(lock);
@@ -475,7 +476,7 @@ struct cond_predicate
 
 void condition_test_waits(condition_test_data* data)
 {
-    std::unique_lock<hpx::lcos::local::mutex> lock(data->mutex);
+    std::unique_lock<hpx::mutex> lock(data->mutex);
     HPX_TEST(lock ? true : false);
 
     // Test wait.
@@ -526,7 +527,7 @@ void condition_test_waits(condition_test_data* data)
 
 void test_condition_waits()
 {
-    typedef std::unique_lock<hpx::lcos::local::mutex> unique_lock;
+    typedef std::unique_lock<hpx::mutex> unique_lock;
 
     condition_test_data data;
 
@@ -613,16 +614,15 @@ std::chrono::milliseconds const timeout_resolution(100);
 
 void test_wait_until_times_out()
 {
-    hpx::lcos::local::condition_variable cond;
-    hpx::lcos::local::mutex m;
+    hpx::condition_variable cond;
+    hpx::mutex m;
 
-    std::unique_lock<hpx::lcos::local::mutex> lock(m);
+    std::unique_lock<hpx::mutex> lock(m);
     std::chrono::system_clock::time_point const start =
         std::chrono::system_clock::now();
     std::chrono::system_clock::time_point const timeout = start + delay;
 
-    while (cond.wait_until(lock, timeout) ==
-        hpx::lcos::local::cv_status::no_timeout)
+    while (cond.wait_until(lock, timeout) == hpx::cv_status::no_timeout)
     {
     }
 
@@ -633,10 +633,10 @@ void test_wait_until_times_out()
 
 void test_wait_until_with_predicate_times_out()
 {
-    hpx::lcos::local::condition_variable cond;
-    hpx::lcos::local::mutex m;
+    hpx::condition_variable cond;
+    hpx::mutex m;
 
-    std::unique_lock<hpx::lcos::local::mutex> lock(m);
+    std::unique_lock<hpx::mutex> lock(m);
     std::chrono::system_clock::time_point const start =
         std::chrono::system_clock::now();
     std::chrono::system_clock::time_point const timeout = start + delay;
@@ -651,10 +651,10 @@ void test_wait_until_with_predicate_times_out()
 
 void test_relative_wait_until_with_predicate_times_out()
 {
-    hpx::lcos::local::condition_variable cond;
-    hpx::lcos::local::mutex m;
+    hpx::condition_variable cond;
+    hpx::mutex m;
 
-    std::unique_lock<hpx::lcos::local::mutex> lock(m);
+    std::unique_lock<hpx::mutex> lock(m);
     std::chrono::system_clock::time_point const start =
         std::chrono::system_clock::now();
 
@@ -668,15 +668,14 @@ void test_relative_wait_until_with_predicate_times_out()
 
 void test_wait_until_relative_times_out()
 {
-    hpx::lcos::local::condition_variable cond;
-    hpx::lcos::local::mutex m;
+    hpx::condition_variable cond;
+    hpx::mutex m;
 
-    std::unique_lock<hpx::lcos::local::mutex> lock(m);
+    std::unique_lock<hpx::mutex> lock(m);
     std::chrono::system_clock::time_point const start =
         std::chrono::system_clock::now();
 
-    while (
-        cond.wait_for(lock, delay) == hpx::lcos::local::cv_status::no_timeout)
+    while (cond.wait_for(lock, delay) == hpx::cv_status::no_timeout)
     {
     }
 

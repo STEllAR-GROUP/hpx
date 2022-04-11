@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -102,7 +102,7 @@ namespace hpx {
         /// \endcond
 
     private:
-        using mutex_type = lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
     public:
         using arrival_token = bool;
@@ -275,7 +275,7 @@ namespace hpx {
         class HPX_CORE_EXPORT barrier
         {
         private:
-            typedef lcos::local::spinlock mutex_type;
+            typedef hpx::spinlock mutex_type;
 
             static constexpr std::size_t barrier_flag =
                 static_cast<std::size_t>(1)

@@ -19,31 +19,19 @@
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local {
-
-#if HPX_HAVE_ITTNOTIFY != 0
-    namespace detail {
-        template <typename Tag, std::size_t N>
-        struct itt_spinlock_init
-        {
-            itt_spinlock_init() noexcept;
-            ~itt_spinlock_init();
-        };
-    }    // namespace detail
-#endif
+namespace hpx {
 
     template <typename Tag, std::size_t N = HPX_HAVE_SPINLOCK_POOL_NUM>
     class spinlock_pool
     {
     private:
-        static util::cache_aligned_data<lcos::local::spinlock> pool_[N];
-#if HPX_HAVE_ITTNOTIFY != 0
-        static detail::itt_spinlock_init<Tag, N> init_;
-#endif
+        static util::cache_aligned_data<hpx::spinlock> pool_[N];
+
     public:
-        static lcos::local::spinlock& spinlock_for(void const* pv) noexcept
+        static hpx::spinlock& spinlock_for(void const* pv) noexcept
         {
             std::size_t i = util::fibhash<N>(reinterpret_cast<std::size_t>(pv));
             return pool_[i].data_;
@@ -52,13 +40,16 @@ namespace hpx { namespace lcos { namespace local {
         class scoped_lock
         {
         private:
-            hpx::lcos::local::spinlock& sp_;
+            hpx::spinlock& sp_;
 
         public:
-            HPX_NON_COPYABLE(scoped_lock);
+            scoped_lock(scoped_lock const&) = delete;
+            scoped_lock& operator=(scoped_lock const&) = delete;
+            scoped_lock(scoped_lock&&) = delete;
+            scoped_lock& operator=(scoped_lock&&) = delete;
 
         public:
-            explicit scoped_lock(void const* pv)
+            explicit scoped_lock(void const* pv) noexcept
               : sp_(spinlock_for(pv))
             {
                 lock();
@@ -71,52 +62,25 @@ namespace hpx { namespace lcos { namespace local {
 
             void lock()
             {
-                HPX_ITT_SYNC_PREPARE(&sp_);
                 sp_.lock();
-                HPX_ITT_SYNC_ACQUIRED(&sp_);
             }
 
-            void unlock()
+            void unlock() noexcept(
+                noexcept(std::declval<hpx::spinlock&>().unlock()))
             {
-                HPX_ITT_SYNC_RELEASING(&sp_);
                 sp_.unlock();
-                HPX_ITT_SYNC_RELEASED(&sp_);
             }
         };
     };
 
     template <typename Tag, std::size_t N>
-    util::cache_aligned_data<lcos::local::spinlock>
-        spinlock_pool<Tag, N>::pool_[N];
+    util::cache_aligned_data<hpx::spinlock> spinlock_pool<Tag, N>::pool_[N];
+}    // namespace hpx
 
-#if HPX_HAVE_ITTNOTIFY != 0
-    namespace detail {
+namespace hpx::lcos::local {
 
-        template <typename Tag, std::size_t N>
-        itt_spinlock_init<Tag, N>::itt_spinlock_init() noexcept
-        {
-            for (int i = 0; i < N; ++i)
-            {
-                HPX_ITT_SYNC_CREATE(
-                    (&lcos::local::spinlock_pool<Tag, N>::pool_[i].data_),
-                    "hpx::lcos::spinlock", 0);
-                HPX_ITT_SYNC_RENAME(
-                    (&lcos::local::spinlock_pool<Tag, N>::pool_[i].data_),
-                    "hpx::lcos::spinlock");
-            }
-        }
-
-        template <typename Tag, std::size_t N>
-        itt_spinlock_init<Tag, N>::~itt_spinlock_init()
-        {
-            for (int i = 0; i < N; ++i)
-            {
-                HPX_ITT_SYNC_DESTROY((&spinlock_pool<Tag, N>::pool_[i].data_));
-            }
-        }
-    }    // namespace detail
-
-    template <typename Tag, std::size_t N>
-    detail::itt_spinlock_init<Tag, N> spinlock_pool<Tag, N>::init_{};
-#endif
-}}}    // namespace hpx::lcos::local
+    template <typename Tag, std::size_t N = HPX_HAVE_SPINLOCK_POOL_NUM>
+    using spinlock_pool HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::spinlock_pool is deprecated, use hpx::spinlock_pool "
+        "instead") = hpx::spinlock_pool<Tag, N>;
+}    // namespace hpx::lcos::local

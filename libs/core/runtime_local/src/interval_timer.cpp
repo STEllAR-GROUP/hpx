@@ -299,10 +299,9 @@ namespace hpx { namespace util { namespace detail {
         threads::thread_id_ref_type id;
         {
             // FIXME: registering threads might lead to thread suspension since
-            // the allocators use hpx::lcos::local::spinlock. Unlocking the
-            // lock here would be the right thing but leads to crashes and hangs
-            // at shutdown.
-            //util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+            // the allocators use hpx::spinlock. Unlocking the lock here would
+            // be the right thing but leads to crashes and hangs at shutdown.
+            // util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
             hpx::threads::thread_init_data data(
                 hpx::threads::make_thread_function(hpx::bind_front(
                     &interval_timer::evaluate, this->shared_from_this())),

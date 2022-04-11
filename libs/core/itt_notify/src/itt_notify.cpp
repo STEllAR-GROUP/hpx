@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -397,7 +397,7 @@ namespace hpx { namespace util { namespace itt {
                 domain_.domain_, reinterpret_cast<std::size_t>(sh_.handle_));
 
             HPX_ITT_TASK_BEGIN_ID(domain_.domain_, id_, sh_.handle_);
-            add_metadata(sh_.handle_, metadata);
+            add_metadata(string_handle(sh_.handle_), metadata);
         }
     }
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -111,7 +111,7 @@ public:
     {
         // notify hpx_main above to tear down the runtime
         {
-            std::lock_guard<hpx::lcos::local::spinlock> lk(mtx_);
+            std::lock_guard<hpx::spinlock> lk(mtx_);
             rts_ = nullptr;    // reset pointer
         }
 
@@ -150,7 +150,7 @@ protected:
 
         // Now, wait for destructor to be called.
         {
-            std::unique_lock<hpx::lcos::local::spinlock> lk(mtx_);
+            std::unique_lock<hpx::spinlock> lk(mtx_);
             if (rts_ != nullptr)
                 cond_.wait(lk);
         }
@@ -160,8 +160,8 @@ protected:
     }
 
 private:
-    hpx::lcos::local::spinlock mtx_;
-    hpx::lcos::local::condition_variable_any cond_;
+    hpx::spinlock mtx_;
+    hpx::condition_variable_any cond_;
 
     std::mutex startup_mtx_;
     std::condition_variable startup_cond_;

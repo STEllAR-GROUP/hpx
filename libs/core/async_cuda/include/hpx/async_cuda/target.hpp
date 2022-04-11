@@ -39,7 +39,7 @@ namespace hpx { namespace cuda { namespace experimental {
     public:
         struct HPX_CORE_EXPORT native_handle_type
         {
-            typedef hpx::lcos::local::spinlock mutex_type;
+            typedef hpx::spinlock mutex_type;
 
             native_handle_type(int device = 0);
 

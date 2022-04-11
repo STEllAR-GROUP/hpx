@@ -24,7 +24,7 @@ namespace hpx { namespace lcos { namespace local {
     class event
     {
     private:
-        typedef lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
     public:
         /// \brief Construct a new event semaphore

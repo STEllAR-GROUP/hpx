@@ -947,7 +947,7 @@ namespace hpx::parcelset {
         /// The connection cache for sending connections
         util::connection_cache<connection, locality> connection_cache_;
 
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
         int archive_flags_;
         hpx::util::atomic_count operations_in_flight_;

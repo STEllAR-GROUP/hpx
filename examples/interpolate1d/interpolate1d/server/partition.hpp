@@ -21,7 +21,7 @@ namespace interpolate1d { namespace server {
     {
     private:
         typedef hpx::components::component_base<partition> base_type;
-        typedef hpx::lcos::local::spinlock mutex_type;
+        typedef hpx::spinlock mutex_type;
 
     public:
         partition();

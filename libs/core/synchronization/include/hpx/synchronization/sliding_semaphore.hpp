@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,7 +20,8 @@
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local {
+namespace hpx {
+
     /// A semaphore is a protected variable (an entity storing a value) or
     /// abstract data type (an entity grouping several variables that may or
     /// may not be numerical) which constitutes the classic method for
@@ -41,11 +42,11 @@ namespace hpx { namespace lcos { namespace local {
     /// allowed to proceed, but will make sure that the difference between
     /// the (arbitrary) number passed to set and wait does not exceed a given
     /// threshold.
-    template <typename Mutex = hpx::lcos::local::spinlock>
+    template <typename Mutex = hpx::spinlock>
     class sliding_semaphore_var
     {
     private:
-        typedef Mutex mutex_type;
+        using mutex_type = Mutex;
 
     public:
         /// \brief Construct a new sliding semaphore
@@ -125,11 +126,24 @@ namespace hpx { namespace lcos { namespace local {
 
     private:
         mutable mutex_type mtx_;
-        detail::sliding_semaphore sem_;
+        lcos::local::detail::sliding_semaphore sem_;
     };
 
-    typedef sliding_semaphore_var<> sliding_semaphore;
-}}}    // namespace hpx::lcos::local
+    using sliding_semaphore = sliding_semaphore_var<>;
+}    // namespace hpx
+
+namespace hpx::lcos::local {
+
+    template <typename Mutex = hpx::spinlock>
+    using sliding_semaphore_var HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::sliding_semaphore_var is deprecated, use "
+        "hpx::sliding_semaphore_var instead") =
+        hpx::sliding_semaphore_var<Mutex>;
+
+    using sliding_semaphore HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::sliding_semaphore is deprecated, use "
+        "hpx::sliding_semaphore instead") = hpx::sliding_semaphore;
+}    // namespace hpx::lcos::local
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)

@@ -24,7 +24,7 @@ namespace hpx { namespace components {
     ///////////////////////////////////////////////////////////////////////////
     /// This hook has to be inserted into the derivation chain of any
     /// abstract_component_base for it to support migration.
-    template <typename BaseComponent, typename Mutex = lcos::local::spinlock>
+    template <typename BaseComponent, typename Mutex = hpx::spinlock>
     struct abstract_base_migration_support : BaseComponent
     {
     private:

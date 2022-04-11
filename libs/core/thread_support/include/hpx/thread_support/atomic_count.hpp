@@ -18,40 +18,40 @@ namespace hpx { namespace util {
         HPX_NON_COPYABLE(atomic_count);
 
     public:
-        explicit atomic_count(long value)
+        explicit atomic_count(long value) noexcept
           : value_(value)
         {
         }
 
-        atomic_count& operator=(long value)
+        atomic_count& operator=(long value) noexcept
         {
             value_.store(value, std::memory_order_relaxed);
             return *this;
         }
 
-        long operator++()
+        long operator++() noexcept
         {
             return value_.fetch_add(1, std::memory_order_acq_rel) + 1;
         }
 
-        long operator--()
+        long operator--() noexcept
         {
             return value_.fetch_sub(1, std::memory_order_acq_rel) - 1;
         }
 
-        atomic_count& operator+=(long n)
+        atomic_count& operator+=(long n) noexcept
         {
             value_.fetch_add(n, std::memory_order_acq_rel);
             return *this;
         }
 
-        atomic_count& operator-=(long n)
+        atomic_count& operator-=(long n) noexcept
         {
             value_.fetch_sub(n, std::memory_order_acq_rel);
             return *this;
         }
 
-        operator long() const
+        operator long() const noexcept
         {
             return value_.load(std::memory_order_acquire);
         }

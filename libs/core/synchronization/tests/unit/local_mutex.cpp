@@ -1,5 +1,5 @@
 //  Copyright (c) 2001-2003 William E. Kempf
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 //  Copyright (c) 2014 Agustin Berge
 //
@@ -31,7 +31,7 @@ struct test_lock
     void operator()()
     {
         mutex_type mutex;
-        hpx::lcos::local::condition_variable_any condition;
+        hpx::condition_variable_any condition;
 
         // Test the lock's constructors.
         {
@@ -48,8 +48,7 @@ struct test_lock
         // Test the lock and the mutex with condition variables.
         // No one is going to notify this condition variable.  We expect to
         // time out.
-        HPX_TEST(condition.wait_until(lock, xt) ==
-            hpx::lcos::local::cv_status::timeout);
+        HPX_TEST(condition.wait_until(lock, xt) == hpx::cv_status::timeout);
         HPX_TEST(lock ? true : false);
 
         // Test the lock and unlock methods.
@@ -69,7 +68,7 @@ struct test_trylock
     void operator()()
     {
         mutex_type mutex;
-        hpx::lcos::local::condition_variable_any condition;
+        hpx::condition_variable_any condition;
 
         // Test the lock's constructors.
         {
@@ -90,8 +89,7 @@ struct test_trylock
         // Test the lock and the mutex with condition variables.
         // No one is going to notify this condition variable.  We expect to
         // time out.
-        HPX_TEST(condition.wait_until(lock, xt) ==
-            hpx::lcos::local::cv_status::timeout);
+        HPX_TEST(condition.wait_until(lock, xt) == hpx::cv_status::timeout);
         HPX_TEST(lock ? true : false);
 
         // Test the lock, unlock and trylock methods.
@@ -112,10 +110,10 @@ struct test_lock_times_out_if_other_thread_has_lock
     typedef std::unique_lock<Mutex> Lock;
 
     Mutex m;
-    hpx::lcos::local::mutex done_mutex;
+    hpx::mutex done_mutex;
     bool done;
     bool locked;
-    hpx::lcos::local::condition_variable_any done_cond;
+    hpx::condition_variable_any done_cond;
 
     test_lock_times_out_if_other_thread_has_lock()
       : done(false)
@@ -128,7 +126,7 @@ struct test_lock_times_out_if_other_thread_has_lock
         Lock lock(m, std::defer_lock);
         lock.try_lock_for(std::chrono::milliseconds(50));
 
-        std::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
+        std::lock_guard<hpx::mutex> lk(done_mutex);
         locked = lock.owns_lock();
         done = true;
         done_cond.notify_one();
@@ -138,7 +136,7 @@ struct test_lock_times_out_if_other_thread_has_lock
     {
         Lock lock(m, std::chrono::milliseconds(50));
 
-        std::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
+        std::lock_guard<hpx::mutex> lk(done_mutex);
         locked = lock.owns_lock();
         done = true;
         done_cond.notify_one();
@@ -163,7 +161,7 @@ struct test_lock_times_out_if_other_thread_has_lock
         try
         {
             {
-                std::unique_lock<hpx::lcos::local::mutex> lk(done_mutex);
+                std::unique_lock<hpx::mutex> lk(done_mutex);
                 HPX_TEST(done_cond.wait_for(lk, std::chrono::seconds(2),
                     hpx::bind(&this_type::is_done, this)));
                 HPX_TEST(!locked);
@@ -203,7 +201,7 @@ struct test_timedlock
         test_lock_times_out_if_other_thread_has_lock<mutex_type>()();
 
         mutex_type mutex;
-        hpx::lcos::local::condition_variable_any condition;
+        hpx::condition_variable_any condition;
 
         // Test the lock's constructors.
         {
@@ -277,22 +275,22 @@ struct test_recursive_lock
 
 void test_mutex()
 {
-    test_lock<hpx::lcos::local::mutex>()();
-    test_trylock<hpx::lcos::local::mutex>()();
+    test_lock<hpx::mutex>()();
+    test_trylock<hpx::mutex>()();
 }
 
 void test_timed_mutex()
 {
-    test_lock<hpx::lcos::local::timed_mutex>()();
-    test_trylock<hpx::lcos::local::timed_mutex>()();
-    test_timedlock<hpx::lcos::local::timed_mutex>()();
+    test_lock<hpx::timed_mutex>()();
+    test_trylock<hpx::timed_mutex>()();
+    test_timedlock<hpx::timed_mutex>()();
 }
 
 //void test_recursive_mutex()
 //{
-//    test_lock<hpx::lcos::local::recursive_mutex>()();
-//    test_trylock<hpx::lcos::local::recursive_mutex>()();
-//    test_recursive_lock<hpx::lcos::local::recursive_mutex>()();
+//    test_lock<hpx::recursive_mutex>()();
+//    test_trylock<hpx::recursive_mutex>()();
+//    test_recursive_lock<hpx::recursive_mutex>()();
 //}
 //
 //void test_recursive_timed_mutex()

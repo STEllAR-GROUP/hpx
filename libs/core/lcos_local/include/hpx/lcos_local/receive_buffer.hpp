@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -23,7 +23,7 @@
 
 namespace hpx { namespace lcos { namespace local {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Mutex = lcos::local::spinlock>
+    template <typename T, typename Mutex = hpx::spinlock>
     struct receive_buffer
     {
     protected:
@@ -164,7 +164,7 @@ namespace hpx { namespace lcos { namespace local {
             return true;
         }
 
-        template <typename Lock = hpx::lcos::local::no_mutex>
+        template <typename Lock = hpx::no_mutex>
         void store_received(std::size_t step, T&& val, Lock* lock = nullptr)
         {
             std::shared_ptr<entry_data> entry;
@@ -386,7 +386,7 @@ namespace hpx { namespace lcos { namespace local {
             return true;
         }
 
-        template <typename Lock = hpx::lcos::local::no_mutex>
+        template <typename Lock = hpx::no_mutex>
         void store_received(std::size_t step, Lock* lock = nullptr)
         {
             std::shared_ptr<entry_data> entry;

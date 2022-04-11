@@ -102,7 +102,7 @@ namespace allocator {
     template <typename T>
     class free_list_allocator
     {
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = hpx::spinlock;
 
     public:
         free_list_allocator()

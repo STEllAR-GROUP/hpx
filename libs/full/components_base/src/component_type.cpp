@@ -53,7 +53,7 @@ namespace hpx { namespace components {
             };
 
         private:
-            using mutex_type = hpx::lcos::local::spinlock;
+            using mutex_type = hpx::spinlock;
             using map_type = std::map<component_type, component_entry>;
 
             static mutex_type& mtx()

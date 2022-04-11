@@ -79,7 +79,7 @@ int hpx_main()
 
     {
         // Suspend and resume pool with callback
-        hpx::lcos::local::counting_semaphore sem;
+        hpx::counting_semaphore_var<> sem;
         hpx::chrono::high_resolution_timer t;
 
         while (t.elapsed() < 1)

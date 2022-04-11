@@ -129,7 +129,7 @@ int hpx_main(hpx::program_options::variables_map&)
 
     future_3.get();
 
-    hpx::lcos::local::mutex m;
+    hpx::mutex m;
     std::set<std::thread::id> thread_set;
 
     // test a parallel algorithm on custom pool with high priority
@@ -137,7 +137,7 @@ int hpx_main(hpx::program_options::variables_map&)
     hpx::experimental::for_loop_strided(
         hpx::execution::par.with(fixed).on(high_priority_executor), 0,
         loop_count, 1, [&](std::size_t i) {
-            std::lock_guard<hpx::lcos::local::mutex> lock(m);
+            std::lock_guard<hpx::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
                 std::cout << std::hex << hpx::this_thread::get_id() << " "
@@ -153,7 +153,7 @@ int hpx_main(hpx::program_options::variables_map&)
     hpx::experimental::for_loop_strided(
         hpx::execution::par.with(fixed).on(normal_priority_executor), 0,
         loop_count, 1, [&](std::size_t i) {
-            std::lock_guard<hpx::lcos::local::mutex> lock(m);
+            std::lock_guard<hpx::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
                 std::cout << std::hex << hpx::this_thread::get_id() << " "
@@ -170,7 +170,7 @@ int hpx_main(hpx::program_options::variables_map&)
     hpx::experimental::for_loop_strided(
         hpx::execution::par.with(fixed).on(mpi_executor), 0, loop_count, 1,
         [&](std::size_t i) {
-            std::lock_guard<hpx::lcos::local::mutex> lock(m);
+            std::lock_guard<hpx::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
                 std::cout << std::hex << hpx::this_thread::get_id() << " "
@@ -191,7 +191,7 @@ int hpx_main(hpx::program_options::variables_map&)
         hpx::execution::par.with(fixed /*, high_priority_async_policy*/)
             .on(mpi_executor),
         0, loop_count, 1, [&](std::size_t i) {
-            std::lock_guard<hpx::lcos::local::mutex> lock(m);
+            std::lock_guard<hpx::mutex> lock(m);
             if (thread_set.insert(std::this_thread::get_id()).second)
             {
                 std::cout << std::hex << hpx::this_thread::get_id() << " "

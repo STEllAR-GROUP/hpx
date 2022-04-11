@@ -156,14 +156,15 @@ namespace hpx { namespace util {
                 return util::itt::task(domain, get_description_itt());
                 break;
             case util::thread_description::data_type_address:
-                return util::itt::task(domain, "address", get_address());
+                return util::itt::task(
+                    domain, util::itt::string_handle("address"), get_address());
                 break;
             default:
                 HPX_ASSERT(false);
                 break;
             }
 
-            return util::itt::task(domain, "<error>");
+            return util::itt::task(domain, util::itt::string_handle("<error>"));
         }
 #endif
 

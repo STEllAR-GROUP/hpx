@@ -43,7 +43,7 @@ int main()
 
     std::atomic<std::size_t> signal_count(0);
 
-    hpx::lcos::local::sliding_semaphore sem(window_size, 0);
+    hpx::sliding_semaphore sem(window_size, 0);
     message_double_action msg;
 
     for (std::size_t i = 0; i < (loop * window_size) + skip; ++i)

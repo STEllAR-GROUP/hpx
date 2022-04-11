@@ -1,5 +1,5 @@
 // (C) Copyright 2006-7 Anthony Williams
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See
@@ -25,25 +25,25 @@
 
 #define CHECK_LOCKED_VALUE_EQUAL(mutex_name, value, expected_value)            \
     {                                                                          \
-        std::unique_lock<hpx::lcos::local::mutex> lock(mutex_name);            \
+        std::unique_lock<hpx::mutex> lock(mutex_name);                         \
         HPX_TEST_EQ(value, expected_value);                                    \
     }
 
 void test_multiple_readers()
 {
-    typedef hpx::lcos::local::shared_mutex shared_mutex_type;
-    typedef hpx::lcos::local::mutex mutex_type;
+    typedef hpx::shared_mutex shared_mutex_type;
+    typedef hpx::mutex mutex_type;
 
     unsigned const number_of_threads = 10;
 
     test::thread_group pool;
 
-    hpx::lcos::local::shared_mutex rw_mutex;
+    hpx::shared_mutex rw_mutex;
     unsigned unblocked_count = 0;
     unsigned simultaneous_running_count = 0;
     unsigned max_simultaneous_running = 0;
     mutex_type unblocked_count_mutex;
-    hpx::lcos::local::condition_variable unblocked_condition;
+    hpx::condition_variable unblocked_condition;
     mutex_type finish_mutex;
     std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
@@ -86,19 +86,19 @@ void test_multiple_readers()
 
 void test_only_one_writer_permitted()
 {
-    typedef hpx::lcos::local::shared_mutex shared_mutex_type;
-    typedef hpx::lcos::local::mutex mutex_type;
+    typedef hpx::shared_mutex shared_mutex_type;
+    typedef hpx::mutex mutex_type;
 
     unsigned const number_of_threads = 10;
 
     test::thread_group pool;
 
-    hpx::lcos::local::shared_mutex rw_mutex;
+    hpx::shared_mutex rw_mutex;
     unsigned unblocked_count = 0;
     unsigned simultaneous_running_count = 0;
     unsigned max_simultaneous_running = 0;
     mutex_type unblocked_count_mutex;
-    hpx::lcos::local::condition_variable unblocked_condition;
+    hpx::condition_variable unblocked_condition;
     mutex_type finish_mutex;
     std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
@@ -135,17 +135,17 @@ void test_only_one_writer_permitted()
 
 void test_reader_blocks_writer()
 {
-    typedef hpx::lcos::local::shared_mutex shared_mutex_type;
-    typedef hpx::lcos::local::mutex mutex_type;
+    typedef hpx::shared_mutex shared_mutex_type;
+    typedef hpx::mutex mutex_type;
 
     test::thread_group pool;
 
-    hpx::lcos::local::shared_mutex rw_mutex;
+    hpx::shared_mutex rw_mutex;
     unsigned unblocked_count = 0;
     unsigned simultaneous_running_count = 0;
     unsigned max_simultaneous_running = 0;
     mutex_type unblocked_count_mutex;
-    hpx::lcos::local::condition_variable unblocked_condition;
+    hpx::condition_variable unblocked_condition;
     mutex_type finish_mutex;
     std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
@@ -195,18 +195,18 @@ void test_reader_blocks_writer()
 
 void test_unlocking_writer_unblocks_all_readers()
 {
-    typedef hpx::lcos::local::shared_mutex shared_mutex_type;
-    typedef hpx::lcos::local::mutex mutex_type;
+    typedef hpx::shared_mutex shared_mutex_type;
+    typedef hpx::mutex mutex_type;
 
     test::thread_group pool;
 
-    hpx::lcos::local::shared_mutex rw_mutex;
-    std::unique_lock<hpx::lcos::local::shared_mutex> write_lock(rw_mutex);
+    hpx::shared_mutex rw_mutex;
+    std::unique_lock<hpx::shared_mutex> write_lock(rw_mutex);
     unsigned unblocked_count = 0;
     unsigned simultaneous_running_count = 0;
     unsigned max_simultaneous_running = 0;
     mutex_type unblocked_count_mutex;
-    hpx::lcos::local::condition_variable unblocked_condition;
+    hpx::condition_variable unblocked_condition;
     mutex_type finish_mutex;
     std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
@@ -257,19 +257,19 @@ void test_unlocking_writer_unblocks_all_readers()
 
 void test_unlocking_last_reader_only_unblocks_one_writer()
 {
-    typedef hpx::lcos::local::shared_mutex shared_mutex_type;
-    typedef hpx::lcos::local::mutex mutex_type;
+    typedef hpx::shared_mutex shared_mutex_type;
+    typedef hpx::mutex mutex_type;
 
     test::thread_group pool;
 
-    hpx::lcos::local::shared_mutex rw_mutex;
+    hpx::shared_mutex rw_mutex;
     unsigned unblocked_count = 0;
     unsigned simultaneous_running_readers = 0;
     unsigned max_simultaneous_readers = 0;
     unsigned simultaneous_running_writers = 0;
     unsigned max_simultaneous_writers = 0;
     mutex_type unblocked_count_mutex;
-    hpx::lcos::local::condition_variable unblocked_condition;
+    hpx::condition_variable unblocked_condition;
     mutex_type finish_reading_mutex;
     std::unique_lock<mutex_type> finish_reading_lock(finish_reading_mutex);
     mutex_type finish_writing_mutex;
