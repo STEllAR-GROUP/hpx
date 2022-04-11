@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,7 +18,7 @@ namespace hpx { namespace traits {
     template <typename Iterator, typename Enable = void>
     struct segmented_iterator_traits
     {
-        typedef std::false_type is_segmented_iterator;
+        using is_segmented_iterator = std::false_type;
     };
 
     template <typename Iterator, typename Enable>
@@ -33,31 +33,40 @@ namespace hpx { namespace traits {
     template <typename Iterator, typename Enable = void>
     struct segmented_local_iterator_traits
     {
-        typedef std::false_type is_segmented_local_iterator;
+        using is_segmented_local_iterator = std::false_type;
 
-        typedef Iterator iterator;
-        typedef Iterator local_iterator;
-        typedef Iterator local_raw_iterator;
+        using iterator = Iterator;
+        using local_iterator = Iterator;
+        using local_raw_iterator = Iterator;
 
-        static local_raw_iterator const& local(local_iterator const& it)
+        static local_raw_iterator const& local(
+            local_iterator const& it) noexcept
         {
             return it;
         }
 
-        static local_iterator const& remote(local_raw_iterator const& it)
+        static local_iterator const& remote(
+            local_raw_iterator const& it) noexcept
         {
             return it;
         }
 
-        static local_raw_iterator local(local_iterator&& it)
+        static local_raw_iterator local(local_iterator&& it) noexcept
         {
             return HPX_MOVE(it);
         }
 
-        static local_iterator remote(local_raw_iterator&& it)
+        static local_iterator remote(local_raw_iterator&& it) noexcept
         {
             return HPX_MOVE(it);
         }
+    };
+
+    // MSVC needs this for whatever reason
+    template <>
+    struct segmented_local_iterator_traits<void>
+    {
+        using is_segmented_local_iterator = std::false_type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
