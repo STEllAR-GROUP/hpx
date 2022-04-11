@@ -665,12 +665,13 @@ namespace hpx { namespace threads {
     };
 
     HPX_FORCEINLINE thread_data* get_thread_id_data(
-        thread_id_ref_type const& tid)
+        thread_id_ref_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get().get());
     }
 
-    HPX_FORCEINLINE thread_data* get_thread_id_data(thread_id_type const& tid)
+    HPX_FORCEINLINE thread_data* get_thread_id_data(
+        thread_id_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get());
     }

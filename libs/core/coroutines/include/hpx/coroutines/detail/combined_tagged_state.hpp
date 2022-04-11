@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,44 +13,48 @@
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T1, typename T2>
     class combined_tagged_state
     {
     private:
-        typedef std::int64_t tagged_state_type;
+        using tagged_state_type = std::int64_t;
 
-        typedef std::int8_t thread_state_type;
-        typedef std::int8_t thread_state_ex_type;
-        typedef std::int64_t tag_type;
+        using thread_state_type = std::int8_t;
+        using thread_state_ex_type = std::int8_t;
+        using tag_type = std::int64_t;
 
-        static const std::size_t state_shift = 56;       // 8th byte
-        static const std::size_t state_ex_shift = 48;    // 7th byte
+        static constexpr std::size_t state_shift = 56;       // 8th byte
+        static constexpr std::size_t state_ex_shift = 48;    // 7th byte
 
-        static const tagged_state_type state_mask = 0xffull;
-        static const tagged_state_type state_ex_mask = 0xffull;
+        static constexpr tagged_state_type state_mask = 0xffull;
+        static constexpr tagged_state_type state_ex_mask = 0xffull;
 
         // (1L << 48L) - 1;
-        static const tagged_state_type tag_mask = 0x0000ffffffffffffull;
+        static constexpr tagged_state_type tag_mask = 0x0000ffffffffffffull;
 
-        static tag_type extract_tag(tagged_state_type const& i)
+        static constexpr tag_type extract_tag(
+            tagged_state_type const& i) noexcept
         {
             return i & tag_mask;
         }
 
-        static thread_state_type extract_state(tagged_state_type const& i)
+        static constexpr thread_state_type extract_state(
+            tagged_state_type const& i) noexcept
         {
             return (i >> state_shift) & state_mask;
         }
 
-        static thread_state_ex_type extract_state_ex(tagged_state_type const& i)
+        static constexpr thread_state_ex_type extract_state_ex(
+            tagged_state_type const& i) noexcept
         {
             return (i >> state_ex_shift) & state_ex_mask;
         }
 
         static tagged_state_type pack_state(
-            T1 state_, T2 state_ex_, tag_type tag)
+            T1 state_, T2 state_ex_, tag_type tag) noexcept
         {
             tagged_state_type state = static_cast<tagged_state_type>(state_);
             tagged_state_type state_ex =
@@ -65,68 +69,70 @@ namespace hpx { namespace threads { namespace detail {
 
     public:
         ///////////////////////////////////////////////////////////////////////
-        combined_tagged_state() noexcept
+        constexpr combined_tagged_state() noexcept
           : state_(0)
         {
         }
 
-        combined_tagged_state(T1 state, T2 state_ex, tag_type t = 0)
+        constexpr combined_tagged_state(
+            T1 state, T2 state_ex, tag_type t = 0) noexcept
           : state_(pack_state(state, state_ex, t))
         {
         }
 
-        combined_tagged_state(combined_tagged_state state, tag_type t)
+        constexpr combined_tagged_state(
+            combined_tagged_state state, tag_type t) noexcept
           : state_(pack_state(state.state(), state.state_ex(), t))
         {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void set(T1 state, T2 state_ex, tag_type t)
+        void set(T1 state, T2 state_ex, tag_type t) noexcept
         {
             state_ = pack_state(state, state_ex, t);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool operator==(combined_tagged_state const& p) const
+        constexpr bool operator==(combined_tagged_state const& p) const noexcept
         {
             return state_ == p.state_;
         }
 
-        bool operator!=(combined_tagged_state const& p) const
+        constexpr bool operator!=(combined_tagged_state const& p) const noexcept
         {
             return !operator==(p);
         }
 
         ///////////////////////////////////////////////////////////////////////
         // state access
-        T1 state() const
+        constexpr T1 state() const noexcept
         {
             return static_cast<T1>(extract_state(state_));
         }
 
-        void set_state(T1 state)
+        void set_state(T1 state) noexcept
         {
             state_ = pack_state(state, state_ex(), tag());
         }
 
-        T2 state_ex() const
+        T2 state_ex() const noexcept
         {
             return static_cast<T2>(extract_state_ex(state_));
         }
 
-        void set_state_ex(T2 state_ex)
+        void set_state_ex(T2 state_ex) noexcept
         {
             state_ = pack_state(state(), state_ex, tag());
         }
 
         ///////////////////////////////////////////////////////////////////////
         // tag access
-        tag_type tag() const
+        constexpr tag_type tag() const noexcept
         {
             return extract_tag(state_);
         }
 
-        void set_tag(tag_type t)
+        void set_tag(tag_type t) noexcept
         {
             state_ = pack_state(state(), state_ex(), t);
         }
@@ -134,4 +140,4 @@ namespace hpx { namespace threads { namespace detail {
     protected:
         tagged_state_type state_;
     };
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail

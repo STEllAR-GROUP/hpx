@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <utility>
 #include <vector>
 
 namespace hpx { namespace util {
@@ -39,12 +40,14 @@ namespace hpx { namespace util {
     }
 
     inline std::vector<std::int64_t> get_and_reset_value(
-        std::vector<std::int64_t>& value, bool reset) noexcept
+        std::vector<std::int64_t>& value, bool reset)
     {
-        std::vector<std::int64_t> result = value;
         if (reset)
-            value.clear();
-
-        return result;
+        {
+            std::vector<std::int64_t> result;
+            std::swap(result, value);
+            return result;
+        }
+        return value;
     }
 }}    // namespace hpx::util
