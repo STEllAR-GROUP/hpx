@@ -94,9 +94,8 @@ fi
 
 echo ""
 echo "Setting the signing key for signing the release. It is up to you to change it back to your own afterwards."
-git config user.signingkey E18AE35E86BB194F
-git config user.email "contact@stellar-group.org"
-git config user.name "STE||AR Group"
+git -c user.signingkey E18AE35E86BB194F -c user.email contact@stellar-group.org \
+    -c user.name "STE||AR Group"
 
 echo ""
 echo "Tagging release."
@@ -110,11 +109,6 @@ hub release create \
     --message "${VERSION_TITLE}" \
     --message "${VERSION_DESCRIPTION}" \
     "${VERSION_FULL_TAG}"
-
-# Unset the local config used for the release
-git config --unset user.signingkey
-git config --unset user.name
-git config --unset user.email
 
 echo ""
 echo "Now add the above URL to the downloads pages on stellar.cct.lsu.edu and stellar-group.org."

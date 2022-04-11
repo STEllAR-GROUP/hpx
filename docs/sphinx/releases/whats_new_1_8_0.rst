@@ -229,6 +229,7 @@ Closed issues
 * :hpx-issue:`5344` - Further simplify tag_invoke helpers
 * :hpx-issue:`5269` - Allow setting a label on executors/policies
 * :hpx-issue:`5219` - (Re-)Implement executor API on top of sender/receiver infrastructure
+* :hpx-issue:`5216` - Performance counter module not loading 
 * :hpx-issue:`5162` - Require C++17 support
 * :hpx-issue:`5156` - Disentangle segmented algorithms
 * :hpx-issue:`5118` - Lock held while suspending
@@ -241,6 +242,7 @@ Closed issues
 * :hpx-issue:`4871` - HEP: conformance to C++20
 * :hpx-issue:`4822` - Adapt parallel algorithms to C++20
 * :hpx-issue:`4736` - Deprecate hpx::flush and hpx::endl
+* :hpx-issue:`4558` -  Prevent work-stealing from stalling
 * :hpx-issue:`4495` - Add anchor links to table rows in documentation
 * :hpx-issue:`4469` - New thread state: `pending_low`
 * :hpx-issue:`4321` - After the modularization the libfabric parcelport does not compile 
@@ -286,6 +288,7 @@ Closed pull requests
 * :hpx-pr:`5842` - change the default value of HPX_WITH_LCI_TAG to v1.7
 * :hpx-pr:`5841` - Move the split_future facilities into the namespace hpx
 * :hpx-pr:`5840` - wait_xxx_nothrow functions return whether one of the futures is exceptional
+* :hpx-pr:`5839` - Moving a list of synchronization primitives into namespace hpx 
 * :hpx-pr:`5837` - Moving latch types to hpx and hpx::distributed namespaces
 * :hpx-pr:`5835` - Add missing compatibility layer for id_type::management_type values
 * :hpx-pr:`5834` - API docs changes 
