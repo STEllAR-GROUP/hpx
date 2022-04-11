@@ -106,9 +106,14 @@ General changes
   - ``hpx::lcos::barrier`` has been moved into the ``hpx::distributed`` namespace and
     ``hpx::lcos::local::cpp20_barrier`` has been ranamed to ``barrier`` and moved into
     the ``hpx`` namespace.
-  - ``unique_function`` has been renames to ``move_only_function`` and moved into 
+  - ``hpx::lcos::latch`` has been moved into the ``hpx::distributed`` namespace and
+    ``lcos::local::latch`` has been moved into the ``hpx`` namespace. The
+    ``count_down_and_wait()`` functionality of ``latch`` has been renamed to
+    ``arrive_and_wait()``.
+  - ``unique_function`` has been renamed to ``move_only_function`` and moved into 
     namespace ``hpx``. ``function`` and ``function_ref`` have been moved into namespace
     ``hpx``.
+  - ``hpx::lcos::split_future`` changed namespace and is now used as ``hpx::split_future``.
 - The new LCI (Lightweight Communication Interface) parcelport was added that supports
   irregular and asynchronous applications like graph analysis, sparce linear algebra,
   modern parallel arhcitectures etc. Major features include
@@ -131,6 +136,7 @@ Breaking changes
   ``schedule``, ``set_value``, ``set_error``, ``set_done``, ``start`` and ``connect``
   inherit ``hpx::functional::tag`. 
 - ``tag_dispatch`` was renamed to ``tag_invoke``.
+- ``hpx.max_backgroud_threads`` was renamed to ``hpx.parcel.max_background_threads``.
 - The following CMake flags were removed after last release deprecation:
  HPX_SCHEDULER_MAX_TERMINATED_THREADS 
  HPX_WITH_GOOGLE_PERFTOOLS
@@ -211,9 +217,17 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`5842` - change the default value of HPX_WITH_LCI_TAG to v1.7
+* :hpx-pr:`5841` - Move the split_future facilities into the namespace hpx
+* :hpx-pr:`5840` - wait_xxx_nothrow functions return whether one of the futures is exceptional
+* :hpx-pr:`5837` - Moving latch types to hpx and hpx::distributed namespaces
+* :hpx-pr:`5835` - Add missing compatibility layer for id_type::management_type values
 * :hpx-pr:`5834` - API docs changes 
+* :hpx-pr:`5831` - Further improvement actions to rotate
+* :hpx-pr:`5830` - Exposing zero-copy serialization threshold through configuration option
 * :hpx-pr:`5829` - Attempting to fix failing barrier test
 * :hpx-pr:`5827` - Add back explicit template parameter to `ignore_while_checking` to compile with nvcc
+* :hpx-pr:`5826` - Reduce number of allocations while calling async_bulk_execute
 * :hpx-pr:`5825` - Steal from neighboring NUMA domain only 
 * :hpx-pr:`5823` - Remove obsolete directories and adjust build system
 * :hpx-pr:`5822` - Clang-format remaining files 
