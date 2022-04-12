@@ -122,5 +122,22 @@ int main()
     HPX_TEST_EQ(friend_tag_invoke_schedule_calls, std::size_t(1));
     HPX_TEST_EQ(tag_invoke_schedule_calls, std::size_t(1));
 
+    static_assert(
+        std::is_same_v<
+            hpx::execution::experimental::schedule_result_t<scheduler_1>,
+            sender>,
+        "Result of scheduler is a sender");
+    static_assert(
+        std::is_same_v<
+            hpx::execution::experimental::schedule_result_t<scheduler_2>,
+            sender>,
+        "Result of scheduler is a sender");
+
+    static_assert(
+        !std::is_same_v<
+            hpx::execution::experimental::schedule_result_t<non_scheduler_1>,
+            sender>,
+        "Result of non-scheduler is not a sender");
+
     return hpx::util::report_errors();
 }
