@@ -51,12 +51,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
 
         ///////////////////////////////////////////////////////////////////////
-
         // do exclusive scan returns result as vector
         // first element of result vector is last T of scan
         // (can be used to transfer to the next partition)
-
-        // first element can be use because it will be
+        //
+        // first element can be used because it will be
         // overwritten by the last T of the previous partition
         template <typename Value>
         struct segmented_exclusive_scan_vector
@@ -100,7 +99,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 vector_type res(std::distance(first, last));
 
                 // use first element to save last T of scan
-                return result::get(dataflow(
+                return result::get(hpx::dataflow(
                     [=](vector_type r) {
                         exclusive_scan<typename vector_type::iterator>()
                             .parallel(hpx::execution::par, first + 1, last,

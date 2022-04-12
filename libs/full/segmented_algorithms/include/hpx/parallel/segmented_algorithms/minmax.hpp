@@ -126,7 +126,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             using result = util::detail::algorithm_result<ExPolicy, SegIter>;
 
             using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<SegIter>>;
+                !hpx::traits::is_random_access_iterator_v<SegIter>>;
+
+            using hpx::execution::non_task;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -142,8 +144,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     segments.push_back(hpx::make_future<SegIter>(
-                        dispatch_async(traits::get_id(sit), algo, policy,
-                            forced_seq(), beg, end, f, proj),
+                        dispatch_async(traits::get_id(sit), algo,
+                            policy(non_task), forced_seq(), beg, end, f, proj),
                         [sit](local_iterator_type const& out) -> SegIter {
                             return traits::compose(sit, out);
                         }));
@@ -157,8 +159,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     segments.push_back(hpx::make_future<SegIter>(
-                        dispatch_async(traits::get_id(sit), algo, policy,
-                            forced_seq(), beg, end, f, proj),
+                        dispatch_async(traits::get_id(sit), algo,
+                            policy(non_task), forced_seq(), beg, end, f, proj),
                         [sit](local_iterator_type const& out) -> SegIter {
                             return traits::compose(sit, out);
                         }));
@@ -172,8 +174,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     if (beg != end)
                     {
                         segments.push_back(hpx::make_future<SegIter>(
-                            dispatch_async(traits::get_id(sit), algo, policy,
-                                forced_seq(), beg, end, f, proj),
+                            dispatch_async(traits::get_id(sit), algo,
+                                policy(non_task), forced_seq(), beg, end, f,
+                                proj),
                             [sit](local_iterator_type const& out) -> SegIter {
                                 return traits::compose(sit, out);
                             }));
@@ -186,15 +189,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     segments.push_back(hpx::make_future<SegIter>(
-                        dispatch_async(traits::get_id(sit), algo, policy,
-                            forced_seq(), beg, end, f, proj),
+                        dispatch_async(traits::get_id(sit), algo,
+                            policy(non_task), forced_seq(), beg, end, f, proj),
                         [sit](local_iterator_type const& out) -> SegIter {
                             return traits::compose(sit, out);
                         }));
                 }
             }
 
-            return result::get(dataflow(
+            return result::get(hpx::dataflow(
+                hpx::launch::sync,
                 [=](std::vector<hpx::future<SegIter>>&& r) -> SegIter {
                     // handle any remote exceptions, will throw on error
                     std::list<std::exception_ptr> errors;
@@ -321,7 +325,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             using local_iterator_type = typename traits::local_iterator;
 
             using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<SegIter>>;
+                !hpx::traits::is_random_access_iterator_v<SegIter>>;
 
             using result_type = minmax_element_result<SegIter>;
             using local_iterator_pair_type =
@@ -329,6 +333,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             using result =
                 util::detail::algorithm_result<ExPolicy, result_type>;
+
+            using hpx::execution::non_task;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -344,8 +350,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     segments.push_back(hpx::make_future<result_type>(
-                        dispatch_async(traits::get_id(sit), algo, policy,
-                            forced_seq(), beg, end, f, proj),
+                        dispatch_async(traits::get_id(sit), algo,
+                            policy(non_task), forced_seq(), beg, end, f, proj),
                         [sit](local_iterator_pair_type out) -> result_type {
                             return {traits::compose(sit, out.min),
                                 traits::compose(sit, out.max)};
@@ -360,8 +366,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     segments.push_back(hpx::make_future<result_type>(
-                        dispatch_async(traits::get_id(sit), algo, policy,
-                            forced_seq(), beg, end, f, proj),
+                        dispatch_async(traits::get_id(sit), algo,
+                            policy(non_task), forced_seq(), beg, end, f, proj),
                         [sit](local_iterator_pair_type const& out)
                             -> result_type {
                             return {traits::compose(sit, out.min),
@@ -377,8 +383,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     if (beg != end)
                     {
                         segments.push_back(hpx::make_future<result_type>(
-                            dispatch_async(traits::get_id(sit), algo, policy,
-                                forced_seq(), beg, end, f, proj),
+                            dispatch_async(traits::get_id(sit), algo,
+                                policy(non_task), forced_seq(), beg, end, f,
+                                proj),
                             [sit](local_iterator_pair_type const& out)
                                 -> result_type {
                                 return {traits::compose(sit, out.min),
@@ -393,8 +400,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (beg != end)
                 {
                     segments.push_back(hpx::make_future<result_type>(
-                        dispatch_async(traits::get_id(sit), algo, policy,
-                            forced_seq(), beg, end, f, proj),
+                        dispatch_async(traits::get_id(sit), algo,
+                            policy(non_task), forced_seq(), beg, end, f, proj),
                         [sit](local_iterator_pair_type const& out)
                             -> result_type {
                             return {traits::compose(sit, out.min),
@@ -403,7 +410,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
             }
 
-            return result::get(dataflow(
+            return result::get(hpx::dataflow(
+                hpx::launch::sync,
                 [=](std::vector<hpx::future<result_type>>&& r) -> result_type {
                     // handle any remote exceptions, will throw on error
                     std::list<std::exception_ptr> errors;
