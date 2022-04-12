@@ -133,11 +133,5 @@ int main()
             sender>,
         "Result of scheduler is a sender");
 
-    static_assert(
-        !std::is_same_v<
-            hpx::execution::experimental::schedule_result_t<non_scheduler_1>,
-            sender>,
-        "Result of non-scheduler is not a sender");
-
     return hpx::util::report_errors();
 }
