@@ -90,17 +90,18 @@ Contributors to this document
 
 .. table:: Documentation authors
 
-  ======================= ================ =====
-  Name                    Institution      Email
-  ======================= ================ =====
-  Hartmut Kaiser          |cct|_, |lsu|_   |email_hkaiser|
-  Thomas Heller           |inf3|_, |fau|_  |email_theller|
-  Bryce Adelstein Lelbach |nvidia|_        |email_blelbach|
-  Vinay C Amatya          |cct|_, |lsu|_   |email_vamatya|
-  Steven Brandt           |cct|_, |lsu|_   |email_sbrandt|
-  Maciej Brodowicz        |crest|_, |iu|_  |email_mbrodowicz|
-  Adrian Serio            |cct|_, |lsu|_   |email_aserio|
-  ======================= ================ =====
+  ======================= ===================== =====
+  Name                    Institution           Email
+  ======================= ===================== =====
+  Hartmut Kaiser          |cct|_, |lsu|_        |email_hkaiser|
+  Thomas Heller           |inf3|_, |fau|_       |email_theller|
+  Bryce Adelstein Lelbach |nvidia|_             |email_blelbach|
+  Vinay C Amatya          |cct|_, |lsu|_        |email_vamatya|
+  Steven Brandt           |cct|_, |lsu|_        |email_sbrandt|
+  Maciej Brodowicz        |crest|_, |iu|_       |email_mbrodowicz|
+  Adrian Serio            |cct|_, |lsu|_        |email_aserio|
+  Dimitra Karatza         |tud_eemcs|_, |tud|_  |email_dkaratza|
+  ======================= ===================== =====
 
 Acknowledgements
 ================
@@ -108,6 +109,8 @@ Acknowledgements
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Dimitra Karatza, for her work on refactoring the documentation and providing 
+  a new user-friendly environment during and after Google Season of Docs 2021.
 * Srinivas Yadav, for his work on SIMD support in algorithms before and during
   Google Summer of Code 2021.
 * Akhil Nair, for his work on adapting algorithms to C++20 before and during
