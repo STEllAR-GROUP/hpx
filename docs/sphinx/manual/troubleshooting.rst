@@ -46,6 +46,7 @@ You may see an error message that looks a bit like this:
    error: coroutines require a traits template; cannot find 'std::coroutine_traits'
 
 This can be resolved by using ``-DHPX_WITH_CXX_STANDARD=20`` to the cmake command line.
+Note that a compiler that supports C++20 is needed.
 
 See also the corresponding closed :hpx-issue:`5784`.
 
@@ -58,7 +59,7 @@ You may see an error message that looks a bit like this:
 
    Cannot open include file asio/io_context.hpp
 
-This can be resolved by using ``DHPX_WITH_FETCH_ASIO=ON`` to the cmake command line.
+This can be resolved by using ``-DHPX_WITH_FETCH_ASIO=ON`` to the cmake command line.
 
 See also the corresponding closed :hpx-issue:`5404` for more information.
 

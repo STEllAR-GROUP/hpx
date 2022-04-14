@@ -83,6 +83,7 @@ tables below.
    Antoine Tran Tan        |cct|_, |lsu|_   |email_atrantan|
    Adrian Serio            |cct|_, |lsu|_   |email_aserio|
    Maciej Brodowicz        |crest|_, |iu|_  |email_mbrodowicz|
+   Giannis Gonidelis       |cct|_, |lsu|_   |email_ggonidelis|
    ======================= ================ =====
 
 Contributors to this document

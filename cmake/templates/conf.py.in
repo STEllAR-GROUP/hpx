@@ -134,6 +134,33 @@ api_ref_file = '''
    :project: {1}
 '''
 
+api_header_file = '''
+..
+    Copyright (C) 2022 Dimitra Karatza
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+.. _modules_{0}_api:
+
+-------------------------------------------------------------------------------
+{0}
+-------------------------------------------------------------------------------
+
+See :ref:`public_api` for a list of names and headers that are part of the public
+|hpx| API.
+
+.. autodoxygenfile:: {0}
+   :project: {1}
+'''
+
+api_file = '''
+
+.. toctree::
+   :maxdepth: 1
+
+'''
+
 for lib in hpx_libs.keys():
     for module in sorted(hpx_libs[lib]):
         assert module in breathe_projects_source.keys()
@@ -145,9 +172,17 @@ for lib in hpx_libs.keys():
             os.makedirs(basedir)
         module_api_ref = open(basedir + '/full_api.rst', 'w')
         module_api_ref.write(api_ref_header.format(module))
+        header_refs = ''
         for source in module_sources[1]:
             header = source[len('include/'):]
-            module_api_ref.write(api_ref_file.format(header, module))
+            header_splitted = re.split('[/ .]',header)
+            header_name = header_splitted[-2]
+            header_ref = open(basedir + '/' + header_name + '.rst', 'w')
+            header_ref.write(api_header_file.format(header, module))
+            header_ref.close()
+            header_refs += '   /libs/' + lib + '/' + module + '/api/' + header_name + '.rst\n'
+        module_api_ref.write(api_file) 
+        module_api_ref.write(header_refs)
         module_api_ref.close()
         api_refs += '   /libs/' + lib + '/' + module + '/api/full_api.rst\n'
 
@@ -507,6 +542,7 @@ rst_prolog += '''
 .. |email_mbrodowicz| image:: /_static/images/emails/mbrodowicz.png
 .. |email_vamatya| image:: /_static/images/emails/vamatya.png
 .. |email_dkaratza| image:: /_static/images/emails/dkaratza.png
+.. |email_ggonidelis| image:: /_static/images/emails/ggonidelis.png
 '''
 
 # Add any paths that contain templates here, relative to this directory.
