@@ -145,7 +145,7 @@ namespace hpx { namespace util {
         {
             return "unknown";
         }
-        return strings::counter_type_short_names[type];
+        return strings::counter_type_short_names[static_cast<int>(type)];
     }
 
     template <typename Stream>

@@ -506,7 +506,7 @@ namespace hpx { namespace performance_counters {
     {
         if (type < counter_text || type > counter_raw_values)
             return "unknown";
-        return strings::counter_type_names[type];
+        return strings::counter_type_names[static_cast<int>(type)];
     }
 
     ///////////////////////////////////////////////////////////////////////////

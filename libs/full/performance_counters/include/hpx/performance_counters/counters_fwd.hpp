@@ -28,7 +28,7 @@ namespace hpx { namespace performance_counters {
     inline std::string remove_counter_prefix(std::string const& counter);
 
     ///////////////////////////////////////////////////////////////////////////
-    enum counter_type
+    enum class counter_type
     {
         // \a counter_text shows a variable-length text string. It does not
         // deliver calculated values.
@@ -36,7 +36,7 @@ namespace hpx { namespace performance_counters {
         // Formula:  None
         // Average:  None
         // Type:     Text
-        counter_text,
+        counter_text = 0,
 
         // \a counter_raw shows the last observed value only. It does
         // not deliver an average.
@@ -44,7 +44,7 @@ namespace hpx { namespace performance_counters {
         // Formula:  None. Shows raw data as collected.
         // Average:  None
         // Type:     Instantaneous
-        counter_raw,
+        counter_raw = 1,
 
         // \a counter_raw shows the cumulatively accumulated observed value.
         // It does not deliver an average.
@@ -52,7 +52,7 @@ namespace hpx { namespace performance_counters {
         // Formula:  None. Shows cumulatively accumulated data as collected.
         // Average:  None
         // Type:     Instantaneous
-        counter_monotonically_increasing,
+        counter_monotonically_increasing = 2,
 
         // \a counter_average_base is used as the base data (denominator) in the
         // computation of time or count averages for the \a counter_average_count
@@ -63,7 +63,7 @@ namespace hpx { namespace performance_counters {
         //           without delivering an output.
         // Average:  SUM (N) / x
         // Type:     Instantaneous
-        counter_average_base,
+        counter_average_base = 3,
 
         // \a counter_average_count shows how many items are processed, on
         // average, during an operation. Counters of this type display a ratio
@@ -79,14 +79,14 @@ namespace hpx { namespace performance_counters {
         //           intervals.
         // Average:  (Nx - N0) / (Dx - D0)
         // Type:     Average
-        counter_average_count,
+        counter_average_count = 4,
 
         // \a counter_aggregating applies a function to an embedded counter
         // instance. The embedded counter is usually evaluated repeatedly
         // after a fixed (but configurable) time interval.
         //
         // Formula:  F(Nx)
-        counter_aggregating,
+        counter_aggregating = 5,
 
         // \a counter_average_timer measures the average time it takes to
         // complete a process or operation. Counters of this type display a
@@ -105,7 +105,7 @@ namespace hpx { namespace performance_counters {
         //           interval.
         // Average:  ((Nx - N0) / F) / (Dx - D0)
         // Type:     Average
-        counter_average_timer,
+        counter_average_timer = 6,
 
         // \a counter_elapsed_time shows the total time between when the
         // component or process started and the time when this value is
@@ -119,7 +119,7 @@ namespace hpx { namespace performance_counters {
         //           number of time units that elapse in one second.
         // Average:  (Dx - N0) / F
         // Type:     Difference
-        counter_elapsed_time,
+        counter_elapsed_time = 7,
 
         // \a counter_histogram exposes a histogram of the measured values
         // instead of a single value as many of the other counter types.
@@ -132,7 +132,7 @@ namespace hpx { namespace performance_counters {
         // and upper boundaries, and the size of the histogram buckets. All
         // remaining values in the returned array represent the number of
         // measurements for each of the buckets in the histogram.
-        counter_histogram,
+        counter_histogram = 8,
 
         /// \a counter_raw_values exposes an array of measured values
         /// instead of a single value as many of the other counter types.
@@ -140,8 +140,53 @@ namespace hpx { namespace performance_counters {
         /// \a counter_value. Those will also not implement the
         /// \a get_counter_value() functionality. The results are exposed
         /// through a separate \a get_counter_values_array() function.
-        counter_raw_values
+        counter_raw_values = 9
     };
+
+    inline constexpr bool operator<(counter_type lhs, counter_type rhs) noexcept
+    {
+        return static_cast<int>(lhs) < static_cast<int>(rhs);
+    }
+
+    inline constexpr bool operator>(counter_type lhs, counter_type rhs) noexcept
+    {
+        return static_cast<int>(lhs) > static_cast<int>(rhs);
+    }
+
+#define HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG                         \
+    "The unscoped counter_type names are deprecated. Please use "              \
+    "counter_type::<type> instead."
+
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_type counter_text = counter_type::counter_text;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_type counter_raw = counter_type::counter_raw;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_type counter_monotonically_increasing =
+        counter_type::counter_monotonically_increasing;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_type counter_average_base =
+        counter_type::counter_average_base;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_type counter_average_count =
+        counter_type::counter_average_count;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_type counter_aggregating =
+        counter_type::counter_aggregating;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_type counter_average_timer =
+        counter_type::counter_average_timer;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_type counter_elapsed_time =
+        counter_type::counter_elapsed_time;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_type counter_raw_values =
+        counter_type::counter_raw_values;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_type counter_histogram =
+        counter_type::counter_histogram;
+
+#undef HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the readable name of a given counter type
