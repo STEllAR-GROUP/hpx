@@ -121,17 +121,14 @@ set(serialization_headers
     hpx/serialization/complex.hpp
     hpx/serialization/datapar.hpp
     hpx/serialization/deque.hpp
-    hpx/serialization/dynamic_bitset.hpp
     hpx/serialization/exception_ptr.hpp
     hpx/serialization/list.hpp
     hpx/serialization/map.hpp
     hpx/serialization/multi_array.hpp
-    hpx/serialization/optional.hpp
     hpx/serialization/set.hpp
     hpx/serialization/serialize_buffer.hpp
     hpx/serialization/string.hpp
     hpx/serialization/std_tuple.hpp
-    hpx/serialization/tuple.hpp
     hpx/serialization/unordered_map.hpp
     hpx/serialization/vector.hpp
     hpx/serialization/variant.hpp
@@ -150,7 +147,6 @@ set(serialization_headers
     hpx/serialization/input_container.hpp
     hpx/serialization/output_archive.hpp
     hpx/serialization/output_container.hpp
-    hpx/serialization/serializable_any.hpp
     hpx/serialization/serialization_chunk.hpp
     hpx/serialization/serialization_fwd.hpp
     hpx/serialization/serialize.hpp
@@ -177,19 +173,15 @@ set(serialization_compat_headers
     hpx/runtime/serialization/container.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/datapar.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/deque.hpp => hpx/serialization.hpp
-    hpx/runtime/serialization/dynamic_bitset.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/list.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/map.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/multi_array.hpp => hpx/serialization.hpp
-    hpx/runtime/serialization/optional.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/serialize_buffer.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/set.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/string.hpp => hpx/serialization.hpp
-    hpx/runtime/serialization/tuple.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/vector.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/variant.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/valarray.hpp => hpx/serialization.hpp
-    hpx/runtime/serialization/intrusive_ptr.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/shared_ptr.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/unique_ptr.hpp => hpx/serialization.hpp
     hpx/runtime/serialization/unordered_map.hpp => hpx/serialization.hpp
@@ -211,18 +203,14 @@ set(serialization_compat_headers
     hpx/traits/needs_automatic_registration.hpp => hpx/serialization.hpp
     hpx/traits/polymorphic_traits.hpp => hpx/serialization.hpp
     hpx/traits/serialization_access_data.hpp => hpx/serialization.hpp
-    hpx/util/serializable_any.hpp => hpx/serialization.hpp
 )
 # cmake-format: on
 
 # Default location is $HPX_ROOT/libs/serialization/src
 set(serialization_sources
-    detail/pointer.cpp
-    detail/polymorphic_id_factory.cpp
+    detail/pointer.cpp detail/polymorphic_id_factory.cpp
     detail/polymorphic_intrusive_factory.cpp
-    detail/polymorphic_nonintrusive_factory.cpp
-    exception_ptr.cpp
-    serializable_any.cpp
+    detail/polymorphic_nonintrusive_factory.cpp exception_ptr.cpp
 )
 
 if(TARGET Vc::vc)
@@ -239,7 +227,6 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_assertion
     hpx_config
-    hpx_datastructures
     hpx_debugging
     hpx_errors
     hpx_format

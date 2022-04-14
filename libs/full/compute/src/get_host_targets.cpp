@@ -31,8 +31,8 @@
 #include <hpx/serialization/bitset.hpp>
 #include <bitset>
 #else
-#include <hpx/serialization/dynamic_bitset.hpp>
-#include <boost/dynamic_bitset.hpp>
+#include <hpx/datastructures/detail/dynamic_bitset.hpp>
+#include <hpx/datastructures/serialization/dynamic_bitset.hpp>
 #endif
 #endif
 

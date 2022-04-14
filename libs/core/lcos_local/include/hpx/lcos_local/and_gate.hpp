@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/datastructures/detail/dynamic_bitset.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/lcos_local/conditional_trigger.hpp>
 #include <hpx/modules/errors.hpp>
@@ -15,8 +16,6 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-
-#include <boost/dynamic_bitset.hpp>
 
 #include <cstddef>
 #include <list>
@@ -364,7 +363,7 @@ namespace hpx { namespace lcos { namespace local {
 
     private:
         mutable mutex_type mtx_;
-        boost::dynamic_bitset<> received_segments_;
+        hpx::detail::dynamic_bitset<> received_segments_;
         hpx::promise<void> promise_;
         std::size_t generation_;
         condition_list_type conditions_;

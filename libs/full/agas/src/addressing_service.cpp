@@ -17,6 +17,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
+#include <hpx/datastructures/detail/dynamic_bitset.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -1115,7 +1116,7 @@ namespace hpx { namespace agas {
     ///////////////////////////////////////////////////////////////////////////
     bool addressing_service::resolve_full_local(naming::gid_type const* gids,
         naming::address* addrs, std::size_t count,
-        boost::dynamic_bitset<>& locals, error_code& ec)
+        hpx::detail::dynamic_bitset<>& locals, error_code& ec)
     {
         locals.resize(count);
 
@@ -1185,7 +1186,7 @@ namespace hpx { namespace agas {
 
     bool addressing_service::resolve_cached(naming::gid_type const* gids,
         naming::address* addrs, std::size_t count,
-        boost::dynamic_bitset<>& locals, error_code& ec)
+        hpx::detail::dynamic_bitset<>& locals, error_code& ec)
     {
         locals.resize(count);
 

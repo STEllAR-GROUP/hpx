@@ -25,7 +25,7 @@
 #  if defined(HPX_HAVE_MAX_CPU_COUNT)
 #    include <bitset>
 #  else
-#    include <boost/dynamic_bitset.hpp>
+#    include <hpx/datastructures/detail/dynamic_bitset.hpp>
 #  endif
 #endif
 // clang-format on
@@ -138,8 +138,8 @@ namespace hpx { namespace threads {
     typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> mask_type;
     typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> const& mask_cref_type;
 #  else
-    typedef boost::dynamic_bitset<std::uint64_t> mask_type;
-    typedef boost::dynamic_bitset<std::uint64_t> const& mask_cref_type;
+    typedef hpx::detail::dynamic_bitset<std::uint64_t> mask_type;
+    typedef hpx::detail::dynamic_bitset<std::uint64_t> const& mask_cref_type;
 #  endif
     // clang-format on
 

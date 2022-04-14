@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -18,6 +18,7 @@
 #include <hpx/actions_base/actions_base_support.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/datastructures/serialization/tuple.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>

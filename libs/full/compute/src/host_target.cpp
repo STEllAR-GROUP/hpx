@@ -17,7 +17,7 @@
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
 #include <hpx/serialization/bitset.hpp>
 #else
-#include <hpx/serialization/dynamic_bitset.hpp>
+#include <hpx/datastructures/serialization/dynamic_bitset.hpp>
 #endif
 #endif
 

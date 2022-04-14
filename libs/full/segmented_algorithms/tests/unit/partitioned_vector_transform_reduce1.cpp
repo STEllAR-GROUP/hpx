@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/datastructures/serialization/tuple.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_transform_reduce.hpp>

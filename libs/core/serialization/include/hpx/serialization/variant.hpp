@@ -2,7 +2,7 @@
 //  troy d. straszheim <troy@resophonic.com>
 //  http://www.resophonic.com
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,10 +11,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/boost_variant.hpp>    // for backwards compatibility
-
-#include <hpx/datastructures/variant_helper.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/serialization/boost_variant.hpp>    // for backwards compatibility
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>

@@ -14,6 +14,7 @@
 #include <hpx/cache/lru_cache.hpp>
 #include <hpx/cache/statistics/local_full_statistics.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
+#include <hpx/datastructures/detail/dynamic_bitset.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/agas_base.hpp>
 #include <hpx/modules/errors.hpp>
@@ -22,8 +23,6 @@
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-
-#include <boost/dynamic_bitset.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -911,7 +910,7 @@ namespace hpx { namespace agas {
         // Bulk version.
         // TODO: Add versions that take std::vector<id_type> for convenience.
         bool resolve_local(naming::gid_type const* gids, naming::address* addrs,
-            std::size_t size, boost::dynamic_bitset<>& locals,
+            std::size_t size, hpx::detail::dynamic_bitset<>& locals,
             error_code& ec = throws)
         {
             // Try the cache.
@@ -930,11 +929,11 @@ namespace hpx { namespace agas {
 
         bool resolve_full_local(naming::gid_type const* gids,
             naming::address* addrs, std::size_t size,
-            boost::dynamic_bitset<>& locals, error_code& ec = throws);
+            hpx::detail::dynamic_bitset<>& locals, error_code& ec = throws);
 
         bool resolve_cached(naming::gid_type const* gids,
             naming::address* addrs, std::size_t size,
-            boost::dynamic_bitset<>& locals, error_code& ec = throws);
+            hpx::detail::dynamic_bitset<>& locals, error_code& ec = throws);
 
 #if defined(HPX_HAVE_NETWORKING)
         /// \brief Route the given parcel to the appropriate AGAS service instance

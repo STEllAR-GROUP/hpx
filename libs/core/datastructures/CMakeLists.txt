@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,6 +21,7 @@ endif()
 
 set(datastructures_headers
     hpx/datastructures/any.hpp
+    hpx/datastructures/detail/dynamic_bitset.hpp
     hpx/datastructures/detail/small_vector.hpp
     hpx/datastructures/detail/optional.hpp
     hpx/datastructures/detail/variant.hpp
@@ -31,20 +32,32 @@ set(datastructures_headers
     hpx/datastructures/traits/is_tuple_like.hpp
     hpx/datastructures/variant.hpp
     hpx/datastructures/variant_helper.hpp
+    hpx/datastructures/serialization/dynamic_bitset.hpp
+    hpx/datastructures/serialization/optional.hpp
+    hpx/datastructures/serialization/serializable_any.hpp
+    hpx/datastructures/serialization/tuple.hpp
 )
 
 # cmake-format: off
 set(datastructures_compat_headers
     hpx/datastructures.hpp => hpx/modules/datastructures.hpp
+    hpx/runtime/serialization/dynamic_bitset.hpp => hpx/datastructures/serialization/dynamic_bitset.hpp
+    hpx/runtime/serialization/optional.hpp => hpx/datastructures/serialization/optional.hpp
+    hpx/runtime/serialization/tuple.hpp => hpx/datastructures/serialization/tuple.hpp
+    hpx/serialization/dynamic_bitset.hpp => hpx/datastructures/serialization/dynamic_bitset.hpp
+    hpx/serialization/optional.hpp => hpx/datastructures/serialization/optional.hpp
+    hpx/serialization/serializable_any.hpp => hpx/datastructures/serialization/serializable_any.hpp
+    hpx/serialization/tuple.hpp => hpx/datastructures/serialization/tuple.hpp
     hpx/traits/supports_streaming_with_any.hpp => hpx/modules/datastructures.hpp
     hpx/traits/is_tuple_like.hpp => hpx/modules/datastructures.hpp
     hpx/util/any.hpp => hpx/any.hpp
     hpx/util/optional.hpp => hpx/optional.hpp
     hpx/util/tuple.hpp => hpx/tuple.hpp
+    hpx/util/serializable_any.hpp => hpx/datastructures/serialization/serializable_any.hpp
 )
 # cmake-format: on
 
-set(datastructures_sources)
+set(datastructures_sources serializable_any.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -53,7 +66,13 @@ add_hpx_module(
   SOURCES ${datastructures_sources}
   HEADERS ${datastructures_headers}
   COMPAT_HEADERS ${datastructures_compat_headers}
-  EXCLUDE_FROM_GLOBAL_HEADER "hpx/datastructures/variant_helper.hpp"
-  MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_concepts hpx_type_support
+  EXCLUDE_FROM_GLOBAL_HEADER
+    "hpx/datastructures/variant_helper.hpp"
+    "hpx/datastructures/serialization/dynamic_bitset.hpp"
+    "hpx/datastructures/serialization/optional.hpp"
+    "hpx/datastructures/serialization/serializable_any.hpp"
+    "hpx/datastructures/serialization/tuple.hpp"
+  MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_concepts hpx_errors
+                      hpx_serialization hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

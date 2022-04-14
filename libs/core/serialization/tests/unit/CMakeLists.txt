@@ -15,23 +15,20 @@ set(tests
     serialization_deque
     serialization_list
     serialization_map
-    serialization_optional
     serialization_set
     serialization_simple
     serialization_smart_ptr
     serialization_std_tuple
-    serialization_tuple
     serialization_unordered_map
     serialization_vector
     serialize_with_incompatible_signature
     serialization_std_variant
 )
 
-set(full_tests any_serialization serializable_any serialization_raw_pointer)
+set(full_tests serialization_raw_pointer)
 
 if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
   set(tests ${tests} serialization_boost_variant)
-  set(full_tests ${full_tests} serializable_boost_any)
 endif()
 
 add_subdirectory(polymorphic)

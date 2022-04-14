@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,13 +11,11 @@
 #define HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/std_tuple.hpp>
-#include <hpx/serialization/tuple.hpp>
 
 #include <hpx/modules/testing.hpp>
 
@@ -82,30 +80,10 @@ int hpx_main()
         HPX_TEST(outp == inp);
     }
 
-    // serialize raw pointer as part of tuple
-    {
-        static_assert(hpx::traits::is_bitwise_serializable_v<
-            hpx::tuple<int*, int const>>);
-
-        int value = 42;
-        hpx::tuple<int*, int const> ot{&value, value};
-
-        std::vector<char> buffer;
-        std::vector<hpx::serialization::serialization_chunk> chunks;
-        hpx::serialization::output_archive oarchive(buffer, 0, &chunks);
-        oarchive << ot;
-        std::size_t size = oarchive.bytes_written();
-
-        hpx::serialization::input_archive iarchive(buffer, size, &chunks);
-        hpx::tuple<int*, int const> it{nullptr, 0};
-        iarchive >> it;
-        HPX_TEST(ot == it);
-    }
-
     // serialize raw pointer as part of std::tuple
     {
         static_assert(hpx::traits::is_bitwise_serializable_v<
-            hpx::tuple<int*, int const>>);
+            std::tuple<int*, int const>>);
 
         int value = 42;
         std::tuple<int*, int const> ot{&value, value};
@@ -125,7 +103,7 @@ int hpx_main()
     // serialize tuple with a non-zero-copyable type and a const
     {
         static_assert(
-            !hpx::traits::is_bitwise_serializable_v<hpx::tuple<A, int const>>);
+            !hpx::traits::is_bitwise_serializable_v<std::tuple<A, int const>>);
 
         int value = 42;
         std::tuple<A, int const> ot{A(), value};

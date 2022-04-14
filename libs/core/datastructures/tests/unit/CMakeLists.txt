@@ -1,10 +1,27 @@
-# Copyright (c) 2019-2021 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests any boost_any is_tuple_like unique_any tuple)
+set(tests
+    any
+    any_serialization
+    boost_any
+    dynamic_bitset1
+    dynamic_bitset2
+    dynamic_bitset3
+    dynamic_bitset4
+    dynamic_bitset5
+    is_tuple_like
+    serializable_any
+    serializable_boost_any
+    serialization_optional
+    serialization_raw_pointer_tuple
+    serialization_tuple
+    tuple
+    unique_any
+)
 
 if(HPX_WITH_CXX17_MEMORY_RESOURCE)
   set(tests ${tests} small_vector)

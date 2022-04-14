@@ -1,4 +1,4 @@
-//  Copyright (c) 2018 Hartmut Kaiser
+//  Copyright (c) 2018-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions/transfer_action.hpp>
+#include <hpx/datastructures/serialization/tuple.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
