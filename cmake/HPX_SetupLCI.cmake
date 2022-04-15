@@ -14,6 +14,13 @@ macro(hpx_setup_lci)
     if(NOT HPX_WITH_FETCH_LCI)
       find_package(LCI REQUIRED)
     elseif(NOT HPX_FIND_PACKAGE)
+      set(HPX_WITH_PARCELPORT_LCI_BACKEND
+          ibv
+          CACHE STRING "The backend for the LCI parcelport (ofi, ibv, psm2)"
+      )
+      set_property(
+        CACHE HPX_WITH_PARCELPORT_LCI_BACKEND PROPERTY STRINGS ofi ibv psm2
+      )
       if(FETCHCONTENT_SOURCE_DIR_LCI)
         hpx_info(
           "HPX_WITH_FETCH_LCI=${HPX_WITH_FETCH_LCI}, LCI will be used through CMake's FetchContent and installed alongside HPX (FETCHCONTENT_SOURCE_DIR_LCI=${FETCHCONTENT_SOURCE_DIR_LCI})"
@@ -59,7 +66,7 @@ macro(hpx_setup_lci)
         endif()
         if(NOT LCI_SERVER)
           set(LCI_SERVER
-              ibv
+              ${HPX_WITH_PARCELPORT_LCI_BACKEND}
               CACHE INTERNAL ""
           )
         endif()
@@ -109,7 +116,8 @@ macro(hpx_setup_lci)
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
       )
 
-      install(FILES "${lci_SOURCE_DIR}/cmake_modules/FindFabric.cmake"
+      string(TOUPPER ${HPX_WITH_PARCELPORT_LCI_BACKEND} FABRIC)
+      install(FILES "${lci_SOURCE_DIR}/cmake_modules/Find${FABRIC}.cmake"
               DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
       )
     endif()
