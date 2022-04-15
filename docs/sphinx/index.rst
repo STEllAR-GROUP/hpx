@@ -25,6 +25,9 @@ If you can't find what you're looking for in the documentation, please:
 * read or ask questions tagged with |hpx| on `StackOverflow
   <hpx_stackoverflow_>`_.
 
+You can find a comprehensive list of contact options on `Support for deploying 
+and using HPX <hpx_github_support_>`_.
+
 See :ref:`citing_hpx` for details on how to cite |hpx| in publications. See
 :ref:`hpx_users` for a list of institutions and projects using |hpx|.
 
