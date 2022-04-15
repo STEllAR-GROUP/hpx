@@ -489,22 +489,22 @@ namespace hpx { namespace performance_counters {
     /// \brief Get the name for a given counter type
     namespace strings {
         char const* const counter_type_names[] = {
-            "counter_text",
-            "counter_raw",
-            "counter_monotonically_increasing",
-            "counter_average_base",
-            "counter_average_count",
-            "counter_aggregating",
-            "counter_average_timer",
-            "counter_elapsed_time",
-            "counter_histogram",
-            "counter_raw_values",
+            "text",
+            "raw",
+            "monotonically_increasing",
+            "average_base",
+            "average_count",
+            "aggregating",
+            "average_timer",
+            "elapsed_time",
+            "histogram",
+            "raw_values",
         };
     }
 
     char const* get_counter_type_name(counter_type type)
     {
-        if (type < counter_text || type > counter_raw_values)
+        if (type < counter_type::text || type > counter_type::raw_values)
             return "unknown";
         return strings::counter_type_names[static_cast<int>(type)];
     }

@@ -45,7 +45,7 @@ namespace hpx { namespace performance_counters { namespace server {
       : base_type_holder(info)
       , counters_(base_counter_names)
     {
-        if (info.type_ != counter_aggregating)
+        if (info.type_ != counter_type::aggregating)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "arithmetics_counter_extended<Statistic>::"
@@ -282,7 +282,7 @@ namespace hpx { namespace performance_counters { namespace detail {
     {
         switch (info.type_)
         {
-        case counter_aggregating:
+        case counter_type::aggregating:
         {
             counter_path_elements paths;
             get_counter_path_elements(info.fullname_, paths, ec);
