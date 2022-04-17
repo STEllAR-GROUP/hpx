@@ -102,6 +102,8 @@ namespace hpx { namespace util {
     LCI_comp_t lci_environment::rt_cq_r_;
     LCI_endpoint_t lci_environment::h_ep_;
     LCI_comp_t lci_environment::h_cq_r_;
+    std::thread* lci_environment::prg_thread_p = nullptr;
+    std::atomic<bool> lci_environment::prg_thread_flag = false;
 
     ///////////////////////////////////////////////////////////////////////////
     LCI_error_t lci_environment::init_lci()
@@ -157,6 +159,11 @@ namespace hpx { namespace util {
         LCI_endpoint_init(&h_ep_, LCI_UR_DEVICE, h_plist_);
         LCI_plist_free(&h_plist_);
         // DEBUG("Rank %d: Init lci env", LCI_RANK);
+
+        HPX_ASSERT(prg_thread_flag == false);
+        HPX_ASSERT(prg_thread_p == nullptr);
+        prg_thread_flag = true;
+        prg_thread_p = new std::thread(progress_fn);
 
         return LCI_OK;
     }
@@ -223,16 +230,33 @@ namespace hpx { namespace util {
     {
         if (enabled())
         {
+            // for some reasons, this code block can be entered twice when HPX exits
             int lci_init = 0;
             LCI_initialized(&lci_init);
             if (lci_init)
+            {
+                HPX_ASSERT(prg_thread_flag.load() == true);
+                HPX_ASSERT(prg_thread_p != nullptr);
+                prg_thread_flag = false;
+                prg_thread_p->join();
+                delete prg_thread_p;
+
                 LCI_finalize();
+            }
             int is_finalized = 0;
             MPI_Finalized(&is_finalized);
             if (!is_finalized)
             {
                 MPI_Finalize();
             }
+        }
+    }
+
+    void lci_environment::progress_fn()
+    {
+        while (prg_thread_flag)
+        {
+            LCI_progress(LCI_UR_DEVICE);
         }
     }
 

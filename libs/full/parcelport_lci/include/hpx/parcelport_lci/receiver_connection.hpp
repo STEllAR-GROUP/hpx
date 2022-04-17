@@ -104,8 +104,6 @@ namespace hpx::parcelset::policies::lci {
             {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 {
-                    util::lci_environment::scoped_lock l;
-
                     LCI_lbuffer_t lbuf_;
                     lbuf_.address = buffer_.transmission_chunks_.data();
                     lbuf_.length =
@@ -115,7 +113,6 @@ namespace hpx::parcelset::policies::lci {
                     if (LCI_recvl(util::lci_environment::lci_endpoint(), lbuf_,
                             get_src_rank(), tag_, sync_, nullptr) != LCI_OK)
                     {
-                        LCI_progress(LCI_UR_DEVICE);
                         return false;
                     }
 
@@ -141,8 +138,6 @@ namespace hpx::parcelset::policies::lci {
             }
             else
             {
-                util::lci_environment::scoped_lock l;
-
                 LCI_lbuffer_t lbuf_;
                 lbuf_.address = buffer_.data_.data();
                 lbuf_.length = static_cast<int>(buffer_.data_.size());
@@ -151,7 +146,6 @@ namespace hpx::parcelset::policies::lci {
                 if (LCI_recvl(util::lci_environment::lci_endpoint(), lbuf_,
                         get_src_rank(), tag_, sync_, nullptr) != LCI_OK)
                 {
-                    LCI_progress(LCI_UR_DEVICE);
                     return false;
                 }
 
@@ -179,8 +173,6 @@ namespace hpx::parcelset::policies::lci {
                 // it would not introduce additional overhead.
                 c.resize(chunk_size);
                 {
-                    util::lci_environment::scoped_lock l;
-
                     LCI_lbuffer_t lbuf_;
                     lbuf_.address = c.data();
                     lbuf_.length = static_cast<int>(c.size());
@@ -188,7 +180,6 @@ namespace hpx::parcelset::policies::lci {
                     if (LCI_recvl(util::lci_environment::lci_endpoint(), lbuf_,
                             get_src_rank(), tag_, sync_, nullptr) != LCI_OK)
                     {
-                        LCI_progress(LCI_UR_DEVICE);
                         return false;
                     }
 
@@ -216,10 +207,6 @@ namespace hpx::parcelset::policies::lci {
             }
             else
             {
-                util::lci_environment::scoped_try_lock l;
-                if (!l.locked)
-                    return false;
-                LCI_progress(LCI_UR_DEVICE);
                 return false;
             }
         }
@@ -233,13 +220,11 @@ namespace hpx::parcelset::policies::lci {
             data.time_ = timer_.elapsed_nanoseconds() - data.time_;
 
             {
-                util::lci_environment::scoped_lock l;
                 LCI_short_t short_rt_;
                 *(int*) &short_rt_ = tag_;
                 if (LCI_puts(util::lci_environment::rt_endpoint(), short_rt_,
                         get_src_rank(), 1, LCI_DEFAULT_COMP_REMOTE) != LCI_OK)
                 {
-                    LCI_progress(LCI_UR_DEVICE);
                     return false;
                 }
             }

@@ -144,7 +144,6 @@ namespace hpx::parcelset::policies::lci {
         bool send_header()
         {
             {
-                util::lci_environment::scoped_lock l;
                 HPX_ASSERT(state_ == initialized);
                 HPX_ASSERT(request_ptr_ == nullptr);
                 HPX_ASSERT(LCI_MEDIUM_SIZE >= header_.data_size_);
@@ -155,7 +154,6 @@ namespace hpx::parcelset::policies::lci {
                         medium_header_, get_dst_rank(), 0,
                         LCI_DEFAULT_COMP_REMOTE) != LCI_OK)
                 {
-                    LCI_progress(LCI_UR_DEVICE);
                     return false;
                 }
             }
@@ -181,8 +179,6 @@ namespace hpx::parcelset::policies::lci {
                 chunks = buffer_.transmission_chunks_;
             if (!chunks.empty())
             {
-                util::lci_environment::scoped_lock l;
-
                 LCI_lbuffer_t lbuf_;
                 lbuf_.address = chunks.data();
                 lbuf_.length = static_cast<int>(chunks.size() *
@@ -191,7 +187,6 @@ namespace hpx::parcelset::policies::lci {
                 if (LCI_sendl(util::lci_environment::lci_endpoint(), lbuf_,
                         get_dst_rank(), tag_, sync_, nullptr) != LCI_OK)
                 {
-                    LCI_progress(LCI_UR_DEVICE);
                     return false;
                 }
 
@@ -210,8 +205,6 @@ namespace hpx::parcelset::policies::lci {
 
             if (!header_.piggy_back())
             {
-                util::lci_environment::scoped_lock l;
-
                 LCI_lbuffer_t lbuf_;
                 lbuf_.address = buffer_.data_.data();
                 lbuf_.length = static_cast<int>(buffer_.data_.size());
@@ -219,7 +212,6 @@ namespace hpx::parcelset::policies::lci {
                 if (LCI_sendl(util::lci_environment::lci_endpoint(), lbuf_,
                         get_dst_rank(), tag_, sync_, nullptr) != LCI_OK)
                 {
-                    LCI_progress(LCI_UR_DEVICE);
                     return false;
                 }
 
@@ -243,8 +235,6 @@ namespace hpx::parcelset::policies::lci {
                         return false;
                     else
                     {
-                        util::lci_environment::scoped_lock l;
-
                         LCI_lbuffer_t lbuf_;
                         lbuf_.address = const_cast<void*>(c.data_.cpos_);
                         lbuf_.length = static_cast<int>(c.size_);
@@ -253,7 +243,6 @@ namespace hpx::parcelset::policies::lci {
                                 lbuf_, get_dst_rank(), tag_, sync_,
                                 nullptr) != LCI_OK)
                         {
-                            LCI_progress(LCI_UR_DEVICE);
                             return false;
                         }
                         request_ptr_ = &sync_;
@@ -281,10 +270,6 @@ namespace hpx::parcelset::policies::lci {
             }
             else
             {
-                util::lci_environment::scoped_try_lock l;
-                if (!l.locked)
-                    return false;
-                LCI_progress(LCI_UR_DEVICE);
                 return false;
             }
         }

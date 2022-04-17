@@ -81,38 +81,17 @@ namespace hpx::parcelset::policies::lci {
 
         connection_ptr accept() noexcept
         {
-            std::unique_lock<mutex_type> l(headers_mtx_, std::try_to_lock);
-            if (l.owns_lock())
-                return accept_locked(l);
-            return connection_ptr();
-        }
-
-        template <typename Lock>
-        connection_ptr accept_locked(Lock& header_lock) noexcept
-        {
             connection_ptr res;
-            util::lci_environment::scoped_try_lock l;
-
-            if (l.locked)
+            LCI_request_t request;
+            LCI_error_t ret =
+                LCI_queue_pop(util::lci_environment::h_queue(), &request);
+            if (ret == LCI_OK)
             {
-                LCI_request_t request;
-                LCI_error_t ret =
-                    LCI_queue_pop(util::lci_environment::h_queue(), &request);
-                if (ret == LCI_OK)
-                {
-                    header h = *(header*) (request.data.mbuffer.address);
-                    h.assert_valid();
-                    l.unlock();
-                    header_lock.unlock();
+                header h = *(header*) (request.data.mbuffer.address);
+                h.assert_valid();
 
-                    res.reset(new connection_type(request.rank, h, pp_));
-                    LCI_mbuffer_free(request.data.mbuffer);
-                    return res;
-                }
-                else
-                {
-                    LCI_progress(LCI_UR_DEVICE);
-                }
+                res.reset(new connection_type(request.rank, h, pp_));
+                LCI_mbuffer_free(request.data.mbuffer);
             }
             return res;
         }
