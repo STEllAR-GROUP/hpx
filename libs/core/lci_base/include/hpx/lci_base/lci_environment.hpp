@@ -18,6 +18,7 @@
 #include <cstdlib>
 #include <string>
 #include <thread>
+#include <atomic>
 
 #include <hpx/config/warnings_prefix.hpp>
 

@@ -102,34 +102,19 @@ namespace hpx::parcelset::policies::lci {
 
         void next_free_tag() noexcept
         {
-            int next_free = -1;
-            {
-                next_free = next_free_tag_locked();
-            }
-
-            if (next_free != -1)
-            {
-                HPX_ASSERT(next_free > 1);
-                tag_provider_.release(next_free);
-            }
-        }
-
-        int next_free_tag_locked() noexcept
-        {
             LCI_request_t request;
             LCI_error_t ret =
                 LCI_queue_pop(util::lci_environment::rt_queue(), &request);
             if (ret == LCI_OK)
             {
-                return *(int*) &request.data.immediate;
+                int next_free = *(int*) &request.data.immediate;
+                HPX_ASSERT(next_free > 1);
+                tag_provider_.release(next_free);
             }
-            return -1;
         }
 
         mutex_type connections_mtx_;
         connection_list connections_;
-
-        mutex_type next_free_tag_mtx_;
     };
 
 }    // namespace hpx::parcelset::policies::lci
