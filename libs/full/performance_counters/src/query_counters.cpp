@@ -145,7 +145,7 @@ namespace hpx { namespace util {
         {
             return "unknown";
         }
-        return strings::counter_type_short_names[type];
+        return strings::counter_type_short_names[static_cast<int>(type)];
     }
 
     template <typename Stream>
@@ -324,12 +324,12 @@ namespace hpx { namespace util {
                 for (std::size_t i = 0; i != infos.size(); ++i)
                 {
                     using namespace performance_counters;
-                    if (infos[i].type_ != counter_raw &&
-                        infos[i].type_ != counter_monotonically_increasing &&
-                        infos[i].type_ != counter_aggregating &&
-                        infos[i].type_ != counter_elapsed_time &&
-                        infos[i].type_ != counter_average_count &&
-                        infos[i].type_ != counter_average_timer)
+                    if (infos[i].type_ != counter_type::raw &&
+                        infos[i].type_ != counter_type::monotonically_increasing &&
+                        infos[i].type_ != counter_type::aggregating &&
+                        infos[i].type_ != counter_type::elapsed_time &&
+                        infos[i].type_ != counter_type::average_count &&
+                        infos[i].type_ != counter_type::average_timer)
                     {
                         continue;
                     }
@@ -365,12 +365,12 @@ namespace hpx { namespace util {
                 for (std::size_t i = 0; i != counter_shortnames_.size(); ++i)
                 {
                     using namespace performance_counters;
-                    if (infos[i].type_ != counter_raw &&
-                        infos[i].type_ != counter_monotonically_increasing &&
-                        infos[i].type_ != counter_aggregating &&
-                        infos[i].type_ != counter_elapsed_time &&
-                        infos[i].type_ != counter_average_count &&
-                        infos[i].type_ != counter_average_timer)
+                    if (infos[i].type_ != counter_type::raw &&
+                        infos[i].type_ != counter_type::monotonically_increasing &&
+                        infos[i].type_ != counter_type::aggregating &&
+                        infos[i].type_ != counter_type::elapsed_time &&
+                        infos[i].type_ != counter_type::average_count &&
+                        infos[i].type_ != counter_type::average_timer)
                     {
                         continue;
                     }

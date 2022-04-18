@@ -938,7 +938,7 @@ namespace hpx {
         performance_counters::generic_counter_type_data
             statistic_counter_types[] =
         {    // averaging counter
-            {"/statistics/average", performance_counters::counter_aggregating,
+            {"/statistics/average", performance_counters::counter_type::aggregating,
                 "returns the averaged value of its base counter over "
                 "an arbitrary time line; pass required base counter as the "
                 "instance "
@@ -948,7 +948,7 @@ namespace hpx {
                 &performance_counters::default_counter_discoverer, ""},
 
             // stddev counter
-            {"/statistics/stddev", performance_counters::counter_aggregating,
+            {"/statistics/stddev", performance_counters::counter_type::aggregating,
                 "returns the standard deviation value of its base counter "
                 "over "
                 "an arbitrary time line; pass required base counter as the "
@@ -960,7 +960,7 @@ namespace hpx {
 
             // rolling_averaging counter
             {"/statistics/rolling_average",
-                performance_counters::counter_aggregating,
+                performance_counters::counter_type::aggregating,
                 "returns the rolling average value of its base counter "
                 "over "
                 "an arbitrary time line; pass required base counter as the "
@@ -972,7 +972,7 @@ namespace hpx {
 
             // rolling stddev counter
             {"/statistics/rolling_stddev",
-                performance_counters::counter_aggregating,
+                performance_counters::counter_type::aggregating,
                 "returns the rolling standard deviation value of its base "
                 "counter over "
                 "an arbitrary time line; pass required base counter as the "
@@ -983,7 +983,7 @@ namespace hpx {
                 &performance_counters::default_counter_discoverer, ""},
 
             // median counter
-            {"/statistics/median", performance_counters::counter_aggregating,
+            {"/statistics/median", performance_counters::counter_type::aggregating,
                 "returns the median value of its base counter over "
                 "an arbitrary time line; pass required base counter as the "
                 "instance "
@@ -993,7 +993,7 @@ namespace hpx {
                 &performance_counters::default_counter_discoverer, ""},
 
             // max counter
-            {"/statistics/max", performance_counters::counter_aggregating,
+            {"/statistics/max", performance_counters::counter_type::aggregating,
                 "returns the maximum value of its base counter over "
                 "an arbitrary time line; pass required base counter as the "
                 "instance "
@@ -1003,7 +1003,7 @@ namespace hpx {
                 &performance_counters::default_counter_discoverer, ""},
 
             // min counter
-            {"/statistics/min", performance_counters::counter_aggregating,
+            {"/statistics/min", performance_counters::counter_type::aggregating,
                 "returns the minimum value of its base counter over "
                 "an arbitrary time line; pass required base counter as the "
                 "instance "
@@ -1014,7 +1014,7 @@ namespace hpx {
 
             // rolling max counter
             {"/statistics/rolling_max",
-                performance_counters::counter_aggregating,
+                performance_counters::counter_type::aggregating,
                 "returns the rolling maximum value of its base counter "
                 "over "
                 "an arbitrary time line; pass required base counter as the "
@@ -1026,7 +1026,7 @@ namespace hpx {
 
             // rolling min counter
             {"/statistics/rolling_min",
-                performance_counters::counter_aggregating,
+                performance_counters::counter_type::aggregating,
                 "returns the rolling minimum value of its base counter "
                 "over "
                 "an arbitrary time line; pass required base counter as the "
@@ -1096,7 +1096,7 @@ namespace hpx {
         performance_counters::generic_counter_type_data
             arithmetic_counter_types[] = {
                 // adding counter
-                {"/arithmetics/add", performance_counters::counter_aggregating,
+                {"/arithmetics/add", performance_counters::counter_type::aggregating,
                     "returns the sum of the values of the specified base "
                     "counters; "
                     "pass required base counters as the parameters: "
@@ -1107,7 +1107,7 @@ namespace hpx {
                     &performance_counters::default_counter_discoverer, ""},
                 // minus counter
                 {"/arithmetics/subtract",
-                    performance_counters::counter_aggregating,
+                    performance_counters::counter_type::aggregating,
                     "returns the difference of the values of the specified "
                     "base counters; "
                     "pass the required base counters as the parameters: "
@@ -1118,7 +1118,7 @@ namespace hpx {
                     &performance_counters::default_counter_discoverer, ""},
                 // multiply counter
                 {"/arithmetics/multiply",
-                    performance_counters::counter_aggregating,
+                    performance_counters::counter_type::aggregating,
                     "returns the product of the values of the specified "
                     "base "
                     "counters; "
@@ -1130,7 +1130,7 @@ namespace hpx {
                     &performance_counters::default_counter_discoverer, ""},
                 // divide counter
                 {"/arithmetics/divide",
-                    performance_counters::counter_aggregating,
+                    performance_counters::counter_type::aggregating,
                     "returns the result of division of the values of the "
                     "specified "
                     "base counters; pass the required base counters as the "
@@ -1142,7 +1142,7 @@ namespace hpx {
                     &performance_counters::default_counter_discoverer, ""},
 
                 // arithmetics mean counter
-                {"/arithmetics/mean", performance_counters::counter_aggregating,
+                {"/arithmetics/mean", performance_counters::counter_type::aggregating,
                     "returns the average value of all values of the "
                     "specified "
                     "base counters; pass the required base counters as the "
@@ -1155,7 +1155,7 @@ namespace hpx {
                     &performance_counters::default_counter_discoverer, ""},
                 // arithmetics variance counter
                 {"/arithmetics/variance",
-                    performance_counters::counter_aggregating,
+                    performance_counters::counter_type::aggregating,
                     "returns the standard deviation of all values of the "
                     "specified "
                     "base counters; pass the required base counters as the "
@@ -1168,7 +1168,7 @@ namespace hpx {
                     &performance_counters::default_counter_discoverer, ""},
                 // arithmetics median counter
                 {"/arithmetics/median",
-                    performance_counters::counter_aggregating,
+                    performance_counters::counter_type::aggregating,
                     "returns the median of all values of the specified "
                     "base counters; pass the required base counters as the "
                     "parameters: "
@@ -1179,7 +1179,7 @@ namespace hpx {
                         arithmetics_counter_extended_creator,
                     &performance_counters::default_counter_discoverer, ""},
                 // arithmetics min counter
-                {"/arithmetics/min", performance_counters::counter_aggregating,
+                {"/arithmetics/min", performance_counters::counter_type::aggregating,
                     "returns the minimum value of all values of the "
                     "specified "
                     "base counters; pass the required base counters as the "
@@ -1191,7 +1191,7 @@ namespace hpx {
                         arithmetics_counter_extended_creator,
                     &performance_counters::default_counter_discoverer, ""},
                 // arithmetics max counter
-                {"/arithmetics/max", performance_counters::counter_aggregating,
+                {"/arithmetics/max", performance_counters::counter_type::aggregating,
                     "returns the maximum value of all values of the "
                     "specified "
                     "base counters; pass the required base counters as the "
@@ -1204,7 +1204,7 @@ namespace hpx {
                     &performance_counters::default_counter_discoverer, ""},
                 // arithmetics count counter
                 {"/arithmetics/count",
-                    performance_counters::counter_aggregating,
+                    performance_counters::counter_type::aggregating,
                     "returns the count value of all values of the "
                     "specified "
                     "base counters; pass the required base counters as the "

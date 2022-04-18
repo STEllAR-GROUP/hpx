@@ -407,7 +407,7 @@ namespace hpx { namespace performance_counters { namespace server {
                 "base interval is specified to be zero");
         }
 
-        if (info.type_ != counter_aggregating)
+        if (info.type_ != counter_type::aggregating)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "statistics_counter<Statistic>::statistics_counter",
@@ -756,7 +756,7 @@ namespace hpx { namespace performance_counters { namespace detail {
     {
         switch (info.type_)
         {
-        case counter_aggregating:
+        case counter_type::aggregating:
         {
             counter_path_elements paths;
             get_counter_path_elements(info.fullname_, paths, ec);

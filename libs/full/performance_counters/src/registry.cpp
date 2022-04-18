@@ -445,24 +445,24 @@ namespace hpx { namespace performance_counters {
         }
 
         // make sure the counter type requested is supported
-        if ((counter_raw != (*it).second.info_.type_ ||
-                counter_raw != info.type_) &&
-            (counter_monotonically_increasing != (*it).second.info_.type_ ||
-                counter_monotonically_increasing != info.type_) &&
-            (counter_aggregating != (*it).second.info_.type_ ||
-                counter_aggregating != info.type_) &&
-            (counter_elapsed_time != (*it).second.info_.type_ ||
-                counter_elapsed_time != info.type_) &&
-            (counter_average_count != (*it).second.info_.type_ ||
-                counter_average_count != info.type_) &&
-            (counter_average_timer != (*it).second.info_.type_ ||
-                counter_average_timer != info.type_))
+        if ((counter_type::raw != (*it).second.info_.type_ ||
+                counter_type::raw != info.type_) &&
+            (counter_type::monotonically_increasing != (*it).second.info_.type_ ||
+                counter_type::monotonically_increasing != info.type_) &&
+            (counter_type::aggregating != (*it).second.info_.type_ ||
+                counter_type::aggregating != info.type_) &&
+            (counter_type::elapsed_time != (*it).second.info_.type_ ||
+                counter_type::elapsed_time != info.type_) &&
+            (counter_type::average_count != (*it).second.info_.type_ ||
+                counter_type::average_count != info.type_) &&
+            (counter_type::average_timer != (*it).second.info_.type_ ||
+                counter_type::average_timer != info.type_))
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter",
-                "invalid counter type requested (only counter_raw, "
-                "counter_monotonically_increasing, counter_aggregating, "
-                "counter_elapsed_time, counter_average_count, or "
-                "counter_average_timer are supported)");
+                "invalid counter type requested (only counter_type::raw, "
+                "counter_type::monotonically_increasing, counter_type::aggregating, "
+                "counter_type::elapsed_time, counter_type::average_count, or "
+                "counter_type::average_timer are supported)");
             return status_counter_type_unknown;
         }
 
@@ -608,15 +608,15 @@ namespace hpx { namespace performance_counters {
             break;
 
             // NOLINTNEXTLINE(bugprone-branch-clone)
-            case counter_raw:
+            case counter_type::raw:
                 [[fallthrough]];
-            case counter_monotonically_increasing:
+            case counter_type::monotonically_increasing:
                 [[fallthrough]];
-            case counter_aggregating:
+            case counter_type::aggregating:
                 [[fallthrough]];
-            case counter_average_count:
+            case counter_type::average_count:
                 [[fallthrough]];
-            case counter_average_timer:
+            case counter_type::average_timer:
                 HPX_THROWS_IF(ec, bad_parameter, "registry::create_counter",
                     "need function parameter for raw_counter");
                 return status_counter_type_unknown;
@@ -671,12 +671,12 @@ namespace hpx { namespace performance_counters {
         }
 
         // make sure the requested counter type is supported
-        if (counter_aggregating != (*it).second.info_.type_ ||
-            counter_aggregating != info.type_)
+        if (counter_type::aggregating != (*it).second.info_.type_ ||
+            counter_type::aggregating != info.type_)
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "registry::create_statistics_counter",
-                "invalid counter type requested (only counter_aggregating is "
+                "invalid counter type requested (only counter_type::aggregating is "
                 "supported)");
             return status_counter_type_unknown;
         }
@@ -896,13 +896,13 @@ namespace hpx { namespace performance_counters {
         }
 
         // make sure the requested counter type is supported
-        if (counter_aggregating != (*it).second.info_.type_ ||
-            counter_aggregating != info.type_)
+        if (counter_type::aggregating != (*it).second.info_.type_ ||
+            counter_type::aggregating != info.type_)
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "registry::create_arithmetics_counter",
                 "invalid counter type requested "
-                "(only counter_aggregating is supported)");
+                "(only counter_type::aggregating is supported)");
             return status_counter_type_unknown;
         }
 
@@ -1007,13 +1007,13 @@ namespace hpx { namespace performance_counters {
         }
 
         // make sure the requested counter type is supported
-        if (counter_aggregating != (*it).second.info_.type_ ||
-            counter_aggregating != info.type_)
+        if (counter_type::aggregating != (*it).second.info_.type_ ||
+            counter_type::aggregating != info.type_)
         {
             HPX_THROWS_IF(ec, bad_parameter,
                 "registry::create_arithmetics_counter_extended",
                 "invalid counter type requested "
-                "(only counter_aggregating is supported)");
+                "(only counter_type::aggregating is supported)");
             return status_counter_type_unknown;
         }
 

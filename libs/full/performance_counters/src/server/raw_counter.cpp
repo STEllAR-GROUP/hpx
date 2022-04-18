@@ -39,11 +39,11 @@ namespace hpx { namespace performance_counters { namespace server {
       , f_(HPX_MOVE(f))
       , reset_(false)
     {
-        if (info.type_ != counter_raw && info.type_ != counter_elapsed_time &&
-            info.type_ != counter_aggregating &&
-            info.type_ != counter_monotonically_increasing &&
-            info.type_ != counter_average_count &&
-            info.type_ != counter_average_timer)
+        if (info.type_ != counter_type::raw && info.type_ != counter_type::elapsed_time &&
+            info.type_ != counter_type::aggregating &&
+            info.type_ != counter_type::monotonically_increasing &&
+            info.type_ != counter_type::average_count &&
+            info.type_ != counter_type::average_timer)
         {
             HPX_THROW_EXCEPTION(bad_parameter, "raw_counter::raw_counter",
                 "unexpected counter type specified for raw_counter");
