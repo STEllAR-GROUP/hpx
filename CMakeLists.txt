@@ -1800,6 +1800,12 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Wno-attributes)
     hpx_add_compile_flag_if_available(-Wno-cast-align)
 
+    # gcc V12.1 and above complain about possible ABI incompatibilities caused
+    # by the use of std::destructive_interference_size
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+      hpx_add_compile_flag_if_available(-Wno-interference-size)
+    endif()
+
     # We do not in general guarantee ABI compatibility between C++ standards, so
     # we ignore this warning
     hpx_add_compile_flag_if_available(-Wno-noexcept-type)
