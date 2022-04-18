@@ -1,0 +1,52 @@
+<!--
+    Copyright (c) 2022 Hartmut Kaiser
+
+    SPDX-License-Identifier: BSL-1.0
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+-->
+<html>
+<head>
+    <title>HPX Dependency Report</title>
+    <style type="text/css">
+        A { color: #06C; text-decoration: none; }
+        A:hover { text-decoration: underline; }
+        body { max-width: 60em; margin-left: auto; margin-right: auto; color: #4A6484; font-family: sans-serif; }
+        .logo { font-family: sans-serif; font-style: italic; }
+        .logo .upper { font-size: 48pt; font-weight: 800; }
+        .logo .lower { font-size: 17pt; }
+        .logo .description { font-size: small; }
+        .primary-list { font-size: small; }
+        .secondary-list { font-size: small; }
+        #module-overview .primary-list { margin-left: 1em; }
+        #module-levels h3 { margin-left: 1em; }
+        #module-levels .primary-list { margin-left: 2em; }
+        #module-weights h3 { margin-left: 1em; }
+        #module-weights .primary-list { margin-left: 2em; }
+        #module-weights .secondary-list { margin-left: 2em; padding-left: 1em; border-left: 1px dotted; }
+    </style>
+</head>
+<body>
+    <table><tr>
+        <td>
+            <a href="https://github.com/STEllAR-GROUP/hpx">
+                <img src="http://stellar-group.org/files/stellar100.png" alt="STE||AR logo" />
+            </a>
+        </td>
+        <td>
+            <div class='logo'>
+                <div class='upper'>HPX</div>
+                <div class='lower'>Dependency Report</div>
+                <div class='description'>&nbsp;</div>
+            </div>
+        </td>
+    </tr></table>
+    <hr />
+    <div id='index'>
+        <h1>@HPX_DEPREPORT_CAPTION@</h1>
+        <h2><a href="@HPX_DEPREPORT_VERSION@/module-overview.html">Module Overview</a></h2>
+        <h2><a href="@HPX_DEPREPORT_VERSION@/module-levels.html">Module Levels</a></h2>
+        <h2><a href="@HPX_DEPREPORT_VERSION@/module-weights.html">Module Weights</a></h2>
+    </div>
+</body>
+</html>

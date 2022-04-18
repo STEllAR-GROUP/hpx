@@ -31,7 +31,7 @@ If you want to use @ref manipulator "formatters and destinations",
 then you can include this one instead:
 
 @code
-#include <hpx/logging/format.hpp>
+#include <hpx/logging/format/formatters.hpp>
 @endcode
 
 */

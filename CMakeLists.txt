@@ -119,6 +119,8 @@ unset(HPX_COMPONENTS CACHE)
 unset(HPX_EXPORT_TARGETS CACHE)
 unset(HPX_EXPORT_INTERNAL_TARGETS CACHE)
 unset(HPX_ENABLED_MODULES CACHE)
+unset(HPX_CORE_ENABLED_MODULES CACHE)
+unset(HPX_FULL_ENABLED_MODULES CACHE)
 unset(HPX_STATIC_PARCELPORT_PLUGINS CACHE)
 
 # ##############################################################################
@@ -2218,14 +2220,6 @@ add_subdirectory(wrap)
 hpx_include(Documentation)
 
 # ##############################################################################
-# Target specification
-# ##############################################################################
-if(HPX_WITH_TOOLS OR HPX_WITH_TESTS_BENCHMARKS)
-  add_hpx_pseudo_target(tools)
-  add_subdirectory(tools)
-endif()
-
-# ##############################################################################
 # Add core configuration
 # ##############################################################################
 
@@ -2250,12 +2244,21 @@ if(HPX_WITH_TESTS)
   add_subdirectory(tests)
 endif()
 
+# ##############################################################################
+# Target specification
+# ##############################################################################
 if(HPX_WITH_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
 if(HPX_WITH_DOCUMENTATION)
   add_subdirectory(docs)
+endif()
+
+# this must come after docs as it creates a dependency on the target git_docs
+if(HPX_WITH_TOOLS OR HPX_WITH_TESTS_BENCHMARKS)
+  add_hpx_pseudo_target(tools)
+  add_subdirectory(tools)
 endif()
 
 # Configure hpxrun.py

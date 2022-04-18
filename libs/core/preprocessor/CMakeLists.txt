@@ -29,7 +29,7 @@ set(preprocessor_sources)
 
 include(HPX_AddModule)
 add_hpx_module(
-  core preprocessor
+  core preprocessor NO_CONFIG_IN_GENERATED_HEADERS
   SOURCES ${preprocessor_sources}
   HEADERS ${preprocessor_headers}
   COMPAT_HEADERS ${preprocessor_compat_headers}

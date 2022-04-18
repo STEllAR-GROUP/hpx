@@ -15,7 +15,7 @@ include(HPX_AddPseudoTarget)
 # gather headers and sources
 
 set(hpx_HEADERS)
-set(hpx_SOURCES "${PROJECT_SOURCE_DIR}/libs/src/dummy.cpp")
+set(hpx_SOURCES "${PROJECT_SOURCE_DIR}/libs/src/empty.cpp")
 set(hpx_external_objects_SOURCES)
 
 if(MSVC)
@@ -317,7 +317,7 @@ foreach(lib ${HPX_LIBS})
   # creation can move here as well.
   if(NOT ${lib} STREQUAL "full")
     string(TOUPPER ${lib} uppercase_lib)
-    add_library(hpx_${lib} SHARED src/dummy.cpp)
+    add_library(hpx_${lib} SHARED src/empty.cpp)
     target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
 
     set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")

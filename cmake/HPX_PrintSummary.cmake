@@ -1,8 +1,29 @@
-# Copyright (c) 2017-2019 Hartmut Kaiser
+# Copyright (c) 2017-2022 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+function(has_configuration_summary module_name has_config_info)
+
+  string(TOUPPER ${module_name} __module_name_uc)
+  get_property(
+    _variableNames GLOBAL PROPERTY HPX_MODULE_CONFIG_${__module_name_uc}
+  )
+  list(LENGTH _variableNames _length)
+  if(${_length} GREATER_EQUAL 1)
+    set(${has_config_info}
+        TRUE
+        PARENT_SCOPE
+    )
+  else()
+    set(${has_config_info}
+        FALSE
+        PARENT_SCOPE
+    )
+  endif()
+
+endfunction()
 
 function(create_configuration_summary message module_name)
 
@@ -17,15 +38,6 @@ function(create_configuration_summary message module_name)
   endif()
 
   get_property(
-    DEFINITIONS_VARS GLOBAL
-    PROPERTY HPX_CONFIG_DEFINITIONS${upper_option_suffix}
-  )
-  if(DEFINED DEFINITIONS_VARS)
-    list(SORT DEFINITIONS_VARS)
-    list(REMOVE_DUPLICATES DEFINITIONS_VARS)
-  endif()
-
-  get_property(
     _variableNames GLOBAL PROPERTY HPX_MODULE_CONFIG_${module_name_uc}
   )
   list(SORT _variableNames)
@@ -35,6 +47,15 @@ function(create_configuration_summary message module_name)
   if(${_length} GREATER_EQUAL 1)
     hpx_info("")
     hpx_info(${message})
+
+    get_property(
+      DEFINITIONS_VARS GLOBAL
+      PROPERTY HPX_CONFIG_DEFINITIONS${upper_option_suffix}
+    )
+    if(DEFINED DEFINITIONS_VARS)
+      list(SORT DEFINITIONS_VARS)
+      list(REMOVE_DUPLICATES DEFINITIONS_VARS)
+    endif()
 
     foreach(_variableName ${_variableNames})
       if(${_variableName}Category)
@@ -87,14 +108,15 @@ function(create_configuration_summary message module_name)
 
     configure_file(
       "${HPX_SOURCE_DIR}/cmake/templates/${_template}"
-      "${HPX_BINARY_DIR}/${_base_dir_local}/config_strings.hpp" @ONLY
+      "${HPX_BINARY_DIR}/libs/core/config/include/${_base_dir_local}/config_strings.hpp"
+      @ONLY
     )
     configure_file(
       "${HPX_SOURCE_DIR}/cmake/templates/${_template}"
       "${HPX_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${_base_dir}/config_strings.hpp"
       @ONLY
     )
-  else()
+  elseif(hpx_config_information)
     set(_base_dir_local "libs/${module_name}/src/")
     set(_template "config_defines_entries_for_modules.cpp.in")
 

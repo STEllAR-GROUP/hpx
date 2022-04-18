@@ -85,6 +85,10 @@ if(HPX_WITH_GIT_BRANCH)
       PATTERN "*.buildinfo" EXCLUDE
     )
   endif()
+  # special handling of dependency report files
+  if(EXISTS "${DOCS_SOURCE}/report")
+    file(COPY "${DOCS_SOURCE}/report" DESTINATION "${DOCS_BRANCH_DEST}")
+  endif()
 endif()
 
 # If a tag name has been set, we copy files to a corresponding directory
@@ -115,6 +119,11 @@ if(HPX_WITH_GIT_TAG)
     )
   endif()
 
+  # special handling of dependency report files
+  if(EXISTS "${DOCS_SOURCE}/report")
+    file(COPY "${DOCS_SOURCE}/report" DESTINATION "${DOCS_TAG_DEST}")
+  endif()
+
   # If a tag name has been set and it is a suitable version number, we also copy
   # files to the "latest" directory. The regex only matches full version numbers
   # with three numerical components (X.Y.Z). It does not match release
@@ -143,6 +152,11 @@ if(HPX_WITH_GIT_TAG)
         DESTINATION "${DOCS_LATEST_DEST}/pdf/"
         PATTERN "*.buildinfo" EXCLUDE
       )
+    endif()
+
+    # special handling of dependency report files
+    if(EXISTS "${DOCS_SOURCE}/report")
+      file(COPY "${DOCS_SOURCE}/report" DESTINATION "${DOCS_LATEST_DEST}")
     endif()
   endif()
 endif()

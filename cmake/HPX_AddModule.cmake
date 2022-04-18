@@ -5,10 +5,11 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 include(HPX_ExportTargets)
+include(HPX_PrintSummary)
 
 function(add_hpx_module libname modulename)
   # Retrieve arguments
-  set(options CUDA CONFIG_FILES)
+  set(options CUDA CONFIG_FILES NO_CONFIG_IN_GENERATED_HEADERS)
   set(one_value_args GLOBAL_HEADER_GEN)
   set(multi_value_args
       SOURCES
@@ -43,20 +44,26 @@ function(add_hpx_module libname modulename)
   string(TOUPPER ${modulename} modulename_upper)
 
   # Mark the module as enabled (see hpx/libs/CMakeLists.txt)
+  set(modules ${HPX_ENABLED_MODULES})
+  list(APPEND modules ${modulename})
+  list(SORT modules)
+  list(REMOVE_DUPLICATES modules)
+
   set(HPX_ENABLED_MODULES
-      ${HPX_ENABLED_MODULES} ${modulename}
+      ${modules}
       CACHE INTERNAL "List of enabled HPX modules" FORCE
   )
-  list(SORT HPX_ENABLED_MODULES)
-  list(REMOVE_DUPLICATES HPX_ENABLED_MODULES)
+
+  set(modules ${HPX_${libname_upper}_ENABLED_MODULES})
+  list(APPEND modules ${modulename})
+  list(SORT modules)
+  list(REMOVE_DUPLICATES modules)
 
   set(HPX_${libname_upper}_ENABLED_MODULES
-      ${HPX_${libname_upper}_ENABLED_MODULES} ${modulename}
+      ${modules}
       CACHE INTERNAL "List of enabled HPX modules in the ${libname} library"
             FORCE
   )
-  list(SORT HPX_${libname_upper}_ENABLED_MODULES)
-  list(REMOVE_DUPLICATES HPX_${libname_upper}_ENABLED_MODULES)
 
   # Main directories of the module
   set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -93,6 +100,11 @@ function(add_hpx_module libname modulename)
         message(FATAL_ERROR "Invalid compatibility header ${compat_header}")
       endif()
 
+      set(config_file)
+      if(NOT ${modulename}_NO_CONFIG_IN_GENERATED_HEADERS)
+        set(config_file "#include <hpx/config.hpp>\n")
+      endif()
+
       list(GET compat_header 0 old_header)
       list(GET compat_header 1 new_header)
       configure_file(
@@ -122,7 +134,12 @@ function(add_hpx_module libname modulename)
     set(global_header
         "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/modules/${modulename}.hpp"
     )
-    set(module_headers)
+    if(NOT ${modulename}_NO_CONFIG_IN_GENERATED_HEADERS)
+      set(module_headers "#include <hpx/config.hpp>\n\n")
+      set(module_headers
+          "${module_headers}#if defined(HPX_HAVE_MODULE_${modulename_upper})\n"
+      )
+    endif()
     foreach(header_file ${${modulename}_HEADERS})
       # Exclude the files specified
       if((NOT (${header_file} IN_LIST ${modulename}_EXCLUDE_FROM_GLOBAL_HEADER))
@@ -131,6 +148,9 @@ function(add_hpx_module libname modulename)
         set(module_headers "${module_headers}#include <${header_file}>\n")
       endif()
     endforeach(header_file)
+    if(NOT ${modulename}_NO_CONFIG_IN_GENERATED_HEADERS)
+      set(module_headers "${module_headers}#endif\n")
+    endif()
     configure_file(
       "${PROJECT_SOURCE_DIR}/cmake/templates/global_module_header.hpp.in"
       "${global_header}"
@@ -138,9 +158,13 @@ function(add_hpx_module libname modulename)
     set(generated_headers ${global_header})
   endif()
 
-  set(config_entries_source
-      "${CMAKE_CURRENT_BINARY_DIR}/src/config_entries.cpp"
-  )
+  set(has_config_info)
+  has_configuration_summary(${modulename} has_config_info)
+  if(has_config_info)
+    set(config_entries_source
+        "${CMAKE_CURRENT_BINARY_DIR}/src/config_entries.cpp"
+    )
+  endif()
 
   # generate configuration header for this module
   set(config_header
@@ -199,6 +223,12 @@ function(add_hpx_module libname modulename)
     set(module_library_type STATIC)
   else()
     set(module_library_type OBJECT)
+  endif()
+
+  set(source_group_root ${SOURCE_ROOT})
+  if(NOT sources AND NOT config_entries_source)
+    set(source_group_root "${HPX_SOURCE_DIR}/libs/src/")
+    set(sources "${source_group_root}/empty.cpp")
   endif()
 
   # create library modules
@@ -286,7 +316,7 @@ function(add_hpx_module libname modulename)
   )
   add_hpx_source_group(
     NAME hpx_${modulename}
-    ROOT ${SOURCE_ROOT}
+    ROOT ${source_group_root}
     CLASS "Source Files"
     TARGETS ${sources}
   )
@@ -423,7 +453,6 @@ function(add_hpx_module libname modulename)
     add_subdirectory(${dir})
   endforeach(dir)
 
-  include(HPX_PrintSummary)
   create_configuration_summary(
     "    Module configuration (${modulename}):" "${modulename}"
   )
