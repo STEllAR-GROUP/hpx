@@ -444,7 +444,7 @@ namespace hpx { namespace performance_counters {
 
         generic_counter_type_data counter_types[] = {
             // length of thread queue(s)
-            {"/threadqueue/length", counter_raw,
+            {"/threadqueue/length", counter_type::raw,
                 "returns the current queue length for the referenced queue",
                 HPX_PERFORMANCE_COUNTER_V1,
                 hpx::bind_front(&detail::locality_pool_thread_counter_creator,
@@ -453,7 +453,7 @@ namespace hpx { namespace performance_counters {
                 &locality_pool_thread_counter_discoverer, ""},
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             // average thread wait time for queue(s)
-            {"/threads/wait-time/pending", counter_average_timer,
+            {"/threads/wait-time/pending", counter_type::average_timer,
                 "returns the average wait time of pending threads for the "
                 "referenced queue",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -462,7 +462,7 @@ namespace hpx { namespace performance_counters {
                     &threads::thread_pool_base::get_average_thread_wait_time),
                 &locality_pool_thread_counter_discoverer, "ns"},
             // average task wait time for queue(s)
-            {"/threads/wait-time/staged", counter_average_timer,
+            {"/threads/wait-time/staged", counter_type::average_timer,
                 "returns the average wait time of staged threads (task "
                 "descriptions) for the referenced queue",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -473,7 +473,7 @@ namespace hpx { namespace performance_counters {
 #endif
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
             // idle rate
-            {"/threads/idle-rate", counter_average_count,
+            {"/threads/idle-rate", counter_type::average_count,
                 "returns the idle rate for the referenced object",
                 HPX_PERFORMANCE_COUNTER_V1,
                 hpx::bind_front(&detail::locality_pool_thread_counter_creator,
@@ -481,7 +481,7 @@ namespace hpx { namespace performance_counters {
                     &threads::thread_pool_base::avg_idle_rate),
                 &locality_pool_thread_counter_discoverer, "0.01%"},
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-            {"/threads/creation-idle-rate", counter_average_count,
+            {"/threads/creation-idle-rate", counter_type::average_count,
                 "returns the % of idle-rate spent creating HPX-threads for the "
                 "referenced object",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -489,7 +489,7 @@ namespace hpx { namespace performance_counters {
                     &tm, &threads::threadmanager::avg_creation_idle_rate,
                     &threads::thread_pool_base::avg_creation_idle_rate),
                 &locality_pool_thread_counter_discoverer, "0.01%"},
-            {"/threads/cleanup-idle-rate", counter_average_count,
+            {"/threads/cleanup-idle-rate", counter_type::average_count,
                 "returns the % of time spent cleaning up terminated "
                 "HPX-threads for the referenced object",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -501,7 +501,8 @@ namespace hpx { namespace performance_counters {
 #endif
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
             // thread counts
-            {"/threads/count/cumulative", counter_monotonically_increasing,
+            {"/threads/count/cumulative",
+                counter_type::monotonically_increasing,
                 "returns the overall number of executed (retired) HPX-threads "
                 "for the referenced locality",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -510,7 +511,7 @@ namespace hpx { namespace performance_counters {
                     &threads::thread_pool_base::get_executed_threads),
                 &locality_pool_thread_counter_discoverer, ""},
             {"/threads/count/cumulative-phases",
-                counter_monotonically_increasing,
+                counter_type::monotonically_increasing,
                 "returns the overall number of HPX-thread phases executed for "
                 "the referenced locality",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -519,35 +520,36 @@ namespace hpx { namespace performance_counters {
                     &threads::thread_pool_base::get_executed_thread_phases),
                 &locality_pool_thread_counter_discoverer, ""},
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-            {"/threads/time/average", counter_average_timer,
+            {"/threads/time/average", counter_type::average_timer,
                 "returns the average time spent executing one HPX-thread",
                 HPX_PERFORMANCE_COUNTER_V1,
                 hpx::bind_front(&detail::locality_pool_thread_counter_creator,
                     &tm, &threads::threadmanager::get_thread_duration,
                     &threads::thread_pool_base::get_thread_duration),
                 &locality_pool_thread_counter_discoverer, "ns"},
-            {"/threads/time/average-phase", counter_average_timer,
+            {"/threads/time/average-phase", counter_type::average_timer,
                 "returns the average time spent executing one HPX-thread phase",
                 HPX_PERFORMANCE_COUNTER_V1,
                 hpx::bind_front(&detail::locality_pool_thread_counter_creator,
                     &tm, &threads::threadmanager::get_thread_phase_duration,
                     &threads::thread_pool_base::get_thread_phase_duration),
                 &locality_pool_thread_counter_discoverer, "ns"},
-            {"/threads/time/average-overhead", counter_average_timer,
+            {"/threads/time/average-overhead", counter_type::average_timer,
                 "returns average overhead time executing one HPX-thread",
                 HPX_PERFORMANCE_COUNTER_V1,
                 hpx::bind_front(&detail::locality_pool_thread_counter_creator,
                     &tm, &threads::threadmanager::get_thread_overhead,
                     &threads::thread_pool_base::get_thread_overhead),
                 &locality_pool_thread_counter_discoverer, "ns"},
-            {"/threads/time/average-phase-overhead", counter_average_timer,
+            {"/threads/time/average-phase-overhead",
+                counter_type::average_timer,
                 "returns average overhead time executing one HPX-thread phase",
                 HPX_PERFORMANCE_COUNTER_V1,
                 hpx::bind_front(&detail::locality_pool_thread_counter_creator,
                     &tm, &threads::threadmanager::get_thread_phase_overhead,
                     &threads::thread_pool_base::get_thread_phase_overhead),
                 &locality_pool_thread_counter_discoverer, "ns"},
-            {"/threads/time/cumulative", counter_elapsed_time,
+            {"/threads/time/cumulative", counter_type::elapsed_time,
                 "returns the cumulative time spent executing HPX-threads",
                 HPX_PERFORMANCE_COUNTER_V1,
                 hpx::bind_front(&detail::locality_pool_thread_counter_creator,
@@ -555,7 +557,7 @@ namespace hpx { namespace performance_counters {
                     &threads::threadmanager::get_cumulative_thread_duration,
                     &threads::thread_pool_base::get_cumulative_thread_duration),
                 &locality_pool_thread_counter_discoverer, "ns"},
-            {"/threads/time/cumulative-overhead", counter_elapsed_time,
+            {"/threads/time/cumulative-overhead", counter_type::elapsed_time,
                 "returns the cumulative overhead time incurred by executing "
                 "HPX threads",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -569,21 +571,23 @@ namespace hpx { namespace performance_counters {
 
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
-            {"/threads/time/background-work-duration", counter_elapsed_time,
+            {"/threads/time/background-work-duration",
+                counter_type::elapsed_time,
                 "returns the overall time spent running background work",
                 HPX_PERFORMANCE_COUNTER_V1,
                 hpx::bind_front(&detail::locality_pool_thread_counter_creator,
                     &tm, &threads::threadmanager::get_background_work_duration,
                     &threads::thread_pool_base::get_background_work_duration),
                 &locality_pool_thread_counter_discoverer, "ns"},
-            {"/threads/background-overhead", counter_aggregating,
+            {"/threads/background-overhead", counter_type::aggregating,
                 "returns the overall background overhead",
                 HPX_PERFORMANCE_COUNTER_V1,
                 hpx::bind_front(&detail::locality_pool_thread_counter_creator,
                     &tm, &threads::threadmanager::get_background_overhead,
                     &threads::thread_pool_base::get_background_overhead),
                 &locality_pool_thread_counter_discoverer, "0.1%"},
-            {"/threads/time/background-send-duration", counter_elapsed_time,
+            {"/threads/time/background-send-duration",
+                counter_type::elapsed_time,
                 "returns the overall time spent running background work "
                 "related to sending parcels",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -591,7 +595,7 @@ namespace hpx { namespace performance_counters {
                     &tm, &threads::threadmanager::get_background_send_duration,
                     &threads::thread_pool_base::get_background_send_duration),
                 &locality_pool_thread_counter_discoverer, "ns"},
-            {"/threads/background-send-overhead", counter_aggregating,
+            {"/threads/background-send-overhead", counter_type::aggregating,
                 "returns the overall background overhead "
                 "related to sending parcels",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -599,7 +603,8 @@ namespace hpx { namespace performance_counters {
                     &tm, &threads::threadmanager::get_background_send_overhead,
                     &threads::thread_pool_base::get_background_send_overhead),
                 &locality_pool_thread_counter_discoverer, "0.1%"},
-            {"/threads/time/background-receive-duration", counter_elapsed_time,
+            {"/threads/time/background-receive-duration",
+                counter_type::elapsed_time,
                 "returns the overall time spent running background work "
                 "related to receiving parcels",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -609,7 +614,7 @@ namespace hpx { namespace performance_counters {
                     &threads::thread_pool_base::
                         get_background_receive_duration),
                 &locality_pool_thread_counter_discoverer, "ns"},
-            {"/threads/background-receive-overhead", counter_aggregating,
+            {"/threads/background-receive-overhead", counter_type::aggregating,
                 "returns the overall background overhead "
                 "related to receiving parcels",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -621,7 +626,7 @@ namespace hpx { namespace performance_counters {
                 &locality_pool_thread_counter_discoverer, "0.1%"},
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
-            {"/threads/time/overall", counter_elapsed_time,
+            {"/threads/time/overall", counter_type::elapsed_time,
                 "returns the overall time spent running the scheduler on a "
                 "core",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -629,7 +634,7 @@ namespace hpx { namespace performance_counters {
                     &tm, &threads::threadmanager::get_cumulative_duration,
                     &threads::thread_pool_base::get_cumulative_duration),
                 &locality_pool_thread_counter_discoverer, "ns"},
-            {"/threads/count/instantaneous/all", counter_raw,
+            {"/threads/count/instantaneous/all", counter_type::raw,
                 "returns the overall current number of HPX-threads "
                 "instantiated at the referenced locality",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -637,7 +642,7 @@ namespace hpx { namespace performance_counters {
                     &tm, &threads::threadmanager::get_thread_count_unknown,
                     &threads::thread_pool_base::get_thread_count_unknown),
                 &locality_pool_thread_counter_discoverer, ""},
-            {"/threads/count/instantaneous/active", counter_raw,
+            {"/threads/count/instantaneous/active", counter_type::raw,
                 "returns the current number of active HPX-threads "
                 "at the referenced locality",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -645,7 +650,7 @@ namespace hpx { namespace performance_counters {
                     &tm, &threads::threadmanager::get_thread_count_active,
                     &threads::thread_pool_base::get_thread_count_active),
                 &locality_pool_thread_counter_discoverer, ""},
-            {"/threads/count/instantaneous/pending", counter_raw,
+            {"/threads/count/instantaneous/pending", counter_type::raw,
                 "returns the current number of pending HPX-threads "
                 "at the referenced locality",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -653,7 +658,7 @@ namespace hpx { namespace performance_counters {
                     &tm, &threads::threadmanager::get_thread_count_pending,
                     &threads::thread_pool_base::get_thread_count_pending),
                 &locality_pool_thread_counter_discoverer, ""},
-            {"/threads/count/instantaneous/suspended", counter_raw,
+            {"/threads/count/instantaneous/suspended", counter_type::raw,
                 "returns the current number of suspended HPX-threads "
                 "at the referenced locality",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -661,7 +666,7 @@ namespace hpx { namespace performance_counters {
                     &tm, &threads::threadmanager::get_thread_count_suspended,
                     &threads::thread_pool_base::get_thread_count_suspended),
                 &locality_pool_thread_counter_discoverer, ""},
-            {"/threads/count/instantaneous/terminated", counter_raw,
+            {"/threads/count/instantaneous/terminated", counter_type::raw,
                 "returns the current number of terminated HPX-threads "
                 "at the referenced locality",
                 HPX_PERFORMANCE_COUNTER_V1,
@@ -669,7 +674,7 @@ namespace hpx { namespace performance_counters {
                     &tm, &threads::threadmanager::get_thread_count_terminated,
                     &threads::thread_pool_base::get_thread_count_terminated),
                 &locality_pool_thread_counter_discoverer, ""},
-            {"/threads/count/instantaneous/staged", counter_raw,
+            {"/threads/count/instantaneous/staged", counter_type::raw,
                 "returns the current number of staged HPX-threads (task "
                 "descriptions) "
                 "at the referenced locality",
@@ -679,26 +684,26 @@ namespace hpx { namespace performance_counters {
                     &threads::thread_pool_base::get_thread_count_staged),
                 &locality_pool_thread_counter_discoverer, ""},
 #if defined(HPX_HAVE_COROUTINE_COUNTERS)
-            {"/threads/count/stack-recycles", counter_monotonically_increasing,
+            {"/threads/count/stack-recycles", counter_type::monotonically_increasing,
                 "returns the total number of HPX-thread recycling operations "
                 "performed for the referenced locality",
                 HPX_PERFORMANCE_COUNTER_V1, counts_creator,
                 &locality_counter_discoverer, ""},
 #if !defined(HPX_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-            {"/threads/count/stack-unbinds", counter_monotonically_increasing,
+            {"/threads/count/stack-unbinds", counter_type::monotonically_increasing,
                 "returns the total number of HPX-thread unbind (madvise) "
                 "operations performed for the referenced locality",
                 HPX_PERFORMANCE_COUNTER_V1, counts_creator,
                 &locality_counter_discoverer, ""},
 #endif
-            {"/threads/count/objects", counter_monotonically_increasing,
+            {"/threads/count/objects", counter_type::monotonically_increasing,
                 "returns the overall number of created HPX-thread objects for "
                 "the referenced locality",
                 HPX_PERFORMANCE_COUNTER_V1, counts_creator,
                 &detail::locality_allocator_counter_discoverer, ""},
 #endif
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-            {"/threads/count/pending-misses", counter_monotonically_increasing,
+            {"/threads/count/pending-misses", counter_type::monotonically_increasing,
                 "returns the number of times that the referenced worker-thread "
                 "on the referenced locality failed to find pending HPX-threads "
                 "in its associated queue",
@@ -708,7 +713,7 @@ namespace hpx { namespace performance_counters {
                     &threads::thread_pool_base::get_num_pending_misses),
                 &locality_pool_thread_counter_discoverer, ""},
             {"/threads/count/pending-accesses",
-                counter_monotonically_increasing,
+                counter_type::monotonically_increasing,
                 "returns the number of times that the referenced worker-thread "
                 "on the referenced locality looked for pending HPX-threads "
                 "in its associated queue",
@@ -718,7 +723,7 @@ namespace hpx { namespace performance_counters {
                     &threads::thread_pool_base::get_num_pending_accesses),
                 &locality_pool_thread_counter_discoverer, ""},
             {"/threads/count/stolen-from-pending",
-                counter_monotonically_increasing,
+                counter_type::monotonically_increasing,
                 "returns the overall number of pending HPX-threads stolen by "
                 "neighboring"
                 "schedulers from &tm scheduler for the referenced locality",
@@ -728,7 +733,7 @@ namespace hpx { namespace performance_counters {
                     &threads::thread_pool_base::get_num_stolen_from_pending),
                 &locality_pool_thread_counter_discoverer, ""},
             {"/threads/count/stolen-from-staged",
-                counter_monotonically_increasing,
+                counter_type::monotonically_increasing,
                 "returns the overall number of task descriptions stolen by "
                 "neighboring"
                 "schedulers from tm scheduler for the referenced locality",
@@ -738,7 +743,7 @@ namespace hpx { namespace performance_counters {
                     &threads::thread_pool_base::get_num_stolen_from_staged),
                 &locality_pool_thread_counter_discoverer, ""},
             {"/threads/count/stolen-to-pending",
-                counter_monotonically_increasing,
+                counter_type::monotonically_increasing,
                 "returns the overall number of pending HPX-threads stolen from "
                 "neighboring"
                 "schedulers for the referenced locality",
@@ -748,7 +753,7 @@ namespace hpx { namespace performance_counters {
                     &threads::thread_pool_base::get_num_stolen_to_pending),
                 &locality_pool_thread_counter_discoverer, ""},
             {"/threads/count/stolen-to-staged",
-                counter_monotonically_increasing,
+                counter_type::monotonically_increasing,
                 "returns the overall number of task descriptions stolen from "
                 "neighboring"
                 "schedulers for the referenced locality",
@@ -759,14 +764,14 @@ namespace hpx { namespace performance_counters {
                 &locality_pool_thread_counter_discoverer, ""},
 #endif
             // scheduler utilization
-            {"/scheduler/utilization/instantaneous", counter_raw,
+            {"/scheduler/utilization/instantaneous", counter_type::raw,
                 "returns the current scheduler utilization",
                 HPX_PERFORMANCE_COUNTER_V1,
                 hpx::bind_front(
                     &detail::scheduler_utilization_counter_creator, &tm),
                 &locality_pool_counter_discoverer, "%"},
             // idle-loop count
-            {"/threads/idle-loop-count/instantaneous", counter_raw,
+            {"/threads/idle-loop-count/instantaneous", counter_type::raw,
                 "returns the current value of the scheduler idle-loop count",
                 HPX_PERFORMANCE_COUNTER_V1,
                 hpx::bind_front(
@@ -774,7 +779,7 @@ namespace hpx { namespace performance_counters {
                     &threads::thread_pool_base::get_idle_loop_count),
                 &locality_pool_thread_no_total_counter_discoverer, ""},
             // busy-loop count
-            {"/threads/busy-loop-count/instantaneous", counter_raw,
+            {"/threads/busy-loop-count/instantaneous", counter_type::raw,
                 "returns the current value of the scheduler busy-loop count",
                 HPX_PERFORMANCE_COUNTER_V1,
                 hpx::bind_front(

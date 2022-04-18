@@ -16,13 +16,13 @@
 #include <hpx/components/performance_counters/io/io_counters.hpp>
 
 #include <hpx/modules/errors.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_uint.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
 #include <boost/fusion/include/define_struct.hpp>
 #include <boost/fusion/include/io.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_object.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/qi_uint.hpp>
 
 #include <unistd.h>
 
@@ -35,17 +35,10 @@
 #endif
 
 // type to store parser output
-BOOST_FUSION_DEFINE_STRUCT(
-    (hpx)(performance_counters)(io),
-    proc_io,
-    (std::uint64_t, riss)
-    (std::uint64_t, wiss)
-    (std::uint64_t, rsysc)
-    (std::uint64_t, wsysc)
-    (std::uint64_t, rstor)
-    (std::uint64_t, wstor)
-    (std::uint64_t, wcanc)
-    )
+BOOST_FUSION_DEFINE_STRUCT((hpx) (performance_counters) (io), proc_io,
+    (std::uint64_t, riss)(std::uint64_t, wiss)(std::uint64_t, rsysc)(
+        std::uint64_t, wsysc)(std::uint64_t, rstor)(std::uint64_t, wstor)(
+        std::uint64_t, wcanc))
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality, We register the module dynamically
@@ -53,31 +46,27 @@ BOOST_FUSION_DEFINE_STRUCT(
 HPX_REGISTER_COMPONENT_MODULE_DYNAMIC()
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace io
-{
+namespace hpx { namespace performance_counters { namespace io {
     namespace qi = boost::spirit::qi;
     namespace ascii = boost::spirit::ascii;
 
     // grammar
-    template<typename I>
-    struct proc_io_parser: qi::grammar<I, proc_io(), ascii::space_type>
+    template <typename I>
+    struct proc_io_parser : qi::grammar<I, proc_io(), ascii::space_type>
     {
-        proc_io_parser(): proc_io_parser::base_type(start)
+        proc_io_parser()
+          : proc_io_parser::base_type(start)
         {
             using qi::lit;
 
-            start %=
-                lit("rchar:")                 >> uint64_t_ >>
-                lit("wchar:")                 >> uint64_t_ >>
-                lit("syscr:")                 >> uint64_t_ >>
-                lit("syscw:")                 >> uint64_t_ >>
-                lit("read_bytes:")            >> uint64_t_ >>
-                lit("write_bytes:")           >> uint64_t_ >>
-                lit("cancelled_write_bytes:") >> uint64_t_;
-          }
+            start %= lit("rchar:") >> uint64_t_ >> lit("wchar:") >> uint64_t_ >>
+                lit("syscr:") >> uint64_t_ >> lit("syscw:") >> uint64_t_ >>
+                lit("read_bytes:") >> uint64_t_ >> lit("write_bytes:") >>
+                uint64_t_ >> lit("cancelled_write_bytes:") >> uint64_t_;
+        }
 
-          qi::rule<I, proc_io(), ascii::space_type> start;
-          qi::uint_parser<std::uint64_t> uint64_t_;
+        qi::rule<I, proc_io(), ascii::space_type> start;
+        qi::uint_parser<std::uint64_t> uint64_t_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -159,50 +148,42 @@ namespace hpx { namespace performance_counters { namespace io
     void register_counter_types()
     {
         namespace pc = hpx::performance_counters;
-        pc::install_counter_type(
-            "/runtime/io/read_bytes_issued",
-            &get_pio_riss,
+        pc::install_counter_type("/runtime/io/read_bytes_issued", &get_pio_riss,
             "number of bytes read by process (aggregate of count "
             "arguments passed to read() call or its analogues)",
-            "bytes", pc::counter_monotonically_increasing);
-        pc::install_counter_type(
-            "/runtime/io/write_bytes_issued",
+            "bytes", pc::counter_type::monotonically_increasing);
+        pc::install_counter_type("/runtime/io/write_bytes_issued",
             &get_pio_wiss,
             "number of bytes the process has caused or shall cause to be "
             "written (aggregate of count arguments passed to write() call or "
             "its analogues)",
-            "bytes", pc::counter_monotonically_increasing);
-        pc::install_counter_type(
-            "/runtime/io/read_syscalls",
-            &get_pio_rsysc,
+            "bytes", pc::counter_type::monotonically_increasing);
+        pc::install_counter_type("/runtime/io/read_syscalls", &get_pio_rsysc,
             "number of system calls that perform I/O reads", "",
-            pc::counter_monotonically_increasing);
-        pc::install_counter_type(
-            "/runtime/io/write_syscalls",
-            &get_pio_wsysc,
+            pc::counter_type::monotonically_increasing);
+        pc::install_counter_type("/runtime/io/write_syscalls", &get_pio_wsysc,
             "number of system calls that perform I/O writes", "",
-            pc::counter_monotonically_increasing);
-        pc::install_counter_type(
-            "/runtime/io/read_bytes_transferred",
+            pc::counter_type::monotonically_increasing);
+        pc::install_counter_type("/runtime/io/read_bytes_transferred",
             &get_pio_rstor,
             "number of bytes retrieved from storage by I/O operations", "bytes",
-            pc::counter_monotonically_increasing);
-        pc::install_counter_type(
-            "/runtime/io/write_bytes_transferred",
+            pc::counter_type::monotonically_increasing);
+        pc::install_counter_type("/runtime/io/write_bytes_transferred",
             &get_pio_wstor,
             "number of bytes transferred to storage by I/O operations", "bytes",
-            pc::counter_monotonically_increasing);
-        pc::install_counter_type(
-            "/runtime/io/write_bytes_cancelled", &get_pio_wcanc,
+            pc::counter_type::monotonically_increasing);
+        pc::install_counter_type("/runtime/io/write_bytes_cancelled",
+            &get_pio_wcanc,
             "number of bytes accounted by write_bytes_transferred that has not "
             "been ultimately stored due to truncation or deletion",
-            "bytes", pc::counter_monotonically_increasing);
+            "bytes", pc::counter_type::monotonically_increasing);
     }
 
-    bool get_startup(hpx::startup_function_type& startup_func,
-        bool& pre_startup)
+    bool get_startup(
+        hpx::startup_function_type& startup_func, bool& pre_startup)
     {
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__gnu_linux__)
+#if defined(__linux) || defined(linux) || defined(__linux__) ||                \
+    defined(__gnu_linux__)
         startup_func = register_counter_types;
         pre_startup = true;
         return true;
@@ -210,8 +191,7 @@ namespace hpx { namespace performance_counters { namespace io
         return false;
 #endif
     }
-}}}
+}}}    // namespace hpx::performance_counters::io
 
 // register component's startup function
-HPX_REGISTER_STARTUP_MODULE_DYNAMIC(
-    hpx::performance_counters::io::get_startup)
+HPX_REGISTER_STARTUP_MODULE_DYNAMIC(hpx::performance_counters::io::get_startup)

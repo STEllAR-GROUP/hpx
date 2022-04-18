@@ -68,7 +68,7 @@ namespace hpx { namespace performance_counters {
     HPX_EXPORT counter_status install_counter_type(std::string const& name,
         hpx::function<std::int64_t(bool)> const& counter_value,
         std::string const& helptext = "", std::string const& uom = "",
-        counter_type type = counter_raw, error_code& ec = throws);
+        counter_type type = counter_type::raw, error_code& ec = throws);
 
     /// Install a new generic performance counter type returning an
     /// array of values in a way, that will uninstall it automatically during

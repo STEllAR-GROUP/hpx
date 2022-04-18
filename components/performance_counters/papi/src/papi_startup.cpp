@@ -293,7 +293,8 @@ namespace hpx { namespace performance_counters { namespace papi {
         using namespace hpx::performance_counters;
 
         // define & install generic PAPI counter type
-        generic_counter_type_data const papi_cnt_type = {"/papi", counter_raw,
+        generic_counter_type_data const papi_cnt_type = {"/papi",
+            counter_type::raw,
             "the current count of occurrences of a specific PAPI event",
             HPX_PERFORMANCE_COUNTER_V1, &create_papi_counter,
             &discover_papi_counters, ""};

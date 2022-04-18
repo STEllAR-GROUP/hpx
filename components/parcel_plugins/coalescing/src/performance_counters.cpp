@@ -93,7 +93,7 @@ namespace hpx::plugins::parcel {
         switch (info.type_)
         {
         // NOLINTNEXTLINE(bugprone-branch-clone)
-        case performance_counters::counter_monotonically_increasing:
+        case performance_counters::counter_type::monotonically_increasing:
         {
             performance_counters::counter_path_elements paths;
             performance_counters::get_counter_path_elements(
@@ -174,7 +174,7 @@ namespace hpx::plugins::parcel {
         switch (info.type_)
         {
         // NOLINTNEXTLINE(bugprone-branch-clone)
-        case performance_counters::counter_monotonically_increasing:
+        case performance_counters::counter_type::monotonically_increasing:
         {
             performance_counters::counter_path_elements paths;
             performance_counters::get_counter_path_elements(
@@ -454,7 +454,7 @@ namespace hpx::plugins::parcel {
     {
         switch (info.type_)
         {
-        case performance_counters::counter_histogram:
+        case performance_counters::counter_type::histogram:
         {
             performance_counters::counter_path_elements paths;
             performance_counters::get_counter_path_elements(
@@ -549,14 +549,16 @@ namespace hpx::plugins::parcel {
         // define the counter types
         generic_counter_type_data const counter_types[] = {
             // /coalescing(locality#<locality_id>/total)/count/parcels@action-name
-            {"/coalescing/count/parcels", counter_monotonically_increasing,
+            {"/coalescing/count/parcels",
+                counter_type::monotonically_increasing,
                 "returns the number of parcels handled by the message handler "
                 "associated with the action which is given by the counter "
                 "parameter",
                 HPX_PERFORMANCE_COUNTER_V1, &num_parcels_counter_creator,
                 &counter_discoverer, ""},
             // /coalescing(locality#<locality_id>/total)/count/messages@action-name
-            {"/coalescing/count/messages", counter_monotonically_increasing,
+            {"/coalescing/count/messages",
+                counter_type::monotonically_increasing,
                 "returns the number of messages creates as the result of "
                 "coalescing parcels of the action which is given by the "
                 "counter "
@@ -573,14 +575,16 @@ namespace hpx::plugins::parcel {
                 &num_parcels_per_message_counter_creator, &counter_discoverer,
                 ""},
             // /coalescing(...)/time/between-parcels-average@action-name
-            {"/coalescing/time/between-parcels-average", counter_type::average_timer,
+            {"/coalescing/time/between-parcels-average",
+                counter_type::average_timer,
                 "returns the average time between parcels for the "
                 "action which is given by the counter parameter",
                 HPX_PERFORMANCE_COUNTER_V1,
                 &average_time_between_parcels_counter_creator,
                 &counter_discoverer, "ns"},
             // /coalescing(...)/time/between-parcels-histogram@action-name,min,max,buckets
-            {"/coalescing/time/between-parcels-histogram", counter_histogram,
+            {"/coalescing/time/between-parcels-histogram",
+                counter_type::histogram,
                 "returns the histogram for the times between parcels for "
                 "the action which is given by the counter parameter",
                 HPX_PERFORMANCE_COUNTER_V1,

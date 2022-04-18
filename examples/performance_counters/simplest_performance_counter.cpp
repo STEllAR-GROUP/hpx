@@ -38,7 +38,7 @@ void register_counter_type()
         // unit of measure
         "",
         // counter type
-        hpx::performance_counters::counter_monotonically_increasing);
+        hpx::performance_counters::counter_type::monotonically_increasing);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -219,7 +219,7 @@ namespace performance_counters { namespace sine {
             // counter has to be instantiated on and '<instance_id>' is the
             // instance number to use for the particular counter. We allow
             // any arbitrary number of instances.
-            {"/sine/immediate/explicit", counter_raw,
+            {"/sine/immediate/explicit", counter_type::raw,
                 "returns the current value of a sine wave calculated over "
                 "an arbitrary time line (explicit, hand-rolled version)",
                 HPX_PERFORMANCE_COUNTER_V1, &explicit_sine_counter_creator,
@@ -231,7 +231,7 @@ namespace performance_counters { namespace sine {
             // where '<locality_id>' is the number of the locality the
             // counter has to be instantiated on. The function 'immediate_sine'
             // is used as the source of counter data for the created counter.
-            {"/sine/immediate/implicit", counter_raw,
+            {"/sine/immediate/implicit", counter_type::raw,
                 "returns the current value of a sine wave calculated over "
                 "an arbitrary time line (implicit version, using HPX "
                 "facilities)",

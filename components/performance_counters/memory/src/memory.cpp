@@ -20,43 +20,39 @@
 HPX_REGISTER_COMPONENT_MODULE_DYNAMIC()
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace memory
-{
+namespace hpx { namespace performance_counters { namespace memory {
     void register_counter_types()
     {
         namespace pc = hpx::performance_counters;
-        pc::install_counter_type(
-            "/runtime/memory/virtual", &read_psm_virtual,
+        pc::install_counter_type("/runtime/memory/virtual", &read_psm_virtual,
             "returns the amount of virtual memory currently allocated by the "
             "referenced locality",
-            "bytes", pc::counter_raw
-        );
-        pc::install_counter_type(
-            "/runtime/memory/resident", &read_psm_resident,
+            "bytes", pc::counter_type::raw);
+        pc::install_counter_type("/runtime/memory/resident", &read_psm_resident,
             "returns the amount of resident memory currently allocated by the "
             "referenced locality",
-            "bytes", pc::counter_raw
-        );
-#if defined(__linux) || defined(linux) || defined(linux__) || defined(__linux__) \
- || defined(HPX_WINDOWS)
+            "bytes", pc::counter_type::raw);
+#if defined(__linux) || defined(linux) || defined(linux__) ||                  \
+    defined(__linux__) || defined(HPX_WINDOWS)
         // this counter is currently supported on Linux only
-        pc::install_counter_type(
-            "/runtime/memory/total", &read_total_mem_avail,
+        pc::install_counter_type("/runtime/memory/total", &read_total_mem_avail,
             "returns the total available memory on the node", "kB",
-            pc::counter_raw
-        );
+            pc::counter_type::raw);
 #endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_startup(hpx::startup_function_type& startup_func, bool& pre_startup)
+    bool get_startup(
+        hpx::startup_function_type& startup_func, bool& pre_startup)
     {
         // return our startup-function
-        startup_func = register_counter_types;    // function to run during startup
-        pre_startup = true;  // run 'register_counter_types' as pre-startup function
+        startup_func =
+            register_counter_types;    // function to run during startup
+        pre_startup =
+            true;    // run 'register_counter_types' as pre-startup function
         return true;
     }
-}}}
+}}}    // namespace hpx::performance_counters::memory
 
 ///////////////////////////////////////////////////////////////////////////////
 // Register a startup function which will be called as a HPX-thread during
@@ -66,4 +62,3 @@ namespace hpx { namespace performance_counters { namespace memory
 // Note that this macro can be used not more than once in one module.
 HPX_REGISTER_STARTUP_MODULE_DYNAMIC(
     hpx::performance_counters::memory::get_startup)
-
