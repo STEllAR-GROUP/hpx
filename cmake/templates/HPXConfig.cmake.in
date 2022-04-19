@@ -41,6 +41,17 @@ else()
   endif()
 endif()
 
+# Eve can be installed by HPX or externally installed. In the first case we use
+# exported targets, in the second we find Eve again using find_package.
+if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "DATAPAR_EVE")
+  if(HPX_WITH_FETCH_DATAPAR_EVE)
+    include("${CMAKE_CURRENT_LIST_DIR}/HPXEveTarget.cmake")
+  else()
+    set(HPX_EVE_ROOT "@EVE_ROOT@")
+    include(HPX_SetupEVE)
+  endif()
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/HPXInternalTargets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
 

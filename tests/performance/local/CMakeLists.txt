@@ -43,7 +43,7 @@ if(HPX_WITH_LIBCDS)
   set(libcds_hazard_pointer_overhead_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
-if(HPX_WITH_CXX20_EXPERIMENTAL_SIMD OR HPX_WITH_DATAPAR_VC)
+if(HPX_WITH_DATAPAR)
   list(APPEND benchmarks transform_reduce_binary_scaling)
   set(transform_reduce_binary_scaling_FLAGS DEPENDENCIES iostreams_component)
 endif()
