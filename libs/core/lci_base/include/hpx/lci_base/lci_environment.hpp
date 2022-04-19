@@ -15,10 +15,10 @@
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
+#include <atomic>
 #include <cstdlib>
 #include <string>
 #include <thread>
-#include <atomic>
 
 #include <hpx/config/warnings_prefix.hpp>
 

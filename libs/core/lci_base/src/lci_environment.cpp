@@ -7,6 +7,7 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/assert.hpp>
 #include <hpx/modules/lci_base.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
@@ -14,6 +15,7 @@
 
 #include <boost/tokenizer.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdlib>
 #include <string>
