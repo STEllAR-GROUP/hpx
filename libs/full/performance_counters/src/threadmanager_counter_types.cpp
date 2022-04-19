@@ -684,13 +684,15 @@ namespace hpx { namespace performance_counters {
                     &threads::thread_pool_base::get_thread_count_staged),
                 &locality_pool_thread_counter_discoverer, ""},
 #if defined(HPX_HAVE_COROUTINE_COUNTERS)
-            {"/threads/count/stack-recycles", counter_type::monotonically_increasing,
+            {"/threads/count/stack-recycles",
+                counter_type::monotonically_increasing,
                 "returns the total number of HPX-thread recycling operations "
                 "performed for the referenced locality",
                 HPX_PERFORMANCE_COUNTER_V1, counts_creator,
                 &locality_counter_discoverer, ""},
 #if !defined(HPX_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-            {"/threads/count/stack-unbinds", counter_type::monotonically_increasing,
+            {"/threads/count/stack-unbinds",
+                counter_type::monotonically_increasing,
                 "returns the total number of HPX-thread unbind (madvise) "
                 "operations performed for the referenced locality",
                 HPX_PERFORMANCE_COUNTER_V1, counts_creator,
@@ -703,7 +705,8 @@ namespace hpx { namespace performance_counters {
                 &detail::locality_allocator_counter_discoverer, ""},
 #endif
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-            {"/threads/count/pending-misses", counter_type::monotonically_increasing,
+            {"/threads/count/pending-misses",
+                counter_type::monotonically_increasing,
                 "returns the number of times that the referenced worker-thread "
                 "on the referenced locality failed to find pending HPX-threads "
                 "in its associated queue",

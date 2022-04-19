@@ -938,7 +938,8 @@ namespace hpx {
         performance_counters::generic_counter_type_data
             statistic_counter_types[] =
         {    // averaging counter
-            {"/statistics/average", performance_counters::counter_type::aggregating,
+            {"/statistics/average",
+                performance_counters::counter_type::aggregating,
                 "returns the averaged value of its base counter over "
                 "an arbitrary time line; pass required base counter as the "
                 "instance "
@@ -948,7 +949,8 @@ namespace hpx {
                 &performance_counters::default_counter_discoverer, ""},
 
             // stddev counter
-            {"/statistics/stddev", performance_counters::counter_type::aggregating,
+            {"/statistics/stddev",
+                performance_counters::counter_type::aggregating,
                 "returns the standard deviation value of its base counter "
                 "over "
                 "an arbitrary time line; pass required base counter as the "
@@ -983,7 +985,8 @@ namespace hpx {
                 &performance_counters::default_counter_discoverer, ""},
 
             // median counter
-            {"/statistics/median", performance_counters::counter_type::aggregating,
+            {"/statistics/median",
+                performance_counters::counter_type::aggregating,
                 "returns the median value of its base counter over "
                 "an arbitrary time line; pass required base counter as the "
                 "instance "
@@ -1038,7 +1041,8 @@ namespace hpx {
 
             // uptime counters
             {
-                "/runtime/uptime", performance_counters::counter_type::elapsed_time,
+                "/runtime/uptime",
+                performance_counters::counter_type::elapsed_time,
                 "returns the up time of the runtime instance for the "
                 "referenced "
                 "locality",
@@ -1049,7 +1053,8 @@ namespace hpx {
             },
 
             // component instance counters
-            {"/runtime/count/component", performance_counters::counter_type::raw,
+            {"/runtime/count/component",
+                performance_counters::counter_type::raw,
                 "returns the number of component instances currently alive "
                 "on "
                 "this locality (the component type has to be specified as "

@@ -39,7 +39,8 @@ namespace hpx { namespace performance_counters { namespace server {
       , f_(HPX_MOVE(f))
       , reset_(false)
     {
-        if (info.type_ != counter_type::raw && info.type_ != counter_type::elapsed_time &&
+        if (info.type_ != counter_type::raw &&
+            info.type_ != counter_type::elapsed_time &&
             info.type_ != counter_type::aggregating &&
             info.type_ != counter_type::monotonically_increasing &&
             info.type_ != counter_type::average_count &&
