@@ -32,8 +32,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         static HPX_FORCEINLINE bool call(Iter const& it)
         {
             typedef typename std::iterator_traits<Iter>::value_type value_type;
+            typedef typename traits::vector_pack_type<value_type>::type pack_type;
+
             return (reinterpret_cast<std::uintptr_t>(std::addressof(*it)) &
-                       (traits::vector_pack_alignment<value_type>::value -
+                       (traits::vector_pack_alignment<pack_type>::value -
                            1)) == 0;
         }
     };
@@ -56,11 +58,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         typedef typename std::iterator_traits<iterator2_type>::value_type
             value2_type;
 
+        typedef typename traits::vector_pack_type<value1_type>::type pack1_type;
+        typedef typename traits::vector_pack_type<value2_type>::type pack2_type;
+
         typedef std::integral_constant<bool,
-            traits::vector_pack_size<value1_type>::value ==
-                    traits::vector_pack_size<value2_type>::value &&
-                traits::vector_pack_alignment<value1_type>::value ==
-                    traits::vector_pack_alignment<value2_type>::value>
+            traits::vector_pack_size<pack1_type>::value ==
+                    traits::vector_pack_size<pack2_type>::value &&
+                traits::vector_pack_alignment<pack1_type>::value ==
+                    traits::vector_pack_alignment<pack1_type>::value>
             type;
     };
 
@@ -91,116 +96,6 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename V, typename Enable = void>
-    struct store_on_exit
-    {
-        typedef V pack_type;
-        typedef typename std::iterator_traits<Iter>::value_type value_type;
-
-        store_on_exit(Iter const& iter)
-          : value_(traits::vector_pack_load<V, value_type>::aligned(iter))
-          , iter_(iter)
-        {
-        }
-        ~store_on_exit()
-        {
-            traits::vector_pack_store<V, value_type>::aligned(value_, iter_);
-        }
-
-        pack_type* operator&()
-        {
-            return &value_;
-        }
-        pack_type const* operator&() const
-        {
-            return &value_;
-        }
-
-        pack_type value_;
-        Iter iter_;
-    };
-
-    template <typename Iter, typename V>
-    struct store_on_exit<Iter, V,
-        typename std::enable_if<std::is_const<
-            typename std::iterator_traits<Iter>::value_type>::value>::type>
-    {
-        typedef V pack_type;
-        typedef typename std::iterator_traits<Iter>::value_type value_type;
-
-        store_on_exit(Iter const& iter)
-          : value_(traits::vector_pack_load<V, value_type>::aligned(iter))
-        {
-        }
-
-        pack_type* operator&()
-        {
-            return &value_;
-        }
-        pack_type const* operator&() const
-        {
-            return &value_;
-        }
-
-        pack_type value_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename V, typename Enable = void>
-    struct store_on_exit_unaligned
-    {
-        typedef V pack_type;
-        typedef typename std::iterator_traits<Iter>::value_type value_type;
-
-        store_on_exit_unaligned(Iter const& iter)
-          : value_(traits::vector_pack_load<V, value_type>::unaligned(iter))
-          , iter_(iter)
-        {
-        }
-        ~store_on_exit_unaligned()
-        {
-            traits::vector_pack_store<V, value_type>::unaligned(value_, iter_);
-        }
-
-        pack_type* operator&()
-        {
-            return &value_;
-        }
-        pack_type const* operator&() const
-        {
-            return &value_;
-        }
-
-        pack_type value_;
-        Iter iter_;
-    };
-
-    template <typename Iter, typename V>
-    struct store_on_exit_unaligned<Iter, V,
-        typename std::enable_if<std::is_const<
-            typename std::iterator_traits<Iter>::value_type>::value>::type>
-    {
-        typedef V pack_type;
-        typedef typename std::iterator_traits<Iter>::value_type value_type;
-
-        store_on_exit_unaligned(Iter const& iter)
-          : value_(traits::vector_pack_load<V, value_type>::unaligned(iter))
-        {
-        }
-
-        pack_type* operator&()
-        {
-            return &value_;
-        }
-        pack_type const* operator&() const
-        {
-            return &value_;
-        }
-
-        pack_type value_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>
     struct datapar_loop_step
     {
@@ -212,9 +107,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         template <typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static void call1(F&& f, Iter& it)
         {
-            V1 tmp(traits::vector_pack_load<V1, value_type>::aligned(it));
+            V1 tmp(traits::vector_pack_load<V1, value_type>::unaligned(it));
             HPX_INVOKE(f, &tmp);
-            traits::vector_pack_store<V1, value_type>::aligned(tmp, it);
+            traits::vector_pack_store<V1, value_type>::unaligned(tmp, it);
             ++it;
         }
 
@@ -240,9 +135,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         template <typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static void call1(F&& f, Iter& it)
         {
-            V1 tmp(traits::vector_pack_load<V1, value_type>::aligned(it));
+            V1 tmp(traits::vector_pack_load<V1, value_type>::unaligned(it));
             HPX_INVOKE(f, tmp);
-            traits::vector_pack_store<V1, value_type>::aligned(tmp, it);
+            traits::vector_pack_store<V1, value_type>::unaligned(tmp, it);
             ++it;
         }
 
@@ -269,9 +164,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static void call1(
             F&& f, Iter& it, std::size_t base_idx)
         {
-            V1 tmp(traits::vector_pack_load<V1, value_type>::aligned(it));
+            V1 tmp(traits::vector_pack_load<V1, value_type>::unaligned(it));
             HPX_INVOKE(f, tmp, base_idx);
-            traits::vector_pack_store<V1, value_type>::aligned(tmp, it);
+            traits::vector_pack_store<V1, value_type>::unaligned(tmp, it);
         }
 
         template <typename F>
@@ -296,9 +191,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         template <typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static void call1(F&& f, Iter& it)
         {
-            V1 tmp(traits::vector_pack_load<V1, value_type>::aligned(it));
+            V1 tmp(traits::vector_pack_load<V1, value_type>::unaligned(it));
             HPX_INVOKE(f, &tmp);
-            traits::vector_pack_store<V1, value_type>::aligned(tmp, it);
+            traits::vector_pack_store<V1, value_type>::unaligned(tmp, it);
         }
 
         template <typename F>
@@ -425,7 +320,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             typename hpx::util::invoke_result<F, V11*, V12*>::type
             call1(F&& f, Iter1& it1, Iter2& it2)
         {
-            return invoke_vectorized_in2<V11, V12>::call_aligned(
+            return invoke_vectorized_in2<V11, V12>::call_unaligned(
                 HPX_FORWARD(F, f), it1, it2);
         }
 
@@ -434,12 +329,6 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             typename hpx::util::invoke_result<F, V1*, V2*>::type
             callv(F&& f, Iter1& it1, Iter2& it2)
         {
-            if (!is_data_aligned(it1) || !is_data_aligned(it2))
-            {
-                return invoke_vectorized_in2<V1, V2>::call_unaligned(
-                    HPX_FORWARD(F, f), it1, it2);
-            }
-
             return invoke_vectorized_in2<V1, V2>::call_aligned(
                 HPX_FORWARD(F, f), it1, it2);
         }
@@ -492,7 +381,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 ret, dest);
 
             std::advance(it, traits::vector_pack_size<V>::value);
-            std::advance(dest, ret.size());
+            std::advance(dest, traits::vector_pack_size<decltype(ret)>::value);
         }
 
         template <typename F, typename InIter, typename OutIter>
@@ -509,7 +398,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 ret, dest);
 
             std::advance(it, traits::vector_pack_size<V>::value);
-            std::advance(dest, ret.size());
+            std::advance(dest, traits::vector_pack_size<decltype(ret)>::value);
         }
     };
 
@@ -530,7 +419,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 ret, dest);
 
             std::advance(it, traits::vector_pack_size<V>::value);
-            std::advance(dest, ret.size());
+            std::advance(dest, traits::vector_pack_size<decltype(ret)>::value);
         }
 
         template <typename F, typename InIter, typename OutIter>
@@ -547,7 +436,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 ret, dest);
 
             std::advance(it, traits::vector_pack_size<V>::value);
-            std::advance(dest, ret.size());
+            std::advance(dest, traits::vector_pack_size<decltype(ret)>::value);
         }
     };
 
@@ -577,7 +466,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             std::advance(it1, traits::vector_pack_size<V1>::value);
             std::advance(it2, traits::vector_pack_size<V2>::value);
-            std::advance(dest, ret.size());
+            std::advance(dest, traits::vector_pack_size<decltype(ret)>::value);
         }
 
         template <typename F, typename InIter1, typename InIter2,
@@ -603,7 +492,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             std::advance(it1, traits::vector_pack_size<V1>::value);
             std::advance(it2, traits::vector_pack_size<V2>::value);
-            std::advance(dest, ret.size());
+            std::advance(dest, traits::vector_pack_size<decltype(ret)>::value);
         }
     };
 
@@ -633,7 +522,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             std::advance(it1, traits::vector_pack_size<V1>::value);
             std::advance(it2, traits::vector_pack_size<V2>::value);
-            std::advance(dest, ret.size());
+            std::advance(dest, traits::vector_pack_size<decltype(ret)>::value);
         }
 
         template <typename F, typename InIter1, typename InIter2,
@@ -659,7 +548,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             std::advance(it1, traits::vector_pack_size<V1>::value);
             std::advance(it2, traits::vector_pack_size<V2>::value);
-            std::advance(dest, ret.size());
+            std::advance(dest, traits::vector_pack_size<decltype(ret)>::value);
         }
     };
 

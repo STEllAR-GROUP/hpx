@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX20_EXPERIMENTAL_SIMD)
+#if defined(HPX_HAVE_DATAPAR_STD_EXPERIMENTAL_SIMD)
 #include <cstddef>
 #include <type_traits>
 
@@ -24,15 +24,7 @@ namespace hpx { namespace parallel { namespace traits {
     };
 
     template <typename T>
-    struct is_vector_pack<
-        std::experimental::simd<T, std::experimental::simd_abi::fixed_size<1>>>
-      : std::false_type
-    {
-    };
-
-    template <typename T>
-    struct is_vector_pack<
-        std::experimental::simd<T, std::experimental::simd_abi::scalar>>
+    struct is_vector_pack<T>
       : std::false_type
     {
     };
@@ -45,15 +37,7 @@ namespace hpx { namespace parallel { namespace traits {
     };
 
     template <typename T>
-    struct is_scalar_vector_pack<
-        std::experimental::simd<T, std::experimental::simd_abi::fixed_size<1>>>
-      : std::true_type
-    {
-    };
-
-    template <typename T>
-    struct is_scalar_vector_pack<
-        std::experimental::simd<T, std::experimental::simd_abi::scalar>>
+    struct is_scalar_vector_pack<T>
       : std::true_type
     {
     };
@@ -62,8 +46,7 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename T, typename Enable>
     struct vector_pack_alignment
     {
-        static std::size_t const value = std::experimental::memory_alignment_v<
-            std::experimental::native_simd<T>>;
+        static std::size_t const value = sizeof(T);
     };
 
     template <typename T, typename Abi>
@@ -73,29 +56,11 @@ namespace hpx { namespace parallel { namespace traits {
             std::experimental::simd<T, Abi>>;
     };
 
-    template <typename T>
-    struct vector_pack_alignment<
-        std::experimental::simd<T, std::experimental::simd_abi::scalar>>
-    {
-        static std::size_t const value = std::experimental::memory_alignment_v<
-            std::experimental::simd<T, std::experimental::simd_abi::scalar>>;
-    };
-
-    template <typename T>
-    struct vector_pack_alignment<
-        std::experimental::simd<T, std::experimental::simd_abi::fixed_size<1>>>
-    {
-        static std::size_t const value =
-            std::experimental::memory_alignment_v<std::experimental::simd<T,
-                std::experimental::simd_abi::fixed_size<1>>>;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable>
     struct vector_pack_size
     {
-        static std::size_t const value =
-            std::experimental::native_simd<T>::size();
+        static std::size_t const value = 1;
     };
 
     template <typename T, typename Abi>
@@ -103,22 +68,6 @@ namespace hpx { namespace parallel { namespace traits {
     {
         static std::size_t const value =
             std::experimental::simd<T, Abi>::size();
-    };
-
-    template <typename T>
-    struct vector_pack_size<
-        std::experimental::simd<T, std::experimental::simd_abi::scalar>>
-    {
-        static std::size_t const value = std::experimental::simd<T,
-            std::experimental::simd_abi::scalar>::size();
-    };
-
-    template <typename T>
-    struct vector_pack_size<
-        std::experimental::simd<T, std::experimental::simd_abi::fixed_size<1>>>
-    {
-        static std::size_t const value = std::experimental::simd<T,
-            std::experimental::simd_abi::fixed_size<1>>::size();
     };
 }}}    // namespace hpx::parallel::traits
 
