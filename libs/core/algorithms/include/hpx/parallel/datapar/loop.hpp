@@ -12,6 +12,7 @@
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution/traits/vector_pack_alignment_size.hpp>
+#include <hpx/execution/traits/vector_pack_get_set.hpp>
 #include <hpx/execution/traits/vector_pack_load_store.hpp>
 #include <hpx/execution/traits/vector_pack_type.hpp>
 #include <hpx/executors/datapar/execution_policy.hpp>
@@ -44,10 +45,10 @@ namespace hpx { namespace parallel { namespace util {
             typedef typename std::decay<Vector>::type vector_type;
             typedef typename vector_type::value_type entry_type;
 
-            entry_type accum = value[0];
+            entry_type accum = traits::get(value, 0);
             for (size_t i = 1; i != value.size(); ++i)
             {
-                accum = f(accum, entry_type(value[i]));
+                accum = f(accum, entry_type(traits::get(value, i)));
             }
 
             return
@@ -64,7 +65,7 @@ namespace hpx { namespace parallel { namespace util {
         {
             for (size_t i = 0; i != value.size(); ++i)
             {
-                accum = f(accum, T(value[i]));
+                accum = f(accum, T(traits::get(value, i)));
             }
 
             return typename traits::vector_pack_type<T, 1>::type(accum);
