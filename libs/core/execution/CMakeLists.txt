@@ -53,6 +53,12 @@ set(execution_headers
     hpx/execution/queries/get_delegatee_scheduler.hpp
     hpx/execution/queries/get_stop_token.hpp
     hpx/execution/queries/read.hpp
+    hpx/execution/traits/detail/eve/vector_pack_alignment_size.hpp
+    hpx/execution/traits/detail/eve/vector_pack_all_any_none.hpp
+    hpx/execution/traits/detail/eve/vector_pack_count_bits.hpp
+    hpx/execution/traits/detail/eve/vector_pack_find.hpp
+    hpx/execution/traits/detail/eve/vector_pack_load_store.hpp
+    hpx/execution/traits/detail/eve/vector_pack_type.hpp
     hpx/execution/traits/detail/simd/vector_pack_alignment_size.hpp
     hpx/execution/traits/detail/simd/vector_pack_all_any_none.hpp
     hpx/execution/traits/detail/simd/vector_pack_count_bits.hpp
@@ -116,6 +122,10 @@ set(execution_compat_headers
 
 if(TARGET Vc::vc)
   set(execution_optional_dependencies Vc::vc)
+endif()
+
+if (TARGET Eve::eve)
+  set(execution_optional_dependencies Eve::eve)
 endif()
 
 include(HPX_AddModule)

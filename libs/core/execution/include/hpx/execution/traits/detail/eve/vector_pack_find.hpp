@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Srinivas Yadav
+//  Copyright (c) 2022 Srinivas Yadav
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,21 +8,23 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DATAPAR)
+#if defined(HPX_HAVE_DATAPAR_EVE)
+#include <cstddef>
 
-#if !defined(__CUDACC__)
+#include <eve/function/first_true.hpp>
 
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
-    HPX_HOST_DEVICE HPX_FORCEINLINE int find_first_of(bool msk)
+    template <typename Mask>
+    HPX_HOST_DEVICE HPX_FORCEINLINE int find_first_of(Mask const& msk)
     {
-        return msk ? 0 : -1;
+        auto tmp = eve::first_true(msk);
+        if (tmp.has_value())
+        {
+            return tmp.value();
+        }
+        return -1;
     }
 }}}    // namespace hpx::parallel::traits
-
-#include <hpx/execution/traits/detail/eve/vector_pack_find.hpp>
-#include <hpx/execution/traits/detail/simd/vector_pack_find.hpp>
-#include <hpx/execution/traits/detail/vc/vector_pack_find.hpp>
-#endif
 
 #endif
