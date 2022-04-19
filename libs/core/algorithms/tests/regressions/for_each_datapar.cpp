@@ -7,6 +7,7 @@
 #include <hpx/local/algorithm.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/include/datapar.hpp>
 
 #include <algorithm>
 #include <cstddef>
