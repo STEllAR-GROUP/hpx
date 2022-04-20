@@ -33,7 +33,7 @@ namespace hpx { namespace performance_counters { namespace detail {
     {
         switch (info.type_)
         {
-        case counter_raw:
+        case counter_type::raw:
         {
             counter_path_elements paths;
             get_counter_path_elements(info.fullname_, paths, ec);

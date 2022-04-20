@@ -153,7 +153,7 @@ namespace hpx { namespace performance_counters {
     {
         using hpx::placeholders::_1;
         using hpx::placeholders::_2;
-        return install_counter_type(name, counter_raw_values, helptext,
+        return install_counter_type(name, counter_type::raw_values, helptext,
             hpx::bind(
                 &hpx::performance_counters::locality_raw_values_counter_creator,
                 _1, counter_value, _2),

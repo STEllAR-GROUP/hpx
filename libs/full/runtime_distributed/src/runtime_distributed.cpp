@@ -938,7 +938,8 @@ namespace hpx {
         performance_counters::generic_counter_type_data
             statistic_counter_types[] =
         {    // averaging counter
-            {"/statistics/average", performance_counters::counter_type::aggregating,
+            {"/statistics/average",
+                performance_counters::counter_type::aggregating,
                 "returns the averaged value of its base counter over "
                 "an arbitrary time line; pass required base counter as the "
                 "instance "
@@ -948,7 +949,8 @@ namespace hpx {
                 &performance_counters::default_counter_discoverer, ""},
 
             // stddev counter
-            {"/statistics/stddev", performance_counters::counter_type::aggregating,
+            {"/statistics/stddev",
+                performance_counters::counter_type::aggregating,
                 "returns the standard deviation value of its base counter "
                 "over "
                 "an arbitrary time line; pass required base counter as the "
@@ -983,7 +985,8 @@ namespace hpx {
                 &performance_counters::default_counter_discoverer, ""},
 
             // median counter
-            {"/statistics/median", performance_counters::counter_type::aggregating,
+            {"/statistics/median",
+                performance_counters::counter_type::aggregating,
                 "returns the median value of its base counter over "
                 "an arbitrary time line; pass required base counter as the "
                 "instance "
@@ -1038,7 +1041,8 @@ namespace hpx {
 
             // uptime counters
             {
-                "/runtime/uptime", performance_counters::counter_elapsed_time,
+                "/runtime/uptime",
+                performance_counters::counter_type::elapsed_time,
                 "returns the up time of the runtime instance for the "
                 "referenced "
                 "locality",
@@ -1049,7 +1053,8 @@ namespace hpx {
             },
 
             // component instance counters
-            {"/runtime/count/component", performance_counters::counter_raw,
+            {"/runtime/count/component",
+                performance_counters::counter_type::raw,
                 "returns the number of component instances currently alive "
                 "on "
                 "this locality (the component type has to be specified as "
@@ -1062,7 +1067,7 @@ namespace hpx {
 
             // action invocation counters
             {"/runtime/count/action-invocation",
-                performance_counters::counter_raw,
+                performance_counters::counter_type::raw,
                 "returns the number of (local) invocations of a specific "
                 "action "
                 "on this locality (the action type has to be specified as "
@@ -1076,7 +1081,7 @@ namespace hpx {
 
 #if defined(HPX_HAVE_NETWORKING)
             {"/runtime/count/remote-action-invocation",
-                performance_counters::counter_raw,
+                performance_counters::counter_type::raw,
                 "returns the number of (remote) invocations of a specific "
                 "action "
                 "on this locality (the action type has to be specified as "
@@ -1096,7 +1101,8 @@ namespace hpx {
         performance_counters::generic_counter_type_data
             arithmetic_counter_types[] = {
                 // adding counter
-                {"/arithmetics/add", performance_counters::counter_type::aggregating,
+                {"/arithmetics/add",
+                    performance_counters::counter_type::aggregating,
                     "returns the sum of the values of the specified base "
                     "counters; "
                     "pass required base counters as the parameters: "
@@ -1142,7 +1148,8 @@ namespace hpx {
                     &performance_counters::default_counter_discoverer, ""},
 
                 // arithmetics mean counter
-                {"/arithmetics/mean", performance_counters::counter_type::aggregating,
+                {"/arithmetics/mean",
+                    performance_counters::counter_type::aggregating,
                     "returns the average value of all values of the "
                     "specified "
                     "base counters; pass the required base counters as the "
@@ -1179,7 +1186,8 @@ namespace hpx {
                         arithmetics_counter_extended_creator,
                     &performance_counters::default_counter_discoverer, ""},
                 // arithmetics min counter
-                {"/arithmetics/min", performance_counters::counter_type::aggregating,
+                {"/arithmetics/min",
+                    performance_counters::counter_type::aggregating,
                     "returns the minimum value of all values of the "
                     "specified "
                     "base counters; pass the required base counters as the "
@@ -1191,7 +1199,8 @@ namespace hpx {
                         arithmetics_counter_extended_creator,
                     &performance_counters::default_counter_discoverer, ""},
                 // arithmetics max counter
-                {"/arithmetics/max", performance_counters::counter_type::aggregating,
+                {"/arithmetics/max",
+                    performance_counters::counter_type::aggregating,
                     "returns the maximum value of all values of the "
                     "specified "
                     "base counters; pass the required base counters as the "

@@ -69,7 +69,8 @@ namespace hpx { namespace performance_counters {
         using placeholders::_2;
         performance_counters::generic_counter_type_data const counter_types[] =
             {
-                {"/agas/count/cache/entries", performance_counters::counter_raw,
+                {"/agas/count/cache/entries",
+                    performance_counters::counter_type::raw,
                     "returns the number of cache entries in the AGAS cache",
                     HPX_PERFORMANCE_COUNTER_V1,
                     hpx::bind(
@@ -77,7 +78,8 @@ namespace hpx { namespace performance_counters {
                         cache_entries, _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {"/agas/count/cache/hits",
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     "returns the number of cache hits while accessing the AGAS "
                     "cache",
                     HPX_PERFORMANCE_COUNTER_V1,
@@ -86,7 +88,8 @@ namespace hpx { namespace performance_counters {
                         cache_hits, _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {"/agas/count/cache/misses",
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     "returns the number of cache misses while accessing the "
                     "AGAS cache",
                     HPX_PERFORMANCE_COUNTER_V1,
@@ -95,7 +98,8 @@ namespace hpx { namespace performance_counters {
                         cache_misses, _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {"/agas/count/cache/evictions",
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     "returns the number of cache evictions from the AGAS cache",
                     HPX_PERFORMANCE_COUNTER_V1,
                     hpx::bind(
@@ -103,7 +107,8 @@ namespace hpx { namespace performance_counters {
                         cache_evictions, _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {"/agas/count/cache/insertions",
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     "returns the number of cache insertions into the AGAS "
                     "cache",
                     HPX_PERFORMANCE_COUNTER_V1,
@@ -112,7 +117,8 @@ namespace hpx { namespace performance_counters {
                         cache_insertions, _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {"/agas/count/cache/get_entry",
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     "returns the number of invocations of get_entry function "
                     "of the AGAS cache",
                     HPX_PERFORMANCE_COUNTER_V1,
@@ -121,7 +127,8 @@ namespace hpx { namespace performance_counters {
                         cache_get_entry_count, _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {"/agas/count/cache/insert_entry",
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     "returns the number of invocations of insert function of "
                     "the AGAS cache",
                     HPX_PERFORMANCE_COUNTER_V1,
@@ -130,7 +137,8 @@ namespace hpx { namespace performance_counters {
                         cache_insertion_count, _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {"/agas/count/cache/update_entry",
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     "returns the number of invocations of update_entry "
                     "function of the AGAS cache",
                     HPX_PERFORMANCE_COUNTER_V1,
@@ -139,7 +147,8 @@ namespace hpx { namespace performance_counters {
                         cache_update_entry_count, _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {"/agas/count/cache/erase_entry",
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     "returns the number of invocations of erase_entry function "
                     "of the AGAS cache",
                     HPX_PERFORMANCE_COUNTER_V1,
@@ -148,7 +157,8 @@ namespace hpx { namespace performance_counters {
                         cache_erase_entry_count, _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {"/agas/time/cache/get_entry",
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     "returns the overall time spent executing of the get_entry "
                     "API function of the AGAS cache",
                     HPX_PERFORMANCE_COUNTER_V1,
@@ -157,7 +167,8 @@ namespace hpx { namespace performance_counters {
                         cache_get_entry_time, _2),
                     &performance_counters::locality_counter_discoverer, "ns"},
                 {"/agas/time/cache/insert_entry",
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     "returns the overall time spent executing of the "
                     "insert_entry API function of the AGAS cache",
                     HPX_PERFORMANCE_COUNTER_V1,
@@ -166,7 +177,8 @@ namespace hpx { namespace performance_counters {
                         cache_insertion_time, _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {"/agas/time/cache/update_entry",
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     "returns the overall time spent executing of the "
                     "update_entry API function of the AGAS cache",
                     HPX_PERFORMANCE_COUNTER_V1,
@@ -175,7 +187,8 @@ namespace hpx { namespace performance_counters {
                         cache_update_entry_time, _2),
                     &performance_counters::locality_counter_discoverer, "ns"},
                 {"/agas/time/cache/erase_entry",
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     "returns the overall time spent executing of the "
                     "erase_entry API function of the AGAS cache",
                     HPX_PERFORMANCE_COUNTER_V1,

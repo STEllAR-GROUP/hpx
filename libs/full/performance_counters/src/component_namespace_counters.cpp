@@ -58,14 +58,15 @@ namespace hpx { namespace agas { namespace server {
                 help = hpx::util::format("returns the number of invocations "
                                          "of the AGAS service '{}'",
                     name.substr(p + 1));
-                type = performance_counters::counter_monotonically_increasing;
+                type = performance_counters::counter_type::
+                    monotonically_increasing;
             }
             else
             {
                 help = hpx::util::format("returns the overall execution "
                                          "time of the AGAS service '{}'",
                     name.substr(p + 1));
-                type = performance_counters::counter_elapsed_time;
+                type = performance_counters::counter_type::elapsed_time;
             }
 
             performance_counters::install_counter_type(
@@ -103,13 +104,14 @@ namespace hpx { namespace agas { namespace server {
             {
                 help = "returns the overall number of invocations of all "
                        "component AGAS services";
-                type = performance_counters::counter_monotonically_increasing;
+                type = performance_counters::counter_type::
+                    monotonically_increasing;
             }
             else
             {
                 help = "returns the overall execution time of all "
                        "component AGAS services";
-                type = performance_counters::counter_elapsed_time;
+                type = performance_counters::counter_type::elapsed_time;
             }
 
             performance_counters::install_counter_type(

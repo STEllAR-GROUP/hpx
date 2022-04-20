@@ -128,7 +128,7 @@ void register_counter_type()
 {
     // Call the HPX API function to register the counter type.
     hpx::performance_counters::install_counter_type("/test/reinit-values",
-        hpx::performance_counters::counter_raw_values,
+        hpx::performance_counters::counter_type::raw_values,
         "returns an array of linearly increasing counter values, supports "
         "reinit",
         &test_counter_creator,

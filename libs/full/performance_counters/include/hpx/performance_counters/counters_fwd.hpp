@@ -168,9 +168,11 @@ namespace hpx { namespace performance_counters {
     inline constexpr counter_type counter_average_base =
         counter_type::average_base;
     HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    inline constexpr counter_type average_count = counter_type::average_count;
+    inline constexpr counter_type counter_average_count =
+        counter_type::average_count;
     HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    inline constexpr counter_type aggregating = counter_type::aggregating;
+    inline constexpr counter_type counter_aggregating =
+        counter_type::aggregating;
     HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
     inline constexpr counter_type counter_average_timer =
         counter_type::average_timer;

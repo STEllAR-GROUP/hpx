@@ -58,44 +58,45 @@ namespace hpx { namespace performance_counters {
 
 #if defined(DOXYGEN)
     ///////////////////////////////////////////////////////////////////////////
-    enum counter_type
+    enum class counter_type
     {
-        /// \a counter_text shows a variable-length text string. It does not
+        /// \a text shows a variable-length text string. It does not
         /// deliver calculated values.
         ///
         /// Formula:  None
         /// Average:  None
         /// Type:     Text
-        counter_text,
+        text,
 
-        /// \a counter_raw shows the last observed value only. It does
+        /// \a raw shows the last observed value only. It does
         /// not deliver an average.
         ///
         /// Formula:  None. Shows raw data as collected.
         /// Average:  None
         /// Type:     Instantaneous
-        counter_raw,
+        raw,
 
-        // \a counter_raw shows the cumulatively accumulated observed value.
-        // It does not deliver an average.
-        //
-        // Formula:  None. Shows cumulatively accumulated data as collected.
-        // Average:  None
-        // Type:     Instantaneous
-        counter_monotonically_increasing,
+        /// \a monotonically_increasing shows the cumulatively accumulated
+        /// observed value. It does not deliver an average.
+        ///
+        /// Formula:  None. Shows cumulatively accumulated data as collected.
+        /// Average:  None
+        /// Type:     Instantaneous
+        monotonically_increasing,
 
-        /// \a counter_average_base is used as the base data (denominator) in the
-        /// computation of time or count averages for the \a counter_average_count
-        /// and \a counter_average_timer counter types. This counter type
-        /// collects the last observed value only.
+        /// \a average_base is used as the base data (denominator) in the
+        /// computation of time or count averages for the
+        /// \a counter_type::average_count and \a counter_type::average_timer
+        /// counter types.
+        /// This counter type collects the last observed value only.
         ///
         /// Formula:  None. This counter uses raw data in factional calculations
-        ///           without delivering an output.
-        /// Average:  SUM (N) / x
-        /// Type:     Instantaneous
-        counter_average_base,
+        /// without delivering an output.
+        /// Average:  SUM (N) / x Type:
+        /// Instantaneous
+        average_base,
 
-        /// \a counter_average_count shows how many items are processed, on
+        /// \a average_count shows how many items are processed, on
         /// average, during an operation. Counters of this type display a ratio
         /// of the items processed (such as bytes sent) to the number of
         /// operations completed. The ratio is calculated by comparing the
@@ -109,16 +110,16 @@ namespace hpx { namespace performance_counters {
         ///           intervals.
         /// Average:  (Nx - N0) / (Dx - D0)
         /// Type:     Average
-        counter_average_count,
+        average_count,
 
-        /// \a counter_aggregating applies a function to an embedded counter
+        /// \a aggregating applies a function to an embedded counter
         /// instance. The embedded counter is usually evaluated repeatedly
         /// after a fixed (but configurable) time interval.
         ///
         /// Formula:  F(Nx)
-        counter_aggregating,
+        aggregating,
 
-        /// \a counter_average_timer measures the average time it takes to
+        /// \a average_timer measures the average time it takes to
         /// complete a process or operation. Counters of this type display a
         /// ratio of the total elapsed time of the sample interval to the
         /// number of processes or operations completed during that time. This
@@ -135,9 +136,9 @@ namespace hpx { namespace performance_counters {
         ///           interval.
         /// Average:  ((Nx - N0) / F) / (Dx - D0)
         /// Type:     Average
-        counter_average_timer,
+        average_timer,
 
-        /// \a counter_elapsed_time shows the total time between when the
+        /// \a elapsed_time shows the total time between when the
         /// component or process started and the time when this value is
         /// calculated. The variable F represents the number of time units that
         /// elapse in one second. The value of F is factored into the equation
@@ -149,9 +150,9 @@ namespace hpx { namespace performance_counters {
         ///           number of time units that elapse in one second.
         /// Average:  (Dx - N0) / F
         /// Type:     Difference
-        counter_elapsed_time,
+        elapsed_time,
 
-        /// \a counter_histogram exposes a histogram of the measured values
+        /// \a histogram exposes a histogram of the measured values
         /// instead of a single value as many of the other counter types.
         /// Counters of this type expose a \a counter_value_array instead of a
         /// \a counter_value. Those will also not implement the
@@ -162,15 +163,15 @@ namespace hpx { namespace performance_counters {
         /// and upper boundaries, and the size of the histogram buckets. All
         /// remaining values in the returned array represent the number of
         /// measurements for each of the buckets in the histogram.
-        counter_histogram,
+        histogram,
 
-        /// \a counter_raw_values exposes an array of measured values
+        /// \a raw_values exposes an array of measured values
         /// instead of a single value as many of the other counter types.
         /// Counters of this type expose a \a counter_value_array instead of a
         /// \a counter_value. Those will also not implement the
         /// \a get_counter_value() functionality. The results are exposed
         /// through a separate \a get_counter_values_array() function.
-        counter_raw_values
+        raw_values
     };
 #endif
 
@@ -315,7 +316,7 @@ namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     struct counter_info
     {
-        counter_info(counter_type type = counter_raw)
+        counter_info(counter_type type = counter_type::raw)
           : type_(type)
           , version_(HPX_PERFORMANCE_COUNTER_V1)
           , status_(status_invalid_data)
@@ -323,7 +324,7 @@ namespace hpx { namespace performance_counters {
         }
 
         counter_info(std::string const& name)
-          : type_(counter_raw)
+          : type_(counter_type::raw)
           , version_(HPX_PERFORMANCE_COUNTER_V1)
           , status_(status_invalid_data)
           , fullname_(name)

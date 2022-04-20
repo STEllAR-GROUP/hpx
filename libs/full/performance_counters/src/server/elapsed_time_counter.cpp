@@ -36,7 +36,7 @@ namespace hpx { namespace performance_counters { namespace server {
     elapsed_time_counter::elapsed_time_counter(counter_info const& info)
       : base_type_holder(info)
     {
-        if (info.type_ != counter_elapsed_time)
+        if (info.type_ != counter_type::elapsed_time)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "elapsed_time_counter::elapsed_time_counter",
@@ -105,7 +105,7 @@ namespace hpx { namespace performance_counters { namespace detail {
     {
         switch (info.type_)
         {
-        case counter_elapsed_time:
+        case counter_type::elapsed_time:
         {
             // verify the validity of the counter instance name
             counter_path_elements paths;

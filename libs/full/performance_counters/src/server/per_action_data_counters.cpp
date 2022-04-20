@@ -64,9 +64,9 @@ namespace hpx { namespace performance_counters {
     {
         switch (info.type_)
         {
-        case counter_elapsed_time:
+        case counter_type::elapsed_time:
             [[fallthrough]];
-        case counter_monotonically_increasing:
+        case counter_type::monotonically_increasing:
         {
             counter_path_elements paths;
             get_counter_path_elements(info.fullname_, paths, ec);

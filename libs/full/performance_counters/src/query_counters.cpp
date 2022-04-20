@@ -124,24 +124,24 @@ namespace hpx { namespace util {
     namespace strings {
 
         char const* const counter_type_short_names[] = {
-            "text",
-            "instant",
-            "monoinc",
-            "avgbase",
-            "avgcount",
-            "aggregated",
-            "avgtime",
-            "elapsed",
-            "histogram",
-            "values",
+            "counter_type::text",
+            "counter_type::raw",
+            "counter_type::monotonically_increasing",
+            "counter_type::average_base",
+            "counter_type::average_count",
+            "counter_type::aggregated",
+            "counter_type::average_timer",
+            "counter_type::elapsed_time",
+            "counter_type::histogram",
+            "counter_type::raw_values",
         };
     }
 
     char const* get_counter_short_type_name(
         performance_counters::counter_type type)
     {
-        if (type < performance_counters::counter_text ||
-            type > performance_counters::counter_raw_values)
+        if (type < performance_counters::counter_type::text ||
+            type > performance_counters::counter_type::raw_values)
         {
             return "unknown";
         }
@@ -325,7 +325,8 @@ namespace hpx { namespace util {
                 {
                     using namespace performance_counters;
                     if (infos[i].type_ != counter_type::raw &&
-                        infos[i].type_ != counter_type::monotonically_increasing &&
+                        infos[i].type_ !=
+                            counter_type::monotonically_increasing &&
                         infos[i].type_ != counter_type::aggregating &&
                         infos[i].type_ != counter_type::elapsed_time &&
                         infos[i].type_ != counter_type::average_count &&
@@ -343,9 +344,9 @@ namespace hpx { namespace util {
                 for (std::size_t i = 0; i != infos.size(); ++i)
                 {
                     if (infos[i].type_ !=
-                            performance_counters::counter_histogram &&
+                            performance_counters::counter_type::histogram &&
                         infos[i].type_ !=
-                            performance_counters::counter_raw_values)
+                            performance_counters::counter_type::raw_values)
                     {
                         continue;
                     }
@@ -366,7 +367,8 @@ namespace hpx { namespace util {
                 {
                     using namespace performance_counters;
                     if (infos[i].type_ != counter_type::raw &&
-                        infos[i].type_ != counter_type::monotonically_increasing &&
+                        infos[i].type_ !=
+                            counter_type::monotonically_increasing &&
                         infos[i].type_ != counter_type::aggregating &&
                         infos[i].type_ != counter_type::elapsed_time &&
                         infos[i].type_ != counter_type::average_count &&
@@ -384,9 +386,9 @@ namespace hpx { namespace util {
                 for (std::size_t i = 0; i != counter_shortnames_.size(); ++i)
                 {
                     if (infos[i].type_ !=
-                            performance_counters::counter_histogram &&
+                            performance_counters::counter_type::histogram &&
                         infos[i].type_ !=
-                            performance_counters::counter_raw_values)
+                            performance_counters::counter_type::raw_values)
                     {
                         continue;
                     }
@@ -513,8 +515,10 @@ namespace hpx { namespace util {
 
         for (std::size_t i = 0; i != infos.size(); ++i)
         {
-            if (infos[i].type_ == performance_counters::counter_histogram ||
-                infos[i].type_ == performance_counters::counter_raw_values)
+            if (infos[i].type_ ==
+                    performance_counters::counter_type::histogram ||
+                infos[i].type_ ==
+                    performance_counters::counter_type::raw_values)
             {
                 continue;
             }
@@ -567,8 +571,10 @@ namespace hpx { namespace util {
 
         for (std::size_t i = 0; i != infos.size(); ++i)
         {
-            if (infos[i].type_ != performance_counters::counter_histogram &&
-                infos[i].type_ != performance_counters::counter_raw_values)
+            if (infos[i].type_ !=
+                    performance_counters::counter_type::histogram &&
+                infos[i].type_ !=
+                    performance_counters::counter_type::raw_values)
             {
                 continue;
             }

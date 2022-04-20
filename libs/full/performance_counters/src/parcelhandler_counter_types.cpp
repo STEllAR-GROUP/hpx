@@ -105,7 +105,8 @@ namespace hpx::performance_counters {
         performance_counters::generic_counter_type_data const counter_types[] =
             {
                 {hpx::util::format("/parcels/count/{}/sent", pp_type),
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     hpx::util::format(
                         "returns the number of parcels sent using the {} "
                         "connection type for the referenced locality",
@@ -124,7 +125,8 @@ namespace hpx::performance_counters {
 #endif
                     ""},
                 {hpx::util::format("/parcels/count/{}/received", pp_type),
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     hpx::util::format(
                         "returns the number of parcels received using the {} "
                         "connection type for the referenced locality",
@@ -143,7 +145,8 @@ namespace hpx::performance_counters {
 #endif
                     ""},
                 {hpx::util::format("/messages/count/{}/sent", pp_type),
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     hpx::util::format(
                         "returns the number of messages sent using the {} "
                         "connection type for the referenced locality",
@@ -154,7 +157,8 @@ namespace hpx::performance_counters {
                         HPX_MOVE(num_message_sends), _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {hpx::util::format("/messages/count/{}/received", pp_type),
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     hpx::util::format(
                         "returns the number of messages received using the {} "
                         "connection type for the referenced locality",
@@ -166,7 +170,7 @@ namespace hpx::performance_counters {
                     &performance_counters::locality_counter_discoverer, ""},
 
                 {hpx::util::format("/data/time/{}/sent", pp_type),
-                    performance_counters::counter_elapsed_time,
+                    performance_counters::counter_type::elapsed_time,
                     hpx::util::format(
                         "returns the total time between the start of each "
                         "asynchronous write and the invocation of the write "
@@ -179,7 +183,7 @@ namespace hpx::performance_counters {
                         HPX_MOVE(sending_time), _2),
                     &performance_counters::locality_counter_discoverer, "ns"},
                 {hpx::util::format("/data/time/{}/received", pp_type),
-                    performance_counters::counter_elapsed_time,
+                    performance_counters::counter_type::elapsed_time,
                     hpx::util::format(
                         "returns the total time between the start of each "
                         "asynchronous read and the invocation of the read "
@@ -192,7 +196,7 @@ namespace hpx::performance_counters {
                         HPX_MOVE(receiving_time), _2),
                     &performance_counters::locality_counter_discoverer, "ns"},
                 {hpx::util::format("/serialize/time/{}/sent", pp_type),
-                    performance_counters::counter_elapsed_time,
+                    performance_counters::counter_type::elapsed_time,
                     hpx::util::format(
                         "returns the total time required to serialize all sent "
                         "parcels using the {} connection type for the "
@@ -212,7 +216,7 @@ namespace hpx::performance_counters {
 #endif
                     "ns"},
                 {hpx::util::format("/serialize/time/{}/received", pp_type),
-                    performance_counters::counter_elapsed_time,
+                    performance_counters::counter_type::elapsed_time,
                     hpx::util::format(
                         "returns the total time required to de-serialize all "
                         "received parcels using the {} connection type for the "
@@ -233,7 +237,8 @@ namespace hpx::performance_counters {
                     "ns"},
 
                 {hpx::util::format("/data/count/{}/sent", pp_type),
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     hpx::util::format(
                         "returns the amount of (uncompressed) parcel argument "
                         "data sent using the {} connection type by the "
@@ -246,7 +251,8 @@ namespace hpx::performance_counters {
                     &performance_counters::locality_counter_discoverer,
                     "bytes"},
                 {hpx::util::format("/data/count/{}/received", pp_type),
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     hpx::util::format(
                         "returns the amount of (uncompressed) parcel argument "
                         "data received using the {} connection type by the "
@@ -259,7 +265,8 @@ namespace hpx::performance_counters {
                     &performance_counters::locality_counter_discoverer,
                     "bytes"},
                 {hpx::util::format("/serialize/count/{}/sent", pp_type),
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     hpx::util::format(
                         "returns the amount of parcel data (including headers, "
                         "possibly compressed) sent using the {} connection "
@@ -279,7 +286,8 @@ namespace hpx::performance_counters {
 #endif
                     "bytes"},
                 {hpx::util::format("/serialize/count/{}/received", pp_type),
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     hpx::util::format(
                         "returns the amount of parcel data (including headers, "
                         "possibly compressed) received using the {} connection "
@@ -300,7 +308,7 @@ namespace hpx::performance_counters {
                     "bytes"},
                 {hpx::util::format(
                      "/parcels/time/{}/buffer_allocate/received", pp_type),
-                    performance_counters::counter_elapsed_time,
+                    performance_counters::counter_type::elapsed_time,
                     hpx::util::format(
                         "returns the time needed to allocate the buffers for "
                         "serializing using the {} connection type",
@@ -312,7 +320,7 @@ namespace hpx::performance_counters {
                     &performance_counters::locality_counter_discoverer, "ns"},
                 {hpx::util::format(
                      "/parcels/time/{}/buffer_allocate/sent", pp_type),
-                    performance_counters::counter_elapsed_time,
+                    performance_counters::counter_type::elapsed_time,
                     hpx::util::format(
                         "returns the time needed to allocate the buffers for "
                         "serializing using the {} connection type",
@@ -365,7 +373,7 @@ namespace hpx::performance_counters {
             connection_cache_types[] = {
                 {hpx::util::format(
                      "/parcelport/count/{}/cache-insertions", pp_type),
-                    performance_counters::counter_raw,
+                    performance_counters::counter_type::raw,
                     hpx::util::format(
                         "returns the number of cache insertions while "
                         "accessing the connection cache for the {} connection "
@@ -378,7 +386,7 @@ namespace hpx::performance_counters {
                     &performance_counters::locality_counter_discoverer, ""},
                 {hpx::util::format(
                      "/parcelport/count/{}/cache-evictions", pp_type),
-                    performance_counters::counter_raw,
+                    performance_counters::counter_type::raw,
                     hpx::util::format(
                         "returns the number of cache evictions while accessing "
                         "the connection cache for the {} connection type on "
@@ -390,7 +398,7 @@ namespace hpx::performance_counters {
                         HPX_MOVE(cache_evictions), _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {hpx::util::format("/parcelport/count/{}/cache-hits", pp_type),
-                    performance_counters::counter_raw,
+                    performance_counters::counter_type::raw,
                     hpx::util::format(
                         "returns the number of cache hits while accessing the "
                         "connection cache for the {} connection type on the "
@@ -403,7 +411,7 @@ namespace hpx::performance_counters {
                     &performance_counters::locality_counter_discoverer, ""},
                 {hpx::util::format(
                      "/parcelport/count/{}/cache-misses", pp_type),
-                    performance_counters::counter_raw,
+                    performance_counters::counter_type::raw,
                     hpx::util::format(
                         "returns the number of cache misses while accessing "
                         "the connection cache for the {} connection type on "
@@ -416,7 +424,7 @@ namespace hpx::performance_counters {
                     &performance_counters::locality_counter_discoverer, ""},
                 {hpx::util::format(
                      "/parcelport/count/{}/cache-reclaims", pp_type),
-                    performance_counters::counter_raw,
+                    performance_counters::counter_type::raw,
                     hpx::util::format(
                         "returns the number of cache reclaims while accessing "
                         "the connection cache for the {} connection type on "
@@ -456,14 +464,16 @@ namespace hpx::performance_counters {
             hpx::bind_front(&parcelhandler::get_parcel_routed_count, &ph));
 
         performance_counters::generic_counter_type_data const counter_types[] =
-            {{"/parcelqueue/length/receive", performance_counters::counter_raw,
+            {{"/parcelqueue/length/receive",
+                 performance_counters::counter_type::raw,
                  "returns the number current length of the queue of incoming "
                  "parcels",
                  HPX_PERFORMANCE_COUNTER_V1,
                  hpx::bind(&performance_counters::locality_raw_counter_creator,
                      _1, incoming_queue_length, _2),
                  &performance_counters::locality_counter_discoverer, ""},
-                {"/parcelqueue/length/send", performance_counters::counter_raw,
+                {"/parcelqueue/length/send",
+                    performance_counters::counter_type::raw,
                     "returns the number current length of the queue of "
                     "outgoing parcels",
                     HPX_PERFORMANCE_COUNTER_V1,
@@ -472,7 +482,8 @@ namespace hpx::performance_counters {
                         outgoing_queue_length, _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {"/parcels/count/routed",
-                    performance_counters::counter_monotonically_increasing,
+                    performance_counters::counter_type::
+                        monotonically_increasing,
                     "returns the number of (outbound) parcel routed through "
                     "the responsible AGAS service",
                     HPX_PERFORMANCE_COUNTER_V1,

@@ -42,12 +42,14 @@ namespace hpx { namespace performance_counters { namespace server {
       , f_(HPX_MOVE(f))
       , reset_(false)
     {
-        if (info.type_ != counter_histogram && info.type_ != counter_raw_values)
+        if (info.type_ != counter_type::histogram &&
+            info.type_ != counter_type::raw_values)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "raw_values_counter::raw_values_counter",
                 "unexpected counter type specified for raw_values_counter "
-                "should be counter_histogram or counter_raw_values");
+                "should be counter_type::histogram or "
+                "counter_type::raw_values");
         }
     }
 

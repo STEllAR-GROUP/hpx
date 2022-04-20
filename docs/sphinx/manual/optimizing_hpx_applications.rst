@@ -326,17 +326,17 @@ Providing more information about all available counters,
    appropriate sequence number)
    ------------------------------------------------------------------------------
    fullname: /agas/count/allocate helptext: returns the number of invocations of
-   the AGAS service 'allocate' type: counter_raw version: 1.0.0
+   the AGAS service 'allocate' type: counter_type::raw version: 1.0.0
    ------------------------------------------------------------------------------
 
    ------------------------------------------------------------------------------
    fullname: /agas/count/bind helptext: returns the number of invocations of the
-   AGAS service 'bind' type: counter_raw version: 1.0.0
+   AGAS service 'bind' type: counter_type::raw version: 1.0.0
    ------------------------------------------------------------------------------
 
    ------------------------------------------------------------------------------
    fullname: /agas/count/bind_gid helptext: returns the number of invocations of
-   the AGAS service 'bind_gid' type: counter_raw version: 1.0.0
+   the AGAS service 'bind_gid' type: counter_type::raw version: 1.0.0
    ------------------------------------------------------------------------------
 
    ...
