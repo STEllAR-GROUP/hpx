@@ -336,15 +336,45 @@ jobs:
           path: /tmp/spelling_suggestions.txt
           destination: /hpx/artifacts/spelling_suggestions.txt
 
-  docs:
+  docs-html:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Sphinx Documentation
+          name: Building Sphinx Documentation (HTML)
           command: |
-              ninja -j1 docs
+                ninja -j1 docs-html
+          no_output_timeout: 2h
+      - persist_to_workspace:
+          root: /hpx
+          paths:
+            - ./build
+
+  docs-singlehtml:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Sphinx Documentation (Single Page HTML)
+          command: |
+                ninja -j1 docs-singlehtml
+          no_output_timeout: 2h
+      - persist_to_workspace:
+          root: /hpx
+          paths:
+            - ./build
+
+  docs-latexpdf:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Sphinx Documentation (pdf)
+          command: |
+                ninja -j1 docs-latexpdf
           no_output_timeout: 2h
       - persist_to_workspace:
           root: /hpx
@@ -830,7 +860,21 @@ workflows:
           <<: *core_dependency
       - tests.headers3:
           <<: *core_dependency
-      - docs:
+      - docs-html:
+          requires:
+            - configure
+            # Force docs to be built after examples so that workspace doesn't
+            # have conflicts
+            - tests.examples
+          <<: *gh_pages_filter
+      - docs-singlehtml:
+          requires:
+            - configure
+            # Force docs to be built after examples so that workspace doesn't
+            # have conflicts
+            - tests.examples
+          <<: *gh_pages_filter
+      - docs-latexpdf:
           requires:
             - configure
             # Force docs to be built after examples so that workspace doesn't
@@ -839,7 +883,9 @@ workflows:
           <<: *gh_pages_filter
       - docs_push:
           requires:
-            - docs
+            - docs-html
+            - docs-singlehtml
+            - docs-latexpdf
           <<: *docs_push_filter
       - install:
           requires:

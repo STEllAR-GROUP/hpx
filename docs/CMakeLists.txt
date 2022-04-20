@@ -217,6 +217,10 @@ create_symbolic_link(
 hpx_source_to_doxygen(hpx_autodoc DEPENDENCIES ${doxygen_dependencies})
 
 add_custom_target(docs)
+add_custom_target(docs-html)
+add_custom_target(docs-singlehtml)
+add_custom_target(docs-latexpdf)
+add_custom_target(docs-man)
 
 set(SPHINX_DOCS_HTML_OUTPUT_FILE "index.html")
 set(SPHINX_DOCS_SINGLEHTML_OUTPUT_FILE "index.html")
@@ -258,8 +262,9 @@ foreach(output_format ${HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS})
   )
 
   add_custom_target(
-    docs-${output_format} ALL DEPENDS ${SPHINX_DOCS_OUTPUT_FILE}
+    docs-${output_format}-file ALL DEPENDS ${SPHINX_DOCS_OUTPUT_FILE}
   )
+  add_dependencies(docs-${output_format} docs-${output_format}-file)
 
   add_dependencies(docs docs-${output_format})
 endforeach()
