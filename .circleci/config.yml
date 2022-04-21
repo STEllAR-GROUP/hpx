@@ -364,7 +364,7 @@ jobs:
       - persist_to_workspace:
           root: /hpx
           paths:
-            - ./build
+            - ./build/share/hpx/docs/singlehtml
 
   docs-latexpdf:
     <<: *defaults
@@ -379,7 +379,7 @@ jobs:
       - persist_to_workspace:
           root: /hpx
           paths:
-            - ./build
+            - ./build/share/hpx/docs/latexpdf
 
   docs_push:
     <<: *defaults
