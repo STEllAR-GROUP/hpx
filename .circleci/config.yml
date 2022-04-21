@@ -64,6 +64,16 @@ core_dependency: &core_dependency
       - core
     <<: *gh_pages_filter
 
+additional_docs_filter: &additional_docs_filter
+    filters:
+      branches:
+        only:
+          - master
+          - /release.*/
+      tags:
+        ignore: stable
+    <<: *gh_pages_filter
+
 add_github_to_known_hosts: &add_github_to_known_hosts
     run:
         name: Add Github's key(s) to known_hosts
@@ -713,7 +723,7 @@ jobs:
               # is enabled, and other machines may fail similarly.
               cmake \
                 -DHPX_WITH_DATAPAR_VC=Off .
-              ninja -j2 install
+              ninja -v -j2 install
           working_directory: /hpx/build
           when: always
           no_output_timeout: 30m
@@ -873,14 +883,14 @@ workflows:
             # Force docs to be built after examples so that workspace doesn't
             # have conflicts
             - tests.examples
-          <<: *gh_pages_filter
+          <<: *additional_docs_filter
       - docs-latexpdf:
           requires:
             - configure
             # Force docs to be built after examples so that workspace doesn't
             # have conflicts
             - tests.examples
-          <<: *gh_pages_filter
+          <<: *additional_docs_filter
       - docs_push:
           requires:
             - docs-html

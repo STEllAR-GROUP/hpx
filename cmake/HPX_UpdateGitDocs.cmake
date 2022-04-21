@@ -25,20 +25,25 @@ if(EXISTS "${HPX_BINARY_DIR}/docs/gh-pages")
     COMMAND "${GIT_EXECUTABLE}" pull --rebase
     WORKING_DIRECTORY "${HPX_BINARY_DIR}/docs/gh-pages"
     RESULT_VARIABLE git_pull_result
+    ERROR_VARIABLE git_pull_result_message COMMAND_ECHO STDERR
   )
   if(NOT "${git_pull_result}" EQUAL "0")
-    message(FATAL_ERROR "Updating the GitHub pages branch failed.")
+    message(
+      FATAL_ERROR
+        "Updating the GitHub pages branch failed: ${git_pull_result_message}."
+    )
   endif()
 else()
   message("${GIT_EXECUTABLE}")
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" clone ${GIT_REPOSITORY} gh-pages
     RESULT_VARIABLE git_clone_result
+    ERROR_VARIABLE git_pull_result_message COMMAND_ECHO STDERR
   )
   if(NOT "${git_clone_result}" EQUAL "0")
     message(
       FATAL_ERROR
-        "Cloning the GitHub pages branch failed. Trying to clone ${GIT_REPOSITORY}"
+        "Cloning the GitHub pages branch failed: ${git_pull_result_message}. Trying to clone ${GIT_REPOSITORY}"
     )
   endif()
 endif()
@@ -147,16 +152,20 @@ execute_process(
   COMMAND "${GIT_EXECUTABLE}" add *
   WORKING_DIRECTORY "${HPX_BINARY_DIR}/docs/gh-pages"
   RESULT_VARIABLE git_add_result
+  ERROR_VARIABLE git_pull_result_message COMMAND_ECHO STDERR
 )
 if(NOT "${git_add_result}" EQUAL "0")
-  message(FATAL_ERROR "Adding files to the GitHub pages branch failed.")
+  message(
+    FATAL_ERROR
+      "Adding files to the GitHub pages branch failed: ${git_pull_result_message}."
+  )
 endif()
 
 # check if there are changes to commit
 execute_process(
   COMMAND "${GIT_EXECUTABLE}" diff-index --quiet HEAD
   WORKING_DIRECTORY "${HPX_BINARY_DIR}/docs/gh-pages"
-  RESULT_VARIABLE git_diff_index_result
+  RESULT_VARIABLE git_diff_index_result COMMAND_ECHO STDERR
 )
 if(NOT "${git_diff_index_result}" EQUAL "0")
   # commit changes
@@ -164,9 +173,13 @@ if(NOT "${git_diff_index_result}" EQUAL "0")
     COMMAND "${GIT_EXECUTABLE}" commit -am "Updating Sphinx docs"
     WORKING_DIRECTORY "${HPX_BINARY_DIR}/docs/gh-pages"
     RESULT_VARIABLE git_commit_result
+    ERROR_VARIABLE git_pull_result_message COMMAND_ECHO STDERR
   )
   if(NOT "${git_commit_result}" EQUAL "0")
-    message(FATAL_ERROR "Committing to the GitHub pages branch failed.")
+    message(
+      FATAL_ERROR
+        "Committing to the GitHub pages branch failed: ${git_pull_result_message}."
+    )
   endif()
 
   # push everything up to github
@@ -174,8 +187,12 @@ if(NOT "${git_diff_index_result}" EQUAL "0")
     COMMAND "${GIT_EXECUTABLE}" push
     WORKING_DIRECTORY "${HPX_BINARY_DIR}/docs/gh-pages"
     RESULT_VARIABLE git_push_result
+    ERROR_VARIABLE git_pull_result_message COMMAND_ECHO STDERR
   )
   if(NOT "${git_push_result}" EQUAL "0")
-    message(FATAL_ERROR "Pushing to the GitHub pages branch failed.")
+    message(
+      FATAL_ERROR
+        "Pushing to the GitHub pages branch failed: ${git_pull_result_message}."
+    )
   endif()
 endif()
