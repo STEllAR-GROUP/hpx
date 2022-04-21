@@ -360,6 +360,8 @@ jobs:
           root: /hpx
           paths:
             - ./build
+      - store_artifacts:
+          path: /hpx/build/share/hpx/docs/html
 
   docs-singlehtml:
     <<: *defaults
@@ -375,6 +377,8 @@ jobs:
           root: /hpx
           paths:
             - ./build/share/hpx/docs/singlehtml
+      - store_artifacts:
+          path: /hpx/build/share/hpx/docs/singlehtml
 
   docs-latexpdf:
     <<: *defaults
@@ -390,6 +394,8 @@ jobs:
           root: /hpx
           paths:
             - ./build/share/hpx/docs/latexpdf
+      - store_artifacts:
+          path: /hpx/build/share/hpx/docs/latexpdf
 
   docs_push:
     <<: *defaults
