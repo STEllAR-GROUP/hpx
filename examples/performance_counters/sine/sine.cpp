@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -96,7 +96,8 @@ namespace performance_counters { namespace sine {
         if (!status_is_valid(status))
             return false;
 
-        if (mode == hpx::performance_counters::discover_counters_minimal ||
+        if (mode ==
+                hpx::performance_counters::discover_counters_mode::minimal ||
             p.parentinstancename_.empty() || p.instancename_.empty())
         {
             if (p.parentinstancename_.empty())
@@ -117,8 +118,8 @@ namespace performance_counters { namespace sine {
         }
         else if (p.instancename_ == "instance#*")
         {
-            HPX_ASSERT(
-                mode == hpx::performance_counters::discover_counters_full);
+            HPX_ASSERT(mode ==
+                hpx::performance_counters::discover_counters_mode::full);
 
             // FIXME: expand for all instances
             p.instancename_ = "instance";

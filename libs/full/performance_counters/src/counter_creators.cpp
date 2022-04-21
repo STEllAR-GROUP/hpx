@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -63,7 +63,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return false;
 
-        if (mode == discover_counters_minimal ||
+        if (mode == discover_counters_mode::minimal ||
             p.parentinstancename_.empty() || p.instancename_.empty())
         {
             if (p.parentinstancename_.empty())
@@ -112,7 +112,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return false;
 
-        if (mode == discover_counters_minimal ||
+        if (mode == discover_counters_mode::minimal ||
             p.parentinstancename_.empty() || p.instancename_.empty())
         {
             if (p.parentinstancename_.empty())
@@ -183,7 +183,7 @@ namespace hpx { namespace performance_counters {
             p.parentinstanceindex_ = 0;
         }
 
-        if (mode == discover_counters_minimal ||
+        if (mode == discover_counters_mode::minimal ||
             p.parentinstancename_.empty() || p.instancename_.empty())
         {
             if (p.parentinstancename_.empty())
@@ -228,7 +228,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return false;
 
-        if (mode == discover_counters_minimal ||
+        if (mode == discover_counters_mode::minimal ||
             p.parentinstancename_.empty() || p.instancename_.empty())
         {
             if (p.parentinstancename_.empty())
@@ -284,7 +284,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return false;
 
-        if (mode == discover_counters_minimal ||
+        if (mode == discover_counters_mode::minimal ||
             p.parentinstancename_.empty() || p.instancename_.empty() ||
             p.subinstancename_.empty())
         {
@@ -351,7 +351,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return false;
 
-        if (mode == discover_counters_minimal ||
+        if (mode == discover_counters_mode::minimal ||
             p.parentinstancename_.empty() || p.instancename_.empty() ||
             p.subinstancename_.empty())
         {
@@ -401,7 +401,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return false;
 
-        if (mode == discover_counters_minimal ||
+        if (mode == discover_counters_mode::minimal ||
             p.parentinstancename_.empty() || p.instancename_.empty())
         {
             if (p.parentinstancename_.empty())

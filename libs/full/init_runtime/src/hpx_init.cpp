@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -181,8 +181,8 @@ namespace hpx { namespace detail {
     {
         // list all counter names
         list_counter_names_header(true);
-        performance_counters::discover_counter_types(
-            &list_counter, performance_counters::discover_counters_minimal);
+        performance_counters::discover_counter_types(&list_counter,
+            performance_counters::discover_counters_mode::minimal);
     }
 
     void list_counter_names_full()
@@ -190,7 +190,7 @@ namespace hpx { namespace detail {
         // list all counter names
         list_counter_names_header(false);
         performance_counters::discover_counter_types(
-            &list_counter, performance_counters::discover_counters_full);
+            &list_counter, performance_counters::discover_counters_mode::full);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -234,15 +234,15 @@ namespace hpx { namespace detail {
         // list all counter information
         list_counter_infos_header(true);
         performance_counters::discover_counter_types(&list_counter_info,
-            performance_counters::discover_counters_minimal);
+            performance_counters::discover_counters_mode::minimal);
     }
 
     void list_counter_infos_full()
     {
         // list all counter information
         list_counter_infos_header(false);
-        performance_counters::discover_counter_types(
-            &list_counter_info, performance_counters::discover_counters_full);
+        performance_counters::discover_counter_types(&list_counter_info,
+            performance_counters::discover_counters_mode::full);
     }
 
     ///////////////////////////////////////////////////////////////////////////

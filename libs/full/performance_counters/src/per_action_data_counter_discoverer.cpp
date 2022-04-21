@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -35,7 +35,7 @@ namespace hpx { namespace performance_counters {
 
         map_type const& map = registry.registered_counters();
 
-        if (mode == performance_counters::discover_counters_minimal ||
+        if (mode == performance_counters::discover_counters_mode::minimal ||
             p.parentinstancename_.empty() || p.instancename_.empty())
         {
             if (p.parentinstancename_.empty())

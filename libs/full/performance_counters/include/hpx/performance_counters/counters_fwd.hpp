@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -212,7 +212,7 @@ namespace hpx { namespace performance_counters {
 
 #define HPX_COUNTER_STATUS_UNSCOPED_ENUM_DEPRECATION_MSG                       \
     "The unscoped counter_status names are deprecated. Please use "            \
-    "counter_status::<type> instead."
+    "counter_status::<status> instead."
 
     HPX_DEPRECATED_V(1, 9, HPX_COUNTER_STATUS_UNSCOPED_ENUM_DEPRECATION_MSG)
     inline constexpr counter_status status_valid_data =
@@ -317,11 +317,26 @@ namespace hpx { namespace performance_counters {
     typedef hpx::function<bool(counter_info const&, error_code&)>
         discover_counter_func;
 
-    enum discover_counters_mode
+    enum class discover_counters_mode
     {
-        discover_counters_minimal,
-        discover_counters_full    // fully expand all wild cards
+        minimal,
+        full    // fully expand all wild cards
     };
+
+#define HPX_DISCOVER_COUNTERS_MODE_UNSCOPED_ENUM_DEPRECATION_MSG               \
+    "The unscoped discover counters mode names are deprecated. Please use "    \
+    "discover_counters_mode::<mode> instead."
+
+    HPX_DEPRECATED_V(
+        1, 9, HPX_DISCOVER_COUNTERS_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr discover_counters_mode discover_counters_minimal =
+        discover_counters_mode::minimal;
+    HPX_DEPRECATED_V(
+        1, 9, HPX_DISCOVER_COUNTERS_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr discover_counters_mode discover_counters_full =
+        discover_counters_mode::full;
+
+#undef HPX_DISCOVER_COUNTERS_MODE_UNSCOPED_ENUM_DEPRECATION_MSG
 
     // This declares the type of a function, which will be called by
     // HPX whenever it needs to discover all performance counter
@@ -514,36 +529,36 @@ namespace hpx { namespace performance_counters {
     /// \brief Call the supplied function for each registered counter type
     HPX_EXPORT counter_status discover_counter_types(
         discover_counter_func const& discover_counter,
-        discover_counters_mode mode = discover_counters_minimal,
+        discover_counters_mode mode = discover_counters_mode::minimal,
         error_code& ec = throws);
 
     /// \brief Return a list of all available counter descriptions.
     HPX_EXPORT counter_status discover_counter_types(
         std::vector<counter_info>& counters,
-        discover_counters_mode mode = discover_counters_minimal,
+        discover_counters_mode mode = discover_counters_mode::minimal,
         error_code& ec = throws);
 
     /// \brief Call the supplied function for the given registered counter type.
     HPX_EXPORT counter_status discover_counter_type(std::string const& name,
         discover_counter_func const& discover_counter,
-        discover_counters_mode mode = discover_counters_minimal,
+        discover_counters_mode mode = discover_counters_mode::minimal,
         error_code& ec = throws);
 
     HPX_EXPORT counter_status discover_counter_type(counter_info const& info,
         discover_counter_func const& discover_counter,
-        discover_counters_mode mode = discover_counters_minimal,
+        discover_counters_mode mode = discover_counters_mode::minimal,
         error_code& ec = throws);
 
     /// \brief Return a list of matching counter descriptions for the given
     ///        registered counter type.
     HPX_EXPORT counter_status discover_counter_type(std::string const& name,
         std::vector<counter_info>& counters,
-        discover_counters_mode mode = discover_counters_minimal,
+        discover_counters_mode mode = discover_counters_mode::minimal,
         error_code& ec = throws);
 
     HPX_EXPORT counter_status discover_counter_type(counter_info const& info,
         std::vector<counter_info>& counters,
-        discover_counters_mode mode = discover_counters_minimal,
+        discover_counters_mode mode = discover_counters_mode::minimal,
         error_code& ec = throws);
 
     /// \brief call the supplied function will all expanded versions of the

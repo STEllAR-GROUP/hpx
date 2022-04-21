@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013      Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -80,8 +80,8 @@ namespace hpx { namespace util {
                 util::expand(name);
 
                 // find matching counter type
-                performance_counters::discover_counter_type(
-                    name, func, performance_counters::discover_counters_full);
+                performance_counters::discover_counter_type(name, func,
+                    performance_counters::discover_counters_mode::full);
             }
         }
 

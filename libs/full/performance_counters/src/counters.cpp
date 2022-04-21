@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -848,7 +848,7 @@ namespace hpx { namespace performance_counters {
             // discover all base names
             std::vector<counter_info> counter_infos;
             counter_status status = discover_counter_type(p.parentinstancename_,
-                counter_infos, discover_counters_full, ec);
+                counter_infos, discover_counters_mode::full, ec);
             if (!status_is_valid(status) || ec)
                 return false;
 
