@@ -13,6 +13,36 @@
 
 namespace hpx::execution::experimental {
 
+    // [exec.sched_queries.forwarding_scheduler_query]
+    // 1. `execution::forwarding_scheduler_query` is used to ask a
+    // customization point object whether it is a scheduler query that
+    // should be forwarded through scheduler adaptors.
+    // 2. The name `execution::forwarding_scheduler_query` denotes a
+    // customization point object. For some subexpression `t`,
+    // `execution::forwarding_scheduler_query(t)` is expression
+    // equivalent to:
+    //      1. `tag_invoke(execution::forwarding_scheduler_query, t)`,
+    // contextually converted to bool, if the tag_invoke expression is
+    // well formed.
+    //          Mandates: The tag_invoke expression is indeed
+    //          contextually convertible to bool, that expression and
+    //          the contextual conversion are not potentially-throwing
+    //          and are core constant expressions if t is a core
+    //          constant expression.
+    //     2. Otherwise, false.
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
+        forwarding_scheduler_query_t final
+      : hpx::functional::detail::tag_fallback<forwarding_scheduler_query_t>
+    {
+    private:
+        template <typename T>
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+            forwarding_scheduler_query_t, T&&) noexcept
+        {
+            return true;
+        }
+    } forwarding_scheduler_query{};
+
     // 1. execution::get_scheduler is used to ask an object for its associated
     //    scheduler.
     //

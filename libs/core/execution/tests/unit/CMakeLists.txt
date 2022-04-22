@@ -28,6 +28,7 @@ set(tests
     executor_parameters_dispatching
     executor_parameters_timer_hooks
     forwarding_env_query
+    forwarding_scheduler_query
     future_then_executor
     minimal_async_executor
     minimal_sync_executor
