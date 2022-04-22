@@ -100,7 +100,11 @@ struct simple_spinlock
         locked_.clear();
     }
 
+#if defined(HPX_HAVE_CXX11_ATOMIC_INIT_FLAG)
     std::atomic_flag locked_ = ATOMIC_FLAG_INIT;
+#else
+    std::atomic_flag locked_;
+#endif
 };
 
 void test_yield()

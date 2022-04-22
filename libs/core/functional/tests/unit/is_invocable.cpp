@@ -117,6 +117,9 @@ void functions_byrvref_params()
 
 void member_function_pointers()
 {
+// clang in C++20 mode complains about invalid float->double promotion that
+// can't be disabled :/
+#if !defined(HPX_CLANG_VERSION)
     typedef int (X::*f)(double);
     HPX_TEST_MSG(
         (hpx::is_invocable_v<f, X*, float> == true), "mem-fun-ptr/ptr");
@@ -152,6 +155,7 @@ void member_function_pointers()
         "const-mem-fun-ptr/smart-ptr");
     HPX_TEST_MSG((hpx::is_invocable_v<fc, smart_ptr<X const>, float> == true),
         "const-mem-fun-ptr/smart-const-ptr");
+#endif
 }
 
 void member_object_pointers()
