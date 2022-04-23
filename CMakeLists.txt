@@ -629,7 +629,7 @@ if ("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "DATAPAR_EVE")
     ADVANCED
   )
   hpx_option(
-    HPX_WITH_DATAPAR_EVE_TAG STRING "Eve repository tag or branch" "develop"
+    HPX_WITH_DATAPAR_EVE_TAG STRING "Eve repository tag or branch" "v2022.03.0"
     CATEGORY "Build Targets"
     ADVANCED
   )
