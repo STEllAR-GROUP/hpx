@@ -32,11 +32,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         static HPX_FORCEINLINE bool call(Iter const& it)
         {
             typedef typename std::iterator_traits<Iter>::value_type value_type;
-            typedef typename traits::vector_pack_type<value_type>::type pack_type;
+            typedef
+                typename traits::vector_pack_type<value_type>::type pack_type;
 
             return (reinterpret_cast<std::uintptr_t>(std::addressof(*it)) &
-                       (traits::vector_pack_alignment<pack_type>::value -
-                           1)) == 0;
+                       (traits::vector_pack_alignment<pack_type>::value - 1)) ==
+                0;
         }
     };
 

@@ -134,7 +134,7 @@ if(TARGET Vc::vc)
   set(execution_optional_dependencies Vc::vc)
 endif()
 
-if (TARGET Eve::eve)
+if(TARGET Eve::eve)
   set(execution_optional_dependencies Eve::eve)
 endif()
 

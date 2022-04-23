@@ -43,7 +43,7 @@ if(NOT TARGET Eve::eve)
     # EVE_VERSION_STRING
     string(REGEX
            REPLACE "#define EVE_LIB_VERSION \"([0-9]+\.[0-9]+\.[0-9]+\.[0-9])\""
-           "\\1" EVE_VERSION_STRING "${EVE_VERSION_DEFINE_LINE}"
+                   "\\1" EVE_VERSION_STRING "${EVE_VERSION_DEFINE_LINE}"
     )
   endif()
 

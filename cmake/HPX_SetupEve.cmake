@@ -15,7 +15,7 @@ if(HPX_WITH_FETCH_DATAPAR_EVE)
     )
   endif()
   include(FetchContent)
-  FetchContent_Declare(
+  fetchcontent_declare(
     eve
     GIT_REPOSITORY https://github.com/jfalcou/eve.git
     GIT_TAG ${HPX_WITH_DATAPAR_EVE_TAG}
@@ -30,7 +30,7 @@ if(HPX_WITH_FETCH_DATAPAR_EVE)
   add_library(eve INTERFACE)
   target_include_directories(
     eve SYSTEM INTERFACE $<BUILD_INTERFACE:${EVE_ROOT}/include/>
-                        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+                         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
   install(
