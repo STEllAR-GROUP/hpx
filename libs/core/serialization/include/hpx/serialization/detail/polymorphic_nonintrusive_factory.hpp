@@ -14,7 +14,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/hashing.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
@@ -23,6 +22,7 @@
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 #include <hpx/type_support/static.hpp>
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -107,9 +107,9 @@ namespace hpx::serialization::detail {
 
     public:
         using serializer_map_type = std::unordered_map<std::string,
-            function_bunch_type, hpx::util::jenkins_hash>;
+            function_bunch_type, std::hash<std::string>>;
         using serializer_typeinfo_map_type = std::unordered_map<std::string,
-            std::string, hpx::util::jenkins_hash>;
+            std::string, std::hash<std::string>>;
 
         HPX_CORE_EXPORT static polymorphic_nonintrusive_factory& instance();
 

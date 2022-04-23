@@ -8,7 +8,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(config_registry_headers hpx/modules/config_registry.hpp)
 
-set(config_registry_sources config_registry.cpp)
+set(config_registry_sources config_entries.cpp config_registry.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(

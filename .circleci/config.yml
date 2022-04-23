@@ -363,6 +363,27 @@ jobs:
       - store_artifacts:
           path: /hpx/build/share/hpx/docs/html
 
+  depreport:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building HPX Dependency Report Tool
+          command: |
+              ninja -j2 tools.hpxdep
+      - run:
+          name: Building HPX Dependency Report Documentation
+          command: |
+              ninja -j1 depreport
+          no_output_timeout: 10m
+      - persist_to_workspace:
+          root: /hpx
+          paths:
+            - ./build
+      - store_artifacts:
+          path: /hpx/build/share/hpx/docs/report
+
   docs-singlehtml:
     <<: *defaults
     steps:
@@ -883,6 +904,10 @@ workflows:
             # have conflicts
             - tests.examples
           <<: *gh_pages_filter
+      - depreport:
+          requires:
+            - configure
+          <<: *gh_pages_filter
       - docs-singlehtml:
           requires:
             - configure
@@ -902,6 +927,7 @@ workflows:
             - docs-html
             - docs-singlehtml
             - docs-latexpdf
+            - depreport
           <<: *docs_push_filter
       - install:
           requires:

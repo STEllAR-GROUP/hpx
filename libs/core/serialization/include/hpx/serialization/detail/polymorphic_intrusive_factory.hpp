@@ -10,10 +10,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/debugging.hpp>
-#include <hpx/modules/hashing.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
+#include <functional>
 #include <string>
 #include <unordered_map>
 
@@ -27,7 +27,7 @@ namespace hpx { namespace serialization { namespace detail {
     private:
         using ctor_type = void* (*) ();
         using ctor_map_type =
-            std::unordered_map<std::string, ctor_type, hpx::util::jenkins_hash>;
+            std::unordered_map<std::string, ctor_type, std::hash<std::string>>;
 
     public:
         polymorphic_intrusive_factory() = default;

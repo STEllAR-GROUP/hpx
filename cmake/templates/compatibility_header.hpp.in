@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 STE||AR Group
+//  Copyright (c) 2020-2022 STE||AR Group
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,8 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/@modulename@/config/defines.hpp>
+@config_file@#include <hpx/@modulename@/config/defines.hpp>
 #include <@new_header@>
 
 #if HPX_HAVE_DEPRECATION_WARNINGS

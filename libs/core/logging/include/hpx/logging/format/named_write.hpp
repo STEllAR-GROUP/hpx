@@ -53,7 +53,7 @@ and specify a %spacer between them. You have a %spacer string, and within it,
 you can escape your contained formatters.
 
 @code
-#include <hpx/logging/format/formatter/named.hpp>
+#include <hpx/logging/format/named_write.hpp>
 @endcode
 
 This allows you:

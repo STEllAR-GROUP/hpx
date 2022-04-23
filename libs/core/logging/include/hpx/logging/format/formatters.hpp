@@ -55,7 +55,7 @@ This will output something similar to:
 You pass the format string at construction.
 
 @code
-#include <hpx/logging/format/formatter/high_precision_time.hpp>
+#include <hpx/logging/format/formatters.hpp>
 @endcode
 
 Internally, it uses hpx::util::date_time::microsec_time_clock.
