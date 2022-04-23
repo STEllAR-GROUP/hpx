@@ -42,14 +42,16 @@ namespace hpx { namespace parallel { namespace traits {
     struct vector_pack_store
     {
         template <typename Iter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static void aligned(V& value, Iter const& iter)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void aligned(
+            V& value, Iter const& iter)
         {
             value.copy_to(
                 std::addressof(*iter), std::experimental::vector_aligned);
         }
 
         template <typename Iter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static void unaligned(V& value, Iter const& iter)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void unaligned(
+            V& value, Iter const& iter)
         {
             *iter = value;
         }

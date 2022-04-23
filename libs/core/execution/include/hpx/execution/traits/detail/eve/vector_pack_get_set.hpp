@@ -14,8 +14,7 @@
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename Vector>
-    HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
-        Vector& vec, std::size_t index)
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto get(Vector& vec, std::size_t index)
     {
         return vec.get(index);
     }

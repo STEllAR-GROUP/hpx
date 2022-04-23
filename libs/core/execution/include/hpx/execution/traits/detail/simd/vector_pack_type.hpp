@@ -47,6 +47,14 @@ namespace hpx { namespace parallel { namespace traits {
     struct vector_pack_type : detail::vector_pack_type<T, N, Abi>
     {
     };
+
+    ////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct vector_pack_mask_type<T,
+        typename std::enable_if_t<std::experimental::is_simd_v<T>>>
+    {
+        using type = T::mask_type;
+    };
 }}}    // namespace hpx::parallel::traits
 
 #endif

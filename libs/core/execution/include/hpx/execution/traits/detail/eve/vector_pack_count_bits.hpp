@@ -16,8 +16,7 @@
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename Mask>
-    HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(
-        Mask const& msk)
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(Mask const& msk)
     {
         return eve::count_true(msk);
     }

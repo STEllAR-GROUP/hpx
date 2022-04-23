@@ -20,8 +20,8 @@
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct is_vector_pack<eve::wide<T, eve::expected_cardinal_t<T>>> : 
-        std::true_type
+    struct is_vector_pack<eve::wide<T, eve::expected_cardinal_t<T>>>
+      : std::true_type
     {
     };
 
@@ -32,8 +32,8 @@ namespace hpx { namespace parallel { namespace traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct is_scalar_vector_pack<eve::wide<T, eve::expected_cardinal_t<T>>> : 
-        std::false_type
+    struct is_scalar_vector_pack<eve::wide<T, eve::expected_cardinal_t<T>>>
+      : std::false_type
     {
     };
 
@@ -52,8 +52,7 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename T, typename Abi>
     struct vector_pack_alignment<eve::wide<T, Abi>>
     {
-        static std::size_t const value = eve::alignment_v<
-            eve::wide<T, Abi>>;
+        static std::size_t const value = eve::alignment_v<eve::wide<T, Abi>>;
     };
 
     ///////////////////////////////////////////////////////////////////////////

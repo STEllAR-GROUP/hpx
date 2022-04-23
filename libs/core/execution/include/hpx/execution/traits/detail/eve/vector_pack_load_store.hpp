@@ -29,8 +29,8 @@ namespace hpx { namespace parallel { namespace traits {
         template <typename Iter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static V aligned(Iter const& iter)
         {
-            return V(eve::as_aligned(
-                std::addressof(*iter), eve::cardinal_t<V>{}));
+            return V(
+                eve::as_aligned(std::addressof(*iter), eve::cardinal_t<V>{}));
         }
 
         template <typename Iter>
@@ -45,15 +45,16 @@ namespace hpx { namespace parallel { namespace traits {
     struct vector_pack_store
     {
         template <typename Iter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static void aligned(V& value, Iter const& iter)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void aligned(
+            V& value, Iter const& iter)
         {
             eve::store(value,
-                eve::as_aligned(
-                    std::addressof(*iter), eve::cardinal_t<V>{}));
+                eve::as_aligned(std::addressof(*iter), eve::cardinal_t<V>{}));
         }
 
         template <typename Iter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static void unaligned(V& value, Iter const& iter)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void unaligned(
+            V& value, Iter const& iter)
         {
             *iter = value;
             return;

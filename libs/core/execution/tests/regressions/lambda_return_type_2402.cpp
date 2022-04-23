@@ -26,10 +26,12 @@ int hpx_main()
             using comp_type = typename hpx::tuple_element<0, decltype(t)>::type;
             using var_type = typename std::decay<comp_type>::type;
 
-            var_type mass_density = 0.0;
-            mass_density(mass_density > 0.0) = 7.0;
+            var_type mass_density = var_type(0.0);
 
-            HPX_TEST(all_of(mass_density == 0.0));
+            hpx::parallel::traits::mask_assign(
+                mass_density > 0.0, mass_density, var_type(7.0));
+
+            HPX_TEST(hpx::parallel::traits::all_of(mass_density == 0.0));
         });
 
     return hpx::local::finalize();    // Handles HPX shutdown
