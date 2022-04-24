@@ -8,13 +8,12 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/datastructures/detail/dynamic_bitset.hpp>
 #include <hpx/future.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/mutex.hpp>
-
-#include <boost/dynamic_bitset.hpp>
 
 #include <cstddef>
 
@@ -64,7 +63,7 @@ namespace throttle { namespace server {
 
         // this is a bit mask where any set bit means the corresponding
         // shepherd is to be blocked
-        boost::dynamic_bitset<> blocked_os_threads_;
+        hpx::detail::dynamic_bitset<> blocked_os_threads_;
         mutable mutex_type mtx_;
     };
 }}    // namespace throttle::server

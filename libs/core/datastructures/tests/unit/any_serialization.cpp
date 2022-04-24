@@ -21,9 +21,9 @@ namespace std {
 }
 #endif
 
+#include <hpx/datastructures/serialization/serializable_any.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/serialization/serializable_any.hpp>
 #include <hpx/serialization/serialize.hpp>
 
 #include "small_big_object.hpp"

@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CXX17_COPY_ELISION)
+#include <hpx/datastructures/variant_helper.hpp>
 #include <variant>
 
 namespace hpx {

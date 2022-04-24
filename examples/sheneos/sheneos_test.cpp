@@ -20,7 +20,6 @@
 #include "sheneos/interpolator.hpp"
 
 #include <hpx/modules/program_options.hpp>
-#include <boost/dynamic_bitset.hpp>
 
 char const* const shen_symbolic_name = "/sheneos/interpolator_test";
 

@@ -10,6 +10,7 @@
 #include <hpx/local/chrono.hpp>
 #include <hpx/local/future.hpp>
 
+#include <cmath>
 #include <cstddef>
 #include <functional>
 #include <memory>

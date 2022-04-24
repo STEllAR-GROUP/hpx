@@ -6,11 +6,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/datastructures/detail/dynamic_bitset.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
-
-#include <boost/dynamic_bitset.hpp>
 
 #include <chrono>
 #include <cstdint>
@@ -44,7 +43,7 @@ namespace detail {
     std::uint64_t wait(std::vector<future<T1>> const& lazy_values,
         std::int32_t suspend_for = 10)
     {
-        boost::dynamic_bitset<> handled(lazy_values.size());
+        hpx::detail::dynamic_bitset<> handled(lazy_values.size());
         std::uint64_t handled_count = 0;
 
         while (handled_count < lazy_values.size())
