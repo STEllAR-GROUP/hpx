@@ -50,10 +50,11 @@ namespace hpx::parcelset::policies::lci {
         {
             header_.assert_valid();
 
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             parcelset::data_point& data = buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
             data.bytes_ = static_cast<std::size_t>(header_.numbytes());
-
+#endif
             buffer_.data_.resize(static_cast<std::size_t>(header_.size()));
             buffer_.num_chunks_ = header_.num_chunks();
 
@@ -211,9 +212,10 @@ namespace hpx::parcelset::policies::lci {
                 LCI_sync_free(&sync_others);
                 sync_others = nullptr;
             }
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             parcelset::data_point& data = buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds() - data.time_;
-
+#endif
             {
                 LCI_short_t short_rt_;
                 *(int*) &short_rt_ = tag_;
@@ -229,8 +231,9 @@ namespace hpx::parcelset::policies::lci {
             return true;
         }
 
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         hpx::chrono::high_resolution_timer timer_;
-
+#endif
         connection_state state_;
 
         int src_rank;

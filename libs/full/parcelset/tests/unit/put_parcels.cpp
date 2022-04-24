@@ -274,7 +274,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         test_task_group_argument(id);
     }
 
-#if defined(HPX_HAVE_NETWORKING)
+#if defined(HPX_HAVE_NETWORKING) && defined(PX_HAVE_PARCELPORT_COUNTERS)
     if (hpx::is_networking_enabled())
     {
         // compare number of parcels with number of messages generated

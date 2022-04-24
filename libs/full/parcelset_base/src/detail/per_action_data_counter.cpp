@@ -6,7 +6,9 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS) && defined(HPX_HAVE_NETWORKING)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS) &&                            \
+    defined(HPX_HAVE_NETWORKING)
 #include <hpx/parcelset_base/detail/per_action_data_counter.hpp>
 
 #include <cstdint>

@@ -1142,6 +1142,14 @@ if(HPX_WITH_NETWORKING)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_TCP)
   endif()
   hpx_option(
+    HPX_WITH_PARCELPORT_COUNTERS BOOL
+    "Enable performance counters reporting parcelport statistics." OFF
+    CATEGORY "Parcelport"
+  )
+  if(HPX_WITH_PARCELPORT_COUNTERS)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_COUNTERS)
+  endif()
+  hpx_option(
     HPX_WITH_PARCELPORT_ACTION_COUNTERS
     BOOL
     "Enable performance counters reporting parcelport statistics on a per-action basis."

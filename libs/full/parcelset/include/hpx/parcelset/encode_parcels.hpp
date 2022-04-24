@@ -91,10 +91,11 @@ namespace hpx::parcelset {
             LPT_(debug) << binary_archive_content(buffer);
 #endif
 
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             parcelset::data_point& data = buffer.data_point_;
             data.bytes_ = buffer.data_.size();
             data.raw_bytes_ = arg_size;
-
+#endif
             // prepare chunk data for transmission, the transmission_chunks data
             // first holds all zero-copy, then all non-zero-copy chunk infos
             using transmission_chunk_type =
@@ -182,8 +183,9 @@ namespace hpx::parcelset {
                 buffer.chunks_.reserve(num_chunks);
 
                 // mark start of serialization
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
                 hpx::chrono::high_resolution_timer timer;
-
+#endif
                 {
                     // Serialize the data
                     if (filter.get() != nullptr)
@@ -200,7 +202,8 @@ namespace hpx::parcelset {
 
                     for (std::size_t i = 0; i != parcels_sent; ++i)
                     {
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
                         std::size_t archive_pos = archive.current_pos();
                         std::int64_t serialize_time =
                             timer.elapsed_nanoseconds();
@@ -217,7 +220,8 @@ namespace hpx::parcelset {
 
                         archive << ps[i];
 
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
                         parcelset::data_point action_data;
                         action_data.bytes_ =
                             archive.current_pos() - archive_pos;
@@ -234,8 +238,10 @@ namespace hpx::parcelset {
                 }
 
                 // store the time required for serialization
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
                 buffer.data_point_.serialization_time_ =
                     timer.elapsed_nanoseconds();
+#endif
             }
             catch (hpx::exception const& e)
             {
@@ -276,7 +282,9 @@ namespace hpx::parcelset {
             return 0;
         }
 
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         buffer.data_point_.num_parcels_ = parcels_sent;
+#endif
         detail::encode_finalize(buffer, arg_size);
 
         return parcels_sent;

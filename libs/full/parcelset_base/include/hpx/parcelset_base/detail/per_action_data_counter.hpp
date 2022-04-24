@@ -8,7 +8,9 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS) && defined(HPX_HAVE_NETWORKING)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS) &&                            \
+    defined(HPX_HAVE_NETWORKING)
 #include <hpx/modules/hashing.hpp>
 #include <hpx/modules/synchronization.hpp>
 

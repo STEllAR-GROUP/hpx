@@ -61,9 +61,13 @@ namespace hpx::parcelset::policies::tcp {
           : socket_(io_service)
           , ack_(0)
           , there_(locality_id)
-          , timer_()
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
           , pp_(pp)
+#endif
         {
+#if not defined(HPX_HAVE_PARCELPORT_COUNTERS)
+            HPX_UNUSED(pp);
+#endif
         }
 
         ~sender()
@@ -135,8 +139,9 @@ namespace hpx::parcelset::policies::tcp {
             state_ = state_async_write;
 #endif
             /// Increment sends and begin timer.
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             buffer_.data_point_.time_ = timer_.elapsed_nanoseconds();
-
+#endif
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
             std::vector<asio::const_buffer> buffers;
@@ -230,9 +235,11 @@ namespace hpx::parcelset::policies::tcp {
             }
 
             // complete data point and push back onto gatherer
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             buffer_.data_point_.time_ =
                 timer_.elapsed_nanoseconds() - buffer_.data_point_.time_;
             pp_->add_sent_data(buffer_.data_point_);
+#endif
 
             // now handle the acknowledgment byte which is sent by the receiver
 #if defined(__linux) || defined(linux) || defined(__linux__)
@@ -274,8 +281,10 @@ namespace hpx::parcelset::policies::tcp {
         parcelset::locality there_;
 
         // Counters and their data containers.
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         hpx::chrono::high_resolution_timer timer_;
         parcelset::parcelport* pp_;
+#endif
 
         postprocess_handler_type handler_;
         hpx::move_only_function<void(std::error_code const&,
