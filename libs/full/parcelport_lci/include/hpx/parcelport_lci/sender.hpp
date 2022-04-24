@@ -102,47 +102,19 @@ namespace hpx::parcelset::policies::lci {
 
         void next_free_tag() noexcept
         {
-            int next_free = -1;
+            LCI_request_t request;
+            LCI_error_t ret =
+                LCI_queue_pop(util::lci_environment::rt_queue(), &request);
+            if (ret == LCI_OK)
             {
-                std::unique_lock<mutex_type> l(
-                    next_free_tag_mtx_, std::try_to_lock);
-                if (l.owns_lock())
-                    next_free = next_free_tag_locked();
-            }
-
-            if (next_free != -1)
-            {
+                int next_free = *(int*) &request.data.immediate;
                 HPX_ASSERT(next_free > 1);
                 tag_provider_.release(next_free);
             }
         }
 
-        int next_free_tag_locked() noexcept
-        {
-            util::lci_environment::scoped_try_lock l;
-
-            if (l.locked)
-            {
-                LCI_error_t ret = LCI_queue_pop(
-                    util::lci_environment::rt_queue(), &next_free_tag_request_);
-                if (ret == LCI_OK)
-                {
-                    return *(int*) &next_free_tag_request_.data.immediate;
-                }
-                else
-                {
-                    LCI_progress(LCI_UR_DEVICE);
-                }
-            }
-            return -1;
-        }
-
         mutex_type connections_mtx_;
         connection_list connections_;
-
-        mutex_type next_free_tag_mtx_;
-
-        LCI_request_t next_free_tag_request_;
     };
 
 }    // namespace hpx::parcelset::policies::lci
