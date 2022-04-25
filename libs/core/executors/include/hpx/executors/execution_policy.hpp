@@ -1396,6 +1396,296 @@ namespace hpx { namespace execution {
     /// Default vector execution policy object.
     inline constexpr parallel_unsequenced_policy par_unseq{};
 
+   
+    ///////////////////////////////////////////////////////////////////////////
+    /// The class unsequenced_task_policy is an execution policy type
+    /// used as a unique type to disambiguate parallel algorithm overloading
+    /// and indicate that a parallel algorithm's execution may be vectorized.
+    struct unsequenced_task_policy
+    {
+        /// The type of the executor associated with this execution policy
+        using executor_type = sequenced_executor;
+
+        /// The type of the associated executor parameters object which is
+        /// associated with this execution policy
+        using executor_parameters_type =
+            parallel::execution::extract_executor_parameters<
+                executor_type>::type;
+
+        /// The category of the execution agents created by this execution
+        /// policy.
+        using execution_category = sequenced_execution_tag;
+
+        /// Rebind the type of executor used by this execution policy.
+        template <typename Executor_, typename Parameters_>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            using type = unsequenced_task_policy_shim<Executor_, Parameters_>;
+        };
+
+        /// \cond NOINTERNAL
+        constexpr unsequenced_task_policy() = default;
+                   
+        template <typename Executor, typename Parameters>
+        constexpr unsequenced_task_policy(Executor&&, Parameters&&) noexcept
+        {
+        }
+        /// \endcond
+
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task unsequenced task policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
+        /// Create a new task policy from itself
+        ///
+        /// \returns The task unsequenced task policy
+        ///
+        constexpr decltype(auto) operator()(task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
+    public:
+        /// Return the associated executor object.
+        executor_type& executor()
+        {
+            return exec_;
+        }
+        /// Return the associated executor object.
+        constexpr executor_type const& executor() const
+        {
+            return exec_;
+        }
+
+        /// Return the associated executor parameters object.
+        executor_parameters_type& parameters()
+        {
+            return params_;
+        }
+        /// Return the associated executor parameters object.
+        constexpr executor_parameters_type const& parameters() const
+        {
+            return params_;
+        }
+
+    private:
+        friend struct hpx::parallel::execution::create_rebound_policy_t;
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        constexpr void serialize(Archive&, const unsigned int)
+        {
+        }
+
+    private:
+        executor_type exec_;
+        executor_parameters_type params_;
+    };
+
+    constexpr decltype(auto) sequenced_task_policy::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return seq.on(executor()).with(parameters());
+    }
+
+    constexpr decltype(auto) parallel_task_policy::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return par.on(executor()).with(parameters());
+    }
+
+    // different versions of clang-format disagree
+    // clang-format off
+    template <typename Executor, typename Parameters>
+    constexpr decltype(auto)
+    sequenced_task_policy_shim<Executor, Parameters>::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return sequenced_task_policy_shim<Executor, Parameters>{}
+            .on(executor())
+            .with(parameters());
+    }
+
+    template <typename Executor, typename Parameters>
+    constexpr decltype(auto)
+    parallel_task_policy_shim<Executor, Parameters>::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return parallel_policy_shim<Executor, Parameters>{}
+            .on(executor())
+            .with(parameters());
+    }
+
+    /// Extension: The class unsequenced_task_policy_shim is an
+    /// execution policy type used as a unique type to disambiguate parallel
+    /// algorithm overloading based on combining a underlying
+    /// \a unsequenced_task_policy and an executor and indicate that
+    /// a parallel algorithm's execution may be vectorized.
+    ///
+    /// The algorithm returns a future representing the result of the
+    /// corresponding algorithm when invoked with the
+    /// unsequenced_policy.
+    template <typename Executor, typename Parameters>
+    struct unsequenced_task_policy_shim
+    {
+        /// The type of the executor associated with this execution policy
+        using executor_type = std::decay_t<Executor>;
+
+        /// The type of the associated executor parameters object which is
+        /// associated with this execution policy
+        using executor_parameters_type = std::decay_t<Parameters>;
+
+        /// The category of the execution agents created by this execution
+        /// policy.
+        typedef typename hpx::traits::executor_execution_category<
+            executor_type>::type execution_category;
+
+        /// Rebind the type of executor used by this execution policy. The
+        /// execution category of Executor shall not be weaker than that of
+        /// this execution policy
+        template <typename Executor_, typename Parameters_>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            using type = unsequenced_task_policy_shim<Executor_, Parameters_>;
+        };
+
+        /// Create a new unsequenced_task_policy from itself
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        ///
+        /// \returns The new unsequenced_task_policy
+        ///
+        constexpr unsequenced_task_policy_shim const& operator()(
+            task_policy_tag /* tag */) const
+        {
+            return *this;
+        }
+
+        /// Create a corresponding non task policy for this task policy
+        ///
+        /// \returns The non task seqeuential shim policy
+        ///
+        inline constexpr decltype(auto) operator()(
+            non_task_policy_tag /*tag*/) const;
+
+        /// Create a new unsequenced_task_policy from the given
+        /// executor
+        ///
+        /// \tparam Executor    The type of the executor to associate with this
+        ///                     execution policy.
+        ///
+        /// \param exec         [in] The executor to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor<Executor>::value is true
+        ///
+        /// \returns The new unsequenced_task_policy
+        ///
+        template <typename Executor_>
+        constexpr decltype(auto) on(Executor_&& exec) const
+        {
+            using executor_type = std::decay_t<Executor_>;
+
+            static_assert(hpx::traits::is_executor_any<executor_type>::value,
+                "hpx::traits::is_executor_any<Executor>::value");
+
+            return hpx::parallel::execution::create_rebound_policy(
+                *this, HPX_FORWARD(Executor_, exec), parameters());
+        }
+
+        /// Create a new unsequenced_task_policy_shim from the given
+        /// execution parameters
+        ///
+        /// \tparam Parameters  The type of the executor parameters to
+        ///                     associate with this execution policy.
+        ///
+        /// \param params       [in] The executor parameters to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: all parameters are executor_parameters,
+        ///                 different parameter types can't be duplicated
+        ///
+        /// \returns The new unsequenced_task_policy_shim
+        ///
+        template <typename... Parameters_>
+        constexpr decltype(auto) with(Parameters_&&... params) const
+        {
+            return hpx::parallel::execution::create_rebound_policy(*this,
+                executor(),
+                parallel::execution::join_executor_parameters(
+                    HPX_FORWARD(Parameters_, params)...));
+        }
+
+        /// Return the associated executor object.
+        executor_type& executor()
+        {
+            return exec_;
+        }
+
+        /// Return the associated executor object.
+        constexpr executor_type const& executor() const
+        {
+            return exec_;
+        }
+
+        /// Return the associated executor parameters object.
+        executor_parameters_type& parameters()
+        {
+            return params_;
+        }
+
+        /// Return the associated executor parameters object.
+        constexpr executor_parameters_type const& parameters() const
+        {
+            return params_;
+        }
+
+        /// \cond NOINTERNAL
+        template <typename Dependent = void,
+            typename Enable =
+                std::enable_if_t<std::is_constructible<Executor>::value &&
+                        std::is_constructible<Parameters>::value,
+                    Dependent>>
+        constexpr unsequenced_task_policy_shim()
+        {
+        }
+
+        template <typename Executor_, typename Parameters_>
+        constexpr sequenced_task_policy_shim(
+            Executor_&& exec, Parameters_&& params)
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
+        {
+        }
+
+    private:
+        friend struct hpx::parallel::execution::create_rebound_policy_t;
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, const unsigned int)
+        {
+            // clang-format off
+            ar & exec_ & params_;
+            // clang-format on
+        }
+
+    private:
+        executor_type exec_;
+        executor_parameters_type params_;
+        /// \endcond
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     /// The class unsequenced_policy is an execution policy type
     /// used as a unique type to disambiguate parallel algorithm overloading
@@ -1415,21 +1705,8 @@ namespace hpx { namespace execution {
         /// policy.
         using execution_category = sequenced_execution_tag;
 
-        /// Rebind the type of executor used by this execution policy.
-        template <typename Executor, typename Parameters>
-        struct rebind
-        {
-            /// The type of the rebound execution policy
-            using type = unsequenced_policy;
-        };
-
         /// \cond NOINTERNAL
         constexpr unsequenced_policy() = default;
-
-        template <typename Executor, typename Parameters>
-        constexpr unsequenced_policy(Executor&&, Parameters&&) noexcept
-        {
-        }
         /// \endcond
 
         /// Create a new non task policy from itself
@@ -1502,12 +1779,10 @@ namespace hpx { namespace execution {
         return par.on(executor()).with(parameters());
     }
 
-    // different versions of clang-format disagree
-    // clang-format off
     template <typename Executor, typename Parameters>
     constexpr decltype(auto)
-    sequenced_task_policy_shim<Executor, Parameters>::operator()(
-        non_task_policy_tag /*tag*/) const
+        sequenced_task_policy_shim<Executor, Parameters>::operator()(
+            non_task_policy_tag /*tag*/) const
     {
         return sequenced_policy_shim<Executor, Parameters>{}
             .on(executor())
@@ -1516,13 +1791,175 @@ namespace hpx { namespace execution {
 
     template <typename Executor, typename Parameters>
     constexpr decltype(auto)
-    parallel_task_policy_shim<Executor, Parameters>::operator()(
-        non_task_policy_tag /*tag*/) const
+        parallel_task_policy_shim<Executor, Parameters>::operator()(
+            non_task_policy_tag /*tag*/) const
     {
         return parallel_policy_shim<Executor, Parameters>{}
             .on(executor())
             .with(parameters());
     }
+
+    /// The class unsequenced_policy is an execution policy type used
+    /// as a unique type to disambiguate parallel algorithm overloading and
+    /// require that a parallel algorithm's execution may be vectorized.
+    template <typename Executor, typename Parameters>
+    struct unsequenced_policy_shim
+    {
+        /// The type of the executor associated with this execution policy
+        using executor_type = std::decay_t<Executor>;
+
+        /// The type of the associated executor parameters object which is
+        /// associated with this execution policy
+        using executor_parameters_type = std::decay_t<Parameters>;
+
+        /// The category of the execution agents created by this execution
+        /// policy.
+        using execution_category =
+            typename hpx::traits::executor_execution_category<
+                executor_type>::type;
+
+        /// Rebind the type of executor used by this execution policy. The
+        /// execution category of Executor shall not be weaker than that of
+        /// this execution policy
+        template <typename Executor_, typename Parameters_>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            using type = unsequenced_policy_shim<Executor_, Parameters_>;
+        };
+
+        /// Create a new unsequenced_task_policy.
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        ///
+        /// \returns The new sequenced_task_policy_shim
+        ///
+        constexpr unsequenced_task_policy_shim<Executor, Parameters> operator()(
+            task_policy_tag /* tag */) const
+        {
+            return unsequenced_task_policy_shim<Executor, Parameters>(
+                exec_, params_);
+        }
+
+        /// Create a new unsequenced_policy from itself.
+        ///
+        /// \returns The new unsequenced_policy_shim
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
+        /// Create a new unsequenced_policy from the given
+        /// executor
+        ///
+        /// \tparam Executor    The type of the executor to associate with this
+        ///                     execution policy.
+        ///
+        /// \param exec         [in] The executor to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor<Executor>::value is true
+        ///
+        /// \returns The new unsequenced_policy
+        ///
+        template <typename Executor_>
+        constexpr decltype(auto) on(Executor_&& exec) const
+        {
+            using executor_type = std::decay_t<Executor_>;
+
+            static_assert(hpx::traits::is_executor_any<executor_type>::value,
+                "hpx::traits::is_executor_any<Executor>::value");
+
+            return hpx::parallel::execution::create_rebound_policy(
+                *this, HPX_FORWARD(Executor_, exec), parameters());
+        }
+
+        /// Create a new unsequenced_policy_shim from the given
+        /// execution parameters
+        ///
+        /// \tparam Parameters  The type of the executor parameters to
+        ///                     associate with this execution policy.
+        ///
+        /// \param params       [in] The executor parameters to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: all parameters are executor_parameters,
+        ///                 different parameter types can't be duplicated
+        ///
+        /// \returns The new unsequenced_policy_shim
+        ///
+        template <typename... Parameters_>
+        constexpr decltype(auto) with(Parameters_&&... params) const
+        {
+            return hpx::parallel::execution::create_rebound_policy(*this,
+                executor(),
+                parallel::execution::join_executor_parameters(
+                    HPX_FORWARD(Parameters_, params)...));
+        }
+
+    public:
+        /// Return the associated executor object.
+        executor_type& executor()
+        {
+            return exec_;
+        }
+
+        /// Return the associated executor object.
+        constexpr executor_type const& executor() const
+        {
+            return exec_;
+        }
+
+        /// Return the associated executor parameters object.
+        executor_parameters_type& parameters()
+        {
+            return params_;
+        }
+
+        /// Return the associated executor parameters object.
+        constexpr executor_parameters_type const& parameters() const
+        {
+            return params_;
+        }
+
+        /// \cond NOINTERNAL
+        template <typename Dependent = void,
+            typename Enable =
+                std::enable_if_t<std::is_constructible<Executor>::value &&
+                        std::is_constructible<Parameters>::value,
+                    Dependent>>
+        constexpr unsequenced_policy_shim()
+        {
+        }
+
+        template <typename Executor_, typename Parameters_>
+        constexpr unsequenced_policy_shim(Executor_&& exec, Parameters_&& params)
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
+        {
+        }
+
+    private:
+        friend struct hpx::parallel::execution::create_rebound_policy_t;
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive& ar, const unsigned int)
+        {
+            // clang-format off
+            ar & exec_ & params_;
+            // clang-format on
+        }
+
+    private:
+        executor_type exec_;
+        executor_parameters_type params_;
+        /// \endcond
+    };
     // clang-format on
 }}    // namespace hpx::execution
 
