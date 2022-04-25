@@ -33,8 +33,15 @@ namespace hpx { namespace execution {
 
     template <typename Executor, typename Parameters>
     struct parallel_task_policy_shim;
+    struct unsequenced_task_policy;
+
+    template <typename Executor, typename Parameters>
+    struct unsequenced_task_policy_shim;
 
     struct parallel_unsequenced_policy;
 
     struct unsequenced_policy;
+
+    template <typename Executor, typename Parameters>
+    struct unsequenced_policy_shim;
 }}    // namespace hpx::execution
