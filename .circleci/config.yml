@@ -635,7 +635,7 @@ jobs:
                 --output-on-failure \
                 --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.targets | sed ':b;N;$!bb;s/\n/|/g'` \
                 --exclude-regex \
-              "tests.unit.modules.compute.numa_allocator|\
+              "tests.unit.modules.compute_local.numa_allocator|\
               tests.unit.modules.resource_partitioner.scheduler_binding_check"
       - run:
           <<: *convert_xml

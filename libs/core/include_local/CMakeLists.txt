@@ -10,6 +10,7 @@ set(include_local_headers
     hpx/local/barrier.hpp
     hpx/local/channel.hpp
     hpx/local/chrono.hpp
+    hpx/local/compute.hpp
     hpx/local/condition_variable.hpp
     hpx/local/exception.hpp
     hpx/local/execution.hpp
@@ -43,6 +44,7 @@ add_hpx_module(
     hpx_async_base
     hpx_async_combinators
     hpx_async_local
+    hpx_compute_local
     hpx_errors
     hpx_execution
     hpx_executors

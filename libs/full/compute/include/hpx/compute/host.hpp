@@ -8,10 +8,6 @@
 
 #pragma once
 
-#include <hpx/compute/host/block_allocator.hpp>
-#include <hpx/compute/host/block_executor.hpp>
-#include <hpx/compute/host/get_targets.hpp>
-#include <hpx/compute/host/numa_domains.hpp>
-#include <hpx/compute/host/target.hpp>
+#include <hpx/compute/host/distributed_target.hpp>
 #include <hpx/compute/host/target_distribution_policy.hpp>
-#include <hpx/compute/host/traits/access_target.hpp>
+#include <hpx/compute_local/host.hpp>

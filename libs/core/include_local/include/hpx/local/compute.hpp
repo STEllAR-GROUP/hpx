@@ -7,6 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/compute/host.hpp>
+#include <hpx/compute_local/host.hpp>
 #include <hpx/compute_local/serialization/vector.hpp>
 #include <hpx/compute_local/vector.hpp>

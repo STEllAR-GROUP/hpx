@@ -8,4 +8,5 @@
 
 #pragma once
 
-#include <hpx/compute_local/traits.hpp>
+#include <hpx/compute_local/traits/access_target.hpp>
+#include <hpx/compute_local/traits/allocator_traits.hpp>

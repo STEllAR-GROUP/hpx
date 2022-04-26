@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,7 @@
 #endif
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/compute/detail/target_distribution_policy.hpp>
-#include <hpx/compute/host/target.hpp>
+#include <hpx/compute/host/distributed_target.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
 #include <hpx/serialization/base_object.hpp>
@@ -31,17 +31,19 @@
 #include <vector>
 
 namespace hpx { namespace compute { namespace host {
+
     /// A target_distribution_policy used for CPU bound localities.
     struct target_distribution_policy
-      : compute::detail::target_distribution_policy<host::target>
+      : compute::detail::target_distribution_policy<host::distributed::target>
     {
-        typedef compute::detail::target_distribution_policy<host::target>
+        typedef compute::detail::target_distribution_policy<
+            host::distributed::target>
             base_type;
 
         /// Default-construct a new instance of a \a target_distribution_policy.
         /// This policy will represent all devices on the current locality.
         ///
-        target_distribution_policy() {}
+        target_distribution_policy() = default;
 
         /// Create a new \a target_distribution_policy representing the given
         /// set of targets
@@ -179,9 +181,17 @@ namespace hpx { namespace compute { namespace host {
                     num_partitions += this->get_num_items(count, t);
                 }
 
+                std::vector<hpx::compute::host::target> local_targets;
+                local_targets.reserve(it->second.size());
+                for (auto&& dt : HPX_MOVE(it->second))
+                {
+                    local_targets.push_back(
+                        hpx::compute::host::target(HPX_MOVE(dt)));
+                }
+
                 objs.push_back(
                     components::bulk_create_async<Component>(localities.back(),
-                        num_partitions, ts..., HPX_MOVE(it->second)));
+                        num_partitions, ts..., HPX_MOVE(local_targets)));
             }
 
             return hpx::dataflow(
@@ -223,7 +233,9 @@ namespace hpx { namespace compute { namespace host {
         template <typename Archive>
         void serialize(Archive& ar, unsigned int const)
         {
-            ar& serialization::base_object<base_type>(*this);
+            // clang-format off
+            ar & serialization::base_object<base_type>(*this);
+            // clang-format on
         }
         /// \endcond
     };

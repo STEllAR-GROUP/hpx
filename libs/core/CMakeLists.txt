@@ -24,6 +24,7 @@ set(_hpx_core_modules
     batch_environments
     cache
     command_line_handling_local
+    compute_local
     concepts
     concurrency
     config
@@ -47,12 +48,12 @@ set(_hpx_core_modules
     io_service
     iterator_support
     itt_notify
+    lci_base
     lcos_local
     lock_registration
     logging
     memory
     mpi_base
-    lci_base
     pack_traversal
     plugin
     prefix

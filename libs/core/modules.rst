@@ -27,6 +27,7 @@ Core modules
    /libs/core/batch_environments/docs/index.rst
    /libs/core/cache/docs/index.rst
    /libs/core/command_line_handling_local/docs/index.rst
+   /libs/core/compute_local/docs/index.rst
    /libs/core/concepts/docs/index.rst
    /libs/core/concurrency/docs/index.rst
    /libs/core/config/docs/index.rst
@@ -50,6 +51,7 @@ Core modules
    /libs/core/io_service/docs/index.rst
    /libs/core/iterator_support/docs/index.rst
    /libs/core/itt_notify/docs/index.rst
+   /libs/core/lci_base/docs/index.rst
    /libs/core/lcos_local/docs/index.rst
    /libs/core/lock_registration/docs/index.rst
    /libs/core/logging/docs/index.rst

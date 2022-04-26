@@ -39,8 +39,8 @@ void allocation_tests()
 
     for (hpx::id_type const& locality : hpx::find_all_localities())
     {
-        std::vector<hpx::compute::host::target> targets =
-            hpx::compute::host::get_targets(locality).get();
+        std::vector<hpx::compute::host::distributed::target> targets =
+            hpx::compute::host::distributed::get_targets(locality).get();
 
         {
             hpx::partitioned_vector<T, target_vector> v(
