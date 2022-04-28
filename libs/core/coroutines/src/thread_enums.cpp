@@ -93,6 +93,7 @@ namespace hpx { namespace threads {
             "high (recursive)",
             "boost",
             "high (non-recursive)",
+            "bound",
         };
         // clang-format on
     }    // namespace strings
@@ -100,7 +101,7 @@ namespace hpx { namespace threads {
     char const* get_thread_priority_name(thread_priority priority)
     {
         if (priority < thread_priority::default_ ||
-            priority > thread_priority::high)
+            priority > thread_priority::bound)
         {
             return "unknown";
         }

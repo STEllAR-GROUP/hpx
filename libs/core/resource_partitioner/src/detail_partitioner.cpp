@@ -858,9 +858,14 @@ namespace hpx { namespace resource { namespace detail {
         return initial_thread_pools_[index].pool_name_;
     }
 
-    size_t partitioner::get_pu_num(std::size_t global_thread_num)
+    std::size_t partitioner::get_pu_num(std::size_t global_thread_num) const
     {
         return affinity_data_.get_pu_num(global_thread_num);
+    }
+
+    std::size_t partitioner::get_thread_occupancy(std::size_t pu_num) const
+    {
+        return affinity_data_.get_thread_occupancy(topo_, pu_num);
     }
 
     threads::mask_cref_type partitioner::get_pu_mask(

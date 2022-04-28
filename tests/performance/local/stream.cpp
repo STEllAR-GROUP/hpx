@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -263,7 +263,7 @@ void check_results(std::size_t iterations, Vector const& a_res,
 template <typename T>
 struct multiply_step
 {
-    multiply_step(T factor)
+    constexpr explicit multiply_step(T factor) noexcept
       : factor_(factor)
     {
     }
@@ -273,7 +273,7 @@ struct multiply_step
     //         (used in invoke()) to get the return type
 
     template <typename U>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val) const
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T operator()(U val) const noexcept
     {
         return val * factor_;
     }
@@ -289,7 +289,8 @@ struct add_step
     //         (used in invoke()) to get the return type
 
     template <typename U>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val1, U val2) const
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T operator()(
+        U val1, U val2) const noexcept
     {
         return val1 + val2;
     }
@@ -298,7 +299,7 @@ struct add_step
 template <typename T>
 struct triad_step
 {
-    triad_step(T factor)
+    constexpr explicit triad_step(T factor) noexcept
       : factor_(factor)
     {
     }
@@ -308,7 +309,8 @@ struct triad_step
     //         (used in invoke()) to get the return type
 
     template <typename U>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val1, U val2) const
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T operator()(
+        U val1, U val2) const noexcept
     {
         return val1 + val2 * factor_;
     }
@@ -577,6 +579,23 @@ int hpx_main(hpx::program_options::variables_map& vm)
             timing = run_benchmark<>(warmup_iterations, iterations, vector_size,
                 std::move(alloc), std::move(policy));
         }
+        else if (executor == 5)
+        {
+            // Block-fork-join executor and allocator with block-fork-join
+            // executor.
+            using executor_type =
+                hpx::execution::experimental::block_fork_join_executor;
+
+            executor_type exec;
+
+            auto policy = hpx::execution::par.on(exec);
+            hpx::compute::host::detail::policy_allocator<STREAM_TYPE,
+                decltype(policy)>
+                alloc(policy);
+
+            timing = run_benchmark<>(warmup_iterations, iterations, vector_size,
+                std::move(alloc), std::move(policy));
+        }
         else
         {
             HPX_THROW_EXCEPTION(hpx::commandline_option_error, "hpx_main",
@@ -634,9 +653,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 "max,add_bytes,add_bw,add_avg,add_min,add_max,triad_bytes,"
                 "triad_bw,triad_avg,triad_min,triad_max\n");
         }
-        std::size_t const num_executors = 5;
+        std::size_t const num_executors = 6;
         const char* executors[num_executors] = {"parallel-serial", "block",
-            "parallel-parallel", "fork_join_executor", "scheduler_executor"};
+            "parallel-parallel", "fork_join_executor", "scheduler_executor",
+            "block_fork_join_executor"};
         hpx::util::format_to(std::cout, "{},{},{},", executors[executor],
             hpx::get_os_thread_count(), vector_size);
     }
@@ -712,7 +732,7 @@ int main(int argc, char* argv[])
             "size of vector (default: 1024)")
         (   "executor",
             hpx::program_options::value<std::size_t>()->default_value(2),
-            "executor to use (0-4) (default: 2, parallel_executor)")
+            "executor to use (0-5) (default: 2, parallel_executor)")
         ;
     // clang-format on
 

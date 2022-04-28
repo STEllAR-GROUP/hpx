@@ -458,7 +458,7 @@ namespace hpx { namespace threads { namespace policies {
         /// Schedule the passed thread
         void schedule_thread(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
-            thread_priority /* priority */ = thread_priority::normal) override
+            thread_priority /* priority */ = thread_priority::default_) override
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
@@ -501,7 +501,7 @@ namespace hpx { namespace threads { namespace policies {
 
         void schedule_thread_last(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
-            thread_priority /* priority */ = thread_priority::normal) override
+            thread_priority /* priority */ = thread_priority::default_) override
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
@@ -579,6 +579,7 @@ namespace hpx { namespace threads { namespace policies {
                 {
                 case thread_priority::default_:
                 case thread_priority::low:
+                case thread_priority::bound:
                 case thread_priority::normal:
                 case thread_priority::boost:
                 case thread_priority::high:
@@ -603,6 +604,7 @@ namespace hpx { namespace threads { namespace policies {
             {
             case thread_priority::default_:
             case thread_priority::low:
+            case thread_priority::bound:
             case thread_priority::normal:
             case thread_priority::boost:
             case thread_priority::high:

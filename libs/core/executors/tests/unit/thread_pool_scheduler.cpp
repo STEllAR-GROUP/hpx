@@ -259,9 +259,10 @@ void test_properties()
     hpx::condition_variable cond;
     bool executed{false};
 
-    constexpr std::array<hpx::threads::thread_priority, 3> priorities{
+    constexpr std::array<hpx::threads::thread_priority, 4> priorities{
         {hpx::threads::thread_priority::low,
             hpx::threads::thread_priority::normal,
+            hpx::threads::thread_priority::bound,
             hpx::threads::thread_priority::high}};
 
     for (auto const prio : priorities)

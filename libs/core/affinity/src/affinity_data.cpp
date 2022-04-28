@@ -206,7 +206,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
             return ret;
         }
 
-        for (std::size_t thread_num = 0; thread_num < num_threads_;
+        for (std::size_t thread_num = 0; thread_num != num_threads_;
              ++thread_num)
         {
             ret |= get_pu_mask(topo, thread_num);
@@ -230,7 +230,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
             threads::resize(pu_mask, hardware_concurrency());
             threads::set(pu_mask, pu_num);
 
-            for (std::size_t num_thread = 0; num_thread < num_threads_;
+            for (std::size_t num_thread = 0; num_thread != num_threads_;
                  ++num_thread)
             {
                 mask_cref_type affinity_mask = get_pu_mask(topo, num_thread);

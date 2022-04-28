@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2021 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,7 +23,11 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::detail {
+    HPX_CORE_EXPORT char const* store_function_annotation(std::string name);
+}    // namespace hpx::detail
+
+namespace hpx::util {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
     struct thread_description
@@ -63,12 +67,27 @@ namespace hpx { namespace util {
             data_.desc_ = desc ? desc : "<unknown>";
         }
 
+        explicit thread_description(std::string desc)
+          : type_(data_type_description)
+        {
+            data_.desc_ =
+                hpx::detail::store_function_annotation(HPX_MOVE(desc));
+        }
+
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         thread_description(
             char const* desc, util::itt::string_handle const& sh) noexcept
           : type_(data_type_description)
         {
             data_.desc_ = desc ? desc : "<unknown>";
+            desc_itt_ = sh;
+        }
+
+        thread_description(std::string desc, util::itt::string_handle const& sh)
+          : type_(data_type_description)
+        {
+            data_.desc_ =
+                hpx::detail::store_function_annotation(HPX_MOVE(desc));
             desc_itt_ = sh;
         }
 #endif
@@ -207,6 +226,10 @@ namespace hpx { namespace util {
         thread_description() noexcept = default;
 
         constexpr thread_description(char const* /*desc*/) noexcept {}
+        constexpr explicit thread_description(
+            std::string const& /*desc*/) noexcept
+        {
+        }
 
         template <typename F,
             typename = typename std::enable_if<
@@ -282,9 +305,9 @@ namespace hpx { namespace util {
     HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream&, thread_description const&);
     HPX_CORE_EXPORT std::string as_string(thread_description const& desc);
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_description is part of the thread related API
     /// allows to query the description of one of the threads known to the
@@ -318,4 +341,4 @@ namespace hpx { namespace threads {
         thread_id_type const& id,
         util::thread_description const& desc = util::thread_description(),
         error_code& ec = throws);
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

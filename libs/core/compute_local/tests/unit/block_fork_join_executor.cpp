@@ -1,5 +1,5 @@
 //  Copyright (c)      2020 ETH Zurich
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/local/thread.hpp>
+#include <hpx/modules/compute_local.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
@@ -23,6 +24,7 @@
 #include <utility>
 #include <vector>
 
+using hpx::execution::experimental::block_fork_join_executor;
 using hpx::execution::experimental::fork_join_executor;
 
 static std::atomic<std::size_t> count{0};
@@ -47,7 +49,7 @@ void test_bulk_sync(ExecutorArgs&&... args)
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
 
-    fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
+    block_fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
     hpx::parallel::execution::bulk_sync_execute(
         exec, hpx::bind(&bulk_test, _1, _2), v, 42);
     HPX_TEST_EQ(count.load(), n);
@@ -69,7 +71,7 @@ void test_bulk_async(ExecutorArgs&&... args)
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
 
-    fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
+    block_fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
                       exec, hpx::bind(&bulk_test, _1, _2), v, 42))
         .get();
@@ -98,7 +100,7 @@ void test_bulk_sync_exception(ExecutorArgs&&... args)
     std::vector<int> v(n);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
+    block_fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
     bool caught_exception = false;
     try
     {
@@ -129,7 +131,7 @@ void test_bulk_async_exception(ExecutorArgs&&... args)
     std::vector<int> v(n);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
+    block_fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
     bool caught_exception = false;
     try
     {
@@ -155,10 +157,22 @@ void static_check_executor()
 {
     using namespace hpx::traits;
 
-    static_assert(is_bulk_one_way_executor_v<fork_join_executor>,
-        "is_bulk_one_way_executor_v<fork_join_executor>");
-    static_assert(is_bulk_two_way_executor_v<fork_join_executor>,
-        "is_bulk_two_way_executor_v<fork_join_executor>");
+    static_assert(!has_sync_execute_member<block_fork_join_executor>::value,
+        "!has_sync_execute_member<block_fork_join_executor>::value");
+    static_assert(!has_async_execute_member<block_fork_join_executor>::value,
+        "!has_async_execute_member<block_fork_join_executor>::value");
+    static_assert(!has_then_execute_member<block_fork_join_executor>::value,
+        "!has_then_execute_member<block_fork_join_executor>::value");
+    static_assert(has_bulk_sync_execute_member<block_fork_join_executor>::value,
+        "has_bulk_sync_execute_member<block_fork_join_executor>::value");
+    static_assert(
+        has_bulk_async_execute_member<block_fork_join_executor>::value,
+        "has_bulk_async_execute_member<block_fork_join_executor>::value");
+    static_assert(
+        !has_bulk_then_execute_member<block_fork_join_executor>::value,
+        "!has_bulk_then_execute_member<block_fork_join_executor>::value");
+    static_assert(!has_post_member<block_fork_join_executor>::value,
+        "!has_post_member<block_fork_join_executor>::value");
 }
 
 template <typename... ExecutorArgs>
@@ -166,7 +180,7 @@ void test_executor(hpx::threads::thread_priority priority,
     hpx::threads::thread_stacksize stacksize,
     fork_join_executor::loop_schedule schedule)
 {
-    std::cerr << "testing fork_join_executor with priority = " << priority
+    std::cerr << "testing block_fork_join_executor with priority = " << priority
               << ", stacksize = " << stacksize << ", schedule = " << schedule
               << "\n";
     test_bulk_sync(priority, stacksize, schedule);
@@ -180,14 +194,14 @@ int hpx_main()
 {
     static_check_executor();
 
-    // thread_stacksize::nostack cannot be used with the fork_join_executor
+    // thread_stacksize::nostack cannot be used with the block_fork_join_executor
     // because it prevents other work from running when yielding. Using
     // thread_priority::low hangs for unknown reasons.
     for (auto const priority : {
              // hpx::threads::thread_priority::low,
+             hpx::threads::thread_priority::bound,
              hpx::threads::thread_priority::normal,
              hpx::threads::thread_priority::high,
-             hpx::threads::thread_priority::bound,
          })
     {
         for (auto const stacksize : {
@@ -200,9 +214,7 @@ int hpx_main()
                      fork_join_executor::loop_schedule::dynamic,
                  })
             {
-                {
-                    test_executor(priority, stacksize, schedule);
-                }
+                test_executor(priority, stacksize, schedule);
             }
         }
     }

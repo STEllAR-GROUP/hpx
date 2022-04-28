@@ -191,7 +191,7 @@ namespace hpx { namespace util {
     // Manufacture a counting iterator for an arbitrary incrementable type
     template <typename Incrementable>
     HPX_HOST_DEVICE inline constexpr counting_iterator<Incrementable>
-    make_counting_iterator(Incrementable x)
+    make_counting_iterator(Incrementable x) noexcept
     {
         return counting_iterator<Incrementable>(x);
     }
