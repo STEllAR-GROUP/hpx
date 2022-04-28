@@ -11,6 +11,7 @@
 #include <hpx/batch_environments/alps_environment.hpp>
 #include <hpx/batch_environments/batch_environment.hpp>
 #include <hpx/batch_environments/pbs_environment.hpp>
+#include <hpx/batch_environments/pjm_environment.hpp>
 #include <hpx/batch_environments/slurm_environment.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -43,6 +44,15 @@ namespace hpx { namespace util {
             num_threads_ = alps_env.num_threads();
             num_localities_ = alps_env.num_localities();
             node_num_ = alps_env.node_num();
+            return;
+        }
+        batch_environments::pjm_environment pjm_env(nodelist, have_mpi, debug);
+        if (pjm_env.valid())
+        {
+            batch_name_ = "PJM";
+            num_threads_ = pjm_env.num_threads();
+            num_localities_ = pjm_env.num_localities();
+            node_num_ = pjm_env.node_num();
             return;
         }
         batch_environments::slurm_environment slurm_env(nodelist, debug);
