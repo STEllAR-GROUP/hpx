@@ -261,6 +261,9 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`5885` - Testing newer ASIO version
+* :hpx-pr:`5884` - Fix miscellaneous doc sections
+* :hpx-pr:`5882` - Fixing OctoTiger incompatibility introduced recently
 * :hpx-pr:`5881` - Fixing recent patch that disables ATOMIC_FLAG_INIT for C++20 and up
 * :hpx-pr:`5880` - refactor: convert `counter_status` enum to enum class
 * :hpx-pr:`5878` - Docs: Replaced non-existent create_reducer function with create_communicator
@@ -269,6 +272,7 @@ Closed pull requests
 * :hpx-pr:`5875` - Doc updates starting the hpx runtime
 * :hpx-pr:`5874` - Doc updates launching configuring
 * :hpx-pr:`5873` - Prevent certain generated files from being deleted on reconfigure
+* :hpx-pr:`5870` - Adding support for the PJM batch environment
 * :hpx-pr:`5867` - Update CMakeLists.txt
 * :hpx-pr:`5866` - add cmake option HPX_WITH_PARCELPORT_COUNTERS
 * :hpx-pr:`5864` - ATOMIC_INIT_FLAG is deprecated starting C++20
