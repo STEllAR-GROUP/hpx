@@ -380,7 +380,7 @@ jobs:
       - persist_to_workspace:
           root: /hpx
           paths:
-            - ./build
+            - ./build/share/hpx/docs/report
       - store_artifacts:
           path: /hpx/build/share/hpx/docs/report
 
