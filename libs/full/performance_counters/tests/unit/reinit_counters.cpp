@@ -43,7 +43,7 @@ public:
         hpx::performance_counters::counter_values_array value;
 
         value.time_ = hpx::chrono::high_resolution_clock::now();
-        value.status_ = hpx::performance_counters::status_new_data;
+        value.status_ = hpx::performance_counters::counter_status::new_data;
         value.count_ = ++invocation_count_;
 
         std::vector<std::int64_t> result(value_count_.load());

@@ -29,7 +29,7 @@ namespace hpx { namespace performance_counters {
     struct manage_counter_type
     {
         manage_counter_type(counter_info const& info)
-          : status_(status_invalid_data)
+          : status_(counter_status::invalid_data)
           , info_(info)
         {
         }
@@ -41,13 +41,13 @@ namespace hpx { namespace performance_counters {
 
         counter_status install(error_code& ec = throws)
         {
-            if (status_invalid_data != status_)
+            if (counter_status::invalid_data != status_)
             {
                 HPX_THROWS_IF(ec, hpx::invalid_status,
                     "manage_counter_type::install",
                     "counter type {} has been already installed.",
                     info_.fullname_);
-                return status_invalid_data;
+                return counter_status::invalid_data;
             }
 
             return status_ = add_counter_type(info_, ec);
@@ -57,13 +57,13 @@ namespace hpx { namespace performance_counters {
             discover_counters_func const& discover_counters,
             error_code& ec = throws)
         {
-            if (status_invalid_data != status_)
+            if (counter_status::invalid_data != status_)
             {
                 HPX_THROWS_IF(ec, hpx::invalid_status,
                     "manage_counter_type::install",
                     "generic counter type {} has been already installed.",
                     info_.fullname_);
-                return status_invalid_data;
+                return counter_status::invalid_data;
             }
 
             return status_ = add_counter_type(
@@ -72,7 +72,7 @@ namespace hpx { namespace performance_counters {
 
         void uninstall(error_code& ec = throws)
         {
-            if (status_invalid_data != status_)
+            if (counter_status::invalid_data != status_)
                 remove_counter_type(info_, ec);    // ignore errors
         }
 
@@ -104,7 +104,7 @@ namespace hpx { namespace performance_counters {
         // Register the shutdown function which will clean up this counter type.
         get_runtime().add_shutdown_function(
             hpx::bind_front(&counter_type_shutdown, p));
-        return status_valid_data;
+        return counter_status::valid_data;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ namespace hpx { namespace performance_counters {
         // Register the shutdown function which will clean up this counter type.
         get_runtime().add_shutdown_function(
             hpx::bind_front(&counter_type_shutdown, p));
-        return status_valid_data;
+        return counter_status::valid_data;
     }
 
     // Install a new generic performance counter type which uses a function to

@@ -49,7 +49,7 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, hpx::invalid_status, "manage_counter::install",
                 "counter has been already installed");
-            return status_invalid_data;
+            return counter_status::invalid_data;
         }
 
         info_ = info;

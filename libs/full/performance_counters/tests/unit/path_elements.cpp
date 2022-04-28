@@ -401,20 +401,20 @@ namespace test {
             using namespace hpx::performance_counters;
 
             std::string fullname;
-            HPX_TEST_EQ(
-                status_valid_data, get_counter_name(t->path_, fullname, ec));
+            HPX_TEST_EQ(counter_status::valid_data,
+                get_counter_name(t->path_, fullname, ec));
             HPX_TEST_EQ(ec.value(), hpx::success);
             HPX_TEST_EQ(fullname, t->fullname_);
 
             std::string type_name;
-            HPX_TEST(status_valid_data ==
+            HPX_TEST(counter_status::valid_data ==
                 get_counter_type_name(t->path_, type_name, ec));
             HPX_TEST_EQ(ec.value(), hpx::success);
             HPX_TEST_EQ(type_name, t->typename_);
 
             counter_path_elements p;
 
-            HPX_TEST(status_valid_data ==
+            HPX_TEST(counter_status::valid_data ==
                 get_counter_path_elements(t->fullname_, p, ec));
             HPX_TEST_EQ(ec.value(), hpx::success);
             HPX_TEST_EQ(p.objectname_, t->path_.objectname_);
@@ -426,26 +426,27 @@ namespace test {
             HPX_TEST_EQ(p.countername_, t->path_.countername_);
 
             fullname.erase();
-            HPX_TEST_EQ(status_valid_data, get_counter_name(p, fullname, ec));
+            HPX_TEST_EQ(
+                counter_status::valid_data, get_counter_name(p, fullname, ec));
             HPX_TEST_EQ(ec.value(), hpx::success);
             HPX_TEST_EQ(fullname, t->fullname_);
 
             counter_type_path_elements tp1, tp2;
 
-            HPX_TEST(status_valid_data ==
+            HPX_TEST(counter_status::valid_data ==
                 get_counter_type_path_elements(t->fullname_, tp1, ec));
             HPX_TEST_EQ(ec.value(), hpx::success);
             HPX_TEST_EQ(tp1.objectname_, t->path_.objectname_);
             HPX_TEST_EQ(tp1.countername_, t->path_.countername_);
 
             type_name.erase();
-            HPX_TEST_EQ(
-                status_valid_data, get_counter_type_name(tp1, type_name, ec));
+            HPX_TEST_EQ(counter_status::valid_data,
+                get_counter_type_name(tp1, type_name, ec));
             HPX_TEST_EQ(ec.value(), hpx::success);
             HPX_TEST_EQ(type_name, t->typename_);
 
             type_name.erase();
-            HPX_TEST(status_valid_data ==
+            HPX_TEST(counter_status::valid_data ==
                 get_full_counter_type_name(tp1, type_name, ec));
             HPX_TEST_EQ(ec.value(), hpx::success);
             if (t->path_.parameters_.empty())
@@ -458,15 +459,15 @@ namespace test {
                     type_name, t->typename_ + '@' + t->path_.parameters_);
             }
 
-            HPX_TEST(status_valid_data ==
+            HPX_TEST(counter_status::valid_data ==
                 get_counter_type_path_elements(t->typename_, tp2, ec));
             HPX_TEST_EQ(ec.value(), hpx::success);
             HPX_TEST_EQ(tp2.objectname_, t->path_.objectname_);
             HPX_TEST_EQ(tp2.countername_, t->path_.countername_);
 
             type_name.erase();
-            HPX_TEST_EQ(
-                status_valid_data, get_counter_type_name(tp2, type_name, ec));
+            HPX_TEST_EQ(counter_status::valid_data,
+                get_counter_type_name(tp2, type_name, ec));
             HPX_TEST_EQ(ec.value(), hpx::success);
             HPX_TEST_EQ(type_name, t->typename_);
         }
@@ -502,8 +503,8 @@ namespace test {
         for (char const* t = data_bad[0]; nullptr != t; t = data_bad[++i])
         {
             hpx::error_code ec;
-            HPX_TEST_EQ(
-                status_invalid_data, get_counter_path_elements(t, p, ec));
+            HPX_TEST_EQ(counter_status::invalid_data,
+                get_counter_path_elements(t, p, ec));
             HPX_TEST_EQ(ec.value(), hpx::bad_parameter);
         }
 
