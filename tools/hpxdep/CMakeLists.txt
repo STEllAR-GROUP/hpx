@@ -28,11 +28,6 @@ else()
   set(HPX_DEPREPORT_CAPTION "Version ${HPX_VERSION}${HPX_VERSION_TAG}")
 endif()
 
-configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/hpxdep_index.html.in"
-  "${PROJECT_BINARY_DIR}/share/hpx/docs/report/index.html" @ONLY
-)
-
 # cmake-format: off
 add_custom_target(depreport
   DEPENDS hpxdep

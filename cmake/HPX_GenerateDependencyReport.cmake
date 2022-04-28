@@ -20,6 +20,12 @@ set(HPXDEP_OUTPUT_DIR
     "${HPX_BINARY_DIR}/share/hpx/docs/report/${HPX_DEPREPORT_VERSION}"
 )
 
+# create index.html
+configure_file(
+  "${HPX_SOURCE_DIR}/cmake/templates/hpxdep_index.html.in"
+  "${HPX_BINARY_DIR}/share/hpx/docs/report/index.html" @ONLY
+)
+
 # create module-list
 set(hpxdep_module_list_output "module-list.txt")
 message("Generating ${hpxdep_module_list_output}")
