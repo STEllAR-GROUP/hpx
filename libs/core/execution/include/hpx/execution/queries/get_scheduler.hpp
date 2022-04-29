@@ -43,6 +43,46 @@ namespace hpx::execution::experimental {
         }
     } forwarding_scheduler_query{};
 
+    enum class forward_progress_guarantee
+    {
+        concurrent,
+        parallel,
+        weakly_parallel
+    };
+
+    // 1. `execution::get_forward_progress_guarantee` is used to ask a scheduler about
+    // the forward progress guarantees of execution agents created by that
+    // scheduler.
+    // 2. The name `execution::get_forward_progress_guarantee` denotes a
+    // customization point object. For some subexpression s, let S be decltype((s)).
+    // If S does not satisfy execution::scheduler,
+    // execution::get_forward_progress_guarantee is ill-formed. Otherwise,
+    // execution::get_forward_progress_guarantee(s) is expression equivalent to:
+    //      2. `tag_invoke(execution::get_forward_progress_guarantee, as_const(s))`,
+    // if this expression is well formed.
+    //          Mandates: The tag_invoke expression above is not
+    //          potentially throwing and its type is execution::forward_progress_guarantee.
+    //          Otherwise, execution::forward_progress_guarantee::weakly_parallel.
+    // 3. If `execution::get_forward_progress_guarantee(s)` for some scheduler s returns
+    // `execution::forward_progress_guarantee::concurrent`, all execution agents
+    // created by that scheduler shall provide the concurrent forward progress
+    // guarantee. If it returns `execution::forward_progress_guarantee::parallel`, all
+    // execution agents created by that scheduler shall provide at least the
+    // parallel forward progress guarantee.
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
+        get_forward_progress_guarantee_t final
+      : hpx::functional::detail::tag_fallback_noexcept<
+            get_forward_progress_guarantee_t>
+    {
+        template <typename T>
+        friend constexpr HPX_FORCEINLINE forward_progress_guarantee
+        tag_fallback_invoke(get_forward_progress_guarantee_t,
+            const hpx::util::unwrap_reference<T>&) noexcept
+        {
+            return forward_progress_guarantee::weakly_parallel;
+        }
+    } get_forward_progress_guarantee{};
+
     // 1. execution::get_scheduler is used to ask an object for its associated
     //    scheduler.
     //
