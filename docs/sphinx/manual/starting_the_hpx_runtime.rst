@@ -12,8 +12,8 @@
 Starting the |hpx| runtime
 ==========================
 
-In order to write an application which uses services from the |hpx| runtime
-system you need to initialize the |hpx| library by inserting certain calls
+In order to write an application that uses services from the |hpx| runtime
+system, you need to initialize the |hpx| library by inserting certain calls
 into the code of your application. Depending on your use case, this can be done
 in 3 different ways:
 
@@ -22,7 +22,7 @@ in 3 different ways:
 * :ref:`Balanced use case <medium>`: Supply your own main |hpx| entry point
   while blocking the main thread.
 * :ref:`Most flexibility <flexible>`: Supply your own main |hpx| entry point
-  while avoiding to block the main thread.
+  while avoiding blocking the main thread.
 * :ref:`Suspend and resume <suspend_resume>`: As above but suspend and resume
   the |hpx| runtime to allow for other runtimes to be used.
 
@@ -31,7 +31,7 @@ in 3 different ways:
 Re-use the ``main()`` function as the main |hpx| entry point
 ============================================================
 
-This method is the least intrusive to your code. It however provides you with
+This method is the least intrusive to your code. However, it provides you with
 the smallest flexibility in terms of initializing the |hpx| runtime system. The
 following code snippet shows what a minimal |hpx| application using this
 technique looks like:
@@ -67,14 +67,14 @@ All command line arguments specific to |hpx| will still be processed by the
 |hpx| runtime system as usual. However, those command line options will be
 removed from the list of values passed to ``argc``/\ ``argv`` of the function
 ``main()``. The list of values passed to ``main()`` will hold only the
-commandline options which are not recognized by the |hpx| runtime system (see
+commandline options that are not recognized by the |hpx| runtime system (see
 the section :ref:`commandline` for more details on what options are recognized
 by |hpx|).
 
 .. note::
 
-   In this mode all one-letter-shortcuts are disabled which are normally
-   available on the |hpx| command line (such as ``-t`` or ``-l`` see
+   In this mode all one-letter shortcuts that are normally
+   available on the |hpx| command line are disabled (such as ``-t`` or ``-l`` see
    :ref:`commandline`). This is done to minimize any possible interaction
    between the command line options recognized by the |hpx| runtime system and
    any command line options defined by the application.
@@ -117,7 +117,7 @@ to the operating system as usual.
 Supply your own main |hpx| entry point while blocking the main thread
 =====================================================================
 
-With this method you need to provide an explicit main thread function named
+With this method you need to provide an explicit main-thread function named
 ``hpx_main`` at global scope. This function will be invoked as the main entry
 point of your |hpx| application on the console :term:`locality` only (this
 function will be invoked as the first |hpx| thread of your application). All
@@ -131,7 +131,7 @@ The function :cpp:func:`hpx::finalize` has to be called on one of the |hpx|
 localities in order to signal that all work has been scheduled and the runtime
 system should be stopped after the scheduled work has been executed.
 
-This method of invoking |hpx| has the advantage of you being able to decide
+This method of invoking |hpx| has the advantage of the user being able to decide
 which version of :cpp:func:`hpx::init` to call. This allows to pass
 additional configuration parameters while initializing the |hpx| runtime system.
 
@@ -168,12 +168,12 @@ The header file to include for this method of using |hpx| is
 ``hpx/hpx_init.hpp``.
 
 There are many additional overloads of :cpp:func:`hpx::init` available, such as
-for instance to provide your own entry point function instead of ``hpx_main``.
+the ability to provide your own entry-point function instead of ``hpx_main``.
 Please refer to the function documentation for more details (see: ``hpx/hpx_init.hpp``).
 
 .. _flexible:
 
-Supply your own main |hpx| entry point while avoiding to block the main thread
+Supply your own main |hpx| entry point while avoiding blocking the main thread
 ==============================================================================
 
 With this method you need to provide an explicit main thread function named
@@ -190,7 +190,7 @@ system should be stopped after the scheduled work has been executed.
 
 This method of invoking |hpx| is useful for applications where the main thread
 is used for special operations, such a GUIs. The function :cpp:func:`hpx::stop`
-can be used to wait for the |hpx| runtime system to exit and should be at least
+can be used to wait for the |hpx| runtime system to exit and should at least be 
 used as the last function called in ``main()``. The value returned from
 ``hpx_main`` will be returned from :cpp:func:`hpx::stop` after the runtime
 system has stopped.
@@ -232,7 +232,7 @@ The header file to include for this method of using |hpx| is
 ``hpx/hpx_start.hpp``.
 
 There are many additional overloads of :cpp:func:`hpx::start` available, such as
-for instance to provide your own entry point function instead of ``hpx_main``.
+the option for users to provide thier own entry point function instead of ``hpx_main``.
 Please refer to the function documentation for more details (see:
 ``hpx/hpx_start.hpp``).
 
@@ -242,7 +242,7 @@ Suspending and resuming the |hpx| runtime
 =========================================
 
 In some applications it is required to combine |hpx| with other runtimes. To
-support this use case |hpx| provides two functions: :cpp:func:`hpx::suspend` and
+support this use case, |hpx| provides two functions: :cpp:func:`hpx::suspend` and
 :cpp:func:`hpx::resume`. :cpp:func:`hpx::suspend` is a blocking call which will
 wait for all scheduled tasks to finish executing and then put the thread pool OS
 threads to sleep. :cpp:func:`hpx::resume` simply wakes up the sleeping threads
@@ -292,7 +292,7 @@ so that they are ready to accept new work. :cpp:func:`hpx::suspend` and
     work required from other localities has also finished.
 
 |hpx| also supports suspending individual thread pools and threads. For details
-on how to do that see the documentation for :cpp:class:`hpx::threads::thread_pool_base`.
+on how to do that, see the documentation for :cpp:class:`hpx::threads::thread_pool_base`.
 
 Automatically suspending worker threads
 ---------------------------------------
@@ -346,7 +346,7 @@ Working of ``hpx_main.hpp``
 
 In order to initialize |hpx| from ``main()``, we make use of linker tricks.
 
-It is implemented differently for different Operating Systems. Method of
+It is implemented differently for different operating systems. The method of
 implementation is as follows:
 
 * :ref:`Linux <hpx_main_implementation_linux>`: Using linker ``--wrap`` option.
@@ -360,7 +360,7 @@ Linux implementation
 --------------------
 
 We make use of the Linux linker ``ld``\ 's ``--wrap`` option to wrap the
-``main()`` function. This way any call to ``main()`` are redirected to our own
+``main()`` function. This way any calls to ``main()`` are redirected to our own
 implementation of main. It is here that we check for the existence of
 ``hpx_main.hpp`` by making use of a shadow variable ``include_libhpx_wrap``. The
 value of this variable determines the function stack at runtime.
