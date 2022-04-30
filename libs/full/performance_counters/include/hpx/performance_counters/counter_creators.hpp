@@ -146,7 +146,8 @@ namespace hpx { namespace performance_counters {
         counter_info const&, discover_counter_func const&,
         discover_counters_mode, error_code&);
 
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
     ///////////////////////////////////////////////////////////////////////////
     // Creation function for per-action parcel data counters
     HPX_EXPORT naming::gid_type per_action_data_counter_creator(

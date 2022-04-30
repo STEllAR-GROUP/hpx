@@ -56,11 +56,11 @@ namespace hpx::parcelset::policies::mpi {
           , pp_(pp)
         {
             header_.assert_valid();
-
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             parcelset::data_point& data = buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
             data.bytes_ = static_cast<std::size_t>(header_.numbytes());
-
+#endif
             buffer_.data_.resize(static_cast<std::size_t>(header_.size()));
             buffer_.num_chunks_ = header_.num_chunks();
         }
@@ -180,10 +180,10 @@ namespace hpx::parcelset::policies::mpi {
             {
                 return false;
             }
-
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             parcelset::data_point& data = buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds() - data.time_;
-
+#endif
             {
                 util::mpi_environment::scoped_lock l;
                 MPI_Isend(&tag_, 1, MPI_INT, src_, 1,
@@ -229,8 +229,9 @@ namespace hpx::parcelset::policies::mpi {
             return false;
         }
 
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         hpx::chrono::high_resolution_timer timer_;
-
+#endif
         connection_state state_;
 
         int src_;

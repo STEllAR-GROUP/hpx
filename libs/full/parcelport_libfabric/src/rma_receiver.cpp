@@ -138,10 +138,11 @@ namespace hpx::parcelset::policies::libfabric {
 
         buffer.num_chunks_ = std::make_pair(zc_chunks, oo_chunks);
         buffer.data_size_ = header_->message_size();
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         parcelset::data_point& data = buffer.data_point_;
-
         data.bytes_ = static_cast<std::size_t>(header_->message_size());
         data.time_ = hpx::chrono::high_resolution_clock::now() - start_time_;
+#endif
         LOG_DEBUG_MSG("receiver "
             << hexpointer(this)
             << "calling parcel decode for complete NORMAL parcel");
@@ -472,11 +473,11 @@ namespace hpx::parcelset::policies::libfabric {
 
         buffer.num_chunks_ = std::make_pair(zc_chunks, oo_chunks);
         buffer.data_size_ = header_->message_size();
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         parcelset::data_point& data = buffer.data_point_;
-
         data.bytes_ = static_cast<std::size_t>(header_->message_size());
         data.time_ = hpx::chrono::high_resolution_clock::now() - start_time_;
-
+#endif
         LOG_DEBUG_MSG("receiver "
             << hexpointer(this)
             << "calling parcel decode for ZEROCOPY complete parcel");

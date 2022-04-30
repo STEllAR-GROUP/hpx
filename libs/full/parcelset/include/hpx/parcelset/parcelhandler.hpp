@@ -263,6 +263,10 @@ namespace hpx::parcelset {
         ///////////////////////////////////////////////////////////////////////
         // Performance counter data
 
+        // number of parcels routed
+        std::int64_t get_parcel_routed_count(bool reset);
+
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         // number of parcels sent
         std::int64_t get_parcel_send_count(
             std::string const& pp_type, bool reset) const;
@@ -270,9 +274,6 @@ namespace hpx::parcelset {
         // number of messages sent
         std::int64_t get_message_send_count(
             std::string const& pp_type, bool reset) const;
-
-        // number of parcels routed
-        std::int64_t get_parcel_routed_count(bool reset);
 
         // number of parcels received
         std::int64_t get_parcel_receive_count(
@@ -323,8 +324,9 @@ namespace hpx::parcelset {
 
         std::int64_t get_buffer_allocate_time_received(
             std::string const& pp_type, bool reset) const;
-
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#endif
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
         // same as above, just separated data for each action
         // number of parcels sent
         std::int64_t get_action_parcel_send_count(std::string const& pp_type,

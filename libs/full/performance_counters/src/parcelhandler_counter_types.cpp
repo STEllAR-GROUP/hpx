@@ -24,6 +24,7 @@ namespace hpx::performance_counters {
     void register_parcelhandler_counter_types(
         parcelset::parcelhandler& ph, std::string const& pp_type)
     {
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         if (!ph.is_networking_enabled())
         {
             return;
@@ -33,8 +34,8 @@ namespace hpx::performance_counters {
         using placeholders::_2;
 
         using parcelset::parcelhandler;
-
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
         hpx::function<std::int64_t(std::string const&, bool)> num_parcel_sends(
             hpx::bind_front(
                 &parcelhandler::get_action_parcel_send_count, &ph, pp_type));
@@ -58,7 +59,8 @@ namespace hpx::performance_counters {
         hpx::function<std::int64_t(bool)> receiving_time(
             hpx::bind_front(&parcelhandler::get_receiving_time, &ph, pp_type));
 
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
         hpx::function<std::int64_t(std::string const&, bool)>
             sending_serialization_time(hpx::bind_front(
                 &parcelhandler::get_action_sending_serialization_time, &ph,
@@ -76,7 +78,8 @@ namespace hpx::performance_counters {
                 &ph, pp_type));
 #endif
 
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
         hpx::function<std::int64_t(std::string const&, bool)> data_sent(
             hpx::bind_front(
                 &parcelhandler::get_action_data_sent, &ph, pp_type));
@@ -112,7 +115,8 @@ namespace hpx::performance_counters {
                         "connection type for the referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
                     hpx::bind(
                         &performance_counters::per_action_data_counter_creator,
                         _1, HPX_MOVE(num_parcel_sends), _2),
@@ -132,7 +136,8 @@ namespace hpx::performance_counters {
                         "connection type for the referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
                     hpx::bind(
                         &performance_counters::per_action_data_counter_creator,
                         _1, HPX_MOVE(num_parcel_receives), _2),
@@ -203,7 +208,8 @@ namespace hpx::performance_counters {
                         "referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
                     hpx::bind(
                         &performance_counters::per_action_data_counter_creator,
                         _1, HPX_MOVE(sending_serialization_time), _2),
@@ -223,7 +229,8 @@ namespace hpx::performance_counters {
                         "referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
                     hpx::bind(
                         &performance_counters::per_action_data_counter_creator,
                         _1, HPX_MOVE(receiving_serialization_time), _2),
@@ -273,7 +280,8 @@ namespace hpx::performance_counters {
                         "type by the referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
                     hpx::bind(
                         &performance_counters::per_action_data_counter_creator,
                         _1, HPX_MOVE(data_sent), _2),
@@ -294,7 +302,8 @@ namespace hpx::performance_counters {
                         "type by the referenced locality",
                         pp_type),
                     HPX_PERFORMANCE_COUNTER_V1,
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
                     hpx::bind(
                         &performance_counters::per_action_data_counter_creator,
                         _1, HPX_MOVE(data_received), _2),
@@ -334,6 +343,10 @@ namespace hpx::performance_counters {
 
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types) / sizeof(counter_types[0]));
+#else
+        HPX_UNUSED(ph);
+        HPX_UNUSED(pp_type);
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////

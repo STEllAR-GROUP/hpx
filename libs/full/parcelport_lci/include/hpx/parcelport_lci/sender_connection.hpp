@@ -87,8 +87,10 @@ namespace hpx::parcelset::policies::lci {
             HPX_ASSERT(!postprocess_handler_);
             HPX_ASSERT(!buffer_.data_.empty());
 
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             buffer_.data_point_.time_ =
                 hpx::chrono::high_resolution_clock::now();
+#endif
             chunks_idx_ = 0;
             tag_ = acquire_tag(sender_);
             header_ = header(buffer_, tag_);
@@ -288,10 +290,12 @@ namespace hpx::parcelset::policies::lci {
             error_code ec;
             handler_(ec);
             handler_.reset();
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             buffer_.data_point_.time_ =
                 hpx::chrono::high_resolution_clock::now() -
                 buffer_.data_point_.time_;
             pp_->add_sent_data(buffer_.data_point_);
+#endif
             buffer_.clear();
 
             state_ = initialized;

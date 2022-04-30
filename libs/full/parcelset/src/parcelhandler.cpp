@@ -978,6 +978,12 @@ namespace hpx::parcelset {
     ///////////////////////////////////////////////////////////////////////////
     // Performance counter data
 
+    // number of parcels routed
+    std::int64_t parcelhandler::get_parcel_routed_count(bool reset)
+    {
+        return util::get_and_reset_value(count_routed_, reset);
+    }
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
     // number of parcels sent
     std::int64_t parcelhandler::get_parcel_send_count(
         std::string const& pp_type, bool reset) const
@@ -985,12 +991,6 @@ namespace hpx::parcelset {
         error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
         return pp ? pp->get_parcel_send_count(reset) : 0;
-    }
-
-    // number of parcels routed
-    std::int64_t parcelhandler::get_parcel_routed_count(bool reset)
-    {
-        return util::get_and_reset_value(count_routed_, reset);
     }
 
     // number of messages sent
@@ -1111,18 +1111,8 @@ namespace hpx::parcelset {
         return pp ? pp->get_buffer_allocate_time_received(reset) : 0;
     }
 
-    // connection stack statistics
-    std::int64_t parcelhandler::get_connection_cache_statistics(
-        std::string const& pp_type,
-        parcelport::connection_cache_statistics_type stat_type,
-        bool reset) const
-    {
-        error_code ec(throwmode::lightweight);
-        parcelport* pp = find_parcelport(pp_type, ec);
-        return pp ? pp->get_connection_cache_statistics(stat_type, reset) : 0;
-    }
-
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
     // same as above, just separated data for each action
     // number of parcels sent
     std::int64_t parcelhandler::get_action_parcel_send_count(
@@ -1182,6 +1172,17 @@ namespace hpx::parcelset {
         return pp ? pp->get_action_data_received(action, reset) : 0;
     }
 #endif
+#endif
+    // connection stack statistics
+    std::int64_t parcelhandler::get_connection_cache_statistics(
+        std::string const& pp_type,
+        parcelport::connection_cache_statistics_type stat_type,
+        bool reset) const
+    {
+        error_code ec(throwmode::lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_connection_cache_statistics(stat_type, reset) : 0;
+    }
 
     std::vector<plugins::parcelport_factory_base*>&
     parcelhandler::get_parcelport_factories()
