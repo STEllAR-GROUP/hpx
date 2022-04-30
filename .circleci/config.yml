@@ -217,13 +217,15 @@ jobs:
             else
                 DOCUMENTATION_OUTPUT_FORMATS="html"
             fi
+            # Disable Vc for now as otherwise we need to reconfigure during the
+            # install step, which in turn forces everything to be rebuilt.
+            # -DHPX_WITH_DATAPAR_VC=On
             cmake \
                 /hpx/source \
                 -G "Ninja" \
                 -DCMAKE_BUILD_TYPE=Debug \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_FETCH_ASIO=Off \
-                -DHPX_WITH_DATAPAR_VC=On \
                 -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} \
                 -DHPX_WITH_GIT_BRANCH="${CIRCLE_BRANCH}" \
                 -DHPX_WITH_GIT_TAG="${CIRCLE_TAG}" \
@@ -489,8 +491,8 @@ jobs:
           command: |
               ninja -j2 -k 0 \
                 tests.unit.modules.algorithms.algorithms \
-                tests.unit.modules.algorithms.block \
-                tests.unit.modules.algorithms.datapar_algorithms
+                tests.unit.modules.algorithms.block
+#                tests.unit.modules.algorithms.datapar_algorithms
       - run:
           name: Running Unit Tests
           when: always
@@ -503,8 +505,8 @@ jobs:
                 --output-on-failure \
                 --tests-regex \
               "tests.unit.modules.algorithms.algorithms|\
-              tests.unit.modules.algorithms.block|\
-              tests.unit.modules.algorithms.datapar_algorithms"
+              tests.unit.modules.algorithms.block"
+#              "|tests.unit.modules.algorithms.datapar_algorithms"
       - run:
           <<: *convert_xml
       - run:
@@ -748,8 +750,12 @@ jobs:
               # not support the same vector intrinsics as this machine. The
               # "Test Docker Image" below fails with "Illegal instruction" if VC
               # is enabled, and other machines may fail similarly.
-              cmake \
-                -DHPX_WITH_DATAPAR_VC=Off .
+              #
+              # Having to reconfigure here forces everything to be rebuilt, thus
+              # we disable it all together.
+              #
+              # cmake \
+              #   -DHPX_WITH_DATAPAR_VC=Off .
               ninja -v -j2 install
           working_directory: /hpx/build
           when: always
@@ -945,6 +951,13 @@ workflows:
             - tests.headers1
             - tests.headers2
             - tests.headers3
+            # prevent docs from being rebuilt
+            - docs-html
+            - docs-singlehtml
+            - docs-latexpdf
+            - depreport
+            # prevent inspect from being rebuilt
+            - inspect
           <<: *gh_pages_filter
       - push_stable_tag:
           requires:

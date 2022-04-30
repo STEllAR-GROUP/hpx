@@ -203,9 +203,14 @@ function(add_hpx_module libname modulename)
        ${CMAKE_CURRENT_BINARY_DIR}/include/*.hpp
        ${CMAKE_CURRENT_BINARY_DIR}/include_compatibility/*.hpp
   )
-  list(REMOVE_ITEM zombie_generated_headers ${generated_headers}
-       ${compat_headers}
-       ${CMAKE_CURRENT_BINARY_DIR}/include/hpx/config/modules_enabled.hpp
+  list(
+    REMOVE_ITEM
+    zombie_generated_headers
+    ${generated_headers}
+    ${compat_headers}
+    ${CMAKE_CURRENT_BINARY_DIR}/include/hpx/config/modules_enabled.hpp
+    ${CMAKE_CURRENT_BINARY_DIR}/include/hpx/config/config_strings.hpp
+    ${CMAKE_CURRENT_BINARY_DIR}/include/hpx/parcelset/static_parcelports.hpp
   )
   foreach(zombie_header IN LISTS zombie_generated_headers)
     hpx_warn("Removing zombie generated header: ${zombie_header}")
