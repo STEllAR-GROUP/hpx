@@ -12,8 +12,25 @@
 # C++ feature tests
 # ##############################################################################
 function(hpx_perform_cxx_feature_tests)
+
+  set(atomics_additional_flags COMPILE_DEFINITIONS
+                               HPX_HAVE_CXX11_ATOMIC_INIT_FLAG
+  )
+  if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 20)
+    # ATOMIC_FLAG_INIT is deprecated starting C++20. Here we check whether using
+    # it will cause failures (-Werror,-Wdeprecated-pragma), so we can disable
+    # its use in the test for C++11 atomics below.
+    hpx_check_for_cxx11_atomic_init_flag(
+      DEFINITIONS HPX_HAVE_CXX11_ATOMIC_INIT_FLAG
+    )
+    if(NOT HPX_WITH_CXX11_ATOMIC_INIT_FLAG)
+      set(atomics_additional_flags)
+    endif()
+  endif()
+
   hpx_check_for_cxx11_std_atomic(
     REQUIRED "HPX needs support for C++11 std::atomic"
+    ${atomics_additional_flags}
   )
 
   # Separately check for 128 bit atomics

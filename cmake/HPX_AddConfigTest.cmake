@@ -251,6 +251,18 @@ function(hpx_check_for_libfun_std_experimental_optional)
 endfunction()
 
 # ##############################################################################
+# ATOMIC_FLAG_INIT is deprecated starting C++20. Here we check whether using it
+# will cause failures (-Werror,-Wdeprecated-pragma), so we check for it
+# separately.
+function(hpx_check_for_cxx11_atomic_init_flag)
+  add_hpx_config_test(
+    HPX_WITH_CXX11_ATOMIC_INIT_FLAG
+    SOURCE cmake/tests/cxx11_atomic_init_flag.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_cxx11_std_atomic)
   # Make sure HPX_HAVE_LIBATOMIC is removed from the cache if necessary
   if(NOT HPX_WITH_CXX11_ATOMIC)
