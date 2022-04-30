@@ -429,6 +429,7 @@ jobs:
           name: Pushing Sphinx Documentation
           command: |
               ninja -j1 git_docs
+          no_output_timeout: 1h
 
   core:
     <<: *defaults
