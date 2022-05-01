@@ -23,7 +23,7 @@ namespace mylib {
             hpx::execution::experimental::forwarding_env_query_t,
             non_query_t) noexcept
         {
-            return false;
+            return true;
         }
     } non_query{};
 
@@ -31,13 +31,13 @@ namespace mylib {
 
 int main()
 {
-    static_assert(
-        !hpx::execution::experimental::forwarding_env_query(mylib::non_query),
-        "non_query is not an environmental query");
+    static_assert(hpx::execution::experimental::forwarding_env_query(
+                      mylib::non_query) == true,
+        "non_query CPO is user implemented that returns true");
 
     static_assert(hpx::execution::experimental::forwarding_env_query(
-                      hpx::execution::experimental::get_scheduler),
-        "get_scheduler is an environmental query");
+                      hpx::execution::experimental::get_scheduler) == false,
+        "environmental query falls back to false");
 
     return hpx::util::report_errors();
 }

@@ -22,7 +22,7 @@ namespace mylib {
             hpx::execution::experimental::forwarding_scheduler_query_t,
             non_query_t) noexcept
         {
-            return false;
+            return true;
         }
     } non_query{};
 
@@ -30,13 +30,13 @@ namespace mylib {
 
 int main()
 {
-    static_assert(!hpx::execution::experimental::forwarding_scheduler_query(
-                      mylib::non_query),
-        "non_query is not a scheduler query");
+    static_assert(hpx::execution::experimental::forwarding_scheduler_query(
+                      mylib::non_query) == true,
+        "non_query CPO is user implemented to return true");
 
     static_assert(hpx::execution::experimental::forwarding_scheduler_query(
-                      hpx::execution::experimental::get_scheduler),
-        "get_scheduler is a scheduler query");
+                      hpx::execution::experimental::get_scheduler) == false,
+        "invokes tag_fallback which returns false by default");
 
     return hpx::util::report_errors();
 }

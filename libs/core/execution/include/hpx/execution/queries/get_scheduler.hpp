@@ -39,7 +39,7 @@ namespace hpx::execution::experimental {
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             forwarding_scheduler_query_t, T&&) noexcept
         {
-            return true;
+            return false;
         }
     } forwarding_scheduler_query{};
 
