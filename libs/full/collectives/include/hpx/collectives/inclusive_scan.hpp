@@ -52,7 +52,7 @@ namespace hpx { namespace collectives {
     /// This function performs an inclusive scan operation on a set of values
     /// received from all call sites operating on the given base name.
     ///
-    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  comm        A communicator object returned from \a create_communicator
     /// \param  local_result The value to transmit to all
     ///                     participating sites from this call site.
     /// \param  op          Reduction operation to apply to all values supplied

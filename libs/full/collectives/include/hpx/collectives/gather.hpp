@@ -47,7 +47,7 @@ namespace hpx { namespace collectives {
     /// This function receives a set of values from all call sites operating on
     /// the given base name.
     ///
-    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  comm        A communicator object returned from \a create_communicator
     /// \param  result      The value to transmit to the central gather point
     ///                     from this call site.
     /// \param this_site    The sequence number of this invocation (usually
@@ -98,7 +98,7 @@ namespace hpx { namespace collectives {
     /// This function transmits the value given by \a result to a central gather
     /// site (where the corresponding \a gather_here is executed)
     ///
-    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  comm        A communicator object returned from \a create_communicator
     /// \param  result      The value to transmit to the central gather point
     ///                     from this call site.
     /// \param this_site    The sequence number of this invocation (usually
