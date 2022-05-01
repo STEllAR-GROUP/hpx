@@ -14,6 +14,7 @@ set(tests
     completion_signatures
     execution_context
     get_env
+    execute_may_block_caller
 )
 
 foreach(test ${tests})
