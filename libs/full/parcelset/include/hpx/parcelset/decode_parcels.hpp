@@ -49,6 +49,20 @@ namespace hpx::parcelset {
 
         std::size_t num_zero_copy_chunks = static_cast<std::size_t>(
             static_cast<std::uint32_t>(buffer.num_chunks_.first));
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
+        HPX_ASSERT(num_zero_copy_chunks == buffer.chunks_.size());
+        parcelset::data_point& data = buffer.data_point_;
+        data.num_zchunks_ += buffer.chunks_.size();
+        data.num_zchunks_per_msg_max_ =
+            (std::max)(data.num_zchunks_per_msg_max_,
+                (std::int64_t) buffer.chunks_.size());
+        for (auto& chunk : buffer.chunks_)
+        {
+            data.size_zchunks_total_ += chunk.size();
+            data.size_zchunks_max_ =
+                (std::max)(data.size_zchunks_max_, (std::int64_t) chunk.size());
+        }
+#endif
 
         if (num_zero_copy_chunks != 0)
         {

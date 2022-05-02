@@ -214,6 +214,54 @@ namespace hpx::parcelset {
     {
         return parcels_received_.total_buffer_allocate_time(reset);
     }
+
+    //// total zero-copy chunks sent
+    std::int64_t parcelport::get_zchunks_send_count(bool reset)
+    {
+        return parcels_sent_.num_zchunks(reset);
+    }
+
+    //// total zero-copy chunks received
+    std::int64_t parcelport::get_zchunks_recv_count(bool reset)
+    {
+        return parcels_received_.num_zchunks(reset);
+    }
+
+    //// the maximum number of zero-copy chunks per message sent
+    std::int64_t parcelport::get_zchunks_send_per_msg_count_max(bool reset)
+    {
+        return parcels_sent_.num_zchunks_per_msg_max(reset);
+    }
+
+    //// the maximum number of zero-copy chunks per message received
+    std::int64_t parcelport::get_zchunks_recv_per_msg_count_max(bool reset)
+    {
+        return parcels_received_.num_zchunks_per_msg_max(reset);
+    }
+
+    //// the size of zero-copy chunks per message sent
+    std::int64_t parcelport::get_zchunks_send_size(bool reset)
+    {
+        return parcels_sent_.size_zchunks_total(reset);
+    }
+
+    //// the size of zero-copy chunks per message received
+    std::int64_t parcelport::get_zchunks_recv_size(bool reset)
+    {
+        return parcels_received_.size_zchunks_total(reset);
+    }
+
+    //// the maximum size of zero-copy chunks per message sent
+    std::int64_t parcelport::get_zchunks_send_size_max(bool reset)
+    {
+        return parcels_sent_.size_zchunks_max(reset);
+    }
+
+    //// the maximum size of zero-copy chunks per message received
+    std::int64_t parcelport::get_zchunks_recv_size_max(bool reset)
+    {
+        return parcels_received_.size_zchunks_max(reset);
+    }
 #endif
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \

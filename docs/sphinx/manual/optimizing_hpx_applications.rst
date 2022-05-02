@@ -996,7 +996,7 @@ system and application performance.
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
-       ``<connection_type`` is one of the following: ``tcp``, ``mpi``
+       ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
      * ``locality#*/total``
 
        where:
@@ -1005,7 +1005,7 @@ system and application performance.
        number of transmitted bytes should be queried for. The :term:`locality`
        id is a (zero based) number identifying the :term:`locality`.
      * Returns the overall number of raw (uncompressed) bytes sent or received
-       (see ``<operation``, e.g. ``en`` or ``eceived``) for the specified
+       (see ``<operation>``, e.g. ``sent`` or ``received``) for the specified
        ``<connection_type>``.
 
        The performance counters are available only if the compile time constant
@@ -1031,7 +1031,7 @@ system and application performance.
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
-       ``<connection_type`` is one of the following: ``tcp``, ``mpi``
+       ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
      * ``locality#*/total``
 
        where:
@@ -1042,7 +1042,7 @@ system and application performance.
      * Returns the total time (in nanoseconds) between the start of each
        asynchronous transmission operation and the end of the corresponding
        operation for the specified ``<connection_type>`` the given
-       :term:`locality` (see ``<operation``, e.g. ``en`` or ``eceived``).
+       :term:`locality` (see ``<operation>``, e.g. ``sent`` or ``received``).
 
        The performance counters are available only if the compile time constant
        ``HPX_HAVE_PARCELPORT_COUNTERS`` was defined while compiling the |hpx|
@@ -1067,7 +1067,7 @@ system and application performance.
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
-       ``<connection_type`` is one of the following: ``tcp``, ``mpi``
+       ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
      * ``locality#*/total``
 
        where:
@@ -1105,7 +1105,7 @@ system and application performance.
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
-       ``<connection_type`` is one of the following: ``tcp``, ``mpi``
+       ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
      * ``locality#*/total``
 
        where:
@@ -1115,7 +1115,7 @@ system and application performance.
        (zero based) number identifying the :term:`locality`.
      * Returns the overall time spent performing outgoing data serialization for
        the specified ``<connection_type>`` on the given :term:`locality` (see
-       ``<operation``, e.g. ``sent`` or ``received``).
+       ``<operation>``, e.g. ``sent`` or ``received``).
 
        The performance counters are available only if the compile time constant
        ``HPX_HAVE_PARCELPORT_COUNTERS`` was defined while compiling the |hpx|
@@ -1170,7 +1170,7 @@ system and application performance.
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
-       ``<connection_type`` is one of the following: ``tcp``, ``mpi``
+       ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
      * ``locality#*/total``
 
        where:
@@ -1179,7 +1179,7 @@ system and application performance.
        parcels should be queried for. The :term:`locality` id is a (zero based)
        number identifying the :term:`locality`.
      * Returns the overall number of parcels transferred using the specified
-       ``<connection_type`` by the given :term:`locality` (see ``operation>``,
+       ``<connection_type>`` by the given :term:`locality` (see ``operation>``,
        e.g. ``sent`` or ``received``.
 
        The performance counters are available only if the compile time constant
@@ -1205,7 +1205,7 @@ system and application performance.
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
-       ``<connection_type`` is one of the following: ``tcp``, ``mpi``
+       ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
      * ``locality#*/total``
 
        where:
@@ -1215,7 +1215,147 @@ system and application performance.
        number identifying the :term:`locality`.
      * Returns the overall number of messages [#]_ transferred using the
        specified ``<connection_type>`` by the given :term:`locality` (see
-       ``<operation``, e.g. ``sent`` or ``received``)
+       ``<operation>``, e.g. ``sent`` or ``received``)
+
+       The performance counters are available only if the compile time constant
+       ``HPX_HAVE_PARCELPORT_COUNTERS`` was defined while compiling the |hpx|
+       core library (which is not defined by default). The corresponding cmake
+       configuration constant is ``HPX_WITH_PARCELPORT_COUNTERS``.
+
+       The performance counters for the connection type ``mpi`` are available
+       only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` was defined
+       while compiling the |hpx| core library (which is not defined by default).
+       The corresponding cmake configuration constant is
+       ``HPX_WITH_PARCELPORT_MPI``.
+
+       Please see :ref:`cmake_variables` for more details.
+     * None
+   * * ``/parcelport/count/<connection_type>/zero_copy_chunks/<operation>``
+
+       .. _parcelport-count-connection-type-zero_copy_chunks-operation:
+
+       :ref:`??<parcelport-count-connection-type-zero_copy_chunks-operation>`
+
+       where:
+
+       ``<operation>`` is one of the following: ``sent``, ``received``
+
+       ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+     * ``locality#*/total``
+
+       where:
+
+       ``*`` is the :term:`locality` id of the :term:`locality` the overall
+       number of transmitted bytes should be queried for. The :term:`locality`
+       id is a (zero based) number identifying the :term:`locality`.
+     * Returns the overall number of zero-copy chunks sent or received
+       (see ``<operation>``, e.g. ``sent`` or ``received``) for the specified
+       ``<connection_type>``.
+
+       The performance counters are available only if the compile time constant
+       ``HPX_HAVE_PARCELPORT_COUNTERS`` was defined while compiling the |hpx|
+       core library (which is not defined by default). The corresponding cmake
+       configuration constant is ``HPX_WITH_PARCELPORT_COUNTERS``.
+
+       The performance counters for the connection type ``mpi`` are available
+       only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` was defined
+       while compiling the |hpx| core library (which is not defined by default).
+       The corresponding cmake configuration constant is
+       ``HPX_WITH_PARCELPORT_MPI``.
+
+       Please see :ref:`cmake_variables` for more details.
+     * None
+   * * ``/parcelport/count-max/<connection_type>/zero_copy_chunks/<operation>``
+
+       .. _parcelport-count-max-connection-type-zero_copy_chunks-operation:
+
+       :ref:`??<parcelport-count-max-connection-type-zero_copy_chunks-operation>`
+
+       where:
+
+       ``<operation>`` is one of the following: ``sent``, ``received``
+
+       ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+     * ``locality#*/total``
+
+       where:
+
+       ``*`` is the :term:`locality` id of the :term:`locality` the overall
+       number of transmitted bytes should be queried for. The :term:`locality`
+       id is a (zero based) number identifying the :term:`locality`.
+     * Returns the maximum number of zero-copy chunks sent or received per message
+       (see ``<operation>``, e.g. ``sent`` or ``received``) for the specified
+       ``<connection_type>``.
+
+       The performance counters are available only if the compile time constant
+       ``HPX_HAVE_PARCELPORT_COUNTERS`` was defined while compiling the |hpx|
+       core library (which is not defined by default). The corresponding cmake
+       configuration constant is ``HPX_WITH_PARCELPORT_COUNTERS``.
+
+       The performance counters for the connection type ``mpi`` are available
+       only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` was defined
+       while compiling the |hpx| core library (which is not defined by default).
+       The corresponding cmake configuration constant is
+       ``HPX_WITH_PARCELPORT_MPI``.
+
+       Please see :ref:`cmake_variables` for more details.
+     * None
+   * * ``/parcelport/size/<connection_type>/zero_copy_chunks/<operation>``
+
+       .. _parcelport-size-connection-type-zero_copy_chunks-operation:
+
+       :ref:`??<parcelport-size-connection-type-zero_copy_chunks-operation>`
+
+       where:
+
+       ``<operation>`` is one of the following: ``sent``, ``received``
+
+       ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+     * ``locality#*/total``
+
+       where:
+
+       ``*`` is the :term:`locality` id of the :term:`locality` the overall
+       number of transmitted bytes should be queried for. The :term:`locality`
+       id is a (zero based) number identifying the :term:`locality`.
+     * Returns the overall size of zero-copy chunks sent or received
+       (see ``<operation>``, e.g. ``sent`` or ``received``) for the specified
+       ``<connection_type>``.
+
+       The performance counters are available only if the compile time constant
+       ``HPX_HAVE_PARCELPORT_COUNTERS`` was defined while compiling the |hpx|
+       core library (which is not defined by default). The corresponding cmake
+       configuration constant is ``HPX_WITH_PARCELPORT_COUNTERS``.
+
+       The performance counters for the connection type ``mpi`` are available
+       only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` was defined
+       while compiling the |hpx| core library (which is not defined by default).
+       The corresponding cmake configuration constant is
+       ``HPX_WITH_PARCELPORT_MPI``.
+
+       Please see :ref:`cmake_variables` for more details.
+     * None
+   * * ``/parcelport/size-max/<connection_type>/zero_copy_chunks/<operation>``
+
+       .. _parcelport-size-max-connection-type-zero_copy_chunks-operation:
+
+       :ref:`??<parcelport-size-max-connection-type-zero_copy_chunks-operation>`
+
+       where:
+
+       ``<operation>`` is one of the following: ``sent``, ``received``
+
+       ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+     * ``locality#*/total``
+
+       where:
+
+       ``*`` is the :term:`locality` id of the :term:`locality` the overall
+       number of transmitted bytes should be queried for. The :term:`locality`
+       id is a (zero based) number identifying the :term:`locality`.
+     * Returns the maximum size of zero-copy chunks sent or received
+       (see ``<operation>``, e.g. ``sent`` or ``received``) for the specified
+       ``<connection_type>``.
 
        The performance counters are available only if the compile time constant
        ``HPX_HAVE_PARCELPORT_COUNTERS`` was defined while compiling the |hpx|
@@ -1241,7 +1381,7 @@ system and application performance.
        ``<cache_statistics>`` is one of the following: ``cache/insertions``,
        ``cache/evictions``, ``cache/hits``, ``cache/misses``
 
-       `<connection_type`` is one of the following: ``tcp``, ``mpi``
+       ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
      * ``locality#*/total``
 
        where:
@@ -1271,7 +1411,7 @@ system and application performance.
 
        where:
 
-       ``<operation>`` is one of the following: ``send``, ``receive``
+       ``<operation>`` is one of the following: ``sent``, ``receive``
      * ``locality#*/total``
 
        where:
@@ -1280,7 +1420,7 @@ system and application performance.
        should be queried. The :term:`locality` id is a (zero based) number
        identifying the :term:`locality`.
      * Returns the current number of parcels stored in the :term:`parcel` queue (see
-       ``<operation`` for which queue to query, e.g. ``sent`` or ``received``).
+       ``<operation>`` for which queue to query, e.g. ``sent`` or ``received``).
      * None
 
 .. list-table:: Thread manager performance counters

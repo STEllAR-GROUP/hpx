@@ -120,6 +120,17 @@ namespace hpx::parcelset {
                 count_chunks_type(static_cast<std::uint32_t>(chunks.size()),
                     static_cast<std::uint32_t>(
                         buffer.chunks_.size() - chunks.size()));
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
+            data.num_zchunks_ += chunks.size();
+            data.num_zchunks_per_msg_max_ = (std::max)(
+                data.num_zchunks_per_msg_max_, (std::int64_t) chunks.size());
+            for (auto& chunk : chunks)
+            {
+                data.size_zchunks_total_ += chunk.second;
+                data.size_zchunks_max_ = (std::max)(
+                    data.size_zchunks_max_, (std::int64_t) chunk.second);
+            }
+#endif
 
             if (!chunks.empty())
             {

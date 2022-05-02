@@ -324,6 +324,38 @@ namespace hpx::parcelset {
 
         std::int64_t get_buffer_allocate_time_received(
             std::string const& pp_type, bool reset) const;
+
+        // total zero-copy chunks sent
+        std::int64_t get_zchunks_send_count(
+            std::string const& pp_type, bool reset) const;
+
+        // total zero-copy chunks received
+        std::int64_t get_zchunks_recv_count(
+            std::string const& pp_type, bool reset) const;
+
+        // the maximum number of zero-copy chunks per message sent
+        std::int64_t get_zchunks_send_per_msg_count_max(
+            std::string const& pp_type, bool reset) const;
+
+        // the maximum number of zero-copy chunks per message received
+        std::int64_t get_zchunks_recv_per_msg_count_max(
+            std::string const& pp_type, bool reset) const;
+
+        // the size of zero-copy chunks per message sent
+        std::int64_t get_zchunks_send_size(
+            std::string const& pp_type, bool reset) const;
+
+        // the size of zero-copy chunks per message received
+        std::int64_t get_zchunks_recv_size(
+            std::string const& pp_type, bool reset) const;
+
+        // the maximum size of zero-copy chunks per message sent
+        std::int64_t get_zchunks_send_size_max(
+            std::string const& pp_type, bool reset) const;
+
+        // the maximum size of zero-copy chunks per message received
+        std::int64_t get_zchunks_recv_size_max(
+            std::string const& pp_type, bool reset) const;
 #endif
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
     defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
