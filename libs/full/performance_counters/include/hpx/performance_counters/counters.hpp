@@ -183,21 +183,21 @@ namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Status and error codes used by the functions related to
     ///        performance counters.
-    enum counter_status
+    enum class counter_status
     {
-        status_valid_data,      ///< No error occurred, data is valid
-        status_new_data,        ///< Data is valid and different from last call
-        status_invalid_data,    ///< Some error occurred, data is not value
-        status_already_defined,    ///< The type or instance already has been defined
-        status_counter_unknown,         ///< The counter instance is unknown
-        status_counter_type_unknown,    ///< The counter type is unknown
-        status_generic_error            ///< A unknown error occurred
+        valid_data,         ///< No error occurred, data is valid
+        new_data,           ///< Data is valid and different from last call
+        invalid_data,       ///< Some error occurred, data is not value
+        already_defined,    ///< The type or instance already has been defined
+        unknown,            ///< The counter instance is unknown
+        type_unknown,       ///< The counter type is unknown
+        generic_error       ///< A unknown error occurred
     };
 #endif
 
     inline bool status_is_valid(counter_status s)
     {
-        return s == status_valid_data || s == status_new_data;
+        return s == counter_status::valid_data || s == counter_status::new_data;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -319,14 +319,14 @@ namespace hpx { namespace performance_counters {
         counter_info(counter_type type = counter_type::raw)
           : type_(type)
           , version_(HPX_PERFORMANCE_COUNTER_V1)
-          , status_(status_invalid_data)
+          , status_(counter_status::invalid_data)
         {
         }
 
         counter_info(std::string const& name)
           : type_(counter_type::raw)
           , version_(HPX_PERFORMANCE_COUNTER_V1)
-          , status_(status_invalid_data)
+          , status_(counter_status::invalid_data)
           , fullname_(name)
         {
         }
@@ -337,7 +337,7 @@ namespace hpx { namespace performance_counters {
             std::string const& uom = "")
           : type_(type)
           , version_(version)
-          , status_(status_invalid_data)
+          , status_(counter_status::invalid_data)
           , fullname_(name)
           , helptext_(helptext)
           , unit_of_measure_(uom)

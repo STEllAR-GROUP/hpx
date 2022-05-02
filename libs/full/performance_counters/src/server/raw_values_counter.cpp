@@ -61,7 +61,7 @@ namespace hpx { namespace performance_counters { namespace server {
         reset_ = false;
         values.scaling_ = 1;
         values.scale_inverse_ = false;
-        values.status_ = status_new_data;
+        values.status_ = counter_status::new_data;
         values.time_ = static_cast<std::int64_t>(hpx::get_system_uptime());
         values.count_ = ++invocation_count_;
         return values;

@@ -427,7 +427,7 @@ namespace hpx { namespace performance_counters { namespace server {
         hpx::performance_counters::counter_value value;
 
         prev_value_.value_ = static_cast<std::int64_t>(value_->get_value());
-        prev_value_.status_ = status_new_data;
+        prev_value_.status_ = counter_status::new_data;
         prev_value_.time_ = static_cast<std::int64_t>(hpx::get_system_uptime());
         prev_value_.count_ = ++invocation_count_;
         has_prev_value_ = true;

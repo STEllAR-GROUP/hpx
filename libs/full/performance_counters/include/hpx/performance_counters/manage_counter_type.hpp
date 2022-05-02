@@ -57,7 +57,7 @@ namespace hpx { namespace performance_counters {
     ///       function doesn't throw but returns the result code using the
     ///       parameter \a ec. Otherwise it throws an instance of hpx::exception.
     ///
-    /// \returns      If successful, this function returns \a status_valid_data,
+    /// \returns      If successful, this function returns \a counter_status::valid_data,
     ///               otherwise it will either throw an exception or return an
     ///               error_code from the enum \a counter_status (also, see
     ///               note related to parameter \a ec).
@@ -105,7 +105,7 @@ namespace hpx { namespace performance_counters {
     ///       function doesn't throw but returns the result code using the
     ///       parameter \a ec. Otherwise it throws an instance of hpx::exception.
     ///
-    /// \returns      If successful, this function returns \a status_valid_data,
+    /// \returns      If successful, this function returns \a counter_status::valid_data,
     ///               otherwise it will either throw an exception or return an
     ///               error_code from the enum \a counter_status (also, see
     ///               note related to parameter \a ec).
@@ -132,7 +132,7 @@ namespace hpx { namespace performance_counters {
     ///               if this is pre-initialized to \a hpx#throws
     ///               the function will throw on error instead.
     ///
-    /// \returns      If successful, this function returns \a status_valid_data,
+    /// \returns      If successful, this function returns \a counter_status::valid_data,
     ///               otherwise it will either throw an exception or return an
     ///               error_code from the enum \a counter_status (also, see
     ///               note related to parameter \a ec).
@@ -168,7 +168,7 @@ namespace hpx { namespace performance_counters {
     ///               if this is pre-initialized to \a hpx#throws
     ///               the function will throw on error instead.
     ///
-    /// \returns      If successful, this function returns \a status_valid_data,
+    /// \returns      If successful, this function returns \a counter_status::valid_data,
     ///               otherwise it will either throw an exception or return an
     ///               error_code from the enum \a counter_status (also, see
     ///               note related to parameter \a ec).
@@ -214,7 +214,7 @@ namespace hpx { namespace performance_counters {
     ///       function doesn't throw but returns the result code using the
     ///       parameter \a ec. Otherwise it throws an instance of hpx#exception.
     ///
-    /// \returns      If successful, this function returns \a status_valid_data,
+    /// \returns      If successful, this function returns \a counter_status::valid_data,
     ///               otherwise it will either throw an exception or return an
     ///               error_code from the enum \a counter_status (also, see
     ///               note related to parameter \a ec).
