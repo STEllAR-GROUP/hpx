@@ -224,6 +224,33 @@ namespace hpx { namespace performance_counters {
 
     inline bool status_is_valid(counter_status s);
 
+#define HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG                         \
+    "Unscoped counter_status names are deprecated. Please use "                \
+    "counter_status::<status> instead."
+
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_valid_data =
+        counter_status::valid_data;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_new_data = counter_status::new_data;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_invalid_data =
+        counter_status::invalid_data;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_already_defined =
+        counter_status::already_defined;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_counter_unknown =
+        counter_status::unknown;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_counter_type_unknown =
+        counter_status::type_unknown;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_generic_error =
+        counter_status::generic_error;
+
+#undef HPX_COUNTER_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG
+
     ///////////////////////////////////////////////////////////////////////////
     // A counter_type_path_elements holds the elements of a full name for a
     // counter type.
