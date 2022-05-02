@@ -418,7 +418,7 @@ jobs:
           paths:
             - ./build/share/hpx/docs/latexpdf
       - store_artifacts:
-          path: /hpx/build/share/hpx/docs/latexpdf
+          path: /hpx/build/share/hpx/docs/latexpdf/HPX.pdf
 
   docs_push:
     <<: *defaults
