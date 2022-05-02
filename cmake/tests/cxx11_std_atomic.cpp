@@ -21,7 +21,7 @@ void test_atomic()
 int main()
 {
 // ATOMIC_FLAG_INIT is deprecated starting C++20
-#if defined(HPX_HAVE_CXX20_ATOMIC_INIT_FLAG)
+#if defined(HPX_HAVE_CXX11_ATOMIC_FLAG_INIT)
     std::atomic_flag af = ATOMIC_FLAG_INIT;
 #else
     std::atomic_flag af;
