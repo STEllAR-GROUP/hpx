@@ -4,7 +4,13 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests apex_action_count annotation_check)
+# We disable the annotation_check test as starting with APEX V2.5.0 the output
+# is sorted by execution time and not by name.
+#
+# APEX might add an option to control the format of the generated output in the
+# future, we should re-enable the test at that point.
+
+set(tests apex_action_count) # annotation_check)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
@@ -24,38 +30,42 @@ foreach(test ${tests})
 
 endforeach()
 
-set(launch_types_
-    ""
-    "Executor "
-    "apply "
-    "async "
-    "deferred "
-    "fork "
-    "sync "
-)
+# cmake-format: off
 
-# dataflow
-foreach(launch ${launch_types_})
-  set(REGEX_MATCH_D_ "${REGEX_MATCH_D_}.*1-${launch}Dataflow")
-endforeach()
+#set(launch_types_
+#    " "
+#    "Executor "
+#    "apply "
+#    "async "
+#    "deferred "
+#    "fork "
+#    "sync "
+#)
+#
+## dataflow
+#foreach(launch ${launch_types_})
+#  set(REGEX_MATCH_D_ "${REGEX_MATCH_D_}.*1-${launch}Dataflow")
+#endforeach()
+#
+## continuations
+#foreach(launch ${launch_types_})
+#  set(REGEX_MATCH_C_ "${REGEX_MATCH_C_}.*2-${launch}Continuation")
+#endforeach()
+#
+## continuations with unwrapping
+#foreach(launch ${launch_types_})
+#  set(REGEX_MATCH_C_ "${REGEX_MATCH_C_}.*3-${launch}Unwrapping Continuation")
+#endforeach()
+#
+## scoped_annotation with std::string and char*
+#foreach(type "char" "string")
+#  set(REGEX_MATCH_ANN_ "${REGEX_MATCH_ANN_}.*4-${type} scoped_annotation")
+#endforeach()
+#
+#set_tests_properties(
+#  tests.unit.apex.annotation_check
+#  PROPERTIES PASS_REGULAR_EXPRESSION
+#             "${REGEX_MATCH_D_}${REGEX_MATCH_C_}${REGEX_MATCH_ANN_}"
+#)
 
-# continuations
-foreach(launch ${launch_types_})
-  set(REGEX_MATCH_C_ "${REGEX_MATCH_C_}.*2-${launch}Continuation")
-endforeach()
-
-# continuations with unwrapping
-foreach(launch ${launch_types_})
-  set(REGEX_MATCH_C_ "${REGEX_MATCH_C_}.*3-${launch}Unwrapping Continuation")
-endforeach()
-
-# scoped_annotation with std::string and char*
-foreach(type "char" "string")
-  set(REGEX_MATCH_ANN_ "${REGEX_MATCH_ANN_}.*4-${type} scoped_annotation")
-endforeach()
-
-set_tests_properties(
-  tests.unit.apex.annotation_check
-  PROPERTIES PASS_REGULAR_EXPRESSION
-             "${REGEX_MATCH_D_}${REGEX_MATCH_C_}${REGEX_MATCH_ANN_}"
-)
+# cmake-format: on
