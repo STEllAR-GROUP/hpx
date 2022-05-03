@@ -280,9 +280,20 @@ namespace hpx { namespace execution { namespace experimental {
             {
                 for (std::size_t t = 0; t != num_threads_; ++t)
                 {
-                    // wait for thread-state to be equal to 'state'
-                    wait_state_this_thread_while(region_data_[t].data_.state_,
-                        state, yield_delay_, std::not_equal_to<>());
+                    if (t != main_thread_)
+                    {
+                        // wait for thread-state to be equal to 'state'
+                        wait_state_this_thread_while(
+                            region_data_[t].data_.state_, state, yield_delay_,
+                            std::not_equal_to<>());
+                    }
+                    else
+                    {
+                        // the main thread should have already reached the
+                        // required state
+                        HPX_ASSERT(region_data_[t].data_.state_.load(
+                                       std::memory_order_acquire) == state);
+                    }
                 }
             }
 
@@ -319,8 +330,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                 if (num_threads_ > 1)
                 {
-                    std::size_t num_pus =
-                        this_thread::get_pool()->get_os_thread_count();
+                    std::size_t num_pus = pool_->get_os_thread_count();
 
                     for (std::size_t pu = 0; t != num_threads_ && pu != num_pus;
                          ++pu)

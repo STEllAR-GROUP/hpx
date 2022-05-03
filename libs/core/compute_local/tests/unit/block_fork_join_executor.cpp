@@ -153,28 +153,6 @@ void test_bulk_async_exception(ExecutorArgs&&... args)
     HPX_TEST(caught_exception);
 }
 
-void static_check_executor()
-{
-    using namespace hpx::traits;
-
-    static_assert(!has_sync_execute_member<block_fork_join_executor>::value,
-        "!has_sync_execute_member<block_fork_join_executor>::value");
-    static_assert(!has_async_execute_member<block_fork_join_executor>::value,
-        "!has_async_execute_member<block_fork_join_executor>::value");
-    static_assert(!has_then_execute_member<block_fork_join_executor>::value,
-        "!has_then_execute_member<block_fork_join_executor>::value");
-    static_assert(has_bulk_sync_execute_member<block_fork_join_executor>::value,
-        "has_bulk_sync_execute_member<block_fork_join_executor>::value");
-    static_assert(
-        has_bulk_async_execute_member<block_fork_join_executor>::value,
-        "has_bulk_async_execute_member<block_fork_join_executor>::value");
-    static_assert(
-        !has_bulk_then_execute_member<block_fork_join_executor>::value,
-        "!has_bulk_then_execute_member<block_fork_join_executor>::value");
-    static_assert(!has_post_member<block_fork_join_executor>::value,
-        "!has_post_member<block_fork_join_executor>::value");
-}
-
 template <typename... ExecutorArgs>
 void test_executor(hpx::threads::thread_priority priority,
     hpx::threads::thread_stacksize stacksize,
@@ -192,8 +170,6 @@ void test_executor(hpx::threads::thread_priority priority,
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    static_check_executor();
-
     // thread_stacksize::nostack cannot be used with the block_fork_join_executor
     // because it prevents other work from running when yielding. Using
     // thread_priority::low hangs for unknown reasons.

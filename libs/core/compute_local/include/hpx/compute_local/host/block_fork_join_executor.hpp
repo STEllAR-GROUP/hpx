@@ -57,13 +57,29 @@ namespace hpx::execution::experimental {
         static hpx::threads::mask_type cores_for_targets(
             std::vector<compute::host::target> const& targets)
         {
+            auto& rp = hpx::resource::get_partitioner();
+            std::size_t this_pu = rp.get_pu_num(hpx::get_worker_thread_num());
+            if (targets.size() == 1)
+            {
+                // don't build a hierarchy of executors if there is only one
+                // mask provided
+                auto target_mask = targets[0].native_handle().get_device();
+                if (!hpx::threads::test(target_mask, this_pu))
+                {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "block_fork_join_executor::cores_for_targets",
+                        "The thread used to initialize the "
+                        "block_fork_join_executor should be part of the given "
+                        "target");
+                }
+                return target_mask;
+            }
+
             // This makes sure that each given set of targets gets exactly one
             // core assigned that will be used as the 'main' thread for the
             // corresponding fork_join_executor instance. This makes also sure
             // that the executing (current) thread is associated with one of the
             // targets.
-            auto& rp = hpx::resource::get_partitioner();
-            std::size_t this_pu = rp.get_pu_num(hpx::get_worker_thread_num());
             hpx::threads::mask_type mask(hpx::threads::hardware_concurrency());
             bool this_thread_is_represented = false;
             for (auto const& t : targets)
@@ -162,52 +178,66 @@ namespace hpx::execution::experimental {
                 fork_join_executor::loop_schedule::static_,
             std::chrono::nanoseconds yield_delay = std::chrono::milliseconds(1))
           : exec_(cores_for_targets(targets), priority, stacksize,
-                fork_join_executor::loop_schedule::static_, yield_delay)
+                targets.size() == 1 ?
+                    schedule :
+                    fork_join_executor::loop_schedule::static_,
+                yield_delay)
         {
-            block_execs_.reserve(targets.size());
-            for (std::size_t i = 0; i != targets.size(); ++i)
+            // don't build a hierarchy of executors if there is only one target
+            // mask given
+            if (targets.size() > 1)
             {
-                block_execs_.emplace_back(
-                    fork_join_executor::init_mode::no_init);
-            }
+                block_execs_.reserve(targets.size());
+                for (std::size_t i = 0; i != targets.size(); ++i)
+                {
+                    block_execs_.emplace_back(
+                        fork_join_executor::init_mode::no_init);
+                }
 
-            auto init_f = [&](std::size_t index) {
-                // create the sub-executors
-                block_execs_[index] = fork_join_executor(
-                    targets[index].native_handle().get_device(), priority,
-                    stacksize, schedule, yield_delay);
-            };
-            exec_.bulk_sync_execute(
-                init_f, hpx::util::detail::make_counting_shape(targets.size()));
+                auto init_f = [&](std::size_t index) {
+                    // create the sub-executors
+                    block_execs_[index] = fork_join_executor(
+                        targets[index].native_handle().get_device(), priority,
+                        stacksize, schedule, yield_delay);
+                };
+                exec_.bulk_sync_execute(init_f,
+                    hpx::util::detail::make_counting_shape(targets.size()));
+            }
         }
 
         template <typename F, typename S, typename... Ts>
         void bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
         {
             std::size_t num_targets = block_execs_.size();
+            if (num_targets == 0)
+            {
+                // simply forward call if there is no executor hierarchy
+                hpx::parallel::execution::bulk_sync_execute(
+                    exec_, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+                return;
+            }
 
+            std::size_t size = std::size(shape);
             auto outer_func = [&](std::size_t index, auto&& f,
                                   auto const& shape, auto&&... ts) {
-                // calculate the new shape dimensions
-                std::size_t size = std::size(shape);
-
+                // calculate the inner shape dimensions
                 auto const part_begin = (index * size) / num_targets;
                 auto const part_end = ((index + 1) * size) / num_targets;
 
+                auto begin = std::next(std::begin(shape), part_begin);
                 auto inner_shape = hpx::util::make_iterator_range(
-                    std::next(std::begin(shape), part_begin),
-                    std::next(std::begin(shape), part_end));
+                    begin, std::next(begin, part_end - part_begin));
 
                 // invoke bulk_sync_execute on one of the inner executors
-                block_execs_[index].bulk_sync_execute(
+                hpx::parallel::execution::bulk_sync_execute(block_execs_[index],
                     HPX_FORWARD(decltype(f), f), inner_shape,
                     HPX_FORWARD(decltype(ts), ts)...);
             };
             auto outer_shape =
                 hpx::util::detail::make_counting_shape(num_targets);
 
-            exec_.bulk_sync_execute(outer_func, outer_shape, HPX_FORWARD(F, f),
-                shape, HPX_FORWARD(Ts, ts)...);
+            hpx::parallel::execution::bulk_sync_execute(exec_, outer_func,
+                outer_shape, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename... Ts>
