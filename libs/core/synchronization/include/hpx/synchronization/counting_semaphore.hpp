@@ -211,6 +211,7 @@ namespace hpx {
     }    // namespace detail
 
     using binary_semaphore = detail::binary_semaphore<>;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Mutex = hpx::spinlock, int N = 0>
     class counting_semaphore_var
@@ -307,7 +308,8 @@ namespace hpx::lcos::local {
 
     using counting_semaphore HPX_DEPRECATED_V(1, 8,
         "hpx::lcos::local::counting_semaphore is deprecated, use "
-        "hpx::counting_semaphore instead") = hpx::counting_semaphore<>;
+        "hpx::counting_semaphore_var<> instead") =
+        hpx::counting_semaphore_var<>;
 }    // namespace hpx::lcos::local
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
