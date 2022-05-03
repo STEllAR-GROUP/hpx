@@ -58,6 +58,8 @@ are completed to avoid confusion.
 #. Make sure ``HPX_VERSION_MAJOR/MINOR/SUBMINOR`` in ``CMakeLists.txt`` contain
    the correct values. Change them if needed.
 
+#. Change version references in CITATION.cff. There are two occurrences.
+
 #. This step does not apply to patch releases. Remove features which have been
    deprecated for at least 2 releases. This involves removing build options
    which enable those features from the main CMakeLists.txt and also deleting
