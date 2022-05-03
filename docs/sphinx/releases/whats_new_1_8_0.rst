@@ -131,6 +131,7 @@ Breaking changes
 - CUDA  version required updated to 11.4.
 - CMake version required updated to 3.18.
 - Asio version requires updated to 1.20.0.
+- APEX version was updated to 2.5.1.
 - ``tagged_pair`` and ``tagged_tuple`` were removed.
 - The HPX Customization Point Obejects (CPOs) were updated according to P2300. Namely,
   ``schedule``, ``set_value``, ``set_error``, ``set_done``, ``start`` and ``connect``
@@ -155,7 +156,9 @@ Breaking changes
 Closed issues
 =============
 
-
+* :hpx-issue:`5871` - distributed::channel.regsiter_as terminates the active task.
+* :hpx-issue:`5856` - Performance counters do not compile
+* :hpx-issue:`5828` - hpx::distributed:barrier errors
 * :hpx-issue:`5812` - OctoTiger does not compile with HPX master and CUDA 11.5
 * :hpx-issue:`5784` - HPX failing with co_await and hpx::when_all(futures)
 * :hpx-issue:`5774` - CMake can't find HPXCacheVariables.cmake 
@@ -217,6 +220,30 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`5881` - Fixing recent patch that disables ATOMIC_FLAG_INIT for C++20 and up
+* :hpx-pr:`5880` - refactor: convert `counter_status` enum to enum class
+* :hpx-pr:`5878` - Docs: Replaced non-existent create_reducer function with create_communicator
+* :hpx-pr:`5877` - Doc updates hpx runtime and resources
+* :hpx-pr:`5876` - Updates to documentation; grammar edits.
+* :hpx-pr:`5875` - Doc updates starting the hpx runtime
+* :hpx-pr:`5874` - Doc updates launching configuring
+* :hpx-pr:`5873` - Prevent certain generated files from being deleted on reconfigure
+* :hpx-pr:`5867` - Update CMakeLists.txt
+* :hpx-pr:`5866` - add cmake option HPX_WITH_PARCELPORT_COUNTERS
+* :hpx-pr:`5864` - ATOMIC_INIT_FLAG is deprecated starting C++20
+* :hpx-pr:`5863` - Adding llvm 14.0.0 with boost 1.79.0 to Jenkins
+* :hpx-pr:`5861` - Let install step proceed on CircleCI even if the segmented algorithms fail
+* :hpx-pr:`5860` - Updating APEX tag
+* :hpx-pr:`5859` - Splitting documentation generation steps on CircleCI
+* :hpx-pr:`5854` - Fixing left-overs from changing counter_type to enum class
+* :hpx-pr:`5853` - Adding HPX dependency tool (adapted from Boostdep tool)
+* :hpx-pr:`5852` - Optimize LCI parcelport
+* :hpx-pr:`5851` - Forking dynamic_bitset from Boost
+* :hpx-pr:`5850` - Convert perf_counters::counter_type enum to enum class.
+* :hpx-pr:`5849` - Update LCI parcelport to LCI v1.7.1
+* :hpx-pr:`5848` - Fedora related fixes
+* :hpx-pr:`5847` - Fix API, troubleshooting & people
+* :hpx-pr:`5844` - Attempting to fix timeouts of segmented iterator tests
 * :hpx-pr:`5842` - change the default value of HPX_WITH_LCI_TAG to v1.7
 * :hpx-pr:`5841` - Move the split_future facilities into the namespace hpx
 * :hpx-pr:`5840` - wait_xxx_nothrow functions return whether one of the futures is exceptional
