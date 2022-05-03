@@ -37,6 +37,32 @@ namespace hpx { namespace util {
         if (!enable)
             return;
 
+        struct onexit
+        {
+            explicit onexit(batch_environment const& env)
+              : env_(env)
+            {
+            }
+
+            ~onexit()
+            {
+                if (env_.debug_)
+                {
+                    std::cerr << "batch_name: " << env_.batch_name_
+                              << std::endl;
+                    std::cerr << "num_threads: " << env_.num_threads_
+                              << std::endl;
+                    std::cerr << "node_num_: " << env_.node_num_ << std::endl;
+                    std::cerr << "num_localities: " << env_.num_localities_
+                              << std::endl;
+                }
+            }
+
+            batch_environment const& env_;
+        };
+
+        onexit _(*this);
+
         batch_environments::alps_environment alps_env(nodelist, debug);
         if (alps_env.valid())
         {
