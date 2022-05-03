@@ -14,18 +14,21 @@
 function(hpx_perform_cxx_feature_tests)
 
   set(atomics_additional_flags COMPILE_DEFINITIONS
-                               HPX_HAVE_CXX11_ATOMIC_INIT_FLAG
+                               HPX_HAVE_CXX11_ATOMIC_FLAG_INIT
   )
   if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 20)
     # ATOMIC_FLAG_INIT is deprecated starting C++20. Here we check whether using
     # it will cause failures (-Werror,-Wdeprecated-pragma), so we can disable
     # its use in the test for C++11 atomics below.
     hpx_check_for_cxx11_atomic_init_flag(
-      DEFINITIONS HPX_HAVE_CXX11_ATOMIC_INIT_FLAG
+      DEFINITIONS HPX_HAVE_CXX11_ATOMIC_FLAG_INIT
     )
-    if(NOT HPX_WITH_CXX11_ATOMIC_INIT_FLAG)
+    if(NOT HPX_WITH_CXX11_ATOMIC_FLAG_INIT)
       set(atomics_additional_flags)
     endif()
+  else()
+    # for anything between C++11 and C++17, ATOMIC_FLAG_INIT should be used.
+    hpx_add_config_define(HPX_HAVE_CXX11_ATOMIC_FLAG_INIT)
   endif()
 
   hpx_check_for_cxx11_std_atomic(
