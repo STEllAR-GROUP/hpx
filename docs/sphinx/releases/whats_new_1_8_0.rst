@@ -9,119 +9,159 @@
 .. _hpx_1_8_0:
 
 ===========================
-|hpx| V1.8.0 (Feb 15, 2022)
+|hpx| V1.8.0 (May 11, 2022)
 ===========================
 
-With HPX parallel algorithms been fully adapted in C++20 the new release achieves
-full conformance with C++20 concurrency and parallelism facilities. Much work has been
-done towards implementing P2300 ("std::execution") and implementing the
-underlying senders/receivers facilities.
-Finally, The new release comes with a brand new documentation interface!
+With HPX parallel algorithms been fully adapted to C++20 the new release
+achieves full conformance with C++20 concurrency and parallelism facilities. HPX
+now supports all of the algorithms as specified by C++20. We have added support
+for vectorization to more of our algorithms. Much work has been done towards
+implementing |p2300| ("std::execution") and implementing the underlying
+senders/receivers facilities. Finally, The new release comes with a brand new
+documentation interface!
 
 General changes
 ===============
-
-- With the new vectorization registers introduced in recent hardware arhcitectures
-  HPX now provides new data-parallel vector types that record significant speed-up
-  using Single Instruction Multiple Data execution policies. The following
-  datapar algorithms now support SIMD execution.:
-  - ``copy``,
-  - ``generate``,
-  - ``adjacent_difference``,
-  - ``all_of``,
-  - ``any_of``,
-  - ``none_of``,
-  - ``mismatch``,
-  - ``adjacent_find``,
-  - ``find``,
-  - ``find_end``,
-  - ``find_first_of``,
-  - ``find_if``,
-  - ``find_if_not``.
 
 - The new documentation can now be found on our webpage: https://hpx-docs.stellar-group.org.
   This includes a completely new and user-friendly interface environment along with
   restructuring of certain components. The content in the "Quick start", "Manual" and
   "Examples" was improved, while the "Build system" page was adapted to include necessary
   information for newcommers.
-- Based on top of [P2300](wg21.link/p2300) the HPX parallel algorithms now support
-  the pipeline syntax towards an effort to unify their usage along with senders/receivers.
-  The HPX parallel algorithms can now bind with senders/receivers using the pipeline operator. 
-- Several changes took place on the executors provided by HPX:
-- The executors now support the ``num_cores`` options in order for the user
-  to be able to specify the desired number of cores to be used in the correspodning
-  execution.
-- The ``scheduler`` executor was implemented on top of senders/receivers 
-  and can be used with all HPX facilities that schedule new work, such as
-  parallel algorithms, hpx::async, hpx::dataflow, etc.
-- The performance of ``fork_join_executor`` was improved.
+- With the vectorization support available in modern hardware architectures HPX
+  now provides new data-parallel vector execution policies
+  ``hpx::execution::simd`` and ``hpx::execution::par_simd`` that enable
+  significant speed-up of our parallel algorithm implementations. The following
+  algorithms now support SIMD execution:
 
+  - ``copy``, ``copy_n``
+  - ``generate``
+  - ``adjacent_difference``, ``adjacent_find``
+  - ``all_of``, ``any_of``, ``none_of``
+  - ``equal``, ``mismatch``,
+  - ``inner_product``
+  - ``count``, ``count_if``
+  - ``fill``, ``fill_n``
+  - ``find``, ``find_end``, ``find_first_of``, ``find_if``, ``find_if_not``
+  - ``for_each``, ``for_each_n``
+  - ``generate``, ``generate_n``.
+
+- Based on top of |p2300| the HPX parallel algorithms now support the pipeline
+  syntax towards an effort to unify their usage along with senders/receivers.
+  The HPX parallel algorithms can now bind with senders/receivers using the
+  pipeline operator. 
+- Several changes took place on the executors provided by HPX:
+- The executors now support the ``num_cores`` options in order for the user to
+  be able to specify the desired number of cores to be used in the correspodning
+  execution.
+- The ``scheduler`` executor was implemented on top of senders/receivers and can
+  be used with all HPX facilities that schedule new work, such as parallel
+  algorithms, ``hpx::async``, ``hpx::dataflow``, etc.
+- The performance of ``fork_join_executor`` was improved.
 - The following algorithms have been added/adapted to be C++20 conformant:
 
-  - ``min_element``,
-  - ``max_element``,
-  - ``minmax_element``,
-  - ``starts_with``,
-  - ``ends_with``,
-  - ``swap_ranges``,
-  - ``unique``,
-  - ``unique_copy``,
-  - ``rotate``,
-  - ``rotate_copy``,
-  - ``sort``,
-  - ``shift_left``,
-  - ``shift_right``,
-  - ``stable_sort``,
-  - ``partition``,
-  - ``partition_copy``,
-  - ``stable_partition``,
-  - ``adjacent_difference``,
-  - ``nth_element``,
-  - ``partial_sort``,
+  - ``min_element``
+  - ``max_element``
+  - ``minmax_element``
+  - ``starts_with``
+  - ``ends_with``
+  - ``swap_ranges``
+  - ``unique``
+  - ``unique_copy``
+  - ``rotate``
+  - ``rotate_copy``
+  - ``sort``
+  - ``shift_left``
+  - ``shift_right``
+  - ``stable_sort``
+  - ``partition``
+  - ``partition_copy``
+  - ``stable_partition``
+  - ``adjacent_difference``
+  - ``nth_element``
+  - ``partial_sort``
   - ``partial_sort_copy``.
 
-- The following CMake flags were added:
-  HPX_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION.
-- ``HPX_FORWARD``/``HPX_MOVE`` macros were introduced and
-  replaced the ``std::move`` and ``std::forward`` facilities.
+- ``HPX_FORWARD``/``HPX_MOVE`` macros were introduced that replaced the
+  ``std::move`` and ``std::forward`` facilities that in the library code.
 - Hangs on distributed barrier were fixed.
 - The performance of ``scan_partitioner`` was improved.
-- Regarding senders/receivers and the P2300 proposal various actions
-  took place. Support was added for ``thread_priority`` to the 
-  ``parallel_execution_policy`` .``stop_token`` was adapted to the recent proposal
-  version. Also hint, annotation, priority and stacksize properties were added
-  to the scheduler executor. Stop support was added to ``when_all``. Support for 
-  completion signatures was added. The following schedulers and algorithms were added:
-  - ``get_completion_scheduler``.
-  - ``any_sender``/``unique_any_sender``.
-  - ``split`` sender.
-  - ``transform_mpi`` sender.
-  - ``transfer`` sender.
+- Support was added for ``thread_priority`` to the ``parallel_execution_policy`` 
+- Regarding senders/receivers and the |p2300| proposal various actions took place.
+  ``stop_token`` was adapted to the recent proposal version
+  (``in_place_stop_token`` was introduced). Also hint, annotation, priority and
+  stacksize properties were added to the scheduler executor. Stop support was
+  added to ``when_all``. Support for completion signatures was added. The
+  following schedulers and algorithms were added:
+
+  - ``get_completion_scheduler``
+  - ``any_sender`` and ``unique_any_sender``
+  - ``split`` sender
+  - ``transform_mpi`` sender
+  - ``transfer`` sender
+  - ``let_error``, ``let_stopped``
+  - ``get_env`` and related environment queries
+  - ``schedule``, ``set_value``, ``set_error``, ``set_done``, ``start`` and
+    ``connect`` are now proper customization points as defined in |p2300|.
+
 - Several namespaces were altered towards conformance with C++20. Compatibility layers
   have been added and the old versions will be removed in next releases. The namespace
   changes are the following:
+
   - ``hpx::parallel::induction/reduction`` were movied into namespace ``hpx::experimental``
   - ``for_loop`` and friends were moved into namespace ``hpx::experimental``.
   - ``hpx::util::optional`` and friends were moved into namespace ``hpx``.
   - ``hpx::lcos::barrier`` has been moved into the ``hpx::distributed`` namespace and
-    ``hpx::lcos::local::cpp20_barrier`` has been ranamed to ``barrier`` and moved into
+    ``hpx::lcos::local::cpp20_barrier`` has been renamed to ``barrier`` and moved into
     the ``hpx`` namespace.
   - ``hpx::lcos::latch`` has been moved into the ``hpx::distributed`` namespace and
     ``lcos::local::latch`` has been moved into the ``hpx`` namespace. The
     ``count_down_and_wait()`` functionality of ``latch`` has been renamed to
     ``arrive_and_wait()``.
-  - ``unique_function`` has been renamed to ``move_only_function`` and moved into 
-    namespace ``hpx``. ``function`` and ``function_ref`` have been moved into namespace
-    ``hpx``.
+  - ``hpx::util::unique_function_nonser`` has been renamed to ``hpx::move_only_function``.
+  - ``hpx::util::unique_function`` has been renamed to ``hpx::distributed::move_only_function``.
+  - ``hpx::util::function`` has been renamed to ``hpx::distributed::function``.
+  - ``hpx::util::function_nonser`` has been renamed to ``hpx::function``.
+  - ``hpx::util::function_ref`` have been moved to namespace ``hpx``.
   - ``hpx::lcos::split_future`` changed namespace and is now used as ``hpx::split_future``.
+  - ``hpx::lcos::local::counting_semaphore`` has been deprecated and
+    ``hpx::lcos::local::cpp20_counting_semaphore`` has been renamed to
+    ``hpx::counting_semaphore``.
+  - ``hpx::lcos::local::cpp20_binary_semaphore`` has been renamed to ``hpx::binary_semaphore``.
+  - ``hpx::lcos::local::sliding_semaphore`` has been renamed to ``hpx::sliding_semaphore`` and
+  - ``hpx::lcos::local::sliding_semaphore_var`` has been renamed to ``hpx::sliding_semaphore_var``.
+  - ``hpx::lcos::local::spinlock`` has been renamed to ``hpx::spinlock``.
+  - ``hpx::lcos::local::mutex`` has been renamed to ``hpx::mutex``.
+  - ``hpx::lcos::local::timed_mutex`` has been renamed to ``hpx::timed_mutex``.
+  - ``hpx::lcos::local::no_mutex`` has been renamed to ``hpx::no_mutex``.
+  - ``hpx::lcos::local::recursive_mutex`` has been renamed to ``hpx::recursive_mutex``.
+  - ``hpx::lcos::local::shared_mutex`` has been renamed to ``hpx::shared_mutex``.
+  - ``hpx::lcos::local::upgrade_lock`` has been renamed to ``hpx::upgrade_lock``.
+  - ``hpx::lcos::local::upgrade_to_unique_lock`` has been renamed to ``hpx::upgrade_to_unique_lock``.
+  - ``hpx::lcos::local::condition_variable`` has been renamed to ``hpx::condition_variable``.
+    ``hpx::lcos::local::condition_variable_var`` has been renamed to
+    ``hpx::condition_variable_var``.
+  - ``hpx::lcos::local::once_flag`` has been renamed to ``hpx::once_flag``, and .
+    ``hpx::lcos::local::call_once`` has been renamed to ``hpx::call_once``.
+
 - The new LCI (Lightweight Communication Interface) parcelport was added that supports
   irregular and asynchronous applications like graph analysis, sparce linear algebra,
-  modern parallel arhcitectures etc. Major features include
+  modern parallel architectures etc. Major features include:
+
   - Support for advanced communication primitives like two sided send/recv and
   one sided remote put.
   - Better multi-threaded performance.
   - Explicit user control of communication resource.
   - Flexible signaling mechanisms (synchronizer, completion queue, active message handler). 
+
+- The following CMake flags were added, mostly to support using HPX as a backend
+  for SHAD (https://github.com/pnnl/SHAD). Please note that these options enable
+  questionable functionalities, partially they even enable undefined behavior.
+  Please only use any of them if you know what you're doing:
+
+  - ``HPX_SERIALIZATION_WITH_ALLOW_RAW_POINTER_SERIALIZATION``
+  - ``HPX_SERIALIZATION_WITH_ALL_TYPES_ARE_BITWISE_SERIALIZABLE``
+  - ``HPX_SERIALIZATION_WITH_ALLOW_CONST_TUPLE_MEMBERS``
 
 Breaking changes
 ================
@@ -130,28 +170,27 @@ Breaking changes
 - Support for GCC 7 and Clang 8.0.0 and below has been removed.
 - CUDA  version required updated to 11.4.
 - CMake version required updated to 3.18.
-- Asio version requires updated to 1.20.0.
-- APEX version was updated to 2.5.1.
+- The default version of Asio used was updated to 1.20.0.
+- The default version of APEX used was updated to 2.5.1.
 - ``tagged_pair`` and ``tagged_tuple`` were removed.
-- The HPX Customization Point Obejects (CPOs) were updated according to P2300. Namely,
-  ``schedule``, ``set_value``, ``set_error``, ``set_done``, ``start`` and ``connect``
-  inherit ``hpx::functional::tag`. 
 - ``tag_dispatch`` was renamed to ``tag_invoke``.
 - ``hpx.max_backgroud_threads`` was renamed to ``hpx.parcel.max_background_threads``.
-- The following CMake flags were removed after last release deprecation:
- HPX_SCHEDULER_MAX_TERMINATED_THREADS 
- HPX_WITH_GOOGLE_PERFTOOLS
- HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY 
- HPX_HAVE_{COROUTINE,PLUGIN}_GCC_HIDDEN_VISIBILITY
- HPX_TOP_LEVEL
- HPX_WITH_COMPUTE_CUDA 
- HPX_WITH_ASYNC_CUDA
+- The following CMake flags were removed after being deprecated for at least two releases:
+
+  - ``HPX_SCHEDULER_MAX_TERMINATED_THREADS``
+  - ``HPX_WITH_GOOGLE_PERFTOOLS``
+  - ``HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY``
+  - ``HPX_HAVE_{COROUTINE,PLUGIN}_GCC_HIDDEN_VISIBILITY``
+  - ``HPX_TOP_LEVEL``
+  - ``HPX_WITH_COMPUTE_CUDA``
+  - ``HPX_WITH_ASYNC_CUDA``
+
 - ``annotate_function`` was renamed to ``scoped_annotation``.
 - ``execution::transform`` was renamed to ``execution::then``.
 - ``execution::detach`` was renamed to ``execution::start_detached``.
 - ``execution::on_sender`` was renamed to ``execution::schedule_on``.
 - ``execution::just_on`` was renamed to ``execution::just_transfer``.
-- ``set_done`` was renamed to ``set_stopped``.
+- ``execution::set_done`` was renamed to ``execution::set_stopped``.
 
 Closed issues
 =============

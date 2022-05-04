@@ -483,9 +483,11 @@ rst_prolog += '''
 .. |p1393| replace:: P1393
 .. _p1393: http://wg21.link/p1393
 .. |p2220| replace:: P2220
-.. _p2220: https://wg21.link/p2220 
+.. _p2220: https://wg21.link/p2220
+.. |p2300| replace:: P2300
+.. _p2300: https://wg21.link/p2300
 .. |p2440| replace:: P2440
-.. _p2440: https://wg21.link/p2440 
+.. _p2440: https://wg21.link/p2440
 
 .. |semver| replace:: semver
 .. _semver: https://semver.org
