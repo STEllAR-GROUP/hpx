@@ -154,9 +154,9 @@ namespace hpx { namespace util {
         LCI_plist_create(&h_plist_);
         LCI_queue_create(LCI_UR_DEVICE, &h_cq_r_);
         LCI_plist_set_comp_type(
-            h_plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_QUEUE);
+            h_plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_SYNC);
         LCI_plist_set_comp_type(
-            h_plist_, LCI_PORT_COMMAND, LCI_COMPLETION_QUEUE);
+            h_plist_, LCI_PORT_COMMAND, LCI_COMPLETION_SYNC);
         LCI_plist_set_default_comp(h_plist_, h_cq_r_);
         LCI_endpoint_init(&h_ep_, LCI_UR_DEVICE, h_plist_);
         LCI_plist_free(&h_plist_);
