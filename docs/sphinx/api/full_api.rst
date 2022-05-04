@@ -26,11 +26,3 @@ refer to the full documentation below.
 {}
 
 .. _libs_unmodularized:
-
-Main |hpx| library
-==================
-
-This lists functionality in the main |hpx| library that has not been moved to
-modules yet.
-
-.. doxygenindex::
