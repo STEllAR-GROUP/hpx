@@ -100,10 +100,10 @@ for lib_dir in os.listdir(hpx_libs_dir):
             # which are headers or source files
             for f in files:
                 if not file_regex.match(f) is None:
-                    skip = False
+                    skip = True
                     for line in open(subdir_full + '/' + f):
-                        if '// sphinx:undocumented' in line:
-                            skip = True
+                        if '/// \\' in line:
+                            skip = False
                             break
                     if skip:
                         continue
@@ -261,7 +261,7 @@ rst_prolog += '''
     :target: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca
     :alt: JOSS Paper about HPX
 .. |hpx_dependency_report| replace:: |hpx| Dependency report
-.. _hpx_dependency_report: https://hpx-docs.stellar-group.org/branches/master/report/index.html
+.. _hpx_dependency_report: ../../report/index.html
 
 .. |hpxpi| replace:: HPXPI
 .. _hpxpi: https://github.com/STEllAR-GROUP/hpxpi/
