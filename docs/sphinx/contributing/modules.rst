@@ -99,9 +99,7 @@ default.
 Documentation is placed in the ``docs`` folder. A empty skeleton for the index
 is created, which is picked up by the main build system and will be part of the
 generated documentation. Each header inside the ``include`` directory will
-automatically be processed by Doxygen and included into the documentation. If a
-header should be excluded from the API reference, a comment ``//
-sphinx:undocumented`` needs to be added.
+automatically be processed by Doxygen and included into the documentation.
 
 Tests are placed in suitable subdirectories of ``tests``.
 
