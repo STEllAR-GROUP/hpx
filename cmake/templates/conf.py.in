@@ -100,10 +100,10 @@ for lib_dir in os.listdir(hpx_libs_dir):
             # which are headers or source files
             for f in files:
                 if not file_regex.match(f) is None:
-                    skip = False
+                    skip = True
                     for line in open(subdir_full + '/' + f):
-                        if '// sphinx:undocumented' in line:
-                            skip = True
+                        if '/// \\' in line:
+                            skip = False
                             break
                     if skip:
                         continue
@@ -260,6 +260,8 @@ rst_prolog += '''
 .. |hpx_joss| image:: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca/status.svg
     :target: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca
     :alt: JOSS Paper about HPX
+.. |hpx_dependency_report| replace:: |hpx| Dependency report
+.. _hpx_dependency_report: ../../report/index.html
 
 .. |hpxpi| replace:: HPXPI
 .. _hpxpi: https://github.com/STEllAR-GROUP/hpxpi/
@@ -303,6 +305,8 @@ rst_prolog += '''
 
 .. |gsoc| replace:: Google Summer of Code
 .. _gsoc: https://developers.google.com/open-source/soc/
+.. |gsod| replace:: Google Season of Docs
+.. _gsod: https://developers.google.com/season-of-docs
 
 .. |boost| replace:: Boost
 .. _boost: https://www.boost.org/
@@ -543,6 +547,7 @@ rst_prolog += '''
 .. |email_vamatya| image:: /_static/images/emails/vamatya.png
 .. |email_dkaratza| image:: /_static/images/emails/dkaratza.png
 .. |email_ggonidelis| image:: /_static/images/emails/ggonidelis.png
+.. |email_rstobaugh| image:: /_static/images/emails/rstobaugh.png
 '''
 
 # Add any paths that contain templates here, relative to this directory.

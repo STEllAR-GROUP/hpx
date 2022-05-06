@@ -101,6 +101,7 @@ Contributors to this document
   Steven Brandt           |cct|_, |lsu|_        |email_sbrandt|
   Maciej Brodowicz        |crest|_, |iu|_       |email_mbrodowicz|
   Adrian Serio            |cct|_, |lsu|_        |email_aserio|
+  Rebecca Stobaugh                              |email_rstobaugh|
   Dimitra Karatza         |tud_eemcs|_, |tud|_  |email_dkaratza|
   ======================= ===================== =====
 
@@ -269,4 +270,6 @@ the project through discussions, pull requests, documentation patches, etc.
   Jeff Trull, Yuri Victorovich, and Gregor Daiß who contributed to the general
   improvement of |hpx|.
 
-|stellar_hpx_funding|_ lists current and past funding sources for |hpx|.
+|stellar_hpx_funding|_ lists current and past funding sources for |hpx|. Special thanks to 
+|gsoc|_ and |gsod|_ for the continuous support they provide which helps us enhance both our 
+code and our documentation.

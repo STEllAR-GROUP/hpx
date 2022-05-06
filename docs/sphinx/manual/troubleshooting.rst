@@ -1,4 +1,5 @@
 ..
+    Copyright (c) 2022 Dimitra Karatza
     Copyright (C) 2019 Mikael Simberg
 
     SPDX-License-Identifier: BSL-1.0
@@ -11,6 +12,9 @@
 Troubleshooting
 ===============
 
+Common issues
+=============
+
 This section contains commonly encountered problems when compiling or using HPX.
 
 See also the closed issues on `GitHub <hpx_github_closed_issues_>`_ to find out 
@@ -21,7 +25,7 @@ one the options found in `Support for deploying and using HPX <hpx_github_suppor
 .. _troubleshooting_iostreams:
 
 ``Undefined reference to hpx::cout``
-====================================
+------------------------------------
 
 You may see a linker error message that looks a bit like this:
 
@@ -37,7 +41,7 @@ this can be solved by adding ``COMPONENT_DEPENDENCIES iostreams`` to a call to
 :ref:`creating_hpx_projects` for more details.
 
 ``Fail compiling for examples with hpx::future and co_await``
-=============================================================
+-------------------------------------------------------------
 
 You may see an error message that looks a bit like this:
 
@@ -51,7 +55,7 @@ Note that a compiler that supports C++20 is needed.
 See also the corresponding closed :hpx-issue:`5784`.
 
 ``Build fails with ASIO error``
-===============================
+-------------------------------
 
 You may see an error message that looks a bit like this:
 
@@ -63,4 +67,57 @@ This can be resolved by using ``-DHPX_WITH_FETCH_ASIO=ON`` to the cmake command 
 
 See also the corresponding closed :hpx-issue:`5404` for more information.
 
+``Build fails with TCMalloc error``
+-----------------------------------
 
+You may see an error message that looks a bit like this:
+
+.. code-block:: text
+
+   Could NOT find TCMalloc (missing: TCMALLOC_LIBRARY TCMALLOC_INCLUDE_DIR)
+   ERROR: HPX_WITH_MALLOC was set to tcmalloc, but tcmalloc could not be
+   found.  Valid options for HPX_WITH_MALLOC are: system, tcmalloc, jemalloc,
+   mimalloc, tbbmalloc, and custom
+
+This can be resolved either by defining ``HPX_WITH_MALLOC=system`` or by installing TCMalloc.
+This error occurs when users don't specify an option for ``HPX_WITH_MALLOC``; in that case, 
+|hpx| will be looking ``tcmalloc``, which is the default value.
+
+Useful suggestions
+==================
+
+Reducing compilation time
+-------------------------
+
+If you want to significantly reduce compilation time, you can just use the local part of |hpx| 
+for parallelism by disabling the distributed functionality. Moreover, you can avoid compiling 
+examples. These can be done with the following flags:
+
+.. code-block:: text
+
+   -DHPX_WITH_NETWORKING=OFF
+   -DHPX_WITH_DISTRIBUTED_RUNTIME=OFF 
+   -DHPX_WITH_EXAMPLES=OFF
+   -DHPX_WITH_TESTS=OFF
+
+Linking |hpx| to your application
+---------------------------------
+
+If you want to avoid installing and linking |hpx|, you can just build |hpx| and then use the 
+following flag on your |hpx| application CMake configuration: 
+
+.. code-block:: text
+   
+   -DHPX_DIR=<build_dir>/lib/cmake/HPX 
+   
+.. note:: 
+   For this to work you need not to specify ``-DCMAKE_INSTALL_PREFIX`` when building |hpx|.
+
+
+|hpx|-application build type conformance
+----------------------------------------
+
+Your application’s build type should align with the HPX build type. For example, if you specified 
+``-DCMAKE_BUILD_TYPE=Debug`` during the |hpx| compilation, then your application needs to be compiled 
+with the same flag. We recommend keeping a separate build folder for different build types and just 
+point accordingly to the type you want by using ``-DHPX_DIR=<build_dir>/lib/cmake/HPX``.
