@@ -63,9 +63,22 @@ int hpx_main()
 
 int main(int argc, char** argv)
 {
-    std::vector<std::string> schedulers = {"local", "local-priority-fifo",
-        "local-priority-lifo", "static", "static-priority", "abp-priority-fifo",
-        "abp-priority-lifo", "shared-priority"};
+    // clang-format off
+    std::vector<std::string> schedulers = {
+        "local",
+        "local-priority-fifo",
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+        "local-priority-lifo",
+#endif
+        "static",
+        "static-priority",
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+        "abp-priority-fifo",
+        "abp-priority-lifo",
+#endif
+        "shared-priority"
+    };
+    // clang-format on
     for (auto const& scheduler : schedulers)
     {
         hpx::local::init_params iparams;

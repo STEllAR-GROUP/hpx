@@ -45,7 +45,7 @@ namespace hpx { namespace collectives {
     /// This function sends a set of values to all call sites operating on
     /// the given base name.
     ///
-    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  comm        A communicator object returned from \a create_communicator
     /// \param  local_result A value to transmit to all
     ///                     participating sites from this call site.
     /// \param this_site    The sequence number of this invocation (usually
@@ -88,7 +88,7 @@ namespace hpx { namespace collectives {
     /// This function sends a set of values to all call sites operating on
     /// the given base name.
     ///
-    /// \param  comm        A communicator object returned from \a create_reducer
+    /// \param  comm        A communicator object returned from \a create_communicator
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.

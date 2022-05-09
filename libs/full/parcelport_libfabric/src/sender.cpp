@@ -29,7 +29,9 @@ namespace hpx::parcelset::policies::libfabric {
     // The main message send routine
     void sender::async_write_impl()
     {
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         buffer_.data_point_.time_ = hpx::chrono::high_resolution_clock::now();
+#endif
         HPX_ASSERT(message_region_ == nullptr);
         HPX_ASSERT(completion_count_ == 0);
         // increment counter of total messages sent
@@ -267,9 +269,11 @@ namespace hpx::parcelset::policies::libfabric {
             memory_pool_->deallocate(region);
         }
         rma_regions_.clear();
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         buffer_.data_point_.time_ = hpx::chrono::high_resolution_clock::now() -
             buffer_.data_point_.time_;
         parcelport_->add_sent_data(buffer_.data_point_);
+#endif
         postprocess_handler_(this);
     }
 

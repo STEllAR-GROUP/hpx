@@ -70,7 +70,9 @@ namespace hpx::parcelset {
             size_ = 0;
             data_size_ = 0;
             header_size_ = 0;
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             data_point_ = parcelset::data_point();
+#endif
         }
 
         BufferType data_;
@@ -86,7 +88,9 @@ namespace hpx::parcelset {
         std::uint64_t header_size_;
 
         /// Counters and their data containers.
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         parcelset::data_point data_point_;
+#endif
     };
 }    // namespace hpx::parcelset
 

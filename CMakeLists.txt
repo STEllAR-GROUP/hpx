@@ -942,7 +942,7 @@ if(HPX_WITH_APEX)
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
   )
   hpx_option(
-    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.4.1"
+    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.5.1"
     CATEGORY "Profiling"
   )
 endif()
@@ -1140,6 +1140,14 @@ if(HPX_WITH_NETWORKING)
   )
   if(HPX_WITH_PARCELPORT_TCP)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_TCP)
+  endif()
+  hpx_option(
+    HPX_WITH_PARCELPORT_COUNTERS BOOL
+    "Enable performance counters reporting parcelport statistics." OFF
+    CATEGORY "Parcelport"
+  )
+  if(HPX_WITH_PARCELPORT_COUNTERS)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_COUNTERS)
   endif()
   hpx_option(
     HPX_WITH_PARCELPORT_ACTION_COUNTERS

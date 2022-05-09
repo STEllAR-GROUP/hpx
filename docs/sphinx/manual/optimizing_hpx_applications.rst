@@ -1008,10 +1008,15 @@ system and application performance.
        (see ``<operation``, e.g. ``en`` or ``eceived``) for the specified
        ``<connection_type>``.
 
+       The performance counters are available only if the compile time constant
+       ``HPX_HAVE_PARCELPORT_COUNTERS`` was defined while compiling the |hpx|
+       core library (which is not defined by default). The corresponding cmake
+       configuration constant is ``HPX_WITH_PARCELPORT_COUNTERS``.
+
        The performance counters for the connection type ``mpi`` are available
        only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` was defined
-       while compiling the |hpx| core library (which is not defined by default,
-       the corresponding cmake configuration constant is
+       while compiling the |hpx| core library (which is not defined by default).
+       The corresponding cmake configuration constant is
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
@@ -1039,10 +1044,15 @@ system and application performance.
        operation for the specified ``<connection_type>`` the given
        :term:`locality` (see ``<operation``, e.g. ``en`` or ``eceived``).
 
+       The performance counters are available only if the compile time constant
+       ``HPX_HAVE_PARCELPORT_COUNTERS`` was defined while compiling the |hpx|
+       core library (which is not defined by default). The corresponding cmake
+       configuration constant is ``HPX_WITH_PARCELPORT_COUNTERS``.
+
        The performance counters for the connection type ``mpi`` are available
        only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` was defined
-       while compiling the |hpx| core library (which is not defined by default,
-       the corresponding cmake configuration constant is
+       while compiling the |hpx| core library (which is not defined by default).
+       The corresponding cmake configuration constant is
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
@@ -1069,10 +1079,15 @@ system and application performance.
        e.g. ``sent`` or ``received`` possibly compressed) for the specified
        ``<connection_type>`` by the given :term:`locality`.
 
+       The performance counters are available only if the compile time constant
+       ``HPX_HAVE_PARCELPORT_COUNTERS`` was defined while compiling the |hpx|
+       core library (which is not defined by default). The corresponding cmake
+       configuration constant is ``HPX_WITH_PARCELPORT_COUNTERS``.
+
        The performance counters for the connection type ``mpi`` are available
        only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` was defined
-       while compiling the |hpx| core library (which is not defined by default,
-       the corresponding cmake configuration constant is
+       while compiling the |hpx| core library (which is not defined by default).
+       The corresponding cmake configuration constant is
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
@@ -1102,10 +1117,15 @@ system and application performance.
        the specified ``<connection_type>`` on the given :term:`locality` (see
        ``<operation``, e.g. ``sent`` or ``received``).
 
+       The performance counters are available only if the compile time constant
+       ``HPX_HAVE_PARCELPORT_COUNTERS`` was defined while compiling the |hpx|
+       core library (which is not defined by default). The corresponding cmake
+       configuration constant is ``HPX_WITH_PARCELPORT_COUNTERS``.
+
        The performance counters for the connection type ``mpi`` are available
        only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` was defined
-       while compiling the |hpx| core library (which is not defined by default,
-       the corresponding cmake configuration constant is
+       while compiling the |hpx| core library (which is not defined by default).
+       The corresponding cmake configuration constant is
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
@@ -1162,10 +1182,15 @@ system and application performance.
        ``<connection_type`` by the given :term:`locality` (see ``operation>``,
        e.g. ``sent`` or ``received``.
 
+       The performance counters are available only if the compile time constant
+       ``HPX_HAVE_PARCELPORT_COUNTERS`` was defined while compiling the |hpx|
+       core library (which is not defined by default). The corresponding cmake
+       configuration constant is ``HPX_WITH_PARCELPORT_COUNTERS``.
+
        The performance counters for the connection type ``mpi`` are available
        only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` was defined
-       while compiling the |hpx| core library (which is not defined by default,
-       the corresponding cmake configuration constant is
+       while compiling the |hpx| core library (which is not defined by default).
+       The corresponding cmake configuration constant is
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
@@ -1192,10 +1217,15 @@ system and application performance.
        specified ``<connection_type>`` by the given :term:`locality` (see
        ``<operation``, e.g. ``sent`` or ``received``)
 
+       The performance counters are available only if the compile time constant
+       ``HPX_HAVE_PARCELPORT_COUNTERS`` was defined while compiling the |hpx|
+       core library (which is not defined by default). The corresponding cmake
+       configuration constant is ``HPX_WITH_PARCELPORT_COUNTERS``.
+
        The performance counters for the connection type ``mpi`` are available
        only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` was defined
-       while compiling the |hpx| core library (which is not defined by default,
-       the corresponding cmake configuration constant is
+       while compiling the |hpx| core library (which is not defined by default).
+       The corresponding cmake configuration constant is
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
@@ -1227,8 +1257,8 @@ system and application performance.
 
        The performance counters for the connection type ``mpi`` are available
        only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` was defined
-       while compiling the |hpx| core library (which is not defined by default,
-       the corresponding cmake configuration constant is
+       while compiling the |hpx| core library (which is not defined by default).
+       The corresponding cmake configuration constant is
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.

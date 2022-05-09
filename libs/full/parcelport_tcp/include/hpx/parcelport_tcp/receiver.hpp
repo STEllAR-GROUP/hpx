@@ -61,7 +61,6 @@ namespace hpx::parcelset::policies::tcp {
           , max_inbound_size_(max_inbound_size)
           , ack_(0)
           , parcelport_(parcelport)
-          , timer_()
           , mtx_()
           , operation_in_flight_(0)
         {
@@ -85,12 +84,13 @@ namespace hpx::parcelset::policies::tcp {
             HPX_ASSERT(buffer_.data_.empty());
 
             // Store the time of the begin of the read operation
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             parcelset::data_point& data = buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
             data.serialization_time_ = 0;
             data.bytes_ = 0;
             data.num_parcels_ = 0;
-
+#endif
             // Issue a read operation to read the message size.
             using asio::buffer;
             std::vector<asio::mutable_buffer> buffers;
@@ -176,9 +176,10 @@ namespace hpx::parcelset::policies::tcp {
                     return;
                 }
 
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
                 buffer_.data_point_.bytes_ =
                     static_cast<std::size_t>(inbound_size);
-
+#endif
                 // receive buffers
                 std::vector<asio::mutable_buffer> buffers;
 
@@ -325,9 +326,10 @@ namespace hpx::parcelset::policies::tcp {
             else
             {
                 // complete data point and pass it along
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
                 buffer_.data_point_.time_ =
                     timer_.elapsed_nanoseconds() - buffer_.data_point_.time_;
-
+#endif
                 // now send acknowledgment byte
                 void (receiver::*f)(std::error_code const&, Handler) =
                     &receiver::handle_write_ack<Handler>;
@@ -385,8 +387,9 @@ namespace hpx::parcelset::policies::tcp {
         connection_handler& parcelport_;
 
         // Counters and timers for parcels received.
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         hpx::chrono::high_resolution_timer timer_;
-
+#endif
         hpx::spinlock mtx_;
         hpx::util::atomic_count operation_in_flight_;
     };

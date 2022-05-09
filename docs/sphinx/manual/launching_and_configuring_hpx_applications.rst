@@ -20,7 +20,7 @@ Configuring |hpx| applications
 All |hpx| applications can be configured using special command line options
 and/or using special configuration files. This section describes the available
 options, the configuration file format, and the algorithm used to locate
-possible predefined configuration files. Additionally this section describes the
+possible predefined configuration files. Additionally, this section describes the
 defaults assumed if no external configuration information is supplied.
 
 During startup any |hpx| application applies a predefined search pattern to
@@ -38,30 +38,29 @@ line configuration options (see the description of the :option:`--hpx:ini`,
 
 .. _ini_format:
 
-The |hpx| INI File Format
+The |hpx| ini file format
 -------------------------
 
-All |hpx| applications can be configured using a special file format which is
+All |hpx| applications can be configured using a special file format that is
 similar to the well-known |ini_file_format|_. This is a structured text format
-allowing to group key/value pairs (properties) into sections. The basic element
+that allows users to group key/value pairs (properties) into sections. The basic element
 contained in an ini file is the property. Every property has a name and a
-value, delimited by an equals sign ``'='``. The name appears to the left of the
-equals sign:
+value, delimited by an equal sign ``'='``. The name appears to the left of the
+equal sign:
 
 .. code-block:: ini
 
    name=value
 
 The value may contain equal signs as only the first ``'='`` character
-is interpreted as the delimiter between ``name`` and ``value`` Whitespace before
+is interpreted as the delimiter between ``name`` and ``value``. Whitespace before
 the name, after the value and immediately before and after the delimiting equal
 sign is ignored. Whitespace inside the value is retained.
 
 Properties may be grouped into arbitrarily named sections. The section name
-appears on a line by itself, in square brackets ``[`` and ``]``. All properties
-after the section declaration are associated with that section. There is no
-explicit "end of section" delimiter; sections end at the next section
-declaration, or the end of the file:
+appears on a line by itself, in square brackets. All properties after the section
+declaration are associated with that section. There is no explicit "end of section"
+delimiter; sections end at the next section declaration or the end of the file:
 
 .. code-block:: ini
 
@@ -75,10 +74,10 @@ a dot ``'.'``:
 
    [outer_section.inner_section]
 
-Here ``inner_section`` is logically nested within ``outer_section``.
+Here, ``inner_section`` is logically nested within ``outer_section``.
 
 It is possible to use the full section name concatenated with the property
-name to refer to a particular property. For example in:
+name to refer to a particular property. For example, in:
 
 .. code-block:: ini
 
@@ -88,18 +87,18 @@ name to refer to a particular property. For example in:
 the property value of ``d`` can be referred to as ``a.b.c.d=e``.
 
 In |hpx| ini files can contain comments. Hash signs ``'#'`` at the beginning
-of a line indicate a comment. All characters starting with the ``'#'`` until the
-end of line are ignored.
+of a line indicate a comment. All characters starting with ``'#'`` until the
+end of the line are ignored.
 
 If a property with the same name is reused inside a section, the second
 occurrence of this property name will override the first occurrence (discard the
 first value). Duplicate sections simply merge their properties together, as if
 they occurred contiguously.
 
-In |hpx| ini files, a property value ``${FOO:default}`` will use the environmental
+In |hpx| ini files a property value ``${FOO:default}`` will use the environmental
 variable ``FOO`` to extract the actual value if it is set and ``default`` otherwise.
-No default has to be specified. Therefore ``${FOO}`` refers to the environmental
-variable ``FOO``. If ``FOO`` is not set or empty the overall expression will evaluate
+No default has to be specified. Therefore, ``${FOO}`` refers to the environmental
+variable ``FOO``. If ``FOO`` is not set or empty, the overall expression will evaluate
 to an empty string. A property value ``$[section.key:default]`` refers to the value
 held by the property ``section.key`` if it exists and ``default`` otherwise. No
 default has to be specified. Therefore ``$[section.key]`` refers to the property
@@ -111,13 +110,13 @@ expression will evaluate to an empty string.
    Any property ``$[section.key:default]`` is evaluated whenever it is queried
    and not when the configuration data is initialized. This allows for lazy
    evaluation and relaxes initialization order of different sections. The only
-   exception are recursive property values, e.g. values referring to the very
+   exception are recursive property values, e.g., values referring to the very
    key they are associated with. Those property values are evaluated at
    initialization time to avoid infinite recursion.
 
 .. _config_defaults:
 
-Built-in Default Configuration Settings
+Built-in default configuration settings
 ---------------------------------------
 
 During startup any |hpx| application applies a predefined search pattern to
@@ -159,7 +158,7 @@ The ``system`` configuration section
      * This is initialized to the base directory the current executable has been
        loaded from.
 
-The ``hpx`` configuration section
+The `|hpx| configuration section
 .................................
 
 .. code-block:: ini
@@ -203,7 +202,7 @@ The ``hpx`` configuration section
    * * ``hpx.component_path``
      * Duplicates are discarded.
        This property can refer to a list of directories separated by ``':'``
-       (Linux, Android, and MacOS) or using ``';'`` (Windows).
+       (Linux, Android, and MacOS) or by ``';'`` (Windows).
    * * ``hpx.master_ini_path``
      * This is initialized to the list of default paths of the main hpx.ini
        configuration files. This property can refer to a list of directories
@@ -215,8 +214,8 @@ The ``hpx`` configuration section
        separated by ``':'`` (Linux, Android, and MacOS) or using ``';'``
        (Windows).
    * * ``hpx.os_threads``
-     * This setting reflects the number of OS-threads used for running
-       |hpx|-threads. Defaults to number of detected cores (not hyperthreads/PUs).
+     * This setting reflects the number of OS threads used for running
+       |hpx| threads. Defaults to number of detected cores (not hyperthreads/PUs).
    * * ``hpx.localities``
      * This setting reflects the number of localities the application is running
        on. Defaults to ``1``.
@@ -237,8 +236,8 @@ The ``hpx`` configuration section
        in CMake. This setting has no effect if ``hpx.lock_detection=0``.
    * * ``hpx.minimal_deadlock_detection``
      * This setting enables support for minimal deadlock detection for
-       |hpx|-threads. By default this is set to ``1`` (for Debug builds) or to
-       ``0`` (for Release, RelWithDebInfo, RelMinSize builds), this setting is
+       |hpx| threads. By default this is set to ``1`` (for Debug builds) or to
+       ``0`` (for Release, RelWithDebInfo, RelMinSize builds). This setting is
        effective only if ``HPX_WITH_THREAD_DEADLOCK_DETECTION`` is set during
        configuration in CMake.
    * * ``hpx.spinlock_deadlock_detection``
@@ -248,22 +247,22 @@ The ``hpx`` configuration section
        configuration in CMake. By default this is set to ``1`` (for Debug
        builds) or to ``0`` (for Release, RelWithDebInfo, RelMinSize builds).
    * * ``hpx.spinlock_deadlock_detection_limit``
-     * This setting specifies the upper limit of allowed number of spins that
+     * This setting specifies the upper limit of the allowed number of spins that
        spinlocks are allowed to perform. This setting is applicable only if
        ``HPX_WITH_SPINLOCK_DEADLOCK_DETECTION`` is set during configuration in
        CMake. By default this is set to ``1000000``.
    * * ``hpx.max_background_threads``
-     * This setting defines the number of threads in the scheduler which are
+     * This setting defines the number of threads in the scheduler, which are
        used to execute background work. By default this is the same as the
        number of cores used for the scheduler.
    * * ``hpx.max_idle_loop_count``
      * By default this is defined by the preprocessor constant
-       ``HPX_IDLE_LOOP_COUNT_MAX``. This is an internal setting which you should
+       ``HPX_IDLE_LOOP_COUNT_MAX``. This is an internal setting that you should
        change only if you know exactly what you are doing.
    * * ``hpx.max_busy_loop_count``
      * This setting defines the maximum value of the busy-loop counter in the
        scheduler. By default this is defined by the preprocessor constant
-       ``HPX_BUSY_LOOP_COUNT_MAX``. This is an internal setting which you should
+       ``HPX_BUSY_LOOP_COUNT_MAX``. This is an internal setting that you should
        change only if you know exactly what you are doing.
    * * ``hpx.max_idle_backoff_time``
      * This setting defines the maximum time (in milliseconds) for the scheduler
@@ -271,7 +270,7 @@ The ``hpx`` configuration section
        This setting is applicable only if
        ``HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF`` is set during configuration in
        |cmake|. By default this is defined by the preprocessor constant
-       ``HPX_IDLE_BACKOFF_TIME_MAX``. This is an internal setting which you
+       ``HPX_IDLE_BACKOFF_TIME_MAX``. This is an internal setting that you
        should change only if you know exactly what you are doing.
    * * ``hpx.exception_verbosity``
      * This setting defines the verbosity of exceptions. Valid values are
@@ -282,22 +281,22 @@ The ``hpx`` configuration section
        exception was thrown. The default value is ``2`` or the value of the
        environment variable ``HPX_EXCEPTION_VERBOSITY``.
    * * ``hpx.stacks.small_size``
-     * This is initialized to the small stack size to be used by |hpx|-threads.
+     * This is initialized to the small stack size to be used by |hpx| threads.
        Set by default to the value of the compile time preprocessor constant
        ``HPX_SMALL_STACK_SIZE`` (defaults to ``0x8000``). This value is used for
        all |hpx| threads by default, except for the thread running ``hpx_main``
        (which runs on a large stack).
    * * ``hpx.stacks.medium_size``
-     * This is initialized to the medium stack size to be used by |hpx|-threads.
+     * This is initialized to the medium stack size to be used by |hpx| threads.
        Set by default to the value of the compile time preprocessor constant
        ``HPX_MEDIUM_STACK_SIZE`` (defaults to ``0x20000``).
    * * ``hpx.stacks.large_size``
-     * This is initialized to the large stack size to be used by |hpx|-threads.
+     * This is initialized to the large stack size to be used by |hpx| threads.
        Set by default to the value of the compile time preprocessor constant
        ``HPX_LARGE_STACK_SIZE`` (defaults to ``0x200000``). This setting is used
        by default for the thread running ``hpx_main`` only.
    * * ``hpx.stacks.huge_size``
-     * This is initialized to the huge stack size to be used by |hpx|-threads.
+     * This is initialized to the huge stack size to be used by |hpx| threads.
        Set by default to the value of the compile time preprocessor constant
        ``HPX_HUGE_STACK_SIZE`` (defaults to ``0x2000000``).
    * * ``hpx.stacks.use_guard_pages``
@@ -324,13 +323,13 @@ The ``hpx.threadpools`` configuration section
    * * Property
      * Description
    * * ``hpx.threadpools.io_pool_size``
-     * The value of this property defines the number of OS-threads created for
+     * The value of this property defines the number of OS threads created for
        the internal I/O thread pool.
    * * ``hpx.threadpools.parcel_pool_size``
-     * The value of this property defines the number of OS-threads created for
+     * The value of this property defines the number of OS threads created for
        the internal parcel thread pool.
    * * ``hpx.threadpools.timer_pool_size``
-     * The value of this property defines the number of OS-threads created for
+     * The value of this property defines the number of OS threads created for
        the internal timer thread pool.
 
 The ``hpx.thread_queue`` configuration section
@@ -338,9 +337,9 @@ The ``hpx.thread_queue`` configuration section
 
 .. important::
 
-   These setting control internal values used by the thread scheduling queues in
-   the |hpx| scheduler. You should not modify these settings except if you know
-   exactly what you are doing]
+   These are the setting control internal values used by the thread scheduling queues
+   in the |hpx| scheduler. You should not modify these settings unless you know
+   exactly what you are doing.
 
 .. code-block:: ini
 
@@ -359,23 +358,23 @@ The ``hpx.thread_queue`` configuration section
      * Description
    * * ``hpx.thread_queue.min_tasks_to_steal_pending``
      * The value of this property defines the number of pending |hpx| threads
-       which have to be available before neighboring cores are allowed to steal
+       that have to be available before neighboring cores are allowed to steal
        work. The default is to allow stealing always.
    * * ``hpx.thread_queue.min_tasks_to_steal_staged``
-     * The value of this property defines the number of staged |hpx| tasks have
-       which to be available before neighboring cores are allowed to steal work.
+     * The value of this property defines the number of staged |hpx| tasks that
+       need to be available before neighboring cores are allowed to steal work.
        The default is to allow stealing always.
    * * ``hpx.thread_queue.min_add_new_count``
-     * The value of this property defines the minimal number tasks to be
+     * The value of this property defines the minimal number of tasks to be
        converted into |hpx| threads whenever the thread queues for a core have
        run empty.
    * * ``hpx.thread_queue.max_add_new_count``
-     * The value of this property defines the maximal number tasks to be
+     * The value of this property defines the maximal number of tasks to be
        converted into |hpx| threads whenever the thread queues for a core have
        run empty.
    * * ``hpx.thread_queue.max_delete_count``
-     * The value of this property defines the number of terminated |hpx| threads
-       to discard during each invocation of the corresponding function.
+     * The value of this property defines the number of terminated |hpx|
+       threads to discard during each invocation of the corresponding function.
 
 The ``hpx.components`` configuration section
 ............................................
@@ -393,7 +392,7 @@ The ``hpx.components`` configuration section
      * Description
    * * ``hpx.components.load_external``
      * This entry defines whether external components will be loaded on this
-       :term:`locality`. This entry normally is set to ``1`` and usually there is
+       :term:`locality`. This entry is normally set to ``1``, and usually there is
        no need to directly change this value. It is automatically set to ``0`` for
        a dedicated :term:`AGAS` server :term:`locality`.
 
@@ -426,11 +425,11 @@ of the components will contain at least the following properties:
        factory.
    * * ``hpx.components.<component_instance_name>.enabled``
      * This setting explicitly enables or disables the component. This is an
-       optional property, |hpx| assumed that the component is enabled if it is
+       optional property. |Hpx| assumes that the component is enabled if it is
        not defined.
 
 The value for ``<component_instance_name>`` is usually the same as for the
-corresponding ``name`` property. However generally it can be defined to any
+corresponding ``name`` property. However, generally it can be defined to any
 arbitrary instance name. It is used to distinguish between different ini
 sections, one for each component.
 
@@ -461,9 +460,9 @@ The ``hpx.parcel`` configuration section
    * * ``hpx.parcel.address``
      * This property defines the default IP address to be used for the :term:`parcel`
        layer to listen to. This IP address will be used as long as no other
-       values are specified (for instance using the :option:`--hpx:hpx` command
+       values are specified (for instance, using the :option:`--hpx:hpx` command
        line option). The expected format is any valid IP address or domain name
-       format which can be resolved into an IP address. The default depends on
+       format that can be resolved into an IP address. The default depends on
        the compile time preprocessor constant ``HPX_INITIAL_IP_ADDRESS``
        (``"127.0.0.1"``).
    * * ``hpx.parcel.port``
@@ -478,7 +477,7 @@ The ``hpx.parcel`` configuration section
        preprocessor constant ``HPX_PARCEL_BOOTSTRAP`` (``"tcp"``).
    * * ``hpx.parcel.max_connections``
      * This property defines how many network connections between different
-       localities are overall kept alive by each of :term:`locality`. The
+       localities are overall kept alive by each :term:`locality`. The
        default depends on the compile time preprocessor constant
        ``HPX_PARCEL_MAX_CONNECTIONS`` (``512``).
    * * ``hpx.parcel.max_connections_per_locality``
@@ -487,13 +486,13 @@ The ``hpx.parcel`` configuration section
        on the compile time preprocessor constant
        ``HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY`` (``4``).
    * * ``hpx.parcel.max_message_size``
-     * This property defines the maximum allowed message size which will be
-       transferable through the :term:`parcel` layer. The default depends on the
+     * This property defines the maximum allowed message size that will be
+       transferrable through the :term:`parcel` layer. The default depends on the
        compile time preprocessor constant ``HPX_PARCEL_MAX_MESSAGE_SIZE``
        (``1000000000`` bytes).
    * * ``hpx.parcel.max_outbound_message_size``
      * This property defines the maximum allowed outbound coalesced message size
-       which will be transferable through the parcel layer. The default depends
+       that will be transferrable through the parcel layer. The default depends
        on the compile time preprocessor constant
        ``HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE`` (``1000000`` bytes).
    * * ``hpx.parcel.array_optimization``
@@ -544,7 +543,7 @@ The following settings relate to the TCP/IP parcelport.
    * * Property
      * Description
    * * ``hpx.parcel.tcp.enable``
-     * Enable the use of the default TCP parcelport. Note that the initial
+     * Enables the use of the default TCP parcelport. Note that the initial
        bootstrap of the overall |hpx| application will be performed using the
        default TCP connections. This parcelport is enabled by default. This will
        be disabled only if MPI is enabled (see below).
@@ -569,24 +568,24 @@ The following settings relate to the TCP/IP parcelport.
        encoding and decoding parcels). The default is the same value as set for
        ``hpx.parcel.async_serialization``.
    * * ``hpx.parcel.tcp.parcel_pool_size``
-     * The value of this property defines the number of OS-threads created for
+     * The value of this property defines the number of OS threads created for
        the internal parcel thread pool of the TCP :term:`parcel` port. The default is
        taken from ``hpx.threadpools.parcel_pool_size``.
    * * ``hpx.parcel.tcp.max_connections``
      * This property defines how many network connections between different
-       localities are overall kept alive by each of :term:`locality`. The
+       localities are overall kept alive by each :term:`locality`. The
        default is taken from ``hpx.parcel.max_connections``.
    * * ``hpx.parcel.tcp.max_connections_per_locality``
      * This property defines the maximum number of network connections that one
        :term:`locality` will open to another :term:`locality`. The default is
        taken from ``hpx.parcel.max_connections_per_locality``.
    * * ``hpx.parcel.tcp.max_message_size``
-     * This property defines the maximum allowed message size which will be
-       transferable through the :term:`parcel` layer. The default is taken from
+     * This property defines the maximum allowed message size that will be
+       transferrable through the :term:`parcel` layer. The default is taken from
        ``hpx.parcel.max_message_size``.
    * * ``hpx.parcel.tcp.max_outbound_message_size``
      * This property defines the maximum allowed outbound coalesced message size
-       which will be transferable through the :term:`parcel` layer. The default is
+       that will be transferrable through the :term:`parcel` layer. The default is
        taken from ``hpx.parcel.max_outbound_connections``.
    * * ``hpx.parcel.tcp.max_background_threads``
      * This property defines how many cores should be used to perform background
@@ -594,8 +593,8 @@ The following settings relate to the TCP/IP parcelport.
 
 The following settings relate to the MPI parcelport. These settings take effect
 only if the compile time constant ``HPX_HAVE_PARCELPORT_MPI`` is set (the
-equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
-``ON``.
+equivalent CMake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
+``ON``).
 
 .. code-block:: ini
 
@@ -624,19 +623,19 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
    * * Property
      * Description
    * * ``hpx.parcel.mpi.enable``
-     * Enable the use of the MPI parcelport. HPX tries to detect if the
+     * Enables the use of the MPI parcelport. |hpx| tries to detect if the
        application was started within a parallel MPI environment. If the
        detection was successful, the MPI parcelport is enabled by default. To
        explicitly disable the MPI parcelport, set to 0. Note that the initial
        bootstrap of the overall |hpx| application will be performed using MPI as
        well.
    * * ``hpx.parcel.mpi.env``
-     * This property influences which environment variables (comma separated)
+     * This property influences which environment variables (separated by commas)
        will be analyzed to find out whether the application was invoked by MPI.
    * * ``hpx.parcel.mpi.multithreaded``
      * This property is used to determine what threading mode to use when
-       initializing MPI. If this setting is ``0`` |hpx| will initialize MPI with
-       ``MPI_THREAD_SINGLE`` if the value is not equal to ``0`` |hpx| will
+       initializing MPI. If this setting is ``0``, |hpx| will initialize MPI with
+       ``MPI_THREAD_SINGLE``. If the value is not equal to ``0``, |hpx| will
        initialize MPI with ``MPI_THREAD_MULTI``.
    * * ``hpx.parcel.mpi.rank``
      * This property will be initialized to the MPI rank of the
@@ -660,7 +659,7 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
        entities. The default is the same value as set for
        ``hpx.parcel.zero_copy_serialization_threshold``.
    * * ``hpx.parcel.mpi.use_io_pool``
-     * This property can be set to run the progress thread inside of HPX threads
+     * This property can be set to run the progress thread inside of |hpx| threads
        instead of a separate thread pool. The default is ``1``.
    * * ``hpx.parcel.mpi.async_serialization``
      * This property defines whether this :term:`locality` is allowed to spawn a
@@ -668,24 +667,24 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
        encoding and decoding parcels). The default is the same value as set for
        ``hpx.parcel.async_serialization``.
    * * ``hpx.parcel.mpi.parcel_pool_size``
-     * The value of this property defines the number of OS-threads created for
+     * The value of this property defines the number of OS threads created for
        the internal parcel thread pool of the MPI :term:`parcel` port. The default is
        taken from ``hpx.threadpools.parcel_pool_size``.
    * * ``hpx.parcel.mpi.max_connections``
      * This property defines how many network connections between different
-       localities are overall kept alive by each of :term:`locality`. The
+       localities are overall kept alive by each :term:`locality`. The
        default is taken from ``hpx.parcel.max_connections``.
    * * ``hpx.parcel.mpi.max_connections_per_locality``
      * This property defines the maximum number of network connections that one
        :term:`locality` will open to another :term:`locality`. The default is
        taken from ``hpx.parcel.max_connections_per_locality``.
    * * ``hpx.parcel.mpi.max_message_size``
-     * This property defines the maximum allowed message size which will be
-       transferable through the :term:`parcel` layer. The default is taken from
+     * This property defines the maximum allowed message size that will be
+       transferrable through the :term:`parcel` layer. The default is taken from
        ``hpx.parcel.max_message_size``.
    * * ``hpx.parcel.mpi.max_outbound_message_size``
      * This property defines the maximum allowed outbound coalesced message size
-       which will be transferable through the :term:`parcel` layer. The default is
+       that will be transferrable through the :term:`parcel` layer. The default is
        taken from ``hpx.parcel.max_outbound_connections``.
    * * ``hpx.parcel.tcp.max_background_threads``
      * This property defines how many cores should be used to perform background
@@ -718,15 +717,15 @@ The ``hpx.agas`` configuration section
    * * ``hpx.agas.address``
      * This property defines the default IP address to be used for the
        :term:`AGAS` root server. This IP address will be used as long as no
-       other values are specified (for instance using the :option:`--hpx:agas`
+       other values are specified (for instance, using the :option:`--hpx:agas`
        command line option). The expected format is any valid IP address or
-       domain name format which can be resolved into an IP address. The default
+       domain name format that can be resolved into an IP address. The default
        depends on the compile time preprocessor constant
        ``HPX_INITIAL_IP_ADDRESS`` (``"127.0.0.1"``).
    * * ``hpx.agas.port``
      * This property defines the default IP port to be used for the :term:`AGAS`
        root server. This IP port will be used as long as no other values are
-       specified (for instance using the :option:`--hpx:agas` command line
+       specified (for instance, using the :option:`--hpx:agas` command line
        option). The default depends on the compile time preprocessor constant
        ``HPX_INITIAL_IP_PORT`` (``7009``).
    * * ``hpx.agas.service_mode``
@@ -764,7 +763,7 @@ The ``hpx.commandline`` configuration section
 .............................................
 
 The following table lists the definition of all pre-defined command line option
-shortcuts. For more information about commandline options see the section
+shortcuts. For more information about commandline options, see the section
 :ref:`commandline`.
 
 .. code-block:: ini
@@ -810,53 +809,53 @@ shortcuts. For more information about commandline options see the section
      * Allow for unknown command line options to be passed through to
        ``hpx_main()`` Defaults to ``0``.
    * * ``hpx.commandline.aliases.-a``
-     * On the commandline, ``-a`` expands to: :option:`--hpx:agas`.
+     * On the commandline ``-a`` expands to: :option:`--hpx:agas`.
    * * ``hpx.commandline.aliases.-c``
-     * On the commandline, ``-c`` expands to: :option:`--hpx:console`.
+     * On the commandline ``-c`` expands to: :option:`--hpx:console`.
    * * ``hpx.commandline.aliases.-h``
-     * On the commandline, ``-h`` expands to: :option:`--hpx:help`.
+     * On the commandline ``-h`` expands to: :option:`--hpx:help`.
    * * ``hpx.commandline.aliases.--help``
-     * On the commandline, ``--help`` expands to: :option:`--hpx:help`.
+     * On the commandline ``--help`` expands to: :option:`--hpx:help`.
    * * ``hpx.commandline.aliases.-I``
-     * On the commandline, ``-I`` expands to: :option:`--hpx:ini`.
+     * On the commandline ``-I`` expands to: :option:`--hpx:ini`.
    * * ``hpx.commandline.aliases.-l``
-     * On the commandline, ``-l`` expands to: :option:`--hpx:localities`.
+     * On the commandline ``-l`` expands to: :option:`--hpx:localities`.
    * * ``hpx.commandline.aliases.-p``
-     * On the commandline, ``-p`` expands to: :option:`--hpx:app-config`.
+     * On the commandline ``-p`` expands to: :option:`--hpx:app-config`.
    * * ``hpx.commandline.aliases.-q``
-     * On the commandline, ``-q`` expands to: :option:`--hpx:queuing`.
+     * On the commandline ``-q`` expands to: :option:`--hpx:queuing`.
    * * ``hpx.commandline.aliases.-r``
-     * On the commandline, ``-r`` expands to: :option:`--hpx:run-agas-server`.
+     * On the commandline ``-r`` expands to: :option:`--hpx:run-agas-server`.
    * * ``hpx.commandline.aliases.-t``
-     * On the commandline, ``-t`` expands to: :option:`--hpx:threads`.
+     * On the commandline ``-t`` expands to: :option:`--hpx:threads`.
    * * ``hpx.commandline.aliases.-v``
-     * On the commandline, ``-v`` expands to: :option:`--hpx:version`.
+     * On the commandline ``-v`` expands to: :option:`--hpx:version`.
    * * ``hpx.commandline.aliases.--version``
-     * On the commandline, ``--version`` expands to: :option:`--hpx:version`.
+     * On the commandline ``--version`` expands to: :option:`--hpx:version`.
    * * ``hpx.commandline.aliases.-w``
-     * On the commandline, ``-w`` expands to: :option:`--hpx:worker`.
+     * On the commandline ``-w`` expands to: :option:`--hpx:worker`.
    * * ``hpx.commandline.aliases.-x``
-     * On the commandline, ``-x`` expands to: :option:`--hpx:hpx`.
+     * On the commandline ``-x`` expands to: :option:`--hpx:hpx`.
    * * ``hpx.commandline.aliases.-0``
-     * On the commandline, ``-0`` expands to: :option:`--hpx:node`\ ``=0``.
+     * On the commandline ``-0`` expands to: :option:`--hpx:node`\ ``=0``.
    * * ``hpx.commandline.aliases.-1``
-     * On the commandline, ``-1`` expands to: :option:`--hpx:node`\ ``=1``.
+     * On the commandline ``-1`` expands to: :option:`--hpx:node`\ ``=1``.
    * * ``hpx.commandline.aliases.-2``
-     * On the commandline, ``-2`` expands to: :option:`--hpx:node`\ ``=2``.
+     * On the commandline ``-2`` expands to: :option:`--hpx:node`\ ``=2``.
    * * ``hpx.commandline.aliases.-3``
-     * On the commandline, ``-3`` expands to: :option:`--hpx:node`\ ``=3``.
+     * On the commandline ``-3`` expands to: :option:`--hpx:node`\ ``=3``.
    * * ``hpx.commandline.aliases.-4``
-     * On the commandline, ``-4`` expands to: :option:`--hpx:node`\ ``=4``.
+     * On the commandline ``-4`` expands to: :option:`--hpx:node`\ ``=4``.
    * * ``hpx.commandline.aliases.-5``
-     * On the commandline, ``-5`` expands to: :option:`--hpx:node`\ ``=5``.
+     * On the commandline ``-5`` expands to: :option:`--hpx:node`\ ``=5``.
    * * ``hpx.commandline.aliases.-6``
-     * On the commandline, ``-6`` expands to: :option:`--hpx:node`\ ``=6``.
+     * On the commandline ``-6`` expands to: :option:`--hpx:node`\ ``=6``.
    * * ``hpx.commandline.aliases.-7``
-     * On the commandline, ``-7`` expands to: :option:`--hpx:node`\ ``=7``.
+     * On the commandline ``-7`` expands to: :option:`--hpx:node`\ ``=7``.
    * * ``hpx.commandline.aliases.-8``
-     * On the commandline, ``-8`` expands to: :option:`--hpx:node`\ ``=8``.
+     * On the commandline ``-8`` expands to: :option:`--hpx:node`\ ``=8``.
    * * ``hpx.commandline.aliases.-9``
-     * On the commandline, ``-9`` expands to: :option:`--hpx:node`\ ``=9``.
+     * On the commandline ``-9`` expands to: :option:`--hpx:node`\ ``=9``.
 
 .. _loading_ini_files:
 
@@ -877,11 +876,11 @@ The merge operation itself conforms to the rules as described in the section
    property ``hpx.component_path`` and retrieve their default configuration
    information (see section :ref:`loading_components` for more details). This
    property can refer to a list of directories separated by ``':'`` (Linux,
-   Android, and MacOS) or using ``';'`` (Windows).
+   Android, and MacOS) or by ``';'`` (Windows).
 #. Load all files named ``hpx.ini`` in the directories referenced by the property
    ``hpx.master_ini_path`` This property can refer to a list of directories
-   separated by ``':'`` (Linux, Android, and MacOS) or using ``';'`` (Windows).
-#. Load a file named ``.hpx.ini`` in the current working directory, e.g. the
+   separated by ``':'`` (Linux, Android, and MacOS) or by ``';'`` (Windows).
+#. Load a file named ``.hpx.ini`` in the current working directory, e.g., the
    directory the application was invoked from.
 #. Load a file referenced by the environment variable ``HPX_INI``. This variable
    is expected to provide the full path name of the ini configuration file (if
@@ -889,7 +888,7 @@ The merge operation itself conforms to the rules as described in the section
 #. Load a file named ``/etc/hpx.ini``. This lookup is done on non-Windows systems
    only.
 #. Load a file named ``.hpx.ini`` in the home directory of the current user,
-   e.g. the directory referenced by the environment variable ``HOME``.
+   e.g., the directory referenced by the environment variable ``HOME``.
 #. Load a file named ``.hpx.ini`` in the directory referenced by the environment
    variable ``PWD``.
 #. Load the file specified on the command line using the option
@@ -897,7 +896,7 @@ The merge operation itself conforms to the rules as described in the section
 #. Load all properties specified on the command line using the option
    :option:`--hpx:ini`. The properties will be added to the database in the
    same sequence as they are specified on the command line. The format for those
-   options is for instance :option:`--hpx:ini`\ ``=hpx.default_stack_size=0x4000``. In
+   options is, for instance, :option:`--hpx:ini`\ ``=hpx.default_stack_size=0x4000``. In
    addition to the explicit command line options, this will set the following
    properties as implied from other settings:
 
@@ -912,7 +911,7 @@ The merge operation itself conforms to the rules as described in the section
    * ``hpx.runtime_mode`` will be derived from any explicit
      :option:`--hpx:console`, :option:`--hpx:worker`, or :option:`--hpx:connect`,
      or it will be derived from other settings, such as :option:`--hpx:node`
-     ``=0`` which implies :option:`--hpx:console`
+     ``=0``, which implies :option:`--hpx:console`.
 #. Load files based on the pattern ``*.ini`` in all directories listed by the
    property ``hpx.ini_path``. All files found during this search will be merged.
    The property ``hpx.ini_path`` can hold a list of directories separated by
@@ -925,7 +924,7 @@ The merge operation itself conforms to the rules as described in the section
 
    Any changes made to the configuration database caused by one of the steps
    will influence the loading process for all subsequent steps. For instance, if
-   one of the ini files loaded changes the property ``hpx.ini_path`` this will
+   one of the ini files loaded changes the property ``hpx.ini_path``, this will
    influence the directories searched in step 9 as described above.
 
 .. important::
@@ -936,10 +935,10 @@ The merge operation itself conforms to the rules as described in the section
    configuration settings. This is to protect the user from unintentional typos
    while specifying those settings. This behavior can be overwritten by
    appending a ``'!'`` to the configuration key, thus forcing the setting to be
-   entered into the configuration database, for instance: :option:`--hpx:ini`\
+   entered into the configuration database. For instance: :option:`--hpx:ini`\
    ``=hpx.foo! = 1``
 
-If any of the environment variables or files listed above is not found the
+If any of the environment variables or files listed above are not found, the
 corresponding loading step will be silently skipped.
 
 .. _loading_components:
@@ -952,14 +951,14 @@ application. Moreover, |hpx| comes with a set of preinstalled components
 supporting basic functionalities useful for almost every application. Any
 component in |hpx| is loaded from a shared library, where any of the shared
 libraries can contain more than one component type. During startup, |hpx| tries
-to locate all available components (e.g. their corresponding shared libraries)
+to locate all available components (e.g., their corresponding shared libraries)
 and creates an internal component registry for later use. This section describes
 the algorithm used by |hpx| to locate all relevant shared libraries on a system.
 As described, this algorithm is customizable by the configuration properties
 loaded from the ini files (see section :ref:`loading_ini_files`).
 
-Loading components is a two stage process. First |hpx| tries to locate all
-component shared libraries, loads those, and generates default configuration
+Loading components is a two-stage process. First |hpx| tries to locate all
+component shared libraries, loads those, and generates a default configuration
 section in the internal configuration database for each component found. For
 each found component the following information is generated:
 
@@ -988,8 +987,8 @@ second step in terms of loading components. During this step, |hpx| scans all
 existing configuration sections
 ``[hpx.component.<some_component_instance_name>]`` and instantiates a special
 factory object for each of the successfully located and loaded components.
-During the application's life time, these factory objects will be responsible to
-create new and discard old instances of the component they are associated with.
+During the application's life time, these factory objects are responsible for
+creating new and discarding old instances of the component they are associated with.
 This step is performed after step 11) of the process of filling the internal
 configuration database with default information as described in section
 :ref:`loading_ini_files`.
@@ -999,10 +998,10 @@ configuration database with default information as described in section
 Application specific component example
 --------------------------------------
 
-In this section we assume to have a simple application component which exposes
+This section assumes there is a simple application component that exposes
 one member function as a component action. The header file ``app_server.hpp``
 declares the C++ type to be exposed as a component. This type has a member
-function ``print_greeting()`` which is exposed as an action
+function ``print_greeting()``, which is exposed as an action
 ``print_greeting_action``. We assume the source files for this example are
 located in a directory referenced by ``$APP_ROOT``:
 
@@ -1032,7 +1031,7 @@ located in a directory referenced by ``$APP_ROOT``:
    // Declare boilerplate code required for each of the component actions.
    HPX_REGISTER_ACTION_DECLARATION(app::server::print_greeting_action);
 
-The corresponding source file contains mainly macro invocations which define
+The corresponding source file contains mainly macro invocations that define the
 boilerplate code needed for |hpx| to function properly:
 
 .. code-block:: c++
@@ -1050,13 +1049,13 @@ boilerplate code needed for |hpx| to function properly:
    // same argument as used for HPX_REGISTER_ACTION_DECLARATION above.
    HPX_REGISTER_ACTION(app::server::print_greeting_action);
 
-The following gives an example of how the component can be used. We create one
-instance of the ``app::server`` component on the current :term:`locality` and
-invoke the exposed action ``print_greeting_action`` using the global id of the
-newly created instance. Note, that no special code is required to delete the
+The following gives an example of how the component can be used. Here, one
+instance of the ``app::server`` component is created on the current :term:`locality` and
+the exposed action ``print_greeting_action`` is invoked using the global id of the
+newly created instance. Note that no special code is required to delete the
 component instance after it is not needed anymore. It will be deleted
-automatically when its last reference goes out of scope, here at the closing
-brace of the block surrounding the code:
+automatically when its last reference goes out of scope (shown in the example below at
+the closing brace of the block surrounding the code):
 
 .. code-block:: c++
 
@@ -1087,8 +1086,8 @@ brace of the block surrounding the code:
 
 In order to make sure that the application will be able to use the component
 ``app::server``, special configuration information must be passed to |hpx|. The
-simples way to allow |hpx| to 'find' the component is to provide special ini
-configuration files, which add the necessary information to the internal
+simplest way to allow |hpx| to 'find' the component is to provide special ini
+configuration files that add the necessary information to the internal
 configuration database. The component should have a special ini file containing
 the information specific to the component ``app_server``.
 
@@ -1099,15 +1098,15 @@ the information specific to the component ``app_server``.
     name = app_server
     path = $APP_LOCATION/
 
-Here ``$APP_LOCATION`` is the directory where the (binary) component shared
+Here, ``$APP_LOCATION`` is the directory where the (binary) component shared
 library is located. |hpx| will attempt to load the shared library from there.
 The section name ``hpx.components.app_server`` reflects the instance name of the
 component (``app_server`` is an arbitrary, but unique name). The property value
 for ``hpx.components.app_server.name`` should be the same as used for the second
 argument to the macro :c:macro:`HPX_REGISTER_COMPONENT` above.
 
-Additionally a file ``.hpx.ini`` which could be located in the current working
-directory (see step 3 as described in the section :ref:`loading_ini_files`) can
+Additionally, a file ``.hpx.ini``, which could be located in the current working
+directory (see step 3 as described in the section :ref:`loading_ini_files`), can
 be used to add to the ini search path for components:
 
 .. code-block:: ini
@@ -1131,10 +1130,10 @@ the directory ``$APP_ROOT``.
 Logging
 =======
 
-|hpx| uses a sophisticated logging framework allowing to follow in detail
+|hpx| uses a sophisticated logging framework, allowing users to follow in detail
 what operations have been performed inside the |hpx| library in what sequence.
 This information proves to be very useful for diagnosing problems or just for
-improving the understanding what is happening in |hpx| as a consequence of
+improving the understanding of what is happening in |hpx| as a consequence of
 invoking |hpx| API functionality.
 
 Default logging
@@ -1144,14 +1143,14 @@ Enabling default logging is a simple process. The detailed description in the
 remainder of this section explains different ways to customize the defaults.
 Default logging can be enabled by using one of the following:
 
-* a command line switch :option:`--hpx:debug-hpx-log`, which will enable
-  logging to the console terminal
-* the command line switch :option:`--hpx:debug-hpx-log`\ ``=<filename>``, which
-  enables logging to a given file ``<filename>``, or
-* setting an environment variable ``HPX_LOGLEVEL=<loglevel>`` while running the
+* A command line switch :option:`--hpx:debug-hpx-log`, which will enable
+  logging to the console terminal.
+* The command line switch :option:`--hpx:debug-hpx-log`\ ``=<filename>``, which
+  enables logging to a given file ``<filename>``.
+* Setting an environment variable ``HPX_LOGLEVEL=<loglevel>`` while running the
   |hpx| application. In this case ``<loglevel>`` should be a number between (or
   equal to) ``1`` and ``5`` where ``1`` means minimal logging and ``5`` causes
-  to log all available messages. When setting the environment variable the logs
+  all available messages to be logged. When setting the environment variable, the logs
   will be written to a file named ``hpx.<PID>.lo`` in the current working
   directory, where ``<PID>`` is the process id of the console instance of the
   application.
@@ -1162,7 +1161,7 @@ Customizing logging
 Generally, logging can be customized either using environment variable settings
 or using by an ini configuration file. Logging is generated in several
 categories, each of which can be customized independently. All customizable
-configuration parameters have reasonable defaults, allowing to use logging
+configuration parameters have reasonable defaults, allowing for the use of logging
 without any additional configuration effort. The following table lists the
 available categories.
 
@@ -1190,7 +1189,7 @@ By default, all logging output is redirected to the console instance of an
 application, where it is collected and written to a file, one file for each
 logging category.
 
-Each logging category can be customized at two levels, the parameters for each
+Each logging category can be customized at two levels. The parameters for each
 are stored in the ini configuration sections ``hpx.logging.CATEGORY`` and
 ``hpx.logging.console.CATEGORY`` (where ``CATEGORY`` is the category shortcut as
 listed in the table above). The former influences logging at the source
@@ -1201,10 +1200,10 @@ Levels
 ------
 
 All |hpx| logging output has seven different logging levels. These levels can
-be set explicitly or through environmental variables in the main |hpx| ini file
+be set explicitly or through environment variables in the main |hpx| ini file
 as shown below. The logging levels and their associated integral values are
 shown in the table below, ordered from most verbose to least verbose. By
-default, all |hpx| logs are set to 0, e.g. all logging output is disabled by
+default, all |hpx| logs are set to 0, e.g., all logging output is disabled by
 default.
 
 .. table:: Logging levels
@@ -1248,9 +1247,9 @@ general logging category are shown here (the syntax is described in the section
     format = ${HPX_LOGFORMAT:(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) P%parentloc%/%hpxparent%.%hpxparentphase% %time%($hh:$mm.$ss.$mili) [%idx%]|\\n}
 
 The logging level is taken from the environment variable ``HPX_LOGLEVEL`` and
-defaults to zero, e.g. no logging. The default logging destination is read from
+defaults to zero, e.g., no logging. The default logging destination is read from
 the environment variable ``HPX_LOGDESTINATION`` On any of the localities it
-defaults to ``console`` which redirects all generated logging output to the
+defaults to ``console``, which redirects all generated logging output to the
 console instance of an application. The following table lists the possible
 destinations for any logging output. It is possible to specify more than one
 destination separated by whitespace.
@@ -1260,23 +1259,23 @@ destination separated by whitespace.
    * * Logging destination
      * Description
    * * file(``<filename>``)
-     * Direct all output to a file with the given <filename>.
+     * Directs all output to a file with the given <filename>.
    * * cout
-     * Direct all output to the local standard output of the application
+     * Directs all output to the local standard output of the application
        instance on this :term:`locality`.
    * * cerr
-     * Direct all output to the local standard error output of the application
+     * Directs all output to the local standard error output of the application
        instance on this :term:`locality`.
    * * console
-     * Direct all output to the console instance of the application. The console
+     * Directs all output to the console instance of the application. The console
        instance has its logging destinations configured separately.
    * * android_log
-     * Direct all output to the (Android) system log (available on Android
+     * Directs all output to the (Android) system log (available on Android
        systems only).
 
-The logging format is read from the environment variable ``HPX_LOGFORMAT`` and
+The logging format is read from the environment variable ``HPX_LOGFORMAT``, and
 it defaults to a complex format description. This format consists of several
-placeholder fields (for instance ``%locality%`` which will be replaced by
+placeholder fields (for instance ``%locality%``), which will be replaced by
 concrete values when the logging output is generated. All other information is
 transferred verbatim to the output. The table below describes the available
 field placeholders. The separator character ``|`` separates the logging message
@@ -1291,22 +1290,22 @@ separator.
      * The id of the :term:`locality` on which the logging message was
        generated.
    * * hpxthread
-     * The id of the |hpx|-thread generating this logging output.
+     * The id of the |hpx| thread generating this logging output.
    * * hpxphase
-     * The phase [#]_ of the |hpx|-thread generating this logging output.
+     * The phase [#]_ of the |hpx| thread generating this logging output.
    * * hpxcomponent
-     * The local virtual address of the component which the current |hpx|-thread
+     * The local virtual address of the component which the current |hpx| thread
        is accessing.
    * * parentloc
-     * The id of the :term:`locality` where the |hpx| thread was running which
-       initiated the current |hpx|-thread. The current |hpx|-thread is
+     * The id of the :term:`locality` where the |hpx| thread was running that
+       initiated the current |hpx| thread. The current |hpx| thread is
        generating this logging output.
    * * hpxparent
-     * The id of the |hpx|-thread which initiated the current |hpx|-thread. The
-       current |hpx|-thread is generating this logging output.
+     * The id of the |hpx| thread that initiated the current |hpx| thread. The
+       current |hpx| thread is generating this logging output.
    * * hpxparentphase
-     * The phase of the |hpx|-thread when it initiated the current |hpx|-thread.
-       The current |hpx|-thread is generating this logging output.
+     * The phase of the |hpx| thread when it initiated the current |hpx| thread.
+       The current |hpx| thread is generating this logging output.
    * * time
      * The time stamp for this logging outputline as generated by the source
        :term:`locality`.
@@ -1314,17 +1313,17 @@ separator.
      * The sequence number of the logging output line as generated on the source
        :term:`locality`.
    * * osthread
-     * The sequence number of the OS-thread which executes the current
-       |hpx|-thread.
+     * The sequence number of the OS thread that executes the current
+       |hpx| thread.
 
 .. note::
 
    Not all of the field placeholder may be expanded for all generated logging
-   output. If no value is available for a particular field it is replaced with a
-   sequence of ``'-'`` characters.]
+   output. If no value is available for a particular field, it is replaced with a
+   sequence of ``'-'`` characters.
 
 Here is an example line from a logging output generated by one of the |hpx|
-examples (please note that this is generated on a single line, without line
+examples (please note that this is generated on a single line, without a line
 break):
 
 .. code-block:: text
@@ -1347,7 +1346,7 @@ received by the console instance of an application. The logging level is read
 from the environment variable ``HPX_LOGLEVEL`` (as set for the console instance
 of the application). The level defaults to the same values as the corresponding
 settings in the general logging configuration shown before. The destination on
-the console instance is set to be a file which name is generated based from its
+the console instance is set to be a file that's name is generated based on its
 OS process id. Setting the environment variable ``HPX_CONSOLE_LOGDESTINATION``
 allows customization of the naming scheme for the output file. The logging
 format is set to leave the original logging output unchanged, as received from
@@ -1368,118 +1367,118 @@ The predefined command line options for any application using
 
 .. option:: --hpx:help
 
-   print out program usage (default: this message), possible values: ``full``
-   (additionally prints options from components)
+   Print out program usage (default: this message). Possible values: ``full``
+   (additionally prints options from components).
 
 .. option:: --hpx:version
 
-   print out |hpx| version and copyright information
+   Print out |hpx| version and copyright information.
 
 .. option:: --hpx:info
 
-   print out |hpx| configuration information
+   Print out |hpx| configuration information.
 
 .. option:: --hpx:options-file arg
 
-   specify a file containing command line options (alternatively: @filepath)
+   Specify a file containing command line options (alternatively: @filepath).
 
 |hpx| options (additionally allowed in an options file)
 -------------------------------------------------------
 
 .. option:: --hpx:worker
 
-   run this instance in worker mode
+   Run this instance in worker mode.
 
 .. option:: --hpx:console
 
-   run this instance in console mode
+   Run this instance in console mode.
 
 .. option:: --hpx:connect
 
-   run this instance in worker mode, but connecting late
+   Run this instance in worker mode, but connecting late.
 
 .. option:: --hpx:run-agas-server
 
-   run :term:`AGAS` server as part of this runtime instance
+   Run :term:`AGAS` server as part of this runtime instance.
 
 .. option:: --hpx:run-hpx-main
 
-   run the hpx_main function, regardless of :term:`locality` mode
+   Run the hpx_main function, regardless of :term:`locality` mode.
 
 .. option:: --hpx:hpx arg
 
-   the IP address the |hpx| parcelport is listening on, expected format:
-   ``address:port`` (default: ``127.0.0.1:7910``)
+   The IP address the |hpx| parcelport is listening on, expected format:
+   ``address:port`` (default: ``127.0.0.1:7910``).
 
 .. option:: --hpx:agas arg
 
-   the IP address the :term:`AGAS` root server is running on, expected format:
-   ``address:port`` (default: ``127.0.0.1:7910``)
+   The IP address the :term:`AGAS` root server is running on, expected format:
+   ``address:port`` (default: ``127.0.0.1:7910``).
 
 .. option:: --hpx:run-agas-server-only
 
-   run only the :term:`AGAS` server
+   Run only the :term:`AGAS` server.
 
 .. option:: --hpx:nodefile arg
 
-   the file name of a node file to use (list of nodes, one node name per line
-   and core)
+   The file name of a node file to use (list of nodes, one node name per line
+   and core).
 
 .. option:: --hpx:nodes arg
 
-   the (space separated) list of the nodes to use (usually this is extracted
-   from a node file)
+   The (space separated) list of the nodes to use (usually this is extracted
+   from a node file).
 
 .. option:: --hpx:endnodes
 
-   this can be used to end the list of nodes specified using the option
-   :option:`--hpx:nodes`
+   This can be used to end the list of nodes specified using the option
+   :option:`--hpx:nodes`.
 
 .. option:: --hpx:ifsuffix arg
 
-   suffix to append to host names in order to resolve them to the proper network
-   interconnect
+   Suffix to append to host names in order to resolve them to the proper network
+   interconnect.
 
 .. option:: --hpx:ifprefix arg
 
-   prefix to prepend to host names in order to resolve them to the proper
-   network interconnect
+   Prefix to prepend to host names in order to resolve them to the proper
+   network interconnect.
 
 .. option:: --hpx:iftransform arg
 
-   sed-style search and replace (``s/search/replace/``) used to transform host
-   names to the proper network interconnect
+   Sed-style search and replace (``s/search/replace/``) used to transform host
+   names to the proper network interconnect.
 
 .. option:: --hpx:localities arg
 
-   the number of localities to wait for at application startup (default: ``1``)
+   The number of localities to wait for at application startup (default: ``1``).
 
 .. option:: --hpx:node arg
 
-   number of the node this :term:`locality` is run on (must be unique)
+   Number of the node this :term:`locality` is run on (must be unique).
 
 .. option:: --hpx:ignore-batch-env
 
-   ignore batch environment variables
+   Ignore batch environment variables.
 
 .. option:: --hpx:expect-connecting-localities
 
-   this :term:`locality` expects other localities to dynamically connect (this
-   is implied if the number of initial localities is larger than 1)
+   This :term:`locality` expects other localities to dynamically connect (this
+   is implied if the number of initial localities is larger than 1).
 
 .. option:: --hpx:pu-offset
 
-   the first processing unit this instance of |hpx| should be run on (default:
-   ``0``)
+   The first processing unit this instance of |hpx| should be run on (default:
+   ``0``).
 
 .. option:: --hpx:pu-step
 
-   the step between used processing unit numbers for this instance of |hpx|
-   (default: ``1``)
+   The step between used processing unit numbers for this instance of |hpx|
+   (default: ``1``).
 
 .. option:: --hpx:threads arg
 
-   the number of operating system threads to spawn for this |hpx|
+   The number of operating system threads to spawn for this |hpx|
    :term:`locality`. Possible values are: numeric values ``1``, ``2``, ``3`` and
    so on, ``all`` (which spawns one thread per processing unit, includes
    hyperthreads), or ``cores`` (which spawns one thread per core) (default:
@@ -1487,18 +1486,18 @@ The predefined command line options for any application using
 
 .. option:: --hpx:cores arg
 
-   the number of cores to utilize for this |hpx| :term:`locality` (default:
-   ``all``, i.e. the number of cores is based on the number of threads
-   :option:`--hpx:threads` assuming :option:`--hpx:bind`\ ``=compact``
+   The number of cores to utilize for this |hpx| :term:`locality` (default:
+   ``all``, i.e., the number of cores is based on the number of threads
+   :option:`--hpx:threads` assuming :option:`--hpx:bind`\ ``=compact``.
 
 .. option:: --hpx:affinity arg
 
-   the affinity domain the OS threads will be confined to, possible values:
-   ``pu``, ``core``, ``numa``, ``machine`` (default: ``pu``)
+   The affinity domain the OS threads will be confined to, possible values:
+   ``pu``, ``core``, ``numa``, ``machine`` (default: ``pu``).
 
 .. option:: --hpx:bind arg
 
-   the detailed affinity description for the OS threads, see :ref:`details` for
+   he detailed affinity description for the OS threads, see :ref:`details` for
    a detailed description of possible values. Do not use with
    :option:`--hpx:pu-step`, :option:`--hpx:pu-offset` or
    :option:`--hpx:affinity` options. Implies :option:`--hpx:numa-sensitive`
@@ -1506,31 +1505,31 @@ The predefined command line options for any application using
 
 .. option:: --hpx:use-process-mask
 
-   use the process mask to restrict available hardware resources (implies
-   :option:`--hpx:ignore-batch-env`)
+   Use the process mask to restrict available hardware resources (implies
+   :option:`--hpx:ignore-batch-env`).
 
 .. option:: --hpx:print-bind
 
-   print to the console the bit masks calculated from the arguments specified to
+   Print to the console the bit masks calculated from the arguments specified to
    all :option:`--hpx:bind` options.
 
 .. option:: --hpx:queuing arg
 
-   the queue scheduling policy to use, options are ``local``,
+   The queue scheduling policy to use. Options are ``local``,
    ``local-priority-fifo``, ``local-priority-lifo``, ``static``,
    ``static-priority``, ``abp-priority-fifo`` and ``abp-priority-lifo``
-   (default: ``local-priority-fifo``)
+   (default: ``local-priority-fifo``).
 
 .. option:: --hpx:high-priority-threads arg
 
-   the number of operating system threads maintaining a high priority queue
+   The number of operating system threads maintaining a high priority queue
    (default: number of OS threads), valid for :option:`--hpx:queuing`\
    ``=abp-priority``, :option:`--hpx:queuing`\ ``=static-priority`` and
-   :option:`--hpx:queuing`\ ``=local-priority`` only
+   :option:`--hpx:queuing`\ ``=local-priority`` only.
 
 .. option:: --hpx:numa-sensitive
 
-   makes the scheduler NUMA sensitive
+   Makes the scheduler NUMA sensitive.
 
 
 |hpx| configuration options
@@ -1538,71 +1537,71 @@ The predefined command line options for any application using
 
 .. option:: --hpx:app-config arg
 
-   load the specified application configuration (ini) file
+   Load the specified application configuration (ini) file.
 
 .. option:: --hpx:config arg
 
-   load the specified hpx configuration (ini) file
+   Load the specified |hpx| configuration (ini) file.
 
 .. option:: --hpx:ini arg
 
-   add a configuration definition to the default runtime configuration
+   Add a configuration definition to the default runtime configuration.
 
 .. option:: --hpx:exit
 
-   exit after configuring the runtime
+   Exit after configuring the runtime.
 
 |hpx| debugging options
 -----------------------
 
 .. option:: --hpx:list-symbolic-names
 
-   list all registered symbolic names after startup
+   List all registered symbolic names after startup.
 
 .. option:: --hpx:list-component-types
 
-   list all dynamic component types after startup
+   List all dynamic component types after startup.
 
 .. option:: --hpx:dump-config-initial
 
-   print the initial runtime configuration
+   Print the initial runtime configuration.
 
 .. option:: --hpx:dump-config
 
-   print the final runtime configuration
+   Print the final runtime configuration.
 
 .. option:: --hpx:debug-hpx-log [arg]
 
-   enable all messages on the |hpx| log channel and send all |hpx| logs to the
-   target destination (default: ``cout``)
+   Enable all messages on the |hpx| log channel and send all |hpx| logs to the
+   target destination (default: ``cout``).
 
 .. option:: --hpx:debug-agas-log [arg]
 
-   enable all messages on the :term:`AGAS` log channel and send all :term:`AGAS`
-   logs to the target destination (default: ``cout``)
+   Enable all messages on the :term:`AGAS` log channel and send all :term:`AGAS`
+   logs to the target destination (default: ``cout``).
 
 .. option:: --hpx:debug-parcel-log [arg]
 
-   enable all messages on the parcel transport log channel and send all parcel
-   transport logs to the target destination (default: ``cout``)
+   Enable all messages on the parcel transport log channel and send all parcel
+   transport logs to the target destination (default: ``cout``).
 
 .. option:: --hpx:debug-timing-log [arg]
 
-   enable all messages on the timing log channel and send all timing logs to the
-   target destination (default: ``cout``)
+   Enable all messages on the timing log channel and send all timing logs to the
+   target destination (default: ``cout``).
 
 .. option:: --hpx:debug-app-log [arg]
 
-   enable all messages on the application log channel and send all application
-   logs to the target destination (default: ``cout``)
+   Enable all messages on the application log channel and send all application
+   logs to the target destination (default: ``cout``).
 
 .. option:: --hpx:debug-clp
 
-   debug command line processing
+   Debug command line processing.
 
 .. option:: --hpx:attach-debugger arg
 
-   wait for a debugger to be attached, possible arg values: ``startup`` or
+   Wait for a debugger to be attached, possible arg values: ``startup`` or
    ``exception`` (default: ``startup``)
 
 |hpx| options related to performance counters
@@ -1610,64 +1609,64 @@ The predefined command line options for any application using
 
 .. option:: --hpx:print-counter
 
-   print the specified performance counter either repeatedly and/or at the times
+   Print the specified performance counter either repeatedly and/or at the times
    specified by :option:`--hpx:print-counter-at` (see also option
-   :option:`--hpx:print-counter-interval`)
+   :option:`--hpx:print-counter-interval`).
 
 .. option:: --hpx:print-counter-reset
 
-   print the specified performance counter either repeatedly and/or at the times
-   specified by :option:`--hpx:print-counter-at` reset the counter after the
-   value is queried. (see also option :option:`--hpx:print-counter-interval`)
+   Print the specified performance counter either repeatedly and/or at the times
+   specified by :option:`--hpx:print-counter-at`. Reset the counter after the
+   value is queried (see also option :option:`--hpx:print-counter-interval`).
 
 .. option:: --hpx:print-counter-interval
 
-   print the performance counter(s) specified with :option:`--hpx:print-counter`
+   Print the performance counter(s) specified with :option:`--hpx:print-counter`
    repeatedly after the time interval (specified in milliseconds), (default:
-   ``0``, which means print once at shutdown)
+   ``0``, which means print once at shutdown).
 
 .. option:: --hpx:print-counter-destination
 
-   print the performance counter(s) specified with :option:`--hpx:print-counter` to
-   the given file (default: ``console``)
+   Print the performance counter(s) specified with :option:`--hpx:print-counter` to
+   the given file (default: ``console``).
 
 .. option:: --hpx:list-counters
 
-   list the names of all registered performance counters, possible values:
+   List the names of all registered performance counters, possible values:
    ``minimal`` (prints counter name skeletons), ``full`` (prints all available
-   counter names)
+   counter names).
 
 .. option:: --hpx:list-counter-infos
 
-   list the description of all registered performance counters, possible values:
+   List the description of all registered performance counters, possible values:
    ``minimal`` (prints info for counter name skeletons), ``full`` (prints all
-   available counter infos)
+   available counter infos).
 
 .. option:: --hpx:print-counter-format
 
-   print the performance counter(s) specified with :option:`--hpx:print-counter`
-   possible formats in csv format with header or without any header (see option
-   :option:`--hpx:no-csv-header`, possible values: ``csv`` (prints counter
+   Print the performance counter(s) specified with :option:`--hpx:print-counter`.
+   Possible formats in CSV include a format with a header or without any header (see option
+   :option:`--hpx:no-csv-header`). Possible values: ``csv`` (prints counter
    values in CSV format with full names as header), ``csv-short`` (prints
-   counter values in CSV format with shortnames provided with
+   counter values in CSV format with short names provided with
    :option:`--hpx:print-counter` as :option:`--hpx:print-counter`
-   ``shortname,full-countername``
+   ``shortname, full-countername``
 
 .. option:: --hpx:no-csv-header
 
-   print the performance counter(s) specified with :option:`--hpx:print-counter`
+   Print the performance counter(s) specified with :option:`--hpx:print-counter`
    and ``csv`` or ``csv-short`` format specified with
-   :option:`--hpx:print-counter-format` without header
+   :option:`--hpx:print-counter-format` without header.
 
 .. option:: --hpx:print-counter-at arg
 
-   print the performance counter(s) specified with :option:`--hpx:print-counter`
-   (or :option:`--hpx:print-counter-reset` at the given point in time, possible
-   argument values: ``startup``, ``shutdown`` (default), ``noshutdown``
+   Print the performance counter(s) specified with :option:`--hpx:print-counter`
+   (or :option:`--hpx:print-counter-reset`) at the given point in time, possible
+   argument values: ``startup``, ``shutdown`` (default), ``noshutdown``.
 
 .. option:: --hpx:reset-counters
 
-   reset all performance counter(s) specified with :option:`--hpx:print-counter`
+   Reset all performance counter(s) specified with :option:`--hpx:print-counter`
    after they have been evaluated.
 
 .. option:: --hpx:print-counters-locally
@@ -1720,10 +1719,10 @@ differently as well.
 Shortcut options are obtained from the internal configuration database. They are
 stored as key-value properties in a special properties section named
 ``hpx.commandline``. You can define your own shortcuts by adding the
-corresponding definitions to one of the ``ini`` configuration files as described
+corresponding definitions to one of the ini configuration files as described
 in the section :ref:`configuration`. For instance, in order to define a command
-line shortcut ``--p`` which should expand to ``-hpx:print-counter``, the
-following configuration information needs to be added to one of the ``ini``
+line shortcut ``--p``, which should expand to ``-hpx:print-counter``, the
+following configuration information needs to be added to one of the ini
 configuration files:
 
 .. code-block:: ini
@@ -1751,21 +1750,21 @@ configuration files:
 
    Any shortcut option should either start with a single ``'-'`` or with two
    ``'--'`` characters. Shortcuts starting with a single ``'-'`` are interpreted
-   as short options (i.e. everything after the first character following the
+   as short options (i.e., everything after the first character following the
    ``'-'`` is treated as the argument). Shortcuts starting with ``'--'`` are
    interpreted as long options. No other shortcut formats are supported.
 
 Specifying options for single localities only
 ---------------------------------------------
 
-For runs involving more than one :term:`locality` it is sometimes desirable to
+For runs involving more than one :term:`locality`, it is sometimes desirable to
 supply specific command line options to single localities only. When the |hpx|
-application is launched using a scheduler (like PBS, for more details see
+application is launched using a scheduler (like PBS; for more details see
 section :ref:`unix_pbs`), specifying dedicated command line options for single
 localities may be desirable. For this reason all of the command line options
-which have the general format ``--hpx:<some_key>`` can be used in a more general
+that have the general format ``--hpx:<some_key>`` can be used in a more general
 form: ``--hpx:<N>:<some_key>``, where <N> is the number of the :term:`locality`
-this command line options will be applied to, all other localities will simply
+this command line option will be applied to; all other localities will simply
 ignore the option. For instance, the following PBS script passes the option
 :option:`--hpx:pu-offset`\ ``=4`` to the :term:`locality` ``'1'`` only.
 
@@ -1782,8 +1781,8 @@ ignore the option. For instance, the following PBS script passes the option
 
 .. caution::
 
-   If the first application specific argument (inside ``$APP_OPTIONS`` is a
-   non-option (i.e. does not start with a ``-`` or a ``--``, then it must be
+   If the first application specific argument (inside ``$APP_OPTIONS``) is a
+   non-option (i.e., does not start with a ``-`` or a ``--``), then it must be
    placed before the option :option:`--hpx:nodes`, which, in this case,
    should be the last option on the command line.
 
@@ -1816,20 +1815,20 @@ bind specification. The affinity settings are to be specified using
 :option:`--hpx:bind`\ ``=<BINDINGS>``, where ``<BINDINGS>`` have to be formatted as
 described below.
 
-In addition to the syntax described below one can use :option:`--hpx:bind`\
+In addition to the syntax described below, one can use :option:`--hpx:bind`\
 ``=none`` to disable all binding of any threads to a particular core. This is
 mostly supported for debugging purposes.
 
 The specified affinities refer to specific regions within a machine hardware
-topology. In order to understand the hardware topology of a particular machine
-it may be useful to run the lstopo tool which is part of |hwloc| to see the
+topology. In order to understand the hardware topology of a particular machine,
+it may be useful to run the lstopo tool, which is part of |hwloc|, to see the
 reported topology tree. Seeing and understanding a topology tree will definitely
 help in understanding the concepts that are discussed below.
 
-Affinities can be specified using HWLOC (|hwloc|) tuples. Tuples of HWLOC
-*objects* and associated *indexes* can be specified in the form
-``object:index``, ``object:index-index`` or ``object:index,...,index``. HWLOC
-objects represent types of mapped items in a topology tree. Possible values for
+Affinities can be specified using hwloc tuples. Tuples of hwloc *objects* and
+associated *indexes* can be specified in the form ``object:index``,
+``object:index-index`` or ``object:index,...,index``. Hwloc objects
+represent types of mapped items in a topology tree. Possible values for
 objects are ``socket``, ``numanode``, ``core`` and ``pu`` (processing unit).
 Indexes are non-negative integers that specify a unique physical object in a
 topology tree using its logical sequence number.
@@ -1844,7 +1843,7 @@ object. For example, ``socket:0.core:1`` refers to the second core in the first
 socket (all indices are zero based).
 
 Multiple affinities can be specified using several :option:`--hpx:bind` command
-line options or by appending several affinities separated by a ``';'`` By
+line options or by appending several affinities separated by a ``';'``. By
 default, if multiple affinities are specified, they are added.
 
 .. If prefixed with``"~"`` the given affinity will be cleared instead of added
@@ -1856,8 +1855,8 @@ default, if multiple affinities are specified, they are added.
 
 .. note::
 
-   All 'names' in an affinity specification, such as ``thread``, ``socket``,
-   ``numanode``, ``pu`` or ``all`` can be abbreviated. Thus the affinity
+   All "names" in an affinity specification, such as ``thread``, ``socket``,
+   ``numanode``, ``pu`` or ``all``, can be abbreviated. Thus, the affinity
    specification ``threads:0-3=socket:0.core:1.pu:1`` is fully equivalent to its
    shortened form ``t:0-3=s:0.c:1.p:1``.
 
@@ -1876,7 +1875,7 @@ Here is a full grammar describing the possible format of mappings:
 
 The following example assumes a system with at least 4 cores, where each core
 has more than 1 processing unit (hardware threads). Running
-``hello_world_distributed`` with 4 OS-threads (on 4 processing units), where
+``hello_world_distributed`` with 4 OS threads (on 4 processing units), where
 each of those threads is bound to the first processing unit of each of the
 cores, can be achieved by invoking:
 
@@ -1884,7 +1883,7 @@ cores, can be achieved by invoking:
 
    $ hello_world_distributed -t4 --hpx:bind=thread:0-3=core:0-3.pu:0
 
-Here ``thread:0-3`` specifies the OS threads for which to define affinity
+Here, ``thread:0-3`` specifies the OS threads used to define affinity
 bindings, and ``core:0-3.pu:`` defines that for each of the cores (``core:0-3``)
 only their first processing unit ``pu:0`` should be used.
 

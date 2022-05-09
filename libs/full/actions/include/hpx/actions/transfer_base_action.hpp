@@ -349,7 +349,8 @@ namespace hpx { namespace actions {
     }
 }}    // namespace hpx::actions
 
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
 #include <hpx/actions_base/detail/per_action_data_counter_registry.hpp>
 
 namespace hpx { namespace actions { namespace detail {

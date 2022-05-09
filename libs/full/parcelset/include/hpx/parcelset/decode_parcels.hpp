@@ -121,10 +121,11 @@ namespace hpx::parcelset {
             try
             {
                 // mark start of serialization
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
                 hpx::chrono::high_resolution_timer timer;
                 std::int64_t overall_add_parcel_time = 0;
                 parcelset::data_point& data = buffer.data_point_;
-
+#endif
                 {
                     std::vector<parcelset::parcel> deferred_parcels;
                     // De-serialize the parcel data
@@ -144,7 +145,8 @@ namespace hpx::parcelset {
                     {
                         bool deferred_schedule = parcel_count > 1;
 
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
                         std::size_t archive_pos = archive.current_pos();
                         std::int64_t serialize_time =
                             timer.elapsed_nanoseconds();
@@ -160,10 +162,13 @@ namespace hpx::parcelset {
                         bool migrated = p.load_schedule(
                             archive, num_thread, deferred_schedule);
 
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
                         std::int64_t add_parcel_time =
                             timer.elapsed_nanoseconds();
+#endif
 
-#if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
+    defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
                         parcelset::data_point action_data;
                         action_data.bytes_ =
                             archive.current_pos() - archive_pos;
@@ -200,14 +205,17 @@ namespace hpx::parcelset {
                         }
 
                         // be sure not to measure add_parcel as serialization time
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
                         overall_add_parcel_time +=
                             timer.elapsed_nanoseconds() - add_parcel_time;
+#endif
                     }
 
                     // complete received data with parcel count
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
                     data.num_parcels_ = parcel_count;
                     data.raw_bytes_ = archive.bytes_read();
-
+#endif
                     if (!deferred_parcels.empty())
                     {
                         for (std::size_t i = 1; i != deferred_parcels.size();
@@ -252,10 +260,13 @@ namespace hpx::parcelset {
                 }
 
                 // store the time required for serialization
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
                 data.serialization_time_ =
                     timer.elapsed_nanoseconds() - overall_add_parcel_time;
-
                 pp.add_received_data(data);
+#else
+                HPX_UNUSED(pp);
+#endif
             }
             catch (hpx::exception const& e)
             {
