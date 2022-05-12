@@ -956,8 +956,15 @@ hpx_option(
   CATEGORY "Build Targets"
   ADVANCED
 )
+
+set(HPX_WITH_ASIO_TAG_DEFAULT "asio-1-21-0")
+if(HPX_WITH_HIP)
+  # newer versions of Asio currently fail when compiled with HIPCC
+  set(HPX_WITH_ASIO_TAG_DEFAULT "asio-1-16-0")
+endif()
 hpx_option(
-  HPX_WITH_ASIO_TAG STRING "Asio repository tag or branch" "asio-1-20-0"
+  HPX_WITH_ASIO_TAG STRING "Asio repository tag or branch"
+  ${HPX_WITH_ASIO_TAG_DEFAULT}
   CATEGORY "Build Targets"
   ADVANCED
 )
