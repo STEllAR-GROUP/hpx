@@ -10,7 +10,6 @@
 #pragma once
 
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/serialization/detail/constructor_selector.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -89,7 +88,12 @@ namespace hpx::util::detail {
             }
             else
             {
-                t = serialization::detail::constructor_selector<T>::create(ar);
+                if constexpr (!std::is_default_constructible_v<T>)
+                {
+                    using serialization::detail::load_construct_data;
+                    load_construct_data(ar, &t, 0);
+                }
+                ar >> t;
             }
         }
 

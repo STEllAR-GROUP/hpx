@@ -43,7 +43,7 @@ namespace hpx::serialization::detail {
 
                 ar.load(*t);
 
-                return HPX_MOVE(*t);
+                return *t;
             }
         }
     };
