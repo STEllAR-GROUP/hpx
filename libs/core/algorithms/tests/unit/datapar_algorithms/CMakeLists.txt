@@ -34,9 +34,11 @@ if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
       mismatch_binary_datapar
       mismatch_datapar
       none_of_datapar
+      reduce_datapar
       transform_binary_datapar
       transform_binary2_datapar
       transform_datapar
+      transform_reduce_datapar
       transform_reduce_binary_datapar
   )
 endif()
