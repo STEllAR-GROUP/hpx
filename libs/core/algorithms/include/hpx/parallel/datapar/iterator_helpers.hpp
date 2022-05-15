@@ -361,6 +361,53 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename V1, typename V2>
+    struct invoke_vectorized_in2_ind
+    {
+        template <typename F, typename Iter1, typename Iter2>
+        static auto call_aligned(F&& f, Iter1& it1, Iter2& it2)
+        {
+            static_assert(traits::vector_pack_size<V1>::value ==
+                    traits::vector_pack_size<V2>::value,
+                "the sizes of the vector-packs should be equal");
+
+            typedef
+                typename std::iterator_traits<Iter1>::value_type value_type1;
+            typedef
+                typename std::iterator_traits<Iter2>::value_type value_type2;
+
+            V1 tmp1(traits::vector_pack_load<V1, value_type1>::aligned(it1));
+            V2 tmp2(traits::vector_pack_load<V2, value_type2>::aligned(it2));
+
+            std::advance(it1, traits::vector_pack_size<V1>::value);
+            std::advance(it2, traits::vector_pack_size<V2>::value);
+
+            return HPX_INVOKE(HPX_FORWARD(F, f), tmp1, tmp2);
+        }
+
+        template <typename F, typename Iter1, typename Iter2>
+        static auto call_unaligned(F&& f, Iter1& it1, Iter2& it2)
+        {
+            static_assert(traits::vector_pack_size<V1>::value ==
+                    traits::vector_pack_size<V2>::value,
+                "the sizes of the vector-packs should be equal");
+
+            typedef
+                typename std::iterator_traits<Iter1>::value_type value_type1;
+            typedef
+                typename std::iterator_traits<Iter2>::value_type value_type2;
+
+            V1 tmp1(traits::vector_pack_load<V1, value_type1>::unaligned(it1));
+            V2 tmp2(traits::vector_pack_load<V2, value_type2>::unaligned(it2));
+
+            std::advance(it1, traits::vector_pack_size<V1>::value);
+            std::advance(it2, traits::vector_pack_size<V2>::value);
+
+            return HPX_INVOKE(HPX_FORWARD(F, f), tmp1, tmp2);
+        }
+    };
+
     template <typename Iter1, typename Iter2>
     struct datapar_loop_step2
     {
@@ -394,6 +441,35 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             }
 
             return invoke_vectorized_in2<V1, V2>::call_aligned(
+                HPX_FORWARD(F, f), it1, it2);
+        }
+    };
+
+    template <typename Iter1, typename Iter2>
+    struct datapar_loop_step2_ind
+    {
+        typedef typename std::iterator_traits<Iter1>::value_type value1_type;
+        typedef typename std::iterator_traits<Iter2>::value_type value2_type;
+
+        typedef typename traits::vector_pack_type<value1_type, 1>::type V11;
+        typedef typename traits::vector_pack_type<value2_type, 1>::type V12;
+
+        typedef typename traits::vector_pack_type<value1_type>::type V1;
+        typedef typename traits::vector_pack_type<value2_type>::type V2;
+
+        template <typename F>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static auto call1(
+            F&& f, Iter1& it1, Iter2& it2)
+        {
+            return invoke_vectorized_in2_ind<V11, V12>::call_unaligned(
+                HPX_FORWARD(F, f), it1, it2);
+        }
+
+        template <typename F>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static auto callv(
+            F&& f, Iter1& it1, Iter2& it2)
+        {
+            return invoke_vectorized_in2_ind<V1, V2>::call_aligned(
                 HPX_FORWARD(F, f), it1, it2);
         }
     };
