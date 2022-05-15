@@ -27,64 +27,6 @@
 namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
-    struct loop_step_t final
-      : hpx::functional::detail::tag_fallback<loop_step_t<ExPolicy>>
-    {
-    private:
-        template <typename VecOnly, typename F, typename... Iters>
-        friend HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename hpx::util::invoke_result<F, Iters...>::type
-            tag_fallback_invoke(hpx::parallel::util::loop_step_t<ExPolicy>,
-                VecOnly&&, F&& f, Iters&... its)
-        {
-            return HPX_INVOKE(HPX_FORWARD(F, f), (its++)...);
-        }
-    };
-
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
-    inline constexpr loop_step_t<ExPolicy> loop_step = loop_step_t<ExPolicy>{};
-#else
-    template <typename ExPolicy, typename VecOnly, typename F,
-        typename... Iters>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename hpx::util::invoke_result<F, Iters...>::type
-        loop_step(VecOnly&& v, F&& f, Iters&... its)
-    {
-        return hpx::parallel::util::loop_step_t<ExPolicy>{}(
-            HPX_FORWARD(VecOnly, v), HPX_FORWARD(F, f), (its)...);
-    }
-#endif
-
-    template <typename ExPolicy>
-    struct loop_optimization_t final
-      : hpx::functional::detail::tag_fallback<loop_optimization_t<ExPolicy>>
-    {
-    private:
-        template <typename Iter>
-        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool
-            tag_fallback_invoke(
-                hpx::parallel::util::loop_optimization_t<ExPolicy>, Iter, Iter)
-        {
-            return false;
-        }
-    };
-
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
-    inline constexpr loop_optimization_t<ExPolicy> loop_optimization =
-        loop_optimization_t<ExPolicy>{};
-#else
-    template <typename ExPolicy, typename Iter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool loop_optimization(
-        Iter it1, Iter it2)
-    {
-        return hpx::parallel::util::loop_optimization_t<ExPolicy>{}(it1, it2);
-    }
-#endif
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
         // Helper class to repeatedly call a function starting from a given
@@ -272,12 +214,11 @@ namespace hpx { namespace parallel { namespace util {
       : hpx::functional::detail::tag_fallback<loop2_t<ExPolicy>>
     {
     private:
-        template <typename VecOnly, typename Begin1, typename End1,
-            typename Begin2, typename F>
+        template <typename Begin1, typename End1, typename Begin2, typename F>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr std::pair<Begin1, Begin2>
             tag_fallback_invoke(hpx::parallel::util::loop2_t<ExPolicy>,
-                VecOnly&&, Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
+                Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
         {
             return detail::loop2<Begin1, Begin2>::call(
                 begin1, end1, begin2, HPX_FORWARD(F, f));
@@ -288,13 +229,13 @@ namespace hpx { namespace parallel { namespace util {
     template <typename ExPolicy>
     inline constexpr loop2_t<ExPolicy> loop2 = loop2_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename VecOnly, typename Begin1,
-        typename End1, typename Begin2, typename F>
+    template <typename ExPolicy, typename Begin1, typename End1,
+        typename Begin2, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::pair<Begin1, Begin2> loop2(
-        VecOnly&& v, Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
+        Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
     {
         return hpx::parallel::util::loop2_t<ExPolicy>{}(
-            HPX_FORWARD(VecOnly, v), begin1, end1, begin2, HPX_FORWARD(F, f));
+            begin1, end1, begin2, HPX_FORWARD(F, f));
     }
 #endif
 
