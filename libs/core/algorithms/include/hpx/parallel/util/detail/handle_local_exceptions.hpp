@@ -795,8 +795,763 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     };
 
     template <>
+    struct handle_local_exceptions<
+        hpx::execution::parallel_unsequenced_task_policy>
+    {
+        ///////////////////////////////////////////////////////////////////////
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        [[noreturn]] static void call(std::exception_ptr const&)
+        {
+            std::terminate();
+        }
+#else
+        [[noreturn]] static void call(std::exception_ptr const&)
+        {
+            parallel_exception_termination_handler();
+        }
+#endif
+
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        [[noreturn]] static void call(
+            std::exception_ptr const&, std::list<std::exception_ptr>&)
+        {
+            std::terminate();
+        }
+#else
+        [[noreturn]] static void call(
+            std::exception_ptr const&, std::list<std::exception_ptr>&)
+        {
+            parallel_exception_termination_handler();
+        }
+#endif
+
+        static void call(std::list<std::exception_ptr>& errors)
+        {
+            if (!errors.empty())
+            {
+                parallel_exception_termination_handler();
+            }
+        }
+
+    private:
+        template <typename Future>
+        static void call_helper_single(Future const& f)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(f);
+            HPX_ASSERT(false);
+#else
+            if (f.has_exception())
+            {
+                parallel_exception_termination_handler();
+            }
+#endif
+        }
+
+    public:
+        template <typename T>
+        static void call(hpx::future<T> const& f,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+        template <typename T>
+        static void call(hpx::shared_future<T> const& f,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+        template <typename T>
+        static void call(hpx::future<T> const& f, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+        template <typename T>
+        static void call(hpx::shared_future<T> const& f, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+    private:
+        template <typename Cont>
+        static void call_helper(Cont const& workitems)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_ASSERT(false);
+#else
+            for (auto const& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    parallel_exception_termination_handler();
+                }
+            }
+#endif
+        }
+
+    public:
+        template <typename T>
+        static void call(std::vector<hpx::future<T>> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(std::array<hpx::future<T>, N> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T>
+        static void call(std::vector<hpx::shared_future<T>> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(std::array<hpx::shared_future<T>, N> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T>
+        static void call(
+            std::vector<hpx::future<T>> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(
+            std::array<hpx::future<T>, N> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T>
+        static void call(
+            std::vector<hpx::shared_future<T>> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(
+            std::array<hpx::shared_future<T>, N> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+    private:
+        template <typename Future>
+        static void call_with_cleanup_helper_single(Future const& f)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(f);
+            HPX_ASSERT(false);
+#else
+            if (f.has_exception())
+            {
+                parallel_exception_termination_handler();
+            }
+#endif
+        }
+
+    public:
+        template <typename T, typename Cleanup>
+        static void call_with_cleanup(hpx::future<T> const& f,
+            std::list<std::exception_ptr>&, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper_single(f);
+        }
+
+        template <typename T, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(
+            hpx::future<T> const& f, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper_single(f);
+        }
+
+    private:
+        template <typename Cont>
+        static void call_with_cleanup_helper(Cont const& workitems)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_ASSERT(false);
+#else
+            for (auto const& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    parallel_exception_termination_handler();
+                }
+            }
+#endif
+        }
+
+    public:
+        template <typename T, typename Cleanup>
+        static void call_with_cleanup(
+            std::vector<hpx::future<T>> const& workitems,
+            std::list<std::exception_ptr>&, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+
+        template <typename T, std::size_t N, typename Cleanup>
+        static void call_with_cleanup(
+            std::array<hpx::future<T>, N> const& workitems,
+            std::list<std::exception_ptr>&, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+
+        template <typename T, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(
+            std::vector<hpx::future<T>> const& workitems, Cleanup&&,
+            bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+
+        template <typename T, std::size_t N, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(
+            std::array<hpx::future<T>, N> const& workitems, Cleanup&&,
+            bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+    };
+
+    template <typename Executor, typename Parameters>
+    struct handle_local_exceptions<
+        hpx::execution::parallel_unsequenced_policy_shim<Executor, Parameters>>
+    {
+        ///////////////////////////////////////////////////////////////////////
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        [[noreturn]] static void call(std::exception_ptr const&)
+        {
+            std::terminate();
+        }
+#else
+        [[noreturn]] static void call(std::exception_ptr const&)
+        {
+            parallel_exception_termination_handler();
+        }
+#endif
+
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        [[noreturn]] static void call(
+            std::exception_ptr const&, std::list<std::exception_ptr>&)
+        {
+            std::terminate();
+        }
+#else
+        [[noreturn]] static void call(
+            std::exception_ptr const&, std::list<std::exception_ptr>&)
+        {
+            parallel_exception_termination_handler();
+        }
+#endif
+
+        static void call(std::list<std::exception_ptr>& errors)
+        {
+            if (!errors.empty())
+            {
+                parallel_exception_termination_handler();
+            }
+        }
+
+    private:
+        template <typename Future>
+        static void call_helper_single(Future const& f)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(f);
+            HPX_ASSERT(false);
+#else
+            if (f.has_exception())
+            {
+                parallel_exception_termination_handler();
+            }
+#endif
+        }
+
+    public:
+        template <typename T>
+        static void call(hpx::future<T> const& f,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+        template <typename T>
+        static void call(hpx::shared_future<T> const& f,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+        template <typename T>
+        static void call(hpx::future<T> const& f, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+        template <typename T>
+        static void call(hpx::shared_future<T> const& f, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+    private:
+        template <typename Cont>
+        static void call_helper(Cont const& workitems)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_ASSERT(false);
+#else
+            for (auto const& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    parallel_exception_termination_handler();
+                }
+            }
+#endif
+        }
+
+    public:
+        template <typename T>
+        static void call(std::vector<hpx::future<T>> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(std::array<hpx::future<T>, N> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T>
+        static void call(std::vector<hpx::shared_future<T>> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(std::array<hpx::shared_future<T>, N> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T>
+        static void call(
+            std::vector<hpx::future<T>> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(
+            std::array<hpx::future<T>, N> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T>
+        static void call(
+            std::vector<hpx::shared_future<T>> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(
+            std::array<hpx::shared_future<T>, N> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+    private:
+        template <typename Future>
+        static void call_with_cleanup_helper_single(Future const& f)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(f);
+            HPX_ASSERT(false);
+#else
+            if (f.has_exception())
+            {
+                parallel_exception_termination_handler();
+            }
+#endif
+        }
+
+    public:
+        template <typename T, typename Cleanup>
+        static void call_with_cleanup(hpx::future<T> const& f,
+            std::list<std::exception_ptr>&, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper_single(f);
+        }
+
+        template <typename T, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(
+            hpx::future<T> const& f, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper_single(f);
+        }
+
+    private:
+        template <typename Cont>
+        static void call_with_cleanup_helper(Cont const& workitems)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_ASSERT(false);
+#else
+            for (auto const& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    parallel_exception_termination_handler();
+                }
+            }
+#endif
+        }
+
+    public:
+        template <typename T, typename Cleanup>
+        static void call_with_cleanup(
+            std::vector<hpx::future<T>> const& workitems,
+            std::list<std::exception_ptr>&, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+
+        template <typename T, std::size_t N, typename Cleanup>
+        static void call_with_cleanup(
+            std::array<hpx::future<T>, N> const& workitems,
+            std::list<std::exception_ptr>&, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+
+        template <typename T, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(
+            std::vector<hpx::future<T>> const& workitems, Cleanup&&,
+            bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+
+        template <typename T, std::size_t N, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(
+            std::array<hpx::future<T>, N> const& workitems, Cleanup&&,
+            bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+    };
+
+    template <typename Executor, typename Parameters>
+    struct handle_local_exceptions<hpx::execution::
+            parallel_unsequenced_task_policy_shim<Executor, Parameters>>
+    {
+        ///////////////////////////////////////////////////////////////////////
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        [[noreturn]] static void call(std::exception_ptr const&)
+        {
+            std::terminate();
+        }
+#else
+        [[noreturn]] static void call(std::exception_ptr const&)
+        {
+            parallel_exception_termination_handler();
+        }
+#endif
+
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        [[noreturn]] static void call(
+            std::exception_ptr const&, std::list<std::exception_ptr>&)
+        {
+            std::terminate();
+        }
+#else
+        [[noreturn]] static void call(
+            std::exception_ptr const&, std::list<std::exception_ptr>&)
+        {
+            parallel_exception_termination_handler();
+        }
+#endif
+
+        static void call(std::list<std::exception_ptr>& errors)
+        {
+            if (!errors.empty())
+            {
+                parallel_exception_termination_handler();
+            }
+        }
+
+    private:
+        template <typename Future>
+        static void call_helper_single(Future const& f)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(f);
+            HPX_ASSERT(false);
+#else
+            if (f.has_exception())
+            {
+                parallel_exception_termination_handler();
+            }
+#endif
+        }
+
+    public:
+        template <typename T>
+        static void call(hpx::future<T> const& f,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+        template <typename T>
+        static void call(hpx::shared_future<T> const& f,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+        template <typename T>
+        static void call(hpx::future<T> const& f, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+        template <typename T>
+        static void call(hpx::shared_future<T> const& f, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+    private:
+        template <typename Cont>
+        static void call_helper(Cont const& workitems)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_ASSERT(false);
+#else
+            for (auto const& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    parallel_exception_termination_handler();
+                }
+            }
+#endif
+        }
+
+    public:
+        template <typename T>
+        static void call(std::vector<hpx::future<T>> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(std::array<hpx::future<T>, N> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T>
+        static void call(std::vector<hpx::shared_future<T>> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(std::array<hpx::shared_future<T>, N> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T>
+        static void call(
+            std::vector<hpx::future<T>> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(
+            std::array<hpx::future<T>, N> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T>
+        static void call(
+            std::vector<hpx::shared_future<T>> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(
+            std::array<hpx::shared_future<T>, N> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+    private:
+        template <typename Future>
+        static void call_with_cleanup_helper_single(Future const& f)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(f);
+            HPX_ASSERT(false);
+#else
+            if (f.has_exception())
+            {
+                parallel_exception_termination_handler();
+            }
+#endif
+        }
+
+    public:
+        template <typename T, typename Cleanup>
+        static void call_with_cleanup(hpx::future<T> const& f,
+            std::list<std::exception_ptr>&, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper_single(f);
+        }
+
+        template <typename T, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(
+            hpx::future<T> const& f, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper_single(f);
+        }
+
+    private:
+        template <typename Cont>
+        static void call_with_cleanup_helper(Cont const& workitems)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_ASSERT(false);
+#else
+            for (auto const& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    parallel_exception_termination_handler();
+                }
+            }
+#endif
+        }
+
+    public:
+        template <typename T, typename Cleanup>
+        static void call_with_cleanup(
+            std::vector<hpx::future<T>> const& workitems,
+            std::list<std::exception_ptr>&, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+
+        template <typename T, std::size_t N, typename Cleanup>
+        static void call_with_cleanup(
+            std::array<hpx::future<T>, N> const& workitems,
+            std::list<std::exception_ptr>&, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+
+        template <typename T, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(
+            std::vector<hpx::future<T>> const& workitems, Cleanup&&,
+            bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+
+        template <typename T, std::size_t N, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(
+            std::array<hpx::future<T>, N> const& workitems, Cleanup&&,
+            bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+    };
+
+    template <>
     struct handle_local_exceptions<hpx::execution::unsequenced_policy>
       : handle_local_exceptions<hpx::execution::parallel_unsequenced_policy>
+    {
+    };
+
+    template <>
+    struct handle_local_exceptions<hpx::execution::unsequenced_task_policy>
+      : handle_local_exceptions<
+            hpx::execution::parallel_unsequenced_task_policy>
+    {
+    };
+
+    template <typename Executor, typename Parameters>
+    struct handle_local_exceptions<
+        hpx::execution::unsequenced_policy_shim<Executor, Parameters>>
+      : handle_local_exceptions<hpx::execution::
+                parallel_unsequenced_policy_shim<Executor, Parameters>>
+    {
+    };
+
+    template <typename Executor, typename Parameters>
+    struct handle_local_exceptions<
+        hpx::execution::unsequenced_task_policy_shim<Executor, Parameters>>
+      : handle_local_exceptions<hpx::execution::
+                parallel_unsequenced_task_policy_shim<Executor, Parameters>>
     {
     };
 }}}}    // namespace hpx::parallel::util::detail

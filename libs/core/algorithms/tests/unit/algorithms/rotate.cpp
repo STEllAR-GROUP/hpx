@@ -278,9 +278,13 @@ void test_rotate_exception()
     test_rotate_exception(IteratorTag());
     test_rotate_exception(seq, IteratorTag());
     test_rotate_exception(par, IteratorTag());
+    test_rotate_exception(unseq, IteratorTag());
+    test_rotate_exception(par_unseq, IteratorTag());
 
     test_rotate_exception_async(seq(task), IteratorTag());
     test_rotate_exception_async(par(task), IteratorTag());
+    test_rotate_exception_async(unseq(task), IteratorTag());
+    test_rotate_exception_async(par_unseq(task), IteratorTag());
 }
 
 void rotate_exception_test()
@@ -419,9 +423,13 @@ void test_rotate_bad_alloc()
     test_rotate_bad_alloc(IteratorTag());
     test_rotate_bad_alloc(seq, IteratorTag());
     test_rotate_bad_alloc(par, IteratorTag());
+    test_rotate_bad_alloc(unseq, IteratorTag());
+    test_rotate_bad_alloc(par_unseq, IteratorTag());
 
     test_rotate_bad_alloc_async(seq(task), IteratorTag());
     test_rotate_bad_alloc_async(par(task), IteratorTag());
+    test_rotate_bad_alloc_async(unseq(task), IteratorTag());
+    test_rotate_bad_alloc_async(par_unseq(task), IteratorTag());
 }
 
 void rotate_bad_alloc_test()
