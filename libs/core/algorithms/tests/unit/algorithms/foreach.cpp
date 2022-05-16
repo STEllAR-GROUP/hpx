@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/local/init.hpp>
 
 #include <iostream>
@@ -23,9 +24,12 @@ void test_for_each()
     test_for_each(seq, IteratorTag());
     test_for_each(par, IteratorTag());
     test_for_each(par_unseq, IteratorTag());
+    test_for_each(unseq, IteratorTag());
 
     test_for_each_async(seq(task), IteratorTag());
     test_for_each_async(par(task), IteratorTag());
+    test_for_each_async(unseq(task), IteratorTag());
+    test_for_each_async(par_unseq(task), IteratorTag());
 }
 
 void for_each_test()
@@ -47,9 +51,13 @@ void test_for_each_exception()
 
     test_for_each_exception(seq, IteratorTag());
     test_for_each_exception(par, IteratorTag());
+    test_for_each_exception(unseq, IteratorTag());
+    test_for_each_exception(par_unseq, IteratorTag());
 
     test_for_each_exception_async(seq(task), IteratorTag());
     test_for_each_exception_async(par(task), IteratorTag());
+    test_for_each_exception_async(unseq(task), IteratorTag());
+    test_for_each_exception_async(par_unseq(task), IteratorTag());
 }
 
 void for_each_exception_test()
@@ -71,9 +79,13 @@ void test_for_each_bad_alloc()
 
     test_for_each_bad_alloc(seq, IteratorTag());
     test_for_each_bad_alloc(par, IteratorTag());
+    test_for_each_bad_alloc(unseq, IteratorTag());
+    test_for_each_bad_alloc(par_unseq, IteratorTag());
 
     test_for_each_bad_alloc_async(seq(task), IteratorTag());
     test_for_each_bad_alloc_async(par(task), IteratorTag());
+    test_for_each_bad_alloc_async(unseq(task), IteratorTag());
+    test_for_each_bad_alloc_async(par_unseq(task), IteratorTag());
 }
 
 void for_each_bad_alloc_test()

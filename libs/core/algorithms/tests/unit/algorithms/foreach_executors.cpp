@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/local/init.hpp>
 
 #include <iostream>
@@ -43,6 +44,9 @@ void for_each_executors_test()
 
         test_executors(par.on(exec));
         test_executors_async(par(task).on(exec));
+
+        test_executors(par_unseq.on(exec));
+        test_executors_async(par_unseq(task).on(exec));
     }
 
     {
@@ -53,6 +57,12 @@ void for_each_executors_test()
 
         test_executors(par.on(exec));
         test_executors_async(par(task).on(exec));
+
+        test_executors(unseq.on(exec));
+        test_executors_async(unseq(task).on(exec));
+
+        test_executors(par_unseq.on(exec));
+        test_executors_async(par_unseq(task).on(exec));
     }
 }
 
