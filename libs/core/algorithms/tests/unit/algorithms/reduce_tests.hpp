@@ -33,7 +33,7 @@ void test_reduce1(IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t val(42);
-    auto op = [val](auto v1, auto v2) { return v1 * v2; };
+    auto op = [](auto v1, auto v2) { return v1 * v2; };
 
     std::size_t r1 =
         hpx::reduce(iterator(std::begin(c)), iterator(std::end(c)), val, op);
@@ -56,7 +56,7 @@ void test_reduce1(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t val(42);
-    auto op = [val](auto v1, auto v2) { return v1 * v2; };
+    auto op = [](auto v1, auto v2) { return v1 * v2; };
 
     std::size_t r1 = hpx::reduce(
         policy, iterator(std::begin(c)), iterator(std::end(c)), val, op);
@@ -76,7 +76,7 @@ void test_reduce1_async(ExPolicy p, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t val(42);
-    auto op = [val](auto v1, auto v2) { return v1 * v2; };
+    auto op = [](auto v1, auto v2) { return v1 * v2; };
 
     hpx::future<std::size_t> f =
         hpx::reduce(p, iterator(std::begin(c)), iterator(std::end(c)), val, op);
@@ -254,11 +254,10 @@ void test_reduce_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f =
-            hpx::reduce(p, iterator(std::begin(c)), iterator(std::end(c)),
-                std::size_t(42), [](auto v1, auto v2) {
-                    return throw std::runtime_error("test"), v1 + v2;
-                });
+        hpx::future<void> f = hpx::reduce(p, iterator(std::begin(c)),
+            iterator(std::end(c)), std::size_t(42), [](auto v1, auto v2) {
+                return throw std::runtime_error("test"), v1 + v2;
+            });
         returned_from_algorithm = true;
         f.get();
 
@@ -295,9 +294,8 @@ void test_reduce_bad_alloc(ExPolicy policy, IteratorTag)
     try
     {
         hpx::reduce(policy, iterator(std::begin(c)), iterator(std::end(c)),
-            std::size_t(42), [](auto v1, auto v2) {
-                return throw std::bad_alloc(), v1 + v2;
-            });
+            std::size_t(42),
+            [](auto v1, auto v2) { return throw std::bad_alloc(), v1 + v2; });
 
         HPX_TEST(false);
     }
@@ -326,11 +324,9 @@ void test_reduce_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f =
-            hpx::reduce(p, iterator(std::begin(c)), iterator(std::end(c)),
-                std::size_t(42), [](auto v1, auto v2) {
-                    return throw std::bad_alloc(), v1 + v2;
-                });
+        hpx::future<void> f = hpx::reduce(p, iterator(std::begin(c)),
+            iterator(std::end(c)), std::size_t(42),
+            [](auto v1, auto v2) { return throw std::bad_alloc(), v1 + v2; });
         returned_from_algorithm = true;
         f.get();
 

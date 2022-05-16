@@ -301,7 +301,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static T sequential(ExPolicy&& policy, Iter first, Sent last,
                 T_&& init, Reduce&& r, Convert&& conv)
             {
-                return sequential_reduce<ExPolicy>(
+                return detail::sequential_reduce<ExPolicy>(
                     HPX_FORWARD(ExPolicy, policy), first, last,
                     HPX_FORWARD(T_, init), HPX_FORWARD(Reduce, r),
                     HPX_FORWARD(Convert, conv));
@@ -344,37 +344,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // transform_reduce_binary
     namespace detail {
 
-        template <typename F>
-        struct transform_reduce_binary_indirect
-        {
-            F f_;
-
-            template <typename Iter1, typename Iter2>
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
-                Iter1 it1, Iter2 it2) -> decltype(HPX_INVOKE(f_, *it1, *it2))
-            {
-                return HPX_INVOKE(f_, *it1, *it2);
-            }
-        };
-
-        template <typename Op1, typename Op2, typename T>
-        struct transform_reduce_binary_partition
-        {
-            typedef typename std::decay<T>::type value_type;
-
-            Op1 op1_;
-            Op2 op2_;
-            value_type& part_sum_;
-
-            template <typename Iter1, typename Iter2>
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
-                Iter1 it1, Iter2 it2)
-            {
-                part_sum_ =
-                    HPX_INVOKE(op1_, part_sum_, HPX_INVOKE(op2_, *it1, *it2));
-            }
-        };
-
         template <typename T>
         struct transform_reduce_binary
           : public detail::algorithm<transform_reduce_binary<T>, T>
@@ -389,8 +358,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static T sequential(ExPolicy&& /* policy */, Iter first1,
                 Sent last1, Iter2 first2, T_ init, Op1&& op1, Op2&& op2)
             {
-                return sequential_reduce<ExPolicy>(first1, last1, first2,
-                    HPX_FORWARD(T_, init), HPX_FORWARD(Op1, op1),
+                return detail::sequential_reduce<ExPolicy>(first1, last1,
+                    first2, HPX_FORWARD(T_, init), HPX_FORWARD(Op1, op1),
                     HPX_FORWARD(Op2, op2));
             }
 
@@ -426,8 +395,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     ++it1;
                     ++it2;
 
-                    return sequential_reduce<ExPolicy>(it1, last1, it2, result,
-                        HPX_FORWARD(Op1, op1), HPX_FORWARD(Op2, op2));
+                    return detail::sequential_reduce<ExPolicy>(it1, last1, it2,
+                        result, HPX_FORWARD(Op1, op1), HPX_FORWARD(Op2, op2));
                 };
 
                 using hpx::util::make_zip_iterator;
@@ -448,68 +417,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
-
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/functional/traits/get_function_address.hpp>
-#include <hpx/functional/traits/get_function_annotation.hpp>
-
-namespace hpx { namespace traits {
-    template <typename T, typename ExPolicy, typename Reduce, typename Convert>
-    struct get_function_address<parallel::v1::detail::
-            transform_reduce_iteration<T, ExPolicy, Reduce, Convert>>
-    {
-        static constexpr char const* call(
-            parallel::v1::detail::transform_reduce_iteration<T, ExPolicy,
-                Reduce, Convert> const& f) noexcept
-        {
-            char const* reduce_name =
-                get_function_address<typename std::decay<Reduce>::type>::call(
-                    f.reduce_);
-
-            return reduce_name != nullptr ?
-                reduce_name :
-                get_function_address<typename std::decay<Convert>::type>::call(
-                    f.convert_);
-        }
-    };
-
-    template <typename T, typename ExPolicy, typename Reduce, typename Convert>
-    struct get_function_annotation<parallel::v1::detail::
-            transform_reduce_iteration<T, ExPolicy, Reduce, Convert>>
-    {
-        static constexpr char const* call(
-            parallel::v1::detail::transform_reduce_iteration<T, ExPolicy,
-                Reduce, Convert> const& f) noexcept
-        {
-            char const* reduce_name = get_function_annotation<
-                typename std::decay<Reduce>::type>::call(f.reduce_);
-
-            return reduce_name != nullptr ?
-                reduce_name :
-                get_function_annotation<
-                    typename std::decay<Convert>::type>::call(f.convert_);
-        }
-    };
-
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename T, typename ExPolicy, typename Reduce, typename Convert>
-    struct get_function_annotation_itt<parallel::v1::detail::
-            transform_reduce_iteration<T, ExPolicy, Reduce, Convert>>
-    {
-        static util::itt::string_handle call(
-            parallel::v1::detail::transform_reduce_iteration<T, ExPolicy,
-                Reduce, Convert> const& f) noexcept
-        {
-            static util::itt::string_handle sh(get_function_annotation<
-                parallel::v1::detail::transform_reduce_iteration<T, ExPolicy,
-                    Reduce, Convert>>::call(f));
-
-            return sh;
-        }
-    };
-#endif
-}}    // namespace hpx::traits
-#endif
 
 namespace hpx {
 
