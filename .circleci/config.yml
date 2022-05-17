@@ -211,7 +211,7 @@ jobs:
             cmake --version
             if [ -z "$CIRCLE_PR_NUMBER" ] && \
                 ( [ "$CIRCLE_BRANCH" == "master" ] || \
-                  [ "$CIRCLE_BRANCH" == "release" ] || \
+                  [ "$CIRCLE_BRANCH" =~ "^release." ] || \
                   [ -n "$CIRCLE_TAG" ] ); then
                 DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf"
             else

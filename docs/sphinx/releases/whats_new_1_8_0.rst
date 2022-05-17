@@ -9,7 +9,7 @@
 .. _hpx_1_8_0:
 
 ===========================
-|hpx| V1.8.0 (May 11, 2022)
+|hpx| V1.8.0 (May 18, 2022)
 ===========================
 
 With HPX parallel algorithms been fully adapted to C++20 the new release
@@ -149,7 +149,7 @@ General changes
   modern parallel architectures etc. Major features include:
 
   - Support for advanced communication primitives like two sided send/recv and
-  one sided remote put.
+    one sided remote put.
   - Better multi-threaded performance.
   - Explicit user control of communication resource.
   - Flexible signaling mechanisms (synchronizer, completion queue, active message handler). 
