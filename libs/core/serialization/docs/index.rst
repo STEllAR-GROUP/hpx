@@ -16,7 +16,7 @@ types as well as all C++ Standard Library collection and utility types. This
 list is extended by |hpx| vocabulary types with proper support for global
 reference counting. |hpx|'s mode of serialization is derived from `Boost's
 serialization model
-<https://www.boost.org/doc/libs/1_79_0/libs/serialization/doc/index.html>`_
+<https://www.boost.org/doc/libs/1_72_0/libs/serialization/doc/index.html>`_
 and, as such, is mostly interface compatible with
 its Boost counterpart.
 
@@ -38,3 +38,131 @@ optimizations in the implementation of the archives.
 
 See the :ref:`API reference <modules_serialization_api>` of the module for more
 details.
+
+
+=============
+Serializing user-defined types
+=============
+
+Just like boost, hpx allows users to serialize user-defined types by either
+providing the serializer as a member function or defining the serialization as a
+free function.
+
++++++++++
+Member function serialization
++++++++++
+
+.. code-block:: c++
+
+    #include <hpx/serialization.hpp>
+
+    class PointClass { // Member function example
+        int x{0};
+        int y{0};
+
+
+    public:
+        PointClass(int x, int y) : x(x), y(y) {}
+
+        PointClass() = default; // Required to instantiate the reconstruction on the receiving node
+
+        [[nodiscard]] int getX() const noexcept {
+            return x;
+        }
+
+        [[nodiscard]] int getY() const noexcept {
+            return y;
+        }
+
+    private:
+        friend class hpx::serialization::access; // Allows HPX to access private members
+
+        template<typename Archive>
+        void serialize(Archive &ar, const unsigned int version) {
+            ar & x & y;
+        }
+    };
+
+HPX is also able to recursively serialize composite classes and structs
+given that the members are serializable.
+
+.. code-block:: c++
+
+    #include <hpx/serialization.hpp>
+
+    struct Rectangle {
+        PointClass top_left;
+        PointClass lower_right;
+
+        template<typename Archive>
+        void serialize(Archive &ar, const unsigned int version) {
+            ar & top_left & lower_right;
+        }
+
+    };
+
++++++++++
+Free function serialization
++++++++++
+
+In order to decouple your models from HPX, HPX also allows for the definition
+of free function serializers.
+
+.. code-block:: c++
+
+    #include <hpx/serialization.hpp>
+
+    struct Rectangle {
+        PointClass top_left;
+        PointClass lower_right;
+    };
+
+    template <typename Archive>
+    void serialize(Archive &ar, Rectangle& pt, const unsigned int version){
+        ar & pt.lower_right & pt.top_left;
+    }
+
+Even if you can't modify a class to befriend it, hpx might still be able to serialize your
+class provided.If your class provides an assignment operator and your class
+is default constructable.
+
+.. code-block:: c++
+
+    #include <hpx/serialization.hpp>
+
+    class PointClass {
+
+    public:
+        PointClass(int x, int y) : x(x), y(y) {}
+
+        PointClass() =default;
+
+        [[nodiscard]] int getX() const noexcept {
+            return x;
+        }
+
+
+        [[nodiscard]] int getY() const noexcept {
+            return y;
+        }
+
+    private:
+        int x;
+        int y;
+    };
+
+    template <typename Archive>
+    void load(Archive &ar, PointClass& pt, const unsigned int version)
+    {
+        int x, y;
+        ar >> x >> y;
+        pt = PointClass(x, y);
+    }
+
+    template <typename Archive>
+    void save(Archive &ar, PointClass const& pt, const unsigned int version)
+    {
+        ar << pt.getX() << pt.getY();
+    }
+
+    HPX_SERIALIZATION_SPLIT_FREE(PointClass); // Required
