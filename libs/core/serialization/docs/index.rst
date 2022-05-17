@@ -16,7 +16,7 @@ types as well as all C++ Standard Library collection and utility types. This
 list is extended by |hpx| vocabulary types with proper support for global
 reference counting. |hpx|'s mode of serialization is derived from `Boost's
 serialization model
-<https://www.boost.org/doc/libs/1_72_0/libs/serialization/doc/index.html>`_
+<https://www.boost.org/doc/libs/1_79_0/libs/serialization/doc/index.html>`_
 and, as such, is mostly interface compatible with
 its Boost counterpart.
 
