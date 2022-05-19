@@ -1548,6 +1548,24 @@ namespace hpx { namespace execution {
             return params_;
         }
 
+        /// \cond NOINTERNAL
+        template <typename Dependent = void,
+            typename Enable =
+                std::enable_if_t<std::is_constructible<Executor>::value &&
+                        std::is_constructible<Parameters>::value,
+                    Dependent>>
+        constexpr parallel_unsequenced_task_policy_shim()
+        {
+        }
+
+        template <typename Executor_, typename Parameters_>
+        constexpr parallel_unsequenced_task_policy_shim(
+            Executor_&& exec, Parameters_&& params)
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
+        {
+        }
+
     private:
         friend struct hpx::parallel::execution::create_rebound_policy_t;
         friend class hpx::serialization::access;
@@ -2118,7 +2136,7 @@ namespace hpx { namespace execution {
                 parallel::execution::join_executor_parameters(
                     HPX_FORWARD(Parameters_, params)...));
         }
-
+    public:
         /// Return the associated executor object.
         executor_type& executor()
         {
@@ -2506,7 +2524,7 @@ namespace hpx { namespace execution {
     sequenced_task_policy_shim<Executor, Parameters>::operator()(
         non_task_policy_tag /*tag*/) const
     {
-        return sequenced_task_policy_shim<Executor, Parameters>{}
+        return sequenced_policy_shim<Executor, Parameters>{}
             .on(executor())
             .with(parameters());
     }
@@ -2516,7 +2534,7 @@ namespace hpx { namespace execution {
     parallel_task_policy_shim<Executor, Parameters>::operator()(
         non_task_policy_tag /*tag*/) const
     {
-        return parallel_task_policy_shim<Executor, Parameters>{}
+        return parallel_policy_shim<Executor, Parameters>{}
             .on(executor())
             .with(parameters());
     }
@@ -2540,7 +2558,7 @@ namespace hpx { namespace execution {
     unsequenced_task_policy_shim<Executor, Parameters>::operator()(
         non_task_policy_tag /*tag*/) const
     {
-        return unsequenced_task_policy_shim<Executor, Parameters>{}
+        return unsequenced_policy_shim<Executor, Parameters>{}
             .on(executor())
             .with(parameters());
     }
@@ -2550,7 +2568,7 @@ namespace hpx { namespace execution {
     parallel_unsequenced_task_policy_shim<Executor, Parameters>::operator()(
         non_task_policy_tag /*tag*/) const
     {
-        return parallel_unsequenced_task_policy_shim<Executor, Parameters>{}
+        return parallel_unsequenced_policy_shim<Executor, Parameters>{}
             .on(executor())
             .with(parameters());
     }
