@@ -1581,6 +1581,7 @@ namespace hpx { namespace execution {
     private:
         executor_type exec_;
         executor_parameters_type params_;
+        /// \endcond
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1920,11 +1921,11 @@ namespace hpx { namespace execution {
         /// \cond NOINTERNAL
         constexpr unsequenced_task_policy() = default;
 
-        // template <typename Executor, typename Parameters>
-        // constexpr unsequenced_task_policy(Executor&&, Parameters&&) noexcept
-        // {
-        // }
-        // /// \endcond
+        template <typename Executor, typename Parameters>
+        constexpr unsequenced_task_policy(Executor&&, Parameters&&) noexcept
+        {
+        }
+        /// \endcond
 
         /// Create a new unsequenced_task_policy from itself
         ///
@@ -2069,8 +2070,8 @@ namespace hpx { namespace execution {
 
         /// Create a new unsequenced_task_policy from itself
         ///
-        /// \param tag          [in] Specify that the corresponding asynchronous
-        ///                     execution policy should be used
+        /// \param tag         [in] Specify that the corresponding asynchronous
+        ///                    execution policy should be used
         ///
         /// \returns The new unsequenced_task_policy_shim
         ///
@@ -2082,7 +2083,7 @@ namespace hpx { namespace execution {
 
         /// Create a corresponding non task policy for this task policy
         ///
-        /// \returns The non task seqeuential policy 
+        /// \returns The non task seqeuential policy
         ///
         inline constexpr decltype(auto) operator()(
             non_task_policy_tag /*tag*/) const;
@@ -2136,6 +2137,7 @@ namespace hpx { namespace execution {
                 parallel::execution::join_executor_parameters(
                     HPX_FORWARD(Parameters_, params)...));
         }
+
     public:
         /// Return the associated executor object.
         executor_type& executor()
@@ -2227,11 +2229,11 @@ namespace hpx { namespace execution {
         /// \cond NOINTERNAL
         constexpr unsequenced_policy() = default;
 
-        // template <typename Executor, typename Parameters>
-        // constexpr unsequenced_policy(Executor&&, Parameters&&) noexcept
-        // {
-        // }
-        // /// \endcond
+        template <typename Executor, typename Parameters>
+        constexpr unsequenced_policy(Executor&&, Parameters&&) noexcept
+        {
+        }
+        /// \endcond
 
         /// Create a new unsequenced_task_policy
         ///
@@ -2480,7 +2482,8 @@ namespace hpx { namespace execution {
         }
 
         template <typename Executor_, typename Parameters_>
-        constexpr unsequenced_policy_shim(Executor_&& exec, Parameters_&& params)
+        constexpr unsequenced_policy_shim(
+            Executor_&& exec, Parameters_&& params)
           : exec_(HPX_FORWARD(Executor_, exec))
           , params_(HPX_FORWARD(Parameters_, params))
         {
@@ -2542,7 +2545,7 @@ namespace hpx { namespace execution {
     constexpr decltype(auto) unsequenced_task_policy::operator()(
         non_task_policy_tag /*tag*/) const
     {
-        return unseq.on(executor()).with(parameters()); 
+        return unseq.on(executor()).with(parameters());
     }
 
     constexpr decltype(auto) parallel_unsequenced_task_policy::operator()(
