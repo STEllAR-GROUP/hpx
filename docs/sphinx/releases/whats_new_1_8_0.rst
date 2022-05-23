@@ -9,7 +9,7 @@
 .. _hpx_1_8_0:
 
 ===========================
-|hpx| V1.8.0 (May 18, 2022)
+|hpx| V1.8.0 (May 23, 2022)
 ===========================
 
 With HPX parallel algorithms been fully adapted to C++20 the new release
