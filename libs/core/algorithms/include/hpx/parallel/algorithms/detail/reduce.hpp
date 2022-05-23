@@ -31,8 +31,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename InIterB, typename InIterE, typename T,
             typename Reduce>
         friend inline constexpr T tag_fallback_invoke(sequential_reduce_t,
-            ExPolicy&& policy, InIterB first, InIterE last, T&& init,
-            Reduce&& r)
+            ExPolicy&& policy, InIterB first, InIterE last, T init, Reduce&& r)
         {
             util::loop_ind(HPX_FORWARD(ExPolicy, policy), first, last,
                 [&init, reduce_op = HPX_FORWARD(Reduce, r)](
@@ -56,7 +55,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename Iter, typename Sent, typename T, typename Reduce,
             typename Convert>
         friend inline constexpr auto tag_fallback_invoke(sequential_reduce_t,
-            ExPolicy&& policy, Iter first, Sent last, T&& init, Reduce&& r,
+            ExPolicy&& policy, Iter first, Sent last, T init, Reduce&& r,
             Convert&& conv)
         {
             util::loop_ind(HPX_FORWARD(ExPolicy, policy), first, last,
@@ -85,7 +84,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename Iter1, typename Sent, typename Iter2, typename T,
             typename Reduce, typename Convert>
         friend inline constexpr T tag_fallback_invoke(sequential_reduce_t,
-            Iter1 first1, Sent last1, Iter2 first2, T&& init, Reduce&& r,
+            Iter1 first1, Sent last1, Iter2 first2, T init, Reduce&& r,
             Convert&& conv)
         {
             util::loop2<ExPolicy>(first1, last1, first2,
@@ -107,10 +106,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename ExPolicy, typename InIterB, typename InIterE, typename T,
         typename Reduce>
     HPX_HOST_DEVICE HPX_FORCEINLINE T sequential_reduce(
-        ExPolicy&& policy, InIterB first, InIterE last, T&& init, Reduce&& r)
+        ExPolicy&& policy, InIterB first, InIterE last, T init, Reduce&& r)
     {
         return sequential_reduce_t<ExPolicy>{}(HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(T, init), HPX_FORWARD(Reduce, r));
+            first, last, init, HPX_FORWARD(Reduce, r));
     }
 
     template <typename ExPolicy, typename T, typename FwdIterB, typename Reduce>
@@ -123,10 +122,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename ExPolicy, typename Iter, typename Sent, typename T,
         typename Reduce, typename Convert>
     HPX_HOST_DEVICE HPX_FORCEINLINE T sequential_reduce(ExPolicy&& policy,
-        Iter first, Sent last, T&& init, Reduce&& r, Convert&& conv)
+        Iter first, Sent last, T init, Reduce&& r, Convert&& conv)
     {
         return sequential_reduce_t<ExPolicy>{}(HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(T, init), HPX_FORWARD(Reduce, r),
+            first, last, init, HPX_FORWARD(Reduce, r),
             HPX_FORWARD(Convert, conv));
     }
 
@@ -142,11 +141,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename ExPolicy, typename Iter1, typename Sent, typename Iter2,
         typename T, typename Reduce, typename Convert>
     HPX_HOST_DEVICE HPX_FORCEINLINE T sequential_reduce(Iter1 first1,
-        Sent last1, Iter2 first2, T&& init, Reduce&& r, Convert&& conv)
+        Sent last1, Iter2 first2, T init, Reduce&& r, Convert&& conv)
     {
-        return sequential_reduce_t<ExPolicy>{}(first1, last1, first2,
-            HPX_FORWARD(T, init), HPX_FORWARD(Reduce, r),
-            HPX_FORWARD(Convert, conv));
+        return sequential_reduce_t<ExPolicy>{}(first1, last1, first2, init,
+            HPX_FORWARD(Reduce, r), HPX_FORWARD(Convert, conv));
     }
 #endif
 

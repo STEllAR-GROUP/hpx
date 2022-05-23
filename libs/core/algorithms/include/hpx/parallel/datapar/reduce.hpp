@@ -31,8 +31,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         template <typename InIterB, typename InIterE, typename T,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static T call(ExPolicy&& policy,
-            InIterB first, InIterE last, T&& init, Reduce&& r)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static T call(
+            ExPolicy&& policy, InIterB first, InIterE last, T init, Reduce&& r)
         {
             util::loop_ind(HPX_FORWARD(ExPolicy, policy), first, last,
                 [&init, reduce_op = HPX_FORWARD(Reduce, r)](auto& val) {
@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename Iter, typename Sent, typename T, typename Reduce,
             typename Convert>
         HPX_HOST_DEVICE HPX_FORCEINLINE static T call(ExPolicy&& policy,
-            Iter first, Sent last, T&& init, Reduce&& r, Convert&& conv)
+            Iter first, Sent last, T init, Reduce&& r, Convert&& conv)
         {
             util::loop_ind(HPX_FORWARD(ExPolicy, policy), first, last,
                 [&init, reduce_op = HPX_FORWARD(Reduce, r),
@@ -87,7 +87,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename Iter1, typename Sent, typename Iter2, typename T,
             typename Reduce, typename Convert>
         HPX_HOST_DEVICE HPX_FORCEINLINE static T call(Iter1 first1, Sent last1,
-            Iter2 first2, T&& init, Reduce&& r, Convert&& conv)
+            Iter2 first2, T init, Reduce&& r, Convert&& conv)
         {
             util::loop2<ExPolicy>(first1, last1, first2,
                 [&init, reduce_op = HPX_FORWARD(Reduce, r),
@@ -107,7 +107,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_CONCEPT_REQUIRES_(
             hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
     HPX_HOST_DEVICE HPX_FORCEINLINE T tag_invoke(sequential_reduce_t<ExPolicy>,
-        ExPolicy&& policy, InIterB first, InIterE last, T&& init, Reduce&& r)
+        ExPolicy&& policy, InIterB first, InIterE last, T init, Reduce&& r)
     {
         if constexpr (hpx::parallel::util::detail::iterator_datapar_compatible<
                           InIterB>::value &&
@@ -115,15 +115,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 InIterE>::value)
         {
             return datapar_reduce<ExPolicy>::call(HPX_FORWARD(ExPolicy, policy),
-                first, last, HPX_FORWARD(T, init), HPX_FORWARD(Reduce, r));
+                first, last, init, HPX_FORWARD(Reduce, r));
         }
         else
         {
             using execution_policy_type = typename std::decay_t<ExPolicy>;
             using base_policy_type =
                 typename execution_policy_type::base_policy_type;
-            return sequential_reduce<base_policy_type>(base_policy_type{},
-                first, last, HPX_FORWARD(T, init), HPX_FORWARD(Reduce, r));
+            return sequential_reduce<base_policy_type>(
+                base_policy_type{}, first, last, init, HPX_FORWARD(Reduce, r));
         }
     }
 
@@ -154,7 +154,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_CONCEPT_REQUIRES_(
             hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
     HPX_HOST_DEVICE HPX_FORCEINLINE T tag_invoke(sequential_reduce_t<ExPolicy>,
-        ExPolicy&& policy, Iter first, Sent last, T&& init, Reduce&& r,
+        ExPolicy&& policy, Iter first, Sent last, T init, Reduce&& r,
         Convert&& conv)
     {
         if constexpr (hpx::parallel::util::detail::iterator_datapar_compatible<
@@ -163,7 +163,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 Sent>::value)
         {
             return datapar_reduce<ExPolicy>::call(HPX_FORWARD(ExPolicy, policy),
-                first, last, HPX_FORWARD(T, init), HPX_FORWARD(Reduce, r),
+                first, last, init, HPX_FORWARD(Reduce, r),
                 HPX_FORWARD(Convert, conv));
         }
         else
@@ -172,7 +172,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             using base_policy_type =
                 typename execution_policy_type::base_policy_type;
             return sequential_reduce<base_policy_type>(base_policy_type{},
-                first, last, HPX_FORWARD(T, init), HPX_FORWARD(Reduce, r),
+                first, last, init, HPX_FORWARD(Reduce, r),
                 HPX_FORWARD(Convert, conv));
         }
     }
@@ -205,7 +205,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_CONCEPT_REQUIRES_(
             hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
     HPX_HOST_DEVICE HPX_FORCEINLINE T tag_invoke(sequential_reduce_t<ExPolicy>,
-        Iter1 first1, Sent last1, Iter2 first2, T&& init, Reduce&& r,
+        Iter1 first1, Sent last1, Iter2 first2, T init, Reduce&& r,
         Convert&& conv)
     {
         if constexpr (hpx::parallel::util::detail::iterator_datapar_compatible<
@@ -213,9 +213,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             hpx::parallel::util::detail::iterator_datapar_compatible<
                 Iter2>::value)
         {
-            return datapar_reduce<ExPolicy>::call(first1, last1, first2,
-                HPX_FORWARD(T, init), HPX_FORWARD(Reduce, r),
-                HPX_FORWARD(Convert, conv));
+            return datapar_reduce<ExPolicy>::call(first1, last1, first2, init,
+                HPX_FORWARD(Reduce, r), HPX_FORWARD(Convert, conv));
         }
         else
         {
@@ -223,8 +222,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             using base_policy_type =
                 typename execution_policy_type::base_policy_type;
             return sequential_reduce<base_policy_type>(first1, last1, first2,
-                HPX_FORWARD(T, init), HPX_FORWARD(Reduce, r),
-                HPX_FORWARD(Convert, conv));
+                init, HPX_FORWARD(Reduce, r), HPX_FORWARD(Convert, conv));
         }
     }
 }}}}    // namespace hpx::parallel::v1::detail
