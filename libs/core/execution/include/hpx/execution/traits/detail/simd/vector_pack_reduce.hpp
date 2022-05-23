@@ -19,8 +19,7 @@ namespace hpx { namespace parallel { namespace traits {
     HPX_HOST_DEVICE HPX_FORCEINLINE T reduce(
         Reduce r, std::experimental::simd<T, Abi>& val)
     {
-        using mask_type = typename std::experimental::simd<T, Abi>::mask_type;
-        return std::experimental::reduce(where(mask_type(true), val), T(1), r);
+        return std::experimental::reduce(val, r);
     }
 }}}    // namespace hpx::parallel::traits
 
