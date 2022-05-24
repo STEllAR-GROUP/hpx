@@ -8,21 +8,25 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DATAPAR)
+#if defined(HPX_HAVE_DATAPAR_VC)
+#include <cstddef>
 
-#if !defined(__CUDACC__)
+#include <Vc/Vc>
+#include <Vc/global.h>
 
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
-    template <typename T, typename Reduce>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T reduce(Reduce, T val)
+    template <typename T, typename Abi, typename Reduce>
+    HPX_HOST_DEVICE HPX_FORCEINLINE T reduce(
+        Reduce r, Vc::Vector<T, Abi> const& val)
     {
-        return val;
+        T init = val[0];
+        for (std::size_t i = 1; i != val.size(); i++)
+        {
+            init = HPX_INVOKE(r, init, val[i]);
+        }
+        return init;
     }
 }}}    // namespace hpx::parallel::traits
-
-#include <hpx/execution/traits/detail/simd/vector_pack_reduce.hpp>
-#include <hpx/execution/traits/detail/vc/vector_pack_reduce.hpp>
-#endif
 
 #endif

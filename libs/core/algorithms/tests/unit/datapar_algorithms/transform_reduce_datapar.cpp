@@ -26,23 +26,23 @@ void test_transform_reduce(ExPolicy&& policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
     auto reduce_op = [](auto v1, auto v2) { return v1 + v2; };
 
     auto convert_op = [](auto val) { return val * val; };
 
-    std::size_t const init = std::size_t(1);
+    int const init = int(1);
 
-    std::size_t r1 = hpx::transform_reduce(policy, iterator(std::begin(c)),
+    int r1 = hpx::transform_reduce(policy, iterator(std::begin(c)),
         iterator(std::end(c)), init, reduce_op, convert_op);
 
     // verify values
-    std::size_t r2 = std::accumulate(std::begin(c), std::end(c), init,
+    int r2 = std::accumulate(std::begin(c), std::end(c), init,
         [&reduce_op, &convert_op](
             auto res, auto val) { return reduce_op(res, convert_op(val)); });
 
@@ -53,22 +53,21 @@ void test_transform_reduce(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_transform_reduce_async(ExPolicy&& p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    std::size_t val = 42;
+    int val = 42;
     auto op = std::plus<>{};
 
-    hpx::future<std::size_t> f =
-        hpx::transform_reduce(p, iterator(std::begin(c)), iterator(std::end(c)),
-            val, op, [](auto v) { return v; });
+    hpx::future<int> f = hpx::transform_reduce(p, iterator(std::begin(c)),
+        iterator(std::end(c)), val, op, [](auto v) { return v; });
     f.wait();
 
     // verify values
-    std::size_t r2 = std::accumulate(std::begin(c), std::end(c), val, op);
+    int r2 = std::accumulate(std::begin(c), std::end(c), val, op);
     HPX_TEST_EQ(f.get(), r2);
 }
 

@@ -65,6 +65,7 @@ set(execution_headers
     hpx/execution/traits/detail/vc/vector_pack_count_bits.hpp
     hpx/execution/traits/detail/vc/vector_pack_find.hpp
     hpx/execution/traits/detail/vc/vector_pack_load_store.hpp
+    hpx/execution/traits/detail/vc/vector_pack_reduce.hpp
     hpx/execution/traits/detail/vc/vector_pack_type.hpp
     hpx/execution/traits/executor_traits.hpp
     hpx/execution/traits/future_then_result_exec.hpp
