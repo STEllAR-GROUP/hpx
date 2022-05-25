@@ -228,6 +228,30 @@ namespace hpx::parcelset {
 
         std::int64_t get_buffer_allocate_time_sent(bool reset);
         std::int64_t get_buffer_allocate_time_received(bool reset);
+
+        //// total zero-copy chunks sent
+        std::int64_t get_zchunks_send_count(bool reset);
+
+        //// total zero-copy chunks received
+        std::int64_t get_zchunks_recv_count(bool reset);
+
+        //// the maximum number of zero-copy chunks per message sent
+        std::int64_t get_zchunks_send_per_msg_count_max(bool reset);
+
+        //// the maximum number of zero-copy chunks per message received
+        std::int64_t get_zchunks_recv_per_msg_count_max(bool reset);
+
+        //// the size of zero-copy chunks per message sent
+        std::int64_t get_zchunks_send_size(bool reset);
+
+        //// the size of zero-copy chunks per message received
+        std::int64_t get_zchunks_recv_size(bool reset);
+
+        //// the maximum size of zero-copy chunks per message sent
+        std::int64_t get_zchunks_send_size_max(bool reset);
+
+        //// the maximum size of zero-copy chunks per message received
+        std::int64_t get_zchunks_recv_size_max(bool reset);
 #endif
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
     defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)

@@ -1111,6 +1111,78 @@ namespace hpx::parcelset {
         return pp ? pp->get_buffer_allocate_time_received(reset) : 0;
     }
 
+    // total zero-copy chunks sent
+    std::int64_t parcelhandler::get_zchunks_send_count(
+        std::string const& pp_type, bool reset) const
+    {
+        error_code ec(throwmode::lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_zchunks_send_count(reset) : 0;
+    }
+
+    // total zero-copy chunks received
+    std::int64_t parcelhandler::get_zchunks_recv_count(
+        std::string const& pp_type, bool reset) const
+    {
+        error_code ec(throwmode::lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_zchunks_recv_count(reset) : 0;
+    }
+
+    // the maximum number of zero-copy chunks per message sent
+    std::int64_t parcelhandler::get_zchunks_send_per_msg_count_max(
+        std::string const& pp_type, bool reset) const
+    {
+        error_code ec(throwmode::lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_zchunks_send_per_msg_count_max(reset) : 0;
+    }
+
+    // the maximum number of zero-copy chunks per message received
+    std::int64_t parcelhandler::get_zchunks_recv_per_msg_count_max(
+        std::string const& pp_type, bool reset) const
+    {
+        error_code ec(throwmode::lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_zchunks_recv_per_msg_count_max(reset) : 0;
+    }
+
+    // the size of zero-copy chunks per message sent
+    std::int64_t parcelhandler::get_zchunks_send_size(
+        std::string const& pp_type, bool reset) const
+    {
+        error_code ec(throwmode::lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_zchunks_send_size(reset) : 0;
+    }
+
+    // the size of zero-copy chunks per message received
+    std::int64_t parcelhandler::get_zchunks_recv_size(
+        std::string const& pp_type, bool reset) const
+    {
+        error_code ec(throwmode::lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_zchunks_recv_size(reset) : 0;
+    }
+
+    // the maximum size of zero-copy chunks per message sent
+    std::int64_t parcelhandler::get_zchunks_send_size_max(
+        std::string const& pp_type, bool reset) const
+    {
+        error_code ec(throwmode::lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_zchunks_send_size_max(reset) : 0;
+    }
+
+    // the maximum size of zero-copy chunks per message received
+    std::int64_t parcelhandler::get_zchunks_recv_size_max(
+        std::string const& pp_type, bool reset) const
+    {
+        error_code ec(throwmode::lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_zchunks_recv_size_max(reset) : 0;
+    }
+
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
     defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
     // same as above, just separated data for each action

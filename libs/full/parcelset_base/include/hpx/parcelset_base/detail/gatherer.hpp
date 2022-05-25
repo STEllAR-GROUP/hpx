@@ -36,6 +36,10 @@ namespace hpx::parcelset {
             inline std::int64_t total_time(bool reset);
             inline std::int64_t total_serialization_time(bool reset);
             inline std::int64_t total_buffer_allocate_time(bool reset);
+            inline std::int64_t num_zchunks(bool reset);
+            inline std::int64_t num_zchunks_per_msg_max(bool reset);
+            inline std::int64_t size_zchunks_total(bool reset);
+            inline std::int64_t size_zchunks_max(bool reset);
 
         private:
             std::int64_t overall_bytes_ = 0;
@@ -44,8 +48,11 @@ namespace hpx::parcelset {
             std::int64_t num_parcels_ = 0;
             std::int64_t num_messages_ = 0;
             std::int64_t overall_raw_bytes_ = 0;
-
             std::int64_t buffer_allocate_time_;
+            std::int64_t num_zchunks_ = 0;
+            std::int64_t num_zchunks_per_msg_max_ = 0;
+            std::int64_t size_zchunks_total_ = 0;
+            std::int64_t size_zchunks_max_ = 0;
 
             // Create mutex for accumulator functions.
             Mutex acc_mtx;
@@ -63,6 +70,12 @@ namespace hpx::parcelset {
             overall_raw_bytes_ += x.raw_bytes_;
             ++num_messages_;
             buffer_allocate_time_ += x.buffer_allocate_time_;
+            num_zchunks_ += x.num_zchunks_;
+            num_zchunks_per_msg_max_ = (std::max)(
+                num_zchunks_per_msg_max_, x.num_zchunks_per_msg_max_);
+            size_zchunks_total_ += x.size_zchunks_total_;
+            size_zchunks_max_ =
+                (std::max)(size_zchunks_max_, x.size_zchunks_max_);
         }
 
         template <typename Mutex>
@@ -112,6 +125,34 @@ namespace hpx::parcelset {
         {
             std::lock_guard l(acc_mtx);
             return util::get_and_reset_value(buffer_allocate_time_, reset);
+        }
+
+        template <typename Mutex>
+        std::int64_t gatherer<Mutex>::num_zchunks(bool reset)
+        {
+            std::lock_guard l(acc_mtx);
+            return util::get_and_reset_value(num_zchunks_, reset);
+        }
+
+        template <typename Mutex>
+        std::int64_t gatherer<Mutex>::num_zchunks_per_msg_max(bool reset)
+        {
+            std::lock_guard l(acc_mtx);
+            return util::get_and_reset_value(num_zchunks_per_msg_max_, reset);
+        }
+
+        template <typename Mutex>
+        std::int64_t gatherer<Mutex>::size_zchunks_total(bool reset)
+        {
+            std::lock_guard l(acc_mtx);
+            return util::get_and_reset_value(size_zchunks_total_, reset);
+        }
+
+        template <typename Mutex>
+        std::int64_t gatherer<Mutex>::size_zchunks_max(bool reset)
+        {
+            std::lock_guard l(acc_mtx);
+            return util::get_and_reset_value(size_zchunks_max_, reset);
         }
     }    // namespace detail
 

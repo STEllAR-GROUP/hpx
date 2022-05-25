@@ -105,6 +105,30 @@ namespace hpx::performance_counters {
             hpx::bind_front(&parcelhandler::get_buffer_allocate_time_received,
                 &ph, pp_type));
 
+        hpx::function<std::int64_t(bool)> num_zchunks_send(hpx::bind_front(
+            &parcelhandler::get_zchunks_send_count, &ph, pp_type));
+        hpx::function<std::int64_t(bool)> num_zchunks_recv(hpx::bind_front(
+            &parcelhandler::get_zchunks_recv_count, &ph, pp_type));
+
+        hpx::function<std::int64_t(bool)> num_zchunks_send_per_msg_max(
+            hpx::bind_front(&parcelhandler::get_zchunks_send_per_msg_count_max,
+                &ph, pp_type));
+        hpx::function<std::int64_t(bool)> num_zchunks_recv_per_msg_max(
+            hpx::bind_front(&parcelhandler::get_zchunks_recv_per_msg_count_max,
+                &ph, pp_type));
+
+        hpx::function<std::int64_t(bool)> size_zchunks_send(hpx::bind_front(
+            &parcelhandler::get_zchunks_send_size, &ph, pp_type));
+        hpx::function<std::int64_t(bool)> size_zchunks_recv(hpx::bind_front(
+            &parcelhandler::get_zchunks_recv_size, &ph, pp_type));
+
+        hpx::function<std::int64_t(bool)> size_zchunks_send_per_msg_max(
+            hpx::bind_front(
+                &parcelhandler::get_zchunks_send_size_max, &ph, pp_type));
+        hpx::function<std::int64_t(bool)> size_zchunks_recv_per_msg_max(
+            hpx::bind_front(
+                &parcelhandler::get_zchunks_recv_size_max, &ph, pp_type));
+
         performance_counters::generic_counter_type_data const counter_types[] =
             {
                 {hpx::util::format("/parcels/count/{}/sent", pp_type),
@@ -339,6 +363,119 @@ namespace hpx::performance_counters {
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(buffer_allocate_time_sent), _2),
                     &performance_counters::locality_counter_discoverer, "ns"},
+                {hpx::util::format(
+                     "/parcelport/count/{}/zero_copy_chunks/sent", pp_type),
+                    performance_counters::counter_type::
+                        monotonically_increasing,
+                    hpx::util::format(
+                        "returns the total number of zero-copy chunks sent "
+                        "using the {} connection type for the referenced "
+                        "locality",
+                        pp_type),
+                    HPX_PERFORMANCE_COUNTER_V1,
+                    hpx::bind(
+                        &performance_counters::locality_raw_counter_creator, _1,
+                        HPX_MOVE(num_zchunks_send), _2),
+                    &performance_counters::locality_counter_discoverer, ""},
+                {hpx::util::format(
+                     "/parcelport/count/{}/zero_copy_chunks/received", pp_type),
+                    performance_counters::counter_type::
+                        monotonically_increasing,
+                    hpx::util::format(
+                        "returns the total number of zero-copy chunks received "
+                        "using the {} connection type for the referenced "
+                        "locality",
+                        pp_type),
+                    HPX_PERFORMANCE_COUNTER_V1,
+                    hpx::bind(
+                        &performance_counters::locality_raw_counter_creator, _1,
+                        HPX_MOVE(num_zchunks_recv), _2),
+                    &performance_counters::locality_counter_discoverer, ""},
+                {hpx::util::format(
+                     "/parcelport/count-max/{}/zero_copy_chunks/sent", pp_type),
+                    performance_counters::counter_type::
+                        monotonically_increasing,
+                    hpx::util::format(
+                        "returns the maximum number of zero-copy chunks per "
+                        "message sent using the {} connection type for the "
+                        "referenced locality",
+                        pp_type),
+                    HPX_PERFORMANCE_COUNTER_V1,
+                    hpx::bind(
+                        &performance_counters::locality_raw_counter_creator, _1,
+                        HPX_MOVE(num_zchunks_send_per_msg_max), _2),
+                    &performance_counters::locality_counter_discoverer, ""},
+                {hpx::util::format(
+                     "/parcelport/count-max/{}/zero_copy_chunks/received",
+                     pp_type),
+                    performance_counters::counter_type::
+                        monotonically_increasing,
+                    hpx::util::format(
+                        "returns the maximum number of zero-copy chunks per "
+                        "message received using the {} connection type for the "
+                        "referenced locality",
+                        pp_type),
+                    HPX_PERFORMANCE_COUNTER_V1,
+                    hpx::bind(
+                        &performance_counters::locality_raw_counter_creator, _1,
+                        HPX_MOVE(num_zchunks_recv_per_msg_max), _2),
+                    &performance_counters::locality_counter_discoverer, ""},
+                {hpx::util::format(
+                     "/parcelport/size/{}/zero_copy_chunks/sent", pp_type),
+                    performance_counters::counter_type::
+                        monotonically_increasing,
+                    hpx::util::format(
+                        "returns the total size of zero-copy chunks sent using "
+                        "the {} connection type for the referenced locality",
+                        pp_type),
+                    HPX_PERFORMANCE_COUNTER_V1,
+                    hpx::bind(
+                        &performance_counters::locality_raw_counter_creator, _1,
+                        HPX_MOVE(size_zchunks_send), _2),
+                    &performance_counters::locality_counter_discoverer, ""},
+                {hpx::util::format(
+                     "/parcelport/size/{}/zero_copy_chunks/received", pp_type),
+                    performance_counters::counter_type::
+                        monotonically_increasing,
+                    hpx::util::format(
+                        "returns the total size of zero-copy chunks received "
+                        "using the {} connection type for the referenced "
+                        "locality",
+                        pp_type),
+                    HPX_PERFORMANCE_COUNTER_V1,
+                    hpx::bind(
+                        &performance_counters::locality_raw_counter_creator, _1,
+                        HPX_MOVE(size_zchunks_recv), _2),
+                    &performance_counters::locality_counter_discoverer, ""},
+                {hpx::util::format(
+                     "/parcelport/size-max/{}/zero_copy_chunks/sent", pp_type),
+                    performance_counters::counter_type::
+                        monotonically_increasing,
+                    hpx::util::format(
+                        "returns the maximum size of zero-copy chunks sent "
+                        "using the {} connection type for the referenced "
+                        "locality",
+                        pp_type),
+                    HPX_PERFORMANCE_COUNTER_V1,
+                    hpx::bind(
+                        &performance_counters::locality_raw_counter_creator, _1,
+                        HPX_MOVE(size_zchunks_send_per_msg_max), _2),
+                    &performance_counters::locality_counter_discoverer, ""},
+                {hpx::util::format(
+                     "/parcelport/size-max/{}/zero_copy_chunks/received",
+                     pp_type),
+                    performance_counters::counter_type::
+                        monotonically_increasing,
+                    hpx::util::format(
+                        "returns the maximum size of zero-copy chunks received "
+                        "using the {} connection type for the referenced "
+                        "locality",
+                        pp_type),
+                    HPX_PERFORMANCE_COUNTER_V1,
+                    hpx::bind(
+                        &performance_counters::locality_raw_counter_creator, _1,
+                        HPX_MOVE(size_zchunks_recv_per_msg_max), _2),
+                    &performance_counters::locality_counter_discoverer, ""},
             };
 
         performance_counters::install_counter_types(
