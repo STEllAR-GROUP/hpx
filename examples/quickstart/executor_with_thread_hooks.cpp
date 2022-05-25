@@ -60,9 +60,12 @@ namespace executor_example {
         };
 
     public:
-        using execution_category = typename BaseExecutor::execution_category;
+        using execution_category =
+            typename hpx::parallel::execution::executor_execution_category<
+                BaseExecutor>::type;
         using executor_parameters_type =
-            typename BaseExecutor::executor_parameters_type;
+            typename hpx::parallel::execution::executor_parameters_type<
+                BaseExecutor>::type;
 
         template <typename OnStart, typename OnStop>
         executor_with_thread_hooks(
