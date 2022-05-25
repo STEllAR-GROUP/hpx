@@ -313,6 +313,7 @@ int test(const std::string& message, Executor& exec)
     HPX_TEST_EQ(fts.get(), "then(shared)");
     std::cout << std::endl;
 
+#if !defined(HPX_MSVC)
     // test 3a
     std::cout << "============================" << std::endl;
     std::cout << "Test 3a : when_all()" << std::endl;
@@ -367,6 +368,7 @@ int test(const std::string& message, Executor& exec)
                 });
     HPX_TEST_EQ(fws.get(), "when_all(shared)");
     std::cout << std::endl;
+#endif
 
     // test 4a
     std::cout << "============================" << std::endl;

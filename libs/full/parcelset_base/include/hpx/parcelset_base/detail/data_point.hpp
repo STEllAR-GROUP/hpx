@@ -34,5 +34,17 @@ namespace hpx::parcelset {
 
         /// The time spent for allocating buffers
         std::int64_t buffer_allocate_time_ = 0;
+
+        //// number of zero-copy chunks in total
+        std::int64_t num_zchunks_ = 0;
+
+        //// maximum number of zero-copy chunks per message
+        std::int64_t num_zchunks_per_msg_max_ = 0;
+
+        //// size of zero-copy chunks in total
+        std::int64_t size_zchunks_total_ = 0;
+
+        //// maximum size of zero-copy chunks
+        std::int64_t size_zchunks_max_ = 0;
     };
 }    // namespace hpx::parcelset

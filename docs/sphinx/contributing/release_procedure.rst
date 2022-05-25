@@ -58,6 +58,8 @@ are completed to avoid confusion.
 #. Make sure ``HPX_VERSION_MAJOR/MINOR/SUBMINOR`` in ``CMakeLists.txt`` contain
    the correct values. Change them if needed.
 
+#. Change version references in CITATION.cff. There are two occurrences.
+
 #. This step does not apply to patch releases. Remove features which have been
    deprecated for at least 2 releases. This involves removing build options
    which enable those features from the main CMakeLists.txt and also deleting
@@ -159,7 +161,7 @@ are completed to avoid confusion.
 
 #. Announce the release on hpx-users@stellar-group.org, stellar@cct.lsu.edu,
    allcct@cct.lsu.edu, faculty@csc.lsu.edu, faculty@ece.lsu.edu,
-   xpress@crest.iu.edu, the |hpx| Slack channel, the IRC channel, Sonia Sachs,
+   xpress@crest.iu.edu, the |hpx| Slack channel, the IRC channel,
    our list of external collaborators, isocpp.org, reddit.com, HPC Wire, Inside
    HPC, Heise Online, and a CCT press release.
 

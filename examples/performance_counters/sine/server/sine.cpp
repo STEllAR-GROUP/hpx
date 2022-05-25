@@ -66,7 +66,7 @@ namespace performance_counters { namespace sine { namespace server {
 
         value.scaling_ = scaling;
         value.scale_inverse_ = true;
-        value.status_ = hpx::performance_counters::status_new_data;
+        value.status_ = hpx::performance_counters::counter_status::new_data;
         value.count_ = ++invocation_count_;
 
         return value;

@@ -95,7 +95,7 @@ void test_all_locality_thread_counters(char const* const* counter_names,
         hpx::performance_counters::counter_path_elements path;
         HPX_TEST_EQ(
             hpx::performance_counters::get_counter_path_elements(*p, path),
-            hpx::performance_counters::status_valid_data);
+            hpx::performance_counters::counter_status::valid_data);
 
         // augment the counter path elements
         path.parentinstancename_ = "locality";
@@ -129,7 +129,7 @@ void test_all_locality_thread_counters(char const* const* counter_names,
 
         std::string name;
         HPX_TEST_EQ(hpx::performance_counters::get_counter_name(path, name),
-            hpx::performance_counters::status_valid_data);
+            hpx::performance_counters::counter_status::valid_data);
 
         std::cout << name << '\n';
 
