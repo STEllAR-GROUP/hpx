@@ -34,6 +34,7 @@ the C++ standard ones in |hpx| threads:
 * :cpp:class:`hpx::stop_callback`
 * :cpp:class:`hpx::stop_source`
 * :cpp:class:`hpx::stop_token`
+* :cpp:class:`hpx::in_place_stop_token`
 * :cpp:class:`hpx::timed_mutex`
 * :cpp:class:`hpx::upgrade_to_unique_lock`
 * :cpp:class:`hpx::upgrade_lock`
