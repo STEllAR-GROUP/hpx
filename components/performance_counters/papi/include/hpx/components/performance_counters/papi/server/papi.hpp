@@ -274,7 +274,8 @@ namespace hpx { namespace performance_counters { namespace papi {
             {
                 val.time_ = timestamp_;
                 val.value_ = value_;
-                val.status_ = hpx::performance_counters::status_new_data;
+                val.status_ =
+                    hpx::performance_counters::counter_status::new_data;
                 val.scaling_ = 1;
                 val.scale_inverse_ = false;
             }

@@ -60,7 +60,7 @@ namespace hpx { namespace performance_counters { namespace server {
         value.value_ = now;
         value.scaling_ = 1000000000LL;    // coefficient to get seconds
         value.scale_inverse_ = true;
-        value.status_ = status_new_data;
+        value.status_ = counter_status::new_data;
         value.time_ = now;
         value.count_ = ++invocation_count_;
         return value;

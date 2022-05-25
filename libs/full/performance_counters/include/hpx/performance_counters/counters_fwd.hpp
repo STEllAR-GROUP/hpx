@@ -193,16 +193,49 @@ namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     // Status and error codes used by the functions related to
     // performance counters.
-    enum counter_status
+    enum class counter_status
     {
-        status_valid_data,         // No error occurred, data is valid
-        status_new_data,           // Data is valid and different from last call
-        status_invalid_data,       // Some error occurred, data is not value
-        status_already_defined,    // The type or instance already has been defined
-        status_counter_unknown,         // The counter instance is unknown
-        status_counter_type_unknown,    // The counter type is unknown
-        status_generic_error            // A unknown error occurred
+        valid_data,         // No error occurred, data is valid
+        new_data,           // Data is valid and different from last call
+        invalid_data,       // Some error occurred, data is not value
+        already_defined,    // The type or instance already has been defined
+        counter_unknown,    // The counter instance is unknown
+        counter_type_unknown,    // The counter type is unknown
+        generic_error            // A unknown error occurred
     };
+
+    inline std::ostream& operator<<(
+        std::ostream& os, counter_status const& rhs) noexcept
+    {
+        return (os << static_cast<int>(rhs));
+    }
+
+#define HPX_COUNTER_STATUS_UNSCOPED_ENUM_DEPRECATION_MSG                       \
+    "The unscoped counter_status names are deprecated. Please use "            \
+    "counter_status::<type> instead."
+
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_STATUS_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_valid_data =
+        counter_status::valid_data;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_STATUS_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_new_data = counter_status::new_data;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_STATUS_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_invalid_data =
+        counter_status::invalid_data;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_STATUS_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_already_defined =
+        counter_status::already_defined;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_STATUS_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_counter_unknown =
+        counter_status::counter_unknown;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_STATUS_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_counter_type_unknown =
+        counter_status::counter_type_unknown;
+    HPX_DEPRECATED_V(1, 9, HPX_COUNTER_STATUS_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr counter_status status_generic_error =
+        counter_status::generic_error;
+
+#undef HPX_COUNTER_STATUS_UNSCOPED_ENUM_DEPRECATION_MSG
 
     inline bool status_is_valid(counter_status s);
 
@@ -314,7 +347,7 @@ namespace hpx { namespace performance_counters {
           , count_(0)
           , value_(value)
           , scaling_(scaling)
-          , status_(status_new_data)
+          , status_(counter_status::new_data)
           , scale_inverse_(scale_inverse)
         {
         }
@@ -380,7 +413,7 @@ namespace hpx { namespace performance_counters {
           , count_(0)
           , values_()
           , scaling_(scaling)
-          , status_(status_new_data)
+          , status_(counter_status::new_data)
           , scale_inverse_(scale_inverse)
         {
         }
@@ -391,7 +424,7 @@ namespace hpx { namespace performance_counters {
           , count_(0)
           , values_(HPX_MOVE(values))
           , scaling_(scaling)
-          , status_(status_new_data)
+          , status_(counter_status::new_data)
           , scale_inverse_(scale_inverse)
         {
         }
@@ -402,7 +435,7 @@ namespace hpx { namespace performance_counters {
           , count_(0)
           , values_(values)
           , scaling_(scaling)
-          , status_(status_new_data)
+          , status_(counter_status::new_data)
           , scale_inverse_(scale_inverse)
         {
         }

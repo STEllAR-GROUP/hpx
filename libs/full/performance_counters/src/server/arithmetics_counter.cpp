@@ -260,7 +260,7 @@ namespace hpx { namespace performance_counters { namespace detail {
                 for (std::string const& name : names)
                 {
                     counter_path_elements paths;
-                    if (status_valid_data !=
+                    if (counter_status::valid_data !=
                             get_counter_path_elements(name, paths, ec) ||
                         ec)
                     {

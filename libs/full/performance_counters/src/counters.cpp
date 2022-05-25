@@ -99,7 +99,7 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_name",
                 "empty counter object name");
-            return status_invalid_data;
+            return counter_status::invalid_data;
         }
 
         result = "/";
@@ -161,7 +161,7 @@ namespace hpx { namespace performance_counters {
 
         if (&ec != &throws)
             ec = make_success_code();
-        return status_valid_data;
+        return counter_status::valid_data;
     }
 
     /// \brief Create a full name of a counter from the contents of the given
@@ -173,7 +173,7 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_type_name",
                 "empty counter object name");
-            return status_invalid_data;
+            return counter_status::invalid_data;
         }
 
         result = "/";
@@ -187,7 +187,7 @@ namespace hpx { namespace performance_counters {
 
         if (&ec != &throws)
             ec = make_success_code();
-        return status_valid_data;
+        return counter_status::valid_data;
     }
 
     /// \brief Create a full name of a counter from the contents of the given
@@ -200,7 +200,7 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_full_counter_type_name",
                 "empty counter object name");
-            return status_invalid_data;
+            return counter_status::invalid_data;
         }
 
         result = "/";
@@ -220,7 +220,7 @@ namespace hpx { namespace performance_counters {
 
         if (&ec != &throws)
             ec = make_success_code();
-        return status_valid_data;
+        return counter_status::valid_data;
     }
 
     /// \brief Create a name of a counter instance from the contents of the
@@ -232,7 +232,7 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_instance_name",
                 "empty counter instance name");
-            return status_invalid_data;
+            return counter_status::invalid_data;
         }
 
         if (path.parentinstance_is_basename_)
@@ -288,7 +288,7 @@ namespace hpx { namespace performance_counters {
 
         if (&ec != &throws)
             ec = make_success_code();
-        return status_valid_data;
+        return counter_status::valid_data;
     }
 
     /// \brief Fill the given \a counter_path_elements instance from the given
@@ -305,7 +305,7 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
                 "invalid counter name format: {}", name);
-            return status_invalid_data;
+            return counter_status::invalid_data;
         }
 
         path.objectname_ = elements.object_;
@@ -359,7 +359,7 @@ namespace hpx { namespace performance_counters {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "get_counter_path_elements",
                             "invalid counter name format: {}", name);
-                        return status_invalid_data;
+                        return counter_status::invalid_data;
                     }
                 }
             }
@@ -378,7 +378,7 @@ namespace hpx { namespace performance_counters {
         if (&ec != &throws)
             ec = make_success_code();
 
-        return status_valid_data;
+        return counter_status::valid_data;
     }
 
     /// \brief Fill the given \a counter_type_path_elements instance from the
@@ -396,7 +396,7 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_type_path_elements",
                 "invalid counter name format: {}", name);
-            return status_invalid_data;
+            return counter_status::invalid_data;
         }
 
         // but extract only counter type elements
@@ -407,7 +407,7 @@ namespace hpx { namespace performance_counters {
         if (&ec != &throws)
             ec = make_success_code();
 
-        return status_valid_data;
+        return counter_status::valid_data;
     }
 
     /// \brief Return the counter type name from a given full instance name
@@ -519,7 +519,7 @@ namespace hpx { namespace performance_counters {
             HPX_THROWS_IF(ec, bad_parameter,
                 "performance_counters::add_counter_type",
                 "the runtime is not currently running");
-            return status_generic_error;
+            return counter_status::generic_error;
         }
         return registry::instance().add_counter_type(
             info, create_counter, discover_counters, ec);
@@ -536,7 +536,7 @@ namespace hpx { namespace performance_counters {
             HPX_THROWS_IF(ec, bad_parameter,
                 "performance_counters::discover_counter_types",
                 "the runtime is not currently running");
-            return status_generic_error;
+            return counter_status::generic_error;
         }
         return registry::instance().discover_counter_types(
             discover_counter, mode, ec);
@@ -553,7 +553,7 @@ namespace hpx { namespace performance_counters {
             HPX_THROWS_IF(ec, bad_parameter,
                 "performance_counters::discover_counter_types",
                 "the runtime is not currently running");
-            return status_generic_error;
+            return counter_status::generic_error;
         }
         return registry::instance().discover_counter_type(
             info, discover_counter, mode, ec);
@@ -568,7 +568,7 @@ namespace hpx { namespace performance_counters {
             HPX_THROWS_IF(ec, bad_parameter,
                 "performance_counters::discover_counter_types",
                 "the runtime is not currently running");
-            return status_generic_error;
+            return counter_status::generic_error;
         }
         return registry::instance().discover_counter_type(
             name, discover_counter, mode, ec);
@@ -619,7 +619,7 @@ namespace hpx { namespace performance_counters {
         // the runtime could be gone already
         if (hpx::get_runtime_ptr() == nullptr)
         {
-            return status_generic_error;
+            return counter_status::generic_error;
         }
         return registry::instance().remove_counter_type(info, ec);
     }
@@ -634,7 +634,7 @@ namespace hpx { namespace performance_counters {
             HPX_THROWS_IF(ec, bad_parameter,
                 "performance_counters::get_counter_type",
                 "the runtime is not currently running");
-            return status_generic_error;
+            return counter_status::generic_error;
         }
         return registry::instance().get_counter_type(name, info, ec);
     }
