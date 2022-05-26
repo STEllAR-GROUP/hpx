@@ -12,6 +12,7 @@
 #include <hpx/hpx_main.hpp>
 #include <iostream>
 #include <hpx/future.hpp>
+#include <hpx/include/runtime.hpp>
 
 //[PointMemberSerialization
 struct PointMemberSerialization {
