@@ -9,7 +9,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/serialization.hpp>
 #include <hpx/format.hpp>
-#include <hpx/wrap_main.hpp>
+#include <hpx/hpx_main.hpp>
 #include <iostream>
 #include <hpx/future.hpp>
 
