@@ -103,48 +103,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     inline constexpr sequential_reduce_t<ExPolicy> sequential_reduce =
         sequential_reduce_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename InIterB, typename InIterE, typename T,
-        typename Reduce>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T sequential_reduce(
-        ExPolicy&& policy, InIterB first, InIterE last, T init, Reduce&& r)
+    template <typename ExPolicy, typename... Args>
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_reduce(Args&&... args)
     {
-        return sequential_reduce_t<ExPolicy>{}(HPX_FORWARD(ExPolicy, policy),
-            first, last, init, HPX_FORWARD(Reduce, r));
-    }
-
-    template <typename ExPolicy, typename T, typename FwdIterB, typename Reduce>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T sequential_reduce(
-        FwdIterB part_begin, std::size_t part_size, T init, Reduce r)
-    {
-        return sequential_reduce_t<ExPolicy>{}(part_begin, part_size, init, r);
-    }
-
-    template <typename ExPolicy, typename Iter, typename Sent, typename T,
-        typename Reduce, typename Convert>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T sequential_reduce(ExPolicy&& policy,
-        Iter first, Sent last, T init, Reduce&& r, Convert&& conv)
-    {
-        return sequential_reduce_t<ExPolicy>{}(HPX_FORWARD(ExPolicy, policy),
-            first, last, init, HPX_FORWARD(Reduce, r),
-            HPX_FORWARD(Convert, conv));
-    }
-
-    template <typename ExPolicy, typename T, typename Iter, typename Reduce,
-        typename Convert>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T sequential_reduce(
-        Iter part_begin, std::size_t part_size, T init, Reduce r, Convert conv)
-    {
-        return sequential_reduce_t<ExPolicy>{}(
-            part_begin, part_size, init, r, conv);
-    }
-
-    template <typename ExPolicy, typename Iter1, typename Sent, typename Iter2,
-        typename T, typename Reduce, typename Convert>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T sequential_reduce(Iter1 first1,
-        Sent last1, Iter2 first2, T init, Reduce&& r, Convert&& conv)
-    {
-        return sequential_reduce_t<ExPolicy>{}(first1, last1, first2, init,
-            HPX_FORWARD(Reduce, r), HPX_FORWARD(Convert, conv));
+        return sequential_reduce_t<ExPolicy>{}(std::forward<Args>(args)...);
     }
 #endif
 
