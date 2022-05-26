@@ -69,6 +69,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       receive_buffer
       sierpinski
       zerocopy_rdma
+      custom_serialization
   )
 endif()
 
