@@ -22,7 +22,7 @@ struct PointMemberSerialization {
     friend class hpx::serialization::access;    // Provide member access to HPX
 
     template<typename Archive>
-    void serialize(Archive &ar, const unsigned int version) {
+    void serialize(Archive &ar, const unsigned int) {
         ar & x & y;
     }
 };
@@ -34,7 +34,7 @@ struct RectangleMemberSerialization {
     PointMemberSerialization lower_right;
 
     template<typename Archive>
-    void serialize(Archive &ar, const unsigned int version) {
+    void serialize(Archive &ar, const unsigned int) {
         ar & top_left & lower_right;
     }
 };
@@ -47,7 +47,7 @@ struct RectangleFREE {
 };
 
 template<typename Archive>
-void serialize(Archive &ar, RectangleFREE &pt, const unsigned int version) {
+void serialize(Archive &ar, RectangleFREE &pt, const unsigned int) {
     ar & pt.lower_right & pt.top_left;
 }
 //]
@@ -75,14 +75,14 @@ private:
 };
 
 template<typename Archive>
-void load(Archive &ar, PointClass &pt, const unsigned int version) {
+void load(Archive &ar, PointClass &pt, const unsigned int) {
     int x, y;
     ar >> x >> y;
     pt = PointClass(x, y);
 }
 
 template<typename Archive>
-void save(Archive &ar, PointClass const &pt, const unsigned int version) {
+void save(Archive &ar, PointClass const &pt, const unsigned int) {
     ar << pt.getX() << pt.getY();
 }
 // This tells HPX that you have spilt your serialize function into
@@ -98,7 +98,7 @@ void send_rectangle_struct(RectangleFREE rectangle) {
 
 HPX_PLAIN_ACTION(send_rectangle_struct);
 
-int main(int argc, char *argv[]) {
+int main() {
     send_rectangle_struct_action rectangle_action;
     auto rectangle = RectangleFREE{{0,0},{0,5}};
     hpx::async(rectangle_action, hpx::find_here(), rectangle).wait();
