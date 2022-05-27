@@ -398,6 +398,6 @@ namespace hpx { namespace util {
         hpx::iostreams::ostream<Char, Sink>& os, std::string const& format_str,
         Args const&... args)
     {
-        return os << format(format_str, args...);
+        return os << hpx::util::format(format_str, args...);
     }
 }}    // namespace hpx::util
