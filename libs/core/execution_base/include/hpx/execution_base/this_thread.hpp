@@ -72,24 +72,24 @@ namespace hpx { namespace execution_base {
         }
 
         // [exec.sched_queries.execute_may_block_caller]
-        // 1. `this_thread::execute_may_block_caller` is used to ask a scheduler s whether a
-        // call `execution::execute(s, f)` with any invocable f may block the thread where
-        // such a call occurs.
+        // 1. `this_thread::execute_may_block_caller` is used to ask a scheduler s
+        // whether a call `execution::execute(s, f)` with any invocable f
+        // may block the thread where such a call occurs.
         //
         // 2. The name `this_thread::execute_may_block_caller` denotes a
         // customization point object. For some subexpression s, let S be decltype((s)).
         // If S does not satisfy `execution::scheduler`,
         // `this_thread::execute_may_block_caller` is ill-formed. Otherwise,
         // `this_thread::execute_may_block_caller(s)` is expression equivalent to:
-        //      1. `tag_invoke(this_thread::execute_may_block_caller, as_const(s))`, if this
-        //          expression is well formed.
+        //      1. `tag_invoke(this_thread::execute_may_block_caller, as_const(s))`,
+        //          if this expression is well formed.
         //      -- Mandates: The tag_invoke expression above is not
         //          potentially throwing and its type is bool.
         //      2. Otherwise, true.
         //
-        // 3. If `this_thread::execute_may_block_caller(s)` for some scheduler s returns false,
-        // no execution::execute(s, f) call with some invocable f shall block the
-        // calling thread.
+        // 3. If `this_thread::execute_may_block_caller(s)` for some scheduler s
+        // returns false, no execution::execute(s, f) call with some invocable f
+        // shall block the calling thread.
         HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
             execute_may_block_caller_t final
           : hpx::functional::detail::tag_fallback_noexcept<

@@ -61,7 +61,8 @@ namespace hpx::execution::experimental {
     //      2. `tag_invoke(execution::get_forward_progress_guarantee, as_const(s))`,
     // if this expression is well formed.
     //          Mandates: The tag_invoke expression above is not
-    //          potentially throwing and its type is execution::forward_progress_guarantee.
+    //          potentially throwing and its type is
+    //          execution::forward_progress_guarantee.
     //          Otherwise, execution::forward_progress_guarantee::weakly_parallel.
     // 3. If `execution::get_forward_progress_guarantee(s)` for some scheduler s returns
     // `execution::forward_progress_guarantee::concurrent`, all execution agents
