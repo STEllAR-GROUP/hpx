@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2019 Austin McCartney
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/boost_iterator_categories.hpp>
-#include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/equality.hpp>
 
 #include <iterator>
@@ -21,7 +20,7 @@ namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         // This implementation of is_iterator seems to work fine even for
-        // VS2013 which has an implementation of std::iterator_traits which is
+        // VS2013 which has an implementation of std::iterator_traits that is
         // SFINAE-unfriendly.
         template <typename T>
         struct is_iterator
@@ -54,8 +53,7 @@ namespace hpx { namespace traits {
 
         template <typename T, typename U>
         struct addition_result<T, U,
-            typename util::always_void<decltype(
-                std::declval<T>() + std::declval<U>())>::type>
+            std::void_t<decltype(std::declval<T>() + std::declval<U>())>>
         {
             using type = decltype(std::declval<T>() + std::declval<U>());
         };
@@ -67,7 +65,7 @@ namespace hpx { namespace traits {
 
         template <typename T>
         struct dereference_result<T,
-            typename util::always_void<decltype(*(std::declval<T&>()))>::type>
+            std::void_t<decltype(*(std::declval<T&>()))>>
         {
             using type = decltype(*(std::declval<T&>()));
         };
@@ -79,8 +77,7 @@ namespace hpx { namespace traits {
 
         template <typename T, typename U>
         struct inplace_addition_result<T, U,
-            typename util::always_void<decltype(
-                std::declval<T>() += std::declval<U>())>::type>
+            std::void_t<decltype(std::declval<T>() += std::declval<U>())>>
         {
             using type = decltype(std::declval<T>() += std::declval<U>());
         };
@@ -92,8 +89,7 @@ namespace hpx { namespace traits {
 
         template <typename T, typename U>
         struct inplace_subtraction_result<T, U,
-            typename util::always_void<decltype(
-                std::declval<T>() -= std::declval<U>())>::type>
+            std::void_t<decltype(std::declval<T>() -= std::declval<U>())>>
         {
             using type = decltype(std::declval<T>() -= std::declval<U>());
         };
@@ -105,7 +101,7 @@ namespace hpx { namespace traits {
 
         template <typename T>
         struct predecrement_result<T,
-            typename util::always_void<decltype(--std::declval<T&>())>::type>
+            std::void_t<decltype(--std::declval<T&>())>>
         {
             using type = decltype(--std::declval<T&>());
         };
@@ -117,7 +113,7 @@ namespace hpx { namespace traits {
 
         template <typename T>
         struct preincrement_result<T,
-            typename util::always_void<decltype(++std::declval<T&>())>::type>
+            std::void_t<decltype(++std::declval<T&>())>>
         {
             using type = decltype(++std::declval<T&>());
         };
@@ -129,7 +125,7 @@ namespace hpx { namespace traits {
 
         template <typename T>
         struct postdecrement_result<T,
-            typename util::always_void<decltype(std::declval<T&>()--)>::type>
+            std::void_t<decltype(std::declval<T&>()--)>>
         {
             using type = decltype(std::declval<T&>()--);
         };
@@ -141,7 +137,7 @@ namespace hpx { namespace traits {
 
         template <typename T>
         struct postincrement_result<T,
-            typename util::always_void<decltype(std::declval<T&>()++)>::type>
+            std::void_t<decltype(std::declval<T&>()++)>>
         {
             using type = decltype(std::declval<T&>()++);
         };
@@ -153,8 +149,7 @@ namespace hpx { namespace traits {
 
         template <typename T, typename U>
         struct subscript_result<T, U,
-            typename util::always_void<decltype(
-                std::declval<T&>()[std::declval<U>()])>::type>
+            std::void_t<decltype(std::declval<T&>()[std::declval<U>()])>>
         {
             using type = decltype(std::declval<T&>()[std::declval<U>()]);
         };
@@ -166,8 +161,7 @@ namespace hpx { namespace traits {
 
         template <typename T, typename U>
         struct subtraction_result<T, U,
-            typename util::always_void<decltype(
-                std::declval<T>() - std::declval<U>())>::type>
+            std::void_t<decltype(std::declval<T>() - std::declval<U>())>>
         {
             using type = decltype(std::declval<T>() - std::declval<U>());
         };
@@ -180,13 +174,13 @@ namespace hpx { namespace traits {
 
         template <typename Iter>
         struct bidirectional_concept<Iter,
-            typename util::always_void<typename dereference_result<Iter>::type,
+            std::void_t<typename dereference_result<Iter>::type,
                 typename equality_result<Iter, Iter>::type,
                 typename inequality_result<Iter, Iter>::type,
                 typename predecrement_result<Iter>::type,
                 typename preincrement_result<Iter>::type,
                 typename postdecrement_result<Iter>::type,
-                typename postincrement_result<Iter>::type>::type>
+                typename postincrement_result<Iter>::type>>
           : std::integral_constant<bool,
                 std::is_convertible<bool,
                     typename equality_result<Iter, Iter>::type>::value &&
@@ -211,7 +205,7 @@ namespace hpx { namespace traits {
 
         template <typename Iter>
         struct random_access_concept<Iter,
-            typename util::always_void<typename dereference_result<Iter>::type,
+            std::void_t<typename dereference_result<Iter>::type,
                 typename subscript_result<Iter,
                     typename std::iterator_traits<Iter>::difference_type>::type,
                 typename addition_result<Iter,
@@ -223,7 +217,7 @@ namespace hpx { namespace traits {
                 typename subtraction_result<Iter, Iter>::type,
                 typename inplace_subtraction_result<Iter,
                     typename std::iterator_traits<Iter>::difference_type>::
-                    type>::type>
+                    type>>
           : std::integral_constant<bool,
                 bidirectional_concept<Iter>::value &&
                     std::is_same<typename dereference_result<Iter>::type,
@@ -538,8 +532,8 @@ namespace hpx { namespace traits {
           : std::integral_constant<bool,
                 std::is_same<decltype(std::declval<std::vector<T>&>().begin()),
                     Iter>::value ||
-                    std::is_same<decltype(
-                                     std::declval<std::vector<T>&>().cbegin()),
+                    std::is_same<
+                        decltype(std::declval<std::vector<T>&>().cbegin()),
                         Iter>::value>
         {
         };
