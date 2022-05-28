@@ -119,7 +119,7 @@ HPX_PLAIN_ACTION(send_rectangle_struct);
 class PlanetWeightCalculator
 {
 public:
-    PlanetWeightCalculator(double g)
+    explicit PlanetWeightCalculator(double g)
       : g(g)
     {
     }
@@ -134,7 +134,7 @@ public:
     }
 
     template <class Archive>
-    void serialize(Archive& ar, const unsigned int version)
+    void serialize(Archive& ar, const unsigned int)
     {
         // Serialization will be done in the save_construct_data
         // Still needs to be defined
@@ -184,6 +184,6 @@ int main()
     hpx::async(rectangle_action, hpx::find_here(), rectangle).wait();
     send_gravity_action gravityAction;
     auto gravity = PlanetWeightCalculator(9.81);
-    hpx::async(gravityAction, locs[1], gravity).wait();
+    hpx::async(gravityAction, hpx::find_here(), gravity).wait();
 }
 //]
