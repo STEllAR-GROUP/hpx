@@ -291,7 +291,7 @@ function(hpx_construct_library_list link_libraries link_options library_list)
     if(IS_ABSOLUTE ${library})
       get_filename_component(_library_path ${library} DIRECTORY)
       get_filename_component(_library_name ${library} NAME_WE)
-      string(REPLACE ${CMAKE_SHARED_LIBRARY_PREFIX} "" _library_name
+      string(REPLACE "${CMAKE_SHARED_LIBRARY_PREFIX}" "" _library_name
                      ${_library_name}
       )
       set(_library_list

@@ -179,6 +179,9 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename Scheduler>
     inline constexpr bool is_scheduler_v = is_scheduler<Scheduler>::value;
 
+    template <typename S>
+    using schedule_result_t = hpx::util::invoke_result_t<schedule_t, S>;
+
     template <typename S, typename R>
     using connect_result_t = hpx::util::invoke_result_t<connect_t, S, R>;
 }}}    // namespace hpx::execution::experimental
