@@ -22,6 +22,7 @@
 #include <hpx/include/compute.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/program_options/options_description.hpp>
 
 #include <algorithm>
@@ -87,7 +88,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         comm.set(communicator_type::right, U[0][Nx - 1], 0);
     }
 
-    auto range = boost::irange(static_cast<std::size_t>(0), nlp);
+    auto range = hpx::util::detail::make_counting_shape(nlp);
 
     executor_type executor(numa_domains);
     auto policy = hpx::execution::par.on(executor);

@@ -1,71 +1,60 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/compute/host/target.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/actions_base/plain_action.hpp>
+#include <hpx/compute/host/distributed_target.hpp>
+#include <hpx/compute/host/get_targets.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/async_distributed.hpp>
+#include <hpx/naming_base/id_type.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/runtime_distributed/find_here.hpp>
 #include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/topology/topology.hpp>
 
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/actions_base/plain_action.hpp>
-#include <hpx/modules/async_distributed.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime_distributed/find_here.hpp>
-#endif
-
-#include <cstddef>
 #include <vector>
 
-// this file requires serializing threads::mask_type
-#if defined(HPX_HAVE_MORE_THAN_64_THREADS) ||                                  \
-    (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT > 64)
-#if defined(HPX_HAVE_MAX_CPU_COUNT)
-#include <hpx/serialization/bitset.hpp>
-#include <bitset>
-#else
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
-#include <hpx/datastructures/serialization/dynamic_bitset.hpp>
-#endif
-#endif
-
-namespace hpx { namespace compute { namespace host {
-    std::vector<target> get_local_targets()
-    {
-        std::size_t num_os_threads = hpx::get_os_thread_count();
-
-        std::vector<target> targets;
-        targets.reserve(num_os_threads);
-
-        auto& rp = hpx::resource::get_partitioner();
-        for (std::size_t num_thread = 0; num_thread != num_os_threads;
-             ++num_thread)
-        {
-            targets.emplace_back(rp.get_pu_mask(num_thread));
-        }
-
-        return targets;
-    }
-}}}    // namespace hpx::compute::host
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 HPX_PLAIN_ACTION(
     hpx::compute::host::get_local_targets, compute_host_get_targets_action)
 
-namespace hpx { namespace compute { namespace host {
-    hpx::future<std::vector<target>> get_targets(hpx::id_type const& locality)
+namespace hpx::compute::host::distributed {
+
+    namespace detail {
+
+        std::vector<host::distributed::target> get_remote_targets(
+            std::vector<host::target> const& targets)
+        {
+            std::vector<host::distributed::target> remote_targets;
+            remote_targets.reserve(targets.size());
+            for (auto&& t : targets)
+            {
+                remote_targets.push_back(host::distributed::target(t));
+            }
+            return remote_targets;
+        }
+    }    // namespace detail
+
+    hpx::future<std::vector<host::distributed::target>> get_targets(
+        hpx::id_type const& locality)
     {
         if (locality == hpx::find_here())
-            return hpx::make_ready_future(get_local_targets());
+        {
+            return hpx::make_ready_future(
+                detail::get_remote_targets(get_local_targets()));
+        }
 
-        return hpx::async(compute_host_get_targets_action(), locality);
+        return hpx::async(compute_host_get_targets_action(), locality)
+            .then([](auto&& f) { return detail::get_remote_targets(f.get()); });
     }
-}}}    // namespace hpx::compute::host
+}    // namespace hpx::compute::host::distributed
+
 #endif

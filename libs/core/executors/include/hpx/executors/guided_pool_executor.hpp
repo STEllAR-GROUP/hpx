@@ -12,6 +12,7 @@
 #include <hpx/executors/dataflow.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/futures/traits/is_future_tuple.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 
@@ -59,10 +60,13 @@ namespace hpx { namespace parallel { namespace execution {
         // --------------------------------------------------------------------
         struct future_extract_value
         {
-            template <typename T, template <typename> class Future>
-            const T& operator()(const Future<T>& el) const
+            template <typename Future,
+                typename Enable = std::enable_if_t<
+                    hpx::traits::is_future_v<std::decay_t<Future>>>>
+            decltype(auto) operator()(Future&& el) const
             {
-                const auto& state = hpx::traits::detail::get_shared_state(el);
+                auto const& state = hpx::traits::detail::get_shared_state(
+                    HPX_FORWARD(Future, el));
                 return *state->get_result();
             }
         };
@@ -172,8 +176,8 @@ namespace hpx { namespace parallel { namespace execution {
                 int domain = -1;
 #else
                 // get the argument for the numa hint function from the predecessor future
-                const auto& predecessor_value =
-                    detail::future_extract_value()(predecessor);
+                const auto& predecessor_value = detail::future_extract_value()(
+                    HPX_FORWARD(Future, predecessor));
                 int domain = numa_function_(predecessor_value, ts...);
 #endif
 
@@ -307,8 +311,7 @@ namespace hpx { namespace parallel { namespace execution {
             // before passing the task onwards to the real executor
             return dataflow(launch::sync,
                 detail::pre_execution_async_domain_schedule<
-                    typename std::decay<typename std::remove_pointer<decltype(
-                        this)>::type>::type,
+                    std::decay_t<std::remove_pointer_t<decltype(this)>>,
                     pool_numa_hint<Tag>>{*this, hint_, hp_sync_},
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
@@ -418,9 +421,7 @@ namespace hpx { namespace parallel { namespace execution {
                         guided_pool_executor, pool_numa_hint<Tag>>
                         pre_exec{*this, hint_, hp_sync_};
 
-                    return pre_exec(HPX_MOVE(f),
-                        std::forward<OuterFuture<hpx::tuple<InnerFutures...>>>(
-                            predecessor));
+                    return pre_exec(HPX_MOVE(f), HPX_MOVE(predecessor));
                 },
                 std::forward<OuterFuture<hpx::tuple<InnerFutures...>>>(
                     predecessor),

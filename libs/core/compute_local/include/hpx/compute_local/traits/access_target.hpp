@@ -8,4 +8,9 @@
 
 #pragma once
 
-#include <hpx/compute_local/traits.hpp>
+#include <hpx/config.hpp>
+
+namespace hpx::compute::traits {
+    template <typename Target, typename Enable = void>
+    struct access_target;
+}    // namespace hpx::compute::traits

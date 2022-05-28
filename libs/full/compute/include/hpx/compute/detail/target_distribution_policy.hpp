@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/compute/host/get_targets.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
@@ -18,6 +19,7 @@
 #include <vector>
 
 namespace hpx { namespace compute { namespace detail {
+
     /// This class specifies the parameters for a simple distribution policy
     /// to use for creating (and evenly distributing) a given number of items
     /// on a given set of localities.
@@ -94,7 +96,8 @@ namespace hpx { namespace compute { namespace detail {
             if (targets_.empty())
             {
                 hpx::util::ignore_lock(&mtx_);
-                targets_ = Target::get_local_targets();
+                targets_ = host::distributed::detail::get_remote_targets(
+                    Target::get_local_targets());
             }
 
             std::size_t num_parts = (num_partitions_ == std::size_t(-1)) ?
@@ -115,7 +118,11 @@ namespace hpx { namespace compute { namespace detail {
         {
             std::lock_guard<mutex_type> l(mtx_);
             if (targets_.empty())
-                targets_ = Target::get_local_targets();
+            {
+                targets_ =
+                    compute::host::distributed::detail::get_remote_targets(
+                        Target::get_local_targets());
+            }
 
             // this distribution policy places an equal number of items onto
             // each target
@@ -164,7 +171,9 @@ namespace hpx { namespace compute { namespace detail {
         template <typename Archive>
         void serialize(Archive& ar, unsigned int const)
         {
-            ar& targets_& num_partitions_;
+            // clang-format off
+            ar & targets_ & num_partitions_;
+            // clang-format on
         }
 
         mutable mutex_type mtx_;

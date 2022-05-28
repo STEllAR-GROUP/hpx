@@ -7,6 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/compute/host.hpp>
-#include <hpx/compute_local/serialization/vector.hpp>
-#include <hpx/compute_local/vector.hpp>
+
+#include <vector>
+
+namespace hpx::compute::host {
+
+    struct HPX_CORE_EXPORT target;
+
+    HPX_CORE_EXPORT std::vector<target> get_local_targets();
+}    // namespace hpx::compute::host
