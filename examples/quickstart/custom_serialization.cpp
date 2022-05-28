@@ -115,10 +115,75 @@ void send_rectangle_struct(RectangleFREE rectangle)
 
 HPX_PLAIN_ACTION(send_rectangle_struct);
 
+//[PlanetWeightCalculator
+class PlanetWeightCalculator
+{
+public:
+    PlanetWeightCalculator(double g)
+      : g(g)
+    {
+    }
+
+    template <class Archive>
+    friend void save_construct_data(
+        Archive&, PlanetWeightCalculator const*, unsigned int);
+
+    [[nodiscard]] double getG() const
+    {
+        return g;
+    }
+
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version)
+    {
+        // Serialization will be done in the save_construct_data
+        // Still needs to be defined
+    }
+
+private:
+    friend class hpx::serialization::access;
+
+    double g;
+};
+//]
+
+//[save_construct_data
+template <class Archive>
+inline void save_construct_data(
+    Archive& ar, PlanetWeightCalculator const* weight_calc, const unsigned int)
+{
+    ar << weight_calc->g;    // Do all of your serialization here
+}
+
+template <class Archive>
+inline void load_construct_data(
+    Archive& ar, PlanetWeightCalculator* weight_calc, const unsigned int)
+{
+    double g;
+    ar >> g;
+    ::new (weight_calc) PlanetWeightCalculator(
+        g);    // ::new(ptr) construct new object at given address
+}
+//]
+
+void send_gravity(PlanetWeightCalculator gravity)
+{
+    std::cout << "gravity.g = " << gravity.getG() << std::flush;
+}
+
+HPX_PLAIN_ACTION(send_gravity);
+
+//[Main
 int main()
 {
+    // Needs at least two localities to run
+    // When sending to your locality, no serialization is done
     send_rectangle_struct_action rectangle_action;
+    auto locs = hpx::find_all_localities();
     auto rectangle = RectangleFREE{{0, 0}, {0, 5}};
     hpx::async(rectangle_action, hpx::find_here(), rectangle).wait();
+    send_gravity_action gravityAction;
+    auto gravity = PlanetWeightCalculator(9.81);
+    hpx::async(gravityAction, locs[1], gravity).wait();
 }
 //]

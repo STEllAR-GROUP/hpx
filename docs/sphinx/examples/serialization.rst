@@ -19,6 +19,9 @@ Just like boost, hpx allows users to serialize user-defined types by either
 providing the serializer as a member function or defining the serialization as a
 free function.
 
+This is tutorial was heavily inspired by
+`Boost's serialization concept <https://www.boost.org/doc/libs/1_79_0/libs/serialization/doc/serialization.html>`_.
+
 Setup
 =====
 
@@ -45,6 +48,7 @@ This should print:
 .. code-block:: text
 
    Rectangle(Point(x=0,y=0),Point(x=0,y=5))
+   gravity.g = 9.81%
 
 
 
@@ -78,10 +82,30 @@ of free function serializers.
    :start-after: //[RectangleFREE
    :end-before: //]
 
-Even if you can't modify a class to befriend it, you can still be able to serialize your
-class provided that your class is default constructable and you are able to reconstruct it yourself.
+Even if you can't modify a class to befriend it, you can still be able to
+serialize your class provided that your class is default constructable
+and you are able to reconstruct it yourself.
 
 .. literalinclude:: ../../examples/quickstart/custom_serialization.cpp
    :language: c++
    :start-after: //[PointClass
+   :end-before: //]
+
+
+Serializing non default constructable classes
+----------------------------------------------
+
+Some classes don't provide any default constructor.
+
+.. literalinclude:: ../../examples/quickstart/custom_serialization.cpp
+   :language: c++
+   :start-after: //[PlanetWeightCalculator
+   :end-before: //]
+
+In this case you have to define a save_construct_data and load_construct_data in which you
+do the serialization yourself.
+
+.. literalinclude:: ../../examples/quickstart/custom_serialization.cpp
+   :language: c++
+   :start-after: //[save_construct_data
    :end-before: //]
