@@ -172,6 +172,7 @@ Breaking changes
 - CMake version required updated to 3.18.
 - The default version of Asio used was updated to 1.20.0.
 - The default version of APEX used was updated to 2.5.1.
+- APEX version was updated to 2.5.1.
 - ``tagged_pair`` and ``tagged_tuple`` were removed.
 - ``tag_dispatch`` was renamed to ``tag_invoke``.
 - ``hpx.max_backgroud_threads`` was renamed to ``hpx.parcel.max_background_threads``.
