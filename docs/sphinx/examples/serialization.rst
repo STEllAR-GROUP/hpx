@@ -20,13 +20,13 @@ providing the serializer as a member function or defining the serialization as a
 free function.
 
 This is tutorial was heavily inspired by
-`Boost's serialization concept <https://www.boost.org/doc/libs/1_79_0/libs/serialization/doc/serialization.html>`_.
+`Boost's serialization concepts <https://www.boost.org/doc/libs/1_79_0/libs/serialization/doc/serialization.html>`_.
 
 Setup
 =====
 
 The source code for this example can be found here:
-:download:`hello_world_distributed.cpp
+:download:`custom_serialization.cpp
 <../../examples/quickstart/custom_serialization.cpp>`.
 
 To compile this program, go to your |hpx| build directory (see
@@ -51,6 +51,19 @@ This should print:
    gravity.g = 9.81%
 
 
+Serialization Requirements
+===========================
+In order to serialize objects in HPX,at least one of the following criteria must be met:
+
+In the case of default constructible objects:
+
+* The object is default constructible and is an empty type.
+* Has a serialization function as shown in this tutorial.
+* All members are accessible publicly and they can be used in structured binding contexts.
+
+Otherwise:
+
+* They need to have  :ref:`special serialization support <Serializing non default constructable classes>`.
 
 Member function serialization
 -----------------------------
@@ -94,6 +107,7 @@ and you are able to reconstruct it yourself.
 
 Serializing non default constructable classes
 ----------------------------------------------
+.. _non-default_constructable
 
 Some classes don't provide any default constructor.
 
@@ -102,7 +116,7 @@ Some classes don't provide any default constructor.
    :start-after: //[PlanetWeightCalculator
    :end-before: //]
 
-In this case you have to define a save_construct_data and load_construct_data in which you
+In this case you have to define a ``save_construct_data`` and ``load_construct_data`` in which you
 do the serialization yourself.
 
 .. literalinclude:: ../../examples/quickstart/custom_serialization.cpp
