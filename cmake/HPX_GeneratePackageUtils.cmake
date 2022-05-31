@@ -79,7 +79,7 @@ function(
       )
     else()
       set(_libraries
-          $<INSTALL_INTERFACE:-L${CMAKE_INSTALL_LIBDIR};-l$<TARGET_FILE_BASE_NAME:${target}>>$<BUILD_INTERFACE:$<TARGET_FILE:${target}>>
+          $<INSTALL_INTERFACE:-L${CMAKE_INSTALL_LIBDIR};-l$<TARGET_FILE_BASE_NAME:$<TARGET_NAME:${target}>>>$<BUILD_INTERFACE:$<TARGET_FILE:${target}>>
       )
     endif()
   else()
@@ -101,7 +101,7 @@ function(
           )
             set(_libraries
                 ${_libraries}
-                $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/$<TARGET_FILE_NAME:${target}>>$<BUILD_INTERFACE:$<TARGET_FILE:${target}>>
+                $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/$<TARGET_FILE_NAME:$<TARGET_NAME:${target}>>>$<BUILD_INTERFACE:$<TARGET_FILE:${target}>>
             )
           endif()
         elseif("${dep_target}" MATCHES "^-l")
