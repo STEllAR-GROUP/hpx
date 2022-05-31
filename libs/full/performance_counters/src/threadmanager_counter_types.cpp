@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2015 Patricia Grubel
@@ -261,7 +261,7 @@ namespace hpx { namespace performance_counters { namespace detail {
             return false;
         }
 
-        if (mode == discover_counters_minimal ||
+        if (mode == discover_counters_mode::minimal ||
             p.parentinstancename_.empty() || p.instancename_.empty())
         {
             if (p.parentinstancename_.empty())
@@ -285,7 +285,7 @@ namespace hpx { namespace performance_counters { namespace detail {
             p.instancename_ = "allocator#*";
             p.instanceindex_ = -1;
 
-            if (mode == discover_counters_full)
+            if (mode == discover_counters_mode::full)
             {
                 for (std::size_t t = 0; t != HPX_COROUTINE_NUM_ALL_HEAPS; ++t)
                 {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011-2012 Maciej Brodowicz
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -116,7 +116,7 @@ namespace hpx { namespace performance_counters { namespace papi {
         std::uint32_t tix = 0;
         while (!((label = tm.get_thread_label(tix++)).empty()))
         {
-            if (mode == discover_counters_minimal)
+            if (mode == discover_counters_mode::minimal)
             {
                 size_t pos = label.find_last_of('#');
                 if (pos == label.npos)

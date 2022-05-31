@@ -214,7 +214,7 @@ namespace hpx::plugins::parcel {
         performance_counters::discover_counter_func const& f,
         performance_counters::discover_counters_mode mode, error_code& ec)
     {
-        if (mode == performance_counters::discover_counters_minimal ||
+        if (mode == performance_counters::discover_counters_mode::minimal ||
             p.parentinstancename_.empty() || p.instancename_.empty())
         {
             if (p.parentinstancename_.empty())
@@ -232,7 +232,7 @@ namespace hpx::plugins::parcel {
 
         if (p.parameters_.empty())
         {
-            if (mode == performance_counters::discover_counters_minimal)
+            if (mode == performance_counters::discover_counters_mode::minimal)
             {
                 std::string fullname;
                 performance_counters::get_counter_name(p, fullname, ec);

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -150,7 +150,7 @@ namespace hpx { namespace performance_counters {
                 return counter_status::counter_type_unknown;
             }
 
-            if (mode == discover_counters_full)
+            if (mode == discover_counters_mode::full)
             {
                 using hpx::placeholders::_1;
                 discover_counter = hpx::bind(
@@ -173,7 +173,7 @@ namespace hpx { namespace performance_counters {
             if (ec)
                 return counter_status::invalid_data;
 
-            if (mode == discover_counters_full)
+            if (mode == discover_counters_mode::full)
             {
                 using hpx::placeholders::_1;
                 discover_counter = hpx::bind(
@@ -246,7 +246,7 @@ namespace hpx { namespace performance_counters {
         // Introducing this temporary silence a report about a potential memory
         // from clang's static analyzer
         discover_counter_func discover_counter_;
-        if (mode == discover_counters_full)
+        if (mode == discover_counters_mode::full)
         {
             using hpx::placeholders::_1;
             discover_counter_ = hpx::bind(&expand_counter_info, _1,
