@@ -5,7 +5,7 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-|circleci_status| |codacy| |coveralls| |CFF| |JOSS| |zenodo_doi|
+|circleci_status| |codacy| |coveralls| |OpenSSF| |CFF| |JOSS| |zenodo_doi|
 
 Documentation: `latest
 <https://hpx-docs.stellar-group.org/latest/html/index.html>`_,
@@ -162,3 +162,7 @@ Past and current funding and support for HPX is listed `here
 .. |CFF| image:: https://github.com/STEllAR-GROUP/hpx/actions/workflows/cff-validator.yml/badge.svg
     :target: https://github.com/STEllAR-GROUP/hpx/actions/workflows/cff-validator.yml
     :alt: Citations file for HPX
+
+.. |OpenSSF| image:: https://bestpractices.coreinfrastructure.org/projects/6093/badge
+    :target: https://bestpractices.coreinfrastructure.org/projects/6093
+    :alt: OpenSSF Best Practices
