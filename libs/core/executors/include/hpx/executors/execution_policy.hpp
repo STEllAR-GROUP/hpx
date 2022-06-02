@@ -2912,4 +2912,59 @@ namespace hpx { namespace detail {
     {
     };
     /// \endcond
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \cond NOINTERNAL
+    template <>
+    struct is_unsequenced_execution_policy<hpx::execution::unsequenced_policy>
+      : std::true_type
+    {
+    };
+
+    template <>
+    struct is_unsequenced_execution_policy<
+        hpx::execution::unsequenced_task_policy> : std::true_type
+    {
+    };
+
+    template <>
+    struct is_unsequenced_execution_policy<
+        hpx::execution::parallel_unsequenced_policy> : std::true_type
+    {
+    };
+
+    template <>
+    struct is_unsequenced_execution_policy<
+        hpx::execution::parallel_unsequenced_task_policy> : std::true_type
+    {
+    };
+
+    template <typename Executor, typename Parameters>
+    struct is_unsequenced_execution_policy<
+        hpx::execution::unsequenced_policy_shim<Executor, Parameters>>
+      : std::true_type
+    {
+    };
+
+    template <typename Executor, typename Parameters>
+    struct is_unsequenced_execution_policy<
+        hpx::execution::parallel_unsequenced_policy_shim<Executor, Parameters>>
+      : std::true_type
+    {
+    };
+
+    template <typename Executor, typename Parameters>
+    struct is_unsequenced_execution_policy<
+        hpx::execution::unsequenced_task_policy_shim<Executor, Parameters>>
+      : std::true_type
+    {
+    };
+
+    template <typename Executor, typename Parameters>
+    struct is_unsequenced_execution_policy<hpx::execution::
+            parallel_unsequenced_task_policy_shim<Executor, Parameters>>
+      : std::true_type
+    {
+    };
+    /// \endcond
 }}    // namespace hpx::detail

@@ -47,6 +47,10 @@ namespace hpx { namespace detail {
     {
     };
 
+    template <typename Bound>
+    inline constexpr bool is_bound_algorithm_v =
+        is_bound_algorithm<Bound>::value;
+
     // Helper function for use in creating overloads of parallel algorithms that
     // take senders. Takes an execution policy, a predecessor sender, and an
     // "algorithm" (i.e. a tag) and applies then with the predecessor
@@ -99,11 +103,10 @@ namespace hpx { namespace detail {
         // clang-format off
         template <typename Predecessor, typename ExPolicy,
             HPX_CONCEPT_REQUIRES_(
-                std::conjunction_v<
-                    hpx::is_execution_policy<ExPolicy>,
-                    std::negation<detail::is_bound_algorithm<Predecessor>>,
-                    hpx::execution::experimental::is_sender<
-                        std::decay_t<Predecessor>>>
+                hpx::is_execution_policy_v<ExPolicy> &&
+               !detail::is_bound_algorithm_v<Predecessor> &&
+                hpx::execution::experimental::is_sender_v<
+                    std::decay_t<Predecessor>>
             )>
         // clang-format on
         friend auto tag_fallback_invoke(
@@ -114,8 +117,12 @@ namespace hpx { namespace detail {
                 HPX_FORWARD(ExPolicy, policy));
         }
 
+        // clang-format off
         template <typename ExPolicy,
-            HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value)>
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy>
+            )>
+        // clang-format on
         friend auto tag_fallback_invoke(Tag, ExPolicy&& policy)
         {
             return hpx::execution::experimental::detail::partial_algorithm<Tag,
