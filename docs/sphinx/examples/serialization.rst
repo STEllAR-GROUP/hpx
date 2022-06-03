@@ -19,6 +19,9 @@ Just like boost, hpx allows users to serialize user-defined types by either
 providing the serializer as a member function or defining the serialization as a
 free function.
 
+**Unlike Boost HPX doesn't acknowledge second unsigned int parameter, it is solely there to preserve
+API compatibility with Boost Serialization**
+
 This is tutorial was heavily inspired by
 `Boost's serialization concepts <https://www.boost.org/doc/libs/1_79_0/libs/serialization/doc/serialization.html>`_.
 
@@ -73,7 +76,8 @@ Member function serialization
    :start-after: //[PointMemberSerialization
    :end-before: //]
 
-
+Notice that ``PointMemberSerialization`` is defined as bitwise serializable
+(see :ref:`bitwise_serialization` for more details).
 HPX is also able to recursively serialize composite classes and structs
 given that its members are serializable.
 
@@ -122,4 +126,21 @@ do the serialization yourself.
 .. literalinclude:: ../../examples/quickstart/custom_serialization.cpp
    :language: c++
    :start-after: //[save_construct_data
+   :end-before: //]
+
+.. _bitwise_serialization:
+
+Bitwise serialization for arithmatic data
+-----------------------------------------
+
+When sending non arithmatic types not defined by
+`std::is_arithmatic <https://en.cppreference.com/w/cpp/types/is_arithmetic>`_, HPX has to (de)serialize each object separately.
+However, if the class you are trying to send consists only of arithmatic datatypes, you may mark your class as such.
+Then HPX will serialize your object bitwise instead of element wise.
+This has enormous benefits, especially when sending a vector/array of your class.
+To define your class as such you need to call ``HPX_IS_BITWISE_SERIALIZABLE(T)`` with your desired custom class.
+
+.. literalinclude:: ../../examples/quickstart/custom_serialization.cpp
+   :language: c++
+   :start-after: //[PointMemberSerialization
    :end-before: //]

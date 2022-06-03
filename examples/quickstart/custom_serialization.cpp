@@ -20,9 +20,13 @@ struct PointMemberSerialization
     int x{0};
     int y{0};
 
-    // Required when defining private fields
-    friend class hpx::serialization::access;    // Provide member access to HPX
+    // Required when defining the serialization function as private
+    // In this case it isn't
+    // Provides serialization access to HPX
+    friend class hpx::serialization::access;
 
+    // Second argument exists soley for compatibity with boost serialize
+    // it is NOT procced by HPX in any way.
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int)
     {
@@ -31,6 +35,8 @@ struct PointMemberSerialization
         // clang-format on
     }
 };
+// Allow bitwise serialization
+HPX_IS_BITWISE_SERIALIZABLE(PointMemberSerialization)
 //]
 
 //[RectangleMemberSerialization
@@ -42,7 +48,9 @@ struct RectangleMemberSerialization
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int)
     {
-        ar& top_left& lower_right;
+        // clang-format off
+        ar & top_left & lower_right;
+        // clang-format on
     }
 };
 //]
@@ -57,7 +65,10 @@ struct RectangleFREE
 template <typename Archive>
 void serialize(Archive& ar, RectangleFREE& pt, const unsigned int)
 {
-    ar& pt.lower_right& pt.top_left;
+    // clang-format off
+    ar & pt.lower_right & pt.top_left;
+    // clang-format one
+
 }
 //]
 
@@ -135,15 +146,15 @@ public:
         return g;
     }
 
+private:
+    // Provides serialization access to HPX
+    friend class hpx::serialization::access;
     template <class Archive>
-    void serialize(Archive& ar, const unsigned int)
+    void serialize(Archive&, const unsigned int)
     {
         // Serialization will be done in the save_construct_data
         // Still needs to be defined
     }
-
-private:
-    friend class hpx::serialization::access;
 
     double g;
 };
@@ -179,9 +190,8 @@ HPX_PLAIN_ACTION(send_gravity);
 int main()
 {
     // Needs at least two localities to run
-    // When sending to your locality, no serialization is done
+    // When sending to your current locality, no serialization is done
     send_rectangle_struct_action rectangle_action;
-    auto locs = hpx::find_all_localities();
     auto rectangle = RectangleFREE{{0, 0}, {0, 5}};
     hpx::async(rectangle_action, hpx::find_here(), rectangle).wait();
     send_gravity_action gravityAction;
