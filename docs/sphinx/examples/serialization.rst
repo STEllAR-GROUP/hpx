@@ -53,7 +53,7 @@ This should print:
 
 Serialization Requirements
 ===========================
-In order to serialize objects in HPX,at least one of the following criteria must be met:
+In order to serialize objects in HPX, at least one of the following criteria must be met:
 
 In the case of default constructible objects:
 
