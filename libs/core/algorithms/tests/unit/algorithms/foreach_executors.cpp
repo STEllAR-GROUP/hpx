@@ -16,22 +16,28 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy>
-void test_executors(ExPolicy&& policy)
+void test_executors(ExPolicy&& policy, bool test_exceptions = true)
 {
     typedef std::random_access_iterator_tag iterator_tag;
 
-    test_for_each_exception(policy, iterator_tag());
-    test_for_each_bad_alloc(policy, iterator_tag());
+    if (test_exceptions)
+    {
+        test_for_each_exception(policy, iterator_tag());
+        test_for_each_bad_alloc(policy, iterator_tag());
+    }
     test_for_each(std::forward<ExPolicy>(policy), iterator_tag());
 }
 
 template <typename ExPolicy>
-void test_executors_async(ExPolicy&& p)
+void test_executors_async(ExPolicy&& p, bool test_exceptions = true)
 {
     typedef std::random_access_iterator_tag iterator_tag;
 
-    test_for_each_exception_async(p, iterator_tag());
-    test_for_each_bad_alloc_async(p, iterator_tag());
+    if (test_exceptions)
+    {
+        test_for_each_exception_async(p, iterator_tag());
+        test_for_each_bad_alloc_async(p, iterator_tag());
+    }
     test_for_each_async(std::forward<ExPolicy>(p), iterator_tag());
 }
 
@@ -45,8 +51,8 @@ void for_each_executors_test()
         test_executors(par.on(exec));
         test_executors_async(par(task).on(exec));
 
-        test_executors(par_unseq.on(exec));
-        test_executors_async(par_unseq(task).on(exec));
+        test_executors(par_unseq.on(exec), false);
+        test_executors_async(par_unseq(task).on(exec), false);
     }
 
     {
@@ -58,11 +64,11 @@ void for_each_executors_test()
         test_executors(par.on(exec));
         test_executors_async(par(task).on(exec));
 
-        test_executors(unseq.on(exec));
-        test_executors_async(unseq(task).on(exec));
+        test_executors(unseq.on(exec), false);
+        test_executors_async(unseq(task).on(exec), false);
 
-        test_executors(par_unseq.on(exec));
-        test_executors_async(par_unseq(task).on(exec));
+        test_executors(par_unseq.on(exec), false);
+        test_executors_async(par_unseq(task).on(exec), false);
     }
 }
 
