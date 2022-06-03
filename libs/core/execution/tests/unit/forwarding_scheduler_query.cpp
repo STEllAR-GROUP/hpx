@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/execution/queries/get_scheduler.hpp>
-#include <hpx/execution_base/get_env.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -20,7 +19,7 @@ namespace mylib {
       : hpx::functional::tag<non_query_t>
     {
         friend constexpr auto tag_invoke(
-            hpx::execution::experimental::forwarding_env_query_t,
+            hpx::execution::experimental::forwarding_scheduler_query_t,
             non_query_t) noexcept
         {
             return true;
@@ -31,13 +30,13 @@ namespace mylib {
 
 int main()
 {
-    static_assert(hpx::execution::experimental::forwarding_env_query(
+    static_assert(hpx::execution::experimental::forwarding_scheduler_query(
                       mylib::non_query) == true,
-        "non_query CPO is user implemented that returns true");
+        "non_query CPO is user implemented to return true");
 
-    static_assert(hpx::execution::experimental::forwarding_env_query(
+    static_assert(hpx::execution::experimental::forwarding_scheduler_query(
                       hpx::execution::experimental::get_scheduler) == false,
-        "environmental query falls back to false");
+        "invokes tag_fallback which returns false by default");
 
     return hpx::util::report_errors();
 }

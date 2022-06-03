@@ -28,10 +28,12 @@ set(tests
     executor_parameters_dispatching
     executor_parameters_timer_hooks
     forwarding_env_query
+    forwarding_scheduler_query
     future_then_executor
     minimal_async_executor
     minimal_sync_executor
     persistent_executor_parameters
+    forward_progress_guarantee
 )
 
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)

@@ -11,6 +11,8 @@
 #include <hpx/execution_base/agent_base.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
 #include <hpx/execution_base/detail/spinlock_deadlock_detection.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
@@ -68,6 +70,39 @@ namespace hpx { namespace execution_base {
         {
             agent().sleep_until(sleep_time, desc);
         }
+
+        // [exec.sched_queries.execute_may_block_caller]
+        // 1. `this_thread::execute_may_block_caller` is used to ask a scheduler s
+        // whether a call `execution::execute(s, f)` with any invocable f
+        // may block the thread where such a call occurs.
+        //
+        // 2. The name `this_thread::execute_may_block_caller` denotes a
+        // customization point object. For some subexpression s, let S be decltype((s)).
+        // If S does not satisfy `execution::scheduler`,
+        // `this_thread::execute_may_block_caller` is ill-formed. Otherwise,
+        // `this_thread::execute_may_block_caller(s)` is expression equivalent to:
+        //      1. `tag_invoke(this_thread::execute_may_block_caller, as_const(s))`,
+        //          if this expression is well formed.
+        //      -- Mandates: The tag_invoke expression above is not
+        //          potentially throwing and its type is bool.
+        //      2. Otherwise, true.
+        //
+        // 3. If `this_thread::execute_may_block_caller(s)` for some scheduler s
+        // returns false, no execution::execute(s, f) call with some invocable f
+        // shall block the calling thread.
+        HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
+            execute_may_block_caller_t final
+          : hpx::functional::detail::tag_fallback_noexcept<
+                execute_may_block_caller_t>
+        {
+            template <typename T>
+            friend constexpr HPX_FORCEINLINE bool tag_fallback_invoke(
+                execute_may_block_caller_t,
+                const hpx::util::unwrap_reference<T>&) noexcept
+            {
+                return true;
+            }
+        } execute_may_block_caller{};
     }    // namespace this_thread
 }}       // namespace hpx::execution_base
 
