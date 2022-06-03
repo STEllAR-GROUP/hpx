@@ -26,7 +26,9 @@ struct PointMemberSerialization
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int)
     {
-        ar& x& y;
+        // clang-format off
+        ar & x & y;
+        // clang-format on
     }
 };
 //]
