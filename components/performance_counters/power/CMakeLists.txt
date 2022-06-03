@@ -8,7 +8,19 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   return()
 endif()
 
-# The Power counters depend on th PWR library (http://powerapi.sandia.gov/)
+hpx_option(
+  HPX_WITH_POWER_COUNTER BOOL
+  "Enable use of performance counters based on pwr library (default: OFF)" OFF
+  ADVANCED
+  CATEGORY "Modules"
+  MODULE POWER_COUNTER
+)
+
+if(NOT HPX_WITH_POWER_COUNTER)
+  return()
+endif()
+
+# The Power counters depend on the PWR library (http://powerapi.sandia.gov/)
 find_package(PWR QUIET)
 if(NOT PWR_FOUND)
   return()
