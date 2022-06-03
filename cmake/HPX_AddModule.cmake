@@ -437,7 +437,8 @@ function(add_hpx_module libname modulename)
     elseif(MSVC)
       set(_module_target hpx_${modulename})
       target_link_libraries(
-        hpx_${libname} PRIVATE -WHOLEARCHIVE:$<TARGET_FILE:hpx_${modulename}>
+        hpx_${libname}
+        PRIVATE -WHOLEARCHIVE:$<TARGET_FILE:$<TARGET_NAME:hpx_${modulename}>>
       )
     endif()
     target_link_libraries(hpx_${libname} PRIVATE ${_module_target})
