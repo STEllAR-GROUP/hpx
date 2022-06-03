@@ -10,6 +10,9 @@
 if(NOT TARGET PWR::pwr)
   find_package(PkgConfig QUIET)
   pkg_check_modules(PC_PWR QUIET pwr)
+  if(NOT PC_PWR_FOUND)
+    pkg_check_modules(PC_PWR pwrapi QUIET)
+  endif()
 
   find_path(
     PWR_INCLUDE_DIR pwr.h

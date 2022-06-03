@@ -23,8 +23,16 @@ endif()
 # The Power counters depend on the PWR library (http://powerapi.sandia.gov/)
 find_package(PWR QUIET)
 if(NOT PWR_FOUND)
+  hpx_warning("PWR library was not found, setting HPX_WITH_POWER_COUNTER=OFF")
+  hpx_set_option(
+    HPX_WITH_POWER_COUNTER
+    VALUE OFF
+    FORCE
+  )
   return()
 endif()
+
+hpx_add_config_define(HPX_HAVE_POWER_COUNTER)
 
 set(HPX_COMPONENTS
     ${HPX_COMPONENTS} power
@@ -50,3 +58,5 @@ add_hpx_component(
 add_hpx_pseudo_dependencies(
   components.performance_counters.power power_component
 )
+
+add_subdirectory(tests)

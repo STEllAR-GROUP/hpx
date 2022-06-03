@@ -1,11 +1,11 @@
-// Copyright (c) 2012 Hartmut Kaiser
+// Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/asssert.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/runtime_local.hpp>
@@ -44,11 +44,11 @@ namespace hpx::performance_counters::power {
 
         std::uint64_t get_value(bool reset)
         {
-            std::lock_guard l(mtx);
+            std::unique_lock l(mtx);
 
             PWR_Time now = 0;
             double energy = 0.0;
-            sample_power(energy, now);
+            sample_power(l, energy, now);
 
             std::uint64_t value = std::uint64_t(
                 (energy - base_energy) / ((now - base_time) / 1000000000.0));
@@ -66,15 +66,16 @@ namespace hpx::performance_counters::power {
         // delayed initialization
         void init()
         {
-            std::lock_guard l(mtx);
+            std::unique_lock l(mtx);
 
             // Get a context
             int rc = PWR_CntxtInit(
                 PWR_CNTXT_DEFAULT, PWR_ROLE_APP, "application", &cntxt);
             if (rc != PWR_RET_SUCCESS || cntxt == nullptr)
             {
+                l.unlock();
                 HPX_THROW_EXCEPTION(bad_request, "power::init",
-                    hpx::format(
+                    hpx::util::format(
                         "PWR_CntxtInit returned error: {} (locality: {})", rc,
                         hpx::get_locality_name()));
             }
@@ -82,26 +83,30 @@ namespace hpx::performance_counters::power {
             rc = PWR_CntxtGetObjByName(cntxt, "plat.node", &obj);
             if (rc != PWR_RET_SUCCESS || obj == nullptr)
             {
+                l.unlock();
                 HPX_THROW_EXCEPTION(bad_request, "power::init",
-                    hpx::format("PWR_CntxtGetObjByName returned error: {} "
-                                "(locality: {})",
+                    hpx::util::format(
+                        "PWR_CntxtGetObjByName returned error: {} "
+                        "(locality: {})",
                         rc, hpx::get_locality_name()));
             }
 
-            sample_power(base_energy, base_time);
+            sample_power(l, base_energy, base_time);
         }
 
-        void sample_power(double& energy, PWR_Time& pwr_time)
+        template <typename Lock>
+        void sample_power(Lock& l, double& energy, PWR_Time& pwr_time)
         {
-            rc = PWR_ObjAttrGetValue(obj, PWR_ATTR_ENERGY, &energy, &pwr_time);
+            int rc =
+                PWR_ObjAttrGetValue(obj, PWR_ATTR_ENERGY, &energy, &pwr_time);
             if (rc != PWR_RET_SUCCESS)
             {
+                l.unlock();
                 HPX_THROW_EXCEPTION(bad_request, "power::sample_power",
-                    hpx::format(
+                    hpx::util::format(
                         "PWR_ObjAttrGetValue returned error: {} (locality: {})",
                         rc, hpx::get_locality_name()));
             }
-            return energy;
         }
 
     private:

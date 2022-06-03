@@ -10,6 +10,7 @@ module load llvm/11
 module load boost/1.73.0-${build_type,,}
 module load hwloc
 module load openmpi
+module load pwrapi/1.1.1
 
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="17"
@@ -24,6 +25,7 @@ configure_extra_options+=" -DHPX_WITH_PARCELPORT_LCI=ON"
 configure_extra_options+=" -DHPX_WITH_FETCH_LCI=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_LCI_BACKEND=ibv"
 configure_extra_options+=" -DHPX_WITH_LOGGING=OFF"
+configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"
 
 # Make sure HWLOC does not report 'cores'. This is purely an option to enable
 # testing the topology code under conditions close to those on FreeBSD.
