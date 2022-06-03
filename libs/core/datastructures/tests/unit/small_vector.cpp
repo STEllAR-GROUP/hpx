@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -926,7 +926,7 @@ int main()
     test::test_swap();
 
     test::vector_test<hpx::detail::small_vector<int, 1>>();
-    test::vector_test<hpx::detail::small_vector<int, 500>>();
+    test::vector_test<hpx::detail::small_vector<int, 100>>();
 
     // Emplace testing
     test::test_emplace_back<hpx::detail::small_vector<test::emplace_int, 5>>();

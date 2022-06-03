@@ -525,18 +525,21 @@ namespace hpx { namespace traits {
 
     namespace detail {
 
-        // Iterators returned from std::vector are contiguous (bydefinition)
+        // Iterators returned from std::vector are contiguous (by definition)
+
+        // different versions of clang-format disagree
+        // clang-format off
         template <typename Iter,
             typename T = typename std::iterator_traits<Iter>::value_type>
         struct is_vector_iterator
           : std::integral_constant<bool,
-                std::is_same<decltype(std::declval<std::vector<T>&>().begin()),
-                    Iter>::value ||
-                    std::is_same<
-                        decltype(std::declval<std::vector<T>&>().cbegin()),
-                        Iter>::value>
+                std::is_same_v<
+                    decltype(std::declval<std::vector<T>&>().begin()), Iter> ||
+                std::is_same_v<
+                    decltype(std::declval<std::vector<T>&>().cbegin()), Iter>>
         {
         };
+        // clang-format on
     }    // namespace detail
 
     template <typename Iter,

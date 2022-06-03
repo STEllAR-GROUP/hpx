@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //  The code below was taken and adapted from:
-//  https://github.com/martinus/small_vector.
+//  https://github.com/martinus/svector.
 //
 // The original file was licensed under the MIT license:
 //
@@ -672,19 +672,23 @@ namespace hpx::detail {
         using const_iterator = T const*;
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+        using allocator_type = Allocator;
 
-        constexpr small_vector() noexcept
+        static constexpr std::size_t static_capacity = N;
+
+        constexpr small_vector(Allocator const& = Allocator()) noexcept
         {
             set_direct_and_size(0);
         }
 
-        small_vector(std::size_t count, T const& value)
+        small_vector(
+            std::size_t count, T const& value, Allocator const& = Allocator())
           : small_vector()
         {
             resize(count, value);
         }
 
-        explicit small_vector(std::size_t count)
+        explicit small_vector(std::size_t count, Allocator const& = Allocator())
           : small_vector()
         {
             reserve(count);
@@ -701,7 +705,8 @@ namespace hpx::detail {
         template <typename InputIt,
             typename =
                 std::enable_if_t<detail::is_argument_iterator_v<InputIt>>>
-        small_vector(InputIt first, InputIt last)
+        small_vector(
+            InputIt first, InputIt last, Allocator const& = Allocator())
           : small_vector()
         {
             assign(first, last);
@@ -722,7 +727,8 @@ namespace hpx::detail {
             do_move_assign(HPX_MOVE(other));
         }
 
-        small_vector(std::initializer_list<T> init)
+        small_vector(
+            std::initializer_list<T> init, Allocator const& = Allocator())
           : small_vector(init.begin(), init.end())
         {
         }
@@ -785,15 +791,28 @@ namespace hpx::detail {
 
         void resize(std::size_t count)
         {
-            resize(count, T());
+            if (count > capacity())
+            {
+                reserve(count);
+            }
+
+            if (is_direct())
+            {
+                resize_after_reserve<direction::direct>(count);
+            }
+            else
+            {
+                resize_after_reserve<direction::indirect>(count);
+            }
         }
 
-        void resize(std::size_t count, T const& value)
+        void resize(std::size_t count, value_type const& value)
         {
             if (count > capacity())
             {
                 reserve(count);
             }
+
             if (is_direct())
             {
                 resize_after_reserve<direction::direct>(count, value);
