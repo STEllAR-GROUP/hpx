@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/mpi_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
@@ -16,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <map>
 #include <stdexcept>
 #include <string>
 
@@ -131,9 +133,17 @@ namespace hpx::util {
 
             if (provided < minimal)
             {
+                std::map<int, char const*> levels = {
+                    {MPI_THREAD_SINGLE, "MPI_THREAD_SINGLE"},
+                    {MPI_THREAD_FUNNELED, "MPI_THREAD_FUNNELED"},
+                    {MPI_THREAD_SERIALIZED, "MPI_THREAD_SERIALIZED"},
+                    {MPI_THREAD_MULTIPLE, "MPI_THREAD_MULTIPLE"}};
+
                 HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "hpx::util::mpi_environment::init",
-                    "MPI doesn't provide minimal requested thread level");
+                    hpx::util::format("MPI doesn't implement minimal requested "
+                                      "thread level, required {}, provided {}",
+                        levels[required], levels[provided]));
             }
             has_called_init_ = true;
         }
@@ -194,7 +204,6 @@ namespace hpx::util {
         if (required == MPI_THREAD_MULTIPLE)
             setenv("MPICH_MAX_THREAD_SAFETY", "multiple", 1);
 #endif
-
 #endif
 
         int const retval =
@@ -222,7 +231,6 @@ namespace hpx::util {
         {
             // explicitly disable multi-threaded mpi if needed
             rtcfg.add_entry("hpx.parcel.mpi.multithreaded", "0");
-        }
 
         if (provided_threading_flag_ == MPI_THREAD_FUNNELED)
         {

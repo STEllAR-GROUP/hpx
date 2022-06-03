@@ -103,6 +103,14 @@ namespace hpx::parcelset {
             static std::size_t background_threads(
                 util::runtime_configuration const& ini)
             {
+                // limit the number of cores accessing MPI to one if
+                // multi-threading in MPI is disabled
+                if (hpx::util::get_entry_as<std::size_t>(
+                        ini, "hpx.parcel.mpi.multithreaded", 1) == 0)
+                {
+                    return 1;
+                }
+
                 return hpx::util::get_entry_as<std::size_t>(ini,
                     "hpx.parcel.mpi.background_threads",
                     HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS);
