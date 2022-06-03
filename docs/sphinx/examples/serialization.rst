@@ -57,7 +57,7 @@ In order to serialize objects in HPX, at least one of the following criteria mus
 
 In the case of default constructible objects:
 
-* The object is default constructible and is an empty type.
+* The object is an empty type.
 * Has a serialization function as shown in this tutorial.
 * All members are accessible publicly and they can be used in structured binding contexts.
 
