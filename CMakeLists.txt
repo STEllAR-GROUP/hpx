@@ -352,7 +352,7 @@ hpx_option(
 if(HPX_WITH_STATIC_LINKING)
   hpx_add_config_define(HPX_HAVE_STATIC_LINKING)
   set(hpx_library_link_mode STATIC)
-  set(CMAKE_SHARED_LIBS OFF)
+  set(BUILD_SHARED_LIBS OFF)
   set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
 
   if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
