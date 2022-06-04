@@ -196,6 +196,6 @@ int main()
     hpx::async(rectangle_action, hpx::find_here(), rectangle).wait();
     send_gravity_action gravityAction;
     auto gravity = PlanetWeightCalculator(9.81);
-    hpx::async(gravityAction, hpx::find_here(), gravity).wait();
+    hpx::async(gravityAction, hpx::find_remote_localities()[0], gravity).wait();
 }
 //]
