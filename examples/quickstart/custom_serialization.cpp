@@ -14,8 +14,8 @@
 #include <hpx/serialization.hpp>
 #include <iostream>
 
-//[PointMemberSerialization
-struct PointMemberSerialization
+//[point_member_serialization
+struct point_member_serialization
 {
     int x{0};
     int y{0};
@@ -36,14 +36,14 @@ struct PointMemberSerialization
     }
 };
 // Allow bitwise serialization
-HPX_IS_BITWISE_SERIALIZABLE(PointMemberSerialization)
+HPX_IS_BITWISE_SERIALIZABLE(point_member_serialization)
 //]
 
-//[RectangleMemberSerialization
-struct RectangleMemberSerialization
+//[rectangle_member_serialization
+struct rectangle_member_serialization
 {
-    PointMemberSerialization top_left;
-    PointMemberSerialization lower_right;
+    point_member_serialization top_left;
+    point_member_serialization lower_right;
 
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int)
@@ -55,15 +55,15 @@ struct RectangleMemberSerialization
 };
 //]
 
-//[RectangleFREE
-struct RectangleFREE
+//[rectangle_free
+struct rectangle_free
 {
-    PointMemberSerialization top_left;
-    PointMemberSerialization lower_right;
+    point_member_serialization top_left;
+    point_member_serialization lower_right;
 };
 
 template <typename Archive>
-void serialize(Archive& ar, RectangleFREE& pt, const unsigned int)
+void serialize(Archive& ar, rectangle_free& pt, const unsigned int)
 {
     // clang-format off
     ar & pt.lower_right & pt.top_left;
@@ -72,17 +72,17 @@ void serialize(Archive& ar, RectangleFREE& pt, const unsigned int)
 }
 //]
 
-//[PointClass
-class PointClass
+//[point_class
+class point_class
 {
 public:
-    PointClass(int x, int y)
+    point_class(int x, int y)
       : x(x)
       , y(y)
     {
     }
 
-    PointClass() = default;
+    point_class() = default;
 
     [[nodiscard]] int getX() const noexcept
     {
@@ -100,25 +100,25 @@ private:
 };
 
 template <typename Archive>
-void load(Archive& ar, PointClass& pt, const unsigned int)
+void load(Archive& ar, point_class& pt, const unsigned int)
 {
     int x, y;
     ar >> x >> y;
-    pt = PointClass(x, y);
+    pt = point_class(x, y);
 }
 
 template <typename Archive>
-void save(Archive& ar, PointClass const& pt, const unsigned int)
+void save(Archive& ar, point_class const& pt, const unsigned int)
 {
     ar << pt.getX() << pt.getY();
 }
 // This tells HPX that you have spilt your serialize function into
 // load and save
-HPX_SERIALIZATION_SPLIT_FREE(PointClass)
+HPX_SERIALIZATION_SPLIT_FREE(point_class)
 //]
 
 //[SendRectangle
-void send_rectangle_struct(RectangleFREE rectangle)
+void send_rectangle_struct(rectangle_free rectangle)
 {
     hpx::util::format_to(std::cout,
         "Rectangle(Point(x={1},y={2}),Point(x={3},y={4}))\n",
@@ -128,18 +128,18 @@ void send_rectangle_struct(RectangleFREE rectangle)
 
 HPX_PLAIN_ACTION(send_rectangle_struct);
 
-//[PlanetWeightCalculator
-class PlanetWeightCalculator
+//[planet_weight_calculator
+class planet_weight_calculator
 {
 public:
-    explicit PlanetWeightCalculator(double g)
+    explicit planet_weight_calculator(double g)
       : g(g)
     {
     }
 
     template <class Archive>
     friend void save_construct_data(
-        Archive&, PlanetWeightCalculator const*, unsigned int);
+        Archive&, planet_weight_calculator const*, unsigned int);
 
     [[nodiscard]] double getG() const
     {
@@ -163,23 +163,23 @@ private:
 //[save_construct_data
 template <class Archive>
 inline void save_construct_data(
-    Archive& ar, PlanetWeightCalculator const* weight_calc, const unsigned int)
+    Archive& ar, planet_weight_calculator const* weight_calc, const unsigned int)
 {
     ar << weight_calc->g;    // Do all of your serialization here
 }
 
 template <class Archive>
 inline void load_construct_data(
-    Archive& ar, PlanetWeightCalculator* weight_calc, const unsigned int)
+    Archive& ar, planet_weight_calculator* weight_calc, const unsigned int)
 {
     double g;
     ar >> g;
-    ::new (weight_calc) PlanetWeightCalculator(
+    ::new (weight_calc) planet_weight_calculator(
         g);    // ::new(ptr) construct new object at given address
 }
 //]
 
-void send_gravity(PlanetWeightCalculator gravity)
+void send_gravity(planet_weight_calculator gravity)
 {
     std::cout << "gravity.g = " << gravity.getG() << std::flush;
 }
@@ -192,10 +192,10 @@ int main()
     // Needs at least two localities to run
     // When sending to your current locality, no serialization is done
     send_rectangle_struct_action rectangle_action;
-    auto rectangle = RectangleFREE{{0, 0}, {0, 5}};
+    auto rectangle = rectangle_free{{0, 0}, {0, 5}};
     hpx::async(rectangle_action, hpx::find_here(), rectangle).wait();
     send_gravity_action gravityAction;
-    auto gravity = PlanetWeightCalculator(9.81);
+    auto gravity = planet_weight_calculator(9.81);
     hpx::async(gravityAction, hpx::find_remote_localities()[0], gravity).wait();
 }
 //]

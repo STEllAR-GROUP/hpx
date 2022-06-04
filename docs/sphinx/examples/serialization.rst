@@ -73,17 +73,17 @@ Member function serialization
 
 .. literalinclude:: ../../examples/quickstart/custom_serialization.cpp
    :language: c++
-   :start-after: //[PointMemberSerialization
+   :start-after: //[point_member_serialization
    :end-before: //]
 
-Notice that ``PointMemberSerialization`` is defined as bitwise serializable
+Notice that ``point_member_serialization`` is defined as bitwise serializable
 (see :ref:`bitwise_serialization` for more details).
 HPX is also able to recursively serialize composite classes and structs
 given that its members are serializable.
 
 .. literalinclude:: ../../examples/quickstart/custom_serialization.cpp
    :language: c++
-   :start-after: //[RectangleMemberSerialization
+   :start-after: //[rectangle_member_serialization
    :end-before: //]
 
 
@@ -96,7 +96,7 @@ of free function serializers.
 
 .. literalinclude:: ../../examples/quickstart/custom_serialization.cpp
    :language: c++
-   :start-after: //[RectangleFREE
+   :start-after: //[rectangle_free
    :end-before: //]
 
 Even if you can't modify a class to befriend it, you can still be able to
@@ -105,7 +105,7 @@ and you are able to reconstruct it yourself.
 
 .. literalinclude:: ../../examples/quickstart/custom_serialization.cpp
    :language: c++
-   :start-after: //[PointClass
+   :start-after: //[point_class
    :end-before: //]
 
 
@@ -117,7 +117,7 @@ Some classes don't provide any default constructor.
 
 .. literalinclude:: ../../examples/quickstart/custom_serialization.cpp
    :language: c++
-   :start-after: //[PlanetWeightCalculator
+   :start-after: //[planet_weight_calculator
    :end-before: //]
 
 In this case you have to define a ``save_construct_data`` and ``load_construct_data`` in which you
@@ -130,17 +130,18 @@ do the serialization yourself.
 
 .. _bitwise_serialization:
 
-Bitwise serialization for arithmatic data
------------------------------------------
+Bitwise serialization for bitwise copyable data
+-----------------------------------------------
 
 When sending non arithmatic types not defined by
-`std::is_arithmatic <https://en.cppreference.com/w/cpp/types/is_arithmetic>`_, HPX has to (de)serialize each object separately.
-However, if the class you are trying to send consists only of arithmatic datatypes, you may mark your class as such.
+`std::is_arithmatic <https://en.cppreference.com/w/cpp/types/is_arithmetic>`_, HPX has to (de)serialize each object
+separately. However, if the class you are trying to send classes consists only of bitwise copyable datatypes,
+you may mark your class as such.
 Then HPX will serialize your object bitwise instead of element wise.
 This has enormous benefits, especially when sending a vector/array of your class.
 To define your class as such you need to call ``HPX_IS_BITWISE_SERIALIZABLE(T)`` with your desired custom class.
 
 .. literalinclude:: ../../examples/quickstart/custom_serialization.cpp
    :language: c++
-   :start-after: //[PointMemberSerialization
+   :start-after: //[point_member_serialization
    :end-before: //]
