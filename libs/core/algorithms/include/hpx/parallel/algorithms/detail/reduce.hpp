@@ -34,10 +34,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             ExPolicy&& policy, InIterB first, InIterE last, T init, Reduce&& r)
         {
             util::loop_ind(HPX_FORWARD(ExPolicy, policy), first, last,
-                [&init, reduce_op = HPX_FORWARD(Reduce, r)](
-                    const auto& v) mutable {
-                    init = HPX_INVOKE(reduce_op, init, v);
-                });
+                [&init, &r](
+                    auto const& v) mutable { init = HPX_INVOKE(r, init, v); });
             return init;
         }
 
@@ -46,7 +44,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             FwdIterB part_begin, std::size_t part_size, T init, Reduce r)
         {
             util::loop_n_ind<ExPolicy>(
-                part_begin, part_size, [&r, &init](const auto& v) mutable {
+                part_begin, part_size, [&init, &r](auto const& v) mutable {
                     init = HPX_INVOKE(r, init, v);
                 });
             return init;
@@ -59,11 +57,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             Convert&& conv)
         {
             util::loop_ind(HPX_FORWARD(ExPolicy, policy), first, last,
-                [&init, reduce_op = HPX_FORWARD(Reduce, r),
-                    conv_op = HPX_FORWARD(Convert, conv)](
-                    const auto& v) mutable {
-                    auto cnv = conv_op(v);
-                    init = HPX_INVOKE(reduce_op, init, cnv);
+                [&init, &r, &conv](auto const& v) mutable {
+                    init = HPX_INVOKE(r, init, HPX_INVOKE(conv, v));
                 });
             return init;
         }
@@ -74,9 +69,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             Convert conv)
         {
             util::loop_n_ind<ExPolicy>(part_begin, part_size,
-                [&r, &conv, &init](const auto& v) mutable {
-                    auto cnv = conv(v);
-                    init = HPX_INVOKE(r, init, cnv);
+                [&init, &r, &conv](auto const& v) mutable {
+                    init = HPX_INVOKE(r, init, HPX_INVOKE(conv, v));
                 });
             return init;
         }
@@ -88,11 +82,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             Convert&& conv)
         {
             util::loop2<ExPolicy>(first1, last1, first2,
-                [&init, reduce_op = HPX_FORWARD(Reduce, r),
-                    convert_op = HPX_FORWARD(Convert, conv)](
-                    Iter1 it1, Iter2 it2) mutable {
-                    init = HPX_INVOKE(
-                        reduce_op, init, HPX_INVOKE(convert_op, *it1, *it2));
+                [&init, &r, &conv](Iter1 it1, Iter2 it2) mutable {
+                    init = HPX_INVOKE(r, init, HPX_INVOKE(conv, *it1, *it2));
                 });
             return init;
         }

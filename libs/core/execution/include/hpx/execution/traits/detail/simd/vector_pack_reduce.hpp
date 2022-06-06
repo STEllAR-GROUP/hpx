@@ -17,7 +17,7 @@ namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi, typename Reduce>
     HPX_HOST_DEVICE HPX_FORCEINLINE T reduce(
-        Reduce r, std::experimental::simd<T, Abi>& val)
+        Reduce r, std::experimental::simd<T, Abi> const& val)
     {
         return std::experimental::reduce(val, r);
     }

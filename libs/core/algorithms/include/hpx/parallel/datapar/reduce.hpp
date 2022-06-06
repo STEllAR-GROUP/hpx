@@ -35,10 +35,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             ExPolicy&& policy, InIterB first, InIterE last, T init, Reduce&& r)
         {
             util::loop_ind(HPX_FORWARD(ExPolicy, policy), first, last,
-                [&init, reduce_op = HPX_FORWARD(Reduce, r)](auto& val) {
-                    T partial_res =
-                        hpx::parallel::traits::reduce(reduce_op, val);
-                    init = reduce_op(init, partial_res);
+                [&init, &r](auto const& val) mutable {
+                    T partial_res = hpx::parallel::traits::reduce(r, val);
+                    init = r(init, partial_res);
                 });
             return init;
         }
@@ -48,7 +47,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             FwdIterB part_begin, std::size_t part_size, T init, Reduce r)
         {
             util::loop_n_ind<ExPolicy>(
-                part_begin, part_size, [&r, &init](auto& val) {
+                part_begin, part_size, [&init, &r](auto const& val) mutable {
                     T partial_res = hpx::parallel::traits::reduce(r, val);
                     init = r(init, partial_res);
                 });
@@ -61,12 +60,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             Iter first, Sent last, T init, Reduce&& r, Convert&& conv)
         {
             util::loop_ind(HPX_FORWARD(ExPolicy, policy), first, last,
-                [&init, reduce_op = HPX_FORWARD(Reduce, r),
-                    conv_op = HPX_FORWARD(Convert, conv)](const auto& v) {
-                    auto cnv = conv_op(v);
-                    T partial_res =
-                        hpx::parallel::traits::reduce(reduce_op, cnv);
-                    init = reduce_op(init, partial_res);
+                [&init, &r, &conv](auto const& v) mutable {
+                    T partial_res = hpx::parallel::traits::reduce(r, conv(v));
+                    init = r(init, partial_res);
                 });
             return init;
         }
@@ -75,10 +71,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static T call(Iter part_begin,
             std::size_t part_size, T init, Reduce r, Convert conv)
         {
-            util::loop_n_ind<ExPolicy>(
-                part_begin, part_size, [&r, &conv, &init](const auto& v) {
-                    auto cnv = conv(v);
-                    T partial_res = hpx::parallel::traits::reduce(r, cnv);
+            util::loop_n_ind<ExPolicy>(part_begin, part_size,
+                [&init, &r, &conv](auto const& v) mutable {
+                    T partial_res = hpx::parallel::traits::reduce(r, conv(v));
                     init = r(init, partial_res);
                 });
             return init;
@@ -89,14 +84,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static T call(Iter1 first1, Sent last1,
             Iter2 first2, T init, Reduce&& r, Convert&& conv)
         {
-            util::loop2<ExPolicy>(first1, last1, first2,
-                [&init, reduce_op = HPX_FORWARD(Reduce, r),
-                    convert_op = HPX_FORWARD(Convert, conv)](
-                    auto it1, auto it2) {
-                    auto conv = HPX_INVOKE(convert_op, it1, it2);
-                    auto partial_res =
-                        hpx::parallel::traits::reduce(reduce_op, conv);
-                    init = HPX_INVOKE(reduce_op, init, partial_res);
+            util::loop2<ExPolicy>(
+                first1, last1, first2, [&init, &r, &conv](auto it1, auto it2) {
+                    auto partial_res = hpx::parallel::traits::reduce(
+                        r, HPX_INVOKE(conv, it1, it2));
+                    init = r(init, partial_res);
                 });
             return init;
         }

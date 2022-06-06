@@ -391,12 +391,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     Iter last1 = it1;
                     std::advance(last1, part_size);
 
-                    auto result = HPX_INVOKE(op2, *it1, *it2);
+                    auto&& result = HPX_INVOKE(op2, *it1, *it2);
                     ++it1;
                     ++it2;
 
                     return detail::sequential_reduce<ExPolicy>(it1, last1, it2,
-                        result, HPX_FORWARD(Op1, op1), HPX_FORWARD(Op2, op2));
+                        HPX_MOVE(result), HPX_FORWARD(Op1, op1),
+                        HPX_FORWARD(Op2, op2));
                 };
 
                 using hpx::util::make_zip_iterator;
