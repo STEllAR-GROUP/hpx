@@ -1,6 +1,7 @@
 //  Copyright (c) 2013-2015 Thomas Heller
 //  Copyright (c)      2020 Google
 //  Copyright (c)      2022 Patrick Diehl
+//  Copyright (c)      2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -110,8 +111,23 @@ namespace hpx::util {
     int mpi_environment::is_initialized_ = -1;
 
     ///////////////////////////////////////////////////////////////////////////
+    [[noreturn]] static void throw_wrong_mpi_mode(int required, int provided)
+    {
+        std::map<int, char const*> levels = {
+            {MPI_THREAD_SINGLE, "MPI_THREAD_SINGLE"},
+            {MPI_THREAD_FUNNELED, "MPI_THREAD_FUNNELED"},
+            {MPI_THREAD_SERIALIZED, "MPI_THREAD_SERIALIZED"},
+            {MPI_THREAD_MULTIPLE, "MPI_THREAD_MULTIPLE"}};
+
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+            "hpx::util::mpi_environment::init",
+            hpx::util::format("MPI doesn't implement minimal requested "
+                              "thread level, required {}, provided {}",
+                levels[required], levels[provided]));
+    }
+
     int mpi_environment::init(
-        int*, char***, const int minimal, const int required, int& provided)
+        int*, char***, int const minimal, int const required, int& provided)
     {
         has_called_init_ = false;
 
@@ -133,17 +149,7 @@ namespace hpx::util {
 
             if (provided < minimal)
             {
-                std::map<int, char const*> levels = {
-                    {MPI_THREAD_SINGLE, "MPI_THREAD_SINGLE"},
-                    {MPI_THREAD_FUNNELED, "MPI_THREAD_FUNNELED"},
-                    {MPI_THREAD_SERIALIZED, "MPI_THREAD_SERIALIZED"},
-                    {MPI_THREAD_MULTIPLE, "MPI_THREAD_MULTIPLE"}};
-
-                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                    "hpx::util::mpi_environment::init",
-                    hpx::util::format("MPI doesn't implement minimal requested "
-                                      "thread level, required {}, provided {}",
-                        levels[required], levels[provided]));
+                throw_wrong_mpi_mode(required, provided);
             }
             has_called_init_ = true;
         }
@@ -158,9 +164,7 @@ namespace hpx::util {
 
             if (provided < minimal)
             {
-                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                    "hpx::util::mpi_environment::init",
-                    "MPI doesn't provide minimal requested thread level");
+                throw_wrong_mpi_mode(required, provided);
             }
         }
         return retval;
@@ -220,28 +224,30 @@ namespace hpx::util {
             MPI_Error_string(retval, message, &msglen);
             message[msglen] = '\0';
 
-            std::string msg("mpi_environment::init: MPI_Init_thread failed: ");
-            msg = msg + message + ".";
-            throw std::runtime_error(msg.c_str());
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::util::mpi_environment::init",
+                hpx::util::format("MPI_Init_thread failed: {}.", message));
         }
 
         MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);
 
+        // explicitly disable multi-threaded mpi if needed
         if (provided_threading_flag_ <= MPI_THREAD_SERIALIZED)
         {
-            // explicitly disable multi-threaded mpi if needed
             rtcfg.add_entry("hpx.parcel.mpi.multithreaded", "0");
+        }
 
         if (provided_threading_flag_ == MPI_THREAD_FUNNELED)
         {
             enabled_ = false;
             has_called_init_ = false;
-            throw std::runtime_error(
-                "mpi_environment::init: MPI_Init_thread: "
-                "The underlying MPI implementation only supports "
-                "MPI_THREAD_FUNNELED. This mode is not supported by HPX. "
-                "Please pass -hpx:ini=hpx.parcel.mpi.multithreaded=0 to "
-                "explicitly disable MPI multi-threading.");
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::util::mpi_environment::init",
+                "MPI_Init_thread: The underlying MPI implementation only "
+                "supports MPI_THREAD_FUNNELED. This mode is not supported "
+                "by HPX. Please pass "
+                "--hpx:ini=hpx.parcel.mpi.multithreaded=0 to explicitly "
+                "disable MPI multi-threading.");
         }
 
         this_rank = rank();
@@ -337,7 +343,9 @@ namespace hpx::util {
       : locked(true)
     {
         if (!multi_threaded())
+        {
             mtx_.lock();
+        }
     }
 
     mpi_environment::scoped_lock::~scoped_lock()

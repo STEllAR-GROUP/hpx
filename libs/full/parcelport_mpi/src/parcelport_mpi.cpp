@@ -105,8 +105,7 @@ namespace hpx::parcelset {
             {
                 // limit the number of cores accessing MPI to one if
                 // multi-threading in MPI is disabled
-                if (hpx::util::get_entry_as<std::size_t>(
-                        ini, "hpx.parcel.mpi.multithreaded", 1) == 0)
+                if (!multi_threaded_mpi(ini))
                 {
                     return 1;
                 }
@@ -116,6 +115,17 @@ namespace hpx::parcelset {
                     HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS);
             }
 
+            static bool multi_threaded_mpi(
+                util::runtime_configuration const& ini)
+            {
+                if (hpx::util::get_entry_as<std::size_t>(
+                        ini, "hpx.parcel.mpi.multithreaded", 1) != 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+
         public:
             parcelport(util::runtime_configuration const& ini,
                 threads::policies::callback_notifier const& notifier)
@@ -123,6 +133,7 @@ namespace hpx::parcelset {
               , stopped_(false)
               , receiver_(*this)
               , background_threads_(background_threads(ini))
+              , multi_threaded_mpi_(multi_threaded_mpi(ini))
             {
             }
 
@@ -220,6 +231,41 @@ namespace hpx::parcelset {
                 return has_work;
             }
 
+            template <typename F>
+            bool reschedule_on_thread(F&& f,
+                threads::thread_schedule_state state, char const* funcname)
+            {
+                // if MPI was initialized in serialized mode the new thread
+                // needs to be pinned to thread 0
+                if (multi_threaded_mpi_)
+                {
+                    return this->base_type::reschedule_on_thread(
+                        HPX_FORWARD(F, f), state, funcname);
+                }
+
+                error_code ec(throwmode::lightweight);
+                hpx::threads::thread_init_data data(
+                    hpx::threads::make_thread_function_nullary(
+                        HPX_FORWARD(F, f)),
+                    funcname, threads::thread_priority::bound,
+                    threads::thread_schedule_hint(static_cast<std::int16_t>(0)),
+                    threads::thread_stacksize::default_, state, true);
+
+                auto const id = hpx::threads::register_thread(data, ec);
+                if (!ec)
+                    return false;
+
+                if (state == threads::thread_schedule_state::suspended)
+                {
+                    threads::set_thread_state(id.noref(),
+                        std::chrono::milliseconds(100),
+                        threads::thread_schedule_state::pending,
+                        threads::thread_restart_state::signaled,
+                        threads::thread_priority::bound, true, ec);
+                }
+                return true;
+            }
+
         private:
             std::atomic<bool> stopped_;
 
@@ -250,6 +296,7 @@ namespace hpx::parcelset {
             }
 
             std::size_t background_threads_;
+            bool multi_threaded_mpi_;
         };
     }    // namespace policies::mpi
 }    // namespace hpx::parcelset
