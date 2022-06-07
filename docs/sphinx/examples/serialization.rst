@@ -133,8 +133,8 @@ do the serialization yourself.
 Bitwise serialization for bitwise copyable data
 -----------------------------------------------
 
-When sending non arithmatic types not defined by
-`std::is_arithmatic <https://en.cppreference.com/w/cpp/types/is_arithmetic>`_, HPX has to (de)serialize each object
+When sending non arithmetic types not defined by
+`std::is_arithmetic <https://en.cppreference.com/w/cpp/types/is_arithmetic>`_, HPX has to (de)serialize each object
 separately. However, if the class you are trying to send classes consists only of bitwise copyable datatypes,
 you may mark your class as such.
 Then HPX will serialize your object bitwise instead of element wise.

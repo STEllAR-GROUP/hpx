@@ -25,8 +25,8 @@ struct point_member_serialization
     // Provides serialization access to HPX
     friend class hpx::serialization::access;
 
-    // Second argument exists soley for compatibity with boost serialize
-    // it is NOT procced by HPX in any way.
+    // Second argument exists solely for compatibility with boost serialize
+    // it is NOT processed by HPX in any way.
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int)
     {
