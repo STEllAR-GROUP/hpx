@@ -224,6 +224,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/accumulate.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/reduce.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -251,11 +252,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIterB, typename InIterE,
                 typename T_, typename Reduce>
-            static T sequential(
-                ExPolicy, InIterB first, InIterE last, T_&& init, Reduce&& r)
+            static T sequential(ExPolicy&& policy, InIterB first, InIterE last,
+                T_&& init, Reduce&& r)
             {
-                return detail::accumulate(
-                    first, last, HPX_FORWARD(T_, init), HPX_FORWARD(Reduce, r));
+                return detail::sequential_reduce<ExPolicy>(
+                    HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(T_, init), HPX_FORWARD(Reduce, r));
             }
 
             template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
@@ -272,7 +274,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 auto f1 = [r](FwdIterB part_begin, std::size_t part_size) -> T {
                     T val = *part_begin;
-                    return util::accumulate_n(
+                    return detail::sequential_reduce<ExPolicy>(
                         ++part_begin, --part_size, HPX_MOVE(val), r);
                 };
 
@@ -282,7 +284,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     hpx::unwrapping(
                         [init = HPX_FORWARD(T_, init),
                             r = HPX_FORWARD(Reduce, r)](auto&& results) -> T {
-                            return util::accumulate_n(hpx::util::begin(results),
+                            return detail::sequential_reduce<ExPolicy>(
+                                hpx::util::begin(results),
                                 hpx::util::size(results), init, r);
                         }));
             }
@@ -338,7 +341,7 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
-                std::plus<T>{});
+                std::plus<>{});
         }
 
         // clang-format off
@@ -361,7 +364,7 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::reduce<value_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, value_type{},
-                std::plus<value_type>{});
+                std::plus<>{});
         }
 
         // clang-format off
@@ -397,7 +400,7 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::reduce<T>().call(
                 hpx::execution::seq, first, last, HPX_MOVE(init),
-                std::plus<T>{});
+                std::plus<>{});
         }
 
         // clang-format off
@@ -416,8 +419,7 @@ namespace hpx {
                 typename std::iterator_traits<FwdIter>::value_type;
 
             return hpx::parallel::v1::detail::reduce<value_type>().call(
-                hpx::execution::seq, first, last, value_type{},
-                std::plus<value_type>());
+                hpx::execution::seq, first, last, value_type{}, std::plus<>());
         }
     } reduce{};
 }    // namespace hpx
