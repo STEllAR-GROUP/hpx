@@ -174,11 +174,11 @@ namespace hpx { namespace ranges {
     /// calling thread.
     ///
     /// \returns  The \a partial_sort algorithm returns \a
-    ///           typename hpx::traits::range_iterator<Rng>::type.
+    ///           typename hpx::traits::range_iterator_t<Rng>.
     ///           It returns \a last.
     template <typename Rng, typename Comp, typename Proj>
-    hpx::traits::range_iterator<Rng>_t
-    partial_sort(Rng&& rng,, hpx::traits::range_iterator<Rng>_t middle,
+    hpx::traits::range_iterator_t<Rng>
+    partial_sort(Rng&& rng,, hpx::traits::range_iterator_t<Rng> middle,
         Comp&& comp = Comp(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -239,19 +239,19 @@ namespace hpx { namespace ranges {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a partial_sort algorithm returns a
-    ///           \a hpx::future<typename hpx::traits::range_iterator<Rng>
-    ///           ::type> if the execution policy is of type
+    ///           \a hpx::future<typename hpx::traits::range_iterator_t<Rng>
+    ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a
-    ///           typename hpx::traits::range_iterator<Rng>::type
+    ///           typename hpx::traits::range_iterator_t<Rng>
     ///           otherwise.
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename Rng, typename Comp, typename Proj>
     util::detail::algorithm_result_t<ExPolicy,
-        hpx::traits::range_iterator<Rng>_t>
+        hpx::traits::range_iterator_t<Rng>>
     partial_sort(ExPolicy&& policy, Rng&& rng,
-        hpx::traits::range_iterator<Rng>_t middle,
+        hpx::traits::range_iterator_t<Rng> middle,
         Comp&& comp = Comp(), Proj&& proj = Proj());
 
     // clang-format on
