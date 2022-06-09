@@ -274,12 +274,8 @@ namespace hpx { namespace performance_counters { namespace papi {
             {
                 val.time_ = timestamp_;
                 val.value_ = value_;
-<<<<<<< HEAD
                 val.status_ =
                     hpx::performance_counters::counter_status::new_data;
-=======
-                val.status_ = hpx::performance_counters::new_data;
->>>>>>> 1a3461daee (Convert enum counter_status to enum class)
                 val.scaling_ = 1;
                 val.scale_inverse_ = false;
             }
