@@ -64,17 +64,30 @@ namespace hpx { namespace assertion {
                     HPX_CURRENT_SOURCE_LOCATION(), HPX_PP_STRINGIZE(expr),     \
                     msg)) /**/
 
+#define HPX_ASSERT_LOCKED_(l, expr, msg)                                       \
+    (!!(expr) ? void() :                                                       \
+                (l.unlock(),                                                   \
+                    ::hpx::assertion::detail::handle_assert(                   \
+                        HPX_CURRENT_SOURCE_LOCATION(), HPX_PP_STRINGIZE(expr), \
+                        msg))) /**/
+
 #if defined(HPX_DEBUG)
 #if defined(HPX_COMPUTE_DEVICE_CODE)
 #define HPX_ASSERT(expr) assert(expr)
 #define HPX_ASSERT_MSG(expr, msg) HPX_ASSERT(expr)
+#define HPX_ASSERT_LOCKED(l, expr) assert(expr)
+#define HPX_ASSERT_LOCKED_MSG(l, expr, msg) HPX_ASSERT(expr)
 #else
 #define HPX_ASSERT(expr) HPX_ASSERT_(expr, std::string())
 #define HPX_ASSERT_MSG(expr, msg) HPX_ASSERT_(expr, msg)
+#define HPX_ASSERT_LOCKED(l, expr) HPX_ASSERT_LOCKED_(l, expr, std::string())
+#define HPX_ASSERT_LOCKED_MSG(l, expr, msg) HPX_ASSERT_LOCKED_(l, expr, msg)
 #endif
 #else
 #define HPX_ASSERT(expr)
 #define HPX_ASSERT_MSG(expr, msg)
+#define HPX_ASSERT_LOCKED(l, expr)
+#define HPX_ASSERT_LOCKED_MSG(l, expr, msg)
 #endif
 
 #define HPX_UNREACHABLE                                                        \

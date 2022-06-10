@@ -494,6 +494,7 @@ namespace hpx { namespace lcos { namespace detail {
 
             // Note: cv.notify_one() above 'consumes' the lock 'l' and leaves
             //       it unlocked when returning.
+            HPX_ASSERT_DOESNT_OWN_LOCK(l);
 
             // invoke the callback (continuation) function
             if (!on_completed.empty())
@@ -553,6 +554,7 @@ namespace hpx { namespace lcos { namespace detail {
 
             // Note: cv.notify_one() above 'consumes' the lock 'l' and leaves
             //       it unlocked when returning.
+            HPX_ASSERT_DOESNT_OWN_LOCK(l);
 
             // invoke the callback (continuation) function
             if (!on_completed.empty())
