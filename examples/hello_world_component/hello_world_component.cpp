@@ -7,7 +7,7 @@
 //[hello_world_cpp_getting_started
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/iostream.hpp>
+#include <hpx/include/iostreams.hpp>
 #include "hello_world_component.hpp"
 
 #include <iostream>
