@@ -10,6 +10,7 @@ module load gcc/10
 module load boost/1.75.0-${build_type,,}
 module load hwloc
 module load openmpi
+module load pwrapi/1.1.1
 
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="17"
@@ -24,3 +25,6 @@ configure_extra_options+=" -DHPX_WITH_PARCELPORT_MPI=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_LCI=ON"
 configure_extra_options+=" -DHPX_WITH_FETCH_LCI=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_LCI_BACKEND=ibv"
+
+# The pwrapi library still needs to be set up properly on rostam
+# configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"
