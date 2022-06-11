@@ -234,12 +234,13 @@ Macros
 
 .. table:: Macros of header ``hpx/assert.hpp``
 
-   =========================
-   Macro              
-   =========================
-   :c:macro:`HPX_ASSERT`
-   :c:macro:`HPX_ASSERT_MSG`
-   =========================
+   +--------------------------+
+   | Macro                    |
+   +==========================+
+   | :c:macro:`HPX_ASSERT`    |
+   +--------------------------+
+   | :c:macro:`HPX_ASSERT_MSG`|
+   +--------------------------+
 
 .. _public_api_header_hpx_barrier:
 
@@ -256,19 +257,19 @@ Classes
 
 .. table:: Classes of header ``hpx/barrier.hpp``
 
-   =========================  ======================================
-   Class                      C++ standard
-   =========================  ======================================
-   :cpp:class:`hpx::barrier`  :cppreference-generic:`thread,barrier`
-   =========================  ======================================
+   +--------------------------+----------------------------------------+
+   | Class                    | C++ standard                           |
+   +==========================+========================================+
+   | :cpp:class:`hpx::barrier`| :cppreference-generic:`thread,barrier` |
+   +--------------------------+----------------------------------------+
 
 .. table:: Distributed implementation of classes of header ``hpx/barrier.hpp``
 
-   ======================================  
-   Class         
-   ======================================  
-   :cpp:class:`hpx::distributed::barrier`  
-   ====================================== 
+   +----------------------------------------+  
+   | Class                                  |
+   +========================================+  
+   | :cpp:class:`hpx::distributed::barrier` |
+   +----------------------------------------+ 
 
 .. _public_api_header_hpx_channel:
 
@@ -284,19 +285,19 @@ Classes
 
 .. table:: Classes of header ``hpx/channel.hpp``
 
-   =========================
-   Class              
-   =========================
-   :cpp:class:`hpx::channel`
-   =========================  
+   +--------------------------+
+   | Class                    |
+   +==========================+
+   | :cpp:class:`hpx::channel`|
+   +--------------------------+  
 
 .. table:: Distributed implementation of classes of header ``hpx/channel.hpp``
 
-   ======================================  
-   Class         
-   ======================================  
-   :cpp:class:`hpx::distributed::channel`  
-   ====================================== 
+   +----------------------------------------+  
+   | Class                                  |
+   +========================================+  
+   | :cpp:class:`hpx::distributed::channel` |
+   +----------------------------------------+ 
 
 .. _public_api_header_hpx_chrono:
 
@@ -362,11 +363,11 @@ Classes
 
 .. table:: Classes of header ``hpx/exception.hpp``
 
-   ===========================  =======================================
-   Class                        C++ standard
-   ===========================  =======================================
-   :cpp:class:`hpx::exception`  :cppreference-generic:`error,exception`
-   ===========================  =======================================
+   +----------------------------+----------------------------------------+
+   | Class                      | C++ standard                           |
+   +============================+========================================+
+   | :cpp:class:`hpx::exception`| :cppreference-generic:`error,exception`|
+   +----------------------------+----------------------------------------+
 
 .. _public_api_header_hpx_execution:
 
@@ -433,14 +434,17 @@ The following constants correspond to the C++ standard :cppreference-generic:`ut
 
 .. table:: Constants of header ``hpx/functional.hpp``
 
-   ================================
-   Constant                               
-   ================================
-   :cpp:var:`hpx::placeholders::_1` 
-   :cpp:var:`hpx::placeholders::_2`
-   ...
-   :cpp:var:`hpx::placeholders::_9`
-   ================================
+   +---------------------------------+
+   | Constant                        |        
+   +=================================+
+   | :cpp:var:`hpx::placeholders::_1`|
+   +---------------------------------+ 
+   | :cpp:var:`hpx::placeholders::_2`|
+   +---------------------------------+
+   | ...                             |
+   +---------------------------------+
+   | :cpp:var:`hpx::placeholders::_9`|
+   +---------------------------------+
 
 
 Classes
@@ -514,11 +518,11 @@ Classes
 
 .. table:: Distributed implementation of classes of header ``hpx/latch.hpp``
 
-   ======================================
-   Class         
-   ======================================
-   :cpp:class:`hpx::distributed::promise`  
-   ======================================
+   +---------------------------------------+
+   | Class                                 |        
+   +=======================================+
+   | :cpp:class:`hpx::distributed::promise`| 
+   +---------------------------------------+
 
 Functions
 ---------
@@ -572,12 +576,13 @@ Classes
 
 .. table:: Classes of header ``hpx/init.hpp``
 
-   =============================
-   Class                        
-   =============================
-   :cpp:class:`hpx::init_params`
-   :cpp:enum:`hpx::runtime_mode`
-   =============================
+   +------------------------------+
+   | Class                        |
+   +==============================+
+   | :cpp:class:`hpx::init_params`|
+   +------------------------------+
+   | :cpp:enum:`hpx::runtime_mode`|
+   +------------------------------+
 
 
 Functions
@@ -585,16 +590,21 @@ Functions
 
 .. table:: Functions of header ``hpx/init.hpp``
 
-   ===========================
-   Function                        
-   ===========================
-   :cpp:func:`hpx::init`
-   :cpp:func:`hpx::start`
-   :cpp:func:`hpx::finalize`
-   :cpp:func:`hpx::disconnect`
-   :cpp:func:`hpx::suspend`
-   :cpp:func:`hpx::resume`
-   ===========================
+   +------------------------------+
+   | Function                     |  
+   +==============================+
+   | :cpp:func:`hpx::init`        |
+   +------------------------------+
+   | :cpp:func:`hpx::start`       |
+   +------------------------------+
+   | :cpp:func:`hpx::finalize`    |
+   +------------------------------+
+   | :cpp:func:`hpx::disconnect`  |
+   +------------------------------+
+   | :cpp:func:`hpx::suspend`     |
+   +------------------------------+
+   | :cpp:func:`hpx::resume`      |
+   +------------------------------+
 
 .. _public_api_header_hpx_latch:
 
@@ -611,19 +621,19 @@ Classes
 
 .. table:: Classes of header ``hpx/latch.hpp``
 
-   =============================  ====================================
-   Class                          C++ standard
-   =============================  ====================================
-   :cpp:class:`hpx::latch`        :cppreference-generic:`thread,latch`
-   =============================  ====================================
+   +----------------------------+----------------------------------------+
+   | Class                      | C++ standard                           |
+   +============================+========================================+
+   | :cpp:class:`hpx::latch`    |  :cppreference-generic:`thread,latch`  |
+   +----------------------------+----------------------------------------+
 
 .. table:: Distributed implementation of classes of header ``hpx/latch.hpp``
 
-   ==================================== 
-   Class         
-   ====================================
-   :cpp:class:`hpx::distributed::latch`  
-   ====================================
+   +--------------------------------------+ 
+   | Class                                |
+   +======================================+
+   | :cpp:class:`hpx::distributed::latch` |
+   +--------------------------------------+
 
 .. _public_api_header_hpx_mutex:
 
@@ -655,11 +665,11 @@ Functions
 
 .. table:: Functions of header ``hpx/mutex.hpp``
 
-   ==========================  ========================================
-   Function                    C++ standard
-   ==========================  ========================================
-   :cpp:func:`hpx::call_once`  :cppreference-generic:`thread,call_once`
-   ==========================  ========================================
+   +----------------------------+------------------------------------------+
+   | Class                      | C++ standard                             |
+   +============================+==========================================+
+   | :cpp:func:`hpx::call_once` | :cppreference-generic:`thread,call_once` |
+   +----------------------------+------------------------------------------+
 
 .. _public_api_header_hpx_memory:
 
@@ -736,14 +746,17 @@ Functions
 
 .. table:: `hpx::ranges` functions of header ``hpx/numeric.hpp``
 
-   =================================================
-   `hpx::ranges` function                      
-   =================================================
-   :cpp:func:`hpx::ranges::exclusive_scan`
-   :cpp:func:`hpx::ranges::inclusive_scan`
-   :cpp:func:`hpx::ranges::transform_exclusive_scan`
-   :cpp:func:`hpx::ranges::transform_inclusive_scan`
-   ================================================= 
+   +--------------------------------------------------+ 
+   | `hpx::ranges` function                           |
+   +==================================================+
+   | :cpp:func:`hpx::ranges::exclusive_scan`          |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::ranges::inclusive_scan`          |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::ranges::transform_exclusive_scan`|
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::ranges::transform_inclusive_scan`|
+   +--------------------------------------------------+ 
 
 .. _public_api_header_hpx_optional:
 
@@ -785,42 +798,57 @@ Typedefs
 
 .. table:: Typedefs of header ``hpx/runtime.hpp``
 
-   =======================================
-   Typedef                      
-   =======================================
-   :cpp:type:`hpx::startup_function_type`
-   :cpp:type:`hpx::shutdown_function_type`
-   =======================================
+   +-----------------------------------------+ 
+   | Typedef                                 |
+   +=========================================+
+   | :cpp:type:`hpx::startup_function_type`  |
+   +-----------------------------------------+
+   | :cpp:type:`hpx::shutdown_function_type` |
+   +-----------------------------------------+
 
 Functions
 ---------
 
 .. table:: Functions of header ``hpx/runtime.hpp``
 
-   ===============================================
-   Function                      
-   ===============================================
-   :cpp:func:`hpx::find_root_locality`
-   :cpp:func:`hpx::find_all_localities`
-   :cpp:func:`hpx::find_remote_localities`
-   :cpp:func:`hpx::find_locality`
-   :cpp:func:`hpx::get_colocation_id`
-   :cpp:func:`hpx::get_locality_id`
-   :cpp:func:`hpx::get_num_worker_threads`
-   :cpp:func:`hpx::get_worker_thread_num`
-   :cpp:func:`hpx::get_thread_name`
-   :cpp:func:`hpx::register_pre_startup_function`
-   :cpp:func:`hpx::register_startup_function`
-   :cpp:func:`hpx::register_pre_shutdown_function`
-   :cpp:func:`hpx::register_shutdown_function`
-   :cpp:func:`hpx::get_num_localities`
-   :cpp:func:`hpx::get_locality_name`
-   ===============================================
+   +--------------------------------------------------+ 
+   | Function                                         |
+   +==================================================+
+   | :cpp:func:`hpx::find_root_locality`              |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::find_all_localities`             |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::find_remote_localities`          |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::find_locality`                   |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::get_colocation_id`               |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::get_locality_id`                 |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::get_num_worker_threads`          |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::get_worker_thread_num`           |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::get_thread_name`                 |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::register_pre_startup_function`   |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::register_startup_function`       |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::register_pre_shutdown_function`  |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::register_shutdown_function`      |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::get_num_localities`              |
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::get_locality_name`               |
+   +--------------------------------------------------+
 
 .. _public_api_header_hpx_source_location:
 
 ``hpx/source_location.hpp``
-========================
+===========================
 
 The header :hpx-header:`libs/full/include/include,hpx/source_location.hpp` corresponds to the 
 C++ standard library header :cppreference-header:`source_location`.
@@ -830,11 +858,11 @@ Classes
 
 .. table:: Classes of header ``hpx/system_error.hpp``
 
-   =================================  ===============================================
-   Class                              C++ standard
-   =================================  ===============================================
-   :cpp:class:`hpx::source_location`  :cppreference-generic:`utility,source_location`
-   =================================  ===============================================
+   +-----------------------------------+-------------------------------------------------+
+   | Class                             | C++ standard                                    |
+   +===================================+=================================================+
+   | :cpp:class:`hpx::source_location` | :cppreference-generic:`utility,source_location` |
+   +-----------------------------------+-------------------------------------------------+
 
 .. _public_api_header_hpx_system_error:
 
@@ -849,11 +877,11 @@ Classes
 
 .. table:: Classes of header ``hpx/system_error.hpp``
 
-   ============================  ========================================
-   Class                         C++ standard
-   ============================  ========================================
-   :cpp:class:`hpx::error_code`  :cppreference-generic:`error,error_code`
-   ============================  ========================================
+   +------------------------------+------------------------------------------+
+   | Class                        | C++ standard                             |
+   +==============================+==========================================+
+   | :cpp:class:`hpx::error_code` | :cppreference-generic:`error,error_code` |
+   +------------------------------+------------------------------------------+
 
 .. _public_api_header_hpx_task_block:
 
@@ -868,24 +896,27 @@ Classes
 -------
 
 .. table:: Classes of header ``hpx/task_black.hpp``
-   =======================================================
-   Class                      
-   =======================================================
-   :cpp:class:`hpx::parallel::v2::task_canceled_exception`
-   :cpp:class:`hpx::parallel::v2::task_block`
-   =======================================================
+
+   +---------------------------------------------------------+ 
+   | Class                                                   |
+   +=========================================================+               
+   | :cpp:class:`hpx::parallel::v2::task_canceled_exception` |
+   +---------------------------------------------------------+
+   | :cpp:class:`hpx::parallel::v2::task_block`              |
+   +---------------------------------------------------------+
 
 Functions
 ---------
 
 .. table:: Functions of header ``hpx/task_black.hpp``
 
-   ===============================================================
-   Function                      
-   ===============================================================
-   :cpp:func:`hpx::parallel::v2::define_task_block`
-   :cpp:func:`hpx::parallel::v2::define_task_block_restore_thread`
-   ===============================================================
+   +-----------------------------------------------------------------+ 
+   | Function                                                        |
+   +=================================================================+   
+   | :cpp:func:`hpx::parallel::v2::define_task_block`                |
+   +-----------------------------------------------------------------+
+   | :cpp:func:`hpx::parallel::v2::define_task_block_restore_thread` |
+   +-----------------------------------------------------------------+
 
 .. _public_api_header_hpx_thread:
 
@@ -914,14 +945,17 @@ Functions
 
 .. table:: Functions of header ``hpx/thread.hpp``
 
-   =========================================
-   Function              
-   =========================================
-   :cpp:func:`hpx::this_thread::yield`
-   :cpp:func:`hpx::this_thread::get_id`
-   :cpp:func:`hpx::this_thread::sleep_for`
-   :cpp:func:`hpx::this_thread::sleep_until`
-   =========================================
+   +-------------------------------------------+ 
+   | Function                                  |
+   +===========================================+
+   | :cpp:func:`hpx::this_thread::yield`       |
+   +-------------------------------------------+
+   | :cpp:func:`hpx::this_thread::get_id`      |
+   +-------------------------------------------+
+   | :cpp:func:`hpx::this_thread::sleep_for`   |
+   +-------------------------------------------+
+   | :cpp:func:`hpx::this_thread::sleep_until` |
+   +-------------------------------------------+
 
 .. _public_api_header_hpx_semaphore:
 
@@ -956,11 +990,11 @@ Classes
 
 .. table:: Classes of header ``hpx/shared_mutex.hpp``
 
-   ==============================  ===========================================
-   Class                           C++ standard
-   ==============================  ===========================================
-   :cpp:class:`hpx::shared_mutex`  :cppreference-generic:`thread,shared_mutex`
-   ==============================  ===========================================
+   +--------------------------------+---------------------------------------------+
+   | Class                          | C++ standard                                |
+   +================================+=============================================+
+   | :cpp:class:`hpx::shared_mutex` | :cppreference-generic:`thread,shared_mutex` |
+   +--------------------------------+---------------------------------------------+
 
 .. _public_api_header_hpx_stop_token:
 
@@ -975,11 +1009,11 @@ Constants
 
 .. table:: Constants of header ``hpx/stop_token.hpp``
 
-   ===========================  ======================================================
-   Constant                     C++ standard
-   ===========================  ======================================================
-   :cpp:var:`hpx::nostopstate`  :cppreference-generic:`thread/stop_source,nostopstate`
-   ===========================  ======================================================
+   +-----------------------------+--------------------------------------------------------+
+   | Constant                    | C++ standard                                           |
+   +=============================+========================================================+
+   | :cpp:var:`hpx::nostopstate` | :cppreference-generic:`thread/stop_source,nostopstate` |
+   +-----------------------------+--------------------------------------------------------+
 
 Classes
 -------
@@ -1009,11 +1043,11 @@ Constants
 
 .. table:: Constants of header ``hpx/tuple.hpp``
 
-   ======================  ============================================
-   Constant                C++ standard
-   ======================  ============================================
-   :cpp:var:`hpx::ignore`  :cppreference-generic:`utility/tuple,ignore`
-   ======================  ============================================
+   +------------------------+----------------------------------------------+
+   | Constant               | C++ standard                                 |
+   +========================+==============================================+
+   | :cpp:var:`hpx::ignore` | :cppreference-generic:`utility/tuple,ignore` |
+   +------------------------+----------------------------------------------+
 
 Classes
 -------
@@ -1075,30 +1109,37 @@ Classes
 -------
 
 .. table:: Classes of header ``hpx/unwrap.hpp``
-
-   =========================================
-   Class              
-   =========================================
-   :cpp:struct:`hpx::functional::unwrap`
-   :cpp:struct:`hpx::functional::unwrap_n`
-   :cpp:struct:`hpx::functional::unwrap_all`
-   =========================================
+          
+   +-------------------------------------------+ 
+   | Class                                     |
+   +===========================================+
+   | :cpp:struct:`hpx::functional::unwrap`     |
+   +-------------------------------------------+
+   | :cpp:struct:`hpx::functional::unwrap_n`   |
+   +-------------------------------------------+
+   | :cpp:struct:`hpx::functional::unwrap_all` |
+   +-------------------------------------------+
 
 Functions
 ---------
 
 .. table:: Functions of header ``hpx/unwrap.hpp``
 
-   ===============================
-   Function              
-   ===============================
-   :cpp:func:`hpx::unwrap`
-   :cpp:func:`hpx::unwrap_n`
-   :cpp:func:`hpx::unwrap_all`
-   :cpp:func:`hpx::unwrapping`
-   :cpp:func:`hpx::unwrapping_n`
-   :cpp:func:`hpx::unwrapping_all`
-   ===============================
+   +----------------------------------+ 
+   | Function                         |
+   +==================================+
+   | :cpp:func:`hpx::unwrap`          |
+   +----------------------------------+
+   | :cpp:func:`hpx::unwrap_n`        |
+   +----------------------------------+
+   | :cpp:func:`hpx::unwrap_all`      |
+   +----------------------------------+
+   | :cpp:func:`hpx::unwrapping`      |
+   +----------------------------------+
+   | :cpp:func:`hpx::unwrapping_n`    |
+   +----------------------------------+
+   | :cpp:func:`hpx::unwrapping_all`  |
+   +----------------------------------+
 
 ``hpx/version.hpp``
 ===================
@@ -1111,36 +1152,50 @@ Macros
 
 .. table:: Macros of header ``hpx/version.hpp``
 
-   ===============================
-   Macro              
-   ===============================
-   :c:macro:`HPX_VERSION_MAJOR`
-   :c:macro:`HPX_VERSION_MINOR`
-   :c:macro:`HPX_VERSION_SUBMINOR`
-   :c:macro:`HPX_VERSION_FULL`
-   :c:macro:`HPX_VERSION_DATE`
-   :c:macro:`HPX_VERSION_TAG`
-   :c:macro:`HPX_AGAS_VERSION`
-   ===============================
+   +----------------------------------+ 
+   | Macro                            |
+   +==================================+
+   | :c:macro:`HPX_VERSION_MAJOR`     |
+   +----------------------------------+
+   | :c:macro:`HPX_VERSION_MINOR`     |
+   +----------------------------------+
+   | :c:macro:`HPX_VERSION_SUBMINOR`  |
+   +----------------------------------+
+   | :c:macro:`HPX_VERSION_FULL`      |
+   +----------------------------------+
+   | :c:macro:`HPX_VERSION_DATE`      |
+   +----------------------------------+
+   | :c:macro:`HPX_VERSION_TAG`       |
+   +----------------------------------+
+   | :c:macro:`HPX_AGAS_VERSION`      |
+   +----------------------------------+
 
 Functions
 ---------
 
 .. table:: Functions of header ``hpx/version.hpp``
 
-   =======================================
-   Function              
-   =======================================
-   :cpp:func:`hpx::major_version`
-   :cpp:func:`hpx::minor_version`
-   :cpp:func:`hpx::subminor_version`
-   :cpp:func:`hpx::full_version`
-   :cpp:func:`hpx::full_version_as_string`
-   :cpp:func:`hpx::tag`
-   :cpp:func:`hpx::agas_version`
-   :cpp:func:`hpx::build_type`
-   :cpp:func:`hpx::build_date_time`
-   =======================================
+   +-----------------------------------------+ 
+   | Function                                |
+   +=========================================+
+   | :cpp:func:`hpx::major_version`          |
+   +-----------------------------------------+
+   | :cpp:func:`hpx::minor_version`          |
+   +-----------------------------------------+
+   | :cpp:func:`hpx::subminor_version`       |
+   +-----------------------------------------+
+   | :cpp:func:`hpx::full_version`           |
+   +-----------------------------------------+
+   | :cpp:func:`hpx::full_version_as_string` |
+   +-----------------------------------------+
+   | :cpp:func:`hpx::tag`                    |
+   +-----------------------------------------+
+   | :cpp:func:`hpx::agas_version`           |
+   +-----------------------------------------+
+   | :cpp:func:`hpx::build_type`             |
+   +-----------------------------------------+
+   | :cpp:func:`hpx::build_date_time`        |
+   +-----------------------------------------+
 
 ``hpx/wrap_main.hpp``
 =====================
