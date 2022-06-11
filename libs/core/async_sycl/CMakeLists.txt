@@ -1,0 +1,43 @@
+# Copyright (c) 2019-2021 The STE||AR-Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+if(NOT (HPX_WITH_SYCL))
+  return()
+endif()
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+set(async_sycl_headers)
+
+# cmake-format: off
+set(async_sycl_compat_headers)
+# cmake-format: on
+
+set(async_sycl_sources)
+
+hpx_info("Building HPX SYCL Module")
+
+include(HPX_AddModule)
+add_hpx_module(
+  core async_sycl
+  GLOBAL_HEADER_GEN ON
+  SOURCES ${async_sycl_sources}
+  HEADERS ${async_sycl_headers}
+  COMPAT_HEADERS ${async_sycl_compat_headers}
+  DEPENDENCIES
+    hpx_allocator_support
+    hpx_assertion
+    hpx_concurrency
+    hpx_config
+    hpx_debugging
+    hpx_errors
+    hpx_execution_base
+    hpx_futures
+    hpx_memory
+    hpx_runtime_local
+    hpx_threading_base
+  CMAKE_SUBDIRS examples tests
+)

@@ -546,6 +546,14 @@ if(HPX_WITH_CUDA AND HPX_WITH_HIP)
 endif()
 
 # ##############################################################################
+# HPX SYCL configuration
+# ##############################################################################
+set(CUDA_OPTION_STRING "Enable support for Sycl (default: OFF)")
+hpx_option(HPX_WITH_SYCL BOOL "${SYCL_OPTION_STRING}" OFF ADVANCED)
+# TODO Add conflict with CUDA/HIP?
+# TODO Enable automatically when compiled with dpcpp or syclcc?
+
+# ##############################################################################
 # pkgconfig file generation
 # ##############################################################################
 set(HPX_WITH_PKGCONFIG_DEFAULT ON)
@@ -2086,6 +2094,7 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
 endif()
 
 # Setup packages and subprojects
+include(HPX_SetupSYCL)
 include(HPX_SetupHIP)
 include(HPX_SetupApex)
 include(HPX_SetupPapi)
