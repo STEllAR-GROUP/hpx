@@ -49,6 +49,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       component_inheritance
       component_with_custom_heap
       component_with_executor
+      custom_serialization
       data_actions
       error_handling
       factorial
@@ -69,7 +70,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       receive_buffer
       sierpinski
       zerocopy_rdma
-      custom_serialization
   )
 endif()
 
