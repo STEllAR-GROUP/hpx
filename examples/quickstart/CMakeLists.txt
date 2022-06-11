@@ -49,6 +49,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       component_inheritance
       component_with_custom_heap
       component_with_executor
+      custom_serialization
       data_actions
       error_handling
       factorial
@@ -127,6 +128,7 @@ set(simple_future_continuation_PARAMETERS THREADS_PER_LOCALITY 4)
 set(timed_futures_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_counting_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_zip_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
+set(custom_serialization_PARAMETERS LOCALITIES 2)
 
 # the following example fails compiling on someversions of MSVC
 if(HPX_WITH_TUPLE_RVALUE_SWAP AND (NOT MSVC))

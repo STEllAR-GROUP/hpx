@@ -24,17 +24,18 @@ To build the |hpx| documentation, you need recent versions of the following
 packages:
 
 - ``python3``
-- ``sphinx 3.5.4`` (Python package)
-- ``sphinx_rtd_theme`` (Python package)
-- ``breathe 4.16.0`` (Python package)
+- ``sphinx 4.5.0`` (Python package)
+- ``sphinx-book-theme`` (Python package)
+- ``breathe 4.33.1`` (Python package)
 - ``doxygen``
+- ``sphinxcontrib-bibtex``
 
 If the |python|_ dependencies are not available through your system package
 manager, you can install them using the Python package manager ``pip``:
 
 .. code-block:: bash
 
-   pip install --user sphinx sphinx_rtd_theme breathe
+   pip install --user "sphinx<5" sphinx-book-theme breathe sphinxcontrib-bibtex
 
 You may need to set the following CMake variables to make sure CMake can
 find the required dependencies.

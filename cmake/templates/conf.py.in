@@ -643,7 +643,6 @@ html_favicon = '_static/images/favicon.png'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 html_context = {
-    'css_files': ['_static/css/theme_overrides.css'],
     'display_github': True,
     'github_user': 'STEllAR-GROUP',
     'github_repo': 'hpx',

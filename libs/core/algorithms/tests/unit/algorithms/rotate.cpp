@@ -131,10 +131,13 @@ void test_rotate()
     test_rotate(IteratorTag());
     test_rotate(seq, IteratorTag());
     test_rotate(par, IteratorTag());
+    test_rotate(unseq, IteratorTag());
     test_rotate(par_unseq, IteratorTag());
 
     test_rotate_async(seq(task), IteratorTag());
     test_rotate_async(par(task), IteratorTag());
+    test_rotate_async(unseq(task), IteratorTag());
+    test_rotate_async(par_unseq(task), IteratorTag());
 }
 
 void rotate_test()

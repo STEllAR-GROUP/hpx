@@ -267,6 +267,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/accumulate.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/reduce.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -286,69 +287,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // transform_reduce
     namespace detail {
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename ExPolicy, typename Reduce,
-            typename Convert>
-        struct transform_reduce_iteration
-        {
-            using execution_policy_type = typename std::decay<ExPolicy>::type;
-            using reduce_type = typename std::decay<Reduce>::type;
-            using convert_type = typename std::decay<Convert>::type;
-
-            reduce_type reduce_;
-            convert_type convert_;
-
-            template <typename Reduce_, typename Convert_>
-            HPX_HOST_DEVICE transform_reduce_iteration(
-                Reduce_&& reduce, Convert_&& convert)
-              : reduce_(HPX_FORWARD(Reduce_, reduce))
-              , convert_(HPX_FORWARD(Convert_, convert))
-            {
-            }
-
-#if !defined(__NVCC__) && !defined(__CUDACC__)
-            transform_reduce_iteration(
-                transform_reduce_iteration const&) = default;
-            transform_reduce_iteration(transform_reduce_iteration&&) = default;
-#else
-            HPX_HOST_DEVICE transform_reduce_iteration(
-                transform_reduce_iteration const& rhs)
-              : reduce_(rhs.reduce_)
-              , convert_(rhs.convert_)
-            {
-            }
-
-            HPX_HOST_DEVICE transform_reduce_iteration(
-                transform_reduce_iteration&& rhs)
-              : reduce_(HPX_MOVE(rhs.reduce_))
-              , convert_(HPX_MOVE(rhs.convert_))
-            {
-            }
-#endif
-
-            transform_reduce_iteration& operator=(
-                transform_reduce_iteration const&) = default;
-            transform_reduce_iteration& operator=(
-                transform_reduce_iteration&&) = default;
-
-            template <typename Iter>
-            HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(
-                Iter part_begin, std::size_t part_size)
-            {
-                using reference =
-                    typename std::iterator_traits<Iter>::reference;
-
-                T val = HPX_INVOKE(convert_, *part_begin);
-                return util::accumulate_n(++part_begin, --part_size,
-                    HPX_MOVE(val),
-                    [HPX_CXX20_CAPTURE_THIS(=)](
-                        T const& res, reference next) mutable -> T {
-                        return HPX_INVOKE(
-                            reduce_, res, HPX_INVOKE(convert_, next));
-                    });
-            }
-        };
-
         template <typename T>
         struct transform_reduce
           : public detail::algorithm<transform_reduce<T>, T>
@@ -360,16 +298,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename T_, typename Reduce, typename Convert>
-            static T sequential(ExPolicy, Iter first, Sent last, T_&& init,
-                Reduce&& r, Convert&& conv)
+            static T sequential(ExPolicy&& policy, Iter first, Sent last,
+                T_&& init, Reduce&& r, Convert&& conv)
             {
-                using value_type =
-                    typename std::iterator_traits<Iter>::value_type;
-
-                return detail::accumulate(first, last, HPX_FORWARD(T_, init),
-                    [&r, &conv](T const& res, value_type const& next) -> T {
-                        return HPX_INVOKE(r, res, HPX_INVOKE(conv, next));
-                    });
+                return detail::sequential_reduce<ExPolicy>(
+                    HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(T_, init), HPX_FORWARD(Reduce, r),
+                    HPX_FORWARD(Convert, conv));
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -385,9 +320,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         HPX_MOVE(init_));
                 }
 
-                auto f1 =
-                    transform_reduce_iteration<T, ExPolicy, Reduce, Convert>(
-                        HPX_FORWARD(Reduce, r), HPX_FORWARD(Convert, conv));
+                auto f1 = [r, conv](
+                              Iter part_begin, std::size_t part_size) mutable {
+                    auto val = HPX_INVOKE(conv, *part_begin);
+                    return detail::sequential_reduce<ExPolicy>(
+                        ++part_begin, --part_size, HPX_MOVE(val), r, conv);
+                };
 
                 return util::partitioner<ExPolicy, T>::call(
                     HPX_FORWARD(ExPolicy, policy), first,
@@ -395,8 +333,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     hpx::unwrapping([init = HPX_FORWARD(T_, init),
                                         r = HPX_FORWARD(Reduce, r)](
                                         auto&& results) mutable -> T {
-                        return util::accumulate_n(hpx::util::begin(results),
-                            hpx::util::size(results), init, r);
+                        return detail::sequential_reduce<ExPolicy>(
+                            hpx::util::begin(results), hpx::util::size(results),
+                            init, r);
                     }));
             }
         };
@@ -404,37 +343,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // transform_reduce_binary
     namespace detail {
-
-        template <typename F>
-        struct transform_reduce_binary_indirect
-        {
-            F f_;
-
-            template <typename Iter1, typename Iter2>
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
-                Iter1 it1, Iter2 it2) -> decltype(HPX_INVOKE(f_, *it1, *it2))
-            {
-                return HPX_INVOKE(f_, *it1, *it2);
-            }
-        };
-
-        template <typename Op1, typename Op2, typename T>
-        struct transform_reduce_binary_partition
-        {
-            typedef typename std::decay<T>::type value_type;
-
-            Op1 op1_;
-            Op2 op2_;
-            value_type& part_sum_;
-
-            template <typename Iter1, typename Iter2>
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
-                Iter1 it1, Iter2 it2)
-            {
-                part_sum_ =
-                    HPX_INVOKE(op1_, part_sum_, HPX_INVOKE(op2_, *it1, *it2));
-            }
-        };
 
         template <typename T>
         struct transform_reduce_binary
@@ -450,51 +358,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static T sequential(ExPolicy&& /* policy */, Iter first1,
                 Sent last1, Iter2 first2, T_ init, Op1&& op1, Op2&& op2)
             {
-                if (first1 == last1)
-                {
-                    return init;
-                }
-
-                // check whether we should apply vectorization
-                if (!util::loop_optimization<ExPolicy>(first1, last1))
-                {
-                    util::loop2<ExPolicy>(std::false_type(), first1, last1,
-                        first2,
-                        transform_reduce_binary_partition<Op1, Op2, T>{
-                            HPX_FORWARD(Op1, op1), HPX_FORWARD(Op2, op2),
-                            init});
-                    return init;
-                }
-
-                // loop_step properly advances the iterators
-                auto part_sum = util::loop_step<ExPolicy>(std::true_type(),
-                    transform_reduce_binary_indirect<Op2>{op2}, first1, first2);
-
-                std::pair<Iter, Iter2> p = util::loop2<ExPolicy>(
-                    std::true_type(), first1, last1, first2,
-                    transform_reduce_binary_partition<Op1, Op2,
-                        decltype(part_sum)>{op1, op2, part_sum});
-
-                // this is to support vectorization, it will call op1 for each
-                // of the elements of a value-pack
-                auto result = util::detail::accumulate_values<ExPolicy>(
-                    [&op1](T const& sum, T&& val) -> T {
-                        return HPX_INVOKE(op1, sum, val);
-                    },
-                    HPX_MOVE(part_sum), HPX_MOVE(init));
-
-                // the vectorization might not cover all of the sequences,
-                // handle the remainder directly
-                if (p.first != last1)
-                {
-                    util::loop2<ExPolicy>(std::false_type(), p.first, last1,
-                        p.second,
-                        transform_reduce_binary_partition<Op1, Op2,
-                            decltype(result)>{HPX_FORWARD(Op1, op1),
-                            HPX_FORWARD(Op2, op2), result});
-                }
-
-                return util::detail::extract_value<ExPolicy>(result);
+                return detail::sequential_reduce<ExPolicy>(first1, last1,
+                    first2, HPX_FORWARD(T_, init), HPX_FORWARD(Op1, op1),
+                    HPX_FORWARD(Op2, op2));
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -525,52 +391,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     Iter last1 = it1;
                     std::advance(last1, part_size);
 
-                    if (!util::loop_optimization<ExPolicy>(it1, last1))
-                    {
-                        // loop_step properly advances the iterators
-                        auto result =
-                            util::loop_step<ExPolicy>(std::false_type(),
-                                transform_reduce_binary_indirect<Op2>{op2}, it1,
-                                it2);
+                    auto&& result = HPX_INVOKE(op2, *it1, *it2);
+                    ++it1;
+                    ++it2;
 
-                        util::loop2<ExPolicy>(std::false_type(), it1, last1,
-                            it2,
-                            transform_reduce_binary_partition<Op1, Op2,
-                                decltype(result)>{HPX_FORWARD(Op1, op1),
-                                HPX_FORWARD(Op2, op2), result});
-
-                        return util::detail::extract_value<ExPolicy>(result);
-                    }
-
-                    // loop_step properly advances the iterators
-                    auto part_sum = util::loop_step<ExPolicy>(std::true_type(),
-                        transform_reduce_binary_indirect<Op2>{op2}, it1, it2);
-
-                    std::pair<Iter, Iter2> p =
-                        util::loop2<ExPolicy>(std::true_type(), it1, last1, it2,
-                            transform_reduce_binary_partition<Op1, Op2,
-                                decltype(part_sum)>{op1, op2, part_sum});
-
-                    // this is to support vectorization, it will call op1
-                    // for each of the elements of a value-pack
-                    auto result = util::detail::accumulate_values<ExPolicy>(
-                        [&op1](T const& sum, T&& val) -> T {
-                            return HPX_INVOKE(op1, sum, val);
-                        },
-                        part_sum);
-
-                    // the vectorization might not cover all of the sequences,
-                    // handle the remainder directly
-                    if (p.first != last1)
-                    {
-                        util::loop2<ExPolicy>(std::false_type(), p.first, last1,
-                            p.second,
-                            transform_reduce_binary_partition<Op1, Op2,
-                                decltype(result)>{HPX_FORWARD(Op1, op1),
-                                HPX_FORWARD(Op2, op2), result});
-                    }
-
-                    return util::detail::extract_value<ExPolicy>(result);
+                    return detail::sequential_reduce<ExPolicy>(it1, last1, it2,
+                        HPX_MOVE(result), HPX_FORWARD(Op1, op1),
+                        HPX_FORWARD(Op2, op2));
                 };
 
                 using hpx::util::make_zip_iterator;
@@ -591,68 +418,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
-
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/functional/traits/get_function_address.hpp>
-#include <hpx/functional/traits/get_function_annotation.hpp>
-
-namespace hpx { namespace traits {
-    template <typename T, typename ExPolicy, typename Reduce, typename Convert>
-    struct get_function_address<parallel::v1::detail::
-            transform_reduce_iteration<T, ExPolicy, Reduce, Convert>>
-    {
-        static constexpr char const* call(
-            parallel::v1::detail::transform_reduce_iteration<T, ExPolicy,
-                Reduce, Convert> const& f) noexcept
-        {
-            char const* reduce_name =
-                get_function_address<typename std::decay<Reduce>::type>::call(
-                    f.reduce_);
-
-            return reduce_name != nullptr ?
-                reduce_name :
-                get_function_address<typename std::decay<Convert>::type>::call(
-                    f.convert_);
-        }
-    };
-
-    template <typename T, typename ExPolicy, typename Reduce, typename Convert>
-    struct get_function_annotation<parallel::v1::detail::
-            transform_reduce_iteration<T, ExPolicy, Reduce, Convert>>
-    {
-        static constexpr char const* call(
-            parallel::v1::detail::transform_reduce_iteration<T, ExPolicy,
-                Reduce, Convert> const& f) noexcept
-        {
-            char const* reduce_name = get_function_annotation<
-                typename std::decay<Reduce>::type>::call(f.reduce_);
-
-            return reduce_name != nullptr ?
-                reduce_name :
-                get_function_annotation<
-                    typename std::decay<Convert>::type>::call(f.convert_);
-        }
-    };
-
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename T, typename ExPolicy, typename Reduce, typename Convert>
-    struct get_function_annotation_itt<parallel::v1::detail::
-            transform_reduce_iteration<T, ExPolicy, Reduce, Convert>>
-    {
-        static util::itt::string_handle call(
-            parallel::v1::detail::transform_reduce_iteration<T, ExPolicy,
-                Reduce, Convert> const& f) noexcept
-        {
-            static util::itt::string_handle sh(get_function_annotation<
-                parallel::v1::detail::transform_reduce_iteration<T, ExPolicy,
-                    Reduce, Convert>>::call(f));
-
-            return sh;
-        }
-    };
-#endif
-}}    // namespace hpx::traits
-#endif
 
 namespace hpx {
 

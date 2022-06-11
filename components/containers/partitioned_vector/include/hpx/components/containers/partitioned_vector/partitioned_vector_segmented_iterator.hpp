@@ -36,7 +36,8 @@
 
 namespace hpx { namespace segmented {
     ///////////////////////////////////////////////////////////////////////////
-    // This class wraps plain a vector<>::iterator or vector<>::const_iterator
+    // This class wraps plain a partitioned_vector<>::iterator or
+    // partitioned_vector<>::const_iterator
     template <typename T, typename Data, typename BaseIter>
     class local_raw_vector_iterator
       : public hpx::util::iterator_adaptor<
@@ -232,7 +233,7 @@ namespace hpx { namespace segmented {
 
     ///////////////////////////////////////////////////////////////////////////
     /// This class implements the local iterator functionality for the
-    /// partitioned backend of a hpx::vector.
+    /// partitioned backend of a hpx::partitioned_vector.
     template <typename T, typename Data>
     class local_vector_iterator
       : public hpx::util::iterator_facade<
@@ -544,7 +545,8 @@ namespace hpx { namespace segmented {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// This class implement the segmented iterator for the hpx::vector
+    /// This class implement the segmented iterator for the
+    /// hpx::partitioned_vector.
     template <typename T, typename Data, typename BaseIter>
     class segment_vector_iterator
       : public hpx::util::iterator_adaptor<
@@ -657,7 +659,8 @@ namespace hpx { namespace segmented {
         };
     }    // namespace detail
 
-    /// This class implement the local segmented iterator for the hpx::vector
+    /// This class implement the local segmented iterator for the
+    /// hpx::partitioned_vector.
     template <typename T, typename Data, typename BaseIter>
     class local_segment_vector_iterator
       : public hpx::util::iterator_adaptor<
@@ -744,7 +747,8 @@ namespace hpx { namespace segmented {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// This class implements the (global) iterator functionality for hpx::vector.
+    /// This class implements the (global) iterator functionality for
+    /// hpx::partitioned_vector.
     template <typename T, typename Data>
     class vector_iterator
       : public hpx::util::iterator_facade<vector_iterator<T, Data>, T,
