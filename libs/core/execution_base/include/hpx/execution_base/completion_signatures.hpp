@@ -380,6 +380,11 @@ namespace hpx::execution::experimental {
     template <typename Sender, typename Receiver>
     struct is_sender_to;
 
+    // The sender_of concept defines the requirements for a sender type that on
+    // successful completion sends the specified set of value types.
+    template <class S, class E = no_env, class... Ts>
+    struct is_sender_of;
+
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
@@ -599,6 +604,31 @@ namespace hpx::execution::experimental {
 
     template <typename Sender, typename Env = empty_env>
     inline constexpr bool is_sender_v = is_sender<Sender, Env>::value;
+
+    namespace detail {
+        template <bool IsSenderOf, class S, class E = no_env, class... Ts>
+        struct is_sender_of_impl;
+
+        template <class S, class E, class... Ts>
+        struct is_sender_of_impl<false, S, E, Ts...> : std::false_type
+        {
+        };
+
+        template <class S, class E, class... Ts>
+        struct is_sender_of_impl<true, S, E, Ts...>
+          : std::integral_constant<bool,
+                is_receiver_of_v<S, completion_signatures_of_t<S, E>>>
+        {
+        };
+    }    // namespace detail
+
+    template <class S, class E, class... Ts>
+    struct is_sender_of : detail::is_sender_of_impl<is_sender_v<S>, E, Ts...>
+    {
+    };
+
+    template <class S, class E = no_env, class... Ts>
+    inline constexpr bool is_sender_of_v = is_sender_of<S, E, Ts...>::value;
 
     template <typename Sender, typename Receiver>
     struct is_sender_to
