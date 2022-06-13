@@ -251,8 +251,8 @@ namespace hpx { namespace ranges {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a sort algorithm returns a
-    ///           \a hpx::future<typename hpx::traits::range_iterator<Rng>
-    ///           ::type> if the execution policy is of type
+    ///           \a hpx::future<typename hpx::traits::range_iterator_t<Rng>
+    ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a
     ///           typename hpx::traits::range_iterator<Rng>::type
@@ -261,7 +261,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng, typename Pred, typename Proj>
     typename util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_iterator<Rng>::type>::type
+        typename hpx::traits::range_iterator_t<Rng>>::type
     sort(ExPolicy&& policy, Rng&& rng, Comp&& comp, Proj&&);
 
     // clang-format on

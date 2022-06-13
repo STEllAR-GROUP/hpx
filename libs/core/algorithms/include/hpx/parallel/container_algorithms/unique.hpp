@@ -195,8 +195,8 @@ namespace hpx { namespace ranges {
     /// calling thread.
     ///
     /// \returns  The \a unique algorithm returns
-    ///           \a subrange_t<typename hpx::traits::range_iterator<Rng>
-    ///           ::type,hpx::traits::range_iterator_t<Rng>>.
+    ///           \a subrange_t<typename hpx::traits::range_iterator_t<Rng>,
+    ///           hpx::traits::range_iterator_t<Rng>>.
     ///           The \a unique algorithm returns an object {ret, last},
     ///           where ret is a past-the-end iterator for a new
     ///           subrange.
