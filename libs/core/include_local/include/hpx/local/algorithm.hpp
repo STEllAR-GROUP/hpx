@@ -9,3 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/algorithm.hpp>
 #include <hpx/parallel/container_algorithms.hpp>
+#if defined(HPX_HAVE_DATAPAR)
+#include <hpx/parallel/datapar.hpp>
+#endif

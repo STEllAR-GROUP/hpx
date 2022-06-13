@@ -22,6 +22,9 @@
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/executors/sequenced_executor.hpp>
 #include <hpx/serialization/serialize.hpp>
+#if defined(HPX_HAVE_DATAPAR)
+#include <hpx/executors/datapar/execution_policy.hpp>
+#endif
 
 #include <memory>
 #include <type_traits>
@@ -1393,6 +1396,12 @@ namespace hpx { namespace execution {
         }
 
     public:
+        using base_policy_type = parallel_task_policy;
+        base_policy_type base_policy()
+        {
+            return parallel_task_policy{};
+        }
+
         /// Return the associated executor object.
         executor_type& executor()
         {
@@ -1526,6 +1535,14 @@ namespace hpx { namespace execution {
         }
 
     public:
+        using base_policy_type =
+            parallel_task_policy_shim<Executor, Parameters>;
+        base_policy_type base_policy()
+        {
+            return parallel_task_policy_shim<Executor, Parameters>(
+                exec_, params_);
+        }
+
         /// Return the associated executor object.
         executor_type& executor()
         {
@@ -1686,6 +1703,12 @@ namespace hpx { namespace execution {
         }
 
     public:
+        using base_policy_type = parallel_policy;
+        base_policy_type base_policy()
+        {
+            return parallel_policy{};
+        }
+
         /// Return the associated executor object.
         executor_type& executor()
         {
@@ -1831,6 +1854,12 @@ namespace hpx { namespace execution {
         }
 
     public:
+        using base_policy_type = parallel_policy_shim<Executor, Parameters>;
+        base_policy_type base_policy()
+        {
+            return parallel_policy_shim<Executor, Parameters>(exec_, params_);
+        }
+
         /// Return the associated executor object.
         executor_type& executor()
         {
@@ -1998,6 +2027,12 @@ namespace hpx { namespace execution {
         }
 
     public:
+        using base_policy_type = sequenced_policy;
+        base_policy_type base_policy()
+        {
+            return sequenced_policy{};
+        }
+
         /// Return the associated executor object.
         executor_type& executor()
         {
@@ -2139,6 +2174,14 @@ namespace hpx { namespace execution {
         }
 
     public:
+        using base_policy_type =
+            sequenced_task_policy_shim<Executor, Parameters>;
+        base_policy_type base_policy()
+        {
+            return sequenced_task_policy_shim<Executor, Parameters>(
+                exec_, params_);
+        }
+
         /// Return the associated executor object.
         executor_type& executor()
         {
@@ -2305,6 +2348,12 @@ namespace hpx { namespace execution {
         }
 
     public:
+        using base_policy_type = sequenced_policy;
+        base_policy_type base_policy()
+        {
+            return sequenced_policy{};
+        }
+
         /// Return the associated executor object.
         executor_type& executor()
         {
@@ -2447,6 +2496,12 @@ namespace hpx { namespace execution {
         }
 
     public:
+        using base_policy_type = sequenced_policy_shim<Executor, Parameters>;
+        base_policy_type base_policy()
+        {
+            return sequenced_policy_shim<Executor, Parameters>(exec_, params_);
+        }
+
         /// Return the associated executor object.
         executor_type& executor()
         {

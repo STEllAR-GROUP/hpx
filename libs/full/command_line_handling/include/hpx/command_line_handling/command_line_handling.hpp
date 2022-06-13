@@ -18,6 +18,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
 
@@ -98,3 +100,5 @@ namespace hpx { namespace util {
             int argc, char** argv);
     };
 }}    // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>
