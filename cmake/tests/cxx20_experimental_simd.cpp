@@ -23,7 +23,7 @@ int main()
             std::experimental::native_simd<float>>;
     auto x2 = std::experimental::memory_alignment_v<
             std::experimental::simd<float, std::experimental::simd_abi::scalar>>;
-    
+
     std::vector<int> arr(32, 5);
     v1.copy_from(arr.data(), std::experimental::element_aligned);
     v3.copy_from(arr.data(), std::experimental::element_aligned);

@@ -13,7 +13,7 @@ if(NOT TARGET Eve::eve)
 
   if(NOT EVE_INCLUDE_DIR)
     hpx_error(
-      "Could not find Eve. Set EVE_ROOT as a CMake or environment variable to point to the Eve root install directory. Alternatively, set HPX_WITH_FETCH_DATAPAR_EVE=ON to fetch Eve using CMake's FetchContent (when using this option Eve will be installed together with HPX, be careful about conflicts with separately installed versions of Eve)."
+      "Could not find Eve. Set EVE_ROOT as a CMake or environment variable to point to the Eve root install directory. Alternatively, set HPX_WITH_FETCH_EVE=ON to fetch Eve using CMake's FetchContent (when using this option Eve will be installed together with HPX, be careful about conflicts with separately installed versions of Eve)."
     )
   endif()
 
@@ -45,6 +45,8 @@ if(NOT TARGET Eve::eve)
            REPLACE "#define EVE_LIB_VERSION \"([0-9]+\.[0-9]+\.[0-9]+\.[0-9])\""
                    "\\1" EVE_VERSION_STRING "${EVE_VERSION_DEFINE_LINE}"
     )
+  else()
+    set(EVE_VERSION_STRING "NOT_FOUND")
   endif()
 
   include(FindPackageHandleStandardArgs)

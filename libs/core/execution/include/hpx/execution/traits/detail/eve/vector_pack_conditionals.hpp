@@ -9,8 +9,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_EVE)
-#include <cstddef>
-
 #include <eve/eve.hpp>
 
 namespace hpx { namespace parallel { namespace traits {

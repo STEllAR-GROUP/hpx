@@ -12,8 +12,6 @@
 #include <eve/module/core.hpp>
 #include <eve/wide.hpp>
 
-#include <cstddef>
-
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi, typename Reduce>

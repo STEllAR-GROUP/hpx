@@ -9,14 +9,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_EVE)
-
 #include <eve/eve.hpp>
-#include <eve/function/load.hpp>
 #include <eve/function/store.hpp>
 #include <eve/memory/aligned_ptr.hpp>
 
-#include <cstddef>
-#include <iterator>
 #include <memory>
 
 ///////////////////////////////////////////////////////////////////////////////

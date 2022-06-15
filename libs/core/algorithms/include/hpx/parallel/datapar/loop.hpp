@@ -34,44 +34,6 @@ namespace hpx { namespace parallel { namespace util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename F, typename Vector>
-        HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-            typename traits::vector_pack_type<
-                typename std::decay<Vector>::type::value_type, 1>::type>::type
-        tag_invoke(hpx::parallel::util::detail::accumulate_values_t<ExPolicy>,
-            F&& f, Vector const& value)
-        {
-            typedef typename std::decay<Vector>::type vector_type;
-            typedef typename vector_type::value_type entry_type;
-
-            entry_type accum = traits::get(value, 0);
-            for (size_t i = 1; i != value.size(); ++i)
-            {
-                accum = f(accum, entry_type(traits::get(value, i)));
-            }
-
-            return
-                typename traits::vector_pack_type<entry_type, 1>::type(accum);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename F, typename Vector, typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-            typename traits::vector_pack_type<T, 1>::type>::type
-        tag_invoke(hpx::parallel::util::detail::accumulate_values_t<ExPolicy>,
-            F&& f, Vector const& value, T accum)
-        {
-            for (size_t i = 0; i != value.size(); ++i)
-            {
-                accum = f(accum, T(traits::get(value, i)));
-            }
-
-            return typename traits::vector_pack_type<T, 1>::type(accum);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function starting from a given
         // iterator position.
         template <typename Iterator>
