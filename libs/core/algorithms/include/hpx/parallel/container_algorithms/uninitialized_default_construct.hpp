@@ -15,7 +15,7 @@ namespace hpx { namespace ranges {
     // clang-format off
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// in the uninitialized storage designated by the range
     /// by default-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
@@ -47,7 +47,7 @@ namespace hpx { namespace ranges {
         FwdIter first, Sent last);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// in the uninitialized storage designated by the range
     /// by default-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
@@ -95,7 +95,7 @@ namespace hpx { namespace ranges {
         ExPolicy&& policy, FwdIter first, Sent last);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// in the uninitialized storage designated by the range
     /// by default-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
@@ -113,8 +113,7 @@ namespace hpx { namespace ranges {
     /// sequential order in the calling thread.
     ///
     /// \returns  The \a uninitialized_default_construct algorithm returns a
-    ///           returns \a hpx::traits::range_traits<Rng>
-    ///           ::iterator_type.
+    ///           returns \a hpx::traits::range_traits<Rng>.
     ///           The \a uninitialized_default_construct algorithm returns
     ///           the output iterator to the element in the range, one past
     ///           the last element constructed.
@@ -124,7 +123,7 @@ namespace hpx { namespace ranges {
     uninitialized_default_construct(Rng&& rng);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// in the uninitialized storage designated by the range
     /// by default-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
@@ -154,9 +153,8 @@ namespace hpx { namespace ranges {
     /// sequenced within each thread.
     ///
     /// \returns  The \a uninitialized_default_construct algorithm returns a
-    ///           \a hpx::future<typename hpx::traits::range_traits<Rng>
-    ///           ::iterator_type>, if the
-    ///           execution policy is of type \a sequenced_task_policy
+    ///           \a hpx::future<typename hpx::traits::range_traits<Rng>>,
+    ///           if the execution policy is of type \a sequenced_task_policy
     ///           or \a parallel_task_policy and returns \a typename
     ///           hpx::traits::range_traits<Rng>::iterator_type otherwise.
     ///           The \a uninitialized_default_construct algorithm returns
@@ -169,7 +167,7 @@ namespace hpx { namespace ranges {
     uninitialized_default_construct(ExPolicy&& policy, Rng&& rng);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// in the uninitialized storage designated by the range
     /// [first, first + count) by default-initialization. If an exception
     /// is thrown during the initialization, the function has no effects.
     ///
@@ -201,7 +199,7 @@ namespace hpx { namespace ranges {
     FwdIter uninitialized_default_construct_n(FwdIter first, Size count);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// in the uninitialized storage designated by the range
     /// [first, first + count) by default-initialization. If an exception
     /// is thrown during the initialization, the function has no effects.
     ///

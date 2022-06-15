@@ -18,7 +18,7 @@ namespace hpx { namespace collectives {
     /// the given base name.
     ///
     /// \param  basename    The base name identifying the all_reduce operation
-    /// \param  local_result A value to reduce on the central reduction point
+    /// \param  result      A value to reduce on the central reduction point
     ///                     from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
@@ -53,7 +53,7 @@ namespace hpx { namespace collectives {
     /// \param  local_result A value to reduce on the root_site from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
-    /// \param this_site    The sequence number of this invocation (usually
+    /// \param  this_site   The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
@@ -78,10 +78,10 @@ namespace hpx { namespace collectives {
     ///                     given base name. This is optional and needs to be
     ///                     supplied only if the reduction operation on the given
     ///                     base name has to be performed more than once.
-    /// \param this_site    The sequence number of this invocation (usually
+    /// \param  this_site   The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \param root_site    The sequence number of the central reduction point
+    /// \param  root_site   The sequence number of the central reduction point
     ///                     (usually the locality id). This value is optional
     ///                     and defaults to 0.
     ///

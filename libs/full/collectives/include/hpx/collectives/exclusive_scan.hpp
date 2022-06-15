@@ -18,7 +18,7 @@ namespace hpx { namespace collectives {
     /// received from all call sites operating on the given base name.
     ///
     /// \param  basename    The base name identifying the exclusive_scan operation
-    /// \param  local_result The value to transmit to all
+    /// \param  result      The value to transmit to all
     ///                     participating sites from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
@@ -32,7 +32,7 @@ namespace hpx { namespace collectives {
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \params root_site   The site that is responsible for creating the
+    /// \param root_site    The site that is responsible for creating the
     ///                     exclusive_scan support object. This value is optional
     ///                     and defaults to '0' (zero).
     ///
@@ -57,11 +57,11 @@ namespace hpx { namespace collectives {
     /// received from all call sites operating on the given base name.
     ///
     /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  local_result The value to transmit to all
+    /// \param  result      The value to transmit to all
     ///                     participating sites from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
-    /// \param this_site    The sequence number of this invocation (usually
+    /// \param  this_site   The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     ///

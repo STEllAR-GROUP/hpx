@@ -18,7 +18,7 @@ namespace hpx { namespace collectives {
     /// the given base name.
     ///
     /// \param  basename    The base name identifying the all_gather operation
-    /// \param  local_result The value to transmit to all
+    /// \param  result      The value to transmit to all
     ///                     participating sites from this call site.
     /// \param  num_sites   The number of participating sites (default: all
     ///                     localities).
@@ -30,7 +30,7 @@ namespace hpx { namespace collectives {
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \params root_site   The site that is responsible for creating the
+    /// \param root_site   The site that is responsible for creating the
     ///                     all_gather support object. This value is optional
     ///                     and defaults to '0' (zero).
     ///
@@ -52,9 +52,9 @@ namespace hpx { namespace collectives {
     /// the given base name.
     ///
     /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  local_result The value to transmit to all
+    /// \param  result      The value to transmit to all
     ///                     participating sites from this call site.
-    /// \param this_site    The sequence number of this invocation (usually
+    /// \param  this_site   The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     ///

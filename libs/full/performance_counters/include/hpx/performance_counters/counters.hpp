@@ -242,8 +242,8 @@ namespace hpx { namespace performance_counters {
     /// instance. Generally, a full name of a counter instance has the
     /// structure:
     ///
-    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}
-    ///      /countername#parameters
+    ///    /objectname{parentinstancename#parentindex/instancename}
+    ///      /countername
     ///
     /// i.e.
     ///    /queue{localityprefix/thread#2}/length

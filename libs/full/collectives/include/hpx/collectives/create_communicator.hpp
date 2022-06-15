@@ -32,7 +32,7 @@ namespace hpx { namespace collectives {
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \params root_site   The site that is responsible for creating the
+    /// \param root_site    The site that is responsible for creating the
     ///                     collective support object. This value is optional
     ///                     and defaults to '0' (zero).
     ///

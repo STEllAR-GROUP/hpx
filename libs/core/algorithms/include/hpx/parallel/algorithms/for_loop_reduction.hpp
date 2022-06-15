@@ -256,7 +256,7 @@ namespace hpx::experimental {
 }    // namespace hpx::experimental
 
 namespace hpx::parallel { inline namespace v2 {
-
+    /// \cond NOINTERNAL
     template <typename T, typename Op>
     HPX_DEPRECATED_V(1, 8,
         "hpx::hpx::parallel::reduction is deprecated. Please use "
@@ -392,4 +392,5 @@ namespace hpx::parallel { inline namespace v2 {
     {
         return hpx::experimental::reduction_max(var, identity);
     }
+    /// \endcond
 }}    // namespace hpx::parallel::v2

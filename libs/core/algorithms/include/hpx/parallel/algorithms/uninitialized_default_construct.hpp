@@ -11,8 +11,8 @@
 #if defined(DOXYGEN)
 namespace hpx {
 
-    /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// Constructs objects of type typename iterator_traits<ForwardIt> 
+    /// in the uninitialized storage designated by the range
     /// by default-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
@@ -38,7 +38,7 @@ namespace hpx {
     void uninitialized_default_construct(FwdIter first, FwdIter last);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// in the uninitialized storage designated by the range
     /// by default-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
@@ -81,7 +81,7 @@ namespace hpx {
         ExPolicy&& policy, FwdIter first, FwdIter last);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// in the uninitialized storage designated by the range
     /// [first, first + count) by default-initialization. If an exception
     /// is thrown during the initialization, the function has no effects.
     ///
@@ -113,7 +113,7 @@ namespace hpx {
     FwdIter uninitialized_default_construct_n(FwdIter first, Size count);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// in the uninitialized storage designated by the range
     /// [first, first + count) by default-initialization. If an exception
     /// is thrown during the initialization, the function has no effects.
     ///

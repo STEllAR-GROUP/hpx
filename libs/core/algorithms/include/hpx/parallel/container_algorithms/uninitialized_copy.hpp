@@ -136,9 +136,8 @@ namespace hpx { namespace ranges {
     /// the calling thread.
     ///
     /// \returns  The \a uninitialized_copy algorithm returns an
-    ///           \a in_out_result<typename hpx::traits::range_traits<Rng1>
-    ///           ::iterator_type, typename hpx::traits::range_traits<Rng2>
-    ///           ::iterator_type>.
+    ///           \a in_out_result<typename hpx::traits::range_traits<Rng1>, 
+    ///           typename hpx::traits::range_traits<Rng2>>.
     ///           The \a uninitialized_copy algorithm returns an input iterator
     ///           to one past the last element copied from and the output
     ///           iterator to the element in the destination range, one past
