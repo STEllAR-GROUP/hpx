@@ -144,7 +144,7 @@ namespace hpx {
             std::unique_lock<mutex_type>& l, std::ptrdiff_t update = 1)
         {
             HPX_ASSERT_OWNS_LOCK(l);
-            HPX_ASSERT(arrived_ >= update);
+            HPX_ASSERT_LOCKED(l, arrived_ >= update);
 
             bool const old_phase = phase_;
             std::ptrdiff_t const result = (arrived_ -= update);
@@ -209,7 +209,7 @@ namespace hpx {
             if (phase_ == old_phase)
             {
                 cond_.wait(l, "barrier::wait");
-                HPX_ASSERT(phase_ != old_phase);
+                HPX_ASSERT_LOCKED(l, phase_ != old_phase);
             }
         }
 
@@ -221,7 +221,7 @@ namespace hpx {
             if (phase_ == old_phase)
             {
                 cond_.wait(l, "barrier::wait");
-                HPX_ASSERT(phase_ != old_phase);
+                HPX_ASSERT_LOCKED(l, phase_ != old_phase);
             }
         }
 
@@ -245,7 +245,7 @@ namespace hpx {
         void arrive_and_drop()
         {
             std::unique_lock<mutex_type> l(mtx_);
-            HPX_ASSERT(expected_ > 0);
+            HPX_ASSERT_LOCKED(l, expected_ > 0);
             --expected_;
             HPX_UNUSED(arrive_locked(l, 1));
         }
