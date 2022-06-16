@@ -285,13 +285,9 @@ namespace hpx { namespace agas {
 
         /// \brief Get locality locality_id of the console locality.
         ///
-        /// \param locality_id     [out] The locality_id value uniquely identifying the
+        /// \param locality   [out] The locality_id value uniquely identifying the
         ///                   console locality. This is valid only, if the
         ///                   return value of this function is true.
-        /// \param try_cache  [in] If this is set to true the console is first
-        ///                   tried to be found in the local cache. Otherwise
-        ///                   this function will always query AGAS, even if the
-        ///                   console locality_id is already known locally.
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
@@ -353,9 +349,6 @@ namespace hpx { namespace agas {
         ///                   for this component. The default value for this
         ///                   parameter is \a components#component_invalid,
         ///                   which will return prefixes of all localities.
-        /// \param ec         [in,out] this represents the error status on exit,
-        ///                   if this is pre-initialized to \a hpx#throws
-        ///                   the function will throw on error instead.
         ///
         /// \note             As long as \a ec is not pre-initialized to
         ///                   \a hpx#throws this function doesn't
@@ -457,9 +450,6 @@ namespace hpx { namespace agas {
         /// to generate. This function can be called to preallocate a range of
         /// ids usable for this purpose.
         ///
-        /// \param l          [in] The locality the locality id needs to be
-        ///                   generated for. Repeating calls using the same
-        ///                   locality results in identical locality_id values.
         /// \param count      [in] The number of global ids to be generated.
         /// \param lower_bound
         ///                   [out] The lower bound of the assigned id range.
@@ -759,7 +749,7 @@ namespace hpx { namespace agas {
         /// This function will test whether the given address refers to an object
         /// living on the locality of the caller.
         ///
-        /// \param addr       [in] The address to test.
+        /// \param id         TODO
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
@@ -958,13 +948,11 @@ namespace hpx { namespace agas {
 
         /// \brief Increment the global reference count for the given id
         ///
-        /// \param id         [in] The global address (id) for which the
+        /// \param gid        [in] The global address (id) for which the
         ///                   global reference count has to be incremented.
         /// \param credits    [in] The number of reference counts to add for
         ///                   the given id.
-        /// \param ec         [in,out] this represents the error status on exit,
-        ///                   if this is pre-initialized to \a hpx#throws
-        ///                   the function will throw on error instead.
+        /// \param keep_alive TODO
         ///
         /// \returns          Whether the operation was successful.
         ///
@@ -987,11 +975,6 @@ namespace hpx { namespace agas {
         ///
         /// \param id         [in] The global address (id) for which the
         ///                   global reference count has to be decremented.
-        /// \param t          [out] If this was the last outstanding global
-        ///                   reference for the given gid (the return value of
-        ///                   this function is zero), t will be set to the
-        ///                   component type of the corresponding element.
-        ///                   Otherwise t will not be modified.
         /// \param credits    [in] The number of reference counts to add for
         ///                   the given id.
         /// \param ec         [in,out] this represents the error status on exit,
@@ -1062,9 +1045,6 @@ namespace hpx { namespace agas {
         /// \param name       [in] The global name (string) for which any
         ///                   association with a global address (id) has to be
         ///                   released.
-        /// \param ec         [in,out] this represents the error status on exit,
-        ///                   if this is pre-initialized to \a hpx#throws
-        ///                   the function will throw on error instead.
         ///
         /// \returns          The function returns \a true if an association of
         ///                   this global name has been released, and it returns
@@ -1090,9 +1070,6 @@ namespace hpx { namespace agas {
         /// \param name       [in] The global name (string) for which the
         ///                   currently associated global address has to be
         ///                   retrieved.
-        /// \param ec         [in,out] this represents the error status on exit,
-        ///                   if this is pre-initialized to \a hpx#throws
-        ///                   the function will throw on error instead.
         /// \returns          [out] The id currently associated with the given
         ///                   global name (valid only if the return value is
         ///                   true).
@@ -1120,8 +1097,6 @@ namespace hpx { namespace agas {
         ///
         /// \param name       [in] The global name (string) for which the given
         ///                   event should be triggered.
-        /// \param evt        [in] The event for which a listener should be
-        ///                   installed.
         /// \param call_for_past_events   [in, optional] Trigger the listener even
         ///                   if the given event has already happened in the past.
         ///                   The default for this parameter is \a false.

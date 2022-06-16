@@ -146,7 +146,7 @@ namespace hpx {
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
-    /// \param dest         Refers to the begin of the destination range.
+    /// \param dest_first   Refers to the begin of the destination range.
     ///
     /// The assignments in the parallel \a reverse_copy algorithm invoked
     /// with an execution policy object of type \a sequenced_policy

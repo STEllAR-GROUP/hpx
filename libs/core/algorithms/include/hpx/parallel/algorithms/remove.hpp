@@ -34,8 +34,6 @@ namespace hpx {
     ///                     This value type must meet the requirements of
     ///                     \a CopyConstructible.
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the

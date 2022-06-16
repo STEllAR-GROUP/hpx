@@ -39,9 +39,9 @@ namespace hpx { namespace ranges {
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param iter         Refers to the beginning of the sequence of elements
+    /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param sent         Refers to the end of the sequence of elements the
+    /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param comp         \a comp is a callable object. The return value of the
     ///                     INVOKE operation applied to an object of type \a Comp,

@@ -11,10 +11,10 @@
 #if defined(DOXYGEN)
 namespace hpx {
 
-    /// Constructs objects of type typename iterator_traits<ForwardIt> 
-    /// in the uninitialized storage designated by the range
-    /// by default-initialization. If an exception is thrown during the
-    /// initialization, the function has no effects.
+    /// Constructs objects of type typename 
+    /// iterator_traits<ForwardIt>::value_type in the uninitialized storage
+    /// designated by the range by default-initialization. If an exception is
+    /// thrown during the initialization, the function has no effects.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///

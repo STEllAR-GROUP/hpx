@@ -35,8 +35,6 @@ namespace hpx { namespace ranges {
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param middle       Refers to the middle of the sequence of elements
-    ///                     the algorithm will be applied to.
     /// \param last         Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied.
     /// \param comp         comp is a callable object. The return value of the

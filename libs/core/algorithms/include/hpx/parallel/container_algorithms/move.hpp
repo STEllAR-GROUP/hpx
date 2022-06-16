@@ -38,9 +38,9 @@ namespace hpx { namespace ranges {
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
+    /// \param iter         Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///

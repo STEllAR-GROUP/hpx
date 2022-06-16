@@ -323,10 +323,6 @@ namespace hpx {
     ///                     it. The type \a Type1 must be such that objects of
     ///                     type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to \a Type1.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
     ///
     /// The comparisons in the parallel \a minmax_element algorithm invoked with
     /// an execution policy object of type \a sequenced_policy

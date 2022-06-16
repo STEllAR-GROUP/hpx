@@ -48,7 +48,7 @@ namespace hpx {
     public:
         /// Construct a new HPX runtime instance
         ///
-        /// \param locality_mode  [in] This is the mode the given runtime
+        /// \param rtcfg          [in] This is the mode the given runtime
         ///                       instance should be executed in.
         explicit runtime_distributed(util::runtime_configuration& rtcfg,
             int (*pre_main)(runtime_mode) = nullptr,

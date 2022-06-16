@@ -31,7 +31,7 @@ namespace hpx { namespace util {
     /// \tparam Container    Container used to store the check-pointed data.
     /// \tparam Ts           Types of variables to checkpoint
     ///
-    /// \param cont          Container instance used to store the checkpoint data
+    /// \param data          Container instance used to store the checkpoint data
     /// \param ts            Variable instances to be inserted into the checkpoint.
     ///
     /// Save_checkpoint_data takes any number of objects which a user may wish

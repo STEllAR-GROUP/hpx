@@ -396,7 +396,7 @@ namespace hpx {
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param f            The binary predicate which returns true if the
     ///                     This argument is optional and defaults to std::less.

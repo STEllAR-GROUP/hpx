@@ -41,7 +41,7 @@ namespace hpx {
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param val          Value to be removed.
+    /// \param value        Value to be removed.
     ///
     /// The assignments in the parallel \a remove_copy algorithm
     /// execute in sequential order in the calling thread.

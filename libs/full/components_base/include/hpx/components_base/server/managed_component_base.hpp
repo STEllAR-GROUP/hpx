@@ -324,7 +324,7 @@ namespace hpx { namespace components {
         /// wrapped instance. This constructor takes ownership of the
         /// passed pointer.
         ///
-        /// \param c    [in] The pointer to the wrapped instance. The
+        /// \param comp [in] The pointer to the wrapped instance. The
         ///             managed_component takes ownership of this pointer.
         explicit managed_component(Component* comp)
           : component_(comp)

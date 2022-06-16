@@ -35,7 +35,7 @@ namespace hpx { namespace ranges {
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param old_value    Refers to the old value of the elements to replace.
     /// \param new_value    Refers to the new value to use as the replacement.
@@ -119,7 +119,7 @@ namespace hpx { namespace ranges {
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param old_value    Refers to the old value of the elements to replace.
     /// \param new_value    Refers to the new value to use as the replacement.
@@ -235,11 +235,9 @@ namespace hpx { namespace ranges {
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param pred         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
@@ -369,7 +367,7 @@ namespace hpx { namespace ranges {
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param pred         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
