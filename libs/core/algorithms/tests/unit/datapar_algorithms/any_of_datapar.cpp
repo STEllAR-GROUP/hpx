@@ -44,57 +44,10 @@ void any_of_test()
     test_any_of<std::forward_iterator_tag>();
 }
 
-template <typename IteratorTag>
-void test_any_of_exception()
-{
-    using namespace hpx::execution;
-
-    test_any_of_exception(IteratorTag());
-
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_any_of_exception(simd, IteratorTag());
-    test_any_of_exception(par_simd, IteratorTag());
-
-    test_any_of_exception_async(simd(task), IteratorTag());
-    test_any_of_exception_async(par_simd(task), IteratorTag());
-}
-
-////////////////////////////////////////////////////////////////////////////
-void any_of_exception_test()
-{
-    test_any_of_exception<std::random_access_iterator_tag>();
-    test_any_of_exception<std::forward_iterator_tag>();
-}
-
-template <typename IteratorTag>
-void test_any_of_bad_alloc()
-{
-    using namespace hpx::execution;
-
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_any_of_bad_alloc(simd, IteratorTag());
-    test_any_of_bad_alloc(par_simd, IteratorTag());
-
-    test_any_of_bad_alloc_async(simd(task), IteratorTag());
-    test_any_of_bad_alloc_async(par_simd(task), IteratorTag());
-}
-
-void any_of_bad_alloc_test()
-{
-    test_any_of_bad_alloc<std::random_access_iterator_tag>();
-    test_any_of_bad_alloc<std::forward_iterator_tag>();
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
     any_of_test();
-    any_of_exception_test();
-    any_of_bad_alloc_test();
     return hpx::local::finalize();
 }
 
