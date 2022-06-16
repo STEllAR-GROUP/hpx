@@ -46,7 +46,7 @@ if(NOT TARGET Eve::eve)
                    "\\1" EVE_VERSION_STRING "${EVE_VERSION_DEFINE_LINE}"
     )
   else()
-    set(EVE_VERSION_STRING "NOT_FOUND")
+    hpx_error("Cound not find EVE_ROOT/include/eve/version.hpp. Please check your eve installation")
   endif()
 
   include(FindPackageHandleStandardArgs)
