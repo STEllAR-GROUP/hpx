@@ -22,7 +22,7 @@
 # to use them to skip whole compilation units. Vc_SSE_INTRINSICS_BROKEN
 # Vc_AVX_INTRINSICS_BROKEN
 
-if(HPX_WITH_DATAPAR_VC AND NOT TARGET Vc::vc)
+if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC") AND NOT TARGET Vc::vc)
   find_package(Vc ${Vc_FIND_VERSION} QUIET)
 
   if(NOT Vc_FOUND)

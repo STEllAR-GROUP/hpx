@@ -1658,7 +1658,7 @@ if(WIN32)
       -Gw PUBLIC CONFIGURATIONS Release RelWithDebInfo MinSizeRel
     )
     hpx_add_target_compile_option(-Zo PUBLIC CONFIGURATIONS RelWithDebInfo)
-    if(HPX_WITH_DATAPAR_VC)
+    if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
       hpx_add_target_compile_option(-std:c++latest PUBLIC)
       hpx_add_config_cond_define(_HAS_AUTO_PTR_ETC 1)
     endif()
@@ -1769,7 +1769,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # is illegal in the current source character set
     hpx_add_compile_flag(-wd4828)
 
-    if(HPX_WITH_DATAPAR_VC)
+    if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
       # unary minus operator applied to unsigned type, result still unsigned
       hpx_add_compile_flag(-wd4146)
 
@@ -1819,7 +1819,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
     endif()
 
     # False positive when build with Vc and Clang
-    if(NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+    if(NOT (("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC") AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
            )
     )
       hpx_add_compile_flag_if_available(-Werror=trampolines)
@@ -1876,7 +1876,7 @@ else()
   endif()
 
   # False positive when building with Vc and Clang
-  if(NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+  if(NOT (("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC") AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
     # Silence warning about __sync_fetch_and_nand changing semantics
     hpx_add_compile_flag_if_available(-Wno-sync-nand)
   endif()

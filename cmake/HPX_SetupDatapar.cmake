@@ -22,43 +22,27 @@ include(HPX_AddDefinitions)
 # ##############################################################################
 if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
   hpx_option(
-    HPX_WITH_DATAPAR_VC
-    BOOL
-    "Enable data parallel algorithm support using the external Vc library (default: ON)"
-    ON
-    ADVANCED
+    HPX_WITH_DATAPAR_VC_NO_LIBRARY BOOL
+    "Don't link with the Vc static library (default: OFF)" OFF ADVANCED
   )
-  if(HPX_WITH_DATAPAR_VC)
-    hpx_option(
-      HPX_WITH_DATAPAR_VC_NO_LIBRARY BOOL
-      "Don't link with the Vc static library (default: OFF)" OFF ADVANCED
-    )
-  endif()
+  hpx_warn(
+    "Vc support is deprecated. This option will be removed in a future release. It will be replaced with SIMD support from the C++ standard library"
+  )
 
-  if(HPX_WITH_DATAPAR_VC)
-    hpx_warn(
-      "Vc support is deprecated. This option will be removed in a future release. It will be replaced with SIMD support from the C++ standard library"
-    )
-    include(HPX_SetupVc)
-    hpx_option(
-      HPX_WITH_DATAPAR BOOL
-      "Enable data parallel algorithm support using Vc library (default: ON)"
-      ON ADVANCED
-    )
-    hpx_add_config_define(HPX_HAVE_DATAPAR)
-    hpx_add_config_define(HPX_HAVE_DATAPAR_VC)
-  endif()
+  include(HPX_SetupVc)
+  hpx_option(
+    HPX_WITH_DATAPAR BOOL
+    "Enable data parallel algorithm support using Vc library (default: ON)"
+    ON ADVANCED
+  )
+  hpx_add_config_define(HPX_HAVE_DATAPAR)
+  hpx_add_config_define(HPX_HAVE_DATAPAR_VC)
 endif()
 
 # ##############################################################################
 # HPX Eve configuration
 # ##############################################################################
 if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE")
-  hpx_option(
-    HPX_WITH_DATAPAR_EVE BOOL "Use Eve as datapar library (default: ON)" ON
-    CATEGORY "Build Targets"
-    ADVANCED
-  )
   hpx_option(
     HPX_WITH_FETCH_EVE
     BOOL
@@ -73,20 +57,18 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE")
     ADVANCED
   )
 
-  if(HPX_WITH_DATAPAR_EVE)
-    if(HPX_WITH_FETCH_EVE)
-      include(HPX_SetupEve)
-    else()
-      find_package(Eve)
-    endif()
-    hpx_option(
-      HPX_WITH_DATAPAR BOOL
-      "Enable data parallel algorithm support using Eve library (default: ON)"
-      ON ADVANCED
-    )
-    hpx_add_config_define(HPX_HAVE_DATAPAR_EVE)
-    hpx_add_config_define(HPX_HAVE_DATAPAR)
+  if(HPX_WITH_FETCH_EVE)
+    include(HPX_SetupEve)
+  else()
+    find_package(Eve)
   endif()
+  hpx_option(
+    HPX_WITH_DATAPAR BOOL
+    "Enable data parallel algorithm support using Eve library (default: ON)"
+    ON ADVANCED
+  )
+  hpx_add_config_define(HPX_HAVE_DATAPAR_EVE)
+  hpx_add_config_define(HPX_HAVE_DATAPAR)
 endif()
 
 # ##############################################################################
@@ -94,12 +76,6 @@ endif()
 # ##############################################################################
 if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "STD_EXPERIMENTAL_SIMD")
   if(HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
-    hpx_option(
-      HPX_WITH_STD_EXPERIMENTAL_SIMD BOOL
-      "Use STD_EXPERIMENTAL_SIMD as datapar library (default: ON)" ON
-      CATEGORY "Build Targets"
-      ADVANCED
-    )
     hpx_option(
       HPX_WITH_DATAPAR
       BOOL
@@ -109,7 +85,7 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "STD_EXPERIMENTAL_SIMD")
     )
     hpx_add_config_define(HPX_HAVE_DATAPAR_STD_EXPERIMENTAL_SIMD)
     hpx_add_config_define(HPX_HAVE_DATAPAR)
-    else()
+  else()
     hpx_error(
       "Could not find std experimental/simd. Use CXX COMPILER GCC 11 OR CLANG 12 AND ABOVE "
     )
