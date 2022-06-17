@@ -47,7 +47,7 @@ if(NOT TARGET Eve::eve)
     )
   else()
     hpx_error(
-      "Cound not find EVE_ROOT/include/eve/version.hpp. Please check your eve installation"
+      "Could not find EVE_ROOT/include/eve/version.hpp. Please check your eve installation"
     )
   endif()
 

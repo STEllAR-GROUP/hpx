@@ -330,6 +330,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             typename hpx::util::invoke_result<F, V1*, V2*>::type
             callv(F&& f, Iter1& it1, Iter2& it2)
         {
+            HPX_ASSERT(is_data_aligned(it1) && is_data_aligned(it2));
             return invoke_vectorized_in2<V1, V2>::call_aligned(
                 HPX_FORWARD(F, f), it1, it2);
         }
