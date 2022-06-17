@@ -24,11 +24,11 @@ int main()
     auto x2 = std::experimental::memory_alignment_v<
             std::experimental::simd<float, std::experimental::simd_abi::scalar>>;
 
-    std::vector<int> arr(32, 5);
-    v1.copy_from(arr.data(), std::experimental::element_aligned);
-    v3.copy_from(arr.data(), std::experimental::element_aligned);
-    v1.copy_to(arr.data(), std::experimental::element_aligned);
-    v3.copy_to(arr.data(), std::experimental::element_aligned);
+    int arr[32] = {5};
+    v1.copy_from(arr, std::experimental::element_aligned);
+    v3.copy_from(arr, std::experimental::element_aligned);
+    v1.copy_to(arr, std::experimental::element_aligned);
+    v3.copy_to(arr, std::experimental::element_aligned);
 
     alignas(std::experimental::memory_alignment_v<
             std::experimental::native_simd<float>>) float arr2[32] = {42.f};
