@@ -32,8 +32,8 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
   include(HPX_SetupVc)
   hpx_option(
     HPX_WITH_DATAPAR BOOL
-    "Enable data parallel algorithm support using Vc library (default: ON)"
-    ON ADVANCED
+    "Enable data parallel algorithm support using Vc library (default: ON)" ON
+    ADVANCED
   )
   hpx_add_config_define(HPX_HAVE_DATAPAR)
   hpx_add_config_define(HPX_HAVE_DATAPAR_VC)
@@ -64,8 +64,8 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE")
   endif()
   hpx_option(
     HPX_WITH_DATAPAR BOOL
-    "Enable data parallel algorithm support using Eve library (default: ON)"
-    ON ADVANCED
+    "Enable data parallel algorithm support using Eve library (default: ON)" ON
+    ADVANCED
   )
   hpx_add_config_define(HPX_HAVE_DATAPAR_EVE)
   hpx_add_config_define(HPX_HAVE_DATAPAR)
