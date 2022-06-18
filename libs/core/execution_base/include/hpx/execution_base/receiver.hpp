@@ -168,44 +168,38 @@ namespace hpx { namespace execution { namespace experimental {
         {
         };
 
-        template <typename CS>
-        auto inline constexpr _variant =
-            typename CS::template value_types<hpx::tuple, hpx::variant>{};
-
-        template <typename CS>
-        auto inline constexpr _variant_idx = (_variant<CS>) .index();
-
-        template <typename CS>
-        auto inline constexpr _tuple = hpx::get<_variant_idx<CS>>(_variant<CS>);
-
-        template <typename CS>
-        inline constexpr auto _tuple_size =
-            hpx::tuple_size<decltype(_tuple<CS>)>{};
-
-        template <typename T, typename R, typename Tuple, std::size_t... I>
-        bool constexpr inline _is_invocable_tuple_unpack(
-            T, R, Tuple&& t, std::index_sequence<I...>)
+        template <typename F, typename T, typename Variant>
+        struct is_invocable_variant_of_tuples : std::false_type
         {
-            return hpx::is_invocable_v<std::decay_t<T>&&, std::decay_t<R>&&,
-                decltype(hpx::get<I>(std::forward<Tuple>(t)))...>;
-        }
+        };
 
-        template <typename T, typename R, typename Tuple, std::size_t... I>
-        bool constexpr inline _is_invocable_f_tuple_unpack(
-            T&& f, R, Tuple&& t, std::index_sequence<I...>)
+        template <typename F, typename T, typename... Ts>
+        struct is_invocable_variant_of_tuples<F, T,
+            hpx::variant<hpx::tuple<Ts...>>>
+          : hpx::is_invocable<F, std::decay_t<T>&&, Ts...>
         {
-            return noexcept(f(std::declval<R>(),
-                std::declval<decltype(
-                    hpx::get<I>(std::forward<Tuple>(t)))>()...));
-        }
+        };
+
+        template <typename F, typename T, typename Variant>
+        struct is_invocable_variant : std::false_type
+        {
+        };
+
+        template <typename F, typename T, typename... Ts>
+        struct is_invocable_variant<F, T, hpx::variant<Ts...>>
+          : hpx::is_invocable<F, std::decay_t<T>&&, Ts...>
+        {
+        };
 
         template <typename T, typename CS>
         struct is_receiver_of_impl<true, T, CS>
           : std::integral_constant<bool,
-                _is_invocable_tuple_unpack(set_value_t{}, T{}, _tuple<CS>,
-                    std::make_index_sequence<_tuple_size<CS>>{}) &&
-                    _is_invocable_tuple_unpack(set_error_t{}, T{}, _tuple<CS>,
-                        std::make_index_sequence<_tuple_size<CS>>{}) &&
+                is_invocable_variant_of_tuples<set_value_t, T,
+                    typename CS::template value_types<hpx::tuple,
+                        hpx::variant>>::value &&
+                    is_invocable_variant<set_error_t, T,
+                        typename CS::template error_types<hpx::variant>>::
+                        value &&
                     CS::sends_stopped>
         {
         };
@@ -221,6 +215,31 @@ namespace hpx { namespace execution { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
+        template <typename F, typename T, typename Variant>
+        struct is_nothrow_invocable_variant_of_tuples : std::false_type
+        {
+        };
+
+        template <typename F, typename T, typename... Ts>
+        struct is_nothrow_invocable_variant_of_tuples<F, T,
+            hpx::variant<hpx::tuple<Ts...>>>
+          : hpx::functional::is_nothrow_tag_invocable<F, std::decay_t<T>&&,
+                Ts...>
+        {
+        };
+
+        template <typename F, typename T, typename Variant>
+        struct is_nothrow_invocable_variant : std::false_type
+        {
+        };
+
+        template <typename F, typename T, typename... Ts>
+        struct is_nothrow_invocable_variant<F, T, hpx::variant<Ts...>>
+          : hpx::functional::is_nothrow_tag_invocable<F, std::decay_t<T>&&,
+                Ts...>
+        {
+        };
+
         template <bool IsReceiverOf, typename T, typename CS>
         struct is_nothrow_receiver_of_impl;
 
@@ -232,10 +251,12 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename T, typename CS>
         struct is_nothrow_receiver_of_impl<true, T, CS>
           : std::integral_constant<bool,
-                _is_invocable_f_tuple_unpack(set_value, T{}, _tuple<CS>,
-                    std::make_index_sequence<_tuple_size<CS>>{}) &&
-                    _is_invocable_f_tuple_unpack(set_error, T{}, _tuple<CS>,
-                        std::make_index_sequence<_tuple_size<CS>>{}) &&
+                is_nothrow_invocable_variant_of_tuples<set_value_t, T,
+                    typename CS::template value_types<hpx::tuple,
+                        hpx::variant>>::value &&
+                    is_nothrow_invocable_variant<set_error_t, T,
+                        typename CS::template error_types<hpx::variant>>::
+                        value &&
                     CS::sends_stopped>
         {
         };

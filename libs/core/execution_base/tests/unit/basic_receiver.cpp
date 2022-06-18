@@ -216,21 +216,21 @@ int main()
     static_assert(
         is_receiver_of<mylib::receiver_1,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(int()),
+                hpx::execution::experimental::set_value_t(int),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::receiver_1 should be a receiver of an int");
     static_assert(
         !is_nothrow_receiver_of<mylib::receiver_1,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(int()),
+                hpx::execution::experimental::set_value_t(int),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::receiver_1 should not be a nothrow receiver of an int");
     static_assert(
         !is_receiver_of<mylib::receiver_1,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(std::string()),
+                hpx::execution::experimental::set_value_t(std::string),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::receiver_1 should not be a receiver of a std::string");
@@ -242,14 +242,14 @@ int main()
     static_assert(
         !is_receiver_of<mylib::receiver_2,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(int()),
+                hpx::execution::experimental::set_value_t(int),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::receiver_2 should not be a receiver of int");
     static_assert(
         !is_nothrow_receiver_of<mylib::receiver_2,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(int()),
+                hpx::execution::experimental::set_value_t(int),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::receiver_2 should not be a nothrow receiver of int");
@@ -259,21 +259,21 @@ int main()
     static_assert(
         is_receiver_of<mylib::receiver_3,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(int()),
+                hpx::execution::experimental::set_value_t(int),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::receiver_3 should be a receiver of an int");
     static_assert(
         is_nothrow_receiver_of<mylib::receiver_3,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(int()),
+                hpx::execution::experimental::set_value_t(int),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::receiver_3 should be a nothrow receiver of an int");
     static_assert(
         !is_receiver_of<mylib::receiver_3,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(std::string()),
+                hpx::execution::experimental::set_value_t(std::string),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::receiver_3 should not be a receiver of a std::string");
@@ -283,7 +283,7 @@ int main()
     static_assert(
         !is_receiver_of<mylib::non_receiver_1,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(int()),
+                hpx::execution::experimental::set_value_t(int),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::non_receiver_1 should not be a receiver of int");
@@ -292,7 +292,7 @@ int main()
     static_assert(
         !is_receiver_of<mylib::non_receiver_2,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(int()),
+                hpx::execution::experimental::set_value_t(int),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::non_receiver_2 should not be a receiver of int");
@@ -301,7 +301,7 @@ int main()
     static_assert(
         !is_receiver_of<mylib::non_receiver_3,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(int()),
+                hpx::execution::experimental::set_value_t(int),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::non_receiver_3 should not be a receiver of int");
@@ -310,7 +310,7 @@ int main()
     static_assert(
         !is_receiver_of<mylib::non_receiver_4,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(int()),
+                hpx::execution::experimental::set_value_t(int),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::non_receiver_4 should not be a receiver of int");
@@ -319,7 +319,7 @@ int main()
     static_assert(
         !is_receiver_of<mylib::non_receiver_5,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(int()),
+                hpx::execution::experimental::set_value_t(int),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::non_receiver_5 should not be a receiver of int");
@@ -328,7 +328,7 @@ int main()
     static_assert(
         !is_receiver_of<mylib::non_receiver_6,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(int()),
+                hpx::execution::experimental::set_value_t(int),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::non_receiver_6 should not be a receiver of int");
@@ -337,7 +337,7 @@ int main()
     static_assert(
         !is_receiver_of<mylib::non_receiver_7,
             hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(int()),
+                hpx::execution::experimental::set_value_t(int),
                 hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>>::value,
         "mylib::non_receiver_7 should not be a receiver of int");
