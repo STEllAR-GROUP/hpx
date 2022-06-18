@@ -11,7 +11,7 @@ set(DATAPAR_BACKEND "NONE")
 hpx_option(
   HPX_WITH_DATAPAR_BACKEND
   STRING
-  "Define which vectorization library should be used. Options are: VC, EVE, STD_EXPERIMENTAL_SIMD"
+  "Define which vectorization library should be used. Options are: VC, EVE, STD_EXPERIMENTAL_SIMD, NONE"
   ${DATAPAR_BACKEND}
   STRINGS "VC;EVE;STD_EXPERIMENTAL_SIMD;NONE"
 )
