@@ -13,7 +13,7 @@ hpx_option(
   STRING
   "Define which vectorization library should be used. Options are: VC, EVE, STD_EXPERIMENTAL_SIMD"
   ${DATAPAR_BACKEND}
-  STRINGS "VC;EVE;STD_EXPERIMENTAL_SIMD"
+  STRINGS "VC;EVE;STD_EXPERIMENTAL_SIMD;NONE"
 )
 include(HPX_AddDefinitions)
 
