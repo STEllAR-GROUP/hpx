@@ -126,7 +126,7 @@ void send_rectangle_struct(rectangle_free rectangle)
         rectangle.lower_right.y);
 }
 
-HPX_PLAIN_ACTION(send_rectangle_struct);
+HPX_PLAIN_ACTION(send_rectangle_struct)
 
 //[planet_weight_calculator
 class planet_weight_calculator
@@ -174,8 +174,9 @@ inline void load_construct_data(
 {
     double g;
     ar >> g;
-    ::new (weight_calc) planet_weight_calculator(
-        g);    // ::new(ptr) construct new object at given address
+
+    // ::new(ptr) construct new object at given address
+    ::new (weight_calc) planet_weight_calculator(g);
 }
 //]
 
@@ -184,7 +185,7 @@ void send_gravity(planet_weight_calculator gravity)
     std::cout << "gravity.g = " << gravity.getG() << std::flush;
 }
 
-HPX_PLAIN_ACTION(send_gravity);
+HPX_PLAIN_ACTION(send_gravity)
 
 //[Main
 int main()
@@ -194,6 +195,7 @@ int main()
     send_rectangle_struct_action rectangle_action;
     auto rectangle = rectangle_free{{0, 0}, {0, 5}};
     hpx::async(rectangle_action, hpx::find_here(), rectangle).wait();
+
     send_gravity_action gravityAction;
     auto gravity = planet_weight_calculator(9.81);
     hpx::async(gravityAction, hpx::find_remote_localities()[0], gravity).wait();

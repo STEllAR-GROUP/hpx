@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy_fwd.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/future.hpp>
@@ -20,9 +21,16 @@
 
 namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
+
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename Result = void>
-        struct handle_exception_impl
+        template <typename ExPolicy, typename Result = void,
+            typename Enable = void>
+        struct handle_exception_impl;
+
+        template <typename ExPolicy, typename Result>
+        struct handle_exception_impl<ExPolicy, Result,
+            std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
+                !hpx::is_unsequenced_execution_policy_v<ExPolicy>>>
         {
             using type = Result;
 
@@ -75,8 +83,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Result>
-        struct handle_exception_task_impl
+        template <typename ExPolicy, typename Result>
+        struct handle_exception_impl<ExPolicy, Result,
+            std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
+                !hpx::is_unsequenced_execution_policy_v<ExPolicy>>>
         {
             using type = future<Result>;
 
@@ -135,49 +145,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Result>
-        struct handle_exception_impl<hpx::execution::sequenced_task_policy,
-            Result> : handle_exception_task_impl<Result>
-        {
-        };
-
-        template <typename Executor, typename Parameters, typename Result>
-        struct handle_exception_impl<
-            hpx::execution::sequenced_task_policy_shim<Executor, Parameters>,
-            Result> : handle_exception_task_impl<Result>
-        {
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Result>
-        struct handle_exception_impl<hpx::execution::parallel_task_policy,
-            Result> : handle_exception_task_impl<Result>
-        {
-        };
-
-        template <typename Executor, typename Parameters, typename Result>
-        struct handle_exception_impl<
-            hpx::execution::parallel_task_policy_shim<Executor, Parameters>,
-            Result> : handle_exception_task_impl<Result>
-        {
-        };
-
-#if defined(HPX_HAVE_DATAPAR)
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Result>
-        struct handle_exception_impl<hpx::execution::simd_task_policy, Result>
-          : handle_exception_task_impl<Result>
-        {
-        };
-
-        template <typename Result>
-        struct handle_exception_impl<hpx::execution::par_simd_task_policy,
-            Result> : handle_exception_task_impl<Result>
-        {
-        };
-#endif
-
         using exception_list_termination_handler_type = hpx::function<void()>;
 
         HPX_CORE_EXPORT void set_exception_list_termination_handler(
@@ -186,16 +153,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
         [[noreturn]] HPX_CORE_EXPORT void exception_list_termination_handler();
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Result>
-        struct handle_exception_impl<
-            hpx::execution::parallel_unsequenced_policy, Result>
+        // any exceptions thrown by algorithms executed with an unsequenced
+        // policy are to call terminate.
+        template <typename ExPolicy, typename Result>
+        struct handle_exception_impl<ExPolicy, Result,
+            std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
+                hpx::is_unsequenced_execution_policy_v<ExPolicy>>>
         {
             using type = Result;
 
             [[noreturn]] static Result call()
             {
-                // any exceptions thrown by algorithms executed with the
-                // parallel_unsequenced_policy are to call terminate.
                 exception_list_termination_handler();
             }
 
@@ -211,25 +179,24 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
 
-        template <typename Result>
-        struct handle_exception_impl<hpx::execution::unsequenced_policy, Result>
+        template <typename ExPolicy, typename Result>
+        struct handle_exception_impl<ExPolicy, Result,
+            std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
+                hpx::is_unsequenced_execution_policy_v<ExPolicy>>>
         {
-            using type = Result;
+            using type = future<Result>;
 
-            [[noreturn]] static Result call()
-            {
-                // any exceptions thrown by algorithms executed with the
-                // unsequenced_policy are to call terminate.
-                exception_list_termination_handler();
-            }
-
-            [[noreturn]] static hpx::future<Result> call(hpx::future<Result>&&)
+            [[noreturn]] static future<Result> call()
             {
                 exception_list_termination_handler();
             }
 
-            [[noreturn]] static hpx::future<Result> call(
-                std::exception_ptr const&)
+            [[noreturn]] static future<Result> call(future<Result>)
+            {
+                exception_list_termination_handler();
+            }
+
+            [[noreturn]] static future<Result> call(std::exception_ptr const&)
             {
                 exception_list_termination_handler();
             }

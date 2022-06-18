@@ -22,17 +22,24 @@ void test_for_each()
     test_for_each_seq(IteratorTag());
 
     test_for_each(seq, IteratorTag());
+    test_for_each(unseq, IteratorTag());
     test_for_each(par, IteratorTag());
     test_for_each(par_unseq, IteratorTag());
 
     test_for_each_async(seq(task), IteratorTag());
     test_for_each_async(par(task), IteratorTag());
+    test_for_each_async(unseq(task), IteratorTag());
+    test_for_each_async(par_unseq(task), IteratorTag());
 
     test_for_each_sender(seq, IteratorTag());
     test_for_each_sender(par, IteratorTag());
+    test_for_each_sender(unseq, IteratorTag());
     test_for_each_sender(par_unseq, IteratorTag());
+
     test_for_each_sender(seq(task), IteratorTag());
     test_for_each_sender(par(task), IteratorTag());
+    test_for_each_sender(unseq(task), IteratorTag());
+    test_for_each_sender(par_unseq(task), IteratorTag());
 }
 
 void for_each_test()

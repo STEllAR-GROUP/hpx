@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,50 +10,27 @@
 #include <hpx/config.hpp>
 #include <hpx/futures/future.hpp>
 
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
+
+#include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util { namespace detail {
+
     template <typename ExPolicy, template <typename...> class Partitioner,
-        template <typename...> class TaskPartitioner>
+        template <typename...> class TaskPartitioner, typename Enable = void>
     struct select_partitioner
     {
         template <typename... Args>
         using apply = Partitioner<ExPolicy, Args...>;
     };
 
-    template <template <typename...> class Partitioner,
+    template <typename ExPolicy, template <typename...> class Partitioner,
         template <typename...> class TaskPartitioner>
-    struct select_partitioner<hpx::execution::parallel_task_policy, Partitioner,
-        TaskPartitioner>
+    struct select_partitioner<ExPolicy, Partitioner, TaskPartitioner,
+        std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
     {
         template <typename... Args>
-        using apply =
-            TaskPartitioner<hpx::execution::parallel_task_policy, Args...>;
+        using apply = TaskPartitioner<ExPolicy, Args...>;
     };
-
-    template <typename Executor, typename Parameters,
-        template <typename...> class Partitioner,
-        template <typename...> class TaskPartitioner>
-    struct select_partitioner<
-        hpx::execution::parallel_task_policy_shim<Executor, Parameters>,
-        Partitioner, TaskPartitioner>
-    {
-        template <typename... Args>
-        using apply = TaskPartitioner<
-            hpx::execution::parallel_task_policy_shim<Executor, Parameters>,
-            Args...>;
-    };
-
-#if defined(HPX_HAVE_DATAPAR)
-    template <template <typename...> class Partitioner,
-        template <typename...> class TaskPartitioner>
-    struct select_partitioner<hpx::execution::par_simd_task_policy, Partitioner,
-        TaskPartitioner>
-    {
-        template <typename... Args>
-        using apply =
-            TaskPartitioner<hpx::execution::par_simd_task_policy, Args...>;
-    };
-#endif
 }}}}    // namespace hpx::parallel::util::detail

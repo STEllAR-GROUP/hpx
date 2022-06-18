@@ -244,6 +244,11 @@ namespace hpx { namespace detail {
             return has_lock_;
         }
 
+        void unlock() noexcept
+        {
+            state_.unlock();
+        }
+
         stop_state& state_;
         bool has_lock_;
     };
@@ -255,7 +260,8 @@ namespace hpx { namespace detail {
         if (!l)
             return false;    // stop has already been requested.
 
-        HPX_ASSERT(stop_requested(state_.load(std::memory_order_acquire)));
+        HPX_ASSERT_LOCKED(
+            l, stop_requested(state_.load(std::memory_order_acquire)));
 
         signalling_thread_ = hpx::threads::get_self_id();
 

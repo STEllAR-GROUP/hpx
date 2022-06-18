@@ -173,10 +173,17 @@ for lib in hpx_libs.keys():
         module_api_ref = open(basedir + '/full_api.rst', 'w')
         module_api_ref.write(api_ref_header.format(module))
         header_refs = ''
+        header_names = set()
         for source in module_sources[1]:
             header = source[len('include/'):]
             header_splitted = re.split('[/ .]',header)
+            
             header_name = header_splitted[-2]
+            # create a new, longer header name if current one already exists
+            if header_name in header_names:
+                header_name = '{0}_{1}'.format(header_splitted[-3], header_name)
+            header_names.add(header_name)
+                                
             header_ref = open(basedir + '/' + header_name + '.rst', 'w')
             header_ref.write(api_header_file.format(header, module))
             header_ref.close()
@@ -643,7 +650,6 @@ html_favicon = '_static/images/favicon.png'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 html_context = {
-    'css_files': ['_static/css/theme_overrides.css'],
     'display_github': True,
     'github_user': 'STEllAR-GROUP',
     'github_repo': 'hpx',
