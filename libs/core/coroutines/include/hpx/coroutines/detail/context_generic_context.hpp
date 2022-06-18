@@ -90,8 +90,8 @@ namespace hpx { namespace threads { namespace coroutines {
 
             void* allocate(std::size_t size) const
             {
-       // Condition excludes MacOS/M1 from using posix mmap
-#if defined(_POSIX_VERSION) && 
+                // Condition excludes MacOS/M1 from using posix mmap
+#if defined(_POSIX_VERSION) &&                                                 \
     !(defined(__ARM64_ARCH_8__) && defined(__APPLE__))
                 void* limit = posix::alloc_stack(size);
                 posix::watermark_stack(limit, size);
