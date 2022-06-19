@@ -36,46 +36,6 @@ void fill_test()
     test_fill<std::forward_iterator_tag>();
 }
 
-////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_fill_exception()
-{
-    using namespace hpx::execution;
-
-    test_fill_exception(IteratorTag());
-
-    test_fill_exception(simd, IteratorTag());
-    test_fill_exception(par_simd, IteratorTag());
-
-    test_fill_exception_async(simd(task), IteratorTag());
-    test_fill_exception_async(par_simd(task), IteratorTag());
-}
-
-void fill_exception_test()
-{
-    test_fill_exception<std::random_access_iterator_tag>();
-    test_fill_exception<std::forward_iterator_tag>();
-}
-
-////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_fill_bad_alloc()
-{
-    using namespace hpx::execution;
-
-    test_fill_bad_alloc(simd, IteratorTag());
-    test_fill_bad_alloc(par_simd, IteratorTag());
-
-    test_fill_bad_alloc_async(simd(task), IteratorTag());
-    test_fill_bad_alloc_async(par_simd(task), IteratorTag());
-}
-
-void fill_bad_alloc_test()
-{
-    test_fill_bad_alloc<std::random_access_iterator_tag>();
-    test_fill_bad_alloc<std::forward_iterator_tag>();
-}
-
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (vm.count("seed"))
@@ -85,8 +45,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     gen.seed(seed);
 
     fill_test();
-    fill_exception_test();
-    fill_bad_alloc_test();
     return hpx::local::finalize();
 }
 

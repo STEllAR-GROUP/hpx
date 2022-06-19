@@ -567,38 +567,6 @@ hpx_option(
 )
 
 # ##############################################################################
-# HPX datapar configuration
-# ##############################################################################
-hpx_option(
-  HPX_WITH_DATAPAR_VC
-  BOOL
-  "Enable data parallel algorithm support using the external Vc library (default: OFF)"
-  OFF
-  ADVANCED
-)
-if(HPX_WITH_DATAPAR_VC)
-  hpx_option(
-    HPX_WITH_DATAPAR_VC_NO_LIBRARY BOOL
-    "Don't link with the Vc static library (default: OFF)" OFF ADVANCED
-  )
-endif()
-
-if(HPX_WITH_DATAPAR_VC)
-  hpx_warn(
-    "Vc support is deprecated. This option will be removed in a future release. It will be replaced with SIMD support from the C++ standard library"
-  )
-  include(HPX_SetupVc)
-endif()
-if(NOT HPX_WITH_DATAPAR_VC)
-  hpx_info("No vectorization library configured")
-else()
-  hpx_option(
-    HPX_WITH_DATAPAR BOOL
-    "Enable data parallel algorithm support (default: ON)" ON ADVANCED
-  )
-endif()
-
-# ##############################################################################
 # Threadlevel Nice option
 # ##############################################################################
 hpx_option(
@@ -1623,6 +1591,11 @@ if(NOT HPX_WITH_STABLE_INPLACE_MERGE)
 endif()
 
 # ##############################################################################
+# HPX datapar configuration
+# ##############################################################################
+include(HPX_SetupDatapar)
+
+# ##############################################################################
 # Check for misc system headers
 # ##############################################################################
 
@@ -1685,7 +1658,7 @@ if(WIN32)
       -Gw PUBLIC CONFIGURATIONS Release RelWithDebInfo MinSizeRel
     )
     hpx_add_target_compile_option(-Zo PUBLIC CONFIGURATIONS RelWithDebInfo)
-    if(HPX_WITH_DATAPAR_VC)
+    if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
       hpx_add_target_compile_option(-std:c++latest PUBLIC)
       hpx_add_config_cond_define(_HAS_AUTO_PTR_ETC 1)
     endif()
@@ -1796,7 +1769,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # is illegal in the current source character set
     hpx_add_compile_flag(-wd4828)
 
-    if(HPX_WITH_DATAPAR_VC)
+    if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
       # unary minus operator applied to unsigned type, result still unsigned
       hpx_add_compile_flag(-wd4146)
 
@@ -1846,8 +1819,8 @@ if(HPX_WITH_COMPILER_WARNINGS)
     endif()
 
     # False positive when build with Vc and Clang
-    if(NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-           )
+    if(NOT (("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
+            AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     )
       hpx_add_compile_flag_if_available(-Werror=trampolines)
     endif()
@@ -1903,7 +1876,9 @@ else()
   endif()
 
   # False positive when building with Vc and Clang
-  if(NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+  if(NOT (("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
+          AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  )
     # Silence warning about __sync_fetch_and_nand changing semantics
     hpx_add_compile_flag_if_available(-Wno-sync-nand)
   endif()

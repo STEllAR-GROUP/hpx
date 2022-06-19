@@ -22,7 +22,7 @@
 # to use them to skip whole compilation units. Vc_SSE_INTRINSICS_BROKEN
 # Vc_AVX_INTRINSICS_BROKEN
 
-if(HPX_WITH_DATAPAR_VC AND NOT TARGET Vc::vc)
+if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC") AND NOT TARGET Vc::vc)
   find_package(Vc ${Vc_FIND_VERSION} QUIET)
 
   if(NOT Vc_FOUND)
@@ -80,9 +80,6 @@ if(HPX_WITH_DATAPAR_VC AND NOT TARGET Vc::vc)
     hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
     hpx_add_config_cond_define(_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS)
   endif()
-
-  hpx_add_config_define(HPX_HAVE_DATAPAR)
-  hpx_add_config_define(HPX_HAVE_DATAPAR_VC)
 
   hpx_info("Found Vc (vectorization):" ${Vc_INCLUDE_DIR} "- version:"
            ${Vc_VERSION_STRING}

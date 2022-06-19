@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX20_EXPERIMENTAL_SIMD)
+#if defined(HPX_HAVE_DATAPAR_STD_EXPERIMENTAL_SIMD)
 
 #include <experimental/simd>
 
@@ -38,9 +38,7 @@ namespace hpx { namespace parallel { namespace traits {
         template <typename T, typename Abi>
         struct vector_pack_type<T, 1, Abi>
         {
-            typedef std::experimental::simd<T,
-                std::experimental::simd_abi::scalar>
-                type;
+            using type = T;
         };
     }    // namespace detail
 
@@ -48,6 +46,14 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename T, std::size_t N, typename Abi>
     struct vector_pack_type : detail::vector_pack_type<T, N, Abi>
     {
+    };
+
+    ////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct vector_pack_mask_type<T,
+        typename std::enable_if_t<std::experimental::is_simd_v<T>>>
+    {
+        using type = T::mask_type;
     };
 }}}    // namespace hpx::parallel::traits
 

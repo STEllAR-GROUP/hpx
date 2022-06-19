@@ -34,50 +34,6 @@ void generate_test()
     test_generate<std::forward_iterator_tag>();
 }
 
-////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_generate_exception()
-{
-    using namespace hpx::execution;
-
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_generate_exception(simd, IteratorTag());
-    test_generate_exception(par_simd, IteratorTag());
-
-    test_generate_exception_async(simd(task), IteratorTag());
-    test_generate_exception_async(par_simd(task), IteratorTag());
-}
-
-void generate_exception_test()
-{
-    test_generate_exception<std::random_access_iterator_tag>();
-    test_generate_exception<std::forward_iterator_tag>();
-}
-
-////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_generate_bad_alloc()
-{
-    using namespace hpx::execution;
-
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_generate_bad_alloc(simd, IteratorTag());
-    test_generate_bad_alloc(par_simd, IteratorTag());
-
-    test_generate_bad_alloc_async(simd(task), IteratorTag());
-    test_generate_bad_alloc_async(par_simd(task), IteratorTag());
-}
-
-void generate_bad_alloc_test()
-{
-    test_generate_bad_alloc<std::random_access_iterator_tag>();
-    test_generate_bad_alloc<std::forward_iterator_tag>();
-}
-
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     unsigned int seed = (unsigned int) std::time(nullptr);
@@ -88,8 +44,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::srand(seed);
 
     generate_test();
-    generate_exception_test();
-    generate_bad_alloc_test();
     return hpx::local::finalize();
 }
 

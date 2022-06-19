@@ -31,44 +31,6 @@ void count_test()
     test_count<std::forward_iterator_tag>();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_count_exception()
-{
-    using namespace hpx::execution;
-
-    test_count_exception(simd, IteratorTag());
-    test_count_exception(par_simd, IteratorTag());
-
-    test_count_exception_async(simd(task), IteratorTag());
-    test_count_exception_async(par_simd(task), IteratorTag());
-}
-
-void count_exception_test()
-{
-    test_count_exception<std::random_access_iterator_tag>();
-    test_count_exception<std::forward_iterator_tag>();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_count_bad_alloc()
-{
-    using namespace hpx::execution;
-
-    test_count_bad_alloc(simd, IteratorTag());
-    test_count_bad_alloc(par_simd, IteratorTag());
-
-    test_count_bad_alloc_async(simd(task), IteratorTag());
-    test_count_bad_alloc_async(par_simd(task), IteratorTag());
-}
-
-void count_bad_alloc_test()
-{
-    test_count_bad_alloc<std::random_access_iterator_tag>();
-    test_count_bad_alloc<std::forward_iterator_tag>();
-}
-
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     unsigned int seed = (unsigned int) std::time(nullptr);
@@ -79,8 +41,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::srand(seed);
 
     count_test();
-    count_exception_test();
-    count_bad_alloc_test();
     return hpx::local::finalize();
 }
 

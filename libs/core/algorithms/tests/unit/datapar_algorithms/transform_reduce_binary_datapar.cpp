@@ -43,7 +43,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::srand(seed);
 
     transform_reduce_binary_test();
-
     return hpx::local::finalize();
 }
 

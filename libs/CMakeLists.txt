@@ -355,8 +355,12 @@ if(MSVC AND HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
   target_link_options(hpx_core PRIVATE "/EXPORT:switch_to_fiber")
 endif()
 
-if(HPX_WITH_DATAPAR_VC)
+if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
   target_link_libraries(hpx_core PUBLIC Vc::vc)
+endif()
+
+if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE")
+  target_link_libraries(hpx_core PUBLIC Eve::eve)
 endif()
 
 if(HPX_WITH_ITTNOTIFY)

@@ -7,7 +7,7 @@
 # add subdirectories
 set(subdirs algorithms block container_algorithms)
 
-if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
+if(HPX_WITH_DATAPAR)
   set(subdirs ${subdirs} datapar_algorithms)
 endif()
 
