@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -31,7 +31,7 @@ namespace hpx { namespace util {
     // Always provide function exports, which guarantees ABI compatibility of
     // Debug and Release builds.
 
-#if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_CORE_EXPORTS)
+#if defined(HPX_HAVE_VERIFY_LOCKS)
 
     namespace detail {
 

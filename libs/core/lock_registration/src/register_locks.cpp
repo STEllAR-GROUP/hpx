@@ -363,42 +363,5 @@ namespace hpx { namespace util {
     {
         detail::register_locks::set_ignore_all_locks(false);
     }
-
-#else
-
-    bool register_lock(void const*, util::register_lock_data*)
-    {
-        return true;
-    }
-
-    bool unregister_lock(void const*)
-    {
-        return true;
-    }
-
-    void verify_no_locks() {}
-
-    void force_error_on_lock() {}
-
-    void enable_lock_detection() {}
-
-    void disable_lock_detection() {}
-
-    void trace_depth_lock_detection(std::size_t) {}
-
-    void ignore_lock(void const* /* lock */) {}
-
-    void reset_ignored(void const* /* lock */) {}
-
-    void ignore_all_locks() {}
-
-    void reset_ignored_all() {}
-
-    std::unique_ptr<held_locks_data> get_held_locks_data()
-    {
-        return std::unique_ptr<held_locks_data>();
-    }
-
-    void set_held_locks_data(std::unique_ptr<held_locks_data>&& /* data */) {}
 #endif
 }}    // namespace hpx::util
