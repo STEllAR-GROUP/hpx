@@ -19,10 +19,10 @@ namespace hpx {
     ///                     (last - first) - 1 application of the predicate
     ///                     where \a result is the value returned
     ///
-    /// \tparam FwdIter     The type of the source iterators used for the
+    /// \tparam InIter      The type of the source iterators used for the
     ///                     range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     input iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
@@ -38,15 +38,15 @@ namespace hpx {
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 must be such
-    ///                     that objects of type \a FwdIter
+    ///                     that objects of type \a InIter
     ///                     can be dereferenced and then implicitly converted
     ///                     to \a Type1 .
     ///
     /// \returns  The \a adjacent_find algorithm returns an iterator to the
     ///           first of the identical elements. If no such elements are
     ///           found, \a last is returned.
-    template <typename FwdIter, typename Pred = detail::equal_to>
-    FwdIter adjacent_find(FwdIter first, FwdIter last, Pred&& pred = Pred());
+    template <typename InIter, typename Pred = detail::equal_to>
+    InIter adjacent_find(InIter first, InIter last, Pred&& pred = Pred());
 
     /// Searches the range [first, last) for two consecutive identical elements.
     /// This version uses the given binary predicate pred
@@ -61,7 +61,7 @@ namespace hpx {
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used for the
     ///                     range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
