@@ -1,3 +1,4 @@
+//  Copyright (c) 2022 Bhumit Attarde
 //  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -29,8 +30,6 @@ namespace hpx {
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -51,10 +50,6 @@ namespace hpx {
     ///                     to it. The type \a Type must be such that an object
     ///                     of type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
@@ -76,11 +71,49 @@ namespace hpx {
     ///           \a f returns true for no elements in the range, false
     ///           otherwise. It returns true if the range is empty.
     ///
-    template <typename ExPolicy, typename FwdIter, typename F,
-        typename Proj = util::projection_identity>
+    template <typename ExPolicy, typename FwdIter, typename F>
     typename util::detail::algorithm_result<ExPolicy, bool>::type
-    none_of(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-        Proj&& proj = Proj());
+    none_of(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
+
+    ///  Checks if unary predicate \a f returns true for no elements in the
+    ///  range [first, last).
+    ///
+    /// \note   Complexity: At most \a last - \a first applications of the
+    ///         predicate \a f
+    ///
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a none_of requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param f            Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).
+    ///                     The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed
+    ///                     to it. The type \a Type must be such that an object
+    ///                     of type \a InIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// \returns  The \a none_of algorithm returns a \a bool .
+    ///           The \a none_of algorithm returns true if the unary predicate
+    ///           \a f returns true for no elements in the range, false
+    ///           otherwise. It returns true if the range is empty.
+    ///
+    template <typename InIter, typename F>
+    bool none_of(InIter first, InIter last, F&& f);
 
     ///  Checks if unary predicate \a f returns true for at least one element
     ///  in the range [first, last).
@@ -99,8 +132,6 @@ namespace hpx {
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a any_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -121,10 +152,6 @@ namespace hpx {
     ///                     to it. The type \a Type must be such that an object
     ///                     of type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
@@ -146,11 +173,49 @@ namespace hpx {
     ///           \a f returns true for at least one element in the range,
     ///           false otherwise. It returns false if the range is empty.
     ///
-    template <typename ExPolicy, typename FwdIter, typename F,
-        typename Proj = util::projection_identity>
+    template <typename ExPolicy, typename FwdIter, typename F>
     typename util::detail::algorithm_result<ExPolicy, bool>::type
-    any_of(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-        Proj&& proj = Proj());
+    any_of(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
+
+    ///  Checks if unary predicate \a f returns true for at least one element
+    ///  in the range [first, last).
+    ///
+    /// \note   Complexity: At most \a last - \a first applications of the
+    ///         predicate \a f
+    ///
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a any_of requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param f            Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).
+    ///                     The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed
+    ///                     to it. The type \a Type must be such that an object
+    ///                     of type \a InIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// \returns  The \a any_of algorithm returns a \a bool .
+    ///           The \a any_of algorithm returns true if the unary predicate
+    ///           \a f returns true for at least one element in the range,
+    ///           false otherwise. It returns false if the range is empty.
+    ///
+    template <typename InIter, typename F>
+    bool any_of(InIter first, InIter last, F&& f);
 
     /// Checks if unary predicate \a f returns true for all elements in the
     /// range [first, last).
@@ -169,8 +234,6 @@ namespace hpx {
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a all_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -191,10 +254,6 @@ namespace hpx {
     ///                     to it. The type \a Type must be such that an object
     ///                     of type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
@@ -216,11 +275,49 @@ namespace hpx {
     ///           \a f returns true for all elements in the range, false
     ///           otherwise. It returns true if the range is empty.
     ///
-    template <typename ExPolicy, typename FwdIter, typename F,
-        typename Proj = util::projection_identity>
+    template <typename ExPolicy, typename FwdIter, typename F>
     typename util::detail::algorithm_result<ExPolicy, bool>::type
-    all_of(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-        Proj&& proj = Proj());
+    all_of(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
+
+    /// Checks if unary predicate \a f returns true for all elements in the
+    /// range [first, last).
+    ///
+    /// \note   Complexity: At most \a last - \a first applications of the
+    ///         predicate \a f
+    ///
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a all_of requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param f            Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).
+    ///                     The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed
+    ///                     to it. The type \a Type must be such that an object
+    ///                     of type \a InIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// \returns  The \a all_of algorithm returns a \a bool .
+    ///           The \a all_of algorithm returns true if the unary predicate
+    ///           \a f returns true for all elements in the range, false
+    ///           otherwise. It returns true if the range is empty.
+    ///
+    template <typename ExPolicy, typename InIter, typename F>
+    bool all_of(InIter first, InIter last, F&& f);
 
     // clang-format on
 }    // namespace hpx
