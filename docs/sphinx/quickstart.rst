@@ -47,7 +47,7 @@ The easiest way to install |hpx| on your system is by choosing one of the steps 
 
    |hpx| is available in the `Arch User Repository (AUR) <https://wiki.archlinux.org/title/Arch_User_Repository>`_ as ``hpx`` too.
 
-More information or alternatives regarding the installation can be found in the :ref:`hpx_build_system`, a detailed guide with thorough explanation of ways to build and use |hpx|.
+More information or alternatives regarding the installation can be found in the :ref:`building_hpx`, a detailed guide with thorough explanation of ways to build and use |hpx|.
 
 Hello, World!
 =============
