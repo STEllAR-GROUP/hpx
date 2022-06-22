@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2021 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,6 @@
 #include <hpx/futures/future.hpp>
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/this_thread.hpp>

@@ -236,14 +236,16 @@ namespace hpx { namespace performance_counters {
         HPX_EXPORT void serialize(
             serialization::input_archive& ar, const unsigned int);
     };
-
+    
     ///////////////////////////////////////////////////////////////////////////
     /// A counter_path_elements holds the elements of a full name for a counter
     /// instance. Generally, a full name of a counter instance has the
     /// structure:
     ///
+    ///    \verbatim 
     ///    /objectname{parentinstancename#parentindex/instancename#instanceindex} 
-    ///      /countername#parameters
+    ///      /countername#parameters 
+    ///    \endverbatim
     ///
     /// i.e.
     ///    /queue{localityprefix/thread#2}/length

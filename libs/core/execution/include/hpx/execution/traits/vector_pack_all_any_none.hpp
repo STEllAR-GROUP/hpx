@@ -34,6 +34,7 @@ namespace hpx { namespace parallel { namespace traits {
     }
 }}}    // namespace hpx::parallel::traits
 
+#include <hpx/execution/traits/detail/eve/vector_pack_all_any_none.hpp>
 #include <hpx/execution/traits/detail/simd/vector_pack_all_any_none.hpp>
 #include <hpx/execution/traits/detail/vc/vector_pack_all_any_none.hpp>
 #endif

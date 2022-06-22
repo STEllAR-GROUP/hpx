@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2012-2022 Hartmut Kaiser
 //  Copyright (c) 2009 Oliver Kowalke
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,8 +21,11 @@
 #include <unistd.h>
 #endif
 
-#if defined(_POSIX_VERSION)
+#if defined(_POSIX_VERSION) &&                                                 \
+    !(defined(__ARM64_ARCH_8__) && defined(__APPLE__))
 #include <hpx/coroutines/detail/posix_utility.hpp>
+
+#define HPX_USE_POSIX_STACK_UTILITIES
 #endif
 
 #include <boost/context/detail/fcontext.hpp>
@@ -90,7 +93,8 @@ namespace hpx { namespace threads { namespace coroutines {
 
             void* allocate(std::size_t size) const
             {
-#if defined(_POSIX_VERSION)
+                // Condition excludes MacOS/M1 from using posix mmap
+#if defined(HPX_USE_POSIX_STACK_UTILITIES)
                 void* limit = posix::alloc_stack(size);
                 posix::watermark_stack(limit, size);
 #else
@@ -105,7 +109,7 @@ namespace hpx { namespace threads { namespace coroutines {
             {
                 HPX_ASSERT(vp);
                 void* limit = static_cast<char*>(vp) - size;
-#if defined(_POSIX_VERSION)
+#if defined(HPX_USE_POSIX_STACK_UTILITIES)
                 posix::free_stack(limit, size);
 #else
                 std::free(limit);
@@ -243,7 +247,7 @@ namespace hpx { namespace threads { namespace coroutines {
             {
                 if (ctx_)
                 {
-#if defined(_POSIX_VERSION)
+#if defined(HPX_USE_POSIX_STACK_UTILITIES)
                     void* limit =
                         static_cast<char*>(stack_pointer_) - stack_size_;
                     if (posix::reset_stack(limit, stack_size_))
@@ -339,3 +343,5 @@ namespace hpx { namespace threads { namespace coroutines {
         };
     }}    // namespace detail::generic_context
 }}}       // namespace hpx::threads::coroutines
+
+#undef HPX_USE_POSIX_STACK_UTILITIES

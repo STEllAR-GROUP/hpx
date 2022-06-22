@@ -13,6 +13,7 @@
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -26,7 +27,7 @@
 namespace hpx { namespace lcos { namespace local { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    condition_variable::condition_variable() {}
+    condition_variable::condition_variable() = default;
 
     condition_variable::~condition_variable()
     {
@@ -41,19 +42,18 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         }
     }
 
-    bool condition_variable::empty(
-        std::unique_lock<mutex_type> const& lock) const
+    bool condition_variable::empty(std::unique_lock<mutex_type>& lock) const
     {
-        HPX_ASSERT(lock.owns_lock());
+        HPX_ASSERT_OWNS_LOCK(lock);
         HPX_UNUSED(lock);
 
         return queue_.empty();
     }
 
     std::size_t condition_variable::size(
-        std::unique_lock<mutex_type> const& lock) const
+        std::unique_lock<mutex_type>& lock) const
     {
-        HPX_ASSERT(lock.owns_lock());
+        HPX_ASSERT_OWNS_LOCK(lock);
         HPX_UNUSED(lock);
 
         return queue_.size();
@@ -64,7 +64,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     bool condition_variable::notify_one(std::unique_lock<mutex_type> lock,
         threads::thread_priority /* priority */, error_code& ec)
     {
-        HPX_ASSERT(lock.owns_lock());
+        HPX_ASSERT_OWNS_LOCK(lock);
 
         if (!queue_.empty())
         {
@@ -101,7 +101,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     void condition_variable::notify_all(std::unique_lock<mutex_type> lock,
         threads::thread_priority /* priority */, error_code& ec)
     {
-        HPX_ASSERT(lock.owns_lock());
+        HPX_ASSERT_OWNS_LOCK(lock);
 
         // swap the list
         queue_type queue;
@@ -146,7 +146,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
     void condition_variable::abort_all(std::unique_lock<mutex_type> lock)
     {
-        HPX_ASSERT(lock.owns_lock());
+        HPX_ASSERT_OWNS_LOCK(lock);
 
         abort_all<mutex_type>(HPX_MOVE(lock));
     }
@@ -155,7 +155,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         std::unique_lock<mutex_type>& lock, char const* /* description */,
         error_code& /* ec */)
     {
-        HPX_ASSERT(lock.owns_lock());
+        HPX_ASSERT_OWNS_LOCK(lock);
 
         // enqueue the request and block this thread
         auto this_ctx = hpx::execution_base::this_thread::agent();
@@ -178,7 +178,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         hpx::chrono::steady_time_point const& abs_time,
         char const* /* description */, error_code& /* ec */)
     {
-        HPX_ASSERT(lock.owns_lock());
+        HPX_ASSERT_OWNS_LOCK(lock);
 
         // enqueue the request and block this thread
         auto this_ctx = hpx::execution_base::this_thread::agent();
@@ -241,7 +241,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     void condition_variable::prepend_entries(
         std::unique_lock<mutex_type>& lock, queue_type& queue)
     {
-        HPX_ASSERT(lock.owns_lock());
+        HPX_ASSERT_OWNS_LOCK(lock);
         HPX_UNUSED(lock);
 
         // splice is constant time only if it == end

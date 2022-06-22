@@ -1,4 +1,5 @@
 //  Copyright (c) 2013 Agustin Berge
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,17 +30,17 @@ namespace hpx { namespace util { namespace detail {
 
     template <typename Lock>
     typename std::enable_if<has_owns_lock<Lock>::value>::type assert_owns_lock(
-        Lock const& l, long) noexcept
+        Lock& l, long) noexcept
     {
-        HPX_ASSERT(l.owns_lock());
+        HPX_ASSERT_LOCKED(l, l.owns_lock());
         HPX_UNUSED(l);
     }
 
     template <typename Lock>
     typename std::enable_if<has_owns_lock<Lock>::value>::type
-    assert_doesnt_own_lock(Lock const& l, long) noexcept
+    assert_doesnt_own_lock(Lock& l, long) noexcept
     {
-        HPX_ASSERT(!l.owns_lock());
+        HPX_ASSERT_LOCKED(l, !l.owns_lock());
         HPX_UNUSED(l);
     }
 }}}    // namespace hpx::util::detail

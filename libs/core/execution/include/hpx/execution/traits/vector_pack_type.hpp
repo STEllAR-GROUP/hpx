@@ -33,9 +33,17 @@ namespace hpx { namespace parallel { namespace traits {
     {
         typedef typename vector_pack_type<T>::type type;
     };
+
+    ////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable = void>
+    struct vector_pack_mask_type
+    {
+        using type = bool;
+    };
 }}}    // namespace hpx::parallel::traits
 
 #if !defined(__CUDACC__)
+#include <hpx/execution/traits/detail/eve/vector_pack_type.hpp>
 #include <hpx/execution/traits/detail/simd/vector_pack_type.hpp>
 #include <hpx/execution/traits/detail/vc/vector_pack_type.hpp>
 #endif

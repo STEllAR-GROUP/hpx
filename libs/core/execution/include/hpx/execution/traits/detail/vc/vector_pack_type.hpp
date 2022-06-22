@@ -71,6 +71,14 @@ namespace hpx { namespace parallel { namespace traits {
     {
         typedef Vc::Scalar::Vector<T> type;
     };
+
+    ////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct vector_pack_mask_type<T,
+        typename std::enable_if_t<Vc::Traits::is_simd_vector<T>::value>>
+    {
+        using type = typename T::mask_type;
+    };
 }}}    // namespace hpx::parallel::traits
 
 #else

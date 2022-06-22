@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 Austin McCartney
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -46,7 +47,7 @@ struct has_nested_type : std::integral_constant<bool, false>
 };
 
 template <typename T>
-struct has_nested_type<T, hpx::util::always_void<typename T::type>>
+struct has_nested_type<T, std::void_t<typename T::type>>
   : std::integral_constant<bool, true>
 {
 };

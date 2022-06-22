@@ -215,7 +215,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Mutex = hpx::spinlock, int N = 0>
     class counting_semaphore_var
-      : detail::counting_semaphore<PTRDIFF_MAX, Mutex>
+      : public detail::counting_semaphore<PTRDIFF_MAX, Mutex>
     {
     private:
         using mutex_type = Mutex;
@@ -286,6 +286,7 @@ namespace hpx {
     };
 }    // namespace hpx
 
+/// \cond NOINTERN
 namespace hpx::lcos::local {
 
     template <std::ptrdiff_t LeastMaxValue = PTRDIFF_MAX,
@@ -311,6 +312,7 @@ namespace hpx::lcos::local {
         "hpx::counting_semaphore_var<> instead") =
         hpx::counting_semaphore_var<>;
 }    // namespace hpx::lcos::local
+/// \endcond
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)

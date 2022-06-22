@@ -131,8 +131,9 @@ namespace hpx {
             {
                 cond_.data_.wait(l, "hpx::latch::wait");
 
-                HPX_ASSERT(counter_.load(std::memory_order_relaxed) == 0);
-                HPX_ASSERT(notified_);
+                HPX_ASSERT_LOCKED(
+                    l, counter_.load(std::memory_order_relaxed) == 0);
+                HPX_ASSERT_LOCKED(l, notified_);
             }
         }
 
@@ -147,14 +148,15 @@ namespace hpx {
 
             std::ptrdiff_t old_count =
                 counter_.fetch_sub(update, std::memory_order_relaxed);
-            HPX_ASSERT(old_count >= update);
+            HPX_ASSERT_LOCKED(l, old_count >= update);
 
             if (old_count > update)
             {
                 cond_.data_.wait(l, "hpx::latch::arrive_and_wait");
 
-                HPX_ASSERT(counter_.load(std::memory_order_relaxed) == 0);
-                HPX_ASSERT(notified_);
+                HPX_ASSERT_LOCKED(
+                    l, counter_.load(std::memory_order_relaxed) == 0);
+                HPX_ASSERT_LOCKED(l, notified_);
             }
             else
             {

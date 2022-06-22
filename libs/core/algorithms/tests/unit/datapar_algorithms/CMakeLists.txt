@@ -6,7 +6,7 @@
 
 set(tests)
 
-if(HPX_WITH_DATAPAR_VC OR HPX_WITH_CXX20_EXPERIMENTAL_SIMD)
+if(HPX_WITH_DATAPAR)
   set(tests
       ${tests}
       adjacentfind_datapar
