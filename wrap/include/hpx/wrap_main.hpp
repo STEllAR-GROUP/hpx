@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2018-2020 Nikunj Gupta
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,18 +8,23 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 4100)
+#endif
+
 #include <hpx/hpx_init.hpp>
 
 // We support different implementation depending upon the Operating
 // System in use.
-#if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) && \
-    (defined(__linux) || defined(__linux__) || defined(linux) || \
-    defined(__APPLE__))
+#if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) &&                                      \
+    (defined(__linux) || defined(__linux__) || defined(linux) ||               \
+        defined(__APPLE__))
 
 #include <string>
 
-namespace hpx_start
-{
+namespace hpx_start {
     // include_libhpx_wrap here is an override for the one present in
     // src/hpx_wrap.cpp. The value of this variable defines if we need
     // to change the program's entry point or not.
@@ -35,7 +40,7 @@ namespace hpx_start
     // HPX::wrap_main instead of an orthogonal exception about thread not
     // registered with the HPX runtime system.
     HPX_SYMBOL_EXPORT bool is_linked __attribute__((weak)) = false;
-}
+}    // namespace hpx_start
 
 #else
 
@@ -49,3 +54,6 @@ namespace hpx_start
 #define main hpx_startup::user_main
 #endif
 
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif

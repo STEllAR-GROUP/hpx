@@ -293,9 +293,11 @@ namespace hpx { namespace execution { inline namespace v1 {
 
         using base_policy_type =
             sequenced_task_policy_shim<Executor, Parameters>;
+
         base_policy_type base_policy()
         {
-            return simd_task_policy_shim<Executor, Parameters>(exec_, params_);
+            return sequenced_task_policy_shim<Executor, Parameters>(
+                exec_, params_);
         }
 
         /// Return the associated executor object.
