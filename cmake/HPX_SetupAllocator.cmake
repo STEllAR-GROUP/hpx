@@ -78,7 +78,7 @@ if(NOT TARGET hpx_dependencies_allocator)
     # ##########################################################################
     # MIMALLOC
     if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "MIMALLOC")
-      find_package(mimalloc 1.0)
+      find_package(mimalloc)
       if(NOT mimalloc_FOUND)
         hpx_error(${allocator_error})
       endif()
