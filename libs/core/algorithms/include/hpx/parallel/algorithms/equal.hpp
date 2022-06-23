@@ -1,3 +1,4 @@
+//  Copyright (c) 2022 Bhumit Attarde
 //  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,7 +14,8 @@ namespace hpx {
     // clang-format off
 
     /// Returns true if the range [first1, last1) is equal to the range
-    /// [first2, last2), and false otherwise.
+    /// [first2, last2), and false otherwise. Executed according to the
+    /// policy.
     ///
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
     ///         applications of the predicate \a f.
@@ -92,7 +94,67 @@ namespace hpx {
             FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred());
 
     /// Returns true if the range [first1, last1) is equal to the range
-    /// starting at first2, and false otherwise.
+    /// [first2, last2), and false otherwise. Executed according to policy.
+    ///
+    /// \note   Complexity: At most min(last1 - first1, last2 - first2)
+    ///         applications of the predicate \a f.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    /// \param last2        Refers to the end of the sequence of elements of
+    ///                     the second range the algorithm will be applied to.
+    ///
+    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \note     The two ranges are considered equal if, for every iterator
+    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
+    ///           This overload of equal uses operator== to determine if two
+    ///           elements are equal.
+    ///
+    /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
+    ///           execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a bool otherwise.
+    ///           The \a equal algorithm returns true if the elements in the
+    ///           two ranges are equal, otherwise it returns false.
+    ///           If the length of the range [first1, last1) does not equal
+    ///           the length of the range [first2, last2), it returns false.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+    typename util::detail::algorithm_result<ExPolicy, bool>::type
+    equal(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2);
+
+    /// Returns true if the range [first1, last1) is equal to the range
+    /// starting at first2, and false otherwise. Executed according to policy.
     ///
     /// \note   Complexity: At most \a last1 - \a first1 applications of the
     ///         predicate \a f.
@@ -164,6 +226,216 @@ namespace hpx {
         typename Pred = detail::equal_to>
     typename util::detail::algorithm_result<ExPolicy, bool>::type
     equal(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, Pred&& op = Pred());
+
+    /// Returns true if the range [first1, last1) is equal to the range
+    /// [first2, last2), and false otherwise. Executed according to policy.
+    ///
+    /// \note   Complexity: At most \a last1 - \a first1 applications of the
+    ///         predicate \a f.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    ///
+    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \note     The two ranges are considered equal if, for every iterator
+    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
+    ///           This overload of equal uses operator== to determine if two
+    ///           elements are equal.
+    ///
+    /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
+    ///           execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a bool otherwise.
+    ///           The \a equal algorithm returns true if the elements in the
+    ///           two ranges are equal, otherwise it returns false.
+    ///           If the length of the range [first1, last1) does not equal
+    ///           the length of the range [first2, last2), it returns false.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+    typename util::detail::algorithm_result<ExPolicy, bool>::type
+    equal(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2);
+
+    /// Returns true if the range [first1, last1) is equal to the range
+    /// [first2, last2), and false otherwise.
+    ///
+    /// \note   Complexity: At most min(last1 - first1, last2 - first2)
+    ///         applications of the predicate \a f.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
+    ///
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    /// \param last2        Refers to the end of the sequence of elements of
+    ///                     the second range the algorithm will be applied to.
+    /// \param op           The binary predicate which returns true if the
+    ///                     elements should be treated as equal. The signature
+    ///                     of the predicate function should be equivalent to
+    ///                     the following:
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type1 and \a Type2 respectively
+    ///
+    /// \note     The two ranges are considered equal if, for every iterator
+    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
+    ///           This overload of equal uses operator== to determine if two
+    ///           elements are equal.
+    ///
+    /// \returns  The \a equal algorithm returns a \a bool .
+    ///           The \a equal algorithm returns true if the elements in the
+    ///           two ranges are equal, otherwise it returns false.
+    ///           If the length of the range [first1, last1) does not equal
+    ///           the length of the range [first2, last2), it returns false.
+    ///
+    template <typename FwdIter1, typename FwdIter2,
+        typename Pred = detail::equal_to>
+    bool equal(FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred());
+
+    /// Returns true if the range [first1, last1) is equal to the range
+    /// [first2, last2), and false otherwise.
+    ///
+    /// \note   Complexity: At most min(last1 - first1, last2 - first2)
+    ///         applications of the predicate \a f.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    /// \param last2        Refers to the end of the sequence of elements of
+    ///                     the second range the algorithm will be applied to.
+    /// \note     The two ranges are considered equal if, for every iterator
+    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
+    ///           This overload of equal uses operator== to determine if two
+    ///           elements are equal.
+    ///
+    /// \returns  The \a equal algorithm returns a \a bool .
+    ///           The \a equal algorithm returns true if the elements in the
+    ///           two ranges are equal, otherwise it returns false.
+    ///           If the length of the range [first1, last1) does not equal
+    ///           the length of the range [first2, last2), it returns false.
+    ///
+    template <typename FwdIter1, typename FwdIter2>
+    bool equal(FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2);
+
+    /// Returns true if the range [first1, last1) is equal to the range
+    /// [first2, first2 + (last1 - first1)), and false otherwise.
+    ///
+    /// \note   Complexity: At most min(last1 - first1, last2 - first2)
+    ///         applications of the predicate \a f.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
+    ///
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    /// \param op           The binary predicate which returns true if the
+    ///                     elements should be treated as equal. The signature
+    ///                     of the predicate function should be equivalent to
+    ///                     the following:
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type1 and \a Type2 respectively
+    ///
+    /// \note     The two ranges are considered equal if, for every iterator
+    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
+    ///           This overload of equal uses operator== to determine if two
+    ///           elements are equal.
+    ///
+    /// \returns  The \a equal algorithm returns a \a bool .
+    ///           The \a equal algorithm returns true if the elements in the
+    ///           two ranges are equal, otherwise it returns false.
+    ///           If the length of the range [first1, last1) does not equal
+    ///           the length of the range [first2, last2), it returns false.
+    ///
+    template <typename FwdIter1, typename FwdIter2,
+        typename Pred = detail::equal_to>
+    bool equal(FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, Pred&& op = Pred());
 
     // clang-format on

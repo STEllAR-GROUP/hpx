@@ -13,7 +13,7 @@ namespace hpx {
     // clang-format off
 
     /// Destroys objects of type typename iterator_traits<ForwardIt>::value_type
-    /// in the range [first, last).
+    /// in the range [first, last). Executed according to the policy.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first operations.
     ///
@@ -52,7 +52,25 @@ namespace hpx {
     destroy(ExPolicy&& policy, FwdIter first, FwdIter last);
 
     /// Destroys objects of type typename iterator_traits<ForwardIt>::value_type
-    /// in the range [first, first + count).
+    /// in the range [first, last).
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first operations.
+    ///
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    ///
+    /// \returns  The \a destroy algorithm returns a \a void
+    template <typename FwdIter>
+    void destroy(FwdIter first, FwdIter last);
+
+    /// Destroys objects of type typename iterator_traits<ForwardIt>::value_type
+    /// in the range [first, first + count). Executed according to the policy.
     ///
     /// \note   Complexity: Performs exactly \a count operations, if
     ///         count > 0, no assignments otherwise.
@@ -98,6 +116,31 @@ namespace hpx {
     template <typename ExPolicy, typename FwdIter, typename Size>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     destroy_n(ExPolicy&& policy, FwdIter first, Size count);
+
+    /// Destroys objects of type typename iterator_traits<ForwardIt>::value_type
+    /// in the range [first, first + count).
+    ///
+    /// \note   Complexity: Performs exactly \a count operations, if
+    ///         count > 0, no assignments otherwise.
+    ///
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply this algorithm to.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.
+    ///
+    /// \returns  The \a destroy_n algorithm returns a \a FwdIter .
+    ///           The \a destroy_n algorithm returns the
+    ///           iterator to the element in the source range, one past
+    ///           the last element constructed.
+    ///
+    template <typename FwdIter, typename Size>
+    FwdIter destroy_n(FwdIter first, Size count);
 
     // clang-format on
 }    // namespace hpx
