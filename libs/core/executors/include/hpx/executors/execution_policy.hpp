@@ -22,9 +22,6 @@
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/executors/sequenced_executor.hpp>
 #include <hpx/serialization/serialize.hpp>
-#if defined(HPX_HAVE_DATAPAR)
-#include <hpx/executors/datapar/execution_policy.hpp>
-#endif
 
 #include <memory>
 #include <type_traits>
