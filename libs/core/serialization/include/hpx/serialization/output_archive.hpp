@@ -244,20 +244,32 @@ namespace hpx::serialization {
 #if defined(HPX_SERIALIZATION_HAVE_SUPPORTS_ENDIANESS)
             else if constexpr (std::is_unsigned_v<T>)
             {
+                static_assert(sizeof(T) <= sizeof(std::uint64_t),
+                    "integral type is larger than supported");
+
                 save_integral(static_cast<std::uint64_t>(t));
             }
             else
             {
+                static_assert(sizeof(T) <= sizeof(std::int64_t),
+                    "integral type is larger than supported");
+
                 save_integral(static_cast<std::int64_t>(t));
             }
 #else
             else if constexpr (std::is_unsigned_v<T>)
             {
+                static_assert(sizeof(T) <= sizeof(std::uint64_t),
+                    "integral type is larger than supported");
+
                 auto val = static_cast<std::uint64_t>(t);
                 save_binary(&val, sizeof(std::uint64_t));
             }
             else
             {
+                static_assert(sizeof(T) <= sizeof(std::int64_t),
+                    "integral type is larger than supported");
+
                 auto val = static_cast<std::int64_t>(t);
                 save_binary(&val, sizeof(std::int64_t));
             }
@@ -272,6 +284,11 @@ namespace hpx::serialization {
         void save(double d)
         {
             save_binary(&d, sizeof(double));
+        }
+
+        void save(long double d)
+        {
+            save_binary(&d, sizeof(long double));
         }
 
         void save(char c)

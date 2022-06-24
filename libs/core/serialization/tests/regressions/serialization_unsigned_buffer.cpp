@@ -40,7 +40,7 @@ struct A
 void test_bool()
 {
     {
-        std::vector<char> buffer;
+        std::vector<std::uint8_t> buffer;
         hpx::serialization::output_archive oarchive(buffer);
 
         bool b = true;
@@ -64,7 +64,7 @@ void test_bool()
         HPX_TEST_EQ(b, true);
     }
     {
-        std::vector<char> buffer;
+        std::vector<std::uint8_t> buffer;
         hpx::serialization::output_archive oarchive(buffer);
 
         auto b = A<bool>(true);
@@ -93,7 +93,7 @@ template <typename T>
 void test(T min, T max)
 {
     {
-        std::vector<char> buffer;
+        std::vector<std::uint8_t> buffer;
         hpx::serialization::output_archive oarchive(buffer);
         for (T c = min; c < max; ++c)
         {
@@ -108,7 +108,7 @@ void test(T min, T max)
         }
     }
     {
-        std::vector<char> buffer;
+        std::vector<std::uint8_t> buffer;
         hpx::serialization::output_archive oarchive(buffer);
         for (T c = min; c < max; ++c)
         {
@@ -129,7 +129,7 @@ template <typename T>
 void test_fp(T min, T max)
 {
     {
-        std::vector<char> buffer;
+        std::vector<std::uint8_t> buffer;
         hpx::serialization::output_archive oarchive(buffer);
         for (T c = min; c < max; c += static_cast<T>(0.5))
         {
@@ -144,7 +144,7 @@ void test_fp(T min, T max)
         }
     }
     {
-        std::vector<char> buffer;
+        std::vector<std::uint8_t> buffer;
         hpx::serialization::output_archive oarchive(buffer);
         for (T c = min; c < max; c += static_cast<T>(0.5))
         {
