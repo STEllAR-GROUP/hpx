@@ -15,14 +15,9 @@
 #include <vector>
 
 using hpx::execution::par;
-using hpx::execution::parallel_policy;
-using hpx::execution::parallel_policy_shim;
-using hpx::execution::parallel_task_policy;
-using hpx::execution::parallel_task_policy_shim;
 using hpx::execution::static_chunk_size;
 using hpx::execution::task;
 using hpx::parallel::define_task_block;
-using hpx::parallel::task_block;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Executor>
@@ -36,10 +31,7 @@ void define_task_block_test1(Executor& exec)
     bool task21_flag = false;
     bool task3_flag = false;
 
-    typedef task_block<parallel_policy_shim<Executor, static_chunk_size>>
-        task_block_type;
-
-    define_task_block(par.on(exec), [&](task_block_type& trh) {
+    define_task_block(par.on(exec), [&](auto& trh) {
         parent_flag = true;
 
         trh.run([&]() {
@@ -51,7 +43,7 @@ void define_task_block_test1(Executor& exec)
             task2_flag = true;
             std::cout << "task2" << std::endl;
 
-            define_task_block(par.on(exec), [&](task_block_type& trh) {
+            define_task_block(par.on(exec), [&](auto& trh) {
                 trh.run([&]() {
                     task21_flag = true;
                     std::cout << "task2.1" << std::endl;
@@ -87,41 +79,34 @@ void define_task_block_test2(Executor& exec)
     bool task21_flag = false;
     bool task3_flag = false;
 
-    typedef task_block<parallel_policy_shim<Executor, static_chunk_size>>
-        task_block_type1;
-    typedef task_block<parallel_task_policy_shim<Executor, static_chunk_size>>
-        task_block_type2;
+    hpx::future<void> f = define_task_block(par(task).on(exec), [&](auto& trh) {
+        parent_flag = true;
 
-    hpx::future<void> f =
-        define_task_block(par(task).on(exec), [&](task_block_type2& trh) {
-            parent_flag = true;
+        trh.run([&]() {
+            task1_flag = true;
+            std::cout << "task1: " << s << std::endl;
+        });
 
-            trh.run([&]() {
-                task1_flag = true;
-                std::cout << "task1: " << s << std::endl;
-            });
+        trh.run([&]() {
+            task2_flag = true;
+            std::cout << "task2" << std::endl;
 
-            trh.run([&]() {
-                task2_flag = true;
-                std::cout << "task2" << std::endl;
-
-                define_task_block(par.on(exec), [&](task_block_type1& trh) {
-                    trh.run([&]() {
-                        task21_flag = true;
-                        std::cout << "task2.1" << std::endl;
-                    });
+            define_task_block(par.on(exec), [&](auto& trh) {
+                trh.run([&]() {
+                    task21_flag = true;
+                    std::cout << "task2.1" << std::endl;
                 });
             });
-
-            int i = 0, j = 10, k = 20;
-            trh.run([=, &task3_flag]() {
-                task3_flag = true;
-                std::cout << "task3: " << i << " " << j << " " << k
-                          << std::endl;
-            });
-
-            std::cout << "parent" << std::endl;
         });
+
+        int i = 0, j = 10, k = 20;
+        trh.run([=, &task3_flag]() {
+            task3_flag = true;
+            std::cout << "task3: " << i << " " << j << " " << k << std::endl;
+        });
+
+        std::cout << "parent" << std::endl;
+    });
 
     f.wait();
 
@@ -144,10 +129,7 @@ void define_task_block_test3(Executor& exec)
     bool task21_flag = false;
     bool task3_flag = false;
 
-    typedef task_block<parallel_policy_shim<Executor, static_chunk_size>>
-        task_block_type;
-
-    define_task_block(par.on(exec), [&](task_block_type& trh) {
+    define_task_block(par.on(exec), [&](auto& trh) {
         parent_flag = true;
 
         trh.run([&]() {
@@ -159,7 +141,7 @@ void define_task_block_test3(Executor& exec)
             task2_flag = true;
             std::cout << "task2" << std::endl;
 
-            define_task_block(par.on(exec), [&](task_block_type& trh) {
+            define_task_block(par.on(exec), [&](auto& trh) {
                 trh.run(exec, [&]() {
                     task21_flag = true;
                     std::cout << "task2.1" << std::endl;
@@ -195,41 +177,34 @@ void define_task_block_test4(Executor& exec)
     bool task21_flag = false;
     bool task3_flag = false;
 
-    typedef task_block<parallel_policy_shim<Executor, static_chunk_size>>
-        task_block_type1;
-    typedef task_block<parallel_task_policy_shim<Executor, static_chunk_size>>
-        task_block_type2;
+    hpx::future<void> f = define_task_block(par(task).on(exec), [&](auto& trh) {
+        parent_flag = true;
 
-    hpx::future<void> f =
-        define_task_block(par(task).on(exec), [&](task_block_type2& trh) {
-            parent_flag = true;
+        trh.run(exec, [&]() {
+            task1_flag = true;
+            std::cout << "task1: " << s << std::endl;
+        });
 
-            trh.run(exec, [&]() {
-                task1_flag = true;
-                std::cout << "task1: " << s << std::endl;
-            });
+        trh.run([&]() {
+            task2_flag = true;
+            std::cout << "task2" << std::endl;
 
-            trh.run([&]() {
-                task2_flag = true;
-                std::cout << "task2" << std::endl;
-
-                define_task_block(par.on(exec), [&](task_block_type1& trh) {
-                    trh.run(exec, [&]() {
-                        task21_flag = true;
-                        std::cout << "task2.1" << std::endl;
-                    });
+            define_task_block(par.on(exec), [&](auto& trh) {
+                trh.run(exec, [&]() {
+                    task21_flag = true;
+                    std::cout << "task2.1" << std::endl;
                 });
             });
-
-            int i = 0, j = 10, k = 20;
-            trh.run(exec, [=, &task3_flag]() {
-                task3_flag = true;
-                std::cout << "task3: " << i << " " << j << " " << k
-                          << std::endl;
-            });
-
-            std::cout << "parent" << std::endl;
         });
+
+        int i = 0, j = 10, k = 20;
+        trh.run(exec, [=, &task3_flag]() {
+            task3_flag = true;
+            std::cout << "task3: " << i << " " << j << " " << k << std::endl;
+        });
+
+        std::cout << "parent" << std::endl;
+    });
 
     f.wait();
 
@@ -244,12 +219,9 @@ void define_task_block_test4(Executor& exec)
 template <typename Executor>
 void define_task_block_exceptions_test1(Executor& exec)
 {
-    typedef task_block<parallel_policy_shim<Executor, static_chunk_size>>
-        task_block_type;
-
     try
     {
-        define_task_block(par.on(exec), [](task_block_type& trh) {
+        define_task_block(par.on(exec), [](auto& trh) {
             trh.run([]() {
                 std::cout << "task1" << std::endl;
                 throw 1;
@@ -279,24 +251,20 @@ void define_task_block_exceptions_test1(Executor& exec)
 template <typename Executor>
 void define_task_block_exceptions_test2(Executor& exec)
 {
-    typedef task_block<parallel_task_policy_shim<Executor, static_chunk_size>>
-        task_block_type;
-
-    hpx::future<void> f =
-        define_task_block(par(task).on(exec), [](task_block_type& trh) {
-            trh.run([]() {
-                std::cout << "task1" << std::endl;
-                throw 1;
-            });
-
-            trh.run([]() {
-                std::cout << "task2" << std::endl;
-                throw 2;
-            });
-
-            std::cout << "parent" << std::endl;
-            throw 100;
+    hpx::future<void> f = define_task_block(par(task).on(exec), [](auto& trh) {
+        trh.run([]() {
+            std::cout << "task1" << std::endl;
+            throw 1;
         });
+
+        trh.run([]() {
+            std::cout << "task2" << std::endl;
+            throw 2;
+        });
+
+        std::cout << "parent" << std::endl;
+        throw 100;
+    });
 
     try
     {
@@ -316,12 +284,9 @@ void define_task_block_exceptions_test2(Executor& exec)
 template <typename Executor>
 void define_task_block_exceptions_test3(Executor& exec)
 {
-    typedef task_block<parallel_policy_shim<Executor, static_chunk_size>>
-        task_block_type;
-
     try
     {
-        define_task_block(par.on(exec), [&](task_block_type& trh) {
+        define_task_block(par.on(exec), [&](auto& trh) {
             trh.run([&]() {
                 HPX_TEST(!hpx::expect_exception());
 
@@ -351,20 +316,16 @@ void define_task_block_exceptions_test3(Executor& exec)
 template <typename Executor>
 void define_task_block_exceptions_test4(Executor& exec)
 {
-    typedef task_block<parallel_task_policy_shim<Executor, static_chunk_size>>
-        task_block_type;
-
-    hpx::future<void> f =
-        define_task_block(par(task).on(exec), [&](task_block_type& trh) {
-            trh.run([&]() {
-                // Error: tr is not active
-                trh.run([]() {
-                    HPX_TEST(false);    // should not be called
-                });
-
-                HPX_TEST(false);
+    hpx::future<void> f = define_task_block(par(task).on(exec), [&](auto& trh) {
+        trh.run([&]() {
+            // Error: tr is not active
+            trh.run([]() {
+                HPX_TEST(false);    // should not be called
             });
+
+            HPX_TEST(false);
         });
+    });
 
     try
     {

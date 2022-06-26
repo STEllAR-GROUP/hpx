@@ -16,6 +16,7 @@
 #include <hpx/executors/datapar/execution_policy.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_find.hpp>
+#include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
 #include <hpx/parallel/datapar/zip_iterator.hpp>
@@ -94,7 +95,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     inline InIter tag_invoke(sequential_adjacent_find_t<ExPolicy>, InIter first,
         Sent_ last, PredProj&& pred_projected)
     {
-        return sequential_adjacent_find<typename ExPolicy::base_policy_type>(
+        using base_policy_type =
+            decltype((hpx::execution::experimental::to_non_simd(
+                std::declval<ExPolicy>())));
+        return sequential_adjacent_find<base_policy_type>(
             first, last, std::forward<PredProj>(pred_projected));
     }
 
@@ -122,9 +126,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         std::size_t base_idx, ZipIter part_begin, std::size_t part_count,
         Token& tok, PredProj&& pred_projected)
     {
-        return sequential_adjacent_find<typename ExPolicy::base_policy_type>(
-            base_idx, part_begin, part_count, tok,
-            std::forward<PredProj>(pred_projected));
+        using base_policy_type =
+            decltype((hpx::execution::experimental::to_non_simd(
+                std::declval<ExPolicy>())));
+        return sequential_adjacent_find<base_policy_type>(base_idx, part_begin,
+            part_count, tok, std::forward<PredProj>(pred_projected));
     }
 }}}}    // namespace hpx::parallel::v1::detail
 #endif

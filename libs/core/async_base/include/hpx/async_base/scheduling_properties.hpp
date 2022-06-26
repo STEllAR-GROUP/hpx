@@ -32,8 +32,8 @@ namespace hpx { namespace execution { namespace experimental {
         private:
             // attempt to improve error messages if property is not supported
             template <typename... Args>
-            friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
-                Tag, Args&&... /*args*/)
+            friend HPX_FORCEINLINE constexpr decltype(auto) tag_fallback_invoke(
+                Tag, Args&&... /*args*/) noexcept
             {
                 return property_not_supported<Tag, Args...>{};
             }

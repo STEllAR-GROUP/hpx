@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,30 +8,24 @@
 
 #include <hpx/config.hpp>
 
-// TODO: Should this be experimental?
 #if defined(HPX_HAVE_DATAPAR)
-namespace hpx { namespace execution { inline namespace v1 {
-    ///////////////////////////////////////////////////////////////////////////
-    struct simd_policy;
+#include <hpx/executors/execution_policy_fwd.hpp>
 
-    template <typename Executor, typename Parameters>
+// TODO: Should this be experimental?
+namespace hpx { namespace execution { namespace detail {
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Executor, typename Parameters = void>
     struct simd_policy_shim;
 
-    struct simd_task_policy;
-
-    template <typename Executor, typename Parameters>
+    template <typename Executor, typename Parameters = void>
     struct simd_task_policy_shim;
 
-    ///////////////////////////////////////////////////////////////////////////
-    struct par_simd_policy;
-
-    template <typename Executor, typename Parameters>
+    template <typename Executor, typename Parameters = void>
     struct par_simd_policy_shim;
 
-    struct par_simd_task_policy;
-
-    template <typename Executor, typename Parameters>
+    template <typename Executor, typename Parameters = void>
     struct par_simd_task_policy_shim;
-}}}    // namespace hpx::execution::v1
+}}}    // namespace hpx::execution::detail
 
 #endif
