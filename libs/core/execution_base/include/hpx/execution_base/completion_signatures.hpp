@@ -616,7 +616,7 @@ namespace hpx::execution::experimental {
         };
 
         template <typename CS, typename... Ts>
-        inline bool constexpr is_same_types = std::same_as<
+        inline bool constexpr is_same_types = std::is_same_v<
             typename CS::template value_types<meta::pack, meta::pack>,
             meta::pack<meta::pack<Ts...>>>;
 
