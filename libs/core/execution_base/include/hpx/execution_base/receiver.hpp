@@ -8,10 +8,10 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/datastructures/variant.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/type_support/meta.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -175,7 +175,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename F, typename T, typename... Ts>
         struct is_invocable_variant_of_tuples<F, T,
-            hpx::variant<hpx::tuple<Ts...>>>
+            meta::pack<meta::pack<Ts...>>>
           : hpx::is_invocable<F, std::decay_t<T>&&, Ts...>
         {
         };
@@ -186,7 +186,7 @@ namespace hpx { namespace execution { namespace experimental {
         };
 
         template <typename F, typename T, typename... Ts>
-        struct is_invocable_variant<F, T, hpx::variant<Ts...>>
+        struct is_invocable_variant<F, T, meta::pack<Ts...>>
           : hpx::is_invocable<F, std::decay_t<T>&&, Ts...>
         {
         };
@@ -195,11 +195,10 @@ namespace hpx { namespace execution { namespace experimental {
         struct is_receiver_of_impl<true, T, CS>
           : std::integral_constant<bool,
                 is_invocable_variant_of_tuples<set_value_t, T,
-                    typename CS::template value_types<hpx::tuple,
-                        hpx::variant>>::value &&
+                    typename CS::template value_types<meta::pack,
+                        meta::pack>>::value &&
                     is_invocable_variant<set_error_t, T,
-                        typename CS::template error_types<hpx::variant>>::
-                        value &&
+                        typename CS::template error_types<meta::pack>>::value &&
                     CS::sends_stopped>
         {
         };
@@ -222,7 +221,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename F, typename T, typename... Ts>
         struct is_nothrow_invocable_variant_of_tuples<F, T,
-            hpx::variant<hpx::tuple<Ts...>>>
+            meta::pack<meta::pack<Ts...>>>
           : hpx::functional::is_nothrow_tag_invocable<F, std::decay_t<T>&&,
                 Ts...>
         {
@@ -234,7 +233,7 @@ namespace hpx { namespace execution { namespace experimental {
         };
 
         template <typename F, typename T, typename... Ts>
-        struct is_nothrow_invocable_variant<F, T, hpx::variant<Ts...>>
+        struct is_nothrow_invocable_variant<F, T, meta::pack<Ts...>>
           : hpx::functional::is_nothrow_tag_invocable<F, std::decay_t<T>&&,
                 Ts...>
         {
@@ -252,11 +251,10 @@ namespace hpx { namespace execution { namespace experimental {
         struct is_nothrow_receiver_of_impl<true, T, CS>
           : std::integral_constant<bool,
                 is_nothrow_invocable_variant_of_tuples<set_value_t, T,
-                    typename CS::template value_types<hpx::tuple,
-                        hpx::variant>>::value &&
+                    typename CS::template value_types<meta::pack,
+                        meta::pack>>::value &&
                     is_nothrow_invocable_variant<set_error_t, T,
-                        typename CS::template error_types<hpx::variant>>::
-                        value &&
+                        typename CS::template error_types<meta::pack>>::value &&
                     CS::sends_stopped>
         {
         };

@@ -349,47 +349,72 @@ int main()
                 hpx::execution::experimental::env_of_t<receiver>>>,
         "receiver does not support completion signatures of sender_1");
 
-    static_assert(
-        hpx::execution::experimental::is_sender_of_v<sender_1, receiver>,
-        "sender_1 is a sender to receiver");
-    static_assert(
-        hpx::execution::experimental::is_sender_of_v<sender_2, receiver>,
-        "sender_2 is a sender to receiver");
-    static_assert(
-        hpx::execution::experimental::is_sender_of_v<sender_3, receiver>,
-        "sender_3 is a sender to receiver");
+    static_assert(hpx::execution::experimental::is_sender_of_v<sender_1,
+                      hpx::execution::experimental::env_of_t<receiver>, int>,
+        "sender_1 is a sender of env_of_t<receiver> and value types int");
+    static_assert(hpx::execution::experimental::is_sender_of_v<sender_2,
+                      hpx::execution::experimental::env_of_t<receiver>, int>,
+        "sender_2 is a sender of env_of_t<receiver> and value types int");
+    static_assert(hpx::execution::experimental::is_sender_of_v<sender_3,
+                      hpx::execution::experimental::env_of_t<receiver>, int>,
+        "sender_3 is a sender of env_of_t<receiver> and value types int");
     static_assert(
         hpx::execution::experimental::is_sender_of_v<sender_4<true, int>,
-            receiver>,
-        "sender_4<true,int> is a sender to receiver");
+            hpx::execution::experimental::env_of_t<receiver>, int>,
+        "sender_4<true,int> is a sender of env_of_t<receiver> and value types "
+        "int");
     static_assert(
         hpx::execution::experimental::is_sender_of_v<sender_4<false, int>,
-            receiver>,
-        "sender_4<false,int> is a sender to receiver");
+            hpx::execution::experimental::env_of_t<receiver>, int>,
+        "sender_4<false,int> is a sender of env_of_t<receiver> and value types "
+        "int");
     static_assert(
-        hpx::execution::experimental::is_sender_of_v<sender_1, receiver_2<int>>,
-        "sender_1 is a sender to receiver_2<int>");
+        hpx::execution::experimental::is_sender_of_v<sender_1,
+            hpx::execution::experimental::env_of_t<receiver_2<int>>, int>,
+        "sender_1 is a sender of env_of_t<receiver_2<int>> and value types "
+        "int");
     static_assert(
-        hpx::execution::experimental::is_sender_of_v<sender_2, receiver_2<int>>,
-        "sender_2 is a sender to receiver_2<int>");
+        hpx::execution::experimental::is_sender_of_v<sender_2,
+            hpx::execution::experimental::env_of_t<receiver_2<int>>, int>,
+        "sender_2 is a sender of env_of_t<receiver_2<int>> and value types "
+        "int");
     static_assert(
-        hpx::execution::experimental::is_sender_of_v<sender_3, receiver_2<int>>,
-        "sender_3 is a sender to receiver_2<int>");
-    static_assert(hpx::execution::experimental::is_sender_of_v<
-                      sender_4<true, std::string>, receiver_2<std::string>>,
-        "sender_4<true,std::string> is a sender to receiver_2<std::string>");
-    static_assert(hpx::execution::experimental::is_sender_of_v<
-                      sender_4<true, std::string>, receiver_2<std::string>>,
-        "sender_4<false,std::string> is a sender to receiver_2<std::string>");
-    static_assert(!hpx::execution::experimental::is_sender_of_v<sender_1,
-                      receiver_2<std::string>>,
-        "sender_1 is not a sender to receiver_2<std::string>");
-    static_assert(!hpx::execution::experimental::is_sender_of_v<sender_2,
-                      receiver_2<std::string>>,
-        "sender_2 is not a sender to receiver_2<std::string>");
-    static_assert(!hpx::execution::experimental::is_sender_of_v<sender_3,
-                      receiver_2<std::string>>,
-        "sender_3 is not a sender to receiver_2<std::string>");
+        hpx::execution::experimental::is_sender_of_v<sender_3,
+            hpx::execution::experimental::env_of_t<receiver_2<int>>, int>,
+        "sender_3 is a sender of env_of_t<receiver_2<int>> and value types "
+        "int");
+    static_assert(
+        hpx::execution::experimental::is_sender_of_v<
+            sender_4<true, std::string>,
+            hpx::execution::experimental::env_of_t<receiver_2<std::string>>,
+            std::string>,
+        "sender_4<true,std::string> is a sender of "
+        "env_of_t<receiver_2<std::string>> and value types std::string");
+    static_assert(
+        hpx::execution::experimental::is_sender_of_v<
+            sender_4<true, std::string>,
+            hpx::execution::experimental::env_of_t<receiver_2<std::string>>,
+            std::string>,
+        "sender_4<false,std::string> is a sender of "
+        "env_of_t<receiver_2<std::string>> and value types std::string");
+    static_assert(
+        !hpx::execution::experimental::is_sender_of_v<sender_1,
+            hpx::execution::experimental::env_of_t<receiver_2<std::string>>,
+            std::string>,
+        "sender_1 is not a sender of env_of_t<receiver_2<std::string>> and "
+        "value types std::string");
+    static_assert(
+        !hpx::execution::experimental::is_sender_of_v<sender_2,
+            hpx::execution::experimental::env_of_t<receiver_2<std::string>>,
+            std::string>,
+        "sender_2 is not a sender of env_of_t<receiver_2<std::string>> and "
+        "value types std::string");
+    static_assert(
+        !hpx::execution::experimental::is_sender_of_v<sender_3,
+            hpx::execution::experimental::env_of_t<receiver_2<std::string>>,
+            std::string>,
+        "sender_3 is not a sender of env_of_t<receiver_2<std::string>> and "
+        "value types std::string");
 
     {
         receiver r1;

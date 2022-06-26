@@ -383,7 +383,7 @@ namespace hpx::execution::experimental {
 
     // The sender_of concept defines the requirements for a sender type that on
     // successful completion sends the specified set of value types.
-    template <class S, class R>
+    template <class S, class E = no_env, class... Ts>
     struct is_sender_of;
 
     namespace detail {
@@ -607,56 +607,35 @@ namespace hpx::execution::experimental {
     inline constexpr bool is_sender_v = is_sender<Sender, Env>::value;
 
     namespace detail {
-
-        // Sender may or may not support sends_stopped
-        // In the false case only the value_types and error_types are checked
-        template <class S, class R, class CS,
-            bool sends_stopped = CS::sends_stopped>
-        struct sender_support_sends_stopped;
-
-        template <class S, class R, class CS>
-        struct sender_support_sends_stopped<S, R, CS, true>
-          : std::integral_constant<bool,
-                is_receiver_of_v<R, completion_signatures_of_t<S, env_of_t<R>>>>
-        {
-        };
-
-        template <class S, class R, class CS>
-        struct sender_support_sends_stopped<S, R, CS, false>
-          : std::integral_constant<bool,
-                is_invocable_variant_of_tuples<set_value_t, R,
-                    typename CS::template value_types<hpx::tuple,
-                        hpx::variant>>::value &&
-                    is_invocable_variant<set_error_t, R,
-                        typename CS::template error_types<hpx::variant>>::value>
-        {
-        };
-
-        template <bool IsSenderOf, class S, class R>
+        template <bool IsSenderOf, typename S, typename E, typename... Ts>
         struct is_sender_of_impl;
 
-        template <class S, class R>
-        struct is_sender_of_impl<false, S, R> : std::false_type
+        template <typename S, typename E, typename... Ts>
+        struct is_sender_of_impl<false, S, E, Ts...> : std::false_type
         {
         };
 
-        template <class S, class R>
-        struct is_sender_of_impl<true, S, R>
+        template <typename CS, typename... Ts>
+        inline bool constexpr is_same_types = std::same_as<
+            typename CS::template value_types<meta::pack, meta::pack>,
+            meta::pack<meta::pack<Ts...>>>;
+
+        template <class S, class E, class... Ts>
+        struct is_sender_of_impl<true, S, E, Ts...>
           : std::integral_constant<bool,
-                sender_support_sends_stopped<S, R,
-                    completion_signatures_of_t<S, env_of_t<R>>>::value>
+                is_same_types<completion_signatures_of_t<S, E>, Ts...>>
         {
         };
     }    // namespace detail
 
-    template <class S, class R>
+    template <class S, class E, class... Ts>
     struct is_sender_of
-      : detail::is_sender_of_impl<is_sender_v<S, env_of_t<R>>, S, R>
+      : detail::is_sender_of_impl<is_sender_v<S, E>, S, E, Ts...>
     {
     };
 
-    template <class S, class R>
-    inline constexpr bool is_sender_of_v = is_sender_of<S, R>::value;
+    template <typename S, typename E, typename... Ts>
+    inline constexpr bool is_sender_of_v = is_sender_of<S, E, Ts...>::value;
 
     template <typename Sender, typename Receiver>
     struct is_sender_to
