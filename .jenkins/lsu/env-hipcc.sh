@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 module load rocm
+module load boost
 export CXX=hipcc
 
 export HPXRUN_RUNWRAPPER=srun

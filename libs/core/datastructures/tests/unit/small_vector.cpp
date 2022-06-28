@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 
+#if !defined(HPX_HAVE_HIP)
 #include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -939,3 +940,5 @@ int main()
 
     return hpx::util::report_errors();
 }
+
+#endif
