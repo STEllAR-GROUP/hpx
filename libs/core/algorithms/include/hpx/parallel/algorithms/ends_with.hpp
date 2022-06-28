@@ -28,12 +28,6 @@ namespace hpx {
     ///                     requirements of a input iterator.
     /// \tparam Pred        The binary predicate that compares the projected
     ///                     elements.
-    /// \tparam Proj1       The type of an optional projection function for
-    ///                     the source range. This defaults to
-    ///                     \a util::projection_identity
-    /// \tparam Proj1       The type of an optional projection function for
-    ///                     the destination range. This defaults to
-    ///                     \a util::projection_identity
     ///
     /// \param first1       Refers to the beginning of the source range.
     /// \param last1        Refers to the end of the source range.
@@ -43,14 +37,6 @@ namespace hpx {
     ///                     (or function object) which will be invoked for
     ///                     comparison of the elements in the in two ranges
     ///                     projected by proj1 and proj2 respectively.
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     source range as a projection operation before the
-    ///                     actual predicate \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     destination range as a projection operation before
-    ///                     the actual predicate \a is invoked.
     ///
     /// The assignments in the parallel \a ends_with algorithm invoked
     /// without an execution policy object execute in sequential order
@@ -60,13 +46,13 @@ namespace hpx {
     ///           The \a ends_with algorithm returns a boolean with the
     ///           value true if the second range matches the suffix of the
     ///           first range, false otherwise.
-    template <typename InIter1, typename InIter2, typename Pred,
-        typename Proj1, typename Proj2>
+    template <typename InIter1, typename InIter2, typename Pred>
     bool ends_with(InIter1 first1, InIter1 last1, InIter2 first2,
-        InIter2 last2, Pred&& pred, Proj1&& proj1, Proj2&& proj2);
+        InIter2 last2, Pred&& pred);
 
     /// Checks whether the second range defined by [first1, last1) matches the
-    /// suffix of the first range defined by [first2, last2)
+    /// suffix of the first range defined by [first2, last2). Executed
+    /// according to the policy.
     ///
     /// \note   Complexity: Linear: at most min(N1, N2) applications of the
     ///                     predicate and both projections.
@@ -83,12 +69,6 @@ namespace hpx {
     ///                     requirements of a forward iterator.
     /// \tparam Pred        The binary predicate that compares the projected
     ///                     elements.
-    /// \tparam Proj1       The type of an optional projection function for
-    ///                     the source range. This defaults to
-    ///                     \a util::projection_identity
-    /// \tparam Proj1       The type of an optional projection function for
-    ///                     the destination range. This defaults to
-    ///                     \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -98,16 +78,6 @@ namespace hpx {
     /// \param last2        Refers to the end of the destination range.
     /// \param pred         Specifies the binary predicate function
     ///                     (or function object) which will be invoked for
-    ///                     comparison of the elements in the in two ranges
-    ///                     projected by proj1 and proj2 respectively.
-    /// \param proj1        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     source range as a projection operation before the
-    ///                     actual predicate \a is invoked.
-    /// \param proj2        Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     destination range as a projection operation before
-    ///                     the actual predicate \a is invoked.
     ///
     /// The assignments in the parallel \a ends_with algorithm invoked with an
     /// execution policy object of type \a sequenced_policy
@@ -127,15 +97,13 @@ namespace hpx {
     ///           value true if the second range matches the suffix of the
     ///           first range, false otherwise.
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred, typename Proj1, typename Proj2>
+        typename Pred>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         bool>::type
     ends_with(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter2 last2, Pred&& pred, Proj1&& proj1,
-        Proj2&& proj2);
+        FwdIter2 first2, FwdIter2 last2, Pred&& pred);
 
     // clang-format on
-}    // namespace hpx
 }    // namespace hpx
 
 #else    // DOXYGEN

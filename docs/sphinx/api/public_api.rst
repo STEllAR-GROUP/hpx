@@ -47,6 +47,7 @@ Functions
    =================================================  ==========================================================
    `hpx` function                                     C++ standard
    =================================================  ==========================================================
+   :cpp:func:`hpx::adjacent_difference`               :cppreference-generic:`algorithm,adjacent_difference`
    :cpp:func:`hpx::adjacent_find`                     :cppreference-generic:`algorithm,adjacent_find`
    :cpp:func:`hpx::all_of`                            :cppreference-generic:`algorithm,all_any_none_of,all_of`
    :cpp:func:`hpx::any_of`                            :cppreference-generic:`algorithm,all_any_none_of,any_of`

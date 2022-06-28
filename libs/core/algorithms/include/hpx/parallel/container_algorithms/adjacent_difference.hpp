@@ -1,3 +1,4 @@
+//  Copyright (c) 2022 Dimitra Karatza
 //  Copyright (c) 2021 Karame M.Shokooh
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -185,10 +186,6 @@ namespace hpx { namespace ranges {
     FwdIter2 adjacent_difference(FwdIter1 first, Sent last, FwdIter2 dest, Op&& op);
 
     /// Searches the \a rng for two consecutive identical elements.
-    ///
-    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
-    ///                     (last - first) - 1 application of the predicate
-    ///                     where \a result is the value returned
     ///
     /// \tparam FwdIter2    The type of the source iterators used for the
     ///                     range (deduced).
