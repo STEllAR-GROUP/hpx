@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2021 Hartmut Kaiser
+//  Copyright (c) 2019-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,6 +29,8 @@ namespace hpx { namespace collectives {
     ///                     given base name. This is optional and needs to be
     ///                     supplied only if the all_reduce operation on the
     ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
@@ -57,7 +59,45 @@ namespace hpx { namespace collectives {
     ///                     participating sites from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
-    /// \param this_site    The sequence number of this invocation (usually
+    /// \param  this_site   The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_reduce operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_reduce operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \returns    This function returns a future holding a vector with all
+    ///             values send by all participating sites. It will become
+    ///             ready once the all_reduce operation has been completed.
+    ///
+    template <typename T, typename F>
+    hpx::future<std::decay_t<T>>
+    all_reduce(communicator comm,
+        T&& result, F&& op, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// AllReduce a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  local_result The value to transmit to all
+    ///                     participating sites from this call site.
+    /// \param  op          Reduction operation to apply to all values supplied
+    ///                     from all participating sites
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_reduce operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_reduce operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param  this_site   The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
@@ -68,7 +108,8 @@ namespace hpx { namespace collectives {
     template <typename T, typename F>
     hpx::future<std::decay_t<T>>
     all_reduce(communicator comm,
-        T&& result, F&& op, this_site_arg this_site = this_site_arg());
+        T&& result, F&& op, generation_arg generation,
+        this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 
 // clang-format on
@@ -78,6 +119,7 @@ namespace hpx { namespace collectives {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/collectives/argument_types.hpp>
@@ -88,8 +130,6 @@ namespace hpx { namespace collectives {
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
-#include <memory>
-#include <mutex>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -104,68 +144,29 @@ namespace hpx { namespace traits {
     // support for all_reduce
     template <typename Communicator>
     struct communication_operation<Communicator, communication::all_reduce_tag>
-      : std::enable_shared_from_this<communication_operation<Communicator,
-            communication::all_reduce_tag>>
     {
-        explicit communication_operation(Communicator& comm)
-          : communicator_(comm)
-        {
-        }
-
         template <typename Result, typename T, typename F>
-        Result get(std::size_t which, T&& t, F&& op)
+        static Result get(Communicator& communicator, std::size_t which,
+            std::size_t generation, T&& t, F&& op)
         {
-            using arg_type = std::decay_t<T>;
-            using mutex_type = typename Communicator::mutex_type;
-            using lock_type = std::unique_lock<mutex_type>;
-
-            auto this_ = this->shared_from_this();
-            auto on_ready =
-                [this_ = HPX_MOVE(this_), op = HPX_FORWARD(F, op)](
-                    hpx::shared_future<void> f) mutable -> arg_type {
-                HPX_UNUSED(this_);
-                f.get();    // propagate any exceptions
-
-                auto& communicator = this_->communicator_;
-
-                lock_type l(communicator.mtx_);
-                util::ignore_while_checking il(&l);
-                HPX_UNUSED(il);
-
-                auto& data = communicator.template access_data<arg_type>(l);
-                if (!communicator.data_available_)
-                {
-                    // compute reduction result only once
-                    auto it = data.begin();
-                    data[0] = hpx::reduce(++it, data.end(), *data.begin(), op);
-                    communicator.data_available_ = true;
-                }
-                return data[0];
-            };
-
-            lock_type l(communicator_.mtx_);
-            util::ignore_while_checking il(&l);
-            HPX_UNUSED(il);
-
-            hpx::future<arg_type> f =
-                communicator_.gate_.get_shared_future(l).then(
-                    hpx::launch::sync, HPX_MOVE(on_ready));
-
-            communicator_.gate_.synchronize(1, l);
-
-            auto& data = communicator_.template access_data<arg_type>(l);
-            data[which] = HPX_FORWARD(T, t);
-
-            if (communicator_.gate_.set(which, HPX_MOVE(l)))
-            {
-                l = lock_type(communicator_.mtx_);
-                communicator_.invalidate_data(l);
-            }
-
-            return f;
+            return communicator.template handle_data<std::decay_t<T>>(
+                which, generation,
+                // step function (invoked for each get)
+                [&](auto& data) { data[which] = HPX_FORWARD(T, t); },
+                // finalizer (invoked after all data has been received)
+                [op = HPX_FORWARD(F, op)](
+                    auto& data, bool& data_available) mutable {
+                    HPX_ASSERT(!data.empty());
+                    if (!data_available && data.size() > 1)
+                    {
+                        // compute reduction result only once
+                        data[0] = hpx::reduce(++data.begin(), data.end(),
+                            data[0], HPX_FORWARD(F, op));
+                        data_available = true;
+                    }
+                    return data[0];
+                });
         }
-
-        Communicator& communicator_;
     };
 }}    // namespace hpx::traits
 
@@ -175,18 +176,25 @@ namespace hpx { namespace collectives {
     // all_reduce plain values
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> all_reduce(communicator fid, T&& local_result,
-        F&& op, this_site_arg this_site = this_site_arg())
+        F&& op, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
     {
+        using arg_type = std::decay_t<T>;
+
         if (this_site == std::size_t(-1))
         {
             this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
+        if (generation == 0)
+        {
+            return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
+                hpx::bad_parameter, "hpx::collectives::all_reduce",
+                "the generation number shouldn't be zero"));
+        }
 
-        using arg_type = std::decay_t<T>;
-
-        auto all_reduce_data_direct =
-            [op = HPX_FORWARD(F, op),
-                local_result = HPX_FORWARD(T, local_result),
+        auto all_reduce_data =
+            [local_result = HPX_FORWARD(T, local_result),
+                op = HPX_FORWARD(F, op), generation,
                 this_site](communicator&& c) mutable -> hpx::future<arg_type> {
             using func_type = std::decay_t<F>;
             using action_type = typename detail::communicator_server::
@@ -194,18 +202,30 @@ namespace hpx { namespace collectives {
                     traits::communication::all_reduce_tag,
                     hpx::future<arg_type>, arg_type, func_type>;
 
-            // make sure id is kept alive as long as the returned future,
             // explicitly unwrap returned future
             hpx::future<arg_type> result = async(action_type(), c, this_site,
-                HPX_FORWARD(T, local_result), HPX_FORWARD(F, op));
+                generation, HPX_MOVE(local_result), HPX_MOVE(op));
 
-            traits::detail::get_shared_state(result)->set_on_completed(
-                [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+            if (!result.is_ready())
+            {
+                // make sure id is kept alive as long as the returned future
+                traits::detail::get_shared_state(result)->set_on_completed(
+                    [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+            }
 
             return result;
         };
 
-        return fid.then(hpx::launch::sync, HPX_MOVE(all_reduce_data_direct));
+        return fid.then(hpx::launch::sync, HPX_MOVE(all_reduce_data));
+    }
+
+    template <typename T, typename F>
+    hpx::future<std::decay_t<T>> all_reduce(communicator fid, T&& local_result,
+        F&& op, generation_arg generation,
+        this_site_arg this_site = this_site_arg())
+    {
+        return all_reduce(HPX_MOVE(fid), HPX_FORWARD(T, local_result),
+            HPX_FORWARD(F, op), this_site, generation);
     }
 
     template <typename T, typename F>

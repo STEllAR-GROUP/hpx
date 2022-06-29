@@ -142,7 +142,7 @@ namespace hpx {
     ///           otherwise.
     ///           The \a copy_n algorithm returns Iterator in the destination range,
     ///           pointing past the last element copied if count>0 or result
-    ///           otherwise. 
+    ///           otherwise.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Size, typename FwdIter2>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
@@ -243,8 +243,8 @@ namespace hpx {
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a FwdIter2 otherwise.
-    ///           The \a copy_if algorithm returns output iterator to the element in 
-    ///           the destination range, one past the last element copied. 
+    ///           The \a copy_if algorithm returns output iterator to the element in
+    ///           the destination range, one past the last element copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred>
@@ -294,7 +294,7 @@ namespace hpx {
     ///                     implicitly converted to Type.
     ///
     /// \returns  The \a copy_if algorithm returns a \a FwdIter2 .
-    ///           The \a copy_if algorithm returns output iterator to the element in 
+    ///           The \a copy_if algorithm returns output iterator to the element in
     ///           the destination range, one past the last element copied.
     ///
     template <typename FwdIter1, typename FwdIter2, typename Pred>
