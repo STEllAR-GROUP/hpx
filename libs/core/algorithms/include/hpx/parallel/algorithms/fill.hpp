@@ -14,6 +14,7 @@ namespace hpx {
     // clang-format off
 
     /// Assigns the given value to the elements in the range [first, last).
+    /// Executed according to the policy.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
@@ -55,8 +56,30 @@ namespace hpx {
     typename util::detail::algorithm_result<ExPolicy>::type
     fill(ExPolicy&& policy, FwdIter first, FwdIter last, T value);
 
+    /// Assigns the given value to the elements in the range [first, last).
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam T           The type of the value to be assigned (deduced).
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param value        The value to be assigned.
+    ///
+    /// \returns  The \a fill algorithm returns a \a void.
+    ///
+    template <typename FwdIter, typename T>
+    void fill(FwdIter first, FwdIter last, T value);
+
+
     /// Assigns the given value value to the first count elements in the range
-    /// beginning at first if count > 0. Does nothing otherwise.
+    /// beginning at first if count > 0. Does nothing otherwise. Executed
+    /// according to the policy.
     ///
     /// \note   Complexity: Performs exactly \a count assignments, for
     ///         count > 0.
@@ -66,8 +89,8 @@ namespace hpx {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
     /// \tparam T           The type of the value to be assigned (deduced).
@@ -100,6 +123,30 @@ namespace hpx {
     template <typename ExPolicy, typename FwdIter, typename Size, typename T>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     fill_n(ExPolicy&& policy, FwdIter first, Size count, T value);
+
+    /// Assigns the given value value to the first count elements in the range
+    /// beginning at first if count > 0. Does nothing otherwise.
+    ///
+    /// \note   Complexity: Performs exactly \a count assignments, for
+    ///         count > 0.
+    ///
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply \a f to.
+    /// \tparam T           The type of the value to be assigned (deduced).
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.
+    /// \param value        The value to be assigned.
+    ///
+    /// \returns  The \a fill_n algorithm returns a \a FwdIter.
+    ///
+    template <typename FwdIter, typename Size, typename T>
+    FwdIter fill_n(FwdIter first, Size count, T value);
 
     // clang-format on
 }    // namespace hpx
