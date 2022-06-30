@@ -1,5 +1,6 @@
 //  Copyright (c) 2018 Christopher Ogle
 //  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2022 Dimitra Karatza
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
