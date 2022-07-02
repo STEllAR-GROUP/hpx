@@ -14,7 +14,6 @@
 #include <vector>
 
 using hpx::parallel::define_task_block;
-using hpx::parallel::task_block;
 
 ///////////////////////////////////////////////////////////////////////////////
 void define_task_block_test()
@@ -27,7 +26,7 @@ void define_task_block_test()
     bool task21_flag = false;
     bool task3_flag = false;
 
-    define_task_block([&](task_block<>& trh) {
+    define_task_block([&](auto& trh) {
         parent_flag = true;
 
         trh.run([&]() {
@@ -39,7 +38,7 @@ void define_task_block_test()
             task2_flag = true;
             std::cout << "task2" << std::endl;
 
-            define_task_block([&](task_block<>& trh) {
+            define_task_block([&](auto& trh) {
                 trh.run([&]() {
                     task21_flag = true;
                     std::cout << "task2.1" << std::endl;
@@ -68,7 +67,7 @@ void define_task_block_exceptions_test1()
 {
     try
     {
-        define_task_block([](task_block<>& trh) {
+        define_task_block([](auto& trh) {
             trh.run([]() {
                 std::cout << "task1" << std::endl;
                 throw 1;
@@ -99,7 +98,7 @@ void define_task_block_exceptions_test2()
 {
     try
     {
-        define_task_block([&](task_block<>& trh) {
+        define_task_block([&](auto& trh) {
             trh.run([&]() {
                 HPX_TEST(!hpx::expect_exception());
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 The STE||AR-Group
+# Copyright (c) 2020-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@ set(tests
     annotating_executor
     annotation_property
     created_executor
+    execution_policy_mappings
     fork_join_executor
     limiting_executor
     parallel_executor

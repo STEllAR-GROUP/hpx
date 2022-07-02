@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,50 +7,31 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#if defined(HPX_HAVE_DATAPAR)
-#include <hpx/executors/datapar/execution_policy_fwd.hpp>
-#endif
 
-namespace hpx { namespace execution {
-    ///////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace execution { namespace detail {
+
     // forward declarations, see execution_policy.hpp
-    struct sequenced_policy;
-
-    template <typename Executor, typename Parameters>
+    template <typename Executor, typename Parameters = void>
     struct sequenced_policy_shim;
 
-    struct sequenced_task_policy;
-
-    template <typename Executor, typename Parameters>
+    template <typename Executor, typename Parameters = void>
     struct sequenced_task_policy_shim;
 
-    struct parallel_policy;
-
-    template <typename Executor, typename Parameters>
+    template <typename Executor, typename Parameters = void>
     struct parallel_policy_shim;
 
-    struct parallel_task_policy;
-
-    template <typename Executor, typename Parameters>
+    template <typename Executor, typename Parameters = void>
     struct parallel_task_policy_shim;
 
-    struct unsequenced_task_policy;
-
-    template <typename Executor, typename Parameters>
+    template <typename Executor, typename Parameters = void>
     struct unsequenced_task_policy_shim;
 
-    struct unsequenced_policy;
-
-    template <typename Executor, typename Parameters>
+    template <typename Executor, typename Parameters = void>
     struct unsequenced_policy_shim;
 
-    struct parallel_unsequenced_task_policy;
-
-    template <typename Executor, typename Parameters>
+    template <typename Executor, typename Parameters = void>
     struct parallel_unsequenced_task_policy_shim;
 
-    struct parallel_unsequenced_policy;
-
-    template <typename Executor, typename Parameters>
+    template <typename Executor, typename Parameters = void>
     struct parallel_unsequenced_policy_shim;
-}}    // namespace hpx::execution
+}}}    // namespace hpx::execution::detail

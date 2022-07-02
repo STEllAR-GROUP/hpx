@@ -549,9 +549,9 @@ namespace hpx { namespace parallel { namespace util {
         }
         else
         {
-            using execution_policy_type = typename std::decay_t<ExPolicy>;
             using base_policy_type =
-                typename execution_policy_type::base_policy_type;
+                decltype((hpx::execution::experimental::to_non_simd(
+                    std::declval<ExPolicy>())));
             return loop2<base_policy_type>(
                 first1, last1, first2, HPX_FORWARD(F, f));
         }

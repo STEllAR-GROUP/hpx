@@ -225,7 +225,7 @@ namespace hpx { namespace execution {
         {
             auto exec_with_annotation = exec;
             exec_with_annotation.annotation_ =
-                detail::store_function_annotation(HPX_MOVE(annotation));
+                hpx::detail::store_function_annotation(HPX_MOVE(annotation));
             return exec_with_annotation;
         }
 
