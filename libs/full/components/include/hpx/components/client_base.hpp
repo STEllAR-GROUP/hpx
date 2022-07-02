@@ -551,6 +551,22 @@ namespace hpx { namespace components {
         }
 
         template <typename F>
+        hpx::traits::future_then_result_t<Derived, F> then(
+            launch::sync_policy l, F&& f)
+        {
+            using func_result = decltype(HPX_FORWARD(F, f)(Derived(*this)));
+            using future_result = hpx::traits::future_then_result_t<Derived, F>;
+            if constexpr (std::is_convertible_v<func_result, future_result>)
+            {
+                if (is_ready())
+                {
+                    return HPX_FORWARD(F, f)(Derived(*this));
+                }
+            }
+            return then(launch(l), HPX_FORWARD(F, f));
+        }
+
+        template <typename F>
         hpx::traits::future_then_result_t<Derived, F> then(F&& f)
         {
             return then(launch::all, HPX_FORWARD(F, f));
