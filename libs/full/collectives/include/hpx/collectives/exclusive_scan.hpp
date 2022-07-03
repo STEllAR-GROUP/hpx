@@ -180,7 +180,8 @@ namespace hpx { namespace traits {
                         std::swap(data, dest);
                         data_available = true;
                     }
-                    return data[which];
+                    return Communicator::template handle_bool<std::decay_t<T>>(
+                        data[which]);
                 });
         }
     };

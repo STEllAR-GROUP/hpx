@@ -229,6 +229,20 @@ namespace hpx { namespace collectives { namespace detail {
             return f;
         }
 
+        // protect against vector<bool> idiosyncrasies
+        template <typename ValueType, typename Data>
+        static decltype(auto) handle_bool(Data&& data)
+        {
+            if constexpr (std::is_same_v<ValueType, bool>)
+            {
+                return bool(data);
+            }
+            else
+            {
+                return HPX_FORWARD(Data, data);
+            }
+        }
+
     private:
         template <typename Communicator, typename Operation>
         friend struct hpx::traits::communication_operation;
