@@ -1,5 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/datastructures/optional.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
@@ -57,26 +60,11 @@ namespace hpx::execution::experimental::detail {
         using predecessor_error_types =
             error_types_of_t<Sender, empty_env, Variant>;
 
-        // The type of the single void or non-void result that we store. If
-        // there are multiple variants or multiple values sync_wait will
-        // fail to compile.
-        using result_type = std::decay_t<
-            single_result_t<predecessor_value_types<meta::pack, meta::pack>>>;
-
-        // Constant to indicate if the type of the result from the
-        // predecessor sender is void or not
-        static constexpr bool is_void_result =
-            std::is_same_v<result_type, void>;
-
-        // Dummy type to indicate that set_value with void has been called
-        struct void_value_type
-        {
-        };
-
-        // The type of the value to store in the variant, void_value_type if
-        // result_type is void, or result_type if it is not
-        using value_type =
-            std::conditional_t<is_void_result, void_value_type, result_type>;
+        // The template should compute the result type of whatever returned from
+        // sync_wait, which should be optional of the variant of the tuples.
+        // The sync_wait works when the variant has one tuple.
+        using result_type = hpx::optional<std::decay_t<
+            single_variant_t<predecessor_value_types<meta::pack, meta::pack>>>>;
 
         // The type of errors to store in the variant. This in itself is a
         // variant.
@@ -94,7 +82,7 @@ namespace hpx::execution::experimental::detail {
             hpx::condition_variable cond_var;
             mutex_type mtx;
             std::atomic<bool> set_called = false;
-            hpx::variant<hpx::monostate, error_type, value_type> value;
+            hpx::variant<hpx::monostate, error_type, result_type> value;
 
             void wait()
             {
@@ -109,17 +97,11 @@ namespace hpx::execution::experimental::detail {
             }
 
             auto get_value()
-            {
-                if (hpx::holds_alternative<value_type>(value))
+            {   
+                if (hpx::holds_alternative<result_type>(value))
                 {
-                    if constexpr (is_void_result)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        return HPX_MOVE(hpx::get<value_type>(value));
-                    }
+                    // pull out tuple of the optional of variant
+                    return HPX_MOVE(hpx::get<0>(hpx::get<result_type>(value)));
                 }
                 else if (hpx::holds_alternative<error_type>(value))
                 {
@@ -159,14 +141,12 @@ namespace hpx::execution::experimental::detail {
             r.signal_set_called();
         }
 
-        template <typename... Us,
-            typename =
-                std::enable_if_t<(is_void_result && sizeof...(Us) == 0) ||
-                    (!is_void_result && sizeof...(Us) == 1)>>
+        // possible add it back
+        template <typename... Us>
         friend void tag_invoke(
             set_value_t, sync_wait_receiver&& r, Us&&... us) noexcept
         {
-            r.state.value.template emplace<value_type>(HPX_FORWARD(Us, us)...);
+            r.state.value.template emplace<result_type>(HPX_FORWARD(Us, us)...);
             r.signal_set_called();
         }
     };
