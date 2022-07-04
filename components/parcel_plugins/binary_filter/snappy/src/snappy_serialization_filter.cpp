@@ -35,10 +35,11 @@ namespace hpx::plugins::compression {
 
     ///////////////////////////////////////////////////////////////////////////
     std::size_t snappy_serialization_filter::init_data(
-        char const* buffer, std::size_t size, std::size_t buffer_size)
+        void const* buffer, std::size_t size, std::size_t buffer_size)
     {
         buffer_.resize(buffer_size);
-        snappy::RawUncompress(buffer, size, buffer_.data());
+        snappy::RawUncompress(
+            static_cast<char const*>(buffer), size, buffer_.data());
         current_ = 0;
         return buffer_.size();
     }

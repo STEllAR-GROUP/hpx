@@ -8,7 +8,6 @@
 #define HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE
 
 #include <hpx/config.hpp>
-#include <hpx/local/init.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -97,7 +96,7 @@ struct B
 
 HPX_IS_NOT_BITWISE_SERIALIZABLE(B)
 
-int hpx_main()
+int main(int, char*[])
 {
     {
         std::vector<char> buffer;
@@ -172,12 +171,5 @@ int hpx_main()
         HPX_TEST_EQ(ib.a, 42);
         HPX_TEST_EQ(ib.b, 42.0);
     }
-
-    return hpx::local::finalize();
-}
-
-int main(int argc, char* argv[])
-{
-    hpx::local::init(hpx_main, argc, argv);
     return hpx::util::report_errors();
 }

@@ -93,7 +93,7 @@ namespace hpx::plugins::compression {
     }
 
     std::size_t zlib_serialization_filter::init_data(
-        char const* buffer, std::size_t size, std::size_t buffer_size)
+        void const* buffer, std::size_t size, std::size_t buffer_size)
     {
         buffer_.resize(buffer_size);
         std::size_t s = load_impl(buffer_.data(), buffer_size, buffer, size);

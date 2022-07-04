@@ -5,7 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests buffer_overrun_2839 non_default_constructible_5886
-          not_bitwise_shared_ptr_serialization
+          not_bitwise_shared_ptr_serialization serialization_unsigned_buffer
 )
 
 foreach(test ${tests})
