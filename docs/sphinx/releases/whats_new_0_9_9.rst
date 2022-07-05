@@ -28,7 +28,7 @@ for the first time to |hpx|.
   ``HPX_UNIQUE_FUTURE_ALIAS``. If this variable is set to ``ON`` while running
   cmake it will additionally define a template alias for this type.
 * We rewrote and significantly changed our build system. Please have a look at
-  the new (now generated) documentation here: :ref:`hpx_build_system`. Please
+  the new (now generated) documentation here: :ref:`building_hpx`. Please
   revisit your build scripts to adapt to the changes. The most notable changes
   are:
 
