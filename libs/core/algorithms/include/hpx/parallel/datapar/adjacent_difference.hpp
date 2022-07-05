@@ -15,6 +15,7 @@
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_difference.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
 #include <hpx/parallel/datapar/zip_iterator.hpp>

@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 
+#if !defined(HPX_HAVE_HIP)
 #include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -181,7 +182,6 @@ namespace test {
     };
 }    // namespace test
 
-#if defined(HPX_HAVE_CXX17_MEMORY_RESOURCE)
 namespace hpx {
 
     // Explicit instantiation to detect compilation errors
@@ -199,7 +199,6 @@ namespace hpx {
     template class hpx::detail::small_vector<test::movable_and_copyable_int, 10,
         std::allocator<test::movable_and_copyable_int>>;
 }    // namespace hpx
-#endif
 
 namespace test {
 
@@ -939,3 +938,12 @@ int main()
 
     return hpx::util::report_errors();
 }
+
+#else
+
+int main()
+{
+    return 0;
+}
+
+#endif

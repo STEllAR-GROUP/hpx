@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2013 Shuangyang Yang
-    Copyright (c) 2007-2019 Hartmut Kaiser
+    Copyright (c) 2007-2022 Hartmut Kaiser
     Copyright (c) Christopher Diggins 2005
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
@@ -31,38 +31,38 @@ namespace hpx { namespace util {
 
         struct hash_binary_filter : serialization::binary_filter
         {
-            explicit hash_binary_filter(std::size_t seed = 0)
+            explicit hash_binary_filter(std::size_t seed = 0) noexcept
               : hash(seed)
             {
             }
 
             // compression API
-            void set_max_length(std::size_t /* size */) {}
-            void save(void const* src, std::size_t src_count)
+            void set_max_length(std::size_t /* size */) override {}
+            void save(void const* src, std::size_t src_count) override
             {
                 char const* data = static_cast<char const*>(src);
                 boost::hash_range(hash, data, data + src_count);
             }
-            bool flush(
-                void* /* dst */, std::size_t dst_count, std::size_t& written)
+            bool flush(void* /* dst */, std::size_t dst_count,
+                std::size_t& written) override
             {
                 written = dst_count;
                 return true;
             }
 
             // decompression API
-            std::size_t init_data(char const* /* buffer */,
-                std::size_t /* size */, std::size_t /* buffer_size */)
+            std::size_t init_data(void const* /* buffer */,
+                std::size_t /* size */, std::size_t /* buffer_size */) override
             {
                 return 0;
             }
-            void load(void* /* dst */, std::size_t /* dst_count */) {}
+            void load(void* /* dst */, std::size_t /* dst_count */) override {}
 
             template <class T>
             void serialize(T&, unsigned)
             {
             }
-            HPX_SERIALIZATION_POLYMORPHIC(hash_binary_filter);
+            HPX_SERIALIZATION_POLYMORPHIC(hash_binary_filter, override);
 
             std::size_t hash;
         };

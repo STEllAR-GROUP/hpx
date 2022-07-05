@@ -10,6 +10,8 @@
 #include <hpx/config/constexpr.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/type_support/meta.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -91,6 +93,15 @@ namespace hpx { namespace execution { namespace experimental {
     /// requiring one additional completion-signal operation:
     ///     * `hpx::execution::set_value`
     ///
+    /// The `receiver_of` concept takes a receiver and an instance of the
+    /// `completion_signatures<>` class template.
+    /// The `receiver_of` concept, rather than accepting a receiver and some
+    /// value types, is changed to take a receiver and an instance of the
+    /// `completion_signatures<>` class template.
+    /// A sender uses `completion_signatures<>` to describe the signals
+    /// with which it completes. The `receiver_of` concept ensures that a
+    /// particular receiver is capable of receiving those signals.
+    ///
     /// This completion-signal operation adds the following to the Receiver's
     /// contract:
     ///     * If `hpx::execution::set_value` exits with an exception, it
@@ -98,7 +109,7 @@ namespace hpx { namespace execution { namespace experimental {
     ///       `hpx::execution::set_stopped`
     ///
     /// \see hpx::execution::traits::is_receiver
-    template <typename T, typename... As>
+    template <typename Receiver, typename CS>
     struct is_receiver_of;
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
@@ -149,59 +160,116 @@ namespace hpx { namespace execution { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
-        template <bool IsReceiverOf, typename T, typename... As>
+        template <bool IsReceiverOf, typename T, typename CS>
         struct is_receiver_of_impl;
 
-        template <typename T, typename... As>
-        struct is_receiver_of_impl<false, T, As...> : std::false_type
+        template <typename T, typename CS>
+        struct is_receiver_of_impl<false, T, CS> : std::false_type
         {
         };
 
-        template <typename T, typename... As>
-        struct is_receiver_of_impl<true, T, As...>
+        template <typename F, typename T, typename Variant>
+        struct is_invocable_variant_of_tuples : std::false_type
+        {
+        };
+
+        template <typename F, typename T, typename... Ts>
+        struct is_invocable_variant_of_tuples<F, T,
+            meta::pack<meta::pack<Ts...>>>
+          : hpx::is_invocable<F, std::decay_t<T>&&, Ts...>
+        {
+        };
+
+        template <typename F, typename T, typename Variant>
+        struct is_invocable_variant : std::false_type
+        {
+        };
+
+        template <typename F, typename T, typename... Ts>
+        struct is_invocable_variant<F, T, meta::pack<Ts...>>
+          : hpx::is_invocable<F, std::decay_t<T>&&, Ts...>
+        {
+        };
+
+        template <typename T, typename CS>
+        struct is_receiver_of_impl<true, T, CS>
           : std::integral_constant<bool,
-                hpx::is_invocable_v<set_value_t, std::decay_t<T>&&, As...>>
+                is_invocable_variant_of_tuples<set_value_t, T,
+                    typename CS::template value_types<meta::pack,
+                        meta::pack>>::value &&
+                    is_invocable_variant<set_error_t, T,
+                        typename CS::template error_types<meta::pack>>::value &&
+                    CS::sends_stopped>
         {
         };
     }    // namespace detail
 
-    template <typename T, typename... As>
-    struct is_receiver_of
-      : detail::is_receiver_of_impl<is_receiver_v<T>, T, As...>
+    template <typename T, typename CS>
+    struct is_receiver_of : detail::is_receiver_of_impl<is_receiver_v<T>, T, CS>
     {
     };
 
-    template <typename T, typename... As>
-    inline constexpr bool is_receiver_of_v = is_receiver_of<T, As...>::value;
+    template <typename T, typename CS>
+    inline constexpr bool is_receiver_of_v = is_receiver_of<T, CS>::value;
 
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
-        template <bool IsReceiverOf, typename T, typename... As>
-        struct is_nothrow_receiver_of_impl;
-
-        template <typename T, typename... As>
-        struct is_nothrow_receiver_of_impl<false, T, As...> : std::false_type
+        template <typename F, typename T, typename Variant>
+        struct is_nothrow_invocable_variant_of_tuples : std::false_type
         {
         };
 
-        template <typename T, typename... As>
-        struct is_nothrow_receiver_of_impl<true, T, As...>
+        template <typename F, typename T, typename... Ts>
+        struct is_nothrow_invocable_variant_of_tuples<F, T,
+            meta::pack<meta::pack<Ts...>>>
+          : hpx::functional::is_nothrow_tag_invocable<F, std::decay_t<T>&&,
+                Ts...>
+        {
+        };
+
+        template <typename F, typename T, typename Variant>
+        struct is_nothrow_invocable_variant : std::false_type
+        {
+        };
+
+        template <typename F, typename T, typename... Ts>
+        struct is_nothrow_invocable_variant<F, T, meta::pack<Ts...>>
+          : hpx::functional::is_nothrow_tag_invocable<F, std::decay_t<T>&&,
+                Ts...>
+        {
+        };
+
+        template <bool IsReceiverOf, typename T, typename CS>
+        struct is_nothrow_receiver_of_impl;
+
+        template <typename T, typename CS>
+        struct is_nothrow_receiver_of_impl<false, T, CS> : std::false_type
+        {
+        };
+
+        template <typename T, typename CS>
+        struct is_nothrow_receiver_of_impl<true, T, CS>
           : std::integral_constant<bool,
-                noexcept(set_value(std::declval<T>(), std::declval<As>()...))>
+                is_nothrow_invocable_variant_of_tuples<set_value_t, T,
+                    typename CS::template value_types<meta::pack,
+                        meta::pack>>::value &&
+                    is_nothrow_invocable_variant<set_error_t, T,
+                        typename CS::template error_types<meta::pack>>::value &&
+                    CS::sends_stopped>
         {
         };
     }    // namespace detail
 
-    template <typename T, typename... As>
+    template <typename T, typename CS>
     struct is_nothrow_receiver_of
       : detail::is_nothrow_receiver_of_impl<
-            is_receiver_v<T> && is_receiver_of_v<T, As...>, T, As...>
+            is_receiver_v<T> && is_receiver_of_v<T, CS>, T, CS>
     {
     };
 
-    template <typename T, typename... As>
+    template <typename T, typename CS>
     inline constexpr bool is_nothrow_receiver_of_v =
-        is_nothrow_receiver_of<T, As...>::value;
+        is_nothrow_receiver_of<T, CS>::value;
 
     namespace detail {
         template <typename CPO>

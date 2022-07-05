@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -43,18 +43,6 @@ namespace hpx { namespace execution {
     ///       \a parallel_execution_tag.
     struct unsequenced_execution_tag
     {
-    };
-
-    /// \cond NOINTERNAL
-    struct task_policy_tag
-    {
-        constexpr task_policy_tag() = default;
-    };
-
-    /// \cond NOINTERNAL
-    struct non_task_policy_tag
-    {
-        constexpr non_task_policy_tag() = default;
     };
 }}    // namespace hpx::execution
 

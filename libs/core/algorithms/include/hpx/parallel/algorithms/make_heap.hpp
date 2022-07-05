@@ -114,6 +114,7 @@ namespace hpx {
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -121,6 +122,7 @@ namespace hpx {
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -358,11 +360,26 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         start = end_exclusive;
                     }
 
-                    scoped_params.mark_end_of_scheduling();
+                    if (errors.empty())
+                    {
+                        scoped_params.mark_end_of_scheduling();
 
-                    // Perform sift down for the head node
-                    sift_down(first, comp = HPX_FORWARD(Comp, comp),
-                        proj = HPX_FORWARD(Proj, proj), n, first);
+                        // Perform sift down for the head node
+                        sift_down(first, comp = HPX_FORWARD(Comp, comp),
+                            proj = HPX_FORWARD(Proj, proj), n, first);
+                    }
+                }
+                catch (std::bad_alloc const& e)
+                {
+                    if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
+                    {
+                        return hpx::make_exceptional_future<RndIter>(e);
+                    }
+                    else
+                    {
+                        HPX_UNUSED(e);
+                        throw;
+                    }
                 }
                 catch (...)
                 {
@@ -371,7 +388,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 // rethrow exceptions, if any
-                util::detail::handle_local_exceptions<ExPolicy>::call(errors);
+                if (!errors.empty())
+                {
+                    if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
+                    {
+                        return hpx::make_exceptional_future<RndIter>(
+                            hpx::exception_list(HPX_MOVE(errors)));
+                    }
+                    else
+                    {
+                        util::detail::handle_local_exceptions<ExPolicy>::call(
+                            errors);
+                    }
+                }
 
                 std::advance(first, n);
                 return util::detail::algorithm_result<ExPolicy, RndIter>::get(

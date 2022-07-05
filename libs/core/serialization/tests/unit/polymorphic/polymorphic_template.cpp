@@ -47,7 +47,7 @@ struct B : A<T>
     }
     B() = default;
 
-    void foo() const {}
+    void foo() const override {}
 
     template <typename Ar>
     void serialize(Ar& ar, unsigned)
@@ -55,7 +55,7 @@ struct B : A<T>
         ar& hpx::serialization::base_object<A<T>>(*this);
         ar& b;
     }
-    HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(B);
+    HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(B, override);
 };
 
 int main()

@@ -31,13 +31,14 @@ namespace hpx::plugins::compression {
         {
         }
 
-        void load(void* dst, std::size_t dst_count);
-        void save(void const* src, std::size_t src_count);
-        bool flush(void* dst, std::size_t dst_count, std::size_t& written);
+        void load(void* dst, std::size_t dst_count) override;
+        void save(void const* src, std::size_t src_count) override;
+        bool flush(
+            void* dst, std::size_t dst_count, std::size_t& written) override;
 
-        void set_max_length(std::size_t size);
-        std::size_t init_data(
-            char const* buffer, std::size_t size, std::size_t buffer_size);
+        void set_max_length(std::size_t size) override;
+        std::size_t init_data(void const* buffer, std::size_t size,
+            std::size_t buffer_size) override;
 
     private:
         // serialization support
@@ -48,7 +49,7 @@ namespace hpx::plugins::compression {
         {
         }
 
-        HPX_SERIALIZATION_POLYMORPHIC(snappy_serialization_filter);
+        HPX_SERIALIZATION_POLYMORPHIC(snappy_serialization_filter, override);
 
         std::vector<char> buffer_;
         std::size_t current_;

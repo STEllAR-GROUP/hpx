@@ -68,7 +68,7 @@ struct D : B
       , d(89)
     {
     }
-    void f() {}
+    void f() override {}
 
     int d;
 
@@ -79,7 +79,7 @@ struct D : B
         ar& hpx::serialization::base_object<B>(*this);
         ar& d;
     }
-    HPX_SERIALIZATION_POLYMORPHIC(D);
+    HPX_SERIALIZATION_POLYMORPHIC(D, override);
 };
 
 int main()

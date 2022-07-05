@@ -17,10 +17,6 @@
 #include <string>
 #include <vector>
 
-#if defined(HPX_HAVE_CXX17_MEMORY_RESOURCE)
-#include <boost/container/small_vector.hpp>
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Container>
 std::uint64_t measure(std::size_t repeat, std::size_t size)
@@ -40,27 +36,12 @@ std::uint64_t measure(std::size_t repeat, std::size_t size)
 template <typename T, std::size_t N>
 void compare(std::size_t repeat, std::size_t size)
 {
-#if defined(HPX_HAVE_CXX17_MEMORY_RESOURCE)
-    {
-        std::uint64_t time =
-            measure<boost::container::small_vector<T, N>>(repeat, size);
+    std::uint64_t time = measure<hpx::detail::small_vector<T, N>>(repeat, size);
 
-        std::cout << "-----Average-(boost::small_vector<" << typeid(T).name()
-                  << ", " << N << ">)---- \n"
-                  << std::left << "Average execution time : " << std::right
-                  << std::setw(8) << time / 1e9 << "\n";
-    }
-#endif
-
-    {
-        std::uint64_t time =
-            measure<hpx::detail::small_vector<T, N>>(repeat, size);
-
-        std::cout << "-----Average-(hpx::small_vector<" << typeid(T).name()
-                  << ", " << N << ">)------ \n"
-                  << std::left << "Average execution time : " << std::right
-                  << std::setw(8) << time / 1e9 << "\n";
-    }
+    std::cout << "-----Average-(hpx::small_vector<" << typeid(T).name() << ", "
+              << N << ">)------ \n"
+              << std::left << "Average execution time : " << std::right
+              << std::setw(8) << time / 1e9 << "\n";
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

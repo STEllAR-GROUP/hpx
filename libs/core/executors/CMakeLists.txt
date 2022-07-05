@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 The STE||AR-Group
+# Copyright (c) 2020-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,8 +10,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(executors_headers
     hpx/executors/annotating_executor.hpp
     hpx/executors/current_executor.hpp
-    hpx/executors/datapar/execution_policy_fwd.hpp
-    hpx/executors/datapar/execution_policy.hpp
     hpx/executors/guided_pool_executor.hpp
     hpx/executors/apply.hpp
     hpx/executors/async.hpp
@@ -20,6 +18,7 @@ set(executors_headers
     hpx/executors/exception_list.hpp
     hpx/executors/execution_policy_annotation.hpp
     hpx/executors/execution_policy_fwd.hpp
+    hpx/executors/execution_policy_mappings.hpp
     hpx/executors/execution_policy_parameters.hpp
     hpx/executors/execution_policy.hpp
     hpx/executors/fork_join_executor.hpp
@@ -37,11 +36,17 @@ set(executors_headers
     hpx/executors/thread_pool_scheduler_bulk.hpp
 )
 
+if(HPX_WITH_DATAPAR)
+  set(executors_headers
+      ${executors_headers} hpx/executors/datapar/execution_policy_fwd.hpp
+      hpx/executors/datapar/execution_policy_mappings.hpp
+      hpx/executors/datapar/execution_policy.hpp
+  )
+endif()
+
 # Default location is $HPX_ROOT/libs/executors/include_compatibility
 # cmake-format: off
 set(executors_compat_headers
-    hpx/execution/datapar/execution_policy_fwd.hpp => hpx/include/parallel_executors.hpp
-    hpx/execution/datapar/execution_policy.hpp => hpx/include/parallel_executors.hpp
     hpx/execution/executors.hpp => hpx/include/parallel_executors.hpp
     hpx/execution/execution_policy_fwd.hpp => hpx/execution.hpp
     hpx/execution/execution_policy.hpp => hpx/execution.hpp
@@ -52,8 +57,6 @@ set(executors_compat_headers
     hpx/execution/executors/parallel_executor_aggregated.hpp => hpx/include/parallel_executors.hpp
     hpx/execution/executors/restricted_thread_pool_executor.hpp => hpx/include/parallel_executors.hpp
     hpx/execution/executors/sequenced_executor.hpp => hpx/include/parallel_executors.hpp
-    hpx/parallel/datapar/execution_policy_fwd.hpp => hpx/include/parallel_executors.hpp
-    hpx/parallel/datapar/execution_policy.hpp => hpx/include/parallel_executors.hpp
     hpx/parallel/executors.hpp => hpx/include/parallel_executors.hpp
     hpx/parallel/exception_list.hpp => hpx/execution.hpp
     hpx/parallel/execution_policy_fwd.hpp => hpx/execution.hpp
@@ -63,6 +66,15 @@ set(executors_compat_headers
     hpx/parallel/executors/sequenced_executor.hpp => hpx/execution.hpp
     hpx/parallel/executors/thread_pool_executor.hpp => hpx/execution.hpp
 )
+
+if(HPX_WITH_DATAPAR)
+  set(executors_compat_headers ${executors_compat_headers}
+      hpx/execution/datapar/execution_policy_fwd.hpp => hpx/include/parallel_executors.hpp
+      hpx/execution/datapar/execution_policy.hpp => hpx/include/parallel_executors.hpp
+      hpx/parallel/datapar/execution_policy_fwd.hpp => hpx/include/parallel_executors.hpp
+      hpx/parallel/datapar/execution_policy.hpp => hpx/include/parallel_executors.hpp
+  )
+endif()
 # cmake-format: on
 
 set(executors_sources current_executor.cpp exception_list_callbacks.cpp

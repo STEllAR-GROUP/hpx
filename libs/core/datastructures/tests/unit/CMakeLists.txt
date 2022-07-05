@@ -23,7 +23,7 @@ set(tests
     unique_any
 )
 
-if(HPX_WITH_CXX17_MEMORY_RESOURCE)
+if(NOT HPX_WITH_HIP)
   set(tests ${tests} small_vector)
 endif()
 

@@ -29,7 +29,7 @@ namespace hpx::serialization {
 
         // decompression API
         virtual std::size_t init_data(
-            char const* buffer, std::size_t size, std::size_t buffer_size) = 0;
+            void const* buffer, std::size_t size, std::size_t buffer_size) = 0;
         virtual void load(void* dst, std::size_t dst_count) = 0;
 
         template <typename T>
