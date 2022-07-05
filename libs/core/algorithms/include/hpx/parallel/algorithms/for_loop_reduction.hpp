@@ -395,6 +395,5 @@ namespace hpx::parallel { inline namespace v2 {
     {
         return hpx::experimental::reduction_max(var, identity);
     }
-
     /// \endcond
 }}    // namespace hpx::parallel::v2
